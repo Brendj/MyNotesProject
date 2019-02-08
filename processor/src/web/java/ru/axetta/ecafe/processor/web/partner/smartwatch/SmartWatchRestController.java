@@ -15,10 +15,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 
-import org.hibernate.Criteria;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
@@ -794,11 +791,12 @@ public class SmartWatchRestController {
     private List<JsonChildrenDataInfoItem> buildChildrenDataInfoItems(Session session, Client guardian) throws Exception{
         List<JsonChildrenDataInfoItem> resultList = new LinkedList<JsonChildrenDataInfoItem>();
         try{
-            List<ClientGuardian> childrens = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, guardian.getIdOfClient());
-            for(ClientGuardian el : childrens){
-                Client child = (Client) session.get(Client.class, el.getIdOfChildren());
-                Card card = DAOUtils.getLastCardByClient(session, child);
+            List<ClientGuardian> childes = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, guardian.getIdOfClient());
+            for(ClientGuardian el : childes){
                 JsonChildrenDataInfoItem item = new JsonChildrenDataInfoItem();
+
+                Client child = (Client) session.get(Client.class, el.getIdOfChildren());
+
                 item.setContractID(child.getContractId());
                 if(child.getPerson() != null) {
                     item.setFirsName(child.getPerson().getFirstName());
@@ -806,14 +804,28 @@ public class SmartWatchRestController {
                     item.setSurName(child.getPerson().getSurname());
                 }
                 item.setGroupName(child.getClientGroup().getGroupName());
-                if(card != null) {
-                    JsonCardInfo info = new JsonCardInfo();
-                    info.setCardPrintedNo(card.getCardPrintedNo());
-                    info.setCardNo(card.getCardNo());
-                    info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
-                    info.setLifeState(Card.LIFE_STATE_NAMES[card.getLifeState()]);
-                    info.setState(this.cardState.get(card.getState()));
-                    item.setCardInfo(info);
+
+                Query query = session.createQuery("FROM Card card"
+                        + " WHERE card.client = :client AND (card.state = :activeState "
+                        + " OR card.updateTime = (SELECT MAX(updateTime) "
+                        + " FROM Card card "
+                        + " WHERE card.client = :client AND card.cardType = :smartWatchType))");
+                query.setParameter("client", child)
+                     .setParameter("activeState", CardState.ISSUED.getValue())
+                     .setParameter("smartWatchType", CARD_TYPE_SMARTWATCH);
+
+                List<Card> cards = query.list();
+
+                for(Card card : cards) {
+                    if (card != null) {
+                        JsonCardInfo info = new JsonCardInfo();
+                        info.setCardPrintedNo(card.getCardPrintedNo());
+                        info.setCardNo(card.getCardNo());
+                        info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
+                        info.setLifeState(Card.LIFE_STATE_NAMES[card.getLifeState()]);
+                        info.setState(this.cardState.get(card.getState()));
+                        item.getCardInfo().add(info);
+                    }
                 }
                 resultList.add(item);
             }

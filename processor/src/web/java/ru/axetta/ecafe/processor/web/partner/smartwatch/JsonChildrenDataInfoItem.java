@@ -4,13 +4,16 @@
 
 package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class JsonChildrenDataInfoItem {
     private String firsName;
     private String secondName;
     private String surName;
     private Long contractID;
     private String groupName;
-    private JsonCardInfo cardInfo;
+    private List<JsonCardInfo> cardInfo;
 
 
     public String getFirsName() {
@@ -53,11 +56,14 @@ public class JsonChildrenDataInfoItem {
         this.groupName = groupName;
     }
 
-    public JsonCardInfo getCardInfo() {
+    public List<JsonCardInfo> getCardInfo() {
+        if(cardInfo == null){
+            cardInfo = new LinkedList<JsonCardInfo>();
+        }
         return cardInfo;
     }
 
-    public void setCardInfo(JsonCardInfo cardInfo) {
+    public void setCardInfo(List<JsonCardInfo> cardInfo) {
         this.cardInfo = cardInfo;
     }
 }
