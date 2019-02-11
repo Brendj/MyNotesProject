@@ -291,7 +291,8 @@ public class PreorderRequestsReportService extends RecoverableService {
                 map = new HashMap<Date, Long>();
                 map.put(item.getPreorderDate(), item.getClientBalance());
             }
-            map.put(item.getPreorderDate(), map.get(item.getPreorderDate()) - item.getAmount() * item.getComplexPrice() + item.getUsedSum());
+            long balance = map.get(item.getPreorderDate()) == null ? item.getClientBalance() : map.get(item.getPreorderDate());
+            map.put(item.getPreorderDate(), balance - item.getAmount() * item.getComplexPrice() + item.getUsedSum());
             result.put(item.getIdOfClient(), map);
         }
         return result;
@@ -711,13 +712,12 @@ public class PreorderRequestsReportService extends RecoverableService {
                 Boolean isDeleted = (Boolean) o[14];
                 Boolean isComplex = !complexAmount.equals(0);
                 Long idOfClientGroup = (null != o[15]) ? ((BigInteger) o[15]).longValue() : null;
-                Long usedSum = (null != o[16]) ? ((BigInteger) o[16]).longValue() : 0L;
 
                 preorderItemList
                         .add(new PreorderItem(idOfPreorderComplex, idOfPreorderMenuDetail, idOfOrg, idOfGood, amount,
                                 createdDate, idOfGoodsRequest, preorderDate,
                                 complexPrice * complexAmount + menuDetailPrice * menuDetailAmount, clientBalance,
-                                idOfClient, isDeleted, isComplex, idOfClientGroup, usedSum));
+                                idOfClient, isDeleted, isComplex, idOfClientGroup, null));
             }
             transaction.commit();
             transaction = null;
@@ -756,7 +756,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 and pmd.deletedstate = 0 and pmd.idOfGoodsRequestPosition is null "
                             + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
                             + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-                            + "WHERE pc.preorderdate > :date " + (dateTo != null ? " and pc.preorderdate < :dateTo " : "")
+                            + "WHERE pc.preorderdate > :date " + (dateTo != null ? " and pc.preorderdate <= :dateTo " : "")
                             + "   AND (pc.amount <> 0 OR pmd.amount <> 0) and pc.deletedstate = 0 and pc.idOfGoodsRequestPosition is null order by pc.preorderdate";
 
             Query query = session.createSQLQuery(sqlQuery);
