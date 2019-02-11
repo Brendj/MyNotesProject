@@ -189,6 +189,8 @@ public class OrgRepository extends AbstractJpaDao<Org> {
         if (endDate.getTime() - startDate.getTime() > dateDiffForTransactionsSearch) {
             return true;
         }
+        Integer timeDelay = Integer.valueOf(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.transactions.timedelay", "0"));
+        startDate.setTime(startDate.getTime()-(timeDelay*60*1000));
         Query query = entityManager.createQuery(
                 "select count(*) from LastProcessSectionsDates l where l.compositeIdOfLastProcessSectionsDates.idOfOrg in :idOfOrgs "
                         + "and l.compositeIdOfLastProcessSectionsDates.type = :sectionType and l.date between :startDate and :endDate");
