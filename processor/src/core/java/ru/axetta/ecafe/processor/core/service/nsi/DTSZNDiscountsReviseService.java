@@ -240,8 +240,7 @@ public class DTSZNDiscountsReviseService {
                                 if (item.getDeleted() || item.getDateEndAsDate().getTime() <= fireTime.getTime()) {
                                     discountInfo.setArchived(true);
                                     wasModified = true;
-                                }
-                                if (item.getBenefitConfirmed() && discountInfo.getArchived()) {
+                                } else if (item.getBenefitConfirmed() && discountInfo.getArchived()) {
                                     discountInfo.setArchived(false);
                                     wasModified = true;
                                 }
@@ -297,7 +296,7 @@ public class DTSZNDiscountsReviseService {
 
         if (pagesCount != 0L) {
             updateArchivedFlagForDiscounts();
-            runTaskPart2();
+            runTaskPart2(fireTime);
         }
     }
 
@@ -690,6 +689,10 @@ public class DTSZNDiscountsReviseService {
     }
 
     public void runTaskPart2() throws Exception {
+        runTaskPart2(CalendarUtils.startOfDay(new Date()));
+    }
+
+    public void runTaskPart2(Date startDate) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -697,8 +700,7 @@ public class DTSZNDiscountsReviseService {
             session.setFlushMode(FlushMode.MANUAL);
             transaction = session.beginTransaction();
 
-            List<Long> clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(session,
-                    CalendarUtils.startOfDay(new Date()));
+            List<Long> clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(session, startDate);
             ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
 
             Integer clientCounter = 1;
@@ -853,8 +855,7 @@ public class DTSZNDiscountsReviseService {
                         if (item.getDeleted() || item.getFd().getTime() <= fireTime.getTime() || item.getFdDszn().getTime() <= fireTime.getTime()) {
                             discountInfo.setArchived(true);
                             wasModified = true;
-                        }
-                        if (item.getBenefitConfirm() && discountInfo.getArchived()) {
+                        } else if (item.getBenefitConfirm() && discountInfo.getArchived()) {
                             discountInfo.setArchived(false);
                             wasModified = true;
                         }
@@ -904,7 +905,7 @@ public class DTSZNDiscountsReviseService {
 
         updateArchivedFlagForDiscountsDB();
 
-        runTaskPart2();
+        runTaskPart2(fireTime);
     }
 
     public void updateArchivedFlagForDiscountsDB() throws Exception {
@@ -921,7 +922,7 @@ public class DTSZNDiscountsReviseService {
                      + " lastupdate = :lastUpdate where dateend <= :now and status = :confirmed and archived = 0");
             query.setParameter("version", nextVersion);
             query.setParameter("lastUpdate", fireTime.getTime());
-            query.setParameter("now", fireTime.getTime());
+            query.setParameter("now", CalendarUtils.addDays(fireTime, -1).getTime());
             query.setParameter("confirmed", ClientDTISZNDiscountStatus.CONFIRMED.getValue());
             int rows = query.executeUpdate();
             if (0 != rows) {
