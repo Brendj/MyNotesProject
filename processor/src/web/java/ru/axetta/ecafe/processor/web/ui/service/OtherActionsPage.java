@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.*;
@@ -40,6 +41,7 @@ import java.text.DateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import static ru.axetta.ecafe.processor.core.service.ImportRegisterFileService.*;
 
@@ -434,6 +436,18 @@ public class OtherActionsPage extends BasicWorkspacePage {
     }
 
     public Object downloadSampleFile() {
+
+        Map<String, Map<String, String>> dates = DAOReadonlyService.getInstance().getProductionCalendar();
+        String result = "\"Год/Месяц\",\"Январь\",\"Февраль\",\"Март\",\"Апрель\",\"Май\",\"Июнь\",\"Июль\",\"Август\",\"Сентябрь\",\"Октябрь\",\"Ноябрь\",\"Декабрь\"\n";
+        for (Map.Entry<String, Map<String, String>> entry : dates.entrySet()) {
+            String str = entry.getKey() + ",";
+            for (Map.Entry<String, String> entry2 : entry.getValue().entrySet()) {
+                str += "\"" + entry2.getValue() + "\",";
+            }
+            result += str.substring(0, str.length()-1) + "\n";
+        }
+        result = result.substring(0, result.length()-1);
+
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
@@ -444,11 +458,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
             facesContext.responseComplete();
             response.setContentType("application/csv");
             response.setHeader("Content-disposition", "attachment;filename=\"pk.csv\"");
-            String sample = "\"Год/Месяц\",\"Январь\",\"Февраль\",\"Март\",\"Апрель\",\"Май\",\"Июнь\",\"Июль\",\"Август\",\"Сентябрь\",\"Октябрь\",\"Ноябрь\",\"Декабрь\"\n"
-                    + "2019,\"1,2,3,4,5,6,7,8,9,10,12,13,19,20,26,27\",\"2,3,9,10,16,17,23,24,25\",\"2,3,8,9,10,16,17,23,24,30,31\",\"6,7,13,14,20,21,27,28\","
-                    + "\"1,4,5,9,11,12,18,19,25,26\",\"1,2,8,9,12,15,16,22,23,29,30\",\"6,7,13,14,20,21,27,28\",\"3,4,10,11,17,18,24,25,31\","
-                    + "\"1,7,8,14,15,21,22,28,29\",\"5,6,12,13,19,20,26,27\",\"2,3,4,9,10,16,17,23,24,30\",\"1,7,8,14,15,21,22,28,29\"";
-            servletOutputStream.write(sample.getBytes(Charset.forName("UTF-8")));
+            servletOutputStream.write(result.getBytes(Charset.forName("UTF-8")));
             servletOutputStream.flush();
             servletOutputStream.close();
         } catch (Exception e) {

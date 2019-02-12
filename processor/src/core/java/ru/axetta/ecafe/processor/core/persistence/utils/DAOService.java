@@ -2483,6 +2483,9 @@ public class DAOService {
 
     //Загружаем производственный календарь из файла
     public void loadProductionCalendar(InputStream inputStream) throws Exception {
+        Query query = entityManager.createQuery("select max(pc.version) from ProductionCalendar pc");
+        Long version = (Long)query.getSingleResult();
+        version = (version == null) ? 0L : (version + 1L);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
         int lineNo = 0;
         String currLine = reader.readLine();
@@ -2491,11 +2494,18 @@ public class DAOService {
                 String[] arr = currLine.split(",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)", -1); //элементы массива - месяцы
                 String sYear = arr[0];
                 List<Integer> days = new ArrayList<Integer>();
+                Map<Integer, Integer> map = new HashMap<Integer, Integer>();
                 for (int i = 1; i <= 12; i++) { //по месяцам
                     String[] sDays = arr[i].split(",");                                 //элементы - дни в месяце
                     days.clear();
+                    map.clear();
+                    for (int k = 0; k < sDays.length; k++) {
+                        sDays[k] = sDays[k].replace("\"", "");
+                    }
                     for (String d : sDays) {
-                        days.add(new Integer(d.replaceAll("\"", "")));
+                        Integer day = new Integer(d.replaceAll("\\*", ""));
+                        days.add(day);
+                        map.put(day, d.endsWith("*") ? ProductionCalendar.HOLIDAY : ProductionCalendar.REGULAR);
                     }
                     Calendar calendar = new GregorianCalendar(Integer.parseInt(sYear), i - 1, 1);
                     int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
@@ -2508,9 +2518,9 @@ public class DAOService {
 
                         ProductionCalendar productionCalendar = getProductionCalendarByDate(date);
                         if (productionCalendar == null) {
-                            productionCalendar = new ProductionCalendar(date);
+                            productionCalendar = new ProductionCalendar(date, map.get(j), version);
                         } else {
-                            productionCalendar.setLastUpdate(new Date());
+                            if (!productionCalendar.getFlag().equals(map.get(j))) productionCalendar.modify(map.get(j), version);
                         }
                         entityManager.merge(productionCalendar);
                     }

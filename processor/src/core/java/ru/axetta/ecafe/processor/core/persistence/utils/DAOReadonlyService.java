@@ -557,4 +557,30 @@ public class DAOReadonlyService {
                 .createQuery("select u from User u where u.isGroup = true and u.deletedState = false order by u.userName")
                 .getResultList();
     }
+
+    public Map<String, Map<String, String>> getProductionCalendar() {
+        Query query = entityManager.createQuery("select pc from ProductionCalendar pc order by pc.day");
+        List<ProductionCalendar> list = query.getResultList();
+        Map<String, Map<String, String>> resultMap = new TreeMap<String, Map<String, String>>();
+        for (ProductionCalendar pc : list) {
+            String str = CalendarUtils.dateToString(pc.getDay());
+            String year = str.substring(6, 10);
+            String month  = str.substring(3, 5);
+            String day = str.substring(0, 2);
+            Map<String, String> monthMap = resultMap.get(year);
+            if (monthMap == null) {
+                monthMap = new TreeMap<String, String>();
+            }
+            String m = monthMap.get(month);
+            String star = "";
+            if (pc.getFlag().equals(ProductionCalendar.HOLIDAY)) star = "*";
+            if (m == null) {
+                monthMap.put(month, day + star);
+            } else {
+                monthMap.put(month, m + "," + day + star);
+            }
+            resultMap.put(year, monthMap);
+        }
+        return resultMap;
+    }
 }

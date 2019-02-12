@@ -199,7 +199,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                                 }
                             }
 
-                            logger.info(String.format("Send requests to orgID=%s, count=%s"), idOfOrg, guids.size());
+                            logger.info(String.format("Send requests to orgID=%s, count=%s", idOfOrg, guids.size()));
                             //notifyOrg(bla-bla);
                             OrgGoodRequest orgGoodRequest = new OrgGoodRequest(idOfOrg, dateWork);
                             session.save(orgGoodRequest);

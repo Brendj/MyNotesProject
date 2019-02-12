@@ -137,7 +137,7 @@
     <h:panelGrid styleClass="borderless-grid-align-top" id="specialDatesFileLoaderPanel" >
         <rich:panel>
             <h:outputText escape="true" value="Загрузить производственный календарь для всех ОО" styleClass="output-text" /> <br/>
-            <h:commandLink action="#{otherActionsPage.downloadSampleFile}" id="downloadSampleSpecialDates" value="Скачать пример файла" styleClass="command-link" />
+            <h:commandLink action="#{otherActionsPage.downloadSampleFile}" id="downloadSampleSpecialDates" value="Скачать текущий календарь" styleClass="command-link" />
             <rich:fileUpload id="specialDatesFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
                              addButtonClassDisabled="upload-command-button-diasbled" cleanButtonClass="upload-command-button"
                              cleanButtonClassDisabled="upload-command-button-diasbled" stopButtonClass="upload-command-button"
