@@ -2520,7 +2520,7 @@ public class DAOService {
                         if (productionCalendar == null) {
                             productionCalendar = new ProductionCalendar(date, map.get(j), version);
                         } else {
-                            if (!productionCalendar.getFlag().equals(map.get(j))) productionCalendar.modify(map.get(j), version);
+                            productionCalendar.modify(map.get(j), version);
                         }
                         entityManager.merge(productionCalendar);
                     }
