@@ -170,6 +170,7 @@ public class GeoplanerManager {
         info.setCardPrintedNo(card.getCardPrintedNo());
         info.setCardNo(card.getCardNo());
         info.setContractId(client.getContractId());
+        info.setActualBalance(client.getBalance());
         info.setEvtDateTime(event.getEvtDateTime());
         info.setDirection(event.getPassDirection());
         if(event.getOrg() == null){
@@ -194,6 +195,7 @@ public class GeoplanerManager {
         info.setCardPrintedNo(card.getCardNo());
         info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
         info.setContractID(client.getContractId());
+        info.setActualBalance(client.getBalance());
         info.setOrderTime(purchases.getTime());
         info.setOrderType(purchases.getOrderType().ordinal());
         info.setRSum(purchases.getRSum());
@@ -218,6 +220,7 @@ public class GeoplanerManager {
         info.setCardPrintedNo(card.getCardPrintedNo());
         info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
         info.setContractId(client.getContractId());
+        info.setActualBalance(client.getBalance());
         info.setCreateTime(clientPayment.getCreateTime());
         if(clientPayment.getTransaction()!= null){
             info.setSourceType(clientPayment.getTransaction().getSourceType());

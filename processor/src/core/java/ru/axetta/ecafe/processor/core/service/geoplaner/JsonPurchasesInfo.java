@@ -15,6 +15,7 @@ public class JsonPurchasesInfo {
     private Integer orderType;
     private Long RSum;
     private String purchasesName;
+    private Long actualBalance;
 
     public Long getCardNo() {
         return cardNo;
@@ -78,5 +79,13 @@ public class JsonPurchasesInfo {
 
     public void setPurchasesName(String purchasesName) {
         this.purchasesName = purchasesName;
+    }
+
+    public Long getActualBalance() {
+        return actualBalance;
+    }
+
+    public void setActualBalance(Long actualBalance) {
+        this.actualBalance = actualBalance;
     }
 }

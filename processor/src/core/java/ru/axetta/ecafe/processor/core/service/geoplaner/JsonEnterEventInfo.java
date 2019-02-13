@@ -15,6 +15,7 @@ public class JsonEnterEventInfo {
     private Integer direction;
     private String shortName;
     private String shortAddress;
+    private Long actualBalance;
 
     public Date getEvtDateTime() {
         return evtDateTime;
@@ -78,5 +79,13 @@ public class JsonEnterEventInfo {
 
     public void setContractId(Long contractId) {
         this.contractId = contractId;
+    }
+
+    public Long getActualBalance() {
+        return actualBalance;
+    }
+
+    public void setActualBalance(Long actualBalance) {
+        this.actualBalance = actualBalance;
     }
 }

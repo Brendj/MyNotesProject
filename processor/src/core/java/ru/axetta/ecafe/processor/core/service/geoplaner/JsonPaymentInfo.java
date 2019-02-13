@@ -14,6 +14,7 @@ public class JsonPaymentInfo {
     private Integer sourceType;
     private Long paySum;
     private Long balanceBefore;
+    private Long actualBalance;
     private Date createTime;
 
     public Long getCardNo() {
@@ -78,5 +79,13 @@ public class JsonPaymentInfo {
 
     public void setContractId(Long contractId) {
         this.contractId = contractId;
+    }
+
+    public Long getActualBalance() {
+        return actualBalance;
+    }
+
+    public void setActualBalance(Long actualBalance) {
+        this.actualBalance = actualBalance;
     }
 }
