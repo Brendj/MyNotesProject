@@ -11,9 +11,7 @@ import org.slf4j.LoggerFactory;
 
 import javax.faces.model.SelectItem;
 import java.io.File;
-import java.io.FilenameFilter;
 import java.util.ArrayList;
-import java.util.Collection;
 import java.util.List;
 
 /**
@@ -27,6 +25,7 @@ public class ReportTemplateFileNameMenu {
     private static final Logger logger = LoggerFactory.getLogger(ReportTemplateFileNameMenu.class);
 
     private SelectItem[] items;
+    private SelectItem[] stringItems;
 
     private static SelectItem[] readAllItems() {
         String reportPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
@@ -71,17 +70,32 @@ public class ReportTemplateFileNameMenu {
         if (items==null) items = readAllItems();
         return items;
     }
+
     public SelectItem[] getItemsForReportType(String reportType) {
         String reportSimpleName;
         int pos = reportType.lastIndexOf('.');
-        if (pos==-1) pos=-1;
         reportSimpleName = reportType.substring(pos+1);
         ArrayList<SelectItem> items = new ArrayList<SelectItem>();
         for (SelectItem si : getItems()) {
             if (si.getLabel().contains(reportSimpleName)) items.add(si);
         }
         return items.toArray(new SelectItem[]{});
-    } 
+    }
+
+    public SelectItem[] getStrItemsForReportType(String reportType) {
+        String reportSimpleName;
+        int pos = reportType.lastIndexOf('.');
+        reportSimpleName = reportType.substring(pos+1);
+        ArrayList<SelectItem> items = new ArrayList<SelectItem>();
+        for (SelectItem si : getItems()) {
+            if (si.getLabel().contains(reportSimpleName)){
+                SelectItem item = new SelectItem(si.getLabel());
+                items.add(item);
+            }
+        }
+        return items.toArray(new SelectItem[]{});
+    }
+
     public SelectItem[] getItemsWithForcedReload() {
         items = readAllItems();
         return items;
@@ -91,4 +105,25 @@ public class ReportTemplateFileNameMenu {
         this.items = items;
     }
 
+    public SelectItem[] getStringItems() {
+        if(stringItems == null){
+            stringItems = readStrItems();
+        }
+        return stringItems;
+    }
+
+    private SelectItem[] readStrItems() {
+        SelectItem[] items = this.getItems();
+        SelectItem[] strItems = new SelectItem[items.length];
+
+        for(int i = 0; i < strItems.length; i++){
+            File file = (File)items[i].getValue();
+            strItems[i] = new SelectItem(file.getName());
+        }
+        return strItems;
+    }
+
+    public void setStringItems(SelectItem[] stringItems) {
+        this.stringItems = stringItems;
+    }
 }

@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.ui.report.rule;
 
 
 import ru.axetta.ecafe.processor.core.RuleProcessor;
-import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.ReportHandleRule;
@@ -131,8 +130,8 @@ public class ReportRuleEditPage  extends OnlineReportPage
     }
 
     public SelectItem[] getReportTemplatesFiles() {
-        if (StringUtils.isEmpty(reportType)) return reportTemplateFileNameMenu.getItems();
-        return reportTemplateFileNameMenu.getItemsForReportType(reportType);
+        if (StringUtils.isEmpty(reportType)) return reportTemplateFileNameMenu.getStringItems();
+        return reportTemplateFileNameMenu.getStrItemsForReportType(reportType);
     }
 
     public void setReportTemplateFileName(String reportTemplateFileName) {
@@ -264,8 +263,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
         reportHandleRule.setAllowManualReportRun (manualReportRun);
         reportHandleRule.setStoragePeriod(storagePeriod);
 
-        String reportPath = RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath();
-        reportHandleRule.setTemplateFileName(this.reportTemplateFileName.substring(reportPath.length()));
+        reportHandleRule.setTemplateFileName(this.reportTemplateFileName);
 
         String[] addressList = this.routeAddresses.split(ReportHandleRule.DELIMETER);
 
@@ -278,7 +276,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
                         break;
                     }
                 }
-                if (ok == false) {
+                if (!ok) {
                     throw new Exception("Некорректное имя рассылки.");
                 }
             }
@@ -446,6 +444,7 @@ public class ReportRuleEditPage  extends OnlineReportPage
         if (null == this.reportType) {
             this.reportType = ReportRuleConstants.UNKNOWN_REPORT_TYPE;
         }
+
         this.reportTemplateFileName = reportHandleRule.getTemplateFileName();
         this.documentFormat = reportHandleRule.getDocumentFormat();
         this.subject = reportHandleRule.getSubject();
