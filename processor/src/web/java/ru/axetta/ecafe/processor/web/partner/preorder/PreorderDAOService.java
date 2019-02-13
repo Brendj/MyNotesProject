@@ -987,14 +987,13 @@ public class PreorderDAOService {
 
     @Transactional
     public Long getPreordersSum(Client client, Date startDate, Date endDate) {
-        Query query = emReport.createQuery("select pc from PreorderComplex pc "
+        Query query = emReport.createQuery("select pc from PreorderComplex pc join fetch pc.preorderMenuDetails "
                 + "where pc.client.idOfClient = :idOfClient and pc.preorderDate between :startDate and :endDate and pc.deletedState = false");
         query.setParameter("idOfClient", client.getIdOfClient());
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
         List<PreorderComplex> list = query.getResultList();
         Long sum = 0L;
-        Session session = (Session)emReport.getDelegate();
         for (PreorderComplex complex : list) {
             sum += complex.getComplexPrice() * complex.getAmount() - complex.getUsedSum();
             for (PreorderMenuDetail pmd : complex.getPreorderMenuDetails()) {
