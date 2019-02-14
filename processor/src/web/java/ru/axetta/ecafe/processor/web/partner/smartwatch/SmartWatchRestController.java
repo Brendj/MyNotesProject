@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
@@ -574,6 +575,99 @@ public class SmartWatchRestController {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    @GET
+    @Path(value="getLocations")
+    public Response getLocations(@QueryParam(value="mobilePhone") String mobilePhone,
+            @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId) {
+        JsonLocations result = new JsonLocations();
+        Session session = null;
+        Transaction transaction = null;
+        try{
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+
+            mobilePhone = checkAndConvertPhone(mobilePhone);
+            if (!isValidPhoneAndToken(session, mobilePhone, token)) {
+                throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone);
+            }
+            token = "";
+
+            if (contractId == null) {
+                throw new IllegalArgumentException("ContractID is null");
+            }
+
+            Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
+            if (parent == null) {
+                throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
+                        + ", but passed the TokenValidator");
+            }
+
+            Client child = DAOUtils.findClientByContractId(session, contractId);
+            if (child == null) {
+                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
+            }
+            if (!isRelatives(session, parent, child)) {
+                throw new IllegalArgumentException(
+                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
+            }
+
+            JsonLocationsInfo locations = buildLocations(session, child);
+
+            result.setLocations(locations);
+
+            transaction.commit();
+            transaction = null;
+
+            result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
+            result.getResult().description = ResponseCodes.RC_OK.toString();
+
+            return Response.status(HttpURLConnection.HTTP_OK)
+                    .entity(result)
+                    .build();
+        } catch (IllegalArgumentException e){
+            logger.error("Can't get Locations ", e);
+            result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
+            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+                    .entity(result)
+                    .build();
+        } catch (Exception e){
+            logger.error("Can't get Locations ", e);
+            result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
+            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+                    .entity(result)
+                    .build();
+        } finally{
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    private JsonLocationsInfo buildLocations(Session session, Client child) throws Exception {
+        Org mainOrg = child.getOrg();
+        Integer typeOfMainOrg = mainOrg.getType().getCode();
+        JsonLocationsInfo info = new JsonLocationsInfo(mainOrg.getShortName(), mainOrg.getShortAddress());
+
+        if(typeOfMainOrg.equals(OrganizationType.PROFESSIONAL.getCode()) || typeOfMainOrg.equals(OrganizationType.SCHOOL.getCode())) {
+            for (Org fo : mainOrg.getFriendlyOrg()) {
+                if (fo.getIdOfOrg().equals(mainOrg.getIdOfOrg()) || !fo.getType().getCode().equals(typeOfMainOrg)) {
+                    continue;
+                }
+                OrgInformation friendlyOrgInfo = new OrgInformation(fo.getShortName(), fo.getShortAddress());
+                info.getFriendlyOrgInfo().add(friendlyOrgInfo);
+            }
+        }
+
+        List<Migrant> clientMigrants = MigrantsUtils.getActiveMigrantsByIdOfClient(session, child.getIdOfClient());
+        for(Migrant m : clientMigrants){
+            MigrantInfo migrantInfo = new MigrantInfo(m);
+            info.getMigrants().add(migrantInfo);
+        }
+
+        return info;
     }
 
     private JsonBalanceInfo buildBalanceInfo(Session session, Client child) throws Exception {
