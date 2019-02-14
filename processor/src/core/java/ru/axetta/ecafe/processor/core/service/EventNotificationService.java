@@ -892,7 +892,7 @@ public class EventNotificationService {
                 empType.getParameters().put(PARAM_AMOUNT_PRICE, amountPrice);
                 empType.getParameters().put(PARAM_AMOUNT_LUNCH, amountLunch);
                 empType.getParameters().put(PARAM_AMOUNT, amount);
-                if (empEventType == EMPEventTypeFactory.PAYMENT_PAY_EVENT) {
+                if (empEventType == EMPEventTypeFactory.PAYMENT_EVENT) {
                     String amountBuyAll = findValueInParams(new String[]{PARAM_AMOUNT_BUY_ALL}, values);
                     amountBuyAll = amountBuyAll != null && !StringUtils.isEmpty(amountBuyAll) ? amountBuyAll : "" + 0D;
                     empType.getParameters().put(PARAM_AMOUNT_BUY_ALL, amountBuyAll);
