@@ -739,7 +739,7 @@ public class SmartWatchRestController {
         List<JsonEnterEventItem> items = new LinkedList<JsonEnterEventItem>();
         List<Long> cardNoOfOwner = new LinkedList<Long>();
         List<EnterEventsItem> events = null;
-        String timeConditional = endDate == null ? " evtDateTime <= :startDate" : " evtDateTime BETWEEN :startDate AND :endDate ";
+        String timeConditional = endDate == null ? " evtDateTime <= :startDate " : " evtDateTime BETWEEN :endDate AND :startDate ";
 
         if(limit == null || limit <= 0){
             limit = DEFAULT_SAMPLE_LIMIT;
