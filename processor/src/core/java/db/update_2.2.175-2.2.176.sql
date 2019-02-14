@@ -8,3 +8,5 @@
 ALTER TABLE cf_production_calendar
   add column flag integer NOT NULL DEFAULT 1,
   add column version bigint NOT NULL DEFAULT 0;
+
+--! новый параметр ecafe.processor.transactions.timedelay=количество минут в минус во время подсчета транзакций для отравки на клиента в быстрой синхронизации

@@ -470,21 +470,11 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     public void sendGoodRequestsNewReports() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean("PreorderRequestsReportService", PreorderRequestsReportService.class).runTaskNextTimePerDay();
+            RuntimeContext.getAppContext().getBean("PreorderRequestsReportService", PreorderRequestsReportService.class).runGeneratePreorderRequests(new Date());
             printMessage("Отправка отчетов завершена");
         } catch (Exception e) {
             getLogger().error("Error send PreorderRequestsReport: ", e);
             printError("Во время отправки произошла ошибка с текстом " + e.getMessage());
-        }
-    }
-
-    public void generatePreorderRequests() throws Exception {
-        try {
-            RuntimeContext.getAppContext().getBean("PreorderRequestsReportService", PreorderRequestsReportService.class).runGeneratePreorderRequests(CalendarUtils.addDays(new Date(), 1));
-            printMessage("Генерация завершена");
-        } catch (Exception e) {
-            getLogger().error("Error PreorderRequestsReport: ", e);
-            printError("Произошла ошибка с текстом " + e.getMessage());
         }
     }
 

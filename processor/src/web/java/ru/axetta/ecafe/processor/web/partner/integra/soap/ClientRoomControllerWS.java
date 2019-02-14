@@ -8517,35 +8517,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             Client client = cr.getClient();
 
-            PreorderDAOService preorderDAOService = RuntimeContext.getAppContext().getBean(PreorderDAOService.class);
-            Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders();
-            Date today = CalendarUtils.startOfDay(new Date());
+            result = getPreorderClientSummaryResultOnDate(client, new Date());
 
-            Date endDate = CalendarUtils.addDays(today, 13);
-            endDate = CalendarUtils.endOfDay(endDate);
-            Long preordersSum14 = preorderDAOService.getPreordersSum(client, today, endDate);
-            result.setPreorderSum14Days(preordersSum14);
-
-            endDate = CalendarUtils.addDays(today, 2);
-            endDate = CalendarUtils.endOfDay(endDate);
-            Long preordersSum3 = preorderDAOService.getPreordersSum(client, today, endDate);
-            result.setPreorderSum3Days(preordersSum3);
-
-            result.setForbiddenDays(DAOUtils.getPreorderFeedingForbiddenDays(client));
-            Map<String, Integer[]> sd = preorderDAOService.getSpecialDates(new Date(), syncCountDays, client.getOrg().getIdOfOrg(), client);
-            PreorderCalendar calendar = new PreorderCalendar();
-            for (Map.Entry<String, Integer[]> entry : sd.entrySet()) {
-                PreorderCalendarItem item = new PreorderCalendarItem();
-                item.setDate(toXmlDateTime(CalendarUtils.parseDate(entry.getKey())));
-                item.setEditForbidden((entry.getValue())[0]);
-                item.setPreorderExists((entry.getValue())[1]);
-                calendar.getItems().add(item);
-            }
-            result.setCalendar(calendar);
-            SubscriptionFeeding sf = preorderDAOService.getClientSubscriptionFeeding(client);
-            result.setSubscriptionFeeding((sf == null) ? 0 : 1);
-            result.resultCode = RC_OK;
-            result.description = RC_OK_DESC;
             return result;
         } catch (Exception e) {
             logger.error("Error in getPreorderClientSummary: ", e);
@@ -8553,6 +8526,66 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_INTERNAL_ERROR_DESC;
             return result;
         }
+    }
+
+    //todo отладочный метод - удалить
+    @WebMethod(operationName = "getPreorderClientSummaryOnDate")
+    public PreorderClientSummaryResult getPreorderClientSummaryOnDate(@WebParam(name="contractId") Long contractId, @WebParam(name="guardianMobile") String guardianMobile,
+            @WebParam(name="date") Date date) {
+        authenticateRequest(contractId);
+        PreorderClientSummaryResult result = new PreorderClientSummaryResult();
+        try {
+            ClientResult cr = getClientOrError(contractId, guardianMobile);
+            if (!cr.resultCode.equals(RC_OK)) {
+                result.resultCode = cr.resultCode;
+                result.description = cr.description;
+                return result;
+            }
+            Client client = cr.getClient();
+
+            result = getPreorderClientSummaryResultOnDate(client, date);
+
+            return result;
+        } catch (Exception e) {
+            logger.error("Error in getPreorderClientSummary: ", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+            return result;
+        }
+    }
+
+    private PreorderClientSummaryResult getPreorderClientSummaryResultOnDate(Client client, Date date) throws Exception {
+        PreorderClientSummaryResult result = new PreorderClientSummaryResult();
+        PreorderDAOService preorderDAOService = RuntimeContext.getAppContext().getBean(PreorderDAOService.class);
+        Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders();
+        Date today = CalendarUtils.startOfDay(date);
+
+        Date endDate = CalendarUtils.addDays(today, 13);
+        endDate = CalendarUtils.endOfDay(endDate);
+        Long preordersSum14 = preorderDAOService.getPreordersSum(client, today, endDate);
+        result.setPreorderSum14Days(preordersSum14);
+
+        endDate = CalendarUtils.addDays(today, 2);
+        endDate = CalendarUtils.endOfDay(endDate);
+        Long preordersSum3 = preorderDAOService.getPreordersSum(client, today, endDate);
+        result.setPreorderSum3Days(preordersSum3);
+
+        result.setForbiddenDays(DAOUtils.getPreorderFeedingForbiddenDays(client));
+        Map<String, Integer[]> sd = preorderDAOService.getSpecialDates(date, syncCountDays, client.getOrg().getIdOfOrg(), client);
+        PreorderCalendar calendar = new PreorderCalendar();
+        for (Map.Entry<String, Integer[]> entry : sd.entrySet()) {
+            PreorderCalendarItem item = new PreorderCalendarItem();
+            item.setDate(toXmlDateTime(CalendarUtils.parseDate(entry.getKey())));
+            item.setEditForbidden((entry.getValue())[0]);
+            item.setPreorderExists((entry.getValue())[1]);
+            calendar.getItems().add(item);
+        }
+        result.setCalendar(calendar);
+        SubscriptionFeeding sf = preorderDAOService.getClientSubscriptionFeeding(client);
+        result.setSubscriptionFeeding((sf == null) ? 0 : 1);
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+        return result;
     }
 
     private ClientResult getClientOrError(Long contractId, String guardianMobile) {

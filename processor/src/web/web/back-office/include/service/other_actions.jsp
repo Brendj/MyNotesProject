@@ -118,8 +118,6 @@
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <a4j:commandButton value="Отправить отчеты PreorderRequestsNewReport поставщикам" action="#{otherActionsPage.sendGoodRequestsNewReports()}" id="sendGoodRequestsReport"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
-    <a4j:commandButton value="Генерация заявок - 2 (Тест)" action="#{otherActionsPage.generatePreorderRequests()}" id="sendGoodRequestsReport2Test"
-                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <a4j:commandButton value="Запустить сервис обработки ЗЛП" action="#{otherActionsPage.runApplicationForFoodProcessingService()}" id="runApplicationForFoodProcessingService"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <a4j:commandButton value="Запустить сверку льгот ДТСЗН с реестрами 2.0" action="#{otherActionsPage.runDTSZNDiscountsReviseService()}" id="runDTSZNDiscountsReviseService"

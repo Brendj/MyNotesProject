@@ -527,6 +527,10 @@ public interface ClientRoomController {
     @WebMethod(operationName = "getPreorderClientSummary")
     PreorderClientSummaryResult getPreorderClientSummary(@WebParam(name="contractId") Long contractId, @WebParam(name="guardianMobile") String guardianMobile);
 
+    @WebMethod(operationName = "getPreorderClientSummaryOnDate")
+    PreorderClientSummaryResult getPreorderClientSummaryOnDate(@WebParam(name="contractId") Long contractId, @WebParam(name="guardianMobile") String guardianMobile,
+            @WebParam(name="date") Date date);
+
     @WebMethod(operationName = "setInformedSpecialMenu")
     Result setInformedSpecialMenu(@WebParam(name="contractId") Long contractId, @WebParam(name="guardianMobile") String guardianMobile);
 

@@ -508,20 +508,19 @@ public class DAOReadonlyService {
         return isSixWorkWeek;
     }
 
-    public boolean isWeekendByGroup(Long idOfOrg, Client client) {
-        Query query = entityManager.createQuery("select gnto from GroupNamesToOrgs gnto where gnto.idOfOrg = :idOfOrg and gnto.isSixDaysWorkWeek = true");
-        query.setParameter("idOfOrg", idOfOrg);
-        List<GroupNamesToOrgs> list = query.getResultList() ;
-        String groupName = getClientGroupName(client);
-        if (list != null && list.size() > 0) {
-            for (GroupNamesToOrgs group : list) {
-                if (group.getGroupName().equals(groupName)) return false;
-            }
+    public boolean isSixWorkWeek(Long orgId, String groupName) throws Exception {
+        boolean resultByOrg = isSixWorkWeek(orgId);
+        try {
+            return (Boolean)entityManager.createQuery("select distinct gnto.isSixDaysWorkWeek from GroupNamesToOrgs gnto where gnto.idOfOrg = :idOfOrg and gnto.groupName = :groupName")
+                .setParameter("idOfOrg", orgId)
+                .setParameter("groupName", groupName)
+                .getSingleResult();
+        } catch (Exception e) {
+            return resultByOrg;
         }
-        return true;
     }
 
-    private String getClientGroupName(Client client) {
+    public String getClientGroupName(Client client) {
         if (client.getClientGroup() != null) {
             Query query = entityManager.createQuery("select cg.groupName from ClientGroup cg "
                     + "where cg.compositeIdOfClientGroup.idOfOrg = :idOfOrg and cg.compositeIdOfClientGroup.idOfClientGroup = :idOfClientGroup");
@@ -546,6 +545,13 @@ public class DAOReadonlyService {
         } catch (Exception e) {
             return null;
         }
+    }
+
+    public List<ProductionCalendar> getProductionCalendar(Date dateBegin, Date dateEnd) {
+        return entityManager.createQuery("select pc from ProductionCalendar pc where pc.day between :dateBegin and :dateEnd")
+                .setParameter("dateBegin", CalendarUtils.startOfDay(dateBegin))
+                .setParameter("dateEnd", CalendarUtils.endOfDay(dateEnd))
+                .getResultList();
     }
 
     public Long getIdOfPacket(Long idOfOrg) {

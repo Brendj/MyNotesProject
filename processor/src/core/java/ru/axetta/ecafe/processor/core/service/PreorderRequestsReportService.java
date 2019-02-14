@@ -16,8 +16,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPositionTemp;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestTemp;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
@@ -102,7 +100,8 @@ public class PreorderRequestsReportService extends RecoverableService {
             return;
 
         updateStatusFile(new Date(), Status.RUNNING);
-        runTaskNextTimePerDay();
+        runGeneratePreorderRequests(new Date());
+        //runTaskNextTimePerDay();
         updateStatusFile(new Date(), Status.FINISHED);
     }
 
@@ -185,7 +184,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                                     }
                                     long balanceOnDate = getBalanceOnDate(item.getIdOfClient(), dateWork, clientBalances);
                                     if (balanceOnDate < 0L) {
-                                        //deletePreorderForNotEnoughMoney(session, item);
+                                        deletePreorderForNotEnoughMoney(session, item);
                                         logger.info("Delete preorder " + item.toString());
                                     } else {
                                         String guid = createRequestFromPreorder2(session, item, fireTime, number, staff);
@@ -199,8 +198,17 @@ public class PreorderRequestsReportService extends RecoverableService {
                                 }
                             }
 
-                            logger.info(String.format("Send requests to orgID=%s, count=%s", idOfOrg, guids.size()));
-                            //notifyOrg(bla-bla);
+                            logger.info(String.format("Sending requests to orgID=%s, count=%s", idOfOrg, guids.size()));
+
+                            if (guids.size() > 0) {
+                                Calendar calendarEnd = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
+                                final Date lastCreateOrUpdateDate = calendarEnd.getTime();
+                                calendarEnd.add(Calendar.MINUTE, 1);
+                                final Date endGenerateTime = calendarEnd.getTime();
+                                RuntimeContext.getAppContext().getBean(GoodRequestsChangeAsyncNotificationService.class)
+                                        .notifyOrg(orgItem, fireTime, endGenerateTime, lastCreateOrUpdateDate, guids);
+                            }
+
                             OrgGoodRequest orgGoodRequest = new OrgGoodRequest(idOfOrg, dateWork);
                             session.save(orgGoodRequest);
                         } catch (Exception e) {
@@ -309,7 +317,8 @@ public class PreorderRequestsReportService extends RecoverableService {
     public void runTask() throws Exception {
         //генерация предзаказов по регулярному правилу
         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().generatePreordersBySchedule();
-        runTaskNextTimePerDay();
+        runGeneratePreorderRequests(new Date());
+        //runTaskNextTimePerDay();
     }
 
     public void runTaskNextTimePerDay() throws Exception {
@@ -597,7 +606,7 @@ public class PreorderRequestsReportService extends RecoverableService {
         this.endDate = localCalendar.getTime();
     }
 
-    private String checkIsExistFile() throws Exception {
+    public String checkIsExistFile() throws Exception {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + TEMPLATE_FILENAME;
         if(!(new File(templateFilename)).exists()){
@@ -874,8 +883,7 @@ public class PreorderRequestsReportService extends RecoverableService {
         if (null == good || null == staff)
             return null;
 
-        //  Создание GoodRequest
-        GoodRequestTemp goodRequest = new GoodRequestTemp();
+        GoodRequest goodRequest = new GoodRequest();
         goodRequest.setOrgOwner(preorderItem.getIdOfOrg());
         goodRequest.setDateOfGoodsRequest(preorderItem.getCreatedDate());
         goodRequest.setDoneDate(preorderItem.getPreorderDate());
@@ -887,11 +895,9 @@ public class PreorderRequestsReportService extends RecoverableService {
         goodRequest.setRequestType(PREORDER_REQUEST_TYPE);
         goodRequest.setStaff(staff);
         goodRequest.setGuidOfStaff(staff.getGuid());
-//        goodRequest = save(session, goodRequest, GoodRequestTemp.class.getSimpleName());
-        session.save(goodRequest);
+        goodRequest = save(session, goodRequest, GoodRequest.class.getSimpleName());
 
-        //  Создание GoodRequestPosition
-        GoodRequestPositionTemp pos = new GoodRequestPositionTemp();
+        GoodRequestPosition pos = new GoodRequestPosition();
         pos.setGoodRequest(goodRequest);
         pos.setGood(good);
         pos.setDeletedState(false);
@@ -903,10 +909,9 @@ public class PreorderRequestsReportService extends RecoverableService {
         pos.setDailySampleCount(0L);
         pos.setTempClientsCount(0L);
         pos.setNotified(false);
-//        pos = save(session, pos, GoodRequestPositionTemp.class.getSimpleName());
-        session.save(pos);
+        pos = save(session, pos, GoodRequestPosition.class.getSimpleName());
 
-        /*if (preorderItem.getComplex()) {
+        if (preorderItem.getComplex()) {
             PreorderComplex complex = (PreorderComplex) session.get(PreorderComplex.class, preorderItem.getIdOfPreorderComplex());
             complex.setIdOfGoodsRequestPosition(pos.getGlobalId());
             session.update(complex);
@@ -915,7 +920,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                     preorderItem.getIdOfPreorderMenuDetail());
             detail.setIdOfGoodsRequestPosition(pos.getGlobalId());
             session.update(detail);
-        }*/
+        }
 
         return pos.getGuid();
     }

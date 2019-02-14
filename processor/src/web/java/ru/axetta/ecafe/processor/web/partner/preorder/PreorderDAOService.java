@@ -634,6 +634,7 @@ public class PreorderDAOService {
 
     private void generatePreordersByScheduleInternal() {
         try {
+            logger.info("Start of generating regular preorders");
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).generatePreordersBySchedule();
             logger.info("Successful end of generating regular preorders");
         } catch (Exception e) {
@@ -1302,49 +1303,77 @@ public class PreorderDAOService {
         return result;
     }
 
+    private Calendar getCalendar() {
+        TimeZone timeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
+        Calendar c = Calendar.getInstance();
+        c.setTimeZone(timeZone);
+        return c;
+    }
+
+    private boolean isWeekendByProductionCalendar(Date date, List<ProductionCalendar> productionCalendar) {
+        for (ProductionCalendar pc : productionCalendar) {
+            if (pc.getDay().equals(date)) return true;
+        }
+        return false;
+    }
+
+    private boolean isHolidayByProductionCalendar(Date date, List<ProductionCalendar> productionCalendar) {
+        for (ProductionCalendar pc : productionCalendar) {
+            if (pc.getDay().equals(date) && pc.getFlag().equals(ProductionCalendar.HOLIDAY)) return true;
+        }
+        return false;
+    }
+
+    private boolean isWeekendBySpecialDate(Date date, Client client, List<SpecialDate> specialDates) {
+        if(specialDates != null){
+            for (SpecialDate specialDate : specialDates) {
+                if (CalendarUtils.betweenOrEqualDate(specialDate.getDate(), date, CalendarUtils.addDays(date, 1)) && !specialDate.getDeleted()) {
+                    if (specialDate.getIdOfClientGroup() == null || specialDate.getIdOfClientGroup().equals(client.getIdOfClientGroup()))
+                        return specialDate.getIsWeekend();
+                    if (specialDate.getIdOfClientGroup() != null && specialDate.getIdOfClientGroup().equals(client.getIdOfClientGroup()))
+                        break;
+                }
+            }
+        }
+        return false;
+    }
+
     @Transactional(readOnly = true)
     public Map<String, Integer[]> getSpecialDates(Date today, Integer syncCountDays, Long orgId, Client client) throws Exception {
         Comparator comparator = new PreorderDateComparator();
         Map map = new TreeMap(comparator);
-        TimeZone timeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
-        Calendar c = Calendar.getInstance();
-        c.setTimeZone(timeZone);
-        Date endDate = CalendarUtils.addDays(today, syncCountDays);
-        boolean isSixWorkWeek = DAOReadonlyService.getInstance().isSixWorkWeek(orgId);
+
+        Calendar c = getCalendar();
+        c.setTime(today);
+
+        Date endDate = CalendarUtils.addDays(today, syncCountDays);                   //14 календарных дней вперед
+        String groupName = DAOReadonlyService.getInstance().getClientGroupName(client);
+        boolean isSixWorkWeek = DAOReadonlyService.getInstance().isSixWorkWeek(orgId, groupName);
+
+        Map<Date, Long> usedAmounts = existPreordersByDate(client.getIdOfClient(), today, endDate);                 //для показа есть ли предзаказы по датам
+        List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(today, endDate, orgId);   //выходные дни по ОО в целом или ее группам
+        Integer forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(client);                                   //дни запрета редактирования
+        List<ProductionCalendar> productionCalendar = DAOReadonlyService.getInstance().getProductionCalendar(today, endDate);
+
         int two_days = 0;
-        Map<Date, Long> usedAmounts = existPreordersByDate(client.getIdOfClient(), today, endDate);
-        List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(today, endDate, orgId);
-        Integer forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(client);
-        if (forbiddenDays == null) {
-            forbiddenDays = PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
-        }
         while (c.getTimeInMillis() < endDate.getTime() ){
-            Date currentDate = CalendarUtils.parseDate(CalendarUtils.dateShortToStringFullYear(c.getTime()));
-            Boolean isWeekend = !CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate);
-            if(specialDates != null){
-                for (SpecialDate specialDate : specialDates) {
-                    if (CalendarUtils.betweenOrEqualDate(specialDate.getDate(), currentDate, CalendarUtils.addDays(currentDate, 1)) && !specialDate.getDeleted()) {
-                        if (specialDate.getIdOfClientGroup() == null || specialDate.getIdOfClientGroup().equals(client.getIdOfClientGroup()))
-                            isWeekend = specialDate.getIsWeekend();
-                        if (specialDate.getIdOfClientGroup() != null && specialDate.getIdOfClientGroup().equals(client.getIdOfClientGroup()))
-                            break;
-                    }
-                }
-            }
+            Date currentDate = CalendarUtils.startOfDayInUTC(c.getTime());
+            Boolean isWeekend = isWeekendByProductionCalendar(currentDate, productionCalendar);
+
             if (two_days <= forbiddenDays) {
                 c.add(Calendar.DATE, 1);
                 map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
                 if (!isWeekend) {
                     two_days++;
                 }
-                continue;
+                continue; //находимся в днях запрета редактирования
             }
 
             int day = CalendarUtils.getDayOfWeek(currentDate);
-            if (day == Calendar.SATURDAY && !isSixWorkWeek  && isWeekend) {
-                //проверяем нет ли привязки отдельных групп к 6-ти дневной неделе
-                isWeekend = DAOReadonlyService.getInstance().isWeekendByGroup(orgId, client);
+            if (day == Calendar.SATURDAY && isSixWorkWeek) {
+                isWeekend = isWeekendBySpecialDate(currentDate, client, specialDates); //выходной по данным таблицы SpecialDates
             }
+            if (!isWeekend) isWeekend = isHolidayByProductionCalendar(currentDate, productionCalendar); //если праздничный день по производственному календарю - то запрет редактирования
 
             c.add(Calendar.DATE, 1);
             map.put(CalendarUtils.dateToString(currentDate), new Integer[] {isWeekend ? 1 : 0, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
