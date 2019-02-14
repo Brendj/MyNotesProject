@@ -3734,6 +3734,17 @@ public class DAOUtils {
         return applicationForFood;
     }
 
+    public static ApplicationForFood updateApplicationForFoodWithVersionHistorySafe(Session session, ApplicationForFood applicationForFood,
+            ApplicationForFoodStatus status, Long version, Long historyVersion) throws Exception {
+        applicationForFood.setStatus(status);
+        applicationForFood.setVersion(version);
+        applicationForFood.setLastUpdate(new Date());
+        session.update(applicationForFood);
+
+        addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood, status, historyVersion);
+        return applicationForFood;
+    }
+
     public static ApplicationForFood  updateApplicationForFoodByServiceNumber(Session persistenceSession, String serviceNumber,
             ApplicationForFoodStatus status) {
         ApplicationForFood applicationForFood = findApplicationForFoodByServiceNumber(persistenceSession, serviceNumber);

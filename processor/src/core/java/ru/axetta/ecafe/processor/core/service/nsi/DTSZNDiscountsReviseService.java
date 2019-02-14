@@ -297,6 +297,7 @@ public class DTSZNDiscountsReviseService {
         if (pagesCount != 0L) {
             updateArchivedFlagForDiscounts();
             runTaskPart2(fireTime);
+            updateApplicationsForFoodTask();
         }
     }
 
@@ -529,11 +530,99 @@ public class DTSZNDiscountsReviseService {
         return entityIds;
     }
 
-    public void updateApplicationForFood(Session session, ETPMVService service, Client client, List<ClientDtisznDiscountInfo> infoList) {
+    public void updateApplicationsForFoodTask() throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            session.setFlushMode(FlushMode.COMMIT);
+            transaction = session.beginTransaction();
+
+            List<ApplicationForFood> applicationForFoodList = DAOUtils.getApplicationForFoodListByStatus(session,
+                    new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null), false);
+
+            ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
+            Date fireTime = new Date();
+
+            for (ApplicationForFood applicationForFood : applicationForFoodList) {
+                List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, applicationForFood.getClient());
+                try {
+                    Boolean isDiscountOk = false;
+                    Boolean isDateOk = true;
+
+                    for (ClientDtisznDiscountInfo info : clientInfoList) {
+                        if (applicationForFood.getDtisznCode().equals(info.getDtisznCode())) {
+                            if (applicationForFood.getLastUpdate().getTime() >= info.getLastReceivedDate().getTime()) {
+                                isDateOk = false;
+                                break;
+                            }
+                            isDiscountOk = info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) &&
+                                    CalendarUtils.betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd()) &&
+                                    !info.getArchived();
+                            break;
+                        }
+                    }
+
+                    if (!isDateOk) {
+                        continue;
+                    }
+
+                    Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
+                    Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
+
+                    LinkedList<ETPMVScheduledStatus> statusList = new LinkedList<ETPMVScheduledStatus>();
+                    //7705
+                    applicationForFood = DAOUtils.updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
+                            new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED, null),
+                            applicationVersion, historyVersion);
+                    statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(), applicationForFood.getStatus().getApplicationForFoodState(),
+                            applicationForFood.getStatus().getDeclineReason()));
+                    if (isDiscountOk) {
+                        //1052
+                        applicationForFood = DAOUtils.updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
+                                new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null),
+                                applicationVersion, historyVersion);
+                        statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(), applicationForFood.getStatus().getApplicationForFoodState(),
+                                applicationForFood.getStatus().getDeclineReason()));
+
+                        //1075
+                        applicationForFood = DAOUtils.updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
+                                new ApplicationForFoodStatus(ApplicationForFoodState.OK, null), applicationVersion,
+                                historyVersion);
+                        statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(), applicationForFood.getStatus().getApplicationForFoodState(),
+                                applicationForFood.getStatus().getDeclineReason()));
+                    } else {
+                        //1080.3
+                        applicationForFood = DAOUtils.updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
+                                new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.INFORMATION_CONFLICT),
+                                applicationVersion, historyVersion);
+                        statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(), applicationForFood.getStatus().getApplicationForFoodState(),
+                                applicationForFood.getStatus().getDeclineReason()));
+                    }
+                    service.sendStatusesAsync(statusList);
+
+                } catch (Exception e) {
+                    logger.error(String.format("Error in updateApplicationsForFoodTask: " +
+                                    "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo={%s}",
+                            applicationForFood.getClient().getIdOfClient(), StringUtils.join(clientInfoList, ",")));
+                }
+            }
+
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in update discounts", e);
+            throw e;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+
+    public void updateApplicationForFood(Session session, Client client, List<ClientDtisznDiscountInfo> infoList) {
         ApplicationForFood application = DAOUtils.findActiveApplicationForFoodByClient(session, client);
-        if (null == application ||
-                !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_SENDED, null)) &&
-                !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null))) {
+        if (null == application || !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null))) {
             return;
         }
 
@@ -552,49 +641,14 @@ public class DTSZNDiscountsReviseService {
                 }
             }
 
-            Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
-            Long historyVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
-
             if (application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null))) {
                 if (!isOk) {
+                    Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
                     application.setArchived(true);
+                    application.setVersion(applicationVersion);
                     session.update(application);
                 }
-                return;
             }
-
-            logger.info(String.format("Found application for status update; clientId=%d", client.getIdOfClient()));
-
-            LinkedList<ETPMVScheduledStatus> statusList = new LinkedList<ETPMVScheduledStatus>();
-            //7705
-            application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
-                    new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED, null),
-                    applicationVersion, historyVersion);
-            statusList.add(new ETPMVScheduledStatus(application.getServiceNumber(), application.getStatus().getApplicationForFoodState(),
-                    application.getStatus().getDeclineReason()));
-            if (isOk) {
-                //1052
-                application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
-                        new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null),
-                        applicationVersion, historyVersion);
-                statusList.add(new ETPMVScheduledStatus(application.getServiceNumber(), application.getStatus().getApplicationForFoodState(),
-                        application.getStatus().getDeclineReason()));
-
-                //1075
-                application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
-                        new ApplicationForFoodStatus(ApplicationForFoodState.OK, null), applicationVersion,
-                        historyVersion);
-                statusList.add(new ETPMVScheduledStatus(application.getServiceNumber(), application.getStatus().getApplicationForFoodState(),
-                        application.getStatus().getDeclineReason()));
-            } else {
-                //1080.3
-                application = DAOUtils.updateApplicationForFoodWithVersion(session, application,
-                        new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.INFORMATION_CONFLICT),
-                        applicationVersion, historyVersion);
-                statusList.add(new ETPMVScheduledStatus(application.getServiceNumber(), application.getStatus().getApplicationForFoodState(),
-                        application.getStatus().getDeclineReason()));
-            }
-            service.sendStatusesAsync(statusList);
         } catch (Exception e) {
             logger.error(String.format("Error in updateApplicationForFood: " +
                     "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo={%s}",
@@ -602,8 +656,7 @@ public class DTSZNDiscountsReviseService {
         }
     }
 
-    public void processDiscounts(Session session, Client client, List<ClientDtisznDiscountInfo> infoList, ETPMVService service,
-            Long otherDiscountCode) throws Exception {
+    public void processDiscounts(Session session, Client client, List<ClientDtisznDiscountInfo> infoList, Long otherDiscountCode) throws Exception {
 
         Date fireTime = new Date();
 
@@ -685,7 +738,7 @@ public class DTSZNDiscountsReviseService {
             client.setClientRegistryVersion(clientRegistryVersion);
             session.update(client);
         }
-        updateApplicationForFood(session, service, client, infoList);
+        updateApplicationForFood(session, client, infoList);
     }
 
     public void runTaskPart2() throws Exception {
@@ -701,7 +754,6 @@ public class DTSZNDiscountsReviseService {
             transaction = session.beginTransaction();
 
             List<Long> clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(session, startDate);
-            ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
 
             Integer clientCounter = 1;
 
@@ -715,7 +767,7 @@ public class DTSZNDiscountsReviseService {
                 Client client = (Client) session.load(Client.class, idOfClient);
                 List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
                 if (!clientInfoList.isEmpty()) {
-                    processDiscounts(session, client, clientInfoList, service, otherDiscountCode);
+                    processDiscounts(session, client, clientInfoList, otherDiscountCode);
                 }
                 transaction.commit();
                 transaction = null;
@@ -904,8 +956,8 @@ public class DTSZNDiscountsReviseService {
         }
 
         updateArchivedFlagForDiscountsDB();
-
         runTaskPart2(fireTime);
+        updateApplicationsForFoodTask();
     }
 
     public void updateArchivedFlagForDiscountsDB() throws Exception {

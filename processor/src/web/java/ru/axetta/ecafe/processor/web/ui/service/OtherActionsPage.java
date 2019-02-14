@@ -529,6 +529,16 @@ public class OtherActionsPage extends BasicWorkspacePage {
         }
     }
 
+    public void runUpdateApplicationsForFoodTask() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodTask();
+            printMessage("Обработка ЗЛП завершена");
+        } catch (Exception e) {
+            getLogger().error("Error in runUpdateApplicationsForFoodTask: ", e);
+            printError("Во время выполнения операции произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
     public String getOrgsForSpbCardsUidUpdate() {
         return orgsForSpbCardsUidUpdate;
     }
