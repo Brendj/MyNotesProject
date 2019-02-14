@@ -86,6 +86,7 @@ public class EventNotificationService {
     public static final String PARAM_BALANCE_TO_NOTIFY = "balanceToNotify";
     public static final String PARAM_COMPLEX_NAME = "complexName";
     public static final String PARAM_DATE = "date";
+    public static final String PARAM_AMOUNT_BUY_ALL = "amountBuyAll";
 
     @Resource
     SMSService smsService;
@@ -727,6 +728,22 @@ public class EventNotificationService {
         return attachToValues(CLIENT_GENDER_KEY, genderString, values);
     }
 
+    public static final String[] attachAmountBuyAllToValues(Long amountBuyAll, String[] values) {
+        if (null == amountBuyAll) {
+            return values;
+        }
+
+        Long rub = amountBuyAll / 100;
+        Long cop = amountBuyAll % 100;
+        String cop_str = cop.toString();
+        while (cop_str.length() < 2) {
+            cop_str = "0" + cop_str;
+        }
+        String amountBuyAllString = rub.toString() + "," + cop_str;
+
+        return attachToValues(PARAM_AMOUNT_BUY_ALL, amountBuyAllString, values);
+    }
+
     public static Long getTargetIdFromValues(String[] values) {
         String id = findValueInParams(new String [] {TARGET_VALUES_KEY}, values);
         if(id == null || StringUtils.isBlank(id) || !NumberUtils.isNumber(id)) {
@@ -875,6 +892,11 @@ public class EventNotificationService {
                 empType.getParameters().put(PARAM_AMOUNT_PRICE, amountPrice);
                 empType.getParameters().put(PARAM_AMOUNT_LUNCH, amountLunch);
                 empType.getParameters().put(PARAM_AMOUNT, amount);
+                if (empEventType == EMPEventTypeFactory.PAYMENT_PAY_EVENT) {
+                    String amountBuyAll = findValueInParams(new String[]{PARAM_AMOUNT_BUY_ALL}, values);
+                    amountBuyAll = amountBuyAll != null && !StringUtils.isEmpty(amountBuyAll) ? amountBuyAll : "" + 0D;
+                    empType.getParameters().put(PARAM_AMOUNT_BUY_ALL, amountBuyAll);
+                }
                 putGenderParams(empType, values);
             } else if (type.equals(NOTIFICATION_LOW_BALANCE)) {
                 if (dataClient != null) {
