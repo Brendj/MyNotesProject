@@ -97,6 +97,10 @@ public class SummaryCalculationService {
     public static String VALUE_PREORDER_SUMM = "PreorderSumm";
     public static String VALUE_PREORDER_LACKS_SUMM = "PreorderLacksSumm";
 
+    public static final String CLIENT_GENDER_KEY = "gender";
+    public static final String CLIENT_GENDER_VALUE_MALE = "male";
+    public static final String CLIENT_GENDER_VALUE_FEMALE = "female";
+
     final static String JOB_NAME_DAILY="NotificationSummaryDaily";
     final static String JOB_NAME_WEEKLY="NotificationSummaryWeekly";
 
@@ -270,7 +274,7 @@ public class SummaryCalculationService {
         String query_ee = "SELECT c.idofclient, p.surname, p.firstname, "
                 + "coalesce(e.evtdatetime, -1) AS evtdatetime, coalesce(e.passdirection, -1) AS passdirection, "
                 + "coalesce(e.guardianid, -1) AS guardianId, coalesce(e.childpasschecker, -1) AS childpasschecker, "
-                + "coalesce(e.childpasscheckerid, -1) AS childpasscheckerId, o.shortnameinfoservice, o.organizationtype, o.idoforg "
+                + "coalesce(e.childpasscheckerid, -1) AS childpasscheckerId, o.shortnameinfoservice, o.organizationtype, o.idoforg, c.gender "
                 + "FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient AND n.notifytype = :notifyType "
                 + "INNER JOIN cf_persons p ON c.idofperson = p.idofperson "
                 + "INNER JOIN cf_orgs o ON c.idoforg = o.idoforg "
@@ -281,7 +285,7 @@ public class SummaryCalculationService {
                 + "SELECT c.idofclient, p.surname, p.firstname, "
                 + "coalesce(e.evtdatetime, -1) AS evtdatetime, coalesce(e.passdirection, -1) AS passdirection, "
                 + "coalesce(e.guardianid, -1) AS guardianId, coalesce(e.childpasschecker, -1) AS childpasschecker, "
-                + "coalesce(e.childpasscheckerid, -1) AS childpasscheckerId, o.shortnameinfoservice, o.organizationtype, o.idoforg "
+                + "coalesce(e.childpasscheckerid, -1) AS childpasscheckerId, o.shortnameinfoservice, o.organizationtype, o.idoforg, c.gender "
                 + "FROM cf_client_guardian_notificationsettings n "
                 + "INNER JOIN cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
                 + "INNER JOIN cf_clients c ON c.idofclient = cg.idofchildren "
@@ -309,6 +313,7 @@ public class SummaryCalculationService {
             if (!id.equals(idOfClient)) {
                 clientEE = new ClientEE();
                 clientEE.setValues(result.clone());
+                clientEE.setValues(attachGenderToValues((Integer) row[11], clientEE.getValues()));
                 idOfClient = id;
                 clients.add(clientEE);
             }
@@ -377,7 +382,7 @@ public class SummaryCalculationService {
 
         //Подсчет данных по балансам
         String query_balance = "SELECT distinct c.idofclient, p.surname, p.firstname, c.expenditurelimit, c.balance, coalesce(query1.sum1, 0) as sum1, coalesce(query2.sum2, 0) AS sum2, "
-                + "c.contractid, coalesce(query3.count1, 0) as count1, coalesce(query4.sum3, 0) as sum3, coalesce(query5.count2, 0) as count2, coalesce(query5.sum4, 0) as sum4 "
+                + "c.contractid, coalesce(query3.count1, 0) as count1, coalesce(query4.sum3, 0) as sum3, coalesce(query5.count2, 0) as count2, coalesce(query5.sum4, 0) as sum4, c.gender "
                 + (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue()) ? "" :
                  ", coalesce(query6.countw1, 0) as countw1, coalesce(query7.countw2, 0) as countw2, coalesce(query8.countw3, 0) as countw3, coalesce(query9.countw4, 0) as countw4, "
                 + "coalesce(query10.countw5, 0) as countw5, coalesce(query11.countw6, 0) as countw6, coalesce(query12.countw7, 0) as countw7 ")
@@ -479,13 +484,13 @@ public class SummaryCalculationService {
             Long quantityAmount = ((BigInteger)row[10]).longValue();
             Long paymentSum = ((BigDecimal)row[11]).longValue();
             if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
-                order1 = ((BigInteger) row[12]).longValue();
-                order2 = ((BigInteger) row[13]).longValue();
-                order3 = ((BigInteger) row[14]).longValue();
-                order4 = ((BigInteger) row[15]).longValue();
-                order5 = ((BigInteger) row[16]).longValue();
-                order6 = ((BigInteger) row[17]).longValue();
-                order7 = ((BigInteger) row[18]).longValue();
+                order1 = ((BigInteger) row[13]).longValue();
+                order2 = ((BigInteger) row[14]).longValue();
+                order3 = ((BigInteger) row[15]).longValue();
+                order4 = ((BigInteger) row[16]).longValue();
+                order5 = ((BigInteger) row[17]).longValue();
+                order6 = ((BigInteger) row[18]).longValue();
+                order7 = ((BigInteger) row[19]).longValue();
             }
             clientEE = findClientEEByClientId(clients, id);
             if (clientEE == null) {
@@ -494,6 +499,7 @@ public class SummaryCalculationService {
                 clientEE.setSurname(surname);
                 clientEE.setFirstname(firstname);
                 clientEE.setValues(result.clone());
+                clientEE.setValues(attachGenderToValues((Integer) row[12], clientEE.getValues()));
                 clients.add(clientEE);
             }
             Balances balances = new Balances();
@@ -527,14 +533,14 @@ public class SummaryCalculationService {
 
         //подсчет данных по предзаказам
         if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
-            String preorders_query = "select distinct pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname from cf_preorder_complex pc "
+            String preorders_query = "select distinct pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender from cf_preorder_complex pc "
                     + " join cf_clients c on c.idofclient = pc.idofclient join cf_persons p on p.idofperson = c.idofperson "
                     + " where pc.preorderdate > :date and pc.deletedstate = 1 "
                     //+ " and pc.createddate = (select max(createddate) from cf_preorder_complex pc2 where pc2.idofclient = pc.idofclient and pc2.preorderdate = pc.preorderdate and pc2.deletedstate = 1) "
                     + " and not exists(select pc1.idofpreordercomplex from cf_preorder_complex pc1 "
                     + "where pc1.idofclient = pc.idofclient and pc1.deletedstate = 0 and pc1.preorderdate = pc.preorderdate and pc1.amount > 0) "
                     + " union "
-                    + "select distinct pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname from cf_preorder_menudetail pmd "
+                    + "select distinct pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender from cf_preorder_menudetail pmd "
                     + " join cf_clients c on c.idofclient = pmd.idofclient join cf_persons p on p.idofperson = c.idofperson "
                     + " where pmd.preorderdate > :date and pmd.deletedstate = 1 "
                     + " and not exists(select pmd1.idofpreordermenudetail from cf_preorder_menudetail pmd1 "
@@ -557,6 +563,7 @@ public class SummaryCalculationService {
                     clientEE.setSurname(surname);
                     clientEE.setFirstname(firstname);
                     clientEE.setValues(result.clone());
+                    clientEE.setValues(attachGenderToValues((Integer) row[5], clientEE.getValues()));
                     clients.add(clientEE);
                 }
                 if (state.equals(PreorderState.OK.getCode())) {
@@ -569,16 +576,16 @@ public class SummaryCalculationService {
         }
 
         if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue())) {
-            String preorders_query = "select pc.preorderdate, cast(pc.amount * pc.complexprice as bigint), c.idofclient, c.balance, p.surname, p.firstname "
+            String preorders_query = "select pc.preorderdate, cast(pc.amount * pc.complexprice as bigint), c.idofclient, c.balance, p.surname, p.firstname, c.gender "
                     + "from cf_preorder_complex pc join cf_clients c on pc.idofclient = c.idofclient "
                     + "join cf_persons p on p.idofperson = c.idofperson "
                     + "where pc.deletedstate = 0 and pc.amount > 0 and pc.preorderdate between :startDate and :endDate "
                     + "union "
-                    + "select pmd.preorderdate, cast(sum(pmd.amount * pmd.menudetailprice) as bigint), pmd.idofclient, c.balance, p.surname, p.firstname "
+                    + "select pmd.preorderdate, cast(sum(pmd.amount * pmd.menudetailprice) as bigint), pmd.idofclient, c.balance, p.surname, p.firstname, c.gender "
                     + "from cf_preorder_menudetail pmd join cf_clients c on pmd.idofclient = c.idofclient "
                     + "join cf_persons p on p.idofperson = c.idofperson "
                     + "where pmd.deletedstate = 0 and pmd.amount > 0 and pmd.preorderdate between :startDate and :endDate "
-                    + "group by pmd.idofclient, p.surname, p.firstname, c.balance, pmd.preorderdate order by 1, 3";
+                    + "group by pmd.idofclient, p.surname, p.firstname, c.balance, pmd.preorderdate, c.gender order by 1, 3";
             Query pQuery = entityManager.createNativeQuery(preorders_query);
             pQuery.setParameter("startDate", System.currentTimeMillis());
             pQuery.setParameter("endDate", CalendarUtils.addDays(new Date(), 7).getTime());
@@ -598,6 +605,7 @@ public class SummaryCalculationService {
                     clientEE.setSurname(surname);
                     clientEE.setFirstname(firstname);
                     clientEE.setValues(result.clone());
+                    clientEE.setValues(attachGenderToValues((Integer) row[6], clientEE.getValues()));
                     clients.add(clientEE);
                 }
                 clientEE.getPreorderWeekly().getPreorderDate().add(date);
@@ -969,6 +977,21 @@ public class SummaryCalculationService {
             enterPassDirection = ee.getPassDirection();
             firstEnterFound = true;
         }
+    }
+
+    public final String[] attachGenderToValues(Integer gender, String[] values) {
+        if (null == gender) {
+            return values;
+        }
+
+        String genderString;
+        switch (gender) {
+            case 0: genderString = CLIENT_GENDER_VALUE_FEMALE; break;
+            case 1: genderString = CLIENT_GENDER_VALUE_MALE; break;
+            default: return values;
+        }
+
+        return attachValue(values, CLIENT_GENDER_KEY, genderString);
     }
 
     public static class ClientEE {
