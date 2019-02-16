@@ -546,6 +546,8 @@ public class DTSZNDiscountsReviseService {
 
             for (ApplicationForFood applicationForFood : applicationForFoodList) {
                 List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, applicationForFood.getClient());
+                if (clientInfoList.isEmpty())
+                    continue;
                 try {
                     Boolean isDiscountOk = false;
                     Boolean isDateOk = true;
