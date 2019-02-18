@@ -79,44 +79,67 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             List<ContragentPreordersReportItem> result = new LinkedList<ContragentPreordersReportItem>();
             String idOfOrgsCondition = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and o.idoforg in (:idOfOrgList) " ;
             String idOfContragentCondition = contragent == null ? "" : " and ctg.idofcontragent = :idOfContragent ";
-            String ordersCondition = showOnlyUnpaidItems ? " and (pl.idoforder is null or co.idoforder is not null ) " : "";
+            String ordersCondition = showOnlyUnpaidItems ? " and pl.idoforder is null " : "";
 
-            Query query = session.createSQLQuery(" select ctg.idofcontragent, ctg.contragentname, o.idoforg, \n"
-                    + " o.shortnameinfoservice, o.address, c.contractid, pc.preorderdate,\n"
-                    + " pc.complexname, pc.amount, '' as \"Блюдо\", pc.complexprice, co.createddate,\n"
-                    + " case coalesce(ord.state, 0) when 0 then 'Нет' else 'Да' end as \"Сторнировано\",\n"
-                    + " ord.orderdate, pl.qty*pl.price as ordersum, pl.idoforder, case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as \"Оплачено\"\n"
-                    + " from cf_preorder_complex pc\n" + " join cf_clients c on pc.idofclient = c.idofclient "
+            Query query = session.createSQLQuery(" select ctg.idofcontragent, ctg.contragentname, o.idoforg, "
+                    + " o.shortnameinfoservice, o.address, c.contractid, pc.preorderdate, "
+                    + " pc.complexname, count(distinct pl.idoforder) as amount, '' as \"Блюдо\", cast(pc.complexprice as bigint), co.createddate, "
+                    + " case coalesce(ord.state, 0) when 0 then 'Нет' else 'Да' end as \"Сторнировано\", "
+                    + " ord.orderdate, pl.qty*pl.price as ordersum, pl.idoforder, case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as \"Оплачено\" "
+                    + " from cf_preorder_complex pc "
+                    + " join cf_clients c on pc.idofclient = c.idofclient "
                     + " join cf_orgs o on c.idoforg = o.idoforg "
-                    + " join cf_contragents ctg on o.defaultsupplier = ctg.idofcontragent\n"
-                    + " left join cf_preorder_linkod pl on pl.preorderguid = pc.guid\n"
-                    + " left join cf_orders ord on ord.idoforg = pl.idoforg and ord.idoforder = pl.idoforder\n"
-                    + " left join cf_transactions tr on ord.idoftransaction = tr.idoftransaction\n"
-                    + " left join cf_canceledorders co on ord.idoforder = co.idoforder and ord.idoforg = co.idoforg\n"
+                    + " join cf_contragents ctg on o.defaultsupplier = ctg.idofcontragent "
+                    + " join cf_preorder_linkod pl on pl.preorderguid = pc.guid "
+                    + " left join cf_orders ord on ord.idoforg = pl.idoforg and ord.idoforder = pl.idoforder "
+                    + " left join cf_transactions tr on ord.idoftransaction = tr.idoftransaction "
+                    + " left join cf_canceledorders co on ord.idoforder = co.idoforder and ord.idoforg = co.idoforg "
                     + " where pc.deletedstate = 0 and pc.amount > 0 and o.PreordersEnabled = 1 "
-                    + idOfContragentCondition
-                    + ordersCondition
                     + " and pc.preorderdate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
-                    + " union\n"
-                    + " select ctg.idofcontragent, ctg.contragentname, o.idoforg, o.shortnameinfoservice, o.address, c.contractid, pc.preorderdate,\n"
-                    + " pc.complexname, pmd.amount, pmd.menudetailname as \"Блюдо\", pmd.menudetailprice, co.createddate,\n"
-                    + " case coalesce(ord.state, 0) when 0 then 'Нет' else 'Да' end as \"Сторнировано\",\n"
-                    + " ord.orderdate, pl.qty*pl.price as ordersum, pl.idoforder,  case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as \"Оплачено\"\n"
-                    + " from cf_preorder_menudetail pmd\n"
-                    + " join cf_clients c on pmd.idofclient = c.idofclient\n"
-                    + " join cf_orgs o on c.idoforg = o.idoforg  "
-                    + " join cf_contragents ctg on o.defaultsupplier = ctg.idofcontragent\n"
-                    + " join cf_preorder_complex pc on pmd.idofpreordercomplex = pc.idofpreordercomplex\n"
-                    + " left join cf_preorder_linkod pl on pl.preorderguid = pc.guid\n"
-                    + " left join cf_orders ord on ord.idoforg = pl.idoforg and ord.idoforder = pl.idoforder\n"
-                    + " left join cf_transactions tr on ord.idoftransaction = tr.idoftransaction\n"
-                    + " left join cf_canceledorders co on ord.idoforder = co.idoforder and ord.idoforg = co.idoforg\n"
-                    + " where pc.deletedstate = 0 and pmd.deletedstate = 0 and pmd.amount > 0 and o.PreordersEnabled = 1 "
                     + idOfContragentCondition
                     + ordersCondition
+                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 10, 11, 12, 13, 14, 15, 16, 17"
+                    + " union"
+                    + " select ctg.idofcontragent, ctg.contragentname, o.idoforg, o.shortnameinfoservice, o.address, c.contractid, pc.preorderdate, "
+                    + " pc.complexname, count(distinct pl.idoforder) as amount, array_to_string(array_agg(pmd.menudetailname), ', ') as \"Блюдо\", "
+                    + " cast(sum(pmd.menudetailprice) as bigint), co.createddate, "
+                    + " case coalesce(ord.state, 0) when 0 then 'Нет' else 'Да' end as \"Сторнировано\", "
+                    + " ord.orderdate, pl.qty*pl.price as ordersum, pl.idoforder,  case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as \"Оплачено\" "
+                    + " from cf_preorder_menudetail pmd "
+                    + " join cf_clients c on pmd.idofclient = c.idofclient "
+                    + " join cf_orgs o on c.idoforg = o.idoforg  "
+                    + " join cf_contragents ctg on o.defaultsupplier = ctg.idofcontragent "
+                    + " join cf_preorder_complex pc on pmd.idofpreordercomplex = pc.idofpreordercomplex "
+                    + " join cf_preorder_linkod pl on pl.preorderguid = pc.guid "
+                    + " left join cf_orders ord on ord.idoforg = pl.idoforg and ord.idoforder = pl.idoforder"
+                    + " left join cf_transactions tr on ord.idoftransaction = tr.idoftransaction"
+                    + " left join cf_canceledorders co on ord.idoforder = co.idoforder and ord.idoforg = co.idoforg"
+                    + " where pc.deletedstate = 0 and pmd.deletedstate = 0 and pmd.amount > 0 and o.PreordersEnabled = 1"
                     + " and pmd.preorderdate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
+                    + idOfContragentCondition
+                    + ordersCondition
+                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 12, 13, 14, 15, 16, 17"
+                    + " UNION"
+                    + " select ctg.idofcontragent, ctg.contragentname, o.idoforg, "
+                    + " o.shortnameinfoservice, o.address, c.contractid, pc.preorderdate,"
+                    + " pc.complexname, (pc.amount - coalesce(q.payed, 0)) as amount, '' as \"Блюдо\", cast(pc.complexprice as bigint),"
+                    + " cast(null as bigint) as createddate, 'Нет'  as \"Сторнировано\","
+                    + " cast(null as bigint), cast(null as bigint) as ordersum, pl.idoforder, 'Нет' as \"Оплачено\""
+                    + " from cf_preorder_complex pc"
+                    + " join cf_clients c on pc.idofclient = c.idofclient "
+                    + " join cf_orgs o on c.idoforg = o.idoforg "
+                    + " join cf_contragents ctg on o.defaultsupplier = ctg.idofcontragent"
+                    + " left outer join cf_preorder_linkod pl on pl.preorderguid = pc.guid"
+                    + " left outer join (select preorderguid, count(idofpreorderlinkod) as payed from cf_preorder_linkod group by  preorderguid) q on q.preorderguid = pc.guid"
+                    + " where pc.deletedstate = 0 and pc.amount > 0 and o.PreordersEnabled = 1"
+                    + " and (pc.amount - coalesce(q.payed, 0)) != 0 "
+                    + " and pc.preorderdate BETWEEN :startDate and :endDate "
+                    + idOfOrgsCondition
+                    + idOfContragentCondition
+                    + ordersCondition
+                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17"
                     + " order by 1, 6 desc, 2, 3, 4 ");
             query.setParameter("startDate", startTime.getTime())
                  .setParameter("endDate", endTime.getTime());
@@ -139,7 +162,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     Long clientContractId = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[5]);
                     Date preorderDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[6]);
                     String complexName = (String) row[7];
-                    Integer amount = (Integer) row[8];
+                    Integer amount = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[8]).intValue();
                     String dish = (String) row[9];
                     Long complexPrice = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[10]);
                     Date cancelDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[11]);
