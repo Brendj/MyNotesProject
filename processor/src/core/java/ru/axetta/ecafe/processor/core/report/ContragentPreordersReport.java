@@ -138,7 +138,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " and pc.preorderdate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
                     + idOfContragentCondition
-                    + ordersCondition
+                    + " and pl.idoforder is null "
                     + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17"
                     + " order by 1, 6 desc, 2, 3, 4 ");
             query.setParameter("startDate", startTime.getTime())
@@ -202,7 +202,4 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
     public ContragentPreordersReport.Builder createBuilder(String templateFilename) {
         return new ContragentPreordersReport.Builder(templateFilename);
     }
-
-
-
 }
