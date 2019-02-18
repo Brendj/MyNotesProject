@@ -397,6 +397,7 @@ public class SmartWatchRestController {
 
             List<JsonEnterEventItem> items = buildEnterEventItem(session, child, startDateTime, endDateTime, limit);
             result.setItems(items);
+
             result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
             result.getResult().description = ResponseCodes.RC_OK.toString();
 
@@ -480,6 +481,7 @@ public class SmartWatchRestController {
 
             List<JsonOrder> items = buildPaymentsInfo(session, child, startDate, endDate, limit);
             result.setItems(items);
+
             result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
             result.getResult().description = ResponseCodes.RC_OK.toString();
 

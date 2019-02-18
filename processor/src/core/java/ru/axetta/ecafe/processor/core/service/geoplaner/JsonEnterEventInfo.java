@@ -16,6 +16,7 @@ public class JsonEnterEventInfo {
     private String shortName;
     private String shortAddress;
     private Long actualBalance;
+    private String gender;
 
     public Date getEvtDateTime() {
         return evtDateTime;
@@ -87,5 +88,13 @@ public class JsonEnterEventInfo {
 
     public void setActualBalance(Long actualBalance) {
         this.actualBalance = actualBalance;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 }

@@ -16,6 +16,7 @@ public class JsonPurchasesInfo {
     private Long RSum;
     private String purchasesName;
     private Long actualBalance;
+    private String gender;
 
     public Long getCardNo() {
         return cardNo;
@@ -87,5 +88,13 @@ public class JsonPurchasesInfo {
 
     public void setActualBalance(Long actualBalance) {
         this.actualBalance = actualBalance;
+    }
+
+    public String getGender() {
+        return gender;
+    }
+
+    public void setGender(String gender) {
+        this.gender = gender;
     }
 }

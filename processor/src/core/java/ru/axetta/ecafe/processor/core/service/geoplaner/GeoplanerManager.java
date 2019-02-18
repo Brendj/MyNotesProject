@@ -30,6 +30,9 @@ public class GeoplanerManager {
     private final int ENTER_EVENTS = 1;
     private final int PURCHASES = 2;
     private final int PAYMENTS = 3;
+    private final String[] CLIENT_GENDERS = {
+            "female", "male"
+    };
 
     private static boolean managerIsOn() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -171,6 +174,7 @@ public class GeoplanerManager {
         info.setCardNo(card.getCardNo());
         info.setContractId(client.getContractId());
         info.setActualBalance(client.getBalance());
+        info.setGender(CLIENT_GENDERS[client.getGender()]);
         info.setEvtDateTime(event.getEvtDateTime());
         info.setDirection(event.getPassDirection());
         if(event.getOrg() == null){
@@ -196,6 +200,7 @@ public class GeoplanerManager {
         info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
         info.setContractID(client.getContractId());
         info.setActualBalance(client.getBalance());
+        info.setGender(CLIENT_GENDERS[client.getGender()]);
         info.setOrderTime(purchases.getTime());
         info.setOrderType(purchases.getOrderType().ordinal());
         info.setRSum(purchases.getRSum());
@@ -221,6 +226,7 @@ public class GeoplanerManager {
         info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
         info.setContractId(client.getContractId());
         info.setActualBalance(client.getBalance());
+        info.setGender(CLIENT_GENDERS[client.getGender()]);
         info.setCreateTime(clientPayment.getCreateTime());
         if(clientPayment.getTransaction()!= null){
             info.setSourceType(clientPayment.getTransaction().getSourceType());
