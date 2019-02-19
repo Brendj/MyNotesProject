@@ -739,7 +739,6 @@ public class SmartWatchRestController {
     private List<JsonEnterEventItem> buildEnterEventItem(Session session, Client child, Long startDate, Long endDate,
             Integer limit) throws Exception{
         List<JsonEnterEventItem> items = new LinkedList<JsonEnterEventItem>();
-        List<Long> cardNoOfOwner = new LinkedList<Long>();
         List<EnterEventsItem> events = null;
         String timeConditional = endDate == null ? " evtDateTime <= :startDate " : " evtDateTime BETWEEN :endDate AND :startDate ";
 
@@ -747,14 +746,11 @@ public class SmartWatchRestController {
             limit = DEFAULT_SAMPLE_LIMIT;
         }
 
-        for(Card card : child.getCards()){
-            cardNoOfOwner.add(card.getCardNo());
-        }
 
         SQLQuery query = session.createSQLQuery("SELECT passDirection, evtDateTime, idOfClient, idOfCard "
                 + " FROM cf_enterevents "
                 + " WHERE " + timeConditional
-                + " AND (idofclient = :idOfChild OR idofcard IN (:idOfCards)) "
+                + " AND idofclient = :idOfChild "
                 + " ORDER BY 2 DESC "
                 + " LIMIT :limit");
         query
@@ -762,10 +758,10 @@ public class SmartWatchRestController {
                 .addScalar("evtDateTime", new LongType())
                 .addScalar("idOfClient", new LongType())
                 .addScalar("idOfCard", new LongType())
+
                 .setParameter("startDate", startDate)
                 .setParameter("idOfChild", child.getIdOfClient())
                 .setParameter("limit", limit)
-                .setParameterList("idOfCards", cardNoOfOwner)
                 .setResultTransformer(Transformers.aliasToBean(EnterEventsItem.class));
 
         if(endDate != null){
