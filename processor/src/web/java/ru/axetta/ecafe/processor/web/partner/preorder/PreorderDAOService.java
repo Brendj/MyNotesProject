@@ -680,7 +680,6 @@ public class PreorderDAOService {
         Date currentDate = CalendarUtils.startOfDay(new Date());
         long nextVersion = nextVersionByPreorderComplex();
 
-        boolean isSixWorkWeek = DAOReadonlyService.getInstance().isSixWorkWeek(regularPreorder.getClient().getOrg().getIdOfOrg()); //шестидневка в целом по ОО
         List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(currentDate, dateTo, regularPreorder.getClient().getOrg().getIdOfOrg());//данные из производственного календаря за период
         currentDate = getStartDateForGeneratePreordersInternal(regularPreorder.getClient());
         if (currentDate.before(regularPreorder.getStartDate())) currentDate = regularPreorder.getStartDate();
@@ -693,12 +692,24 @@ public class PreorderDAOService {
             }
         }
 
+        List<ProductionCalendar> productionCalendar = DAOReadonlyService.getInstance().getProductionCalendar(new Date(), dateTo);
+        currentDate = CalendarUtils.startOfDayInUTC(currentDate);
         while (currentDate.before(dateTo) || currentDate.equals(dateTo)) {
-
-            boolean isWorkDate = getIsWorkDate(isSixWorkWeek, currentDate, specialDates, regularPreorder.getClient());
+            Boolean isWeekend = isWeekendByProductionCalendar(currentDate, productionCalendar);
+            int day = CalendarUtils.getDayOfWeek(currentDate);
+            if (day == Calendar.SATURDAY) {
+                Boolean isWeekendSD = isWeekendBySpecialDate(currentDate, regularPreorder.getClient(), specialDates); //выходной по данным таблицы SpecialDates
+                if (isWeekendSD == null) {
+                    String groupName = DAOReadonlyService.getInstance().getClientGroupName(regularPreorder.getClient());
+                    isWeekend = !DAOReadonlyService.getInstance().isSixWorkWeek(regularPreorder.getClient().getOrg().getIdOfOrg(), groupName);
+                } else {
+                    isWeekend = isWeekendSD;
+                }
+            }
+            if (!isWeekend) isWeekend = isHolidayByProductionCalendar(currentDate, productionCalendar);
 
             boolean doGenerate = doGenerate(currentDate, regularPreorder);  //генерить ли предзаказ по дню недели в регулярном заказе
-            if (!isWorkDate || !doGenerate) {
+            if (isWeekend || !doGenerate) {
                 currentDate = CalendarUtils.addDays(currentDate, 1);
                 continue;
             }
@@ -1324,18 +1335,19 @@ public class PreorderDAOService {
         return false;
     }
 
-    private boolean isWeekendBySpecialDate(Date date, Client client, List<SpecialDate> specialDates) {
+    private Boolean isWeekendBySpecialDate(Date date, Client client, List<SpecialDate> specialDates) {
+        Boolean isWeekend = null;
         if(specialDates != null){
             for (SpecialDate specialDate : specialDates) {
                 if (CalendarUtils.betweenOrEqualDate(specialDate.getDate(), date, CalendarUtils.addDays(date, 1)) && !specialDate.getDeleted()) {
                     if (specialDate.getIdOfClientGroup() == null || specialDate.getIdOfClientGroup().equals(client.getIdOfClientGroup()))
-                        return specialDate.getIsWeekend();
+                        isWeekend = specialDate.getIsWeekend();
                     if (specialDate.getIdOfClientGroup() != null && specialDate.getIdOfClientGroup().equals(client.getIdOfClientGroup()))
                         break;
                 }
             }
         }
-        return false;
+        return isWeekend;
     }
 
     @Transactional(readOnly = true)
@@ -1347,8 +1359,6 @@ public class PreorderDAOService {
         c.setTime(today);
 
         Date endDate = CalendarUtils.addDays(today, syncCountDays);                   //14 календарных дней вперед
-        String groupName = DAOReadonlyService.getInstance().getClientGroupName(client);
-        boolean isSixWorkWeek = DAOReadonlyService.getInstance().isSixWorkWeek(orgId, groupName);
 
         Map<Date, Long> usedAmounts = existPreordersByDate(client.getIdOfClient(), today, endDate);                 //для показа есть ли предзаказы по датам
         List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(today, endDate, orgId);   //выходные дни по ОО в целом или ее группам
@@ -1370,8 +1380,14 @@ public class PreorderDAOService {
             }
 
             int day = CalendarUtils.getDayOfWeek(currentDate);
-            if (day == Calendar.SATURDAY && isSixWorkWeek) {
-                isWeekend = isWeekendBySpecialDate(currentDate, client, specialDates); //выходной по данным таблицы SpecialDates
+            if (day == Calendar.SATURDAY) {
+                Boolean isWeekendSD = isWeekendBySpecialDate(currentDate, client, specialDates); //выходной по данным таблицы SpecialDates
+                if (isWeekendSD == null) {
+                    String groupName = DAOReadonlyService.getInstance().getClientGroupName(client);
+                    isWeekend = !DAOReadonlyService.getInstance().isSixWorkWeek(orgId, groupName);
+                } else {
+                    isWeekend = isWeekendSD;
+                }
             }
             if (!isWeekend) isWeekend = isHolidayByProductionCalendar(currentDate, productionCalendar); //если праздничный день по производственному календарю - то запрет редактирования
 

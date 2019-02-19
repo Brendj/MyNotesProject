@@ -3128,6 +3128,9 @@ public class DAOUtils {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+        if (forbiddenDays == null) {
+            forbiddenDays = PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
+        }
         return forbiddenDays;
     }
 
@@ -3184,7 +3187,7 @@ public class DAOUtils {
 
     public static Integer getPreorderFeedingForbiddenDays(Client client) {
         if (client == null) {
-            return null;
+            return PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
         }
         return getPreorderFeedingForbiddenDays(client.getOrg().getIdOfOrg());
     }

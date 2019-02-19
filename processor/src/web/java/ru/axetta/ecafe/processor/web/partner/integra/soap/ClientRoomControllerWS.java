@@ -8571,7 +8571,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         result.setPreorderSum3Days(preordersSum3);
 
         result.setForbiddenDays(DAOUtils.getPreorderFeedingForbiddenDays(client));
-        Map<String, Integer[]> sd = preorderDAOService.getSpecialDates(date, syncCountDays, client.getOrg().getIdOfOrg(), client);
+        Map<String, Integer[]> sd = preorderDAOService.getSpecialDates(CalendarUtils.addHours(today, 12), syncCountDays, client.getOrg().getIdOfOrg(), client);
         PreorderCalendar calendar = new PreorderCalendar();
         for (Map.Entry<String, Integer[]> entry : sd.entrySet()) {
             PreorderCalendarItem item = new PreorderCalendarItem();
