@@ -144,6 +144,10 @@ public class DTSZNDiscountsReviseService {
     }
 
     public void runTaskRest() throws Exception {
+        runTaskRest(null);
+    }
+
+    public void runTaskRest(String guid) throws Exception {
         if (null == serviceURL) {
             throw new Exception("Unable to run DTSZNDiscountsReviseService - no service url was found");
         }
@@ -169,7 +173,7 @@ public class DTSZNDiscountsReviseService {
 
         do {
             try {
-                NSIPersonBenefitResponse response = loadPersonBenefits(currentPage, pageSize, entityIdList, filterDate);
+                NSIPersonBenefitResponse response = loadPersonBenefits(currentPage, pageSize, entityIdList, filterDate, guid);
 
                 session = runtimeContext.createPersistenceSession();
                 session.setFlushMode(FlushMode.MANUAL);
@@ -295,7 +299,10 @@ public class DTSZNDiscountsReviseService {
         } while (currentPage++ < pagesCount);
 
         if (pagesCount != 0L) {
-            updateArchivedFlagForDiscounts();
+            // не ставим архивный при обработке льгот одного клиента
+            if (StringUtils.isEmpty(guid)) {
+                updateArchivedFlagForDiscounts();
+            }
             runTaskPart2(fireTime);
             updateApplicationsForFoodTask();
         }
@@ -382,7 +389,7 @@ public class DTSZNDiscountsReviseService {
         return new NSIRequest(paramList, page, "DictBenefit", pageSize);
     }
 
-    private NSIRequest buildPersonBenefitRequest(Long page, Long pageSize, List<String> entityIdList, String date) {
+    private NSIRequest buildPersonBenefitRequest(Long page, Long pageSize, List<String> entityIdList, String date, String guid) {
         List<NSIRequestParam> paramList = new ArrayList<NSIRequestParam>();
         if (!disableOUFilter) {
             paramList.add(new NSIRequestParam("person/student/institution-groups/institution-group/age-group",
@@ -402,6 +409,11 @@ public class DTSZNDiscountsReviseService {
         paramList.add(new NSIRequestParam("created-by", OPERATOR_EQUAL, "ou", false));
         paramList.add(new NSIRequestParam("deleted", OPERATOR_EQUAL, Boolean.TRUE.toString(), true));
         paramList.add(new NSIRequestParam("date-end", OPERATOR_LT, date, true));
+
+        if (!StringUtils.isEmpty(guid)) {
+            paramList.add(new NSIRequestParam("person/entity-id", OPERATOR_EQUAL, guid, false));
+        }
+
         return new NSIRequest(paramList, page, "PersonBenefit", pageSize);
     }
 
@@ -441,7 +453,7 @@ public class DTSZNDiscountsReviseService {
         return null;
     }
 
-    private NSIPersonBenefitResponse loadPersonBenefits(Long page, Long pageSize, List<String> entityIdList, String filterDate) throws ConnectException {
+    private NSIPersonBenefitResponse loadPersonBenefits(Long page, Long pageSize, List<String> entityIdList, String filterDate, String guid) throws ConnectException {
         HttpClient httpClient = new HttpClient();
 
         httpClient.getHostConfiguration().setHost(serviceURL.getHost(), serviceURL.getPort(),
@@ -451,7 +463,7 @@ public class DTSZNDiscountsReviseService {
 
             method.addRequestHeader("Content-Type", "application/json; charset=utf-8");
             authenticateHeaders(method);
-            prepareMethodData(method, buildPersonBenefitRequest(page, pageSize, entityIdList, filterDate));
+            prepareMethodData(method, buildPersonBenefitRequest(page, pageSize, entityIdList, filterDate, guid));
 
             Date date = new Date();
             Integer status = httpClient.executeMethod(method);
@@ -544,11 +556,17 @@ public class DTSZNDiscountsReviseService {
             ETPMVService service = RuntimeContext.getAppContext().getBean(ETPMVService.class);
             Date fireTime = new Date();
 
+            logger.info(String.format("%d applications was find for update", applicationForFoodList.size()));
+            Integer counter = 1;
             for (ApplicationForFood applicationForFood : applicationForFoodList) {
-                List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, applicationForFood.getClient());
-                if (clientInfoList.isEmpty())
-                    continue;
+                List<ClientDtisznDiscountInfo> clientInfoList = null;
                 try {
+                    if (null == transaction || !transaction.isActive()) {
+                        transaction = session.beginTransaction();
+                    }
+                    clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, applicationForFood.getClient());
+                    if (clientInfoList.isEmpty())
+                        continue;
                     Boolean isDiscountOk = false;
                     Boolean isDateOk = true;
 
@@ -566,6 +584,8 @@ public class DTSZNDiscountsReviseService {
                     }
 
                     if (!isDateOk) {
+                        logger.info(String.format("Updating applications: %d/%d",
+                                counter++, applicationForFoodList.size()));
                         continue;
                     }
 
@@ -602,16 +622,25 @@ public class DTSZNDiscountsReviseService {
                                 applicationForFood.getStatus().getDeclineReason()));
                     }
                     service.sendStatusesAsync(statusList);
+                    logger.info(String.format("Updating applications: %d/%d",
+                            counter++, applicationForFoodList.size()));
 
                 } catch (Exception e) {
                     logger.error(String.format("Error in updateApplicationsForFoodTask: " +
                                     "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo={%s}",
                             applicationForFood.getClient().getIdOfClient(), StringUtils.join(clientInfoList, ",")));
+                } finally {
+                    if (null != transaction && transaction.isActive()) {
+                        transaction.commit();
+                        transaction = null;
+                    }
                 }
             }
 
-            transaction.commit();
-            transaction = null;
+            if (null != transaction && transaction.isActive()) {
+                transaction.commit();
+                transaction = null;
+            }
         } catch (Exception e) {
             logger.error("Error in update discounts", e);
             throw e;
@@ -827,10 +856,19 @@ public class DTSZNDiscountsReviseService {
     }
 
     public void runTaskDB() throws Exception {
-        Integer delta = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DELTA);
-        Date deltaDate = CalendarUtils.addHours(new Date(), -delta);
-        List<ReviseDAOService.DiscountItem> discountItemList =
-                RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsUpdatedSinceDate(deltaDate);
+        runTaskDB(null);
+    }
+
+    public void runTaskDB(String guid) throws Exception {
+        List<ReviseDAOService.DiscountItem> discountItemList;
+
+        if (StringUtils.isEmpty(guid)) {
+            Integer delta = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DELTA);
+            Date deltaDate = CalendarUtils.addHours(new Date(), -delta);
+            discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsUpdatedSinceDate(deltaDate);
+        } else {
+            discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsByGUID(guid);
+        }
 
         Date fireTime = new Date();
         Session session = null;
@@ -991,6 +1029,20 @@ public class DTSZNDiscountsReviseService {
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void updateDiscountsForGUID(String guid) throws Exception {
+        if (!guid.matches("^[0-9a-fA-F]{8}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{4}-[0-9a-fA-F]{12}$")) {
+            throw new IllegalArgumentException("GUID wrong format");
+        }
+
+        Integer sourceType = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DATA_SOURCE);
+
+        switch (sourceType) {
+            case 1: runTaskRest(guid); break;   //DATA_SOURCE_TYPE_NSI
+            case 2: runTaskDB(guid); break;     //DATA_SOURCE_TYPE_DB
+            default: runTaskRest(guid); break;
         }
     }
 

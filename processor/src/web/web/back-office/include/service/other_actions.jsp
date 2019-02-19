@@ -126,8 +126,15 @@
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <a4j:commandButton value="Запустить сверку льгот ДТСЗН с реестрами 2.0(этап 2)" action="#{otherActionsPage.runDTSZNDiscountsReviseServicePart2()}" id="runDTSZNDiscountsReviseServicePart2"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
-        <a4j:commandButton value="Запустить обработку ЗЛП по результатам сверки" action="#{otherActionsPage.runUpdateApplicationsForFoodTask()}" id="runUpdateApplicationsForFoodTask"
-                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+    <a4j:commandButton value="Запустить обработку ЗЛП по результатам сверки" action="#{otherActionsPage.runUpdateApplicationsForFoodTask()}" id="runUpdateApplicationsForFoodTask"
+                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+    <rich:panel>
+        <a4j:commandButton value="Получить льготы по гуиду" action="#{otherActionsPage.runUpdateDiscounts()}"
+                           title="Источник данных указывается в настройках"
+                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" /><br/>
+        <h:outputText value="GUID:"/>
+        <h:inputText value="#{otherActionsPage.guidForDiscountsUpdate}" size="50"/>
+    </rich:panel>
     <rich:separator align="center" height = "8" width = "75%" />
     <a4j:commandButton value="Итого за день" action="#{otherActionsPage.runEventNotificationServiceForDaily}" id="runEventNotificationServiceForDaily"
                            styleClass="command-button" />

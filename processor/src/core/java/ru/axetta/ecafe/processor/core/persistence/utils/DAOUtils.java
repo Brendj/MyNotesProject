@@ -4123,4 +4123,12 @@ public class DAOUtils {
         query.setParameter("activeState", CardState.ISSUED.getValue());
         return (Integer) query.uniqueResult();
     }
+
+    public static ApplicationForFoodHistory getLastApplicationForFoodHistory(Session session, ApplicationForFood applicationForFood) {
+        Criteria criteria = session.createCriteria(ApplicationForFoodHistory.class);
+        criteria.add(Restrictions.eq("applicationForFood", applicationForFood));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("createdDate"));
+        criteria.setMaxResults(1);
+        return (ApplicationForFoodHistory) criteria.uniqueResult();
+    }
 }

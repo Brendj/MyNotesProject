@@ -55,6 +55,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
     private Date summaryDate;
     private Date summaryFinOperatorDate;
     private String orgsForSpbCardsUidUpdate;
+    private String guidForDiscountsUpdate;
 
     private static void close(Closeable resource) {
         if (resource != null) {
@@ -539,6 +540,16 @@ public class OtherActionsPage extends BasicWorkspacePage {
         }
     }
 
+    public void runUpdateDiscounts() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateDiscountsForGUID(guidForDiscountsUpdate);
+            printMessage("Обновление льгот завершено");
+        } catch (Exception e) {
+            getLogger().error("Error in runUpdateDiscounts: ", e);
+            printError("Во время выполнения операции произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
     public String getOrgsForSpbCardsUidUpdate() {
         return orgsForSpbCardsUidUpdate;
     }
@@ -554,6 +565,14 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     private List<Long> getOrgsForCardsUpdate() throws Exception {
         return getOrgs(orgsForSpbCardsUidUpdate);
+    }
+
+    public String getGuidForDiscountsUpdate() {
+        return guidForDiscountsUpdate;
+    }
+
+    public void setGuidForDiscountsUpdate(String guidForDiscountsUpdate) {
+        this.guidForDiscountsUpdate = guidForDiscountsUpdate;
     }
 
     public void runUpdateSpbCardUids() throws Exception {

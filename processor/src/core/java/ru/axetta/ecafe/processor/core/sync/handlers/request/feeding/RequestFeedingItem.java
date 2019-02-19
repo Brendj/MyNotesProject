@@ -39,6 +39,7 @@ public class RequestFeedingItem {
     private String errorMessage;
     private Integer resCode;
     private Long version;
+    private Date statusCreatedDate;
 
     public RequestFeedingItem(Long applicationForFeedingNumber, String servNumber, Integer status, Integer declineReason,
             Date applicationCreatedDate, Long idOfClient, String applicantSurname, String applicantName,
@@ -67,7 +68,7 @@ public class RequestFeedingItem {
         }
     }
 
-    public RequestFeedingItem(ApplicationForFood applicationForFood) {
+    public RequestFeedingItem(ApplicationForFood applicationForFood, Date statusCreatedDate) {
         this.applicationForFeedingNumber = applicationForFood.getIdOfApplicationForFood();
         ApplicationForFoodStatus status = applicationForFood.getStatus();
         this.status = status.getApplicationForFoodState().getCode();
@@ -87,6 +88,7 @@ public class RequestFeedingItem {
         this.idOfDocOrder = applicationForFood.getIdOfDocOrder();
         this.docOrderDate = applicationForFood.getDocOrderDate();
         this.hasSocialDiscount = (null != applicationForFood.getDtisznCode());
+        this.statusCreatedDate = statusCreatedDate;
     }
 
     public static RequestFeedingItem build(Node itemNode, Long idOfOrg) throws Exception {
@@ -230,6 +232,9 @@ public class RequestFeedingItem {
         }
         if (null != hasSocialDiscount) {
             XMLUtils.setAttributeIfNotNull(element, "InSocOrgans", hasSocialDiscount);
+        }
+        if (null != statusCreatedDate) {
+            XMLUtils.setAttributeIfNotNull(element, "StatusDate", simpleDateFormat.format(statusCreatedDate));
         }
         return element;
     }
@@ -384,5 +389,13 @@ public class RequestFeedingItem {
 
     public void setHasSocialDiscount(Boolean hasSocialDiscount) {
         this.hasSocialDiscount = hasSocialDiscount;
+    }
+
+    public Date getStatusCreatedDate() {
+        return statusCreatedDate;
+    }
+
+    public void setStatusCreatedDate(Date statusCreatedDate) {
+        this.statusCreatedDate = statusCreatedDate;
     }
 }

@@ -133,7 +133,8 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                 DAOUtils.getApplicationsForFoodForOrgsSinceVersion(session, friendlyOrgIds, requestFeeding.getMaxVersion());
         for (ApplicationForFood applicationForFood : list) {
             if (null != applicationForFood) {
-                resItem = new RequestFeedingItem(applicationForFood);
+                ApplicationForFoodHistory history = DAOUtils.getLastApplicationForFoodHistory(session, applicationForFood);
+                resItem = new RequestFeedingItem(applicationForFood, history.getCreatedDate());
                 items.add(resItem);
             }
         }

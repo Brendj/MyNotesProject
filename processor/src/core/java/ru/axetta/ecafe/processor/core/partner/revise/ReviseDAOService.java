@@ -15,8 +15,8 @@ import org.springframework.stereotype.Component;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.List;
 
 @Component("ReviseDAOService")
@@ -29,9 +29,8 @@ public class ReviseDAOService {
     private EntityManager entityManager;
 
     public List<DiscountItem> getDiscountsUpdatedSinceDate(Date updated) {
-        List<DiscountItem> discountItemList = new LinkedList<DiscountItem>();
         String sqlString = "select registry_guid, dszn_code, title, sd, sd_dszn, fd, fd_dszn, is_benefit_confirm, updated_at, is_del "
-                + " from benefits_for_ispp where updated_at >= :updatedDate and registry_guid is not null";
+                + " from benefits_for_ispp where updated_at >= :updatedDate and registry_guid is not null order by updated_at asc";
         Query query = entityManager.createNativeQuery(sqlString);
         query.setParameter("updatedDate", updated);
         try {
@@ -39,7 +38,36 @@ public class ReviseDAOService {
         } catch (Exception e) {
             logger.warn("Unable to log revise request");
         }
-        List list = query.getResultList();
+        List<DiscountItem> discountItemList = parseDiscounts(query.getResultList());
+        try {
+            reviseLogger.logResponseDB(discountItemList);
+        } catch (Exception e) {
+            logger.warn("Unable to log revise response");
+        }
+        return discountItemList;
+    }
+
+    public List<DiscountItem> getDiscountsByGUID(String guid) {
+        String sqlString = "select registry_guid, dszn_code, title, sd, sd_dszn, fd, fd_dszn, is_benefit_confirm, updated_at, is_del "
+                + " from benefits_for_ispp where registry_guid = :guid order by updated_at asc";
+        Query query = entityManager.createNativeQuery(sqlString);
+        query.setParameter("guid", guid);
+        try {
+            reviseLogger.logRequestDB(query, sqlString);
+        } catch (Exception e) {
+            logger.warn("Unable to log revise request");
+        }
+        List<DiscountItem> discountItemList = parseDiscounts(query.getResultList());
+        try {
+            reviseLogger.logResponseDB(discountItemList);
+        } catch (Exception e) {
+            logger.warn("Unable to log revise response");
+        }
+        return discountItemList;
+    }
+
+    private List<DiscountItem> parseDiscounts(List list) {
+        List<DiscountItem> discountItemList = new ArrayList<DiscountItem>();
         for (Object o : list) {
             Object[] row = (Object[]) o;
             String registryGUID = (String) row[0];
@@ -61,11 +89,6 @@ public class ReviseDAOService {
             Boolean isDeleted = (Boolean) row[9];
             discountItemList.add(new DiscountItem(registryGUID, dsznCode, title, sd, sdDszn, fd, fdDszn, isBenefitConfirmed,
                     updatedAt, isDeleted));
-        }
-        try {
-            reviseLogger.logResponseDB(discountItemList);
-        } catch (Exception e) {
-            logger.warn("Unable to log revise response");
         }
         return discountItemList;
     }
