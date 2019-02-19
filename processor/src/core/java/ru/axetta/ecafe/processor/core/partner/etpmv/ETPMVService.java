@@ -53,7 +53,7 @@ public class ETPMVService {
     private final int PAUSE_IN_MILLIS = 1000;
     public final String BENEFIT_INOE = "0";
     public final String BENEFIT_REGULAR = "1";
-    private final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss";
+    private final String DATE_FORMAT = "yyyy-MM-dd'T'HH:mm:ss.SSS";
     //public final Set<String> BENEFITS_ETP = new HashSet<String>(Arrays.asList("0", "1", "2", "3", "4", "5"));
     //private final int DAYS_TO_EXPIRE = 5;
     private IsppWebServiceService service;
