@@ -3110,11 +3110,11 @@ public class DAOUtils {
             List list = criteria.list();
             if (list == null || list.isEmpty()) {
                 //logger.error("Отсутствуют настройки предзаказанного питания для организации с id=" + idOfOrg);
-                return null;
+                return PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
             }
             if (list.size() > 1) {
                 logger.error("Организация имеет более одной настройки id OO=" + idOfOrg);
-                return null;
+                return PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
             }
             ECafeSettings settings = (ECafeSettings) list.get(0);
             PreOrderFeedingSettingValue parser = (PreOrderFeedingSettingValue) settings.getSplitSettingValue();

@@ -1380,14 +1380,14 @@ public class PreorderDAOService {
             }
 
             int day = CalendarUtils.getDayOfWeek(currentDate);
-            if (day == Calendar.SATURDAY) {
-                Boolean isWeekendSD = isWeekendBySpecialDate(currentDate, client, specialDates); //выходной по данным таблицы SpecialDates
-                if (isWeekendSD == null) {
+            Boolean isWeekendSD = isWeekendBySpecialDate(currentDate, client, specialDates); //выходной по данным таблицы SpecialDates
+            if (isWeekendSD == null) { //нет данных по дню в КУД
+                if (day == Calendar.SATURDAY) {
                     String groupName = DAOReadonlyService.getInstance().getClientGroupName(client);
                     isWeekend = !DAOReadonlyService.getInstance().isSixWorkWeek(orgId, groupName);
-                } else {
-                    isWeekend = isWeekendSD;
                 }
+            } else {
+                isWeekend = isWeekendSD;
             }
             if (!isWeekend) isWeekend = isHolidayByProductionCalendar(currentDate, productionCalendar); //если праздничный день по производственному календарю - то запрет редактирования
 
