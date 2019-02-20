@@ -82,7 +82,7 @@ public class GeoplanerManager {
     }
 
     @Async
-    public void sendPurchasesInfoToGentler(Payment purchases, Client client) throws Exception{
+    public void sendPurchasesInfoToGeoplaner(Payment purchases, Client client) throws Exception{
         Session session = null;
         Transaction hibernateTransaction = null;
         try {

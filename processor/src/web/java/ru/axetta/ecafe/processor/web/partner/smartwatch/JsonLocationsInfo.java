@@ -8,6 +8,9 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class JsonLocationsInfo {
+    private String fio;
+    private Long contractId;
+    private Boolean hasActiveSmartWatch;
     private OrgInformation mainOrgInfo;
     private List<OrgInformation> friendlyOrgInfo;
     private List<MigrantInfo> migrants;
@@ -44,5 +47,29 @@ public class JsonLocationsInfo {
 
     public void setMigrants(List<MigrantInfo> migrants) {
         this.migrants = migrants;
+    }
+
+    public String getFio() {
+        return fio;
+    }
+
+    public void setFio(String fio) {
+        this.fio = fio;
+    }
+
+    public Long getContractId() {
+        return contractId;
+    }
+
+    public void setContractId(Long contractId) {
+        this.contractId = contractId;
+    }
+
+    public Boolean getHasActiveSmartWatch() {
+        return hasActiveSmartWatch;
+    }
+
+    public void setHasActiveSmartWatch(Boolean hasActiveSmartWatch) {
+        this.hasActiveSmartWatch = hasActiveSmartWatch;
     }
 }

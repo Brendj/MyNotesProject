@@ -6,9 +6,12 @@ package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 
+import java.util.LinkedList;
+import java.util.List;
+
 public class JsonLocations {
     private Result result;
-    private JsonLocationsInfo locations;
+    private List<JsonLocationsInfo> locations;
 
     public JsonLocations(){
         result = new Result();
@@ -22,11 +25,14 @@ public class JsonLocations {
         this.result = result;
     }
 
-    public JsonLocationsInfo getLocations() {
+    public List<JsonLocationsInfo> getLocations() {
+        if(locations == null){
+            locations = new LinkedList<JsonLocationsInfo>();
+        }
         return locations;
     }
 
-    public void setLocations(JsonLocationsInfo locations) {
+    public void setLocations(List<JsonLocationsInfo> locations) {
         this.locations = locations;
     }
 }

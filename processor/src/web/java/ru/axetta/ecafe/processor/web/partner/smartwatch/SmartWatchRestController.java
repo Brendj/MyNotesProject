@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
@@ -356,6 +357,7 @@ public class SmartWatchRestController {
             @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId,
             @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime,
             @QueryParam(value="limit") Integer limit){
+        Date date = new Date();
         JsonEnterEvents result = new JsonEnterEvents();
         Session session = null;
         Transaction transaction = null;
@@ -424,6 +426,9 @@ public class SmartWatchRestController {
         } finally{
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
+            Date eDate = new Date();
+            Date delta = new Date(eDate.getTime() - date.getTime());
+            logger.info("METHOD WORKS: " + (delta.getTime()));
         }
     }
 
@@ -582,7 +587,7 @@ public class SmartWatchRestController {
     @GET
     @Path(value="getLocations")
     public Response getLocations(@QueryParam(value="mobilePhone") String mobilePhone,
-            @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId) {
+            @QueryParam(value="token") String token) {
         JsonLocations result = new JsonLocations();
         Session session = null;
         Transaction transaction = null;
@@ -596,9 +601,6 @@ public class SmartWatchRestController {
             }
             token = "";
 
-            if (contractId == null) {
-                throw new IllegalArgumentException("ContractID is null");
-            }
 
             Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
             if (parent == null) {
@@ -606,19 +608,12 @@ public class SmartWatchRestController {
                         + ", but passed the TokenValidator");
             }
 
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if (child == null) {
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
+            List<Client> children = findChildrenByGuardian(session, parent);
+
+            for(Client child : children) {
+                JsonLocationsInfo locations = buildLocations(session, child);
+                result.getLocations().add(locations);
             }
-            if (!isRelatives(session, parent, child)) {
-                throw new IllegalArgumentException(
-                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
-
-            JsonLocationsInfo locations = buildLocations(session, child);
-
-            result.setLocations(locations);
-
             transaction.commit();
             transaction = null;
 
@@ -648,10 +643,28 @@ public class SmartWatchRestController {
         }
     }
 
+    private List<Client> findChildrenByGuardian(Session session, Client parent) {
+        List<ClientGuardian> listOfClientGuardianByIdOfGuardian = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, parent.getIdOfClient());
+        if(CollectionUtils.isEmpty(listOfClientGuardianByIdOfGuardian)){
+            return Collections.emptyList();
+        }
+        List<Client> children = new LinkedList<Client>();
+        for(ClientGuardian relation : listOfClientGuardianByIdOfGuardian){
+            Client child = (Client) session.get(Client.class, relation.getIdOfChildren());
+            if(child != null){
+                children.add(child);
+            }
+        }
+        return children;
+    }
+
     private JsonLocationsInfo buildLocations(Session session, Client child) throws Exception {
         Org mainOrg = child.getOrg();
         Integer typeOfMainOrg = mainOrg.getType().getCode();
         JsonLocationsInfo info = new JsonLocationsInfo(mainOrg.getShortName(), mainOrg.getShortAddress());
+        info.setFio(child.getPerson().getFullName());
+        info.setContractId(child.getContractId());
+        info.setHasActiveSmartWatch(child.clientHasActiveSmartWatch());
 
         if(typeOfMainOrg.equals(OrganizationType.PROFESSIONAL.getCode()) || typeOfMainOrg.equals(OrganizationType.SCHOOL.getCode())) {
             for (Org fo : mainOrg.getFriendlyOrg()) {
@@ -745,7 +758,6 @@ public class SmartWatchRestController {
         if(limit == null || limit <= 0){
             limit = DEFAULT_SAMPLE_LIMIT;
         }
-
 
         SQLQuery query = session.createSQLQuery("SELECT passDirection, evtDateTime, idOfClient, idOfCard "
                 + " FROM cf_enterevents "
