@@ -5004,22 +5004,6 @@ public class Processor implements SyncProcessor {
         return ((str1 == null ? "" : str1).equals(str2 == null ? "" : str2));
     }
 
-    private int getDaysToAdd(Long idOfOrg, Date fromDate, Date toDate) throws Exception {
-        //Integer days = DAOUtils.getPreorderFeedingForbiddenDays(idOfOrg);
-        //if (days == null) days = PreorderComplex.DEFAULT_FORBIDDEN_DAYS + 1;
-
-        Map<Date, Integer> map = DAOUtils.getSpecialDates(fromDate, CalendarUtils.getDifferenceInDays(fromDate, toDate), idOfOrg);
-        int result = 0;
-        for (Map.Entry<Date, Integer> entry : map.entrySet()) {
-            if (entry.getValue().equals(1)) {
-                result++;
-            }
-            else break;
-        }
-
-        return result;
-    }
-
     private void processReqAssortment(Session persistenceSession, Org organization, Date menuDate,
             List<SyncRequest.ReqMenu.Item.ReqAssortment> reqAssortments) {
         deleteAssortmentForDate(persistenceSession, organization, menuDate);

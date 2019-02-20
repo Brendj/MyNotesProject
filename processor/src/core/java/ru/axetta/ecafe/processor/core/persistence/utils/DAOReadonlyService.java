@@ -9,9 +9,6 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.OrgDeliveryInfo;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -496,7 +493,7 @@ public class DAOReadonlyService {
         }
     }
 
-    public boolean isSixWorkWeek(Long orgId) throws Exception {
+    /*public boolean isSixWorkWeek(Long orgId) throws Exception {
         List<ECafeSettings> settings = DAOService.getInstance().geteCafeSettingses(orgId, SettingsIds.SubscriberFeeding, false);
         boolean isSixWorkWeek = false;
         if(!settings.isEmpty()){
@@ -506,10 +503,10 @@ public class DAOReadonlyService {
             isSixWorkWeek = parser.isSixWorkWeek();
         }
         return isSixWorkWeek;
-    }
+    }*/
 
     public boolean isSixWorkWeek(Long orgId, String groupName) throws Exception {
-        boolean resultByOrg = isSixWorkWeek(orgId);
+        boolean resultByOrg = false; //isSixWorkWeek(orgId);
         try {
             return (Boolean)entityManager.createQuery("select distinct gnto.isSixDaysWorkWeek from GroupNamesToOrgs gnto where gnto.idOfOrg = :idOfOrg and gnto.groupName = :groupName")
                 .setParameter("idOfOrg", orgId)

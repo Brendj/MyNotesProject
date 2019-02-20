@@ -38,6 +38,12 @@ public class ThreadDumpService {
     @PostConstruct
     public void init() {
         threadMxBean = ManagementFactory.getThreadMXBean();
+        try {
+            threadMxBean.setThreadCpuTimeEnabled(true);
+        } catch (Exception e) {
+            logger.error("Error in init ThreadDumpService", e);
+        }
+
         isON = isOn();
     }
 

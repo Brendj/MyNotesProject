@@ -11,15 +11,13 @@
         </webroots>
         <sourceRoots />
       </configuration>
-      <facet type="jsf" name="JSF">
-        <configuration />
-      </facet>
     </facet>
     <facet type="jpa" name="JPA">
       <configuration>
         <setting name="validation-enabled" value="true" />
         <setting name="provider-name" value="" />
         <datasource-mapping>
+          <factory-entry name="entityManagerFactory" />
           <factory-entry name="org_room" value="cedfba61-0f44-4ced-9708-18045311d229" />
           <factory-entry name="processorPU" />
           <factory-entry name="reportsPU" />
@@ -67,4 +65,3 @@
     <orderEntry type="library" name="cxf" level="project" />
   </component>
 </module>
-

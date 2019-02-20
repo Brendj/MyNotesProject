@@ -3217,47 +3217,6 @@ public class DAOUtils {
         return sql.list();
     }
 
-    public static Map<Date, Integer> getSpecialDates(Date today, Integer syncCountDays, Long orgId) throws Exception {//, Client client) throws Exception {
-        Map map = new TreeMap<Date, Integer>(); //new DateComparator());
-        TimeZone timeZone = RuntimeContext.getInstance().getLocalTimeZone(null);
-        Calendar c = Calendar.getInstance();
-        c.setTimeZone(timeZone);
-        Date endDate = CalendarUtils.addDays(today, syncCountDays);
-        boolean isSixWorkWeek = DAOReadonlyService.getInstance().isSixWorkWeek(orgId);
-        int two_days = 0;
-        List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(today, endDate, orgId);
-        Integer forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(orgId);
-        if (forbiddenDays == null) {
-            forbiddenDays = PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
-        }
-        if (CalendarUtils.getHourFromDate(today) < 12) forbiddenDays++;
-        while (c.getTimeInMillis() < endDate.getTime() ){
-            Date currentDate = CalendarUtils.parseDate(CalendarUtils.dateShortToStringFullYear(c.getTime()));
-            if (two_days < forbiddenDays) {
-                c.add(Calendar.DATE, 1);
-                map.put(currentDate, 1);
-                if (CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate)) {
-                    two_days++;
-                }
-                continue;
-            }
-
-            Boolean isWeekend = !CalendarUtils.isWorkDateWithoutParser(isSixWorkWeek, currentDate);
-            if(specialDates != null){
-                for (SpecialDate specialDate : specialDates) {
-                    if (CalendarUtils.betweenOrEqualDate(specialDate.getDate(), currentDate, CalendarUtils.addDays(currentDate, 1)) && !specialDate.getDeleted()) {
-                        isWeekend = specialDate.getIsWeekend();
-                        break;
-                    }
-                }
-            }
-
-            c.add(Calendar.DATE, 1);
-            map.put(currentDate, isWeekend ? 1 : 0);
-        }
-        return map;
-    }
-
     public static Staff getAdminStaffFromOrg(Session session, Long idOfOrg) {
         Criteria criteria = session.createCriteria(Staff.class);
         criteria.add(Restrictions.eq("orgOwner", idOfOrg));
