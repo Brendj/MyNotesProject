@@ -789,7 +789,8 @@ public class PreorderDAOService {
         if (forbiddenDays == null) {
             forbiddenDays = PreorderComplex.DEFAULT_FORBIDDEN_DAYS;
         }
-        boolean isSixWorkWeek = DAOReadonlyService.getInstance().isSixWorkWeek(client.getOrg().getIdOfOrg()); //шестидневка в целом по ОО
+        String groupName = DAOReadonlyService.getInstance().getClientGroupName(client);
+        boolean isSixWorkWeek = DAOReadonlyService.getInstance().isSixWorkWeek(client.getOrg().getIdOfOrg(), groupName);
         int i = 0;
         Date result = CalendarUtils.addDays(currentDate, 1);
         while (i < forbiddenDays) {
