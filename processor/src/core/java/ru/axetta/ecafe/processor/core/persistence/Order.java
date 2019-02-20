@@ -45,6 +45,7 @@ public class Order{
     private Long idOfClientGroup;
     private Long idOfPayForClient;
     private Boolean isFromFriendlyOrg;
+    private Long idOrgPayment;
 
     public OrderTypeEnumType getOrderType() {
         return orderType;
@@ -313,5 +314,13 @@ public class Order{
         if (state==STATE_COMMITED) return "Проведен";
         else if (state==STATE_CANCELED) return "Отменен";
         return "Неизвестно";
+    }
+
+    public Long getIdOrgPayment() {
+        return idOrgPayment;
+    }
+
+    public void setIdOrgPayment(Long idOrgPayment) {
+        this.idOrgPayment = idOrgPayment;
     }
 }

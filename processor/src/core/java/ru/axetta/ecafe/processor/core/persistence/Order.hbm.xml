@@ -57,6 +57,7 @@
                      not-null="true" fetch="join"/>
         <property name="idOfClientGroup" column="IdOfClientGroup" type="long"/>
         <property name="idOfPayForClient" column="IdOfPayForClient" type="long"/>
+        <property name="idOrgPayment" column="idOrgPayment" type="long"/>
         <set name="orderDetailsInternal" inverse="true" cascade="all">
             <key>
                 <column name="IdOfOrg"/>

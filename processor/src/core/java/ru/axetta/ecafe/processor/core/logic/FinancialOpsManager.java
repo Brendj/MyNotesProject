@@ -133,8 +133,8 @@ public class FinancialOpsManager {
         return subscriptionFee;
     }
 
-    public void createOrderCharge(Session session, Payment payment, Long idOfOrg,
-            Client client, Card card, Long confirmerId, boolean isFromFriendlyOrg) throws Exception {
+    public void createOrderCharge(Session session, Payment payment, Long idOfOrg, Client client, Card card, Long confirmerId, boolean isFromFriendlyOrg,
+            Long idOfOrgPayment) throws Exception {
         // By default we have no transaction
         AccountTransaction orderTransaction = null;
         // If "card part" of payment is specified...
@@ -179,6 +179,7 @@ public class FinancialOpsManager {
                 payment.getTime(),payment.getOrderDate(), payment.getSumByCard(), payment.getSumByCash(),payment.getComments(), client, card, orderTransaction, pos,
                 supplier, payment.getOrderType(), payment.getIdOfPayForClient());
         order.setIsFromFriendlyOrg(isFromFriendlyOrg);
+        order.setIdOrgPayment(idOfOrgPayment);
         if(client != null){
             Long idOfClientGroup = DAOService.getInstance().getClientGroupByClientId(client.getIdOfClient());    //
             order.setIdOfClientGroup(idOfClientGroup);

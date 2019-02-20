@@ -3359,8 +3359,6 @@ public class Processor implements SyncProcessor {
                             String.format("Organization is not friendly, IdOfOrg == %s, IdOfOrder == %s", idOfOrgPayment,
                                     payment.getIdOfOrder()));
                 }
-
-                idOfOrg = idOfOrgPayment;
                 isFromFriendlyOrg = true;
             }
 
@@ -3461,7 +3459,7 @@ public class Processor implements SyncProcessor {
                 // Create order
                 RuntimeContext.getFinancialOpsManager()
                         .createOrderCharge(persistenceSession, payment, idOfOrg, client, card,
-                                payment.getConfirmerId(), isFromFriendlyOrg);
+                                payment.getConfirmerId(), isFromFriendlyOrg, idOfOrgPayment);
                 long totalPurchaseDiscount = 0;
                 long totalPurchaseRSum = 0;
                 long totalLunchRSum = 0;
