@@ -18,9 +18,6 @@ CREATE INDEX cf_applications_for_food_servicenumber_idx on cf_applications_for_f
 ALTER TABLE cf_client_dtiszn_discount_info
     ALTER column dtiszncode TYPE bigint;
 
-ALTER TABLE cf_applications_for_food
-    add column if not EXISTS archived integer;
-
 --таблица для хранения входящих сообщений из очереди ЕТП
 create table cf_etp_incoming_message
 (
