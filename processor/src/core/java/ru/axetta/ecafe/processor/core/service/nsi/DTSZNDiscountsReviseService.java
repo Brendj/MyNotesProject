@@ -868,6 +868,9 @@ public class DTSZNDiscountsReviseService {
             discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsUpdatedSinceDate(deltaDate);
         } else {
             discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsByGUID(guid);
+            if (discountItemList.isEmpty()) {
+                throw new Exception(String.format("По гуиду \"%s\" ничего не найдено", guid));
+            }
         }
 
         Date fireTime = new Date();
