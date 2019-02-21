@@ -3360,6 +3360,9 @@ public class Processor implements SyncProcessor {
                                     payment.getIdOfOrder()));
                 }
                 isFromFriendlyOrg = true;
+                long temp = idOfOrg;
+                idOfOrg = idOfOrgPayment;
+                idOfOrgPayment = temp;
             }
 
             CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(idOfOrg, payment.getIdOfOrder());
