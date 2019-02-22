@@ -18,7 +18,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-
 import java.math.BigInteger;
 import java.util.*;
 
@@ -31,6 +30,7 @@ public class ScudManager {
     private final static boolean isOn = isOn();
     private ScudService service = RuntimeContext.getAppContext().getBean(ScudService.class);
     private final String SCUD_ENDPOINT_ADDRESS = getScudEndPointAdressFromConfig();
+    private final static String SCUD_NODE = "ecafe.processor.scudmanager.node";
 
     private String getScudEndPointAdressFromConfig() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
@@ -39,9 +39,17 @@ public class ScudManager {
     }
 
     public static boolean isOn() {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String reqInstance = runtimeContext.getConfigProperties().getProperty("ecafe.processor.scudmanager.sendtoexternal", "false");
-        return Boolean.parseBoolean(reqInstance);
+        try {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            Boolean serviceIsOn = Boolean.parseBoolean(runtimeContext.getConfigProperties()
+                    .getProperty("ecafe.processor.scudmanager.sendtoexternal", "false"));
+            String reqNode = runtimeContext.getConfigProperties().getProperty(SCUD_NODE, "").trim();
+            String instance = runtimeContext.getNodeName().trim();
+            return serviceIsOn && reqNode.equals(instance);
+        } catch (Exception e){
+            logger.error("Error when initialize ScudManager, manager is Off");
+            return false;
+        }
     }
 
     private static Integer getLimitRecords(){
@@ -99,7 +107,6 @@ public class ScudManager {
             sendToExternal = false;
             updateEnterEventsSendInfo(session, list, false, sendToExternal);
         }
-
     }
 
     private void updateEnterEventsSendInfo(Session session, List<EventDataItem> list, Boolean result,
