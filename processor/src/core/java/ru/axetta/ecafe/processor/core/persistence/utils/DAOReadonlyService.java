@@ -505,7 +505,7 @@ public class DAOReadonlyService {
         return isSixWorkWeek;
     }*/
 
-    public boolean isSixWorkWeek(Long orgId, String groupName) throws Exception {
+    public boolean isSixWorkWeek(Long orgId, String groupName) {
         boolean resultByOrg = false; //isSixWorkWeek(orgId);
         try {
             return (Boolean)entityManager.createQuery("select distinct gnto.isSixDaysWorkWeek from GroupNamesToOrgs gnto where gnto.idOfOrg = :idOfOrg and gnto.groupName = :groupName")
@@ -517,12 +517,12 @@ public class DAOReadonlyService {
         }
     }
 
-    public String getClientGroupName(Client client) {
-        if (client.getClientGroup() != null) {
+    public String getClientGroupName(Long idOfOrg, Long idOfClientGroup) {
+        if (idOfClientGroup != null) {
             Query query = entityManager.createQuery("select cg.groupName from ClientGroup cg "
                     + "where cg.compositeIdOfClientGroup.idOfOrg = :idOfOrg and cg.compositeIdOfClientGroup.idOfClientGroup = :idOfClientGroup");
-            query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
-            query.setParameter("idOfClientGroup", client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setParameter("idOfClientGroup", idOfClientGroup);
             try {
                 return (String) query.getSingleResult();
             } catch (Exception ignore) { }

@@ -21,6 +21,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.EC
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SubscriberFeedingSettingSettingValue;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
@@ -141,10 +142,12 @@ public class PreorderRequestsReportService extends RecoverableService {
 
             Integer maxDays = getMaxDateToCreateRequests(currentDate, weekends, MAX_FORBIDDEN_DAYS);
             Date dateTo = CalendarUtils.addDays(currentDate, maxDays);
-            List<PreorderItem> preorderItemList = loadPreorders2(dateTo); //предзаказы от завтрашнего дня до дня, на который максимум можем сгенерить заявки
+            List<PreorderItem> preorderItemList = loadPreorders2(date, dateTo); //предзаказы от завтрашнего дня до дня, на который максимум можем сгенерить заявки
             List<OrgGoodRequest> doneOrgGoodRequests = GoodRequestsChangeAsyncNotificationService.getInstance().getDoneOrgGoodRequests(dateTo);
+            Map<Long, List<SpecialDate>> mapSpecialDates = getAllSpecialDates(orgItemsLocal, date, dateTo);
+            List<ProductionCalendar> productionCalendar = DAOReadonlyService.getInstance().getProductionCalendar(date, dateTo);
 
-            Map<Long, Map<Date, Long>> clientBalances = getClientBalancesOnDates(preorderItemList); //балансы клиентов на даты с учетом предзаказов
+            Map<Long, Map<Date, Long>> clientBalances = getClientBalancesOnDates(preorderItemList, mapSpecialDates, productionCalendar); //балансы клиентов на даты с учетом предзаказов
 
             Integer sizeOrgs = orgItemsLocal.size();
             int counterOrgs = 0;
@@ -159,6 +162,8 @@ public class PreorderRequestsReportService extends RecoverableService {
                     long idOfOrg = entry.getKey();
                     logger.info(String.format("Generating preorder requests. orgID=%s (№%s from %s)", idOfOrg, counterOrgs, sizeOrgs));
 
+                    List<SpecialDate> specialDates = mapSpecialDates.get(idOfOrg); //DAOReadonlyService.getInstance().getSpecialDates(CalendarUtils.addHours(currentDate, 12), dateTo, idOfOrg);
+
                     GoodRequestsChangeAsyncNotificationService.OrgItem orgItem = entry.getValue();
 
                     Long number = DAOUtils.getNextGoodRequestNumberForOrgPerDay(session, idOfOrg, new Date());
@@ -171,6 +176,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                             logger.info(String.format("Requests for orgID=%s on date=%s already exist", idOfOrg, CalendarUtils.dateToString(dateWork)));
                             continue;
                         }
+                        Boolean isWeekend = isWeekendByProductionCalendar(currentDate, productionCalendar);
                         try {
                             transaction = session.beginTransaction();
                             List<PreorderItem> preordersByOrg = getPreorderItemsByOrg(idOfOrg, preorderItemList, dateWork); //предзаказы по ОО на дату
@@ -182,16 +188,22 @@ public class PreorderRequestsReportService extends RecoverableService {
                                                 item.getIdOfOrg(), item.getCreatedDate().toString()));
                                         continue;
                                     }
+                                    if (isWeekendBySpecialDateAndSixWorkWeek(isWeekend, dateWork, item.getIdOfClientGroup(), idOfOrg, specialDates)
+                                            || isHolidayByProductionCalendar(dateWork, productionCalendar)) {
+                                        deletePreorderForChangedCalendar(session, item);
+                                        logger.info("Delete preorder for changed calendar " + item.toString());
+                                        continue;
+                                    }
                                     long balanceOnDate = getBalanceOnDate(item.getIdOfClient(), dateWork, clientBalances);
-                                    if (balanceOnDate < 0L) {
+                                    if (balanceOnDate < item.getComplexPrice()) {
                                         deletePreorderForNotEnoughMoney(session, item);
-                                        logger.info("Delete preorder " + item.toString());
-                                    } else {
-                                        String guid = createRequestFromPreorder2(session, item, fireTime, number, staff);
-                                        if (null != guid) {
-                                            number++;
-                                            guids.add(guid);
-                                        }
+                                        logger.info("Delete preorder for not enougn money " + item.toString());
+                                        continue;
+                                    }
+                                    String guid = createRequestFromPreorder2(session, item, fireTime, number, staff);
+                                    if (null != guid) {
+                                        number++;
+                                        guids.add(guid);
                                     }
                                 } catch (Exception e) {
                                     logger.error("Error in create request for item = " + item.toString());
@@ -235,6 +247,52 @@ public class PreorderRequestsReportService extends RecoverableService {
         logger.info("End generating preorder requests");
     }
 
+    private Map<Long, List<SpecialDate>> getAllSpecialDates(Map<Long, GoodRequestsChangeAsyncNotificationService.OrgItem> orgItems, Date date, Date dateTo) {
+        Map<Long, List<SpecialDate>> mapSpecialDates = new HashMap<Long, List<SpecialDate>>();
+        for (Map.Entry<Long, GoodRequestsChangeAsyncNotificationService.OrgItem> entry : orgItems.entrySet()) {
+            long idOfOrg = entry.getKey();
+            List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(CalendarUtils.addHours(date, 12), dateTo, idOfOrg);
+            mapSpecialDates.put(idOfOrg, specialDates);
+        }
+        return mapSpecialDates;
+    }
+
+    public Boolean isWeekendBySpecialDate(Date date, Long idOfClientGroup, List<SpecialDate> specialDates) {
+        Boolean isWeekend = null;
+        if(specialDates != null){
+            for (SpecialDate specialDate : specialDates) {
+                if (CalendarUtils.betweenOrEqualDate(specialDate.getDate(), date, CalendarUtils.addDays(date, 1)) && !specialDate.getDeleted()) {
+                    if (specialDate.getIdOfClientGroup() == null || specialDate.getIdOfClientGroup().equals(idOfClientGroup))
+                        isWeekend = specialDate.getIsWeekend();
+                    if (specialDate.getIdOfClientGroup() != null && specialDate.getIdOfClientGroup().equals(idOfClientGroup))
+                        break;
+                }
+            }
+        }
+        return isWeekend;
+    }
+
+    public boolean isWeekendByProductionCalendar(Date date, List<ProductionCalendar> productionCalendar) {
+        for (ProductionCalendar pc : productionCalendar) {
+            if (pc.getDay().equals(date)) return true;
+        }
+        return false;
+    }
+
+    public Boolean isWeekendBySpecialDateAndSixWorkWeek(boolean isWeekendByProductionCalendar, Date currentDate, Long idOfClientGroup, Long idOfOrg, List<SpecialDate> specialDates) {
+        boolean isWeekend = isWeekendByProductionCalendar;
+        Boolean isWeekendSD = isWeekendBySpecialDate(currentDate, idOfClientGroup, specialDates); //выходной по данным таблицы SpecialDates
+        int day = CalendarUtils.getDayOfWeek(currentDate);
+        if (isWeekendSD == null) { //нет данных по дню в КУД
+            if (day == Calendar.SATURDAY) {
+                String groupName = DAOReadonlyService.getInstance().getClientGroupName(idOfOrg, idOfClientGroup);
+                isWeekend = !DAOReadonlyService.getInstance().isSixWorkWeek(idOfOrg, groupName);
+            }
+        } else {
+            isWeekend = isWeekendSD;
+        }
+        return isWeekend;
+    }
     /**
     * Максимальная дата, на которую нужно построить заявки при количестве дней запрета редактирования предзаказа = 3
     * (3 - максимально возможное количество дней по системе)
@@ -291,26 +349,51 @@ public class PreorderRequestsReportService extends RecoverableService {
         return null;
     }
 
-    private Map<Long, Map<Date, Long>> getClientBalancesOnDates(List<PreorderItem> preorderItemList) {
-        Map<Long, Map<Date, Long>> result = new HashMap<Long, Map<Date, Long>>();
+    public Map<Long, Map<Date, Long>> getClientBalancesOnDates(List<PreorderItem> preorderItemList, Map<Long,
+            List<SpecialDate>> mapSpecialDates, List<ProductionCalendar> productionCalendar) {
+        Map<Long, Map<Date, Long>> result = new TreeMap<Long, Map<Date, Long>>();
+
         for (PreorderItem item : preorderItemList) {
             Map<Date, Long> map = result.get(item.getIdOfClient());
+            List<SpecialDate> specialDates = mapSpecialDates.get(item.getIdOfOrg());
+            boolean isWeekend = isWeekendByProductionCalendar(item.getPreorderDate(), productionCalendar);
+            if (specialDates != null
+                && (
+                        isWeekendBySpecialDateAndSixWorkWeek(isWeekend, item.getPreorderDate(), item.getIdOfClientGroup(), item.getIdOfOrg(), specialDates)
+                            || isHolidayByProductionCalendar(item.getPreorderDate(), productionCalendar)
+                    )
+                ) continue;
             if (map == null) {
-                map = new HashMap<Date, Long>();
+                map = new TreeMap<Date, Long>();
                 map.put(item.getPreorderDate(), item.getClientBalance());
             }
-            long balance = map.get(item.getPreorderDate()) == null ? item.getClientBalance() : map.get(item.getPreorderDate());
-            map.put(item.getPreorderDate(), balance - item.getAmount() * item.getComplexPrice() + item.getUsedSum());
+            long balance = map.get(item.getPreorderDate()) == null ? getActualBalance(map) : map.get(item.getPreorderDate());
+            map.put(item.getPreorderDate(), balance - item.getComplexPrice() + item.getUsedSum());
             result.put(item.getIdOfClient(), map);
         }
         return result;
+    }
+
+    public boolean isHolidayByProductionCalendar(Date date, List<ProductionCalendar> productionCalendar) {
+        for (ProductionCalendar pc : productionCalendar) {
+            if (pc.getDay().equals(date) && pc.getFlag().equals(ProductionCalendar.HOLIDAY)) return true;
+        }
+        return false;
+    }
+
+    private long getActualBalance(Map<Date, Long> map) {
+        long balance = 0L;
+        for (Map.Entry<Date, Long> entry : map.entrySet()) {
+            balance = entry.getValue();
+        }
+        return balance;
     }
 
     private long getBalanceOnDate(long idOfClient, Date date, Map<Long, Map<Date, Long>> clientBalances) {
         try {
             return clientBalances.get(idOfClient).get(date);
         } catch (Exception e) {
-            return 0L;
+            return -1L;
         }
     }
 
@@ -737,7 +820,7 @@ public class PreorderRequestsReportService extends RecoverableService {
         return preorderItemList;
     }
 
-    private List<PreorderItem> loadPreorders2(Date dateTo) {
+    private List<PreorderItem> loadPreorders2(Date dateFrom, Date dateTo) {
         Session session = null;
         Transaction transaction = null;
         List<PreorderItem> preorderItemList = new ArrayList<PreorderItem>();
@@ -769,7 +852,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "   AND (pc.amount <> 0 OR pmd.amount <> 0) and pc.deletedstate = 0 and pc.idOfGoodsRequestPosition is null order by pc.preorderdate";
 
             Query query = session.createSQLQuery(sqlQuery);
-            query.setParameter("date", CalendarUtils.endOfDay(new Date()).getTime());
+            query.setParameter("date", CalendarUtils.startOfDayInUTC(dateFrom).getTime());
             if (dateTo != null) query.setParameter("dateTo", dateTo.getTime());
             List data = query.list();
             for (Object entry : data) {
