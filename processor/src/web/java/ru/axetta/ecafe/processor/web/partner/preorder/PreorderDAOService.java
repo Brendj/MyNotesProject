@@ -686,29 +686,14 @@ public class PreorderDAOService {
         if (currentDate.before(regularPreorder.getStartDate())) currentDate = regularPreorder.getStartDate();
         if (doDeleteExisting) {
             deleteGeneratedPreordersByRegular((Session) em.getDelegate(), regularPreorder, PreorderState.OK);
-        } else {
-            Date maxPreorderDate = getMaxPreorderDate(regularPreorder);
-            if (maxPreorderDate != null && maxPreorderDate.after(currentDate)) {
-                currentDate = CalendarUtils.addDays(maxPreorderDate, 1);
-            }
         }
 
         List<ProductionCalendar> productionCalendar = DAOReadonlyService.getInstance().getProductionCalendar(new Date(), dateTo);
         currentDate = CalendarUtils.startOfDayInUTC(currentDate);
         while (currentDate.before(dateTo) || currentDate.equals(dateTo)) {
             Boolean isWeekend = RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).isWeekendByProductionCalendar(currentDate, productionCalendar);
-            int day = CalendarUtils.getDayOfWeek(currentDate);
-            if (day == Calendar.SATURDAY) {
-                Boolean isWeekendSD = RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class)
-                        .isWeekendBySpecialDate(currentDate, regularPreorder.getClient().getIdOfClientGroup(), specialDates); //выходной по данным таблицы SpecialDates
-                if (isWeekendSD == null) {
-                    String groupName = DAOReadonlyService.getInstance()
-                            .getClientGroupName(regularPreorder.getClient().getOrg().getIdOfOrg(), regularPreorder.getClient().getIdOfClientGroup());
-                    isWeekend = !DAOReadonlyService.getInstance().isSixWorkWeek(regularPreorder.getClient().getOrg().getIdOfOrg(), groupName);
-                } else {
-                    isWeekend = isWeekendSD;
-                }
-            }
+            isWeekend = RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).isWeekendBySpecialDateAndSixWorkWeek(
+                    isWeekend, currentDate, regularPreorder.getClient().getIdOfClientGroup(), regularPreorder.getClient().getOrg().getIdOfOrg(), specialDates);
             if (!isWeekend) isWeekend = RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).isHolidayByProductionCalendar(currentDate, productionCalendar);
 
             boolean doGenerate = doGenerate(currentDate, regularPreorder);  //генерить ли предзаказ по дню недели в регулярном заказе
@@ -966,7 +951,7 @@ public class PreorderDAOService {
         try {
             return (ComplexInfo)query.getSingleResult();
         } catch (Exception e) {
-            logger.error(String.format("Cant find complexInfo idOfComplex=%s, date=%s", idOfComplex, date.getTime()));
+            logger.error(String.format("Cant find complexInfo idOfComplex=%s, date=%s, idOfClient=%s", idOfComplex, date.getTime(), client.getIdOfClient()));
             return null;
         }
     }
