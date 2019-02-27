@@ -37,12 +37,14 @@ public class ClientPassItem implements Comparable {
         if (checkerId != null) {
             Client cheker = (Client) session.get(Client.class, checkerId);
             this.chekerItemList.add(new ClientChekerPassItem(cheker.getIdOfClient(), cheker.getContractId(),
-                    cheker.getPerson().getFullName(), cheker.getClientGroup().getGroupName()));
+                    cheker.getPerson().getFullName(),
+                    (null != cheker.getClientGroup()) ? cheker.getClientGroup().getGroupName() : ""));
         }
         if (guardianId != null) {
             Client guardian = (Client) session.get(Client.class, guardianId);
             this.chekerItemList.add(new ClientChekerPassItem(guardian.getIdOfClient(), guardian.getContractId(),
-                    guardian.getPerson().getFullName(), guardian.getClientGroup().getGroupName()));
+                    guardian.getPerson().getFullName(),
+                    (null != guardian.getClientGroup()) ? guardian.getClientGroup().getGroupName() : ""));
         }
         if(checkerId == null && guardianId == null) {
             this.chekerItemList.add(new ClientChekerPassItem(0L, null, "", ""));
