@@ -167,8 +167,7 @@ public class SMSService {
 
             SendResponse sendResponse = null;
 
-            logger.info("sending SMS, sender: {}, phoneNumber: {}, text: {}", new Object[]{sender, phoneNumber,
-                                                                                           textObject.toString()});
+            logger.info("sending SMS: " + getLoggingInfo(values));
             String textMessage = null;
             if(smsService instanceof SMPPClient){
                 try {
@@ -200,8 +199,8 @@ public class SMSService {
                             sendResponse = smsService.sendTextMessage(sender, phoneNumber, textObject);
                             textMessage = textObject.toString();
                         }
-                        logger.info(String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s, RC: %s, error: %s",
-                                sendResponse.getMessageId(), sender, phoneNumber, textMessage, sendResponse.getStatusCode(), sendResponse.getError()));
+                        logger.info(String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, RC: %s, error: %s",
+                                sendResponse.getMessageId(), sender, phoneNumber, sendResponse.getStatusCode(), sendResponse.getError()));
                         if (sendResponse.isSuccess()) {
                             break;
                         }
@@ -234,6 +233,15 @@ public class SMSService {
             return result;
         }
 
+        private String getLoggingInfo(String[] values) {
+            String result = "";
+            try {
+                for (int i = 0; i < values.length - 1; i += 2) {
+                    result += values[i] + "=" + values[i + 1] + ";";
+                }
+            } catch (Exception ignore) {}
+            return result;
+        }
 
         protected boolean regisgterClientSMSFailedCharge(Client client, String messageId,
                                                          String phoneNumber, Long messageTargetId, int messageType, String text) throws Exception {
