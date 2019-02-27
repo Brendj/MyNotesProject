@@ -47,7 +47,7 @@ public class ClientPassItem implements Comparable {
                     (null != guardian.getClientGroup()) ? guardian.getClientGroup().getGroupName() : ""));
         }
         if(checkerId == null && guardianId == null) {
-            this.chekerItemList.add(new ClientChekerPassItem(0L, null, "", ""));
+            this.chekerItemList.add(new ClientChekerPassItem(0L, null, " ", " "));
         }
     }
 
