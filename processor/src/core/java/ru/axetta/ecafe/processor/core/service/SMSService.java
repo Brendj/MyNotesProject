@@ -167,7 +167,7 @@ public class SMSService {
 
             SendResponse sendResponse = null;
 
-            logger.info("sending SMS: " + getLoggingInfo(values));
+            logger.info("sending SMS: " + getLoggingInfo(values, textObject));
             String textMessage = null;
             if(smsService instanceof SMPPClient){
                 try {
@@ -233,11 +233,13 @@ public class SMSService {
             return result;
         }
 
-        private String getLoggingInfo(String[] values) {
+        private String getLoggingInfo(String[] values, Object textObject) {
             String result = "";
             try {
+                result += "phone=" + ((EMPEventType) textObject).getMsisdn();
+                result += ";typeId=" + ((EMPEventType) textObject).getType();
                 for (int i = 0; i < values.length - 1; i += 2) {
-                    result += values[i] + "=" + values[i + 1] + ";";
+                    result += ";"+ values[i] + "=" + values[i + 1];
                 }
             } catch (Exception ignore) {}
             return result;
