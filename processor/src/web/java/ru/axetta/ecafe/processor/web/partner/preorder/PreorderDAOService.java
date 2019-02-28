@@ -669,6 +669,22 @@ public class PreorderDAOService {
         return (Date)query.getSingleResult();
     }
 
+    @Transactional
+    private List<OrgGoodRequest> getOrgGoodRequests(long idOfOrg, Date startDate, Date endDate) {
+        return emReport.createQuery("select ogr from OrgGoodRequest ogr where ogr.idOfOrg = :idOfOrg and ogr.day between :startDate and :endDate order by ogr.day")
+                .setParameter("idOfOrg",idOfOrg)
+                .setParameter("startDate", startDate)
+                .setParameter("endDate",endDate)
+                .getResultList();
+    }
+
+    private boolean orgGoodRequestExists(List<OrgGoodRequest> list, Date date) {
+        for (OrgGoodRequest org : list) {
+            if (org.getDay().equals(date)) return true;
+        }
+        return false;
+    }
+
     @Transactional(propagation = Propagation.SUPPORTS)
     public void createPreordersFromRegular(RegularPreorder regularPreorder, boolean doDeleteExisting) throws Exception {
         //генерация предзаказов по ид. регулярного заказа
@@ -682,6 +698,7 @@ public class PreorderDAOService {
         long nextVersion = nextVersionByPreorderComplex();
 
         List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(currentDate, dateTo, regularPreorder.getClient().getOrg().getIdOfOrg());//данные из производственного календаря за период
+        List<OrgGoodRequest> preorderRequests = getOrgGoodRequests(regularPreorder.getClient().getOrg().getIdOfOrg(), currentDate, dateTo);
         currentDate = getStartDateForGeneratePreordersInternal(regularPreorder.getClient());
         if (currentDate.before(regularPreorder.getStartDate())) currentDate = regularPreorder.getStartDate();
         if (doDeleteExisting) {
@@ -697,6 +714,7 @@ public class PreorderDAOService {
             if (!isWeekend) isWeekend = RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).isHolidayByProductionCalendar(currentDate, productionCalendar);
 
             boolean doGenerate = doGenerate(currentDate, regularPreorder);  //генерить ли предзаказ по дню недели в регулярном заказе
+            doGenerate &= !orgGoodRequestExists(preorderRequests, currentDate);
             if (isWeekend || !doGenerate) {
                 currentDate = CalendarUtils.addDays(currentDate, 1);
                 continue;
