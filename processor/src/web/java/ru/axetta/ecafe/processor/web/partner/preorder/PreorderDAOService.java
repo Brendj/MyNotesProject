@@ -36,10 +36,7 @@ import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
-import javax.persistence.EntityManager;
-import javax.persistence.NoResultException;
-import javax.persistence.PersistenceContext;
-import javax.persistence.Query;
+import javax.persistence.*;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -782,7 +779,11 @@ public class PreorderDAOService {
         List<RegularPreorder> list = query.getResultList();
         for (RegularPreorder regularPreorder : list) {
             if (regularPreorder.getIdOfComplex() != null) {
-                createPreordersFromRegular(regularPreorder, false);
+                try {
+                    createPreordersFromRegular(regularPreorder, false);
+                } catch (Exception e) {
+                    logger.error("Error in generate preorders by schedule: ", e);
+                }
             }
         }
     }
@@ -899,7 +900,7 @@ public class PreorderDAOService {
 
     private boolean preorderMenuDetailExists(PreorderComplex preorderComplex, Client client, Date date, Long idOfMenu) {
         Query query = em.createQuery("select pmd.idOfPreorderMenuDetail from PreorderMenuDetail pmd where pmd.preorderComplex.idOfPreorderComplex = :preorderComplex "
-                + "and pmd.client = :client and pmd.preorderDate = :preorderDate and pmd.armIdOfMenu = :idOfMenu");
+                + "and pmd.client = :client and pmd.preorderDate = :preorderDate and pmd.armIdOfMenu = :idOfMenu and pmd.deletedState = false");
         query.setParameter("preorderComplex", preorderComplex.getIdOfPreorderComplex());
         query.setParameter("client", client);
         query.setParameter("preorderDate", date);
@@ -909,6 +910,9 @@ public class PreorderDAOService {
             return true;
         } catch (NoResultException e) {
             return false;
+        } catch (NonUniqueResultException e) {
+            logger.error("Error in preorderMenuDetailExists: ", e);
+            return true;
         }
     }
 
