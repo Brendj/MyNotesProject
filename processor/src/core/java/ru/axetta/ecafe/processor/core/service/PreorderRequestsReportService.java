@@ -195,7 +195,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                                         continue;
                                     }
                                     long balanceOnDate = getBalanceOnDate(item.getIdOfClient(), dateWork, clientBalances);
-                                    if (balanceOnDate < item.getComplexPrice()) {
+                                    if (balanceOnDate < 0L) {
                                         deletePreorderForNotEnoughMoney(session, item);
                                         logger.info("Delete preorder for not enougn money " + item.toString());
                                         continue;
@@ -848,7 +848,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 and pmd.deletedstate = 0 and pmd.idOfGoodsRequestPosition is null "
                             + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
                             + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-                            + "WHERE pc.preorderdate > :date " + (dateTo != null ? " and pc.preorderdate <= :dateTo " : "")
+                            + "WHERE pc.preorderdate >= :date " + (dateTo != null ? " and pc.preorderdate <= :dateTo " : "")
                             + "   AND (pc.amount <> 0 OR pmd.amount <> 0) and pc.deletedstate = 0 and pc.idOfGoodsRequestPosition is null order by pc.preorderdate";
 
             Query query = session.createSQLQuery(sqlQuery);
@@ -1004,6 +1004,8 @@ public class PreorderRequestsReportService extends RecoverableService {
             detail.setIdOfGoodsRequestPosition(pos.getGlobalId());
             session.update(detail);
         }
+
+        logger.info("Created good request number=" + number + " " + preorderItem.toString());
 
         return pos.getGuid();
     }

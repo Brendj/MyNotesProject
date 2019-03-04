@@ -397,6 +397,7 @@ public class GoodRequestsChangeAsyncNotificationService {
     @Async
     public void notifyOrg(OrgItem orgItem, final Date beginGenerateTime, final Date endGenerateTime,
             final Date lastCreateOrUpdateDate, List<String> guids) {
+        LOGGER.info("Start notifyOrg method idOfOrg=" + orgItem.getIdOfOrg());
         Calendar localCalendar = runtimeContext.getDefaultLocalCalendar(null);
         /* проверим есть ли измененые заявки на неделю */
 
@@ -553,7 +554,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                         LOGGER.error("Failed build report ", e);
                     }
                 } else {
-                    LOGGER.debug("IdOfOrg: " + orgItem.getIdOfOrg() + " reportJob is null");
+                    LOGGER.error("IdOfOrg: " + orgItem.getIdOfOrg() + " reportJob is null");
                 }
                 if (StringUtils.isNotEmpty(htmlReport)) {
                     boolean modifyTypeEdit = htmlReport.contains("#FF6666");
@@ -618,6 +619,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                 }
             }
         }
+        LOGGER.info("End notifyOrg method idOfOrg=" + orgItem.getIdOfOrg());
     }
 
     private String checkIsExistFile(String suffix) {
