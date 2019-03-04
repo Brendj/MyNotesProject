@@ -1023,9 +1023,9 @@ public class PreorderDAOService {
             if (!set.contains(complex.getIdOfPreorderComplex())) {
                 sum += complex.getComplexPrice() * complex.getAmount() - complex.getUsedSum();
                 set.add(complex.getIdOfPreorderComplex());
-            }
-            for (PreorderMenuDetail pmd : complex.getPreorderMenuDetails()) {
-                sum += pmd.getMenuDetailPrice() * pmd.getAmount();
+                for (PreorderMenuDetail pmd : complex.getPreorderMenuDetails()) {
+                    sum += pmd.getMenuDetailPrice() * pmd.getAmount();
+                }
             }
         }
         return sum; // client.getBalance() - sum;
@@ -1358,6 +1358,7 @@ public class PreorderDAOService {
         while (c.getTimeInMillis() < endDate.getTime() ){
             Date currentDate = CalendarUtils.startOfDayInUTC(c.getTime());
             Boolean isWeekend = RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).isWeekendByProductionCalendar(currentDate, productionCalendar);
+            if (isWeekend && two_days == 0) two_days++;
 
             if (two_days <= forbiddenDays) {
                 c.add(Calendar.DATE, 1);
