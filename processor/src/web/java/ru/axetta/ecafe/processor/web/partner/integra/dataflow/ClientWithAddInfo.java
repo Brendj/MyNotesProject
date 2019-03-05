@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType;
 public class ClientWithAddInfo {
     private ClientCreatedFromType clientCreatedFrom;
     private Integer informedSpecialMenu;
+    private boolean disabled;
 
     public ClientCreatedFromType getClientCreatedFrom() {
         return clientCreatedFrom;
@@ -27,5 +28,13 @@ public class ClientWithAddInfo {
 
     public void setInformedSpecialMenu(Integer informedSpecialMenu) {
         this.informedSpecialMenu = informedSpecialMenu;
+    }
+
+    public boolean isDisabled() {
+        return disabled;
+    }
+
+    public void setDisabled(boolean disabled) {
+        this.disabled = disabled;
     }
 }

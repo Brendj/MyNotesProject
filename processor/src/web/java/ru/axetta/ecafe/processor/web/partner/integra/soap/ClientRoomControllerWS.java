@@ -3633,11 +3633,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (list != null && list.size() > 0) {
                     for (Object o : list) {
                         Object[] row = (Object[])o;
-                        ClientGuardian cg = (ClientGuardian) row[1];
-                        ClientWithAddInfo addInfo = new ClientWithAddInfo();
-                        addInfo.setInformedSpecialMenu(cg.getInformedSpecialMenu() ? 1 : null);
-                        addInfo.setClientCreatedFrom(cg.isDisabled() ? null : cg.getCreatedFrom());
-                        result.put((Client)row[0], addInfo);
+                        if (result.get(row[0]) == null || (result.get(row[0]) != null && result.get(row[0]).isDisabled())) {
+                            //если по клиенту инфы еще нет то добавляем, или инфа уже есть, но связка выключена, то обновляем инфу
+                            ClientGuardian cg = (ClientGuardian) row[1];
+                            ClientWithAddInfo addInfo = new ClientWithAddInfo();
+                            addInfo.setInformedSpecialMenu(cg.getInformedSpecialMenu() ? 1 : null);
+                            addInfo.setClientCreatedFrom(cg.isDisabled() ? null : cg.getCreatedFrom());
+                            addInfo.setDisabled(cg.isDisabled());
+                            result.put((Client) row[0], addInfo);
+                        }
                     }
                 } else {
                     ClientWithAddInfo addInfo = new ClientWithAddInfo();
@@ -4002,7 +4006,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if (cd != null && cd.getClients() != null) {
                 for (Map.Entry<Client, ClientWithAddInfo> entry : cd.getClients().entrySet()) {
-                    if (entry.getValue().getClientCreatedFrom() == null) continue;
+                    if (entry.getValue().isDisabled()) continue;
                     Data dataProcess = new ClientRequest().process(entry.getKey(), session, new Processor() {
                         public void process(Client client, Data dataProcess, ObjectFactory objectFactory,
                                 Session session) throws Exception {
@@ -8371,7 +8375,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             if (cd != null && cd.getClients() != null) {
                 for (Map.Entry<Client, ClientWithAddInfo> entry : cd.getClients().entrySet()) {
-                    if (entry.getValue().getClientCreatedFrom() == null) continue;
+                    if (entry.getValue().isDisabled()) continue;
                     ClientSummaryBase base = processSummaryBase(entry.getKey());
                     base.setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
                     base.setInformedSpecialMenu(entry.getValue().getInformedSpecialMenu());
