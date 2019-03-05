@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.smartwatch;
 
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 
-public class JsonBalance {
+public class JsonBalance implements IJsonBase {
     private Result result = new Result();
     private JsonBalanceInfo balanceInfo;
 

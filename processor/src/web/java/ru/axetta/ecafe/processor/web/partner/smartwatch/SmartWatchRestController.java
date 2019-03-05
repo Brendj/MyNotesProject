@@ -33,6 +33,8 @@ import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
 import java.util.*;
 
+import static java.lang.Math.abs;
+
 
 @Path(value = "")
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
@@ -106,18 +108,10 @@ public class SmartWatchRestController {
                     .build();
         } catch (IllegalArgumentException e){
             logger.error("Can't generate or send token :", e);
-            result.resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-            result.description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-                    .entity(result)
-                    .build();
+            return resultBadArgs(result, e);
         } catch (Exception e){
             logger.error("Can't generate or send token :", e);
-            result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-                    .entity(result)
-                    .build();
+            return resultException(result, e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -139,17 +133,10 @@ public class SmartWatchRestController {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            mobilePhone = checkAndConvertPhone(mobilePhone);
-            if(!isValidPhoneAndToken(session, mobilePhone, token)){
-                throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone );
-            }
+            mobilePhone = checkMobilePhone(session, mobilePhone, token);
             token = "";
 
-            Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
-            if(parent == null){
-                throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
-                            + ", but passed the TokenValidator");
-            }
+            Client parent = findParentByMobile(mobilePhone);
 
             List<JsonChildrenDataInfoItem> items = buildChildrenDataInfoItems(session, parent);
             result.setItems(items);
@@ -157,25 +144,13 @@ public class SmartWatchRestController {
             transaction.commit();
             transaction = null;
 
-            result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
-            result.getResult().description = ResponseCodes.RC_OK.toString();
-            return Response.status(HttpURLConnection.HTTP_OK)
-                    .entity(result)
-                    .build();
+            return resultOK(result);
         } catch (IllegalArgumentException e){
             logger.error("Can't get List Of Children's", e);
-            result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-                    .entity(result)
-                    .build();
+            return resultBadArgs(result, e);
         } catch (Exception e){
             logger.error("Can't get List Of Children's", e);
-            result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-                    .entity(result)
-                    .build();
+            return resultException(result, e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -202,11 +177,7 @@ public class SmartWatchRestController {
                 throw new IllegalArgumentException("ContractID is null");
             }
 
-            Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
-            if(parent == null){
-                throw new Exception("No clients found by this mobilePhone number: " + mobilePhone
-                        + ", but passed the TokenValidator");
-            }
+            Client parent = findParentByMobile(mobilePhone);
             Client child = DAOUtils.findClientByContractId(session, contractId);
             if(child == null){
                 throw new IllegalArgumentException("No clients found by contractID: " + contractId);
@@ -265,25 +236,13 @@ public class SmartWatchRestController {
             transaction.commit();
             transaction = null;
 
-            result.resultCode = ResponseCodes.RC_OK.getCode();
-            result.description = ResponseCodes.RC_OK.toString();
-            return Response.status(HttpURLConnection.HTTP_OK)
-                    .entity(result)
-                    .build();
+            return resultOK(result);
         } catch (IllegalArgumentException e){
             logger.error("Can't registry SmartWatch ", e);
-            result.resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-            result.description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-                    .entity(result)
-                    .build();
+            return resultBadArgs(result, e);
         } catch (Exception e){
             logger.error("Can't registry SmartWatch ", e);
-            result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-                    .entity(result)
-                    .build();
+            return resultException(result, e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -326,25 +285,13 @@ public class SmartWatchRestController {
             transaction.commit();
             transaction = null;
 
-            result.resultCode = ResponseCodes.RC_OK.getCode();
-            result.description = ResponseCodes.RC_OK.toString();
-            return Response.status(HttpURLConnection.HTTP_OK)
-                    .entity(result)
-                    .build();
+            return resultOK(result);
         } catch (IllegalArgumentException e){
             logger.error("Can't block SmartWatch", e);
-            result.resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-            result.description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-                    .entity(result)
-                    .build();
+            return resultBadArgs(result, e);
         } catch (Exception e){
             logger.error("Can't block SmartWatch", e);
-            result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-                    .entity(result)
-                    .build();
+            return resultException(result, e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -365,21 +312,14 @@ public class SmartWatchRestController {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            mobilePhone = checkAndConvertPhone(mobilePhone);
-            if(!isValidPhoneAndToken(session, mobilePhone, token)){
-                throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone );
-            }
+            mobilePhone = checkMobilePhone(session, mobilePhone, token);
             token = "";
 
             if(contractId == null){
                 throw new IllegalArgumentException("ContractID is null");
             }
 
-            Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
-            if(parent == null){
-                throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
-                        + ", but passed the TokenValidator");
-            }
+            Client parent = findParentByMobile(mobilePhone);
 
             Client child = DAOUtils.findClientByContractId(session, contractId);
             if(child == null){
@@ -400,29 +340,16 @@ public class SmartWatchRestController {
             List<JsonEnterEventItem> items = buildEnterEventItem(session, child, startDateTime, endDateTime, limit);
             result.setItems(items);
 
-            result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
-            result.getResult().description = ResponseCodes.RC_OK.toString();
-
             transaction.commit();
             transaction = null;
 
-            return Response.status(HttpURLConnection.HTTP_OK)
-                    .entity(result)
-                    .build();
+            return resultOK(result);
         } catch (IllegalArgumentException e){
             logger.error("Can't get EnterEvents ", e);
-            result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-                    .entity(result)
-                    .build();
+            return resultBadArgs(result, e);
         } catch (Exception e){
             logger.error("Can't get EnterEvents ", e);
-            result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-                    .entity(result)
-                    .build();
+            return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -432,9 +359,10 @@ public class SmartWatchRestController {
         }
     }
 
+    @Deprecated
     @GET
-    @Path(value="getPurchases")
-    public Response getPurchases(@QueryParam(value="mobilePhone") String mobilePhone,
+    @Path(value="getPurchasesOld")
+    public Response getPurchasesOld(@QueryParam(value="mobilePhone") String mobilePhone,
             @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId,
             @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime,
             @QueryParam(value="limit") Integer limit){
@@ -445,21 +373,14 @@ public class SmartWatchRestController {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            mobilePhone = checkAndConvertPhone(mobilePhone);
-            if (!isValidPhoneAndToken(session, mobilePhone, token)) {
-                throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone);
-            }
+            mobilePhone = checkMobilePhone(session, mobilePhone, token);
             token = "";
 
             if (contractId == null) {
                 throw new IllegalArgumentException("ContractID is null");
             }
 
-            Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
-            if (parent == null) {
-                throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
-                        + ", but passed the TokenValidator");
-            }
+            Client parent = findParentByMobile(mobilePhone);
 
             Client child = DAOUtils.findClientByContractId(session, contractId);
             if (child == null) {
@@ -487,29 +408,177 @@ public class SmartWatchRestController {
             List<JsonOrder> items = buildPaymentsInfo(session, child, startDate, endDate, limit);
             result.setItems(items);
 
-            result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
-            result.getResult().description = ResponseCodes.RC_OK.toString();
+            transaction.commit();
+            transaction = null;
+
+            return resultOK(result);
+        } catch (IllegalArgumentException e){
+            logger.error("Can't get Purchases ", e);
+            return resultBadArgs(result, e);
+        } catch (Exception e){
+            logger.error("Can't get Purchases  ", e);
+            return resultException(result, e);
+        } finally{
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    @GET
+    @Path(value="getPurchases")
+    public Response getPurchases(@QueryParam(value="mobilePhone") String mobilePhone,
+            @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId,
+            @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime,
+            @QueryParam(value="limit") Integer limit){
+        Session session = null;
+        Transaction transaction = null;
+        JsonTransactions result = new JsonTransactions();
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+
+            mobilePhone = checkMobilePhone(session, mobilePhone, token);
+            token = "";
+
+            if (contractId == null) {
+                throw new IllegalArgumentException("ContractID is null");
+            }
+
+            Client parent = findParentByMobile(mobilePhone);
+
+            Client child = DAOUtils.findClientByContractId(session, contractId);
+            if (child == null) {
+                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
+            }
+            if (!isRelatives(session, parent, child)) {
+                throw new IllegalArgumentException(
+                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
+            }
+
+            Date startDate;
+            Date endDate = null;
+
+            if(startDateTime == null){
+                logger.warn("Start date is Null, set as now");
+                startDate = new Date();
+            } else {
+                startDate = new Date(startDateTime);
+            }
+
+            if(endDateTime != null && endDateTime < startDate.getTime()){
+                endDate = new Date(endDateTime);
+            }
+
+            List<JsonTransaction> items = buildTransactionsInfo(session, child, startDate, endDate, limit);
+            result.setItems(items);
 
             transaction.commit();
             transaction = null;
 
-            return Response.status(HttpURLConnection.HTTP_OK)
-                    .entity(result)
-                    .build();
+            return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get Purchases ", e);
-            result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-                    .entity(result)
-                    .build();
+            logger.error("Can't get Transactions ", e);
+            return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get Purchases  ", e);
-            result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-                    .entity(result)
-                    .build();
+            logger.error("Can't get Transactions ", e);
+            return resultException(result, e);
+        } finally{
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    @GET
+    @Path(value="getPurchaseDetail")
+    public Response getPurchaseDetail(@QueryParam(value="mobilePhone") String mobilePhone,
+            @QueryParam(value="token") String token, @QueryParam(value="idOfTransaction") Long idOfTransaction){
+        Session session = null;
+        Transaction transaction = null;
+        JsonPurchaseDetail result = new JsonPurchaseDetail();
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+
+            mobilePhone = checkMobilePhone(session, mobilePhone, token);
+            token = "";
+
+            List<JsonPurchaseDetailItem> items = buildPurchaseDetailInfo(session, idOfTransaction);
+            result.setItems(items);
+
+            transaction.commit();
+            transaction = null;
+
+            return resultOK(result);
+        } catch (IllegalArgumentException e){
+            logger.error("Can't get PurchaseDetail ", e);
+            return resultBadArgs(result, e);
+        } catch (Exception e){
+            logger.error("Can't get PurchaseDetail ", e);
+            return resultException(result, e);
+        } finally{
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    @GET
+    @Path(value="getPurchasedComplexes")
+    public Response getPurchasedComplexes(@QueryParam(value="mobilePhone") String mobilePhone,
+            @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId,
+            @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime,
+            @QueryParam(value="limit") Integer limit){
+        Session session = null;
+        Transaction transaction = null;
+        JsonPurchaseDetail result = new JsonPurchaseDetail();
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+
+            mobilePhone = checkMobilePhone(session, mobilePhone, token);
+            token = "";
+
+            if (contractId == null) {
+                throw new IllegalArgumentException("ContractID is null");
+            }
+
+            Client parent = findParentByMobile(mobilePhone);
+
+            Client child = DAOUtils.findClientByContractId(session, contractId);
+            if (child == null) {
+                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
+            }
+            if (!isRelatives(session, parent, child)) {
+                throw new IllegalArgumentException(
+                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
+            }
+
+            Date startDate;
+            Date endDate = null;
+
+            if(startDateTime == null){
+                logger.warn("Start date is Null, set as now");
+                startDate = new Date();
+            } else {
+                startDate = new Date(startDateTime);
+            }
+
+            if(endDateTime != null && endDateTime < startDate.getTime()){
+                endDate = new Date(endDateTime);
+            }
+
+            List<JsonPurchaseDetailItem> items = buildPurchaseComplexInfo(session, child, startDate, endDate, limit);
+            result.setItems(items);
+
+            transaction.commit();
+            transaction = null;
+
+            return resultOK(result);
+        } catch (IllegalArgumentException e){
+            logger.error("Can't get PurchasedComplexes ", e);
+            return resultBadArgs(result, e);
+        } catch (Exception e){
+            logger.error("Can't get PurchasedComplexes ", e);
+            return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -527,21 +596,14 @@ public class SmartWatchRestController {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            mobilePhone = checkAndConvertPhone(mobilePhone);
-            if (!isValidPhoneAndToken(session, mobilePhone, token)) {
-                throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone);
-            }
+            mobilePhone = checkMobilePhone(session, mobilePhone, token);
             token = "";
 
             if (contractId == null) {
                 throw new IllegalArgumentException("ContractID is null");
             }
 
-            Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
-            if (parent == null) {
-                throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
-                        + ", but passed the TokenValidator");
-            }
+            Client parent = findParentByMobile(mobilePhone);
 
             Client child = DAOUtils.findClientByContractId(session, contractId);
             if (child == null) {
@@ -558,26 +620,13 @@ public class SmartWatchRestController {
             transaction.commit();
             transaction = null;
 
-            result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
-            result.getResult().description = ResponseCodes.RC_OK.toString();
-
-            return Response.status(HttpURLConnection.HTTP_OK)
-                    .entity(result)
-                    .build();
+            return resultOK(result);
         } catch (IllegalArgumentException e){
             logger.error("Can't get Balance ", e);
-            result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-                    .entity(result)
-                    .build();
+            return resultBadArgs(result, e);
         } catch (Exception e){
             logger.error("Can't get Balance ", e);
-            result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-                    .entity(result)
-                    .build();
+            return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -595,18 +644,10 @@ public class SmartWatchRestController {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            mobilePhone = checkAndConvertPhone(mobilePhone);
-            if (!isValidPhoneAndToken(session, mobilePhone, token)) {
-                throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone);
-            }
+            mobilePhone = checkMobilePhone(session, mobilePhone, token);
             token = "";
 
-
-            Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
-            if (parent == null) {
-                throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
-                        + ", but passed the TokenValidator");
-            }
+            Client parent = findParentByMobile(mobilePhone);
 
             List<Client> children = findChildrenByGuardian(session, parent);
 
@@ -617,26 +658,13 @@ public class SmartWatchRestController {
             transaction.commit();
             transaction = null;
 
-            result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
-            result.getResult().description = ResponseCodes.RC_OK.toString();
-
-            return Response.status(HttpURLConnection.HTTP_OK)
-                    .entity(result)
-                    .build();
+            return resultOK(result);
         } catch (IllegalArgumentException e){
             logger.error("Can't get Locations ", e);
-            result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
-                    .entity(result)
-                    .build();
+            return resultBadArgs(result, e);
         } catch (Exception e){
             logger.error("Can't get Locations ", e);
-            result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
-                    .entity(result)
-                    .build();
+            return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -800,6 +828,94 @@ public class SmartWatchRestController {
                 item.setClient(child.getPerson().getFullName());
             }
             items.add(item);
+        }
+        return items;
+    }
+
+    private List<JsonTransaction> buildTransactionsInfo(Session session, Client child, Date startDate,
+            Date endDate, Integer limit) throws Exception{
+        List<JsonTransaction> items = new LinkedList<JsonTransaction>();
+        List<AccountTransaction> accountTransactionList = null;
+        Criterion timeRestriction = endDate == null ?
+                Restrictions.le("transactionTime", startDate) : Restrictions.between("transactionTime", startDate, endDate);
+
+        if(limit == null || limit <= 0){
+            limit = DEFAULT_SAMPLE_LIMIT;
+        }
+
+        Criteria criteria = session.createCriteria(AccountTransaction.class);
+        criteria.add(Restrictions.eq("client", child))
+                .add(timeRestriction)
+                .addOrder(org.hibernate.criterion.Order.desc("transactionTime"))
+                .setMaxResults(limit);
+
+        accountTransactionList = criteria.list();
+
+        if(accountTransactionList == null || accountTransactionList.isEmpty()){
+            logger.warn("No transactions was found for client contractID: " + child.getContractId());
+            return Collections.emptyList();
+        }
+
+        for(AccountTransaction at: accountTransactionList){
+            JsonTransaction jsonTransaction = new JsonTransaction();
+            jsonTransaction.setIdOfTransaction(at.getIdOfTransaction());
+            jsonTransaction.setOrderDate(at.getTransactionTime());
+            jsonTransaction.setTransactionSum(abs(at.getTransactionSum()));
+            jsonTransaction.setTransactionType(at.getSourceTypeAsString());
+            items.add(jsonTransaction);
+        }
+        return items;
+    }
+
+    private List<JsonPurchaseDetailItem> buildPurchaseDetailInfo(Session session, Long idOfTransaction) throws Exception{
+        List<JsonPurchaseDetailItem> items = new LinkedList<JsonPurchaseDetailItem>();
+
+        AccountTransaction accountTransaction = (AccountTransaction) session
+                .load(AccountTransaction.class, idOfTransaction);
+
+        if(accountTransaction == null){
+            logger.warn("No transaction was found with idOfTransaction: " + idOfTransaction);
+            return Collections.emptyList();
+        }
+
+        for(Order order: accountTransaction.getOrders()){
+            items.add(fillPurchaseDetailItem(order));
+        }
+        return items;
+    }
+
+    private List<JsonPurchaseDetailItem> buildPurchaseComplexInfo(Session session, Client child, Date startDate, Date endDate, Integer limit) throws Exception{
+        List<JsonPurchaseDetailItem> items = new LinkedList<JsonPurchaseDetailItem>();
+        List<Order> ordersOfClient = null;
+        Criterion timeRestriction = endDate == null ?
+                Restrictions.le("orderDate", startDate) : Restrictions.between("orderDate", startDate, endDate);
+
+        if(limit == null || limit <= 0){
+            limit = DEFAULT_SAMPLE_LIMIT;
+        }
+
+        Criteria criteria = session.createCriteria(Order.class);
+        List<OrderTypeEnumType> complexTypeList = new ArrayList<OrderTypeEnumType>();
+        complexTypeList.add(OrderTypeEnumType.PAY_PLAN);
+        complexTypeList.add(OrderTypeEnumType.REDUCED_PRICE_PLAN);
+        complexTypeList.add(OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE);
+        complexTypeList.add(OrderTypeEnumType.SUBSCRIPTION_FEEDING);
+        complexTypeList.add(OrderTypeEnumType.DISCOUNT_PLAN_CHANGE);
+        criteria.add(Restrictions.in("orderType", complexTypeList));
+        criteria.add(Restrictions.eq("client", child))
+                .add(timeRestriction)
+                .addOrder(org.hibernate.criterion.Order.desc("orderDate"))
+                .setMaxResults(limit);
+
+        ordersOfClient = criteria.list();
+
+        if(ordersOfClient == null || ordersOfClient.isEmpty()){
+            logger.warn("No found Orders of Client contractID: " + child.getContractId());
+            return Collections.emptyList();
+        }
+
+        for(Order o: ordersOfClient){
+            items.add(fillPurchaseDetailItem(o));
         }
         return items;
     }
@@ -984,5 +1100,90 @@ public class SmartWatchRestController {
             logger.error("", e);
             throw e;
         }
+    }
+
+    private <T extends IJsonBase> Response resultBadArgs(T result, IllegalArgumentException e) {
+        result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
+        result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+        return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+                .entity(result)
+                .build();
+    }
+
+    private Response resultBadArgs(Result result, IllegalArgumentException e) {
+        result.resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
+        result.description = debug ? e.getMessage() : ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+        return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+                .entity(result)
+                .build();
+    }
+
+    private <T extends IJsonBase> Response resultException(T result, Exception e) {
+        result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
+        result.getResult().description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
+        return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+                .entity(result)
+                .build();
+    }
+
+    private Response resultException(Result result, Exception e) {
+        result.resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
+        result.description = debug ? e.getMessage() : ResponseCodes.RC_INTERNAL_ERROR.toString();
+        return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR)
+                .entity(result)
+                .build();
+    }
+
+    private <T extends IJsonBase> Response resultOK(T result) {
+        result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
+        result.getResult().description = ResponseCodes.RC_OK.toString();
+        return Response.status(HttpURLConnection.HTTP_OK)
+                .entity(result)
+                .build();
+    }
+
+    private Response resultOK(Result result) {
+        result.resultCode = ResponseCodes.RC_OK.getCode();
+        result.description = ResponseCodes.RC_OK.toString();
+        return Response.status(HttpURLConnection.HTTP_OK)
+                .entity(result)
+                .build();
+    }
+
+    private String checkMobilePhone(Session session, String mobilePhone, String token) throws Exception {
+        mobilePhone = checkAndConvertPhone(mobilePhone);
+        if(!isValidPhoneAndToken(session, mobilePhone, token)){
+            throw new IllegalArgumentException("Invalid token and mobilePhone number, mobilePhone: " + mobilePhone );
+        }
+        return mobilePhone;
+    }
+
+    private Client findParentByMobile(String mobilePhone) throws Exception {
+        Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
+        if(parent == null){
+            throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
+                    + ", but passed the TokenValidator");
+        }
+        return parent;
+    }
+
+    private JsonPurchaseDetailItem fillPurchaseDetailItem(Order order) {
+        JsonPurchaseDetailItem detailItem = new JsonPurchaseDetailItem();
+        detailItem.setOrderDate(order.getOrderDate());
+        detailItem.setOrderType(order.getOrderType().toString());
+        detailItem.setrSum(order.getRSum());
+        detailItem.setSocDiscount(order.getSocDiscount());
+        detailItem.setTrdDiscount(order.getTrdDiscount());
+        detailItem.setGrantSum(order.getGrantSum());
+        detailItem.setSumByCard(order.getSumByCard());
+        detailItem.setSumByCash(order.getSumByCash());
+        for (OrderDetail orderDetail : order.getOrderDetails()){
+            JsonOrderDetail jsonOrderDetail = new JsonOrderDetail();
+            jsonOrderDetail.setGoodName(orderDetail.getMenuDetailName());
+            jsonOrderDetail.setrPrice(orderDetail.getRPrice());
+            jsonOrderDetail.setQty(orderDetail.getQty());
+            detailItem.getOrderDetails().add(jsonOrderDetail);
+        }
+        return detailItem;
     }
 }

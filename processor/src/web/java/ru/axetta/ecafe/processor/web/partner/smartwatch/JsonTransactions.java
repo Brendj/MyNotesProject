@@ -9,12 +9,12 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 import java.util.LinkedList;
 import java.util.List;
 
-public class JsonLocations implements IJsonBase {
+public class JsonTransactions implements IJsonBase {
     private Result result;
-    private List<JsonLocationsInfo> locations;
+    private List<JsonTransaction> items;
 
-    public JsonLocations(){
-        result = new Result();
+    public JsonTransactions(){
+        this.result = new Result();
     }
 
     public Result getResult() {
@@ -25,14 +25,14 @@ public class JsonLocations implements IJsonBase {
         this.result = result;
     }
 
-    public List<JsonLocationsInfo> getLocations() {
-        if(locations == null){
-            locations = new LinkedList<JsonLocationsInfo>();
+    public List<JsonTransaction> getItems() {
+        if(this.items == null){
+            this.items = new LinkedList<JsonTransaction>();
         }
-        return locations;
+        return items;
     }
 
-    public void setLocations(List<JsonLocationsInfo> locations) {
-        this.locations = locations;
+    public void setItems(List<JsonTransaction> items) {
+        this.items = items;
     }
 }

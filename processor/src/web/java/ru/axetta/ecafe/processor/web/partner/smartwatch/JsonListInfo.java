@@ -9,7 +9,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 import java.util.LinkedList;
 import java.util.List;
 
-public class JsonListInfo {
+public class JsonListInfo implements IJsonBase {
     private Result result;
     private List<JsonChildrenDataInfoItem> items;
 
