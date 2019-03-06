@@ -837,7 +837,7 @@ public class SmartWatchRestController {
         List<JsonTransaction> items = new LinkedList<JsonTransaction>();
         List<AccountTransaction> accountTransactionList = null;
         Criterion timeRestriction = endDate == null ?
-                Restrictions.le("transactionTime", startDate) : Restrictions.between("transactionTime", startDate, endDate);
+                Restrictions.le("transactionTime", startDate) : Restrictions.between("transactionTime", endDate, startDate);
 
         if(limit == null || limit <= 0){
             limit = DEFAULT_SAMPLE_LIMIT;
@@ -888,7 +888,7 @@ public class SmartWatchRestController {
         List<JsonPurchaseDetailItem> items = new LinkedList<JsonPurchaseDetailItem>();
         List<Order> ordersOfClient = null;
         Criterion timeRestriction = endDate == null ?
-                Restrictions.le("orderDate", startDate) : Restrictions.between("orderDate", startDate, endDate);
+                Restrictions.le("orderDate", startDate) : Restrictions.between("orderDate", endDate, startDate);
 
         if(limit == null || limit <= 0){
             limit = DEFAULT_SAMPLE_LIMIT;
