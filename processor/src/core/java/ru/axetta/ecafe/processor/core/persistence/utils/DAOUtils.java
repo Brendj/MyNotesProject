@@ -4020,6 +4020,17 @@ public class DAOUtils {
         return query.list();
     }
 
+    public static List<Long> getUniqueClientIdFromClientDTISZNDiscountInfo(Session session) {
+        List<Long> clientGroupList = new LinkedList<Long>();
+        clientGroupList.add(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+        clientGroupList.add(ClientGroup.Predefined.CLIENT_DELETED.getValue());
+        clientGroupList.add(ClientGroup.Predefined.CLIENT_OTHER_ORG.getValue());
+        Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo "
+                + "where client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
+        query.setParameterList("clientGroups", clientGroupList);
+        return query.list();
+    }
+
     public static List<CategoryDiscountDSZN> getCategoryDiscountDSZNByCategoryDiscountCode(Session session, Long idOfCategoryDiscount) {
         Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
         criteria.add(Restrictions.eq("categoryDiscount.idOfCategoryDiscount", idOfCategoryDiscount));

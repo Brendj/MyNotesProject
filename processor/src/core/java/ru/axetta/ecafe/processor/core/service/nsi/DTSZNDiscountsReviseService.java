@@ -773,7 +773,7 @@ public class DTSZNDiscountsReviseService {
     }
 
     public void runTaskPart2() throws Exception {
-        runTaskPart2(CalendarUtils.startOfDay(new Date()));
+        runTaskPart2(null);
     }
 
     public void runTaskPart2(Date startDate) throws Exception {
@@ -784,7 +784,12 @@ public class DTSZNDiscountsReviseService {
             session.setFlushMode(FlushMode.MANUAL);
             transaction = session.beginTransaction();
 
-            List<Long> clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(session, startDate);
+            List<Long> clientList;
+            if (null == startDate) {
+                clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfo(session);
+            } else {
+                clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(session, startDate);
+            }
 
             Integer clientCounter = 1;
 
