@@ -535,19 +535,39 @@ public class SummaryCalculationService {
         if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
             String preorders_query = "select distinct pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender from cf_preorder_complex pc "
                     + " join cf_clients c on c.idofclient = pc.idofclient join cf_persons p on p.idofperson = c.idofperson "
+                    + " join cf_clientsnotificationsettings n on c.idofclient = n.idofclient AND n.notifytype = :notifyType "
                     + " where pc.preorderdate > :date and pc.deletedstate = 1 "
-                    //+ " and pc.createddate = (select max(createddate) from cf_preorder_complex pc2 where pc2.idofclient = pc.idofclient and pc2.preorderdate = pc.preorderdate and pc2.deletedstate = 1) "
                     + " and not exists(select pc1.idofpreordercomplex from cf_preorder_complex pc1 "
                     + "where pc1.idofclient = pc.idofclient and pc1.deletedstate = 0 and pc1.preorderdate = pc.preorderdate and pc1.amount > 0) "
                     + " union "
                     + "select distinct pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender from cf_preorder_menudetail pmd "
                     + " join cf_clients c on c.idofclient = pmd.idofclient join cf_persons p on p.idofperson = c.idofperson "
+                    + " join cf_clientsnotificationsettings n on c.idofclient = n.idofclient AND n.notifytype = :notifyType "
                     + " where pmd.preorderdate > :date and pmd.deletedstate = 1 "
                     + " and not exists(select pmd1.idofpreordermenudetail from cf_preorder_menudetail pmd1 "
+                    + "where pmd1.idofclient = pmd.idofclient and pmd1.deletedstate = 0 and pmd1.preorderdate = pmd.preorderdate and pmd1.amount > 0) "
+                    + " UNION "
+                    + "select distinct pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender "
+                    + "from cf_client_guardian_notificationsettings n join cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
+                    + "join cf_clients c on c.idofclient = cg.idofchildren "
+                    + "join cf_preorder_complex pc on c.idofclient = pc.idofclient "
+                    + "join cf_persons p on p.idofperson = c.idofperson "
+                    + "where pc.preorderdate > :date and pc.deletedstate = 1 "
+                    + "and not exists(select pc1.idofpreordercomplex from cf_preorder_complex pc1 "
+                    + "where pc1.idofclient = pc.idofclient and pc1.deletedstate = 0 and pc1.preorderdate = pc.preorderdate and pc1.amount > 0) "
+                    + "union "
+                    + "select distinct pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender "
+                    + "from cf_client_guardian_notificationsettings n join cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
+                    + "join cf_clients c on c.idofclient = cg.idofchildren "
+                    + "join cf_preorder_menudetail pmd on pmd.idofclient = c.idofclient "
+                    + "join cf_persons p on p.idofperson = c.idofperson "
+                    + "where pmd.preorderdate > :date and pmd.deletedstate = 1 "
+                    + "and not exists(select pmd1.idofpreordermenudetail from cf_preorder_menudetail pmd1 "
                     + "where pmd1.idofclient = pmd.idofclient and pmd1.deletedstate = 0 and pmd1.preorderdate = pmd.preorderdate and pmd1.amount > 0) "
                     + "order by 3,1";
             Query pQuery = entityManager.createNativeQuery(preorders_query);
             pQuery.setParameter("date", System.currentTimeMillis());
+            pQuery.setParameter("notifyType", notifyType);
             List plist = pQuery.getResultList();
             for (Object obj : plist) {
                 Object[] row = (Object[]) obj;
@@ -579,16 +599,35 @@ public class SummaryCalculationService {
             String preorders_query = "select pc.preorderdate, cast(pc.amount * pc.complexprice as bigint), c.idofclient, c.balance, p.surname, p.firstname, c.gender "
                     + "from cf_preorder_complex pc join cf_clients c on pc.idofclient = c.idofclient "
                     + "join cf_persons p on p.idofperson = c.idofperson "
+                    + "join cf_clientsnotificationsettings n on c.idofclient = n.idofclient AND n.notifytype = :notifyType "
                     + "where pc.deletedstate = 0 and pc.amount > 0 and pc.preorderdate between :startDate and :endDate "
                     + "union "
                     + "select pmd.preorderdate, cast(sum(pmd.amount * pmd.menudetailprice) as bigint), pmd.idofclient, c.balance, p.surname, p.firstname, c.gender "
                     + "from cf_preorder_menudetail pmd join cf_clients c on pmd.idofclient = c.idofclient "
+                    + "join cf_clientsnotificationsettings n on c.idofclient = n.idofclient AND n.notifytype = :notifyType "
                     + "join cf_persons p on p.idofperson = c.idofperson "
                     + "where pmd.deletedstate = 0 and pmd.amount > 0 and pmd.preorderdate between :startDate and :endDate "
-                    + "group by pmd.idofclient, p.surname, p.firstname, c.balance, pmd.preorderdate, c.gender order by 1, 3";
+                    + "group by pmd.idofclient, p.surname, p.firstname, c.balance, pmd.preorderdate, c.gender "
+                    + "UNION "
+                    + "select pc.preorderdate, cast(pc.amount * pc.complexprice as bigint), c.idofclient, c.balance, p.surname, p.firstname, c.gender "
+                    + "from cf_client_guardian_notificationsettings n join cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
+                    + "join cf_clients c on c.idofclient = cg.idofchildren "
+                    + "join cf_preorder_complex pc on pc.idofclient = c.idofclient "
+                    + "join cf_persons p on p.idofperson = c.idofperson "
+                    + "where pc.deletedstate = 0 and pc.amount > 0 and pc.preorderdate between :startDate and :endDate "
+                    + "union "
+                    + "select pmd.preorderdate, cast(sum(pmd.amount * pmd.menudetailprice) as bigint), pmd.idofclient, c.balance, p.surname, p.firstname, c.gender "
+                    + "from cf_client_guardian_notificationsettings n join cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
+                    + "join cf_clients c on c.idofclient = cg.idofchildren "
+                    + "join cf_preorder_menudetail pmd on pmd.idofclient = c.idofclient "
+                    + "join cf_persons p on p.idofperson = c.idofperson "
+                    + "where pmd.deletedstate = 0 and pmd.amount > 0 and pmd.preorderdate between :startDate and :endDate "
+                    + "group by pmd.idofclient, p.surname, p.firstname, c.balance, pmd.preorderdate, c.gender "
+                    + "order by 1, 3";
             Query pQuery = entityManager.createNativeQuery(preorders_query);
             pQuery.setParameter("startDate", System.currentTimeMillis());
             pQuery.setParameter("endDate", CalendarUtils.addDays(new Date(), 7).getTime());
+            pQuery.setParameter("notifyType", notifyType);
             List pList = pQuery.getResultList();
             for (Object obj : pList) {
                 Object[] row = (Object[])obj;
