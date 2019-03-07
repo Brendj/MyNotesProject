@@ -8,6 +8,8 @@ import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfMigrant;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
 import java.util.ArrayList;
@@ -31,6 +33,8 @@ public class Migrants implements SectionRequest{
     private final List<OutcomeMigrationRequestsHistoryItem> outcomeMigrationRequestsHistoryItems;
     private final List<IncomeMigrationRequestsHistoryItem> incomeMigrationRequestsHistoryItems;
 
+    private static Logger logger = LoggerFactory.getLogger(Migrants.class);
+
     public Migrants(Node migrantsRequestNode, Long idOfOrgRegistry) {
         this.idOfOrg = idOfOrgRegistry;
 
@@ -43,7 +47,11 @@ public class Migrants implements SectionRequest{
             if(outcomeCurrentActive.length() > 0) {
                 String[] outcomeIds = outcomeCurrentActive.split(",");
                 for (String id : outcomeIds) {
-                    currentActiveOutcome.add(Long.parseLong(id));
+                    try {
+                        currentActiveOutcome.add(Long.parseLong(id));
+                    } catch (NumberFormatException e) {
+                        logger.error("Unable to parse data from \"CurrentActive\" attribute in \"OutcomeMigrationRequests\" tag", e);
+                    }
                 }
             }
         }
@@ -89,7 +97,11 @@ public class Migrants implements SectionRequest{
                         String[] orgAndId = idForOrg.split(":");
                         Long idOfOrg = Long.parseLong(orgAndId[0]);
                         for (String id : orgAndId[1].split(",")) {
-                            currentActiveIncome.add(new CompositeIdOfMigrant(Long.parseLong(id), idOfOrg));
+                            try {
+                                currentActiveIncome.add(new CompositeIdOfMigrant(Long.parseLong(id), idOfOrg));
+                            } catch (NumberFormatException e) {
+                                logger.error("Unable to parse data from \"CurrentActive\" attribute in \"IncomeMigrationRequests\" tag", e);
+                            }
                         }
 
                     }
