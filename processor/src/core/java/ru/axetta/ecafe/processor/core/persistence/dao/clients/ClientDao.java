@@ -47,7 +47,7 @@ import static ru.axetta.ecafe.processor.core.logic.ClientManager.generateNewClie
  */
 @Repository
 public class ClientDao extends WritableJpaDao {
-    public static final String UNKNOWN_PERSON_DATA = "Обратитесь в школу для корректировки ФИО представителя";
+    public static final String UNKNOWN_PERSON_DATA = "Не заполнено";
     public static final String UNKNOWN_PERSON_SURNAME = "Представитель обучающегося: %s";
     public static final String COMMENT_AUTO_CREATE = "{Создано %s}";
     private static final Logger logger = LoggerFactory.getLogger(ClientDao.class);
