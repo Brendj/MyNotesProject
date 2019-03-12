@@ -195,7 +195,9 @@ public class ETPMVDaoService {
                 result.add(DAOUtils.updateApplicationForFoodWithSendToAISContingent(session, applicationForFood, status,
                         nextVersion, historyVersion));
             } else {
-                DAOUtils.updateApplicationForFoodSendToAISContingentOnly(session, applicationForFood, nextVersion);
+                if (ApplicationForFoodState.DENIED != applicationForFood.getStatus().getApplicationForFoodState()) {
+                    DAOUtils.updateApplicationForFoodSendToAISContingentOnly(session, applicationForFood, nextVersion);
+                }
             }
         }
         return result;
