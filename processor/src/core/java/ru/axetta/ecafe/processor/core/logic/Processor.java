@@ -3191,10 +3191,9 @@ public class Processor implements SyncProcessor {
         Transaction persistenceTransaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession.setFlushMode(FlushMode.COMMIT);
             persistenceTransaction = persistenceSession.beginTransaction();
             for (ClientGuardianItem item : items) {
-
-
                 try {
                     Criteria criteria = persistenceSession.createCriteria(ClientGuardian.class);
                     criteria.add(Restrictions.eq("idOfChildren", item.getIdOfChildren()));
