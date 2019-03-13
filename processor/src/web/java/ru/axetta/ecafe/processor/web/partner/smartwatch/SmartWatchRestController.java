@@ -304,7 +304,6 @@ public class SmartWatchRestController {
             @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId,
             @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime,
             @QueryParam(value="limit") Integer limit){
-        Date date = new Date();
         JsonEnterEvents result = new JsonEnterEvents();
         Session session = null;
         Transaction transaction = null;
@@ -353,9 +352,6 @@ public class SmartWatchRestController {
         } finally{
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
-            Date eDate = new Date();
-            Date delta = new Date(eDate.getTime() - date.getTime());
-            logger.info("METHOD WORKS: " + (delta.getTime()));
         }
     }
 
