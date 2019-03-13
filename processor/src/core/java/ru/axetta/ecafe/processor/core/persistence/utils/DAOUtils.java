@@ -3680,9 +3680,9 @@ public class DAOUtils {
     }
 
     public static ApplicationForFood updateApplicationForFoodWithSendToAISContingent(Session session, ApplicationForFood applicationForFood,
-            ApplicationForFoodStatus status, Long version, Long historyVersion) {
+            ApplicationForFoodStatus status, Long version, Long historyVersion) throws Exception {
         applicationForFood.setSendToAISContingent(true);
-        return updateApplicationForFoodWithVersion(session, applicationForFood, status, version, historyVersion);
+        return updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status, version, historyVersion);
     }
 
     public static ApplicationForFood updateApplicationForFoodWithVersion(Session session, ApplicationForFood applicationForFood,
