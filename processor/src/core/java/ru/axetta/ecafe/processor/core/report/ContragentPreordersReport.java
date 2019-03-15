@@ -171,7 +171,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
         private String getUnpaidComplexesQueryPart(String idOfContragentCondition, String idOfOrgsCondition) {
             return " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, "
                     + " o.shortNameInfoService, o.address, c.contractId, pc.preorderDate,"
-                    + " pc.complexName, (pc.amount - pc.usedamount) as amount, '' as dish, cast((pc.complexPrice * (pc.amount - pc.usedamount)) as bigint) as complexPrice,"
+                    + " pc.complexName, (pc.amount - coalesce(pl.qty, 0)) as amount, '' as dish, cast((pc.complexPrice * (pc.amount - coalesce(pl.qty, 0))) as bigint) as complexPrice,"
                     + " cast(null as bigint) as createddate, 'Нет'  as reversed,"
                     + " cast(null as bigint) as idOfOrder, cast(null as bigint) as orderSum, cast(null as bigint), 'Нет' as isPaid"
                     + " from cf_preorder_complex pc "
@@ -179,9 +179,8 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " join cf_orgs o on c.idOfOrg = o.idOfOrg "
                     + " join cf_contragents ctg on o.defaultsupplier = ctg.idOfContragent"
                     + " left join cf_preorder_linkod pl on pl.preorderguid = pc.guid"
-                    + " left join (select preorderguid, count(idofpreorderlinkod) as payed from cf_preorder_linkod group by  preorderguid) q on q.preorderguid = pc.guid"
                     + " where pc.deletedstate = 0 and pc.amount > 0 and o.PreordersEnabled = 1"
-                    + " and (pc.amount - pc.usedamount) > 0 "
+                    + " and (pc.amount - coalesce(pl.qty, 0)) > 0 "
                     + " and pc.preorderDate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
                     + idOfContragentCondition
