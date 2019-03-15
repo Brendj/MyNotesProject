@@ -86,7 +86,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             } else {
                 getDataQuery = " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, "
                         + "o.shortnameinfoservice, o.address, c.contractId, pc.preorderDate, "
-                        + "pc.complexName, pc.usedamount as amount, '' as dish, "
+                        + "pc.complexName, cast(pc.usedamount as bigint) as amount, '' as dish, "
                         + "cast((pc.complexPrice * pc.usedamount) as bigint), co.createddate as cancelDate, "
                         + "case coalesce(ord.state, 0) when 0 then 'Нет' else 'Да' end as reversed, "
                         + "ord.orderDate, pl.qty*pl.price as orderSum, pl.idOfOrder, case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as isPaid "
@@ -104,8 +104,8 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                         + idOfContragentCondition
                         + " union"
                         + " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, o.shortNameInfoService, o.address, c.contractId, pc.preorderDate, "
-                        + " pc.complexName, pc.usedamount as amount, array_to_string(array_agg(pmd.menudetailname), ', ') as dish, "
-                        + " cast((sum(pmd.menudetailprice * pmd.amount) * pc.usedamount) as bigint), co.createddate as cancelDate, "
+                        + " pc.complexName, cast(1 as bigint) as amount, array_to_string(array_agg(pmd.menudetailname), ', ') as dish, "
+                        + " cast(sum(pmd.menudetailprice * pmd.amount) as bigint), co.createddate as cancelDate, "
                         + " case coalesce(ord.state, 0) when 0 then 'Нет' else 'Да' end as reversed, "
                         + " ord.orderDate, pl.qty*pl.price as orderSum, pl.idOfOrder,  case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as isPaid "
                         + " from cf_preorder_menudetail pmd "
@@ -198,9 +198,9 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + "join cf_contragents ctg on o.defaultsupplier = ctg.idOfContragent "
                     + "join cf_preorder_complex pc on pmd.idofpreordercomplex = pc.idofpreordercomplex "
                     + "left join cf_preorder_linkod pl on pl.preorderguid = pc.guid "
-                    + "left join (select preorderguid, count(idofpreorderlinkod) as payed from cf_preorder_linkod group by  preorderguid) q on q.preorderguid = pc.guid "
+                    + "left join cf_canceledorders co on pl.idOfOrder = co.idOfOrder and pl.idOfOrg = co.idOfOrg  "
                     + "where pc.deletedstate = 0 and pmd.deletedstate = 0 and pmd.amount > 0 and pc.usedamount = 0"
-                    + "  and o.PreordersEnabled = 1 "
+                    + "  and o.PreordersEnabled = 1 and co.idOfOrder is null "
                     + " and pc.preorderDate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
                     + idOfContragentCondition
