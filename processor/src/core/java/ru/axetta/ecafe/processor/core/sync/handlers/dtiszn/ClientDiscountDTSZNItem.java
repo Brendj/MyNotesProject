@@ -22,6 +22,7 @@ public class ClientDiscountDTSZNItem {
     private Date dateEnd;
     private Long version;
     private Boolean archived;
+    private Date lastDiscountUpdate;
 
     public ClientDiscountDTSZNItem() {
 
@@ -35,6 +36,7 @@ public class ClientDiscountDTSZNItem {
         this.dateEnd = info.getDateEnd();
         this.version = info.getVersion();
         this.archived = info.getArchived();
+        this.lastDiscountUpdate = info.getLastUpdate();
     }
 
     public Element toElement(Document document) {
@@ -61,6 +63,9 @@ public class ClientDiscountDTSZNItem {
         }
         if (null != archived) {
             element.setAttribute("D", Boolean.toString(archived));
+        }
+        if (null != lastDiscountUpdate) {
+            element.setAttribute("LastDiscountUpdate", timeFormat.format(lastDiscountUpdate));
         }
         return element;
     }
@@ -119,5 +124,13 @@ public class ClientDiscountDTSZNItem {
 
     public void setArchived(Boolean archived) {
         this.archived = archived;
+    }
+
+    public Date getLastDiscountUpdate() {
+        return lastDiscountUpdate;
+    }
+
+    public void setLastDiscountUpdate(Date lastDiscountUpdate) {
+        this.lastDiscountUpdate = lastDiscountUpdate;
     }
 }
