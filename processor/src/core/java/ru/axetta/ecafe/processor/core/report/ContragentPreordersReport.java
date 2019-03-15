@@ -86,8 +86,8 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             } else {
                 getDataQuery = " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, "
                         + "o.shortnameinfoservice, o.address, c.contractId, pc.preorderDate, "
-                        + "pc.complexName, cast(pc.usedamount as bigint) as amount, '' as dish, "
-                        + "cast((pc.complexPrice * pc.usedamount) as bigint), co.createddate as cancelDate, "
+                        + "pc.complexName, cast(pl.qty as bigint) as amount, '' as dish, "
+                        + "cast((pc.complexPrice * pl.qty) as bigint), co.createddate as cancelDate, "
                         + "case coalesce(ord.state, 0) when 0 then 'Нет' else 'Да' end as reversed, "
                         + "ord.orderDate, pl.qty*pl.price as orderSum, pl.idOfOrder, case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as isPaid "
                         + "from cf_preorder_complex pc "
