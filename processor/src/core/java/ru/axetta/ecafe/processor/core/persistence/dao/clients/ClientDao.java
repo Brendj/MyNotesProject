@@ -48,7 +48,7 @@ import static ru.axetta.ecafe.processor.core.logic.ClientManager.generateNewClie
 @Repository
 public class ClientDao extends WritableJpaDao {
     public static final String UNKNOWN_PERSON_DATA = "Не заполнено";
-    public static final String UNKNOWN_PERSON_SURNAME = "Представитель обучающегося: %s";
+    public static final String UNKNOWN_PERSON_SURNAME = "Представитель обучающегося:";
     public static final String COMMENT_AUTO_CREATE = "{Создано %s}";
     private static final Logger logger = LoggerFactory.getLogger(ClientDao.class);
 
@@ -233,9 +233,12 @@ public class ClientDao extends WritableJpaDao {
         //Создаем нового клиента-родителя
         FieldProcessor.Config createConfig = new ClientManager.ClientFieldConfig();
         Client child = (Client)session.load(Client.class, clientInfo.getIdOfClient());
-        String surname = String.format(UNKNOWN_PERSON_SURNAME, child.getPerson().getSurnameAndFirstLetters());
-        createConfig.setValue(ClientManager.FieldId.SURNAME, surname);
-        createConfig.setValue(ClientManager.FieldId.NAME, UNKNOWN_PERSON_DATA);
+        createConfig.setValue(ClientManager.FieldId.SURNAME, UNKNOWN_PERSON_SURNAME);
+        try {
+            createConfig.setValue(ClientManager.FieldId.NAME, child.getPerson().getSurnameAndFirstLetters());
+        } catch (Exception e) {
+            createConfig.setValue(ClientManager.FieldId.NAME, UNKNOWN_PERSON_DATA);
+        }
         createConfig.setValue(ClientManager.FieldId.SECONDNAME, "");
         createConfig.setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
         createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, clientInfo.getNotifyViaPUSH());
