@@ -103,8 +103,13 @@ public class ImportMigrantsService {
                     Long idOfClient = ClientManager.forceGetClientESZ(session, request.getIdOfESZ(),
                             (request.getSurname() == null) ? "" : request.getSurname(),
                             (request.getFirstname() == null) ? "" : request.getFirstname(),
-                            (request.getSecondname() == null) ? "" : request.getSecondname());
+                            (request.getSecondname() == null) ? "" : request.getSecondname(),
+                            (request.getClientGuid() == null) ? "" : request.getClientGuid());
                     client = (Client) session.load(Client.class, idOfClient);
+                } else {
+                    if (!client.getExternalId().equals(request.getIdOfESZ()) && null != request.getIdOfESZ()) {
+                        client.setExternalId(request.getIdOfESZ());
+                    }
                 }
 
                 Integer resolution;

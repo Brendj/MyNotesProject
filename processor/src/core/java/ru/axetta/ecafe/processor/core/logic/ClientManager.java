@@ -1145,7 +1145,8 @@ public class ClientManager {
         setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
     }
 
-    public static long forceGetClientESZ(Session session, Long eszId, String surname, String firstName, String secondName) throws Exception {
+    public static long forceGetClientESZ(Session session, Long eszId, String surname, String firstName, String secondName,
+            String clientGuid) throws Exception {
         String strNSIOrg = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.esz.migrants.eszOrg", "");
         if (StringUtils.isEmpty(strNSIOrg)) throw new Exception("Не найдена организация ЕСЗ");
         Long idOfESZOrg = Long.parseLong(strNSIOrg);
@@ -1161,6 +1162,7 @@ public class ClientManager {
         fc.setValue(FieldId.SECONDNAME, secondName);
         fc.setValue(FieldId.GROUP, "Обучающиеся других ОО"); //todo переделать на новую константу из ClientGroup.Predefined
         fc.setValue(FieldId.EXTERNAL_ID, eszId);
+        fc.setValue(FieldId.CLIENT_GUID, clientGuid);
         return ClientManager.registerClient(idOfESZOrg, fc, false, true);
     }
 
