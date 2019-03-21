@@ -107,7 +107,7 @@ public class ImportMigrantsService {
                             (request.getClientGuid() == null) ? "" : request.getClientGuid());
                     client = (Client) session.load(Client.class, idOfClient);
                 } else {
-                    if (!client.getExternalId().equals(request.getIdOfESZ()) && null != request.getIdOfESZ()) {
+                    if (null != request.getIdOfESZ() && !request.getIdOfESZ().equals(client.getExternalId())) {
                         client.setExternalId(request.getIdOfESZ());
                     }
                 }
