@@ -1150,8 +1150,7 @@ public class ClientManager {
         String strNSIOrg = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.esz.migrants.eszOrg", "");
         if (StringUtils.isEmpty(strNSIOrg)) throw new Exception("Не найдена организация ЕСЗ");
         Long idOfESZOrg = Long.parseLong(strNSIOrg);
-        Query query = session.createQuery("select c.idOfClient from Client c where c.org.idOfOrg = :idOfOrg and c.externalId = :externalId");
-        query.setParameter("idOfOrg", idOfESZOrg);
+        Query query = session.createQuery("select c.idOfClient from Client c where c.externalId = :externalId");
         query.setParameter("externalId", eszId);
         Long idOfClient = (Long)query.uniqueResult();
         if (idOfClient != null) return idOfClient;
