@@ -944,17 +944,6 @@
                             action="#{mainPage.cancelCategoryBenefitsPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
-    <rich:panelMenuGroup id="infoMessageGroupMenu" label="Сообщения в АРМ администратора ОО"
-                         binding="#{mainPage.infoMessageGroupPage.mainMenuComponent}">
-        <a4j:support event="onclick" action="#{mainPage.showInfoMessageGroupPage}" reRender="workspaceForm" />
-
-        <rich:panelMenuItem id="infoMessageList" binding="#{mainPage.infoMessagePage.mainMenuComponent}"
-                            label="Список" action="#{mainPage.showInfoMessagePage}" reRender="workspaceForm" />
-
-        <rich:panelMenuItem id="infoMessageCreate" binding="#{mainPage.infoMessageCreatePage.mainMenuComponent}"
-                            label="Новое сообщение" action="#{mainPage.showInfoMessageCreatePage}" reRender="workspaceForm" />
-    </rich:panelMenuGroup>
-
     <rich:panelMenuItem id="empInfo" binding="#{mainPage.empInfoPage.mainMenuComponent}"
                         label="Просмотр записей в ЕМП" action="#{mainPage.empInfoPage.show}" reRender="workspaceForm" />
 
@@ -1015,6 +1004,17 @@
 <rich:panelMenuGroup id="reportOnlineGroupMenu" binding="#{mainPage.reportOnlineGroupPage.mainMenuComponent}"
                      label="Онлайн отчеты" rendered="#{mainPage.eligibleToWorkOnlineReport}">
     <a4j:support event="onclick" action="#{mainPage.showReportOnlineGroupPage}" reRender="workspaceForm" />
+
+    <rich:panelMenuGroup id="infoMessageGroupMenu" label="Сообщения в АРМ администратора ОО"
+                         binding="#{mainPage.infoMessageGroupPage.mainMenuComponent}">
+        <a4j:support event="onclick" action="#{mainPage.showInfoMessageGroupPage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="infoMessageList" binding="#{mainPage.infoMessagePage.mainMenuComponent}"
+                            label="Список" action="#{mainPage.showInfoMessagePage}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="infoMessageCreate" binding="#{mainPage.infoMessageCreatePage.mainMenuComponent}"
+                            label="Новое сообщение" action="#{mainPage.showInfoMessageCreatePage}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="complexGroupMenu" binding="#{mainPage.complexGroupPage.mainMenuComponent}"
                          label="Отчеты по комплексам" rendered="#{mainPage.eligibleToViewComplexReports}">
