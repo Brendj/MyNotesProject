@@ -319,7 +319,7 @@ public class FunctionSelector {
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
                     .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") ||
                     item.getFunctionName().equals("feedingSettingsSupplier") || item.getFunctionName().equals("feedingSettingsAdmin")
-                    || item.getFunctionName().equals("manualRprt")) {
+                    || item.getFunctionName().equals("manualRprt") || item.getFunctionName().equals("messageARMinOO")) {
                 onlineReportItems.add(item);
             }
         }
@@ -439,7 +439,7 @@ public class FunctionSelector {
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
                     .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") ||
                     item.getFunctionName().equals("feedingSettingsSupplier") || item.getFunctionName().equals("feedingSettingsAdmin")
-                    || item.getFunctionName().equals("manualRprt")) {
+                    || item.getFunctionName().equals("manualRprt") || item.getFunctionName().equals("messageARMinOO")) {
                 if (selectedFunctions != null && selectedFunctions.contains(function)) {
                     item.setSelected(true);
                 }

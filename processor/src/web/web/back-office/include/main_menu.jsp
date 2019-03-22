@@ -1006,7 +1006,7 @@
     <a4j:support event="onclick" action="#{mainPage.showReportOnlineGroupPage}" reRender="workspaceForm" />
 
     <rich:panelMenuGroup id="infoMessageGroupMenu" label="Сообщения в АРМ администратора ОО"
-                         binding="#{mainPage.infoMessageGroupPage.mainMenuComponent}">
+                         binding="#{mainPage.infoMessageGroupPage.mainMenuComponent}" rendered="#{mainPage.eligibleToViewMessageARM}">
         <a4j:support event="onclick" action="#{mainPage.showInfoMessageGroupPage}" reRender="workspaceForm" />
 
         <rich:panelMenuItem id="infoMessageList" binding="#{mainPage.infoMessagePage.mainMenuComponent}"

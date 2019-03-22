@@ -86,6 +86,8 @@ public class Function {
     public static final String FUNC_RESTRICT_ONLINE_REPORT_BENEFIT = "onlineRprtBenefit";
     public static final String FUNCD_RESTRICT_ONLINE_REPORT_BENEFIT = "Закрыть раздел 'Отчет по льготам'";
     public static final String FUNC_RESTRICT_ONLINE_REPORT_REQUEST = "onlineRprtRequest";
+    public static final String FUNC_RESTICT_MESSAGE_IN_ARM_OO = "messageARMinOO";
+    public static final String FUNCD_RESTICT_MESSAGE_IN_ARM_OO = "Закрыть 'Сообщения в АРМ администратора ОО'";
     public static final String FUNCD_RESTRICT_ONLINE_REPORT_REQUEST = "Закрыть раздел 'Отчет по заявкам'";
     public static final String FUNC_RESTRICT_ONLINE_REPORT_MEALS = "onlineRprtMeals";
     public static final String FUNCD_RESTRICT_ONLINE_REPORT_MEALS = "Закрыть раздел 'Льготное питание'";

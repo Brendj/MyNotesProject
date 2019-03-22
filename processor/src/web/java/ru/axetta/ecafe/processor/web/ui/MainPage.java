@@ -9332,6 +9332,10 @@ public class MainPage implements Serializable {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_REQUEST);
     }
 
+    public boolean isEligibleToViewMessageARM() throws Exception {
+        return !getCurrentUser().hasFunction(Function.FUNC_RESTICT_MESSAGE_IN_ARM_OO);
+    }
+
     public boolean isEligibleToViewMealsReports() throws Exception {
         return !getCurrentUser().hasFunction(Function.FUNC_RESTRICT_ONLINE_REPORT_MEALS);
     }

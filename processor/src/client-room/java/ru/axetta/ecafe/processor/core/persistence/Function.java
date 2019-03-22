@@ -56,6 +56,8 @@ public class Function {
     public static final String FUNCD_REPORT_VIEW = "Отчеты просмотр";
     public static final String FUNC_REPORT_EDIT = "reportEdit";
     public static final String FUNCD_REPORT_EDIT = "Отчеты редактирование";
+    public static final String FUNC_RESTICT_MESSAGE_IN_ARM_OO = "messageARMinOO";
+    public static final String FUNCD_RESTICT_MESSAGE_IN_ARM_OO = "Закрыть 'Сообщения в АРМ администратора ОО'";
     // baybikov
     public static final String FUNC_WORK_OPTION = "workOption";
     public static final String FUNCD_WORK_OPTION = "Редактирование настроек";
