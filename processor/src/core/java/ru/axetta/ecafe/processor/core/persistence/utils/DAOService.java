@@ -892,7 +892,7 @@ public class DAOService {
         return q.getResultList();
     }
 
-    public Org findOrgByRegistryData(Long uniqueAddressId, String guid, String inn, Long unom, Long unad) {
+    public Org findOrgByRegistryData(Long uniqueAddressId, String guid, String inn, Long unom, Long unad, Boolean skipThirdPart) {
         //Новый алгоритм поиска организации в нашей БД по данным от реестров. Сраниваем в 3 этапа по разным наборам полей
         entityManager.setFlushMode(FlushModeType.COMMIT);
         javax.persistence.Query q;
@@ -912,6 +912,9 @@ public class DAOService {
                     return orgs2.get(0);
                 }
             }
+        }
+        if (null != skipThirdPart && skipThirdPart && (null == unom || null == unad)) {
+            return null;
         }
         q = entityManager.createQuery("from Org o left join fetch o.officialPerson p where o.btiUnom=:unom and o.btiUnad=:unad");
         q.setParameter("unom", unom);

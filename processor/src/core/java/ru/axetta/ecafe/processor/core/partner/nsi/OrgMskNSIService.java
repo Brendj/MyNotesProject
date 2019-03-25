@@ -199,7 +199,7 @@ public class OrgMskNSIService extends MskNSIService {
                     item.setInn(info.getInn());
 
                     Org fOrg = DAOService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(),
-                            item.getInn(), item.getUnom(), item.getUnad());
+                            item.getInn(), item.getUnom(), item.getUnad(), false);
                     if (fOrg != null) {
                         fillInfOWithOrg(item, fOrg);
                         item.setOperationType(OrgRegistryChange.MODIFY_OPERATION);

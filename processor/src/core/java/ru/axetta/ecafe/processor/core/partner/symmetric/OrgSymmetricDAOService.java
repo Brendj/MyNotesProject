@@ -78,8 +78,16 @@ public class OrgSymmetricDAOService extends OrgMskNSIService {
             info.setAddress((String)row[1]);
             info.setCity("Москва");
             info.setGuid((String)row[8]);
-            if (row[12] != null) info.setUnom(Long.parseLong((String)row[12]));
-            if (row[13] != null) info.setUnad(Long.parseLong((String)row[13]));
+            if (row[12] != null) {
+                info.setUnom(Long.parseLong((String)row[12]));
+            } else {
+                info.setUnom(null);
+            }
+            if (row[13] != null) {
+                info.setUnad(Long.parseLong((String)row[13]));
+            } else {
+                info.setUnad(null);
+            }
             info.setAdditionalId(((BigInteger)row[15]).longValue());
             info.setUniqueAddressId(((BigInteger)row[15]).longValue());
             info.setDirectorFullName((String)row[6]);
@@ -107,11 +115,13 @@ public class OrgSymmetricDAOService extends OrgMskNSIService {
             item.setDirector(info.getDirector());
 
             Org fOrg = DAOService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(),
-                    item.getInn(), item.getUnom(), item.getUnad());
+                    item.getInn(), item.getUnom(), item.getUnad(), true);
             if (fOrg != null) {
                 fillInfOWithOrg(item, fOrg);
                 item.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
                 modify = true;
+            } else if ((null == item.getUnom() || null == item.getUnad()) && null == fOrg) {    // 3 этап был пропущен
+                result.remove(info);
             } else {
                 item.setOperationType(OrgRegistryChange.CREATE_OPERATION);
             }
