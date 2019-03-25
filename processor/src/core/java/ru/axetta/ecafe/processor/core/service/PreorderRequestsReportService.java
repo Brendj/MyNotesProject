@@ -317,7 +317,7 @@ public class PreorderRequestsReportService extends RecoverableService {
     private List<PreorderItem> getPreorderItemsByOrg(long idOfOrg, List<PreorderItem> items, Date date) {
         List<PreorderItem> result = new ArrayList<PreorderItem>();
         for (PreorderItem item : items) {
-            if (item.getIdOfOrg().equals(idOfOrg) && item.getPreorderDate().equals(date)) result.add(item);
+            if (item.getIdOfOrg().equals(idOfOrg) && item.getPreorderDate().equals(date) && item.getIdOfGoodsRequestPosition() == null) result.add(item);
         }
         return result;
     }
@@ -389,7 +389,7 @@ public class PreorderRequestsReportService extends RecoverableService {
         return balance;
     }
 
-    private long getBalanceOnDate(long idOfClient, Date date, Map<Long, Map<Date, Long>> clientBalances) {
+    public long getBalanceOnDate(long idOfClient, Date date, Map<Long, Map<Date, Long>> clientBalances) {
         try {
             return clientBalances.get(idOfClient).get(date);
         } catch (Exception e) {
@@ -842,14 +842,15 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "c.balance, "                                                                                //11
                             + "c.idofclient, "                                                                             //12
                             + "c.idofclientgroup, "                                                                        //13
-                            + "pc.usedsum "                                                                                //14
+                            + "pc.usedsum, "                                                                                //14
+                            + "case when (pc.amount = 0) then pmd.idofgoodsrequestposition else pc.idofgoodsrequestposition end "
                             + "FROM cf_preorder_complex pc INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                             + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid "
                             + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 and pmd.deletedstate = 0 and pmd.idOfGoodsRequestPosition is null "
                             + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
                             + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
                             + "WHERE pc.preorderdate >= :date " + (dateTo != null ? " and pc.preorderdate <= :dateTo " : "")
-                            + "   AND (pc.amount <> 0 OR pmd.amount <> 0) and pc.deletedstate = 0 and pc.idOfGoodsRequestPosition is null order by pc.preorderdate";
+                            + "   AND (pc.amount <> 0 OR pmd.amount <> 0) and pc.deletedstate = 0 order by pc.preorderdate";
 
             Query query = session.createSQLQuery(sqlQuery);
             query.setParameter("date", CalendarUtils.startOfDayInUTC(dateFrom).getTime());
@@ -863,7 +864,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                 Long idOfPreorderMenuDetail = (null != o[3]) ? ((BigInteger) o[3]).longValue() : null;
                 Long idOfGood = (null != o[4]) ? ((BigInteger) o[4]).longValue() : null;
                 Integer amount = (Integer) o[5];
-                Long idOfGoodsRequest = null; //(null != o[6]) ? ((BigInteger) o[6]).longValue() : null;
+                Long idOfGoodsRequest = (null != o[15]) ? ((BigInteger) o[15]).longValue() : null;
                 Date preorderDate = (null != o[6]) ? new Date(((BigInteger) o[6]).longValue()) : null;
 
                 Long complexPrice = (null != o[7]) ? ((BigInteger) o[7]).longValue() : 0L;
