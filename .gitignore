@@ -1,0 +1,7 @@
+
+# /processor/build/projects/
+/processor/build/projects/atlassian-ide-plugin.xml
+/processor/build/projects/processor.iws
+
+# /processor/src/core/java/ru/axetta/ecafe/processor/core/persistence/
+/processor/src/core/java/ru/axetta/ecafe/processor/core/persistence/NewCard.hbm.xml
