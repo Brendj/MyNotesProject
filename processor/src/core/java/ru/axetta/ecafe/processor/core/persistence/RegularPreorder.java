@@ -57,6 +57,16 @@ public class RegularPreorder {
         this.mobile = guardianMobile;
     }
 
+    @Override
+    public String toString() {
+        return "RegularPreorder{" +
+                "idOfClient=" + client.getIdOfClient() +
+                ", idOfComplex=" + idOfComplex +
+                ", itemCode=" + itemCode +
+                ", idOfRegularPreorder='" + idOfRegularPreorder +
+                '}';
+    }
+
     public Long getIdOfRegularPreorder() {
         return idOfRegularPreorder;
     }
