@@ -67,6 +67,10 @@ public class PreorderComplex {
         query.executeUpdate();
     }
 
+    public void deleteByReason(Long nextVersion, boolean doDelete, PreorderState reason) {
+        doDelete(nextVersion, doDelete, reason);
+    }
+
     public void deleteBySupplier(Long nextVersion, boolean doDelete) {
         doDelete(nextVersion, doDelete, PreorderState.DELETED);
     }
