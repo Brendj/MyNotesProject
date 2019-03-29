@@ -17,14 +17,12 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 import ru.axetta.ecafe.processor.web.ui.card.CardLockReason;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.*;
 import org.hibernate.criterion.Criterion;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 import org.hibernate.type.IntegerType;
 import org.hibernate.type.LongType;
-import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
@@ -49,24 +47,6 @@ public class SmartWatchRestController {
     private final Integer CARD_TYPE_SMARTWATCH = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
     private final Long DEFAULT_SMART_WATCH_VALID_TIME = 157766400000L; // 5 year
     private final Integer DEFAULT_SAMPLE_LIMIT = 10;
-
-    private final String IS_BUFFET = StringUtils.join(Arrays.asList(
-            OrderTypeEnumType.UNKNOWN.ordinal(),
-            OrderTypeEnumType.DEFAULT.ordinal(),
-            OrderTypeEnumType.VENDING.ordinal()
-    ), ", ");
-
-    private final String IS_REDUCED_PRICE_PLAN_FOOD = StringUtils.join(Arrays.asList(
-            OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal(),
-            OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal(),
-            OrderTypeEnumType.DISCOUNT_PLAN_CHANGE.ordinal()
-    ), ", ");
-
-    private final String IS_PAY_PLAN_FOOD = StringUtils.join(Arrays.asList(
-            OrderTypeEnumType.PAY_PLAN.ordinal(),
-            OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal()
-    ), ", ");
-
 
     public SmartWatchRestController(){
         this.cardState = new HashMap<Integer, String>();
@@ -445,7 +425,7 @@ public class SmartWatchRestController {
     public Response getPurchases(@QueryParam(value="mobilePhone") String mobilePhone,
             @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId,
             @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime,
-            @QueryParam(value="limit") Integer limit, @QueryParam(value="transactionType") Integer transactionType){
+            @QueryParam(value="limit") Integer limit){
         Session session = null;
         Transaction transaction = null;
         JsonTransactions result = new JsonTransactions();
@@ -485,7 +465,7 @@ public class SmartWatchRestController {
                 endDate = new Date(endDateTime);
             }
 
-            List<JsonTransaction> items = buildTransactionsInfo(session, child, startDate, endDate, limit, transactionType);
+            List<JsonTransaction> items = buildTransactionsInfo(session, child, startDate, endDate, limit);
             result.setItems(items);
 
             transaction.commit();
@@ -650,143 +630,6 @@ public class SmartWatchRestController {
     }
 
     @GET
-    @Path(value="getBalanceOperations")
-    public Response getBalanceOperations(@QueryParam(value="mobilePhone") String mobilePhone,
-            @QueryParam(value="token") String token, @QueryParam(value="contractId") Long contractId,
-            @QueryParam(value="startDate") Long startDateTime, @QueryParam(value="endDate") Long endDateTime){
-        Session session = null;
-        Transaction transaction = null;
-        JsonBalanceOperations result = new JsonBalanceOperations();
-        try {
-            session = RuntimeContext.getInstance().createReportPersistenceSession();
-            transaction = session.beginTransaction();
-
-            mobilePhone = checkMobilePhone(session, mobilePhone, token);
-            token = "";
-
-            if (contractId == null) {
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if (child == null) {
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if (!isRelatives(session, parent, child)) {
-                throw new IllegalArgumentException(
-                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
-
-            Date startDate;
-            Date endDate = null;
-
-            if(startDateTime == null){
-                logger.warn("Start date is Null, set as now");
-                startDate = new Date();
-            } else {
-                startDate = new Date(startDateTime);
-            }
-
-            if(endDateTime != null && endDateTime < startDate.getTime()){
-                endDate = new Date(endDateTime);
-            }
-
-            List<JsonBalanceOperationsItem> items = buildBalanceOperations(session, child, startDate, endDate);
-            result.setItems(items);
-
-            transaction.commit();
-            transaction = null;
-
-            return resultOK(result);
-        } catch (IllegalArgumentException e){
-            logger.error("Can't get BalanceOperations ", e);
-            return resultBadArgs(result, e);
-        } catch (Exception e){
-            logger.error("Can't get BalanceOperations ", e);
-            return resultException(result, e);
-        } finally{
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
-    }
-
-    private List<JsonBalanceOperationsItem> buildBalanceOperations(Session session, Client child, Date startDate, Date endDate) {
-        SQLQuery query = session.createSQLQuery(" select o.createdDate as orderDate,\n"
-                + " case when co.idofcanceledorder is null then " + SmartWatchTransactionTypes.IS_DESCRIPTION_OF_CASH.ordinal()
-                + "\t else " + SmartWatchTransactionTypes.IS_REPLENISHMENT.ordinal()
-                + " end as transactionType,\n"
-                + " case when o.ordertype in ( "+ IS_BUFFET +" ) then " + SmartWatchOrderType.BUFFET.ordinal()
-                + "\t when o.ordertype in ( " + IS_REDUCED_PRICE_PLAN_FOOD + " ) then " + SmartWatchOrderType.REDUCED_PRICE_PLAN_FOOD.ordinal()
-                + "\t else " + SmartWatchOrderType.PAY_PLAN_FOOD.ordinal()
-                + " end as orderType,\n"
-                + " o.rSum as rSum, o.orderDate as date,\n"
-                + " string_agg(od.menudetailname, ',') as goodsNames, string_agg(cast(od.qty as varchar), ',') as qty, string_agg(cast(od.rprice as varchar), ',') as rPrices "
-                + " from cf_orders o \n"
-                + " join cf_clients c on o.idofclient = c.idofclient\n"
-                + " left join cf_canceledorders co on co.idoforg = o.idoforg and co.idoforder = o.idoforder\n"
-                + " left join cf_transactions t on t.idoftransaction = o.idoftransaction and t.idoforg = o.idoforg\n"
-                + " join cf_orderdetails od on od.idoforg = o.idoforg and od.idoforder = o.idoforder\n"
-                + " where o.createddate between :endDate and :startDate and o.ordertype in (0,1,2,3,4,6,7,11)\n"
-                + " and c.idofclient = :idOfClient "
-                + " group by 1, 2, 3, 4, 5\n"
-                + " union\n"
-                + " select t.transactiondate orderDate,\n"
-                + " case when transactionsum < 0 then " + SmartWatchTransactionTypes.IS_REPLENISHMENT.ordinal()
-                + "\t else " + SmartWatchTransactionTypes.IS_DESCRIPTION_OF_CASH.ordinal()
-                + " end as transactionType,\n"
-                + " case when o.ordertype in ( " + IS_PAY_PLAN_FOOD + " ) then " + SmartWatchOrderType.PAY_PLAN_FOOD.ordinal()
-                + "\t when o.ordertype in ( " + IS_REDUCED_PRICE_PLAN_FOOD + " ) then " + SmartWatchOrderType.REDUCED_PRICE_PLAN_FOOD.ordinal()
-                + "\t else " + SmartWatchOrderType.BUFFET.ordinal()
-                + " end as orderType,\n"
-                + " abs(t.transactionsum) as rSum, t.transactiondate as date,"
-                + " string_agg(od.menudetailname, ',') as goodsNames, string_agg(cast(od.qty as varchar), ',') as qty, string_agg(cast(od.rprice as varchar), ',') as rPrices "
-                + " from cf_transactions t\n"
-                + " join cf_clients c on t.idofclient = c.idofclient\n"
-                + " left join cf_orders o on t.idoftransaction = o.idoftransaction and t.idoforg = o.idoforg\n"
-                + " left join cf_canceledorders co on co.idoforg = o.idoforg and co.idoforder = o.idoforder\n"
-                + " left join cf_orderdetails od on od.idoforg = o.idoforg and od.idoforder = o.idoforder\n"
-                + " where t.transactiondate between :endDate and :startDate\n"
-                + " and c.idofclient = :idOfClient "
-                + " group by 1, 2, 3, 4, 5\n"
-                + " order by orderType, orderDate");
-
-        query.setParameter("endDate", endDate.getTime())
-             .setParameter("startDate", startDate.getTime())
-             .setParameter("idOfClient", child.getIdOfClient());
-
-        query.addScalar("orderDate", new LongType())
-             .addScalar("transactionType", new IntegerType())
-             .addScalar("orderType", new IntegerType())
-             .addScalar("rSum", new LongType())
-             .addScalar("date", new LongType())
-             .addScalar("goodsNames", new StringType())
-             .addScalar("qty", new StringType())
-             .addScalar("rPrices", new StringType());
-
-        query.setResultTransformer(Transformers.aliasToBean(JsonBalanceOperationsItem.class));
-
-        List<JsonBalanceOperationsItem> result = query.list();
-        for(JsonBalanceOperationsItem item : result){
-            if(item.getOrderType().equals(SmartWatchOrderType.BUFFET.ordinal())){
-                String[] splitedGoodNames = item.getGoodsNames().split(",");
-                String[] splitedQty = item.getQty().split(",");
-                String[] splitedPrice = item.getrPrices().split(",");
-                
-                for(int i = 0; i < splitedGoodNames.length; i++){
-                    JsonOrderDetail orderDetail = new JsonOrderDetail();
-                    orderDetail.setGoodName(splitedGoodNames[i]);
-                    orderDetail.setrPrice(Long.parseLong(splitedPrice[i]));
-                    orderDetail.setQty(Long.parseLong(splitedQty[i]));
-                    item.getOrderDetails().add(orderDetail);
-                }
-            }
-        }
-        return result;
-    }
-
-    @GET
     @Path(value="getLocations")
     public Response getLocations(@QueryParam(value="mobilePhone") String mobilePhone,
             @QueryParam(value="token") String token) {
@@ -934,17 +777,16 @@ public class SmartWatchRestController {
             Integer limit) throws Exception{
         List<JsonEnterEventItem> items = new LinkedList<JsonEnterEventItem>();
         List<EnterEventsItem> events = null;
-        String timeConditional = endDate == null ? " ee.evtDateTime <= :startDate " : " ee.evtDateTime BETWEEN :endDate AND :startDate ";
+        String timeConditional = endDate == null ? " evtDateTime <= :startDate " : " evtDateTime BETWEEN :endDate AND :startDate ";
 
         if(limit == null || limit <= 0){
             limit = DEFAULT_SAMPLE_LIMIT;
         }
 
-        SQLQuery query = session.createSQLQuery("SELECT ee.passDirection, ee.evtDateTime, ee.idOfClient, ee.idOfCard, o.shortNameInfoService, o.shortAddress "
-                + " FROM cf_enterevents AS ee "
-                + " JOIN cf_orgs AS o ON o.idOfOrg = ee.idOfOrg "
+        SQLQuery query = session.createSQLQuery("SELECT passDirection, evtDateTime, idOfClient, idOfCard "
+                + " FROM cf_enterevents "
                 + " WHERE " + timeConditional
-                + " AND ee.idofclient = :idOfChild "
+                + " AND idofclient = :idOfChild "
                 + " ORDER BY 2 DESC "
                 + " LIMIT :limit");
         query
@@ -952,8 +794,6 @@ public class SmartWatchRestController {
                 .addScalar("evtDateTime", new LongType())
                 .addScalar("idOfClient", new LongType())
                 .addScalar("idOfCard", new LongType())
-                .addScalar("ShortNameInfoService", new StringType())
-                .addScalar("ShortAddress", new StringType())
 
                 .setParameter("startDate", startDate)
                 .setParameter("idOfChild", child.getIdOfClient())
@@ -983,16 +823,13 @@ public class SmartWatchRestController {
             if(event.getIdOfClient() != null){
                 item.setClient(child.getPerson().getFullName());
             }
-            item.setShortNameInfoService(event.getShortNameInfoService());
-            item.setAddress(event.getShortAddress());
-
             items.add(item);
         }
         return items;
     }
 
-    private List<JsonTransaction> buildTransactionsInfo(Session session, Client child, Date startDate, Date endDate,
-            Integer limit, Integer transactionType) throws Exception{
+    private List<JsonTransaction> buildTransactionsInfo(Session session, Client child, Date startDate,
+            Date endDate, Integer limit) throws Exception{
         List<JsonTransaction> items = new LinkedList<JsonTransaction>();
         List<AccountTransaction> accountTransactionList = null;
         Criterion timeRestriction = endDate == null ?
@@ -1008,12 +845,6 @@ public class SmartWatchRestController {
                 .addOrder(org.hibernate.criterion.Order.desc("transactionTime"))
                 .setMaxResults(limit);
 
-        if(transactionType.equals(SmartWatchTransactionTypes.IS_REPLENISHMENT.ordinal())){
-            criteria.add(Restrictions.gt("transactionSum", 0));
-        } else if (transactionType.equals(SmartWatchTransactionTypes.IS_DESCRIPTION_OF_CASH.ordinal())){
-            criteria.add(Restrictions.lt("transactionSum", 0));
-        }
-
         accountTransactionList = criteria.list();
 
         if(accountTransactionList == null || accountTransactionList.isEmpty()){
@@ -1026,11 +857,7 @@ public class SmartWatchRestController {
             jsonTransaction.setIdOfTransaction(at.getIdOfTransaction());
             jsonTransaction.setOrderDate(at.getTransactionTime());
             jsonTransaction.setTransactionSum(abs(at.getTransactionSum()));
-            if(at.getTransactionSum() < 0) {
-                jsonTransaction.setTransactionType(SmartWatchTransactionTypes.IS_DESCRIPTION_OF_CASH.ordinal());
-            } else {
-                jsonTransaction.setTransactionType(SmartWatchTransactionTypes.IS_REPLENISHMENT.ordinal());
-            }
+            jsonTransaction.setTransactionType(at.getSourceTypeAsString());
             items.add(jsonTransaction);
         }
         return items;

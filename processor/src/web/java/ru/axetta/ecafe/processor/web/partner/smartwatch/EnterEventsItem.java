@@ -9,8 +9,6 @@ public class EnterEventsItem {
     private Long evtDateTime;
     private Long idOfClient;
     private Long idOfCard;
-    private String shortNameInfoService;
-    private String shortAddress;
 
     public Integer getPassDirection() {
         return passDirection;
@@ -42,21 +40,5 @@ public class EnterEventsItem {
 
     public void setIdOfCard(Long idOfCard) {
         this.idOfCard = idOfCard;
-    }
-
-    public String getShortNameInfoService() {
-        return shortNameInfoService;
-    }
-
-    public void setShortNameInfoService(String shortNameInfoService) {
-        this.shortNameInfoService = shortNameInfoService;
-    }
-
-    public String getShortAddress() {
-        return shortAddress;
-    }
-
-    public void setShortAddress(String shortAddress) {
-        this.shortAddress = shortAddress;
     }
 }

@@ -9,8 +9,6 @@ public class JsonEnterEventItem {
     private Integer direction;
     private String cardType;
     private String client;
-    private String address;
-    private String shortNameInfoService;
 
     public Long getEvtDateTime() {
         return evtDateTime;
@@ -42,21 +40,5 @@ public class JsonEnterEventItem {
 
     public void setClient(String client) {
         this.client = client;
-    }
-
-    public String getAddress() {
-        return address;
-    }
-
-    public void setAddress(String address) {
-        this.address = address;
-    }
-
-    public String getShortNameInfoService() {
-        return shortNameInfoService;
-    }
-
-    public void setShortNameInfoService(String shortNameInfoService) {
-        this.shortNameInfoService = shortNameInfoService;
     }
 }
