@@ -70,66 +70,53 @@ public class OrgSymmetricDAOService extends OrgMskNSIService {
         List list = query.getResultList();
         for (Object o : list) {
             Object[] row = (Object[])o;
-            ImportRegisterOrgsService.OrgInfo info = getInfoWithAddToResult(result, row); //new ImportRegisterOrgsService.OrgInfo();
-            info.setOrganizationType(OrganizationType.SCHOOL);
-            info.setShortName((String)row[3]);
-            info.setOfficialName((String)row[2]);
-            info.setInn((String)row[4]);
-            info.setAddress((String)row[1]);
-            info.setCity("Москва");
-            info.setGuid((String)row[8]);
+            boolean modify = false;
+            ImportRegisterOrgsService.OrgInfo item = new ImportRegisterOrgsService.OrgInfo();
+            item.setShortName((String)row[3]);
+            item.setOfficialName((String)row[2]);
+            item.setInn((String)row[4]);
+            item.setAddress((String)row[1]);
+            item.setCity("Москва");
+            item.setGuid((String)row[8]);
             if (row[12] != null) {
-                info.setUnom(Long.parseLong((String)row[12]));
+                item.setUnom(Long.parseLong((String)row[12]));
             } else {
-                info.setUnom(null);
+                item.setUnom(null);
             }
             if (row[13] != null) {
-                info.setUnad(Long.parseLong((String)row[13]));
+                item.setUnad(Long.parseLong((String)row[13]));
             } else {
-                info.setUnad(null);
+                item.setUnad(null);
             }
-            info.setAdditionalId(((BigInteger)row[15]).longValue());
-            info.setUniqueAddressId(((BigInteger)row[15]).longValue());
-            info.setDirectorFullName((String)row[6]);
-            info.setOGRN((String)row[5]);
-            info.setMainBuilding(false);
-            info.setIntroductionQueue((String)row[14]);
-            info.setDirector((String)row[6]);
-            info.setRegion((String)row[16]);
-            if (info.getOrgInfos().size() == 0) {
-                info.setOrgInfos(new ArrayList<ImportRegisterOrgsService.OrgInfo>());
-            }
-            ImportRegisterOrgsService.OrgInfo item = new ImportRegisterOrgsService.OrgInfo();
+            item.setUniqueAddressId(((BigInteger)row[15]).longValue());
+            item.setIntroductionQueue((String)row[14]);
+            item.setDirector((String)row[6]);
 
-            boolean modify = false;
-            item.setAddress(info.getAddress());
-            item.setShortName(info.getShortName());
-            item.setOfficialName(info.getOfficialName());
-            item.setCity(info.getCity());
-            item.setGuid(info.getGuid());
-            item.setInn(info.getInn());
-            item.setUnom(info.getUnom());
-            item.setUnad(info.getUnad());
-            item.setUniqueAddressId(info.getUniqueAddressId());
-            item.setIntroductionQueue(info.getIntroductionQueue());
-            item.setDirector(info.getDirector());
+            ImportRegisterOrgsService.OrgInfo info;
 
             Org fOrg = DAOService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(),
                     item.getInn(), item.getUnom(), item.getUnad(), true);
+
             if (fOrg != null) {
+                info = getInfoWithAddToResult(result, row);
+                fillInfoWithItem(item, info, ((BigInteger)row[15]).longValue(), (String)row[6], (String)row[5],
+                        (String)row[16]);
                 fillInfOWithOrg(item, fOrg);
-                item.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
+                info.getOrgInfos().add(item);
+                info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
                 modify = true;
-            } else if ((null == item.getUnom() || null == item.getUnad()) && null == fOrg) {    // 3 этап был пропущен
-                result.remove(info);
+            } else if ((null != item.getUnom() && null != item.getUnad()) && null == fOrg) {
+                info = getInfoWithAddToResult(result, row);
+                fillInfoWithItem(item, info, ((BigInteger)row[15]).longValue(), (String)row[6], (String)row[5],
+                        (String)row[16]);
+                info.setOperationType(OrgRegistryChange.CREATE_OPERATION);
+                info.getOrgInfos().add(item);
+            }
+
+            if (modify) {
+                item.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
             } else {
                 item.setOperationType(OrgRegistryChange.CREATE_OPERATION);
-            }
-            info.getOrgInfos().add(item);
-            if (modify) {
-                info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
-            } else {
-                info.setOperationType(OrgRegistryChange.CREATE_OPERATION);
             }
         }
         return result;
@@ -150,5 +137,29 @@ public class OrgSymmetricDAOService extends OrgMskNSIService {
         entityManager.setFlushMode(FlushModeType.COMMIT);
         Query query = entityManager.createNativeQuery(str_query);
         return query.getResultList();
+    }
+
+    private void fillInfoWithItem(ImportRegisterOrgsService.OrgInfo item, ImportRegisterOrgsService.OrgInfo info, Long additionalId,
+            String directorFullName, String ogrn, String region) {
+        info.setOrganizationType(OrganizationType.SCHOOL);
+        info.setAddress(item.getAddress());
+        info.setShortName(item.getShortName());
+        info.setOfficialName(item.getOfficialName());
+        info.setCity(item.getCity());
+        info.setGuid(item.getGuid());
+        info.setInn(item.getInn());
+        info.setUnom(item.getUnom());
+        info.setUnad(item.getUnad());
+        info.setAdditionalId(additionalId);
+        info.setUniqueAddressId(item.getUniqueAddressId());
+        info.setDirectorFullName(directorFullName);
+        info.setOGRN(ogrn);
+        info.setMainBuilding(false);
+        info.setIntroductionQueue(item.getIntroductionQueue());
+        info.setDirector(item.getDirector());
+        info.setRegion(region);
+        if (info.getOrgInfos().size() == 0) {
+            info.setOrgInfos(new ArrayList<ImportRegisterOrgsService.OrgInfo>());
+        }
     }
 }
