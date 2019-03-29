@@ -106,11 +106,13 @@ public class ImportMigrantsService {
                             (request.getSecondname() == null) ? "" : request.getSecondname(),
                             (request.getClientGuid() == null) ? "" : request.getClientGuid());
                     client = (Client) session.load(Client.class, idOfClient);
-                } else {
-                    if (null != request.getIdOfESZ() && !request.getIdOfESZ().equals(client.getExternalId())) {
-                        client.setExternalId(request.getIdOfESZ());
-                    }
                 }
+                //TODO: #85 удаляем из релиза 2.2.178
+                //else {
+                //    if (null != request.getIdOfESZ() && !request.getIdOfESZ().equals(client.getExternalId())) {
+                //        client.setExternalId(request.getIdOfESZ());
+                //    }
+                //}
 
                 Integer resolution;
 
