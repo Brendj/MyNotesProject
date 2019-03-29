@@ -21,7 +21,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.ByteArrayOutputStream;
-import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.text.DateFormatSymbols;
 import java.util.*;
@@ -655,7 +654,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                                 + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) THEN 'mixed' "
                                 + "ELSE 'other' END AS flag "
                                 + "FROM CF_ORDERS o "
-                                + "INNER JOIN CF_ORDERDETAILS od ON o.IdOfOrder=od.IdOfOrder "
+                                + "INNER JOIN CF_ORDERDETAILS od ON o.IdOfOrder=od.IdOfOrder and o.idoforg = od.idoforg "
                                 + "LEFT JOIN cf_preorder_linkod pl ON pl.idoforder = o.idoforder"
                                 + " WHERE "
                                 + orgAdditionalCondition
