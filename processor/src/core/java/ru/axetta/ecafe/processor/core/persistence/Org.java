@@ -148,6 +148,8 @@ public class Org implements Serializable {
     private Boolean requestForVisitsToOtherOrg;
     private Boolean preordersEnabled;
     private Boolean multiCardModeEnabled;
+    private Boolean cardDuplicateEnabled;
+    private Boolean reverseMonthOfSale;
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -1174,5 +1176,25 @@ public class Org implements Serializable {
         } else {
             return this.multiCardModeEnabled;
         }
+    }
+
+    public Boolean getCardDuplicateEnabled() {
+        return cardDuplicateEnabled;
+    }
+
+    public void setCardDuplicateEnabled(Boolean cardDuplicateEnabled) {
+        this.cardDuplicateEnabled = cardDuplicateEnabled;
+    }
+
+    public Boolean isCardDuplicateEnabled(){
+        return this.cardDuplicateEnabled == null ? false : this.cardDuplicateEnabled;
+    }
+
+    public Boolean getReverseMonthOfSale() {
+        return reverseMonthOfSale;
+    }
+
+    public void setReverseMonthOfSale(Boolean reverseMonthOfSale) {
+        this.reverseMonthOfSale = reverseMonthOfSale;
     }
 }

@@ -528,6 +528,12 @@ public class MainPage implements Serializable {
         return reportGroupPage;
     }
 
+    public OrgSettingsReportPage getOrgSettingsReportPage() {
+        return orgSettingsReportPage;
+    }
+
+    private final OrgSettingsReportPage orgSettingsReportPage = new OrgSettingsReportPage();
+
     public Object showAllOrgsDiscountReportPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -10537,5 +10543,30 @@ public class MainPage implements Serializable {
 
     public void setRemovedIdOfUserGroup(Long removedIdOfUserGroup) {
         this.removedIdOfUserGroup = removedIdOfUserGroup;
+    }
+
+    public void showOrgSettingReportPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            orgSettingsReportPage.fill(persistenceSession);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            currentWorkspacePage = orgSettingsReportPage;
+
+        } catch (Exception e) {
+            logger.error("Failed to fill org settings report page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы отчета настроект ОО: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
     }
 }

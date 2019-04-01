@@ -960,6 +960,9 @@
     <%--@elvariable id="preorderJournalReportPage" type="ru.axetta.ecafe.processor.web.ui.service.PreorderJournalReportPage"--%>
     <rich:panelMenuItem id="preorderJournalReport" binding="#{preorderJournalReportPage.mainMenuComponent}"
                         label="Журнал операций ВП" action="#{preorderJournalReportPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="orgSettingsReport" binding="#{mainPage.orgSettingsReportPage.mainMenuComponent}"
+                        label="Настройки ОО" action="#{mainPage.showOrgSettingReportPage}" reRender="workspaceForm" />
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"

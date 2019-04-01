@@ -9,8 +9,8 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -4100,5 +4100,10 @@ public class DAOUtils {
         criteria.addOrder(org.hibernate.criterion.Order.desc("createdDate"));
         criteria.setMaxResults(1);
         return (ApplicationForFoodHistory) criteria.uniqueResult();
+    }
+
+    public static List<String> getAllDistinctDepartmentsFromOrgs(Session session) {
+        SQLQuery query = session.createSQLQuery("select distinct district from cf_orgs where district is not null and district not like ''");
+        return query.list();
     }
 }
