@@ -717,50 +717,52 @@ public class SmartWatchRestController {
     }
 
     private List<JsonBalanceOperationsItem> buildBalanceOperations(Session session, Client child, Date startDate, Date endDate) {
-        SQLQuery query = session.createSQLQuery(" select o.createdDate as orderDate,\n"
-                + " case when co.idofcanceledorder is null then " + SmartWatchTransactionTypes.IS_DESCRIPTION_OF_CASH.ordinal()
-                + "\t else " + SmartWatchTransactionTypes.IS_REPLENISHMENT.ordinal()
-                + " end as transactionType,\n"
-                + " case when o.ordertype in ( " + IS_BUFFET + " ) then " + SmartWatchOrderType.BUFFET.ordinal()
-                + "\t when o.ordertype in ( " + IS_REDUCED_PRICE_PLAN_FOOD + " ) then " + SmartWatchOrderType.REDUCED_PRICE_PLAN_FOOD.ordinal()
-                + "\t else " + SmartWatchOrderType.PAY_PLAN_FOOD.ordinal()
-                + " end as orderType,\n"
-                + " case when o.ordertype in ( " + IS_BUFFET + " ) then t.idOfTransaction "
-                + "  else NULL "
-                + " end as idOfTransaction, o.rSum as rSum,"
-                + " case "
-                + "  when o.ordertype in ( " + IS_REDUCED_PRICE_PLAN_FOOD + ", " + IS_PAY_PLAN_FOOD + " ) then o.orderDate \n"
-                + "  else NULL "
-                + " end as date, "
-                + " string_agg(od.menudetailname, ',') as goodsNames, string_agg(cast(od.qty as varchar), ',') as qty, string_agg(cast(od.rprice as varchar), ',') as rPrices "
-                + " from cf_orders o \n"
-                + " join cf_clients c on o.idofclient = c.idofclient\n"
-                + " left join cf_canceledorders co on co.idoforg = o.idoforg and co.idoforder = o.idoforder\n"
-                + " left join cf_transactions t on t.idoftransaction = o.idoftransaction and t.idoforg = o.idoforg\n"
+        SQLQuery query = session.createSQLQuery(
+                " select o.createdDate as orderDate, " + SmartWatchTransactionTypes.IS_DESCRIPTION_OF_CASH.ordinal() + " as transactionType, "
+                + SmartWatchOrderType.BUFFET.ordinal() + " as ordertype, t.idOfTransaction, "
+                + " o.rSum, cast(NULL as bigint) as date, NULL as complexName,\n"
+                + " string_agg(od.menudetailname, ',') as goodsNames, string_agg(cast(od.qty as varchar), ',') as qty, string_agg(cast(od.rprice as varchar), ',') as rPrices\n"
+                + " from cf_orders o\n"
+                + " join cf_transactions t on t.idoftransaction = o.idoftransaction and t.idoforg = o.idoforg\n"
                 + " join cf_orderdetails od on od.idoforg = o.idoforg and od.idoforder = o.idoforder\n"
-                + " where o.createddate between :endDate and :startDate and o.ordertype in (0,1,2,3,4,6,7,11)\n"
-                + " and c.idofclient = :idOfClient "
-                + " group by 1, 2, 3, 4, 5, 6\n"
+                + " join cf_clients c on t.idofclient = c.idofclient\n"
+                + " where o.createddate between :endDate and :startDate and o.ordertype in ( " + IS_BUFFET + " )\n"
+                + " and c.idOfClient = :idOfClient\n"
+                + " group by 1, 2, 3, 4, 5, 6, 7\n"
                 + " union\n"
+                + " select o.createdDate as orderDate, " + SmartWatchTransactionTypes.IS_DESCRIPTION_OF_CASH.ordinal() + " as transactionType,\n"
+                + " case \n"
+                + " when o.ordertype in ( " + IS_REDUCED_PRICE_PLAN_FOOD + " ) then " + SmartWatchOrderType.REDUCED_PRICE_PLAN_FOOD.ordinal()
+                + " else " + SmartWatchOrderType.PAY_PLAN_FOOD.ordinal()
+                + " end as orderType, cast(NULL as bigint) as idOfTransaction,\n"
+                + " case \n"
+                + "  when o.ordertype in ( " + IS_REDUCED_PRICE_PLAN_FOOD + " ) then NULL \n"
+                + "  else o.rSum \n"
+                + " end as rSum, \n"
+                + " o.orderDate as date, q.complexName, NULL as goodsNames, NULL as qty, NULL as rPrices \n"
+                + " from cf_orders o \n"
+                + " join cf_transactions t on t.idoftransaction = o.idoftransaction and t.idoforg = o.idoforg\n"
+                + " join cf_clients c on t.idofclient = c.idofclient\n"
+                + " left join (select idoforg, idoforder, menudetailname as complexname \n"
+                + "           from cf_orderdetails where menutype between 50 and 99 ) as q on q.idoforder = o.idoforder and q.idoforg = o.idoforg \n"
+                + " where o.createddate between :endDate and :startDate and o.ordertype in ( " + IS_REDUCED_PRICE_PLAN_FOOD + ", " + IS_PAY_PLAN_FOOD + " ) "
+                + " and c.idOfClient = :idOfClient\n"
+                + " group by 1, 2, 3, 4, 5, 6, 7\n"
+                + " union \n"
                 + " select t.transactiondate orderDate,\n"
                 + " case when t.transactionsum < 0 then " + SmartWatchTransactionTypes.IS_DESCRIPTION_OF_CASH.ordinal()
-                + "\t else " + SmartWatchTransactionTypes.IS_REPLENISHMENT.ordinal()
+                + " else " + SmartWatchTransactionTypes.IS_REPLENISHMENT.ordinal()
                 + " end as transactionType,\n"
-                + " case when o.ordertype in ( " + IS_PAY_PLAN_FOOD + " ) then " + SmartWatchOrderType.PAY_PLAN_FOOD.ordinal()
-                + "\t when o.ordertype in ( " + IS_REDUCED_PRICE_PLAN_FOOD + " ) then " + SmartWatchOrderType.REDUCED_PRICE_PLAN_FOOD.ordinal()
-                + "\t else " + SmartWatchOrderType.BUFFET.ordinal()
-                + " end as orderType,\n"
-                + " t.idOfTransaction, abs(t.transactionsum) as rSum, cast(NULL as bigint) as date,"
-                + " string_agg(od.menudetailname, ',') as goodsNames, string_agg(cast(od.qty as varchar), ',') as qty, string_agg(cast(od.rprice as varchar), ',') as rPrices "
+                + SmartWatchOrderType.BUFFET.ordinal() + " as orderType, \n"
+                + " t.idOfTransaction, abs(t.transactionsum) as rSum, cast(NULL as bigint) as date,\n"
+                + " NULL as complexName, \n"
+                + " NULL as goodsNames, NULL as qty, NULL as rPrices \n"
                 + " from cf_transactions t\n"
                 + " join cf_clients c on t.idofclient = c.idofclient\n"
                 + " left join cf_orders o on t.idoftransaction = o.idoftransaction and t.idoforg = o.idoforg\n"
-                + " left join cf_canceledorders co on co.idoforg = o.idoforg and co.idoforder = o.idoforder\n"
-                + " left join cf_orderdetails od on od.idoforg = o.idoforg and od.idoforder = o.idoforder\n"
-                + " where t.transactiondate between :endDate and :startDate and o.idoforder is NULL "
-                + " and c.idofclient = :idOfClient "
-                + " group by 1, 2, 3, 4, 5, 6\n"
-                + " order by orderType, orderDate");
+                + " where t.transactiondate between :endDate and :startDate and o.idoforder is NULL \n"
+                + " and c.idOfClient = :idOfClient\n"
+                + " order by orderType, orderDate" );
 
         query.setParameter("endDate", endDate.getTime())
              .setParameter("startDate", startDate.getTime())
@@ -772,6 +774,7 @@ public class SmartWatchRestController {
              .addScalar("idOfTransaction", new LongType())
              .addScalar("rSum", new LongType())
              .addScalar("date", new LongType())
+             .addScalar("complexName", new StringType())
              .addScalar("goodsNames", new StringType())
              .addScalar("qty", new StringType())
              .addScalar("rPrices", new StringType());
@@ -1020,9 +1023,9 @@ public class SmartWatchRestController {
                 .setMaxResults(limit);
 
         if(transactionType.equals(SmartWatchTransactionTypes.IS_REPLENISHMENT.ordinal())){
-            criteria.add(Restrictions.gt("transactionSum", 0));
+            criteria.add(Restrictions.gt("transactionSum", 0L));
         } else if (transactionType.equals(SmartWatchTransactionTypes.IS_DESCRIPTION_OF_CASH.ordinal())){
-            criteria.add(Restrictions.lt("transactionSum", 0));
+            criteria.add(Restrictions.lt("transactionSum", 0L));
         }
 
         accountTransactionList = criteria.list();
