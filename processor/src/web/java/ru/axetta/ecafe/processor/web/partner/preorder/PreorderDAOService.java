@@ -48,7 +48,7 @@ import static ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomContr
  */
 @Component
 @Scope("singleton")
-@DependsOn("daoService")
+@DependsOn({"daoService", "runtimeContext"})
 public class PreorderDAOService {
     private static final Logger logger = LoggerFactory.getLogger(PreorderDAOService.class);
     private final String NEW_LINE_DELIMITER = ";";
@@ -82,10 +82,10 @@ public class PreorderDAOService {
                 return getStartDateForGeneratePreordersInternal(client);
             }
 
-            /*@Override
+            @Override
             public void relevancePreorders() {
-                relevancePreordersInternal();
-            }*/
+                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).relevancePreorders();
+            }
         };
         RuntimeContext.getAppContext().getBean(DAOService.class).setPreorderDAOOperationsImpl(impl);
     }
@@ -635,7 +635,7 @@ public class PreorderDAOService {
         session.update(regularPreorder);
     }
 
-    private void relevancePreordersInternal() {
+    /*public void relevancePreordersInternal() {
         try {
             logger.info("Start process relevance preorders");
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgs();
@@ -644,11 +644,13 @@ public class PreorderDAOService {
         } catch(Exception e) {
             logger.error("Error in process relevance preorders");
         }
-    }
+    }*/
 
     @Transactional
     public void relevancePreordersToOrgs() {
-        Query query = emReport.createQuery("select pc, pc.client.org.idOfOrg from PreorderComplex pc "
+        logger.info("Start relevancePreordersToOrgs process");
+        long nextVersion = nextVersionByPreorderComplex();
+        Query query = em.createQuery("select pc, c.org.idOfOrg from PreorderComplex pc join pc.client c "
                 + "where pc.preorderDate > :date and pc.deletedState = false order by pc.preorderDate");
         query.setParameter("date", new Date());
         List list = query.getResultList();
@@ -658,26 +660,101 @@ public class PreorderDAOService {
             Long idOfOrg = (Long) row[1];
             if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
             if (preorderComplex.getIdOfOrgOnCreate() != null && !preorderComplex.getIdOfOrgOnCreate().equals(idOfOrg)) {
-                testAndDeletePreorderComplex(preorderComplex, PreorderState.CHANGE_ORG);
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGE_ORG);
                 continue;
             }
-            ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
-            if (complexInfo == null) {
-                testAndDeletePreorderComplex(preorderComplex, PreorderState.DELETED);
-            } else if (preorderComplex.getAmount() > 0 && !preorderComplex.getComplexPrice().equals(complexInfo.getCurrentPrice())) {
-                testAndDeletePreorderComplex(preorderComplex, PreorderState.CHANGED_PRICE);
-            }
         }
+        logger.info("End relevancePreordersToOrgs process");
     }
 
-    private void testAndDeletePreorderComplex(PreorderComplex preorderComplex, PreorderState preorderState) {
+    @Transactional
+    public void relevancePreordersToMenu() {
+        logger.info("Start relevancePreordersToMenu process");
+        long nextVersion = nextVersionByPreorderComplex();
+        Query query = em.createQuery("select pc from PreorderComplex pc "
+                + "where pc.preorderDate > :date and pc.deletedState = false order by pc.preorderDate");
+        query.setParameter("date", new Date());
+        List<PreorderComplex> list = query.getResultList();
+        for (PreorderComplex preorderComplex : list) {
+            if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
+            ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
+            if (complexInfo == null) {
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED);
+            }
+            if (preorderComplex.getAmount() > 0) {
+                if (!preorderComplex.getComplexPrice().equals(complexInfo.getCurrentPrice())) {
+                    testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE);
+                }
+            } else {
+                for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
+                    if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) continue;
+                    if (!preorderMenuDetail.getDeletedState() && preorderMenuDetail.getAmount() > 0) {
+                        MenuDetail menuDetail = getMenuDetail(preorderComplex.getClient(), preorderMenuDetail.getItemCode(),
+                                preorderMenuDetail.getPreorderDate(), null, complexInfo.getIdOfComplexInfo());
+                        if (menuDetail == null) {
+                            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED);
+                        } else {
+                            if (!preorderMenuDetail.getMenuDetailPrice().equals(menuDetail.getPrice())) {
+                                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE);
+                            } else if (!preorderMenuDetail.getArmIdOfMenu().equals(menuDetail.getLocalIdOfMenu())) {
+                                preorderMenuDetail.modifyArmIdOfMenu(nextVersion, menuDetail.getLocalIdOfMenu());
+                                em.merge(preorderMenuDetail);
+                            }
+                        }
+                    }
+                }
+            }
+        }
+        logger.info("End relevancePreordersToMenu process");
+    }
 
+    @Transactional
+    public void relevancePreordersToOrgFlag() {
+        logger.info("Start relevancePreordersToOrgFlag process");
+        long nextVersion = nextVersionByPreorderComplex();
+        Query query = em.createQuery("select pc from PreorderComplex pc join pc.client.org o "
+                + "where pc.preorderDate > :date and pc.deletedState = false and o.preordersEnabled = false order by pc.preorderDate");
+        query.setParameter("date", new Date());
+        List<PreorderComplex> list = query.getResultList();
+        for (PreorderComplex preorderComplex : list) {
+            if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF);
+        }
+
+        logger.info("End relevancePreordersToOrgFlag process");
+    }
+
+    private void testAndDeletePreorderComplex(long nextVersion, PreorderComplex preorderComplex, PreorderState preorderState) {
+        try {
+            Boolean doDelete = null;
+            Date today = CalendarUtils.startOfDay(new Date());
+            Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders();
+            Map<String, Integer[]> sd = getSpecialDates(CalendarUtils.addHours(today, 12), syncCountDays,
+                    preorderComplex.getClient().getOrg().getIdOfOrg(), preorderComplex.getClient());
+            for (Map.Entry<String, Integer[]> entry : sd.entrySet()) {
+                if (preorderComplex.getPreorderDate().equals(CalendarUtils.parseDate(entry.getKey()))) {
+                    doDelete = (entry.getValue())[0].equals(0);
+                    break;
+                }
+            }
+            if (doDelete != null && doDelete) {
+                deletePreorderComplex(preorderComplex, nextVersion, preorderState);
+                if (preorderComplex.getRegularPreorder() != null) {
+                    deleteRegularPreorderInternal((Session)em.getDelegate(), preorderComplex.getRegularPreorder(), preorderState, null);
+                }
+                logger.info("Deleted preorder " + preorderComplex.toString());
+            } else {
+                logger.info("Preoder can't be deleted " + preorderComplex.toString());
+            }
+        } catch (Exception e) {
+            logger.error("Error in testAndDeletePreorderComplex: ", e);
+        }
     }
 
     private void generatePreordersByScheduleInternal() {
         try {
             logger.info("Start of generating regular preorders");
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).generatePreordersBySchedule();
+            RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).generatePreordersBySchedule();
             logger.info("Successful end of generating regular preorders");
         } catch (Exception e) {
             logger.error("Error in generating regular preorders: ", e);
@@ -726,7 +803,7 @@ public class PreorderDAOService {
         return false;
     }
 
-    @Transactional(propagation = Propagation.SUPPORTS)
+    @Transactional(propagation = Propagation.REQUIRED)
     public void createPreordersFromRegular(RegularPreorder regularPreorder, boolean doDeleteExisting) throws Exception {
         //генерация предзаказов по ид. регулярного заказа
         //для блюд - по коду товара и цене
@@ -937,6 +1014,13 @@ public class PreorderDAOService {
                 }
             }
         }
+    }
+
+    @Transactional
+    public List<RegularPreorder> getRegularPreorders() {
+        Query query = em.createQuery("select r from RegularPreorder r where r.deletedState = false and r.endDate > :date");
+        query.setParameter("date", new Date());
+        return query.getResultList();
     }
 
     private Date getStartDateForGeneratePreordersInternal(Client client) throws Exception {
@@ -1155,14 +1239,15 @@ public class PreorderDAOService {
     }
 
     private MenuDetail getMenuDetail(Client client, String itemCode, Date date, Long price, Long idOfComplexInfo) {
+        String priceCondition = (price == null ? "" : " and cid.menuDetail.price = :price");
         Query query = emReport.createQuery("select cid.menuDetail from ComplexInfoDetail cid where cid.complexInfo.idOfComplexInfo = :idOfComplexInfo and cid.complexInfo.org.idOfOrg = :idOfOrg "
-                + "and cid.menuDetail.itemCode = :itemCode and cid.complexInfo.menuDate between :startDate and :endDate and cid.menuDetail.price = :price");
+                + "and cid.menuDetail.itemCode = :itemCode and cid.complexInfo.menuDate between :startDate and :endDate" + priceCondition);
         query.setParameter("idOfComplexInfo", idOfComplexInfo);
         query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
         query.setParameter("itemCode", itemCode);
         query.setParameter("startDate", CalendarUtils.startOfDay(date));
         query.setParameter("endDate", CalendarUtils.endOfDay(date));
-        query.setParameter("price", price);
+        if (price != null) query.setParameter("price", price);
         try {
             return (MenuDetail)query.getSingleResult();
         } catch (Exception e) {

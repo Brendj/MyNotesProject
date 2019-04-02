@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Query;
 import org.hibernate.Session;
@@ -71,14 +72,6 @@ public class PreorderComplex {
         doDelete(nextVersion, doDelete, reason);
     }
 
-    public void deleteBySupplier(Long nextVersion, boolean doDelete) {
-        doDelete(nextVersion, doDelete, PreorderState.DELETED);
-    }
-
-    public void changeBySupplier(Long nextVersion, boolean doDelete) {
-        doDelete(nextVersion, doDelete, PreorderState.CHANGED_PRICE);
-    }
-
     public void deleteByChangeOrg(Long nextVersion, boolean doDelete) {
         doDelete(nextVersion, doDelete, PreorderState.CHANGE_ORG);
     }
@@ -93,6 +86,16 @@ public class PreorderComplex {
 
     public boolean equalPrice(ComplexInfo ci) {
         return getPriceNullSafe(this.getComplexPrice()) == getPriceNullSafe(ci.getCurrentPrice());
+    }
+
+    @Override
+    public String toString() {
+        return "PreorderComplex{" +
+                "idOfClient=" + client.getIdOfClient() +
+                ", preorderDate=" + CalendarUtils.dateToString(preorderDate) +
+                ", armComplexId=" + armComplexId +
+                ", idOfRegularPreorder='" + regularPreorder.getIdOfRegularPreorder() +
+                '}';
     }
 
     private long getPriceNullSafe(Long value) {
