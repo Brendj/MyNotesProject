@@ -792,7 +792,7 @@ public class PreorderDAOService {
                 currentDate = CalendarUtils.addDays(currentDate, 1);
                 continue;
             }
-            if (preorderComplex == null || (preorderComplex != null && allowCreateNewPreorderComplex(preorderComplex))) {
+            if ((preorderComplex == null || (preorderComplex != null && allowCreateNewPreorderComplex(preorderComplex))) && !forcePreorderComplexExists(regularPreorder, currentDate)) {
                 //на искомую дату нет предзаказа, надо создавать
 
                 boolean comparePrice = StringUtils.isEmpty(regularPreorder.getItemCode()); //здесь сравниваем по цене если заказ на комплекс, а не на блюдо
@@ -831,7 +831,8 @@ public class PreorderDAOService {
                     }
                 }
                 PreorderMenuDetail preorderMenuDetail = findPreorderMenuDetail(currentDate, regularPreorder.getClient(), menuDetail.getLocalIdOfMenu());
-                if (preorderMenuDetail == null || (preorderMenuDetail != null && allowCreateNewPreorderMenuDetail(preorderMenuDetail))) {
+                if ((preorderMenuDetail == null || (preorderMenuDetail != null && allowCreateNewPreorderMenuDetail(preorderMenuDetail)))
+                        && !forcePreorderMenuDetailExists(regularPreorder, currentDate)) {
                     //на искомую дату нет предзаказа, надо создавать
                     logger.info("===Create preorder menudetail from regular===");
                     preorderMenuDetail = createPreorderMenuDetail(regularPreorder.getClient(), preorderComplex, menuDetail,
@@ -848,6 +849,26 @@ public class PreorderDAOService {
         }
         //Проверяем есть ли от сегодняшнего дня актуальные предзаказы. если нет ни одного - удаляем рег правило
         testAndDeleteRegularPreorder(regularPreorder);
+    }
+
+    private boolean forcePreorderComplexExists(RegularPreorder regularPreorder, Date date) {
+        //существует ли актуальный предзаказ на комплекс без привязки к регуляру
+        return em.createQuery("select pc.idOfPreorderComplex from PreorderComplex pc "
+                + "where pc.client = :client and pc.preorderDate = :date and pc.armComplexId = :complexId and pc.deletedState = false")
+                .setParameter("client", regularPreorder.getClient())
+                .setParameter("date", date)
+                .setParameter("complexId", regularPreorder.getIdOfComplex())
+                .getResultList().size() > 0;
+    }
+
+    private boolean forcePreorderMenuDetailExists(RegularPreorder regularPreorder, Date date) {
+        //существует ли актуальный предзаказ на блюдо без привязки к регуляру
+        return em.createQuery("select pmd.idOfPreorderMenuDetail from PreorderMenuDetail pmd "
+                + "where pmd.client = :client and pmd.preorderDate = :date and pmd.itemCode = :itemCode and pmd.deletedState = false")
+                .setParameter("client", regularPreorder.getClient())
+                .setParameter("date", date)
+                .setParameter("itemCode", regularPreorder.getItemCode())
+                .getResultList().size() > 0;
     }
 
     private boolean allowCreateNewPreorderComplex(PreorderComplex preorderComplex) {
