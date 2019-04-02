@@ -3137,6 +3137,7 @@ public class Processor implements SyncProcessor {
         ClientGuardianData clientGuardianData = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession.setFlushMode(FlushMode.COMMIT);
             persistenceTransaction = persistenceSession.beginTransaction();
             ClientGuardianDataProcessor processor = new ClientGuardianDataProcessor(persistenceSession, idOfOrg,
                     maxVersion);
