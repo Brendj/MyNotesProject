@@ -30,6 +30,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
+import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -122,10 +123,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
         }
     }
 
-    public void buildXLS() {
-        if(CollectionUtils.isEmpty(items)){
-            return;
-        }
+    public void buildXLS(ActionEvent actionEvent) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -162,7 +160,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
                 facesContext.responseComplete();
                 response.setContentType("application/xls");
-                response.setHeader("Content-disposition", "inline;filename=contragent_preorders_report.xls");
+                response.setHeader("Content-disposition", "inline;filename=org_setting_report.xls");
                 JRXlsExporter xlsExport = new JRXlsExporter();
                 xlsExport.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
                 xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
@@ -216,7 +214,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     org.setMultiCardModeEnabled(item.getMultiCardModeEnabled());
 
                     org.setRequestForVisitsToOtherOrg(item.getRequestForVisitsToOtherOrg());
-                    org.setIsWorkInSummerTime(item.getWorkInSummerTime());
+                    org.setIsWorkInSummerTime(item.getIsWorkInSummerTime());
 
                     org.setOrgStructureVersion(nextOrgVersion);
                     session.update(org);

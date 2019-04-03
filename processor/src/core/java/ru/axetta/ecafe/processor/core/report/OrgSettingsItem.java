@@ -19,7 +19,7 @@ public class OrgSettingsItem {
     private String district;
     private String shortAddress;
     private String type;
-    private OrganizationStatus status;
+    private String status;
 
     //----------------- Реквизиты --------------------//
     private String orgNumberInName;
@@ -40,7 +40,11 @@ public class OrgSettingsItem {
     private Boolean preordersEnabled;
     private Boolean reverseMonthOfSale;
     private Boolean denyPayPlanForTimeDifference;
-    private FeedingSettingInfo info;
+
+    //FeedingSetting Info
+    private Long idOfSetting = -1L;
+    private Long limit = 0L;
+    private String settingName = "Лимит не установлен";
 
     //----------------- Карты --------------------//
     private Boolean oneActiveCard;
@@ -62,7 +66,11 @@ public class OrgSettingsItem {
 
     public OrgSettingsItem(Org org, FeedingSetting setting) {
         if(org == null){
-            info = new FeedingSettingInfo(setting);
+            if(setting != null) {
+                this.idOfSetting = setting.getIdOfSetting();
+                this.settingName = setting.getSettingName();
+                this.limit = setting.getLimit();
+            }
             return;
         }
         this.idOfOrg = org.getIdOfOrg();
@@ -70,7 +78,7 @@ public class OrgSettingsItem {
         this.district = org.getDistrict();
         this.shortAddress = org.getShortAddress();
         this.type = org.getType().getShortType();
-        this.status = org.getStatus();
+        this.status = org.getStatus().toString();
 
         this.orgNumberInName = org.getOrgNumberInName();
         this.GUID = org.getGuid();
@@ -88,7 +96,11 @@ public class OrgSettingsItem {
         this.preordersEnabled = org.getPreordersEnabled();
         this.reverseMonthOfSale = org.getReverseMonthOfSale();
         this.denyPayPlanForTimeDifference = org.getDenyPayPlanForTimeDifference();
-        this.info = new FeedingSettingInfo(setting);
+        if(setting != null) {
+            this.idOfSetting = setting.getIdOfSetting();
+            this.settingName = setting.getSettingName();
+            this.limit = setting.getLimit();
+        }
 
         this.oneActiveCard = org.getOneActiveCard();
         this.enableDuplicateCard = org.isCardDuplicateEnabled();
@@ -142,11 +154,11 @@ public class OrgSettingsItem {
         this.shortAddress = shortAddress;
     }
 
-    public OrganizationStatus getStatus() {
+    public String getStatus() {
         return status;
     }
 
-    public void setStatus(OrganizationStatus status) {
+    public void setStatus(String status) {
         this.status = status;
     }
 
@@ -262,11 +274,11 @@ public class OrgSettingsItem {
         this.needVerifyCardSign = needVerifyCardSign;
     }
 
-    public Boolean getWorkInSummerTime() {
+    public Boolean getIsWorkInSummerTime() {
         return isWorkInSummerTime;
     }
 
-    public void setWorkInSummerTime(Boolean workInSummerTime) {
+    public void setIsWorkInSummerTime(Boolean workInSummerTime) {
         isWorkInSummerTime = workInSummerTime;
     }
 
@@ -281,7 +293,7 @@ public class OrgSettingsItem {
     // For web-page
     public String getStyle(){
         return (this.mainBuilding ? MAIN_BUILDING_STYLE + " " : "")
-            +  (!this.status.equals(OrganizationStatus.ACTIVE) ? NOT_SERVICED_STYLE : "" );
+                +  (!this.status.equals(OrganizationStatus.ACTIVE.toString()) ? NOT_SERVICED_STYLE : "" );
     }
 
     public void isChangedWhenModify(){
@@ -361,14 +373,6 @@ public class OrgSettingsItem {
         return idOfOrg.hashCode();
     }
 
-    public FeedingSettingInfo getInfo() {
-        return info;
-    }
-
-    public void setInfo(FeedingSettingInfo info) {
-        this.info = info;
-    }
-
     public String getArmVersionNumber() {
         return armVersionNumber;
     }
@@ -377,42 +381,27 @@ public class OrgSettingsItem {
         this.armVersionNumber = armVersionNumber;
     }
 
-    public class FeedingSettingInfo{
-        private Long idOfSetting = -1L;
-        private Long limit = 0L;
-        private String settingName = "Лимит не установлен";
+    public Long getIdOfSetting() {
+        return idOfSetting;
+    }
 
-        public FeedingSettingInfo(FeedingSetting feedingSetting){
-            if(feedingSetting == null){
-                return;
-            }
-            this.idOfSetting = feedingSetting.getIdOfSetting();
-            this.limit = feedingSetting.getLimit();
-            this.settingName = feedingSetting.getSettingName();
-        }
+    public void setIdOfSetting(Long idOfSetting) {
+        this.idOfSetting = idOfSetting;
+    }
 
-        public Long getIdOfSetting() {
-            return idOfSetting;
-        }
+    public Long getLimit() {
+        return limit;
+    }
 
-        public void setIdOfSetting(Long idOfSetting) {
-            this.idOfSetting = idOfSetting;
-        }
+    public void setLimit(Long limit) {
+        this.limit = limit;
+    }
 
-        public Long getLimit() {
-            return limit;
-        }
+    public String getSettingName() {
+        return settingName;
+    }
 
-        public void setLimit(Long limit) {
-            this.limit = limit;
-        }
-
-        public String getSettingName() {
-            return settingName;
-        }
-
-        public void setSettingName(String settingName) {
-            this.settingName = settingName;
-        }
+    public void setSettingName(String settingName) {
+        this.settingName = settingName;
     }
 }
