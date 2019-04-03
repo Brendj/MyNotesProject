@@ -680,10 +680,12 @@ public class PreorderDAOService {
             ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
             if (complexInfo == null) {
                 testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED);
+                continue;
             }
             if (preorderComplex.getAmount() > 0) {
                 if (!preorderComplex.getComplexPrice().equals(complexInfo.getCurrentPrice())) {
                     testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE);
+                    continue;
                 }
             } else {
                 for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
@@ -693,9 +695,11 @@ public class PreorderDAOService {
                                 preorderMenuDetail.getPreorderDate(), null, complexInfo.getIdOfComplexInfo());
                         if (menuDetail == null) {
                             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED);
+                            continue;
                         } else {
                             if (!preorderMenuDetail.getMenuDetailPrice().equals(menuDetail.getPrice())) {
                                 testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE);
+                                continue;
                             } else if (!preorderMenuDetail.getArmIdOfMenu().equals(menuDetail.getLocalIdOfMenu())) {
                                 preorderMenuDetail.modifyArmIdOfMenu(nextVersion, menuDetail.getLocalIdOfMenu());
                                 em.merge(preorderMenuDetail);
