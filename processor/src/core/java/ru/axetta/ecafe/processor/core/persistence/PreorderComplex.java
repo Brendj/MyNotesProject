@@ -94,7 +94,7 @@ public class PreorderComplex {
                 "idOfClient=" + client.getIdOfClient() +
                 ", preorderDate=" + CalendarUtils.dateToString(preorderDate) +
                 ", armComplexId=" + armComplexId +
-                ", idOfRegularPreorder='" + regularPreorder.getIdOfRegularPreorder() +
+                ", idOfRegularPreorder='" + (regularPreorder == null ? "null" : regularPreorder.getIdOfRegularPreorder()) +
                 '}';
     }
 

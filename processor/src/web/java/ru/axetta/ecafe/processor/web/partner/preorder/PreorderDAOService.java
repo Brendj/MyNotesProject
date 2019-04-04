@@ -660,7 +660,7 @@ public class PreorderDAOService {
             Long idOfOrg = (Long) row[1];
             if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
             if (preorderComplex.getIdOfOrgOnCreate() != null && !preorderComplex.getIdOfOrgOnCreate().equals(idOfOrg)) {
-                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGE_ORG);
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGE_ORG, true);
                 continue;
             }
         }
@@ -679,12 +679,12 @@ public class PreorderDAOService {
             if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
             ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
             if (complexInfo == null) {
-                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED);
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
                 continue;
             }
             if (preorderComplex.getAmount() > 0) {
                 if (!preorderComplex.getComplexPrice().equals(complexInfo.getCurrentPrice())) {
-                    testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE);
+                    testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false);
                     continue;
                 }
             } else {
@@ -694,12 +694,12 @@ public class PreorderDAOService {
                         MenuDetail menuDetail = getMenuDetail(preorderComplex.getClient(), preorderMenuDetail.getItemCode(),
                                 preorderMenuDetail.getPreorderDate(), null, complexInfo.getIdOfComplexInfo());
                         if (menuDetail == null) {
-                            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED);
-                            continue;
+                            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
+                            break;
                         } else {
                             if (!preorderMenuDetail.getMenuDetailPrice().equals(menuDetail.getPrice())) {
-                                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE);
-                                continue;
+                                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false);
+                                break;
                             } else if (!preorderMenuDetail.getArmIdOfMenu().equals(menuDetail.getLocalIdOfMenu())) {
                                 preorderMenuDetail.modifyArmIdOfMenu(nextVersion, menuDetail.getLocalIdOfMenu());
                                 em.merge(preorderMenuDetail);
@@ -722,13 +722,13 @@ public class PreorderDAOService {
         List<PreorderComplex> list = query.getResultList();
         for (PreorderComplex preorderComplex : list) {
             if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
-            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF);
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF, true);
         }
 
         logger.info("End relevancePreordersToOrgFlag process");
     }
 
-    private void testAndDeletePreorderComplex(long nextVersion, PreorderComplex preorderComplex, PreorderState preorderState) {
+    private void testAndDeletePreorderComplex(long nextVersion, PreorderComplex preorderComplex, PreorderState preorderState, boolean deleteRegular) {
         try {
             Boolean doDelete = null;
             Date today = CalendarUtils.startOfDay(new Date());
@@ -743,7 +743,7 @@ public class PreorderDAOService {
             }
             if (doDelete != null && doDelete) {
                 deletePreorderComplex(preorderComplex, nextVersion, preorderState);
-                if (preorderComplex.getRegularPreorder() != null) {
+                if (deleteRegular && preorderComplex.getRegularPreorder() != null) {
                     deleteRegularPreorderInternal((Session)em.getDelegate(), preorderComplex.getRegularPreorder(), preorderState, null);
                 }
                 logger.info("Deleted preorder " + preorderComplex.toString());
@@ -813,6 +813,7 @@ public class PreorderDAOService {
         //для блюд - по коду товара и цене
         //для комплексов - по ид. комплеса + цена.
         if (regularPreorder == null || regularPreorder.getDeletedState()) return;
+        if (!em.contains(regularPreorder)) regularPreorder = em.find(RegularPreorder.class, regularPreorder.getIdOfRegularPreorder());
         //проверка на даты: от текущего дня пропускаем дни запрета редактирвоания и генерируем на 2 недели вперед
         Date dateTo = CalendarUtils.addDays(new Date(), PreorderComplex.getDaysOfRegularPreorders()-1);
         if (dateTo.after(regularPreorder.getEndDate())) dateTo = regularPreorder.getEndDate();
@@ -830,7 +831,7 @@ public class PreorderDAOService {
         List<PreorderComplex> preorderComplexes = getPreorderComplexesByRegular(regularPreorder, currentDate, dateTo); //получаем список всех предзаказов (в т.ч. удаленные)
 
         List<ProductionCalendar> productionCalendar = DAOReadonlyService.getInstance().getProductionCalendar(new Date(), dateTo);
-        currentDate = CalendarUtils.startOfDayInUTC(currentDate);
+        currentDate = CalendarUtils.startOfDayInUTC(CalendarUtils.addHours(currentDate, 12));
         while (currentDate.before(dateTo) || currentDate.equals(dateTo)) {
             logger.info(String.format("Processing regular preorder %s on date %s...", regularPreorder, CalendarUtils.dateToString(currentDate)));
             if (orgGoodRequestExists(preorderRequests, currentDate)) {
@@ -873,10 +874,11 @@ public class PreorderDAOService {
                 currentDate = CalendarUtils.addDays(currentDate, 1);
                 continue;
             }
-            if ((preorderComplex == null || (preorderComplex != null && allowCreateNewPreorderComplex(preorderComplex))) && !forcePreorderComplexExists(regularPreorder, currentDate)) {
+            if ((preorderComplex == null || (preorderComplex != null && allowCreateNewPreorderComplex(preorderComplex)))
+                    && !forcePreorderComplexExists(regularPreorder, currentDate)) {
                 //на искомую дату нет предзаказа, надо создавать
 
-                boolean comparePrice = StringUtils.isEmpty(regularPreorder.getItemCode()); //здесь сравниваем по цене если заказ на комплекс, а не на блюдо
+                boolean comparePrice = !isMenuDetailPreorder(regularPreorder); //здесь сравниваем по цене если заказ на комплекс, а не на блюдо
                 if (!comparePrice) {
                     menuDetail = getMenuDetail(regularPreorder.getClient(), regularPreorder.getItemCode(), currentDate, regularPreorder.getPrice(), complexInfo.getIdOfComplexInfo());
                     if (menuDetail == null) {
@@ -892,7 +894,7 @@ public class PreorderDAOService {
                 }
                 logger.info("===Create preorder complex from regular===");
                 preorderComplex = createPreorderComplex(regularPreorder.getIdOfComplex(), regularPreorder.getClient(),
-                        complexInfo.getMenuDate(), StringUtils.isEmpty(regularPreorder.getItemCode()) ? regularPreorder.getAmount() : 0, complexInfo,
+                        complexInfo.getMenuDate(), !isMenuDetailPreorder(regularPreorder) ? regularPreorder.getAmount() : 0, complexInfo,
                         nextVersion, regularPreorder.getMobile());
                 preorderComplex.setRegularPreorder(regularPreorder);
                 em.persist(preorderComplex);
@@ -901,7 +903,7 @@ public class PreorderDAOService {
                 currentDate = CalendarUtils.addDays(currentDate, 1);
                 continue;
             }
-            if (!StringUtils.isEmpty(regularPreorder.getItemCode())) {
+            if (isMenuDetailPreorder(regularPreorder)) {
                 if (preorderComplex != null && !preorderComplex.getDeletedState() && menuDetail == null) {
                     menuDetail = getMenuDetail(regularPreorder.getClient(), regularPreorder.getItemCode(), currentDate, regularPreorder.getPrice(), complexInfo.getIdOfComplexInfo());
                     if (menuDetail == null) {
@@ -930,6 +932,10 @@ public class PreorderDAOService {
         }
         //Проверяем есть ли от сегодняшнего дня актуальные предзаказы. если нет ни одного - удаляем рег правило
         testAndDeleteRegularPreorder(regularPreorder);
+    }
+
+    private boolean isMenuDetailPreorder(RegularPreorder regularPreorder) {
+        return !StringUtils.isEmpty(regularPreorder.getItemCode());
     }
 
     private boolean forcePreorderComplexExists(RegularPreorder regularPreorder, Date date) {
