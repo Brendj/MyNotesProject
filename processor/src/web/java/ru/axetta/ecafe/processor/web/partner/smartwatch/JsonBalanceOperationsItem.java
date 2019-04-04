@@ -16,6 +16,7 @@ public class JsonBalanceOperationsItem {
     private Long idOfTransaction;
     private Long rSum;
     private Long date;
+    private Integer state;
     private String complexName;
     private List<JsonOrderDetail> orderDetails;
 
@@ -121,5 +122,13 @@ public class JsonBalanceOperationsItem {
 
     public void setComplexName(String complexName) {
         this.complexName = complexName;
+    }
+
+    public Integer getState() {
+        return state;
+    }
+
+    public void setState(Integer state) {
+        this.state = state;
     }
 }
