@@ -65,6 +65,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsS
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryList;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.preorder.MenuDetailNotExistsException;
+import ru.axetta.ecafe.processor.web.partner.preorder.NotEditedDayException;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderListWithComplexesGroupResult;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderSaveListParam;
@@ -175,6 +176,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_NOT_FOUND_MENUDETAIL = 670L;
     private static final Long RC_NOT_ENOUGH_BALANCE = 680L;
     private static final Long RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED = 690L;
+    private static final Long RC_NOT_EDITED_DAY = 700L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -218,6 +220,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_NOT_FOUND_MENUDETAIL_DESC = "На данный момент блюдо в меню не найдено";
     private static final String RC_NOT_ENOUGH_BALANCE_DESC = "Недостаточно средств на балансе лицевого счета";
     private static final String RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED_DESC = "Заявление не найдено или имеет статус, в котором удаление запрещено";
+    private static final String RC_NOT_EDITED_DAY_DESC = "День недоступен для редактирования предзаказа";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -8769,6 +8772,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } catch (MenuDetailNotExistsException e) {
             result.resultCode = RC_NOT_FOUND_MENUDETAIL;
             result.description = RC_NOT_FOUND_MENUDETAIL_DESC;
+        } catch (NotEditedDayException e) {
+            result.resultCode = RC_NOT_EDITED_DAY;
+            result.description = RC_NOT_EDITED_DAY_DESC;
         } catch(Exception e) {
             logger.error("Error in putPreorderComplex", e);
             result.resultCode = RC_INTERNAL_ERROR;
