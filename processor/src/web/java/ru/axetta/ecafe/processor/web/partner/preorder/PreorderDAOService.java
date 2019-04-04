@@ -898,12 +898,15 @@ public class PreorderDAOService {
                         nextVersion, regularPreorder.getMobile());
                 preorderComplex.setRegularPreorder(regularPreorder);
                 em.persist(preorderComplex);
-            } else {
+            } else if (!isMenuDetailPreorder(regularPreorder)) {
                 logger.info("Preorder complex exists or deleted by user");
                 currentDate = CalendarUtils.addDays(currentDate, 1);
                 continue;
             }
             if (isMenuDetailPreorder(regularPreorder)) {
+                if (preorderComplex == null) {
+                    preorderComplex = findPreorderComplex(currentDate, regularPreorder.getClient(), regularPreorder.getIdOfComplex());
+                }
                 if (preorderComplex != null && !preorderComplex.getDeletedState() && menuDetail == null) {
                     menuDetail = getMenuDetail(regularPreorder.getClient(), regularPreorder.getItemCode(), currentDate, regularPreorder.getPrice(), complexInfo.getIdOfComplexInfo());
                     if (menuDetail == null) {
