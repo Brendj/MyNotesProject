@@ -1191,7 +1191,31 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath());
             addPaymentTypeTotalValuesToReportParameters(parameterMap, totalDataRows);
 
-            return new JRBeanCollectionDataSource(mealRowHashMap.values());
+            List<MealRow> mealRowCollection = new ArrayList<MealRow>(mealRowHashMap.values());
+            Collections.sort(mealRowCollection, new Comparator<MealRow>() {
+                @Override
+                public int compare(MealRow obj1, MealRow obj2) {
+                    if (obj1.getOriginName().toLowerCase().startsWith("платное") && obj2.getOriginName().toLowerCase().startsWith("платное")) {
+                        return obj1.getOriginName().compareTo(obj2.getOriginName());
+                    } else if (obj1.getOriginName().toLowerCase().startsWith("платное") && !obj2.getOriginName().toLowerCase().startsWith("платное")) {
+                        return -1;
+                    } else if (!obj1.getOriginName().toLowerCase().startsWith("платное") && obj2.getOriginName().toLowerCase().startsWith("платное")) {
+                        return 1;
+                    }
+
+                    if (obj1.getOriginName().toLowerCase().startsWith("бесплатное") && obj2.getOriginName().toLowerCase().startsWith("бесплатное")) {
+                        return obj1.getOriginName().compareTo(obj2.getOriginName());
+                    } else if (obj1.getOriginName().toLowerCase().startsWith("бесплатное") && !obj2.getOriginName().toLowerCase().startsWith("бесплатное")) {
+                        return 1;
+                    } else if (!obj1.getOriginName().toLowerCase().startsWith("бесплатное") && obj2.getOriginName().toLowerCase().startsWith("бесплатное")) {
+                        return -1;
+                    }
+
+                    return obj1.getOriginName().compareTo(obj2.getOriginName());
+                }
+            });
+
+            return new JRBeanCollectionDataSource(mealRowCollection);
         }
 
         private String createOrgAdditionalConditionByOrgList(List<OrgShortItem> orgShortItems) {
