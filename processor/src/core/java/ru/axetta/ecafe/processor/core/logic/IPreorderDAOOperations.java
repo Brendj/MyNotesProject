@@ -20,4 +20,5 @@ public interface IPreorderDAOOperations {
     void generatePreordersBySchedule();
     void deletePreordersByClient(Client client);
     Date getStartDateForGeneratePreorders(Client client) throws Exception;
+    void relevancePreorders();
 }

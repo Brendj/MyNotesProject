@@ -41,19 +41,12 @@ public class PreorderMenuDetail {
         doDelete(nextVersion, doDelete, reason);
     }
 
-    public void deleteBySupplier(Long nextVersion, boolean doDelete) {
-        doDelete(nextVersion, doDelete, PreorderState.DELETED);
-    }
-
-    public void changeBySupplier(Long nextVersion, boolean doDelete) {
-        doDelete(nextVersion, doDelete, PreorderState.CHANGED_PRICE);
-    }
-
     public void deleteByChangeOrg(Long nextVersion, boolean doDelete) {
         doDelete(nextVersion, doDelete, PreorderState.CHANGE_ORG);
     }
 
-    public void modifyArmIdOfMenu(Long version) {
+    public void modifyArmIdOfMenu(Long version, Long armIdOfMenu) {
+        this.setArmIdOfMenu(armIdOfMenu);
         this.preorderComplex.setVersion(version);
         this.preorderComplex.setLastUpdate(new Date());
     }
