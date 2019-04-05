@@ -332,9 +332,10 @@
                            reRender="orgSettingsTable" styleClass="command-button"
                            status="reportGenerateStatus" id="buildHTMLButton" />
 
-        <a4j:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.orgSettingsReportPage.buildXLS}"
-                           styleClass="command-button"
-                           status="reportGenerateStatus" id="buildXLSButton" disabled="false"/>
+        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.orgSettingsReportPage.buildXLS}"
+                           styleClass="command-button"  id="buildXLSButton" disabled="false">
+        <a4j:support status="reportGenerateStatus" id="buildXLSButtonSupport"/>
+        </h:commandButton>
     </h:panelGrid>
 
     <rich:separator align="center" height = "5" width="270px"/>

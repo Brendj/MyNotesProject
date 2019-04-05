@@ -243,7 +243,7 @@ public class OrgSettingsItem {
     }
 
     public Boolean getUsePaydableSubscriptionFeeding() {
-        return usePaydableSubscriptionFeeding;
+        return usePaydableSubscriptionFeeding == null ? false : usePaydableSubscriptionFeeding;
     }
 
     public void setUsePaydableSubscriptionFeeding(Boolean usePaydableSubscriptionFeeding) {
@@ -251,7 +251,7 @@ public class OrgSettingsItem {
     }
 
     public Boolean getVariableFeeding() {
-        return variableFeeding;
+        return variableFeeding == null ? false: variableFeeding;
     }
 
     public void setVariableFeeding(Boolean variableFeeding) {
@@ -259,7 +259,7 @@ public class OrgSettingsItem {
     }
 
     public Boolean getDenyPayPlanForTimeDifference() {
-        return denyPayPlanForTimeDifference;
+        return denyPayPlanForTimeDifference == null ? false : denyPayPlanForTimeDifference;
     }
 
     public void setDenyPayPlanForTimeDifference(Boolean denyPayPlanForTimeDifference) {
@@ -267,7 +267,7 @@ public class OrgSettingsItem {
     }
 
     public Boolean getNeedVerifyCardSign() {
-        return needVerifyCardSign;
+        return needVerifyCardSign == null ? false : needVerifyCardSign;
     }
 
     public void setNeedVerifyCardSign(Boolean needVerifyCardSign) {
@@ -275,7 +275,7 @@ public class OrgSettingsItem {
     }
 
     public Boolean getIsWorkInSummerTime() {
-        return isWorkInSummerTime;
+        return isWorkInSummerTime == null ? false : isWorkInSummerTime;
     }
 
     public void setIsWorkInSummerTime(Boolean workInSummerTime) {
@@ -301,7 +301,7 @@ public class OrgSettingsItem {
     }
 
     public Boolean getPreordersEnabled() {
-        return preordersEnabled;
+        return preordersEnabled == null ? false : preordersEnabled;
     }
 
     public void setPreordersEnabled(Boolean preordersEnabled) {
@@ -309,7 +309,7 @@ public class OrgSettingsItem {
     }
 
     public Boolean getReverseMonthOfSale() {
-        return reverseMonthOfSale;
+        return reverseMonthOfSale == null ? false : reverseMonthOfSale;
     }
 
     public void setReverseMonthOfSale(Boolean reverseMonthOfSale) {
@@ -317,7 +317,7 @@ public class OrgSettingsItem {
     }
 
     public Boolean getOneActiveCard() {
-        return oneActiveCard;
+        return oneActiveCard == null ? false : oneActiveCard;
     }
 
     public void setOneActiveCard(Boolean oneActiveCard) {
@@ -325,7 +325,7 @@ public class OrgSettingsItem {
     }
 
     public Boolean getMultiCardModeEnabled() {
-        return multiCardModeEnabled;
+        return multiCardModeEnabled == null ? false : multiCardModeEnabled;
     }
 
     public void setMultiCardModeEnabled(Boolean multiCardModeEnabled) {
@@ -333,7 +333,7 @@ public class OrgSettingsItem {
     }
 
     public Boolean getRequestForVisitsToOtherOrg() {
-        return requestForVisitsToOtherOrg;
+        return requestForVisitsToOtherOrg == null ? false : requestForVisitsToOtherOrg;
     }
 
     public void setRequestForVisitsToOtherOrg(Boolean requestForVisitsToOtherOrg) {
@@ -341,7 +341,7 @@ public class OrgSettingsItem {
     }
 
     public Boolean getEnableDuplicateCard() {
-        return enableDuplicateCard;
+        return enableDuplicateCard == null ? false : enableDuplicateCard;
     }
 
     public void setEnableDuplicateCard(Boolean enableDuplicateCard) {

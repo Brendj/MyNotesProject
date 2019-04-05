@@ -129,6 +129,8 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
         try {
+            startDate = new Date();
+
             OrgSettingsReport.Builder builder = new OrgSettingsReport.Builder();
 
             builder.getReportProperties().setProperty(OrgSettingsReport.Builder.LIST_OF_ORG_IDS_PARAM, getGetStringIdOfOrgList());
@@ -160,12 +162,14 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
                 facesContext.responseComplete();
                 response.setContentType("application/xls");
-                response.setHeader("Content-disposition", "inline;filename=org_setting_report.xls");
+                response.setHeader("Content-disposition", "inline;filename=org_settings_report.xls");
                 JRXlsExporter xlsExport = new JRXlsExporter();
                 xlsExport.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
                 xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
                 xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
                 xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_COLUMNS, Boolean.TRUE);
                 xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
                 xlsExport.exportReport();
                 servletOutputStream.flush();
