@@ -435,6 +435,19 @@ public class PreorderDAOService {
         Date endDate = CalendarUtils.endOfDay(date);
         long nextVersion = nextVersionByPreorderComplex();
 
+        boolean doCreate = false;
+        Date today = CalendarUtils.startOfDay(new Date());
+        Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders();
+        Map<String, Integer[]> sd = getSpecialDates(CalendarUtils.addHours(today, 12), syncCountDays,
+                client.getOrg().getIdOfOrg(), client);
+        for (Map.Entry<String, Integer[]> entry : sd.entrySet()) {
+            if (date.equals(CalendarUtils.parseDate(entry.getKey()))) {
+                doCreate = (entry.getValue())[0].equals(0);
+                break;
+            }
+        }
+        if (!doCreate) throw new NotEditedDayException("День недоступен для редактирования предзаказа");
+
         Query queryComplexSelect = em.createQuery("select p from PreorderComplex p "
                 + "where p.client.idOfClient = :idOfClient and p.armComplexId = :idOfComplexInfo "
                 + "and p.preorderDate between :startDate and :endDate and p.deletedState = false");
