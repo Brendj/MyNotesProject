@@ -2042,4 +2042,21 @@ public class ClientManager {
         client.setClientRegistryVersion(clientRegistryVersion);
         session.update(client);
     }
+
+    public static void removeExternalIdFromClients(Session session, Long externalId) throws Exception {
+        Criteria criteria = session.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("externalId", externalId));
+        List<Client> clientList = criteria.list();
+
+        for (Client client : clientList) {
+            try {
+                ClientManager.ClientFieldConfigForUpdate fieldConfig = new ClientFieldConfigForUpdate();
+                fieldConfig.setValue(FieldId.CONTRACT_ID, client.getContractId());
+                fieldConfig.setValue(FieldId.EXTERNAL_ID, "");
+                modifyClient(fieldConfig);
+            } catch (Exception e) {
+                logger.error(String.format("Unable to remove externalId for client with id = %d", client.getIdOfClient()));
+            }
+        }
+    }
 }
