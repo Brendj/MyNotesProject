@@ -29,6 +29,7 @@ public class RegularPreorder {
     private Date lastUpdate;
     private Boolean deletedState;
     private String mobile;
+    private RegularPreorderState state;
 
     public RegularPreorder() {
 
@@ -36,7 +37,7 @@ public class RegularPreorder {
 
     public RegularPreorder(Client client, Date startDate, Date endDate, String itemCode, Integer idOfComplex,
             Integer amount, String itemName, Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday,
-            Boolean friday, Boolean saturday, Long price, String guardianMobile) {
+            Boolean friday, Boolean saturday, Long price, String guardianMobile, RegularPreorderState state) {
         this.client = client;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -55,6 +56,7 @@ public class RegularPreorder {
         this.lastUpdate = new Date();
         this.deletedState = false;
         this.mobile = guardianMobile;
+        this.state = state;
     }
 
     @Override
@@ -217,5 +219,13 @@ public class RegularPreorder {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public RegularPreorderState getState() {
+        return state;
+    }
+
+    public void setState(RegularPreorderState state) {
+        this.state = state;
     }
 }
