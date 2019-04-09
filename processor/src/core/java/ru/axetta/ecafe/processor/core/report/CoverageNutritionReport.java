@@ -131,7 +131,7 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
                 Boolean showYoungerClasses, Boolean showMiddleClasses, Boolean showOlderClasses, Boolean showEmployee,
                 Boolean showFreeNutrition, Boolean showPaidNutrition, Boolean showBuffet,
                 Boolean showComplexesByOrgCard) throws Exception {
-            List<CoverageNutritionReportItem> itemList = new ArrayList<>();
+            List<CoverageNutritionReportItem> itemList = new ArrayList<CoverageNutritionReportItem>();
 
             String sqlString = "select distinct "
                     + "    cast(substring(og.shortnameinfoservice, '№\\s{0,1}(\\d{1,5})') as integer) as number, "

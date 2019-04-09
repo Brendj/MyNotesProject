@@ -102,11 +102,6 @@
 							<box>
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
-							<staticText>
-								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" x="0" y="0" width="80" height="25"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<text><![CDATA[Total schoolNumber]]></text>
-							</staticText>
 						</cellContents>
 					</crosstabTotalRowHeader>
 				</rowGroup>
@@ -118,7 +113,7 @@
 					<crosstabColumnHeader>
 						<cellContents mode="Transparent">
 							<textField>
-								<reportElement uuid="5983a7bc-db33-4487-ad88-d143fede42da" style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="160" height="30" backcolor="#FFFFFF"/>
+								<reportElement uuid="5983a7bc-db33-4487-ad88-d143fede42da" style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="540" height="30" backcolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -141,7 +136,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement uuid="e92bd551-6e31-4c76-b481-99e9bac17369" style="Crosstab Data Text" x="0" y="0" width="80" height="30"/>
+								<reportElement uuid="e92bd551-6e31-4c76-b481-99e9bac17369" style="Crosstab Data Text" x="0" y="0" width="180" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -155,9 +150,60 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<staticText>
-								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" x="0" y="0" width="80" height="30"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<text><![CDATA[Total foodType]]></text>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="0" y="0" width="180" height="60"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="10" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Платное питание + Бесплатное]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="60" y="60" width="60" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
+								<text><![CDATA[кол-во  комплексов ]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="120" y="60" width="60" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
+								<text><![CDATA[% уникальных покупателей]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="0" y="60" width="60" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
+								<text><![CDATA[кол-во покупателей ]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="180" y="0" width="180" height="60"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="10" isBold="true"/>
+								</textElement>
+								<text><![CDATA[Буфет общее]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="240" y="60" width="60" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
+								<text><![CDATA[кол-во  комплексов ]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="300" y="60" width="60" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
+								<text><![CDATA[% уникальных покупателей]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="180" y="60" width="60" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
+								<text><![CDATA[кол-во покупателей ]]></text>
 							</staticText>
 						</cellContents>
 					</crosstabTotalColumnHeader>
@@ -169,21 +215,32 @@
 					<crosstabColumnHeader>
 						<cellContents>
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="9ee044f2-f1f2-4317-af67-18158d7b64d2" style="table" x="0" y="0" width="80" height="30"/>
+								<reportElement uuid="9ee044f2-f1f2-4317-af67-18158d7b64d2" style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="180" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{complexName}]]></textFieldExpression>
 							</textField>
 							<staticText>
-								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="0" y="30" width="40" height="30"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="0" y="30" width="60" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
 								<text><![CDATA[кол-во покупателей ]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="40" y="30" width="40" height="30"/>
-								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="60" y="30" width="60" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
 								<text><![CDATA[кол-во  комплексов ]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="120" y="30" width="60" height="30"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8"/>
+								</textElement>
+								<text><![CDATA[% уникальных покупателей]]></text>
 							</staticText>
 						</cellContents>
 					</crosstabColumnHeader>
@@ -191,79 +248,110 @@
 						<cellContents/>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<measure name="idOfOrderDetailMeasure" class="java.lang.Integer" calculation="DistinctCount">
+				<measure name="idOfOrderDetailMeasure" class="java.lang.Long" calculation="DistinctCount">
 					<measureExpression><![CDATA[$F{idOfOrderDetail}]]></measureExpression>
 				</measure>
-				<measure name="idOfClientMeasure" class="java.lang.Integer" calculation="DistinctCount">
+				<measure name="idOfClientMeasure" class="java.lang.Long" calculation="DistinctCount">
 					<measureExpression><![CDATA[$F{idOfClient}]]></measureExpression>
 				</measure>
-				<crosstabCell width="80" height="25">
+				<measure name="idOfClientsPaidAndFreeMeasure" class="java.lang.Integer" calculation="DistinctCount">
+					<measureExpression><![CDATA[$F{foodType}.toLowerCase().contains("платное") ? $F{idOfClient} : null]]></measureExpression>
+				</measure>
+				<measure name="idOfOrderDetailPaidAndFreeMeasure" class="java.lang.Integer" calculation="DistinctCount">
+					<measureExpression><![CDATA[$F{foodType}.toLowerCase().contains("платное") ? $F{idOfOrderDetail} : null]]></measureExpression>
+				</measure>
+				<measure name="idOfOrderDetailBuffetMeasure" class="java.lang.Long" calculation="DistinctCount">
+					<measureExpression><![CDATA[$F{foodType}.toLowerCase().contains("буфет") ? $F{idOfOrderDetail} : null]]></measureExpression>
+				</measure>
+				<measure name="idOfClientBuffetMeasure" class="java.lang.Long" calculation="DistinctCount">
+					<measureExpression><![CDATA[$F{foodType}.toLowerCase().contains("буфет") ? $F{idOfClient} : null]]></measureExpression>
+				</measure>
+				<crosstabCell width="180" height="25">
 					<cellContents>
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField>
-							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="40" y="0" width="40" height="25"/>
+							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="60" y="0" width="60" height="25"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="9"/>
+								<font size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{idOfOrderDetailMeasure}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="0" y="0" width="40" height="25"/>
+							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="0" y="0" width="60" height="25"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="9"/>
+								<font size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{idOfClientMeasure}]]></textFieldExpression>
 						</textField>
+						<textField>
+							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="120" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="10"/>
+							</textElement>
+						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="80" height="25" rowTotalGroup="schoolNumber">
+				<crosstabCell width="180" height="0" rowTotalGroup="schoolNumber">
+					<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="360" height="25" columnTotalGroup="foodType">
 					<cellContents backcolor="#BFE1FF" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField>
-							<reportElement uuid="7b28b6ae-535f-48c1-971b-63db733d6399" style="Crosstab Data Text" x="0" y="0" width="80" height="25"/>
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="0" y="0" width="60" height="25"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$V{idOfOrderDetailMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{idOfClientsPaidAndFreeMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="60" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$V{idOfOrderDetailPaidAndFreeMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="120" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+						</textField>
+						<textField>
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="180" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$V{idOfClientBuffetMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="300" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+						</textField>
+						<textField>
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="240" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[$V{idOfOrderDetailBuffetMeasure}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="80" height="25" columnTotalGroup="foodType">
+				<crosstabCell width="360" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="foodType">
 					<cellContents backcolor="#BFE1FF" mode="Opaque">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
-						<textField>
-							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="Crosstab Data Text" x="0" y="0" width="80" height="25"/>
-							<textElement textAlignment="Center" verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$V{idOfOrderDetailMeasure}]]></textFieldExpression>
-						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="80" height="25" rowTotalGroup="schoolNumber" columnTotalGroup="foodType">
-					<cellContents backcolor="#BFE1FF" mode="Opaque">
-						<box>
-							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-						</box>
-						<textField>
-							<reportElement uuid="196fe507-8a6e-45a1-b3c5-cecc7551e816" style="Crosstab Data Text" x="0" y="0" width="80" height="25"/>
-							<textElement textAlignment="Center" verticalAlignment="Middle"/>
-							<textFieldExpression><![CDATA[$V{idOfOrderDetailMeasure}]]></textFieldExpression>
-						</textField>
-					</cellContents>
-				</crosstabCell>
-				<crosstabCell width="1" height="25" columnTotalGroup="group">
+				<crosstabCell width="0" height="25" columnTotalGroup="group">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="1" height="25" rowTotalGroup="schoolNumber" columnTotalGroup="group">
+				<crosstabCell width="0" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="group">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell width="0" height="25" columnTotalGroup="complexName">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="0" rowTotalGroup="schoolNumber" columnTotalGroup="complexName">
+				<crosstabCell width="0" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="complexName">
 					<cellContents/>
 				</crosstabCell>
 			</crosstab>
