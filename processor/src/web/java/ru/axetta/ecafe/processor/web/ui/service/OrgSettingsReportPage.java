@@ -30,7 +30,6 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.faces.context.FacesContext;
-import javax.faces.event.ActionEvent;
 import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
@@ -123,7 +122,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
         }
     }
 
-    public void buildXLS(ActionEvent actionEvent) {
+    public void buildXLS(){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -206,11 +205,11 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     org.setUsePaydableSubscriptionFeeding(item.getUsePaydableSubscriptionFeeding());
                     org.setVariableFeeding(item.getVariableFeeding());
                     org.setPreordersEnabled(item.getPreordersEnabled());
-                    org.setReverseMonthOfSale(item.getReverseMonthOfSale());
+                    //org.setReverseMonthOfSale(item.getReverseMonthOfSale()); // TODO add value in new table
                     org.setDenyPayPlanForTimeDifference(item.getDenyPayPlanForTimeDifference());
 
                     org.setOneActiveCard(item.getOneActiveCard());
-                    org.setCardDuplicateEnabled(item.getEnableDuplicateCard());
+                    //org.setCardDuplicateEnabled(item.getEnableDuplicateCard());
                     org.setNeedVerifyCardSign(item.getNeedVerifyCardSign());
                     if (!item.getMultiCardModeEnabled() && org.multiCardModeIsEnabled()) {
                         ClientManager.resetMultiCardModeToAllClientsAndBlockCardsAndUpRegVersion(org, session);

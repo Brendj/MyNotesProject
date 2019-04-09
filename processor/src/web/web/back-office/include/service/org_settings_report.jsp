@@ -332,8 +332,8 @@
                            reRender="orgSettingsTable" styleClass="command-button"
                            status="reportGenerateStatus" id="buildHTMLButton" />
 
-        <h:commandButton value="Выгрузить в Excel" actionListener="#{mainPage.orgSettingsReportPage.buildXLS}"
-                           styleClass="command-button"  id="buildXLSButton" disabled="false">
+        <h:commandButton value="Выгрузить в Excel" action="#{mainPage.orgSettingsReportPage.buildXLS}"
+                           styleClass="command-button"  id="buildXLSButton" disabled="true">
         <a4j:support status="reportGenerateStatus" id="buildXLSButtonSupport"/>
         </h:commandButton>
     </h:panelGrid>

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 
 import org.apache.commons.codec.binary.Base64;
@@ -78,6 +79,7 @@ public class Org implements Serializable {
     private Set<DiaryTimesheet> diaryTimesheets = new HashSet<DiaryTimesheet>();
     private Set<DiaryClass> diaryClasses = new HashSet<DiaryClass>();
     private Set<DiaryValue> diaryValues = new HashSet<DiaryValue>();
+    private Set<OrgSetting> orgSettings = new HashSet<OrgSetting>();
     private String OGRN;
     private String INN;
     private Set<CategoryOrg> categoriesInternal = new HashSet<CategoryOrg>();
@@ -148,8 +150,6 @@ public class Org implements Serializable {
     private Boolean requestForVisitsToOtherOrg;
     private Boolean preordersEnabled;
     private Boolean multiCardModeEnabled;
-    private Boolean cardDuplicateEnabled;
-    private Boolean reverseMonthOfSale;
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -1178,23 +1178,11 @@ public class Org implements Serializable {
         }
     }
 
-    public Boolean getCardDuplicateEnabled() {
-        return cardDuplicateEnabled;
+    public Set<OrgSetting> getOrgSettings() {
+        return orgSettings;
     }
 
-    public void setCardDuplicateEnabled(Boolean cardDuplicateEnabled) {
-        this.cardDuplicateEnabled = cardDuplicateEnabled;
-    }
-
-    public Boolean isCardDuplicateEnabled(){
-        return this.cardDuplicateEnabled == null ? false : this.cardDuplicateEnabled;
-    }
-
-    public Boolean getReverseMonthOfSale() {
-        return reverseMonthOfSale;
-    }
-
-    public void setReverseMonthOfSale(Boolean reverseMonthOfSale) {
-        this.reverseMonthOfSale = reverseMonthOfSale;
+    public void setOrgSettings(Set<OrgSetting> orgSettings) {
+        this.orgSettings = orgSettings;
     }
 }
