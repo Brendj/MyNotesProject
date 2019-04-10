@@ -403,7 +403,8 @@ public class MonitoringOfReportService {
                     + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
                     + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient "
                     + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
-                    + "WHERE cfod.State = :detailedStateCommited AND "
+                    + "LEFT JOIN cf_preorder_linkod pl on cfo.idoforder = pl.idoforder and cfo.idoforg = pl.idoforg "
+                    + "WHERE cfod.State = :detailedStateCommited AND pl.idoforder IS NULL AND"
                     + orgCondition
                     + " (cfo.CreatedDate BETWEEN :startTime AND :endTime) "
                     + "AND cfod.MenuType >= :minType AND cfod.MenuType <= :maxType AND ((g.idofclientgroup < :employees) "
