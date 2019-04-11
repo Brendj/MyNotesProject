@@ -472,7 +472,7 @@ public class SmartWatchRestController {
             }
 
             Date startDate;
-            Date endDate;
+            Date endDate = null;
 
             if(startDateTime == null){
                 logger.warn("Start date is Null, set as now");
@@ -483,8 +483,6 @@ public class SmartWatchRestController {
 
             if(endDateTime != null && endDateTime < startDate.getTime()){
                 endDate = new Date(endDateTime);
-            } else {
-                endDate = new Date();
             }
 
             List<JsonTransaction> items = buildTransactionsInfo(session, child, startDate, endDate, limit, transactionType);
