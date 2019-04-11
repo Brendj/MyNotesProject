@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.CoverageNutritionReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportWithContragentPage;
 
 import org.apache.commons.lang.StringUtils;
@@ -47,7 +48,7 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
     private Boolean showTotal = true;
 
     public CoverageNutritionReportPage() {
-
+        onReportPeriodChanged(null);
     }
 
     public Object buildReportHTML() {
@@ -131,6 +132,9 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
         properties.setProperty(CoverageNutritionReport.P_SHOW_COMPLEXES_BY_ORG_CARD, showComplexesByOrgCard.toString());
 
         properties.setProperty(CoverageNutritionReport.P_SHOW_TOTAL, showTotal.toString());
+
+        properties.setProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG, StringUtils.join(idOfContragentOrgList, ','));
+        properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, StringUtils.join(idOfOrgList, ','));
         return properties;
     }
 

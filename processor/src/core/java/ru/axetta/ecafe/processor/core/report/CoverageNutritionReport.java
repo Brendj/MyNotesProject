@@ -11,13 +11,22 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.PostConstruct;
 import java.math.BigInteger;
 import java.util.*;
 import java.util.regex.Matcher;
@@ -118,19 +127,24 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
             Boolean showComplexesByOrgCard = Boolean
                     .parseBoolean(reportProperties.getProperty(P_SHOW_COMPLEXES_BY_ORG_CARD));
 
-            JRDataSource dataSource = createDataSource(session, startDate, endDate, idOfOrg, showYoungerClasses,
-                    showMiddleClasses, showOlderClasses, showEmployeeClasses, showFreeNutrition, showPaidNutrition,
-                    showBuffet, showComplexesByOrgCard);
+            List<Long> idOfOrgList = parseStringAsLongList(ReportPropertiesUtils.P_ID_OF_ORG);
+            List<Long> idOfSourceOrgList = parseStringAsLongList(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG);
+
+            JRDataSource dataSource = createDataSource(session, startDate, endDate, idOfOrgList, idOfSourceOrgList,
+                    showYoungerClasses, showMiddleClasses, showOlderClasses, showEmployeeClasses, showFreeNutrition,
+                    showPaidNutrition, showBuffet, showComplexesByOrgCard);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
             return new PreordersReport(generateTime, generateDuration, jasperPrint, startDate, endDate, idOfOrg);
         }
 
-        private JRDataSource createDataSource(Session session, Date startDate, Date endDate, Long idOfOrg,
-                Boolean showYoungerClasses, Boolean showMiddleClasses, Boolean showOlderClasses, Boolean showEmployee,
-                Boolean showFreeNutrition, Boolean showPaidNutrition, Boolean showBuffet,
-                Boolean showComplexesByOrgCard) throws Exception {
+        private JRDataSource createDataSource(Session session, Date startDate, Date endDate, List<Long> idOfOrgList,
+                List<Long> idOfSourceOrgList, Boolean showYoungerClasses, Boolean showMiddleClasses,
+                Boolean showOlderClasses, Boolean showEmployee, Boolean showFreeNutrition, Boolean showPaidNutrition,
+                Boolean showBuffet, Boolean showComplexesByOrgCard) throws Exception {
+            List<Long> orgList = loadOrgList(session, idOfSourceOrgList, idOfOrgList);
+
             List<CoverageNutritionReportItem> itemList = new ArrayList<CoverageNutritionReportItem>();
 
             String sqlString = "select distinct "
@@ -143,8 +157,8 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
                     + "     when od.menutype between 50 and 99 and od.rprice > 0 then 'Платное питание' "
                     + "         when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then 'Бесплатное питание' "
                     + "         when od.menutype = 0 and od.menuorigin in (10, 11) then 'Буфет покупная' end as type, "
-                    + "    case when od.menutype between 50 and 99 and od.rprice > 0 then g.nameofgood || ' ' || od.rprice / 100 || ' ' || 'руб.' "
-                    + "         when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then g.nameofgood || ' ' || od.discount/100 || ' ' || 'руб.' end as complexname, "
+                    + "    case when od.menutype between 50 and 99 and od.rprice > 0 then g.nameofgood || ' - ' || od.rprice / 100 || ' ' || 'руб.' "
+                    + "         when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then g.nameofgood || ' - ' || od.discount/100 || ' ' || 'руб.' end as complexname, "
                     + "    od.idoforderdetail, c.idofclient "
                     + "from cf_orders o "
                     + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
@@ -152,45 +166,62 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
                     + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + "join cf_goods g on g.idofgood = od.idofgood "
                     + "join cf_orgs og on og.idoforg = o.idoforg "
-                    + "where o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0";
+                    + "where o.idoforg in (:orgList) and o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
+            List<String> classesConditionList = new ArrayList<String>();
+            List<String> classesNotConditionList = new ArrayList<String>();
             if (showYoungerClasses) {
-                sqlString += " and (";
-                sqlString += String.format(conditionString, "", 1, 4);
+                classesConditionList.add(String.format(conditionString, "", 1, 4));
+            } else {
+                classesNotConditionList.add(String.format(conditionString, "not", 1, 4));
             }
             if (showMiddleClasses) {
-                if (showYoungerClasses) {
-                    sqlString += " or ";
-                } else {
-                    sqlString += " and (";
-                }
-                sqlString += String.format(conditionString, "", 5, 9);
+                classesConditionList.add(String.format(conditionString, "", 5, 9));
+            } else {
+                classesNotConditionList.add(String.format(conditionString, "not", 5, 9));
             }
             if (showOlderClasses) {
-                if (showYoungerClasses || showMiddleClasses) {
-                    sqlString += " or ";
-                } else {
-                    sqlString += " and (";
-                }
-                sqlString += String.format(conditionString, "", 10, 11);
-            }
-            if (showYoungerClasses || showMiddleClasses || showOlderClasses) {
-                sqlString += ")";
+                classesConditionList.add(String.format(conditionString, "", 10, 11));
+            } else {
+                classesNotConditionList.add(String.format(conditionString, "not", 10, 11));
             }
 
-            if (!showYoungerClasses) {
-                sqlString += " and " + String.format(conditionString, "not", 1, 4);
+            if (!classesConditionList.isEmpty()) {
+                sqlString += " and (" + StringUtils.join(classesConditionList, " or ") + ") ";
             }
-            if (!showMiddleClasses) {
-                sqlString += " and " + String.format(conditionString, "not", 5, 9);
-            }
-            if (!showOlderClasses) {
-                sqlString += " and " + String.format(conditionString, "not", 10, 11);
+            if (!classesNotConditionList.isEmpty()) {
+                sqlString += " and " + StringUtils.join(classesNotConditionList, " and ");
             }
 
             if (!showEmployee) {
                 //TODO: Добавить группу сотрудники
                 sqlString += " and cg.idofclientgroup not in (:clientEmployees, :clientAdministration, :clientTechEmployees)";
+            }
+
+            List<String> nutritionConditionList = new ArrayList<String>();
+            List<String> nutritionNotConditionList = new ArrayList<String>();
+            if (showFreeNutrition) {
+                nutritionConditionList.add(" od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 ");
+            } else {
+                nutritionNotConditionList.add(" (od.menutype not between 50 and 99 or od.rprice != 0 or od.discount <= 0) ");
+            }
+            if (showPaidNutrition) {
+                nutritionConditionList.add(" od.menutype between 50 and 99 and od.rprice > 0 ");
+            } else {
+                nutritionNotConditionList.add(" (od.menutype not between 50 and 99 or od.rprice <= 0) ");
+            }
+            if (showBuffet) {
+                nutritionConditionList.add(" od.menutype = 0 and od.menuorigin in (0, 1, 10, 11) ");
+            } else {
+                nutritionNotConditionList.add(" (od.menutype != 0 or od.menuorigin not in (0, 1, 10, 11)) ");
+            }
+
+            if (!nutritionConditionList.isEmpty()) {
+                sqlString += " and (" + StringUtils.join(nutritionConditionList, " or ") + ") ";
+            }
+
+            if (!nutritionNotConditionList.isEmpty()) {
+                sqlString += " and " + StringUtils.join(nutritionNotConditionList, " and ");
             }
 
             Query query = session.createSQLQuery(sqlString);
@@ -199,6 +230,7 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
             query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             query.setParameter("clientAdministration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
             query.setParameter("clientTechEmployees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+            query.setParameterList("orgList", orgList);
             List list = query.list();
 
             for (Object o : list) {
@@ -215,6 +247,35 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
             }
 
             return new JRBeanCollectionDataSource(itemList);
+        }
+
+        private List<Long> loadOrgList(Session session, List<Long> idOfSourceOrgList, List<Long> idOfOrgList) {
+            Criteria criteria = session.createCriteria(Org.class)
+                    .createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
+                    .createAlias("categoriesInternal", "cat", JoinType.LEFT_OUTER_JOIN)
+                    .add(Restrictions.in("sm.idOfOrg", idOfSourceOrgList))
+                    .setProjection(Projections.projectionList()
+                            .add(Projections.groupProperty("idOfOrg")))
+                    .addOrder(Order.asc("idOfOrg"));
+            if (!idOfOrgList.isEmpty()) {
+                criteria.add(Restrictions.in("idOfOrg", idOfOrgList));
+            }
+
+            return criteria.list();
+        }
+
+        private List<Long> parseStringAsLongList(String propertyName) {
+            String propertyValueString = reportProperties.getProperty(propertyName);
+            String[] propertyValueArray = StringUtils.split(propertyValueString, ',');
+            List<Long> propertyValueList = new ArrayList<Long>();
+            for (String propertyValue : propertyValueArray) {
+                try {
+                    propertyValueList.add(Long.parseLong(propertyValue));
+                } catch (NumberFormatException e) {
+                    logger.error(String.format("Unable to parse propertyValue: property = %s, value = %s", propertyName, propertyValue), e);
+                }
+            }
+            return propertyValueList;
         }
 
         public String getTemplateFilename() {
