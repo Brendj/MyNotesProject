@@ -14,10 +14,7 @@ import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
-import org.hibernate.Criteria;
-import org.hibernate.SQLQuery;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
@@ -33,10 +30,7 @@ import javax.persistence.Query;
 import javax.persistence.TypedQuery;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.generateNewClientGuardianVersion;
 
@@ -143,9 +137,12 @@ public class ClientDao extends WritableJpaDao {
     }
 
     public int runGenerateGuardians(List idOfOrgs) throws Exception {
+        logger.info("Start generate guardians");
+        List<ClientContactInfo> clientsGenerate = new ArrayList<ClientContactInfo>();
         int result = 0;
         Transaction transaction = null;
         Session session = RuntimeContext.getInstance().createPersistenceSession();
+        session.setFlushMode(FlushMode.COMMIT);
         try {
 
             //Получаем клиентов, у которых указан телефон или мейл
@@ -154,9 +151,10 @@ public class ClientDao extends WritableJpaDao {
                     + "from cf_clients c "
                     + "where "
                     + (idOfOrgs == null ? "" : "c.idOfOrg in :orgs and "
-                    + "c.idOfClientGroup not between 1100000000 and 1100000080 and ")
+                    + "c.idOfClientGroup < :clientGroup and ")
                     + "((c.mobile is not null and c.mobile <> '') or (c.email is not null and c.email <> ''))";
             SQLQuery query = session.createSQLQuery(squery);
+            query.setParameter("clientGroup", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             if (idOfOrgs != null) {
                 query.setParameterList("orgs", idOfOrgs);
             }
@@ -172,7 +170,9 @@ public class ClientDao extends WritableJpaDao {
             query.addScalar("ssoid", new StringType());
             query.addScalar("guardCount", new LongType());
             query.setResultTransformer(Transformers.aliasToBean(ClientContactInfo.class));
+
             List<ClientContactInfo> clients = query.list();
+            logger.info(String.format("Found %s clients", clients.size()));
             for (ClientContactInfo ccInfo : clients) {
                 if (ccInfo.getMobile() == null) {
                     continue;
@@ -187,13 +187,16 @@ public class ClientDao extends WritableJpaDao {
                         List<ClientGuardian> guardians = getGuardians(session, ccInfo.getIdOfClient());
                         boolean mobileFound = false;
                         for (ClientGuardian cg : guardians) {
-                            Client guardian = (Client)session.load(Client.class, cg.getIdOfGuardian());
-                            if (guardian.getMobile() != null &&
-                                    PhoneNumberCanonicalizator.canonicalize(guardian.getMobile()).equals(PhoneNumberCanonicalizator.canonicalize(ccInfo.getMobile()))) {
+                            org.hibernate.Query query1 = session.createQuery("select c.mobile from Client c where c.idOfClient = :idOfClient");
+                            query1.setParameter("idOfClient", cg.getIdOfGuardian());
+                            String mobile = (String)query1.uniqueResult();
+                            if (mobile != null &&
+                                    PhoneNumberCanonicalizator.canonicalize(mobile).equals(PhoneNumberCanonicalizator.canonicalize(ccInfo.getMobile()))) {
                                 //хотя бы у одного опекуна найден номер мобильного ребенка - очищаем контактные данные у ребенка
                                 mobileFound = true;
                                 Client child = (Client) session.load(Client.class, ccInfo.getIdOfClient());
                                 clearClientContacts(child, session);
+                                logger.info(String.format("Cleared contacts from client id=%s", child.getIdOfClient()));
                                 session.save(child);
                                 break;
                             }
@@ -203,10 +206,10 @@ public class ClientDao extends WritableJpaDao {
                         }
                     }
                     if (doGenerate) {
-                        createParentAndGuardianship(session, ccInfo);
+                        logger.info(String.format("Client id=%s added to list for generating guardians", ccInfo.getIdOfClient()));
+                        clientsGenerate.add(ccInfo);
                         result++;
                     }
-                    session.flush();
                     transaction.commit();
                     transaction = null;
                 } catch (Exception ignoreRecord) {
@@ -219,6 +222,8 @@ public class ClientDao extends WritableJpaDao {
         } finally {
             HibernateUtils.close(session, logger);
         }
+        createParentAndGuardianship(clientsGenerate);
+        logger.info("End generate guardians");
         return result;
     }
 
@@ -229,81 +234,131 @@ public class ClientDao extends WritableJpaDao {
         return criteria.list();
     }
 
-    private void createParentAndGuardianship(Session session, ClientContactInfo clientInfo) throws Exception {
-        //Создаем нового клиента-родителя
-        FieldProcessor.Config createConfig = new ClientManager.ClientFieldConfig();
-        Client child = (Client)session.load(Client.class, clientInfo.getIdOfClient());
-        createConfig.setValue(ClientManager.FieldId.SURNAME, UNKNOWN_PERSON_SURNAME);
+    private Map<Long, List<ClientContactInfo>> getClientContactInfoMap(List<ClientContactInfo> contactInfos) {
+        Map<Long, List<ClientContactInfo>> map = new HashMap<Long, List<ClientContactInfo>>();
+        for (ClientContactInfo contactInfo : contactInfos) {
+            List<ClientContactInfo> list = map.get(contactInfo.getIdOfOrg());
+            if (list == null) list = new ArrayList<ClientContactInfo>();
+            list.add(contactInfo);
+            map.put(contactInfo.getIdOfOrg(), list);
+        }
+        return map;
+    }
+
+    private void createParentAndGuardianship(List<ClientContactInfo> clientInfos) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
         try {
-            createConfig.setValue(ClientManager.FieldId.NAME, child.getPerson().getSurnameAndFirstLetters());
-        } catch (Exception e) {
-            createConfig.setValue(ClientManager.FieldId.NAME, UNKNOWN_PERSON_DATA);
-        }
-        createConfig.setValue(ClientManager.FieldId.SECONDNAME, "");
-        createConfig.setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
-        createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, clientInfo.getNotifyViaPUSH());
-        createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_SMS, clientInfo.getNotifyViaSMS());
-        createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, clientInfo.getNotifyViaEmail());
-        if (clientInfo.getMobile() != null) {
-            createConfig.setValue(ClientManager.FieldId.MOBILE_PHONE, clientInfo.getMobile());
-        }
-        if (clientInfo.getEmail() != null) {
-            createConfig.setValue(ClientManager.FieldId.EMAIL, clientInfo.getEmail());
-        }
-        if (clientInfo.getSsoid() != null) {
-            createConfig.setValue(ClientManager.FieldId.SSOID, clientInfo.getSsoid());
-        }
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            session.setFlushMode(FlushMode.MANUAL);
 
-        String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
 
-        Client clientId = ClientManager.registerClientTransactionFree(clientInfo.getIdOfOrg(),
-                (ClientManager.ClientFieldConfig) createConfig, false, session, String.format(COMMENT_AUTO_CREATE, dateCreate));
 
-        //Создаем опекунскую связь
-        Long version = generateNewClientGuardianVersion(session);
-        ClientManager.addGuardianByClient(session, clientInfo.getIdOfClient(), clientId.getIdOfClient(), version, false, null, null,
-                ClientCreatedFromType.DEFAULT, null);
+            Map<Long, List<ClientContactInfo>> clientContactInfoMap = getClientContactInfoMap(clientInfos);
+            for (Map.Entry<Long, List<ClientContactInfo>> entry : clientContactInfoMap.entrySet()) {
+                Long idOfOrg = entry.getKey();
+                List<ClientContactInfo> orgClientInfos = entry.getValue();
+                List<Long> contractIds = RuntimeContext.getInstance().getClientContractIdGenerator()
+                        .generateTransactionFree(idOfOrg, orgClientInfos.size());
+                Iterator<Long> iterator = contractIds.iterator();
+                for (ClientContactInfo clientInfo : orgClientInfos) {
+                    try {
+                        transaction = session.beginTransaction();
+                        FieldProcessor.Config createConfig = new ClientManager.ClientFieldConfig();
+                        Client child = (Client) session.load(Client.class, clientInfo.getIdOfClient());
+                        createConfig.setValue(ClientManager.FieldId.SURNAME, UNKNOWN_PERSON_SURNAME);
+                        try {
+                            createConfig.setValue(ClientManager.FieldId.NAME, child.getPerson().getSurnameAndFirstLetters());
+                        } catch (Exception e) {
+                            createConfig.setValue(ClientManager.FieldId.NAME, UNKNOWN_PERSON_DATA);
+                        }
+                        createConfig.setValue(ClientManager.FieldId.SECONDNAME, "");
+                        createConfig.setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
+                        createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, clientInfo.getNotifyViaPUSH());
+                        createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_SMS, clientInfo.getNotifyViaSMS());
+                        createConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, clientInfo.getNotifyViaEmail());
+                        if (clientInfo.getMobile() != null) {
+                            createConfig.setValue(ClientManager.FieldId.MOBILE_PHONE, clientInfo.getMobile());
+                        }
+                        if (clientInfo.getEmail() != null) {
+                            createConfig.setValue(ClientManager.FieldId.EMAIL, clientInfo.getEmail());
+                        }
+                        if (clientInfo.getSsoid() != null) {
+                            createConfig.setValue(ClientManager.FieldId.SSOID, clientInfo.getSsoid());
+                        }
+                        Long contractId = iterator.next();
+                        if (contractId != null) {
+                            createConfig.setValue(ClientManager.FieldId.CONTRACT_ID, contractId);
+                        }
 
-        //Устанавливаем правила оповещения для опекуна
-        Client client = (Client)session.load(Client.class, clientInfo.getIdOfClient());
-        ClientGuardian currentClientGuardian = DAOUtils.findClientGuardian(session, clientInfo.getIdOfClient(), clientId.getIdOfClient());
+                        String dateCreate = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
 
-        for(ClientNotificationSetting item : client.getNotificationSettings()){
-            ClientGuardianNotificationSetting notificationSetting = new ClientGuardianNotificationSetting(currentClientGuardian, item.getNotifyType());
-            currentClientGuardian.getNotificationSettings().add(notificationSetting);
-        }
+                        Client clientId = ClientManager.registerClientTransactionFree(clientInfo.getIdOfOrg(), (ClientManager.ClientFieldConfig) createConfig, false, session,
+                                String.format(COMMENT_AUTO_CREATE, dateCreate));
 
-        if(RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE)){
-            boolean containsNotificationOnBalances = false;
-            boolean containsNotificationOnEnterEvent = false;
+                        //Создаем опекунскую связь
+                        Long version = generateNewClientGuardianVersion(session);
+                        ClientManager.addGuardianByClient(session, clientInfo.getIdOfClient(), clientId.getIdOfClient(),
+                                version, false, null, null, ClientCreatedFromType.DEFAULT, null);
+                        session.flush();
 
-            // getNotificationSettings().contains() always false
-            for(ClientGuardianNotificationSetting item : currentClientGuardian.getNotificationSettings()){
-                if(item.getNotifyType().equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue())){
-                    containsNotificationOnBalances = true;
-                } else if (item.getNotifyType().equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue())){
-                    containsNotificationOnEnterEvent = true;
+                        //Устанавливаем правила оповещения для опекуна
+                        Client client = (Client) session.load(Client.class, clientInfo.getIdOfClient());
+                        ClientGuardian currentClientGuardian = DAOUtils
+                                .findClientGuardian(session, clientInfo.getIdOfClient(), clientId.getIdOfClient());
+
+                        for (ClientNotificationSetting item : client.getNotificationSettings()) {
+                            ClientGuardianNotificationSetting notificationSetting = new ClientGuardianNotificationSetting(
+                                    currentClientGuardian, item.getNotifyType());
+                            currentClientGuardian.getNotificationSettings().add(notificationSetting);
+                        }
+
+                        if (RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE)) {
+                            boolean containsNotificationOnBalances = false;
+                            boolean containsNotificationOnEnterEvent = false;
+
+                            // getNotificationSettings().contains() always false
+                            for (ClientGuardianNotificationSetting item : currentClientGuardian.getNotificationSettings()) {
+                                if (item.getNotifyType()
+                                        .equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue())) {
+                                    containsNotificationOnBalances = true;
+                                } else if (item.getNotifyType()
+                                        .equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue())) {
+                                    containsNotificationOnEnterEvent = true;
+                                }
+                                if (containsNotificationOnBalances && containsNotificationOnEnterEvent) {
+                                    break;
+                                }
+                            }
+                            if (!containsNotificationOnBalances) {
+                                ClientGuardianNotificationSetting notificationOnBalancesSetting = new ClientGuardianNotificationSetting(
+                                        currentClientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue());
+                                currentClientGuardian.getNotificationSettings().add(notificationOnBalancesSetting);
+                            }
+                            if (!containsNotificationOnEnterEvent) {
+                                ClientGuardianNotificationSetting notificationOnEnterEventSetting = new ClientGuardianNotificationSetting(
+                                        currentClientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue());
+                                currentClientGuardian.getNotificationSettings().add(notificationOnEnterEventSetting);
+                            }
+                        }
+                        session.update(currentClientGuardian);
+
+                        //Очищаем данные клиента (ребенка)
+                        clearClientContacts(client, session);
+                        session.update(client);
+                        session.flush();
+                        transaction.commit();
+                        transaction = null;
+                    } catch (Exception e) {
+                        logger.error(String.format("Error in generate guardian for client id=%s: ", clientInfo.getIdOfClient()), e);
+                        HibernateUtils.rollback(transaction, logger);
+                    }
+
                 }
-                if(containsNotificationOnBalances && containsNotificationOnEnterEvent){
-                    break;
-                }
             }
-            if(!containsNotificationOnBalances) {
-                ClientGuardianNotificationSetting notificationOnBalancesSetting = new ClientGuardianNotificationSetting(
-                        currentClientGuardian, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_REFILLS.getValue());
-                currentClientGuardian.getNotificationSettings().add(notificationOnBalancesSetting);
-            }
-            if(!containsNotificationOnEnterEvent){
-                ClientGuardianNotificationSetting notificationOnEnterEventSetting = new ClientGuardianNotificationSetting(currentClientGuardian,
-                        ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue());
-                currentClientGuardian.getNotificationSettings().add(notificationOnEnterEventSetting);
-            }
+        } finally {
+            HibernateUtils.close(session, logger);
         }
-        session.update(currentClientGuardian);
-
-        //Очищаем данные клиента (ребенка)
-        clearClientContacts(client, session);
-        session.update(client);
     }
 
     private void clearClientContacts(Client client, Session session) throws Exception {
