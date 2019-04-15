@@ -11,10 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
-import org.hibernate.CacheMode;
-import org.hibernate.Criteria;
-import org.hibernate.Session;
-import org.hibernate.SessionFactory;
+import org.hibernate.*;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -56,6 +53,8 @@ public abstract class BasicReportForOrgJob extends BasicReportJob {
                 org.hibernate.Transaction transaction = null;
                 try {
                     session = autoReportBuildTask.sessionFactory.openSession();
+                    session.setDefaultReadOnly(true);
+                    session.setFlushMode(FlushMode.MANUAL);
                     transaction = BasicReport.createTransaction(session);
                     transaction.begin();
                     Criteria allOrgCriteria = session.createCriteria(Org.class);

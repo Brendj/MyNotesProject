@@ -3138,7 +3138,7 @@ public class Processor implements SyncProcessor {
         Transaction persistenceTransaction = null;
         ClientGuardianData clientGuardianData = null;
         try {
-            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             ClientGuardianDataProcessor processor = new ClientGuardianDataProcessor(persistenceSession, idOfOrg,
                     maxVersion);
@@ -4645,6 +4645,7 @@ public class Processor implements SyncProcessor {
             Transaction persistenceTransaction = null;
             try {
                 persistenceSession = persistenceSessionFactory.openSession();
+                persistenceSession.setFlushMode(FlushMode.COMMIT);
 
                 Org organization = getOrgReference(persistenceSession, idOfOrg);
 
@@ -5380,7 +5381,7 @@ public class Processor implements SyncProcessor {
         Transaction persistenceTransaction = null;
         ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = new ResCategoriesDiscountsAndRules();
         try {
-            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             boolean isManyOrgs = categoriesAndDiscountsRequest != null && categoriesAndDiscountsRequest.isManyOrgs();
             resCategoriesDiscountsAndRules.fillData(persistenceSession, idOfOrg, isManyOrgs, categoriesAndDiscountsRequest.getVersionDSZN());
