@@ -79,14 +79,22 @@
 			<crosstab>
 				<reportElement uuid="e2351233-788b-4c5e-9fac-6fbc9924c407" x="0" y="0" width="900" height="70"/>
 				<crosstabHeaderCell>
-					<cellContents/>
+					<cellContents>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="0" y="0" width="80" height="120"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font isBold="true"/>
+							</textElement>
+							<text><![CDATA[№ школы]]></text>
+						</staticText>
+					</cellContents>
 				</crosstabHeaderCell>
 				<rowGroup name="schoolNumber" width="80" totalPosition="End">
 					<bucket class="java.lang.Integer">
 						<bucketExpression><![CDATA[$F{schoolNumber}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents backcolor="#F0F8FF" mode="Opaque">
+						<cellContents backcolor="#F0F8FF" mode="Transparent">
 							<box>
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
@@ -111,7 +119,7 @@
 						<comparatorExpression><![CDATA[$P{OVERRIDE_GroupComparator}]]></comparatorExpression>
 					</bucket>
 					<crosstabColumnHeader>
-						<cellContents mode="Transparent">
+						<cellContents backcolor="#FFF5F5" mode="Opaque">
 							<textField>
 								<reportElement uuid="5983a7bc-db33-4487-ad88-d143fede42da" style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="540" height="30" backcolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -213,7 +221,7 @@
 						<bucketExpression><![CDATA[$F{complexName}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
-						<cellContents>
+						<cellContents backcolor="#F0F8FF" mode="Opaque">
 							<textField isBlankWhenNull="true">
 								<reportElement uuid="9ee044f2-f1f2-4317-af67-18158d7b64d2" style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="180" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">

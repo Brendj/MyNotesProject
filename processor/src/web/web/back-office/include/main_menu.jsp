@@ -961,8 +961,20 @@
     <rich:panelMenuItem id="preorderJournalReport" binding="#{preorderJournalReportPage.mainMenuComponent}"
                         label="Журнал операций ВП" action="#{preorderJournalReportPage.show}" reRender="workspaceForm" />
 
-    <rich:panelMenuItem id="сoverageNutritionReport" binding="#{mainPage.coverageNutritionReportPage.mainMenuComponent}"
-                        label="Отчет по охвату питания" action="#{mainPage.coverageNutritionReportPage.show}" reRender="workspaceForm" />
+    <%--@elvariable id="coverageNutritionReportPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.CoverageNutritionReportPage"--%>
+    <rich:panelMenuItem id="coverageNutritionReport" binding="#{coverageNutritionReportPage.mainMenuComponent}"
+                        label="Отчет по охвату питания" action="#{coverageNutritionReportPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuGroup id="kznClientsStatisticMenuGroup" label="Статистика по клиентам" reRender="workspaceForm">
+
+        <%--@elvariable id="kznClientsStatisticViewPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticViewPage"--%>
+        <rich:panelMenuItem id="kznClientsStatisticViewMenuItem" binding="#{kznClientsStatisticViewPage.mainMenuComponent}" label="Просмотр"
+                            action="#{kznClientsStatisticViewPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="kznClientsStatisticCreatePage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticCreatePage"--%>
+        <rich:panelMenuItem id="kznClientsStatisticCreateMenuItem" binding="#{kznClientsStatisticCreatePage.mainMenuComponent}" label="Создание"
+                            action="#{kznClientsStatisticCreatePage.show}" reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"

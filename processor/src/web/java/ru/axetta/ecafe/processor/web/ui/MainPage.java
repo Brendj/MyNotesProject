@@ -273,7 +273,6 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage infoMessageGroupPage = new BasicWorkspacePage();
     private final InfoMessagePage infoMessagePage = new InfoMessagePage();
     private final InfoMessageCreatePage infoMessageCreatePage = new InfoMessageCreatePage();
-    private final CoverageNutritionReportPage coverageNutritionReportPage = new CoverageNutritionReportPage();
 
     // Report job manipulation
     private final BasicWorkspacePage reportJobGroupPage = new BasicWorkspacePage();
@@ -10538,9 +10537,5 @@ public class MainPage implements Serializable {
 
     public void setRemovedIdOfUserGroup(Long removedIdOfUserGroup) {
         this.removedIdOfUserGroup = removedIdOfUserGroup;
-    }
-
-    public CoverageNutritionReportPage getCoverageNutritionReportPage() {
-        return coverageNutritionReportPage;
     }
 }

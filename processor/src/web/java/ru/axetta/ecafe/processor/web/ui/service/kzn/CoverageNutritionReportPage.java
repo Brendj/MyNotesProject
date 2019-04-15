@@ -2,7 +2,7 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.service;
+package ru.axetta.ecafe.processor.web.ui.service.kzn;
 
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.JRHtmlExporter;
@@ -11,7 +11,7 @@ import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.CoverageNutritionReport;
+import ru.axetta.ecafe.processor.core.report.kzn.CoverageNutritionReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportWithContragentPage;
@@ -58,10 +58,10 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
         if (StringUtils.isEmpty(templateFilename)) {
             return null;
         }
-        //if (null == idOfOrg) {
-        //    printError("Выберите организацию");
-        //    return null;
-        //}
+        if (idOfContragentOrgList.isEmpty() && idOfOrgList.isEmpty()) {
+            printError("Выберите организацию");
+            return null;
+        }
         CoverageNutritionReport.Builder builder = new CoverageNutritionReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
@@ -217,6 +217,6 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
 
     @Override
     public String getPageFilename() {
-        return "service/coverage_nutrition_report";
+        return "service/kzn/coverage_nutrition_report";
     }
 }

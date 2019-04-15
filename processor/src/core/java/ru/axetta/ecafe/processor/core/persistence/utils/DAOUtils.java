@@ -4101,4 +4101,17 @@ public class DAOUtils {
         criteria.setMaxResults(1);
         return (ApplicationForFoodHistory) criteria.uniqueResult();
     }
+
+    public static List<KznClientsStatistic> getKznClientStatisticByOrgs(Session session, List<Long> idOfOrgList) {
+        Criteria criteria = session.createCriteria(KznClientsStatistic.class);
+        criteria.add(Restrictions.in("org.idOfOrg", idOfOrgList));
+        return criteria.list();
+    }
+
+    public static void deleteFromKznClientStatisticById(Session session, Long idOfKznClientsStatistic) {
+        Query query = session.createQuery(
+                "delete from KznClientsStatistic statistic where idOfKznClientsStatistic=:id");
+        query.setParameter("id", idOfKznClientsStatistic);
+        query.executeUpdate();
+    }
 }

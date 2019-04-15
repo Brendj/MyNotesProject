@@ -27,7 +27,8 @@
     });
 </script>
 
-<h:panelGrid id="coverageNutritionReportPanelGrid" binding="#{mainPage.coverageNutritionReportPage.pageComponent}"
+<%--@elvariable id="coverageNutritionReportPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.CoverageNutritionReportPage"--%>
+<h:panelGrid id="coverageNutritionReportPanelGrid" binding="#{coverageNutritionReportPage.pageComponent}"
              styleClass="borderless-grid">
 
     <rich:simpleTogglePanel label="Настройки отчета" switchType="client" style="width: 800px;" opened="true"
@@ -37,59 +38,59 @@
             <h:outputText styleClass="output-text" escape="true" value="Поставщик" />
             <h:panelGroup id="contragentFilter">
                 <a4j:commandButton value="..."
-                                   action="#{mainPage.coverageNutritionReportPage.showContragentListSelectPage}"
+                                   action="#{coverageNutritionReportPage.showContragentListSelectPage}"
                                    reRender="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null})
                                         #{rich:component('modalOrgListSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;">
                     <f:setPropertyActionListener value="2" target="#{mainPage.orgListSelectPage.filterMode}" />
                     <f:setPropertyActionListener
-                            value="#{mainPage.coverageNutritionReportPage.contragentStringIdOfOrgList}"
+                            value="#{coverageNutritionReportPage.contragentStringIdOfOrgList}"
                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
                     <f:setPropertyActionListener value="Выбор организации - источника меню" target="#{mainPage.orgFilterPageName}" />
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true"
-                              value=" {#{mainPage.coverageNutritionReportPage.contragentFilter}}" />
+                              value=" {#{coverageNutritionReportPage.contragentFilter}}" />
             </h:panelGroup>
 
             <h:outputText styleClass="output-text" escape="true" value="Организация" />
             <h:panelGroup id="orgFilter">
-                <a4j:commandButton value="..." action="#{mainPage.coverageNutritionReportPage.showOrgListSelectPage}"
+                <a4j:commandButton value="..." action="#{coverageNutritionReportPage.showOrgListSelectPage}"
                                    reRender="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null})
                                         #{rich:component('modalOrgListSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;">
                     <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
                     <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.supplierFilter}" />
-                    <f:setPropertyActionListener value="#{mainPage.coverageNutritionReportPage.getStringIdOfOrgList}"
+                    <f:setPropertyActionListener value="#{coverageNutritionReportPage.getStringIdOfOrgList}"
                                                  target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" escape="true"
-                              value=" {#{mainPage.coverageNutritionReportPage.filter}}" />
+                              value=" {#{coverageNutritionReportPage.filter}}" />
             </h:panelGroup>
             <h:outputText escape="true" value="Дата от" styleClass="output-text" />
-            <rich:calendar value="#{mainPage.coverageNutritionReportPage.startDate}" datePattern="dd.MM.yyyy"
+            <rich:calendar value="#{coverageNutritionReportPage.startDate}" datePattern="dd.MM.yyyy"
                            converter="dateConverter" inputClass="input-text"
                            showWeeksBar="false">
                 <a4j:support event="onchanged" reRender="endDateCalendar,coverageNutritionReportPanel"
-                             actionListener="#{mainPage.coverageNutritionReportPage.onReportPeriodChanged}" />
+                             actionListener="#{coverageNutritionReportPage.onReportPeriodChanged}" />
             </rich:calendar>
 
             <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
             <h:selectOneMenu id="endDatePeriodSelect"
-                             value="#{mainPage.coverageNutritionReportPage.periodTypeMenu.periodType}"
+                             value="#{coverageNutritionReportPage.periodTypeMenu.periodType}"
                              styleClass="input-text" style="width: 250px;">
                 <f:converter converterId="periodTypeConverter" />
-                <f:selectItems value="#{mainPage.coverageNutritionReportPage.periodTypeMenu.items}" />
+                <f:selectItems value="#{coverageNutritionReportPage.periodTypeMenu.items}" />
                 <a4j:support event="onchange" reRender="endDateCalendar,coverageNutritionReportPanel"
-                             actionListener="#{mainPage.coverageNutritionReportPage.onReportPeriodChanged}" />
+                             actionListener="#{coverageNutritionReportPage.onReportPeriodChanged}" />
             </h:selectOneMenu>
             <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-            <rich:calendar id="endDateCalendar" value="#{mainPage.coverageNutritionReportPage.endDate}"
+            <rich:calendar id="endDateCalendar" value="#{coverageNutritionReportPage.endDate}"
                            datePattern="dd.MM.yyyy" converter="dateConverter"
                            inputClass="input-text" showWeeksBar="false">
                 <a4j:support event="onchanged" reRender="endDatePeriodSelect,coverageNutritionReportPanel"
-                             actionListener="#{mainPage.coverageNutritionReportPage.onEndDateSpecified}" />
+                             actionListener="#{coverageNutritionReportPage.onEndDateSpecified}" />
             </rich:calendar>
             <h:panelGrid styleClass="borderless-grid">
                 <h:outputText escape="true" styleClass="output-text"
@@ -97,19 +98,19 @@
                 <h:panelGrid styleClass="borderless-grid" columns="2">
                     <h:outputText escape="true" styleClass="output-text mleft20px"
                                   value="1-4 классы"  />
-                    <h:selectBooleanCheckbox value="#{mainPage.coverageNutritionReportPage.showYoungerClasses}"
+                    <h:selectBooleanCheckbox value="#{coverageNutritionReportPage.showYoungerClasses}"
                                              styleClass="output-text" />
                     <h:outputText escape="true" styleClass="output-text mleft20px"
                                   value="5-9 классы"  />
-                    <h:selectBooleanCheckbox value="#{mainPage.coverageNutritionReportPage.showMiddleClasses}"
+                    <h:selectBooleanCheckbox value="#{coverageNutritionReportPage.showMiddleClasses}"
                                              styleClass="output-text" />
                     <h:outputText escape="true" styleClass="output-text mleft20px"
                                   value="10-11 классы"  />
-                    <h:selectBooleanCheckbox value="#{mainPage.coverageNutritionReportPage.showOlderClasses}"
+                    <h:selectBooleanCheckbox value="#{coverageNutritionReportPage.showOlderClasses}"
                                              styleClass="output-text" />
                     <h:outputText escape="true" styleClass="output-text mleft20px"
                                   value="Сотрудники"  />
-                    <h:selectBooleanCheckbox value="#{mainPage.coverageNutritionReportPage.showEmployee}"
+                    <h:selectBooleanCheckbox value="#{coverageNutritionReportPage.showEmployee}"
                                              styleClass="output-text" />
                 </h:panelGrid>
                 <h:outputText escape="true" styleClass="output-text"
@@ -117,25 +118,25 @@
                 <h:panelGrid styleClass="borderless-grid" columns="2">
                     <h:outputText escape="true" styleClass="output-text mleft20px"
                                   value="Бесплатное"  />
-                    <h:selectBooleanCheckbox value="#{mainPage.coverageNutritionReportPage.showFreeNutrition}"
+                    <h:selectBooleanCheckbox value="#{coverageNutritionReportPage.showFreeNutrition}"
                                              styleClass="output-text" />
                     <h:outputText escape="true" styleClass="output-text mleft20px"
                                   value="Платное"  />
-                    <h:selectBooleanCheckbox value="#{mainPage.coverageNutritionReportPage.showPaidNutrition}"
+                    <h:selectBooleanCheckbox value="#{coverageNutritionReportPage.showPaidNutrition}"
                                              styleClass="output-text" />
                     <h:outputText escape="true" styleClass="output-text mleft20px"
                                   value="Буфет"  />
-                    <h:selectBooleanCheckbox value="#{mainPage.coverageNutritionReportPage.showBuffet}"
+                    <h:selectBooleanCheckbox value="#{coverageNutritionReportPage.showBuffet}"
                                              styleClass="output-text" />
                 </h:panelGrid>
                 <h:panelGrid styleClass="borderless-grid" columns="2">
                     <h:outputText escape="true" styleClass="output-text"
                                   value="Комплексы, проданные по карте ОО"  />
-                    <h:selectBooleanCheckbox value="#{mainPage.coverageNutritionReportPage.showComplexesByOrgCard}"
+                    <h:selectBooleanCheckbox value="#{coverageNutritionReportPage.showComplexesByOrgCard}"
                                              styleClass="output-text" />
                     <h:outputText escape="true" styleClass="output-text"
                                   value="Итоговые значения"  />
-                    <h:selectBooleanCheckbox value="#{mainPage.coverageNutritionReportPage.showTotal}"
+                    <h:selectBooleanCheckbox value="#{coverageNutritionReportPage.showTotal}"
                                              styleClass="output-text" />
                 </h:panelGrid>
             </h:panelGrid>
@@ -143,12 +144,12 @@
     </rich:simpleTogglePanel>
 
     <h:panelGrid styleClass="borderless-grid" columns="3">
-        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.coverageNutritionReportPage.buildReportHTML}"
+        <a4j:commandButton value="Генерировать отчет" action="#{coverageNutritionReportPage.buildReportHTML}"
                            reRender="coverageNutritionReportPanel"
                            styleClass="command-button" status="coverageNutritionReportGenerateStatus" />
 
         <h:commandButton value="Генерировать отчет в Excel"
-                         actionListener="#{mainPage.coverageNutritionReportPage.exportToXLS}"
+                         actionListener="#{coverageNutritionReportPage.exportToXLS}"
                          styleClass="command-button" />
 
     </h:panelGrid>
@@ -164,9 +165,9 @@
 
     <h:panelGrid styleClass="borderless-grid" id="coverageNutritionReportPanel" columnClasses="center-aligned-column">
         <%-- не показывать пустую таблицу --%>
-        <c:if test="${not empty mainPage.coverageNutritionReportPage.htmlReport}" >
+        <c:if test="${not empty coverageNutritionReportPage.htmlReport}" >
             <f:verbatim>
-                <div>${mainPage.coverageNutritionReportPage.htmlReport}</div>
+                <div>${coverageNutritionReportPage.htmlReport}</div>
             </f:verbatim>
         </c:if>
     </h:panelGrid>
