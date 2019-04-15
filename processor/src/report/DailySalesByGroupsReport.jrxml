@@ -101,7 +101,9 @@
 	<detail>
 		<band height="66">
 			<subreport>
-				<reportElement uuid="99e0c657-c95f-453b-8bee-4fec9b95cc8d" stretchType="RelativeToBandHeight" x="0" y="46" width="680" height="20"/>
+				<reportElement uuid="99e0c657-c95f-453b-8bee-4fec9b95cc8d" stretchType="RelativeToBandHeight" x="0" y="46" width="680" height="20">
+					<printWhenExpression><![CDATA[!$F{subReportMealRowList}.isEmpty()]]></printWhenExpression>
+				</reportElement>
 				<subreportParameter name="SUBREPORT_DIR">
 					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
@@ -346,7 +348,9 @@
 	<summary>
 		<band height="30">
 			<subreport>
-				<reportElement uuid="5e29ba83-c40d-4bc4-a4bb-f03c67599a7d" x="0" y="0" width="680" height="30"/>
+				<reportElement uuid="5e29ba83-c40d-4bc4-a4bb-f03c67599a7d" x="0" y="0" width="680" height="30">
+					<printWhenExpression><![CDATA[!((net.sf.jasperreports.engine.data.JRBeanCollectionDataSource)$P{totalsData}).getData().isEmpty()]]></printWhenExpression>
+				</reportElement>
 				<subreportParameter name="SUBREPORT_DIR">
 					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
 				</subreportParameter>

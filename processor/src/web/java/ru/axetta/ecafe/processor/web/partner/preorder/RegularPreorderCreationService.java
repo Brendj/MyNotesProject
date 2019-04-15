@@ -33,7 +33,7 @@ public class RegularPreorderCreationService {
         return true;
     }
 
-    public void run() {
+    /*public void run() {
         if (!isOn()) return;
         logger.info("Start of generating regular preorders");
         try {
@@ -42,5 +42,5 @@ public class RegularPreorderCreationService {
         } catch (Exception e) {
             logger.error("Error in generating regular preorders: ", e);
         }
-    }
+    }*/
 }

@@ -139,6 +139,22 @@ public class RuntimeContext implements ApplicationContextAware {
         this.usePriceSms = usePriceSms;
     }
 
+    public boolean isLogInfoService() {
+        return logInfoService;
+    }
+
+    public void setLogInfoService(boolean logInfoService) {
+        this.logInfoService = logInfoService;
+    }
+
+    public String[] getMethodsInfoService() {
+        return methodsInfoService;
+    }
+
+    public void setMethodsInfoService(String[] methodsInfoService) {
+        this.methodsInfoService = methodsInfoService;
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -283,6 +299,8 @@ public class RuntimeContext implements ApplicationContextAware {
             + "GmtI6Yxjlvzt1zcqpq4MZM3HTLdz4gibDBPGG3cd692TYkHeFg==";
     private static X509Certificate rtCert = null; // корневой сертификат
 
+    private boolean logInfoService;
+    private String[] methodsInfoService;
 
     private SettingsConfig settingsConfig;
 
@@ -1525,6 +1543,8 @@ public class RuntimeContext implements ApplicationContextAware {
             String v = DAOUtils.getOptionValue(entityManager, nOption, (String) Option.OPTIONS_INITIALIZER[n + 1]);
             optionsValues.put(nOption, v);
         }
+        logInfoService = getOptionValueBool(Option.OPTION_LOG_INFOSERVICE);
+        methodsInfoService = getOptionValueString(Option.OPTION_METHODS_INFOSERVICE).split(",");
     }
 
     public boolean actionIsOnByNode(String parameterName) {
