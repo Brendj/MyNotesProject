@@ -54,7 +54,9 @@
 	<detail>
 		<band height="20" splitType="Stretch">
 			<subreport>
-				<reportElement uuid="69987ef7-aa09-4b82-8fe8-2f7891460ef1" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="0" y="0" width="680" height="20"/>
+				<reportElement uuid="69987ef7-aa09-4b82-8fe8-2f7891460ef1" stretchType="RelativeToBandHeight" isPrintRepeatedValues="false" x="0" y="0" width="680" height="20">
+					<printWhenExpression><![CDATA[!$F{subReportDataRows}.isEmpty()]]></printWhenExpression>
+				</reportElement>
 				<subreportParameter name="SUBREPORT_DIR">
 					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
 				</subreportParameter>

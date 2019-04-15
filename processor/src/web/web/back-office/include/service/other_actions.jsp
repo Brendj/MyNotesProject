@@ -114,10 +114,7 @@
 
     <a4j:commandButton value="Обработка мигрантов" action="#{otherActionsPage.loadESZMigrants()}" id="loadESZMigrants"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
-    <a4j:commandButton value="Сгенерировать регулярные предзаказы" action="#{otherActionsPage.createRegularPreorders()}" id="createRegularPreorders"
-                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
-    <a4j:commandButton value="Отправить отчеты PreorderRequestsNewReport поставщикам" action="#{otherActionsPage.sendGoodRequestsNewReports()}" id="sendGoodRequestsReport"
-                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+
     <a4j:commandButton value="Запустить сервис обработки ЗЛП" action="#{otherActionsPage.runApplicationForFoodProcessingService()}" id="runApplicationForFoodProcessingService"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <a4j:commandButton value="Запустить сверку льгот ДТСЗН с реестрами 2.0" action="#{otherActionsPage.runDTSZNDiscountsReviseService()}" id="runDTSZNDiscountsReviseService"
@@ -141,7 +138,7 @@
     <a4j:commandButton value="Итого за неделю" action="#{otherActionsPage.runEventNotificationServiceForWeekly}" id="runEventNotificationServiceForWeekly"
                                                                              styleClass="command-button" />
     </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid-align-top" id="specialDatesFileLoaderPanel" >
+    <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" id="specialDatesFileLoaderPanel" >
         <rich:panel>
             <h:outputText escape="true" value="Загрузить производственный календарь для всех ОО" styleClass="output-text" /> <br/>
             <h:commandLink action="#{otherActionsPage.downloadSampleFile}" id="downloadSampleSpecialDates" value="Скачать текущий календарь" styleClass="command-link" />
@@ -163,6 +160,21 @@
                 <a4j:support event="onuploadcomplete" reRender="specialDatesFileLoaderPanel" />
                 <a4j:support event="onclear" reRender="specialDatesFileLoaderPanel" />
             </rich:fileUpload>
+        </rich:panel>
+        <rich:panel>
+            <h:panelGrid columns="1">
+                <h:outputText escape="true" value="Предзаказы" styleClass="output-text" />
+                <a4j:commandButton value="Сгенерировать регулярные предзаказы" action="#{otherActionsPage.createRegularPreorders()}" id="createRegularPreorders"
+                                   styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+                <a4j:commandButton value="Отправить отчеты PreorderRequestsNewReport поставщикам" action="#{otherActionsPage.sendGoodRequestsNewReports()}" id="sendGoodRequestsReport"
+                                   styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+                <a4j:commandButton value="Проверка соответствия ОО клиента и предзаказа" action="#{otherActionsPage.relevancePreordersToOrgs()}" id="relevancePreordersToOrgs"
+                                   styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+                <a4j:commandButton value="Проверка соответствия меню и предзаказа" action="#{otherActionsPage.relevancePreordersToMenu()}" id="relevancePreordersToMenu"
+                                   styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+                <a4j:commandButton value="Проверка соответствия флага включения функционала предзаказа ОО" action="#{otherActionsPage.relevancePreordersToOrgFlag()}" id="relevancePreordersToOrgFlag"
+                                   styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+            </h:panelGrid>
         </rich:panel>
     </h:panelGrid>
 

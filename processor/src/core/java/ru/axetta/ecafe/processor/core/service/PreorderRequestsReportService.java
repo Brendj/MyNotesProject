@@ -399,6 +399,7 @@ public class PreorderRequestsReportService extends RecoverableService {
 
     public void runTask() throws Exception {
         //генерация предзаказов по регулярному правилу
+        RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().relevancePreorders();
         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().generatePreordersBySchedule();
         runGeneratePreorderRequests(new Date());
         //runTaskNextTimePerDay();
