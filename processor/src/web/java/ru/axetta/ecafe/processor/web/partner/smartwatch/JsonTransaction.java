@@ -8,7 +8,7 @@ import java.util.Date;
 
 public class JsonTransaction {
     private Date orderDate;
-    private String transactionType;
+    private Integer transactionType;
     private Long transactionSum;
     private Long idOfTransaction;
 
@@ -20,11 +20,11 @@ public class JsonTransaction {
         this.orderDate = orderDate;
     }
 
-    public String getTransactionType() {
+    public Integer getTransactionType() {
         return transactionType;
     }
 
-    public void setTransactionType(String transactionType) {
+    public void setTransactionType(Integer transactionType) {
         this.transactionType = transactionType;
     }
 
