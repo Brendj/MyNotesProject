@@ -2595,4 +2595,9 @@ public class DAOService {
                 .setParameter("idOfOption", new Long(Option.OPTION_LAST_ORG_CHANGE_PROCESS))
                 .executeUpdate();
     }
+
+    public void saveLogServiceMessage(String message, LogServiceType type) {
+        LogService logService = new LogService(type, message);
+        entityManager.merge(logService);
+    }
 }

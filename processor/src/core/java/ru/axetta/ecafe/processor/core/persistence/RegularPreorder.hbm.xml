@@ -33,5 +33,10 @@
         <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="mobile" column="mobile" type="string" length="32"/>
+        <property name="state" column="state">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.RegularPreorderState</param>
+            </type>
+        </property>
     </class>
 </hibernate-mapping>
