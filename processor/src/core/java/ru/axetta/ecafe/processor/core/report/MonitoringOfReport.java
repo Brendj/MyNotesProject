@@ -42,9 +42,10 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
     public static final boolean IS_TEMPLATE_REPORT = true;
     public static final Integer FOR_ONE_DAY = 0;
     public static final Integer FOR_MONTH = 1;
+    public static final Integer FOR_THREE_DAYS = 2;
     public static final int[] PARAM_HINTS = new int[]{3};
     public static final String[] TEMPLATE_FILE_NAMES = {
-            "MonitoringOfReportForOneDay.jasper", "MonitoringOfReportForMonth.jasper", /*"MonitoringOfReport.jasper"*/
+            "MonitoringOfReportForOneDay.jasper", "MonitoringOfReportForMonth.jasper", "MonitoringOfReportForThreeDays.jasper", /*"MonitoringOfReport.jasper"*/
     };
 
     public static final String REPORT_NAME_FOR_MENU = "Мониторинг";
@@ -56,6 +57,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
         private String templateFilename;
         private String subReportDir;
         private Integer selectedPeriod = FOR_ONE_DAY;
+        private boolean divideIntoPeriods = false; // вывести данные подня
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -83,8 +85,13 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
                 parameterMap.put("currentMonth", month);
                 parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
                 parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
+            } else if(selectedPeriod.equals(FOR_THREE_DAYS)){
+                Date secondDate = CalendarUtils.calculateNextWorkDateWithoutParser(true,startTime);
+                parameterMap.put("firstDate", CalendarUtils.dateShortToStringFullYear(endTime));
+                parameterMap.put("secondDate", CalendarUtils.dateShortToStringFullYear(secondDate));
+                parameterMap.put("thridDate", CalendarUtils.dateShortToStringFullYear(startTime));
+                divideIntoPeriods = true;
             }
-
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
             List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
@@ -106,22 +113,31 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
                 date = CalendarUtils.getFirstDayOfMonth(new Date());
                 endTime = CalendarUtils.getLastDayOfMonth(date);
                 selectedPeriod = FOR_MONTH;
-            } else {
+            } else if(templateFilename.contains(TEMPLATE_FILE_NAMES[FOR_ONE_DAY])){
                 date = CalendarUtils.addDays(CalendarUtils.startOfDay(new Date()), -1);
                 endTime = CalendarUtils.endOfDay(date);
                 int day = CalendarUtils.getDayOfWeek(date);
-                if (day == 1) {
+                if (day == Calendar.SUNDAY) {
                     return null; //на Вск не генерируем
                 }
                 selectedPeriod = FOR_ONE_DAY;
+            } else {
+                endTime = CalendarUtils.addDays(CalendarUtils.startOfDay(new Date()), -1);
+                int dayOfWeek = CalendarUtils.getDayOfWeek(endTime);
+                date = CalendarUtils.startOfDay(
+                        dayOfWeek < Calendar.WEDNESDAY ? CalendarUtils.addDays(endTime, -4) : CalendarUtils.addDays(endTime, -3)
+                );
+
+                selectedPeriod = FOR_THREE_DAYS;
             }
             return buildInternal(date, endTime, calendar);
         }
 
+
         private JRDataSource createDataSource(Date startTime, Date endTime, List<Long> idOfOrgList)
                 throws Exception {
-            MonitoringOfReportService service = new MonitoringOfReportService();
-            return new JRBeanCollectionDataSource(service.buildReportItems(startTime, endTime, idOfOrgList));
+            MonitoringOfReportService service = RuntimeContext.getAppContext().getBean(MonitoringOfReportService.class);
+            return new JRBeanCollectionDataSource(service.buildReportItems(startTime, endTime, idOfOrgList, divideIntoPeriods));
         }
 
         public Integer getSelectedPeriod() {

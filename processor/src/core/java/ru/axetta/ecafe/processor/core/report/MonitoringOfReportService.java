@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.report;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.service.org.OrgService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.DataBaseSafeConverterUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -15,23 +16,28 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 /**
  * Created by anvarov on 04.05.2017.
  */
+@Component
 public class MonitoringOfReportService {
     final private static Logger logger = LoggerFactory.getLogger(MonitoringOfReportService.class);
     private final static Integer ORGS_AMOUNT_FOR_REPORT = 20;
+    private final static String DATE_FORMAT = "DD/MM/YYYY";
+    private final SimpleDateFormat QUERY_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
 
     private List<MonitoringOfItem> getMonitoringOfItems(Date startDate, Long idOfOrg,
-            Map<Long, NumberOfPasses> numberOfPassesMap, Map<Long, NumberOfPreferential> numberOfPreferentialMap,
-            Map<Long, NumberOfStudentsAndGuardians> numberOfBuffetMap,
-            Map<Long, NumberOfStudentsAndGuardians> numberOfSubfeedMap,
-            Map<Long, NumberOfStudentsAndGuardians> numberOfPaidMap,
-            Map<Long, Long> numberOfpreordersMap) {
+            Map<Long, List<NumberOfPasses>> numberOfPassesMap, Map<Long, List<NumberOfPreferential>> numberOfPreferentialMap,
+            Map<Long, List<NumberOfStudentsAndGuardians>> numberOfBuffetMap,
+            Map<Long, List<NumberOfStudentsAndGuardians>> numberOfSubfeedMap,
+            Map<Long, List<NumberOfStudentsAndGuardians>> numberOfPaidMap, Map<Long, List<Long>> numberOfpreordersMap,
+            Integer i) {
 
         MonitoringOfItem monitoringOfItem = new MonitoringOfItem();
         monitoringOfItem.setsDate(startDate);
@@ -40,8 +46,9 @@ public class MonitoringOfReportService {
         monitoringOfItemList.add(monitoringOfItem);
 
         // passes
-        NumberOfPasses numberOfPasses = numberOfPassesMap.get(idOfOrg);
-        if(numberOfPasses != null) {
+        List<NumberOfPasses> numberOfPassesList = numberOfPassesMap.get(idOfOrg);
+        if(numberOfPassesList != null) {
+            NumberOfPasses numberOfPasses = numberOfPassesList.get(i);
             monitoringOfItem.setNumberOfPassesStudents(numberOfPasses.getStudents());
             monitoringOfItem.setNumberOfUniquePassesStudents(numberOfPasses.getUniqueStudents());
             monitoringOfItem.setNumberOfPassesEmployees(numberOfPasses.getEmployees());
@@ -53,8 +60,9 @@ public class MonitoringOfReportService {
         }
 
         // lgotnoe
-        NumberOfPreferential numberOfPreferential = numberOfPreferentialMap.get(idOfOrg);
-        if(numberOfPreferential != null) {
+        List<NumberOfPreferential> numberOfPreferentialList = numberOfPreferentialMap.get(idOfOrg);
+        if(numberOfPreferentialList != null) {
+            NumberOfPreferential numberOfPreferential = numberOfPreferentialList.get(i);
             monitoringOfItem.setNumberOfLgotnoeFriendlyOrg(numberOfPreferential.getFriendlyOrg());
             monitoringOfItem.setNumberOfLgotnoeOtherOrg(numberOfPreferential.getOthersOrg());
             monitoringOfItem.setNumberOfLgotnoe(monitoringOfItem.getNumberOfLgotnoeFriendlyOrg() + monitoringOfItem.getNumberOfLgotnoeOtherOrg());
@@ -63,56 +71,62 @@ public class MonitoringOfReportService {
 
 
         // buffet
-        NumberOfStudentsAndGuardians numberOfBuffet = numberOfBuffetMap.get(idOfOrg);
-        if(numberOfBuffet != null) {
+        List<NumberOfStudentsAndGuardians> numberOfBuffetList = numberOfBuffetMap.get(idOfOrg);
+        if(numberOfBuffetList != null) {
+            NumberOfStudentsAndGuardians numberOfBuffet = numberOfBuffetList.get(i);
             monitoringOfItem.setNumberOfBuffetStudent(numberOfBuffet.getStudents());
             monitoringOfItem.setNumberOfBuffetGuardians(numberOfBuffet.getGuardians());
         }
 
         // subfeed
-        NumberOfStudentsAndGuardians numberOfSubfeed = numberOfSubfeedMap.get(idOfOrg);
-        if(numberOfSubfeed != null) {
+        List<NumberOfStudentsAndGuardians> numberOfSubfeedList = numberOfSubfeedMap.get(idOfOrg);
+        if(numberOfSubfeedList != null) {
+            NumberOfStudentsAndGuardians numberOfSubfeed = numberOfSubfeedList.get(i);
             monitoringOfItem.setNumberOfSubFeedStudents(numberOfSubfeed.getStudents());
             monitoringOfItem.setNumberOfSubFeedGuardians(numberOfSubfeed.getGuardians());
         }
 
         // paid
-        NumberOfStudentsAndGuardians numberOfPaid = numberOfPaidMap.get(idOfOrg);
-        if(numberOfPaid != null) {
+        List<NumberOfStudentsAndGuardians> numberOfPaidList = numberOfPaidMap.get(idOfOrg);
+        if(numberOfPaidList != null) {
+            NumberOfStudentsAndGuardians numberOfPaid = numberOfPaidList.get(i);
             monitoringOfItem.setNumberOfPaidStudents(numberOfPaid.getStudents());
             monitoringOfItem.setNumberOfPaidGuardians(numberOfPaid.getGuardians());
         }
 
         //preorders
-        Long numberOfUniquePreorderClients = numberOfpreordersMap.get(idOfOrg);
-        if(numberOfUniquePreorderClients != null){
+        List<Long> numberOfUniquePreorderClientsList = numberOfpreordersMap.get(idOfOrg);
+        if(numberOfUniquePreorderClientsList != null){
+            Long numberOfUniquePreorderClients = numberOfUniquePreorderClientsList.get(i);
             monitoringOfItem.setNumberOfPreorders(numberOfUniquePreorderClients);
         }
         return monitoringOfItemList;
     }
 
-    private Map<Long, NumberOfPasses> generateNumberOfPasses(Date startTime, Date endTime, List<Long> idOfOrgList) {
-        Map<Long, NumberOfPasses> result = new HashMap<Long, NumberOfPasses>();
+    private Map<Long, List<NumberOfPasses>> generateNumberOfPasses(Date startTime, Date endTime, List<Long> idOfOrgList,
+            Boolean divideIntoPeriods) {
+        Map<Long, List<NumberOfPasses>> result = new HashMap<Long, List<NumberOfPasses>>();
         Session session = null;
         Transaction transaction = null;
         try {
+            String divideByDay = divideIntoPeriods ? ", TO_CHAR(TO_TIMESTAMP(cfo.createddate / 1000), '"+ DATE_FORMAT +"') as evttime " : "";
+            String groupByDay = divideIntoPeriods ? ", evttime " : "";
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
             String selectFields =
-                        "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTime AND :endTime)) "
-                                + "                   THEN idofenterevent END)) AS number_of_passes_students_monday, "
-                                + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) AND (evtdatetime BETWEEN :startTime AND :endTime)) "
-                                + "                   THEN idofclient END)) AS number_of_unique_passes_students_monday, "
-                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-                                + "                   AND (evtdatetime BETWEEN :startTime AND :endTime)) "
-                                + "                   THEN idofenterevent END)) AS number_of_passes_employees_monday, "
-                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))"
-                                + "                   AND (evtdatetime BETWEEN :startTime AND :endTime)) "
-                                + "                   THEN idofclient END)) AS number_of_unique_passes_employees_monday, "
-                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTime AND :endTime))"
-                                + "                   THEN idofenterevent END)) AS number_of_passes_guardians_monday, "
-                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) AND (evtdatetime BETWEEN :startTime AND :endTime))"
-                                + "                   THEN idofclient END)) AS number_of_unique_passes_guardians_monday ";
+                        "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) ) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_students, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup < :employees) ) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_students, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))) "
+                                + "                   THEN idofenterevent END)) AS number_of_passes_employees, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup IN (:employees, :administration, :employee, :techEmployees, :visitors, :others))) "
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_employees, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) )"
+                                + "                   THEN idofenterevent END)) AS number_of_passes_guardians, "
+                                + "count(DISTINCT(CASE WHEN ((idofclientgroup = :parents) )"
+                                + "                   THEN idofclient END)) AS number_of_unique_passes_guardians "
+                                + divideByDay;
 
             String orgCondition = "";
             if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
@@ -126,7 +140,7 @@ public class MonitoringOfReportService {
                             + "    ((idofclientgroup < :employees) OR idofclientgroup IN "
                             + "        (:employees, :administration, :employee, :techEmployees, :parents, :visitors, :others)) "
                             + " AND passdirection IN (:passEntry, :passExit, :passReEntry, :passReExit) AND evtdatetime BETWEEN :startTime AND :endTime "
-                            + "group by idoforg";
+                            + "group by idoforg " + groupByDay;
 
             Query query = session.createSQLQuery(sqlString);
 
@@ -149,10 +163,42 @@ public class MonitoringOfReportService {
 
             List<Object[]> list = query.list();
 
-            for (Object[] object : list) {
-                NumberOfPasses numberOfPasses = new NumberOfPasses(((BigInteger) object[1]).longValue(), ((BigInteger) object[2]).longValue(), ((BigInteger) object[3]).longValue(),
+            if(divideIntoPeriods) {
+                for (Object[] row : list) {
+                    Long idOfCurrentOrg = -1L;
+                    Date currentDay = startTime;
+                    Date limitDate = CalendarUtils.addOneDay(endTime);
+                    List<NumberOfPasses> preferentialList = new LinkedList<NumberOfPasses>();
+                    Date dateFromRow = QUERY_DATE_FORMAT.parse((String)row[7]);
+                    if (idOfCurrentOrg.equals(-1L) || !idOfCurrentOrg.equals(row[0])) {
+                        result.put(idOfCurrentOrg, preferentialList);
+                        idOfCurrentOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
+                        preferentialList = new LinkedList<NumberOfPasses>();
+                        currentDay = startTime;
+                    }
+                    while (!CalendarUtils.isCurrentDay(currentDay, limitDate)) {
+                        if (!CalendarUtils.isCurrentDay(currentDay, dateFromRow)) {
+                            NumberOfPasses numberOfPreferential = new NumberOfPasses();
+                            preferentialList.add(numberOfPreferential);
+                            currentDay = CalendarUtils.addOneDay(currentDay);
+                        } else if (CalendarUtils.isWorkDateWithoutParser(true, dateFromRow)) {
+                            NumberOfPasses numberOfPreferential = new NumberOfPasses((
+                                    (BigInteger) row[1]).longValue(), ((BigInteger) row[2]).longValue(), ((BigInteger) row[3]).longValue(),
+                                    ((BigInteger) row[4]).longValue(), ((BigInteger) row[5]).longValue(), ((BigInteger) row[6]).longValue());
+                            preferentialList.add(numberOfPreferential);
+                            currentDay = CalendarUtils.addOneDay(currentDay);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                for (Object[] object : list) {
+                    NumberOfPasses numberOfPasses = new NumberOfPasses(((BigInteger) object[1]).longValue(), ((BigInteger) object[2]).longValue(), ((BigInteger) object[3]).longValue(),
                             ((BigInteger) object[4]).longValue(), ((BigInteger) object[5]).longValue(), ((BigInteger) object[6]).longValue());
-                result.put(((BigInteger) object[0]).longValue(), numberOfPasses);
+                    List<NumberOfPasses> numberOfPassesList = new ArrayList<NumberOfPasses>(1);
+                    numberOfPassesList.add(numberOfPasses);
+                    result.put(((BigInteger) object[0]).longValue(), numberOfPassesList);
+                }
             }
             transaction.commit();
             transaction = null;
@@ -165,21 +211,25 @@ public class MonitoringOfReportService {
         return result;
     }
 
-    private Map<Long, NumberOfPreferential> numberOfPreferential(Date startTime, Date endTime, List<Long> idOfOrgList) {
-        Map<Long, NumberOfPreferential> result = new HashMap<Long, NumberOfPreferential>();
+    private Map<Long, List<NumberOfPreferential>> numberOfPreferential(Date startTime, Date endTime, List<Long> idOfOrgList,
+            Boolean divideIntoPeriods) {
+        Map<Long, List<NumberOfPreferential>> result = new HashMap<Long, List<NumberOfPreferential>>();
         Session session = null;
         Transaction transaction = null;
         try {
+            String divideByDay = divideIntoPeriods ? ", TO_CHAR(TO_TIMESTAMP(cfo.createddate / 1000), '"+ DATE_FORMAT +"') as evttime " : "";
+            String groupByDay = divideIntoPeriods ? ", evttime " : "";
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
             String selectFields =
-                    "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) AND (cfo.createddate BETWEEN :startTime AND :endTime)) "
-                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly_monday, "
-                  + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) AND (cfo.createddate BETWEEN :startTime AND :endTime)) "
-                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other_monday, "
-                  + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) AND (cfo.createddate BETWEEN :startTime AND :endTime)) "
-                  + "                 THEN cfo.idofclient END)) AS number_of_reserve_monday ";
+                    "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NOT NULL) ) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_friendly, "
+                  + "count(DISTINCT(CASE WHEN ((fo.friendlyorg IS NULL) ) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_lgotnoe_other, "
+                  + "count(DISTINCT(CASE WHEN (cfo.ordertype IN (:reservePlan, :changePlan) ) "
+                  + "                 THEN cfo.idofclient END)) AS number_of_reserve "
+                  + divideByDay;
 
 
             String orgCondition = "";
@@ -195,7 +245,8 @@ public class MonitoringOfReportService {
                   + "LEFT JOIN cf_friendly_organization fo on fo.currentorg = c.idoforg "
                   + "WHERE cfo.ordertype IN (:reducedPricePlan, :correctionType) AND " + orgCondition
                   + "    cfo.state = 0 AND g.idofclientgroup < :employees AND cfo.createddate BETWEEN :startTime AND :endTime AND "
-                  + "    cfod.menutype >= :minType AND cfod.menutype <= :maxType  AND cfod.idofrule >= 0 group by cfo.idoforg";
+                  + "    cfod.menutype >= :minType AND cfod.menutype <= :maxType  AND cfod.idofrule >= 0"
+                  + " group by cfo.idoforg " + groupByDay;
 
             Query query = session.createSQLQuery(sqlQuery);
             if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
@@ -214,12 +265,43 @@ public class MonitoringOfReportService {
 
 
             List<Object[]> list = query.list();
-            for (Object[] object : list) {
-                NumberOfPreferential numberOfPreferential = new NumberOfPreferential(((BigInteger) object[1]).longValue(),
-                            ((BigInteger) object[2]).longValue(), ((BigInteger) object[3]).longValue());
-                result.put(((BigInteger) object[0]).longValue(), numberOfPreferential);
-            }
 
+            if(divideIntoPeriods) {
+                Long idOfCurrentOrg = -1L;
+                Date currentDay = startTime;
+                Date limitDate = CalendarUtils.addOneDay(endTime);
+                List<NumberOfPreferential> preferentialList = new LinkedList<NumberOfPreferential>();
+                for (Object[] row : list) {
+                    Date dateFromRow = QUERY_DATE_FORMAT.parse((String)row[4]);
+                    if (idOfCurrentOrg.equals(-1L) || !idOfCurrentOrg.equals(row[0])) {
+                        result.put(idOfCurrentOrg, preferentialList);
+                        idOfCurrentOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
+                        preferentialList = new LinkedList<NumberOfPreferential>();
+                        currentDay = startTime;
+                    }
+                    while (!CalendarUtils.isCurrentDay(currentDay, limitDate)) {
+                        if (!CalendarUtils.isCurrentDay(currentDay, dateFromRow)) {
+                            NumberOfPreferential numberOfPreferential = new NumberOfPreferential();
+                            preferentialList.add(numberOfPreferential);
+                            currentDay = CalendarUtils.addOneDay(currentDay);
+                        } else if (CalendarUtils.isWorkDateWithoutParser(true, dateFromRow)) {
+                            NumberOfPreferential numberOfPreferential = new NumberOfPreferential(((BigInteger) row[1]).longValue(), ((BigInteger) row[2]).longValue(),
+                                    ((BigInteger) row[3]).longValue());
+                            preferentialList.add(numberOfPreferential);
+                            currentDay = CalendarUtils.addOneDay(currentDay);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                for (Object[] object : list) {
+                    NumberOfPreferential numberOfPreferential = new NumberOfPreferential(((BigInteger) object[1]).longValue(),
+                            ((BigInteger) object[2]).longValue(), ((BigInteger) object[3]).longValue());
+                    List<NumberOfPreferential> numberOfPreferentials = new ArrayList<NumberOfPreferential>(1);
+                    numberOfPreferentials.add(numberOfPreferential);
+                    result.put(((BigInteger) object[0]).longValue(), numberOfPreferentials);
+                }
+            }
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
@@ -231,28 +313,32 @@ public class MonitoringOfReportService {
         return result;
     }
 
-    private Map<Long, NumberOfStudentsAndGuardians> numberOfBuffet(Date startTime, Date endTime, List<Long> idOfOrgList) {
-        Map<Long, NumberOfStudentsAndGuardians> result = new HashMap<Long, NumberOfStudentsAndGuardians>();
+    private Map<Long, List<NumberOfStudentsAndGuardians>> numberOfBuffet(Date startTime, Date endTime, List<Long> idOfOrgList,
+            Boolean divideIntoPeriods) {
+        Map<Long, List<NumberOfStudentsAndGuardians>> result = new HashMap<Long, List<NumberOfStudentsAndGuardians>>();
         Session session = null;
         Transaction transaction = null;
         try {
+            String divideByDay = divideIntoPeriods ? ", TO_CHAR(TO_TIMESTAMP(cfo.createddate / 1000), '"+ DATE_FORMAT +"') as evttime " : "";;
+            String groupByDay = divideIntoPeriods ? ", evttime " : "";
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
             String selectFields =
-                        "count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.createddate BETWEEN :startTime AND :endTime)) "
-                                + "   THEN cfo.idofclient END)) AS number_of_buffet_students_monday, "
+                                " count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) ) "
+                                + "   THEN cfo.idofclient END)) AS number_of_buffet_students, "
                                 + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
                                 + "   (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
-                                + "   AND (cfo.createddate BETWEEN :startTime AND :endTime)) THEN cfo.idofclient END)) "
-                                + "   AS number_of_buffet_guardians_monday ";
+                                + "   ) THEN cfo.idofclient END)) "
+                                + "   AS number_of_buffet_guardians "
+                                + divideByDay;
 
             String orgCondition = "";
             if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
                 orgCondition = " cfo.idoforg in (:idOfOrgs) and ";
             }
 
-            String sqlQuery = "SELECT cfo.idoforg, " + selectFields
+            String sqlQuery = "SELECT  cfo.idoforg, " + selectFields
                     + "FROM cf_orders cfo "
                     + "LEFT JOIN cf_orderdetails cfod ON cfod.idoforg = cfo.idoforg AND cfod.idoforder = cfo.idoforder "
                     + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient "
@@ -262,7 +348,8 @@ public class MonitoringOfReportService {
                     + " cfo.state = :stateCommited "
                     + "    AND ((g.idofclientgroup < :employees) OR g.idofclientgroup IN "
                     + "        (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
-                    + "    AND cfo.createddate BETWEEN :startTime AND :endTime group by cfo.idoforg";
+                    + "    AND cfo.createddate BETWEEN :startTime AND :endTime"
+                    + " group by cfo.idoforg " + groupByDay;
             Query query = session.createSQLQuery(sqlQuery);
 
             if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
@@ -286,7 +373,7 @@ public class MonitoringOfReportService {
 
             transaction.commit();
             transaction = null;
-            result = getFromQuery(list, idOfOrgList);
+            result = getFromQuery(list, divideIntoPeriods, startTime, endTime);
         } catch (Exception e) {
             logger.error("Error in numberOfBuffet: ", e);
         } finally {
@@ -296,18 +383,52 @@ public class MonitoringOfReportService {
         return result;
     }
 
-    private Map<Long, NumberOfStudentsAndGuardians> getFromQuery(List<Object[]> list, List<Long> idOfOrgList) {
-        Map<Long, NumberOfStudentsAndGuardians> result = new HashMap<Long, NumberOfStudentsAndGuardians>();
-        for (Object[] object : list) {
-            NumberOfStudentsAndGuardians numberOfBuffet = new NumberOfStudentsAndGuardians(((BigInteger) object[1]).longValue(),
-                    ((BigInteger) object[2]).longValue());
-            result.put(((BigInteger) object[0]).longValue(), numberOfBuffet);
+    private Map<Long, List<NumberOfStudentsAndGuardians>> getFromQuery(List<Object[]> list, Boolean divideIntoPeriods,
+            Date startTime, Date endTime) throws Exception{
+        Map<Long,List<NumberOfStudentsAndGuardians>> result = new HashMap<Long, List<NumberOfStudentsAndGuardians>>();
+
+        if(divideIntoPeriods){
+            Long idOfCurrentOrg = -1L;
+            Date currentDay = startTime;
+            Date limitDate = CalendarUtils.addOneDay(endTime);
+            List<NumberOfStudentsAndGuardians> numberOfStudentsAndGuardiansList = new LinkedList<NumberOfStudentsAndGuardians>();
+            for (Object[] row : list) {
+                Date dateFromRow = QUERY_DATE_FORMAT.parse((String)row[3]);
+                if (idOfCurrentOrg.equals(-1L) || !idOfCurrentOrg.equals(row[0])) {
+                    result.put(idOfCurrentOrg, numberOfStudentsAndGuardiansList);
+                    idOfCurrentOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
+                    numberOfStudentsAndGuardiansList = new LinkedList<NumberOfStudentsAndGuardians>();
+                    currentDay = startTime;
+                }
+                while (!CalendarUtils.isCurrentDay(currentDay, limitDate)) {
+                    if (!CalendarUtils.isCurrentDay(currentDay, dateFromRow)) {
+                        NumberOfStudentsAndGuardians numberOfPreferential = new NumberOfStudentsAndGuardians();
+                        numberOfStudentsAndGuardiansList.add(numberOfPreferential);
+                        currentDay = CalendarUtils.addOneDay(currentDay);
+                    } else if (CalendarUtils.isWorkDateWithoutParser(true, dateFromRow)) {
+                        NumberOfStudentsAndGuardians numberOfPreferential = new NumberOfStudentsAndGuardians(((BigInteger) row[1]).longValue(),
+                                ((BigInteger) row[2]).longValue());
+                        numberOfStudentsAndGuardiansList.add(numberOfPreferential);
+                        currentDay = CalendarUtils.addOneDay(currentDay);
+                        break;
+                    }
+                }
+            }
+        } else {
+            for (Object[] object : list) {
+                NumberOfStudentsAndGuardians numberOfBuffet = new NumberOfStudentsAndGuardians(((BigInteger) object[1]).longValue(),
+                        ((BigInteger) object[2]).longValue());
+                List<NumberOfStudentsAndGuardians> numbers = new ArrayList<NumberOfStudentsAndGuardians>(1);
+                numbers.add(numberOfBuffet);
+                result.put(((BigInteger) object[0]).longValue(), numbers);
+            }
         }
         return result;
     }
 
-    private Map<Long, NumberOfStudentsAndGuardians> numberOfSubFeed(Date startTime, Date endTime, List<Long> idOfOrgList) {
-        Map<Long, NumberOfStudentsAndGuardians> result = new HashMap<Long, NumberOfStudentsAndGuardians>();
+    private Map<Long, List<NumberOfStudentsAndGuardians>> numberOfSubFeed(Date startTime, Date endTime,
+            List<Long> idOfOrgList, Boolean divideIntoPeriods) {
+        Map<Long, List<NumberOfStudentsAndGuardians>> result = new HashMap<Long, List<NumberOfStudentsAndGuardians>>();
         Session session = null;
         Transaction transaction = null;
         try {
@@ -315,12 +436,11 @@ public class MonitoringOfReportService {
             transaction = session.beginTransaction();
 
             String selectFields =
-                        "count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTime AND :endTime)) "
-                                + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students_monday, "
+                        "count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) ) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_subfeed_students, "
                                 + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-                                + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-                                + "           AND (cfo.CreatedDate BETWEEN :startTime AND :endTime)) "
-                                + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_monday ";
+                                + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents))) "
+                                + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians ";
             String orgCondition = "";
             if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
                 orgCondition = " cfo.idoforg in (:idOfOrgs) and ";
@@ -364,7 +484,7 @@ public class MonitoringOfReportService {
             List<Object[]> list = query.list();
             transaction.commit();
             transaction = null;
-            result = getFromQuery(list, idOfOrgList);
+            result = getFromQuery(list, divideIntoPeriods, startTime, endTime);
         } catch (Exception e) {
             logger.error("Error in numberOfSubFeed: ", e);
         } finally {
@@ -374,8 +494,9 @@ public class MonitoringOfReportService {
         return result;
     }
 
-    private Map<Long, NumberOfStudentsAndGuardians> numberOfPaid(Date startTime, Date endTime, List<Long> idOfOrgList) {
-        Map<Long, NumberOfStudentsAndGuardians> result = new HashMap<Long, NumberOfStudentsAndGuardians>();
+    private Map<Long, List<NumberOfStudentsAndGuardians>> numberOfPaid(Date startTime, Date endTime, List<Long> idOfOrgList,
+            Boolean divideIntoPeriods) {
+        Map<Long, List<NumberOfStudentsAndGuardians>> result = new HashMap<Long, List<NumberOfStudentsAndGuardians>>();
         Session session = null;
         Transaction transaction = null;
         try {
@@ -383,12 +504,11 @@ public class MonitoringOfReportService {
             transaction = session.beginTransaction();
 
             String selectFields =
-                        "count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees) AND (cfo.CreatedDate BETWEEN :startTime AND :endTime)) "
-                                + "                   THEN cfo.idofclient END)) AS number_of_paid_students_monday, "
+                        "count(DISTINCT(CASE WHEN ((g.idofclientgroup < :employees)) "
+                                + "                   THEN cfo.idofclient END)) AS number_of_paid_students, "
                                 + "count(DISTINCT(CASE WHEN ((g.idofclientgroup IN "
-                                + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
-                                + "           AND (cfo.CreatedDate BETWEEN :startTime AND :endTime))"
-                                + "        THEN cfo.idofclient END)) AS number_of_paid_guardians_monday ";
+                                + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents))) "
+                                + "        THEN cfo.idofclient END)) AS number_of_paid_guardians ";
 
             String orgCondition = "";
             if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
@@ -431,7 +551,7 @@ public class MonitoringOfReportService {
             List<Object[]> list = query.list();
             transaction.commit();
             transaction = null;
-            result = getFromQuery(list, idOfOrgList);
+            result = getFromQuery(list, divideIntoPeriods, startTime, endTime);
         } catch (Exception e) {
             logger.error("Error in numberOfPaid: ", e);
         } finally {
@@ -449,7 +569,7 @@ public class MonitoringOfReportService {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
             String orgsCondition = " ";
-            if (idOfOrgList.size() <= 10) {
+            if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
                 orgsCondition = " cfc.idoforg in (:idOfOrg) and ";
             }
             Query query = session.createSQLQuery(
@@ -497,15 +617,16 @@ public class MonitoringOfReportService {
         return result;
     }
 
-    public List<ReportItem> buildReportItems(Date startTime, Date endTime, List<Long> idOfOrgList) throws Exception {
+    public List<ReportItem> buildReportItems(Date startTime, Date endTime, List<Long> idOfOrgList,
+            Boolean divideIntoPeriods) throws Exception {
         List<ReportItem> reportItemList = new LinkedList<ReportItem>();
         Map<Long, PeopleData> peopleDataMap = loadPeopleDataForOrgs(idOfOrgList);
-        Map<Long, NumberOfPasses> numberOfPassesMap = generateNumberOfPasses(startTime, endTime, idOfOrgList);
-        Map<Long, NumberOfPreferential> numberOfPreferentialMap = numberOfPreferential(startTime, endTime, idOfOrgList);
-        Map<Long, NumberOfStudentsAndGuardians> numberOfBuffetMap = numberOfBuffet(startTime, endTime, idOfOrgList);
-        Map<Long, NumberOfStudentsAndGuardians> numberOfSubfeedMap = numberOfSubFeed(startTime, endTime, idOfOrgList);
-        Map<Long, NumberOfStudentsAndGuardians> numberOfPaidMap = numberOfPaid(startTime, endTime, idOfOrgList);
-        Map<Long, Long> numberOfpreordersMap = buildNumberOfPreordersMap(startTime, endTime, idOfOrgList);
+        Map<Long, List<NumberOfPasses>> numberOfPassesMap = generateNumberOfPasses(startTime, endTime, idOfOrgList, divideIntoPeriods);
+        Map<Long, List<NumberOfPreferential>> numberOfPreferentialMap = numberOfPreferential(startTime, endTime, idOfOrgList, divideIntoPeriods);
+        Map<Long, List<NumberOfStudentsAndGuardians>> numberOfBuffetMap = numberOfBuffet(startTime, endTime, idOfOrgList, divideIntoPeriods);
+        Map<Long, List<NumberOfStudentsAndGuardians>> numberOfSubfeedMap = numberOfSubFeed(startTime, endTime, idOfOrgList, divideIntoPeriods);
+        Map<Long, List<NumberOfStudentsAndGuardians>> numberOfPaidMap = numberOfPaid(startTime, endTime, idOfOrgList, divideIntoPeriods);
+        Map<Long, List<Long>> numberOfpreordersMap = buildNumberOfPreordersMap(startTime, endTime, idOfOrgList, divideIntoPeriods);
         Session session = null;
         Transaction transaction = null;
         try {
@@ -537,11 +658,22 @@ public class MonitoringOfReportService {
                 reportItem.setPedagogicalComposition(peopleData == null ? "" : String.valueOf(peopleData.getPedagogicalComposition()));
                 reportItem.setOtherEmployees(peopleData == null ? "" : String.valueOf(peopleData.getOther()));
 
-                List<MonitoringOfItem> monitoringOfItemList = getMonitoringOfItems(startTime,
+                List<MonitoringOfItem> monitoringOfItemListFirst = getMonitoringOfItems(startTime,
                         idOfOrg, numberOfPassesMap, numberOfPreferentialMap, numberOfBuffetMap,
-                        numberOfSubfeedMap, numberOfPaidMap, numberOfpreordersMap);
+                        numberOfSubfeedMap, numberOfPaidMap, numberOfpreordersMap, 1);
 
-                reportItem.setMonitoringOfItems(monitoringOfItemList);
+                List<MonitoringOfItem> monitoringOfItemListSecond = getMonitoringOfItems(startTime,
+                        idOfOrg, numberOfPassesMap, numberOfPreferentialMap, numberOfBuffetMap,
+                        numberOfSubfeedMap, numberOfPaidMap, numberOfpreordersMap, 2);
+
+                List<MonitoringOfItem> monitoringOfItemListThrid = getMonitoringOfItems(startTime,
+                        idOfOrg, numberOfPassesMap, numberOfPreferentialMap, numberOfBuffetMap,
+                        numberOfSubfeedMap, numberOfPaidMap, numberOfpreordersMap, 3);
+
+                reportItem.setMonitoringOfItemsFirst(monitoringOfItemListFirst);
+                reportItem.setMonitoringOfItemsSecond(monitoringOfItemListSecond);
+                reportItem.setMonitoringOfItemsThrid(monitoringOfItemListThrid);
+
                 reportItemList.add(reportItem);
             }
             transaction.commit();
@@ -569,10 +701,11 @@ public class MonitoringOfReportService {
         return reportItemList;
     }
 
-    private Map<Long, Long> buildNumberOfPreordersMap(Date startTime, Date endTime, List<Long> idOfOrgList) {
+    private Map<Long, List<Long>> buildNumberOfPreordersMap(Date startTime, Date endTime,
+            List<Long> idOfOrgList, Boolean divideIntoPeriods) {
         Session session = null;
         Transaction transaction = null;
-        Map<Long, Long> result = new HashMap<Long, Long>();
+        Map<Long, List<Long>> result = new HashMap<Long, List<Long>>();
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
@@ -599,9 +732,39 @@ public class MonitoringOfReportService {
             query.setParameter("endDate", endTime.getTime());
             List<Object[]> list = query.list();
 
-            for (Object[] obj : list) {
-                Long idOfUniqueClient = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(obj[1]);
-                result.put(DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(obj[0]), idOfUniqueClient);
+            if(divideIntoPeriods){
+                Long idOfCurrentOrg = -1L;
+                Date currentDay = startTime;
+                Date limitDate = CalendarUtils.addOneDay(endTime);
+                List<Long> uniqueClients = new LinkedList<Long>();
+                for (Object[] row : list) {
+                    Date dateFromRow = QUERY_DATE_FORMAT.parse((String)row[4]);
+                    if (idOfCurrentOrg.equals(-1L) || !idOfCurrentOrg.equals(row[0])) {
+                        result.put(idOfCurrentOrg, uniqueClients);
+                        idOfCurrentOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
+                        uniqueClients = new LinkedList<Long>();
+                        currentDay = startTime;
+                    }
+                    while (!CalendarUtils.isCurrentDay(currentDay, limitDate)) {
+                        if (!CalendarUtils.isCurrentDay(currentDay, dateFromRow)) {
+                            Long numberOfPreferential = 0L;
+                            uniqueClients.add(numberOfPreferential);
+                            currentDay = CalendarUtils.addOneDay(currentDay);
+                        } else if (CalendarUtils.isWorkDateWithoutParser(true, dateFromRow)) {
+                            Long numberOfPreferential = ((BigInteger) row[1]).longValue();
+                            uniqueClients.add(numberOfPreferential);
+                            currentDay = CalendarUtils.addOneDay(currentDay);
+                            break;
+                        }
+                    }
+                }
+            } else {
+                for (Object[] obj : list) {
+                    Long idOfUniqueClient = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(obj[1]);
+                    List<Long> uniqueClients = new ArrayList<Long>(1);
+                    uniqueClients.add(idOfUniqueClient);
+                    result.put(DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(obj[0]), uniqueClients);
+                }
             }
             transaction.commit();
             transaction = null;
@@ -632,7 +795,9 @@ public class MonitoringOfReportService {
         private String pedagogicalComposition;
         private String otherEmployees;
 
-        private List<MonitoringOfItem> monitoringOfItems;
+        private List<MonitoringOfItem> monitoringOfItemsFirst;
+        private List<MonitoringOfItem> monitoringOfItemsSecond;
+        private List<MonitoringOfItem> monitoringOfItemsThrid;
 
         public ReportItem() {
         }
@@ -640,7 +805,7 @@ public class MonitoringOfReportService {
         public ReportItem(String orgNum, String shortName, String address, String idOfOrg, String code, String district,
                 String typeOfBuilding, String introductionQueue, String orgStatus, String studentsInDatabase,
                 String studentsWithMaps, String parents, String pedagogicalComposition, String otherEmployees,
-                List<MonitoringOfItem> monitoringOfItems) {
+                List<MonitoringOfItem> monitoringOfItemsFirst) {
             this.orgNum = orgNum;
             this.shortName = shortName;
             this.address = address;
@@ -655,7 +820,7 @@ public class MonitoringOfReportService {
             this.parents = parents;
             this.pedagogicalComposition = pedagogicalComposition;
             this.otherEmployees = otherEmployees;
-            this.monitoringOfItems = monitoringOfItems;
+            this.monitoringOfItemsFirst = monitoringOfItemsFirst;
         }
 
         public String getOrgNum() {
@@ -770,12 +935,12 @@ public class MonitoringOfReportService {
             this.otherEmployees = otherEmployees;
         }
 
-        public List<MonitoringOfItem> getMonitoringOfItems() {
-            return monitoringOfItems;
+        public List<MonitoringOfItem> getMonitoringOfItemsFirst() {
+            return monitoringOfItemsFirst;
         }
 
-        public void setMonitoringOfItems(List<MonitoringOfItem> monitoringOfItems) {
-            this.monitoringOfItems = monitoringOfItems;
+        public void setMonitoringOfItemsFirst(List<MonitoringOfItem> monitoringOfItemsFirst) {
+            this.monitoringOfItemsFirst = monitoringOfItemsFirst;
         }
 
         public String getTypeOfBuildingInternal() {
@@ -784,6 +949,22 @@ public class MonitoringOfReportService {
 
         public void setTypeOfBuildingInternal(String typeOfBuildingInternal) {
             this.typeOfBuildingInternal = typeOfBuildingInternal;
+        }
+
+        public List<MonitoringOfItem> getMonitoringOfItemsSecond() {
+            return monitoringOfItemsSecond;
+        }
+
+        public void setMonitoringOfItemsSecond(List<MonitoringOfItem> monitoringOfItemsSecond) {
+            this.monitoringOfItemsSecond = monitoringOfItemsSecond;
+        }
+
+        public List<MonitoringOfItem> getMonitoringOfItemsThrid() {
+            return monitoringOfItemsThrid;
+        }
+
+        public void setMonitoringOfItemsThrid(List<MonitoringOfItem> monitoringOfItemsThrid) {
+            this.monitoringOfItemsThrid = monitoringOfItemsThrid;
         }
     }
 
@@ -1024,6 +1205,15 @@ public class MonitoringOfReportService {
             this.uniqueGuardians = uniqueGuardians;
         }
 
+        public NumberOfPasses(){
+            students = 0L;
+            uniqueStudents = 0L;
+            employees = 0L;
+            uniqueEmployees = 0L;
+            guardians = 0L;
+            uniqueGuardians = 0L;
+        }
+
         public Long getStudents() {
             return students;
         }
@@ -1084,6 +1274,12 @@ public class MonitoringOfReportService {
             this.reserve = reserve;
         }
 
+        public NumberOfPreferential(){
+            friendlyOrg = 0L;
+            othersOrg = 0L;
+            reserve = 0L;
+        }
+
         public Long getFriendlyOrg() {
             return friendlyOrg;
         }
@@ -1116,6 +1312,11 @@ public class MonitoringOfReportService {
         public NumberOfStudentsAndGuardians(Long students, Long guardians) {
             this.students = students;
             this.guardians = guardians;
+        }
+
+        public NumberOfStudentsAndGuardians(){
+            students = 0L;
+            guardians = 0L;
         }
 
         public Long getStudents() {
