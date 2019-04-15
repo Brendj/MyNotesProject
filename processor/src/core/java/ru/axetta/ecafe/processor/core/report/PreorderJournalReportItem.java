@@ -24,6 +24,7 @@ public class PreorderJournalReportItem {
     private Date createdDate;
     private Date lastUpdate;
     private String mobile;
+    private Long usedSum;
 
     public PreorderJournalReportItem() {
 
@@ -53,6 +54,7 @@ public class PreorderJournalReportItem {
         this.createdDate = preorderComplex.getCreatedDate();
         this.lastUpdate = preorderComplex.getLastUpdate();
         this.mobile = preorderComplex.getMobile();
+        if (preorderComplex.getUsedSum() != null && preorderComplex.getUsedSum() > 0) this.usedSum = preorderComplex.getUsedSum();
     }
 
     public Integer getNumber() {
@@ -157,5 +159,13 @@ public class PreorderJournalReportItem {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public Long getUsedSum() {
+        return usedSum;
+    }
+
+    public void setUsedSum(Long usedSum) {
+        this.usedSum = usedSum;
     }
 }

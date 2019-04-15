@@ -126,6 +126,7 @@ the signature crypto configuration.  See SignaturePropRefId. -->
             implementor='ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomControllerWS'>
         <jaxws:inInterceptors>
             <bean class="ru.axetta.ecafe.processor.web.util.RemoveSecurityHeaderSoapInterceptor"/>
+            <bean class="ru.axetta.ecafe.processor.web.util.ClientRoomControllerLoggingInterceptor"/>
         </jaxws:inInterceptors>
     </jaxws:endpoint>
     <jaxws:endpoint

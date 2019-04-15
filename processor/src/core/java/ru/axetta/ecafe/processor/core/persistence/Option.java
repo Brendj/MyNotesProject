@@ -143,7 +143,9 @@ public class Option {
             OPTION_EXTERNAL_SYSTEM_OPERATION_TYPES  = 100092,
             OPTION_LAST_ORG_CHANGE_PROCESS = 100093,
             OPTION_REVISE_DATA_SOURCE = 100095,
-            OPTION_REVISE_DELTA = 100096;
+            OPTION_REVISE_DELTA = 100096,
+            OPTION_LOG_INFOSERVICE = 100097,
+            OPTION_METHODS_INFOSERVICE = 100098;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -264,7 +266,9 @@ public class Option {
             OPTION_EXTERNAL_SYSTEM_OPERATION_TYPES, "",
             OPTION_LAST_ORG_CHANGE_PROCESS, "2777058000000",
             OPTION_REVISE_DATA_SOURCE, "1",
-            OPTION_REVISE_DELTA, "24"
+            OPTION_REVISE_DELTA, "24",
+            OPTION_LOG_INFOSERVICE, "0",
+            OPTION_METHODS_INFOSERVICE, "",
 
 };
 

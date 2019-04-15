@@ -11,7 +11,6 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.libriary.Li
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodComplaintBook;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Prohibition;
 import ru.axetta.ecafe.processor.core.persistence.questionary.ClientAnswerByQuestionary;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 
 import org.apache.commons.codec.binary.Base64;
@@ -455,15 +454,6 @@ public class Client {
     }
 
     public void setOrg(Org org) throws Exception {
-        //todo перенести эту логику по смене ОО в отдельный сервис на основе просмотра по расписанию таблицы истории перемещений
-        if (this.org != null && org != null && !this.org.equals(org)) {
-            RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().deletePreordersByClient(this);
-        }
-        /*if (this.org != null && org != null && !org.equals(this.org) && !this.org.getDefaultSupplier().equals(org.getDefaultSupplier())) {
-               RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).holdClientBalance(this, null, this.org, org,
-                       this.org.getDefaultSupplier(), org.getDefaultSupplier(), ClientBalanceHoldCreateStatus.CHANGE_SUPPLIER,
-                       ClientBalanceHoldRequestStatus.CREATED, null);
-        }*/
         this.org = org;
     }
 

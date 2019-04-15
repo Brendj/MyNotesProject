@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreorderJournalReport" pageWidth="1234" pageHeight="100000" columnWidth="1194" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8c825af0-a087-4437-8ca9-1415cdd91f95">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="PreorderJournalReport" pageWidth="1301" pageHeight="100000" columnWidth="1261" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8c825af0-a087-4437-8ca9-1415cdd91f95">
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="249"/>
+	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="startDate" class="java.util.Date" isForPrompting="false"/>
 	<parameter name="endDate" class="java.util.Date" isForPrompting="false"/>
@@ -18,6 +18,7 @@
 	<field name="createdDate" class="java.util.Date"/>
 	<field name="lastUpdate" class="java.util.Date"/>
 	<field name="mobile" class="java.lang.String"/>
+	<field name="usedSum" class="java.lang.Long"/>
 	<variable name="startDate" class="java.lang.String" calculation="First">
 		<variableExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></variableExpression>
 		<initialValueExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($P{startDate})]]></initialValueExpression>
@@ -130,7 +131,7 @@
 				<textFieldExpression><![CDATA["Количество"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="668" y="0" width="52" height="34" uuid="dbfcf830-efe6-4038-a20c-4abf83deb834"/>
+				<reportElement x="735" y="0" width="52" height="34" uuid="dbfcf830-efe6-4038-a20c-4abf83deb834"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -142,7 +143,7 @@
 				<textFieldExpression><![CDATA["Удалено"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="720" y="0" width="100" height="34" uuid="c3267515-30ab-4e1c-80ad-1af2dbeffa0d"/>
+				<reportElement x="787" y="0" width="100" height="34" uuid="c3267515-30ab-4e1c-80ad-1af2dbeffa0d"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -154,7 +155,7 @@
 				<textFieldExpression><![CDATA["Причина удаления"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="820" y="0" width="51" height="34" uuid="637aaa27-33b8-4769-bb8e-69d0de516735"/>
+				<reportElement x="887" y="0" width="51" height="34" uuid="637aaa27-33b8-4769-bb8e-69d0de516735"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -166,7 +167,7 @@
 				<textFieldExpression><![CDATA["Регуляр"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="871" y="0" width="83" height="34" uuid="ece548df-cbd2-4eb9-9024-d8339e47bd6d"/>
+				<reportElement x="938" y="0" width="83" height="34" uuid="ece548df-cbd2-4eb9-9024-d8339e47bd6d"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -178,7 +179,7 @@
 				<textFieldExpression><![CDATA["Дата создания"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="954" y="0" width="96" height="34" uuid="32d19d6b-b2bf-4246-a8b5-913df2c8a99e"/>
+				<reportElement x="1021" y="0" width="96" height="34" uuid="32d19d6b-b2bf-4246-a8b5-913df2c8a99e"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -190,7 +191,7 @@
 				<textFieldExpression><![CDATA["Дата обновления"]]></textFieldExpression>
 			</textField>
 			<textField>
-				<reportElement x="1050" y="0" width="143" height="34" uuid="5f2a64b2-51ec-4e35-a322-c2085b857b15"/>
+				<reportElement x="1117" y="0" width="143" height="34" uuid="5f2a64b2-51ec-4e35-a322-c2085b857b15"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -200,6 +201,18 @@
 				</box>
 				<textElement textAlignment="Center"/>
 				<textFieldExpression><![CDATA["Номер представителя, внесшего изменения"]]></textFieldExpression>
+			</textField>
+			<textField>
+				<reportElement x="668" y="0" width="67" height="34" uuid="8e63998a-a9fc-4fe5-9eaa-303022071603"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Center"/>
+				<textFieldExpression><![CDATA["Оплата"]]></textFieldExpression>
 			</textField>
 		</band>
 	</columnHeader>
@@ -284,7 +297,7 @@
 				<textFieldExpression><![CDATA[$F{amount}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="668" y="0" width="52" height="20" uuid="9edc7108-28ea-4ef0-818a-4fefc03fbe42"/>
+				<reportElement stretchType="RelativeToBandHeight" x="735" y="0" width="52" height="20" uuid="9edc7108-28ea-4ef0-818a-4fefc03fbe42"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -295,7 +308,7 @@
 				<textFieldExpression><![CDATA[$F{isDeleted}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="720" y="0" width="100" height="20" uuid="34b92c02-97ee-474b-8e8a-a45381734755"/>
+				<reportElement stretchType="RelativeToBandHeight" x="787" y="0" width="100" height="20" uuid="34b92c02-97ee-474b-8e8a-a45381734755"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -306,7 +319,7 @@
 				<textFieldExpression><![CDATA[$F{deleteReason}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="820" y="0" width="51" height="20" uuid="c2adc075-e422-474f-af03-61f4e65f6a53"/>
+				<reportElement stretchType="RelativeToBandHeight" x="887" y="0" width="51" height="20" uuid="c2adc075-e422-474f-af03-61f4e65f6a53"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -317,7 +330,7 @@
 				<textFieldExpression><![CDATA[$F{isRegular}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="871" y="0" width="83" height="20" uuid="6ca57964-1cb8-431c-996e-9fe85053e059"/>
+				<reportElement stretchType="RelativeToBandHeight" x="938" y="0" width="83" height="20" uuid="6ca57964-1cb8-431c-996e-9fe85053e059"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -328,7 +341,7 @@
 				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($F{createdDate})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="954" y="0" width="96" height="20" uuid="1db7e32c-02de-4c95-ad54-6a71e450bc92"/>
+				<reportElement stretchType="RelativeToBandHeight" x="1021" y="0" width="96" height="20" uuid="1db7e32c-02de-4c95-ad54-6a71e450bc92"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -339,7 +352,7 @@
 				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy").format($F{lastUpdate})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement stretchType="RelativeToBandHeight" x="1050" y="0" width="143" height="20" uuid="45d9996f-2c04-4eec-980a-812b31c733e0"/>
+				<reportElement stretchType="RelativeToBandHeight" x="1117" y="0" width="143" height="20" uuid="45d9996f-2c04-4eec-980a-812b31c733e0"/>
 				<box>
 					<pen lineWidth="1.0"/>
 					<topPen lineWidth="1.0"/>
@@ -348,6 +361,18 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textFieldExpression><![CDATA[$F{mobile}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement stretchType="RelativeToBandHeight" x="668" y="0" width="67" height="20" uuid="2cedc232-5fd7-49eb-ae04-4662a7108b52"/>
+				<box>
+					<pen lineWidth="1.0"/>
+					<topPen lineWidth="1.0"/>
+					<leftPen lineWidth="1.0"/>
+					<bottomPen lineWidth="1.0"/>
+					<rightPen lineWidth="1.0"/>
+				</box>
+				<textElement textAlignment="Right"/>
+				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{usedSum}).movePointLeft(2)]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
