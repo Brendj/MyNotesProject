@@ -321,7 +321,6 @@ public class MonitoringOfReportService {
                                 + "        (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents)) "
                                 + "           AND (cfo.CreatedDate BETWEEN :startTime AND :endTime)) "
                                 + "        THEN cfo.idofclient END)) AS number_of_subfeed_guardians_monday ";
-
             String orgCondition = "";
             if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
                 orgCondition = " cfo.idoforg in (:idOfOrgs) and ";
@@ -403,7 +402,8 @@ public class MonitoringOfReportService {
                     + "LEFT OUTER JOIN CF_Orgs org ON cfo.IdOfOrg = org.IdOfOrg "
                     + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient "
                     + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
-                    + "WHERE cfod.State = :detailedStateCommited AND "
+                    + "LEFT JOIN cf_preorder_linkod pl on cfo.idoforder = pl.idoforder and cfo.idoforg = pl.idoforg "
+                    + "WHERE cfod.State = :detailedStateCommited AND pl.idoforder IS NULL AND"
                     + orgCondition
                     + " (cfo.CreatedDate BETWEEN :startTime AND :endTime) "
                     + "AND cfod.MenuType >= :minType AND cfod.MenuType <= :maxType AND ((g.idofclientgroup < :employees) "
@@ -525,6 +525,7 @@ public class MonitoringOfReportService {
                 reportItem.setCode(String.valueOf(org.getUniqueAddressId()));
                 reportItem.setDistrict(org.getDistrict());
                 reportItem.setTypeOfBuilding(org.getType().getShortType());
+                reportItem.setTypeOfBuildingInternal(org.getTypeInitial().getShortType());
                 reportItem.setIntroductionQueue(org.getIntroductionQueue());
                 reportItem.setOrgStatus(org.stateString());
 
@@ -622,6 +623,7 @@ public class MonitoringOfReportService {
         private String code;
         private String district;
         private String typeOfBuilding;
+        private String typeOfBuildingInternal;
         private String introductionQueue;
         private String orgStatus;
         private String studentsInDatabase;
@@ -774,6 +776,14 @@ public class MonitoringOfReportService {
 
         public void setMonitoringOfItems(List<MonitoringOfItem> monitoringOfItems) {
             this.monitoringOfItems = monitoringOfItems;
+        }
+
+        public String getTypeOfBuildingInternal() {
+            return typeOfBuildingInternal;
+        }
+
+        public void setTypeOfBuildingInternal(String typeOfBuildingInternal) {
+            this.typeOfBuildingInternal = typeOfBuildingInternal;
         }
     }
 
