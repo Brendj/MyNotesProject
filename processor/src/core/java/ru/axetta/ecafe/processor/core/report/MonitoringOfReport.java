@@ -87,9 +87,9 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
                 parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
             } else if(selectedPeriod.equals(FOR_THREE_DAYS)){
                 Date secondDate = CalendarUtils.calculateNextWorkDateWithoutParser(true,startTime);
-                parameterMap.put("firstDate", CalendarUtils.dateShortToStringFullYear(endTime));
+                parameterMap.put("firstDate", CalendarUtils.dateShortToStringFullYear(startTime));
                 parameterMap.put("secondDate", CalendarUtils.dateShortToStringFullYear(secondDate));
-                parameterMap.put("thridDate", CalendarUtils.dateShortToStringFullYear(startTime));
+                parameterMap.put("thridDate", CalendarUtils.dateShortToStringFullYear(endTime));
                 divideIntoPeriods = true;
             }
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
@@ -125,7 +125,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
                 endTime = CalendarUtils.addDays(CalendarUtils.startOfDay(new Date()), -1);
                 int dayOfWeek = CalendarUtils.getDayOfWeek(endTime);
                 date = CalendarUtils.startOfDay(
-                        dayOfWeek < Calendar.WEDNESDAY ? CalendarUtils.addDays(endTime, -4) : CalendarUtils.addDays(endTime, -3)
+                        dayOfWeek < Calendar.WEDNESDAY ? CalendarUtils.addDays(endTime, -3) : CalendarUtils.addDays(endTime, -2)
                 );
 
                 selectedPeriod = FOR_THREE_DAYS;
