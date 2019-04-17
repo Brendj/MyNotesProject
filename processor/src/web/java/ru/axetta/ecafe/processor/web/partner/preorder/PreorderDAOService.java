@@ -843,6 +843,7 @@ public class PreorderDAOService {
         Date currentDate = new Date();
         if (currentDate.before(regularPreorder.getEndDate())) return;
         regularPreorder.setState(RegularPreorderState.CHANGE_BY_SERVICE);
+        regularPreorder.setDeletedState(true);
         em.merge(regularPreorder);
     }
 
