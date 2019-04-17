@@ -729,7 +729,9 @@ public class CalendarUtils {
     }
 
     public static Boolean isCurrentDay(Date targetDay, Date currentDay){
-        return betweenOrEqualDate(targetDay, startOfDay(currentDay), endOfDay(currentDay));
+        Date beginCurrentDay = startOfDay(currentDay);
+        Date endOfCurrentDay = endOfDay(currentDay);
+        return beginCurrentDay.getTime() <= targetDay.getTime() && targetDay.getTime() <= endOfCurrentDay.getTime();
     }
 
     public static boolean isWorkDateStringByFormat(String currentDate, String format) throws Exception{
