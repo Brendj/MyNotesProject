@@ -368,9 +368,10 @@ public class Processor implements SyncProcessor {
         timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSyncPaymentRegistry", timeForDelta);
 
         // Process ClientParamRegistry
+        List<Long> clientsWithWrongVersion = new ArrayList<Long>();
         try {
             processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), request.getClientParamRegistry(),
-                    errorClientIds);
+                    errorClientIds, clientsWithWrongVersion);
         } catch (Exception e) {
             String message = String
                     .format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg());
@@ -424,7 +425,7 @@ public class Processor implements SyncProcessor {
         try {
             saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.CLIENT_REGISTRY);
             clientRegistry = processSyncClientRegistry(request.getIdOfOrg(), request.getClientRegistryRequest(),
-                    errorClientIds);
+                    errorClientIds, clientsWithWrongVersion);
         } catch (Exception e) {
             String message = String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
@@ -882,6 +883,7 @@ public class Processor implements SyncProcessor {
         SyncHistory syncHistory = null; // регистируются и заполняются только для полной синхронизации
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
         List<Long> errorClientIds = new ArrayList<Long>();
+        List<Long> clientsWithWrongVersion = new ArrayList<Long>();
 
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
         // Register sync history
@@ -904,7 +906,7 @@ public class Processor implements SyncProcessor {
         boolean wasErrorProcessedAccInc = fullProcessingAccIncRegistryOrAccIncUpdate(request, responseSections);
 
         // Process ClientParamRegistry
-        fullProcessingClientParamsRegistry(request, syncHistory, errorClientIds);
+        fullProcessingClientParamsRegistry(request, syncHistory, errorClientIds, clientsWithWrongVersion);
 
         // Process ClientGuardianRequest
         fullProcessingClientGuardians(request, syncHistory, responseSections);
@@ -913,7 +915,7 @@ public class Processor implements SyncProcessor {
         fullProcessingOrgStructure(request, syncHistory, responseSections);
 
         // Build client registry
-        fullProcessingClientsRegistry(request, syncHistory, responseSections, errorClientIds);
+        fullProcessingClientsRegistry(request, syncHistory, responseSections, errorClientIds, clientsWithWrongVersion);
 
         // базовая корзина (товарный учет)
         fullProcessingGoodsBasicBaskerData(request, syncHistory, responseSections);
@@ -1568,13 +1570,13 @@ public class Processor implements SyncProcessor {
     }
 
     private void fullProcessingClientsRegistry(SyncRequest request, SyncHistory syncHistory,
-            List<AbstractToElement> responseSections, List<Long> errorClientIds) {
+            List<AbstractToElement> responseSections, List<Long> errorClientIds, List<Long> clientsWithWrongVersion) {
         try {
             SyncRequest.ClientRegistryRequest clientRegistryRequest = request.getClientRegistryRequest();
             if (clientRegistryRequest != null) {
                 saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.CLIENT_REGISTRY);
                 SyncResponse.ClientRegistry clientRegistry = processSyncClientRegistry(request.getIdOfOrg(),
-                        clientRegistryRequest, errorClientIds);
+                        clientRegistryRequest, errorClientIds, clientsWithWrongVersion);
                 addToResponseSections(clientRegistry, responseSections);
             }
         } catch (Exception e) {
@@ -1621,11 +1623,11 @@ public class Processor implements SyncProcessor {
     }
 
     private void fullProcessingClientParamsRegistry(SyncRequest request, SyncHistory syncHistory,
-            List<Long> errorClientIds) {
+            List<Long> errorClientIds, List<Long> clientsWithWrongVersion) {
         try {
             SyncRequest.ClientParamRegistry clientParamRegistry = request.getClientParamRegistry();
             if (clientParamRegistry != null) {
-                processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), clientParamRegistry, errorClientIds);
+                processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), clientParamRegistry, errorClientIds, clientsWithWrongVersion);
             }
         } catch (Exception e) {
             String message = String
@@ -2328,10 +2330,10 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
 
         }
-
+        List<Long> clientsWithWrongVersion = new ArrayList<Long>();
         try {
             processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry(),
-                    errorClientIds);
+                    errorClientIds, clientsWithWrongVersion);
         } catch (Exception e) {
             logger.error(String.format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
@@ -2340,7 +2342,7 @@ public class Processor implements SyncProcessor {
         try {
             saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.CLIENT_REGISTRY);
             clientRegistry = processSyncClientRegistry(request.getIdOfOrg(), request.getClientRegistryRequest(),
-                    errorClientIds);
+                    errorClientIds, clientsWithWrongVersion);
         } catch (Exception e) {
             logger.error(String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
@@ -3136,7 +3138,7 @@ public class Processor implements SyncProcessor {
         Transaction persistenceTransaction = null;
         ClientGuardianData clientGuardianData = null;
         try {
-            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             ClientGuardianDataProcessor processor = new ClientGuardianDataProcessor(persistenceSession, idOfOrg,
                     maxVersion);
@@ -3657,7 +3659,7 @@ public class Processor implements SyncProcessor {
     }
 
     private void processSyncClientParamRegistry(SyncHistory syncHistory, Long idOfOrg,
-            SyncRequest.ClientParamRegistry clientParamRegistry, List<Long> errorClientIds) throws Exception {
+            SyncRequest.ClientParamRegistry clientParamRegistry, List<Long> errorClientIds, List<Long> clientsWithWrongVersion) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -3705,7 +3707,8 @@ public class Processor implements SyncProcessor {
                 }*/
                 try {
                     //processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem, orgMap, version);
-                    processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds, idOfOrg, allocatedClients, orgSet);
+                    processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds, idOfOrg, allocatedClients,
+                            orgSet, clientsWithWrongVersion);
                 } catch (Exception e) {
                     String message = String.format("Failed to process clientParamItem == %s", idOfOrg);
                     if (syncHistory != null) {
@@ -3735,7 +3738,7 @@ public class Processor implements SyncProcessor {
 
     private void processSyncClientParamRegistryItem(SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
             HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds, Long idOfOrg,
-            List<Long> allocatedClients, Set<Org> orgSet) throws Exception {
+            List<Long> allocatedClients, Set<Org> orgSet, List<Long> clientsWithWrongVersion) throws Exception {
         boolean ignoreNotifyFlags = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -3745,6 +3748,7 @@ public class Processor implements SyncProcessor {
 
             Client client = findClient(persistenceSession, clientParamItem.getIdOfClient());
             if (clientParamItem.getVersion() != null && clientParamItem.getVersion() < client.getClientRegistryVersion()) {
+                clientsWithWrongVersion.add(client.getIdOfClient());
                 return;
             }
 
@@ -4388,7 +4392,7 @@ public class Processor implements SyncProcessor {
     }
 
     private SyncResponse.ClientRegistry processSyncClientRegistry(Long idOfOrg,
-            SyncRequest.ClientRegistryRequest clientRegistryRequest, List<Long> errorClientIds) throws Exception {
+            SyncRequest.ClientRegistryRequest clientRegistryRequest, List<Long> errorClientIds, List<Long> clientsWithWrongVersion) throws Exception {
         SyncResponse.ClientRegistry clientRegistry = new SyncResponse.ClientRegistry();
         List<Client> clients;
         Org organization;
@@ -4409,6 +4413,11 @@ public class Processor implements SyncProcessor {
             // Добавляем временных посетителей (мигрантов)
             List<Client> migrants = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
             clients.addAll(migrants);
+
+            for (Long idOfClientWithWrongVersion : clientsWithWrongVersion) {
+                Client c = (Client)persistenceSession.load(Client.class, idOfClientWithWrongVersion);
+                if (!clients.contains(c)) clients.add(c);
+            }
 
             for (Client client : clients) {
                 if (client.getOrg().getIdOfOrg().equals(idOfOrg)) {
@@ -4636,6 +4645,7 @@ public class Processor implements SyncProcessor {
             Transaction persistenceTransaction = null;
             try {
                 persistenceSession = persistenceSessionFactory.openSession();
+                persistenceSession.setFlushMode(FlushMode.COMMIT);
 
                 Org organization = getOrgReference(persistenceSession, idOfOrg);
 
@@ -5371,7 +5381,7 @@ public class Processor implements SyncProcessor {
         Transaction persistenceTransaction = null;
         ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = new ResCategoriesDiscountsAndRules();
         try {
-            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             boolean isManyOrgs = categoriesAndDiscountsRequest != null && categoriesAndDiscountsRequest.isManyOrgs();
             resCategoriesDiscountsAndRules.fillData(persistenceSession, idOfOrg, isManyOrgs, categoriesAndDiscountsRequest.getVersionDSZN());

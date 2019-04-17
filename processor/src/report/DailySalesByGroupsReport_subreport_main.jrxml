@@ -61,8 +61,11 @@
 			</textField>
 		</band>
 		<band height="20">
+			<printWhenExpression><![CDATA[!$F{dishesList}.isEmpty()]]></printWhenExpression>
 			<subreport>
-				<reportElement uuid="99e0c657-c95f-453b-8bee-4fec9b95cc8d" stretchType="RelativeToBandHeight" x="0" y="0" width="680" height="20"/>
+				<reportElement uuid="99e0c657-c95f-453b-8bee-4fec9b95cc8d" stretchType="RelativeToBandHeight" x="0" y="0" width="680" height="20">
+					<printWhenExpression><![CDATA[!$F{dishesList}.isEmpty()]]></printWhenExpression>
+				</reportElement>
 				<subreportParameter name="SUBREPORT_DIR">
 					<subreportParameterExpression><![CDATA[$P{SUBREPORT_DIR}]]></subreportParameterExpression>
 				</subreportParameter>
