@@ -45,9 +45,6 @@ public class ClientMigrationHistoryService {
         Date nextDate = new Date();
         int counter = 0;
         for (ClientMigration clientMigration : list) {
-            if (clientMigration.getOrg() != null && clientMigration.getOldOrg() != null && ! clientMigration.getOrg().equals(clientMigration.getOldOrg())) {
-                //todo смена ОО, нужно удалить предзаказы (и убрать обработку в сеттере setOrg класса Client)
-            }
             if (clientMigration.getOldContragent() != null && clientMigration.getNewContragent() != null
                     && !clientMigration.getOldContragent().equals(clientMigration.getNewContragent())) {
                 //меняется контрагент, нужно заблокировать баланс

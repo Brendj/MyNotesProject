@@ -996,9 +996,9 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             List mealsPayTotals;
 
             Query payComplexQueryTotal = session.createSQLQuery(
-                    "SELECT CASE WHEN pc.modeofadd = 2 THEN SUM(od.Qty) "
+                    "SELECT CASE WHEN pc.modeofadd = 2 or pc.idofpreordercomplex is null THEN SUM(od.Qty) "
                             + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.amount) ELSE 0 END AS amount, "
-                            + "CASE WHEN pc.modeofadd = 2 THEN SUM(od.Qty * od.RPrice) "
+                            + "CASE WHEN pc.modeofadd = 2 or pc.idofpreordercomplex is null THEN SUM(od.Qty * od.RPrice) "
                             + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.amount * pmd.menudetailprice) ELSE 0 END AS price, "
                             + "CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) AND pl.idofpreorderlinkod IS NULL THEN 'cash' "
                             + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) AND pl.idofpreorderlinkod IS NULL THEN 'card' "
@@ -1016,7 +1016,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                             + "AND (od.rPrice > 0) AND (o.CreatedDate >= :startTime AND o.CreatedDate <= :endTime) "
                             + "AND o.state = 0 AND od.state = 0 "
                             + "GROUP BY od.MenuType, od.RPrice, od.menuDetailName, od.menuDetailName, od.discount, od.socdiscount, "
-                            + "o.grantsum, o.sumbycard, o.sumbycash, pl.idofpreorderlinkod, pc.modeofadd");
+                            + "o.grantsum, o.sumbycard, o.sumbycash, pl.idofpreorderlinkod, pc.modeofadd, pc.idofpreordercomplex");
             payComplexQueryTotal.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
             payComplexQueryTotal.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
             payComplexQueryTotal.setParameter("startTime", startTime.getTime());
@@ -1191,7 +1191,31 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                     RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath());
             addPaymentTypeTotalValuesToReportParameters(parameterMap, totalDataRows);
 
-            return new JRBeanCollectionDataSource(mealRowHashMap.values());
+            List<MealRow> mealRowCollection = new ArrayList<MealRow>(mealRowHashMap.values());
+            Collections.sort(mealRowCollection, new Comparator<MealRow>() {
+                @Override
+                public int compare(MealRow obj1, MealRow obj2) {
+                    if (obj1.getOriginName().toLowerCase().startsWith("платное") && obj2.getOriginName().toLowerCase().startsWith("платное")) {
+                        return obj1.getOriginName().compareTo(obj2.getOriginName());
+                    } else if (obj1.getOriginName().toLowerCase().startsWith("платное") && !obj2.getOriginName().toLowerCase().startsWith("платное")) {
+                        return -1;
+                    } else if (!obj1.getOriginName().toLowerCase().startsWith("платное") && obj2.getOriginName().toLowerCase().startsWith("платное")) {
+                        return 1;
+                    }
+
+                    if (obj1.getOriginName().toLowerCase().startsWith("бесплатное") && obj2.getOriginName().toLowerCase().startsWith("бесплатное")) {
+                        return obj1.getOriginName().compareTo(obj2.getOriginName());
+                    } else if (obj1.getOriginName().toLowerCase().startsWith("бесплатное") && !obj2.getOriginName().toLowerCase().startsWith("бесплатное")) {
+                        return 1;
+                    } else if (!obj1.getOriginName().toLowerCase().startsWith("бесплатное") && obj2.getOriginName().toLowerCase().startsWith("бесплатное")) {
+                        return -1;
+                    }
+
+                    return obj1.getOriginName().compareTo(obj2.getOriginName());
+                }
+            });
+
+            return new JRBeanCollectionDataSource(mealRowCollection);
         }
 
         private String createOrgAdditionalConditionByOrgList(List<OrgShortItem> orgShortItems) {

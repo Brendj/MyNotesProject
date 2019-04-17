@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="3640" pageHeight="30000" columnWidth="3600" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
-	<property name="ireport.zoom" value="0.5644739300537773"/>
-	<property name="ireport.x" value="1024"/>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="3490" pageHeight="30000" columnWidth="3450" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
+	<property name="ireport.zoom" value="1.0"/>
+	<property name="ireport.x" value="416"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="startDate" class="java.lang.String"/>
 	<parameter name="SUBREPORT_DIR" class="java.lang.String" isForPrompting="false">
@@ -24,10 +24,11 @@
 	<field name="otherEmployees" class="java.lang.String"/>
 	<field name="monitoringOfItems" class="java.util.List"/>
 	<field name="orgStatus" class="java.lang.String"/>
+	<field name="typeOfBuildingInternal" class="java.lang.String"/>
 	<title>
 		<band height="79" splitType="Stretch">
 			<textField>
-				<reportElement uuid="37bb7c01-c576-4bf5-a025-1b8122b7724a" x="0" y="0" width="3600" height="79"/>
+				<reportElement uuid="37bb7c01-c576-4bf5-a025-1b8122b7724a" x="0" y="0" width="3450" height="79"/>
 				<textElement verticalAlignment="Middle">
 					<font size="24" isBold="true"/>
 					<paragraph leftIndent="50"/>
@@ -119,7 +120,7 @@
 				<text><![CDATA[Округ]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="cf3ff105-eb8e-4be8-8542-c7931417622f" stretchType="RelativeToBandHeight" x="1200" y="0" width="150" height="135"/>
+				<reportElement uuid="cf3ff105-eb8e-4be8-8542-c7931417622f" stretchType="RelativeToBandHeight" x="1200" y="0" width="73" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -145,7 +146,7 @@
 				<text><![CDATA[Очередь]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="fad07077-a767-4a5d-a841-3a757544f30b" stretchType="RelativeToBandHeight" x="2000" y="0" width="70" height="135"/>
+				<reportElement uuid="fad07077-a767-4a5d-a841-3a757544f30b" stretchType="RelativeToBandHeight" x="1850" y="0" width="70" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -158,7 +159,7 @@
 				<text><![CDATA[Учащихся в базе]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1bc17b47-f1ea-40c6-882a-99860c874d51" stretchType="RelativeToBandHeight" x="2140" y="0" width="70" height="135"/>
+				<reportElement uuid="1bc17b47-f1ea-40c6-882a-99860c874d51" stretchType="RelativeToBandHeight" x="1990" y="0" width="70" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -171,7 +172,7 @@
 				<text><![CDATA[Родители]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5c374888-f022-4141-849e-b8db9616ae24" stretchType="RelativeToBandHeight" x="2210" y="0" width="110" height="135"/>
+				<reportElement uuid="5c374888-f022-4141-849e-b8db9616ae24" stretchType="RelativeToBandHeight" x="2060" y="0" width="110" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -184,7 +185,7 @@
 				<text><![CDATA[Пед.состав и администрация ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="5f5ee610-a666-46d5-8412-6a09666ecaa7" stretchType="RelativeToBandHeight" x="2320" y="0" width="110" height="135"/>
+				<reportElement uuid="5f5ee610-a666-46d5-8412-6a09666ecaa7" stretchType="RelativeToBandHeight" x="2170" y="0" width="110" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -197,7 +198,7 @@
 				<text><![CDATA[Иные сотрудники ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="01d83222-e4c5-437a-bd0f-cbbaba061618" stretchType="RelativeToBandHeight" x="2070" y="0" width="70" height="135"/>
+				<reportElement uuid="01d83222-e4c5-437a-bd0f-cbbaba061618" stretchType="RelativeToBandHeight" x="1920" y="0" width="70" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -210,7 +211,7 @@
 				<text><![CDATA[Учащихся с картами]]></text>
 			</staticText>
 			<textField>
-				<reportElement uuid="92988e5d-e0ca-4b55-8365-eeed717e4ba6" stretchType="RelativeToBandHeight" x="2430" y="0" width="1170" height="25"/>
+				<reportElement uuid="92988e5d-e0ca-4b55-8365-eeed717e4ba6" stretchType="RelativeToBandHeight" x="2280" y="0" width="1170" height="25"/>
 				<box>
 					<pen lineWidth="0.5"/>
 					<topPen lineWidth="0.5"/>
@@ -224,7 +225,7 @@
 				<textFieldExpression><![CDATA[$P{currentMonth}]]></textFieldExpression>
 			</textField>
 			<staticText>
-				<reportElement uuid="cf3ff105-eb8e-4be8-8542-c7931417622f" stretchType="RelativeToBandHeight" x="1450" y="0" width="550" height="135"/>
+				<reportElement uuid="cf3ff105-eb8e-4be8-8542-c7931417622f" stretchType="RelativeToBandHeight" x="1450" y="0" width="400" height="135"/>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
 					<leftPen lineWidth="0.5"/>
@@ -237,7 +238,7 @@
 				<text><![CDATA[Статус ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="b5d9aa72-d1aa-49a8-b22a-3eb9adbf528a" stretchType="RelativeToBandHeight" x="3063" y="25" width="65" height="110">
+				<reportElement uuid="b5d9aa72-d1aa-49a8-b22a-3eb9adbf528a" stretchType="RelativeToBandHeight" x="2913" y="25" width="65" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -253,7 +254,7 @@
 				<text><![CDATA[Льготное питание временно обучающихся в данной ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="7ec7d0d7-34e9-43b4-9a8c-02ea35849dda" stretchType="RelativeToBandHeight" x="2500" y="25" width="85" height="110">
+				<reportElement uuid="7ec7d0d7-34e9-43b4-9a8c-02ea35849dda" stretchType="RelativeToBandHeight" x="2350" y="25" width="85" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -269,7 +270,7 @@
 				<text><![CDATA[Кол-во уникальных проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="574279d8-b9d4-4de5-bde3-26e65bf10243" stretchType="RelativeToBandHeight" x="3408" y="25" width="66" height="110">
+				<reportElement uuid="574279d8-b9d4-4de5-bde3-26e65bf10243" stretchType="RelativeToBandHeight" x="3258" y="25" width="66" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -285,7 +286,7 @@
 				<text><![CDATA[Предзаказ (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ffce1a2b-243b-4096-b204-3f49081ce0fb" stretchType="RelativeToBandHeight" x="3228" y="25" width="60" height="110">
+				<reportElement uuid="ffce1a2b-243b-4096-b204-3f49081ce0fb" stretchType="RelativeToBandHeight" x="3078" y="25" width="60" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -301,7 +302,7 @@
 				<text><![CDATA[Буфет (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="1e56ad0c-3e32-401e-aa9d-0632e4dc816f" stretchType="RelativeToBandHeight" x="2787" y="25" width="66" height="110">
+				<reportElement uuid="1e56ad0c-3e32-401e-aa9d-0632e4dc816f" stretchType="RelativeToBandHeight" x="2637" y="25" width="66" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -317,7 +318,7 @@
 				<text><![CDATA[Кол-во уникальных проходов (представители обучающихся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="3fdbb6e6-537f-40d3-8579-980c9564885d" stretchType="RelativeToBandHeight" x="2430" y="25" width="70" height="110">
+				<reportElement uuid="3fdbb6e6-537f-40d3-8579-980c9564885d" stretchType="RelativeToBandHeight" x="2280" y="25" width="70" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -333,7 +334,7 @@
 				<text><![CDATA[Кол-во проходов (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="da6b77dc-7e1b-4373-81a4-da5660c3b933" stretchType="RelativeToBandHeight" x="2655" y="25" width="62" height="110">
+				<reportElement uuid="da6b77dc-7e1b-4373-81a4-da5660c3b933" stretchType="RelativeToBandHeight" x="2505" y="25" width="62" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -349,7 +350,7 @@
 				<text><![CDATA[Кол-во уникальных проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="379dbb05-64da-42dc-b9b0-37d6b4e808e1" stretchType="RelativeToBandHeight" x="3288" y="25" width="60" height="110">
+				<reportElement uuid="379dbb05-64da-42dc-b9b0-37d6b4e808e1" stretchType="RelativeToBandHeight" x="3138" y="25" width="60" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -365,7 +366,7 @@
 				<text><![CDATA[Абонементный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="075db1a5-5de7-4594-90a9-3c983ccc594e" stretchType="RelativeToBandHeight" x="3168" y="25" width="60" height="110">
+				<reportElement uuid="075db1a5-5de7-4594-90a9-3c983ccc594e" stretchType="RelativeToBandHeight" x="3018" y="25" width="60" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -381,7 +382,7 @@
 				<text><![CDATA[Буфет (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="160ad977-0948-4993-9826-744f5b2a3033" stretchType="RelativeToBandHeight" x="2993" y="25" width="70" height="110">
+				<reportElement uuid="160ad977-0948-4993-9826-744f5b2a3033" stretchType="RelativeToBandHeight" x="2843" y="25" width="70" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -397,7 +398,7 @@
 				<text><![CDATA[Льготное питание своей ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="82557509-0adc-42d2-928b-ce14c494b9d7" stretchType="RelativeToBandHeight" x="2717" y="25" width="70" height="110">
+				<reportElement uuid="82557509-0adc-42d2-928b-ce14c494b9d7" stretchType="RelativeToBandHeight" x="2567" y="25" width="70" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -413,7 +414,7 @@
 				<text><![CDATA[Кол-во проходов (представители обучающихся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="6f7439bd-b75a-4143-b1f5-66316b95f253" stretchType="RelativeToBandHeight" x="3474" y="25" width="76" height="110">
+				<reportElement uuid="6f7439bd-b75a-4143-b1f5-66316b95f253" stretchType="RelativeToBandHeight" x="3324" y="25" width="76" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -429,7 +430,7 @@
 				<text><![CDATA[Платный план (обучающиеся)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="a27b33aa-316d-4a54-b2ae-498a396be2d1" stretchType="RelativeToBandHeight" x="3348" y="25" width="60" height="110">
+				<reportElement uuid="a27b33aa-316d-4a54-b2ae-498a396be2d1" stretchType="RelativeToBandHeight" x="3198" y="25" width="60" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -445,7 +446,7 @@
 				<text><![CDATA[Абонементный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="f3feb1de-133b-4821-939d-3a2294faac51" stretchType="RelativeToBandHeight" x="3550" y="25" width="50" height="110">
+				<reportElement uuid="f3feb1de-133b-4821-939d-3a2294faac51" stretchType="RelativeToBandHeight" x="3400" y="25" width="50" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -461,7 +462,7 @@
 				<text><![CDATA[Платный план (взрослые)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="9b0affa8-fd1d-445d-8440-3964acbaeb4d" stretchType="RelativeToBandHeight" x="2923" y="25" width="70" height="110">
+				<reportElement uuid="9b0affa8-fd1d-445d-8440-3964acbaeb4d" stretchType="RelativeToBandHeight" x="2773" y="25" width="70" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -477,7 +478,7 @@
 				<text><![CDATA[Льготное питание итого]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ee7fd5af-7452-475e-ab62-7f0f5267058b" stretchType="RelativeToBandHeight" x="2585" y="25" width="70" height="110">
+				<reportElement uuid="ee7fd5af-7452-475e-ab62-7f0f5267058b" stretchType="RelativeToBandHeight" x="2435" y="25" width="70" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -493,7 +494,7 @@
 				<text><![CDATA[Кол-во проходов (сотрудники ОО)]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4d49675f-ddaa-424a-bb74-d15bb8603927" stretchType="RelativeToBandHeight" x="3128" y="25" width="40" height="110">
+				<reportElement uuid="4d49675f-ddaa-424a-bb74-d15bb8603927" stretchType="RelativeToBandHeight" x="2978" y="25" width="40" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -509,7 +510,7 @@
 				<text><![CDATA[Резерв]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c5843f12-850e-4913-a9b4-4b47c7e0e8d5" stretchType="RelativeToBandHeight" x="2853" y="25" width="70" height="110">
+				<reportElement uuid="c5843f12-850e-4913-a9b4-4b47c7e0e8d5" stretchType="RelativeToBandHeight" x="2703" y="25" width="70" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box>
@@ -523,6 +524,19 @@
 					<font size="11" isBold="true"/>
 				</textElement>
 				<text><![CDATA[Общее кол-во проходов]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="cf3ff105-eb8e-4be8-8542-c7931417622f" stretchType="RelativeToBandHeight" x="1273" y="0" width="77" height="135"/>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Тип здания (внедрение)]]></text>
 			</staticText>
 		</band>
 	</columnHeader>
@@ -607,7 +621,7 @@
 				<textFieldExpression><![CDATA[$F{district}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="e4c683b9-f5d3-4b28-b177-f4244cefceb1" stretchType="RelativeToBandHeight" x="1200" y="0" width="150" height="27">
+				<reportElement uuid="e4c683b9-f5d3-4b28-b177-f4244cefceb1" stretchType="RelativeToBandHeight" x="1200" y="0" width="73" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -633,7 +647,7 @@
 				<textFieldExpression><![CDATA[$F{introductionQueue}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="6149493e-e572-450f-b8d5-1517b22e40ff" stretchType="RelativeToBandHeight" x="2000" y="0" width="70" height="27">
+				<reportElement uuid="6149493e-e572-450f-b8d5-1517b22e40ff" stretchType="RelativeToBandHeight" x="1850" y="0" width="70" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -646,7 +660,7 @@
 				<textFieldExpression><![CDATA[$F{studentsInDatabase}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="50f58b25-98d4-4521-b459-7b68ab2aebda" stretchType="RelativeToBandHeight" x="2070" y="0" width="70" height="27">
+				<reportElement uuid="50f58b25-98d4-4521-b459-7b68ab2aebda" stretchType="RelativeToBandHeight" x="1920" y="0" width="70" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -659,7 +673,7 @@
 				<textFieldExpression><![CDATA[$F{studentsWithMaps}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="767f11f3-03dc-46b3-aa02-8d2b32cf4ca7" stretchType="RelativeToBandHeight" x="2140" y="0" width="70" height="27">
+				<reportElement uuid="767f11f3-03dc-46b3-aa02-8d2b32cf4ca7" stretchType="RelativeToBandHeight" x="1990" y="0" width="70" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -672,7 +686,7 @@
 				<textFieldExpression><![CDATA[$F{parents}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="a01fdca4-8901-4440-88ee-7358dc9e6e4c" stretchType="RelativeToBandHeight" x="2210" y="0" width="110" height="27">
+				<reportElement uuid="a01fdca4-8901-4440-88ee-7358dc9e6e4c" stretchType="RelativeToBandHeight" x="2060" y="0" width="110" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -685,7 +699,7 @@
 				<textFieldExpression><![CDATA[$F{pedagogicalComposition}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="2ff0c362-a480-4923-b26e-68722d9a2f2e" stretchType="RelativeToBandHeight" x="2320" y="0" width="110" height="27">
+				<reportElement uuid="2ff0c362-a480-4923-b26e-68722d9a2f2e" stretchType="RelativeToBandHeight" x="2170" y="0" width="110" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -698,14 +712,14 @@
 				<textFieldExpression><![CDATA[$F{otherEmployees}]]></textFieldExpression>
 			</textField>
 			<subreport>
-				<reportElement uuid="99810182-8432-4f01-91ec-f75e42ae953e" stretchType="RelativeToBandHeight" x="2430" y="0" width="1170" height="27">
+				<reportElement uuid="99810182-8432-4f01-91ec-f75e42ae953e" stretchType="RelativeToBandHeight" x="2280" y="0" width="1170" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<dataSourceExpression><![CDATA[new net.sf.jasperreports.engine.data.JRBeanCollectionDataSource($F{monitoringOfItems})]]></dataSourceExpression>
 				<subreportExpression><![CDATA[$P{SUBREPORT_DIR} + "MonitoringOfSubReport.jasper"]]></subreportExpression>
 			</subreport>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="e4c683b9-f5d3-4b28-b177-f4244cefceb1" stretchType="RelativeToBandHeight" x="1450" y="0" width="550" height="27">
+				<reportElement uuid="e4c683b9-f5d3-4b28-b177-f4244cefceb1" stretchType="RelativeToBandHeight" x="1450" y="0" width="400" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -716,6 +730,19 @@
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{orgStatus}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="e4c683b9-f5d3-4b28-b177-f4244cefceb1" stretchType="RelativeToBandHeight" x="1273" y="0" width="77" height="27">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{typeOfBuildingInternal}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
