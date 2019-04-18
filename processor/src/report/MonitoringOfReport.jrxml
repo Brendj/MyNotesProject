@@ -17,7 +17,9 @@
 	<field name="parents" class="java.lang.String"/>
 	<field name="pedagogicalComposition" class="java.lang.String"/>
 	<field name="otherEmployees" class="java.lang.String"/>
-	<field name="monitoringOfItems" class="java.util.List"/>
+	<field name="monitoringOfItemsThrid" class="java.util.List"/>
+	<field name="monitoringOfItemsSecond" class="java.util.List"/>
+	<field name="monitoringOfItemsFirst" class="java.util.List"/>
 	<title>
 		<band height="79" splitType="Stretch">
 			<textField>
