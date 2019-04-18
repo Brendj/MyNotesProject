@@ -973,6 +973,9 @@
         <%--@elvariable id="kznClientsStatisticCreatePage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticCreatePage"--%>
         <rich:panelMenuItem id="kznClientsStatisticCreateMenuItem" binding="#{kznClientsStatisticCreatePage.mainMenuComponent}" label="Создание"
                             action="#{kznClientsStatisticCreatePage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="kznClientsStatisticEditPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticEditPage"--%>
+        <rich:panelMenuItem id="kznClientsStatisticEditMenuItem" binding="#{kznClientsStatisticEditPage.mainMenuComponent}" label="Редактирование"
+                            action="#{kznClientsStatisticEditPage.show}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>

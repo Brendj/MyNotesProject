@@ -26,7 +26,7 @@ import java.util.List;
 @Scope("session")
 public class KznClientsStatisticViewPage extends OnlineReportPage {
 
-    Logger logger = LoggerFactory.getLogger(KznClientsStatisticViewPage.class);
+    private Logger logger = LoggerFactory.getLogger(KznClientsStatisticViewPage.class);
     private List<KznClientsStatisticReportItem> items = new ArrayList<KznClientsStatisticReportItem>();
     private KznClientsStatisticReportItem currentItem;
     private KznClientsStatisticReportItem addingItem = new KznClientsStatisticReportItem();
@@ -44,28 +44,6 @@ public class KznClientsStatisticViewPage extends OnlineReportPage {
             for (KznClientsStatistic kznClientsStatistic : kznClientsStatisticList) {
                 items.add(new KznClientsStatisticReportItem(kznClientsStatistic));
             }
-
-            transaction.commit();
-            transaction = null;
-        } catch (Exception e) {
-            logger.error("Error in reload KznClientsStatisticReportPage: ", e);
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
-    }
-
-    public void delete() {
-        if (null == currentItem) return;
-
-        Session session = null;
-        Transaction transaction = null;
-
-        try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-
-            DAOUtils.deleteFromKznClientStatisticById(session, currentItem.getIdOfKznClientsStatistic());
 
             transaction.commit();
             transaction = null;

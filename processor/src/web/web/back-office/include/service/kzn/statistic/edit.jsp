@@ -27,99 +27,29 @@
     });
 </script>
 
-<%--@elvariable id="kznClientsStatisticReportPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticReportPage"--%>
-<h:panelGrid id="kznClientsStatisticPanelGrid" binding="#{kznClientsStatisticReportPage.pageComponent}"
+<%--@elvariable id="kznClientsStatisticEditPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticEditPage"--%>
+<h:panelGrid id="kznClientsStatisticEditPanelGrid" binding="#{kznClientsStatisticEditPage.pageComponent}"
              styleClass="borderless-grid">
-    <rich:modalPanel id="kznClientsStatisticPanel" autosized="true" minWidth="500">
-        <f:facet name="header">
-            <h:outputText value="#{kznClientsStatisticReportPage.currentItem.orgName}" />
-        </f:facet>
-        <h:panelGrid styleClass="borderless-grid" columns="2">
-            <h:outputText escape="true" value="Общее количество учащихся" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.currentItem.studentsCountTotal}" rendered="#{kznClientsStatisticReportPage.currentItem != null}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество учеников 1-4 классов" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.currentItem.studentsCountYoung}" rendered="#{kznClientsStatisticReportPage.currentItem != null}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество учеников 5-9 классов" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.currentItem.studentsCountMiddle}" rendered="#{kznClientsStatisticReportPage.currentItem != null}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество учеников 10-11 классов" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.currentItem.studentsCountOld}" rendered="#{kznClientsStatisticReportPage.currentItem != null}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество льготников 1-4 классов" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.currentItem.benefitStudentsCountYoung}" rendered="#{kznClientsStatisticReportPage.currentItem != null}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество льготников 5-9 классов" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.currentItem.benefitStudentsCountMiddle}" rendered="#{kznClientsStatisticReportPage.currentItem != null}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество льготников 10-11 классов" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.currentItem.benefitStudentsCountOld}" rendered="#{kznClientsStatisticReportPage.currentItem != null}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество льготников всего" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.currentItem.benefitStudentsCountTotal}" rendered="#{kznClientsStatisticReportPage.currentItem != null}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество сотрудников, администрации и прочих групп" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.currentItem.employeeCount}" rendered="#{kznClientsStatisticReportPage.currentItem != null}" styleClass="input-text" />
-        </h:panelGrid>
-        <rich:spacer height="20px" />
-        <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('kznClientsStatisticPanel')" style="width: 180px;" ajaxSingle="true" />
-    </rich:modalPanel>
-
-    <rich:modalPanel id="kznClientsStatisticAddingPanel" autosized="true" minWidth="500">
-        <f:facet name="header">
-            <h:outputText value="#{kznClientsStatisticReportPage.currentItem.orgName}" />
-        </f:facet>
-        <h:panelGrid styleClass="borderless-grid" columns="2">
-            <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage()}"
-                               reRender="modalOrgSelectorPanel"
-                               oncomplete="if (#{facesContext.maximumSeverity == null})
-                                        #{rich:component('modalOrgSelectorPanel')}.show();"
-                               styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="0" target="#{mainPage.orgSelectPage.filterMode}" />
-                <f:setPropertyActionListener value="1" target="#{mainPage.orgSelectPage.supplierFilter}" />
-                <f:setPropertyActionListener value="#{kznClientsStatisticReportPage.getStringIdOfOrgList}"
-                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
-            </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true"
-                          value=" {#{kznClientsStatisticReportPage.filter}}" />
-            <h:outputText escape="true" value="Общее количество учащихся" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.addingItem.studentsCountTotal}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество учеников 1-4 классов" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.addingItem.studentsCountYoung}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество учеников 5-9 классов" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.addingItem.studentsCountMiddle}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество учеников 10-11 классов" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.addingItem.studentsCountOld}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество льготников 1-4 классов" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.addingItem.benefitStudentsCountYoung}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество льготников 5-9 классов" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.addingItem.benefitStudentsCountMiddle}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество льготников 10-11 классов" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.addingItem.benefitStudentsCountOld}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество льготников всего" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.addingItem.benefitStudentsCountTotal}" styleClass="input-text" />
-            <h:outputText escape="true" value="Количество сотрудников, администрации и прочих групп" styleClass="output-text"/>
-            <h:inputSecret value="#{kznClientsStatisticReportPage.addingItem.employeeCount}" styleClass="input-text" />
-        </h:panelGrid>
-        <rich:spacer height="20px" />
-        <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('kznClientsStatisticAddingPanel')" style="width: 180px;" ajaxSingle="true" />
-    </rich:modalPanel>
-
-    <h:panelGroup id="orgFilter">
-        <a4j:commandButton value="..." action="#{kznClientsStatisticReportPage.showOrgListSelectPage()}"
-                           reRender="modalOrgListSelectorPanel"
+    <h:panelGrid id="orgFilter" columns="3">
+        <h:outputText escape="true" value="Организация" styleClass="output-text" />
+        <a4j:commandButton value="..." action="#{kznClientsStatisticEditPage.showOrgSelectPage()}"
+                           reRender="modalOrgSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null})
-                                        #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                        #{rich:component('modalOrgSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;">
-            <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
-            <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.supplierFilter}" />
-            <f:setPropertyActionListener value="#{kznClientsStatisticReportPage.getStringIdOfOrgList}"
+            <f:setPropertyActionListener value="0" target="#{mainPage.orgSelectPage.filterMode}" />
+            <f:setPropertyActionListener value="1" target="#{mainPage.orgSelectPage.supplierFilter}" />
+            <f:setPropertyActionListener value="#{kznClientsStatisticEditPage.getStringIdOfOrgList}"
                                          target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
         </a4j:commandButton>
         <h:outputText styleClass="output-text" escape="true"
-                      value=" {#{kznClientsStatisticReportPage.filter}}" />
-    </h:panelGroup>
+                      value=" {#{kznClientsStatisticEditPage.filter}}" />
+    </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <a4j:commandButton value="Сформировать" action="#{kznClientsStatisticReportPage.update()}"
-                           reRender="kznClientsStatisticPanelGrid" styleClass="command-button"
-                           status="reportGenerateStatus" id="reloadButton" />
-        <a4j:commandButton value="Добавить" reRender="kznClientsStatisticAddingPanel" ajaxSingle="true"
-                           action="#{kznClientsStatisticReportPage.showAddingModalPage()}"
-                           oncomplete="Richfaces.showModalPanel('kznClientsStatisticAddingPanel');"/>
+        <a4j:commandButton value="Найти" action="#{kznClientsStatisticEditPage.find()}"
+                           reRender="kznClientsStatisticEditPanelGrid" styleClass="command-button"
+                           status="reportGenerateStatus" id="findButton" />
     </h:panelGrid>
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">
@@ -127,90 +57,47 @@
         </f:facet>
     </a4j:status>
 
-    <rich:dataTable id="applicationForFoodTable" value="#{kznClientsStatisticReportPage.items}" var="item" rows="25"
-                    footerClass="data-table-footer">
-        <f:facet name="header">
-            <rich:columnGroup>
-                <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Школа" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Общее количество учащихся" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Количество учащихся 1-4 классов" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Количество учащихся 5-9 классов" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Количество учащихся 10-11 классов" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Количество льготников 1-4 классов" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Количество льготников 5-9 классов" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Количество льготников 10-11 классов" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Количество льготников всего" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Количество сотрудников, администрации и прочих групп" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Редактировать" />
-                </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Удалить" />
-                </rich:column>
-            </rich:columnGroup>
-        </f:facet>
-        <rich:column headerClass="column-header">
-            <h:outputText escape="true" value="#{item.orgName}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <h:outputText escape="true" value="#{item.studentsCountTotal}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <h:outputText escape="true" value="#{item.studentsCountYoung}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <h:outputText escape="true" value="#{item.studentsCountMiddle}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <h:outputText escape="true" value="#{item.studentsCountOld}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <h:outputText escape="true" value="#{item.benefitStudentsCountYoung}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <h:outputText escape="true" value="#{item.benefitStudentsCountMiddle}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <h:outputText escape="true" value="#{item.benefitStudentsCountOld}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <h:outputText escape="true" value="#{item.benefitStudentsCountTotal}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <h:outputText escape="true" value="#{item.employeeCount}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <a4j:commandButton value="..." reRender="kznClientsStatisticPanel" ajaxSingle="true"
-                               oncomplete="Richfaces.showModalPanel('kznClientsStatisticPanel');">
-                <f:setPropertyActionListener value="#{item}" target="#{kznClientsStatisticReportPage.currentItem}" />
-            </a4j:commandButton>
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <a4j:commandLink reRender="applicationForFoodTable" value="x"
-                             action="#{kznClientsStatisticReportPage.delete()}" styleClass="command-link">
-                <f:setPropertyActionListener value="#{item}" target="#{kznClientsStatisticReportPage.currentItem}" />
-            </a4j:commandLink>
-        </rich:column>
-    </rich:dataTable>
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText escape="true" value="Общее количество учащихся" styleClass="output-text" />
+        <h:inputText value="#{kznClientsStatisticEditPage.studentsCountTotal}" styleClass="input-text"
+                     onkeypress="if(event.which < 48 || event.which > 57 ) if(event.which != 8) return false;" />
+        <h:outputText escape="true" value="Количество учеников 1-4 классов" styleClass="output-text" />
+        <h:inputText value="#{kznClientsStatisticEditPage.studentsCountYoung}" styleClass="input-text"
+                     onkeypress="if(event.which < 48 || event.which > 57 ) if(event.which != 8) return false;" />
+        <h:outputText escape="true" value="Количество учеников 5-9 классов" styleClass="output-text" />
+        <h:inputText value="#{kznClientsStatisticEditPage.studentsCountMiddle}" styleClass="input-text"
+                     onkeypress="if(event.which < 48 || event.which > 57 ) if(event.which != 8) return false;" />
+        <h:outputText escape="true" value="Количество учеников 10-11 классов" styleClass="output-text" />
+        <h:inputText value="#{kznClientsStatisticEditPage.studentsCountOld}" styleClass="input-text"
+                     onkeypress="if(event.which < 48 || event.which > 57 ) if(event.which != 8) return false;" />
+        <h:outputText escape="true" value="Количество льготников 1-4 классов" styleClass="output-text" />
+        <h:inputText value="#{kznClientsStatisticEditPage.benefitStudentsCountYoung}"
+                     styleClass="input-text" onkeypress="if(event.which < 48 || event.which > 57 ) if(event.which != 8) return false;" />
+        <h:outputText escape="true" value="Количество льготников 5-9 классов" styleClass="output-text" />
+        <h:inputText value="#{kznClientsStatisticEditPage.benefitStudentsCountMiddle}"
+                     styleClass="input-text" onkeypress="if(event.which < 48 || event.which > 57 ) if(event.which != 8) return false;" />
+        <h:outputText escape="true" value="Количество льготников 10-11 классов" styleClass="output-text" />
+        <h:inputText value="#{kznClientsStatisticEditPage.benefitStudentsCountOld}" styleClass="input-text"
+                     onkeypress="if(event.which < 48 || event.which > 57 ) if(event.which != 8) return false;" />
+        <h:outputText escape="true" value="Количество льготников всего" styleClass="output-text" />
+        <h:inputText value="#{kznClientsStatisticEditPage.benefitStudentsCountTotal}"
+                     styleClass="input-text" onkeypress="if(event.which < 48 || event.which > 57 ) if(event.which != 8) return false;" />
+        <h:outputText escape="true" value="Количество сотрудников, администрации и прочих групп"
+                      styleClass="output-text" />
+        <h:inputText value="#{kznClientsStatisticEditPage.employeeCount}" styleClass="input-text"
+                     onkeypress="if(event.which < 48 || event.which > 57 ) if(event.which != 8) return false;" />
+    </h:panelGrid>
+
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <a4j:commandButton value="Сохранить" action="#{kznClientsStatisticEditPage.save()}"
+                           reRender="kznClientsStatisticEditPanelGrid" styleClass="command-button"
+                           status="reportGenerateStatus" id="saveButton" />
+        <a4j:commandButton value="Удалить" action="#{kznClientsStatisticEditPage.delete()}"
+                           reRender="kznClientsStatisticEditPanelGrid" styleClass="command-button"
+                           status="reportGenerateStatus" id="deleteButton" />
+    </h:panelGrid>
 
 </h:panelGrid>

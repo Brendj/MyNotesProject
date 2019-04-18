@@ -30,7 +30,8 @@
 <%--@elvariable id="kznClientsStatisticViewPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticViewPage"--%>
 <h:panelGrid id="kznClientsStatisticPanelGrid" binding="#{kznClientsStatisticViewPage.pageComponent}"
              styleClass="borderless-grid">
-    <h:panelGroup id="orgFilter">
+    <h:panelGrid id="orgFilter" columns="3">
+        <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <a4j:commandButton value="..." action="#{kznClientsStatisticViewPage.showOrgListSelectPage()}"
                            reRender="modalOrgListSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null})
@@ -43,15 +44,12 @@
         </a4j:commandButton>
         <h:outputText styleClass="output-text" escape="true"
                       value=" {#{kznClientsStatisticViewPage.filter}}" />
-    </h:panelGroup>
+    </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Сформировать" action="#{kznClientsStatisticViewPage.update()}"
                            reRender="kznClientsStatisticPanelGrid" styleClass="command-button"
                            status="reportGenerateStatus" id="reloadButton" />
-        <a4j:commandButton value="Добавить" reRender="kznClientsStatisticAddingPanel" ajaxSingle="true"
-                           action="#{kznClientsStatisticViewPage.showAddingModalPage()}"
-                           oncomplete="Richfaces.showModalPanel('kznClientsStatisticAddingPanel');"/>
     </h:panelGrid>
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">
@@ -59,7 +57,7 @@
         </f:facet>
     </a4j:status>
 
-    <rich:dataTable id="applicationForFoodTable" value="#{kznClientsStatisticViewPage.items}" var="item" rows="25"
+    <rich:dataTable id="kznClientsStatisticTable" value="#{kznClientsStatisticViewPage.items}" var="item" rows="25"
                     footerClass="data-table-footer">
         <f:facet name="header">
             <rich:columnGroup>
@@ -92,6 +90,9 @@
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Количество сотрудников, администрации и прочих групп" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Редактирование" />
                 </rich:column>
             </rich:columnGroup>
         </f:facet>

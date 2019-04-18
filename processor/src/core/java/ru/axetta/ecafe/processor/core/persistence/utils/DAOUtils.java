@@ -9,8 +9,8 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -4104,14 +4104,21 @@ public class DAOUtils {
 
     public static List<KznClientsStatistic> getKznClientStatisticByOrgs(Session session, List<Long> idOfOrgList) {
         Criteria criteria = session.createCriteria(KznClientsStatistic.class);
-        criteria.add(Restrictions.in("org.idOfOrg", idOfOrgList));
+        if (!idOfOrgList.isEmpty())
+            criteria.add(Restrictions.in("org.idOfOrg", idOfOrgList));
         return criteria.list();
     }
 
-    public static void deleteFromKznClientStatisticById(Session session, Long idOfKznClientsStatistic) {
+    public static void deleteFromKznClientStatisticByOrgId(Session session, Long idOfOrg) {
         Query query = session.createQuery(
-                "delete from KznClientsStatistic statistic where idOfKznClientsStatistic=:id");
-        query.setParameter("id", idOfKznClientsStatistic);
+                "delete from KznClientsStatistic statistic where idOfOrg=:id");
+        query.setParameter("id", idOfOrg);
         query.executeUpdate();
+    }
+
+    public static KznClientsStatistic getKznClientStatisticByOrg(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(KznClientsStatistic.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        return (KznClientsStatistic) criteria.uniqueResult();
     }
 }

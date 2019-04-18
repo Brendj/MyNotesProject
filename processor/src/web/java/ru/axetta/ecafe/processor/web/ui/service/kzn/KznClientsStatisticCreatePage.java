@@ -7,8 +7,6 @@ package ru.axetta.ecafe.processor.web.ui.service.kzn;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.KznClientsStatistic;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.report.kzn.KznClientsStatisticReportItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
@@ -20,14 +18,11 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.List;
-
 @Component
 @Scope("session")
 public class KznClientsStatisticCreatePage extends OnlineReportPage {
 
-    Logger logger = LoggerFactory.getLogger(KznClientsStatisticCreatePage.class);
+    private Logger logger = LoggerFactory.getLogger(KznClientsStatisticCreatePage.class);
 
     private Long studentsCountTotal;
     private Long studentsCountYoung;
@@ -66,12 +61,6 @@ public class KznClientsStatisticCreatePage extends OnlineReportPage {
 
     public void showOrgSelectPage() {
         MainPage.getSessionInstance().showOrgSelectPage();
-    }
-
-    public Object showAddingModalPage() {
-        MainPage mainPage = MainPage.getSessionInstance();
-        mainPage.getModalPages().push(this);
-        return null;
     }
 
     @Override

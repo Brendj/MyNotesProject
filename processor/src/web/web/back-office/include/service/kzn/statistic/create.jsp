@@ -31,7 +31,8 @@
 <h:panelGrid id="kznClientsStatisticPanelGrid" binding="#{kznClientsStatisticCreatePage.pageComponent}"
              styleClass="borderless-grid">
 
-    <h:panelGroup id="orgFilter">
+    <h:panelGrid id="orgFilter" columns="3">
+        <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <a4j:commandButton value="..." action="#{kznClientsStatisticCreatePage.showOrgSelectPage()}"
                            reRender="modalOrgSelectorPanel"
                            oncomplete="if (#{facesContext.maximumSeverity == null})
@@ -44,7 +45,7 @@
         </a4j:commandButton>
         <h:outputText styleClass="output-text" escape="true"
                       value=" {#{kznClientsStatisticCreatePage.filter}}" />
-    </h:panelGroup>
+    </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Общее количество учащихся" styleClass="output-text" />
