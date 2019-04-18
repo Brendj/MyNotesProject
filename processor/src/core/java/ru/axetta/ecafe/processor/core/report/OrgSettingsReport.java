@@ -103,10 +103,10 @@ public class OrgSettingsReport extends BasicReportForListOrgsJob{
         }
 
 
-        public static List<OrgSettingsItem> buildOrgSettingCollection(List<Long> idOfOrgList, Integer statusCondition,
+        public static List<OrgSettingsReportItem> buildOrgSettingCollection(List<Long> idOfOrgList, Integer statusCondition,
                 Session persistenceSession, String selectedDistricts)
                 throws Exception {
-            List<OrgSettingsItem> result = new ArrayList<OrgSettingsItem>(idOfOrgList.size());
+            List<OrgSettingsReportItem> result = new ArrayList<OrgSettingsReportItem>(idOfOrgList.size());
 
             Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
             if(!CollectionUtils.isEmpty(idOfOrgList)) {
@@ -141,7 +141,7 @@ public class OrgSettingsReport extends BasicReportForListOrgsJob{
 
             for(Org org : orgs){
                 FeedingSetting setting = getSettingByOrg(settings, org);
-                OrgSettingsItem item = new OrgSettingsItem(org, setting);
+                OrgSettingsReportItem item = new OrgSettingsReportItem(org, setting);
                 result.add(item);
             }
             return result;

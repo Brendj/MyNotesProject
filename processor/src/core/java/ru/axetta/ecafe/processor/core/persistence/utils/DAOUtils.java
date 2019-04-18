@@ -28,10 +28,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
-import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -4105,5 +4102,15 @@ public class DAOUtils {
     public static List<String> getAllDistinctDepartmentsFromOrgs(Session session) {
         SQLQuery query = session.createSQLQuery("select distinct district from cf_orgs where district is not null and district not like ''");
         return query.list();
+    }
+
+    public static  Long getLastVersionOfOrgSettings(Session session){
+        SQLQuery query = session.createSQLQuery("SELECT MAX(version) FROM CF_OrgSettings");
+        return DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
+    }
+
+    public static  Long getLastVersionOfOrgSettingsItem(Session session){
+        SQLQuery query = session.createSQLQuery("SELECT MAX(version) FROM CF_OrgSettings_Items");
+        return DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
     }
 }

@@ -12,9 +12,11 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingManager;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ARMsSettingsType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.OrgSettingsItem;
+import ru.axetta.ecafe.processor.core.report.OrgSettingsReportItem;
 import ru.axetta.ecafe.processor.core.report.OrgSettingsReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
@@ -41,7 +43,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     private Integer status = 0;
     private List<SelectItem> statuses;
-    private List<OrgSettingsItem> items;
+    private List<OrgSettingsReportItem> items;
     private List<SelectItem> listOfOrgDistricts;
     private String selectedDistricts = "";
 
@@ -191,10 +193,10 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
+            OrgSettingManager manager = RuntimeContext.getAppContext().getBean(OrgSettingManager.class);
 
             Long nextOrgVersion = DAOUtils.nextVersionByOrgStucture(session);
-
-            for (OrgSettingsItem item : items){
+            for (OrgSettingsReportItem item : items){
                 if(!item.getChanged()) {
                     continue;
                 }
@@ -205,11 +207,11 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     org.setUsePaydableSubscriptionFeeding(item.getUsePaydableSubscriptionFeeding());
                     org.setVariableFeeding(item.getVariableFeeding());
                     org.setPreordersEnabled(item.getPreordersEnabled());
-                    //org.setReverseMonthOfSale(item.getReverseMonthOfSale()); // TODO add value in new table
+                    manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.REVERSE_MONTH_OF_SALE, item.getReverseMonthOfSale().toString(), session);
                     org.setDenyPayPlanForTimeDifference(item.getDenyPayPlanForTimeDifference());
 
                     org.setOneActiveCard(item.getOneActiveCard());
-                    //org.setCardDuplicateEnabled(item.getEnableDuplicateCard());
+                    manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED, item.getEnableDuplicateCard().toString(), session);
                     org.setNeedVerifyCardSign(item.getNeedVerifyCardSign());
                     if (!item.getMultiCardModeEnabled() && org.multiCardModeIsEnabled()) {
                         ClientManager.resetMultiCardModeToAllClientsAndBlockCardsAndUpRegVersion(org, session);
@@ -241,19 +243,19 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
             logger.error("Can't apply settings ", e);
             printError("Не удалось запустить процедуру установки новых значений настроек: " + e.getMessage());
         } finally {
-            HibernateUtils.close(session, logger);
             HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
     }
 
-    public List<OrgSettingsItem> getItems() {
+    public List<OrgSettingsReportItem> getItems() {
         if(items == null){
             return Collections.emptyList();
         }
         return items;
     }
 
-    public void setItems(List<OrgSettingsItem> items) {
+    public void setItems(List<OrgSettingsReportItem> items) {
         this.items = items;
     }
 

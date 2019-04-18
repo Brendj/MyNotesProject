@@ -2,25 +2,26 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.orgsettings;
+package ru.axetta.ecafe.processor.core.persistence.orgsettings;
 
 import java.util.Date;
 
 /*
- *  CREATE TABLE CF_OrgSettingsItems(
- *  idOfOrgSettingItems BIGSERIAL NOT NULL,
+ *  CREATE TABLE CF_OrgSettings_Items(
+ *  idOfOrgSettingItem BIGSERIAL NOT NULL,
  *  idOfOrgSetting BIGINT NOT NULL,
  *  createdDate BIGINT NOT NULL,
  *  lastUpdate BIGINT NOT NULL,
  *  settingType INTEGER NOT NULL,
  *  settingValue character varying(128),
+ *  version BIGINT NOT NULL,
  *  CONSTRAINT cf_OrgSettingsItems_pk PRIMARY KEY(idOfOrgSettingItem),
  *  CONSTRAINT cf_OrgSettingsItems_uk UNIQUE(idOfOrgSetting, settingType), -- для одной группы одна настройка
- *  CONSTRAINT cf_OrgSettingsItems_org_fk FOREIGN KEY(idOfOrgSetting),
+ *  CONSTRAINT cf_OrgSettingsItems_org_fk FOREIGN KEY(idOfOrgSetting)
  *  REFERENCES CF_OrgSettings (idOfOrgSetting) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE
  *  );
  *
- *  CREATE INDEX CF_OrgSettingsItems_TYPE_GROUP_IDX ON CF_OrgSettingsItems USING btree (idOfOrgSetting, settingType);
+ *  CREATE INDEX CF_OrgSettings_Items_TYPE_GROUP_IDX ON CF_OrgSettings_Items USING btree (idOfOrgSetting, settingType);
  * */
 
 public class OrgSettingItem {
@@ -30,6 +31,7 @@ public class OrgSettingItem {
     private Date lastUpdate;
     private Integer settingType;
     private String settingValue;
+    private Long version;
 
     public Long getIdOfOrgSettingItem() {
         return idOfOrgSettingItem;
@@ -94,5 +96,13 @@ public class OrgSettingItem {
     @Override
     public int hashCode(){
         return idOfOrgSettingItem.hashCode();
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

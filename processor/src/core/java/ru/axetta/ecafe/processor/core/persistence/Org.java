@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.orgsettings.OrgSetting;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 
 import org.apache.commons.codec.binary.Base64;

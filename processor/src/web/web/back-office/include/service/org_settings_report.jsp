@@ -223,7 +223,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Оплата/сторнирование месяц продажи + 5 дней следующего" />
             </f:facet>
-            <h:selectBooleanCheckbox value="#{item.reverseMonthOfSale}" disabled="true"
+            <h:selectBooleanCheckbox value="#{item.reverseMonthOfSale}" disabled="false"
                                      styleClass="checkboxes">
                 <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
             </h:selectBooleanCheckbox>
@@ -273,7 +273,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Дубликаты для основных карт" />
             </f:facet>
-            <h:selectBooleanCheckbox value="#{item.enableDuplicateCard}" styleClass="checkboxes" disabled="true">
+            <h:selectBooleanCheckbox value="#{item.enableDuplicateCard}" styleClass="checkboxes" disabled="false">
                 <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
             </h:selectBooleanCheckbox>
         </rich:column>
@@ -333,7 +333,7 @@
                            status="reportGenerateStatus" id="buildHTMLButton" />
 
         <h:commandButton value="Выгрузить в Excel" action="#{mainPage.orgSettingsReportPage.buildXLS}"
-                           styleClass="command-button"  id="buildXLSButton" disabled="true">
+                           styleClass="command-button"  id="buildXLSButton" disabled="false">
         <a4j:support status="reportGenerateStatus" id="buildXLSButtonSupport"/>
         </h:commandButton>
     </h:panelGrid>

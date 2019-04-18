@@ -2,7 +2,7 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.orgsettings;
+package ru.axetta.ecafe.processor.core.persistence.orgsettings;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -24,10 +24,14 @@ public enum OrgSettingGroup {
     private static Map<Integer,OrgSettingGroup> mapInt = new HashMap<Integer,OrgSettingGroup>();
     private static Map<String,OrgSettingGroup> mapStr = new HashMap<String,OrgSettingGroup>();
     static {
-        for (OrgSettingGroup questionaryStatus : OrgSettingGroup.values()) {
-            mapInt.put(questionaryStatus.getId(), questionaryStatus);
-            mapStr.put(questionaryStatus.toString(), questionaryStatus);
+        for (OrgSettingGroup orgSettingGroup : OrgSettingGroup.values()) {
+            mapInt.put(orgSettingGroup.getId(), orgSettingGroup);
+            mapStr.put(orgSettingGroup.toString(), orgSettingGroup);
         }
+    }
+
+    public static OrgSettingGroup getGroupById(Integer id){
+        return mapInt.get(id);
     }
 
     OrgSettingGroup(Integer id, String description) {

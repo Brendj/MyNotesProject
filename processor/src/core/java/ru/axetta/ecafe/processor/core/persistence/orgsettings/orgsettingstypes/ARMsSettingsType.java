@@ -2,9 +2,9 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.orgsettings.orgsettingstypes;
+package ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes;
 
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.orgsettings.OrgSettingGroup;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -19,9 +19,9 @@ public enum ARMsSettingsType implements SettingType {
     private static Map<Integer, OrgSettingGroup> mapInt = new HashMap<Integer,OrgSettingGroup>();
     private static Map<String,OrgSettingGroup> mapStr = new HashMap<String,OrgSettingGroup>();
     static {
-        for (OrgSettingGroup questionaryStatus : OrgSettingGroup.values()) {
-            mapInt.put(questionaryStatus.getId(), questionaryStatus);
-            mapStr.put(questionaryStatus.toString(), questionaryStatus);
+        for (OrgSettingGroup orgSettingGroup : OrgSettingGroup.values()) {
+            mapInt.put(orgSettingGroup.getId(), orgSettingGroup);
+            mapStr.put(orgSettingGroup.toString(), orgSettingGroup);
         }
     }
 

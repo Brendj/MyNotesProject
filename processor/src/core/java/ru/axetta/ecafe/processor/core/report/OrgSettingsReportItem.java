@@ -4,16 +4,17 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.FeedingSetting;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationStatus;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.orgsettings.OrgSettingManager;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.orgsettings.orgsettingstypes.ARMsSettingsType;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingManager;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ARMsSettingsType;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
 import org.apache.commons.lang.StringUtils;
 
-public class OrgSettingsItem {
+public class OrgSettingsReportItem {
 
     //----------------- Main info --------------------//
     private String orgNumberInName;
@@ -66,7 +67,7 @@ public class OrgSettingsItem {
     private final String NOT_SERVICED_STYLE = "notServiced";
     //----------------------------------------------------------//
 
-    public OrgSettingsItem(Org org, FeedingSetting setting) {
+    public OrgSettingsReportItem(Org org, FeedingSetting setting) {
         if(org == null){
             if(setting != null) {
                 this.idOfSetting = setting.getIdOfSetting();
@@ -75,6 +76,8 @@ public class OrgSettingsItem {
             }
             return;
         }
+        OrgSettingManager manager = RuntimeContext.getAppContext().getBean(OrgSettingManager.class);
+
         this.orgNumberInName = org.getOrgNumberInName();
         this.idOfOrg = org.getIdOfOrg();
         this.shortName = org.getShortName();
@@ -97,7 +100,7 @@ public class OrgSettingsItem {
         this.variableFeeding = org.getVariableFeeding();
         this.preordersEnabled = org.getPreordersEnabled();
         this.reverseMonthOfSale = Boolean.parseBoolean(
-                OrgSettingManager.getSettingValueFromOrg(org, ARMsSettingsType.REVERSE_MONTH_OF_SALE)
+                manager.getSettingValueFromOrg(org, ARMsSettingsType.REVERSE_MONTH_OF_SALE)
         );
         this.denyPayPlanForTimeDifference = org.getDenyPayPlanForTimeDifference();
         if(setting != null) {
@@ -108,7 +111,7 @@ public class OrgSettingsItem {
 
         this.oneActiveCard = org.getOneActiveCard();
         this.enableDuplicateCard = Boolean.parseBoolean(
-                OrgSettingManager.getSettingValueFromOrg(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED)
+                manager.getSettingValueFromOrg(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED)
         );
         this.needVerifyCardSign = org.getNeedVerifyCardSign();
         this.multiCardModeEnabled = org.multiCardModeIsEnabled();
@@ -367,10 +370,10 @@ public class OrgSettingsItem {
         if(this == o){
             return true;
         }
-        if (!(o instanceof OrgSettingsItem)) {
+        if (!(o instanceof OrgSettingsReportItem)) {
             return false;
         }
-        final OrgSettingsItem item = (OrgSettingsItem) o;
+        final OrgSettingsReportItem item = (OrgSettingsReportItem) o;
         return idOfOrg.equals(item.getIdOfOrg());
     }
 

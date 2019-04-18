@@ -2,7 +2,7 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.orgsettings;
+package ru.axetta.ecafe.processor.core.persistence.orgsettings;
 
 import java.util.Date;
 import java.util.Set;
@@ -14,9 +14,10 @@ import java.util.Set;
 *  createdDate BIGINT NOT NULL,
 *  lastUpdate BIGINT NOT NULL,
 *  settingGroup INTEGER NOT NULL,
+*  version BIGINT NOT NULL,
 *  CONSTRAINT cf_OrgSettings_pk PRIMARY KEY(idOfOrgSetting),
 *  CONSTRAINT cf_OrgSettings_uk UNIQUE(idOfOrg, settingGroup), -- для одной ОО одна группа
-*  CONSTRAINT cf_OrgSettings_org_fk FOREIGN KEY(idOfOrg),
+*  CONSTRAINT cf_OrgSettings_org_fk FOREIGN KEY(idOfOrg)
 *  REFERENCES cf_Orgs (idOfOrg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE
 *  );
 *
@@ -30,6 +31,7 @@ public class OrgSetting {
     private Date lastUpdate;
     private OrgSettingGroup settingGroup;
     private Set<OrgSettingItem> orgSettingItems;
+    private Long version;
 
     public Long getIdOfOrgSetting() {
         return idOfOrgSetting;
@@ -94,5 +96,13 @@ public class OrgSetting {
     @Override
     public int hashCode(){
         return idOfOrgSetting.hashCode();
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }
