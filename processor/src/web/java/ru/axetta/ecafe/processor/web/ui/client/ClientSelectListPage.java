@@ -390,6 +390,7 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
         this.clientFilter.completeOrgSelection(session, idOfOrg);
+        this.clientFilter.setIncludeFriendlyOrg(false);
     }
 
     public void fill(Session session, List<Item> clientList) throws Exception {
