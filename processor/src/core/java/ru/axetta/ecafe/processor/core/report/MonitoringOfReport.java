@@ -122,7 +122,7 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
                 }
                 selectedPeriod = FOR_ONE_DAY;
             } else {
-                endTime = CalendarUtils.addDays(CalendarUtils.startOfDay(new Date()), -1);
+                endTime = CalendarUtils.addDays(CalendarUtils.endOfDay(new Date()), -1);
                 int dayOfWeek = CalendarUtils.getDayOfWeek(endTime);
                 date = CalendarUtils.startOfDay(
                         dayOfWeek < Calendar.WEDNESDAY ? CalendarUtils.addDays(endTime, -3) : CalendarUtils.addDays(endTime, -2)

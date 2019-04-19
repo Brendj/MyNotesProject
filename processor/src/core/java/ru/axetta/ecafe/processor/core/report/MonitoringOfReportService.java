@@ -29,7 +29,7 @@ import java.util.*;
 public class MonitoringOfReportService {
     final private static Logger logger = LoggerFactory.getLogger(MonitoringOfReportService.class);
     private final static Integer ORGS_AMOUNT_FOR_REPORT = 20;
-    private final static String DATE_FORMAT = "dd/MM/yyyy";
+    private final static String DATE_FORMAT = "yyyy/MM/dd";
     private final SimpleDateFormat QUERY_DATE_FORMAT = new SimpleDateFormat(DATE_FORMAT);
 
     private List<MonitoringOfItem> getMonitoringOfItems(Date startDate, Long idOfOrg,
@@ -140,7 +140,8 @@ public class MonitoringOfReportService {
                             + "    ((idofclientgroup < :employees) OR idofclientgroup IN "
                             + "        (:employees, :administration, :employee, :techEmployees, :parents, :visitors, :others)) "
                             + " AND passdirection IN (:passEntry, :passExit, :passReEntry, :passReExit) AND evtdatetime BETWEEN :startTime AND :endTime "
-                            + "group by idoforg " + groupByDay;
+                            + "group by idoforg " + groupByDay
+                            + " order by idoforg " + groupByDay;
 
             Query query = session.createSQLQuery(sqlString);
 
@@ -170,7 +171,7 @@ public class MonitoringOfReportService {
                 List<NumberOfPasses> preferentialList = null;
                 for (Object[] row : list) {
                     Date dateFromRow = QUERY_DATE_FORMAT.parse((String)row[7]);
-                    if (!idOfCurrentOrg.equals(row[0])) {
+                    if (!idOfCurrentOrg.equals(((BigInteger)row[0]).longValue())) {
                         result.put(idOfCurrentOrg, preferentialList);
                         idOfCurrentOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
                         preferentialList = new LinkedList<NumberOfPasses>();
@@ -247,7 +248,8 @@ public class MonitoringOfReportService {
                   + "WHERE cfo.ordertype IN (:reducedPricePlan, :correctionType) AND " + orgCondition
                   + "    cfo.state = 0 AND g.idofclientgroup < :employees AND cfo.createddate BETWEEN :startTime AND :endTime AND "
                   + "    cfod.menutype >= :minType AND cfod.menutype <= :maxType  AND cfod.idofrule >= 0"
-                  + " group by cfo.idoforg " + groupByDay;
+                  + " group by cfo.idoforg " + groupByDay
+                  + " order by cfo.idoforg " + groupByDay;
 
             Query query = session.createSQLQuery(sqlQuery);
             if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
@@ -274,7 +276,8 @@ public class MonitoringOfReportService {
                 List<NumberOfPreferential> preferentialList = null;
                 for (Object[] row : list) {
                     Date dateFromRow = QUERY_DATE_FORMAT.parse((String)row[4]);
-                    if (!idOfCurrentOrg.equals(row[0])) {
+
+                    if (!idOfCurrentOrg.equals(((BigInteger)row[0]).longValue())) {
                         result.put(idOfCurrentOrg, preferentialList);
                         idOfCurrentOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
                         preferentialList = new LinkedList<NumberOfPreferential>();
@@ -351,7 +354,8 @@ public class MonitoringOfReportService {
                     + "    AND ((g.idofclientgroup < :employees) OR g.idofclientgroup IN "
                     + "        (:employees, :administration, :displaced, :tech_employees, :visitors, :other, :parents)) "
                     + "    AND cfo.createddate BETWEEN :startTime AND :endTime"
-                    + " group by cfo.idoforg " + groupByDay;
+                    + " group by cfo.idoforg " + groupByDay
+                    + " order by cfo.idoforg " + groupByDay;
             Query query = session.createSQLQuery(sqlQuery);
 
             if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
@@ -396,7 +400,7 @@ public class MonitoringOfReportService {
             List<NumberOfStudentsAndGuardians> numberOfStudentsAndGuardiansList = null;
             for (Object[] row : list) {
                 Date dateFromRow = QUERY_DATE_FORMAT.parse((String)row[3]);
-                if (!idOfCurrentOrg.equals(row[0])) {
+                if (!idOfCurrentOrg.equals(((BigInteger)row[0]).longValue())) {
                     result.put(idOfCurrentOrg, numberOfStudentsAndGuardiansList);
                     idOfCurrentOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
                     numberOfStudentsAndGuardiansList = new LinkedList<NumberOfStudentsAndGuardians>();
@@ -465,7 +469,8 @@ public class MonitoringOfReportService {
                     + "    AND cfod.MenuType >= :minType AND cfod.MenuType <= :maxType "
                     + "    AND ((g.idofclientgroup < :employees) OR "
                     + "        g.idofclientgroup IN (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents))"
-                    + " group by cfo.idoforg " + groupByDay;
+                    + " group by cfo.idoforg " + groupByDay
+                    + " order by cfo.idoforg " + groupByDay;
 
             Query query = session.createSQLQuery(sqlQuery);
 
@@ -538,7 +543,8 @@ public class MonitoringOfReportService {
                     + " (cfo.CreatedDate BETWEEN :startTime AND :endTime) "
                     + "AND cfod.MenuType >= :minType AND cfod.MenuType <= :maxType AND ((g.idofclientgroup < :employees) "
                     + "    OR g.idofclientgroup IN (:employees, :administration, :employee, :tech_employees, :visitors, :other, :parents))"
-                    + " group by cfo.idoforg " + groupByDay;
+                    + " group by cfo.idoforg " + groupByDay
+                    + " order by cfo.idoforg " + groupByDay;
 
             Query query = session.createSQLQuery(sqlQuery);
             if (idOfOrgList.size() <= ORGS_AMOUNT_FOR_REPORT) {
@@ -735,7 +741,8 @@ public class MonitoringOfReportService {
                             + " JOIN cf_clients c on c.idofclient = pc.idofclient "
                             + " WHERE o.state = 0 AND pc.preorderdate BETWEEN :startDate AND :endDate " + orgsCondition
                             + " AND c.idofclientgroup < :employees "
-                            + " GROUP BY pl.idoforg " + groupByDay);
+                            + " GROUP BY pl.idoforg " + groupByDay
+                            + " order by pl.idoforg " + groupByDay);
 
             if (idOfOrgList.size() <= 10) {
                 query.setParameterList("idOfOrg", idOfOrgList);
@@ -753,7 +760,7 @@ public class MonitoringOfReportService {
                 List<Long> uniqueClients = new LinkedList<Long>();
                 for (Object[] row : list) {
                     Date dateFromRow = QUERY_DATE_FORMAT.parse((String)row[2]);
-                    if (!idOfCurrentOrg.equals(row[0])) {
+                    if (!idOfCurrentOrg.equals(((BigInteger)row[0]).longValue())) {
                         result.put(idOfCurrentOrg, uniqueClients);
                         idOfCurrentOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
                         uniqueClients = new LinkedList<Long>();
