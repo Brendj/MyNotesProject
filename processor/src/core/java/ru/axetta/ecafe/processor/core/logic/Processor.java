@@ -368,9 +368,10 @@ public class Processor implements SyncProcessor {
         timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSyncPaymentRegistry", timeForDelta);
 
         // Process ClientParamRegistry
+        List<Long> clientsWithWrongVersion = new ArrayList<Long>();
         try {
             processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), request.getClientParamRegistry(),
-                    errorClientIds);
+                    errorClientIds, clientsWithWrongVersion);
         } catch (Exception e) {
             String message = String
                     .format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg());
@@ -424,7 +425,7 @@ public class Processor implements SyncProcessor {
         try {
             saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.CLIENT_REGISTRY);
             clientRegistry = processSyncClientRegistry(request.getIdOfOrg(), request.getClientRegistryRequest(),
-                    errorClientIds);
+                    errorClientIds, clientsWithWrongVersion);
         } catch (Exception e) {
             String message = String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
@@ -882,6 +883,7 @@ public class Processor implements SyncProcessor {
         SyncHistory syncHistory = null; // регистируются и заполняются только для полной синхронизации
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
         List<Long> errorClientIds = new ArrayList<Long>();
+        List<Long> clientsWithWrongVersion = new ArrayList<Long>();
 
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
         // Register sync history
@@ -904,7 +906,7 @@ public class Processor implements SyncProcessor {
         boolean wasErrorProcessedAccInc = fullProcessingAccIncRegistryOrAccIncUpdate(request, responseSections);
 
         // Process ClientParamRegistry
-        fullProcessingClientParamsRegistry(request, syncHistory, errorClientIds);
+        fullProcessingClientParamsRegistry(request, syncHistory, errorClientIds, clientsWithWrongVersion);
 
         // Process ClientGuardianRequest
         fullProcessingClientGuardians(request, syncHistory, responseSections);
@@ -913,7 +915,7 @@ public class Processor implements SyncProcessor {
         fullProcessingOrgStructure(request, syncHistory, responseSections);
 
         // Build client registry
-        fullProcessingClientsRegistry(request, syncHistory, responseSections, errorClientIds);
+        fullProcessingClientsRegistry(request, syncHistory, responseSections, errorClientIds, clientsWithWrongVersion);
 
         // базовая корзина (товарный учет)
         fullProcessingGoodsBasicBaskerData(request, syncHistory, responseSections);
@@ -1568,13 +1570,13 @@ public class Processor implements SyncProcessor {
     }
 
     private void fullProcessingClientsRegistry(SyncRequest request, SyncHistory syncHistory,
-            List<AbstractToElement> responseSections, List<Long> errorClientIds) {
+            List<AbstractToElement> responseSections, List<Long> errorClientIds, List<Long> clientsWithWrongVersion) {
         try {
             SyncRequest.ClientRegistryRequest clientRegistryRequest = request.getClientRegistryRequest();
             if (clientRegistryRequest != null) {
                 saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.CLIENT_REGISTRY);
                 SyncResponse.ClientRegistry clientRegistry = processSyncClientRegistry(request.getIdOfOrg(),
-                        clientRegistryRequest, errorClientIds);
+                        clientRegistryRequest, errorClientIds, clientsWithWrongVersion);
                 addToResponseSections(clientRegistry, responseSections);
             }
         } catch (Exception e) {
@@ -1621,11 +1623,11 @@ public class Processor implements SyncProcessor {
     }
 
     private void fullProcessingClientParamsRegistry(SyncRequest request, SyncHistory syncHistory,
-            List<Long> errorClientIds) {
+            List<Long> errorClientIds, List<Long> clientsWithWrongVersion) {
         try {
             SyncRequest.ClientParamRegistry clientParamRegistry = request.getClientParamRegistry();
             if (clientParamRegistry != null) {
-                processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), clientParamRegistry, errorClientIds);
+                processSyncClientParamRegistry(syncHistory, request.getIdOfOrg(), clientParamRegistry, errorClientIds, clientsWithWrongVersion);
             }
         } catch (Exception e) {
             String message = String
@@ -2328,10 +2330,10 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
 
         }
-
+        List<Long> clientsWithWrongVersion = new ArrayList<Long>();
         try {
             processSyncClientParamRegistry(idOfSync, request.getIdOfOrg(), request.getClientParamRegistry(),
-                    errorClientIds);
+                    errorClientIds, clientsWithWrongVersion);
         } catch (Exception e) {
             logger.error(String.format("Failed to process ClientParamRegistry, IdOfOrg == %s", request.getIdOfOrg()),
                     e);
@@ -2340,7 +2342,7 @@ public class Processor implements SyncProcessor {
         try {
             saveLastProcessSectionDateSmart(persistenceSessionFactory, request.getIdOfOrg(), SectionType.CLIENT_REGISTRY);
             clientRegistry = processSyncClientRegistry(request.getIdOfOrg(), request.getClientRegistryRequest(),
-                    errorClientIds);
+                    errorClientIds, clientsWithWrongVersion);
         } catch (Exception e) {
             logger.error(String.format("Failed to build ClientRegistry, IdOfOrg == %s", request.getIdOfOrg()), e);
         }
@@ -3136,7 +3138,7 @@ public class Processor implements SyncProcessor {
         Transaction persistenceTransaction = null;
         ClientGuardianData clientGuardianData = null;
         try {
-            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             ClientGuardianDataProcessor processor = new ClientGuardianDataProcessor(persistenceSession, idOfOrg,
                     maxVersion);
@@ -3657,7 +3659,7 @@ public class Processor implements SyncProcessor {
     }
 
     private void processSyncClientParamRegistry(SyncHistory syncHistory, Long idOfOrg,
-            SyncRequest.ClientParamRegistry clientParamRegistry, List<Long> errorClientIds) throws Exception {
+            SyncRequest.ClientParamRegistry clientParamRegistry, List<Long> errorClientIds, List<Long> clientsWithWrongVersion) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -3705,7 +3707,8 @@ public class Processor implements SyncProcessor {
                 }*/
                 try {
                     //processSyncClientParamRegistryItem(idOfSync, idOfOrg, clientParamItem, orgMap, version);
-                    processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds, idOfOrg, allocatedClients, orgSet);
+                    processSyncClientParamRegistryItem(clientParamItem, orgMap, version, errorClientIds, idOfOrg, allocatedClients,
+                            orgSet, clientsWithWrongVersion);
                 } catch (Exception e) {
                     String message = String.format("Failed to process clientParamItem == %s", idOfOrg);
                     if (syncHistory != null) {
@@ -3735,7 +3738,7 @@ public class Processor implements SyncProcessor {
 
     private void processSyncClientParamRegistryItem(SyncRequest.ClientParamRegistry.ClientParamItem clientParamItem,
             HashMap<Long, HashMap<String, ClientGroup>> orgMap, Long version, List<Long> errorClientIds, Long idOfOrg,
-            List<Long> allocatedClients, Set<Org> orgSet) throws Exception {
+            List<Long> allocatedClients, Set<Org> orgSet, List<Long> clientsWithWrongVersion) throws Exception {
         boolean ignoreNotifyFlags = RuntimeContext.getInstance().getSmsService().ignoreNotifyFlags();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -3745,6 +3748,7 @@ public class Processor implements SyncProcessor {
 
             Client client = findClient(persistenceSession, clientParamItem.getIdOfClient());
             if (clientParamItem.getVersion() != null && clientParamItem.getVersion() < client.getClientRegistryVersion()) {
+                clientsWithWrongVersion.add(client.getIdOfClient());
                 return;
             }
 
@@ -4388,7 +4392,7 @@ public class Processor implements SyncProcessor {
     }
 
     private SyncResponse.ClientRegistry processSyncClientRegistry(Long idOfOrg,
-            SyncRequest.ClientRegistryRequest clientRegistryRequest, List<Long> errorClientIds) throws Exception {
+            SyncRequest.ClientRegistryRequest clientRegistryRequest, List<Long> errorClientIds, List<Long> clientsWithWrongVersion) throws Exception {
         SyncResponse.ClientRegistry clientRegistry = new SyncResponse.ClientRegistry();
         List<Client> clients;
         Org organization;
@@ -4409,6 +4413,11 @@ public class Processor implements SyncProcessor {
             // Добавляем временных посетителей (мигрантов)
             List<Client> migrants = MigrantsUtils.getActiveMigrantsForOrg(persistenceSession, idOfOrg);
             clients.addAll(migrants);
+
+            for (Long idOfClientWithWrongVersion : clientsWithWrongVersion) {
+                Client c = (Client)persistenceSession.load(Client.class, idOfClientWithWrongVersion);
+                if (!clients.contains(c)) clients.add(c);
+            }
 
             for (Client client : clients) {
                 if (client.getOrg().getIdOfOrg().equals(idOfOrg)) {
@@ -4636,6 +4645,7 @@ public class Processor implements SyncProcessor {
             Transaction persistenceTransaction = null;
             try {
                 persistenceSession = persistenceSessionFactory.openSession();
+                persistenceSession.setFlushMode(FlushMode.COMMIT);
 
                 Org organization = getOrgReference(persistenceSession, idOfOrg);
 
@@ -4707,7 +4717,6 @@ public class Processor implements SyncProcessor {
                                 localIdsToMenuDetailMap);
                         processReqComplexInfos(persistenceSession, organization, menuDate, menu,
                                 item.getReqComplexInfos(), localIdsToMenuDetailMap);
-                        processPreorders(persistenceSession, organization, menuDate, item);
 
                     }
 
@@ -4838,168 +4847,6 @@ public class Processor implements SyncProcessor {
             reqComplexInfoMatch = null;
         }
         return reqComplexInfoMatch;
-    }
-
-    private void processPreorders(Session persistenceSession, Org organization, Date menuDate,
-            SyncRequest.ReqMenu.Item item) throws Exception {
-        if (menuDate.before(CalendarUtils.startOfDay(new Date()))) return; //пропускаем для прошедших дат
-        Date begDate = CalendarUtils.startOfDay(menuDate);
-        Date endDate = CalendarUtils.endOfDay(menuDate);
-        Date now = new Date();
-
-        int day = CalendarUtils.getDayOfWeek(menuDate);
-        if (day != Calendar.SATURDAY && day != Calendar.SUNDAY) {
-            Query query = persistenceSession.createQuery("select rp from RegularPreorder rp where rp.client.org = :org "
-                    + "and rp.endDate >= :date and rp.deletedState = false");
-            query.setParameter("org", organization);
-            query.setParameter("date", menuDate);
-            List<RegularPreorder> rpList = query.list();
-            for (RegularPreorder regularPreorder : rpList) {
-                if (!StringUtils.isEmpty(regularPreorder.getItemCode())) {
-                    //заказ на блюдо
-                    SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetailMatch = null;
-                    Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = item.getReqMenuDetails(); //новый итератор
-                    while (reqMenuDetails.hasNext()) {
-                        SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
-                        if (equalsNullSafe(regularPreorder.getItemCode(), reqMenuDetail.getItemCode())) { //ищем по цене и коду товара
-                            reqMenuDetailMatch = reqMenuDetail;
-                            if (regularPreorder.getPrice().equals(reqMenuDetailMatch.getPrice())) { //проверяем на цену отдельно, т.к. в меню могут быть несколько позиций с одинаковым itemCode
-                                break;
-                            }
-                        }
-                    }
-                    if (reqMenuDetailMatch == null) {
-                        RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
-                                .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.DELETED);
-                    } else if (!regularPreorder.getPrice().equals(reqMenuDetailMatch.getPrice())) {
-                        RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
-                                .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.CHANGED_PRICE);
-                    }
-                } else {
-                    //заказ на комплекс
-                    SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfoMatch = findReqComplexInfo(item,
-                            regularPreorder.getIdOfComplex());
-                    if (reqComplexInfoMatch == null) {
-                        RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
-                                .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.DELETED);
-                    } else {
-                        if (!reqComplexInfoMatch.getCurrentPrice().equals(regularPreorder.getPrice())) {
-                            RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
-                                    .deleteRegularPreorder(persistenceSession, regularPreorder, PreorderState.CHANGED_PRICE);
-                        }
-                    }
-                }
-            }
-        }
-
-        Query query = persistenceSession.createQuery("select pc from PreorderComplex pc "
-                + "where pc.client.org = :org and pc.preorderDate between :begDate and :endDate and pc.deletedState = false "
-                + "and pc.amount is not null and pc.amount > 0");  //предзаказы по ОО на день меню
-        query.setParameter("org", organization);
-        query.setParameter("begDate", begDate);
-        query.setParameter("endDate", endDate);
-        List<PreorderComplex> list = query.list();
-        List<PreorderComplex> deletedPreorders = new ArrayList<PreorderComplex>();
-        List<PreorderComplex> changedPreorders = new ArrayList<PreorderComplex>();
-        for (PreorderComplex preorderComplex : list) {
-            boolean found = false;
-            SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfoMatch = null;
-            for (SyncRequest.ReqMenu.Item.ReqComplexInfo reqComplexInfo : item.getReqComplexInfos()) {
-                if (preorderComplex.getArmComplexId().equals(reqComplexInfo.getComplexId()) && reqComplexInfo.getComplexInfoDetails() != null && reqComplexInfo.getComplexInfoDetails().size() > 0) {
-                    found = true;
-                    reqComplexInfoMatch = reqComplexInfo;
-                    break;
-                }
-            }
-            if (!found) {
-                deletedPreorders.add(preorderComplex);
-            } else {
-                if (!preorderComplex.getComplexPrice().equals(reqComplexInfoMatch.getCurrentPrice())) {
-                    changedPreorders.add(preorderComplex);
-                }
-            }
-        }
-
-        query = persistenceSession.createQuery("select pmd from PreorderMenuDetail pmd "
-                + "where pmd.client.org = :org and pmd.preorderDate between :begDate and :endDate and pmd.deletedState = false "
-                + "and pmd.amount is not null and pmd.amount > 0");
-        query.setParameter("org", organization);
-        query.setParameter("begDate", begDate);
-        query.setParameter("endDate", endDate);
-        List<PreorderMenuDetail> pmdList = query.list();
-        List<PreorderMenuDetail> deletedPreorderMenuDetails = new ArrayList<PreorderMenuDetail>();
-        List<PreorderMenuDetail> changedPreorderMenuDetails = new ArrayList<PreorderMenuDetail>();
-        List<PreorderMenuDetail> modifiedIdsPreorderMenuDetails = new ArrayList<PreorderMenuDetail>();
-        for (PreorderMenuDetail preorderMenuDetail : pmdList) {
-            boolean found = false;
-            SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetailMatch = null;
-            Iterator<SyncRequest.ReqMenu.Item.ReqMenuDetail> reqMenuDetails = item.getReqMenuDetails(); //новый итератор
-            while (reqMenuDetails.hasNext()) {
-                SyncRequest.ReqMenu.Item.ReqMenuDetail reqMenuDetail = reqMenuDetails.next();
-                if (equalsNullSafe(preorderMenuDetail.getItemCode(), reqMenuDetail.getItemCode())) {
-                    found = true;
-                    reqMenuDetailMatch = reqMenuDetail;
-                    if (preorderMenuDetail.getMenuDetailPrice().equals(reqMenuDetailMatch.getPrice())) {
-                        if (!preorderMenuDetail.getArmIdOfMenu().equals(reqMenuDetail.getIdOfMenu())) {
-                            preorderMenuDetail.setArmIdOfMenu(reqMenuDetail.getIdOfMenu());
-                            modifiedIdsPreorderMenuDetails.add(preorderMenuDetail);
-                        }
-                        break;
-                    }
-                }
-            }
-            if (!found) {
-                deletedPreorderMenuDetails.add(preorderMenuDetail);
-            } else {
-                if (!preorderMenuDetail.getMenuDetailPrice().equals(reqMenuDetailMatch.getPrice())) {
-                    changedPreorderMenuDetails.add(preorderMenuDetail);
-                }
-            }
-        }
-
-        Long version = 0L;
-        Date dateFrom = new Date();
-
-        if (deletedPreorders.size() > 0 || changedPreorders.size() > 0 || deletedPreorderMenuDetails.size() > 0 || changedPreorderMenuDetails.size() > 0) {
-            version = DAOUtils.nextVersionByPreorderComplex(persistenceSession);
-/*            Integer days = DAOUtils.getPreorderFeedingForbiddenDays(organization.getIdOfOrg());
-            if (days != null) days++;
-            else {
-                days = PreorderComplex.DEFAULT_FORBIDDEN_DAYS + 1;
-            }
-            dateFrom = CalendarUtils.startOfDay(CalendarUtils.addDays(now, days)); //дата, начиная с которой нужно удалять измененные предзаказы*/
-        }
-        for (PreorderComplex preorderComplex : deletedPreorders) {
-            dateFrom = RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
-                    .getStartDateForGeneratePreorders(preorderComplex.getClient());
-            preorderComplex.deleteBySupplier(version, preorderComplex.getPreorderDate().after(dateFrom));
-            persistenceSession.update(preorderComplex);
-        }
-        for (PreorderComplex preorderComplex : changedPreorders) {
-            dateFrom = RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
-                    .getStartDateForGeneratePreorders(preorderComplex.getClient());
-            preorderComplex.changeBySupplier(version, preorderComplex.getPreorderDate().after(dateFrom));
-            persistenceSession.update(preorderComplex);
-        }
-        for (PreorderMenuDetail preorderMenuDetail : deletedPreorderMenuDetails) {
-            dateFrom = RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
-                    .getStartDateForGeneratePreorders(preorderMenuDetail.getClient());
-            preorderMenuDetail.deleteBySupplier(version, preorderMenuDetail.getPreorderDate().after(dateFrom));
-            persistenceSession.update(preorderMenuDetail);
-        }
-        for (PreorderMenuDetail preorderMenuDetail : changedPreorderMenuDetails) {
-            dateFrom = RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
-                    .getStartDateForGeneratePreorders(preorderMenuDetail.getClient());
-            preorderMenuDetail.changeBySupplier(version, preorderMenuDetail.getPreorderDate().after(dateFrom));
-            persistenceSession.update(preorderMenuDetail);
-        }
-        if (modifiedIdsPreorderMenuDetails.size() > 0 && version.equals(0L)) {
-            version = DAOUtils.nextVersionByPreorderComplex(persistenceSession);
-        }
-        for (PreorderMenuDetail preorderMenuDetail : modifiedIdsPreorderMenuDetails) {
-            preorderMenuDetail.modifyArmIdOfMenu(version);
-            persistenceSession.update(preorderMenuDetail);
-        }
     }
 
     private boolean equalsNullSafe(String str1, String str2) {
@@ -5534,7 +5381,7 @@ public class Processor implements SyncProcessor {
         Transaction persistenceTransaction = null;
         ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = new ResCategoriesDiscountsAndRules();
         try {
-            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             boolean isManyOrgs = categoriesAndDiscountsRequest != null && categoriesAndDiscountsRequest.isManyOrgs();
             resCategoriesDiscountsAndRules.fillData(persistenceSession, idOfOrg, isManyOrgs, categoriesAndDiscountsRequest.getVersionDSZN());

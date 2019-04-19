@@ -127,6 +127,8 @@ public class OptionPage extends BasicWorkspacePage {
     private Date validRegistryDate;
     private Integer reviseSourceType;
     private Integer reviseDelta;
+    private Boolean logInfoService;
+    private String methodsInfoService;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString()};
 
@@ -909,6 +911,8 @@ public class OptionPage extends BasicWorkspacePage {
         RNIPSenderCode = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_CODE);
         RNIPSenderName = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_SENDER_NAME);
         RNIPTSAServer = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_TSA_SERVER);
+        logInfoService = runtimeContext.getOptionValueBool(Option.OPTION_LOG_INFOSERVICE);
+        methodsInfoService = runtimeContext.getOptionValueString(Option.OPTION_METHODS_INFOSERVICE);
 
         readerForWebInterfaceString = runtimeContext.getOptionValueString(Option.OPTION_READER_FOR_WEB_STRING);
 
@@ -1064,6 +1068,8 @@ public class OptionPage extends BasicWorkspacePage {
 
             runtimeContext.setOptionValue(Option.OPTION_REVISE_DATA_SOURCE, reviseSourceType);
             runtimeContext.setOptionValue(Option.OPTION_REVISE_DELTA, reviseDelta);
+            runtimeContext.setOptionValue(Option.OPTION_LOG_INFOSERVICE, logInfoService);
+            runtimeContext.setOptionValue(Option.OPTION_METHODS_INFOSERVICE, methodsInfoService);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
@@ -1144,5 +1150,21 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setReviseDelta(Integer reviseDelta) {
         this.reviseDelta = reviseDelta;
+    }
+
+    public Boolean getLogInfoService() {
+        return logInfoService;
+    }
+
+    public void setLogInfoService(Boolean logInfoService) {
+        this.logInfoService = logInfoService;
+    }
+
+    public String getMethodsInfoService() {
+        return methodsInfoService;
+    }
+
+    public void setMethodsInfoService(String methodsInfoService) {
+        this.methodsInfoService = methodsInfoService;
     }
 }

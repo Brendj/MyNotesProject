@@ -379,6 +379,19 @@
                 </h:panelGrid>
             </rich:panel>
 
+            <rich:panel>
+                <f:facet name="header"><h:outputText styleClass="column-header" value="Сервис информирования" /></f:facet>
+                <h:panelGrid styleClass="borderless-grid" columns="2">
+                    <h:outputText escape="true" value="Включить логирование пакетов"
+                                  styleClass="output-text" />
+                    <h:selectBooleanCheckbox value="#{optionPage.logInfoService}" styleClass="output-text" />
+                    <h:outputText escape="true" value="Список методов"
+                                  styleClass="output-text" />
+                    <h:inputText value="#{optionPage.methodsInfoService}" styleClass="input-text" size="100" />
+
+                </h:panelGrid>
+            </rich:panel>
+
         </h:panelGrid>
     </rich:tab>
 

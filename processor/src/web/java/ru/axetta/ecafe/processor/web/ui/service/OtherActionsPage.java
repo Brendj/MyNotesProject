@@ -24,6 +24,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.SyncStatsManager;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
+import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.richfaces.event.UploadEvent;
@@ -487,7 +488,36 @@ public class OtherActionsPage extends BasicWorkspacePage {
             getLogger().error("Error create RegularPreorders: ", e);
             printError("Во время создания регулярных предзаказов произошла ошибка с текстом " + e.getMessage());
         }
+    }
 
+    public void relevancePreordersToOrgs() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgs();
+            printMessage("Проверка соответствия ОО клиента и предзаказа завершена");
+        } catch (Exception e) {
+            getLogger().error("Error create relevancePreordersToOrgs: ", e);
+            printError("Во время проверки соответствия ОО клиента и предзаказа произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
+    public void relevancePreordersToMenu() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu();
+            printMessage("Проверка соответствия меню и предзаказа завершена");
+        } catch (Exception e) {
+            getLogger().error("Error create relevancePreordersToMenu: ", e);
+            printError("Во время проверки соответствия меню и предзаказа произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
+    public void relevancePreordersToOrgFlag() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgFlag();
+            printMessage("Проверка соответствия флага включения функционала предзаказа ОО завершена");
+        } catch (Exception e) {
+            getLogger().error("Error create relevancePreordersToOrgFlag: ", e);
+            printError("Во время проверки соответствия флага включения функционала предзаказа ОО произошла ошибка с текстом " + e.getMessage());
+        }
     }
 
     public void runApplicationForFoodProcessingService() throws Exception {
