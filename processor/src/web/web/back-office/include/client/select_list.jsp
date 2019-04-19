@@ -98,7 +98,7 @@ background-image: url("/images/16x16/delete.png");
                     </rich:column>
 
                     <f:facet name="footer">
-                        <h:panelGroup>
+                        <h:panelGroup style="display:block; text-align:center">
                             <a4j:commandButton type="button" image="/images/16x16/left-arrow.png"
                                                action="#{mainPage.clientSelectListPage.pageBack}"
                                                reRender="modalClientSelectorTable,selectedClientsTable"
