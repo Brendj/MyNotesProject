@@ -16,8 +16,8 @@ import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingManager;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ARMsSettingsType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.OrgSettingsReportItem;
 import ru.axetta.ecafe.processor.core.report.OrgSettingsReport;
+import ru.axetta.ecafe.processor.core.report.OrgSettingsReportItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
@@ -28,9 +28,11 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
@@ -39,6 +41,7 @@ import java.util.*;
 
 @Component
 @Scope("session")
+@DependsOn("runtimeContext")
 public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSelectPage.CompleteHandlerList{
 
     private Integer status = 0;
@@ -78,8 +81,9 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
         return selectItemList;
     }
 
-    @Override
-    public void fill(Session session) throws Exception {
+    @PostConstruct
+    public void initComponents() throws Exception {
+        Session session = RuntimeContext.getInstance().createReportPersistenceSession();
         statuses = buildStatuses();
         listOfOrgDistricts = buildListOfOrgDistricts(session);
     }
@@ -118,6 +122,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
             transaction = null;
         } catch (Exception e){
             logger.error("Can't build HTML report: ", e);
+            printError("Не удалось построить отчет: " + e.getMessage());
         } finally {
             HibernateUtils.close(persistenceSession, logger);
             HibernateUtils.rollback(transaction, logger);
@@ -184,6 +189,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     public void applyChanges() {
         if(CollectionUtils.isEmpty(items)){
+            printError("Для применения настроек необходимо выгрузить в таблицу хотя бы 1 ОО");
             return;
         }
 

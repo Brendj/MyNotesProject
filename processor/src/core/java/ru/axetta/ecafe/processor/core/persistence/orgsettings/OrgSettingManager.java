@@ -37,7 +37,10 @@ public class OrgSettingManager {
         return "";
     }
 
-    public void createOrUpdateOrgSettingValue(Org org, SettingType settingType, String value, Session session)throws Exception{
+    public void createOrUpdateOrgSettingValue(Org org, SettingType settingType, Object value, Session session) throws Exception{
+        if(!settingType.validateSettingValue(value)){
+            throw new IllegalArgumentException("Value instance of " + value.getClass() + ", but expected " + settingType.getExpectedClass());
+        }
         Integer settingGroup = settingType.getSettingGroupId();
         Integer settingTypeId = settingType.getId();
         try {
@@ -77,13 +80,13 @@ public class OrgSettingManager {
                 targetItem.setOrgSetting(targetGroup);
                 targetItem.setSettingType(settingTypeId);
                 targetItem.setVersion(lastVersionOfOrgSettingItem == null ? DEFAULT_VERSION : lastVersionOfOrgSettingItem + 1L);
-                targetItem.setSettingValue(value);
+                targetItem.setSettingValue(value.toString());
                 session.save(targetItem);
                 targetGroup.getOrgSettingItems().add(targetItem);
             } else {
                 targetItem.setLastUpdate(new Date());
                 targetItem.setVersion(lastVersionOfOrgSettingItem == null ? DEFAULT_VERSION : lastVersionOfOrgSettingItem + 1L);
-                targetItem.setSettingValue(value);
+                targetItem.setSettingValue(value.toString());
                 session.update(targetItem);
             }
         } catch (Exception e){
