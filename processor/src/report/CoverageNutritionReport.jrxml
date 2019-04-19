@@ -383,56 +383,56 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<staticText>
-								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="0" y="0" width="180" height="60"/>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="0" y="0" width="180" height="61"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="10" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Платное питание + Бесплатное]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="60" y="60" width="60" height="30"/>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="60" y="61" width="60" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
 								<text><![CDATA[кол-во  комплексов ]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="120" y="60" width="60" height="30"/>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="120" y="61" width="60" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
 								<text><![CDATA[% уникальных покупателей]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="0" y="60" width="60" height="30"/>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="0" y="61" width="60" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
 								<text><![CDATA[кол-во покупателей ]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="180" y="0" width="180" height="60"/>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="180" y="0" width="180" height="61"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="10" isBold="true"/>
 								</textElement>
 								<text><![CDATA[Буфет общее]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="240" y="60" width="60" height="30"/>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="240" y="61" width="60" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
 								<text><![CDATA[кол-во  комплексов ]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="300" y="60" width="60" height="30"/>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="300" y="61" width="60" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
 								<text><![CDATA[% уникальных покупателей]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="180" y="60" width="60" height="30"/>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="180" y="61" width="60" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
@@ -523,6 +523,18 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10"/>
 							</textElement>
+							<textFieldExpression><![CDATA[($V{group}.contains("1-4") && !$V{foodType}.toLowerCase().contains("бесплатное")) ?
+    String.format("%.2f", $V{idOfClientMeasure}.doubleValue() / $V{studentsCountYoung}.doubleValue() * 100.f) :
+($V{group}.contains("1-4") && $V{foodType}.toLowerCase().contains("бесплатное")) ?
+    String.format("%.2f", $V{idOfClientMeasure}.doubleValue() / $V{benefitStudentsCountYoung}.doubleValue() * 100.f) :
+($V{group}.contains("5-9") && !$V{foodType}.toLowerCase().contains("бесплатное")) ?
+    String.format("%.2f", $V{idOfClientMeasure}.doubleValue() / $V{studentsCountMiddle}.doubleValue() * 100.f) :
+($V{group}.contains("5-9") && $V{foodType}.toLowerCase().contains("бесплатное")) ?
+    String.format("%.2f", $V{idOfClientMeasure}.doubleValue() / $V{benefitStudentsCountMiddle}.doubleValue() * 100.f) :
+($V{group}.contains("10-11") && !$V{foodType}.toLowerCase().contains("бесплатное")) ?
+    String.format("%.2f", $V{idOfClientMeasure}.doubleValue() / $V{studentsCountOld}.doubleValue() * 100.f) :
+($V{group}.contains("10-11") && $V{foodType}.toLowerCase().contains("бесплатное")) ?
+    String.format("%.2f", $V{idOfClientMeasure}.doubleValue() / $V{benefitStudentsCountOld}.doubleValue() * 100.f) : ""]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
@@ -551,6 +563,12 @@
 						<textField>
 							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="120" y="0" width="60" height="25"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[($V{group}.contains("1-4")) ?
+    String.format("%.2f", $V{idOfClientsPaidAndFreeMeasure}.doubleValue() / ($V{studentsCountYoung}.doubleValue() + $V{benefitStudentsCountYoung}) * 100.f) :
+($V{group}.contains("5-9")) ?
+    String.format("%.2f", $V{idOfClientsPaidAndFreeMeasure}.doubleValue() / ($V{studentsCountMiddle}.doubleValue() + $V{benefitStudentsCountMiddle}) * 100.f) :
+($V{group}.contains("10-11")) ?
+    String.format("%.2f", $V{idOfClientsPaidAndFreeMeasure}.doubleValue() / ($V{studentsCountOld}.doubleValue() + $V{benefitStudentsCountOld}) * 100.f) : ""]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="180" y="0" width="60" height="25"/>
@@ -560,6 +578,12 @@
 						<textField>
 							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="300" y="0" width="60" height="25"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
+							<textFieldExpression><![CDATA[($V{group}.contains("1-4")) ?
+    String.format("%.2f", $V{idOfClientBuffetMeasure}.doubleValue() / ($V{studentsCountYoung}.doubleValue() + $V{benefitStudentsCountYoung}) * 100.f) :
+($V{group}.contains("5-9")) ?
+    String.format("%.2f", $V{idOfClientBuffetMeasure}.doubleValue() / ($V{studentsCountMiddle}.doubleValue() + $V{benefitStudentsCountMiddle}) * 100.f) :
+($V{group}.contains("10-11")) ?
+    String.format("%.2f", $V{idOfClientBuffetMeasure}.doubleValue() / ($V{studentsCountOld}.doubleValue() + $V{benefitStudentsCountOld}) * 100.f) : ""]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="240" y="0" width="60" height="25"/>
