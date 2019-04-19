@@ -4,16 +4,23 @@
 
 package ru.axetta.ecafe.processor.web.ui.client;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
+import javax.faces.application.FacesMessage;
+import javax.faces.context.FacesContext;
 import java.util.*;
 
 /**
@@ -24,6 +31,24 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class ClientSelectListPage extends BasicPage implements OrgSelectPage.CompleteHandler {
+
+    private final Logger logger = LoggerFactory.getLogger(ClientSelectListPage.class);
+
+    public Integer getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
+    public Integer getOffset() {
+        return offset;
+    }
+
+    public void setOffset(Integer offset) {
+        this.offset = offset;
+    }
 
     public interface CompleteHandler {
         void completeClientSelection(Session session, List<Item> items) throws Exception;
@@ -268,6 +293,9 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
     private List<Item> items = Collections.emptyList();
     private List<Item> selectedItems = new ArrayList<Item>(); // Collections.emptyList();
     private final ClientFilter clientFilter = new ClientFilter();
+    private Integer limit = 10;
+    private Integer offset = 0;
+    private final int OFFSET = 10;
 
     public void pushCompleteHandler(CompleteHandler handler) {
         completeHandlers.push(handler);
@@ -279,8 +307,8 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
             completeHandlers.peek().completeClientSelection(session, selectedItems);
             completeHandlers.pop();
         }
-        clientFilter.setPermanentOrgId(null);
-        clientFilter.setOrg(new ClientFilter.OrgItem());
+        //clientFilter.setPermanentOrgId(null);
+        //clientFilter.setOrg(new ClientFilter.OrgItem());
         removeAllFromSelected();
     }
 
@@ -393,6 +421,67 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
         this.clientFilter.setIncludeFriendlyOrg(false);
     }
 
+    public void pageBack() {
+        offset -= OFFSET;
+        clientFilter.setOffset(offset);
+        updateClientSelectListPage();
+    }
+
+    public void pageForward() {
+        offset += OFFSET;
+        clientFilter.setOffset(offset);
+        updateClientSelectListPage();
+    }
+
+    public void resetLimitOffset() {
+        clientFilter.setLimit(limit);
+        clientFilter.setOffset(0);
+    }
+
+    public Boolean showPager() {
+        return items.size() > 0;
+    }
+
+    public Boolean pageBackEnabled() {
+        return offset > 0;
+    }
+
+    public Boolean pageForwardEnabled() {
+        return items.size() == OFFSET;
+    }
+
+    private Object fillTable() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            fill(persistenceSession, selectedItems);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed to fill client selection page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return null;
+    }
+
+    public Object updateClientSelectListPage() {
+        return fillTable();
+    }
+
+    public Object apply() {
+        resetLimitOffset();
+        return fillTable();
+    }
+
     public void fill(Session session, List<Item> clientList) throws Exception {
 
         if (!clientFilter.isEmpty()) { // && this.items.isEmpty()) {
@@ -405,7 +494,7 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
             }
             this.items = items;
         }
-        if (clientList != null) {
+        if (clientList != null && clientList.size() != selectedItems.size()) {
             selectedItems.clear();
             for (Item item : clientList) {
                 selectedItems.add(item);

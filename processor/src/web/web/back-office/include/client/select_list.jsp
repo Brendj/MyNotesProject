@@ -74,8 +74,8 @@ background-image: url("/images/16x16/delete.png");
                 </rich:simpleTogglePanel>
                 <rich:spacer></rich:spacer>
                 <h:panelGrid columns="2" styleClass="borderless-grid">
-                    <a4j:commandButton value="Применить" action="#{mainPage.updateClientSelectListPage}"
-                                       reRender="modalClientListSelectorForm" styleClass="command-button" />
+                    <a4j:commandButton value="Применить" action="#{mainPage.clientSelectListPage.apply()}"
+                                       reRender="modalClientListSelectorForm" styleClass="command-button" oncomplete="#{mainPage.clientSelectListPage.resetLimitOffset()}"/>
                     <a4j:commandButton value="Очистить" action="#{mainPage.clearClientSelectListPageFilter}"
                                        reRender="modalClientListSelectorForm" ajaxSingle="true"
                                        styleClass="command-button" />
@@ -98,16 +98,17 @@ background-image: url("/images/16x16/delete.png");
                     </rich:column>
 
                     <f:facet name="footer">
-                        <rich:datascroller for="modalClientSelectorTable" renderIfSinglePage="false" maxPages="5"
-                                           fastControls="hide" stepControls="auto" boundaryControls="hide">
-                            <f:facet name="previous">
-                                <h:graphicImage value="/images/16x16/left-arrow.png" />
-                            </f:facet>
-                            <f:facet name="next">
-                                <h:graphicImage value="/images/16x16/right-arrow.png" />
-                            </f:facet>
-                            <a4j:support event="onpagechange"/>
-                        </rich:datascroller>
+                        <h:panelGroup>
+                            <a4j:commandButton type="button" image="/images/16x16/left-arrow.png"
+                                               action="#{mainPage.clientSelectListPage.pageBack}"
+                                               reRender="modalClientSelectorTable,selectedClientsTable"
+                                               rendered="#{mainPage.clientSelectListPage.showPager() && mainPage.clientSelectListPage.pageBackEnabled()}" />
+                            <rich:spacer/>
+                            <a4j:commandButton type="button" image="/images/16x16/right-arrow.png"
+                                               action="#{mainPage.clientSelectListPage.pageForward}"
+                                               reRender="modalClientSelectorTable,selectedClientsTable"
+                                               rendered="#{mainPage.clientSelectListPage.showPager() && mainPage.clientSelectListPage.pageForwardEnabled()}" />
+                        </h:panelGroup>
                     </f:facet>
                 </rich:dataTable>
                 <a4j:commandButton value="Выбрать всех"
