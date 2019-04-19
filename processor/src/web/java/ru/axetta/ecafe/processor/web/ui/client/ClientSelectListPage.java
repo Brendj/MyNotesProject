@@ -435,7 +435,8 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
 
     public void resetLimitOffset() {
         clientFilter.setLimit(limit);
-        clientFilter.setOffset(0);
+        offset = 0;
+        clientFilter.setOffset(offset);
     }
 
     public Boolean showPager() {

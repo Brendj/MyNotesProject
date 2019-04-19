@@ -83,7 +83,7 @@ background-image: url("/images/16x16/delete.png");
                 <h:outputText escape="true" value="Выберите клиентов:" styleClass="output-text"
                               rendered="#{!mainPage.clientSelectListPage.isItemsEmpty()}"/>
                 <rich:dataTable width="100%" align="center" id="modalClientSelectorTable"
-                                value="#{mainPage.clientSelectListPage.items}" var="item" rows="8" columns="2"
+                                value="#{mainPage.clientSelectListPage.items}" var="item" rows="10" columns="2"
                                 footerClass="data-table-footer" columnClasses="left-aligned-column"
                                 rowClasses="select-panel-row" onRowMouseOver="this.style.backgroundColor='#e6e6e6'"
                                 onRowMouseOut="this.style.backgroundColor='#{a4jSkin.tableBackgroundColor}'">
