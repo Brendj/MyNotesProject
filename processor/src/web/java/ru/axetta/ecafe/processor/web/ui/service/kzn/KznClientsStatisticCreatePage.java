@@ -61,6 +61,8 @@ public class KznClientsStatisticCreatePage extends KznClientsStatisticPage {
             transaction.commit();
             transaction = null;
             printMessage("Сохранено");
+            completeOrgSelection(session, null);
+            clear();
         } catch (Exception e) {
             logger.error("Error in reload KznClientsStatisticReportPage: ", e);
         } finally {
