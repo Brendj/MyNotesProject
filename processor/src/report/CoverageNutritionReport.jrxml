@@ -52,6 +52,15 @@
 	<parameter name="OVERRIDE_GroupComparator" class="java.util.Comparator"/>
 	<parameter name="OVERRIDE_FoodTypeComparator" class="java.util.Comparator"/>
 	<field name="schoolNumber" class="java.lang.Integer"/>
+	<field name="studentsCountTotal" class="java.lang.Long"/>
+	<field name="studentsCountYoung" class="java.lang.Long"/>
+	<field name="studentsCountMiddle" class="java.lang.Long"/>
+	<field name="studentsCountOld" class="java.lang.Long"/>
+	<field name="benefitStudentsCountYoung" class="java.lang.Long"/>
+	<field name="benefitStudentsCountMiddle" class="java.lang.Long"/>
+	<field name="benefitStudentsCountOld" class="java.lang.Long"/>
+	<field name="benefitStudentsCountTotal" class="java.lang.Long"/>
+	<field name="employeeCount" class="java.lang.Long"/>
 	<field name="group" class="java.lang.String"/>
 	<field name="foodType" class="java.lang.String"/>
 	<field name="complexName" class="java.lang.String"/>
@@ -81,11 +90,74 @@
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="0" y="0" width="80" height="120"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="0" y="0" width="80" height="121"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font isBold="true"/>
+								<font size="9" isBold="true"/>
 							</textElement>
 							<text><![CDATA[№ школы]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="80" y="0" width="100" height="121"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="9" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Общее количество учащихся]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="180" y="0" width="100" height="121"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="9" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Количество учащихся 1-4 классов]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="280" y="0" width="100" height="121"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="9" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Количество учащихся 5-9 классов]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="380" y="0" width="100" height="121"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="9" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Количество учащихся 10-11 классов]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="880" y="0" width="100" height="121"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="9" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Количество сотрудников, администрации и прочих групп]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="680" y="0" width="100" height="121"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="9" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Количество льготников 10-11 классы]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="580" y="0" width="100" height="121"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="9" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Количество льготников 5-9 классы]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="480" y="0" width="100" height="121"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="9" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Количество льготников 1-4 классы]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="780" y="0" width="100" height="121"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="9" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Количество льготников всего]]></text>
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
@@ -99,7 +171,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement uuid="de6e2908-9ec2-46fc-a569-f296d93e2454" style="Crosstab Data Text" x="0" y="0" width="80" height="25"/>
+								<reportElement uuid="de6e2908-9ec2-46fc-a569-f296d93e2454" style="table" x="0" y="0" width="80" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{schoolNumber}]]></textFieldExpression>
 							</textField>
@@ -111,6 +183,159 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="studentsCountTotal" width="100" totalPosition="End">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{studentsCountTotal}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="cf403b74-d035-4c79-a83a-2756f7429a65" style="table" x="0" y="0" width="100" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{studentsCountTotal}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="studentsCountYoung" width="100" totalPosition="End">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{studentsCountYoung}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="2aeaf291-d82b-49ef-8f28-78397b3a6806" style="table" x="0" y="0" width="100" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{studentsCountYoung}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="studentsCountMiddle" width="100" totalPosition="End">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{studentsCountMiddle}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="f1ae8c22-8885-43a7-9560-7fca68fe58e0" style="table" x="0" y="0" width="100" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{studentsCountMiddle}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="studentsCountOld" width="100" totalPosition="End">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{studentsCountOld}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="55814637-58aa-4432-b061-8cc52ed1b72e" style="table" x="0" y="0" width="100" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{studentsCountOld}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="benefitStudentsCountYoung" width="100" totalPosition="End">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{benefitStudentsCountYoung}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="48e2f215-b5d8-4521-8dba-bba37e7694f9" style="table" x="0" y="0" width="100" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{benefitStudentsCountYoung}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="benefitStudentsCountMiddle" width="100" totalPosition="End">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{benefitStudentsCountMiddle}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="1bd62b91-3353-4bd6-a5a2-e2d694418b80" style="table" x="0" y="0" width="100" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{benefitStudentsCountMiddle}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="benefitStudentsCountOld" width="100" totalPosition="End">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{benefitStudentsCountOld}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="ed3d1900-711c-40e5-887d-1981fbe0d55c" style="table" x="0" y="0" width="100" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{benefitStudentsCountOld}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="benefitStudentsCountTotal" width="100" totalPosition="End">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{benefitStudentsCountTotal}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="068217c6-9939-4e67-815b-859b4d8df373" style="table" x="0" y="0" width="100" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{benefitStudentsCountTotal}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="employeeCount" width="100" totalPosition="End">
+					<bucket class="java.lang.Long">
+						<bucketExpression><![CDATA[$F{employeeCount}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="2f89b403-2fbd-463a-b62d-fd3dfbefbe9e" style="table" x="0" y="0" width="100" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{employeeCount}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<columnGroup name="group" height="30" totalPosition="End" headerPosition="Stretch">
@@ -133,7 +358,7 @@
 						<cellContents mode="Transparent" style="Crosstab Data Text"/>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<columnGroup name="foodType" height="30" totalPosition="End" headerPosition="Stretch">
+				<columnGroup name="foodType" height="31" totalPosition="End" headerPosition="Stretch">
 					<bucket order="Descending" class="java.lang.String">
 						<bucketExpression><![CDATA[$F{foodType}]]></bucketExpression>
 						<comparatorExpression><![CDATA[$P{OVERRIDE_FoodTypeComparator}]]></comparatorExpression>
@@ -360,6 +585,114 @@
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell width="0" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="complexName">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountTotal">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="group">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="foodType">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="complexName">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountYoung">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="group">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="foodType">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="complexName">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountMiddle">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="group">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="foodType">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="complexName">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountOld">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="group">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="foodType">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="complexName">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountYoung">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="group">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="foodType">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="complexName">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountMiddle">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="group">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="foodType">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="complexName">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountOld">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="group">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="foodType">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="complexName">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountTotal">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="group">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="foodType">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="complexName">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="employeeCount">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="employeeCount" columnTotalGroup="group">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="employeeCount" columnTotalGroup="foodType">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="employeeCount" columnTotalGroup="complexName">
 					<cellContents/>
 				</crosstabCell>
 			</crosstab>
