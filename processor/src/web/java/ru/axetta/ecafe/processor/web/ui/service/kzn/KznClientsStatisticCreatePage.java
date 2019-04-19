@@ -7,9 +7,9 @@ package ru.axetta.ecafe.processor.web.ui.service.kzn;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.KznClientsStatistic;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -20,21 +20,22 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("session")
-public class KznClientsStatisticCreatePage extends OnlineReportPage {
+public class KznClientsStatisticCreatePage extends KznClientsStatisticPage {
 
     private Logger logger = LoggerFactory.getLogger(KznClientsStatisticCreatePage.class);
 
-    private Long studentsCountTotal;
-    private Long studentsCountYoung;
-    private Long studentsCountMiddle;
-    private Long studentsCountOld;
-    private Long benefitStudentsCountYoung;
-    private Long benefitStudentsCountMiddle;
-    private Long benefitStudentsCountOld;
-    private Long benefitStudentsCountTotal;
-    private Long employeeCount;
-
     public void save() {
+        if (null == idOfOrg) {
+            printError("Выберите организацию");
+            clear();
+            return;
+        }
+
+        if (!validate()) {
+            printError("Заполните все поля");
+            return;
+        }
+
         Session session = null;
         Transaction transaction = null;
 
@@ -42,21 +43,42 @@ public class KznClientsStatisticCreatePage extends OnlineReportPage {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
+            if (null != DAOUtils.getKznClientStatisticByOrg(session, idOfOrg)) {
+                printError("Для выбранной школы уже имеются данные");
+                return;
+            }
+
             Org org = (Org) session.load(Org.class, idOfOrg);
 
-            KznClientsStatistic kznClientsStatistic = new KznClientsStatistic(org, studentsCountTotal,
-                    studentsCountYoung, studentsCountMiddle, studentsCountOld, benefitStudentsCountYoung,
-                    benefitStudentsCountMiddle, benefitStudentsCountOld, benefitStudentsCountTotal, employeeCount);
+            KznClientsStatistic kznClientsStatistic = new KznClientsStatistic(org,
+                    stringAsLong(getStudentsCountTotal()), stringAsLong(getStudentsCountYoung()),
+                    stringAsLong(getStudentsCountMiddle()), stringAsLong(getStudentsCountOld()),
+                    stringAsLong(getBenefitStudentsCountYoung()), stringAsLong(getBenefitStudentsCountMiddle()),
+                    stringAsLong(getBenefitStudentsCountOld()), stringAsLong(getBenefitStudentsCountTotal()),
+                    stringAsLong(getEmployeeCount()));
             session.save(kznClientsStatistic);
 
             transaction.commit();
             transaction = null;
+            printMessage("Сохранено");
         } catch (Exception e) {
             logger.error("Error in reload KznClientsStatisticReportPage: ", e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    @Override
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        this.idOfOrg = idOfOrg;
+        if (this.idOfOrg == null) {
+            filter = "Не выбрано";
+        } else {
+            Org org = (Org)session.load(Org.class, this.idOfOrg);
+            filter = org.getShortName();
+        }
+        clear();
     }
 
     public void showOrgSelectPage() {
@@ -66,77 +88,5 @@ public class KznClientsStatisticCreatePage extends OnlineReportPage {
     @Override
     public String getPageFilename() {
         return "service/kzn/statistic/create";
-    }
-
-    public Long getStudentsCountTotal() {
-        return studentsCountTotal;
-    }
-
-    public void setStudentsCountTotal(Long studentsCountTotal) {
-        this.studentsCountTotal = studentsCountTotal;
-    }
-
-    public Long getStudentsCountYoung() {
-        return studentsCountYoung;
-    }
-
-    public void setStudentsCountYoung(Long studentsCountYoung) {
-        this.studentsCountYoung = studentsCountYoung;
-    }
-
-    public Long getStudentsCountMiddle() {
-        return studentsCountMiddle;
-    }
-
-    public void setStudentsCountMiddle(Long studentsCountMiddle) {
-        this.studentsCountMiddle = studentsCountMiddle;
-    }
-
-    public Long getStudentsCountOld() {
-        return studentsCountOld;
-    }
-
-    public void setStudentsCountOld(Long studentsCountOld) {
-        this.studentsCountOld = studentsCountOld;
-    }
-
-    public Long getBenefitStudentsCountYoung() {
-        return benefitStudentsCountYoung;
-    }
-
-    public void setBenefitStudentsCountYoung(Long benefitStudentsCountYoung) {
-        this.benefitStudentsCountYoung = benefitStudentsCountYoung;
-    }
-
-    public Long getBenefitStudentsCountMiddle() {
-        return benefitStudentsCountMiddle;
-    }
-
-    public void setBenefitStudentsCountMiddle(Long benefitStudentsCountMiddle) {
-        this.benefitStudentsCountMiddle = benefitStudentsCountMiddle;
-    }
-
-    public Long getBenefitStudentsCountOld() {
-        return benefitStudentsCountOld;
-    }
-
-    public void setBenefitStudentsCountOld(Long benefitStudentsCountOld) {
-        this.benefitStudentsCountOld = benefitStudentsCountOld;
-    }
-
-    public Long getBenefitStudentsCountTotal() {
-        return benefitStudentsCountTotal;
-    }
-
-    public void setBenefitStudentsCountTotal(Long benefitStudentsCountTotal) {
-        this.benefitStudentsCountTotal = benefitStudentsCountTotal;
-    }
-
-    public Long getEmployeeCount() {
-        return employeeCount;
-    }
-
-    public void setEmployeeCount(Long employeeCount) {
-        this.employeeCount = employeeCount;
     }
 }

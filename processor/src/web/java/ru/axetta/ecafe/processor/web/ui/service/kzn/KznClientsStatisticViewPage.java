@@ -59,12 +59,6 @@ public class KznClientsStatisticViewPage extends OnlineReportPage {
         MainPage.getSessionInstance().showOrgListSelectPage();
     }
 
-    public Object showAddingModalPage() {
-        MainPage mainPage = MainPage.getSessionInstance();
-        mainPage.getModalPages().push(this);
-        return null;
-    }
-
     @Override
     public String getPageFilename() {
         return "service/kzn/statistic/view";

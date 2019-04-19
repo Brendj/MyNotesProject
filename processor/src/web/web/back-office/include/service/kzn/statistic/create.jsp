@@ -84,6 +84,9 @@
         </f:facet>
     </a4j:status>
 
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+
     <a4j:commandButton value="Сохранить" reRender="kznClientsStatisticPanelGrid"
                        action="#{kznClientsStatisticCreatePage.save()}"/>
 

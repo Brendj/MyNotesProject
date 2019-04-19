@@ -4109,11 +4109,11 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static void deleteFromKznClientStatisticByOrgId(Session session, Long idOfOrg) {
+    public static Boolean deleteFromKznClientStatisticByOrgId(Session session, Long idOfOrg) {
         Query query = session.createQuery(
                 "delete from KznClientsStatistic statistic where idOfOrg=:id");
         query.setParameter("id", idOfOrg);
-        query.executeUpdate();
+        return query.executeUpdate() > 0;
     }
 
     public static KznClientsStatistic getKznClientStatisticByOrg(Session session, Long idOfOrg) {

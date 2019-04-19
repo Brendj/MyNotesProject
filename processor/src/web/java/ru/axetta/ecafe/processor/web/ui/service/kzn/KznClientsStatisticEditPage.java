@@ -10,7 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
-import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -22,23 +21,18 @@ import org.springframework.stereotype.Component;
 
 @Component
 @Scope("session")
-public class KznClientsStatisticEditPage extends OnlineReportPage {
+public class KznClientsStatisticEditPage extends KznClientsStatisticPage {
 
     private Logger logger = LoggerFactory.getLogger(KznClientsStatisticEditPage.class);
-
-    private Long studentsCountTotal;
-    private Long studentsCountYoung;
-    private Long studentsCountMiddle;
-    private Long studentsCountOld;
-    private Long benefitStudentsCountYoung;
-    private Long benefitStudentsCountMiddle;
-    private Long benefitStudentsCountOld;
-    private Long benefitStudentsCountTotal;
-    private Long employeeCount;
 
     public void save() {
         if (null == idOfOrg) {
             printError("Выберите организацию");
+            return;
+        }
+
+        if (!validate()) {
+            printError("Заполните все поля");
             return;
         }
 
@@ -57,48 +51,57 @@ public class KznClientsStatisticEditPage extends OnlineReportPage {
             }
 
             boolean modified = false;
-            if (!kznClientsStatistic.getStudentsCountTotal().equals(studentsCountTotal)) {
-                kznClientsStatistic.setStudentsCountTotal(studentsCountTotal);
+            Long studentsCountTotalLong = stringAsLong(getStudentsCountTotal());
+            if (!kznClientsStatistic.getStudentsCountTotal().equals(studentsCountTotalLong)) {
+                kznClientsStatistic.setStudentsCountTotal(studentsCountTotalLong);
                 modified = true;
             }
 
-            if (!kznClientsStatistic.getStudentsCountYoung().equals(studentsCountYoung)) {
-                kznClientsStatistic.setStudentsCountYoung(studentsCountYoung);
+            Long studentsCountYoungLong = stringAsLong(getStudentsCountYoung());
+            if (!kznClientsStatistic.getStudentsCountYoung().equals(studentsCountYoungLong)) {
+                kznClientsStatistic.setStudentsCountYoung(studentsCountYoungLong);
                 modified = true;
             }
 
-            if (!kznClientsStatistic.getStudentsCountMiddle().equals(studentsCountMiddle)) {
-                kznClientsStatistic.setStudentsCountMiddle(studentsCountMiddle);
+            Long studentsCountMiddleLong = stringAsLong(getStudentsCountMiddle());
+            if (!kznClientsStatistic.getStudentsCountMiddle().equals(studentsCountMiddleLong)) {
+                kznClientsStatistic.setStudentsCountMiddle(studentsCountMiddleLong);
                 modified = true;
             }
 
-            if (!kznClientsStatistic.getStudentsCountOld().equals(studentsCountOld)) {
-                kznClientsStatistic.setStudentsCountOld(studentsCountOld);
+            Long studentsCountOldLong = stringAsLong(getStudentsCountOld());
+            if (!kznClientsStatistic.getStudentsCountOld().equals(studentsCountOldLong)) {
+                kznClientsStatistic.setStudentsCountOld(studentsCountOldLong);
                 modified = true;
             }
 
-            if (!kznClientsStatistic.getBenefitStudentsCountYoung().equals(benefitStudentsCountYoung)) {
-                kznClientsStatistic.setBenefitStudentsCountYoung(benefitStudentsCountYoung);
+            Long benefitStudentsCountYoungLong = stringAsLong(getBenefitStudentsCountYoung());
+            if (!kznClientsStatistic.getBenefitStudentsCountYoung().equals(benefitStudentsCountYoungLong)) {
+                kznClientsStatistic.setBenefitStudentsCountYoung(benefitStudentsCountYoungLong);
                 modified = true;
             }
 
-            if (!kznClientsStatistic.getBenefitStudentsCountMiddle().equals(benefitStudentsCountMiddle)) {
-                kznClientsStatistic.setBenefitStudentsCountMiddle(benefitStudentsCountMiddle);
+            Long benefitStudentsCountMiddleLong = stringAsLong(getBenefitStudentsCountMiddle());
+            if (!kznClientsStatistic.getBenefitStudentsCountMiddle().equals(benefitStudentsCountMiddleLong)) {
+                kznClientsStatistic.setBenefitStudentsCountMiddle(benefitStudentsCountMiddleLong);
                 modified = true;
             }
 
-            if (!kznClientsStatistic.getBenefitStudentsCountOld().equals(benefitStudentsCountOld)) {
-                kznClientsStatistic.setBenefitStudentsCountOld(benefitStudentsCountOld);
+            Long benefitStudentsCountOldLong = stringAsLong(getBenefitStudentsCountOld());
+            if (!kznClientsStatistic.getBenefitStudentsCountOld().equals(benefitStudentsCountOldLong)) {
+                kznClientsStatistic.setBenefitStudentsCountOld(benefitStudentsCountOldLong);
                 modified = true;
             }
 
-            if (!kznClientsStatistic.getBenefitStudentsCountTotal().equals(benefitStudentsCountTotal)) {
-                kznClientsStatistic.setBenefitStudentsCountTotal(benefitStudentsCountTotal);
+            Long benefitStudentsCountTotalLong = stringAsLong(getBenefitStudentsCountTotal());
+            if (!kznClientsStatistic.getBenefitStudentsCountTotal().equals(benefitStudentsCountTotalLong)) {
+                kznClientsStatistic.setBenefitStudentsCountTotal(benefitStudentsCountTotalLong);
                 modified = true;
             }
 
-            if (!kznClientsStatistic.getEmployeeCount().equals(employeeCount)) {
-                kznClientsStatistic.setEmployeeCount(employeeCount);
+            Long employeeCountLong = stringAsLong(getEmployeeCount());
+            if (!kznClientsStatistic.getEmployeeCount().equals(employeeCountLong)) {
+                kznClientsStatistic.setEmployeeCount(employeeCountLong);
                 modified = true;
             }
 
@@ -121,6 +124,7 @@ public class KznClientsStatisticEditPage extends OnlineReportPage {
     public void find() {
         if (null == idOfOrg) {
             printError("Выберите организацию");
+            clear();
             return;
         }
 
@@ -134,18 +138,19 @@ public class KznClientsStatisticEditPage extends OnlineReportPage {
             KznClientsStatistic kznClientsStatistic = DAOUtils.getKznClientStatisticByOrg(session, idOfOrg);
             if (null == kznClientsStatistic) {
                 printError("Не удалось найти данные для выбранной организации");
+                clear();
                 return;
             }
 
-            studentsCountTotal = kznClientsStatistic.getStudentsCountTotal();
-            studentsCountYoung = kznClientsStatistic.getStudentsCountYoung();
-            studentsCountMiddle = kznClientsStatistic.getStudentsCountMiddle();
-            studentsCountOld = kznClientsStatistic.getBenefitStudentsCountOld();
-            benefitStudentsCountYoung = kznClientsStatistic.getBenefitStudentsCountYoung();
-            benefitStudentsCountMiddle = kznClientsStatistic.getBenefitStudentsCountMiddle();
-            benefitStudentsCountOld = kznClientsStatistic.getBenefitStudentsCountOld();
-            benefitStudentsCountTotal = kznClientsStatistic.getBenefitStudentsCountTotal();
-            employeeCount = kznClientsStatistic.getEmployeeCount();
+            setStudentsCountTotal(kznClientsStatistic.getStudentsCountTotal().toString());
+            setStudentsCountYoung(kznClientsStatistic.getStudentsCountYoung().toString());
+            setStudentsCountMiddle(kznClientsStatistic.getStudentsCountMiddle().toString());
+            setStudentsCountOld(kznClientsStatistic.getBenefitStudentsCountOld().toString());
+            setBenefitStudentsCountYoung(kznClientsStatistic.getBenefitStudentsCountYoung().toString());
+            setBenefitStudentsCountMiddle(kznClientsStatistic.getBenefitStudentsCountMiddle().toString());
+            setBenefitStudentsCountOld(kznClientsStatistic.getBenefitStudentsCountOld().toString());
+            setBenefitStudentsCountTotal(kznClientsStatistic.getBenefitStudentsCountTotal().toString());
+            setEmployeeCount(kznClientsStatistic.getEmployeeCount().toString());
 
             transaction.commit();
             transaction = null;
@@ -170,29 +175,22 @@ public class KznClientsStatisticEditPage extends OnlineReportPage {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            DAOUtils.deleteFromKznClientStatisticByOrgId(session, idOfOrg);
-            completeOrgSelection(session, null);
+            if (DAOUtils.deleteFromKznClientStatisticByOrgId(session, idOfOrg)) {
+                completeOrgSelection(session, null);
+                printMessage("Удалено");
+            } else {
+                printMessage("Нет данных для выбранной организации");
+            }
 
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
             logger.error("Error in reload KznClientsStatisticReportPage: ", e);
+            printError("Ошибка при удалении");
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
-    }
-
-    private void clear() {
-        studentsCountTotal = null;
-        studentsCountYoung = null;
-        studentsCountMiddle = null;
-        studentsCountOld = null;
-        benefitStudentsCountYoung = null;
-        benefitStudentsCountMiddle = null;
-        benefitStudentsCountOld = null;
-        benefitStudentsCountTotal = null;
-        employeeCount = null;
     }
 
     @Override
@@ -214,77 +212,5 @@ public class KznClientsStatisticEditPage extends OnlineReportPage {
     @Override
     public String getPageFilename() {
         return "service/kzn/statistic/edit";
-    }
-
-    public Long getStudentsCountTotal() {
-        return studentsCountTotal;
-    }
-
-    public void setStudentsCountTotal(Long studentsCountTotal) {
-        this.studentsCountTotal = studentsCountTotal;
-    }
-
-    public Long getStudentsCountYoung() {
-        return studentsCountYoung;
-    }
-
-    public void setStudentsCountYoung(Long studentsCountYoung) {
-        this.studentsCountYoung = studentsCountYoung;
-    }
-
-    public Long getStudentsCountMiddle() {
-        return studentsCountMiddle;
-    }
-
-    public void setStudentsCountMiddle(Long studentsCountMiddle) {
-        this.studentsCountMiddle = studentsCountMiddle;
-    }
-
-    public Long getStudentsCountOld() {
-        return studentsCountOld;
-    }
-
-    public void setStudentsCountOld(Long studentsCountOld) {
-        this.studentsCountOld = studentsCountOld;
-    }
-
-    public Long getBenefitStudentsCountYoung() {
-        return benefitStudentsCountYoung;
-    }
-
-    public void setBenefitStudentsCountYoung(Long benefitStudentsCountYoung) {
-        this.benefitStudentsCountYoung = benefitStudentsCountYoung;
-    }
-
-    public Long getBenefitStudentsCountMiddle() {
-        return benefitStudentsCountMiddle;
-    }
-
-    public void setBenefitStudentsCountMiddle(Long benefitStudentsCountMiddle) {
-        this.benefitStudentsCountMiddle = benefitStudentsCountMiddle;
-    }
-
-    public Long getBenefitStudentsCountOld() {
-        return benefitStudentsCountOld;
-    }
-
-    public void setBenefitStudentsCountOld(Long benefitStudentsCountOld) {
-        this.benefitStudentsCountOld = benefitStudentsCountOld;
-    }
-
-    public Long getBenefitStudentsCountTotal() {
-        return benefitStudentsCountTotal;
-    }
-
-    public void setBenefitStudentsCountTotal(Long benefitStudentsCountTotal) {
-        this.benefitStudentsCountTotal = benefitStudentsCountTotal;
-    }
-
-    public Long getEmployeeCount() {
-        return employeeCount;
-    }
-
-    public void setEmployeeCount(Long employeeCount) {
-        this.employeeCount = employeeCount;
     }
 }

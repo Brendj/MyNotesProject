@@ -91,9 +91,6 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Количество сотрудников, администрации и прочих групп" />
                 </rich:column>
-                <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Редактирование" />
-                </rich:column>
             </rich:columnGroup>
         </f:facet>
         <rich:column headerClass="column-header">
