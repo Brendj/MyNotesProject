@@ -287,6 +287,19 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
             return stringBuilder.toString();
         }
 
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof Item)) {
+                return false;
+            }
+            final Item that = (Item) o;
+            if (!idOfClient.equals(that.getIdOfClient())) {
+                return false;
+            }
+            return true;
+        }
     }
 
     private final Stack<CompleteHandler> completeHandlers = new Stack<CompleteHandler>();
@@ -402,6 +415,7 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
 
     public void addAllToSelected() {
         for(Item item : items) {
+            if (selectedItems.contains(item)) continue;
             selectedItems.add(item);
             item.setSelected(true);
         }

@@ -10,9 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -22,7 +20,6 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -147,7 +144,6 @@ public class PreordersReport extends BasicReportForOrgJob {
             query.setParameter("startDate", CalendarUtils.startOfDay(startTime).getTime());
             query.setParameter("endDate", CalendarUtils.endOfDay(endTime).getTime());
             query.setParameter("idOfOrg", idOfOrg);
-            query.setParameter("orderStateCommited", Order.STATE_COMMITED);
             if (idOfClientList.size() > 0) {
                 query.setParameterList("clients", idOfClientList);
             }
