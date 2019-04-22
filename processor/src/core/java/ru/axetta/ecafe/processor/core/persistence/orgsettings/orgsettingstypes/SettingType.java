@@ -4,15 +4,13 @@
 
 package ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes;
 
-import com.sun.org.apache.xpath.internal.operations.Bool;
-
 public interface SettingType {
 
-    public Integer getSettingGroupId();
+    Integer getSettingGroupId();
 
-    public Integer getId();
+    Integer getId();
 
-    public Class getExpectedClass();
+    Class getExpectedClass();
 
-    public Boolean validateSettingValue(Object value);
+    Boolean validateSettingValue(Object value);
 }

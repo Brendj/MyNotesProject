@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.persistence.orgsettings;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.SettingType;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -37,15 +36,15 @@ public class OrgSettingManager {
         return "";
     }
 
-    public void createOrUpdateOrgSettingValue(Org org, SettingType settingType, Object value, Session session) throws Exception{
+    public void createOrUpdateOrgSettingValue(Org org, SettingType settingType, Object value, Session session,
+            Long lastVersionOfOrgSetting, Long lastVersionOfOrgSettingItem) throws Exception{
         if(!settingType.validateSettingValue(value)){
             throw new IllegalArgumentException("Value instance of " + value.getClass() + ", but expected " + settingType.getExpectedClass());
         }
         Integer settingGroup = settingType.getSettingGroupId();
         Integer settingTypeId = settingType.getId();
         try {
-            Long lastVersionOfOrgSetting = DAOUtils.getLastVersionOfOrgSettings(session);
-            Long lastVersionOfOrgSettingItem = DAOUtils.getLastVersionOfOrgSettingsItem(session);
+
 
             OrgSetting targetGroup = getTargetSetting(org, settingGroup);
 

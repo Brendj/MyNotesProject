@@ -25,12 +25,12 @@
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Организации" />
         <h:panelGroup>
-            <a4j:commandButton value="..." action="#{showOrgListSelectPage}"
+            <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
                                reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
                 <f:setPropertyActionListener value="#{orgSettingsReportPage.getStringIdOfOrgList}"
-                                             target="#{orgFilterOfSelectOrgListSelectPage}" />
+                                             target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{orgSettingsReportPage.filter}}" />
         </h:panelGroup>
@@ -246,12 +246,12 @@
             </f:facet>
             <h:panelGrid columnClasses="center-aligned-column" columns="1" rendered="#{item.idOfSetting != -1}" styleClass="center-aligned-column">
                 <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.settingName}"
-                                 action="#{showFeedingSettingEditPage}"
+                                 action="#{mainPage.showFeedingSettingEditPage}"
                                  styleClass="command-link">
                     <f:setPropertyActionListener value="#{item.idOfSetting}"
-                                                 target="#{feedingSettingEditPage.idOfSetting}" />
+                                                 target="#{mainPage.feedingSettingEditPage.idOfSetting}" />
                     <f:setPropertyActionListener value="#{item.idOfSetting}"
-                                                 target="#{selectedIdOfFeedingSetting}" />
+                                                 target="#{mainPage.selectedIdOfFeedingSetting}" />
                 </a4j:commandLink>
                 <h:outputText escape="true" value="#{item.limit}" converter="copeckSumConverter"
                               styleClass="output-text" />

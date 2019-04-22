@@ -32,7 +32,6 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import javax.annotation.PostConstruct;
 import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
 import javax.servlet.ServletOutputStream;
@@ -81,11 +80,19 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
         return selectItemList;
     }
 
-    @PostConstruct
-    public void initComponents() throws Exception {
-        Session session = RuntimeContext.getInstance().createReportPersistenceSession();
-        statuses = buildStatuses();
-        listOfOrgDistricts = buildListOfOrgDistricts(session);
+    @Override
+    public void onShow() throws Exception {
+        Session session = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            statuses = buildStatuses();
+            listOfOrgDistricts = buildListOfOrgDistricts(session);
+        } catch (Exception e){
+            logger.error("Exception when prepared the OrgSettingsPage: ", e);
+            throw e;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
     }
 
     public Integer getStatus() {
@@ -119,6 +126,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
             items = OrgSettingsReport.Builder.buildOrgSettingCollection(idOfOrgList, status, persistenceSession, selectedDistricts);
 
+            transaction.commit();
             transaction = null;
         } catch (Exception e){
             logger.error("Can't build HTML report: ", e);
@@ -210,14 +218,19 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     logger.info("Try apply settings for Org ID: " + item.getIdOfOrg());
                     Org org = (Org) session.load(Org.class, item.getIdOfOrg());
 
+                    Long lastVersionOfOrgSetting = DAOUtils.getLastVersionOfOrgSettings(session);
+                    Long lastVersionOfOrgSettingItem = DAOUtils.getLastVersionOfOrgSettingsItem(session);
+
                     org.setUsePaydableSubscriptionFeeding(item.getUsePaydableSubscriptionFeeding());
                     org.setVariableFeeding(item.getVariableFeeding());
                     org.setPreordersEnabled(item.getPreordersEnabled());
-                    manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.REVERSE_MONTH_OF_SALE, item.getReverseMonthOfSale().toString(), session);
+                    manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.REVERSE_MONTH_OF_SALE, item.getReverseMonthOfSale(),
+                            session, lastVersionOfOrgSetting, lastVersionOfOrgSettingItem);
                     org.setDenyPayPlanForTimeDifference(item.getDenyPayPlanForTimeDifference());
 
                     org.setOneActiveCard(item.getOneActiveCard());
-                    manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED, item.getEnableDuplicateCard().toString(), session);
+                    manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED, item.getEnableDuplicateCard(), session,
+                            lastVersionOfOrgSetting, lastVersionOfOrgSettingItem);
                     org.setNeedVerifyCardSign(item.getNeedVerifyCardSign());
                     if (!item.getMultiCardModeEnabled() && org.multiCardModeIsEnabled()) {
                         ClientManager.resetMultiCardModeToAllClientsAndBlockCardsAndUpRegVersion(org, session);
@@ -243,8 +256,12 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                 String problemOrgsIdString = StringUtils.join(problemOrgsId, ", ");
                 logger.warn("Can't apply settings for next Org (IDs) : " + problemOrgsIdString);
                 printWarn("Не удалось установить новые значения для следующих ID OO: " + problemOrgsIdString);
+            } else {
+                printMessage("Новые настройки применены успешно");
             }
+
             transaction.commit();
+            transaction = null;
         }catch (Exception e){
             logger.error("Can't apply settings ", e);
             printError("Не удалось запустить процедуру установки новых значений настроек: " + e.getMessage());
