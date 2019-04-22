@@ -245,7 +245,7 @@ public class MonitoringOfReportService {
                   + "LEFT JOIN cf_clients c ON cfo.idofclient = c.idofclient "
                   + "LEFT JOIN cf_clientgroups g ON g.idofclientgroup = c.idofclientgroup AND c.idoforg = g.idoforg "
                   + "LEFT JOIN cf_friendly_organization fo on fo.currentorg = c.idoforg "
-                  + "WHERE cfo.ordertype IN (:reducedPricePlan, :correctionType) AND " + orgCondition
+                  + "WHERE cfo.ordertype IN (:reducedPricePlan, :correctionType, :reservePlan, :changePlan) AND " + orgCondition
                   + "    cfo.state = 0 AND g.idofclientgroup < :employees AND cfo.createddate BETWEEN :startTime AND :endTime AND "
                   + "    cfod.menutype >= :minType AND cfod.menutype <= :maxType  AND cfod.idofrule >= 0"
                   + " group by cfo.idoforg " + groupByDay
