@@ -3493,10 +3493,6 @@ public class MainPage implements Serializable {
     }
 
     public Object showClientSelectListPage(List<ClientSelectListPage.Item> clientList) {
-        return showClientSelectListPage(clientList, null);
-    }
-
-    public Object showClientSelectListPage(List<ClientSelectListPage.Item> clientList, Long idOfOrg) {
         BasicPage currentTopMostPage = getTopMostPage();
         //if (currentTopMostPage instanceof ClientSelectListPage.CompleteHandler) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -3508,6 +3504,7 @@ public class MainPage implements Serializable {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             //clientSelectListPage.updatePermanentOrg(persistenceSession, idOfOrg);
+            clientSelectListPage.getClientFilter().setOffset(0);
             clientSelectListPage.fill(persistenceSession, clientList);
             persistenceTransaction.commit();
             persistenceTransaction = null;

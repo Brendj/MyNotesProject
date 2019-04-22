@@ -380,7 +380,7 @@ public class ClientSelectListPage extends BasicPage implements OrgSelectPage.Com
     public void removeFromSelectedOne(Item item) {
         //item.setSelected(false);
         for(Item it : items) {
-            if (item.getIdOfClient() == it.getIdOfClient()) {
+            if (item.getIdOfClient().equals(it.getIdOfClient())) {
                 it.setSelected(false);
                 break;
             }
