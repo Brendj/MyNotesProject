@@ -3493,6 +3493,10 @@ public class MainPage implements Serializable {
     }
 
     public Object showClientSelectListPage(List<ClientSelectListPage.Item> clientList) {
+        return showClientSelectListPage(clientList, null);
+    }
+
+    public Object showClientSelectListPage(List<ClientSelectListPage.Item> clientList, Long idOfOrg) {
         BasicPage currentTopMostPage = getTopMostPage();
         //if (currentTopMostPage instanceof ClientSelectListPage.CompleteHandler) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
