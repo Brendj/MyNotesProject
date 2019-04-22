@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.core.persistence.orgsettings;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.SettingType;
 
+import org.apache.commons.beanutils.ConvertUtils;
+import org.apache.commons.beanutils.converters.ClassConverter;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -20,7 +22,7 @@ public class OrgSettingManager {
 
     private static Long DEFAULT_VERSION = 1L;
 
-    public String getSettingValueFromOrg(Org org, SettingType settingType) {
+    public Object getSettingValueFromOrg(Org org, SettingType settingType) {
         Integer settingGroup = settingType.getSettingGroupId();
         Integer settingTypeId = settingType.getId();
 
@@ -29,11 +31,11 @@ public class OrgSettingManager {
         if(targetSetting != null && targetSetting.getOrgSettingItems() != null) {
             for (OrgSettingItem item : targetSetting.getOrgSettingItems()) {
                 if (item.getSettingType().equals(settingTypeId)) {
-                    return item.getSettingValue();
+                    return ConvertUtils.convert(item.getSettingValue(), settingType.getExpectedClass());
                 }
             }
         }
-        return "";
+        return null;
     }
 
     public void createOrUpdateOrgSettingValue(Org org, SettingType settingType, Object value, Session session,
@@ -44,8 +46,6 @@ public class OrgSettingManager {
         Integer settingGroup = settingType.getSettingGroupId();
         Integer settingTypeId = settingType.getId();
         try {
-
-
             OrgSetting targetGroup = getTargetSetting(org, settingGroup);
 
             if (targetGroup == null) {

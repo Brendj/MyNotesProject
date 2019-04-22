@@ -99,9 +99,7 @@ public class OrgSettingsReportItem {
         this.usePaydableSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding();
         this.variableFeeding = org.getVariableFeeding();
         this.preordersEnabled = org.getPreordersEnabled();
-        this.reverseMonthOfSale = Boolean.parseBoolean(
-                manager.getSettingValueFromOrg(org, ARMsSettingsType.REVERSE_MONTH_OF_SALE)
-        );
+        this.reverseMonthOfSale = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.REVERSE_MONTH_OF_SALE);
         this.denyPayPlanForTimeDifference = org.getDenyPayPlanForTimeDifference();
         if(setting != null) {
             this.idOfSetting = setting.getIdOfSetting();
@@ -110,9 +108,7 @@ public class OrgSettingsReportItem {
         }
 
         this.oneActiveCard = org.getOneActiveCard();
-        this.enableDuplicateCard = Boolean.parseBoolean(
-                manager.getSettingValueFromOrg(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED)
-        );
+        this.enableDuplicateCard = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED);
         this.needVerifyCardSign = org.getNeedVerifyCardSign();
         this.multiCardModeEnabled = org.multiCardModeIsEnabled();
 
