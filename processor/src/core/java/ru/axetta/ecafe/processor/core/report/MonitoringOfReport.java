@@ -87,9 +87,12 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
                 parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
             } else if(selectedPeriod.equals(FOR_THREE_DAYS)){
                 Date secondDate = CalendarUtils.calculateNextWorkDateWithoutParser(true,startTime);
+                Date thridDate = CalendarUtils.calculateNextWorkDateWithoutParser(true, secondDate);
+
                 parameterMap.put("firstDate", CalendarUtils.dateShortToStringFullYear(startTime));
                 parameterMap.put("secondDate", CalendarUtils.dateShortToStringFullYear(secondDate));
-                parameterMap.put("thridDate", CalendarUtils.dateShortToStringFullYear(endTime));
+                parameterMap.put("thridDate", CalendarUtils.dateShortToStringFullYear(thridDate));
+
                 divideIntoPeriods = true;
             }
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
