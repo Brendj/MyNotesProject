@@ -110,16 +110,16 @@ public class ConfigurationProvider {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof ConfigurationProvider)) {
             return false;
         }
 
         ConfigurationProvider that = (ConfigurationProvider) o;
 
-        if (!idOfConfigurationProvider.equals(that.idOfConfigurationProvider)) {
+        if (!idOfConfigurationProvider.equals(that.getIdOfConfigurationProvider())) {
             return false;
         }
-        if (!name.equals(that.name)) {
+        if (!name.equals(that.getName())) {
             return false;
         }
 
