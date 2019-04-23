@@ -18,9 +18,11 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.type.LongType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -50,6 +52,7 @@ public class OrgSettingsReport extends BasicReportForListOrgsJob{
         public static final String SHOW_FEEDING_SETTINGS = "showFeedingSettings";
         public static final String SHOW_CARD_SETTINGS = "showCardSettings";
         public static final String SHOW_OTHER_SETTINGS = "showOtherSetting";
+        public static final String ALL_FRIENDLY_ORGS = "allFriendlyOrgs";
 
         private String templateFilename;
 
@@ -79,6 +82,7 @@ public class OrgSettingsReport extends BasicReportForListOrgsJob{
             Boolean showFeedingSettings = Boolean.parseBoolean(getReportProperties().getProperty(SHOW_FEEDING_SETTINGS));
             Boolean showCardSettings = Boolean.parseBoolean(getReportProperties().getProperty(SHOW_CARD_SETTINGS));
             Boolean showOtherSetting = Boolean.parseBoolean(getReportProperties().getProperty(SHOW_OTHER_SETTINGS));
+            Boolean allFriendlyOrgs = Boolean.parseBoolean(getReportProperties().getProperty(ALL_FRIENDLY_ORGS));
 
             parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
             parameterMap.put(SHOW_REQUISITE, showRequisite);
@@ -87,7 +91,7 @@ public class OrgSettingsReport extends BasicReportForListOrgsJob{
             parameterMap.put(SHOW_OTHER_SETTINGS, showOtherSetting);
 
             JRDataSource dataSource = createDataSource(session, selectedDistrinct, selectedStatus,
-                    idOfOrgList);
+                    idOfOrgList, allFriendlyOrgs);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
 
@@ -98,19 +102,30 @@ public class OrgSettingsReport extends BasicReportForListOrgsJob{
         }
 
         private JRDataSource createDataSource(Session session, String selectedDistrict,
-                Integer selectedStatus, List<Long> idOfOrgList) throws Exception {
-            return new JRBeanCollectionDataSource(buildOrgSettingCollection(idOfOrgList, selectedStatus, session, selectedDistrict));
+                Integer selectedStatus, List<Long> idOfOrgList, Boolean allFriendlyOrg) throws Exception {
+            return new JRBeanCollectionDataSource(buildOrgSettingCollection(idOfOrgList, selectedStatus, session,
+                    selectedDistrict, allFriendlyOrg));
         }
 
 
         public static List<OrgSettingsReportItem> buildOrgSettingCollection(List<Long> idOfOrgList, Integer statusCondition,
-                Session persistenceSession, String selectedDistricts)
+                Session persistenceSession, String selectedDistricts, Boolean allFriendlyOrgs)
                 throws Exception {
             List<OrgSettingsReportItem> result = new ArrayList<OrgSettingsReportItem>(idOfOrgList.size());
 
             Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
             if(!CollectionUtils.isEmpty(idOfOrgList)) {
-                orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
+                if(allFriendlyOrgs){
+                    SQLQuery subQuery = persistenceSession.createSQLQuery("select friendlyOrg from cf_friendly_organization where currentOrg in (:idOfOrgs)");
+                    subQuery.addScalar("friendlyOrg", LongType.INSTANCE);
+                    subQuery.setParameterList("idOfOrgs", idOfOrgList);
+
+                    List<Long> idsOfFriendlyOrg = subQuery.list();
+                    orgCriteria.add(Restrictions.in("idOfOrg", idsOfFriendlyOrg));
+                } else {
+                    orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
+                }
+
             }
 
             if(statusCondition.equals(SERVICED)){

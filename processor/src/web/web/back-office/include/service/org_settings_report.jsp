@@ -48,6 +48,10 @@
             <f:selectItems value="#{orgSettingsReportPage.listOfOrgDistricts}" />
             <a4j:support event="onchange" />
         </h:selectOneMenu>
+        <h:outputText styleClass="output-text" escape="true" value="Построить по всем дружественным ОО" />
+        <h:selectBooleanCheckbox value="#{orgSettingsReportPage.allFriendlyOrgs}" styleClass="checkboxes">
+            <a4j:support event="onchange" reRender="orgSettingsTable" />
+        </h:selectBooleanCheckbox>
         <h:outputText styleClass="output-text" escape="true" value="Отобразить реквизиты" />
         <h:selectBooleanCheckbox value="#{orgSettingsReportPage.showRequisite}" styleClass="checkboxes">
             <a4j:support event="onchange" reRender="orgSettingsTable" />

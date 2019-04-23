@@ -53,6 +53,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private Boolean showFeedingSettings = true;
     private Boolean showCardSettings = true;
     private Boolean showOtherSetting = true;
+    private Boolean allFriendlyOrgs = true;
 
     private final Logger logger = LoggerFactory.getLogger(OrgSettingsReportPage.class);
 
@@ -124,7 +125,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                 idOfOrgList.add(Long.parseLong(item));
             }
 
-            items = OrgSettingsReport.Builder.buildOrgSettingCollection(idOfOrgList, status, persistenceSession, selectedDistricts);
+            items = OrgSettingsReport.Builder.buildOrgSettingCollection(idOfOrgList, status, persistenceSession, selectedDistricts, allFriendlyOrgs);
 
             transaction.commit();
             transaction = null;
@@ -154,6 +155,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
             builder.getReportProperties().setProperty(OrgSettingsReport.Builder.SHOW_FEEDING_SETTINGS, showFeedingSettings.toString());
             builder.getReportProperties().setProperty(OrgSettingsReport.Builder.SHOW_CARD_SETTINGS, showCardSettings.toString());
             builder.getReportProperties().setProperty(OrgSettingsReport.Builder.SHOW_OTHER_SETTINGS, showOtherSetting.toString());
+            builder.getReportProperties().setProperty(OrgSettingsReport.Builder.ALL_FRIENDLY_ORGS, allFriendlyOrgs.toString());
 
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -338,5 +340,13 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     public void setSelectedDistricts(String selectedDistricts) {
         this.selectedDistricts = selectedDistricts;
+    }
+
+    public Boolean getAllFriendlyOrgs() {
+        return allFriendlyOrgs;
+    }
+
+    public void setAllFriendlyOrgs(Boolean allFriendlyOrgs) {
+        this.allFriendlyOrgs = allFriendlyOrgs;
     }
 }
