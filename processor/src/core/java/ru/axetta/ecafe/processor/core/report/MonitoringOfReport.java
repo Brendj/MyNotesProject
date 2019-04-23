@@ -64,7 +64,6 @@ public class MonitoringOfReport extends BasicReportForListOrgsJob {
         }
 
         public Builder() {
-
         }
 
         public BasicReportJob buildInternal(Date startTime, Date endTime, Calendar calendar) throws Exception {

@@ -171,6 +171,9 @@ public class MonitoringOfReportService {
                 List<NumberOfPasses> preferentialList = null;
                 for (Object[] row : list) {
                     Date dateFromRow = QUERY_DATE_FORMAT.parse((String)row[7]);
+                    if(!CalendarUtils.isWorkDateWithoutParser(true, dateFromRow)){
+                        continue;
+                    }
                     if (!idOfCurrentOrg.equals(((BigInteger)row[0]).longValue())) {
                         result.put(idOfCurrentOrg, preferentialList);
                         idOfCurrentOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
@@ -178,15 +181,18 @@ public class MonitoringOfReportService {
                         currentDay = startTime;
                     }
                     while (!CalendarUtils.isCurrentDay(currentDay, limitDate)) {
-                        if (!CalendarUtils.isCurrentDay(currentDay, dateFromRow)) {
-                            NumberOfPasses numberOfPreferential = new NumberOfPasses();
-                            preferentialList.add(numberOfPreferential);
+                        if (!CalendarUtils.isWorkDateWithoutParser(true, currentDay)) {
                             currentDay = CalendarUtils.addOneDay(currentDay);
-                        } else if (CalendarUtils.isWorkDateWithoutParser(true, dateFromRow)) {
-                            NumberOfPasses numberOfPreferential = new NumberOfPasses((
-                                    (BigInteger) row[1]).longValue(), ((BigInteger) row[2]).longValue(), ((BigInteger) row[3]).longValue(),
-                                    ((BigInteger) row[4]).longValue(), ((BigInteger) row[5]).longValue(), ((BigInteger) row[6]).longValue());
-                            preferentialList.add(numberOfPreferential);
+                        } else if (!CalendarUtils.isCurrentDay(currentDay, dateFromRow)) {
+                            NumberOfPasses numberOfPasses = new NumberOfPasses();
+                            preferentialList.add(numberOfPasses);
+                            currentDay = CalendarUtils.addOneDay(currentDay);
+                        } else {
+                            NumberOfPasses numberOfPasses = new NumberOfPasses(((BigInteger) row[1]).longValue(),
+                                    ((BigInteger) row[2]).longValue(), ((BigInteger) row[3]).longValue(),
+                                    ((BigInteger) row[4]).longValue(), ((BigInteger) row[5]).longValue(),
+                                    ((BigInteger) row[6]).longValue());
+                            preferentialList.add(numberOfPasses);
                             currentDay = CalendarUtils.addOneDay(currentDay);
                             break;
                         }
@@ -195,8 +201,10 @@ public class MonitoringOfReportService {
                 result.put(idOfCurrentOrg, preferentialList);
             } else {
                 for (Object[] object : list) {
-                    NumberOfPasses numberOfPasses = new NumberOfPasses(((BigInteger) object[1]).longValue(), ((BigInteger) object[2]).longValue(), ((BigInteger) object[3]).longValue(),
-                            ((BigInteger) object[4]).longValue(), ((BigInteger) object[5]).longValue(), ((BigInteger) object[6]).longValue());
+                    NumberOfPasses numberOfPasses = new NumberOfPasses(((BigInteger) object[1]).longValue(),
+                            ((BigInteger) object[2]).longValue(), ((BigInteger) object[3]).longValue(),
+                            ((BigInteger) object[4]).longValue(), ((BigInteger) object[5]).longValue(),
+                            ((BigInteger) object[6]).longValue());
                     List<NumberOfPasses> numberOfPassesList = new ArrayList<NumberOfPasses>(1);
                     numberOfPassesList.add(numberOfPasses);
                     result.put(((BigInteger) object[0]).longValue(), numberOfPassesList);
@@ -276,7 +284,9 @@ public class MonitoringOfReportService {
                 List<NumberOfPreferential> preferentialList = null;
                 for (Object[] row : list) {
                     Date dateFromRow = QUERY_DATE_FORMAT.parse((String)row[4]);
-
+                    if(!CalendarUtils.isWorkDateWithoutParser(true, dateFromRow)){
+                        continue;
+                    }
                     if (!idOfCurrentOrg.equals(((BigInteger)row[0]).longValue())) {
                         result.put(idOfCurrentOrg, preferentialList);
                         idOfCurrentOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
@@ -284,12 +294,15 @@ public class MonitoringOfReportService {
                         currentDay = startTime;
                     }
                     while (!CalendarUtils.isCurrentDay(currentDay, limitDate)) {
-                        if (!CalendarUtils.isCurrentDay(currentDay, dateFromRow)) {
+                        if (!CalendarUtils.isWorkDateWithoutParser(true, currentDay)) {
+                            currentDay = CalendarUtils.addOneDay(currentDay);
+                        } else if (!CalendarUtils.isCurrentDay(currentDay, dateFromRow)) {
                             NumberOfPreferential numberOfPreferential = new NumberOfPreferential();
                             preferentialList.add(numberOfPreferential);
                             currentDay = CalendarUtils.addOneDay(currentDay);
                         } else if (CalendarUtils.isWorkDateWithoutParser(true, dateFromRow)) {
-                            NumberOfPreferential numberOfPreferential = new NumberOfPreferential(((BigInteger) row[1]).longValue(), ((BigInteger) row[2]).longValue(),
+                            NumberOfPreferential numberOfPreferential = new NumberOfPreferential(
+                                    ((BigInteger) row[1]).longValue(), ((BigInteger) row[2]).longValue(),
                                     ((BigInteger) row[3]).longValue());
                             preferentialList.add(numberOfPreferential);
                             currentDay = CalendarUtils.addOneDay(currentDay);
@@ -300,8 +313,9 @@ public class MonitoringOfReportService {
                 result.put(idOfCurrentOrg, preferentialList);
             } else {
                 for (Object[] object : list) {
-                    NumberOfPreferential numberOfPreferential = new NumberOfPreferential(((BigInteger) object[1]).longValue(),
-                            ((BigInteger) object[2]).longValue(), ((BigInteger) object[3]).longValue());
+                    NumberOfPreferential numberOfPreferential = new NumberOfPreferential(
+                            ((BigInteger) object[1]).longValue(), ((BigInteger) object[2]).longValue(),
+                            ((BigInteger) object[3]).longValue());
                     List<NumberOfPreferential> numberOfPreferentials = new ArrayList<NumberOfPreferential>(1);
                     numberOfPreferentials.add(numberOfPreferential);
                     result.put(((BigInteger) object[0]).longValue(), numberOfPreferentials);
@@ -392,7 +406,6 @@ public class MonitoringOfReportService {
     private Map<Long, List<NumberOfStudentsAndGuardians>> getFromQuery(List<Object[]> list, Boolean divideIntoPeriods,
             Date startTime, Date endTime) throws Exception{
         Map<Long,List<NumberOfStudentsAndGuardians>> result = new HashMap<Long, List<NumberOfStudentsAndGuardians>>();
-
         if(divideIntoPeriods){
             Long idOfCurrentOrg = -1L;
             Date currentDay = startTime;
@@ -400,6 +413,9 @@ public class MonitoringOfReportService {
             List<NumberOfStudentsAndGuardians> numberOfStudentsAndGuardiansList = null;
             for (Object[] row : list) {
                 Date dateFromRow = QUERY_DATE_FORMAT.parse((String)row[3]);
+                if(!CalendarUtils.isWorkDateWithoutParser(true, dateFromRow)){
+                    continue;
+                }
                 if (!idOfCurrentOrg.equals(((BigInteger)row[0]).longValue())) {
                     result.put(idOfCurrentOrg, numberOfStudentsAndGuardiansList);
                     idOfCurrentOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
@@ -407,14 +423,16 @@ public class MonitoringOfReportService {
                     currentDay = startTime;
                 }
                 while (!CalendarUtils.isCurrentDay(currentDay, limitDate)) {
-                    if (!CalendarUtils.isCurrentDay(currentDay, dateFromRow)) {
-                        NumberOfStudentsAndGuardians numberOfPreferential = new NumberOfStudentsAndGuardians();
-                        numberOfStudentsAndGuardiansList.add(numberOfPreferential);
+                    if (!CalendarUtils.isWorkDateWithoutParser(true, currentDay)) {
+                        currentDay = CalendarUtils.addOneDay(currentDay);
+                    } else if (!CalendarUtils.isCurrentDay(currentDay, dateFromRow)) {
+                        NumberOfStudentsAndGuardians numberOfStudentsAndGuardians = new NumberOfStudentsAndGuardians();
+                        numberOfStudentsAndGuardiansList.add(numberOfStudentsAndGuardians);
                         currentDay = CalendarUtils.addOneDay(currentDay);
                     } else if (CalendarUtils.isWorkDateWithoutParser(true, dateFromRow)) {
-                        NumberOfStudentsAndGuardians numberOfPreferential = new NumberOfStudentsAndGuardians(((BigInteger) row[1]).longValue(),
-                                ((BigInteger) row[2]).longValue());
-                        numberOfStudentsAndGuardiansList.add(numberOfPreferential);
+                        NumberOfStudentsAndGuardians numberOfStudentsAndGuardians = new NumberOfStudentsAndGuardians(
+                                ((BigInteger) row[1]).longValue(), ((BigInteger) row[2]).longValue());
+                        numberOfStudentsAndGuardiansList.add(numberOfStudentsAndGuardians);
                         currentDay = CalendarUtils.addOneDay(currentDay);
                         break;
                     }
@@ -423,8 +441,8 @@ public class MonitoringOfReportService {
             result.put(idOfCurrentOrg, numberOfStudentsAndGuardiansList);
         } else {
             for (Object[] object : list) {
-                NumberOfStudentsAndGuardians numberOfBuffet = new NumberOfStudentsAndGuardians(((BigInteger) object[1]).longValue(),
-                        ((BigInteger) object[2]).longValue());
+                NumberOfStudentsAndGuardians numberOfBuffet = new NumberOfStudentsAndGuardians(
+                        ((BigInteger) object[1]).longValue(), ((BigInteger) object[2]).longValue());
                 List<NumberOfStudentsAndGuardians> numbers = new ArrayList<NumberOfStudentsAndGuardians>(1);
                 numbers.add(numberOfBuffet);
                 result.put(((BigInteger) object[0]).longValue(), numbers);
@@ -760,6 +778,9 @@ public class MonitoringOfReportService {
                 List<Long> uniqueClients = new LinkedList<Long>();
                 for (Object[] row : list) {
                     Date dateFromRow = QUERY_DATE_FORMAT.parse((String)row[2]);
+                    if(!CalendarUtils.isWorkDateWithoutParser(true, dateFromRow)){
+                        continue;
+                    }
                     if (!idOfCurrentOrg.equals(((BigInteger)row[0]).longValue())) {
                         result.put(idOfCurrentOrg, uniqueClients);
                         idOfCurrentOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
@@ -767,13 +788,15 @@ public class MonitoringOfReportService {
                         currentDay = startTime;
                     }
                     while (!CalendarUtils.isCurrentDay(currentDay, limitDate)) {
-                        if (!CalendarUtils.isCurrentDay(currentDay, dateFromRow)) {
-                            Long numberOfPreferential = 0L;
-                            uniqueClients.add(numberOfPreferential);
+                        if (!CalendarUtils.isWorkDateWithoutParser(true, currentDay)) {
+                            currentDay = CalendarUtils.addOneDay(currentDay);
+                        } else if (!CalendarUtils.isCurrentDay(currentDay, dateFromRow)) {
+                            Long uniqueClientsCount = 0L;
+                            uniqueClients.add(uniqueClientsCount);
                             currentDay = CalendarUtils.addOneDay(currentDay);
                         } else if (CalendarUtils.isWorkDateWithoutParser(true, dateFromRow)) {
-                            Long numberOfPreferential = ((BigInteger) row[1]).longValue();
-                            uniqueClients.add(numberOfPreferential);
+                            Long uniqueClientsCount = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[1]);
+                            uniqueClients.add(uniqueClientsCount);
                             currentDay = CalendarUtils.addOneDay(currentDay);
                             break;
                         }
