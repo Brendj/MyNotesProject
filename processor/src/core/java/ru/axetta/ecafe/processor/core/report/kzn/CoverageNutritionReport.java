@@ -266,6 +266,8 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
         }
 
         private List<Long> loadOrgList(Session session, List<Long> idOfSourceOrgList, List<Long> idOfOrgList) {
+            if (idOfSourceOrgList.isEmpty())
+                return idOfOrgList;
             Criteria criteria = session.createCriteria(Org.class)
                     .createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
                     .createAlias("categoriesInternal", "cat", JoinType.LEFT_OUTER_JOIN)
@@ -275,7 +277,6 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
             if (!idOfOrgList.isEmpty()) {
                 criteria.add(Restrictions.in("idOfOrg", idOfOrgList));
             }
-
             return criteria.list();
         }
 
