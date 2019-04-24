@@ -521,6 +521,14 @@ public class CalendarUtils {
         return firstWorkDate;
     }
 
+    public static Date calculateNextWorkDateWithoutParser(Boolean isSixWorkWeek, Date date) {
+        Date firstWorkDate = CalendarUtils.addOneDay(date);
+        while (!isWorkDateWithoutParser(isSixWorkWeek, firstWorkDate)) {
+            firstWorkDate = CalendarUtils.addOneDay(firstWorkDate);
+        }
+        return firstWorkDate;
+    }
+
     public static Date calculateYesterdayStart(Calendar calendar, Date scheduledFireTime) {
         calendar.setTime(scheduledFireTime);
         CalendarUtils.truncateToDayOfMonth(calendar);
@@ -718,5 +726,23 @@ public class CalendarUtils {
         calendar.setTime(date);
         calendar.set(Calendar.MILLISECOND, 0);
         return calendar;
+    }
+
+    public static Boolean isCurrentDay(Date targetDay, Date currentDay){
+        Date beginCurrentDay = startOfDay(currentDay);
+        Date endOfCurrentDay = endOfDay(currentDay);
+        return beginCurrentDay.getTime() <= targetDay.getTime() && targetDay.getTime() <= endOfCurrentDay.getTime();
+    }
+
+    public static boolean isWorkDateStringByFormat(String currentDate, String format) throws Exception{
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(format);
+        Date date = simpleDateFormat.parse(currentDate);
+        return CalendarUtils.isWorkDateWithoutParser(true, date);
+    }
+
+    public static boolean isCurrentDayStringByFormat(Date targetDay, String stringCurrentDay, String dateFormat) throws Exception{
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(dateFormat);
+        Date currentDay = simpleDateFormat.parse(stringCurrentDay);
+        return isCurrentDay(targetDay, currentDay);
     }
 }
