@@ -6,3 +6,5 @@
 
 -- Увеличить поле СНИЛС до 14 символов
 ALTER TABLE cf_clients ALTER COLUMN san TYPE VARCHAR(14);
+
+--! ФИНАЛИЗИРОВАН 24.04.2019, НЕ МЕНЯТЬ
