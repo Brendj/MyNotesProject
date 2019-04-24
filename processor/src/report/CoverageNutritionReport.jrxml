@@ -51,6 +51,7 @@
 	<parameter name="idOfOrg" class="java.lang.Long"/>
 	<parameter name="OVERRIDE_GroupComparator" class="java.util.Comparator"/>
 	<parameter name="OVERRIDE_FoodTypeComparator" class="java.util.Comparator"/>
+	<parameter name="test" class="java.lang.String"/>
 	<field name="schoolNumber" class="java.lang.Integer"/>
 	<field name="studentsCountTotal" class="java.lang.Long"/>
 	<field name="studentsCountYoung" class="java.lang.Long"/>
