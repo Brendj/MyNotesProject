@@ -242,20 +242,20 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
             for (Object o : list) {
                 Object[] row = (Object[]) o;
                 Integer schoolNumber = (Integer) row[0];
-                Long studentsCountTotal = ((BigInteger) row[1]).longValue();
-                Long studentsCountYoung = ((BigInteger) row[2]).longValue();
-                Long studentsCountMiddle = ((BigInteger) row[3]).longValue();
-                Long studentsCountOld = ((BigInteger) row[4]).longValue();
-                Long benefitStudentsCountYoung = ((BigInteger) row[5]).longValue();
-                Long beneftiStudentsCountMiddle = ((BigInteger) row[6]).longValue();
-                Long benefitStudentsCountOld = ((BigInteger) row[7]).longValue();
-                Long benefitStudentsCountTotal = ((BigInteger) row[8]).longValue();
-                Long employeeCount = ((BigInteger) row[9]).longValue();
+                Long studentsCountTotal = (null == row[1]) ? 0 : ((BigInteger) row[1]).longValue();
+                Long studentsCountYoung = (null == row[2]) ? 0 : ((BigInteger) row[2]).longValue();
+                Long studentsCountMiddle = (null == row[3]) ? 0 : ((BigInteger) row[3]).longValue();
+                Long studentsCountOld = (null == row[4]) ? 0 : ((BigInteger) row[4]).longValue();
+                Long benefitStudentsCountYoung = (null == row[5]) ? 0 : ((BigInteger) row[5]).longValue();
+                Long beneftiStudentsCountMiddle = (null == row[6]) ? 0 : ((BigInteger) row[6]).longValue();
+                Long benefitStudentsCountOld = (null == row[7]) ? 0 : ((BigInteger) row[7]).longValue();
+                Long benefitStudentsCountTotal = (null == row[8]) ? 0 : ((BigInteger) row[8]).longValue();
+                Long employeeCount = (null == row[9]) ? 0 : ((BigInteger) row[9]).longValue();
                 String group = (String) row[10];
                 String foodType = (String) row[11];
                 String complexName = (String) row[12];
-                Long idOfOrderDetail = ((BigInteger) row[13]).longValue();
-                Long idOfClient = ((BigInteger) row[14]).longValue();
+                Long idOfOrderDetail = (null == row[13]) ? 0 : ((BigInteger) row[13]).longValue();
+                Long idOfClient = (null == row[14]) ? 0 : ((BigInteger) row[14]).longValue();
                 itemList.add(new CoverageNutritionReportItem(schoolNumber, studentsCountTotal, studentsCountYoung,
                         studentsCountMiddle, studentsCountOld, benefitStudentsCountYoung, beneftiStudentsCountMiddle,
                         benefitStudentsCountOld, benefitStudentsCountTotal, employeeCount, group, foodType, complexName,
