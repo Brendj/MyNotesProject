@@ -337,7 +337,7 @@ public class Processor implements SyncProcessor {
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
         // Register sync history
         syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
-                request.getRemoteAddr(), request.getSyncType().getValue());
+                request.getRemoteAddr(), request.getSyncType().getValue(), request.getSqlServerVersion());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
                 request.getRemoteAddr());
         timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "Begin sync", timeForDelta);
@@ -888,7 +888,7 @@ public class Processor implements SyncProcessor {
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
         // Register sync history
         syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
-                request.getRemoteAddr(), request.getSyncType().getValue());
+                request.getRemoteAddr(), request.getSyncType().getValue(), request.getSqlServerVersion());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
                 request.getRemoteAddr());
 
@@ -1601,7 +1601,7 @@ public class Processor implements SyncProcessor {
                         String clientVersion = (request.getClientVersion() == null ? "" : request.getClientVersion());
                         Long packet = (idOfPacket == null ? -1L : idOfPacket);
                         localSyncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(), clientVersion,
-                                request.getRemoteAddr(), request.getSyncType().getValue());
+                                request.getRemoteAddr(), request.getSyncType().getValue(), request.getSqlServerVersion());
                     }
                     final String s = String.format("Failed to process PaymentRegistry, IdOfOrg == %s, no license slots available",
                             request.getIdOfOrg());
@@ -1822,7 +1822,7 @@ public class Processor implements SyncProcessor {
                     Long packet = (idOfPacket == null ? -1L : idOfPacket);
                     if (syncHistory == null && !request.getSyncType().equals(SyncType.TYPE_GET_ACC_INC)) {
                         syncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(), clientVersion,
-                                request.getRemoteAddr(), request.getSyncType().getValue());
+                                request.getRemoteAddr(), request.getSyncType().getValue(), request.getSqlServerVersion());
                     }
 
                     if (request.getPaymentRegistry().getPayments().hasNext()) {
@@ -4187,7 +4187,7 @@ public class Processor implements SyncProcessor {
     }
 
     public SyncHistory createSyncHistory(Long idOfOrg, Long idOfPacket, Date startTime, String clientVersion,
-            String remoteAddress, Integer syncType) throws Exception {
+            String remoteAddress, Integer syncType, String SQLServerVersion) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -4196,7 +4196,7 @@ public class Processor implements SyncProcessor {
 
             Org organization = getOrgReference(persistenceSession, idOfOrg);
             SyncHistory syncHistory = new SyncHistory(organization, startTime, idOfPacket, clientVersion,
-                    remoteAddress, syncType);
+                    remoteAddress, syncType, SQLServerVersion);
             persistenceSession.save(syncHistory);
             //Long idOfSync = syncHistory.getIdOfSync();
 

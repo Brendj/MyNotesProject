@@ -87,6 +87,14 @@ public class SyncRequest {
 
     private static Logger logger = LoggerFactory.getLogger(SyncRequest.class);
 
+    public String getSqlServerVersion() {
+        return sqlServerVersion;
+    }
+
+    public void setSqlServerVersion(String sqlServerVersion) {
+        this.sqlServerVersion = sqlServerVersion;
+    }
+
     public static class ClientParamRegistry implements SectionRequest {
 
         public static final String SECTION_NAME = "ClientParams";
@@ -2604,6 +2612,7 @@ public class SyncRequest {
             checkClientVersion(version);
             SyncType syncType = getSyncType(namedNodeMap);
             String clientVersion = getClientVersion(namedNodeMap);
+            String sqlServerVersion = getSQLServerVersion(namedNodeMap);
             Date syncTime = timeFormat.parse(idOfSync);
             Long idOfPacket = getIdOfPacket(namedNodeMap);
             List<SectionRequest> result = new ArrayList<SectionRequest>();
@@ -2617,7 +2626,12 @@ public class SyncRequest {
             Manager manager = createManagerSyncRO(envelopeNode, syncType, org);
             String message = getMessage(envelopeNode);
             return new SyncRequest(remoteAddr, version, syncType, clientVersion, org, syncTime, idOfPacket, message,
-                    result, manager);
+                    result, manager, sqlServerVersion);
+        }
+
+        private String getSQLServerVersion(NamedNodeMap namedNodeMap) {
+            return namedNodeMap.getNamedItem("SqlServerVersion") == null ?
+                    null : namedNodeMap.getNamedItem("SqlServerVersion").getTextContent();
         }
 
         private SectionRequest buildSeactionRequest(Node envelopeNode, SectionRequestBuilder builder) {
@@ -2744,10 +2758,11 @@ public class SyncRequest {
     private String message;
     private String clientVersion;
     private Manager manager;
+    private String sqlServerVersion;
     private final List<SectionRequest> sectionRequests = new ArrayList<SectionRequest>();
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket,
-            String message, List<SectionRequest> sectionRequests, Manager manager) {
+            String message, List<SectionRequest> sectionRequests, Manager manager, String sqlServerVersion) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
