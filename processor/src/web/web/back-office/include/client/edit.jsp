@@ -169,7 +169,7 @@
                   styleClass="output-text" />
 
     <h:outputText escape="true" value="СНИЛС" styleClass="output-text" />
-    <h:inputText value="#{mainPage.clientEditPage.san}" maxlength="11" styleClass="input-text" />
+    <h:inputText value="#{mainPage.clientEditPage.san}" maxlength="14" styleClass="input-text" />
     <h:outputText escape="true" value="СНИЛС опекун" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.guardsan}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Серия паспорта" styleClass="output-text" />

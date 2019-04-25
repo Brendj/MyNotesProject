@@ -90,7 +90,7 @@
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="disablePlanEndDate" column="DisablePlanEndDate"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <property name="san" column="San" type="string" length="11" not-null="false"/>
+        <property name="san" column="San" type="string" length="14" not-null="false"/>
         <!--<property name="guardSan" column="GuardSan" type="string" length="64" not-null="false"/>-->
         <property name="externalId" column="ExternalId" type="long" not-null="false"/>
         <property name="clientGUID" column="ClientGUID" type="string" length="40" not-null="false"/>
