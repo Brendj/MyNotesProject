@@ -3507,7 +3507,8 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            clientSelectListPage.updatePermanentOrg(persistenceSession, idOfOrg);
+            //clientSelectListPage.updatePermanentOrg(persistenceSession, idOfOrg);
+            clientSelectListPage.getClientFilter().setOffset(0);
             clientSelectListPage.fill(persistenceSession, clientList);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -3579,31 +3580,6 @@ public class MainPage implements Serializable {
             logger.error("Failed to clear filter for client list page", e);
             facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
                     "Ошибка при подготовке страницы списка клиентов: " + e.getMessage(), null));
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-
-
-        }
-        return null;
-    }
-
-    public Object updateClientSelectListPage() {
-        FacesContext facesContext = FacesContext.getCurrentInstance();
-        RuntimeContext runtimeContext = null;
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        try {
-            runtimeContext = RuntimeContext.getInstance();
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            clientSelectListPage.fill(persistenceSession, null);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed to fill client selection page", e);
-            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                    "Ошибка при подготовке страницы выбора клиента: " + e.getMessage(), null));
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

@@ -38,6 +38,21 @@ import java.util.Map;
 public class ClientFilter {
 
 
+    public Integer getLimit() {
+        return limit;
+    }
+
+    public void setLimit(Integer limit) {
+        this.limit = limit;
+    }
+
+    public Integer getOffset() {
+        return offset;
+    }
+
+    public void setOffset(Integer offset) {
+        this.offset = offset;
+    }
 
     public static class OrgItem {
 
@@ -143,6 +158,8 @@ public class ClientFilter {
     private String mobileNumber;
     private String email;
     private Long permanentOrgId;
+    private Integer limit = 0;
+    private Integer offset = 0;
 
     public ClientBalanceFilter getClientBalanceMenu() {
         return clientBalanceMenu;
@@ -412,6 +429,10 @@ public class ClientFilter {
             criteria.add(Restrictions.or(Restrictions.not(Restrictions
                     .in(cgFieldName, condition)),
                     Restrictions.isNull(cgFieldName)));
+        }
+        if (limit > 0) {
+            criteria.setMaxResults(limit);
+            criteria.setFirstResult(offset);
         }
        criteria.addOrder(Order.asc("contractId"));
     }

@@ -10,9 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -22,7 +20,6 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.reflect.Array;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -109,16 +106,12 @@ public class PreordersReport extends BasicReportForOrgJob {
                      + "        pc.preorderdate, pc.amount AS complexAmount, 0 AS menudetailAmount, pc.complexname, "
                      + "        '' AS menudetailname, pc.complexPrice, 0 AS menudetailPrice, "
                      + "        pc.idofregularpreorder IS NOT NULL AS isRegularPreorder, "
-                     + "        pc.idofpreordercomplex, pl.idofpreorderlinkod is not null as isPayed "
+                     + "        pc.idofpreordercomplex, pc.usedsum > 0 as isPayed "
                      + "    FROM cf_preorder_complex pc "
                      + "    INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                      + "    INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
                      + "    INNER JOIN cf_clientgroups cg ON cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                      + "    INNER JOIN cf_orgs o ON o.idoforg = c.idoforg "
-                     + "    LEFT JOIN (SELECT idofpreorderlinkod, preorderguid "
-                     + "        FROM cf_preorder_linkod pl "
-                     + "        INNER JOIN cf_orders o ON o.idoforg = pl.idoforg AND o.idoforder = pl.idoforder AND o.state = :orderStateCommited "
-                     + "        ) pl ON pl.preorderguid = pc.guid "
                      + "    WHERE pc.amount > 0 and pc.preorderdate between :startDate and :endDate "
                      + "        and o.idoforg = :idOfOrg and coalesce(pc.deletedstate, 0) = 0 "
                      + conditions
@@ -128,17 +121,13 @@ public class PreordersReport extends BasicReportForOrgJob {
                      + "        pc.preorderdate, pc.amount AS complexAmount, pmd.amount AS menudetailAmount, pc.complexname, "
                      + "        pmd.menudetailname, pc.complexPrice, pmd.menudetailPrice, "
                      + "        pc.idofregularpreorder IS NOT NULL OR pmd.idofregularpreorder IS NOT NULL AS isRegularPreorder, "
-                     + "        pc.idofpreordercomplex, pl.idofpreorderlinkod is not null as isPayed "
+                     + "        pc.idofpreordercomplex, pc.usedsum > 0 as isPayed "
                      + "    FROM cf_preorder_menudetail pmd "
                      + "    INNER JOIN cf_preorder_complex pc ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
                      + "    INNER JOIN cf_clients c ON c.idofclient = pmd.idofclient "
                      + "    INNER JOIN cf_persons p ON p.idofperson = c.idofperson "
                      + "    INNER JOIN cf_clientgroups cg ON cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                      + "    INNER JOIN cf_orgs o ON o.idoforg = c.idoforg "
-                     + "    LEFT JOIN (SELECT idofpreorderlinkod, preorderguid "
-                     + "        FROM cf_preorder_linkod pl "
-                     + "        INNER JOIN cf_orders o ON o.idoforg = pl.idoforg AND o.idoforder = pl.idoforder AND o.state = :orderStateCommited "
-                     + "        ) pl ON pl.preorderguid = pc.guid "
                      + "    WHERE pmd.amount > 0 and pc.amount = 0 and pmd.preorderdate between :startDate and :endDate "
                      + "        and o.idoforg = :idOfOrg and coalesce(pmd.deletedstate, 0) = 0 "
                      + conditions
@@ -147,7 +136,6 @@ public class PreordersReport extends BasicReportForOrgJob {
             query.setParameter("startDate", CalendarUtils.startOfDay(startTime).getTime());
             query.setParameter("endDate", CalendarUtils.endOfDay(endTime).getTime());
             query.setParameter("idOfOrg", idOfOrg);
-            query.setParameter("orderStateCommited", Order.STATE_COMMITED);
             if (idOfClientList.size() > 0) {
                 query.setParameterList("clients", idOfClientList);
             }
