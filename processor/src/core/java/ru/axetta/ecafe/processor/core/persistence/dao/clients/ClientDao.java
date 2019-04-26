@@ -385,6 +385,7 @@ public class ClientDao extends WritableJpaDao {
                 clientGroup = createClientGroup(session, guardian.getOrg().getIdOfOrg(), ClientGroup.Predefined.CLIENT_PARENTS);
             }
             guardian.setClientGroup(clientGroup);
+            guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
             guardian.setClientRegistryVersion(clientRegistryVersion);
             session.update(guardian);
         }
