@@ -29,9 +29,14 @@ import java.util.List;
 public class CardSignDataBasicPage extends BasicWorkspacePage {
     private static final Logger logger = LoggerFactory.getLogger(CardSignDataBasicPage.class);
     protected byte[] signData;
-    protected String signType;
+    protected String signTypeCard;
+    protected String signTypeProvider;
     protected Integer manufacturerCode;
     protected String manufacturerName;
+    protected Boolean newProvider;
+
+    public static final String NEW_TYPE_PROVIDER = "По новому типу";
+    public static final String TYPE_PROVIDER = "По старому типу";
 
     public void fileUploadListener(UploadEvent event) {
         FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -65,11 +70,19 @@ public class CardSignDataBasicPage extends BasicWorkspacePage {
         }
     }
 
-    public List<SelectItem> getTypes() {
+    public List<SelectItem> getTypes(int type) {
         List<SelectItem> items = new ArrayList<SelectItem>();
         items.add(new SelectItem(0, CardSign.CARDSIGN_SCRIPT_TYPE));
         items.add(new SelectItem(1, CardSign.CARDSIGN_ECDSA_TYPE));
-        items.add(new SelectItem(2, CardSign.CARDSIGN_GOST2012_TYPE));
+        if (type == 2)
+         items.add(new SelectItem(2, CardSign.CARDSIGN_GOST2012_TYPE));
+        return items;
+    }
+
+    public List<SelectItem> getTypesRegister() {
+        List<SelectItem> items = new ArrayList<SelectItem>();
+        items.add(new SelectItem(true, NEW_TYPE_PROVIDER));
+        items.add(new SelectItem(false, TYPE_PROVIDER));
         return items;
     }
 
@@ -86,13 +99,6 @@ public class CardSignDataBasicPage extends BasicWorkspacePage {
         this.signData = signData;
     }
 
-    public String getSignType() {
-        return signType;
-    }
-
-    public void setSignType(String signType) {
-        this.signType = signType;
-    }
 
     public Integer getManufacturerCode() {
         return manufacturerCode;
@@ -108,5 +114,31 @@ public class CardSignDataBasicPage extends BasicWorkspacePage {
 
     public void setManufacturerName(String manufacturerName) {
         this.manufacturerName = manufacturerName;
+    }
+
+    public String getSignTypeCard() {
+        return signTypeCard;
+    }
+
+    public void setSignTypeCard(String signTypeCard) {
+        this.signTypeCard = signTypeCard;
+    }
+
+    public String getSignTypeProvider() {
+        return signTypeProvider;
+    }
+
+    public void setSignTypeProvider(String signTypeProvider) {
+        this.signTypeProvider = signTypeProvider;
+    }
+
+    public Boolean getNewProvider() {
+        if (newProvider == null)
+            return false;
+        return newProvider;
+    }
+
+    public void setNewProvider(Boolean newProvider) {
+        this.newProvider = newProvider;
     }
 }

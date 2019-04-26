@@ -12,6 +12,10 @@
         <property name="signData" column="signData" type="byte[]" not-null="true"/>
         <property name="manufacturerCode" column="manufacturerCode" type="integer" not-null="true" unique="true"/>
         <property name="manufacturerName" column="manufacturerName" type="string" length="200" not-null="true"/>
+        <property name="privatekeycard" column="privatekeycard" type="byte[]" not-null="true"/>
+        <property name="publickeyprovider" column="publickeyprovider" type="byte[]" not-null="true"/>
+        <property name="signtypeprov" column="signtypeprov" type="integer" not-null="true"/>
+        <property name="newtypeprovider" column="newtypeprovider" type="boolean" not-null="true"/>
     </class>
 </hibernate-mapping>
 

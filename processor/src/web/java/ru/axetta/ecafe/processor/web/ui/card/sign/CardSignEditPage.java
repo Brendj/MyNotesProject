@@ -40,13 +40,18 @@ public class CardSignEditPage extends CardSignDataBasicPage {
 
     private void fill() {
         idOfCardSign = groupPage.getCurrentCard().getIdOfCardSign();
-        signType = CardSignItem.getSignTypeFromString(groupPage.getCurrentCard().getSignType());
+        signTypeCard = CardSignItem.getSignTypeFromString(groupPage.getCurrentCard().getSignType());
+        if (groupPage.getCurrentCard().getSignTypeProvider() != null)
+            signTypeProvider = CardSignItem.getSignTypeFromString(groupPage.getCurrentCard().getSignTypeProvider());
+        else
+            signTypeProvider = null;
         manufacturerCode = groupPage.getCurrentCard().getManufacturerCode();
         manufacturerName = groupPage.getCurrentCard().getManufacturerName();
         signData = groupPage.getCurrentCard().getSignData();
+        newProvider = groupPage.getCurrentCard().getNewProvider();
     }
 
-    public Object save() {
+    public Object save(boolean newProvider) {
         if (signData == null || manufacturerCode == null || manufacturerCode == 0 || StringUtils.isEmpty(manufacturerName)) {
             printError("Все поля на форме обязательны для заполнения. Файл с данными ключа также должен быть загружен");
             return null;
@@ -57,10 +62,15 @@ public class CardSignEditPage extends CardSignDataBasicPage {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             CardSign cardSign = (CardSign)session.load(CardSign.class, groupPage.getCurrentCard().getIdOfCardSign());
-            cardSign.setSignType(new Integer(signType));
+            cardSign.setSignType(new Integer(signTypeCard));
             cardSign.setManufacturerCode(manufacturerCode);
             cardSign.setManufacturerName(manufacturerName);
-            cardSign.setSignData(signData);
+            if (newProvider) {
+                cardSign.setSigntypeprov(new Integer(signTypeProvider));
+                cardSign.setPublickeyprovider(signData);
+            }
+            else
+                cardSign.setSignData(signData);
             session.update(cardSign);
             transaction.commit();
             transaction = null;
