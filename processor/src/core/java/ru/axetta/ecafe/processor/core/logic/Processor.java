@@ -337,9 +337,9 @@ public class Processor implements SyncProcessor {
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
         // Register sync history
         syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
-                request.getRemoteAddr(), request.getSyncType().getValue(), request.getSqlServerVersion());
+                request.getRemoteAddr(), request.getSyncType().getValue());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
-                request.getRemoteAddr());
+                request.getRemoteAddr(), request.getSqlServerVersion());
         timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "Begin sync", timeForDelta);
 
         processMigrantsSections(request, syncHistory, responseSections, null);
@@ -888,9 +888,9 @@ public class Processor implements SyncProcessor {
         idOfPacket = generateIdOfPacket(request.getIdOfOrg());
         // Register sync history
         syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
-                request.getRemoteAddr(), request.getSyncType().getValue(), request.getSqlServerVersion());
+                request.getRemoteAddr(), request.getSyncType().getValue());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
-                request.getRemoteAddr());
+                request.getRemoteAddr(), request.getSqlServerVersion());
 
         // мигранты
         processMigrantsSectionsWithClientsData(request, syncHistory, responseSections);
@@ -1601,7 +1601,7 @@ public class Processor implements SyncProcessor {
                         String clientVersion = (request.getClientVersion() == null ? "" : request.getClientVersion());
                         Long packet = (idOfPacket == null ? -1L : idOfPacket);
                         localSyncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(), clientVersion,
-                                request.getRemoteAddr(), request.getSyncType().getValue(), request.getSqlServerVersion());
+                                request.getRemoteAddr(), request.getSyncType().getValue());
                     }
                     final String s = String.format("Failed to process PaymentRegistry, IdOfOrg == %s, no license slots available",
                             request.getIdOfOrg());
@@ -1822,7 +1822,7 @@ public class Processor implements SyncProcessor {
                     Long packet = (idOfPacket == null ? -1L : idOfPacket);
                     if (syncHistory == null && !request.getSyncType().equals(SyncType.TYPE_GET_ACC_INC)) {
                         syncHistory = createSyncHistory(request.getIdOfOrg(), packet, new Date(), clientVersion,
-                                request.getRemoteAddr(), request.getSyncType().getValue(), request.getSqlServerVersion());
+                                request.getRemoteAddr(), request.getSyncType().getValue());
                     }
 
                     if (request.getPaymentRegistry().getPayments().hasNext()) {
@@ -4171,15 +4171,19 @@ public class Processor implements SyncProcessor {
         return false;
     }
 
-    private void addClientVersionAndRemoteAddressByOrg(Long idOfOrg, String clientVersion, String remoteAddress) {
+    private void addClientVersionAndRemoteAddressByOrg(Long idOfOrg, String clientVersion, String remoteAddress,
+            String sqlServerVersion) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            updateClientVersionAndRemoteAddressByOrg(persistenceSession, idOfOrg, clientVersion, remoteAddress);
+            updateClientVersionAndRemoteAddressByOrg(persistenceSession, idOfOrg, clientVersion, remoteAddress,
+                    sqlServerVersion);
             persistenceTransaction.commit();
             persistenceTransaction = null;
+        }catch(Exception e){
+            logger.error("Can't update ClientVersion, RemoteAddress and sqlServerVersion for ID of Org: " + idOfOrg, e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -4187,7 +4191,7 @@ public class Processor implements SyncProcessor {
     }
 
     public SyncHistory createSyncHistory(Long idOfOrg, Long idOfPacket, Date startTime, String clientVersion,
-            String remoteAddress, Integer syncType, String SQLServerVersion) throws Exception {
+            String remoteAddress, Integer syncType) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
@@ -4196,7 +4200,7 @@ public class Processor implements SyncProcessor {
 
             Org organization = getOrgReference(persistenceSession, idOfOrg);
             SyncHistory syncHistory = new SyncHistory(organization, startTime, idOfPacket, clientVersion,
-                    remoteAddress, syncType, SQLServerVersion);
+                    remoteAddress, syncType);
             persistenceSession.save(syncHistory);
             //Long idOfSync = syncHistory.getIdOfSync();
 

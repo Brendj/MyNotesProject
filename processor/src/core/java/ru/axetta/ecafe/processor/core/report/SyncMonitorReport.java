@@ -64,14 +64,13 @@ public class SyncMonitorReport extends BasicReportForAllOrgJob {
             String sqlQuery =
                     "SELECT o.idoforg, o.shortnameinfoservice, o.district, o.shortaddress, o.organizationtype, "
                   + "   o.introductionqueue, os.lastsucbalancesync, os.remoteaddress, os.clientversion, "
-                  + "   count(se.idoforg) AS exceptions, q.sqlServerVersion "
+                  + "   count(se.idoforg) AS exceptions, os.sqlServerVersion "
                   + "FROM cf_orgs o "
                   + "INNER JOIN cf_orgs_sync os ON os.idoforg=o.idoforg "
                   + "LEFT JOIN cf_synchistory_exceptions se ON se.idoforg=o.idoforg "
-                  + "LEFT JOIN (SELECT idOfOrg, sqlserverversion, max(syncendtime) FROM cf_synchistory GROUP BY idoforg, sqlserverversion) as q ON q.idoforg = o.idoforg "
                   + "WHERE state<>0 " + ((null != versionsList && !versionsList.isEmpty()) ? "AND os.clientversion IN (:versions) " : "")
                   + "GROUP BY o.idoforg, o.tag, o.shortname, o.district, os.lastsucbalancesync, os.lastunsucbalancesync, "
-                  + "   os.remoteaddress, os.clientversion, q.sqlServerVersion "
+                  + "   os.remoteaddress, os.clientversion, os.sqlServerVersion "
                   + "ORDER BY os.lastSucBalanceSync";
 
             Query query = session.createSQLQuery(sqlQuery);

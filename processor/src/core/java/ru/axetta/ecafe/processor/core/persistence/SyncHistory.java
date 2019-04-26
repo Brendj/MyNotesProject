@@ -26,7 +26,7 @@ public class SyncHistory {
     private String remoteAddress;
     private Integer syncType;
     private Set<SyncHistoryException> syncHistoryExceptions = new HashSet<SyncHistoryException>();
-    private String sqlServerVersion;
+
 
     public String getRemoteAddress() {
         return remoteAddress;
@@ -57,14 +57,13 @@ public class SyncHistory {
     }
 
     public SyncHistory(Org org, Date syncStartTime, long idOfPacket, String clientVersion, String remoteAddress,
-            Integer syncType, String sqlServerVersion) {
+            Integer syncType) {
         this.org = org;
         this.syncStartTime = syncStartTime;
         this.idOfPacket = idOfPacket;
         this.clientVersion = clientVersion;
         this.remoteAddress = remoteAddress;
         this.syncType = syncType;
-        this.sqlServerVersion = sqlServerVersion;
     }
 
     public Long getIdOfSync() {
@@ -157,13 +156,5 @@ public class SyncHistory {
         return "SyncHistory{" + "idOfSync=" + idOfSync + ", org=" + org + ", syncStartTime=" + syncStartTime
                 + ", syncEndTime=" + syncEndTime + ", syncResult=" + syncResult + ", idOfPacket='" + idOfPacket + '\''
                 + '}';
-    }
-
-    public String getSqlServerVersion() {
-        return sqlServerVersion;
-    }
-
-    public void setSqlServerVersion(String sqlServerVersion) {
-        this.sqlServerVersion = sqlServerVersion;
     }
 }

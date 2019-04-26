@@ -2774,6 +2774,7 @@ public class SyncRequest {
         this.message = message;
         this.manager = manager;
         this.sectionRequests.addAll(sectionRequests);
+        this.sqlServerVersion = sqlServerVersion;
     }
 
     public String getClientVersion() {

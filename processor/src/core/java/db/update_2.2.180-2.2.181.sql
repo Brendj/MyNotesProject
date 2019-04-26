@@ -5,4 +5,4 @@
 -- Пакет обновлений 2.2.181
 
 -- Добавление новой колонки "Версия MySQL"
-ALTER TABLE cf_syncHistory ADD COLUMN sqlServerVersion VARCHAR(20);
+ALTER TABLE cf_orgs_sync ADD COLUMN sqlServerVersion VARCHAR(20);

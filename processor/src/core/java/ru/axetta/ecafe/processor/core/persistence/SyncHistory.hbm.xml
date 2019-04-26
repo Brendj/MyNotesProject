@@ -24,7 +24,6 @@
         <property name="clientVersion" column="ClientVersion" type="string" length="16" not-null="false"/>
         <property name="remoteAddress" column="RemoteAddress" type="string" length="20" not-null="false"/>
         <property name="syncType" column="SyncType" type="integer" />
-        <property name="sqlServerVersion" column="sqlServerVersion" type="string" length="20" not-null="false"/>
         <set name="syncHistoryExceptions" table="CF_SyncHistory_Exceptions" inverse="true" lazy="true" fetch="select">
             <key>
                 <column name="idofsync" not-null="true" />
