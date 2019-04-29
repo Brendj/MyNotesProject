@@ -5,8 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service.kzn;
 
 import net.sf.jasperreports.engine.JRExporterParameter;
-import net.sf.jasperreports.engine.export.JRHtmlExporter;
-import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
+import net.sf.jasperreports.engine.export.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
@@ -24,9 +23,15 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.Properties;
 
 @Component
@@ -104,7 +109,69 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
     }
 
     public void exportToXLS(ActionEvent actionEvent) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String templateFilename = checkIsExistFile(".jasper");
+        if (StringUtils.isEmpty(templateFilename)) {
+            return;
+        }
+        if (idOfContragentOrgList.isEmpty() && idOfOrgList.isEmpty()) {
+            printError("Выберите организацию");
+            return;
+        }
+        Date generateTime = new Date();
+        CoverageNutritionReport.Builder builder = new CoverageNutritionReport.Builder(templateFilename);
+        builder.setReportProperties(buildProperties());
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        BasicReportJob report = null;
+        try {
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
 
+        if(report!=null){
+            try {
+                FacesContext facesContext = FacesContext.getCurrentInstance();
+                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+
+                ServletOutputStream servletOutputStream = response.getOutputStream();
+
+                facesContext.responseComplete();
+                response.setContentType("application/xls");
+                String filename = buildFileName(generateTime, report);
+                response.setHeader("Content-disposition", String.format("inline;filename=%s.xls", filename));
+
+                JRXlsExporter xlsExport = new JRXlsExporter();
+                xlsExport.setParameter(JRCsvExporterParameter.JASPER_PRINT, report.getPrint());
+                xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                xlsExport.exportReport();
+                servletOutputStream.flush();
+                servletOutputStream.close();
+            } catch (Exception e) {
+                logger.error("Failed export report : ", e);
+                printError("Ошибка при подготовке отчета: " + e.getMessage());
+            }
+        }
+    }
+
+    private String buildFileName(Date generateTime, BasicReportJob basicReportJob) {
+        DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy-HH:mm:ss");
+        String reportDistinctText = basicReportJob.getReportDistinctText();
+        String format = timeFormat.format(generateTime);
+        return String.format("%s-%s-%s", CoverageNutritionReport.class.getSimpleName(), reportDistinctText, format);
     }
 
     private String checkIsExistFile(String suffix) {

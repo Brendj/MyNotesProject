@@ -11,10 +11,12 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportForOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.PreordersReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
@@ -34,7 +36,7 @@ import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
-public class CoverageNutritionReport extends BasicReportForOrgJob {
+public class CoverageNutritionReport extends BasicReportForAllOrgJob {
 
     public static final String REPORT_NAME = "Отчет по охвату питания";
     public static final String[] TEMPLATE_FILE_NAMES = {"CoverageNutritionReport.jasper"};
@@ -61,7 +63,7 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
     }
 
     @Override
-    public BasicReportForOrgJob createInstance() {
+    public BasicReportForAllOrgJob createInstance() {
         return new CoverageNutritionReport();
     }
 
@@ -138,7 +140,7 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
-            return new PreordersReport(generateTime, generateDuration, jasperPrint, startDate, endDate, idOfOrg);
+            return new CoverageNutritionReport(generateTime, generateDuration, jasperPrint, startDate, endDate);
         }
 
         private JRDataSource createDataSource(Session session, Date startDate, Date endDate, List<Long> idOfOrgList,
@@ -147,9 +149,11 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
                 Boolean showBuffet, Boolean showComplexesByOrgCard) throws Exception {
             List<Long> orgList = loadOrgList(session, idOfSourceOrgList, idOfOrgList);
 
+            HashMap<Long, EmployeeItem> employeeItemHashMap = loadEmployeesByOrgs(session, orgList, startDate, endDate);
+
             List<CoverageNutritionReportItem> itemList = new ArrayList<CoverageNutritionReportItem>();
 
-            String sqlString = "select distinct "
+            String sqlString = "select distinct og.idoforg, "
                     + "    cast(substring(og.shortnameinfoservice, '№\\s{0,1}(\\d{1,5})') as integer) as number, "
                     + "    st.studentsCountTotal, st.studentsCountYoung, st.studentsCountMiddle, st.studentsCountOld, st.benefitStudentsCountYoung, "
                     + "    st.benefitStudentsCountMiddle, st.benefitStudentsCountOld, st.benefitStudentsCountTotal, st.employeeCount, "
@@ -164,8 +168,7 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
                     + "         when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then g.nameofgood || ' - ' || od.discount/100 || ' ' || 'руб.' "
                     + "         when od.menutype = 0 and od.menuorigin in (0,1) then 'Горячее' "
                     + "         when od.menutype = 0 and od.menuorigin in (10,11) then 'Покупная' end as complexname, "
-                    + "    od.idoforderdetail, c.idofclient "
-                    + "from cf_orders o "
+                    + "    od.idoforderdetail, c.idofclient " + "from cf_orders o "
                     + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + "join cf_clients c on c.idofclient = o.idofclient "
                     + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
@@ -241,33 +244,37 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
 
             for (Object o : list) {
                 Object[] row = (Object[]) o;
-                Integer schoolNumber = (Integer) row[0];
-                Long studentsCountTotal = (null == row[1]) ? 0 : ((BigInteger) row[1]).longValue();
-                Long studentsCountYoung = (null == row[2]) ? 0 : ((BigInteger) row[2]).longValue();
-                Long studentsCountMiddle = (null == row[3]) ? 0 : ((BigInteger) row[3]).longValue();
-                Long studentsCountOld = (null == row[4]) ? 0 : ((BigInteger) row[4]).longValue();
-                Long benefitStudentsCountYoung = (null == row[5]) ? 0 : ((BigInteger) row[5]).longValue();
-                Long beneftiStudentsCountMiddle = (null == row[6]) ? 0 : ((BigInteger) row[6]).longValue();
-                Long benefitStudentsCountOld = (null == row[7]) ? 0 : ((BigInteger) row[7]).longValue();
-                Long benefitStudentsCountTotal = (null == row[8]) ? 0 : ((BigInteger) row[8]).longValue();
-                Long employeeCount = (null == row[9]) ? 0 : ((BigInteger) row[9]).longValue();
-                String group = (String) row[10];
-                String foodType = (String) row[11];
-                String complexName = (String) row[12];
-                Long idOfOrderDetail = (null == row[13]) ? 0 : ((BigInteger) row[13]).longValue();
-                Long idOfClient = (null == row[14]) ? 0 : ((BigInteger) row[14]).longValue();
+                Long idOfOrg = ((BigInteger) row[0]).longValue();
+                Integer schoolNumber = (Integer) row[1];
+                Long studentsCountTotal = (null == row[2]) ? 0 : ((BigInteger) row[2]).longValue();
+                Long studentsCountYoung = (null == row[3]) ? 0 : ((BigInteger) row[3]).longValue();
+                Long studentsCountMiddle = (null == row[4]) ? 0 : ((BigInteger) row[4]).longValue();
+                Long studentsCountOld = (null == row[5]) ? 0 : ((BigInteger) row[5]).longValue();
+                Long benefitStudentsCountYoung = (null == row[6]) ? 0 : ((BigInteger) row[6]).longValue();
+                Long beneftiStudentsCountMiddle = (null == row[7]) ? 0 : ((BigInteger) row[7]).longValue();
+                Long benefitStudentsCountOld = (null == row[8]) ? 0 : ((BigInteger) row[8]).longValue();
+                Long benefitStudentsCountTotal = (null == row[9]) ? 0 : ((BigInteger) row[9]).longValue();
+                Long employeeCount = (null == row[10]) ? 0 : ((BigInteger) row[10]).longValue();
+                String group = (String) row[11];
+                String foodType = (String) row[12];
+                String complexName = (String) row[13];
+                Long idOfOrderDetail = (null == row[14]) ? 0 : ((BigInteger) row[14]).longValue();
+                Long idOfClient = (null == row[15]) ? 0 : ((BigInteger) row[15]).longValue();
+                EmployeeItem employeeItem = employeeItemHashMap.get(idOfOrg);
                 itemList.add(new CoverageNutritionReportItem(schoolNumber, studentsCountTotal, studentsCountYoung,
                         studentsCountMiddle, studentsCountOld, benefitStudentsCountYoung, beneftiStudentsCountMiddle,
                         benefitStudentsCountOld, benefitStudentsCountTotal, employeeCount, group, foodType, complexName,
-                        idOfOrderDetail, idOfClient));
+                        idOfOrderDetail, idOfClient, employeeItem.getComplexesCount(), employeeItem.getBuffetCount(),
+                        employeeItem.getAllFoodCount(), employeeItem.getPercentageOfActive()));
             }
 
             return new JRBeanCollectionDataSource(itemList);
         }
 
         private List<Long> loadOrgList(Session session, List<Long> idOfSourceOrgList, List<Long> idOfOrgList) {
-            if (idOfSourceOrgList.isEmpty())
+            if (idOfSourceOrgList.isEmpty()) {
                 return idOfOrgList;
+            }
             Criteria criteria = session.createCriteria(Org.class)
                     .createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN)
                     .createAlias("categoriesInternal", "cat", JoinType.LEFT_OUTER_JOIN)
@@ -295,6 +302,70 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
             return propertyValueList;
         }
 
+        private HashMap<Long, EmployeeItem> loadEmployeesByOrgs(Session session, List<Long> idOfOrgList, Date startDate,
+                Date endDate) {
+            HashMap<Long, EmployeeItem> employeeItemHashMap = new HashMap<Long, EmployeeItem>();
+            for (Long idOfOrg : idOfOrgList) {
+                if (!employeeItemHashMap.containsKey(idOfOrg)) {
+                    employeeItemHashMap.put(idOfOrg, new EmployeeItem());
+                }
+
+                ClientGroup employeeGroup = DAOUtils.findKznEmployeeGroupByOrgId(session, idOfOrg);
+
+                String orgCondition;
+                if (null != employeeGroup) {
+                    orgCondition = " and cg.idofclientgroup in (:clientEmployees, :clientAdministration, :clientTechEmployees, :employees) ";
+                } else {
+                    orgCondition = " and cg.idofclientgroup in (:clientEmployees, :clientAdministration, :clientTechEmployees) ";
+                }
+
+                String sqlString =
+                        "select a.idoforg, a.employeeCount, a.type, count(distinct a.idofclient) as clientcount "
+                                + "from ( " + " select og.idoforg, st.employeeCount, "
+                                + "     case when od.menutype = 0 and od.menuorigin in (0, 1, 10, 11) then 'Буфет' "
+                                + "      when od.menutype between 50 and 99 then 'Комплекс' end as type, "
+                                + "     od.idoforderdetail, c.idofclient " + " from cf_orders o "
+                                + " join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
+                                + " join cf_clients c on c.idofclient = o.idofclient "
+                                + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
+                                + " join cf_goods g on g.idofgood = od.idofgood join cf_orgs og on og.idoforg = o.idoforg "
+                                + " left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
+                                + " where o.idoforg in (:orgList) and o.createddate between :startDate and :endDate and od.menutype < :complexItemMin and og.organizationtype = 0 "
+                                + orgCondition + " order by 3) a " + "group by a.idoforg, a.employeecount, a.type";
+                Query query = session.createSQLQuery(sqlString);
+                query.setParameter("startDate", startDate.getTime());
+                query.setParameter("endDate", endDate.getTime());
+                query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                query.setParameter("clientAdministration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+                query.setParameter("clientTechEmployees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+                if (null != employeeGroup) {
+                    query.setParameter("employees", employeeGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                }
+                query.setParameter("complexItemMin", OrderDetail.TYPE_COMPLEX_ITEM_MIN);
+                query.setParameterList("orgList", idOfOrgList);
+                List list = query.list();
+
+                for (Object o : list) {
+                    Object[] row = (Object[]) o;
+                    Long orgId = ((BigInteger) row[0]).longValue();
+                    Long employeeCount = ((BigInteger) row[1]).longValue();
+                    String type = (String) row[2];
+                    Long clientCount = ((BigInteger) row[3]).longValue();
+
+                    EmployeeItem employeeItem = employeeItemHashMap.get(orgId);
+                    if (type.equals("Буфет")) {
+                        employeeItem.setBuffetCount(clientCount);
+                    } else if (type.equals("Комплекс")) {
+                        employeeItem.setComplexesCount(clientCount);
+                    }
+                    employeeItem.setAllFoodCount(employeeItem.getBuffetCount() + employeeItem.getComplexesCount());
+                    employeeItem.setPercentageOfActive(
+                            employeeItem.getAllFoodCount().doubleValue() / employeeCount.doubleValue());
+                }
+            }
+            return employeeItemHashMap;
+        }
+
         public String getTemplateFilename() {
             return templateFilename;
         }
@@ -306,6 +377,15 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
         public void setIdOfOrg(Long idOfOrg) {
             this.idOfOrg = idOfOrg;
         }
+    }
+
+    public CoverageNutritionReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
+            Date endTime) {
+        super(generateTime, generateDuration, print, startTime, endTime);
+    }
+
+    public CoverageNutritionReport() {
+
     }
 
     public static class CoverageNutritionReportItem {
@@ -325,16 +405,21 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
         private String complexName;
         private Long idOfOrderDetail;
         private Long idOfClient;
+        private Long employeeComplexesCount;
+        private Long employeeBuffetCount;
+        private Long employeeAllFoodCount;
+        private Double employeePercentageOfActive;
 
         public CoverageNutritionReportItem() {
 
         }
 
-        public CoverageNutritionReportItem(Integer schoolNumber, Long studentsCountTotal, Long studentsCountYoung,
+        private CoverageNutritionReportItem(Integer schoolNumber, Long studentsCountTotal, Long studentsCountYoung,
                 Long studentsCountMiddle, Long studentsCountOld, Long benefitStudentsCountYoung,
                 Long benefitStudentsCountMiddle, Long benefitStudentsCountOld, Long benefitStudentsCountTotal,
                 Long employeeCount, String group, String foodType, String complexName, Long idOfOrderDetail,
-                Long idOfClient) {
+                Long idOfClient, Long employeeComplexesCount, Long employeeBuffetCount, Long employeeAllFoodCount,
+                Double employeePercentageOfActive) {
             this.schoolNumber = schoolNumber;
             this.studentsCountTotal = studentsCountTotal;
             this.studentsCountYoung = studentsCountYoung;
@@ -350,6 +435,10 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
             this.complexName = complexName;
             this.idOfOrderDetail = idOfOrderDetail;
             this.idOfClient = idOfClient;
+            this.employeeComplexesCount = employeeComplexesCount;
+            this.employeeBuffetCount = employeeBuffetCount;
+            this.employeeAllFoodCount = employeeAllFoodCount;
+            this.employeePercentageOfActive = employeePercentageOfActive;
         }
 
         public Integer getSchoolNumber() {
@@ -470,6 +559,92 @@ public class CoverageNutritionReport extends BasicReportForOrgJob {
 
         public void setIdOfClient(Long idOfClient) {
             this.idOfClient = idOfClient;
+        }
+
+        public Long getEmployeeComplexesCount() {
+            return employeeComplexesCount;
+        }
+
+        public void setEmployeeComplexesCount(Long employeeComplexesCount) {
+            this.employeeComplexesCount = employeeComplexesCount;
+        }
+
+        public Long getEmployeeBuffetCount() {
+            return employeeBuffetCount;
+        }
+
+        public void setEmployeeBuffetCount(Long employeeBuffetCount) {
+            this.employeeBuffetCount = employeeBuffetCount;
+        }
+
+        public Long getEmployeeAllFoodCount() {
+            return employeeAllFoodCount;
+        }
+
+        public void setEmployeeAllFoodCount(Long employeeAllFoodCount) {
+            this.employeeAllFoodCount = employeeAllFoodCount;
+        }
+
+        public Double getEmployeePercentageOfActive() {
+            return employeePercentageOfActive;
+        }
+
+        public void setEmployeePercentageOfActive(Double employeePercentageOfActive) {
+            this.employeePercentageOfActive = employeePercentageOfActive;
+        }
+    }
+
+    public static class EmployeeItem {
+
+        private Long complexesCount;
+        private Long buffetCount;
+        private Long allFoodCount;
+        private Double percentageOfActive;
+
+        private EmployeeItem(Long complexesCount, Long buffetCount, Long allFoodCount, Double percentageOfActive) {
+            this.complexesCount = complexesCount;
+            this.buffetCount = buffetCount;
+            this.allFoodCount = allFoodCount;
+            this.percentageOfActive = percentageOfActive;
+        }
+
+        private EmployeeItem() {
+            complexesCount = 0L;
+            buffetCount = 0L;
+            allFoodCount = 0L;
+            percentageOfActive = 0.;
+        }
+
+        public Long getComplexesCount() {
+            return complexesCount;
+        }
+
+        public void setComplexesCount(Long complexesCount) {
+            this.complexesCount = complexesCount;
+        }
+
+        public Long getBuffetCount() {
+            return buffetCount;
+        }
+
+        public void setBuffetCount(Long buffetCount) {
+            this.buffetCount = buffetCount;
+        }
+
+        public Long getAllFoodCount() {
+            return allFoodCount;
+        }
+
+        public void setAllFoodCount(Long allFoodCount) {
+            this.allFoodCount = allFoodCount;
+        }
+
+        public Double getPercentageOfActive() {
+            return percentageOfActive;
+        }
+
+        public void setPercentageOfActive(Double percentageOfActive) {
+            this.percentageOfActive = percentageOfActive;
         }
     }
 }

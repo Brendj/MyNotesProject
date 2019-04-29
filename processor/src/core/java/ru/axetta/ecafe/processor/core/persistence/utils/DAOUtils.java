@@ -4121,4 +4121,11 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         return (KznClientsStatistic) criteria.uniqueResult();
     }
+
+    public static ClientGroup findKznEmployeeGroupByOrgId(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(ClientGroup.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("groupName", "Сотрудники"));
+        return (ClientGroup) criteria.uniqueResult();
+    }
 }
