@@ -6,3 +6,5 @@
 
 -- Добавление новой колонки "Версия MySQL"
 ALTER TABLE cf_orgs_sync ADD COLUMN sqlServerVersion VARCHAR(20);
+
+--! ФИНАЛИЗИРОВАН 29.04.2019, НЕ МЕНЯТЬ
