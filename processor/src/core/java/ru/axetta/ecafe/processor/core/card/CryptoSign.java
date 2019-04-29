@@ -125,7 +125,7 @@ public class CryptoSign
                             sucsess = false;
                         }
                     }
-                    byte[] allData = new byte[card_data.length + sign.length + 3];
+                    byte[] allData = new byte[card_data.length + sign.length + 1];
 
                     //1 байт для хранения типа подписи
                     byte[] typeCard = ByteBuffer.allocate(Short.SIZE / Byte.SIZE).putShort((short) (card.getMemSize()))
@@ -138,7 +138,8 @@ public class CryptoSign
                     //Сохраняем сами подписи
                     System.arraycopy(card_data, 0, allData, 1, card_data.length);
                     System.arraycopy(sign, 0, allData, card_data.length + 1, sign.length);
-                    responseCardSign.setAllDate(bytesToHex(allData));
+                    responseCardSign.setAllDate(allData);
+                    responseCardSign.setAllDateHEX(bytesToHex(allData));
                 }
             }
             catch (Exception e)

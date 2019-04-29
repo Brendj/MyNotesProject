@@ -8,7 +8,8 @@ public class ResponseCardSign extends ErrorCartSign {
     private long cardno;  //Номер на идентификаторе
     private short sizeDate;
     private short sizeSign;
-    private String allDate; //Исходные данные + ЭЦП
+    private byte[] allDate; //Исходные данные + ЭЦП
+    private String allDateHEX; //Исходные данные + ЭЦП
 
     public long getCardno() {
         return cardno;
@@ -18,11 +19,11 @@ public class ResponseCardSign extends ErrorCartSign {
         this.cardno = cardno;
     }
 
-    public String getAllDate() {
+    public byte[] getAllDate() {
         return allDate;
     }
 
-    public void setAllDate(String allDate) {
+    public void setAllDate(byte[] allDate) {
         this.allDate = allDate;
     }
 
@@ -40,5 +41,13 @@ public class ResponseCardSign extends ErrorCartSign {
 
     public void setSizeSign(short sizeSign) {
         this.sizeSign = sizeSign;
+    }
+
+    public String getAllDateHEX() {
+        return allDateHEX;
+    }
+
+    public void setAllDateHEX(String allDateHEX) {
+        this.allDateHEX = allDateHEX;
     }
 }
