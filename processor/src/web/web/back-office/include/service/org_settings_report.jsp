@@ -70,6 +70,17 @@
         </h:selectBooleanCheckbox>
     </h:panelGrid>
 
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <a4j:commandButton value="Генерировать отчет" action="#{orgSettingsReportPage.buildHTML}"
+                           reRender="orgSettingsTable" styleClass="command-button"
+                           status="reportGenerateStatus" id="buildHTMLButton" />
+
+        <h:commandButton value="Выгрузить в Excel" action="#{orgSettingsReportPage.buildXLS}"
+                         styleClass="command-button"  id="buildXLSButton" disabled="false">
+            <a4j:support status="reportGenerateStatus" id="buildXLSButtonSupport"/>
+        </h:commandButton>
+    </h:panelGrid>
+
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
@@ -331,17 +342,6 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
-
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <a4j:commandButton value="Генерировать отчет" action="#{orgSettingsReportPage.buildHTML}"
-                           reRender="orgSettingsTable" styleClass="command-button"
-                           status="reportGenerateStatus" id="buildHTMLButton" />
-
-        <h:commandButton value="Выгрузить в Excel" action="#{orgSettingsReportPage.buildXLS}"
-                           styleClass="command-button"  id="buildXLSButton" disabled="false">
-        <a4j:support status="reportGenerateStatus" id="buildXLSButtonSupport"/>
-        </h:commandButton>
-    </h:panelGrid>
 
     <rich:separator align="center" height = "5" width="270px"/>
 
