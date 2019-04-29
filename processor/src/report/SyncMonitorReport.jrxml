@@ -5,8 +5,7 @@
 	<property name="ireport.y" value="0"/>
 	<style name="Crosstab Data Text" hAlign="Center">
 		<conditionalStyle>
-			<conditionExpression><![CDATA[!$F{lastSuccessfulBalanceSync}.equals(null) && (($P{currentTimeMillis} - $F{lastSuccessfulBalanceSync}.getTime()) > (1000 * 60 * 10))
-]]></conditionExpression>
+			<conditionExpression><![CDATA[!$F{lastSuccessfulBalanceSync}.equals(null) && (($P{currentTimeMillis} - $F{lastSuccessfulBalanceSync}.getTime()) > (1000 * 60 * 10))]]></conditionExpression>
 			<style forecolor="#FF0000"/>
 		</conditionalStyle>
 	</style>
@@ -25,6 +24,7 @@
 	<field name="lastSuccessfulBalanceSync" class="java.util.Date"/>
 	<field name="version" class="java.lang.String"/>
 	<field name="remoteAddr" class="java.lang.String"/>
+	<field name="sqlServerVersion" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
@@ -63,25 +63,30 @@
 				<text><![CDATA[Тип здания]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="4ca88b00-8f1b-46a6-ae31-d4b645e03b4e" x="500" y="47" width="100" height="41"/>
+				<reportElement uuid="4ca88b00-8f1b-46a6-ae31-d4b645e03b4e" x="500" y="47" width="73" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Очередь внедрения]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="344bde11-0959-4a60-92db-84402c0b06d2" x="600" y="47" width="100" height="41"/>
+				<reportElement uuid="344bde11-0959-4a60-92db-84402c0b06d2" x="573" y="47" width="74" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Посл. успешная
 синхр. балансов]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="004b0416-ce7f-41d2-bdce-bf36d23e7c46" x="700" y="47" width="62" height="41"/>
+				<reportElement uuid="004b0416-ce7f-41d2-bdce-bf36d23e7c46" x="710" y="47" width="52" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<text><![CDATA[Версия клиента]]></text>
+				<text><![CDATA[Версия MySQL]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="ce3d8771-d459-4805-b967-042dddcd005e" x="762" y="47" width="103" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[IP-адрес]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="004b0416-ce7f-41d2-bdce-bf36d23e7c46" x="647" y="47" width="63" height="41"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Версия клиента]]></text>
 			</staticText>
 		</band>
 	</title>
@@ -129,19 +134,19 @@
 				<textFieldExpression><![CDATA[$F{organizationTypeName}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="50fe26f8-cf91-410f-b390-e08b8e31d459" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="700" y="0" width="62" height="41"/>
+				<reportElement uuid="50fe26f8-cf91-410f-b390-e08b8e31d459" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="647" y="0" width="63" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{version}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="dd.MM.yyyy" isBlankWhenNull="true">
-				<reportElement uuid="7f14b0ad-5841-41f7-b592-f8ab00f94614" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="500" y="0" width="100" height="41">
+				<reportElement uuid="7f14b0ad-5841-41f7-b592-f8ab00f94614" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="500" y="0" width="73" height="41">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{introductionQueue}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="ee0cda4f-bab3-432c-989f-5cb17ea14fbd" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="600" y="0" width="100" height="41">
+				<reportElement uuid="ee0cda4f-bab3-432c-989f-5cb17ea14fbd" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="573" y="0" width="74" height="41">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -153,6 +158,11 @@
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{remoteAddr}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="50fe26f8-cf91-410f-b390-e08b8e31d459" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="710" y="0" width="52" height="41"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{sqlServerVersion}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
