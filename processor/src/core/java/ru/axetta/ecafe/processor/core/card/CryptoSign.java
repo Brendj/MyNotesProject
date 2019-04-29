@@ -138,7 +138,7 @@ public class CryptoSign
                     //Сохраняем сами подписи
                     System.arraycopy(card_data, 0, allData, 1, card_data.length);
                     System.arraycopy(sign, 0, allData, card_data.length + 1, sign.length);
-                    responseCardSign.setAllDate(allData);
+                    responseCardSign.setAllDate(bytesToHex(allData));
                 }
             }
             catch (Exception e)
@@ -153,6 +153,17 @@ public class CryptoSign
             }
         }
         return responseCardSigns;
+    }
+
+    private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+    public static String bytesToHex(byte[] bytes) {
+        char[] hexChars = new char[bytes.length * 2];
+        for ( int j = 0; j < bytes.length; j++ ) {
+            int v = bytes[j] & 0xFF;
+            hexChars[j * 2] = hexArray[v >>> 4];
+            hexChars[j * 2 + 1] = hexArray[v & 0x0F];
+        }
+        return new String(hexChars);
     }
 
     public static byte[] createAllDate (List<RequestCardForSign> cards, CardSign cardSign)
