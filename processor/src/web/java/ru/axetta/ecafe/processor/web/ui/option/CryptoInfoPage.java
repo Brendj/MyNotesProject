@@ -32,9 +32,9 @@ public class CryptoInfoPage extends BasicWorkspacePage {
         return "" + JCP.getProductVersion();
     }
 
-    public String getCryptoLibURL() {
-        return "" + JCP.getProviderURL();
-    }
+    //public String getCryptoLibURL() {
+    //    return "" + JCP.getProviderURL();
+    //}
 
     public String getCryptoProviderName() {
         return JCP.PROVIDER_NAME;
