@@ -110,8 +110,8 @@ public class CryptoSign
                     if (card.getMemSize() == 1) {
                         //Шифрование по SHA-1
                         final MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
-                        card_data = Base64.encodeBase64(messageDigest.digest(card_data));
-                        sign = CryptoSign.sign(card_data, pk);
+                        //Подписывание
+                        sign = CryptoSign.sign(messageDigest.digest(card_data), pk);
                     }
                     else {
                         if (card.getMemSize() == 2) {
