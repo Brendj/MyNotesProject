@@ -24,15 +24,14 @@ import java.util.Arrays;
 import java.util.Calendar;
 import java.util.List;
 
-public class CryptoSign
-{
+public class CryptoSign {
+
     public static final String BP160R1 = "brainpoolP160r1";
     public static final String BC_PROV = "BC";
-    public static final String ALGORITHM =  "SHA1withECDSA";
-    public static final String KEY_FACTOR =  "ECDSA";
+    public static final String ALGORITHM = "SHA1withECDSA";
+    public static final String KEY_FACTOR = "ECDSA";
 
-    public static KeyPair keyPairGen() throws Exception
-    {
+    public static KeyPair keyPairGen() throws Exception {
         ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(BP160R1);
         KeyPairGenerator g = KeyPairGenerator.getInstance(KEY_FACTOR, BC_PROV);
         g.initialize(ecSpec, new SecureRandom());
@@ -40,8 +39,7 @@ public class CryptoSign
         return pair;
     }
 
-    private static byte[] sign(byte[] data, PrivateKey priv) throws Exception
-    {
+    private static byte[] sign(byte[] data, PrivateKey priv) throws Exception {
         Signature dsa = Signature.getInstance(ALGORITHM, BC_PROV);
         dsa.initSign(priv);
         dsa.update(data);
@@ -49,8 +47,7 @@ public class CryptoSign
     }
 
     //Проверка карты на её наличие в базе
-    private static boolean verifyCardforDuble (Long num)
-    {
+    private static boolean verifyCardforDuble(Long num) {
         byte[] res = new byte[8];
         byte[] fiz = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(num).array();
         res[4] = fiz[7];
@@ -58,14 +55,16 @@ public class CryptoSign
         res[6] = fiz[5];
         res[7] = fiz[4];
         Long longRes = ByteBuffer.wrap(res).getLong();
-        if (DAOReadonlyService.getInstance().getCardfromNum(longRes) == null)
+        if (DAOReadonlyService.getInstance().getCardfromNum(longRes) == null) {
             return true;
-        else
+        } else {
             return false;
+        }
     }
 
 
-    public static List<ResponseCardSign> createSignforCard (List<RequestCardForSign> cards, CardSign cardSign) throws Exception {
+    public static List<ResponseCardSign> createSignforCard(List<RequestCardForSign> cards, CardSign cardSign)
+            throws Exception {
         List<ResponseCardSign> responseCardSigns = new ArrayList<ResponseCardSign>();
         //Достаем приватный ключ для подписи
         PrivateKey pk = loadPrivKey(cardSign.getPrivatekeycard());
@@ -75,81 +74,73 @@ public class CryptoSign
             ResponseCardSign responseCardSign = new ResponseCardSign();
             try {
                 byte[] sign;
-                responseCardSign.setCardno(card.getPrinted_no());
-                if (!verifyCardforDuble(card.getPrinted_no())) {
+                responseCardSign.setUid(card.getUid());
+                if (!verifyCardforDuble(card.getUid())) {
                     responseCardSign.setMessage("Карта с таким номером уже зарегистирована");
                     sucsess = false;
                 }
-                if (card.getTypeId() != 1 && card.getTypeId() != 9 && card.getTypeId() != 10 && card.getTypeId() != 11 && card.getTypeId() != 15)
-                {
+                if (card.getTypeId() != 1 && card.getTypeId() != 9 && card.getTypeId() != 10 && card.getTypeId() != 11
+                        && card.getTypeId() != 15) {
                     responseCardSign.setMessage("Неверный тип носителя");
                     sucsess = false;
                 }
-                //Подготавливаем данные для подписи
-                byte[] fiz = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(card.getUid()).array();
-                byte[] type = ByteBuffer.allocate(Short.SIZE / Byte.SIZE).putShort(card.getTypeId()).array();
-                byte[] num = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(card.getPrinted_no()).array();
-                byte[] kod = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(cardSign.getManufacturerCode()).array();
-                byte[] data = new byte[3];
-                data[0] = (byte)(card.getIssuedate().get(Calendar.YEAR)-2000);
-                data[1] = (byte)(card.getIssuedate().get(Calendar.MONTH)+1);
-                data[2] = (byte)(card.getIssuedate().get(Calendar.DAY_OF_MONTH));
-                byte[] sert = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(cardSign.getIdOfCardSign()).array();
-
-                //Здесь сформируется конечный вариант
-                byte[] card_data = new byte[32];
-                System.arraycopy(fiz, 1, card_data, 0, 7);
-                System.arraycopy(type, 1, card_data, 7, 1);
-                System.arraycopy(num, 3, card_data, 8, 5);
-                System.arraycopy(kod, 3, card_data, 13, 1);
-                System.arraycopy(data, 0, card_data, 14, 3);
-                System.arraycopy(sert, 2, card_data, 17, 2);
-
-                //Если тип карты поддерживает данный более 128 байт
                 if (sucsess) {//Подписываем карту только если пройдены проверки
+                    //Подготавливаем данные для подписи
+                    byte[] fiz = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(card.getUid()).array();
+                    byte[] type = ByteBuffer.allocate(Short.SIZE / Byte.SIZE).putShort(card.getTypeId()).array();
+                    byte[] num = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(card.getPrinted_no()).array();
+                    byte[] kod = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(cardSign.getManufacturerCode())
+                            .array();
+                    byte[] data = new byte[3];
+                    data[0] = (byte) (card.getIssuedate().get(Calendar.YEAR) - 2000);
+                    data[1] = (byte) (card.getIssuedate().get(Calendar.MONTH) + 1);
+                    data[2] = (byte) (card.getIssuedate().get(Calendar.DAY_OF_MONTH));
+                    byte[] sert = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(cardSign.getIdOfCardSign())
+                            .array();
+
+                    //Здесь сформируется конечный вариант
+                    byte[] card_data = new byte[32];
+                    System.arraycopy(fiz, 1, card_data, 0, 7);
+                    System.arraycopy(type, 1, card_data, 7, 1);
+                    System.arraycopy(num, 3, card_data, 8, 5);
+                    System.arraycopy(kod, 3, card_data, 13, 1);
+                    System.arraycopy(data, 0, card_data, 14, 3);
+                    System.arraycopy(sert, 2, card_data, 17, 2);
+
+                    //Если тип карты поддерживает данный более 128 байт
                     if (card.getMemSize() == 1) {
                         //Шифрование по SHA-1
                         final MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
                         //Подписывание
                         sign = CryptoSign.sign(messageDigest.digest(card_data), pk);
-                    }
-                    else {
+                    } else {
                         if (card.getMemSize() == 2) {
                             sign = SCrypt.generate(pk.getEncoded(), card_data, //данные карты используем как "соль"
                                     16384, 8, 1, 20);
 
-                        }
-                        else  {
+                        } else {
                             sign = new byte[]{0};
                             responseCardSign.setMessage("Тип подписи для карты задан некорректно");
                             sucsess = false;
                         }
                     }
-                    byte[] allData = new byte[card_data.length + sign.length + 1];
+                    //Размер ответа фиксированный
+                    byte[] allData = new byte[12];
 
-                    //1 байт для хранения типа подписи
-                    byte[] typeCard = ByteBuffer.allocate(Short.SIZE / Byte.SIZE).putShort((short) (card.getMemSize()))
-                            .array();
-                    System.arraycopy(typeCard, 1, allData, 0, 1);
-
-                    responseCardSign.setSizeDate((short)card_data.length);
-                    responseCardSign.setSizeSign((short)sign.length);
+                    responseCardSign.setMemSize(card.getMemSize());
 
                     //Сохраняем сами подписи
-                    System.arraycopy(card_data, 0, allData, 1, card_data.length);
+                    System.arraycopy(card_data, 7, allData, 0, 12);
                     System.arraycopy(sign, 0, allData, card_data.length + 1, sign.length);
                     responseCardSign.setAllDate(allData);
-                    responseCardSign.setAllDateHEX(bytesToHex(allData));
                 }
-            }
-            catch (Exception e)
-            {
+            } catch (Exception e) {
                 responseCardSign.setInsideError("Неизвестная ошибка при подписании карты");
                 sucsess = false;
-            }
-            finally {
-                if (!sucsess)
+            } finally {
+                if (!sucsess) {
                     responseCardSign.setAllDate(null);
+                }
                 responseCardSigns.add(responseCardSign);
             }
         }
@@ -157,9 +148,10 @@ public class CryptoSign
     }
 
     private final static char[] hexArray = "0123456789ABCDEF".toCharArray();
+
     public static String bytesToHex(byte[] bytes) {
         char[] hexChars = new char[bytes.length * 2];
-        for ( int j = 0; j < bytes.length; j++ ) {
+        for (int j = 0; j < bytes.length; j++) {
             int v = bytes[j] & 0xFF;
             hexChars[j * 2] = hexArray[v >>> 4];
             hexChars[j * 2 + 1] = hexArray[v & 0x0F];
@@ -167,24 +159,23 @@ public class CryptoSign
         return new String(hexChars);
     }
 
-    public static byte[] createAllDate (List<RequestCardForSign> cards, CardSign cardSign)
-    {
+    public static byte[] createAllDate(List<RequestCardForSign> cards, CardSign cardSign) {
         //17 байт для хранений информации о одной карте + 1 байт для id поставщика
-        byte[] allDate = new byte[17*cards.size() + 1];
+        byte[] allDate = new byte[17 * cards.size() + 1];
         byte[] kod = ByteBuffer.allocate(Integer.SIZE / Byte.SIZE).putInt(cardSign.getManufacturerCode()).array();
         System.arraycopy(kod, 3, allDate, 0, 1);
         //17 байт информация об одной карте
         byte[] card_data = new byte[17];
-        for (int i = 0; i<cards.size(); i++)
-        {
+        for (int i = 0; i < cards.size(); i++) {
             byte[] num = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(cards.get(i).getUid()).array();
             byte[] type = ByteBuffer.allocate(Short.SIZE / Byte.SIZE).putShort(cards.get(i).getTypeId()).array();
             byte[] fiz = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(cards.get(i).getPrinted_no()).array();
             byte[] data = new byte[3];
-            data[0] = (byte)(cards.get(i).getIssuedate().get(Calendar.YEAR)-2000);
-            data[1] = (byte)(cards.get(i).getIssuedate().get(Calendar.MONTH)+1);
-            data[2] = (byte)(cards.get(i).getIssuedate().get(Calendar.DAY_OF_MONTH));
-            byte[] memSize = ByteBuffer.allocate(Short.SIZE / Byte.SIZE).putShort((short) (cards.get(i).getMemSize())).array();
+            data[0] = (byte) (cards.get(i).getIssuedate().get(Calendar.YEAR) - 2000);
+            data[1] = (byte) (cards.get(i).getIssuedate().get(Calendar.MONTH) + 1);
+            data[2] = (byte) (cards.get(i).getIssuedate().get(Calendar.DAY_OF_MONTH));
+            byte[] memSize = ByteBuffer.allocate(Short.SIZE / Byte.SIZE).putShort((short) (cards.get(i).getMemSize()))
+                    .array();
             //17 байт информация об одной карте
             System.arraycopy(fiz, 1, card_data, 0, 7);
             System.arraycopy(type, 1, card_data, 7, 1);
@@ -192,12 +183,13 @@ public class CryptoSign
             System.arraycopy(data, 0, card_data, 13, 3);
             System.arraycopy(memSize, 1, card_data, 16, 1);
             //Добавляем в общий массив данных
-            System.arraycopy(card_data, 0, allDate, 17*i+1, 17);
+            System.arraycopy(card_data, 0, allDate, 17 * i + 1, 17);
         }
         return allDate;
     }
 
-    public static boolean verifySignforProvider (List<RequestCardForSign> requestCardForSigns, byte[] signProvider, CardSign cardSign) throws Exception {
+    public static boolean verifySignforProvider(List<RequestCardForSign> requestCardForSigns, byte[] signProvider,
+            CardSign cardSign) throws Exception {
         byte[] date = createAllDate(requestCardForSigns, cardSign);
         if (cardSign.getSigntypeprov() == 0) {
             return CryptoSign.verifySCRIPT(date, signProvider, cardSign);
@@ -212,45 +204,35 @@ public class CryptoSign
     }
 
 
-
-    private static boolean verifyGOST2012(byte[] data, byte [] sign, CardSign cardSign ) throws Exception
-    {
+    private static boolean verifyGOST2012(byte[] data, byte[] sign, CardSign cardSign) throws Exception {
         Signature signature = Signature.getInstance(JCP.GOST_EL_SIGN_NAME, JCP.PROVIDER_NAME);
         signature.initVerify(loadPubKey(cardSign.getPublickeyprovider()));
         signature.update(MessageDigest.getInstance(JCP.GOST_DIGEST_NAME, JCP.PROVIDER_NAME).digest(data));
         return signature.verify(sign);
     }
 
-    private static boolean verifyECDSA(byte[] data, byte [] sign, CardSign cardSign ) throws Exception
-    {
+    private static boolean verifyECDSA(byte[] data, byte[] sign, CardSign cardSign) throws Exception {
         Signature dsa = Signature.getInstance(ALGORITHM, BC_PROV);
         dsa.initVerify(loadPubKey(cardSign.getPublickeyprovider()));
         dsa.update(data);
         return dsa.verify(sign);
     }
 
-    private static boolean verifySCRIPT(byte [] dateCards, byte [] sign, CardSign cardSign) throws Exception
-    {
+    private static boolean verifySCRIPT(byte[] dateCards, byte[] sign, CardSign cardSign) throws Exception {
 
-        byte[] varsign = SCrypt.generate
-                (loadPrivKey(cardSign.getPublickeyprovider()).getEncoded(),
-                        dateCards, //данные карты используем как "соль"
-                        16384,
-                        8,
-                        1,
-                        20);
+        byte[] varsign = SCrypt.generate(loadPrivKey(cardSign.getPublickeyprovider()).getEncoded(), dateCards,
+                //данные карты используем как "соль"
+                16384, 8, 1, 20);
         return Arrays.equals(varsign, sign);
     }
 
-    public static PublicKey loadPubKey(byte [] data) throws Exception
-    {
+    public static PublicKey loadPubKey(byte[] data) throws Exception {
         KeySpec ks = new X509EncodedKeySpec(data);
         KeyFactory key_f = KeyFactory.getInstance(KEY_FACTOR);
         return key_f.generatePublic(ks);
     }
 
-    public static PrivateKey loadPrivKey(byte [] data) throws Exception
-    {
+    public static PrivateKey loadPrivKey(byte[] data) throws Exception {
         KeySpec ks = new PKCS8EncodedKeySpec(data);
         KeyFactory key_f = KeyFactory.getInstance(KEY_FACTOR);
         PrivateKey res = key_f.generatePrivate(ks);

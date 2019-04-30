@@ -5,19 +5,9 @@
 package ru.axetta.ecafe.processor.core.card;
 
 public class ResponseCardSign extends ErrorCartSign {
-    private long cardno;  //Номер на идентификаторе
-    private short sizeDate;
-    private short sizeSign;
+    private long uid;   //Физический номер
+    private short memSize; //Более или менее 128 байт
     private byte[] allDate; //Исходные данные + ЭЦП
-    private String allDateHEX; //Исходные данные + ЭЦП
-
-    public long getCardno() {
-        return cardno;
-    }
-
-    public void setCardno(long cardno) {
-        this.cardno = cardno;
-    }
 
     public byte[] getAllDate() {
         return allDate;
@@ -27,27 +17,19 @@ public class ResponseCardSign extends ErrorCartSign {
         this.allDate = allDate;
     }
 
-    public short getSizeDate() {
-        return sizeDate;
+    public long getUid() {
+        return uid;
     }
 
-    public void setSizeDate(short sizeDate) {
-        this.sizeDate = sizeDate;
+    public void setUid(long uid) {
+        this.uid = uid;
     }
 
-    public short getSizeSign() {
-        return sizeSign;
+    public short getMemSize() {
+        return memSize;
     }
 
-    public void setSizeSign(short sizeSign) {
-        this.sizeSign = sizeSign;
-    }
-
-    public String getAllDateHEX() {
-        return allDateHEX;
-    }
-
-    public void setAllDateHEX(String allDateHEX) {
-        this.allDateHEX = allDateHEX;
+    public void setMemSize(short memSize) {
+        this.memSize = memSize;
     }
 }
