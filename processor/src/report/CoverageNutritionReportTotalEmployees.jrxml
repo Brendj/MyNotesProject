@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CoverageNutritionReport" pageWidth="2500" pageHeight="200" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="2500" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CoverageNutritionReportTotalEmployees" pageWidth="3500" pageHeight="200" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="3500" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -9,7 +9,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.0000000000000004"/>
-	<property name="ireport.x" value="1129"/>
+	<property name="ireport.x" value="1852"/>
 	<property name="ireport.y" value="0"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="003 Sample data xls"/>
 	<style name="table">
@@ -74,6 +74,9 @@
 	<background>
 		<band splitType="Stretch"/>
 	</background>
+	<title>
+		<band splitType="Stretch"/>
+	</title>
 	<pageHeader>
 		<band height="20">
 			<staticText>
@@ -88,7 +91,7 @@
 	<summary>
 		<band height="165" splitType="Stretch">
 			<crosstab>
-				<reportElement uuid="e2351233-788b-4c5e-9fac-6fbc9924c407" x="0" y="0" width="2300" height="165"/>
+				<reportElement uuid="e2351233-788b-4c5e-9fac-6fbc9924c407" x="0" y="0" width="2720" height="165"/>
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
@@ -357,7 +360,267 @@
 						</cellContents>
 					</crosstabColumnHeader>
 					<crosstabTotalColumnHeader>
-						<cellContents mode="Transparent" style="Crosstab Data Text"/>
+						<cellContents mode="Transparent" style="Crosstab Data Text">
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="180" y="30" width="120" height="60" backcolor="#CCFFCC"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Бесплатное питание]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="300" y="30" width="180" height="60" backcolor="#CCFFCC"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Платное питание + Бесплатное]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="0" y="0" width="1200" height="30" backcolor="#CCFFCC"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Итоговые значения]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="480" y="30" width="180" height="60" backcolor="#CCFFCC"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Буфет горячее]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="660" y="30" width="180" height="60" backcolor="#CCFFCC"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Буфет покупная]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="840" y="30" width="180" height="60" backcolor="#CCFFCC"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Буфет общее]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="1020" y="30" width="80" height="60" backcolor="#CCFFCC"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Количество уникальных покупателей всего]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="120" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество проданных комплексов по карте зав. пр-ва]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="0" y="30" width="180" height="60" backcolor="#CCFFCC"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Платное питание]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="0" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[уникальные покупатели]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="60" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество проданных комплексов ]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="360" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество проданных комплексов ]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="180" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[уникальные покупатели]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="300" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[уникальные покупатели]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="420" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[% уникальных покупателей ]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="240" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество проданных комплексов ]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="480" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество уникальных покупателей буфета 1-11 классы]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="540" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество проданной продукции буфета горячее]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="600" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество проданных позиций буфета горячее по карте зав. пр-ва]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="660" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество уникальных покупателей буфета1-11 классы]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="1100" y="90" width="100" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[ количество уникальных покупателей буфет+комплексы из групп учащихся делим на общее количество учащихся ]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="1100" y="30" width="100" height="60" backcolor="#CCFFCC"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[% активных клиентов]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="1020" y="90" width="80" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[ (комлексы+буфет)]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="960" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество проданных позиций буфета  по карте зав. пр-ва]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="900" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество проданной продукции]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="840" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество уникальных покупателей буфета]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="780" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество проданных позиций буфета покупная по карте зав. пр-ва]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="720" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество проданной продукции буфета покупная]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="1200" y="0" width="241" height="30" backcolor="#CCCCFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Сотрудники]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="1200" y="30" width="60" height="60" backcolor="#CCCCFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Комплексы]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="1260" y="30" width="60" height="60" backcolor="#CCCCFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Буфет]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="1320" y="30" width="60" height="60" backcolor="#CCCCFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[Комплексы + Буфет]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" mode="Opaque" x="1380" y="30" width="61" height="60" backcolor="#CCCCFF"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font isBold="true"/>
+								</textElement>
+								<text><![CDATA[% активных клиентов]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="1380" y="90" width="61" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[% активных сотрудников ]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="1320" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[итого]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="1260" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество по всем видам буфета]]></text>
+							</staticText>
+							<staticText>
+								<reportElement uuid="d4af18c9-61db-4162-9c5f-594553d886f2" style="table" x="1200" y="90" width="60" height="70"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle">
+									<font size="8" isBold="false"/>
+								</textElement>
+								<text><![CDATA[количество по всем видам комлексов]]></text>
+							</staticText>
+						</cellContents>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
 				<columnGroup name="foodType" height="30" totalPosition="End" headerPosition="Stretch">
@@ -640,10 +903,176 @@
 						</box>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="0" height="25" columnTotalGroup="group">
-					<cellContents/>
+				<crosstabCell width="1441" height="25" columnTotalGroup="group">
+					<cellContents>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="1380" y="0" width="61" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{employeePercentageOfActiveMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="1020" y="0" width="80" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalPaidClientsMeasure} + $V{totalFreeClientsMeasure} +
+$V{totalBuffetHotClientsMeasure} + $V{totalBuffetPaidClientsMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="960" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[""]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="900" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalBuffetHotComplexesMeasure} + $V{totalBuffetPaidComplexesMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="840" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalBuffetHotClientsMeasure} + $V{totalBuffetPaidClientsMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="780" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[""]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="720" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalBuffetPaidComplexesMeasure} == null ? 0L : $V{totalBuffetPaidComplexesMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="660" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalBuffetPaidClientsMeasure} == null ? 0L : $V{totalBuffetPaidClientsMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="600" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[""]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="540" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalBuffetHotComplexesMeasure} == null ? 0L : $V{totalBuffetHotComplexesMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="480" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalBuffetHotClientsMeasure} == null ? 0L : $V{totalBuffetHotClientsMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="420" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[String.format("%.2f", new Long($V{totalPaidClientsMeasure} + $V{totalFreeClientsMeasure}).doubleValue() /
+$V{studentsCountTotal}.doubleValue() * 100.f)]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="360" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalPaidComplexesMeasure} + $V{totalFreeComplexesMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="300" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalPaidClientsMeasure} + $V{totalFreeClientsMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="240" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalFreeComplexesMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="180" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalFreeClientsMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="120" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[""]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="60" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalPaidComplexesMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="0" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{totalPaidClientsMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="1320" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{employeeComplexesBuffetMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="1200" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{employeeComplexesMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="1260" y="0" width="60" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[$V{employeeBuffetMeasure}]]></textFieldExpression>
+						</textField>
+						<textField>
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="1100" y="0" width="100" height="25"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="8"/>
+							</textElement>
+							<textFieldExpression><![CDATA[String.format("%.2f", new Long($V{totalPaidClientsMeasure} + $V{totalFreeClientsMeasure} +
+ $V{totalBuffetHotClientsMeasure} + $V{totalBuffetPaidClientsMeasure}).doubleValue() /
+$V{studentsCountTotal}.doubleValue() * 100.f)]]></textFieldExpression>
+						</textField>
+					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="group">
+				<crosstabCell width="1441" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="group">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell width="0" height="25" columnTotalGroup="complexName">
@@ -655,7 +1084,7 @@
 				<crosstabCell height="0" rowTotalGroup="studentsCountTotal">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="group">
+				<crosstabCell width="1441" height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="group">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="foodType">
@@ -667,7 +1096,7 @@
 				<crosstabCell height="0" rowTotalGroup="studentsCountYoung">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="group">
+				<crosstabCell width="1441" height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="group">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="foodType">
@@ -679,7 +1108,7 @@
 				<crosstabCell height="0" rowTotalGroup="studentsCountMiddle">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="group">
+				<crosstabCell width="1441" height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="group">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="foodType">
@@ -691,7 +1120,7 @@
 				<crosstabCell height="0" rowTotalGroup="studentsCountOld">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="group">
+				<crosstabCell width="1441" height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="group">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="foodType">
@@ -703,7 +1132,7 @@
 				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountYoung">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="group">
+				<crosstabCell width="1441" height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="group">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="foodType">
@@ -715,7 +1144,7 @@
 				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountMiddle">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="group">
+				<crosstabCell width="1441" height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="group">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="foodType">
@@ -727,7 +1156,7 @@
 				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountOld">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="group">
+				<crosstabCell width="1441" height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="group">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="foodType">
@@ -739,7 +1168,7 @@
 				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountTotal">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="group">
+				<crosstabCell width="1441" height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="group">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="foodType">
@@ -751,7 +1180,7 @@
 				<crosstabCell height="0" rowTotalGroup="employeeCount">
 					<cellContents/>
 				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="employeeCount" columnTotalGroup="group">
+				<crosstabCell width="1441" height="0" rowTotalGroup="employeeCount" columnTotalGroup="group">
 					<cellContents/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="employeeCount" columnTotalGroup="foodType">

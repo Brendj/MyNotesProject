@@ -37,6 +37,7 @@ import java.util.Properties;
 @Component
 @Scope("session")
 public class CoverageNutritionReportPage extends OnlineReportWithContragentPage {
+
     Logger logger = LoggerFactory.getLogger(CoverageNutritionReportPage.class);
 
     private Boolean showYoungerClasses = false;  // 1-4
@@ -75,7 +76,7 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -101,8 +102,8 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
                 htmlReport = os.toString("UTF-8");
                 os.close();
             } catch (Exception e) {
-                printError("Ошибка при построении отчета: "+e.getMessage());
-                logger.error("Failed build report ",e);
+                printError("Ошибка при построении отчета: " + e.getMessage());
+                logger.error("Failed build report ", e);
             }
         }
         return null;
@@ -127,7 +128,7 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -138,7 +139,7 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
             HibernateUtils.close(persistenceSession, logger);
         }
 
-        if(report!=null){
+        if (report != null) {
             try {
                 FacesContext facesContext = FacesContext.getCurrentInstance();
                 HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
@@ -176,9 +177,11 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
 
     private String checkIsExistFile(String suffix) {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateShortFileName = CoverageNutritionReport.class.getSimpleName() + suffix;
+        String templateShortFileName =
+                CoverageNutritionReport.class.getSimpleName() + ((showTotal) ? "Total" : "") + ((showEmployee)
+                        ? "Employees" : "") + suffix;
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
-        if(!(new File(templateFilename)).exists()){
+        if (!(new File(templateFilename)).exists()) {
             printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
             return null;
         }
@@ -200,7 +203,8 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
 
         properties.setProperty(CoverageNutritionReport.P_SHOW_TOTAL, showTotal.toString());
 
-        properties.setProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG, StringUtils.join(idOfContragentOrgList, ','));
+        properties.setProperty(ReportPropertiesUtils.P_ID_OF_MENU_SOURCE_ORG,
+                StringUtils.join(idOfContragentOrgList, ','));
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, StringUtils.join(idOfOrgList, ','));
         return properties;
     }
