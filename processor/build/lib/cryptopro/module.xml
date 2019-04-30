@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<module xmlns="urn:jboss:module:1.0" name="ru.cryptopro">
+  <resources>
+	<resource-root path="AdES-core.jar"/>
+	<resource-root path="ASN1P.jar"/>
+	<resource-root path="asn1rt.jar"/>
+	<resource-root path="CAdES.jar"/>
+	<resource-root path="cmsutil.jar"/>
+	<resource-root path="cpSSL.jar"/>
+	<resource-root path="forms_rt.jar"/>
+	<resource-root path="J6CF.jar"/>
+	<resource-root path="J6Oscar.jar"/>
+	<resource-root path="JCP.jar"/>
+	<resource-root path="JCPControlPane.jar"/>
+	<resource-root path="JCPinst.jar"/>
+	<resource-root path="JCPinstGUI.jar"/>
+	<resource-root path="JCPRequest.jar"/>
+	<resource-root path="JCPRevCheck.jar"/>
+	<resource-root path="JCPRevTools.jar"/>
+	<resource-root path="JCPxml.jar"/>
+	<resource-root path="JCryptoP.jar"/>
+	<resource-root path="OCF.jar"/>
+	<resource-root path="Oscar.jar"/>
+	<resource-root path="Rutoken.jar"/>
+	<resource-root path="samples.jar"/>
+	<resource-root path="samples-sources.jar"/>
+	<resource-root path="tls_proxy.jar"/>
+	<resource-root path="XAdES.jar"/>
+	<resource-root path="XMLDSigRI.jar"/>
+  </resources>
+  <dependencies>
+      <module name="org.apache.santuario.xmlsec" export="true" />
+      <module name="org.apache.commons.logging" export="true" />
+      <module name="org.apache.xalan" export="true" />
+	  <module name="org.apache.xerces" export="true" />
+    </dependencies>
+</module>

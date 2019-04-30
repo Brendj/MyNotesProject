@@ -33,6 +33,8 @@ import java.text.SimpleDateFormat;
 import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.logic.ClientManager.generateNewClientGuardianVersion;
+import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.createClientGroup;
+import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.findClientGroupByGroupNameAndIdOfOrg;
 
 /**
  * User: shamil
@@ -187,15 +189,18 @@ public class ClientDao extends WritableJpaDao {
                         List<ClientGuardian> guardians = getGuardians(session, ccInfo.getIdOfClient());
                         boolean mobileFound = false;
                         for (ClientGuardian cg : guardians) {
-                            org.hibernate.Query query1 = session.createQuery("select c.mobile from Client c where c.idOfClient = :idOfClient");
+                            org.hibernate.Query query1 = session.createQuery("select c from Client c where c.idOfClient = :idOfClient");
                             query1.setParameter("idOfClient", cg.getIdOfGuardian());
-                            String mobile = (String)query1.uniqueResult();
-                            if (mobile != null &&
-                                    PhoneNumberCanonicalizator.canonicalize(mobile).equals(PhoneNumberCanonicalizator.canonicalize(ccInfo.getMobile()))) {
+                            Client guardian = (Client)query1.uniqueResult();
+                            if (guardian.getMobile() != null &&
+                                    PhoneNumberCanonicalizator.canonicalize(guardian.getMobile()).equals(PhoneNumberCanonicalizator.canonicalize(ccInfo.getMobile()))) {
                                 //хотя бы у одного опекуна найден номер мобильного ребенка - очищаем контактные данные у ребенка
                                 mobileFound = true;
                                 Client child = (Client) session.load(Client.class, ccInfo.getIdOfClient());
-                                clearClientContacts(child, session);
+                                long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+                                refreshClientGuadianData(child, cg, session);
+                                clearClientContacts(child, session, clientRegistryVersion);
+                                refreshGuardianData(guardian, session, clientRegistryVersion);
                                 logger.info(String.format("Cleared contacts from client id=%s", child.getIdOfClient()));
                                 session.save(child);
                                 break;
@@ -344,7 +349,8 @@ public class ClientDao extends WritableJpaDao {
                         session.update(currentClientGuardian);
 
                         //Очищаем данные клиента (ребенка)
-                        clearClientContacts(client, session);
+                        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
+                        clearClientContacts(client, session, clientRegistryVersion);
                         session.update(client);
                         session.flush();
                         transaction.commit();
@@ -361,14 +367,44 @@ public class ClientDao extends WritableJpaDao {
         }
     }
 
-    private void clearClientContacts(Client client, Session session) throws Exception {
+    private void clearClientContacts(Client client, Session session, long clientRegistryVersion) throws Exception {
         client.setMobile("");
         client.setEmail("");
         client.setNotifyViaSMS(false);
         client.setNotifyViaPUSH(false);
         client.setNotifyViaEmail(false);
         client.setSsoid("");
-        long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(session);
         client.setClientRegistryVersion(clientRegistryVersion);
+    }
+
+    private void refreshGuardianData(Client guardian, Session session, long clientRegistryVersion) throws Exception {
+        if (guardian.isDeletedOrLeaving()) {
+            ClientGroup clientGroup = findClientGroupByGroupNameAndIdOfOrg(session, guardian.getOrg().getIdOfOrg(),
+                    ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
+            if (clientGroup == null) {
+                clientGroup = createClientGroup(session, guardian.getOrg().getIdOfOrg(), ClientGroup.Predefined.CLIENT_PARENTS);
+            }
+            guardian.setClientGroup(clientGroup);
+            guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+            guardian.setClientRegistryVersion(clientRegistryVersion);
+            session.update(guardian);
+        }
+    }
+
+    private void refreshClientGuadianData(Client client, ClientGuardian clientGuardian, Session session) {
+        if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
+            clientGuardian.setDeletedState(false);
+            clientGuardian.setDisabled(false);
+            clientGuardian.setVersion(ClientManager.generateNewClientGuardianVersion(session));
+            if (clientGuardian.getNotificationSettings() == null) {
+                Set<ClientGuardianNotificationSetting> set = new HashSet<ClientGuardianNotificationSetting>();
+                clientGuardian.setNotificationSettings(set);
+            }
+            clientGuardian.getNotificationSettings().clear();
+            for (ClientNotificationSetting ns : client.getNotificationSettings()) {
+                clientGuardian.getNotificationSettings().add(new ClientGuardianNotificationSetting(clientGuardian, ns.getNotifyType()));
+            }
+            session.update(clientGuardian);
+        }
     }
 }

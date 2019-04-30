@@ -339,7 +339,7 @@ public class Processor implements SyncProcessor {
         syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
                 request.getRemoteAddr(), request.getSyncType().getValue());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
-                request.getRemoteAddr());
+                request.getRemoteAddr(), request.getSqlServerVersion());
         timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "Begin sync", timeForDelta);
 
         processMigrantsSections(request, syncHistory, responseSections, null);
@@ -890,7 +890,7 @@ public class Processor implements SyncProcessor {
         syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
                 request.getRemoteAddr(), request.getSyncType().getValue());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
-                request.getRemoteAddr());
+                request.getRemoteAddr(), request.getSqlServerVersion());
 
         // мигранты
         processMigrantsSectionsWithClientsData(request, syncHistory, responseSections);
@@ -4171,15 +4171,19 @@ public class Processor implements SyncProcessor {
         return false;
     }
 
-    private void addClientVersionAndRemoteAddressByOrg(Long idOfOrg, String clientVersion, String remoteAddress) {
+    private void addClientVersionAndRemoteAddressByOrg(Long idOfOrg, String clientVersion, String remoteAddress,
+            String sqlServerVersion) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            updateClientVersionAndRemoteAddressByOrg(persistenceSession, idOfOrg, clientVersion, remoteAddress);
+            updateClientVersionAndRemoteAddressByOrg(persistenceSession, idOfOrg, clientVersion, remoteAddress,
+                    sqlServerVersion);
             persistenceTransaction.commit();
             persistenceTransaction = null;
+        }catch(Exception e){
+            logger.error("Can't update ClientVersion, RemoteAddress and sqlServerVersion for ID of Org: " + idOfOrg, e);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);

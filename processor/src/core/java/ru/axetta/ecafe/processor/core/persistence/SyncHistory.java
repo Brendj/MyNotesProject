@@ -27,6 +27,7 @@ public class SyncHistory {
     private Integer syncType;
     private Set<SyncHistoryException> syncHistoryExceptions = new HashSet<SyncHistoryException>();
 
+
     public String getRemoteAddress() {
         return remoteAddress;
     }
@@ -55,7 +56,8 @@ public class SyncHistory {
         this.remoteAddress = remoteAddress;
     }
 
-    public SyncHistory(Org org, Date syncStartTime, long idOfPacket, String clientVersion, String remoteAddress, Integer syncType) {
+    public SyncHistory(Org org, Date syncStartTime, long idOfPacket, String clientVersion, String remoteAddress,
+            Integer syncType) {
         this.org = org;
         this.syncStartTime = syncStartTime;
         this.idOfPacket = idOfPacket;

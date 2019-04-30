@@ -283,11 +283,13 @@ public class RNIPLoadPaymentsService {
         RNIPLoadPaymentsService rnipLoadPaymentsService = getRNIPServiceBean(); //RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class);
         for (Contragent contragent : ContragentReadOnlyRepository.getInstance().getContragentsList()) {
             try {
-                resultReceivePayments = rnipLoadPaymentsService.receiveContragentPayments(REQUEST_LOAD_PAYMENTS, contragent, startDate, endDate);
+                resultReceivePayments = rnipLoadPaymentsService
+                        .receiveContragentPayments(REQUEST_LOAD_PAYMENTS, contragent, startDate, endDate);
                 isSuccessEnd = isSuccessEnd && resultReceivePayments;
-                if ((paymentRunTotalIterator % valueToRunModifiedPayments == 0 || !isAutoRun)
-                        && rnipLoadPaymentsService instanceof RNIPLoadPaymentsServiceV116) {
-                    rnipLoadPaymentsService.receiveContragentPayments(REQUEST_LOAD_PAYMENTS_MODIFIED, contragent, startDate, endDate);
+                if ((paymentRunTotalIterator % valueToRunModifiedPayments == 0 || !isAutoRun) && rnipLoadPaymentsService instanceof RNIPLoadPaymentsServiceV116) {
+                    rnipLoadPaymentsService
+                            .receiveContragentPayments(REQUEST_LOAD_PAYMENTS_MODIFIED, contragent, startDate,
+                                    endDate);
                 }
             } catch (Exception e) {
                 isSuccessEnd = false;

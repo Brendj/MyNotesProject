@@ -9,8 +9,8 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -2032,11 +2032,15 @@ public class DAOUtils {
         }
     }
 
-    public static void updateClientVersionAndRemoteAddressByOrg(Session persistenceSession,Long idOfOrg, String clientVersion,
-            String remoteAddress) {
-        Query query = persistenceSession.createQuery("update OrgSync set remoteAddress=:remoteAddress, clientVersion=:clientVersion where idOfOrg=:idOfOrg");
+    public static void updateClientVersionAndRemoteAddressByOrg(Session persistenceSession, Long idOfOrg, String clientVersion,
+            String remoteAddress, String sqlServerVersion) {
+        Query query = persistenceSession.createQuery(
+                 "update OrgSync "
+                 + " set remoteAddress=:remoteAddress, clientVersion=:clientVersion, sqlserverversion = :sqlServerVersion "
+                 + " where idOfOrg=:idOfOrg ");
         query.setParameter("remoteAddress", remoteAddress);
         query.setParameter("clientVersion", clientVersion);
+        query.setParameter("sqlServerVersion", sqlServerVersion);
         query.setParameter("idOfOrg", idOfOrg);
         query.executeUpdate();
     }

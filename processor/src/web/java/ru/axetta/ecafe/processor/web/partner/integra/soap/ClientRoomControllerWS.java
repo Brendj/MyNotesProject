@@ -7986,6 +7986,29 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public ClientContractIdResult getContractIdByGUID(@WebParam(name = "GUID") String guid){
+        ClientContractIdResult result = new ClientContractIdResult();
+        try{
+            DAOService daoService = DAOService.getInstance();
+
+            Client client = daoService.getClientByGuid(guid);
+            if(client == null){
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+            } else {
+                result.resultCode = RC_OK;
+                result.description = RC_OK_DESC;
+                result.setContractId(client.getContractId());
+            }
+        } catch (Exception e){
+            logger.error("Failed get contractID by GUID", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return result;
+    }
+
+    @Override
     public Result addGuardian(@WebParam(name = "firstName") String firstName,
             @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
             @WebParam(name = "mobile") String mobile, @WebParam(name = "gender") Integer gender,
