@@ -140,6 +140,15 @@
 
             <rich:column headerClass="column-header">
                 <f:facet name="header">
+                    <h:outputText escape="true" value="Версия MySQL" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.sqlServerVersion}"
+                              style="#{(item.lastSuccessfulBalanceSync!=null and mainPage.syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
+                              styleClass="output-text" />
+            </rich:column>
+
+            <rich:column headerClass="column-header">
+                <f:facet name="header">
                     <h:outputText escape="true" value="IP-адрес" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.remoteAddr}"

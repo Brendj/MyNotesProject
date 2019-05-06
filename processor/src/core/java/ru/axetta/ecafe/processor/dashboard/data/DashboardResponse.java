@@ -414,11 +414,11 @@ public class DashboardResponse {
         private String address;
         private String organizationTypeName;
         private String introductionQueue;
-        
+        private String sqlServerVersion;
 
         public OrgSyncStatItem(Long idOfOrg, String orgName, String address, String organizationTypeName,
                 String introductionQueue, Date lastSuccessfulBalanceSync, String remoteAddr, String version,
-                Long errorsCount, String district) {
+                Long errorsCount, String district, String sqlServerVersion) {
             this.idOfOrg = idOfOrg;
             this.orgName = orgName;
             this.district = district;
@@ -429,6 +429,7 @@ public class DashboardResponse {
             this.address = address;
             this.organizationTypeName = organizationTypeName;
             this.introductionQueue = introductionQueue;
+            this.sqlServerVersion = sqlServerVersion;
         }
 
         public String getOrgName() {
@@ -474,6 +475,14 @@ public class DashboardResponse {
 
         public String getIntroductionQueue() {
             return introductionQueue;
+        }
+
+        public String getSqlServerVersion() {
+            return sqlServerVersion;
+        }
+
+        public void setSqlServerVersion(String sqlServerVersion) {
+            this.sqlServerVersion = sqlServerVersion;
         }
     }
 

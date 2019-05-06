@@ -64,13 +64,13 @@ public class SyncMonitorReport extends BasicReportForAllOrgJob {
             String sqlQuery =
                     "SELECT o.idoforg, o.shortnameinfoservice, o.district, o.shortaddress, o.organizationtype, "
                   + "   o.introductionqueue, os.lastsucbalancesync, os.remoteaddress, os.clientversion, "
-                  + "   count(se.idoforg) AS exceptions "
+                  + "   count(se.idoforg) AS exceptions, os.sqlServerVersion "
                   + "FROM cf_orgs o "
                   + "INNER JOIN cf_orgs_sync os ON os.idoforg=o.idoforg "
                   + "LEFT JOIN cf_synchistory_exceptions se ON se.idoforg=o.idoforg "
                   + "WHERE state<>0 " + ((null != versionsList && !versionsList.isEmpty()) ? "AND os.clientversion IN (:versions) " : "")
                   + "GROUP BY o.idoforg, o.tag, o.shortname, o.district, os.lastsucbalancesync, os.lastunsucbalancesync, "
-                  + "   os.remoteaddress, os.clientversion "
+                  + "   os.remoteaddress, os.clientversion, os.sqlServerVersion "
                   + "ORDER BY os.lastSucBalanceSync";
 
             Query query = session.createSQLQuery(sqlQuery);
@@ -95,9 +95,11 @@ public class SyncMonitorReport extends BasicReportForAllOrgJob {
                 String remoteAddress = (String)vals[7];
                 String clientVersion = (String)vals[8];
                 Long exceptionsCount = ((BigInteger)vals[9]).longValue();
+                String sqlServerVersion = (String) vals[10];
 
                 items.add(new DashboardResponse.OrgSyncStatItem(idOfOrg, shortName, address, organizationTypeName,
-                        introductionQueue, successfulBalanceSync, remoteAddress, clientVersion, exceptionsCount, district));
+                        introductionQueue, successfulBalanceSync, remoteAddress, clientVersion, exceptionsCount,
+                        district, sqlServerVersion));
             }
 
             return items;

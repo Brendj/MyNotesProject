@@ -30,6 +30,7 @@ public class OrgSync implements Serializable {
     private String remoteAddress;
     private Date lastAccRegistrySync;
     private Integer errorState;
+    private String sqlServerVersion;
 
     public Long getIdOfOrg() {
         return idOfOrg;
@@ -122,5 +123,13 @@ public class OrgSync implements Serializable {
 
     public void setErrorState(Integer errorState) {
         this.errorState = errorState;
+    }
+
+    public String getSqlServerVersion() {
+        return sqlServerVersion;
+    }
+
+    public void setSqlServerVersion(String sqlServerVersion) {
+        this.sqlServerVersion = sqlServerVersion;
     }
 }

@@ -2,19 +2,12 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
-import org.hibernate.Session;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.io.IOException;
-import java.math.BigInteger;
-import java.util.Calendar;
-import java.util.GregorianCalendar;
-import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -33,7 +26,8 @@ public class CleanupReportsService {
     }
 
     public void run() throws IOException {
-        if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
+        return;
+        /*if (!RuntimeContext.getInstance().isMainNode() || !isOn()) {
             //logger.info ("BI data export is turned off. You have to activate this tool using common Settings");
             return;
         }
@@ -47,6 +41,6 @@ public class CleanupReportsService {
             }
         } catch (Exception e) {
             logger.error("Failed to cleanup reports", e);
-        }
+        }*/
     }
 }
