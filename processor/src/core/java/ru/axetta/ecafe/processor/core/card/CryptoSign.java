@@ -30,6 +30,7 @@ public class CryptoSign {
     public static final String BC_PROV = "BC";
     public static final String ALGORITHM = "SHA1withECDSA";
     public static final String KEY_FACTOR = "ECDSA";
+    public static final Integer SIZE_DATE = 12;
 
     public static KeyPair keyPairGen() throws Exception {
         ECParameterSpec ecSpec = ECNamedCurveTable.getParameterSpec(BP160R1);
@@ -125,14 +126,15 @@ public class CryptoSign {
                         }
                     }
                     //Размер ответа фиксированный
-                    byte[] allData = new byte[12];
+                    byte[] allData = new byte[SIZE_DATE + sign.length];
 
+                    //Здесь возвращаем тип подписи
                     responseCardSign.setMemSize(card.getMemSize());
 
                     //Сохраняем сами подписи
-                    System.arraycopy(card_data, 7, allData, 0, 12);
-                    System.arraycopy(sign, 0, allData, card_data.length + 1, sign.length);
-                    responseCardSign.setAllDate(allData);
+                    System.arraycopy(card_data, 7, allData, 0, SIZE_DATE);
+                    System.arraycopy(sign, 0, allData, SIZE_DATE, sign.length);
+                    responseCardSign.setAllDate(bytesToHex(allData));
                 }
             } catch (Exception e) {
                 responseCardSign.setInsideError("Неизвестная ошибка при подписании карты");

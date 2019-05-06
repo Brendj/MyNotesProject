@@ -7,13 +7,13 @@ package ru.axetta.ecafe.processor.core.card;
 public class ResponseCardSign extends ErrorCartSign {
     private long uid;   //Физический номер
     private short memSize; //Более или менее 128 байт
-    private byte[] allDate; //Исходные данные + ЭЦП
+    private String allDate; //Исходные данные + ЭЦП
 
-    public byte[] getAllDate() {
+    public String getAllDate() {
         return allDate;
     }
 
-    public void setAllDate(byte[] allDate) {
+    public void setAllDate(String allDate) {
         this.allDate = allDate;
     }
 
