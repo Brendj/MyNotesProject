@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -24,9 +25,7 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
+import org.hibernate.criterion.*;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -150,14 +149,18 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             List<Long> orgList = loadOrgList(session, idOfSourceOrgList, idOfOrgList);
 
             HashMap<Long, EmployeeItem> employeeItemHashMap = loadEmployeesByOrgs(session, orgList, startDate, endDate);
-
+            List<Long> managerList = loadManagers(session);
+            //TODO: delete
+            //managerList.add(1889814L);
             List<CoverageNutritionReportItem> itemList = new ArrayList<CoverageNutritionReportItem>();
 
             String sqlString = "select distinct og.idoforg, "
                     + "    cast(substring(og.shortnameinfoservice, '№\\s{0,1}(\\d{1,5})') as integer) as number, "
                     + "    st.studentsCountTotal, st.studentsCountYoung, st.studentsCountMiddle, st.studentsCountOld, st.benefitStudentsCountYoung, "
                     + "    st.benefitStudentsCountMiddle, st.benefitStudentsCountOld, st.benefitStudentsCountTotal, st.employeeCount, "
-                    + "    case when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 1 and 4 then 'Обучающиеся 1-4 классов' "
+                    + "    case "
+                    + (managerList.isEmpty() ?  "" : "when c.idofclient in (:managerList) then 'Комплексы проданные по карте ОО' ")
+                    + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 1 and 4 then 'Обучающиеся 1-4 классов' "
                     + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 5 and 9 then 'Обучающиеся 5-9 классов' "
                     + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 10 and 11 then 'Обучающиеся 10-11 классов' "
                     + "         when cg.idofclientgroup in (:clientEmployees, :clientAdministration, :clientTechEmployees) then 'Сотрудники' end as group, "
@@ -174,7 +177,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + "join cf_goods g on g.idofgood = od.idofgood " + "join cf_orgs og on og.idoforg = o.idoforg "
                     + "left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
-                    + "where o.idoforg in (:orgList) and o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0";
+                    + "where o.idoforg in (:orgList) and o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0 ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<String>();
             List<String> classesNotConditionList = new ArrayList<String>();
@@ -240,6 +243,9 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             query.setParameter("clientAdministration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
             query.setParameter("clientTechEmployees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
             query.setParameterList("orgList", orgList);
+            if (!managerList.isEmpty()) {
+                query.setParameterList("managerList", managerList);
+            }
             List list = query.list();
 
             for (Object o : list) {
@@ -364,6 +370,18 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 }
             }
             return employeeItemHashMap;
+        }
+
+        private List<Long> loadManagers(Session session) {
+            Criteria criteria = session.createCriteria(Client.class);
+            criteria.createAlias("person", "p");
+            Disjunction disjunction = Restrictions.disjunction();
+            disjunction.add(Restrictions.like("p.firstName", "#%"));
+            disjunction.add(Restrictions.like("p.secondName", "#%"));
+            disjunction.add(Restrictions.like("p.surname", "#%"));
+            criteria.add(disjunction);
+            criteria.setProjection(Property.forName("idOfClient"));
+            return criteria.list();
         }
 
         public String getTemplateFilename() {

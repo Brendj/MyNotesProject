@@ -9,7 +9,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.0000000000000004"/>
-	<property name="ireport.x" value="1852"/>
+	<property name="ireport.x" value="1628"/>
 	<property name="ireport.y" value="0"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="003 Sample data xls"/>
 	<style name="table">
@@ -89,9 +89,9 @@
 		</band>
 	</pageHeader>
 	<summary>
-		<band height="165" splitType="Stretch">
+		<band height="190" splitType="Stretch">
 			<crosstab>
-				<reportElement uuid="e2351233-788b-4c5e-9fac-6fbc9924c407" x="0" y="0" width="2720" height="165"/>
+				<reportElement uuid="e2351233-788b-4c5e-9fac-6fbc9924c407" x="0" y="0" width="2720" height="190"/>
 				<crosstabHeaderCell>
 					<cellContents>
 						<staticText>
@@ -746,16 +746,16 @@
 						<cellContents/>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
-				<measure name="idOfOrderDetailMeasure" class="java.lang.Integer" calculation="DistinctCount">
+				<measure name="idOfOrderDetailMeasure" class="java.lang.Long" calculation="DistinctCount">
 					<measureExpression><![CDATA[$F{idOfOrderDetail}]]></measureExpression>
 				</measure>
 				<measure name="idOfClientMeasure" class="java.lang.Long" calculation="DistinctCount">
 					<measureExpression><![CDATA[$F{idOfClient}]]></measureExpression>
 				</measure>
-				<measure name="idOfClientsPaidAndFreeMeasure" class="java.lang.Integer" calculation="DistinctCount">
+				<measure name="idOfClientsPaidAndFreeMeasure" class="java.lang.Long" calculation="DistinctCount">
 					<measureExpression><![CDATA[$F{foodType}.toLowerCase().contains("платное") ? $F{idOfClient} : null]]></measureExpression>
 				</measure>
-				<measure name="idOfOrderDetailPaidAndFreeMeasure" class="java.lang.Integer" calculation="DistinctCount">
+				<measure name="idOfOrderDetailPaidAndFreeMeasure" class="java.lang.Long" calculation="DistinctCount">
 					<measureExpression><![CDATA[$F{foodType}.toLowerCase().contains("платное") ? $F{idOfOrderDetail} : null]]></measureExpression>
 				</measure>
 				<measure name="idOfOrderDetailBuffetMeasure" class="java.lang.Long" calculation="DistinctCount">
