@@ -355,7 +355,7 @@ public class GoodRequestsChangeAsyncNotificationService {
 
     @Async
     public void notifyOrg(OrgItem orgItem, final Date beginGenerateTime, final Date endGenerateTime,
-            final Date lastCreateOrUpdateDate, List<String> guids, Date requestDate) {
+            final Date lastCreateOrUpdateDate, Date requestDate) {
         LOGGER.info("Start notifyOrg method idOfOrg=" + orgItem.getIdOfOrg());
         Calendar localCalendar = runtimeContext.getDefaultLocalCalendar(null);
 
@@ -385,7 +385,6 @@ public class GoodRequestsChangeAsyncNotificationService {
         properties.setProperty(GoodRequestsNewReport.P_HIDE_LAST_VALUE, Boolean.toString(false));
         properties.setProperty(GoodRequestsNewReport.P_HIDE_TOTAL_ROW, Boolean.toString(true));
         properties.setProperty(GoodRequestsNewReport.P_NOTIFICATION, Boolean.toString(true));
-        properties.setProperty(PreorderRequestsReport.P_GUID_FILTER, StringUtils.join(guids, ","));
         //TODO
         properties.setProperty(GoodRequestsNewReport.P_HIDE_PREORDERS, Boolean.toString(false));
         properties.setProperty(GoodRequestsNewReport.P_PREORDERS_ONLY, Boolean.toString(true));

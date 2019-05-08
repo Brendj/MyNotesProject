@@ -218,7 +218,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                                 calendarEnd.add(Calendar.MINUTE, 1);
                                 final Date endGenerateTime = calendarEnd.getTime();
                                 RuntimeContext.getAppContext().getBean(GoodRequestsChangeAsyncNotificationService.class)
-                                        .notifyOrg(orgItem, fireTime, endGenerateTime, lastCreateOrUpdateDate, guids, dateWork);
+                                        .notifyOrg(orgItem, fireTime, endGenerateTime, lastCreateOrUpdateDate, dateWork);
                             }
 
                             OrgGoodRequest orgGoodRequest = new OrgGoodRequest(idOfOrg, dateWork);
