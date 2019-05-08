@@ -294,6 +294,7 @@ public class GoodRequestsNewReportService {
                 Long idOfOrgFromItem = dataItem.getIdOfOrg();
                 if(idOfOrgFromItem != null && idOfOrgFromItem.equals(orgItem.getIdOfOrg())){
                     findCurrentOrg = true;
+                    break;
                 }
             }
             if(!findCurrentOrg){
