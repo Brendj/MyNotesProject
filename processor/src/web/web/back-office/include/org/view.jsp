@@ -131,8 +131,6 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.configurationProviderName}" styleClass="input-text" />
     <h:outputText escape="true" value="Идентификатор организации - источника меню" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.menuExchangeSourceOrgName}" styleClass="input-text long-field" />
-    <h:outputText escape="true" value="Разрешить получение льгот из сверки контингента" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.changesDSZN}"  styleClass="input-text" readonly="true" disabled="true"  />
     <h:outputText escape="true" value="Использование плана питания" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.usePlanOrders?'Включен':'Выключен'}" styleClass="input-text" />
     <h:outputText escape="true" value="Включить функционал платного горячего питания" styleClass="output-text" />
@@ -188,6 +186,10 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.needVirifyCardSign}"  styleClass="input-text" disabled="true"  />
     <h:outputText escape="true" value="Уровень безопасности" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.securityLevel}" styleClass="input-text long-field" />
+    <h:outputText id="disableEditingClientsFromAISReestrLabel" escape="true" value="Разрешить проведение сверки контингента" styleClass="output-text"/>
+    <h:selectBooleanCheckbox id="disableEditingClientsFromAISReestrCheckbox" value="#{mainPage.orgViewPage.disableEditingClientsFromAISReestr}" disabled="true" />
+    <h:outputText escape="true" value="Разрешить получение льгот из сверки контингента" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.changesDSZN}"  styleClass="input-text" readonly="true" disabled="true"  />
     <h:outputText escape="true" value="Разрешить проведение сверки фотографий" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.photoRegistry}"  styleClass="input-text" disabled="true"  />
     <h:outputText escape="true" value="Разрешить проведение сверки сотрудников" styleClass="output-text" />
