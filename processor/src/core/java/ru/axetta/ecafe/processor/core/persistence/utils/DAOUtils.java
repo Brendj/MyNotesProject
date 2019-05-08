@@ -2029,11 +2029,15 @@ public class DAOUtils {
         }
     }
 
-    public static void updateClientVersionAndRemoteAddressByOrg(Session persistenceSession,Long idOfOrg, String clientVersion,
-            String remoteAddress) {
-        Query query = persistenceSession.createQuery("update OrgSync set remoteAddress=:remoteAddress, clientVersion=:clientVersion where idOfOrg=:idOfOrg");
+    public static void updateClientVersionAndRemoteAddressByOrg(Session persistenceSession, Long idOfOrg, String clientVersion,
+            String remoteAddress, String sqlServerVersion) {
+        Query query = persistenceSession.createQuery(
+                 "update OrgSync "
+                 + " set remoteAddress=:remoteAddress, clientVersion=:clientVersion, sqlserverversion = :sqlServerVersion "
+                 + " where idOfOrg=:idOfOrg ");
         query.setParameter("remoteAddress", remoteAddress);
         query.setParameter("clientVersion", clientVersion);
+        query.setParameter("sqlServerVersion", sqlServerVersion);
         query.setParameter("idOfOrg", idOfOrg);
         query.executeUpdate();
     }
