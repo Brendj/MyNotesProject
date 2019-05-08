@@ -117,6 +117,13 @@ public class PreorderRequestsReportService extends RecoverableService {
         return true;
     }
 
+    private boolean itemComplexWasDeleted(PreorderItem item, List<PreorderItem> deletedItems) {
+        for (PreorderItem deletedItem : deletedItems) {
+            if (item.getIdOfPreorderComplex().equals(deletedItem.getIdOfPreorderComplex()) && item.getIdOfClient().equals(deletedItem.getIdOfClient())) return true;
+        }
+        return false;
+    }
+
     private void deletePreorder(Session session, PreorderItem item, PreorderState reason) {
         Long version = DAOUtils.nextVersionByPreorderComplex(session);
         if (item.getIdOfPreorderComplex() != null) {
@@ -164,6 +171,7 @@ public class PreorderRequestsReportService extends RecoverableService {
 
                     List<Date> orgDates = getOrgDates(currentDate, idOfOrg, weekends); //вычислены даты, на которые нужно генерировать заявки для текущей ОО
                     List<String> guids = new ArrayList<String>();
+                    List<PreorderItem> deletedItems = new ArrayList<PreorderItem>();
                     for (Date dateWork : orgDates) {
                         if (getOrgGoodRequestByDate(idOfOrg, dateWork, doneOrgGoodRequests) != null) {
                             logger.info(String.format("Requests for orgID=%s on date=%s already exist", idOfOrg, CalendarUtils.dateToString(dateWork)));
@@ -173,21 +181,26 @@ public class PreorderRequestsReportService extends RecoverableService {
                         try {
                             transaction = session.beginTransaction();
                             List<PreorderItem> preordersByOrg = getPreorderItemsByOrg(idOfOrg, preorderItemList, dateWork); //предзаказы по ОО на дату
+                            deletedItems.clear();
                             for (PreorderItem item : preordersByOrg) {
                                 try {
+                                    if (itemComplexWasDeleted(item, deletedItems)) continue;
                                     if (null == item.getIdOfGood()) {
+                                        deletedItems.add(item);
                                         deletePreorder(session, item, PreorderState.DELETED);
                                         logger.info("Delete preorder for delete by supplier " + item.toString());
                                         continue;
                                     }
                                     if (isWeekendBySpecialDateAndSixWorkWeek(isWeekend, dateWork, item.getIdOfClientGroup(), idOfOrg, specialDates)
                                             || isHolidayByProductionCalendar(dateWork, productionCalendar)) {
+                                        deletedItems.add(item);
                                         deletePreorder(session, item, PreorderState.CHANGED_CALENDAR);
                                         logger.info("Delete preorder for changed calendar " + item.toString());
                                         continue;
                                     }
                                     long balanceOnDate = getBalanceOnDate(item.getIdOfClient(), dateWork, clientBalances);
                                     if (balanceOnDate < 0L) {
+                                        deletedItems.add(item);
                                         deletePreorder(session, item, PreorderState.NOT_ENOUGH_BALANCE);
                                         logger.info("Delete preorder for not enougn money " + item.toString());
                                         continue;
