@@ -93,7 +93,13 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     Pattern pattern = Pattern.compile("\\D*(\\d{1,2})-\\d{1,2}");
                     Matcher matcher1 = pattern.matcher(obj1);
                     Matcher matcher2 = pattern.matcher(obj2);
-                    if (matcher1.find() && matcher2.find()) {
+                    if (obj1.toLowerCase().startsWith("комплексы") && !obj2.toLowerCase().startsWith("комплексы")) {
+                        return 1;
+                    } else if (obj2.toLowerCase().startsWith("комплексы") && !obj1.toLowerCase().startsWith("комплексы")) {
+                        return -1;
+                    } else if (obj1.toLowerCase().startsWith("комплексы") && obj2.toLowerCase().startsWith("комплексы")) {
+                        return 0;
+                    } else if (matcher1.find() && matcher2.find()) {
                         Integer val1 = Integer.parseInt(matcher1.group(1));
                         Integer val2 = Integer.parseInt(matcher2.group(1));
                         return val1.compareTo(val2);
@@ -149,9 +155,10 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             List<Long> orgList = loadOrgList(session, idOfSourceOrgList, idOfOrgList);
 
             HashMap<Long, EmployeeItem> employeeItemHashMap = loadEmployeesByOrgs(session, orgList, startDate, endDate);
-            List<Long> managerList = loadManagers(session);
-            //TODO: delete
-            //managerList.add(1889814L);
+            List<Long> managerList = Collections.EMPTY_LIST;
+            if (showComplexesByOrgCard) {
+                managerList = loadManagers(session);
+            }
             List<CoverageNutritionReportItem> itemList = new ArrayList<CoverageNutritionReportItem>();
 
             String sqlString = "select distinct og.idoforg, "
@@ -159,7 +166,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "    st.studentsCountTotal, st.studentsCountYoung, st.studentsCountMiddle, st.studentsCountOld, st.benefitStudentsCountYoung, "
                     + "    st.benefitStudentsCountMiddle, st.benefitStudentsCountOld, st.benefitStudentsCountTotal, st.employeeCount, "
                     + "    case "
-                    + (managerList.isEmpty() ?  "" : "when c.idofclient in (:managerList) then 'Комплексы проданные по карте ОО' ")
+                    + (managerList.isEmpty() || !showComplexesByOrgCard ?  "" : "when c.idofclient in (:managerList) then 'Комплексы проданные по карте ОО' ")
                     + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 1 and 4 then 'Обучающиеся 1-4 классов' "
                     + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 5 and 9 then 'Обучающиеся 5-9 классов' "
                     + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 10 and 11 then 'Обучающиеся 10-11 классов' "
@@ -205,7 +212,6 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             }
 
             if (!showEmployee) {
-                //TODO: Добавить группу сотрудники
                 sqlString += " and cg.idofclientgroup not in (:clientEmployees, :clientAdministration, :clientTechEmployees)";
             }
 
@@ -243,7 +249,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             query.setParameter("clientAdministration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
             query.setParameter("clientTechEmployees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
             query.setParameterList("orgList", orgList);
-            if (!managerList.isEmpty()) {
+            if (!managerList.isEmpty() && showComplexesByOrgCard) {
                 query.setParameterList("managerList", managerList);
             }
             List list = query.list();

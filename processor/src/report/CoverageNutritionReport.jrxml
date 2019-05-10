@@ -90,7 +90,7 @@
 			<crosstab>
 				<reportElement uuid="e2351233-788b-4c5e-9fac-6fbc9924c407" x="0" y="0" width="2300" height="165"/>
 				<crosstabHeaderCell>
-					<cellContents>
+					<cellContents mode="Transparent">
 						<staticText>
 							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="0" y="0" width="80" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
@@ -180,7 +180,7 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<cellContents backcolor="#BFE1FF" mode="Transparent">
 							<box>
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
@@ -192,7 +192,7 @@
 						<bucketExpression><![CDATA[$F{studentsCountTotal}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents>
+						<cellContents mode="Transparent">
 							<textField>
 								<reportElement uuid="cf403b74-d035-4c79-a83a-2756f7429a65" style="table" x="0" y="0" width="100" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -201,7 +201,7 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents/>
+						<cellContents mode="Transparent"/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="studentsCountYoung" width="100" totalPosition="End">
@@ -209,7 +209,7 @@
 						<bucketExpression><![CDATA[$F{studentsCountYoung}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents>
+						<cellContents mode="Transparent">
 							<textField>
 								<reportElement uuid="2aeaf291-d82b-49ef-8f28-78397b3a6806" style="table" x="0" y="0" width="100" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -218,7 +218,7 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents/>
+						<cellContents mode="Transparent"/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="studentsCountMiddle" width="100" totalPosition="End">
@@ -226,7 +226,7 @@
 						<bucketExpression><![CDATA[$F{studentsCountMiddle}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents>
+						<cellContents mode="Transparent">
 							<textField>
 								<reportElement uuid="f1ae8c22-8885-43a7-9560-7fca68fe58e0" style="table" x="0" y="0" width="100" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -235,7 +235,7 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents/>
+						<cellContents mode="Transparent"/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="studentsCountOld" width="100" totalPosition="End">
@@ -243,7 +243,7 @@
 						<bucketExpression><![CDATA[$F{studentsCountOld}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents>
+						<cellContents mode="Transparent">
 							<textField>
 								<reportElement uuid="55814637-58aa-4432-b061-8cc52ed1b72e" style="table" x="0" y="0" width="100" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -252,7 +252,7 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents/>
+						<cellContents mode="Transparent"/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="benefitStudentsCountYoung" width="100" totalPosition="End">
@@ -260,7 +260,7 @@
 						<bucketExpression><![CDATA[$F{benefitStudentsCountYoung}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents>
+						<cellContents mode="Transparent">
 							<textField>
 								<reportElement uuid="48e2f215-b5d8-4521-8dba-bba37e7694f9" style="table" x="0" y="0" width="100" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -269,7 +269,7 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents/>
+						<cellContents mode="Transparent"/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="benefitStudentsCountMiddle" width="100" totalPosition="End">
@@ -277,7 +277,7 @@
 						<bucketExpression><![CDATA[$F{benefitStudentsCountMiddle}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents>
+						<cellContents mode="Transparent">
 							<textField>
 								<reportElement uuid="1bd62b91-3353-4bd6-a5a2-e2d694418b80" style="table" x="0" y="0" width="100" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -286,7 +286,7 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents/>
+						<cellContents mode="Transparent"/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="benefitStudentsCountOld" width="100" totalPosition="End">
@@ -294,7 +294,7 @@
 						<bucketExpression><![CDATA[$F{benefitStudentsCountOld}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents>
+						<cellContents mode="Transparent">
 							<textField>
 								<reportElement uuid="ed3d1900-711c-40e5-887d-1981fbe0d55c" style="table" x="0" y="0" width="100" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -303,7 +303,7 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents/>
+						<cellContents mode="Transparent"/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="benefitStudentsCountTotal" width="100" totalPosition="End">
@@ -311,7 +311,7 @@
 						<bucketExpression><![CDATA[$F{benefitStudentsCountTotal}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents>
+						<cellContents mode="Transparent">
 							<textField>
 								<reportElement uuid="068217c6-9939-4e67-815b-859b4d8df373" style="table" x="0" y="0" width="100" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -320,7 +320,7 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents/>
+						<cellContents mode="Transparent"/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="employeeCount" width="100" totalPosition="End">
@@ -328,7 +328,7 @@
 						<bucketExpression><![CDATA[$F{employeeCount}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
-						<cellContents>
+						<cellContents mode="Transparent">
 							<textField>
 								<reportElement uuid="2f89b403-2fbd-463a-b62d-fd3dfbefbe9e" style="table" x="0" y="0" width="100" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -337,7 +337,7 @@
 						</cellContents>
 					</crosstabRowHeader>
 					<crosstabTotalRowHeader>
-						<cellContents/>
+						<cellContents mode="Transparent"/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<columnGroup name="group" height="30" totalPosition="End" headerPosition="Stretch">
@@ -346,9 +346,9 @@
 						<comparatorExpression><![CDATA[$P{OVERRIDE_GroupComparator}]]></comparatorExpression>
 					</bucket>
 					<crosstabColumnHeader>
-						<cellContents backcolor="#FFF5F5" mode="Opaque">
+						<cellContents backcolor="#FFF5F5" mode="Transparent">
 							<textField>
-								<reportElement uuid="5983a7bc-db33-4487-ad88-d143fede42da" style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="540" height="30" backcolor="#FFFFFF"/>
+								<reportElement uuid="5983a7bc-db33-4487-ad88-d143fede42da" style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="570" height="30" backcolor="#FFFFFF"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -366,12 +366,12 @@
 						<comparatorExpression><![CDATA[$P{OVERRIDE_FoodTypeComparator}]]></comparatorExpression>
 					</bucket>
 					<crosstabColumnHeader>
-						<cellContents backcolor="#F0F8FF" mode="Opaque">
+						<cellContents backcolor="#F0F8FF" mode="Transparent">
 							<box>
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField>
-								<reportElement uuid="e92bd551-6e31-4c76-b481-99e9bac17369" style="Crosstab Data Text" x="0" y="0" width="180" height="30"/>
+								<reportElement uuid="e92bd551-6e31-4c76-b481-99e9bac17369" style="Crosstab Data Text" x="0" y="0" width="210" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
@@ -380,7 +380,7 @@
 						</cellContents>
 					</crosstabColumnHeader>
 					<crosstabTotalColumnHeader>
-						<cellContents backcolor="#BFE1FF" mode="Opaque">
+						<cellContents backcolor="#BFE1FF" mode="Transparent">
 							<box>
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
@@ -448,30 +448,30 @@
 						<bucketExpression><![CDATA[$F{complexName}]]></bucketExpression>
 					</bucket>
 					<crosstabColumnHeader>
-						<cellContents backcolor="#F0F8FF" mode="Opaque">
+						<cellContents backcolor="#F0F8FF" mode="Transparent">
 							<textField isBlankWhenNull="true">
-								<reportElement uuid="9ee044f2-f1f2-4317-af67-18158d7b64d2" style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="180" height="30"/>
+								<reportElement uuid="9ee044f2-f1f2-4317-af67-18158d7b64d2" style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="210" height="30"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font isBold="true"/>
 								</textElement>
 								<textFieldExpression><![CDATA[$V{complexName}]]></textFieldExpression>
 							</textField>
 							<staticText>
-								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="0" y="30" width="60" height="70"/>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="0" y="30" width="70" height="70"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
 								<text><![CDATA[кол-во покупателей ]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="60" y="30" width="60" height="70"/>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="70" y="30" width="70" height="70"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
 								<text><![CDATA[кол-во  комплексов ]]></text>
 							</staticText>
 							<staticText>
-								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="120" y="30" width="60" height="70"/>
+								<reportElement uuid="08dd7599-4892-4b59-89af-556180941a6b" style="table" x="140" y="30" width="70" height="70"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle">
 									<font size="8"/>
 								</textElement>
@@ -480,7 +480,7 @@
 						</cellContents>
 					</crosstabColumnHeader>
 					<crosstabTotalColumnHeader>
-						<cellContents/>
+						<cellContents mode="Transparent"/>
 					</crosstabTotalColumnHeader>
 				</columnGroup>
 				<measure name="idOfOrderDetailMeasure" class="java.lang.Integer" calculation="DistinctCount">
@@ -540,54 +540,54 @@
 				<measure name="employeePercentageOfActiveMeasure" class="java.lang.Double" calculation="First">
 					<measureExpression><![CDATA[$F{employeePercentageOfActive}]]></measureExpression>
 				</measure>
-				<crosstabCell width="180" height="25">
-					<cellContents>
+				<crosstabCell width="210" height="25">
+					<cellContents mode="Transparent">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 						<textField>
-							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="60" y="0" width="60" height="25"/>
+							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="70" y="0" width="70" height="25"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{idOfOrderDetailMeasure}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="0" y="0" width="60" height="25"/>
+							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="0" y="0" width="70" height="25"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{idOfClientMeasure}]]></textFieldExpression>
 						</textField>
 						<textField>
-							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="120" y="0" width="60" height="25"/>
+							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="140" y="0" width="70" height="25"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10"/>
 							</textElement>
-							<textFieldExpression><![CDATA[($V{group}.contains("1-4") && !$V{foodType}.toLowerCase().contains("бесплатное")) ?
+							<textFieldExpression><![CDATA[($V{group}.contains("1-4") && !$V{foodType}.toLowerCase().contains("бесплатное") && !$V{studentsCountYoung}.equals(0L)) ?
     String.format("%.2f", $V{idOfClientMeasure}.doubleValue() / $V{studentsCountYoung}.doubleValue() * 100.f) :
-($V{group}.contains("1-4") && $V{foodType}.toLowerCase().contains("бесплатное")) ?
+($V{group}.contains("1-4") && $V{foodType}.toLowerCase().contains("бесплатное") && !$V{benefitStudentsCountYoung}.equals(0L)) ?
     String.format("%.2f", $V{idOfClientMeasure}.doubleValue() / $V{benefitStudentsCountYoung}.doubleValue() * 100.f) :
-($V{group}.contains("5-9") && !$V{foodType}.toLowerCase().contains("бесплатное")) ?
+($V{group}.contains("5-9") && !$V{foodType}.toLowerCase().contains("бесплатное") && !$V{studentsCountMiddle}.equals(0L)) ?
     String.format("%.2f", $V{idOfClientMeasure}.doubleValue() / $V{studentsCountMiddle}.doubleValue() * 100.f) :
-($V{group}.contains("5-9") && $V{foodType}.toLowerCase().contains("бесплатное")) ?
+($V{group}.contains("5-9") && $V{foodType}.toLowerCase().contains("бесплатное") && !$V{benefitStudentsCountMiddle}.equals(0L)) ?
     String.format("%.2f", $V{idOfClientMeasure}.doubleValue() / $V{benefitStudentsCountMiddle}.doubleValue() * 100.f) :
-($V{group}.contains("10-11") && !$V{foodType}.toLowerCase().contains("бесплатное")) ?
+($V{group}.contains("10-11") && !$V{foodType}.toLowerCase().contains("бесплатное") && !$V{studentsCountOld}.equals(0L)) ?
     String.format("%.2f", $V{idOfClientMeasure}.doubleValue() / $V{studentsCountOld}.doubleValue() * 100.f) :
-($V{group}.contains("10-11") && $V{foodType}.toLowerCase().contains("бесплатное")) ?
-    String.format("%.2f", $V{idOfClientMeasure}.doubleValue() / $V{benefitStudentsCountOld}.doubleValue() * 100.f) : ""]]></textFieldExpression>
+($V{group}.contains("10-11") && $V{foodType}.toLowerCase().contains("бесплатное") && !$V{benefitStudentsCountOld}.equals(0L)) ?
+    String.format("%.2f", $V{idOfClientMeasure}.doubleValue() / $V{benefitStudentsCountOld}.doubleValue() * 100.f) : "-"]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="180" height="0" rowTotalGroup="schoolNumber">
-					<cellContents backcolor="#BFE1FF" mode="Opaque">
+				<crosstabCell width="210" height="0" rowTotalGroup="schoolNumber">
+					<cellContents backcolor="#BFE1FF" mode="Transparent">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell width="360" height="25" columnTotalGroup="foodType">
-					<cellContents backcolor="#BFE1FF" mode="Opaque">
+					<cellContents backcolor="#BFE1FF" mode="Transparent">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
@@ -609,7 +609,7 @@
 ($V{group}.contains("5-9")) ?
     String.format("%.2f", $V{idOfClientsPaidAndFreeMeasure}.doubleValue() / ($V{studentsCountMiddle}.doubleValue() + $V{benefitStudentsCountMiddle}) * 100.f) :
 ($V{group}.contains("10-11")) ?
-    String.format("%.2f", $V{idOfClientsPaidAndFreeMeasure}.doubleValue() / ($V{studentsCountOld}.doubleValue() + $V{benefitStudentsCountOld}) * 100.f) : ""]]></textFieldExpression>
+    String.format("%.2f", $V{idOfClientsPaidAndFreeMeasure}.doubleValue() / ($V{studentsCountOld}.doubleValue() + $V{benefitStudentsCountOld}) * 100.f) : "-"]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="180" y="0" width="60" height="25"/>
@@ -624,7 +624,7 @@
 ($V{group}.contains("5-9")) ?
     String.format("%.2f", $V{idOfClientBuffetMeasure}.doubleValue() / ($V{studentsCountMiddle}.doubleValue() + $V{benefitStudentsCountMiddle}) * 100.f) :
 ($V{group}.contains("10-11")) ?
-    String.format("%.2f", $V{idOfClientBuffetMeasure}.doubleValue() / ($V{studentsCountOld}.doubleValue() + $V{benefitStudentsCountOld}) * 100.f) : ""]]></textFieldExpression>
+    String.format("%.2f", $V{idOfClientBuffetMeasure}.doubleValue() / ($V{studentsCountOld}.doubleValue() + $V{benefitStudentsCountOld}) * 100.f) : "-"]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="240" y="0" width="60" height="25"/>
@@ -634,131 +634,131 @@
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell width="360" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="foodType">
-					<cellContents backcolor="#BFE1FF" mode="Opaque">
+					<cellContents backcolor="#BFE1FF" mode="Transparent">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 					</cellContents>
 				</crosstabCell>
 				<crosstabCell width="0" height="25" columnTotalGroup="group">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="0" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="group">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="0" height="25" columnTotalGroup="complexName">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="0" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="complexName">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="studentsCountTotal">
-					<cellContents/>
+				<crosstabCell width="210" height="0" rowTotalGroup="studentsCountTotal">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="group">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="foodType">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="complexName">
-					<cellContents/>
+				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="studentsCountYoung">
-					<cellContents/>
+				<crosstabCell width="210" height="0" rowTotalGroup="studentsCountYoung">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="group">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="foodType">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="complexName">
-					<cellContents/>
+				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="studentsCountMiddle">
-					<cellContents/>
+				<crosstabCell width="210" height="0" rowTotalGroup="studentsCountMiddle">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="group">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="foodType">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="complexName">
-					<cellContents/>
+				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="studentsCountOld">
-					<cellContents/>
+				<crosstabCell width="210" height="0" rowTotalGroup="studentsCountOld">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="group">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="foodType">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="complexName">
-					<cellContents/>
+				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountYoung">
-					<cellContents/>
+				<crosstabCell width="210" height="0" rowTotalGroup="benefitStudentsCountYoung">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="group">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="foodType">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="complexName">
-					<cellContents/>
+				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountMiddle">
-					<cellContents/>
+				<crosstabCell width="210" height="0" rowTotalGroup="benefitStudentsCountMiddle">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="group">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="foodType">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="complexName">
-					<cellContents/>
+				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountOld">
-					<cellContents/>
+				<crosstabCell width="210" height="0" rowTotalGroup="benefitStudentsCountOld">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="group">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="foodType">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="complexName">
-					<cellContents/>
+				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountTotal">
-					<cellContents/>
+				<crosstabCell width="210" height="0" rowTotalGroup="benefitStudentsCountTotal">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="group">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="foodType">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="complexName">
-					<cellContents/>
+				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="employeeCount">
-					<cellContents/>
+				<crosstabCell width="210" height="0" rowTotalGroup="employeeCount">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="0" height="0" rowTotalGroup="employeeCount" columnTotalGroup="group">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell height="0" rowTotalGroup="employeeCount" columnTotalGroup="foodType">
-					<cellContents/>
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="employeeCount" columnTotalGroup="complexName">
-					<cellContents/>
+				<crosstabCell width="0" height="0" rowTotalGroup="employeeCount" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 			</crosstab>
 		</band>
