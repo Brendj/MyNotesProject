@@ -25,7 +25,7 @@ import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.SyncStatsManager;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
@@ -48,7 +48,7 @@ import static ru.axetta.ecafe.processor.core.service.ImportRegisterFileService.*
 
 @Component
 @Scope("session")
-public class OtherActionsPage extends BasicWorkspacePage {
+public class OtherActionsPage extends OnlineReportPage {
 
     private String passwordForSearch;
     private String orgsForGenerateGuardians;
@@ -72,6 +72,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
         super();
         summaryDate = new Date();
         summaryFinOperatorDate = new Date();
+        startDate = new Date();
     }
 
     public void rubBIExport() throws Exception {
@@ -518,6 +519,10 @@ public class OtherActionsPage extends BasicWorkspacePage {
             getLogger().error("Error create relevancePreordersToOrgFlag: ", e);
             printError("Во время проверки соответствия флага включения функционала предзаказа ОО произошла ошибка с текстом " + e.getMessage());
         }
+    }
+
+    public void preorderRequestsManualGenerate() throws Exception {
+
     }
 
     public void runApplicationForFoodProcessingService() throws Exception {
