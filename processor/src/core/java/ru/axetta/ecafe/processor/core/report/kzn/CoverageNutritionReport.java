@@ -203,6 +203,9 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             } else {
                 classesNotConditionList.add(String.format(conditionString, "not", 10, 11));
             }
+            if (showComplexesByOrgCard) {
+                classesConditionList.add(String.format("c.idofclient in (%s)", StringUtils.join(managerList, ",")));
+            }
 
             if (!classesConditionList.isEmpty()) {
                 sqlString += " and (" + StringUtils.join(classesConditionList, " or ") + ") ";

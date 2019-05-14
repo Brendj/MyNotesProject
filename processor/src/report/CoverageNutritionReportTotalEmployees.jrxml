@@ -914,7 +914,7 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{employeePercentageOfActiveMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{employeePercentageOfActiveMeasure})]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="1020" y="0" width="80" height="25"/>
