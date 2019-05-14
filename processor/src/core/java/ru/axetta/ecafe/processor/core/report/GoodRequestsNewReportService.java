@@ -21,6 +21,7 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -73,33 +74,29 @@ public class GoodRequestsNewReportService {
 
         if (!preordersOnly) {
             Criteria criteriaComplex = session.createCriteria(ComplexInfo.class);
-            criteriaComplex.createAlias("org", "o");
-            criteriaComplex.add(Restrictions.isNotNull("good"));
-            criteriaComplex.add(Restrictions.in("o.idOfOrg", orgMap.keySet()));
-            criteriaComplex.add(Restrictions.between("menuDate", beginDate, endDate));
-            List complexList = criteriaComplex.list();
-            for (Object obj : complexList) {
-                ComplexInfo complexInfo = (ComplexInfo) obj;
+
+            criteriaComplex.createAlias("org", "o")
+                    .add(Restrictions.isNotNull("good"))
+                    .add(Restrictions.in("o.idOfOrg", orgMap.keySet()))
+                    .add(Restrictions.between("menuDate", beginDate, endDate));
+
+            List<ComplexInfo> complexList = criteriaComplex.list();
+            for (ComplexInfo complexInfo : complexList) {
                 FeedingPlanType feedingPlanType = null;
                 if (complexInfo != null) {
-                    if ((complexInfo.getUsedSubscriptionFeeding() != null) && (complexInfo.getUsedSubscriptionFeeding()
-                            == 1)) {
-                        //feedingPlanType = "Абонементное питание";
+                    if ((complexInfo.getUsedSubscriptionFeeding() != null)
+                            && (complexInfo.getUsedSubscriptionFeeding() == 1)) {
                         feedingPlanType = FeedingPlanType.SUBSCRIPTION_FEEDING;
                     } else {
-                        if (complexInfo.getModeFree() == 1) {
-                            //feedingPlanType = "Льготное питание";
-                            feedingPlanType = FeedingPlanType.REDUCED_PRICE_PLAN;
-                        } else {
-                            //feedingPlanType = "Платное питание";
-                            feedingPlanType = FeedingPlanType.PAY_PLAN;
-                        }
+                        feedingPlanType = complexInfo.getModeFree() == 1 ?
+                                FeedingPlanType.REDUCED_PRICE_PLAN : FeedingPlanType.PAY_PLAN;
                     }
                 }
                 final Long globalId = complexInfo.getGood().getGlobalId();
                 final Long idOfOrg = complexInfo.getOrg().getIdOfOrg();
                 final String goodsCode = complexInfo.getGood().getGoodsCode();
                 final Long price = complexInfo.getCurrentPrice();
+
                 ComplexInfoItem infoItem = complexOrgDictionary.get(idOfOrg);
                 GoodInfo info = new GoodInfo(globalId, "", feedingPlanType, goodsCode, price);
                 if (infoItem == null) {
@@ -202,66 +199,70 @@ public class GoodRequestsNewReportService {
             }
         }
         Map<Long, GoodInfo> requestGoodsInfo = new HashMap<Long, GoodInfo>();
-        for (Object obj : goodRequestPositionList) {
+        for (GoodRequestPosition goodRequestPosition : goodRequestPositionList) {
             processPosition(hideDailySampleValue, generateBeginTime, generateEndTime, hideMissedColumns,
                     hideGeneratePeriod, hideLastValue, orgMap, itemList, beginDate, endDate, dates,
-                    complexOrgDictionary, goodRequestPositionList, requestGoodsInfo, obj, notification,
+                    complexOrgDictionary, goodRequestPositionList, requestGoodsInfo, goodRequestPosition, notification,
                     needFullGoodNames);
         }
 
         if (orgFilter == 0 && !idOfMenuSourceOrgList.isEmpty()) {
+            MultiValueMap fullNameProviderMap = new MultiValueMap();
+            Criteria goodCriteria = session.createCriteria(Good.class);
+            goodCriteria.add(Restrictions.in("orgOwner", idOfMenuSourceOrgList));
+            if (StringUtils.isNotEmpty(nameFilter)) {
+                goodCriteria.add(Restrictions.or(
+                        Restrictions.ilike("fullName", nameFilter, MatchMode.ANYWHERE),
+                        Restrictions.ilike("nameOfGood", nameFilter, MatchMode.ANYWHERE)));
+            }
+            goodCriteria.setProjection(
+                    Projections.projectionList()
+                            .add(Projections.property("fullName"))
+                            .add(Projections.property("nameOfGood"))
+                            .add(Projections.property("orgOwner"))
+                            .add(Projections.property("globalId"))
+                            .add(Projections.property("goodsCode"))
+            );
+            goodCriteria.setResultTransformer(Transformers.aliasToBean(Good.class));
+            List<Good> goodNames = goodCriteria.list();
+            for (Good good : goodNames) {
+                final Long idOfOrg = good.getOrgOwner();
+                final Long idOfGood = good.getGlobalId();
+                final String goodsCode = good.getGoodsCode();
+                String nameOfGood = StringUtils.isEmpty(good.getNameOfGood()) ?
+                        good.getNameOfGood() : good.getFullName();
+                if (!requestGoodsInfo.containsKey(idOfGood)) {
+                    FeedingPlanType feedingPlanType = null;
+                    Long price = null;
+                    if (allGoodsInfo.containsKey(idOfGood)) {
+                        feedingPlanType = allGoodsInfo.get(idOfGood).feedingPlanType;
+                        price = allGoodsInfo.get(idOfGood).price;
+                    } else {
+                        continue;
+                    }
+                    fullNameProviderMap.put(idOfOrg, new GoodInfo(idOfGood, nameOfGood, feedingPlanType, goodsCode, price));
+                }
+            }
             for (BasicReportJob.OrgShortItem item : orgMap.values()) {
-                if (item.getSourceMenuOrg() != null) {
-                    MultiValueMap fullNameProviderMap = new MultiValueMap();
-                    Criteria goodCriteria = session.createCriteria(Good.class);
-                    goodCriteria.add(Restrictions.in("orgOwner", idOfMenuSourceOrgList));
-                    if (StringUtils.isNotEmpty(nameFilter)) {
-                        goodCriteria.add(Restrictions.or(Restrictions.ilike("fullName", nameFilter, MatchMode.ANYWHERE),
-                                Restrictions.ilike("nameOfGood", nameFilter, MatchMode.ANYWHERE)));
-                    }
-                    goodCriteria.setProjection(Projections.projectionList().add(Projections.property("fullName"))
-                            .add(Projections.property("nameOfGood")).add(Projections.property("orgOwner"))
-                            .add(Projections.property("globalId")).add(Projections.property("goodsCode")));
-                    List goodNames = goodCriteria.list();
-                    for (Object obj : goodNames) {
-                        Object[] row = (Object[]) obj;
-                        final Long idOfOrg = Long.valueOf(row[2].toString());
-                        final Long idOfGood = Long.valueOf(row[3].toString());
-                        final String goodsCode = row[4].toString();
-                        String nameOfGood = row[0].toString();
-                        if (StringUtils.isEmpty(nameOfGood)) {
-                            nameOfGood = row[1].toString();
-                        }
-                        if (!requestGoodsInfo.containsKey(idOfGood)) {
-                            FeedingPlanType feedingPlanType = null;
-                            Long price = null;
-                            if (allGoodsInfo.containsKey(idOfGood)) {
-                                feedingPlanType = allGoodsInfo.get(idOfGood).feedingPlanType;
-                                price = allGoodsInfo.get(idOfGood).price;
-                            } else {
-                                continue;
+                if (item.getSourceMenuOrg() != null
+                        && fullNameProviderMap.getCollection(item.getSourceMenuOrg()) != null) {
+                    for (Object object : fullNameProviderMap.getCollection(item.getSourceMenuOrg())) {
+                        GoodInfo goodInfo = (GoodInfo) object;
+                        if (hideMissedColumns) {
+                            for (Date date : dates) {
+                                addItemsFromList(itemList, item, date, goodInfo.name, hideDailySampleValue,
+                                        hideLastValue, goodInfo.feedingPlanType, 0L, goodInfo.goodsCode, goodInfo.price,
+                                        goodInfo.feedingPlanType.getTotalString());
                             }
-                            fullNameProviderMap.put(idOfOrg, new GoodInfo(idOfGood, nameOfGood, feedingPlanType, goodsCode, price));
-                        }
-                    }
-                    if (fullNameProviderMap.getCollection(item.getSourceMenuOrg()) != null) {
-                        for (Object object : fullNameProviderMap.getCollection(item.getSourceMenuOrg())) {
-                            GoodInfo goodInfo = (GoodInfo) object;
-                            if (hideMissedColumns) {
-                                for (Date date : dates) {
-                                    addItemsFromList(itemList, item, date, goodInfo.name, hideDailySampleValue,
-                                            hideLastValue, goodInfo.feedingPlanType, 0L,
-                                            goodInfo.goodsCode, goodInfo.price, goodInfo.feedingPlanType.getTotalString());
-                                }
-                            } else {
-                                beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
-                                endDate = CalendarUtils.endOfDay(endTime);
-                                while (beginDate.getTime() <= endDate.getTime()) {
-                                    addItemsFromList(itemList, item, beginDate, goodInfo.name, hideDailySampleValue,
-                                            hideLastValue, goodInfo.feedingPlanType, 0L,
-                                            goodInfo.goodsCode, goodInfo.price, goodInfo.feedingPlanType.getTotalString());
-                                    beginDate = CalendarUtils.addOneDay(beginDate);
-                                }
+                        } else {
+                            beginDate = CalendarUtils.truncateToDayOfMonth(startTime);
+                            endDate = CalendarUtils.endOfDay(endTime);
+                            while (beginDate.getTime() <= endDate.getTime()) {
+                                addItemsFromList(itemList, item, beginDate, goodInfo.name, hideDailySampleValue,
+                                        hideLastValue, goodInfo.feedingPlanType, 0L, goodInfo.goodsCode, goodInfo.price,
+                                        goodInfo.feedingPlanType.getTotalString());
+                                beginDate = CalendarUtils.addOneDay(beginDate);
+
                             }
                         }
                     }
@@ -279,7 +280,29 @@ public class GoodRequestsNewReportService {
                     "", 0L, ""));
         }
 
+        if(orgFilter == 0){
+            buildReportItemsWithoutData(itemList, orgMap, startTime, hideDailySampleValue, hideLastValue);
+        }
         return itemList;
+    }
+
+    private void buildReportItemsWithoutData(List<Item> itemList, HashMap<Long, BasicReportJob.OrgShortItem> orgMap,
+            Date startTime, int hideDailySampleValue, int hideLastValue) {
+        for(BasicReportJob.OrgShortItem orgItem : orgMap.values()){
+            boolean findCurrentOrg = false;
+            for(Item dataItem : itemList){
+                Long idOfOrgFromItem = dataItem.getIdOfOrg();
+                if(idOfOrgFromItem != null && idOfOrgFromItem.equals(orgItem.getIdOfOrg())){
+                    findCurrentOrg = true;
+                    break;
+                }
+            }
+            if(!findCurrentOrg){
+                Item newItem = new Item(orgItem, "", CalendarUtils.truncateToDayOfMonth(startTime), hideDailySampleValue,
+                        hideLastValue, null, 0L, "", 0L, "");
+                itemList.add(newItem);
+            }
+        }
     }
 
     public List<Item> buildReportItems(Date startTime, Date endTime, String nameFilter, int orgFilter,
@@ -298,24 +321,29 @@ public class GoodRequestsNewReportService {
         if (!CollectionUtils.isEmpty(idOfOrgList)) {
             orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
         }
+
         orgCriteria.createAlias("sourceMenuOrgs", "sm", JoinType.LEFT_OUTER_JOIN);
         if (!CollectionUtils.isEmpty(idOfMenuSourceOrgList)) {
             orgCriteria.add(Restrictions.in("sm.idOfOrg", idOfMenuSourceOrgList));
         }
+
         orgCriteria.setProjection(
-                Projections.projectionList().add(Projections.property("idOfOrg")).add(Projections.property("shortName"))
-                        .add(Projections.property("officialName")).add(Projections.property("sm.idOfOrg"))
+                Projections.projectionList()
+                        .add(Projections.property("idOfOrg"))
+                        .add(Projections.property("shortName"))
+                        .add(Projections.property("officialName"))
+                        .add(Projections.property("sm.idOfOrg"))
                         .add(Projections.property("address")));
         List orgList = orgCriteria.list();
-        HashMap<Long, BasicReportJob.OrgShortItem> orgMap = new HashMap<Long, BasicReportJob.OrgShortItem>(
-                orgList.size());
+
+        HashMap<Long, BasicReportJob.OrgShortItem> orgMap = new HashMap<Long, BasicReportJob.OrgShortItem>(orgList.size());
         for (Object obj : orgList) {
             Object[] row = (Object[]) obj;
-            long idOfOrg = Long.parseLong(row[0].toString());
+            long idOfOrg = (Long) row[0];
             BasicReportJob.OrgShortItem educationItem;
             educationItem = new BasicReportJob.OrgShortItem(idOfOrg, row[1].toString(), row[2].toString());
             if (row[3] != null) {
-                Long sourceMenuOrg = Long.parseLong(row[3].toString());
+                Long sourceMenuOrg = (Long) row[3];
                 educationItem.setSourceMenuOrg(sourceMenuOrg);
                 idOfMenuSourceOrgList.add(sourceMenuOrg);
             }
@@ -331,9 +359,8 @@ public class GoodRequestsNewReportService {
             boolean hideMissedColumns, boolean hideGeneratePeriod, int hideLastValue,
             HashMap<Long, BasicReportJob.OrgShortItem> orgMap, List<Item> itemList, Date beginDate, Date endDate,
             TreeSet<Date> dates, Map<Long, ComplexInfoItem> complexOrgDictionary, List goodRequestPositionList,
-            Map<Long, GoodInfo> requestGoodsInfo, Object obj, boolean notification, boolean needFullGoodNames) {
+            Map<Long, GoodInfo> requestGoodsInfo, GoodRequestPosition position, boolean notification, boolean needFullGoodNames) {
         Date doneDate;
-        GoodRequestPosition position = (GoodRequestPosition) obj;
         BasicReportJob.OrgShortItem org = orgMap.get(position.getOrgOwner());
 
         Long totalCount = position.getTotalCount() / 1000;
@@ -404,7 +431,7 @@ public class GoodRequestsNewReportService {
             requestGoodsInfo.put(good.getGlobalId(), new GoodInfo(good.getGlobalId(), name, feedingPlanType, goodsCode, price));
         }
         // чтобы хотя бы раз выполнилмся, для уведомлений
-        if (!hideMissedColumns && hideTotalRow && goodRequestPositionList.indexOf(obj) == 0) {
+        if (!hideMissedColumns && hideTotalRow && goodRequestPositionList.indexOf(position) == 0) {
             while (beginDate.getTime() <= endDate.getTime()) {
                 itemList.add(new Item(org, name, beginDate, 0L, 0L, 0L, 0L, 0L, 0L, hideDailySampleValue, hideLastValue,
                         feedingPlanType, 0L, "", price, null));
