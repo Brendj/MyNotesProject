@@ -342,7 +342,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                                 + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                                 + " join cf_goods g on g.idofgood = od.idofgood join cf_orgs og on og.idoforg = o.idoforg "
                                 + " left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
-                                + " where o.idoforg in (:orgList) and o.createddate between :startDate and :endDate and od.menutype < :complexItemMin and og.organizationtype = 0 "
+                                + " where o.idoforg = :idOfOrg and o.createddate between :startDate and :endDate and od.menutype < :complexItemMin and og.organizationtype = 0 "
                                 + orgCondition + " order by 3) a " + "group by a.idoforg, a.employeecount, a.type";
                 Query query = session.createSQLQuery(sqlString);
                 query.setParameter("startDate", startDate.getTime());
@@ -354,7 +354,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     query.setParameter("employees", employeeGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                 }
                 query.setParameter("complexItemMin", OrderDetail.TYPE_COMPLEX_ITEM_MIN);
-                query.setParameterList("orgList", idOfOrgList);
+                query.setParameter("idOfOrg", idOfOrg);
                 List list = query.list();
 
                 for (Object o : list) {

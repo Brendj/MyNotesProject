@@ -579,12 +579,8 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="210" height="0" rowTotalGroup="schoolNumber">
-					<cellContents backcolor="#BFE1FF" mode="Transparent">
-						<box>
-							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
-						</box>
-					</cellContents>
+				<crosstabCell width="0" height="25" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="360" height="25" columnTotalGroup="foodType">
 					<cellContents backcolor="#BFE1FF" mode="Transparent">
@@ -633,6 +629,127 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
+				<crosstabCell width="0" height="25" columnTotalGroup="group">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="210" height="0" rowTotalGroup="employeeCount">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="employeeCount" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="employeeCount" columnTotalGroup="foodType">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="employeeCount" columnTotalGroup="group">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="210" height="0" rowTotalGroup="benefitStudentsCountTotal">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="foodType">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="group">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="210" height="0" rowTotalGroup="benefitStudentsCountOld">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="foodType">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="group">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="210" height="0" rowTotalGroup="benefitStudentsCountMiddle">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="foodType">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="group">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="210" height="0" rowTotalGroup="benefitStudentsCountYoung">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="foodType">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="group">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="210" height="0" rowTotalGroup="studentsCountOld">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="foodType">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="group">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="210" height="0" rowTotalGroup="studentsCountMiddle">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="foodType">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="group">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="210" height="0" rowTotalGroup="studentsCountYoung">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="foodType">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="group">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="210" height="0" rowTotalGroup="studentsCountTotal">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="foodType">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="group">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell width="210" height="0" rowTotalGroup="schoolNumber">
+					<cellContents backcolor="#BFE1FF" mode="Transparent">
+						<box>
+							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
+						</box>
+					</cellContents>
+				</crosstabCell>
+				<crosstabCell width="0" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="complexName">
+					<cellContents mode="Transparent"/>
+				</crosstabCell>
 				<crosstabCell width="360" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="foodType">
 					<cellContents backcolor="#BFE1FF" mode="Transparent">
 						<box>
@@ -640,124 +757,7 @@
 						</box>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="0" height="25" columnTotalGroup="group">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
 				<crosstabCell width="0" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="group">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="25" columnTotalGroup="complexName">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="complexName">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="210" height="0" rowTotalGroup="studentsCountTotal">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="group">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="foodType">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="complexName">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="210" height="0" rowTotalGroup="studentsCountYoung">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="group">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="foodType">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountYoung" columnTotalGroup="complexName">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="210" height="0" rowTotalGroup="studentsCountMiddle">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="group">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="foodType">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountMiddle" columnTotalGroup="complexName">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="210" height="0" rowTotalGroup="studentsCountOld">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="group">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="foodType">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountOld" columnTotalGroup="complexName">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="210" height="0" rowTotalGroup="benefitStudentsCountYoung">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="group">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="foodType">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountYoung" columnTotalGroup="complexName">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="210" height="0" rowTotalGroup="benefitStudentsCountMiddle">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="group">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="foodType">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountMiddle" columnTotalGroup="complexName">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="210" height="0" rowTotalGroup="benefitStudentsCountOld">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="group">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="foodType">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountOld" columnTotalGroup="complexName">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="210" height="0" rowTotalGroup="benefitStudentsCountTotal">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="group">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="foodType">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="benefitStudentsCountTotal" columnTotalGroup="complexName">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="210" height="0" rowTotalGroup="employeeCount">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="employeeCount" columnTotalGroup="group">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell height="0" rowTotalGroup="employeeCount" columnTotalGroup="foodType">
-					<cellContents mode="Transparent"/>
-				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="employeeCount" columnTotalGroup="complexName">
 					<cellContents mode="Transparent"/>
 				</crosstabCell>
 			</crosstab>
