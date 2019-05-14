@@ -718,16 +718,16 @@
 					<measureExpression><![CDATA[$F{foodType}.toLowerCase().equals("бесплатное питание") ? $F{idOfOrderDetail} : null]]></measureExpression>
 				</measure>
 				<measure name="totalBuffetHotClientsMeasure" class="java.lang.Long" calculation="DistinctCount">
-					<measureExpression><![CDATA[$F{foodType}.toLowerCase().equals("буфет горячее") ? $F{idOfClient} : null]]></measureExpression>
+					<measureExpression><![CDATA[$F{group}.toLowerCase().startsWith("обучающиеся") && $F{foodType}.toLowerCase().equals("буфет") && $F{complexName}.toLowerCase().equals("горячее") ? $F{idOfClient} : null]]></measureExpression>
 				</measure>
 				<measure name="totalBuffetHotComplexesMeasure" class="java.lang.Long" calculation="DistinctCount">
-					<measureExpression><![CDATA[$F{foodType}.toLowerCase().equals("буфет горячее") ? $F{idOfOrderDetail} : null]]></measureExpression>
+					<measureExpression><![CDATA[$F{group}.toLowerCase().startsWith("обучающиеся") && $F{foodType}.toLowerCase().equals("буфет") && $F{complexName}.toLowerCase().equals("горячее") ? $F{idOfOrderDetail} : null]]></measureExpression>
 				</measure>
 				<measure name="totalBuffetPaidClientsMeasure" class="java.lang.Long" calculation="DistinctCount">
-					<measureExpression><![CDATA[$F{foodType}.toLowerCase().equals("буфет покупная") ? $F{idOfClient} : null]]></measureExpression>
+					<measureExpression><![CDATA[$F{group}.toLowerCase().startsWith("обучающиеся") && $F{foodType}.toLowerCase().equals("буфет") && $F{complexName}.toLowerCase().equals("покупная") ? $F{idOfClient} : null]]></measureExpression>
 				</measure>
 				<measure name="totalBuffetPaidComplexesMeasure" class="java.lang.Long" calculation="DistinctCount">
-					<measureExpression><![CDATA[$F{foodType}.toLowerCase().equals("буфет покупная") ? $F{idOfOrderDetail} : null]]></measureExpression>
+					<measureExpression><![CDATA[$F{group}.toLowerCase().startsWith("обучающиеся") && $F{foodType}.toLowerCase().equals("буфет") && $F{complexName}.toLowerCase().equals("покупная") ? $F{idOfOrderDetail} : null]]></measureExpression>
 				</measure>
 				<measure name="employeeComplexesMeasure" class="java.lang.Long" calculation="First">
 					<measureExpression><![CDATA[$F{employeeComplexesCount}]]></measureExpression>
@@ -745,10 +745,10 @@
 					<measureExpression><![CDATA[$F{group}.toLowerCase().startsWith("комплексы") && $F{foodType}.toLowerCase().equals("платное питание") ? $F{idOfOrderDetail} : null]]></measureExpression>
 				</measure>
 				<measure name="totalBuffetHotCard" class="java.lang.Integer" calculation="DistinctCount">
-					<measureExpression><![CDATA[$F{group}.toLowerCase().startsWith("комплексы") && $F{foodType}.toLowerCase().equals("буфет горячее") ? $F{idOfOrderDetail} : null]]></measureExpression>
+					<measureExpression><![CDATA[$F{group}.toLowerCase().startsWith("комплексы") && $F{foodType}.toLowerCase().equals("буфет") && $F{complexName}.toLowerCase().equals("горячее") ? $F{idOfOrderDetail} : null]]></measureExpression>
 				</measure>
 				<measure name="totalBuffetPaidCard" class="java.lang.Integer" calculation="DistinctCount">
-					<measureExpression><![CDATA[$F{group}.toLowerCase().startsWith("комплексы") && $F{foodType}.toLowerCase().equals("буфет покупная") ? $F{idOfOrderDetail} : null]]></measureExpression>
+					<measureExpression><![CDATA[$F{group}.toLowerCase().startsWith("комплексы") && $F{foodType}.toLowerCase().equals("буфет") && $F{complexName}.toLowerCase().equals("покупная") ? $F{idOfOrderDetail} : null]]></measureExpression>
 				</measure>
 				<crosstabCell width="210" height="25">
 					<cellContents mode="Transparent">

@@ -182,7 +182,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + "join cf_clients c on c.idofclient = o.idofclient "
                     + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
-                    + "join cf_goods g on g.idofgood = od.idofgood " + "join cf_orgs og on og.idoforg = o.idoforg "
+                    + "left join cf_goods g on g.idofgood = od.idofgood " + "join cf_orgs og on og.idoforg = o.idoforg "
                     + "left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
                     + "where o.idoforg in (:orgList) and o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0 ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
