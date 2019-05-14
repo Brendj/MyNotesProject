@@ -209,7 +209,7 @@
                 <rich:calendar value="#{otherActionsPage.startDate}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false">
                 </rich:calendar>
-                <a4j:commandButton value="Проверка соответствия флага включения функционала предзаказа ОО" action="#{otherActionsPage.preorderRequestsManualGenerate()}" id="preorderRequestsManualGenerate"
+                <a4j:commandButton value="Создать заявки по выбранным параметрам" action="#{otherActionsPage.preorderRequestsManualGenerate()}" id="preorderRequestsManualGenerate"
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" /><br/>
             </h:panelGrid>
         </rich:panel>

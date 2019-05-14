@@ -750,11 +750,12 @@ public class GoodRequestsChangeAsyncNotificationService {
     }
 
     @Transactional(readOnly = true)
-    public Map<Long, OrgItem> findOrgItems2(boolean onlyWithPreorders) {
+    public Map<Long, OrgItem> findOrgItems2(boolean onlyWithPreorders, PreorderRequestsReportServiceParam params) {
         updateContragentItems();
         Map<Long, OrgItem> items = new HashMap<Long, OrgItem>();
         String str_query = "select o.idOfOrg, o.shortName, o.officialName, o.defaultSupplier.id, o.address, sm.idOfOrg from Org o join o.sourceMenuOrgs sm";
         if (onlyWithPreorders) str_query += " where o.preordersEnabled = true";
+        str_query += params.getOrgJPACondition("o");
         str_query += " order by o.idOfOrg";
         Query query = entityManager.createQuery(str_query);
         List res = query.getResultList();
@@ -787,8 +788,10 @@ public class GoodRequestsChangeAsyncNotificationService {
                 .getResultList();
     }
 
-    public List<OrgGoodRequest> getDoneOrgGoodRequests(Date date) {
-        return entityManager.createQuery("select ogr from OrgGoodRequest ogr where ogr.day between :startDate and :endDate order by ogr.day")
+    public List<OrgGoodRequest> getDoneOrgGoodRequests(Date date, PreorderRequestsReportServiceParam params) {
+        return entityManager.createQuery("select ogr from OrgGoodRequest ogr where ogr.day between :startDate and :endDate "
+                + params.getOrgJPACondition("ogr")
+                + "order by ogr.day")
         .setParameter("startDate", CalendarUtils.endOfDay(new Date()))
         .setParameter("endDate", date)
         .getResultList();
