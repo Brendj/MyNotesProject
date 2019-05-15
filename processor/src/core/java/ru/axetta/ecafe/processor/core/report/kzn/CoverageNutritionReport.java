@@ -343,7 +343,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                                 + " join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                                 + " join cf_clients c on c.idofclient = o.idofclient "
                                 + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
-                                + " join cf_goods g on g.idofgood = od.idofgood join cf_orgs og on og.idoforg = o.idoforg "
+                                + " left join cf_goods g on g.idofgood = od.idofgood join cf_orgs og on og.idoforg = o.idoforg "
                                 + " left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
                                 + " where o.idoforg = :idOfOrg and o.createddate between :startDate and :endDate and od.menutype < :complexItemMin and og.organizationtype = 0 "
                                 + orgCondition + " order by 3) a " + "group by a.idoforg, a.employeecount, a.type";
