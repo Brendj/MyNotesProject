@@ -6,9 +6,9 @@ package ru.axetta.ecafe.processor.core.persistence.orgsettings;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.SettingType;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.beanutils.ConvertUtils;
-import org.apache.commons.beanutils.converters.ClassConverter;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -46,7 +46,7 @@ public class OrgSettingManager {
         Integer settingGroup = settingType.getSettingGroupId();
         Integer settingTypeId = settingType.getId();
         try {
-            OrgSetting targetGroup = getTargetSetting(org, settingGroup);
+            OrgSetting targetGroup = DAOUtils.getOrgSettingByOrgAndType(session, org.getIdOfOrg(), settingType.getSettingGroupId());
 
             if (targetGroup == null) {
                 targetGroup = new OrgSetting();

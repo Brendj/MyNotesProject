@@ -21,6 +21,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.EC
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.PreOrderFeedingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
@@ -4116,5 +4118,12 @@ public class DAOUtils {
     public static  Long getLastVersionOfOrgSettingsItem(Session session){
         SQLQuery query = session.createSQLQuery("SELECT MAX(version) FROM CF_OrgSettings_Items");
         return DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
+    }
+
+    public static OrgSetting getOrgSettingByOrgAndType(Session session, Long idOfOrg, Integer settingGroupId) {
+        Criteria criteria = session.createCriteria(OrgSetting.class);
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg))
+                .add(Restrictions.eq("settingGroup", OrgSettingGroup.getGroupById(settingGroupId)));
+        return (OrgSetting) criteria.uniqueResult();
     }
 }

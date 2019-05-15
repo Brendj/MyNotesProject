@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.FeedingSetting;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrgSync;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationStatus;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -151,12 +152,19 @@ public class OrgSettingsReport extends BasicReportForListOrgsJob{
                 }
             }
             feedSettingCriteria.add(Restrictions.in("orgs.idOfOrg", idOfOrgList));
-
             List<FeedingSetting> settings = feedSettingCriteria.list();
+
+            Criteria orgSyncCriteria = persistenceSession.createCriteria(OrgSync.class);
+            orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
+            List<OrgSync> listOfOrgSync = orgSyncCriteria.list();
 
             for(Org org : orgs){
                 FeedingSetting setting = getSettingByOrg(settings, org);
+                OrgSync orgSync = getOrgSyncByOrg(listOfOrgSync, org);
                 OrgSettingsReportItem item = new OrgSettingsReportItem(org, setting);
+                if(orgSync != null){
+                    item.setArmVersionNumber(orgSync.getClientVersion());
+                }
                 result.add(item);
             }
             return result;
@@ -170,6 +178,18 @@ public class OrgSettingsReport extends BasicReportForListOrgsJob{
         for(FeedingSetting setting : settings){
             if(setting.getOrgsInternal().contains(org)){
                 return setting;
+            }
+        }
+        return null;
+    }
+
+    private static OrgSync getOrgSyncByOrg(List<OrgSync> listOfOrgSync, Org org) {
+        if(CollectionUtils.isEmpty(listOfOrgSync)){
+            return null;
+        }
+        for(OrgSync orgSync : listOfOrgSync){
+            if(orgSync.getIdOfOrg().equals(org.getIdOfOrg())){
+                return orgSync;
             }
         }
         return null;

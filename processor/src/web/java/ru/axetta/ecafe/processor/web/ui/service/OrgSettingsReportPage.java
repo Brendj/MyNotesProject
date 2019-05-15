@@ -49,7 +49,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private List<SelectItem> listOfOrgDistricts;
     private String selectedDistricts = "";
 
-    private Boolean showRequisite = true;
+    private Boolean showRequisite = false;
     private Boolean showFeedingSettings = true;
     private Boolean showCardSettings = true;
     private Boolean showOtherSetting = true;
@@ -126,6 +126,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
             }
 
             items = OrgSettingsReport.Builder.buildOrgSettingCollection(idOfOrgList, status, persistenceSession, selectedDistricts, allFriendlyOrgs);
+            Collections.sort(items);
 
             transaction.commit();
             transaction = null;
