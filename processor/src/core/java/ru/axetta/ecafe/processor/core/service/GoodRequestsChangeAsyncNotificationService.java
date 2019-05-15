@@ -353,128 +353,11 @@ public class GoodRequestsChangeAsyncNotificationService {
         }
     }
 
-    private Date[] getDates(List<String> guids) {
-        Date minDone = new Date();
-        Date maxDone = new Date();
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            try {
-                session = runtimeContext.createPersistenceSession();
-                transaction = session.beginTransaction();
-
-                Criteria criteria = session.createCriteria(GoodRequestPosition.class);
-                criteria.createAlias("goodRequest", "gr");
-                criteria.add(Restrictions.in("guid", guids));
-                criteria.setProjection(Projections.projectionList()
-                        .add(Projections.max("gr.doneDate")).add(Projections.min("gr.doneDate")));
-                List list = criteria.list();
-
-                if (list != null && !list.isEmpty()) {
-                    Object[] objects = (Object[]) list.get(0);
-                    maxDone = (Date) objects[0];
-                    minDone = (Date) objects[1];
-                    if (minDone != null) {
-                        minDone = CalendarUtils.truncateToDayOfMonth(minDone);
-                    }
-                }
-                transaction.commit();
-                transaction = null;
-            } finally {
-                HibernateUtils.rollback(transaction, LOGGER);
-                HibernateUtils.close(session, LOGGER);
-            }
-        } catch (Exception e) {
-            LOGGER.error("Failed export report : ", e);
-        }
-        Date[] result = new Date[2];
-        result[0] = minDone;
-        result[1] = maxDone;
-        return result;
-    }
-
     @Async
     public void notifyOrg(OrgItem orgItem, final Date beginGenerateTime, final Date endGenerateTime,
-            final Date lastCreateOrUpdateDate, List<String> guids) {
+            final Date lastCreateOrUpdateDate, Date requestDate) {
         LOGGER.info("Start notifyOrg method idOfOrg=" + orgItem.getIdOfOrg());
         Calendar localCalendar = runtimeContext.getDefaultLocalCalendar(null);
-        /* проверим есть ли измененые заявки на неделю */
-
-        Date[] dates = getDates(guids);
-        Date minDone = dates[0];
-        Date maxDone = dates[1];
-
-        if (maxDone == null || minDone == null) {
-            return;
-        }
-
-        class DateInterval {
-            private final Date beginDate;
-            private final Date endDate;
-
-            DateInterval(Date beginDate, Date endDate) {
-                this.beginDate = beginDate;
-                this.endDate = endDate;
-            }
-
-            public Date getBeginDate() {
-                return beginDate;
-            }
-
-            public Date getEndDate() {
-                return endDate;
-            }
-        }
-
-        List<DateInterval> intervals = new ArrayList<DateInterval>();
-        //Подправить интервалы в зависимости от дня недели день начало второй недели
-        Date stDate = minDone;
-        Date enDate;
-
-        CalendarUtils.truncateToDayOfMonth(localCalendar);
-        String weekDay = CalendarUtils.dayInWeekToString(stDate);
-
-        localCalendar.setTime(stDate);
-
-        if (weekDay.equals("Вт")) {
-            localCalendar.add(Calendar.DATE, -1);
-            stDate = localCalendar.getTime();
-        } else if (weekDay.equals("Ср")) {
-            localCalendar.add(Calendar.DATE, -2);
-            stDate = localCalendar.getTime();
-        } else if (weekDay.equals("Чт")) {
-            localCalendar.add(Calendar.DATE, -3);
-            stDate = localCalendar.getTime();
-        } else if (weekDay.equals("Пт")) {
-            localCalendar.add(Calendar.DATE, -4);
-            stDate = localCalendar.getTime();
-        } else if (weekDay.equals("Сб")) {
-            localCalendar.add(Calendar.DATE, -5);
-            stDate = localCalendar.getTime();
-        } else if (weekDay.equals("Вс")) {
-            localCalendar.add(Calendar.DATE, -6);
-            stDate = localCalendar.getTime();
-        }
-
-        localCalendar.add(Calendar.DATE, maxNumDays - 1);
-        localCalendar.add(Calendar.MILLISECOND, -1);
-        enDate = localCalendar.getTime();
-
-        intervals.add(new DateInterval(stDate, enDate));
-        Date eD = CalendarUtils.truncateToDayOfMonth(enDate);
-        Date mD = CalendarUtils.truncateToDayOfMonth(maxDone);
-
-        while (eD.before(mD)) {
-            localCalendar.add(Calendar.DATE, 1);
-            localCalendar.add(Calendar.MILLISECOND, -1);
-            stDate = localCalendar.getTime();
-            localCalendar.add(Calendar.DATE, maxNumDays - 1);
-            localCalendar.add(Calendar.MILLISECOND, -1);
-            enDate = localCalendar.getTime();
-            eD = CalendarUtils.truncateToDayOfMonth(enDate);
-            intervals.add(new DateInterval(stDate, enDate));
-        }
 
         String templateFilename;
         try {
@@ -502,7 +385,6 @@ public class GoodRequestsChangeAsyncNotificationService {
         properties.setProperty(GoodRequestsNewReport.P_HIDE_LAST_VALUE, Boolean.toString(false));
         properties.setProperty(GoodRequestsNewReport.P_HIDE_TOTAL_ROW, Boolean.toString(true));
         properties.setProperty(GoodRequestsNewReport.P_NOTIFICATION, Boolean.toString(true));
-        properties.setProperty(PreorderRequestsReport.P_GUID_FILTER, StringUtils.join(guids, ","));
         //TODO
         properties.setProperty(GoodRequestsNewReport.P_HIDE_PREORDERS, Boolean.toString(false));
         properties.setProperty(GoodRequestsNewReport.P_PREORDERS_ONLY, Boolean.toString(true));
@@ -511,113 +393,107 @@ public class GoodRequestsChangeAsyncNotificationService {
         /* создаем отчет */
         String htmlReport = "";
 
-        Collections.reverse(intervals);
-
         Date currentDate = new Date();
 
         Session session = null;
         Transaction transaction = null;
-        for (DateInterval interval : intervals) {
-            if (interval.endDate.after(currentDate)) {
+        try {
+            try {
+                session = runtimeContext.createPersistenceSession();
+                transaction = session.beginTransaction();
+                reportJob = builder
+                        .build(session, CalendarUtils.startOfDay(requestDate), CalendarUtils.endOfDay(requestDate), localCalendar);
+                transaction.commit();
+                transaction = null;
+            } finally {
+                HibernateUtils.rollback(transaction, LOGGER);
+                HibernateUtils.close(session, LOGGER);
+            }
+        } catch (Exception e) {
+            LOGGER.error("Failed export report : ", e);
+        }
+        if (reportJob != null) {
+            try {
+                ByteArrayOutputStream os = new ByteArrayOutputStream();
+                JRHtmlExporter exporter = new JRHtmlExporter();
+                exporter.setParameter(JRExporterParameter.JASPER_PRINT, reportJob.getPrint());
+                exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
+                exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
+                exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
+                exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS,
+                        Boolean.TRUE);
+                exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
+                exporter.exportReport();
+                htmlReport = os.toString("UTF-8");
+                os.close();
+            } catch (Exception e) {
+                LOGGER.error("Failed build report ", e);
+            }
+        } else {
+            LOGGER.error("IdOfOrg: " + orgItem.getIdOfOrg() + " reportJob is null");
+        }
+        if (StringUtils.isNotEmpty(htmlReport)) {
+            boolean modifyTypeEdit = htmlReport.contains("#FF6666");
+            boolean modifyTypeCreate = htmlReport.contains("#92D050");
+            String reportType;
+            if (modifyTypeCreate && modifyTypeEdit) {
+                reportType = "ОП";
+            } else if (modifyTypeCreate) {
+                reportType = "НП";
+            } else if (modifyTypeEdit) {
+                reportType = "КП";
+            } else {
+                return;
+            }
+
+            String[] values = {
+                    "address", orgItem.getAddress(), "shortOrgName", orgItem.getShortName(), "reportValues", htmlReport,
+                    "reportType", reportType};
+            List<String> strings = Arrays
+                    .asList(StringUtils.split(orgItem.getDefaultSupplier().getRequestNotifyMailList(), ";"));
+            Set<String> addresses = new HashSet<String>(strings);
+
+            /* Закладываем почтовые ящики ответсвенных по питанию в школе если таковые имеются */
+            try {
                 try {
-                    try {
-                        session = runtimeContext.createPersistenceSession();
-                        transaction = session.beginTransaction();
-                        reportJob = builder
-                                .build(session, interval.beginDate, interval.endDate, localCalendar);
-                        transaction.commit();
-                        transaction = null;
-                    } finally {
-                        HibernateUtils.rollback(transaction, LOGGER);
-                        HibernateUtils.close(session, LOGGER);
-                    }
-                } catch (Exception e) {
-                    LOGGER.error("Failed export report : ", e);
+                    session = runtimeContext.createReportPersistenceSession();
+                    transaction = session.beginTransaction();
+                    GoodRequestsChangeAsyncNotificationService.addEmailFromClient(session, orgItem.getIdOfOrg(), addresses);
+                    transaction.commit();
+                    transaction = null;
+                } finally {
+                    HibernateUtils.rollback(transaction, LOGGER);
+                    HibernateUtils.close(session, LOGGER);
                 }
-                if (reportJob != null) {
-                    try {
-                        ByteArrayOutputStream os = new ByteArrayOutputStream();
-                        JRHtmlExporter exporter = new JRHtmlExporter();
-                        exporter.setParameter(JRExporterParameter.JASPER_PRINT, reportJob.getPrint());
-                        exporter.setParameter(JRHtmlExporterParameter.IS_OUTPUT_IMAGES_TO_DIR, Boolean.TRUE);
-                        exporter.setParameter(JRHtmlExporterParameter.IMAGES_DIR_NAME, "./images/");
-                        exporter.setParameter(JRHtmlExporterParameter.IMAGES_URI, "/images/");
-                        exporter.setParameter(JRHtmlExporterParameter.IS_USING_IMAGES_TO_ALIGN, Boolean.FALSE);
-                        exporter.setParameter(JRHtmlExporterParameter.FRAMES_AS_NESTED_TABLES, Boolean.FALSE);
-                        exporter.setParameter(JRHtmlExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS,
-                                Boolean.TRUE);
-                        exporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
-                        exporter.exportReport();
-                        htmlReport = os.toString("UTF-8");
-                        os.close();
-                    } catch (Exception e) {
-                        LOGGER.error("Failed build report ", e);
-                    }
-                } else {
-                    LOGGER.error("IdOfOrg: " + orgItem.getIdOfOrg() + " reportJob is null");
+            } catch (Exception e) {
+                LOGGER.error("Find email from clients : ", e);
+            }
+
+            try {
+                try {
+                    session = runtimeContext.createReportPersistenceSession();
+                    transaction = session.beginTransaction();
+                    GoodRequestsChangeAsyncNotificationService.addEmailFromUser(session, orgItem.getIdOfOrg(), addresses);
+                    transaction.commit();
+                    transaction = null;
+                } finally {
+                    HibernateUtils.rollback(transaction, LOGGER);
+                    HibernateUtils.close(session, LOGGER);
                 }
-                if (StringUtils.isNotEmpty(htmlReport)) {
-                    boolean modifyTypeEdit = htmlReport.contains("#FF6666");
-                    boolean modifyTypeCreate = htmlReport.contains("#92D050");
-                    String reportType;
-                    if (modifyTypeCreate && modifyTypeEdit) {
-                        reportType = "ОП";
-                    } else if (modifyTypeCreate) {
-                        reportType = "НП";
-                    } else if (modifyTypeEdit) {
-                        reportType = "КП";
-                    } else {
-                        continue;
-                    }
-
-                    String[] values = {
-                            "address", orgItem.getAddress(), "shortOrgName", orgItem.getShortName(), "reportValues", htmlReport,
-                            "reportType", reportType};
-                    List<String> strings = Arrays
-                            .asList(StringUtils.split(orgItem.getDefaultSupplier().getRequestNotifyMailList(), ";"));
-                    Set<String> addresses = new HashSet<String>(strings);
-
-                    /* Закладываем почтовые ящики ответсвенных по питанию в школе если таковые имеются */
-                    try {
-                        try {
-                            session = runtimeContext.createReportPersistenceSession();
-                            transaction = session.beginTransaction();
-                            GoodRequestsChangeAsyncNotificationService.addEmailFromClient(session, orgItem.getIdOfOrg(), addresses);
-                            transaction.commit();
-                            transaction = null;
-                        } finally {
-                            HibernateUtils.rollback(transaction, LOGGER);
-                            HibernateUtils.close(session, LOGGER);
-                        }
-                    } catch (Exception e) {
-                        LOGGER.error("Find email from clients : ", e);
-                    }
-
-                    try {
-                        try {
-                            session = runtimeContext.createReportPersistenceSession();
-                            transaction = session.beginTransaction();
-                            GoodRequestsChangeAsyncNotificationService.addEmailFromUser(session, orgItem.getIdOfOrg(), addresses);
-                            transaction.commit();
-                            transaction = null;
-                        } finally {
-                            HibernateUtils.rollback(transaction, LOGGER);
-                            HibernateUtils.close(session, LOGGER);
-                        }
-                    } catch (Exception e) {
-                        LOGGER.error("Find email from user : ", e);
-                    }
-                    LOGGER.debug("addresses " + addresses.toString());
-                    for (String address : addresses) {
-                        if (StringUtils.trimToNull(address) != null) {
-                            RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendEmailAsync(address,
-                                    EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
-                        }
-                    }
-                } else {
-                    LOGGER.debug("IdOfOrg: " + orgItem.getIdOfOrg() + " email text is empty");
+            } catch (Exception e) {
+                LOGGER.error("Find email from user : ", e);
+            }
+            LOGGER.debug("addresses " + addresses.toString());
+            for (String address : addresses) {
+                if (StringUtils.trimToNull(address) != null) {
+                    RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendEmailAsync(address,
+                            EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
                 }
             }
+        } else {
+            LOGGER.debug("IdOfOrg: " + orgItem.getIdOfOrg() + " email text is empty");
         }
         LOGGER.info("End notifyOrg method idOfOrg=" + orgItem.getIdOfOrg());
     }
