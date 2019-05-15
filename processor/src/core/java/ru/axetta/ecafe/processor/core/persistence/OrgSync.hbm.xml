@@ -33,6 +33,7 @@
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
 
         <property name="errorState" column="ErrorState" type="integer" not-null="false"/>
+        <property name="sqlServerVersion" column="sqlServerVersion" type="string" length="20" not-null="false"/>
 
     </class>
 </hibernate-mapping>

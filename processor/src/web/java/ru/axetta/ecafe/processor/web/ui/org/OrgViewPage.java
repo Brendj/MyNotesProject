@@ -71,8 +71,10 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Integer refectoryType;
     private Boolean commodityAccountingParam;
     private Boolean usePlanOrders;
+    private Boolean disableEditingClientsFromAISReestr;
     private Boolean usePaydableSubscriptionFeeding;
     private Boolean multiCardModeEnabled;
+
     // тип организации "ПОТРЕБИТЕЛЬ / ПОСТАВЩИК"
     private OrganizationType organizationType;
     private OrganizationType organizationTypeInitial;
@@ -186,6 +188,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.OGRN=org.getOGRN();
         this.guid = org.getGuid();
         this.commodityAccountingParam = org.getCommodityAccounting();
+        this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
         this.usePlanOrders = org.getUsePlanOrders();
         this.usePaydableSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding();
         this.categoryOrg= new LinkedList<CategoryOrg>();
@@ -748,5 +751,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setMultiCardModeEnabled(Boolean multiCardModeEnabled) {
         this.multiCardModeEnabled = multiCardModeEnabled;
+    }
+
+    public Boolean getDisableEditingClientsFromAISReestr() {
+        return disableEditingClientsFromAISReestr;
+    }
+
+    public void setDisableEditingClientsFromAISReestr(Boolean disableEditingClientsFromAISReestr) {
+        this.disableEditingClientsFromAISReestr = disableEditingClientsFromAISReestr;
     }
 }

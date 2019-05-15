@@ -497,6 +497,8 @@ public interface ClientRoomController {
 
     @WebMethod ClientGuidResult getClientGuidByContractId(@WebParam(name = "contractId") Long contractId);
 
+    @WebMethod ClientContractIdResult getContractIdByGUID(@WebParam(name = "GUID") String guid);
+
     @WebMethod Result addGuardian(@WebParam(name = "firstName") String firstName,
             @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
             @WebParam(name = "mobile") String mobile, @WebParam(name = "gender") Integer gender,
