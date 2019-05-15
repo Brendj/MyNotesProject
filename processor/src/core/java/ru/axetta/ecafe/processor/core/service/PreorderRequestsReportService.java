@@ -107,7 +107,7 @@ public class PreorderRequestsReportService extends RecoverableService {
     public void runGeneratePreorderRequests(PreorderRequestsReportServiceParam params) {
         try {
             Date fireTime = new Date();
-            Date date = params.getDate();
+            Date date = CalendarUtils.addHours(CalendarUtils.startOfDay(params.getDate()), 12);
             Date currentDate = CalendarUtils.startOfDayInUTC(date); // CalendarUtils.addHours(CalendarUtils.startOfDay(date), 3);
             if (DAOService.getInstance().getProductionCalendarByDate(currentDate) != null) return; //в выходной день заявки не формируем
             logger.info("Start generating preorder requests");
@@ -143,7 +143,14 @@ public class PreorderRequestsReportService extends RecoverableService {
                     Long number = DAOUtils.getNextGoodRequestNumberForOrgPerDay(session, idOfOrg, new Date());
                     Staff staff = DAOUtils.getAdminStaffFromOrg(session, idOfOrg);
 
-                    List<Date> orgDates = getOrgDates(currentDate, idOfOrg, weekends); //вычислены даты, на которые нужно генерировать заявки для текущей ОО
+                    //вычисляем даты, на которые нужно генерировать заявки для текущей ОО
+                    List<Date> orgDates;
+                    if (params.isEmpty()) {
+                        orgDates = getOrgDates(currentDate, idOfOrg, weekends);
+                    } else {
+                        orgDates = new ArrayList<>();
+                        orgDates.add(currentDate);
+                    }
                     List<String> guids = new ArrayList<String>();
                     for (Date dateWork : orgDates) {
                         if (getOrgGoodRequestByDate(idOfOrg, dateWork, doneOrgGoodRequests) != null && params.isEmpty()) {
