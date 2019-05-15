@@ -174,11 +174,14 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "    case when od.menutype = 0 and od.menuorigin in (0, 1, 10, 11) then 'Буфет' "
                     + "     when od.menutype between 50 and 99 and od.rprice > 0 then 'Платное питание' "
                     + "         when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then 'Бесплатное питание' end as type, "
-                    + "    case when od.menutype between 50 and 99 and od.rprice > 0 then g.nameofgood || ' - ' || od.rprice / 100 || ' ' || 'руб.' "
-                    + "         when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then g.nameofgood || ' - ' || od.discount/100 || ' ' || 'руб.' "
+                    + "    case when od.menutype between 50 and 99 and od.rprice > 0 then g.nameofgood "
+                    + "         when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then g.nameofgood "
                     + "         when od.menutype = 0 and od.menuorigin in (0,1) then 'Горячее' "
                     + "         when od.menutype = 0 and od.menuorigin in (10,11) then 'Покупная' end as complexname, "
-                    + "    od.idoforderdetail, c.idofclient " + "from cf_orders o "
+                    + "    od.idoforderdetail, c.idofclient,"
+                    + "     case when od.menutype between 50 and 99 and od.rprice > 0 then od.rprice "
+                    + "          when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then od.discount else 0 end as price "
+                    + "from cf_orders o "
                     + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + "join cf_clients c on c.idofclient = o.idofclient "
                     + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
@@ -275,10 +278,11 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 String complexName = (String) row[13];
                 Long idOfOrderDetail = (null == row[14]) ? 0 : ((BigInteger) row[14]).longValue();
                 Long idOfClient = (null == row[15]) ? 0 : ((BigInteger) row[15]).longValue();
+                Long price = (null == row[16]) ? 0 : ((BigInteger) row[16]).longValue();
                 EmployeeItem employeeItem = employeeItemHashMap.get(idOfOrg);
                 itemList.add(new CoverageNutritionReportItem(schoolNumber, studentsCountTotal, studentsCountYoung,
                         studentsCountMiddle, studentsCountOld, benefitStudentsCountYoung, beneftiStudentsCountMiddle,
-                        benefitStudentsCountOld, benefitStudentsCountTotal, employeeCount, group, foodType, complexName,
+                        benefitStudentsCountOld, benefitStudentsCountTotal, employeeCount, group, foodType, complexName + priceFormat(price),
                         idOfOrderDetail, idOfClient, employeeItem.getComplexesCount(), employeeItem.getBuffetCount(),
                         employeeItem.getAllFoodCount(), employeeItem.getPercentageOfActive()));
             }
@@ -391,6 +395,22 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             criteria.add(disjunction);
             criteria.setProjection(Property.forName("idOfClient"));
             return criteria.list();
+        }
+
+        private String priceFormat(Long price) {
+            if (price.equals(0L)) {
+                return "";
+            }
+
+            Integer rub = new Double(price.doubleValue() / 100.f).intValue();
+            Integer cop = new Long(price - rub * 100).intValue();
+
+            String moneyString = String.format(" %d руб.", rub);
+
+            if (!cop.equals(0)) {
+                moneyString += String.format(" %02d коп.", cop);
+            }
+            return moneyString;
         }
 
         public String getTemplateFilename() {
