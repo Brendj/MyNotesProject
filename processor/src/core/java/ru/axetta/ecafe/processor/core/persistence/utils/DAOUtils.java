@@ -4105,4 +4105,31 @@ public class DAOUtils {
         criteria.setMaxResults(1);
         return (ApplicationForFoodHistory) criteria.uniqueResult();
     }
+
+    public static List<KznClientsStatistic> getKznClientStatisticByOrgs(Session session, List<Long> idOfOrgList) {
+        Criteria criteria = session.createCriteria(KznClientsStatistic.class);
+        if (!idOfOrgList.isEmpty())
+            criteria.add(Restrictions.in("org.idOfOrg", idOfOrgList));
+        return criteria.list();
+    }
+
+    public static Boolean deleteFromKznClientStatisticByOrgId(Session session, Long idOfOrg) {
+        Query query = session.createQuery(
+                "delete from KznClientsStatistic statistic where idOfOrg=:id");
+        query.setParameter("id", idOfOrg);
+        return query.executeUpdate() > 0;
+    }
+
+    public static KznClientsStatistic getKznClientStatisticByOrg(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(KznClientsStatistic.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        return (KznClientsStatistic) criteria.uniqueResult();
+    }
+
+    public static ClientGroup findKznEmployeeGroupByOrgId(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(ClientGroup.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("groupName", "Сотрудники"));
+        return (ClientGroup) criteria.uniqueResult();
+    }
 }
