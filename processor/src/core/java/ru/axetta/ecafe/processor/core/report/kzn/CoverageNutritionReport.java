@@ -162,7 +162,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             List<CoverageNutritionReportItem> itemList = new ArrayList<CoverageNutritionReportItem>();
 
             String sqlString = "select distinct og.idoforg, "
-                    + "    cast(substring(og.shortnameinfoservice, '№\\s{0,1}(\\d{1,5})') as integer) as number, "
+                    + "    cast(substring(og.shortnameinfoservice, '\\s{0,1}(\\d{1,5})') as integer) as number, "
                     + "    st.studentsCountTotal, st.studentsCountYoung, st.studentsCountMiddle, st.studentsCountOld, st.benefitStudentsCountYoung, "
                     + "    st.benefitStudentsCountMiddle, st.benefitStudentsCountOld, st.benefitStudentsCountTotal, st.employeeCount, "
                     + "    case "
@@ -174,10 +174,9 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "    case when od.menutype = 0 and od.menuorigin in (0, 1, 10, 11) then 'Буфет' "
                     + "     when od.menutype between 50 and 99 and od.rprice > 0 then 'Платное питание' "
                     + "         when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then 'Бесплатное питание' end as type, "
-                    + "    case when od.menutype between 50 and 99 and od.rprice > 0 then g.nameofgood "
-                    + "         when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then g.nameofgood "
+                    + "    case when od.menutype between 50 and 99 then od.menudetailname "
                     + "         when od.menutype = 0 and od.menuorigin in (0,1) then 'Горячее' "
-                    + "         when od.menutype = 0 and od.menuorigin in (10,11) then 'Покупная' end as complexname, "
+                    + "         when od.menutype = 0 and od.menuorigin in (10,11) then 'Покупная' else '' end as complexname, "
                     + "    od.idoforderdetail, c.idofclient,"
                     + "     case when od.menutype between 50 and 99 and od.rprice > 0 then od.rprice "
                     + "          when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then od.discount else 0 end as price "
@@ -185,7 +184,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + "join cf_clients c on c.idofclient = o.idofclient "
                     + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
-                    + "left join cf_goods g on g.idofgood = od.idofgood " + "join cf_orgs og on og.idoforg = o.idoforg "
+                    + "join cf_orgs og on og.idoforg = o.idoforg "
                     + "left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
                     + "where o.idoforg in (:orgList) and o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0 ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
@@ -206,7 +205,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             } else {
                 classesNotConditionList.add(String.format(conditionString, "not", 10, 11));
             }
-            if (showComplexesByOrgCard) {
+            if (showComplexesByOrgCard && !managerList.isEmpty()) {
                 classesConditionList.add(String.format("c.idofclient in (%s)", StringUtils.join(managerList, ",")));
             }
 
@@ -224,18 +223,18 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             List<String> nutritionConditionList = new ArrayList<String>();
             List<String> nutritionNotConditionList = new ArrayList<String>();
             if (showFreeNutrition) {
-                nutritionConditionList.add(" od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 ");
+                nutritionConditionList.add(" (od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0) ");
             } else {
                 nutritionNotConditionList
                         .add(" (od.menutype not between 50 and 99 or od.rprice != 0 or od.discount <= 0) ");
             }
             if (showPaidNutrition) {
-                nutritionConditionList.add(" od.menutype between 50 and 99 and od.rprice > 0 ");
+                nutritionConditionList.add(" (od.menutype between 50 and 99 and od.rprice > 0) ");
             } else {
                 nutritionNotConditionList.add(" (od.menutype not between 50 and 99 or od.rprice <= 0) ");
             }
             if (showBuffet) {
-                nutritionConditionList.add(" od.menutype = 0 and od.menuorigin in (0, 1, 10, 11) ");
+                nutritionConditionList.add(" (od.menutype = 0 and od.menuorigin in (0, 1, 10, 11)) ");
             } else {
                 nutritionNotConditionList.add(" (od.menutype != 0 or od.menuorigin not in (0, 1, 10, 11)) ");
             }
@@ -342,7 +341,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                         "select a.idoforg, a.employeeCount, a.type, count(distinct a.idofclient) as clientcount "
                                 + "from ( " + " select og.idoforg, st.employeeCount, "
                                 + "     case when od.menutype = 0 and od.menuorigin in (0, 1, 10, 11) then 'Буфет' "
-                                + "      when od.menutype between 50 and 99 then 'Комплекс' end as type, "
+                                + "      when od.menutype between 50 and 99 then 'Комплекс' else '' end as type, "
                                 + "     od.idoforderdetail, c.idofclient " + " from cf_orders o "
                                 + " join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                                 + " join cf_clients c on c.idofclient = o.idofclient "
@@ -366,10 +365,10 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
 
                 for (Object o : list) {
                     Object[] row = (Object[]) o;
-                    Long orgId = ((BigInteger) row[0]).longValue();
-                    Long employeeCount = ((BigInteger) row[1]).longValue();
+                    Long orgId = (null == row[0]) ? 0L : ((BigInteger) row[0]).longValue();
+                    Long employeeCount = (null == row[1]) ? 0L : ((BigInteger) row[1]).longValue();
                     String type = (String) row[2];
-                    Long clientCount = ((BigInteger) row[3]).longValue();
+                    Long clientCount = (null == row[3]) ? 0L : ((BigInteger) row[3]).longValue();
 
                     EmployeeItem employeeItem = employeeItemHashMap.get(orgId);
                     if (type.equals("Буфет")) {
@@ -405,7 +404,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             Integer rub = new Double(price.doubleValue() / 100.f).intValue();
             Integer cop = new Long(price - rub * 100).intValue();
 
-            String moneyString = String.format(" %d руб.", rub);
+            String moneyString = String.format(" - %d руб.", rub);
 
             if (!cop.equals(0)) {
                 moneyString += String.format(" %02d коп.", cop);
