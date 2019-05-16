@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.FeedingSetting;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationStatus;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingManager;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ARMsSettingsType;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
@@ -89,7 +88,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
         this.district = org.getDistrict();
         this.shortAddress = org.getShortAddress();
         this.type = org.getType().getShortType();
-        this.status = org.getStatus().toString();
+        this.status = Org.STATE_NAMES[org.getState()];
 
         this.GUID = org.getGuid();
         this.additionalIdBuilding = org.getAdditionalIdBuilding();
@@ -311,7 +310,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
     // For web-page
     public String getStyle(){
         return (this.mainBuilding ? MAIN_BUILDING_STYLE + " " : "")
-                +  (!this.status.equals(OrganizationStatus.ACTIVE.toString()) ? NOT_SERVICED_STYLE : "" );
+                +  (this.status.equals(Org.STATE_NAMES[Org.INACTIVE_STATE]) ? NOT_SERVICED_STYLE : "" );
     }
 
     public void isChangedWhenModify(){

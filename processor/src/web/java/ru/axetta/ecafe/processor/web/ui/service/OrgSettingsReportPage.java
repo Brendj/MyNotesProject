@@ -45,7 +45,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     private Integer status = 0;
     private List<SelectItem> statuses;
-    private List<OrgSettingsReportItem> items;
+    private List<OrgSettingsReportItem> items = Collections.emptyList();
     private List<SelectItem> listOfOrgDistricts;
     private String selectedDistricts = "";
 
@@ -88,6 +88,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             statuses = buildStatuses();
             listOfOrgDistricts = buildListOfOrgDistricts(session);
+            items.clear();
         } catch (Exception e){
             logger.error("Exception when prepared the OrgSettingsPage: ", e);
             throw e;
