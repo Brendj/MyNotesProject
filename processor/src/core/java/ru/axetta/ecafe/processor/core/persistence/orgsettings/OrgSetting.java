@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.orgsettings;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 /*
@@ -66,6 +67,9 @@ public class OrgSetting {
     }
 
     public Set<OrgSettingItem> getOrgSettingItems() {
+        if(orgSettingItems == null){
+            orgSettingItems = new HashSet<>();
+        }
         return orgSettingItems;
     }
 
