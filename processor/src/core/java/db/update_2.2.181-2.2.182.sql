@@ -21,3 +21,5 @@ CREATE TABLE cf_kzn_clients_statistic (
   CONSTRAINT cf_kzn_clients_statistic_fk FOREIGN KEY (idoforg) REFERENCES cf_orgs(idoforg)
 );
 CREATE UNIQUE INDEX cf_kzn_clients_statistic_idoforg_idx ON cf_kzn_clients_statistic (idoforg);
+
+--! ФИНАЛИЗИРОВАН 16.05.2019, НЕ МЕНЯТЬ
