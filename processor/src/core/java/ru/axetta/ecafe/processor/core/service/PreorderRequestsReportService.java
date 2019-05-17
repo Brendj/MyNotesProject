@@ -191,9 +191,8 @@ public class PreorderRequestsReportService extends RecoverableService {
                                 }
                             }
 
-                            logger.info(String.format("Sending requests to orgID=%s, count=%s", idOfOrg, guids.size()));
-
                             if (guids.size() > 0) {
+                                logger.info(String.format("Sending requests to orgID=%s, count=%s", idOfOrg, guids.size()));
                                 Calendar calendarEnd = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
                                 final Date lastCreateOrUpdateDate = calendarEnd.getTime();
                                 calendarEnd.add(Calendar.MINUTE, 1);

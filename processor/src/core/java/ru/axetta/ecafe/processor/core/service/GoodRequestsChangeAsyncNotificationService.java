@@ -393,24 +393,22 @@ public class GoodRequestsChangeAsyncNotificationService {
         /* создаем отчет */
         String htmlReport = "";
 
-        Date currentDate = new Date();
-
+        LOGGER.info("Start build report");
         Session session = null;
         Transaction transaction = null;
         try {
-            try {
-                session = runtimeContext.createPersistenceSession();
-                transaction = session.beginTransaction();
-                reportJob = builder
-                        .build(session, CalendarUtils.startOfDay(requestDate), CalendarUtils.endOfDay(requestDate), localCalendar);
-                transaction.commit();
-                transaction = null;
-            } finally {
-                HibernateUtils.rollback(transaction, LOGGER);
-                HibernateUtils.close(session, LOGGER);
-            }
+            session = runtimeContext.createPersistenceSession();
+            transaction = session.beginTransaction();
+            reportJob = builder
+                    .build(session, CalendarUtils.startOfDay(requestDate), CalendarUtils.endOfDay(requestDate), localCalendar);
+            transaction.commit();
+            transaction = null;
+            LOGGER.info("Successful end build report");
         } catch (Exception e) {
-            LOGGER.error("Failed export report : ", e);
+            LOGGER.error("Failed build report : ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, LOGGER);
+            HibernateUtils.close(session, LOGGER);
         }
         if (reportJob != null) {
             try {
@@ -429,7 +427,7 @@ public class GoodRequestsChangeAsyncNotificationService {
                 htmlReport = os.toString("UTF-8");
                 os.close();
             } catch (Exception e) {
-                LOGGER.error("Failed build report ", e);
+                LOGGER.error("Failed export report ", e);
             }
         } else {
             LOGGER.error("IdOfOrg: " + orgItem.getIdOfOrg() + " reportJob is null");
@@ -457,43 +455,40 @@ public class GoodRequestsChangeAsyncNotificationService {
 
             /* Закладываем почтовые ящики ответсвенных по питанию в школе если таковые имеются */
             try {
-                try {
-                    session = runtimeContext.createReportPersistenceSession();
-                    transaction = session.beginTransaction();
-                    GoodRequestsChangeAsyncNotificationService.addEmailFromClient(session, orgItem.getIdOfOrg(), addresses);
-                    transaction.commit();
-                    transaction = null;
-                } finally {
-                    HibernateUtils.rollback(transaction, LOGGER);
-                    HibernateUtils.close(session, LOGGER);
-                }
+                session = runtimeContext.createReportPersistenceSession();
+                transaction = session.beginTransaction();
+                GoodRequestsChangeAsyncNotificationService.addEmailFromClient(session, orgItem.getIdOfOrg(), addresses);
+                transaction.commit();
+                transaction = null;
             } catch (Exception e) {
                 LOGGER.error("Find email from clients : ", e);
+            } finally {
+                HibernateUtils.rollback(transaction, LOGGER);
+                HibernateUtils.close(session, LOGGER);
             }
 
             try {
-                try {
-                    session = runtimeContext.createReportPersistenceSession();
-                    transaction = session.beginTransaction();
-                    GoodRequestsChangeAsyncNotificationService.addEmailFromUser(session, orgItem.getIdOfOrg(), addresses);
-                    transaction.commit();
-                    transaction = null;
-                } finally {
-                    HibernateUtils.rollback(transaction, LOGGER);
-                    HibernateUtils.close(session, LOGGER);
-                }
+                session = runtimeContext.createReportPersistenceSession();
+                transaction = session.beginTransaction();
+                GoodRequestsChangeAsyncNotificationService.addEmailFromUser(session, orgItem.getIdOfOrg(), addresses);
+                transaction.commit();
+                transaction = null;
             } catch (Exception e) {
                 LOGGER.error("Find email from user : ", e);
+            } finally {
+                HibernateUtils.rollback(transaction, LOGGER);
+                HibernateUtils.close(session, LOGGER);
             }
-            LOGGER.debug("addresses " + addresses.toString());
+            LOGGER.info("addresses " + addresses.toString());
             for (String address : addresses) {
                 if (StringUtils.trimToNull(address) != null) {
+                    LOGGER.info("Send email async");
                     RuntimeContext.getAppContext().getBean(EventNotificationService.class).sendEmailAsync(address,
                             EventNotificationService.NOTIFICATION_GOOD_REQUEST_CHANGE, values);
                 }
             }
         } else {
-            LOGGER.debug("IdOfOrg: " + orgItem.getIdOfOrg() + " email text is empty");
+            LOGGER.info("IdOfOrg: " + orgItem.getIdOfOrg() + " email text is empty");
         }
         LOGGER.info("End notifyOrg method idOfOrg=" + orgItem.getIdOfOrg());
     }
