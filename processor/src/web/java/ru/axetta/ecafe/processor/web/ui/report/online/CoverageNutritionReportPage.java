@@ -2,7 +2,7 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.service.kzn;
+package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.kzn.CoverageNutritionReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
-import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportWithContragentPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -288,6 +287,6 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
 
     @Override
     public String getPageFilename() {
-        return "service/kzn/coverage_nutrition_report";
+        return "report/online/coverage_nutrition_report";
     }
 }

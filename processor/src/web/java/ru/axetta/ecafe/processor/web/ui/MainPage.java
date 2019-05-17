@@ -9413,6 +9413,10 @@ public class MainPage implements Serializable {
                 getCurrentUser().hasFunction(Function.FUNC_FEEDING_SETTINGS_ADMIN);
     }
 
+    public boolean isEligibleToViewCoverageNutritionReport() throws Exception {
+        return getCurrentUser().hasFunction(Function.FUNC_COVERAGENUTRITION);
+    }
+
     public Object removeClient() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;

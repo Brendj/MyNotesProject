@@ -27,7 +27,7 @@
     });
 </script>
 
-<%--@elvariable id="coverageNutritionReportPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.CoverageNutritionReportPage"--%>
+<%--@elvariable id="coverageNutritionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CoverageNutritionReportPage"--%>
 <h:panelGrid id="coverageNutritionReportPanelGrid" binding="#{coverageNutritionReportPage.pageComponent}"
              styleClass="borderless-grid">
 

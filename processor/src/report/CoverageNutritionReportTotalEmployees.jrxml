@@ -843,6 +843,12 @@
 				<measure name="totalBuffetPaidCard" class="java.lang.Integer" calculation="DistinctCount">
 					<measureExpression><![CDATA[$F{group}.toLowerCase().startsWith("комплексы") && $F{foodType}.toLowerCase().equals("буфет") && $F{complexName}.toLowerCase().equals("покупная") ? $F{idOfOrderDetail} : null]]></measureExpression>
 				</measure>
+				<measure name="totalBuffetClientsMeasure" class="java.lang.Long" calculation="DistinctCount">
+					<measureExpression><![CDATA[$F{group}.toLowerCase().startsWith("обучающиеся") && $F{foodType}.toLowerCase().equals("буфет") ? $F{idOfClient} : null]]></measureExpression>
+				</measure>
+				<measure name="totalActiveClientsMeasure" class="java.lang.Long" calculation="DistinctCount">
+					<measureExpression><![CDATA[$F{idOfClient}]]></measureExpression>
+				</measure>
 				<crosstabCell width="210" height="25">
 					<cellContents mode="Transparent">
 						<box>
@@ -968,7 +974,7 @@ $V{totalBuffetHotClientsMeasure} + $V{totalBuffetPaidClientsMeasure}]]></textFie
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
-							<textFieldExpression><![CDATA[$V{totalBuffetHotClientsMeasure} + $V{totalBuffetPaidClientsMeasure}]]></textFieldExpression>
+							<textFieldExpression><![CDATA[$V{totalBuffetClientsMeasure}]]></textFieldExpression>
 						</textField>
 						<textField>
 							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="780" y="0" width="60" height="25"/>
@@ -1095,8 +1101,7 @@ $V{studentsCountTotal}.doubleValue() * 100.f)]]></textFieldExpression>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
-							<textFieldExpression><![CDATA[String.format("%.2f", new Long($V{totalPaidClientsMeasure} + $V{totalFreeClientsMeasure} +
- $V{totalBuffetHotClientsMeasure} + $V{totalBuffetPaidClientsMeasure}).doubleValue() /
+							<textFieldExpression><![CDATA[String.format("%.2f", $V{totalActiveClientsMeasure}.doubleValue() /
 $V{studentsCountTotal}.doubleValue() * 100.f)]]></textFieldExpression>
 						</textField>
 					</cellContents>
