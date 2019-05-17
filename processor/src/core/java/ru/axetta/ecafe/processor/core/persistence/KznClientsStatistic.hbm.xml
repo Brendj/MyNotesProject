@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.KznClientsStatistic" table="cf_kzn_clients_statistic">
+        <id name="idOfKznClientsStatistic" column="idofkznclientsstatistic" type="long">
+            <generator class="identity"/>
+        </id>
+
+        <many-to-one name="org" column="IdOfOrg" class="ru.axetta.ecafe.processor.core.persistence.Org" unique="true" not-null="true"/>
+        <property name="studentsCountTotal" column="StudentsCountTotal" type="long" not-null="true"/>
+        <property name="studentsCountYoung" column="StudentsCountYoung" type="long" not-null="true"/>
+        <property name="studentsCountMiddle" column="StudentsCountMiddle" type="long" not-null="true"/>
+        <property name="studentsCountOld" column="StudentsCountOld" type="long" not-null="true"/>
+        <property name="benefitStudentsCountYoung" column="BenefitStudentsCountYoung" type="long" not-null="true"/>
+        <property name="benefitStudentsCountMiddle" column="BenefitStudentsCountMiddle" type="long" not-null="true"/>
+        <property name="benefitStudentsCountOld" column="BenefitStudentsCountOld" type="long" not-null="true"/>
+        <property name="benefitStudentsCountTotal" column="BenefitStudentsCountTotal" type="long" not-null="true"/>
+        <property name="employeeCount" column="EmployeeCount" type="long" not-null="true"/>
+    </class>
+</hibernate-mapping>

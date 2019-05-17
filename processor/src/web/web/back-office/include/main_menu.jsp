@@ -961,6 +961,24 @@
     <rich:panelMenuItem id="preorderJournalReport" binding="#{preorderJournalReportPage.mainMenuComponent}"
                         label="Журнал операций ВП" action="#{preorderJournalReportPage.show}" reRender="workspaceForm" />
 
+    <%--@elvariable id="coverageNutritionReportPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.CoverageNutritionReportPage"--%>
+    <rich:panelMenuItem id="coverageNutritionReport" binding="#{coverageNutritionReportPage.mainMenuComponent}"
+                        label="Отчет по охвату питания" action="#{coverageNutritionReportPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuGroup id="kznClientsStatisticMenuGroup" label="Статистика по клиентам" reRender="workspaceForm">
+
+        <%--@elvariable id="kznClientsStatisticViewPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticViewPage"--%>
+        <rich:panelMenuItem id="kznClientsStatisticViewMenuItem" binding="#{kznClientsStatisticViewPage.mainMenuComponent}" label="Просмотр"
+                            action="#{kznClientsStatisticViewPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="kznClientsStatisticCreatePage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticCreatePage"--%>
+        <rich:panelMenuItem id="kznClientsStatisticCreateMenuItem" binding="#{kznClientsStatisticCreatePage.mainMenuComponent}" label="Создание"
+                            action="#{kznClientsStatisticCreatePage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="kznClientsStatisticEditPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticEditPage"--%>
+        <rich:panelMenuItem id="kznClientsStatisticEditMenuItem" binding="#{kznClientsStatisticEditPage.mainMenuComponent}" label="Редактирование"
+                            action="#{kznClientsStatisticEditPage.show}" reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
+
     <%--@elvariable id="orgSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.OrgSettingsReportPage"--%>
     <rich:panelMenuItem id="orgSettingsReport" binding="#{orgSettingsReportPage.mainMenuComponent}"
                         label="Настройки ОО" action="#{orgSettingsReportPage.show}" reRender="workspaceForm" />
