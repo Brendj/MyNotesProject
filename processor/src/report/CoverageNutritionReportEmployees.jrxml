@@ -180,8 +180,8 @@
 							<box>
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
-							<textField>
-								<reportElement uuid="de6e2908-9ec2-46fc-a569-f296d93e2454" style="table" x="0" y="0" width="80" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="de6e2908-9ec2-46fc-a569-f296d93e2454" style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="80" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{schoolName}]]></textFieldExpression>
 							</textField>
@@ -201,8 +201,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents>
-							<textField>
-								<reportElement uuid="0683eca3-84ca-4d14-a3cd-8a382b77cbe3" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="0683eca3-84ca-4d14-a3cd-8a382b77cbe3" style="table" stretchType="RelativeToBandHeight" x="0" y="0" width="100" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{schoolAddress}]]></textFieldExpression>
 							</textField>
