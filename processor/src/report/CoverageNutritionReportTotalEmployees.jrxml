@@ -53,7 +53,8 @@
 	<parameter name="OVERRIDE_GroupComparator" class="java.util.Comparator"/>
 	<parameter name="OVERRIDE_FoodTypeComparator" class="java.util.Comparator"/>
 	<parameter name="test" class="java.lang.String"/>
-	<field name="schoolNumber" class="java.lang.Integer"/>
+	<field name="schoolName" class="java.lang.String"/>
+	<field name="schoolAddress" class="java.lang.String"/>
 	<field name="studentsCountTotal" class="java.lang.Long"/>
 	<field name="studentsCountYoung" class="java.lang.Long"/>
 	<field name="studentsCountMiddle" class="java.lang.Long"/>
@@ -90,7 +91,7 @@
 		</band>
 	</pageHeader>
 	<summary>
-		<band height="185" splitType="Stretch">
+		<band height="150" splitType="Stretch">
 			<crosstab>
 				<reportElement uuid="e2351233-788b-4c5e-9fac-6fbc9924c407" x="0" y="0" width="2720" height="150"/>
 				<box>
@@ -105,76 +106,83 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
-							<text><![CDATA[№ школы]]></text>
-						</staticText>
-						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="80" y="0" width="100" height="160"/>
-							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="10" isBold="true"/>
-							</textElement>
-							<text><![CDATA[Общее количество учащихся]]></text>
+							<text><![CDATA[Название ОО]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="180" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
-							<text><![CDATA[Количество учащихся 1-4 классов]]></text>
+							<text><![CDATA[Общее количество учащихся]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="280" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
-							<text><![CDATA[Количество учащихся 5-9 классов]]></text>
+							<text><![CDATA[Количество учащихся 1-4 классов]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="380" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
-							<text><![CDATA[Количество учащихся 10-11 классов]]></text>
-						</staticText>
-						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="880" y="0" width="100" height="160"/>
-							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="10" isBold="true"/>
-							</textElement>
-							<text><![CDATA[Количество сотрудников, администрации и прочих групп]]></text>
-						</staticText>
-						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="680" y="0" width="100" height="160"/>
-							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="10" isBold="true"/>
-							</textElement>
-							<text><![CDATA[Количество льготников 10-11 классы]]></text>
-						</staticText>
-						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="580" y="0" width="100" height="160"/>
-							<textElement textAlignment="Center" verticalAlignment="Middle">
-								<font size="10" isBold="true"/>
-							</textElement>
-							<text><![CDATA[Количество льготников 5-9 классы]]></text>
+							<text><![CDATA[Количество учащихся 5-9 классов]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="480" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
-							<text><![CDATA[Количество льготников 1-4 классы]]></text>
+							<text><![CDATA[Количество учащихся 10-11 классов]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="980" y="0" width="100" height="160"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="10" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Количество сотрудников, администрации и прочих групп]]></text>
 						</staticText>
 						<staticText>
 							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="780" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
+							<text><![CDATA[Количество льготников 10-11 классы]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="680" y="0" width="100" height="160"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="10" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Количество льготников 5-9 классы]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="580" y="0" width="100" height="160"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="10" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Количество льготников 1-4 классы]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="880" y="0" width="100" height="160"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="10" isBold="true"/>
+							</textElement>
 							<text><![CDATA[Количество льготников всего]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="80" y="0" width="100" height="160"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="10" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Адрес ОО]]></text>
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
-				<rowGroup name="schoolNumber" width="80" totalPosition="End">
-					<bucket class="java.lang.Integer">
-						<bucketExpression><![CDATA[$F{schoolNumber}]]></bucketExpression>
+				<rowGroup name="schoolName" width="80" totalPosition="End">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{schoolName}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents backcolor="#F0F8FF" mode="Transparent">
@@ -184,7 +192,7 @@
 							<textField>
 								<reportElement uuid="de6e2908-9ec2-46fc-a569-f296d93e2454" style="table" x="0" y="0" width="80" height="25"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[$V{schoolNumber}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{schoolName}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
@@ -194,6 +202,23 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 						</cellContents>
+					</crosstabTotalRowHeader>
+				</rowGroup>
+				<rowGroup name="schoolAddress" width="100" totalPosition="End">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{schoolAddress}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField>
+								<reportElement uuid="c7c571fa-1dff-42f1-8649-d3c145002e84" style="table" x="0" y="0" width="100" height="25"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{schoolAddress}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
 				<rowGroup name="studentsCountTotal" width="100" totalPosition="End">
@@ -1184,25 +1209,37 @@ $V{studentsCountTotal}.doubleValue() * 100.f)]]></textFieldExpression>
 				<crosstabCell width="1441" height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="group">
 					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell width="210" height="0" rowTotalGroup="schoolNumber">
+				<crosstabCell width="210" height="0" rowTotalGroup="schoolName">
 					<cellContents backcolor="#BFE1FF" mode="Transparent">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="complexName">
+				<crosstabCell width="0" height="0" rowTotalGroup="schoolName" columnTotalGroup="complexName">
 					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell width="360" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="foodType">
+				<crosstabCell width="360" height="0" rowTotalGroup="schoolName" columnTotalGroup="foodType">
 					<cellContents backcolor="#BFE1FF" mode="Transparent">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="1441" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="group">
+				<crosstabCell width="1441" height="0" rowTotalGroup="schoolName" columnTotalGroup="group">
 					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="schoolAddress">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="schoolAddress" columnTotalGroup="group">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="schoolAddress" columnTotalGroup="foodType">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="schoolAddress" columnTotalGroup="complexName">
+					<cellContents/>
 				</crosstabCell>
 			</crosstab>
 		</band>
