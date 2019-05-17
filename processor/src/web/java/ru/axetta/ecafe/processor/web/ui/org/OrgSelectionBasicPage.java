@@ -17,7 +17,6 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.CacheMode;
 import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
 import org.hibernate.criterion.*;
 import org.hibernate.transform.Transformers;
@@ -72,22 +71,21 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter, int supplierFilter,
             String idFilter, String region, List<Long> idOfSourceMenuOrgList, List<Long> idOfSupplierList,
             Long idOfContragent, Long idOfContract) throws Exception {
-
         Criteria orgCriteria = session.createCriteria(Org.class);
-        orgCriteria.addOrder(Order.asc("idOfOrg"));
-        //  Ограничение оргов, которые позволено видеть пользователю
-        //try {// -- Убран try с пустым catch для потверждения догадки в рамках задачи EP-1377
-            Long idOfUser = DAOReadonlyService.getInstance().getUserFromSession().getIdOfUser();
-            if(idOfUser == null){
-                throw new Exception("Не удалось получить пользователя");
-            }
-            ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, orgCriteria);
-        //} catch (Exception ignored) {
-        //}
+
+        Long idOfUser = DAOReadonlyService.getInstance().getUserFromSession().getIdOfUser();
+        if (idOfUser == null) {
+            throw new Exception("Не удалось получить ID пользователя");
+        }
+        ContextDAOServices.getInstance().buildOrgRestriction(idOfUser, orgCriteria);
 
         if (StringUtils.isNotEmpty(filter)) {
-            orgCriteria.add(Restrictions.or(Restrictions.ilike("shortName", filter, MatchMode.ANYWHERE),
-                    Restrictions.ilike("officialName", filter, MatchMode.ANYWHERE)));
+            LogicalExpression shortNameOrOfficalNameIlike = Restrictions
+                    .or(Restrictions.ilike("shortName", filter, MatchMode.ANYWHERE),
+                            Restrictions.ilike("officialName", filter, MatchMode.ANYWHERE));
+            Criterion shortNameInfoServiceIlike = Restrictions.ilike("shortNameInfoService", filter, MatchMode.ANYWHERE);
+
+            orgCriteria.add(Restrictions.or(shortNameInfoServiceIlike, shortNameOrOfficalNameIlike));
         }
 
         if (StringUtils.isNotEmpty(tagFilter)) {
@@ -163,6 +161,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         orgCriteria.setCacheable(true);
         orgCriteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));
         orgCriteria.addOrder(Order.asc("idOfOrg"));
+
         return (List<OrgShortItem>) orgCriteria.list();
     }
 

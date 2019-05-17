@@ -64,7 +64,7 @@
         <h:selectBooleanCheckbox value="#{orgSettingsReportPage.showCardSettings}" styleClass="checkboxes">
             <a4j:support event="onchange" reRender="orgSettingsTable" />
         </h:selectBooleanCheckbox>
-        <h:outputText styleClass="output-text" escape="true" value="Отобразить другое настройки" />
+        <h:outputText styleClass="output-text" escape="true" value="Отобразить другие настройки" />
         <h:selectBooleanCheckbox value="#{orgSettingsReportPage.showOtherSetting}" styleClass="checkboxes">
             <a4j:support event="onchange" reRender="orgSettingsTable" />
         </h:selectBooleanCheckbox>
@@ -183,7 +183,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер версии АРМа" />
             </f:facet>
-            <h:outputText escape="true" value="0" styleClass="output-text" />
+            <h:outputText escape="true" value="#{item.armVersionNumber}" styleClass="output-text" />
         </rich:column>
         <!-- id="orgSettingsSupplierInfoPart"-->
         <rich:column sortable="true" sortBy="#{item.defaultSupplierName}" headerClass="column-header" rendered="#{orgSettingsReportPage.showRequisite}"

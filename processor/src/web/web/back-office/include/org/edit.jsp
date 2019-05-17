@@ -177,8 +177,6 @@
             <f:setPropertyActionListener value="2" target="#{mainPage.orgSelectPage.filterMode}" />
         </a4j:commandButton>
     </h:panelGroup>
-    <h:outputText escape="true" value="Разрешить получение льгот из сверки контингента" styleClass="output-text" />
-    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.changesDSZN}"  styleClass="input-text"  />
     <h:outputText id="payPlanParamLabel" escape="true" value="Включить использование плана питания" styleClass="output-text" />
     <h:selectBooleanCheckbox id="payPlanParamCheckbox" value="#{mainPage.orgEditPage.usePlanOrders}"/>
     <h:outputText id="PaydableSubscriptionFeedingLabel" escape="true" value="Включить функционал платного горячего питания" styleClass="output-text" />
@@ -233,8 +231,10 @@
         <f:converter converterId="organizationSecurityLevelConverter"/>
         <f:selectItems value="#{mainPage.orgEditPage.securityLevels}" />
     </h:selectOneMenu>
-    <h:outputText id="disableEditingClientsFromAISReestrLabel" escape="true" value="Отключить создание, редактирование, удаление клиентов и их атрибутов" styleClass="output-text"/>
+    <h:outputText id="disableEditingClientsFromAISReestrLabel" escape="true" value="Разрешить проведение сверки контингента" styleClass="output-text"/>
     <h:selectBooleanCheckbox id="disableEditingClientsFromAISReestrCheckbox" value="#{mainPage.orgEditPage.disableEditingClientsFromAISReestr}" />
+    <h:outputText escape="true" value="Разрешить получение льгот из сверки контингента" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.changesDSZN}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Разрешить проведение сверки фотографий" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.photoRegistry}"  styleClass="input-text"  />
     <h:outputText escape="true" value="Разрешить проведение сверки сотрудников" styleClass="output-text" />

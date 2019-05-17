@@ -5,16 +5,20 @@
 package ru.axetta.ecafe.processor.core.report;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.FeedingSetting;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationStatus;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingManager;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ARMsSettingsType;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
 import org.apache.commons.lang.StringUtils;
 
-public class OrgSettingsReportItem {
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Set;
+
+public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
 
     //----------------- Main info --------------------//
     private String orgNumberInName;
@@ -84,7 +88,7 @@ public class OrgSettingsReportItem {
         this.district = org.getDistrict();
         this.shortAddress = org.getShortAddress();
         this.type = org.getType().getShortType();
-        this.status = org.getStatus().toString();
+        this.status = Org.STATE_NAMES[org.getState()];
 
         this.GUID = org.getGuid();
         this.additionalIdBuilding = org.getAdditionalIdBuilding();
@@ -94,7 +98,7 @@ public class OrgSettingsReportItem {
         this.typeInternal = org.getTypeInitial().getShortType();
         this.defaultSupplierName = org.getDefaultSupplier().getContragentName();
         this.productionConfig = org.getConfigurationProvider() == null ? "Информации о производственной конфигурации нет" : org.getConfigurationProvider().getName();
-        this.orgCategory = CollectionUtils.isEmpty(org.getCategories()) ? "Организация не принадлежит ни к одной категории" : StringUtils.join(org.getCategories(), ", ");
+        this.orgCategory = CollectionUtils.isEmpty(org.getCategories()) ? "Организация не принадлежит ни к одной категории" : buildOrgCategoriesString(org.getCategories());
 
         this.usePaydableSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding();
         this.variableFeeding = org.getVariableFeeding();
@@ -103,7 +107,7 @@ public class OrgSettingsReportItem {
         this.denyPayPlanForTimeDifference = org.getDenyPayPlanForTimeDifference();
         if(setting != null) {
             this.idOfSetting = setting.getIdOfSetting();
-            this.settingName = setting.getSettingName();
+            this.settingName = StringUtils.isEmpty(setting.getSettingName()) ? "Название отсуствует" : setting.getSettingName();
             this.limit = setting.getLimit();
         }
 
@@ -117,6 +121,14 @@ public class OrgSettingsReportItem {
 
         this.mainBuilding = org.isMainBuilding();
         this.changed = false;
+    }
+
+    private String buildOrgCategoriesString(Set<CategoryOrg> categories) {
+        List<String> settingNameList = new ArrayList<>(categories.size());
+        for(CategoryOrg category : categories){
+            settingNameList.add(category.getCategoryName());
+        }
+        return StringUtils.join(settingNameList, ", ");
     }
 
     public String getOrgNumberInName() {
@@ -298,7 +310,7 @@ public class OrgSettingsReportItem {
     // For web-page
     public String getStyle(){
         return (this.mainBuilding ? MAIN_BUILDING_STYLE + " " : "")
-                +  (!this.status.equals(OrganizationStatus.ACTIVE.toString()) ? NOT_SERVICED_STYLE : "" );
+                +  (this.status.equals(Org.STATE_NAMES[Org.INACTIVE_STATE]) ? NOT_SERVICED_STYLE : "" );
     }
 
     public void isChangedWhenModify(){
@@ -408,5 +420,20 @@ public class OrgSettingsReportItem {
 
     public void setSettingName(String settingName) {
         this.settingName = settingName;
+    }
+
+    @Override
+    public int compareTo(OrgSettingsReportItem o) {
+        int compareNumber = this.orgNumberInName.compareTo(o.orgNumberInName);
+        if(compareNumber != 0){
+            return compareNumber;
+        }
+
+        int compareIsServices = -this.status.compareTo(o.status);
+        if(compareIsServices != 0){
+            return compareIsServices;
+        }
+
+        return -this.mainBuilding.compareTo(o.mainBuilding);
     }
 }

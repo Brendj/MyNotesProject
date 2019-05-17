@@ -21,7 +21,7 @@
             </type>
         </property>
         
-        <set name="orgSettingItems" inverse="true" cascade="all">
+        <set name="orgSettingItems" inverse="true" cascade="all" lazy="false">
             <key column="idOfOrgSetting"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem"/>
         </set>
