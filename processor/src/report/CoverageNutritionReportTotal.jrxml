@@ -104,70 +104,70 @@
 							<text><![CDATA[Название ОО]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="180" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="260" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Общее количество учащихся]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="280" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="360" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество учащихся 1-4 классов]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="380" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="460" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество учащихся 5-9 классов]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="480" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="560" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество учащихся 10-11 классов]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="980" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="1060" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество сотрудников, администрации и прочих групп]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="780" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="860" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество льготников 10-11 классы]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="680" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="760" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество льготников 5-9 классы]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="580" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="660" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество льготников 1-4 классы]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="880" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="960" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество льготников всего]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="80" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="80" y="0" width="180" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
@@ -199,14 +199,14 @@
 						</cellContents>
 					</crosstabTotalRowHeader>
 				</rowGroup>
-				<rowGroup name="schoolAddress" width="100" totalPosition="End">
+				<rowGroup name="schoolAddress" width="180" totalPosition="End">
 					<bucket class="java.lang.String">
 						<bucketExpression><![CDATA[$F{schoolAddress}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents>
 							<textField isStretchWithOverflow="true">
-								<reportElement uuid="817b61e3-788f-4652-b270-4b5428e0c5d1" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
+								<reportElement uuid="817b61e3-788f-4652-b270-4b5428e0c5d1" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="180" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{schoolAddress}]]></textFieldExpression>
 							</textField>
