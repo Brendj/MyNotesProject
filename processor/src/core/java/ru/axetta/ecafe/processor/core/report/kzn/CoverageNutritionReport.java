@@ -166,133 +166,134 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             }
             List<CoverageNutritionReportItem> itemList = new ArrayList<CoverageNutritionReportItem>();
 
-            String sqlString = "select distinct og.idoforg, og.shortnameinfoservice, og.shortaddress, "
-                    + "    st.studentsCountTotal, st.studentsCountYoung, st.studentsCountMiddle, st.studentsCountOld, st.benefitStudentsCountYoung, "
-                    + "    st.benefitStudentsCountMiddle, st.benefitStudentsCountOld, st.benefitStudentsCountTotal, st.employeeCount, "
-                    + "    case " + (managerList.isEmpty() || !showComplexesByOrgCard ? ""
-                    : "when c.idofclient in (:managerList) then 'Комплексы проданные по карте ОО' ")
-                    + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 1 and 4 then 'Обучающиеся 1-4 классов' "
-                    + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 5 and 9 then 'Обучающиеся 5-9 классов' "
-                    + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 10 and 11 then 'Обучающиеся 10-11 классов' "
-                    + "         when cg.idofclientgroup in (:clientEmployees, :clientAdministration, :clientTechEmployees) then 'Сотрудники' end as group, "
-                    + "    case when od.menutype = 0 and od.menuorigin in (0, 1, 10, 11) then 'Буфет' "
-                    + "     when od.menutype between 50 and 99 and od.rprice > 0 then 'Платное питание' "
-                    + "         when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then 'Бесплатное питание' end as type, "
-                    + "    case when od.menutype between 50 and 99 then od.menudetailname "
-                    + "         when od.menutype = 0 and od.menuorigin in (0,1) then 'Горячее' "
-                    + "         when od.menutype = 0 and od.menuorigin in (10,11) then 'Покупная' else '' end as complexname, "
-                    + "    od.idoforderdetail, c.idofclient,"
-                    + "     case when od.menutype between 50 and 99 and od.rprice > 0 then od.rprice "
-                    + "          when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then od.discount else 0 end as price "
-                    + "from cf_orders o "
-                    + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
-                    + "join cf_clients c on c.idofclient = o.idofclient "
-                    + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
-                    + "join cf_orgs og on og.idoforg = o.idoforg "
-                    + "left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
-                    + "where o.idoforg in (:orgList) and o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0 ";
-            String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
-            List<String> classesConditionList = new ArrayList<String>();
-            List<String> classesNotConditionList = new ArrayList<String>();
-            if (showYoungerClasses) {
-                classesConditionList.add(String.format(conditionString, "", 1, 4));
-            } else {
-                classesNotConditionList.add(String.format(conditionString, "not", 1, 4));
-            }
-            if (showMiddleClasses) {
-                classesConditionList.add(String.format(conditionString, "", 5, 9));
-            } else {
-                classesNotConditionList.add(String.format(conditionString, "not", 5, 9));
-            }
-            if (showOlderClasses) {
-                classesConditionList.add(String.format(conditionString, "", 10, 11));
-            } else {
-                classesNotConditionList.add(String.format(conditionString, "not", 10, 11));
-            }
-            if (showComplexesByOrgCard && !managerList.isEmpty()) {
-                classesConditionList.add(String.format("c.idofclient in (%s)", StringUtils.join(managerList, ",")));
-            }
+            for (Long orgId : orgList) {
+                String sqlString = "select distinct og.idoforg, og.shortnameinfoservice, og.shortaddress, "
+                        + "    st.studentsCountTotal, st.studentsCountYoung, st.studentsCountMiddle, st.studentsCountOld, st.benefitStudentsCountYoung, "
+                        + "    st.benefitStudentsCountMiddle, st.benefitStudentsCountOld, st.benefitStudentsCountTotal, st.employeeCount, "
+                        + "    case " + (managerList.isEmpty() || !showComplexesByOrgCard ? ""
+                        : "when c.idofclient in (:managerList) then 'Комплексы проданные по карте ОО' ")
+                        + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 1 and 4 then 'Обучающиеся 1-4 классов' "
+                        + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 5 and 9 then 'Обучающиеся 5-9 классов' "
+                        + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 10 and 11 then 'Обучающиеся 10-11 классов' "
+                        + "         when cg.idofclientgroup in (:clientEmployees, :clientAdministration, :clientTechEmployees) then 'Сотрудники' end as group, "
+                        + "    case when od.menutype = 0 and od.menuorigin in (0, 1, 10, 11) then 'Буфет' "
+                        + "     when od.menutype between 50 and 99 and od.rprice > 0 then 'Платное питание' "
+                        + "         when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then 'Бесплатное питание' end as type, "
+                        + "    case when od.menutype between 50 and 99 then od.menudetailname "
+                        + "         when od.menutype = 0 and od.menuorigin in (0,1) then 'Горячее' "
+                        + "         when od.menutype = 0 and od.menuorigin in (10,11) then 'Покупная' else '' end as complexname, "
+                        + "    od.idoforderdetail, c.idofclient,"
+                        + "     case when od.menutype between 50 and 99 and od.rprice > 0 then od.rprice "
+                        + "          when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then od.discount else 0 end as price "
+                        + "from cf_orders o "
+                        + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
+                        + "join cf_clients c on c.idofclient = o.idofclient "
+                        + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
+                        + "join cf_orgs og on og.idoforg = o.idoforg "
+                        + "left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
+                        + "where o.idoforg = :idOfOrg and o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0 ";
+                String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
+                List<String> classesConditionList = new ArrayList<String>();
+                List<String> classesNotConditionList = new ArrayList<String>();
+                if (showYoungerClasses) {
+                    classesConditionList.add(String.format(conditionString, "", 1, 4));
+                } else {
+                    classesNotConditionList.add(String.format(conditionString, "not", 1, 4));
+                }
+                if (showMiddleClasses) {
+                    classesConditionList.add(String.format(conditionString, "", 5, 9));
+                } else {
+                    classesNotConditionList.add(String.format(conditionString, "not", 5, 9));
+                }
+                if (showOlderClasses) {
+                    classesConditionList.add(String.format(conditionString, "", 10, 11));
+                } else {
+                    classesNotConditionList.add(String.format(conditionString, "not", 10, 11));
+                }
+                if (showComplexesByOrgCard && !managerList.isEmpty()) {
+                    classesConditionList.add(String.format("c.idofclient in (%s)", StringUtils.join(managerList, ",")));
+                }
 
-            if (!classesConditionList.isEmpty()) {
-                sqlString += " and (" + StringUtils.join(classesConditionList, " or ") + ") ";
-            }
-            if (!classesNotConditionList.isEmpty()) {
-                sqlString += " and " + StringUtils.join(classesNotConditionList, " and ");
-            }
+                if (!classesConditionList.isEmpty()) {
+                    sqlString += " and (" + StringUtils.join(classesConditionList, " or ") + ") ";
+                }
+                if (!classesNotConditionList.isEmpty()) {
+                    sqlString += " and " + StringUtils.join(classesNotConditionList, " and ");
+                }
 
-            if (!showEmployee) {
-                sqlString += " and cg.idofclientgroup not in (:clientEmployees, :clientAdministration, :clientTechEmployees)";
-            }
+                if (!showEmployee) {
+                    sqlString += " and cg.idofclientgroup not in (:clientEmployees, :clientAdministration, :clientTechEmployees)";
+                }
 
-            List<String> nutritionConditionList = new ArrayList<String>();
-            List<String> nutritionNotConditionList = new ArrayList<String>();
-            if (showFreeNutrition) {
-                nutritionConditionList.add(" (od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0) ");
-            } else {
-                nutritionNotConditionList
-                        .add(" (od.menutype not between 50 and 99 or od.rprice != 0 or od.discount <= 0) ");
-            }
-            if (showPaidNutrition) {
-                nutritionConditionList.add(" (od.menutype between 50 and 99 and od.rprice > 0) ");
-            } else {
-                nutritionNotConditionList.add(" (od.menutype not between 50 and 99 or od.rprice <= 0) ");
-            }
-            if (showBuffet) {
-                nutritionConditionList.add(" (od.menutype = 0 and od.menuorigin in (0, 1, 10, 11)) ");
-            } else {
-                nutritionNotConditionList.add(" (od.menutype != 0 or od.menuorigin not in (0, 1, 10, 11)) ");
-            }
+                List<String> nutritionConditionList = new ArrayList<String>();
+                List<String> nutritionNotConditionList = new ArrayList<String>();
+                if (showFreeNutrition) {
+                    nutritionConditionList
+                            .add(" (od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0) ");
+                } else {
+                    nutritionNotConditionList
+                            .add(" (od.menutype not between 50 and 99 or od.rprice != 0 or od.discount <= 0) ");
+                }
+                if (showPaidNutrition) {
+                    nutritionConditionList.add(" (od.menutype between 50 and 99 and od.rprice > 0) ");
+                } else {
+                    nutritionNotConditionList.add(" (od.menutype not between 50 and 99 or od.rprice <= 0) ");
+                }
+                if (showBuffet) {
+                    nutritionConditionList.add(" (od.menutype = 0 and od.menuorigin in (0, 1, 10, 11)) ");
+                } else {
+                    nutritionNotConditionList.add(" (od.menutype != 0 or od.menuorigin not in (0, 1, 10, 11)) ");
+                }
 
-            if (!nutritionConditionList.isEmpty()) {
-                sqlString += " and (" + StringUtils.join(nutritionConditionList, " or ") + ") ";
-            }
+                if (!nutritionConditionList.isEmpty()) {
+                    sqlString += " and (" + StringUtils.join(nutritionConditionList, " or ") + ") ";
+                }
 
-            if (!nutritionNotConditionList.isEmpty()) {
-                sqlString += " and " + StringUtils.join(nutritionNotConditionList, " and ");
-            }
+                if (!nutritionNotConditionList.isEmpty()) {
+                    sqlString += " and " + StringUtils.join(nutritionNotConditionList, " and ");
+                }
 
-            Query query = session.createSQLQuery(sqlString);
-            query.setParameter("startDate", startDate.getTime());
-            query.setParameter("endDate", endDate.getTime());
-            query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            query.setParameter("clientAdministration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
-            query.setParameter("clientTechEmployees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
-            query.setParameterList("orgList", orgList);
-            if (!managerList.isEmpty() && showComplexesByOrgCard) {
-                query.setParameterList("managerList", managerList);
-            }
-            List list = query.list();
+                Query query = session.createSQLQuery(sqlString);
+                query.setParameter("startDate", startDate.getTime());
+                query.setParameter("endDate", endDate.getTime());
+                query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+                query.setParameter("clientAdministration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+                query.setParameter("clientTechEmployees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+                query.setParameter("idOfOrg", orgId);
+                if (!managerList.isEmpty() && showComplexesByOrgCard) {
+                    query.setParameterList("managerList", managerList);
+                }
+                List list = query.list();
 
-            for (Object o : list) {
-                Object[] row = (Object[]) o;
-                Long idOfOrg = ((BigInteger) row[0]).longValue();
-                String schoolName = (String) row[1];
-                String schoolAddress = (String) row[2];
-                Long studentsCountTotal = (null == row[3]) ? 0 : ((BigInteger) row[3]).longValue();
-                Long studentsCountYoung = (null == row[4]) ? 0 : ((BigInteger) row[4]).longValue();
-                Long studentsCountMiddle = (null == row[5]) ? 0 : ((BigInteger) row[5]).longValue();
-                Long studentsCountOld = (null == row[6]) ? 0 : ((BigInteger) row[6]).longValue();
-                Long benefitStudentsCountYoung = (null == row[7]) ? 0 : ((BigInteger) row[7]).longValue();
-                Long beneftiStudentsCountMiddle = (null == row[8]) ? 0 : ((BigInteger) row[8]).longValue();
-                Long benefitStudentsCountOld = (null == row[9]) ? 0 : ((BigInteger) row[9]).longValue();
-                Long benefitStudentsCountTotal = (null == row[10]) ? 0 : ((BigInteger) row[10]).longValue();
-                Long employeeCount = (null == row[11]) ? 0 : ((BigInteger) row[11]).longValue();
-                String group = (String) row[12];
-                String foodType = (String) row[13];
-                String complexName = (String) row[14];
-                Long idOfOrderDetail = (null == row[15]) ? 0 : ((BigInteger) row[15]).longValue();
-                Long idOfClient = (null == row[16]) ? 0 : ((BigInteger) row[16]).longValue();
-                Long price = (null == row[17]) ? 0 : ((BigInteger) row[17]).longValue();
-                EmployeeItem employeeItem = employeeItemHashMap.get(idOfOrg);
-                itemList.add(
-                        new CoverageNutritionReportItem(schoolName, schoolAddress, studentsCountTotal, studentsCountYoung,
-                                studentsCountMiddle, studentsCountOld, benefitStudentsCountYoung,
-                                beneftiStudentsCountMiddle, benefitStudentsCountOld, benefitStudentsCountTotal,
-                                employeeCount, group, foodType, complexName + priceFormat(price), idOfOrderDetail,
-                                idOfClient, employeeItem.getComplexesCount(), employeeItem.getBuffetCount(),
-                                employeeItem.getAllFoodCount(), employeeItem.getPercentageOfActive()));
+                for (Object o : list) {
+                    Object[] row = (Object[]) o;
+                    Long idOfOrg = ((BigInteger) row[0]).longValue();
+                    String schoolName = (String) row[1];
+                    String schoolAddress = (String) row[2];
+                    Long studentsCountTotal = (null == row[3]) ? 0 : ((BigInteger) row[3]).longValue();
+                    Long studentsCountYoung = (null == row[4]) ? 0 : ((BigInteger) row[4]).longValue();
+                    Long studentsCountMiddle = (null == row[5]) ? 0 : ((BigInteger) row[5]).longValue();
+                    Long studentsCountOld = (null == row[6]) ? 0 : ((BigInteger) row[6]).longValue();
+                    Long benefitStudentsCountYoung = (null == row[7]) ? 0 : ((BigInteger) row[7]).longValue();
+                    Long beneftiStudentsCountMiddle = (null == row[8]) ? 0 : ((BigInteger) row[8]).longValue();
+                    Long benefitStudentsCountOld = (null == row[9]) ? 0 : ((BigInteger) row[9]).longValue();
+                    Long benefitStudentsCountTotal = (null == row[10]) ? 0 : ((BigInteger) row[10]).longValue();
+                    Long employeeCount = (null == row[11]) ? 0 : ((BigInteger) row[11]).longValue();
+                    String group = (String) row[12];
+                    String foodType = (String) row[13];
+                    String complexName = (String) row[14];
+                    Long idOfOrderDetail = (null == row[15]) ? 0 : ((BigInteger) row[15]).longValue();
+                    Long idOfClient = (null == row[16]) ? 0 : ((BigInteger) row[16]).longValue();
+                    Long price = (null == row[17]) ? 0 : ((BigInteger) row[17]).longValue();
+                    EmployeeItem employeeItem = employeeItemHashMap.get(idOfOrg);
+                    itemList.add(new CoverageNutritionReportItem(schoolName, schoolAddress, studentsCountTotal,
+                            studentsCountYoung, studentsCountMiddle, studentsCountOld, benefitStudentsCountYoung,
+                            beneftiStudentsCountMiddle, benefitStudentsCountOld, benefitStudentsCountTotal,
+                            employeeCount, group, foodType, complexName + priceFormat(price), idOfOrderDetail,
+                            idOfClient, employeeItem.getComplexesCount(), employeeItem.getBuffetCount(),
+                            employeeItem.getAllFoodCount(), employeeItem.getPercentageOfActive()));
+                }
             }
-
             return new JRBeanCollectionDataSource(itemList);
         }
 

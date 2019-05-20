@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CoverageNutritionReportTotalEmployees" pageWidth="3500" pageHeight="185" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="3500" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="CoverageNutritionReportTotalEmployees" pageWidth="2000" pageHeight="185" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="2000" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" isIgnorePagination="true" uuid="a2cb3d44-e974-4f58-a6f1-ac55e8d90923">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -9,7 +9,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.0000000000000004"/>
-	<property name="ireport.x" value="10"/>
+	<property name="ireport.x" value="1576"/>
 	<property name="ireport.y" value="0"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="003 Sample data xls"/>
 	<property name="net.sf.jasperreports.export.xls.ignore.cell.border" value="false"/>
@@ -190,7 +190,7 @@
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
 							<textField isStretchWithOverflow="true">
-								<reportElement uuid="de6e2908-9ec2-46fc-a569-f296d93e2454" style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="80" height="25"/>
+								<reportElement uuid="de6e2908-9ec2-46fc-a569-f296d93e2454" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="80" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{schoolName}]]></textFieldExpression>
 							</textField>
@@ -211,7 +211,7 @@
 					<crosstabRowHeader>
 						<cellContents>
 							<textField isStretchWithOverflow="true">
-								<reportElement uuid="c7c571fa-1dff-42f1-8649-d3c145002e84" style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="25"/>
+								<reportElement uuid="c7c571fa-1dff-42f1-8649-d3c145002e84" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{schoolAddress}]]></textFieldExpression>
 							</textField>
@@ -227,8 +227,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="cf403b74-d035-4c79-a83a-2756f7429a65" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="cf403b74-d035-4c79-a83a-2756f7429a65" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{studentsCountTotal}]]></textFieldExpression>
 							</textField>
@@ -244,8 +244,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="2aeaf291-d82b-49ef-8f28-78397b3a6806" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="2aeaf291-d82b-49ef-8f28-78397b3a6806" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{studentsCountYoung}]]></textFieldExpression>
 							</textField>
@@ -261,8 +261,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="f1ae8c22-8885-43a7-9560-7fca68fe58e0" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="f1ae8c22-8885-43a7-9560-7fca68fe58e0" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{studentsCountMiddle}]]></textFieldExpression>
 							</textField>
@@ -278,8 +278,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="55814637-58aa-4432-b061-8cc52ed1b72e" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="55814637-58aa-4432-b061-8cc52ed1b72e" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{studentsCountOld}]]></textFieldExpression>
 							</textField>
@@ -295,8 +295,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="48e2f215-b5d8-4521-8dba-bba37e7694f9" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="48e2f215-b5d8-4521-8dba-bba37e7694f9" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{benefitStudentsCountYoung}]]></textFieldExpression>
 							</textField>
@@ -312,8 +312,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="1bd62b91-3353-4bd6-a5a2-e2d694418b80" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="1bd62b91-3353-4bd6-a5a2-e2d694418b80" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{benefitStudentsCountMiddle}]]></textFieldExpression>
 							</textField>
@@ -329,8 +329,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="ed3d1900-711c-40e5-887d-1981fbe0d55c" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="ed3d1900-711c-40e5-887d-1981fbe0d55c" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{benefitStudentsCountOld}]]></textFieldExpression>
 							</textField>
@@ -346,8 +346,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="068217c6-9939-4e67-815b-859b4d8df373" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="068217c6-9939-4e67-815b-859b4d8df373" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{benefitStudentsCountTotal}]]></textFieldExpression>
 							</textField>
@@ -363,8 +363,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="2f89b403-2fbd-463a-b62d-fd3dfbefbe9e" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="2f89b403-2fbd-463a-b62d-fd3dfbefbe9e" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{employeeCount}]]></textFieldExpression>
 							</textField>
@@ -849,27 +849,27 @@
 				<measure name="totalActiveClientsMeasure" class="java.lang.Long" calculation="DistinctCount">
 					<measureExpression><![CDATA[$F{idOfClient}]]></measureExpression>
 				</measure>
-				<crosstabCell width="210" height="25">
+				<crosstabCell width="210" height="50">
 					<cellContents mode="Transparent">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
-						<textField>
-							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="70" y="0" width="70" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="70" y="0" width="70" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{idOfOrderDetailMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="0" y="0" width="70" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{idOfClientMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="140" y="0" width="70" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="140" y="0" width="70" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10"/>
 							</textElement>
@@ -888,26 +888,26 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="0" height="25" columnTotalGroup="complexName">
+				<crosstabCell width="0" height="50" columnTotalGroup="complexName">
 					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell width="360" height="25" columnTotalGroup="foodType">
+				<crosstabCell width="360" height="50" columnTotalGroup="foodType">
 					<cellContents backcolor="#BFE1FF" mode="Transparent">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
-						<textField>
-							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="0" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{idOfClientsPaidAndFreeMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="60" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="60" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{idOfOrderDetailPaidAndFreeMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="120" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="120" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[($V{group}.contains("1-4")) ?
     String.format("%.2f", $V{idOfClientsPaidAndFreeMeasure}.doubleValue() / ($V{studentsCountYoung}.doubleValue() + $V{benefitStudentsCountYoung}) * 100.f) :
@@ -916,13 +916,13 @@
 ($V{group}.contains("10-11")) ?
     String.format("%.2f", $V{idOfClientsPaidAndFreeMeasure}.doubleValue() / ($V{studentsCountOld}.doubleValue() + $V{benefitStudentsCountOld}) * 100.f) : "-"]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="180" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="180" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{idOfClientBuffetMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="300" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="300" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[($V{group}.contains("1-4")) ?
     String.format("%.2f", $V{idOfClientBuffetMeasure}.doubleValue() / ($V{studentsCountYoung}.doubleValue() + $V{benefitStudentsCountYoung}) * 100.f) :
@@ -931,173 +931,173 @@
 ($V{group}.contains("10-11")) ?
     String.format("%.2f", $V{idOfClientBuffetMeasure}.doubleValue() / ($V{studentsCountOld}.doubleValue() + $V{benefitStudentsCountOld}) * 100.f) : "-"]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="240" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="240" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{idOfOrderDetailBuffetMeasure}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="1441" height="25" columnTotalGroup="group">
+				<crosstabCell width="1441" height="50" columnTotalGroup="group">
 					<cellContents mode="Transparent">
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="1380" y="0" width="61" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="1380" y="0" width="61" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[String.format("%.2f", $V{employeePercentageOfActiveMeasure})]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="1020" y="0" width="80" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="1020" y="0" width="80" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalPaidClientsMeasure} + $V{totalFreeClientsMeasure} +
 $V{totalBuffetHotClientsMeasure} + $V{totalBuffetPaidClientsMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="960" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="960" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalBuffetHotCard} + $V{totalBuffetPaidCard}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="900" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="900" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalBuffetHotComplexesMeasure} + $V{totalBuffetPaidComplexesMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="840" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="840" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalBuffetClientsMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="780" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="780" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalBuffetPaidCard}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="720" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="720" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalBuffetPaidComplexesMeasure} == null ? 0L : $V{totalBuffetPaidComplexesMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="660" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="660" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalBuffetPaidClientsMeasure} == null ? 0L : $V{totalBuffetPaidClientsMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="600" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="600" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalBuffetHotCard}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="540" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="540" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalBuffetHotComplexesMeasure} == null ? 0L : $V{totalBuffetHotComplexesMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="480" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="480" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalBuffetHotClientsMeasure} == null ? 0L : $V{totalBuffetHotClientsMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="420" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="420" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[String.format("%.2f", new Long($V{totalPaidClientsMeasure} + $V{totalFreeClientsMeasure}).doubleValue() /
 $V{studentsCountTotal}.doubleValue() * 100.f)]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="360" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="360" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalPaidComplexesMeasure} + $V{totalFreeComplexesMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="300" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="300" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalPaidClientsMeasure} + $V{totalFreeClientsMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="240" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="240" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalFreeComplexesMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="180" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="180" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalFreeClientsMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="120" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="120" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalPaidCard}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="60" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="60" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalPaidComplexesMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="0" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{totalPaidClientsMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="1320" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="1320" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{employeeComplexesBuffetMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="1200" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="1200" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{employeeComplexesMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="1260" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="1260" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{employeeBuffetMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" x="1100" y="0" width="100" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="7d830acd-ac1c-4b5f-a1f7-138fce33c803" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="1100" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="8"/>
 							</textElement>
