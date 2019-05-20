@@ -155,6 +155,9 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 Boolean showOlderClasses, Boolean showEmployee, Boolean showFreeNutrition, Boolean showPaidNutrition,
                 Boolean showBuffet, Boolean showComplexesByOrgCard) throws Exception {
             List<Long> orgList = loadOrgList(session, idOfSourceOrgList, idOfOrgList);
+            if (orgList.isEmpty()) {
+                throw new Exception("Выберите организацию");
+            }
 
             HashMap<Long, EmployeeItem> employeeItemHashMap = loadEmployeesByOrgs(session, orgList, startDate, endDate);
             List<Long> managerList = Collections.EMPTY_LIST;

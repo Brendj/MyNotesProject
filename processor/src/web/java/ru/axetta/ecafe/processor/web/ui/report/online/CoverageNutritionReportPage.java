@@ -67,6 +67,10 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
             printError("Выберите организацию");
             return null;
         }
+        if (!checkFoodTypeAndGroups()) {
+            printError("Выберите хотя бы одну группу и один тип питания");
+            return null;
+        }
         CoverageNutritionReport.Builder builder = new CoverageNutritionReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
@@ -116,6 +120,10 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
         }
         if (idOfContragentOrgList.isEmpty() && idOfOrgList.isEmpty()) {
             printError("Выберите организацию");
+            return;
+        }
+        if (!checkFoodTypeAndGroups()) {
+            printError("Выберите хотя бы одну группу и один тип питания");
             return;
         }
         Date generateTime = new Date();
@@ -185,6 +193,23 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
             return null;
         }
         return templateFilename;
+    }
+
+    public Boolean enableFoodTypeCheckBoxes() {
+        return showYoungerClasses || showMiddleClasses || showOlderClasses || showEmployee;
+    }
+
+    public void onClassesChecked(ActionEvent event) {
+        if (!enableFoodTypeCheckBoxes()) {
+            showFreeNutrition = false;
+            showPaidNutrition = false;
+            showBuffet = false;
+        }
+    }
+
+    private Boolean checkFoodTypeAndGroups() {
+        return (showYoungerClasses || showMiddleClasses || showOlderClasses || showEmployee) && (showFreeNutrition
+                || showPaidNutrition || showBuffet);
     }
 
     private Properties buildProperties() {
