@@ -54,6 +54,7 @@ public class CycleDiagram extends DistributedObject{
     private InformationContents informationContent = InformationContents.ONLY_CURRENT_ORG;
     private SubscriptionFeedingType feedingType;
     private Integer startWeekPosition;
+    private Long idOfOrgLastChange;
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -198,6 +199,7 @@ public class CycleDiagram extends DistributedObject{
         setSaturdayPrice(XMLUtils.getStringAttributeValue(node, "SaturdayPrice", 255));
         setSunday(XMLUtils.getStringAttributeValue(node, "Sunday", 255));
         setSundayPrice(XMLUtils.getStringAttributeValue(node, "SundayPrice", 255));
+        setIdOfOrgLastChange(getIdOfSyncOrg());
         guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
         setSendAll(SendToAssociatedOrgs.SendToSelf);
         return this;
@@ -413,5 +415,13 @@ public class CycleDiagram extends DistributedObject{
 
     public void setStartWeekPosition(Integer startWeekPosition) {
         this.startWeekPosition = startWeekPosition;
+    }
+
+    public Long getIdOfOrgLastChange() {
+        return idOfOrgLastChange;
+    }
+
+    public void setIdOfOrgLastChange(Long idOfOrgLastChange) {
+        this.idOfOrgLastChange = idOfOrgLastChange;
     }
 }
