@@ -407,6 +407,10 @@
     <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.multiCardMode}" styleClass="output-text"
                              disabled="true"  readonly="true"/>
 
+    <h:outputText escape="true" value="Клиент может подтверждать групповые платежи (для сотрудников школы, отвечающих за работу с системой)" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.canConfirmGroupPayment}" styleClass="output-text"
+                             disabled="true"  readonly="true"/>
+
     <h:outputText escape="true" value="Дата и время подтверждения номера телефона" styleClass="output-text"
                  rendered="#{!mainPage.clientViewPage.isLastConfirmMobileEmpty()}" />
     <h:inputText value="#{mainPage.clientViewPage.lastConfirmMobile}" readonly="true" converter="timeConverter"

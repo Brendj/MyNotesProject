@@ -108,6 +108,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.parallel = parallel;
     }
 
+    public Boolean getCanConfirmGroupPayment() {
+        return canConfirmGroupPayment;
+    }
+
+    public void setCanConfirmGroupPayment(Boolean canConfirmGroupPayment) {
+        this.canConfirmGroupPayment = canConfirmGroupPayment;
+    }
+
     public static class PersonData {
 
         private final String firstName;
@@ -202,6 +210,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Boolean multiCardMode;
     private Boolean visitsSections;
     private String parallel;
+    private Boolean canConfirmGroupPayment;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -520,6 +529,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.lastConfirmMobile = client.getLastConfirmMobile();
         this.multiCardMode = client.activeMultiCardMode();
         this.clientDiscountItems = buildClientDiscountItem(session, client);
+        this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
 
         // опекуны
         // (Kadyrov D) 23.12.2011
