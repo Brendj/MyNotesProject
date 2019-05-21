@@ -6,24 +6,6 @@ package ru.axetta.ecafe.processor.core.persistence.orgsettings;
 
 import java.util.Date;
 
-/*
- *  CREATE TABLE CF_OrgSettings_Items(
- *  idOfOrgSettingItem BIGSERIAL NOT NULL,
- *  idOfOrgSetting BIGINT NOT NULL,
- *  createdDate BIGINT NOT NULL,
- *  lastUpdate BIGINT NOT NULL,
- *  settingType INTEGER NOT NULL,
- *  settingValue character varying(128),
- *  version BIGINT NOT NULL,
- *  CONSTRAINT cf_OrgSettingsItems_pk PRIMARY KEY(idOfOrgSettingItem),
- *  CONSTRAINT cf_OrgSettingsItems_uk UNIQUE(idOfOrgSetting, settingType), -- для одной группы одна настройка
- *  CONSTRAINT cf_OrgSettingsItems_org_fk FOREIGN KEY(idOfOrgSetting)
- *  REFERENCES CF_OrgSettings (idOfOrgSetting) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE
- *  );
- *
- *  CREATE INDEX CF_OrgSettings_Items_TYPE_GROUP_IDX ON CF_OrgSettings_Items USING btree (idOfOrgSetting, settingType);
- * */
-
 public class OrgSettingItem {
     private Long idOfOrgSettingItem;
     private OrgSetting orgSetting;

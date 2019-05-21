@@ -8,23 +8,6 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-/*
-*  CREATE TABLE CF_OrgSettings(
-*  idOfOrgSetting BIGSERIAL NOT NULL,
-*  idOfOrg BIGINT NOT NULL,
-*  createdDate BIGINT NOT NULL,
-*  lastUpdate BIGINT NOT NULL,
-*  settingGroup INTEGER NOT NULL,
-*  version BIGINT NOT NULL,
-*  CONSTRAINT cf_OrgSettings_pk PRIMARY KEY(idOfOrgSetting),
-*  CONSTRAINT cf_OrgSettings_uk UNIQUE(idOfOrg, settingGroup), -- для одной ОО одна группа
-*  CONSTRAINT cf_OrgSettings_org_fk FOREIGN KEY(idOfOrg)
-*  REFERENCES cf_Orgs (idOfOrg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE
-*  );
-*
-*  CREATE INDEX CF_OrgSettings_GROUP_ORG_IDX ON CF_OrgSettings USING btree (idOfOrg, settingGroup);
-* */
-
 public class OrgSetting {
     private Long idOfOrgSetting;
     private Long idOfOrg;
