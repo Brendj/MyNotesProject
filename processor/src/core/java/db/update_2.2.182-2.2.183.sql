@@ -37,5 +37,9 @@ REFERENCES CF_OrgSettings (idOfOrgSetting) MATCH SIMPLE ON UPDATE NO ACTION ON D
 
 CREATE INDEX CF_OrgSettings_Items_TYPE_GROUP_IDX ON CF_OrgSettings_Items USING btree (idOfOrgSetting, settingType);
 
+alter table cf_subscriber_feeding
+  add column idOfOrgLastChange bigint;
 
+alter table cf_clients_cycle_diagrams
+  add column idOfOrgLastChange bigint;
 
