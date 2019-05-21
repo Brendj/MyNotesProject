@@ -960,24 +960,6 @@
     <%--@elvariable id="preorderJournalReportPage" type="ru.axetta.ecafe.processor.web.ui.service.PreorderJournalReportPage"--%>
     <rich:panelMenuItem id="preorderJournalReport" binding="#{preorderJournalReportPage.mainMenuComponent}"
                         label="Журнал операций ВП" action="#{preorderJournalReportPage.show}" reRender="workspaceForm" />
-
-    <%--@elvariable id="coverageNutritionReportPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.CoverageNutritionReportPage"--%>
-    <rich:panelMenuItem id="coverageNutritionReport" binding="#{coverageNutritionReportPage.mainMenuComponent}"
-                        label="Отчет по охвату питания" action="#{coverageNutritionReportPage.show}" reRender="workspaceForm" />
-
-    <rich:panelMenuGroup id="kznClientsStatisticMenuGroup" label="Статистика по клиентам" reRender="workspaceForm">
-
-        <%--@elvariable id="kznClientsStatisticViewPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticViewPage"--%>
-        <rich:panelMenuItem id="kznClientsStatisticViewMenuItem" binding="#{kznClientsStatisticViewPage.mainMenuComponent}" label="Просмотр"
-                            action="#{kznClientsStatisticViewPage.show}" reRender="workspaceForm" />
-        <%--@elvariable id="kznClientsStatisticCreatePage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticCreatePage"--%>
-        <rich:panelMenuItem id="kznClientsStatisticCreateMenuItem" binding="#{kznClientsStatisticCreatePage.mainMenuComponent}" label="Создание"
-                            action="#{kznClientsStatisticCreatePage.show}" reRender="workspaceForm" />
-        <%--@elvariable id="kznClientsStatisticEditPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticEditPage"--%>
-        <rich:panelMenuItem id="kznClientsStatisticEditMenuItem" binding="#{kznClientsStatisticEditPage.mainMenuComponent}" label="Редактирование"
-                            action="#{kznClientsStatisticEditPage.show}" reRender="workspaceForm" />
-
-    </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"
@@ -1269,6 +1251,25 @@
                             label="Мониторинг" action="#{mainPage.showMonitoringOfReportPage}" reRender="workspaceForm" />
         <rich:panelMenuItem id="clientTransactionsReportMenuItem" binding="#{mainPage.clientTransactionsReportPage.mainMenuComponent}"
                             label="Транзакции клиента" action="#{mainPage.showClientTransactionsReportPage}" reRender="workspaceForm" />
+        <a4j:support event="onclick" action="#{mainPage.showBudgetFoodGroupMenu}" reRender="workspaceForm" />
+        <rich:panelMenuGroup id="coverageNutritionReportGroupMenu" label="Отчет по охвату питания">
+            <%--@elvariable id="coverageNutritionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CoverageNutritionReportPage"--%>
+            <rich:panelMenuItem id="coverageNutritionReport" binding="#{coverageNutritionReportPage.mainMenuComponent}"
+                                label="Отчет по охвату питания" action="#{coverageNutritionReportPage.show}" reRender="workspaceForm" />
+
+            <rich:panelMenuGroup id="kznClientsStatisticMenuGroup" label="Статистика по клиентам" reRender="workspaceForm">
+
+                <%--@elvariable id="kznClientsStatisticViewPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticViewPage"--%>
+                <rich:panelMenuItem id="kznClientsStatisticViewMenuItem" binding="#{kznClientsStatisticViewPage.mainMenuComponent}" label="Просмотр"
+                                    action="#{kznClientsStatisticViewPage.show}" reRender="workspaceForm" />
+                <%--@elvariable id="kznClientsStatisticCreatePage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticCreatePage"--%>
+                <rich:panelMenuItem id="kznClientsStatisticCreateMenuItem" binding="#{kznClientsStatisticCreatePage.mainMenuComponent}" label="Создание"
+                                    action="#{kznClientsStatisticCreatePage.show}" reRender="workspaceForm" />
+                <%--@elvariable id="kznClientsStatisticEditPage" type="ru.axetta.ecafe.processor.web.ui.service.kzn.KznClientsStatisticEditPage"--%>
+                <rich:panelMenuItem id="kznClientsStatisticEditMenuItem" binding="#{kznClientsStatisticEditPage.mainMenuComponent}" label="Редактирование"
+                                    action="#{kznClientsStatisticEditPage.show}" reRender="workspaceForm" />
+            </rich:panelMenuGroup>
+        </rich:panelMenuGroup>
     </rich:panelMenuGroup>
 
     <%--@elvariable id="clientBalanceHoldPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ClientBalanceHoldPage"--%>
