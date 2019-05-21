@@ -13,7 +13,7 @@ lastUpdate BIGINT NOT NULL,
 settingGroup INTEGER NOT NULL,
 version BIGINT NOT NULL,
 CONSTRAINT cf_OrgSettings_pk PRIMARY KEY(idOfOrgSetting),
-CONSTRAINT cf_OrgSettings_uk UNIQUE(idOfOrg, settingGroup), -- для одной ОО одна группа
+CONSTRAINT cf_OrgSettings_uk UNIQUE(idOfOrg, settingGroup),
 CONSTRAINT cf_OrgSettings_org_fk FOREIGN KEY(idOfOrg)
 REFERENCES cf_Orgs (idOfOrg) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE
 );
@@ -30,16 +30,19 @@ settingType INTEGER NOT NULL,
 settingValue character varying(128),
 version BIGINT NOT NULL,
 CONSTRAINT cf_OrgSettingsItems_pk PRIMARY KEY(idOfOrgSettingItem),
-CONSTRAINT cf_OrgSettingsItems_uk UNIQUE(idOfOrgSetting, settingType), -- для одной группы одна настройка
+CONSTRAINT cf_OrgSettingsItems_uk UNIQUE(idOfOrgSetting, settingType),
 CONSTRAINT cf_OrgSettingsItems_org_fk FOREIGN KEY(idOfOrgSetting)
 REFERENCES CF_OrgSettings (idOfOrgSetting) MATCH SIMPLE ON UPDATE NO ACTION ON DELETE CASCADE
 );
 
 CREATE INDEX CF_OrgSettings_Items_TYPE_GROUP_IDX ON CF_OrgSettings_Items USING btree (idOfOrgSetting, settingType);
 
+--ид ОО последних изменений
 alter table cf_subscriber_feeding
   add column idOfOrgLastChange bigint;
 
+--ид ОО последних изменений
 alter table cf_clients_cycle_diagrams
   add column idOfOrgLastChange bigint;
 
+--! ФИНАЛИЗИРОВАН 21.05.2019, НЕ МЕНЯТЬ
