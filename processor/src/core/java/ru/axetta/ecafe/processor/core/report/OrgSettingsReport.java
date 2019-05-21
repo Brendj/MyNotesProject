@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.FeedingSetting;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgSync;
-import ru.axetta.ecafe.processor.core.persistence.OrganizationStatus;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -126,13 +125,12 @@ public class OrgSettingsReport extends BasicReportForListOrgsJob{
                 } else {
                     orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
                 }
-
             }
 
             if(statusCondition.equals(SERVICED)){
-                orgCriteria.add(Restrictions.eq("status", OrganizationStatus.ACTIVE));
+                orgCriteria.add(Restrictions.eq("state", Org.ACTIVE_STATE));
             } else if(statusCondition.equals(NOT_SERVISED)){
-                orgCriteria.add(Restrictions.not(Restrictions.eq("status", OrganizationStatus.ACTIVE)));
+                orgCriteria.add(Restrictions.eq("state", Org.INACTIVE_STATE));
             }
 
             if(!StringUtils.isEmpty(selectedDistricts)){
