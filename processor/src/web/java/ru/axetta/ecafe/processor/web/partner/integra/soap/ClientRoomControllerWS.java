@@ -3384,6 +3384,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 enterEventWithRepItem.setChildPassCheckerContractId(checker.getContractId());
                 enterEventWithRepItem.setChildPassChecker(checker.getPerson().getFullName());
             }
+            enterEventWithRepItem.setChildPassCheckerMethod(enterEvent.getChildPassChecker());
             enterEventWithRepList.getE().add(enterEventWithRepItem);
         }
         data.setEnterEventWithRepList(enterEventWithRepList);
@@ -3459,6 +3460,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             final Long guardianId = enterEvent.getGuardianId();
             if (guardianId != null) {
                 enterEventItem.setGuardianSan(guardianSan.get(guardianId));
+            }
+            enterEventItem.setChildPassCheckerMethod(enterEvent.getChildPassChecker());
+            final Long checkerId = enterEvent.getChildPassCheckerId();
+            if (checkerId != null) {
+                Client checker = DAOUtils.findClient(session, checkerId);
+                enterEventItem.setChildPassChecker(checker.getPerson().getFullName());
             }
             enterEventList.getE().add(enterEventItem);
         }
