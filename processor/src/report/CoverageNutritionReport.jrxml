@@ -9,7 +9,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.0000000000000004"/>
-	<property name="ireport.x" value="393"/>
+	<property name="ireport.x" value="93"/>
 	<property name="ireport.y" value="0"/>
 	<property name="com.jaspersoft.studio.data.defaultdataadapter" value="003 Sample data xls"/>
 	<style name="table">
@@ -52,7 +52,8 @@
 	<parameter name="OVERRIDE_GroupComparator" class="java.util.Comparator"/>
 	<parameter name="OVERRIDE_FoodTypeComparator" class="java.util.Comparator"/>
 	<parameter name="test" class="java.lang.String"/>
-	<field name="schoolNumber" class="java.lang.Integer"/>
+	<field name="schoolName" class="java.lang.String"/>
+	<field name="schoolAddress" class="java.lang.String"/>
 	<field name="studentsCountTotal" class="java.lang.Long"/>
 	<field name="studentsCountYoung" class="java.lang.Long"/>
 	<field name="studentsCountMiddle" class="java.lang.Long"/>
@@ -96,66 +97,73 @@
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
-							<text><![CDATA[№ школы]]></text>
+							<text><![CDATA[Название ОО]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="80" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="80" y="0" width="180" height="160"/>
+							<textElement textAlignment="Center" verticalAlignment="Middle">
+								<font size="10" isBold="true"/>
+							</textElement>
+							<text><![CDATA[Адрес ОО]]></text>
+						</staticText>
+						<staticText>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="260" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Общее количество учащихся]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="180" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="360" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество учащихся 1-4 классов]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="280" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="460" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество учащихся 5-9 классов]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="380" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="560" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество учащихся 10-11 классов]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="880" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="1060" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество сотрудников, администрации и прочих групп]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="680" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="860" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество льготников 10-11 классы]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="580" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="760" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество льготников 5-9 классы]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="480" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="660" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
 							<text><![CDATA[Количество льготников 1-4 классы]]></text>
 						</staticText>
 						<staticText>
-							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="780" y="0" width="100" height="160"/>
+							<reportElement uuid="9e1e4cb2-8d0c-430f-8531-8d00581820ae" style="table" x="960" y="0" width="100" height="160"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10" isBold="true"/>
 							</textElement>
@@ -163,19 +171,19 @@
 						</staticText>
 					</cellContents>
 				</crosstabHeaderCell>
-				<rowGroup name="schoolNumber" width="80" totalPosition="End">
-					<bucket class="java.lang.Integer">
-						<bucketExpression><![CDATA[$F{schoolNumber}]]></bucketExpression>
+				<rowGroup name="schoolName" width="80" totalPosition="End">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{schoolName}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents backcolor="#F0F8FF" mode="Transparent">
 							<box>
 								<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 							</box>
-							<textField>
-								<reportElement uuid="de6e2908-9ec2-46fc-a569-f296d93e2454" style="table" x="0" y="0" width="80" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="de6e2908-9ec2-46fc-a569-f296d93e2454" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="80" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
-								<textFieldExpression><![CDATA[$V{schoolNumber}]]></textFieldExpression>
+								<textFieldExpression><![CDATA[$V{schoolName}]]></textFieldExpression>
 							</textField>
 						</cellContents>
 					</crosstabRowHeader>
@@ -187,14 +195,31 @@
 						</cellContents>
 					</crosstabTotalRowHeader>
 				</rowGroup>
+				<rowGroup name="schoolAddress" width="180" totalPosition="End">
+					<bucket class="java.lang.String">
+						<bucketExpression><![CDATA[$F{schoolAddress}]]></bucketExpression>
+					</bucket>
+					<crosstabRowHeader>
+						<cellContents>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="8ca251e7-24ad-4f6e-94ed-892761d6a267" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="180" height="50" isPrintWhenDetailOverflows="true"/>
+								<textElement textAlignment="Center" verticalAlignment="Middle"/>
+								<textFieldExpression><![CDATA[$V{schoolAddress}]]></textFieldExpression>
+							</textField>
+						</cellContents>
+					</crosstabRowHeader>
+					<crosstabTotalRowHeader>
+						<cellContents/>
+					</crosstabTotalRowHeader>
+				</rowGroup>
 				<rowGroup name="studentsCountTotal" width="100" totalPosition="End">
 					<bucket class="java.lang.Long">
 						<bucketExpression><![CDATA[$F{studentsCountTotal}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="cf403b74-d035-4c79-a83a-2756f7429a65" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="cf403b74-d035-4c79-a83a-2756f7429a65" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{studentsCountTotal}]]></textFieldExpression>
 							</textField>
@@ -210,8 +235,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="2aeaf291-d82b-49ef-8f28-78397b3a6806" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="2aeaf291-d82b-49ef-8f28-78397b3a6806" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{studentsCountYoung}]]></textFieldExpression>
 							</textField>
@@ -227,8 +252,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="f1ae8c22-8885-43a7-9560-7fca68fe58e0" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="f1ae8c22-8885-43a7-9560-7fca68fe58e0" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{studentsCountMiddle}]]></textFieldExpression>
 							</textField>
@@ -244,8 +269,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="55814637-58aa-4432-b061-8cc52ed1b72e" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="55814637-58aa-4432-b061-8cc52ed1b72e" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{studentsCountOld}]]></textFieldExpression>
 							</textField>
@@ -261,8 +286,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="48e2f215-b5d8-4521-8dba-bba37e7694f9" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="48e2f215-b5d8-4521-8dba-bba37e7694f9" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{benefitStudentsCountYoung}]]></textFieldExpression>
 							</textField>
@@ -278,8 +303,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="1bd62b91-3353-4bd6-a5a2-e2d694418b80" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="1bd62b91-3353-4bd6-a5a2-e2d694418b80" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{benefitStudentsCountMiddle}]]></textFieldExpression>
 							</textField>
@@ -295,8 +320,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="ed3d1900-711c-40e5-887d-1981fbe0d55c" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="ed3d1900-711c-40e5-887d-1981fbe0d55c" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{benefitStudentsCountOld}]]></textFieldExpression>
 							</textField>
@@ -312,8 +337,8 @@
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="068217c6-9939-4e67-815b-859b4d8df373" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="068217c6-9939-4e67-815b-859b4d8df373" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{benefitStudentsCountTotal}]]></textFieldExpression>
 							</textField>
@@ -323,14 +348,14 @@
 						<cellContents mode="Transparent"/>
 					</crosstabTotalRowHeader>
 				</rowGroup>
-				<rowGroup name="employeeCount" width="100" totalPosition="End">
+				<rowGroup name="employeeCount" width="101" totalPosition="End">
 					<bucket class="java.lang.Long">
 						<bucketExpression><![CDATA[$F{employeeCount}]]></bucketExpression>
 					</bucket>
 					<crosstabRowHeader>
 						<cellContents mode="Transparent">
-							<textField>
-								<reportElement uuid="2f89b403-2fbd-463a-b62d-fd3dfbefbe9e" style="table" x="0" y="0" width="100" height="25"/>
+							<textField isStretchWithOverflow="true">
+								<reportElement uuid="2f89b403-2fbd-463a-b62d-fd3dfbefbe9e" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="100" height="50" isPrintWhenDetailOverflows="true"/>
 								<textElement textAlignment="Center" verticalAlignment="Middle"/>
 								<textFieldExpression><![CDATA[$V{employeeCount}]]></textFieldExpression>
 							</textField>
@@ -540,27 +565,27 @@
 				<measure name="employeePercentageOfActiveMeasure" class="java.lang.Double" calculation="First">
 					<measureExpression><![CDATA[$F{employeePercentageOfActive}]]></measureExpression>
 				</measure>
-				<crosstabCell width="210" height="25">
+				<crosstabCell width="210" height="50">
 					<cellContents mode="Transparent">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
-						<textField>
-							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="70" y="0" width="70" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="70" y="0" width="70" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{idOfOrderDetailMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="0" y="0" width="70" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="70" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10"/>
 							</textElement>
 							<textFieldExpression><![CDATA[$V{idOfClientMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" x="140" y="0" width="70" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="aa8acbed-e6cb-4036-b06a-dc1822b9e1aa" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="140" y="0" width="70" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle">
 								<font size="10"/>
 							</textElement>
@@ -579,26 +604,26 @@
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="0" height="25" columnTotalGroup="complexName">
+				<crosstabCell width="0" height="50" columnTotalGroup="complexName">
 					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell width="360" height="25" columnTotalGroup="foodType">
+				<crosstabCell width="360" height="50" columnTotalGroup="foodType">
 					<cellContents backcolor="#BFE1FF" mode="Transparent">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
-						<textField>
-							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="0" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="0" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{idOfClientsPaidAndFreeMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="60" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="60" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{idOfOrderDetailPaidAndFreeMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="120" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="120" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[($V{group}.contains("1-4")) ?
     String.format("%.2f", $V{idOfClientsPaidAndFreeMeasure}.doubleValue() / ($V{studentsCountYoung}.doubleValue() + $V{benefitStudentsCountYoung}) * 100.f) :
@@ -607,13 +632,13 @@
 ($V{group}.contains("10-11")) ?
     String.format("%.2f", $V{idOfClientsPaidAndFreeMeasure}.doubleValue() / ($V{studentsCountOld}.doubleValue() + $V{benefitStudentsCountOld}) * 100.f) : "-"]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="180" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="180" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{idOfClientBuffetMeasure}]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="300" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="300" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[($V{group}.contains("1-4")) ?
     String.format("%.2f", $V{idOfClientBuffetMeasure}.doubleValue() / ($V{studentsCountYoung}.doubleValue() + $V{benefitStudentsCountYoung}) * 100.f) :
@@ -622,14 +647,14 @@
 ($V{group}.contains("10-11")) ?
     String.format("%.2f", $V{idOfClientBuffetMeasure}.doubleValue() / ($V{studentsCountOld}.doubleValue() + $V{benefitStudentsCountOld}) * 100.f) : "-"]]></textFieldExpression>
 						</textField>
-						<textField>
-							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" x="240" y="0" width="60" height="25"/>
+						<textField isStretchWithOverflow="true">
+							<reportElement uuid="4e291d4a-189a-4004-8083-819d03513285" style="table" positionType="Float" stretchType="RelativeToTallestObject" x="240" y="0" width="60" height="50" isPrintWhenDetailOverflows="true"/>
 							<textElement textAlignment="Center" verticalAlignment="Middle"/>
 							<textFieldExpression><![CDATA[$V{idOfOrderDetailBuffetMeasure}]]></textFieldExpression>
 						</textField>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="0" height="25" columnTotalGroup="group">
+				<crosstabCell width="0" height="50" columnTotalGroup="group">
 					<cellContents mode="Transparent"/>
 				</crosstabCell>
 				<crosstabCell width="210" height="0" rowTotalGroup="employeeCount">
@@ -740,25 +765,37 @@
 				<crosstabCell width="0" height="0" rowTotalGroup="studentsCountTotal" columnTotalGroup="group">
 					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell width="210" height="0" rowTotalGroup="schoolNumber">
+				<crosstabCell width="210" height="0" rowTotalGroup="schoolName">
 					<cellContents backcolor="#BFE1FF" mode="Transparent">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="complexName">
+				<crosstabCell width="0" height="0" rowTotalGroup="schoolName" columnTotalGroup="complexName">
 					<cellContents mode="Transparent"/>
 				</crosstabCell>
-				<crosstabCell width="360" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="foodType">
+				<crosstabCell width="360" height="0" rowTotalGroup="schoolName" columnTotalGroup="foodType">
 					<cellContents backcolor="#BFE1FF" mode="Transparent">
 						<box>
 							<pen lineWidth="0.5" lineStyle="Solid" lineColor="#000000"/>
 						</box>
 					</cellContents>
 				</crosstabCell>
-				<crosstabCell width="0" height="0" rowTotalGroup="schoolNumber" columnTotalGroup="group">
+				<crosstabCell width="0" height="0" rowTotalGroup="schoolName" columnTotalGroup="group">
 					<cellContents mode="Transparent"/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="schoolAddress">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="schoolAddress" columnTotalGroup="group">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="schoolAddress" columnTotalGroup="foodType">
+					<cellContents/>
+				</crosstabCell>
+				<crosstabCell height="0" rowTotalGroup="schoolAddress" columnTotalGroup="complexName">
+					<cellContents/>
 				</crosstabCell>
 			</crosstab>
 		</band>

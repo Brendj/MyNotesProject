@@ -119,6 +119,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.parallel = parallel;
     }
 
+    public Boolean getCanConfirmGroupPayment() {
+        return canConfirmGroupPayment;
+    }
+
+    public void setCanConfirmGroupPayment(Boolean canConfirmGroupPayment) {
+        this.canConfirmGroupPayment = canConfirmGroupPayment;
+    }
+
     public static class OrgItem {
 
         private final Long idOfOrg;
@@ -314,6 +322,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private String balanceHold;
     private Boolean inOrgEnabledMultiCardMode;
     private String parallel;
+    private Boolean canConfirmGroupPayment;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -1229,6 +1238,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.inOrgEnabledMultiCardMode = client.getOrg().multiCardModeIsEnabled();
         this.parallel = StringUtils.defaultString(client.getParallel());
         this.clientDiscountItems = ClientViewPage.buildClientDiscountItem(session, client);
+        this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
     }
 
     public String getIdOfCategoryListString() {

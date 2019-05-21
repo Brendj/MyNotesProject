@@ -2,7 +2,7 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.service.kzn;
+package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import net.sf.jasperreports.engine.JRExporterParameter;
 import net.sf.jasperreports.engine.export.*;
@@ -13,7 +13,6 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.kzn.CoverageNutritionReport;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
-import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportWithContragentPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -68,6 +67,10 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
             printError("Выберите организацию");
             return null;
         }
+        if (!checkFoodTypeAndGroups()) {
+            printError("Выберите хотя бы одну группу и один тип питания");
+            return null;
+        }
         CoverageNutritionReport.Builder builder = new CoverageNutritionReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
@@ -117,6 +120,10 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
         }
         if (idOfContragentOrgList.isEmpty() && idOfOrgList.isEmpty()) {
             printError("Выберите организацию");
+            return;
+        }
+        if (!checkFoodTypeAndGroups()) {
+            printError("Выберите хотя бы одну группу и один тип питания");
             return;
         }
         Date generateTime = new Date();
@@ -186,6 +193,23 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
             return null;
         }
         return templateFilename;
+    }
+
+    public Boolean enableFoodTypeCheckBoxes() {
+        return showYoungerClasses || showMiddleClasses || showOlderClasses || showEmployee;
+    }
+
+    public void onClassesChecked(ActionEvent event) {
+        if (!enableFoodTypeCheckBoxes()) {
+            showFreeNutrition = false;
+            showPaidNutrition = false;
+            showBuffet = false;
+        }
+    }
+
+    private Boolean checkFoodTypeAndGroups() {
+        return (showYoungerClasses || showMiddleClasses || showOlderClasses || showEmployee) && (showFreeNutrition
+                || showPaidNutrition || showBuffet);
     }
 
     private Properties buildProperties() {
@@ -288,6 +312,6 @@ public class CoverageNutritionReportPage extends OnlineReportWithContragentPage 
 
     @Override
     public String getPageFilename() {
-        return "service/kzn/coverage_nutrition_report";
+        return "report/online/coverage_nutrition_report";
     }
 }

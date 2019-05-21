@@ -82,8 +82,8 @@ public class FunctionSelector {
     private static final String[] notAdminFunctions = new String[]{
             "cardRprts", "clientRprts", "clientsBenefitsRprt", "electronicReconciliationRprt", "enterEventRprt",
             "financialControl", "informRprts", "onlineRprtActivity", "onlineRprtBenefit", "onlineRprtComplex",
-            "onlineRprtMeals", "onlineRprtRefill", "onlineRprtRequest", "paidFood", "salesRprt", "statisticDifferences",
-            "subscriptionFeeding", "totalServicesRprt", "transactionsRprt"};
+            "onlineRprtCoverageNutrition", "onlineRprtMeals", "onlineRprtRefill", "onlineRprtRequest", "paidFood",
+            "salesRprt", "statisticDifferences", "subscriptionFeeding", "totalServicesRprt", "transactionsRprt"};
     private static final String[] securityAdminFunctions = new String[]{
             "viewUser", "editUser", "deleteUser", "workOption"};
 
@@ -178,7 +178,7 @@ public class FunctionSelector {
                     .equalsIgnoreCase(Function.FUNC_RULE_VIEW) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_REPORT_EDIT) || function.getFunctionName()
                     .equalsIgnoreCase(Function.FUNC_COMMODITY_ACCOUNTING)
-                    /*|| function.getFunctionName().equalsIgnoreCase(Function.FUNC_RESTRICT_MANUAL_REPORT)*/) {
+                /*|| function.getFunctionName().equalsIgnoreCase(Function.FUNC_RESTRICT_MANUAL_REPORT)*/) {
                 supplierFunctions.add(function);
             }
         }
@@ -228,8 +228,7 @@ public class FunctionSelector {
         for (Object object : allFunctions) {
             Function function = (Function) object;
 
-            if (function.getFunctionName()
-                    .equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT)) {
+            if (function.getFunctionName().equalsIgnoreCase(Function.FUNC_WORK_ONLINE_REPORT)) {
                 supplierReportFunctions.add(function);
             }
         }
@@ -293,7 +292,8 @@ public class FunctionSelector {
                 cardItems.add(item);
             } else if (item.getFunctionName().equals("commAcc")) {
                 wayBillItems.add(item);
-            } else if (item.getFunctionName().equals("servAdm") || item.getFunctionName().equals("servClnt") || item.getFunctionName().equals("servSupp")) {
+            } else if (item.getFunctionName().equals("servAdm") || item.getFunctionName().equals("servClnt") || item
+                    .getFunctionName().equals("servSupp")) {
                 serviceItems.add(item);
             } else if (item.getFunctionName().equals("monitor")) {
                 monitorItems.add(item);
@@ -301,8 +301,8 @@ public class FunctionSelector {
                 repositoryItems.add(item);
             } else if (item.getFunctionName().equals("helpdesk")) {
                 helpdeskItems.add(item);
-            } else if (item.getFunctionName().equals("workOption") || item.getFunctionName().equals("catEdit") ||
-                    item.getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
+            } else if (item.getFunctionName().equals("workOption") || item.getFunctionName().equals("catEdit") || item
+                    .getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
                     .getFunctionName().equals("ruleView") || item.getFunctionName().equals("reportEdit") || item
                     .getFunctionName().equals("reportView") || item.getFunctionName().equals("supplier")) {
                 optionsItems.add(item);
@@ -317,9 +317,11 @@ public class FunctionSelector {
                     || item.getFunctionName().equals("salesRprt") || item.getFunctionName().equals("enterEventRprt")
                     || item.getFunctionName().equals("totalServicesRprt") || item.getFunctionName()
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
-                    .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") ||
-                    item.getFunctionName().equals("feedingSettingsSupplier") || item.getFunctionName().equals("feedingSettingsAdmin")
-                    || item.getFunctionName().equals("manualRprt") || item.getFunctionName().equals("messageARMinOO")) {
+                    .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") || item
+                    .getFunctionName().equals("feedingSettingsSupplier") || item.getFunctionName()
+                    .equals("feedingSettingsAdmin") || item.getFunctionName().equals("manualRprt") || item
+                    .getFunctionName().equals("messageARMinOO") || item.getFunctionName()
+                    .equals("onlineRprtCoverageNutrition")) {
                 onlineReportItems.add(item);
             }
         }
@@ -340,7 +342,7 @@ public class FunctionSelector {
         this.monitorItems = monitorItems;
         this.repositoryItems = repositoryItems;
         this.helpdeskItems = helpdeskItems;
-        this.optionsItems =optionsItems;
+        this.optionsItems = optionsItems;
         Collections.sort(optionsItems);
     }
 
@@ -418,8 +420,8 @@ public class FunctionSelector {
                     item.setSelected(true);
                 }
                 helpdeskItems.add(item);
-            } else if (item.getFunctionName().equals("workOption") || item.getFunctionName().equals("catEdit") ||
-                    item.getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
+            } else if (item.getFunctionName().equals("workOption") || item.getFunctionName().equals("catEdit") || item
+                    .getFunctionName().equals("catView") || item.getFunctionName().equals("ruleEdit") || item
                     .getFunctionName().equals("ruleView") || item.getFunctionName().equals("reportEdit") || item
                     .getFunctionName().equals("reportView") || item.getFunctionName().equals("supplier")) {
                 if (selectedFunctions != null && selectedFunctions.contains(function)) {
@@ -437,9 +439,11 @@ public class FunctionSelector {
                     || item.getFunctionName().equals("salesRprt") || item.getFunctionName().equals("enterEventRprt")
                     || item.getFunctionName().equals("totalServicesRprt") || item.getFunctionName()
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
-                    .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") ||
-                    item.getFunctionName().equals("feedingSettingsSupplier") || item.getFunctionName().equals("feedingSettingsAdmin")
-                    || item.getFunctionName().equals("manualRprt") || item.getFunctionName().equals("messageARMinOO")) {
+                    .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") || item
+                    .getFunctionName().equals("feedingSettingsSupplier") || item.getFunctionName()
+                    .equals("feedingSettingsAdmin") || item.getFunctionName().equals("manualRprt") || item
+                    .getFunctionName().equals("messageARMinOO") || item.getFunctionName()
+                    .equals("onlineRprtCoverageNutrition")) {
                 if (selectedFunctions != null && selectedFunctions.contains(function)) {
                     item.setSelected(true);
                 }
@@ -463,7 +467,7 @@ public class FunctionSelector {
         this.monitorItems = monitorItems;
         this.repositoryItems = repositoryItems;
         this.helpdeskItems = helpdeskItems;
-        this.optionsItems =optionsItems;
+        this.optionsItems = optionsItems;
         Collections.sort(optionsItems);
     }
 
