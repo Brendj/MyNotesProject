@@ -56,7 +56,7 @@
         <property name="saturdayPrice" column="saturdayPrice" type="string" length="255" />
         <property name="sunday" column="sunday" type="string" length="255" />
         <property name="sundayPrice" column="sundayPrice" type="string" length="255" />
-        <property name="idOfOrgLastChange" column="idOfOrgLastChange" type="Long"/>
+        <property name="idOfOrgLastChange" column="idOfOrgLastChange" type="long"/>
 
         <property name="feedingType" column="FeedingType">
             <type name="org.hibernate.type.EnumType">

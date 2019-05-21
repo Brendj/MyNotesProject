@@ -35,7 +35,7 @@
         <!-- End Global params -->
 
         <property name="orgOwner" column="OrgOwner" type="long"/>
-        <property name="idOfOrgLastChange" column="idOfOrgLastChange" type="Long"/>
+        <property name="idOfOrgLastChange" column="idOfOrgLastChange" type="long"/>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client"
                      column="IdOfClient" not-null="false"/>
 
