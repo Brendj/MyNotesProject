@@ -538,6 +538,7 @@ public class OtherActionsPage extends OnlineReportPage {
             return;
         }
         RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).runTask(params);
+        printMessage("Операция по созданию заявок выполнена");
     }
 
     public void runApplicationForFoodProcessingService() throws Exception {
