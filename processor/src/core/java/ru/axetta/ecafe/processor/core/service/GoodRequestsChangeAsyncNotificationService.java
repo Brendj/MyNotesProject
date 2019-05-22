@@ -433,18 +433,7 @@ public class GoodRequestsChangeAsyncNotificationService {
             LOGGER.error("IdOfOrg: " + orgItem.getIdOfOrg() + " reportJob is null");
         }
         if (StringUtils.isNotEmpty(htmlReport)) {
-            boolean modifyTypeEdit = htmlReport.contains("#FF6666");
-            boolean modifyTypeCreate = htmlReport.contains("#92D050");
-            String reportType;
-            if (modifyTypeCreate && modifyTypeEdit) {
-                reportType = "ОП";
-            } else if (modifyTypeCreate) {
-                reportType = "НП";
-            } else if (modifyTypeEdit) {
-                reportType = "КП";
-            } else {
-                return;
-            }
+            String reportType = "НП";
 
             String[] values = {
                     "address", orgItem.getAddress(), "shortOrgName", orgItem.getShortName(), "reportValues", htmlReport,
