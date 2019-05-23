@@ -153,6 +153,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                     }
                     List<String> guids = new ArrayList<String>();
                     for (Date dateWork : orgDates) {
+                        guids.clear();
                         if (getOrgGoodRequestByDate(idOfOrg, dateWork, doneOrgGoodRequests) != null && params.isEmpty()) {
                             logger.info(String.format("Requests for orgID=%s on date=%s already exist", idOfOrg, CalendarUtils.dateToString(dateWork)));
                             continue;
@@ -191,16 +192,6 @@ public class PreorderRequestsReportService extends RecoverableService {
                                 }
                             }
 
-                            if (guids.size() > 0) {
-                                logger.info(String.format("Sending requests to orgID=%s, count=%s", idOfOrg, guids.size()));
-                                Calendar calendarEnd = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
-                                final Date lastCreateOrUpdateDate = calendarEnd.getTime();
-                                calendarEnd.add(Calendar.MINUTE, 1);
-                                final Date endGenerateTime = calendarEnd.getTime();
-                                RuntimeContext.getAppContext().getBean(GoodRequestsChangeAsyncNotificationService.class)
-                                        .notifyOrg(orgItem, fireTime, endGenerateTime, lastCreateOrUpdateDate, dateWork);
-                            }
-
                             OrgGoodRequest orgGoodRequest = new OrgGoodRequest(idOfOrg, dateWork);
                             session.save(orgGoodRequest);
                         } catch (Exception e) {
@@ -209,6 +200,15 @@ public class PreorderRequestsReportService extends RecoverableService {
                         } finally {
                             if (transaction.isActive()) transaction.commit();
                             transaction = null;
+                        }
+                        if (guids.size() > 0) {
+                            logger.info(String.format("Sending requests to orgID=%s, count=%s", idOfOrg, guids.size()));
+                            Calendar calendarEnd = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
+                            final Date lastCreateOrUpdateDate = calendarEnd.getTime();
+                            calendarEnd.add(Calendar.MINUTE, 1);
+                            final Date endGenerateTime = calendarEnd.getTime();
+                            RuntimeContext.getAppContext().getBean(GoodRequestsChangeAsyncNotificationService.class)
+                                    .notifyOrg(orgItem, fireTime, endGenerateTime, lastCreateOrUpdateDate, dateWork);
                         }
                     }
 
