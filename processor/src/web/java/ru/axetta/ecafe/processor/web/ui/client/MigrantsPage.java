@@ -20,8 +20,6 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.ProjectionList;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -126,22 +124,20 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
 
     public List<Migrant> getMigrantItems(Session session, Long idOfOrg, String guid, Date startDate, Date endDate,
             Boolean ignoreDates, List<Long> clientIDList, Integer migrantType){
-        Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
-        criteria.createAlias("migrant", "m");
-        criteria.createAlias("m.clientMigrate", "clientMigrate");
-        ProjectionList projectionList = Projections.projectionList();
-        projectionList.add(Projections.property("migrant"));
-        criteria.setProjection(projectionList);
+
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.createAlias("visitReqResolutionHists", "v");
+        criteria.createAlias("clientMigrate", "clientMigrate");
 
         if(!ignoreDates){
-            criteria.add(Restrictions.lt("resolutionDateTime", endDate));
-            criteria.add(Restrictions.gt("resolutionDateTime", startDate));
+            criteria.add(Restrictions.lt("v.resolutionDateTime", endDate));
+            criteria.add(Restrictions.gt("v.resolutionDateTime", startDate));
         }
 
         if(migrantType.equals(TYPE_CREATED)){
-            criteria.add(Restrictions.eq("resolution",  VisitReqResolutionHist.RES_CREATED));
+            criteria.add(Restrictions.eq("v.resolution", VisitReqResolutionHist.RES_CREATED));
         } else if(migrantType.equals(TYPE_ACTIVE)){
-            criteria.add(Restrictions.eq("resolution", VisitReqResolutionHist.RES_CONFIRMED));
+            criteria.add(Restrictions.eq("v.resolution", VisitReqResolutionHist.RES_CONFIRMED));
         } else if(migrantType.equals(TYPE_INACTIVE)){
             List<Integer> inactiveTypes = Arrays.asList(
                     VisitReqResolutionHist.RES_REJECTED,
@@ -149,11 +145,11 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
                     VisitReqResolutionHist.RES_OVERDUE,
                     VisitReqResolutionHist.RES_OVERDUE_SERVER
             );
-            criteria.add(Restrictions.in("resolution", inactiveTypes));
+            criteria.add(Restrictions.in("v.resolution", inactiveTypes));
         }
         if (idOfOrg != null) {
-            Criterion orgVisitCondition = Restrictions.eq("m.orgVisit.idOfOrg", idOfOrg);
-            Criterion orgRegistryCondition = Restrictions.eq("m.orgRegistry.idOfOrg", idOfOrg);
+            Criterion orgVisitCondition = Restrictions.eq("orgVisit.idOfOrg", idOfOrg);
+            Criterion orgRegistryCondition = Restrictions.eq("orgRegistry.idOfOrg", idOfOrg);
             criteria.add(Restrictions.or(orgRegistryCondition, orgVisitCondition));
         }
         if (!StringUtils.isEmpty(guid)) {
