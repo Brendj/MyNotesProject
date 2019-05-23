@@ -413,17 +413,7 @@ public class RNIPLoadPaymentsService {
     }
 
     protected String getRNIPUrl() {
-        RNIPVersion version = RNIPVersion.getType(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION));
-        String url = null;
-        switch (version) {
-            case RNIP_V115:
-                url = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL);
-                break;
-            case RNIP_V116:
-                url = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116);
-                break;
-        }
-        return url;
+        return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL);
     }
 
 
@@ -462,6 +452,8 @@ public class RNIPLoadPaymentsService {
                 return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsService", RNIPLoadPaymentsService.class);
             case RNIP_V116:
                 return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV116", RNIPLoadPaymentsServiceV116.class);
+            case RNIP_V20:
+                return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV20", RNIPLoadPaymentsServiceV20.class);
         }
         return null;
     }

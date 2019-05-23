@@ -1,6 +1,8 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import com.sun.org.apache.xpath.internal.XPathAPI;
+import ru.CryptoPro.JCP.JCP;
+
 import org.apache.ws.security.message.WSSecHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,38 +33,39 @@ import javax.xml.transform.stream.StreamSource;
 import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
-import java.io.*;
+import java.io.ByteArrayInputStream;
+import java.io.InputStream;
+import java.io.StringWriter;
 import java.security.KeyStore;
 import java.security.PrivateKey;
 import java.security.Provider;
 import java.security.Security;
 import java.security.cert.X509Certificate;
 import java.util.*;
-import ru.CryptoPro.JCP.JCP;
 
 public class RNIPSecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> {
 
     private static final Logger logger = LoggerFactory.getLogger(RNIPSecuritySOAPHandler.class);
 
-    private static final String WS_SECURITY_SECEXT_URI =
+    protected static final String WS_SECURITY_SECEXT_URI =
             "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-secext-1.0.xsd";
-    private static final String WS_SECURITY_UTILITY_URI =
+    protected static final String WS_SECURITY_UTILITY_URI =
             "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-wssecurity-utility-1.0.xsd";
-    private static final String ENCODING_TYPE_ATTRIBUTE =
+    protected static final String ENCODING_TYPE_ATTRIBUTE =
             "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-soap-message-security-1.0#Base64Binary";
-    private static final String VALUE_TYPE_ATTRIBUTE =
+    protected static final String VALUE_TYPE_ATTRIBUTE =
             "http://docs.oasis-open.org/wss/2004/01/oasis-200401-wss-x509-token-profile-1.0#X509v3";
 
-    private static final String MESSAGE_NS = "http://smev.gosuslugi.ru/rev120315";
-    private static final String NS_SMEV = "http://roskazna.ru/gisgmp/02000000/SmevGISGMPService/";
-    private static final String NS_INC = "http://www.w3.org/2004/08/xop/include";
+    protected static final String MESSAGE_NS = "http://smev.gosuslugi.ru/rev120315";
+    protected static final String NS_SMEV = "http://roskazna.ru/gisgmp/02000000/SmevGISGMPService/";
+    protected static final String NS_INC = "http://www.w3.org/2004/08/xop/include";
 
-    private IRNIPMessageToLog messageLogger;
-    private String containerAlias;
-    private String containerPassword;
-    private static PrivateKey privateKey;
-    private static KeyStore keyStore;
-    private static X509Certificate cert;
+    protected IRNIPMessageToLog messageLogger;
+    protected String containerAlias;
+    protected String containerPassword;
+    protected static PrivateKey privateKey;
+    protected static KeyStore keyStore;
+    protected static X509Certificate cert;
 
 
     public  RNIPSecuritySOAPHandler(String containerAlias, String containerPassword, IRNIPMessageToLog messageLogger) {

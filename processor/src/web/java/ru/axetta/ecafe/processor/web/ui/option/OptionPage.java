@@ -114,6 +114,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean smsFailureTestingMode;
     private String rnipProcessorInstance;
     private String RNIPPaymentsURL_v116;
+    private String RNIPPaymentsURL_v20;
     private String RNIPPaymentsWorkingVersion;
     private Boolean NotifyByPushNewClients;
     private Boolean NotifyByEmailNewClients;
@@ -130,7 +131,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean logInfoService;
     private String methodsInfoService;
 
-    private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString()};
+    private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString(), RNIPVersion.RNIP_V20.toString()};
 
     private List<BankOptionItem> banks;
 
@@ -903,6 +904,7 @@ public class OptionPage extends BasicWorkspacePage {
         smsFailureTestingMode = runtimeContext.getOptionValueBool(Option.OPTION_SMS_FAILURE_TESTING_MODE);
         rnipProcessorInstance = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE);
         RNIPPaymentsURL_v116 = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116);
+        RNIPPaymentsURL_v20 = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V20);
         RNIPPaymentsWorkingVersion = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION);
         setNotifyByPushNewClients(runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS));
         setNotifyByEmailNewClients(runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS));
@@ -1051,6 +1053,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_SMS_FAILURE_TESTING_MODE, smsFailureTestingMode);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PROCESSOR_INSTANCE, rnipProcessorInstance);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116, RNIPPaymentsURL_v116);
+            runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V20, RNIPPaymentsURL_v20);
             runtimeContext.setOptionValue(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION, RNIPPaymentsWorkingVersion);
             runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS, getNotifyByPushNewClients());
             runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS, getNotifyByEmailNewClients());
@@ -1134,6 +1137,14 @@ public class OptionPage extends BasicWorkspacePage {
         } else {
             this.validRegistryDate = validRegistryDate;
         }
+    }
+
+    public String getRNIPPaymentsURL_v20() {
+        return RNIPPaymentsURL_v20;
+    }
+
+    public void setRNIPPaymentsURL_v20(String RNIPPaymentsURL_v20) {
+        this.RNIPPaymentsURL_v20 = RNIPPaymentsURL_v20;
     }
 
     public Integer getReviseSourceType() {

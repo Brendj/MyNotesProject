@@ -1,4 +1,3 @@
-
 package generated.ru.mos.rnip.xsd.organization._2_0;
 
 import javax.xml.bind.annotation.*;
@@ -44,6 +43,8 @@ public class OrganizationType {
     protected String kpp;
     @XmlAttribute(name = "ogrn")
     protected String ogrn;
+    @XmlAttribute(name = "oktmo")
+    private String oktmo;
 
     /**
      * Gets the value of the name property.
@@ -141,4 +142,11 @@ public class OrganizationType {
         this.ogrn = value;
     }
 
+    public String getOktmo() {
+        return oktmo;
+    }
+
+    public void setOktmo(String oktmo) {
+        this.oktmo = oktmo;
+    }
 }

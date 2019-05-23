@@ -116,7 +116,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         return null;
     }
 
-    private IRNIPMessageToLog getPacketLogger(final Contragent contragent) {
+    protected IRNIPMessageToLog getPacketLogger(final Contragent contragent) {
         return new IRNIPMessageToLog() {
             @Override
             public void LogPacket(String message, int message_type) throws Exception {
@@ -262,6 +262,11 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
             logger.error(String.format("Error call RNIP service: %s", e.getMessage()));
             return null;
         }
+    }
+
+    @Override
+    protected String getRNIPUrl() {
+        return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116);
     }
 
     @Override
@@ -792,7 +797,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         return null;
     }
 
-    private String getMacroPart(Contragent contragent, String part) {
+    protected String getMacroPart(Contragent contragent, String part) {
 
         if (part.equals("CONTRAGENT_ID")) {
             String id = getRNIPIdFromRemarks(contragent.getRemarks());

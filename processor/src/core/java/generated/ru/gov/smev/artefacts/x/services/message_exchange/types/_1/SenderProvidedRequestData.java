@@ -1,4 +1,3 @@
-
 package generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1;
 
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.*;
@@ -66,7 +65,8 @@ import java.util.List;
     "attachmentHeaderList",
     "refAttachmentHeaderList",
     "businessProcessMetadata",
-    "testMessage"
+    "testMessage",
+    "sender"
 })
 @XmlRootElement(name = "SenderProvidedRequestData")
 public class SenderProvidedRequestData {
@@ -94,6 +94,8 @@ public class SenderProvidedRequestData {
     protected SenderProvidedRequestData.BusinessProcessMetadata businessProcessMetadata;
     @XmlElement(name = "TestMessage")
     protected Void testMessage;
+    @XmlElement(name = "Sender")
+    protected MessageMetadata.Sender sender;
     @XmlAttribute(name = "Id")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
@@ -386,6 +388,14 @@ public class SenderProvidedRequestData {
      */
     public void setId(String value) {
         this.id = value;
+    }
+
+    public MessageMetadata.Sender getSender() {
+        return sender;
+    }
+
+    public void setSender(MessageMetadata.Sender sender) {
+        this.sender = sender;
     }
 
 

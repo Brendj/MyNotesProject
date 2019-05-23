@@ -1,4 +1,3 @@
-
 package generated.ru.mos.rnip.xsd.catalog._2_0;
 
 import generated.ru.mos.rnip.xsd.common._2_0.*;
@@ -121,7 +120,7 @@ public class ServiceType {
     protected DescriptionParametersType paymentParameters;
     @XmlElement(name = "CurrenciesServices")
     protected ServiceType.CurrenciesServices currenciesServices;
-    @XmlElement(name = "Payee", namespace = "http://rnip.mos.ru/xsd/Organization/2.0.1", required = true)
+    @XmlElement(name = "Payee", namespace = "http://rnip.mos.ru/xsd/Catalog/2.0.1", required = true)
     protected Payee payee;
     @XmlElement(name = "MinAmount")
     protected Money minAmount;
