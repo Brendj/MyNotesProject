@@ -72,10 +72,14 @@
                            converter="dateConverter" inputClass="input-text" showWeeksBar="false">
             </rich:calendar>
 
-            <h:outputText escape="true" value="Показывать архивные заявки" styleClass="output-text" />
+            <h:outputText escape="true" value="Строить за всё время" styleClass="output-text" />
             <h:selectBooleanCheckbox id="showAllMigrants"
-                                     value="#{migrantsPage.showAllMigrants}"
+                                     value="#{migrantsPage.ignoreDates}"
                                      styleClass="output-text" />
+            <h:outputText escape="true" value="Тип заявок" styleClass="output-text" />
+            <h:selectOneMenu value="#{migrantsPage.migrantType}" style="width:180px;">
+                <f:selectItems value="#{migrantsPage.migrantTypes}" />
+            </h:selectOneMenu>
         </h:panelGrid>
 
         <h:panelGrid columns="2" styleClass="borderless-grid">

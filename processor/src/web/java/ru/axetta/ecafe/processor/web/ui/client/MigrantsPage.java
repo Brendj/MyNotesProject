@@ -5,30 +5,32 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Migrant;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.VisitReqResolutionHist;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.MigrantItem;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Criterion;
+import org.hibernate.criterion.ProjectionList;
+import org.hibernate.criterion.Projections;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.annotation.PostConstruct;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import javax.faces.model.SelectItem;
+import java.util.*;
 
 /**
  * Created by i.semenov on 01.02.2018.
@@ -36,6 +38,10 @@ import java.util.List;
 @Component
 @Scope("session")
 public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.CompleteHandler {
+    private static final int TYPE_ALL = 0;
+    private static final int TYPE_CREATED = 1;
+    private static final int TYPE_ACTIVE = 2;
+    private static final int TYPE_INACTIVE = 3;
 
     Logger logger = LoggerFactory.getLogger(MigrantsPage.class);
 
@@ -45,8 +51,19 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
     private String orgName;
     private String guid;
     private List<MigrantItem> items = new ArrayList<MigrantItem>();
-    private Boolean showAllMigrants;
     private MigrantItem currentItem;
+    private Boolean ignoreDates;
+    private Integer migrantType = TYPE_ALL;
+    private List<SelectItem> migrantTypes = initMigrantType();
+
+    private List<SelectItem> initMigrantType() {
+        List<SelectItem> filters = new ArrayList<SelectItem>(4);
+        filters.add(new SelectItem(TYPE_ALL, "Все"));
+        filters.add(new SelectItem(TYPE_CREATED, "Созданные"));
+        filters.add(new SelectItem(TYPE_ACTIVE, "Активные"));
+        filters.add(new SelectItem(TYPE_INACTIVE, "Неактивные"));
+        return filters;
+    }
 
     protected String filterClient = "Не выбрано";
 
@@ -86,17 +103,13 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
-            List orgs = new ArrayList<Long>();
-            if (idOfOrg != null) {
-                orgs.add(idOfOrg);
-            }
 
             List<Long> clientIDList = new ArrayList<Long>();
             for (ClientSelectListPage.Item item : clientList) {
                 clientIDList.add(item.getIdOfClient());
             }
 
-            List<Migrant> list = MigrantsUtils.getAllMigrantsForOrgsByDate(session, orgs, guid, startDate, endDate, showAllMigrants, clientIDList);
+            List<Migrant> list = getMigrantItems(session, idOfOrg, guid, startDate, endDate, ignoreDates, clientIDList, migrantType);
             items.clear();
             for (Migrant migrant : list) {
                 MigrantItem item = new MigrantItem(session, migrant);
@@ -111,11 +124,53 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
         }
     }
 
+    public List<Migrant> getMigrantItems(Session session, Long idOfOrg, String guid, Date startDate, Date endDate,
+            Boolean ignoreDates, List<Long> clientIDList, Integer migrantType){
+        Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
+        criteria.createAlias("migrant", "m");
+        criteria.createAlias("m.clientMigrate", "clientMigrate");
+        ProjectionList projectionList = Projections.projectionList();
+        projectionList.add(Projections.property("migrant"));
+        criteria.setProjection(projectionList);
+
+        if(!ignoreDates){
+            criteria.add(Restrictions.lt("resolutionDateTime", endDate));
+            criteria.add(Restrictions.gt("resolutionDateTime", startDate));
+        }
+
+        if(migrantType.equals(TYPE_CREATED)){
+            criteria.add(Restrictions.eq("resolution",  VisitReqResolutionHist.RES_CREATED));
+        } else if(migrantType.equals(TYPE_ACTIVE)){
+            criteria.add(Restrictions.eq("resolution", VisitReqResolutionHist.RES_CONFIRMED));
+        } else if(migrantType.equals(TYPE_INACTIVE)){
+            List<Integer> inactiveTypes = Arrays.asList(
+                    VisitReqResolutionHist.RES_REJECTED,
+                    VisitReqResolutionHist.RES_CANCELED,
+                    VisitReqResolutionHist.RES_OVERDUE,
+                    VisitReqResolutionHist.RES_OVERDUE_SERVER
+            );
+            criteria.add(Restrictions.in("resolution", inactiveTypes));
+        }
+        if (idOfOrg != null) {
+            Criterion orgVisitCondition = Restrictions.eq("m.orgVisit.idOfOrg", idOfOrg);
+            Criterion orgRegistryCondition = Restrictions.eq("m.orgRegistry.idOfOrg", idOfOrg);
+            criteria.add(Restrictions.or(orgRegistryCondition, orgVisitCondition));
+        }
+        if (!StringUtils.isEmpty(guid)) {
+            criteria.add(Restrictions.ilike("clientMigrate.clientGUID", guid));
+        }
+        if (!clientIDList.isEmpty()) {
+            criteria.add(Restrictions.in("clientMigrate.idOfClient", clientIDList));
+        }
+
+        return criteria.list();
+    }
+
     public void updateFilter() {
         try {
             update();
         } catch (Exception e) {
-            printMessage("Во время обновления данных произошла ошибка: " + e.getMessage());
+            printError("Во время обновления данных произошла ошибка: " + e.getMessage());
             logger.error("Error loading migrants: ", e);
         }
     }
@@ -124,8 +179,9 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
         this.orgName = "";
         this.idOfOrg = null;
         this.guid = "";
-        this.showAllMigrants = false;
+        this.ignoreDates = false;
         this.items.clear();
+        this.migrantType = TYPE_ALL;
     }
 
     public void disableMigrantRequest() {
@@ -195,14 +251,6 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
         this.orgName = orgName;
     }
 
-    public Boolean getShowAllMigrants() {
-        return showAllMigrants;
-    }
-
-    public void setShowAllMigrants(Boolean showAllMigrants) {
-        this.showAllMigrants = showAllMigrants;
-    }
-
     public MigrantItem getCurrentItem() {
         return currentItem;
     }
@@ -240,5 +288,29 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
 
     public void setFilterClient(String filterClient) {
         this.filterClient = filterClient;
+    }
+
+    public Boolean getIgnoreDates() {
+        return ignoreDates;
+    }
+
+    public void setIgnoreDates(Boolean ignoreDates) {
+        this.ignoreDates = ignoreDates;
+    }
+
+    public Integer getMigrantType() {
+        return migrantType;
+    }
+
+    public void setMigrantType(Integer migrantType) {
+        this.migrantType = migrantType;
+    }
+
+    public List<SelectItem> getMigrantTypes() {
+        return migrantTypes;
+    }
+
+    public void setMigrantTypes(List<SelectItem> migrantTypes) {
+        this.migrantTypes = migrantTypes;
     }
 }
