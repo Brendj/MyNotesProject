@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.service;
 
 import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.SMEVMessageExchangePortType;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.SMEVMessageExchangeService;
-import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.MessageMetadata;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.SendRequestRequest;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.SendRequestResponse;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.SenderProvidedRequestData;
@@ -37,14 +36,14 @@ import java.util.UUID;
 /**
  * Created by nuc on 17.10.2018.
  */
-@Component("RNIPLoadPaymentsServiceV20")
+@Component("RNIPLoadPaymentsServiceV21")
 @Scope("singleton")
-public class RNIPLoadPaymentsServiceV20 extends RNIPLoadPaymentsServiceV116 {
+public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
 
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RNIPLoadPaymentsServiceV20.class);
-    private static SMEVMessageExchangeService service20;
-    private static SMEVMessageExchangePortType port20;
-    private static BindingProvider bindingProvider20;
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RNIPLoadPaymentsServiceV21.class);
+    private static SMEVMessageExchangeService service21;
+    private static SMEVMessageExchangePortType port21;
+    private static BindingProvider bindingProvider21;
     private final static ThreadLocal<String> hasError = new ThreadLocal<String>(){
         @Override protected String initialValue() { return null; }
     };
@@ -88,7 +87,7 @@ public class RNIPLoadPaymentsServiceV20 extends RNIPLoadPaymentsServiceV116 {
     }
 
     public SendRequestResponse executeModifyCatalog20(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
-        InitRNIP20Service();
+        InitRNIP21Service();
 
         String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
         String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
@@ -96,7 +95,7 @@ public class RNIPLoadPaymentsServiceV20 extends RNIPLoadPaymentsServiceV116 {
         //final RNIPSecuritySOAPHandler pfrSecuritySOAPHandler = new RNIPSecuritySOAPHandler(alias, pass, getPacketLogger(contragent));
         final List<Handler> handlerChain = new ArrayList<Handler>();
         handlerChain.add(pfrSecuritySOAPHandler);
-        bindingProvider20.getBinding().setHandlerChain(handlerChain);
+        bindingProvider21.getBinding().setHandlerChain(handlerChain);
 
         generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.ObjectFactory requestObjectFactory =
                 new generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.ObjectFactory();
@@ -107,7 +106,7 @@ public class RNIPLoadPaymentsServiceV20 extends RNIPLoadPaymentsServiceV116 {
 
         senderProvidedRequestData.setMessageID(UUID.randomUUID().toString());
 
-        MessageMetadata.Sender sender = requestObjectFactory.createMessageMetadataSender();
+        SenderProvidedRequestData.Sender sender = requestObjectFactory.createSenderProvidedRequestDataSender();
         sender.setMnemonic(getMacroPart(contragent, "CONTRAGENT_ID"));
         senderProvidedRequestData.setSender(sender);
 
@@ -116,8 +115,8 @@ public class RNIPLoadPaymentsServiceV20 extends RNIPLoadPaymentsServiceV116 {
         MessagePrimaryContent messagePrimaryContent = messagePrimaryObjectFactory.createMessagePrimaryContent();
         senderProvidedRequestData.setMessagePrimaryContent(messagePrimaryContent);
 
-        generated.ru.mos.rnip.xsd.services.import_catalog._2_0.ObjectFactory importCatalogObjectFactory =
-                new generated.ru.mos.rnip.xsd.services.import_catalog._2_0.ObjectFactory();
+        generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ObjectFactory importCatalogObjectFactory =
+                new generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ObjectFactory();
         ImportCatalogRequest importCatalogRequest = importCatalogObjectFactory.createImportCatalogRequest();
         importCatalogRequest.setId(String.format("I_%s", UUID.randomUUID()));
         importCatalogRequest.setTimestamp(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(
@@ -125,7 +124,7 @@ public class RNIPLoadPaymentsServiceV20 extends RNIPLoadPaymentsServiceV116 {
         importCatalogRequest.setSenderIdentifier(getMacroPart(contragent, "CONTRAGENT_ID"));
         messagePrimaryContent.setImportCatalogRequest(importCatalogRequest);
 
-        generated.ru.mos.rnip.xsd.catalog._2_0.ObjectFactory serviceCatalogObjectFactory = new generated.ru.mos.rnip.xsd.catalog._2_0.ObjectFactory();
+        generated.ru.mos.rnip.xsd.catalog._2_1.ObjectFactory serviceCatalogObjectFactory = new generated.ru.mos.rnip.xsd.catalog._2_1.ObjectFactory();
         ServiceCatalogType serviceCatalogType = serviceCatalogObjectFactory.createServiceCatalogType();
         importCatalogRequest.setServiceCatalog(serviceCatalogType);
         serviceCatalogType.setId(String.format("I_%s", UUID.randomUUID().toString()));
@@ -133,7 +132,7 @@ public class RNIPLoadPaymentsServiceV20 extends RNIPLoadPaymentsServiceV116 {
         serviceCatalogType.setRevisionDate(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(
                 RuntimeContext.getInstance().getDefaultLocalCalendar(null).getTime()));
 
-        generated.ru.mos.rnip.xsd.catalog._2_0.ObjectFactory serviceTypeObjectFactory = new generated.ru.mos.rnip.xsd.catalog._2_0.ObjectFactory();
+        generated.ru.mos.rnip.xsd.catalog._2_1.ObjectFactory serviceTypeObjectFactory = new generated.ru.mos.rnip.xsd.catalog._2_1.ObjectFactory();
         ServiceType serviceType = serviceTypeObjectFactory.createServiceType();
         serviceType.setCode("AAAA" + getMacroPart(contragent, "CONTRAGENT_ID") + "0000000001");
         serviceType.setDesc("Услуги по оплате питания учеников в образовательных учреждениях");
@@ -299,15 +298,15 @@ public class RNIPLoadPaymentsServiceV20 extends RNIPLoadPaymentsServiceV116 {
         currenciesServices.getCurrencyCode().add(CurrencyCodeType.RUR);
         serviceType.setCurrenciesServices(currenciesServices);
 
-        generated.ru.mos.rnip.xsd.organization._2_0.ObjectFactory payeeObjectFactory = new generated.ru.mos.rnip.xsd.organization._2_0.ObjectFactory();
-        generated.ru.mos.rnip.xsd.organization._2_0.Payee payee = payeeObjectFactory.createPayee();
+        //generated.ru.mos.rnip.xsd.catalog._2_1.ObjectFactory payeeObjectFactory = new ObjectFactory();
+        generated.ru.mos.rnip.xsd.catalog._2_1.ServiceType.Payee payee = new ServiceType.Payee();
         payee.setInn(getMacroPart(contragent, "INN"));
         payee.setKpp(getMacroPart(contragent, "KPP"));
         payee.setOgrn(getMacroPart(contragent, "OGRN"));
         payee.setOktmo(getMacroPart(contragent, "OKTMO"));
         payee.setName(getMacroPart(contragent, "CONTRAGENT_NAME"));
 
-        generated.ru.mos.rnip.xsd.common._2_0.ObjectFactory orgAccountObjectFactory = new generated.ru.mos.rnip.xsd.common._2_0.ObjectFactory();
+        generated.ru.mos.rnip.xsd.common._2_1.ObjectFactory orgAccountObjectFactory = new generated.ru.mos.rnip.xsd.common._2_1.ObjectFactory();
         OrgAccount orgAccount = orgAccountObjectFactory.createOrgAccount();
         orgAccount.setAccountNumber(getMacroPart(contragent, "FINANCE_ACCOUNT"));
         BankType bankType = orgAccountObjectFactory.createBankType();
@@ -319,7 +318,7 @@ public class RNIPLoadPaymentsServiceV20 extends RNIPLoadPaymentsServiceV116 {
         serviceType.setPayee(payee);
         serviceType.setPaymentKind(BigInteger.valueOf(1L));
 
-        generated.ru.mos.rnip.xsd.common._2_0.ObjectFactory moneyObjectFactory = new generated.ru.mos.rnip.xsd.common._2_0.ObjectFactory();
+        generated.ru.mos.rnip.xsd.common._2_1.ObjectFactory moneyObjectFactory = new generated.ru.mos.rnip.xsd.common._2_1.ObjectFactory();
         Money minMoney = moneyObjectFactory.createMoney();
         minMoney.setCurrency(CurrencyCodeType.RUR);
         minMoney.setExponent(BigInteger.valueOf(2L));
@@ -348,7 +347,7 @@ public class RNIPLoadPaymentsServiceV20 extends RNIPLoadPaymentsServiceV116 {
         }*/
 
         try {
-            SendRequestResponse response = port20.sendRequest(sendRequestRequest);
+            SendRequestResponse response = port21.sendRequest(sendRequestRequest);
             hasError.set(null);
             return response;
         } catch (Exception e) {
@@ -358,13 +357,13 @@ public class RNIPLoadPaymentsServiceV20 extends RNIPLoadPaymentsServiceV116 {
         return null;
     }
 
-    private void InitRNIP20Service() throws MalformedURLException {
-        if (port20 == null) {
-            service20 = new SMEVMessageExchangeService();
-            port20 = service20.getSMEVMessageExchangeEndpoint();
-            bindingProvider20 = (BindingProvider) port20;
+    private void InitRNIP21Service() throws MalformedURLException {
+        if (port21 == null) {
+            service21 = new SMEVMessageExchangeService();
+            port21 = service21.getSMEVMessageExchangeEndpoint();
+            bindingProvider21 = (BindingProvider) port21;
             URL endpoint = new URL(getRNIPUrl());
-            setEndpointAddress(bindingProvider20, endpoint.toString());
+            setEndpointAddress(bindingProvider21, endpoint.toString());
         }
     }
 

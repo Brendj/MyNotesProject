@@ -131,7 +131,7 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean logInfoService;
     private String methodsInfoService;
 
-    private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString(), RNIPVersion.RNIP_V20.toString()};
+    private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString(), RNIPVersion.RNIP_V21.toString()};
 
     private List<BankOptionItem> banks;
 
