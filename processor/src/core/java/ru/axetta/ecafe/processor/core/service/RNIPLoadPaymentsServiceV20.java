@@ -11,9 +11,9 @@ import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.Send
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.SendRequestResponse;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.SenderProvidedRequestData;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.MessagePrimaryContent;
-import generated.ru.mos.rnip.xsd.catalog._2_0.*;
-import generated.ru.mos.rnip.xsd.common._2_0.*;
-import generated.ru.mos.rnip.xsd.services.import_catalog._2_0.ImportCatalogRequest;
+import generated.ru.mos.rnip.xsd.catalog._2_1.*;
+import generated.ru.mos.rnip.xsd.common._2_1.*;
+import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogRequest;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
