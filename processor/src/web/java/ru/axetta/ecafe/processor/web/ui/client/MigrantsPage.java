@@ -16,11 +16,9 @@ import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Criterion;
-import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -124,42 +122,63 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
 
     public List<Migrant> getMigrantItems(Session session, Long idOfOrg, String guid, Date startDate, Date endDate,
             Boolean ignoreDates, List<Long> clientIDList, Integer migrantType){
+        String inactiveTypes = StringUtils.join(Arrays.asList(
+                VisitReqResolutionHist.RES_REJECTED,
+                VisitReqResolutionHist.RES_CANCELED,
+                VisitReqResolutionHist.RES_OVERDUE,
+                VisitReqResolutionHist.RES_OVERDUE_SERVER
+        ), ", ");
+        String strQuery = "SELECT m FROM Migrant AS m "
+                + " JOIN m.visitReqResolutionHists AS v "
+                + " WHERE ";
 
-        Criteria criteria = session.createCriteria(Migrant.class);
-        criteria.createAlias("visitReqResolutionHists", "v");
-        criteria.createAlias("clientMigrate", "clientMigrate");
+        boolean isFirstStatement = true;
+        if (idOfOrg != null) {
+            strQuery += " (m.orgVisit.idOfOrg = :idOfOrg OR m.orgRegistry.idOfOrg = :idOfOrg) ";
+            isFirstStatement = false;
+        }
+        if (!StringUtils.isEmpty(guid)) {
+            strQuery += isFirstStatement ? "" : " AND ";
+            strQuery += " clientMigrate.clientGUID LIKE " + guid;
+            isFirstStatement = false;
+        }
+        if (!clientIDList.isEmpty()) {
+            String clientIDListStr = StringUtils.join(clientIDList, ", ");
+            strQuery += isFirstStatement ? "" : " AND ";
+            strQuery += " clientMigrate.idOfClient LIKE (" + clientIDListStr + ")";
+        }
 
         if(!ignoreDates){
-            criteria.add(Restrictions.lt("v.resolutionDateTime", endDate));
-            criteria.add(Restrictions.gt("v.resolutionDateTime", startDate));
+            strQuery += " AND v.resolutionDateTime between :startDate AND :endDate ";
         }
 
         if(migrantType.equals(TYPE_CREATED)){
-            criteria.add(Restrictions.eq("v.resolution", VisitReqResolutionHist.RES_CREATED));
+            strQuery += "AND v.resolution = " + VisitReqResolutionHist.RES_CREATED
+                    + " AND NOT EXISTS ("
+                    + " FROM VisitReqResolutionHist AS vs WHERE (vs.resolution NOT IN (" + inactiveTypes + ") "
+                    + " OR vs.resolution = " + VisitReqResolutionHist.RES_CONFIRMED + ")"
+                    + " AND vs.compositeIdOfVisitReqResolutionHist = v.compositeIdOfVisitReqResolutionHist"
+                    + ") ";
         } else if(migrantType.equals(TYPE_ACTIVE)){
-            criteria.add(Restrictions.eq("v.resolution", VisitReqResolutionHist.RES_CONFIRMED));
+            strQuery += "AND v.resolution = " + VisitReqResolutionHist.RES_CONFIRMED
+                    + " AND NOT EXISTS ("
+                    + " FROM VisitReqResolutionHist AS vs WHERE vs.resolution NOT IN (" + inactiveTypes + ") "
+                    + " AND vs.compositeIdOfVisitReqResolutionHist = v.compositeIdOfVisitReqResolutionHist "
+                    + ")";
         } else if(migrantType.equals(TYPE_INACTIVE)){
-            List<Integer> inactiveTypes = Arrays.asList(
-                    VisitReqResolutionHist.RES_REJECTED,
-                    VisitReqResolutionHist.RES_CANCELED,
-                    VisitReqResolutionHist.RES_OVERDUE,
-                    VisitReqResolutionHist.RES_OVERDUE_SERVER
-            );
-            criteria.add(Restrictions.in("v.resolution", inactiveTypes));
-        }
-        if (idOfOrg != null) {
-            Criterion orgVisitCondition = Restrictions.eq("orgVisit.idOfOrg", idOfOrg);
-            Criterion orgRegistryCondition = Restrictions.eq("orgRegistry.idOfOrg", idOfOrg);
-            criteria.add(Restrictions.or(orgRegistryCondition, orgVisitCondition));
-        }
-        if (!StringUtils.isEmpty(guid)) {
-            criteria.add(Restrictions.ilike("clientMigrate.clientGUID", guid));
-        }
-        if (!clientIDList.isEmpty()) {
-            criteria.add(Restrictions.in("clientMigrate.idOfClient", clientIDList));
+            strQuery += "AND v.resolution in (" + inactiveTypes + ")";
         }
 
-        return criteria.list();
+        Query query = session.createQuery(strQuery);
+        if(idOfOrg != null){
+            query.setParameter("idOfOrg", idOfOrg);
+        }
+        if(!ignoreDates){
+            query.setParameter("startDate", startDate);
+            query.setParameter("endDate", endDate);
+        }
+
+        return query.list();
     }
 
     public void updateFilter() {

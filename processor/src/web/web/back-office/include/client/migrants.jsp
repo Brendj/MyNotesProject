@@ -1,19 +1,3 @@
-<%--
-  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
-  --%>
-
-<%--
-  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
-  --%>
-
-<%--
-  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
-  --%>
-
-<%--
-  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
-  --%>
-
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%--
   ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
