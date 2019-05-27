@@ -37,11 +37,16 @@
             <h:outputText styleClass="output-text" escape="true"
                           value=" {#{mainPage.migrantsReportPage.filter}}" />
         </h:panelGroup>
-
+        <h:outputText escape="true" value="Показывать заявки за всё время" styleClass="output-text" />
+        <h:selectBooleanCheckbox id="showAllMigrants"
+                                 value="#{mainPage.migrantsReportPage.showAllMigrants}"
+                                 styleClass="output-text">
+            <a4j:support event="onchange" reRender="migrantsReportPanelGrid" action="#{mainPage.migrantsReportPage.initDateFilter()}"/>
+        </h:selectBooleanCheckbox>
         <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
         <rich:calendar value="#{mainPage.migrantsReportPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text"
-                       showWeeksBar="false">
+                       showWeeksBar="false" readonly="#{mainPage.migrantsReportPage.showAllMigrants}">
             <a4j:support event="onchanged" reRender="endDateCalendar,migrantsReportPanelGrid"
                          actionListener="#{mainPage.migrantsReportPage.onReportPeriodChanged}" />
         </rich:calendar>
@@ -49,19 +54,23 @@
         <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
         <h:selectOneMenu id="endDatePeriodSelect"
                          value="#{mainPage.migrantsReportPage.periodTypeMenu.periodType}"
-                         styleClass="input-text" style="width: 250px;">
+                         styleClass="input-text" style="width: 250px;" readonly="#{mainPage.migrantsReportPage.showAllMigrants}">
             <f:converter converterId="periodTypeConverter" />
             <f:selectItems value="#{mainPage.migrantsReportPage.periodTypeMenu.items}" />
-            <a4j:support event="onchange" reRender="endDateCalendar,migrantsReportPanelGrid"
+            <a4j:support event="onchange" reRender="endDateCalendar migrantsReportPanelGrid"
                          actionListener="#{mainPage.migrantsReportPage.onReportPeriodChanged}" />
         </h:selectOneMenu>
         <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
         <rich:calendar id="endDateCalendar" value="#{mainPage.migrantsReportPage.endDate}"
                        datePattern="dd.MM.yyyy" converter="dateConverter"
-                       inputClass="input-text" showWeeksBar="false">
+                       inputClass="input-text" showWeeksBar="false" readonly="#{mainPage.migrantsReportPage.showAllMigrants}">
             <a4j:support event="onchanged" reRender="endDatePeriodSelect,migrantsReportPanelGrid"
                          actionListener="#{mainPage.migrantsReportPage.onEndDateSpecified}" />
         </rich:calendar>
+        <h:outputText escape="true" value="Выборка по дате" styleClass="output-text" />
+        <h:selectOneMenu value="#{mainPage.migrantsReportPage.selectedPeriodType}" style="width:180px;" readonly="#{mainPage.migrantsReportPage.showAllMigrants}">
+            <f:selectItems value="#{mainPage.migrantsReportPage.migrantPeriodTypes}"/>
+        </h:selectOneMenu>
 
         <h:outputText escape="true" value="Тип заявок" styleClass="output-text" />
         <h:selectOneMenu value="#{mainPage.migrantsReportPage.migrantType}" style="width:180px;">

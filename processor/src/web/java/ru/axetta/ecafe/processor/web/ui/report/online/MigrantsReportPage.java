@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.MigrantsReport;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
@@ -46,13 +47,30 @@ public class MigrantsReportPage extends OnlineReportPage {
     private final String reportName = MigrantsReport.REPORT_NAME;
     private final String reportNameForMenu = MigrantsReport.REPORT_NAME_FOR_MENU;
 
+
     private String htmlReport = null;
     private Boolean applyUserSettings = false;
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+    private PeriodTypeMenu periodTypeMenu;
     private String migrantType;
+    private Boolean showAllMigrants = false;
+    private Integer selectedPeriodType = MigrantsReport.PERIOD_TYPE_VISIT;
+    private List<SelectItem> migrantPeriodTypes = buildPeriodTypes();
+
+    private List<SelectItem> buildPeriodTypes() {
+        List<SelectItem> periodTypes = new LinkedList<>();
+        periodTypes.add(new SelectItem(MigrantsReport.PERIOD_TYPE_VISIT, "По дате посещения"));
+        periodTypes.add(new SelectItem(MigrantsReport.PERIOD_TYPE_CHANGED, "По дате изменения"));
+        return periodTypes;
+    }
 
     public MigrantsReportPage() {
         super();
+        initDateFilter();
+    }
+
+    public void initDateFilter(){
+        periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+        this.startDate = CalendarUtils.getFirstDayOfMonth(new Date());
         localCalendar.setTime(this.startDate);
         localCalendar.add(Calendar.DATE, 7);
         localCalendar.add(Calendar.SECOND, -1);
@@ -128,17 +146,19 @@ public class MigrantsReportPage extends OnlineReportPage {
             printError("Выберите список организаций");
             return true;
         }
-        if(startDate==null){
-            printError("Не указано дата выборки от");
-            return true;
-        }
-        if(endDate==null){
-            printError("Не указано дата выборки до");
-            return true;
-        }
-        if(startDate.after(endDate)){
-            printError("Дата выборки от меньше дата выборки до");
-            return true;
+        if(!showAllMigrants) {
+            if (startDate == null) {
+                printError("Не указано дата выборки от");
+                return true;
+            }
+            if (endDate == null) {
+                printError("Не указано дата выборки до");
+                return true;
+            }
+            if (startDate.after(endDate)) {
+                printError("Дата выборки от меньше дата выборки до");
+                return true;
+            }
         }
         return false;
     }
@@ -201,11 +221,13 @@ public class MigrantsReportPage extends OnlineReportPage {
         Properties properties = new Properties();
         String idOfOrgString = "";
         if(idOfOrgList != null) {
-            idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
+            idOfOrgString = StringUtils.join(idOfOrgList, ",");
         }
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         properties.setProperty(MigrantsReport.P_MIGRANTS_TYPES, MigrantsUtils.MigrantsEnumType
                 .getNameByDescription(migrantType));
+        properties.setProperty("showAllMigrants", showAllMigrants.toString());
+        properties.setProperty("periodType", selectedPeriodType.toString());
         return properties;
     }
 
@@ -259,5 +281,29 @@ public class MigrantsReportPage extends OnlineReportPage {
 
     public String getReportNameForMenu() {
         return reportNameForMenu;
+    }
+
+    public Boolean getShowAllMigrants() {
+        return showAllMigrants;
+    }
+
+    public void setShowAllMigrants(Boolean showAllMigrants) {
+        this.showAllMigrants = showAllMigrants;
+    }
+
+    public Integer getSelectedPeriodType() {
+        return selectedPeriodType;
+    }
+
+    public void setSelectedPeriodType(Integer selectedPeriodType) {
+        this.selectedPeriodType = selectedPeriodType;
+    }
+
+    public List<SelectItem> getMigrantPeriodTypes() {
+        return migrantPeriodTypes;
+    }
+
+    public void setMigrantPeriodTypes(List<SelectItem> migrantPeriodTypes) {
+        this.migrantPeriodTypes = migrantPeriodTypes;
     }
 }

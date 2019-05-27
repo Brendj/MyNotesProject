@@ -14,6 +14,7 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
@@ -242,6 +243,26 @@ public class MigrantsUtils {
         return criteria.list();
     }
 
+    public static List<Migrant> getOutcomeMigrantsForOrgsWithoutDate(Session session, List<Long> idOfOrgs){
+        Criteria criteria = session.createCriteria(Migrant.class)
+                .createCriteria("orgRegistry", "org")
+                .add(Restrictions.in("org.idOfOrg", idOfOrgs));
+
+        return criteria.list();
+    }
+
+    public static List<Migrant> getOutcomeMigrantsForOrgsByResolutionDate(Session session, List<Long> idOfOrgs,
+    Date startDate, Date endDate){
+        Criteria criteria = session.createCriteria(VisitReqResolutionHist.class, "v")
+                .setProjection(Projections.property("v.migrant"))
+                .createAlias("v.migrant", "m")
+                .createCriteria("m.orgRegistry", "org")
+                .add(Restrictions.in("org.idOfOrg", idOfOrgs))
+                .add(Restrictions.between("v.resolutionDateTime", startDate, endDate));
+
+        return criteria.list();
+    }
+
     public static List<Migrant> getIncomeMigrantsForOrgsByDate(Session session, List<Long> idOfOrgs,
             Date startDate, Date endDate){
         Criteria criteria = session.createCriteria(Migrant.class);
@@ -249,6 +270,26 @@ public class MigrantsUtils {
         criteria.add(Restrictions.in("org.idOfOrg", idOfOrgs));
         criteria.add(Restrictions.or(Restrictions.between("visitStartDate", startDate, endDate),
                 Restrictions.between("visitEndDate", startDate, endDate)));
+        return criteria.list();
+    }
+
+    public static List<Migrant> getIncomeMigrantsForOrgsWithoutDate(Session session, List<Long> idOfOrgs){
+        Criteria criteria = session.createCriteria(Migrant.class)
+                .createCriteria("orgVisit", "org")
+                .add(Restrictions.in("org.idOfOrg", idOfOrgs));
+
+        return criteria.list();
+    }
+
+    public static List<Migrant> getIncomeMigrantsForOrgsByResolutionDate(Session session, List<Long> idOfOrgs,
+            Date startDate, Date endDate){
+        Criteria criteria = session.createCriteria(VisitReqResolutionHist.class, "v")
+                .setProjection(Projections.property("v.migrant"))
+                .createAlias("v.migrant", "m")
+                .createCriteria("m.orgVisit", "org")
+                .add(Restrictions.in("org.idOfOrg", idOfOrgs))
+                .add(Restrictions.between("v.resolutionDateTime", startDate, endDate));
+
         return criteria.list();
     }
 

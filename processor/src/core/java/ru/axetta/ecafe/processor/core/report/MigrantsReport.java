@@ -51,6 +51,9 @@ public class MigrantsReport extends BasicReportForListOrgsJob {
     final private static Logger logger = LoggerFactory.getLogger(MigrantsReport.class);
     final public static String P_MIGRANTS_TYPES = "migrantsTypes";
 
+    public final static Integer PERIOD_TYPE_VISIT = 0;
+    public final static Integer PERIOD_TYPE_CHANGED = 1;
+
     public static class Builder extends BasicReportForAllOrgJob.Builder {
 
         private final String templateFilename;
@@ -75,25 +78,28 @@ public class MigrantsReport extends BasicReportForListOrgsJob {
             parameterMap.put("SUBREPORT_DIR", RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath());
 
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+            Boolean showAllMigrants = Boolean.parseBoolean(reportProperties.getProperty("showAllMigrants", "false"));
+            Integer periodType = Integer.parseInt(reportProperties.getProperty("periodType", PERIOD_TYPE_VISIT.toString()));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
             List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
             for (String idOfOrg : stringOrgList) {
                 idOfOrgList.add(Long.parseLong(idOfOrg));
             }
 
-            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList);
+            JRDataSource dataSource = createDataSource(session, startTime, endTime, idOfOrgList, showAllMigrants, periodType);
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
             Date generateEndTime = new Date();
             long generateDuration = generateEndTime.getTime() - generateTime.getTime();
             return new MigrantsReport(generateTime, generateDuration, jasperPrint, startTime, endTime);
         }
 
-        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, List<Long> idOfOrgList) throws Exception{
+        private JRDataSource createDataSource(Session session, Date startTime, Date endTime, List<Long> idOfOrgList,
+                Boolean showAllMigrants, Integer periodType) throws Exception{
             String migrantsTypes = reportProperties.getProperty(P_MIGRANTS_TYPES,
                     MigrantsUtils.MigrantsEnumType.ALL.toString());
 
             MigrantsReportService service = new MigrantsReportService(session);
-            return new JRBeanCollectionDataSource(service.buildReportItems(startTime, endTime, migrantsTypes, idOfOrgList));
+            return new JRBeanCollectionDataSource(service.buildReportItems(startTime, endTime, migrantsTypes, idOfOrgList, showAllMigrants, periodType));
         }
     }
 

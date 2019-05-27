@@ -35,29 +35,59 @@ public class MigrantsReportService {
         this.session = session;
     }
 
-    public List<ReportItem> buildReportItems(Date startTime, Date endTime, String migrantsTypes, List<Long> idOfOrgList){
+    public List<ReportItem> buildReportItems(Date startTime, Date endTime, String migrantsTypes, List<Long> idOfOrgList,
+            Boolean showAllMigrants, Integer periodType){
         List<ReportItem> reportItemList = new ArrayList<ReportItem>();
-        if(migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.ALL.getName())){
+
+        if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.ALL.getName())) {
             ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
             reportItem.getOutcomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), true));
+                    buildOutcomeMigrants(session, idOfOrgList, startTime, endTime, showAllMigrants, periodType), true));
             reportItem.getIncomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), false));
+                    buildIncomeMigrants(session, idOfOrgList, startTime, endTime, showAllMigrants, periodType), false));
             reportItemList.add(reportItem);
         }
         if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.OUTCOME.getName())) {
             ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
             reportItem.getOutcomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), true));
+                    buildOutcomeMigrants(session, idOfOrgList, startTime, endTime, showAllMigrants, periodType), true));
             reportItemList.add(reportItem);
         }
-        if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.INCOME.getName())){
+        if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.INCOME.getName())) {
             ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
             reportItem.getIncomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), false));
+                    buildIncomeMigrants(session, idOfOrgList, startTime, endTime, showAllMigrants, periodType), false));
             reportItemList.add(reportItem);
         }
         return reportItemList;
+    }
+
+    private List<Migrant> buildOutcomeMigrants(Session session, List<Long> idOfOrgList, Date startTime, Date endTime, Boolean showAllMigrants, Integer periodType) {
+        List<Migrant> result = null;
+        if(showAllMigrants) {
+            result =  MigrantsUtils.getOutcomeMigrantsForOrgsWithoutDate(session, idOfOrgList);
+        } else {
+            if (periodType.equals(MigrantsReport.PERIOD_TYPE_VISIT)) {
+                result = MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime);
+            } else if(periodType.equals(MigrantsReport.PERIOD_TYPE_CHANGED)){
+                result = MigrantsUtils.getOutcomeMigrantsForOrgsByResolutionDate(session, idOfOrgList, startTime, endTime);
+            }
+        }
+        return result;
+    }
+
+    private List<Migrant> buildIncomeMigrants(Session session, List<Long> idOfOrgList, Date startTime, Date endTime, Boolean showAllMigrants, Integer periodType) {
+        List<Migrant> result = null;
+        if(showAllMigrants) {
+            result =  MigrantsUtils.getIncomeMigrantsForOrgsWithoutDate(session, idOfOrgList);
+        } else {
+            if (periodType.equals(MigrantsReport.PERIOD_TYPE_VISIT)) {
+                result = MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime);
+            } else if(periodType.equals(MigrantsReport.PERIOD_TYPE_CHANGED)){
+                result = MigrantsUtils.getIncomeMigrantsForOrgsByResolutionDate(session, idOfOrgList, startTime, endTime);
+            }
+        }
+        return result;
     }
 
     private List<MigrantItem> buildMigrantItems(Date startTime, Date endTime, List<Migrant> migrants, boolean isOutcome){
