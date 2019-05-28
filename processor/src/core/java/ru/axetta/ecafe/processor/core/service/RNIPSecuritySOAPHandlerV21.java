@@ -4,16 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
-import com.sun.org.apache.xpath.internal.XPathAPI;
-import ru.CryptoPro.JCP.JCP;
-
-import org.apache.ws.security.message.WSSecHeader;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 
 import javax.xml.crypto.XMLStructure;
 import javax.xml.crypto.dsig.*;
@@ -28,21 +22,17 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.io.ByteArrayInputStream;
-import java.io.InputStream;
-import java.security.KeyStore;
-import java.security.PrivateKey;
 import java.security.Provider;
-import java.security.Security;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-public class RNIPSecuritySOAPHandlerV20 extends RNIPSecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> {
+public class RNIPSecuritySOAPHandlerV21 extends RNIPSecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> {
 
-    private static final Logger logger = LoggerFactory.getLogger(RNIPSecuritySOAPHandlerV20.class);
+    private static final Logger logger = LoggerFactory.getLogger(RNIPSecuritySOAPHandlerV21.class);
+    public static final String SIGN_ID = "I_52d85fa5-18ae-11e5-b50b-bcaec5d977ce";
 
-    public RNIPSecuritySOAPHandlerV20(String containerAlias, String containerPassword, IRNIPMessageToLog messageLogger) {
+    public RNIPSecuritySOAPHandlerV21(String containerAlias, String containerPassword, IRNIPMessageToLog messageLogger) {
         super(containerAlias, containerPassword, messageLogger);
     }
 
@@ -50,83 +40,35 @@ public class RNIPSecuritySOAPHandlerV20 extends RNIPSecuritySOAPHandler implemen
     public boolean handleMessage(SOAPMessageContext smc) {
 
         final Boolean outboundProperty = (Boolean) smc.get(MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-
+        final SOAPPart soapPart = smc.getMessage().getSOAPPart();
+        Document doc = null;
         try {
             if (outboundProperty) {
-                if (privateKey == null) {
-                    Security.insertProviderAt(new JCP(), 1);
-                    keyStore = KeyStore.getInstance((new JCP()).HD_STORE_NAME);
-                    keyStore.load(null, null);
-                    privateKey = (PrivateKey) keyStore.getKey(containerAlias, containerPassword.toCharArray());
-                    cert = (X509Certificate) keyStore.getCertificate(containerAlias);
-                    org.apache.xml.security.Init.init();
-                }
-                //Получаем SOAP документ
-                final SOAPPart soapPart = smc.getMessage().getSOAPPart();
+                initKeys();
 
-                //Получаем xml значения из SOAP документа
-                final Document source_doc = soapPart.getEnvelope().getOwnerDocument();
-                //добавляем неймспейсы к Message и MessageData
-                String sss = toString(source_doc)
-                        .replaceAll("<Message>", String.format("<pmes:Message xmlns:pmes=\"%s\">", MESSAGE_NS))
-                        .replaceAll("</Message>", "</pmes:Message>")
-                        .replaceAll("<MessageData>",
-                                String.format("<pmesd:MessageData xmlns:pmesd=\"%s\">", MESSAGE_NS))
-                        .replaceAll("</MessageData>", "</pmesd:MessageData>")
-                        .replaceAll(" xmlns:xsi=\"http://www.w3.org/2001/XMLSchema-instance\" xsi:type=\"ns4:GISGMPTransferMsgRequest\"", "");
+                doc = soapPart.getEnvelope().getOwnerDocument();
 
-                //Сохраняем измененный SOAP документ
-                InputStream in = new ByteArrayInputStream(sss.getBytes("UTF-8"));
-                soapPart.setContent(new StreamSource(in));
-                soapPart.getEnvelope().addNamespaceDeclaration("wsse", WS_SECURITY_SECEXT_URI);
-                soapPart.getEnvelope().addNamespaceDeclaration("wsu", WS_SECURITY_UTILITY_URI);
-                soapPart.getEnvelope().addNamespaceDeclaration("ds", "http://www.w3.org/2000/09/xmldsig#");
-                soapPart.getEnvelope().addNamespaceDeclaration("smev", NS_SMEV);
-                soapPart.getEnvelope().addNamespaceDeclaration("rev", MESSAGE_NS);
-                soapPart.getEnvelope().addNamespaceDeclaration("inc", NS_INC);
-                smc.getMessage().getSOAPBody().setAttributeNS(WS_SECURITY_UTILITY_URI, "wsu:Id", "body");
-
-                final WSSecHeader header = new WSSecHeader();
-                header.setActor("http://smev.gosuslugi.ru/actors/smev");
-                header.setMustUnderstand(false);
-
-                //Получаем текущий вариант SOAP запроса
-                final Document doc = soapPart.getEnvelope().getOwnerDocument();
-
-                //Добавляем заголовог для SOAP запроса
-                final Element sec = header.insertSecurityHeader(soapPart);
-                final Element secToken = (Element) sec
-                        .appendChild(doc.createElementNS(WS_SECURITY_SECEXT_URI, "wsse:BinarySecurityToken"));
-                secToken.setAttribute("EncodingType", ENCODING_TYPE_ATTRIBUTE);
-                secToken.setAttribute("ValueType", VALUE_TYPE_ATTRIBUTE);
-                secToken.setAttribute("wsu:Id", "CertId");
-                header.getSecurityHeader().appendChild(secToken);
-
-                Element token = header.getSecurityHeader();
-
-                org.apache.xml.security.Init.init();
-
-                //Преобразование документа к каноническому виду
                 final org.apache.xml.security.transforms.Transforms transforms =
                         new org.apache.xml.security.transforms.Transforms(doc);
                 transforms
                         .addTransform(org.apache.xml.security.transforms.Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS);
 
-                // Загрузка провайдера.
                 final Provider xmlDSigProvider = new ru.CryptoPro.JCPxml.dsig.internal.dom.XMLDSigRI();
-
                 final XMLSignatureFactory fac = XMLSignatureFactory.getInstance("DOM", xmlDSigProvider);
 
-                //Преобразования над узлом ds:SignedInfo:
                 final List<Transform> transformList = new ArrayList<Transform>();
                 final Transform transformC14N = fac.newTransform(
                         org.apache.xml.security.transforms.Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS,
                         (XMLStructure) null);
                 transformList.add(transformC14N);
 
+                Element token = (Element)doc.getElementsByTagName("ns2:CallerInformationSystemSignature").item(0);
+                Element assertionNode = (Element)doc.getElementsByTagName("ns2:SenderProvidedRequestData").item(0);
+                assertionNode.setIdAttribute("Id", true);
+
                 // Ссылка на подписываемые данные с алгоритмом хеширования ГОСТ 34.11.
                 final Reference ref =
-                        fac.newReference("#body", fac.newDigestMethod(ru.CryptoPro.JCPxml.Consts.URN_GOST_DIGEST_2012_256, null), transformList, null, null);
+                        fac.newReference("#" + SIGN_ID, fac.newDigestMethod(ru.CryptoPro.JCPxml.Consts.URN_GOST_DIGEST_2012_256, null), transformList, null, null);
                 // Задаём алгоритм подписи:
                 final SignedInfo si = fac.newSignedInfo(
                         fac.newCanonicalizationMethod(CanonicalizationMethod.EXCLUSIVE, (C14NMethodParameterSpec) null),
@@ -140,46 +82,31 @@ public class RNIPSecuritySOAPHandlerV20 extends RNIPSecuritySOAPHandler implemen
                 //В качестве параметров алгоритм подписи, ключ и сертификат
                 final javax.xml.crypto.dsig.XMLSignature sig = fac.newXMLSignature(si, ki);
                 final DOMSignContext signContext = new DOMSignContext(privateKey, token);
-                //Подписываем ;)
+                //Подписываем
                 sig.sign(signContext);
 
-                // Узел подписи Signature.
-                final Element sigE = (Element) XPathAPI.selectSingleNode(signContext.getParent(), "//ds:Signature");
-                // Блок данных KeyInfo.
-                final Node keyE = XPathAPI.selectSingleNode(sigE, "//ds:KeyInfo", sigE);
-
-                token.getFirstChild().setTextContent(
-                        XPathAPI.selectSingleNode(keyE, "//ds:X509Certificate", keyE).getFirstChild().getNodeValue());
-
-                // Удаляем содержимое KeyInfo
-                keyE.removeChild(XPathAPI.selectSingleNode(keyE, "//ds:X509Data", keyE));
-                final NodeList chl = keyE.getChildNodes();
-                for (int i = 0; i < chl.getLength(); i++) {
-                    keyE.removeChild(chl.item(i));
-                }
-                // Узел KeyInfo содержит указание на проверку подписи с помощью сертификата SenderCertificate.
-                final Node str =
-                        keyE.appendChild(doc.createElementNS(WS_SECURITY_SECEXT_URI, "wsse:SecurityTokenReference"));
-                final Element strRef =
-                        (Element) str.appendChild(doc.createElementNS(WS_SECURITY_SECEXT_URI, "wsse:Reference"));
-                strRef.setAttribute("ValueType", VALUE_TYPE_ATTRIBUTE);
-                strRef.setAttribute("URI", "#CertId");
-                token.appendChild(sigE);
-
-                String msg = toString(doc);
+                String msg = RNIPSecuritySOAPHandler.toString(doc);
 
                 smc.getMessage().getSOAPPart().setContent(new StreamSource(new ByteArrayInputStream(msg.getBytes("UTF-8"))));
 
                 messageLogger.LogPacket(msg, IRNIPMessageToLog.MESSAGE_OUT);
 
             } else {
-                final SOAPPart soapPart = smc.getMessage().getSOAPPart();
-                final Document doc = soapPart.getEnvelope().getOwnerDocument();
+                doc = soapPart.getEnvelope().getOwnerDocument();
                 String msg = toString(doc);
                 messageLogger.LogPacket(msg, IRNIPMessageToLog.MESSAGE_IN);
             }
         } catch (Exception e) {
             logger.error("Error in handle Rnip message", e);
+            if (doc != null) {
+                try {
+                    String msg = RNIPSecuritySOAPHandler.toString(doc);
+                    smc.getMessage().getSOAPPart().setContent(new StreamSource(new ByteArrayInputStream(msg.getBytes("UTF-8"))));
+                    messageLogger.LogPacket(msg, IRNIPMessageToLog.MESSAGE_OUT);
+                } catch (Exception e1) {
+                    logger.error("Error in logging packet:", e1);
+                }
+            }
         }
 
         return true;

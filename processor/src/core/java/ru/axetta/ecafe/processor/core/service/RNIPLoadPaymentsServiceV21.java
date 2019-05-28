@@ -10,6 +10,7 @@ import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.Send
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.SendRequestResponse;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.SenderProvidedRequestData;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.MessagePrimaryContent;
+import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.XMLDSigSignatureType;
 import generated.ru.mos.rnip.xsd.catalog._2_1.*;
 import generated.ru.mos.rnip.xsd.common._2_1.*;
 import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogRequest;
@@ -91,8 +92,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
 
         String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
         String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
-        final RNIPSecuritySOAPHandlerV20 pfrSecuritySOAPHandler = new RNIPSecuritySOAPHandlerV20(alias, pass, getPacketLogger(contragent));
-        //final RNIPSecuritySOAPHandler pfrSecuritySOAPHandler = new RNIPSecuritySOAPHandler(alias, pass, getPacketLogger(contragent));
+        final RNIPSecuritySOAPHandlerV21 pfrSecuritySOAPHandler = new RNIPSecuritySOAPHandlerV21(alias, pass, getPacketLogger(contragent));
         final List<Handler> handlerChain = new ArrayList<Handler>();
         handlerChain.add(pfrSecuritySOAPHandler);
         bindingProvider21.getBinding().setHandlerChain(handlerChain);
@@ -101,7 +101,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
                 new generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.ObjectFactory();
         SendRequestRequest sendRequestRequest = requestObjectFactory.createSendRequestRequest();
         SenderProvidedRequestData senderProvidedRequestData = requestObjectFactory.createSenderProvidedRequestData();
-        senderProvidedRequestData.setId("I_52d85fa5-18ae-11e5-b50b-bcaec5d977ce");
+        senderProvidedRequestData.setId(RNIPSecuritySOAPHandlerV21.SIGN_ID);
         sendRequestRequest.setSenderProvidedRequestData(senderProvidedRequestData);
 
         senderProvidedRequestData.setMessageID(UUID.randomUUID().toString());
@@ -114,6 +114,9 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
                 new generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.ObjectFactory();
         MessagePrimaryContent messagePrimaryContent = messagePrimaryObjectFactory.createMessagePrimaryContent();
         senderProvidedRequestData.setMessagePrimaryContent(messagePrimaryContent);
+
+        XMLDSigSignatureType callerInformationSystemSignature = messagePrimaryObjectFactory.createXMLDSigSignatureType();
+        sendRequestRequest.setCallerInformationSystemSignature(callerInformationSystemSignature);
 
         generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ObjectFactory importCatalogObjectFactory =
                 new generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ObjectFactory();

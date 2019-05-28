@@ -79,6 +79,18 @@ public class RNIPSecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> 
         return Collections.emptySet();
     }
 
+    protected void initKeys() throws Exception {
+        if (privateKey == null) {
+            Security.insertProviderAt(new JCP(), 1);
+            keyStore = KeyStore.getInstance((new JCP()).HD_STORE_NAME);
+            //keyStore = KeyStore.getInstance(store);
+            keyStore.load(null, null);
+            privateKey = (PrivateKey) keyStore.getKey(containerAlias, containerPassword.toCharArray());
+            cert = (X509Certificate) keyStore.getCertificate(containerAlias);
+            org.apache.xml.security.Init.init();
+        }
+    }
+
     @Override
     public boolean handleMessage(SOAPMessageContext smc) {
 
@@ -86,15 +98,7 @@ public class RNIPSecuritySOAPHandler implements SOAPHandler<SOAPMessageContext> 
 
         try {
             if (outboundProperty) {
-                if (privateKey == null) {
-                    Security.insertProviderAt(new JCP(), 1);
-                    keyStore = KeyStore.getInstance((new JCP()).HD_STORE_NAME);
-                    //keyStore = KeyStore.getInstance(store);
-                    keyStore.load(null, null);
-                    privateKey = (PrivateKey) keyStore.getKey(containerAlias, containerPassword.toCharArray());
-                    cert = (X509Certificate) keyStore.getCertificate(containerAlias);
-                    org.apache.xml.security.Init.init();
-                }
+                initKeys();
                 //Получаем SOAP документ
                 final SOAPPart soapPart = smc.getMessage().getSOAPPart();
 
