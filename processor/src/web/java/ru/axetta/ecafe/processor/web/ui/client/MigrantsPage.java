@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Migrant;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.VisitReqResolutionHist;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
@@ -16,9 +15,10 @@ import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.transform.Transformers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -105,12 +105,8 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
                 clientIDList.add(item.getIdOfClient());
             }
 
-            List<Migrant> list = getMigrantItems(session, idOfOrg, guid, startDate, endDate, ignoreDates, clientIDList, migrantType);
-            items.clear();
-            for (Migrant migrant : list) {
-                MigrantItem item = new MigrantItem(session, migrant);
-                items.add(item);
-            }
+            items = getMigrantItems(session, idOfOrg, guid, startDate, endDate, ignoreDates, clientIDList, migrantType);
+
             Collections.sort(items);
             transaction.commit();
             transaction = null;
@@ -120,7 +116,7 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
         }
     }
 
-    public List<Migrant> getMigrantItems(Session session, Long idOfOrg, String guid, Date startDate, Date endDate,
+    private List<MigrantItem> getMigrantItems(Session session, Long idOfOrg, String guid, Date startDate, Date endDate,
             Boolean ignoreDates, List<Long> clientIDList, Integer migrantType){
         String inactiveTypes = StringUtils.join(Arrays.asList(
                 VisitReqResolutionHist.RES_REJECTED,
@@ -128,48 +124,75 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
                 VisitReqResolutionHist.RES_OVERDUE,
                 VisitReqResolutionHist.RES_OVERDUE_SERVER
         ), ", ");
-        String strQuery = "SELECT m FROM Migrant AS m "
-                + " JOIN m.visitReqResolutionHists AS v "
-                + " WHERE ";
 
+        String strQuery = "SELECT m.requestNumber AS requestNumber, firstResol.resolutiondatetime AS createDateTime, lastResol.resolutiondatetime AS lastUpdateDateTime, "
+                + "CASE WHEN m.initiator = 0 THEN 'ОУ' "
+                + "     WHEN m.initiator = 1 THEN 'ЕСЗ' "
+                + "     WHEN m.initiator = 2 THEN 'НСИ' "
+                + "     WHEN m.initiator = 3 THEN 'Процессинг' "
+                + "     ELSE 'Неизвестно' "
+                + "END AS initiator, "
+                + "(p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fio, ('(' || regOrg.idoforg || ') ' || regOrg.shortnameinfoservice) AS orgRegistry, "
+                + "('(' || visitOrg.idoforg || ') ' || visitOrg.shortnameinfoservice) AS orgVisit, "
+                + "m.visitstartdate AS visitStartDate, m.visitenddate AS visitEndDate, "
+                + "(CASE WHEN lastResol.resolution = 0 THEN 'Создана' "
+                + "     WHEN lastResol.resolution = 1 THEN 'Подтверждена' "
+                + "     WHEN lastResol.resolution = 2 THEN 'Отклонена и сдана в архив' "
+                + "     WHEN lastResol.resolution = 3 THEN 'Аннулирована и сдана в архив' "
+                + "     WHEN lastResol.resolution = 4 THEN 'Сдана в архив по истечению срока действия' "
+                + "     WHEN lastResol.resolution = 5 THEN 'Сдана в архив по истечению срока действия' "
+                + "     ELSE 'Неизвестно' "
+                + "END || "
+                + "CASE WHEN lastResol.initiator IS NULL THEN '' "
+                + "     ELSE ' (' || CASE WHEN lastResol.initiator = 0 THEN 'ОУ' "
+                + "                       WHEN lastResol.initiator = 1 THEN 'ЕСЗ' "
+                + "                       WHEN lastResol.initiator = 2 THEN 'НСИ' "
+                + "                       WHEN lastResol.initiator = 3 THEN 'Процессинг' "
+                + "                       ELSE 'Неизвестно' "
+                + "                  END || ')' "
+                + "END) AS resolution, "
+                + "cc.clientguid AS guid, m.section AS section, lastResol.resolution AS resolutionValue, cg.groupname AS group, visitOrg.shortname AS shortNameVisit, "
+                + "visitOrg.idoforg AS idOfOrgVisit, visitOrg.shortAddress AS shortAddressVisit, m.idofrequest AS idOfRequest, m.idoforgregistry AS idOfOgRegistry "
+                + "FROM cf_migrants AS m "
+                + "JOIN cf_clients cc ON m.idofclientmigrate = cc.idofclient "
+                + "JOIN cf_persons p ON cc.idofperson = p.idofperson "
+                + "JOIN cf_orgs AS regOrg ON m.idoforgregistry = regOrg.idoforg "
+                + "JOIN cf_orgs AS visitOrg ON m.idoforgvisit = visitOrg.idoforg "
+                + "LEFT JOIN cf_clientgroups cg ON cc.idoforg = cg.idoforg AND cc.idofclientgroup = cg.idofclientgroup "
+                + "JOIN (SELECT DISTINCT ON(idofrequest, idoforgregistry) * FROM cf_visitreqresolutionhist ORDER BY idofrequest, idoforgregistry, resolutiondatetime ASC) AS firstResol ON m.idofrequest = firstResol.idofrequest and m.idoforgregistry = firstResol.idoforgregistry "
+                + "JOIN (SELECT DISTINCT ON(idofrequest, idoforgregistry) * FROM cf_visitreqresolutionhist ORDER BY idofrequest, idoforgregistry, resolutiondatetime DESC) AS lastResol ON m.idofrequest = lastResol.idofrequest and m.idoforgregistry = lastResol.idoforgregistry "
+                + "WHERE ";
         boolean isFirstStatement = true;
         if (idOfOrg != null) {
-            strQuery += " (m.orgVisit.idOfOrg = :idOfOrg OR m.orgRegistry.idOfOrg = :idOfOrg) ";
+            strQuery += " (m.idoforgregistry = :idOfOrg OR m.idoforgvisit = :idOfOrg) ";
             isFirstStatement = false;
         }
         if (!StringUtils.isEmpty(guid)) {
             strQuery += isFirstStatement ? "" : " AND ";
-            strQuery += " clientMigrate.clientGUID LIKE " + guid;
+            strQuery += " cc.clientGUID LIKE " + guid;
+
             isFirstStatement = false;
         }
         if (!clientIDList.isEmpty()) {
             String clientIDListStr = StringUtils.join(clientIDList, ", ");
+
             strQuery += isFirstStatement ? "" : " AND ";
-            strQuery += " clientMigrate.idOfClient LIKE (" + clientIDListStr + ")";
+            strQuery += " cc.idOfClient LIKE (" + clientIDListStr + ")";
         }
 
         if(!ignoreDates){
-            strQuery += " AND v.resolutionDateTime between :startDate AND :endDate ";
+            strQuery += " AND lastResol.resolutionDateTime between :startDate AND :endDate ";
         }
 
-        if(migrantType.equals(TYPE_CREATED)){
-            strQuery += "AND v.resolution = " + VisitReqResolutionHist.RES_CREATED
-                    + " AND NOT EXISTS ("
-                    + " FROM VisitReqResolutionHist AS vs WHERE (vs.resolution NOT IN (" + inactiveTypes + ") "
-                    + " OR vs.resolution = " + VisitReqResolutionHist.RES_CONFIRMED + ")"
-                    + " AND vs.compositeIdOfVisitReqResolutionHist = v.compositeIdOfVisitReqResolutionHist"
-                    + ") ";
+        if (migrantType.equals(TYPE_CREATED)) {
+            strQuery += " AND lastResol.resolution = " + VisitReqResolutionHist.RES_CREATED;
         } else if(migrantType.equals(TYPE_ACTIVE)){
-            strQuery += "AND v.resolution = " + VisitReqResolutionHist.RES_CONFIRMED
-                    + " AND NOT EXISTS ("
-                    + " FROM VisitReqResolutionHist AS vs WHERE vs.resolution NOT IN (" + inactiveTypes + ") "
-                    + " AND vs.compositeIdOfVisitReqResolutionHist = v.compositeIdOfVisitReqResolutionHist "
-                    + ")";
+            strQuery += " AND lastResol.resolution = " + VisitReqResolutionHist.RES_CONFIRMED;
         } else if(migrantType.equals(TYPE_INACTIVE)){
-            strQuery += "AND v.resolution in (" + inactiveTypes + ")";
+            strQuery += " AND lastResol.resolution IN (" + inactiveTypes + ")";
         }
 
-        Query query = session.createQuery(strQuery);
+        SQLQuery query = session.createSQLQuery(strQuery);
         if(idOfOrg != null){
             query.setParameter("idOfOrg", idOfOrg);
         }
@@ -177,6 +200,8 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
             query.setParameter("startDate", startDate);
             query.setParameter("endDate", endDate);
         }
+        //TODO add scalar for all field
+        query.setResultTransformer(Transformers.aliasToBean(MigrantItem.class));
 
         return query.list();
     }

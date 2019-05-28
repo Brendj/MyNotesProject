@@ -39,6 +39,10 @@ public class MigrantItem implements Comparable {
     private Long idOfOrgVisit;
     private String shortAddressVisit;
 
+    // For Transformers.aliasToBean()
+    private Long idOfRequest;
+    private Long idOfOrgRegistry;
+
     public MigrantItem(Session session, Migrant migrant) {
         this.compositeIdOfMigrant = migrant.getCompositeIdOfMigrant();
         this.requestNumber = migrant.getRequestNumber();
@@ -98,6 +102,9 @@ public class MigrantItem implements Comparable {
         if (!(o instanceof MigrantItem)) {
             return false;
         }
+        if(compositeIdOfMigrant == null){
+            compositeIdOfMigrant = new CompositeIdOfMigrant(idOfRequest, idOfOrgRegistry);
+        }
         final MigrantItem that = (MigrantItem) o;
         return compositeIdOfMigrant.equals(that.getCompositeIdOfMigrant());
     }
@@ -110,6 +117,9 @@ public class MigrantItem implements Comparable {
     }
 
     public CompositeIdOfMigrant getCompositeIdOfMigrant() {
+        if(compositeIdOfMigrant == null){
+            compositeIdOfMigrant = new CompositeIdOfMigrant(idOfRequest, idOfOrgRegistry);
+        }
         return compositeIdOfMigrant;
     }
 
@@ -259,5 +269,21 @@ public class MigrantItem implements Comparable {
 
     public void setShortAddressVisit(String shortAddress) {
         this.shortAddressVisit = shortAddress;
+    }
+
+    public Long getIdOfRequest() {
+        return idOfRequest;
+    }
+
+    public void setIdOfRequest(Long idOfRequest) {
+        this.idOfRequest = idOfRequest;
+    }
+
+    public Long getIdOfOrgRegistry() {
+        return idOfOrgRegistry;
+    }
+
+    public void setIdOfOrgRegistry(Long idOfOrgRegistry) {
+        this.idOfOrgRegistry = idOfOrgRegistry;
     }
 }
