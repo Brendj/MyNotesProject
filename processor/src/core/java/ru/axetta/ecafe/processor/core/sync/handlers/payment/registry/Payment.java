@@ -33,7 +33,7 @@ public class Payment {
     private final Long idOfClient;
     private final Long idOfPayForClient;
     private final long idOfOrder;
-    private final long idOfCashier;
+    private final Long idOfCashier;
     private final long sumByCard;
     private final long sumByCash;
     private final long RSum;
@@ -81,7 +81,12 @@ public class Payment {
         Long idOfClient = getLongValueNullSafe(namedNodeMap, "IdOfClient");
         Long idOfPayForClient = getLongValueNullSafe(namedNodeMap, "IdOfPayForClient");
         long idOfOrder = getLongValue(namedNodeMap, "IdOfOrder");
-        long idOfCashier = getLongValue(namedNodeMap, "IdOfCashier");
+        Long idOfCashier;
+        try {
+            idOfCashier = getLongValue(namedNodeMap, "IdOfCashier");
+        } catch (Exception e) {
+            idOfCashier = null;
+        }
         long sumByCard = getLongValue(namedNodeMap, "SumByCard");
         long sumByCash = getLongValue(namedNodeMap, "SumByCash");
         Long idOfPOS = null;
@@ -119,7 +124,7 @@ public class Payment {
     }
 
     public Payment(Long cardNo, Date time, Date orderDate, long socDiscount, long trdDiscount, long grant, Long IdOfOrg, Long idOfClient,
-            Long idOfPayForClient, long idOfOrder, long idOfCashier, long sumByCard, long sumByCash, long RSum, Long idOfPOS,
+            Long idOfPayForClient, long idOfOrder, Long idOfCashier, long sumByCard, long sumByCash, long RSum, Long idOfPOS,
             Long confirmerId, int state, String comments, OrderTypeEnumType orderType, List<Purchase> posPurchases) {
         this.cardNo = cardNo;
         this.time = time;
