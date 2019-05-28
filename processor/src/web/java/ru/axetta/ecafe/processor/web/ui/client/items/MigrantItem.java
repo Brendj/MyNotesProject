@@ -43,6 +43,8 @@ public class MigrantItem implements Comparable {
     private Long idOfRequest;
     private Long idOfOrgRegistry;
 
+    public MigrantItem(){}
+
     public MigrantItem(Session session, Migrant migrant) {
         this.compositeIdOfMigrant = migrant.getCompositeIdOfMigrant();
         this.requestNumber = migrant.getRequestNumber();

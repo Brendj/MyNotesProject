@@ -19,6 +19,10 @@ import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.transform.Transformers;
+import org.hibernate.type.IntegerType;
+import org.hibernate.type.LongType;
+import org.hibernate.type.StringType;
+import org.hibernate.type.TimestampType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -125,7 +129,9 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
                 VisitReqResolutionHist.RES_OVERDUE_SERVER
         ), ", ");
 
-        String strQuery = "SELECT m.requestNumber AS requestNumber, firstResol.resolutiondatetime AS createDateTime, lastResol.resolutiondatetime AS lastUpdateDateTime, "
+        String strQuery = "SELECT m.requestNumber AS requestNumber,"
+                + " TO_TIMESTAMP(firstResol.resolutiondatetime/1000) AS createDateTime,"
+                + " TO_TIMESTAMP(lastResol.resolutiondatetime/1000) AS lastUpdateDateTime, "
                 + "CASE WHEN m.initiator = 0 THEN 'ОУ' "
                 + "     WHEN m.initiator = 1 THEN 'ЕСЗ' "
                 + "     WHEN m.initiator = 2 THEN 'НСИ' "
@@ -134,7 +140,7 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
                 + "END AS initiator, "
                 + "(p.surname || ' ' || p.firstname || ' ' || p.secondname) AS fio, ('(' || regOrg.idoforg || ') ' || regOrg.shortnameinfoservice) AS orgRegistry, "
                 + "('(' || visitOrg.idoforg || ') ' || visitOrg.shortnameinfoservice) AS orgVisit, "
-                + "m.visitstartdate AS visitStartDate, m.visitenddate AS visitEndDate, "
+                + "TO_TIMESTAMP(m.visitstartdate/1000) AS visitStartDate, TO_TIMESTAMP(m.visitenddate/1000) AS visitEndDate, "
                 + "(CASE WHEN lastResol.resolution = 0 THEN 'Создана' "
                 + "     WHEN lastResol.resolution = 1 THEN 'Подтверждена' "
                 + "     WHEN lastResol.resolution = 2 THEN 'Отклонена и сдана в архив' "
@@ -152,7 +158,7 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
                 + "                  END || ')' "
                 + "END) AS resolution, "
                 + "cc.clientguid AS guid, m.section AS section, lastResol.resolution AS resolutionValue, cg.groupname AS group, visitOrg.shortname AS shortNameVisit, "
-                + "visitOrg.idoforg AS idOfOrgVisit, visitOrg.shortAddress AS shortAddressVisit, m.idofrequest AS idOfRequest, m.idoforgregistry AS idOfOgRegistry "
+                + "visitOrg.idoforg AS idOfOrgVisit, visitOrg.shortAddress AS shortAddressVisit, m.idofrequest AS idOfRequest, m.idoforgregistry AS idOfOrgRegistry "
                 + "FROM cf_migrants AS m "
                 + "JOIN cf_clients cc ON m.idofclientmigrate = cc.idofclient "
                 + "JOIN cf_persons p ON cc.idofperson = p.idofperson "
@@ -197,11 +203,30 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
             query.setParameter("idOfOrg", idOfOrg);
         }
         if(!ignoreDates){
-            query.setParameter("startDate", startDate);
-            query.setParameter("endDate", endDate);
+            query.setParameter("startDate", startDate.getTime());
+            query.setParameter("endDate", endDate.getTime());
         }
-        //TODO add scalar for all field
-        query.setResultTransformer(Transformers.aliasToBean(MigrantItem.class));
+        query
+                .addScalar("requestNumber", StringType.INSTANCE)
+                .addScalar("createDateTime", TimestampType.INSTANCE)
+                .addScalar("lastUpdateDateTime", TimestampType.INSTANCE)
+                .addScalar("initiator", StringType.INSTANCE)
+                .addScalar("fio", StringType.INSTANCE)
+                .addScalar("orgRegistry", StringType.INSTANCE)
+                .addScalar("orgVisit", StringType.INSTANCE)
+                .addScalar("visitStartDate", TimestampType.INSTANCE)
+                .addScalar("visitEndDate", TimestampType.INSTANCE)
+                .addScalar("resolution", StringType.INSTANCE)
+                .addScalar("guid", StringType.INSTANCE)
+                .addScalar("section", StringType.INSTANCE)
+                .addScalar("resolutionValue", IntegerType.INSTANCE)
+                .addScalar("group", StringType.INSTANCE)
+                .addScalar("shortNameVisit", StringType.INSTANCE)
+                .addScalar("idOfOrgVisit", LongType.INSTANCE)
+                .addScalar("shortAddressVisit", StringType.INSTANCE)
+                .addScalar("idOfRequest", LongType.INSTANCE)
+                .addScalar("idOfOrgRegistry", LongType.INSTANCE)
+                .setResultTransformer(Transformers.aliasToBean(MigrantItem.class));
 
         return query.list();
     }
