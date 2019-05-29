@@ -77,7 +77,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RNIPLoadPaymentsServiceV116.class);
     //todo добавить ограничение на MAX_REREQUESTS
     private static int MAX_REREQUESTS = 3; //максимальное число повторных запросов, если получено ReRequest = true
-    private HashMap<Contragent, Integer> requests;
+    protected HashMap<Contragent, Integer> requests;
     private Integer reqs;
     private final static ThreadLocal<String> messageId = new ThreadLocal<String>() {
         @Override protected String initialValue() { return UUID.randomUUID().toString(); }
