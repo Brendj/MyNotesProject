@@ -14,7 +14,7 @@
     <rich:simpleTogglePanel label="Фильтр" switchType="client"
                             eventsQueue="mainFormEventsQueue" opened="true" headerClass="filter-panel-header">
 
-        <h:panelGrid columns="2" styleClass="borderless-grid" columnClasses="column-width-250,column-width-500">
+        <h:panelGrid columns="2" styleClass="borderless-grid" columnClasses="column-width-250,column-width-500" id="migrantsServisePanelGrid">
 
             <h:outputText escape="true" value="Организация" styleClass="output-text" />
             <h:panelGroup styleClass="borderless-grid">
@@ -48,18 +48,20 @@
 
             <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
             <rich:calendar value="#{migrantsPage.startDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" readonly="#{migrantsPage.ignoreDates}">
             </rich:calendar>
 
             <h:outputText escape="true" value="Конечная дата" styleClass="output-text" />
             <rich:calendar id="endDateCalendar" value="#{migrantsPage.endDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" readonly="#{migrantsPage.ignoreDates}">
             </rich:calendar>
 
             <h:outputText escape="true" value="Строить за всё время" styleClass="output-text" />
             <h:selectBooleanCheckbox id="showAllMigrants"
                                      value="#{migrantsPage.ignoreDates}"
-                                     styleClass="output-text" />
+                                     styleClass="output-text" >
+                <a4j:support event="onchange" reRender="migrantsServisePanelGrid"/>
+            </h:selectBooleanCheckbox>
             <h:outputText escape="true" value="Тип заявок" styleClass="output-text" />
             <h:selectOneMenu value="#{migrantsPage.migrantType}" style="width:180px;">
                 <f:selectItems value="#{migrantsPage.migrantTypes}" />
