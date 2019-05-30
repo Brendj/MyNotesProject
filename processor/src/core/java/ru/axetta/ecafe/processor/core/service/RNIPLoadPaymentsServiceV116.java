@@ -360,6 +360,10 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         return vals;
     }
 
+    protected void forceRunGetResponse() {
+        //в версии 1.16.X ничего не делаем
+    }
+
     //todo дописать заполнение всех разделов пакета и переписать метод getMacroPart
     public MessageDataType executeModifyCatalog(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
         InitRNIP116Service();

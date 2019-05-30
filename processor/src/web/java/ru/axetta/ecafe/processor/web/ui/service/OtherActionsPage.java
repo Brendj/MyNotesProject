@@ -105,7 +105,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
     }
 
     public void runImportRNIPPayment() throws Exception {
-        RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).run(); //DEF
+        RuntimeContext.getAppContext().getBean(RNIPLoadPaymentsService.class).runRequests(); //DEF
         printMessage("Импорт платежей RNIP был выполнен успешно");
     }
 

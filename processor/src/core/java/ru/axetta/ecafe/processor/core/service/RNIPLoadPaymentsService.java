@@ -231,7 +231,7 @@ public class RNIPLoadPaymentsService {
             logger.error(String.format("Ошибка при добавлении каталога для контрагента %s: %s", contragent.getContragentName(), soapError));
             throw new IllegalStateException ("Ошибка во время обращения к РНИП: " + soapError);
         }
-        info("Каталог для контрагента %s создан", contragent.getContragentName());
+        info("Каталог для контрагента %s добавлен в очередь обработки РНиП", contragent.getContragentName());
     }
 
 
@@ -260,13 +260,26 @@ public class RNIPLoadPaymentsService {
             logger.error(String.format("Ошибка при изменении каталога для контрагента %s: %s", contragent.getContragentName(), soapError));
             throw new IllegalStateException ("Ошибка во время обращения к РНИП: " + soapError);
         }
-        info("Каталог для контрагента %s изменен", contragent.getContragentName());
+        info("Каталог для контрагента %s добавлен в очередь обработки РНиП", contragent.getContragentName());
     }
 
 
-    public void run() {
+    public void runGetResponse() {
+        if (!isOn()) {
+            //return;
+        }
+        RNIPLoadPaymentsService rnipLoadPaymentsService = getRNIPServiceBean();
+        rnipLoadPaymentsService.forceRunGetResponse();
+    }
+
+    protected void forceRunGetResponse() {
+        //в версии 1.15 ничего не делаем
+    }
+
+    public void runRequests() {
         run(null, null);
     }
+
     public void run(Date startDate, Date endDate) {
         if (!isOn()) {
             return;

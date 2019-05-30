@@ -6,10 +6,9 @@ package ru.axetta.ecafe.processor.core.service;
 
 import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.SMEVMessageExchangePortType;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.SMEVMessageExchangeService;
-import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.SendRequestRequest;
-import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.SendRequestResponse;
-import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.SenderProvidedRequestData;
+import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.*;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.MessagePrimaryContent;
+import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.ObjectFactory;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.XMLDSigSignatureType;
 import generated.ru.mos.rnip.xsd.catalog._2_1.*;
 import generated.ru.mos.rnip.xsd.common._2_1.*;
@@ -18,10 +17,13 @@ import generated.ru.mos.rnip.xsd.searchconditions._2_1.PaymentsExportConditions;
 import generated.ru.mos.rnip.xsd.searchconditions._2_1.TimeConditionsType;
 import generated.ru.mos.rnip.xsd.services.export_payments._2_1.ExportPaymentsRequest;
 import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogRequest;
+import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogResponse;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.RnipEventType;
+import ru.axetta.ecafe.processor.core.persistence.RnipMessage;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -34,6 +36,8 @@ import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.*;
+
+import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.ObjectFactory;
 
 /**
  * Created by nuc on 17.10.2018.
@@ -55,7 +59,23 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
 
     @Override
     public Object executeRequest(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
-        return executeRequest21(requestType, contragent, updateDate, startDate, endDate);
+        SendRequestResponse requestResponse = (SendRequestResponse)executeRequest21(requestType, contragent, updateDate, startDate, endDate);
+        if (isRequestQueued(requestResponse)) {
+            RnipEventType eventType = null;
+            if (requestType == REQUEST_MODIFY_CATALOG) eventType = RnipEventType.CONTRAGENT_EDIT;
+            else if (requestType == REQUEST_CREATE_CATALOG) eventType = RnipEventType.CONTRAGENT_CREATE;
+            RnipDAOService.getInstance().saveRnipMessage(requestResponse, contragent, eventType);
+        }
+        return requestResponse;
+    }
+
+    private boolean isRequestQueued(SendRequestResponse requestResponse) {
+        try {
+            return requestResponse.getMessageMetadata().getStatus().equals(generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.InteractionStatusType.REQUEST_IS_QUEUED);
+        } catch (Exception e) {
+            logger.error("Response from RNIP - request was not queued", e);
+        }
+        return false;
     }
 
     public Object executeRequest21(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
@@ -464,4 +484,58 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         }
         return hasError.get();
     }
+
+    protected void forceRunGetResponse() {
+        List<RnipMessage> messages = RnipDAOService.getInstance().getRnipMessages();
+        for (RnipMessage rnipMessage : messages) {
+            try {
+                processRnipMessage(rnipMessage);
+            } catch (Exception e) {
+                logger.error("Error in processing rnip message async", e);
+            }
+        }
+    }
+
+    private void processRnipMessage(RnipMessage rnipMessage) throws Exception {
+        InitRNIP21Service();
+        String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
+        String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
+        final RNIPSecuritySOAPHandlerV21 pfrSecuritySOAPHandler = new RNIPSecuritySOAPHandlerV21(alias, pass, getPacketLogger(rnipMessage.getContragent()));
+        final List<Handler> handlerChain = new ArrayList<Handler>();
+        handlerChain.add(pfrSecuritySOAPHandler);
+        bindingProvider21.getBinding().setHandlerChain(handlerChain);
+
+        generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.ObjectFactory requestObjectFactory =
+                new generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.ObjectFactory();
+        GetResponseRequest getResponseRequest = requestObjectFactory.createGetResponseRequest();
+
+        generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.ObjectFactory messageExchangeObjectFactory = new ObjectFactory();
+        XMLDSigSignatureType callerInformationSystemSignature = messageExchangeObjectFactory.createXMLDSigSignatureType();
+        getResponseRequest.setCallerInformationSystemSignature(callerInformationSystemSignature);
+
+        GetResponseRequest.OriginalMessageID originalMessageID = requestObjectFactory.createGetResponseRequestOriginalMessageID();
+        originalMessageID.setId(RNIPSecuritySOAPHandlerV21.SIGN_ID);
+        originalMessageID.setValue(rnipMessage.getRequestId());
+        getResponseRequest.setOriginalMessageID(originalMessageID);
+        GetResponseRequest.Sender sender = requestObjectFactory.createGetResponseRequestSender();
+        sender.setMnemonic(getMacroPart(rnipMessage.getContragent(), "CONTRAGENT_ID"));
+        getResponseRequest.setSender(sender);
+
+        GetResponseResponse response = null;
+        try {
+            response = port21.getResponse(getResponseRequest);
+            GetResponseResponse.ResponseMessage responseMessage = response.getResponseMessage();
+            Response internalResponse = responseMessage.getResponse();
+            SenderProvidedResponseData senderProvidedResponseData = internalResponse.getSenderProvidedResponseData();
+            MessagePrimaryContent messagePrimaryContent = senderProvidedResponseData.getMessagePrimaryContent();
+            ImportCatalogResponse importCatalogResponse = messagePrimaryContent.getImportCatalogResponse();
+            SingleImportProtocolType importProtocolType = importCatalogResponse.getImportProtocol();
+            String responseMessageToSave = importProtocolType.getCode() + " " + importProtocolType.getDescription();
+            RnipDAOService.getInstance().saveAsProcessed(rnipMessage, responseMessageToSave);
+        } catch (Exception e) {
+            logger.error("Error in request to rnip 2.1", e);
+            return;
+        }
+    }
+
 }

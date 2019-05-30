@@ -89,6 +89,14 @@
     <h:inputTextarea readonly="true" rows="5" cols="64" value="#{mainPage.contragentViewPage.remarks}"
                      styleClass="input-text" />
 </h:panelGrid>
+<h:panelGrid styleClass="borderless-grid" rendered="#{mainPage.contragentViewPage.hasRnip()}">
+    <h:outputText escape="true" value="Лог взаимодействия с каталогом РНиП (последние 10 записей)" styleClass="output-text" />
+    <h:outputText escape="false" value="#{mainPage.contragentViewPage.rnipLogEdit}" styleClass="output-text" />
+</h:panelGrid>
+<h:panelGrid styleClass="borderless-grid" rendered="#{mainPage.contragentViewPage.hasRnip()}">
+    <h:outputText escape="true" value="Лог экспорта платежей из РНиП (последние 10 записей)" styleClass="output-text" />
+    <h:outputText escape="false" value="#{mainPage.contragentViewPage.rnipLogPayment}" styleClass="output-text" />
+</h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showContragentEditPage}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />

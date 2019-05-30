@@ -64,7 +64,12 @@ public class RNIPSecuritySOAPHandlerV21 extends RNIPSecuritySOAPHandler implemen
 
                 Element token = (Element)doc.getElementsByTagName("ns2:CallerInformationSystemSignature").item(0);
                 Element assertionNode = (Element)doc.getElementsByTagName("ns2:SenderProvidedRequestData").item(0);
-                assertionNode.setIdAttribute("Id", true);
+                try {
+                    assertionNode.setIdAttribute("Id", true);
+                } catch (NullPointerException npe) {
+                    assertionNode = (Element)doc.getElementsByTagName("ns2:OriginalMessageID").item(0);
+                    assertionNode.setIdAttribute("Id", true);
+                }
 
                 // Ссылка на подписываемые данные с алгоритмом хеширования ГОСТ 34.11.
                 final Reference ref =

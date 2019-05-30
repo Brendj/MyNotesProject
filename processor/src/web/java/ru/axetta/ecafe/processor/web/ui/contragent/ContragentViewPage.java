@@ -4,13 +4,20 @@
 
 package ru.axetta.ecafe.processor.web.ui.contragent;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.RnipEventType;
+import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
+import ru.axetta.ecafe.processor.core.service.RnipDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -87,6 +94,25 @@ public class ContragentViewPage extends BasicWorkspacePage {
     private String ogrn;
     private String defaultPayContragent;
     private boolean payByCashier;
+
+    public boolean hasRnip() {
+        RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
+        return !StringUtils.isEmpty(rnipLoadPaymentsService.getRNIPIdFromRemarks (this.remarks));
+    }
+
+    public String getRnipLogEdit() {
+        List<RnipEventType> list = new ArrayList<>();
+        list.add(RnipEventType.CONTRAGENT_CREATE);
+        list.add(RnipEventType.CONTRAGENT_EDIT);
+        return RuntimeContext.getAppContext().getBean(RnipDAOService.class).getRnipInfoResultString(idOfContragent, list);
+    }
+
+    public String getRnipLogPayment() {
+        List<RnipEventType> list = new ArrayList<>();
+        list.add(RnipEventType.PAYMENT);
+        list.add(RnipEventType.PAYMENT_MODIFIED);
+        return RuntimeContext.getAppContext().getBean(RnipDAOService.class).getRnipInfoResultString(idOfContragent, list);
+    }
 
     public Long getIdOfContragent() {
         return idOfContragent;
