@@ -50,7 +50,6 @@ public class MigrantsReportPage extends OnlineReportPage {
 
     private String htmlReport = null;
     private Boolean applyUserSettings = false;
-    private PeriodTypeMenu periodTypeMenu;
     private String migrantType;
     private Boolean showAllMigrants = false;
     private Integer selectedPeriodType = MigrantsReport.PERIOD_TYPE_VISIT;

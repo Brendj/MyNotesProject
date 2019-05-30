@@ -57,7 +57,7 @@
                          styleClass="input-text" style="width: 250px;" readonly="#{mainPage.migrantsReportPage.showAllMigrants}">
             <f:converter converterId="periodTypeConverter" />
             <f:selectItems value="#{mainPage.migrantsReportPage.periodTypeMenu.items}" />
-            <a4j:support event="onchange" reRender="endDateCalendar migrantsReportPanelGrid"
+            <a4j:support event="onchange" reRender="endDateCalendar,migrantsReportPanelGrid"
                          actionListener="#{mainPage.migrantsReportPage.onReportPeriodChanged}" />
         </h:selectOneMenu>
         <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
