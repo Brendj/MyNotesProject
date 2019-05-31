@@ -82,7 +82,7 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             String getDataQuery;
 
             if(showOnlyUnpaidItems) {
-                getDataQuery = getUnpaidComplexesQueryPart(idOfContragentCondition, idOfOrgsCondition);;
+                getDataQuery = getUnpaidComplexesQueryPart(idOfContragentCondition, idOfOrgsCondition);
             } else {
                 getDataQuery = " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, "
                         + "o.shortnameinfoservice, o.address, c.contractId, pc.preorderDate, "
