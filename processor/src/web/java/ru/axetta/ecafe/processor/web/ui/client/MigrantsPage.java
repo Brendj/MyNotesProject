@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.VisitReqResolutionHist;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.items.MigrantItem;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -179,11 +180,9 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
 
             isFirstStatement = false;
         }
-        if (!clientIDList.isEmpty()) {
-            String clientIDListStr = StringUtils.join(clientIDList, ", ");
-
+        if (!CollectionUtils.isEmpty(clientIDList)) {
             strQuery += isFirstStatement ? "" : " AND ";
-            strQuery += " cc.idOfClient LIKE (" + clientIDListStr + ")";
+            strQuery += " cc.idOfClient IN (:clientIDList)";
         }
 
         if(!ignoreDates){
@@ -201,6 +200,9 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
         SQLQuery query = session.createSQLQuery(strQuery);
         if(idOfOrg != null){
             query.setParameter("idOfOrg", idOfOrg);
+        }
+        if(!CollectionUtils.isEmpty(clientIDList)){
+            query.setParameterList("clientIDList", clientIDList);
         }
         if(!ignoreDates){
             query.setParameter("startDate", startDate.getTime());
