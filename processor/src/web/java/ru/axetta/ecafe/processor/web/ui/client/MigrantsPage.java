@@ -96,6 +96,9 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
         if (StringUtils.isEmpty(guid) && idOfOrg == null && clientList.isEmpty()) {
             printError("Выберите организацию, введите Guid клиента или выберите клиента");
             return;
+        } else if(startDate.after(endDate)){
+            printError("Начальная дата выборки больше конечной даты");
+            return;
         }
         startDate = CalendarUtils.startOfDay(startDate);
         endDate = CalendarUtils.endOfDay(endDate);

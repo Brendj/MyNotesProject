@@ -86,14 +86,14 @@
                    warnClass="warn-messages" />
 
     <rich:dataTable id="migrantsTable" value="#{migrantsPage.items}" var="item" rows="10" footerClass="data-table-footer">
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" sortBy="#{item.requestNumber}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер заявки" />
             </f:facet>
             <h:outputText escape="true" value="#{item.requestNumber}"
                           styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" sortBy="#{item.lastUpdateDateTime}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Дата создания/редактирования" />
             </f:facet>
