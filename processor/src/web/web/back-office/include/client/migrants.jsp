@@ -1,19 +1,3 @@
-<%--
-  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
-  --%>
-
-<%--
-  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
-  --%>
-
-<%--
-  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
-  --%>
-
-<%--
-  ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
-  --%>
-
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%--
   ~ Copyright (c) 2018. Axetta LLC. All Rights Reserved.
@@ -30,7 +14,7 @@
     <rich:simpleTogglePanel label="Фильтр" switchType="client"
                             eventsQueue="mainFormEventsQueue" opened="true" headerClass="filter-panel-header">
 
-        <h:panelGrid columns="2" styleClass="borderless-grid" columnClasses="column-width-250,column-width-500">
+        <h:panelGrid columns="2" styleClass="borderless-grid" columnClasses="column-width-250,column-width-500" id="migrantsServisePanelGrid">
 
             <h:outputText escape="true" value="Организация" styleClass="output-text" />
             <h:panelGroup styleClass="borderless-grid">
@@ -64,18 +48,24 @@
 
             <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
             <rich:calendar value="#{migrantsPage.startDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" readonly="#{migrantsPage.ignoreDates}">
             </rich:calendar>
 
             <h:outputText escape="true" value="Конечная дата" styleClass="output-text" />
             <rich:calendar id="endDateCalendar" value="#{migrantsPage.endDate}" datePattern="dd.MM.yyyy"
-                           converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                           converter="dateConverter" inputClass="input-text" showWeeksBar="false" readonly="#{migrantsPage.ignoreDates}">
             </rich:calendar>
 
-            <h:outputText escape="true" value="Показывать архивные заявки" styleClass="output-text" />
+            <h:outputText escape="true" value="Строить за всё время" styleClass="output-text" />
             <h:selectBooleanCheckbox id="showAllMigrants"
-                                     value="#{migrantsPage.showAllMigrants}"
-                                     styleClass="output-text" />
+                                     value="#{migrantsPage.ignoreDates}"
+                                     styleClass="output-text" >
+                <a4j:support event="onchange" reRender="migrantsServisePanelGrid"/>
+            </h:selectBooleanCheckbox>
+            <h:outputText escape="true" value="Тип заявок" styleClass="output-text" />
+            <h:selectOneMenu value="#{migrantsPage.migrantType}" style="width:180px;">
+                <f:selectItems value="#{migrantsPage.migrantTypes}" />
+            </h:selectOneMenu>
         </h:panelGrid>
 
         <h:panelGrid columns="2" styleClass="borderless-grid">
@@ -96,14 +86,14 @@
                    warnClass="warn-messages" />
 
     <rich:dataTable id="migrantsTable" value="#{migrantsPage.items}" var="item" rows="10" footerClass="data-table-footer">
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" sortBy="#{item.requestNumber}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер заявки" />
             </f:facet>
             <h:outputText escape="true" value="#{item.requestNumber}"
                           styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" sortBy="#{item.lastUpdateDateTime}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Дата создания/редактирования" />
             </f:facet>
