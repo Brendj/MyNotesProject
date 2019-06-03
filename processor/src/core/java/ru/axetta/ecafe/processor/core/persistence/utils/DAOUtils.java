@@ -1340,6 +1340,30 @@ public class DAOUtils {
         return publicKey;
     }
 
+    public static Contragent getContragentbyClientId(Session persistenceSession, Integer clientId) throws Exception {
+        PublicKey publicKey;
+        Transaction persistenceTransaction = null;
+        Contragent contragent = null;
+        //try {
+        //    // Start data model transaction
+        //    persistenceTransaction = persistenceSession.beginTransaction();
+        //    // Find given org
+        //    Client client = (Client) persistenceSession.get(Client.class, clientId);
+        //    if (null == client) {
+        //        throw new NullPointerException("Unknown client with id == "+clientId);
+        //    }
+        //    Criteria criteria = persistenceSession.createCriteria(Contragent.class).createAlias("orgs", "org")
+        //            .createAlias("org.client", "c").add(Restrictions.ge("idofclient", clientId));
+        //    //contragent = criteria.list().get(0);
+        //    persistenceTransaction.commit();
+        //    persistenceTransaction = null;
+        //} finally {
+        //    HibernateUtils.rollback(persistenceTransaction, logger);
+        //    HibernateUtils.close(persistenceSession, logger);
+        //}
+        return contragent;
+    }
+
     /**
      * Возвращает список транзакций произведенных в интревале времени, для конкретной организации
      * и с укзазанием спика необходимого типа транзакций (если список пуст то не будет оганичеваться по данному критерию)
