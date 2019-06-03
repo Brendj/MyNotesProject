@@ -566,7 +566,7 @@ public class FinancialOpsManager {
         ClientBalanceHold clientBalanceHold = (ClientBalanceHold)session.get(ClientBalanceHold.class, idOfClientBalanceHold);
         ClientAccountManager.processAccountTransaction(session, clientBalanceHold.getClient(),
                 null, clientBalanceHold.getHoldSum(), clientBalanceHold.getAccountTransaction().getIdOfTransaction().toString(),
-                AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, null, new Date());
+                AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, clientBalanceHold.getOldOrg().getIdOfOrg(), new Date());
         RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).setStatusWithValue(idOfClientBalanceHold, status);
         session.save(clientBalanceHold);
     }
@@ -575,6 +575,6 @@ public class FinancialOpsManager {
     public void declineClientBalanceNonTransactional(Session session, ClientBalanceHold clientBalanceHold) throws Exception {
         ClientAccountManager.processAccountTransaction(session, clientBalanceHold.getClient(),
                 null, clientBalanceHold.getHoldSum(), clientBalanceHold.getAccountTransaction().getIdOfTransaction().toString(),
-                AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, null, new Date());
+                AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, clientBalanceHold.getOldOrg().getIdOfOrg(), new Date());
     }
 }
