@@ -116,7 +116,7 @@ public class ClientBalanceHoldItem {
             element.setAttribute("RequestStatus", Integer.toString(requestStatus));
         }
         if (null != phoneOfDeclarer) {
-            element.setAttribute("DeclarerPhone", phoneOfDeclarer);
+            element.setAttribute("PhoneOfDeclarer", phoneOfDeclarer);
         }
         if (null != declarerInn) {
             element.setAttribute("DeclarerInn", declarerInn);

@@ -76,10 +76,11 @@ public class ClientBalanceHoldService {
 
     public List<ClientBalanceHold> getClientBalanceHoldForOrgSinceVersion(Session session,
             long orgOwner, long version) throws Exception {
+        List<Long> listOfOrgs = DAOUtils.findFriendlyOrgIds(session, orgOwner);
         Query query = session.createQuery("select cbh from ClientBalanceHold cbh "
-                + "where cbh.version > :version and cbh.oldOrg.idOfOrg = :idOfOrg");
+                + "where cbh.version > :version and (cbh.oldOrg.idOfOrg in (:idOfOrgList) or cbh.newOrg.idOfOrg in (:idOfOrgList))");
         query.setParameter("version", version);
-        query.setParameter("idOfOrg", orgOwner);
+        query.setParameterList("idOfOrgList", listOfOrgs);
         return query.list();
     }
 
