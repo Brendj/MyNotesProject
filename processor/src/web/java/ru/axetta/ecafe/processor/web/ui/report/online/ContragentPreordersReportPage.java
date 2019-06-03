@@ -173,9 +173,12 @@ public class ContragentPreordersReportPage extends OnlineReportPage implements O
             builder.setContragent(this.contragent);
             builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
             builder.getReportProperties().setProperty("showOnlyUnpaidItems", showOnlyUnpaidItems.toString());
+
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
