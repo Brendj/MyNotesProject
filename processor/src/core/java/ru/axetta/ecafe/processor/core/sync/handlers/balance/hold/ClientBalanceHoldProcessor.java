@@ -25,6 +25,7 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
     private final ClientBalanceHoldRequest clientBalanceHoldRequest;
     private final ClientBalanceHoldData clientBalanceHoldData;
     private final static Logger logger = LoggerFactory.getLogger(ClientBalanceHoldProcessor.class);
+    private static final String WRONG_STATUS = "Заявление не может быть аннулировано";
 
     public ClientBalanceHoldProcessor(Session persistenceSession, ClientBalanceHoldRequest clientBalanceHoldRequest, ClientBalanceHoldData clientBalanceHoldData) {
         super(persistenceSession);
@@ -74,6 +75,20 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
                             newOrg, oldContragent, newContragent, createStatus, requestStatus, item.getPhoneOfDeclarer(),
                             item.getDeclarerInn(), item.getDeclarerAccount(), item.getDeclarerBank(), item.getDeclarerBik(), item.getDeclarerCorrAccount(), nextVersion);
                 } else {
+                    //Проверяем пришедший статус. если приходит аннулирование, то заявление на тек. момент может быть только в статусе создания. Иной статус - ошибка
+                    if (item.getRequestStatus().equals(ClientBalanceHoldRequestStatus.ANNULLED.ordinal())) {
+                        if (!clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.ANNULLED)
+                                && !clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.CREATED)) {
+                            ClientBalanceHoldItem resItem = new ClientBalanceHoldItem(item.getGuid(), 102, WRONG_STATUS, null);
+                            items.add(resItem);
+                            continue;
+                        }
+                        //если прежний статус - Создано, а новый Аннулировано, возвращаем баланс
+                        if (clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.CREATED)) {
+                            RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
+                                    .declineClientBalance(clientBalanceHold.getIdOfClientBalanceHold(), ClientBalanceHoldRequestStatus.ANNULLED);
+                        }
+                    }
                     //Если объект найден в БД, то меняем только статусы, данные о заявителе и версию
                     clientBalanceHold.setVersion(nextVersion);
                     clientBalanceHold.setCreateStatus(ClientBalanceHoldCreateStatus.fromInteger(item.getCreateStatus()));
