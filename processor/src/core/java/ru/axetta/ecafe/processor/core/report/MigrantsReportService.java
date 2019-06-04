@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.report;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -312,10 +313,17 @@ public class MigrantsReportService {
             idOfOrg2 = org2.getIdOfOrg();
             orgShortName2 = org2.getShortName();
             orgAddress2 = org2.getAddress();
-            Long numberLong = migrant.getCompositeIdOfMigrant().getIdOfRequest()/10L;
             number = migrant.getRequestNumber();
-            resolutionCause = resolutions.get(0).getResolutionCause() != null ? resolutions.get(0).getResolutionCause() : NO_DATA;
-            contactInfo = resolutions.get(0).getContactInfo() != null ? resolutions.get(0).getContactInfo() : NO_DATA;
+            if(!CollectionUtils.isEmpty(resolutions)) {
+                resolutionCause =
+                        resolutions.get(0).getResolutionCause() != null ? resolutions.get(0).getResolutionCause() : NO_DATA;
+                contactInfo = resolutions.get(0).getContactInfo() != null ? resolutions.get(0).getContactInfo() : NO_DATA;
+                resolution = MigrantsUtils.getResolutionString(resolutions.get(resolutions.size() - 1).getResolution());
+            } else {
+                resolutionCause = NO_DATA;
+                contactInfo = NO_DATA;
+                resolution = NO_DATA;
+            }
             contractId = migrant.getClientMigrate().getContractId();
             name = migrant.getClientMigrate().getPerson().getFullName();
             groupName = getGroupNameByClient(migrant.getClientMigrate());
@@ -325,10 +333,10 @@ public class MigrantsReportService {
             gtStartDate = startTime.after(migrant.getVisitStartDate());
             endDate = CalendarUtils.dateShortToStringFullYear(migrant.getVisitEndDate());
             gtEndDate = migrant.getVisitEndDate().after(endTime);
-            resolution = MigrantsUtils.getResolutionString(resolutions.get(resolutions.size() - 1).getResolution());
         }
 
         private static String getGroupNameForOrgVisitByClient(Client client, List<VisitReqResolutionHist> resolutions){
+            if(CollectionUtils.isEmpty(resolutions)) return NO_DATA;
             List<Integer> resolInts = new ArrayList<Integer>();
             for(VisitReqResolutionHist v : resolutions){
                 resolInts.add(v.getResolution());

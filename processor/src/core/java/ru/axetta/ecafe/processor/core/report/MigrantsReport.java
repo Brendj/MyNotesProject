@@ -71,16 +71,18 @@ public class MigrantsReport extends BasicReportForListOrgsJob {
         @Override
         public BasicReportJob build(Session session, Date startTime, Date endTime, Calendar calendar) throws Exception {
             Date generateTime = new Date();
-            Map<String, Object> parameterMap = new HashMap<String, Object>();
-            parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
-            parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
-            parameterMap.put("reportName", REPORT_NAME);
-            parameterMap.put("SUBREPORT_DIR", RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath());
-
             String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
             Boolean showAllMigrants = Boolean.parseBoolean(reportProperties.getProperty("showAllMigrants", "false"));
             Integer periodType = Integer.parseInt(reportProperties.getProperty("periodType", PERIOD_TYPE_VISIT.toString()));
             List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
+
+            Map<String, Object> parameterMap = new HashMap<String, Object>();
+            parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
+            parameterMap.put("endDate", CalendarUtils.dateShortToStringFullYear(endTime));
+            parameterMap.put("reportName", REPORT_NAME);
+            parameterMap.put("showAllMigrants", showAllMigrants);
+            parameterMap.put("SUBREPORT_DIR", RuntimeContext.getInstance().getAutoReportGenerator().getReportsTemplateFilePath());
+
             List<Long> idOfOrgList = new ArrayList<Long>(stringOrgList.size());
             for (String idOfOrg : stringOrgList) {
                 idOfOrgList.add(Long.parseLong(idOfOrg));

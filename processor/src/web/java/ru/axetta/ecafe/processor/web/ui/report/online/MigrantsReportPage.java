@@ -83,29 +83,7 @@ public class MigrantsReportPage extends OnlineReportPage {
     public Object buildReportHTML() {
         htmlReport = null;
         if (validateFormData())  return null;
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String templateFilename = checkIsExistFile(".jasper");
-        if (StringUtils.isEmpty(templateFilename)) {
-            return null;
-        }
-        MigrantsReport.Builder builder = new MigrantsReport.Builder(templateFilename);
-        builder.setReportProperties(buildProperties());
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        BasicReportJob report = null;
-        try {
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed export report : ", e);
-            printError("Ошибка при подготовке отчета: " + e.getMessage());
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
+        BasicReportJob report = buildReport();
         if (report != null) {
             try {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -127,6 +105,33 @@ public class MigrantsReportPage extends OnlineReportPage {
             }
         }
         return null;
+    }
+
+    private BasicReportJob buildReport() {
+        String templateFilename = checkIsExistFile(".jasper");
+        if (StringUtils.isEmpty(templateFilename)) {
+            return null;
+        }
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        MigrantsReport.Builder builder = new MigrantsReport.Builder(templateFilename);
+        builder.setReportProperties(buildProperties());
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        BasicReportJob report = null;
+        try {
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return report;
     }
 
     private String checkIsExistFile(String suffix) {
@@ -164,29 +169,8 @@ public class MigrantsReportPage extends OnlineReportPage {
 
     public void exportToXLS(ActionEvent actionEvent){
         if (validateFormData()) return;
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String templateFilename = checkIsExistFile(".jasper");
-        if (StringUtils.isEmpty(templateFilename)) return ;
         Date generateTime = new Date();
-        MigrantsReport.Builder builder = new MigrantsReport.Builder(templateFilename);
-        builder.setReportProperties(buildProperties());
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        BasicReportJob report = null;
-        try {
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed export report : ", e);
-            printError("Ошибка при подготовке отчета: " + e.getMessage());
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-
+        BasicReportJob report = buildReport();
         if(report!=null){
             try {
                 FacesContext facesContext = FacesContext.getCurrentInstance();
