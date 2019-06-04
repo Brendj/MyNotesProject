@@ -83,7 +83,8 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
                     //Проверяем пришедший статус. если приходит аннулирование, то заявление на тек. момент может быть только в статусе создания. Иной статус - ошибка
                     if (item.getRequestStatus().equals(ClientBalanceHoldRequestStatus.ANNULLED.ordinal())) {
                         if (!clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.ANNULLED)
-                                && !clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.CREATED)) {
+                                && !clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.CREATED)
+                                && !clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.SUBSCRIBED)) {
                             ClientBalanceHoldItem resItem = new ClientBalanceHoldItem(item.getGuid(), 102, WRONG_STATUS, null);
                             items.add(resItem);
                             continue;
