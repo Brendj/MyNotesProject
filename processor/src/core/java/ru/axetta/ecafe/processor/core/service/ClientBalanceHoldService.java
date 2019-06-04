@@ -62,6 +62,18 @@ public class ClientBalanceHoldService {
         return clientBalanceHold;
     }
 
+    public static BalanceHoldTransaction processClientBalanceHoldTransaction(Session session, String guid, Long summ) throws Exception {
+        Query query = session.createQuery("select cbh from ClientBalanceHold cbh where cbh.guid = :guid");
+        query.setParameter("guid", guid);
+        ClientBalanceHold clientBalanceHold = (ClientBalanceHold)query.uniqueResult();
+        if (clientBalanceHold == null) throw new Exception("Client Balance Hold not found by guid");
+        Long nextVersion = DAOUtils.nextVersionByClientBalanceHold(session);
+        clientBalanceHold.setHoldSum(clientBalanceHold.getHoldSum() - summ);
+        clientBalanceHold.setVersion(nextVersion);
+        session.update(clientBalanceHold);
+        return new BalanceHoldTransaction(clientBalanceHold, summ, new Date());
+    }
+
     public void holdClientBalance(String guid, Client client, Long holdSum, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
             ClientBalanceHoldCreateStatus createStatus, ClientBalanceHoldRequestStatus requestStatus, String phoneOfDeclarer,
             String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, Long version) throws Exception {

@@ -20,7 +20,7 @@
         <property name="createdDate" column="createdDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <property name="holdSum" column="holdSum" type="long" update="false" not-null="true"/>
+        <property name="holdSum" column="holdSum" type="long" not-null="true"/>
         <property name="version" column="version" type="long" not-null="true"/>
         <property name="declarerInn" column="declarerInn" type="string" length="20"/>
         <property name="declarerAccount" column="declarerAccount" type="string" length="20"/>
