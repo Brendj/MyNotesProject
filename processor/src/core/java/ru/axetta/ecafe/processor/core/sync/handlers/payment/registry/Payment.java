@@ -124,6 +124,10 @@ public class Payment {
         String guidOfCBHR = getStringValueNullSafe(namedNodeMap, "GuidOfCBHR");
         Long summOfCBHR = getLongValueNullSafe(namedNodeMap, "SummFromCBHR");
         if (summOfCBHR == null) summOfCBHR = 0L;
+        //для случая, когда заказ частью оплачивается из заблокированных средств, а частью с основного баланса - уменьшаем сумму по карте
+        //на сумму из заблокированных средств. В обработке заказа в FinancialOpsManager.createOrderCharge в этом случае будет две
+        //транзакции - по обычному балансу и по заблокированному. Если sumByCard == summOfCBHR, то заказ целиком по заблокированному балансу
+        sumByCard = sumByCard - summOfCBHR;
 
         return new Payment(cardNo, date, orderDate, socDiscount, trdDiscount, grant, idOfOrg, idOfClient, idOfPayForClient, idOfOrder,
                 idOfCashier, sumByCard, sumByCash, rSum, idOfPOS,confirmerId, state, comments, OrderTypeEnumType.fromInteger(orderType),

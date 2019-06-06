@@ -142,7 +142,8 @@ public class FinancialOpsManager {
             BalanceHoldTransaction balanceHoldTransaction = ClientBalanceHoldService
                     .processClientBalanceHoldTransaction(session, payment.getGuidOfCBHR(), payment.getSummFromCBHR());
             session.save(balanceHoldTransaction);
-        } else if (0 != payment.getSumByCard()) { // If "card part" of payment is specified...
+        }
+        if (0 != payment.getSumByCard()) { // If "card part" of payment is specified...
             if(payment.getOrderType()==null){
                 // поддержка старых версий
                 orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
