@@ -99,9 +99,7 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
                     clientBalanceHold.setVersion(nextVersion);
                     clientBalanceHold.setCreateStatus(ClientBalanceHoldCreateStatus.fromInteger(item.getCreateStatus()));
                     clientBalanceHold.setRequestStatus(ClientBalanceHoldRequestStatus.fromInteger(item.getRequestStatus()));
-                    if (clientBalanceHold.getDeclarer() == null) {
-                        clientBalanceHold.setDeclarer(declarer);
-                    }
+                    clientBalanceHold.setDeclarer(declarer);
                     clientBalanceHold.setPhoneOfDeclarer(item.getPhoneOfDeclarer());
                     clientBalanceHold.setDeclarerAccount(item.getDeclarerAccount());
                     clientBalanceHold.setDeclarerBank(item.getDeclarerBank());
