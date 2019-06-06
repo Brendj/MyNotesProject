@@ -964,6 +964,38 @@
     <%--@elvariable id="orgSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.OrgSettingsReportPage"--%>
     <rich:panelMenuItem id="orgSettingsReport" binding="#{orgSettingsReportPage.mainMenuComponent}"
                         label="Настройки ОО" action="#{orgSettingsReportPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuGroup id="webTechnologistGroupMenuItem" label="WEB-Технолог">
+        <a4j:support event="onclick" reRender="workspaceForm" />
+
+        <rich:panelMenuGroup id="webTechnologistGroupDish" binding="#{mainPage.nsiGroupContingentPage.mainMenuComponent}"
+                             label="Блюда" rendered="#{mainPage.eligibleToServiceAdmin}">
+            <a4j:support event="onclick" action="#{mainPage.showNSIGroupContingentPage}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="webTechnologistGroupDishList" binding="#{pupilCatalogFindPage.mainMenuComponent}"
+                                label="Список блюд" action="#{pupilCatalogFindPage.show}" reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="webTechnologistGroupDishCreate" binding="#{NSIOrgRegistrySynchPage.mainMenuComponent}"
+                                label="Создать" action="#{NSIOrgRegistrySynchPage.show}"
+                                reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+
+        <rich:panelMenuGroup id="webTechnologistCatalogs" binding="#{mainPage.nsiGroupOrgPage.mainMenuComponent}"
+                             label="Справочники" rendered="#{mainPage.eligibleToServiceAdmin}">
+            <a4j:support event="onclick" action="#{mainPage.showNSIGroupOrgPage}" reRender="workspaceForm" />
+
+
+            <rich:panelMenuItem id="webTechnologistCatalogsList" binding="#{orgCatalogFindPage.mainMenuComponent}"
+                                label="Список справочников" action="#{orgCatalogFindPage.show}"
+                                reRender="workspaceForm" />
+
+            <rich:panelMenuItem id="nsiOrgsRegistrySync" binding="#{NSIOrgsRegistrySynchPage.mainMenuComponent}"
+                                label="Создать справочник" action="#{NSIOrgsRegistrySynchPage.show}"
+                                reRender="workspaceForm" />
+
+        </rich:panelMenuGroup>
+    </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"
