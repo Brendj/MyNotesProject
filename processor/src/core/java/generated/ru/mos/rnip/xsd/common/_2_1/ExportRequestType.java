@@ -18,11 +18,11 @@ import javax.xml.bind.annotation.*;
  * <pre>
  * &lt;complexType name="ExportRequestType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}RequestType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}RequestType">
  *       &lt;sequence>
- *         &lt;element name="Paging" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PagingType" minOccurs="0"/>
+ *         &lt;element name="Paging" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PagingType" minOccurs="0"/>
  *       &lt;/sequence>
- *       &lt;attribute name="originatorId" type="{http://rnip.mos.ru/xsd/Common/2.1.0}URNType" />
+ *       &lt;attribute name="originatorId" type="{http://rnip.mos.ru/xsd/Common/2.1.1}URNType" />
  *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>

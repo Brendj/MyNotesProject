@@ -12,9 +12,9 @@ import javax.xml.bind.annotation.*;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Catalog/2.1.0}DescriptionParameterType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Catalog/2.1.1}DescriptionParameterType">
  *       &lt;sequence>
- *         &lt;element name="AllowedValues" type="{http://rnip.mos.ru/xsd/Catalog/2.1.0}AllowedValuesType" minOccurs="0"/>
+ *         &lt;element name="AllowedValues" type="{http://rnip.mos.ru/xsd/Catalog/2.1.1}AllowedValuesType" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="regexp">
  *         &lt;simpleType>

@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="CertificateInfo" type="{http://rnip.mos.ru/xsd/Common/2.1.0}CertificateInfoType"/>
+ *         &lt;element name="CertificateInfo" type="{http://rnip.mos.ru/xsd/Common/2.1.1}CertificateInfoType"/>
  *       &lt;/sequence>
  *       &lt;attribute name="Id" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" />
  *       &lt;attribute name="operation" use="required">

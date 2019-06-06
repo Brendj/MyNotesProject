@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * <pre>
  * &lt;complexType name="ImportProtocolType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}SingleImportProtocolType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}SingleImportProtocolType">
  *       &lt;attribute name="entityID" use="required" type="{http://www.w3.org/2001/XMLSchema}ID" />
  *     &lt;/extension>
  *   &lt;/complexContent>

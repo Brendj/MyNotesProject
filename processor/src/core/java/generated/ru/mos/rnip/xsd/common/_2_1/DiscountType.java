@@ -14,8 +14,8 @@ import javax.xml.bind.annotation.*;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Value" type="{http://rnip.mos.ru/xsd/Common/2.1.0}DiscountValueType"/>
- *         &lt;element name="Expiry" type="{http://rnip.mos.ru/xsd/Common/2.1.0}DiscountDateType"/>
+ *         &lt;element name="Value" type="{http://rnip.mos.ru/xsd/Common/2.1.1}DiscountValueType"/>
+ *         &lt;element name="Expiry" type="{http://rnip.mos.ru/xsd/Common/2.1.1}DiscountDateType"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>

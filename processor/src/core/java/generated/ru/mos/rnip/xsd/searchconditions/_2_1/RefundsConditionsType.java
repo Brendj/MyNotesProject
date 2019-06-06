@@ -19,7 +19,7 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="RefundId" type="{http://rnip.mos.ru/xsd/Common/2.1.0}RefundIdType" maxOccurs="100"/>
+ *         &lt;element name="RefundId" type="{http://rnip.mos.ru/xsd/Common/2.1.1}RefundIdType" maxOccurs="100"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>

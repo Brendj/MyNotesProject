@@ -15,9 +15,9 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;restriction base="{http://rnip.mos.ru/xsd/Package/2.1.0}PackageType">
+ *     &lt;restriction base="{http://rnip.mos.ru/xsd/Package/2.1.1}PackageType">
  *       &lt;choice>
- *         &lt;element name="ImportedCharge" type="{http://rnip.mos.ru/xsd/Package/2.1.0}ImportedChargeType" maxOccurs="100"/>
+ *         &lt;element name="ImportedCharge" type="{http://rnip.mos.ru/xsd/Package/2.1.1}ImportedChargeType" maxOccurs="100"/>
  *       &lt;/choice>
  *     &lt;/restriction>
  *   &lt;/complexContent>

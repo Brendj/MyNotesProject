@@ -32,7 +32,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *         &lt;/simpleType>
  *       &lt;/attribute>
  *       &lt;attribute name="timestamp" use="required" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
- *       &lt;attribute name="senderIdentifier" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}URNType" />
+ *       &lt;attribute name="senderIdentifier" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}URNType" />
  *       &lt;attribute name="senderRole">
  *         &lt;simpleType>
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">

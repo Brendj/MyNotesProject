@@ -14,9 +14,9 @@ import java.util.List;
  * <pre>
  * &lt;complexType name="ComplexParameterType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}ParameterType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}ParameterType">
  *       &lt;sequence>
- *         &lt;element name="Field" type="{http://rnip.mos.ru/xsd/Common/2.1.0}FieldType" maxOccurs="unbounded"/>
+ *         &lt;element name="Field" type="{http://rnip.mos.ru/xsd/Common/2.1.1}FieldType" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *       &lt;attribute name="label">
  *         &lt;simpleType>

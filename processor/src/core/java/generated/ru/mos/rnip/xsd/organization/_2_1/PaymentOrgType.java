@@ -21,7 +21,7 @@ import javax.xml.bind.annotation.XmlType;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice>
- *         &lt;element name="Bank" type="{http://rnip.mos.ru/xsd/Common/2.1.0}BankType"/>
+ *         &lt;element name="Bank" type="{http://rnip.mos.ru/xsd/Common/2.1.1}BankType"/>
  *         &lt;element name="UFK">
  *           &lt;simpleType>
  *             &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">

@@ -16,10 +16,10 @@ import javax.xml.bind.annotation.*;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}ExportRequestType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}ExportRequestType">
  *       &lt;sequence>
- *         &lt;element name="EsiaUserInfo" type="{http://rnip.mos.ru/xsd/Common/2.1.0}EsiaUserInfoType" minOccurs="0"/>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}ChargesExportConditions"/>
+ *         &lt;element name="EsiaUserInfo" type="{http://rnip.mos.ru/xsd/Common/2.1.1}EsiaUserInfoType" minOccurs="0"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}ChargesExportConditions"/>
  *       &lt;/sequence>
  *       &lt;attribute name="external" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="includeTaxes">
@@ -50,7 +50,7 @@ public class ExportChargesRequest
 
     @XmlElement(name = "EsiaUserInfo")
     protected EsiaUserInfoType esiaUserInfo;
-    @XmlElement(name = "ChargesExportConditions", namespace = "http://rnip.mos.ru/xsd/SearchConditions/2.1.0", required = true)
+    @XmlElement(name = "ChargesExportConditions", namespace = "http://rnip.mos.ru/xsd/SearchConditions/2.1.1", required = true)
     protected ChargesExportConditions chargesExportConditions;
     @XmlAttribute(name = "external")
     protected Boolean external;

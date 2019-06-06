@@ -14,26 +14,32 @@ public class RnipMessage {
     private long version;
     private Date eventTime;
     private RnipEventType eventType;
+    private RnipRequestType requestType;
     private String request;
     private String response;
-    private String requestId;
+    private String messageId;
+    private Integer paging;
     private String responseMessage;
     private Contragent contragent;
-    private Date lastRnipUpdate;
+    private Date startDate;
+    private Date endDate;
     private Boolean processed;
+    private Boolean ackSent;
     private Date lastUpdate;
 
     public RnipMessage() {
 
     }
 
-    public RnipMessage(Contragent contragent, RnipEventType eventType, String requestId) {
+    public RnipMessage(Contragent contragent, RnipEventType eventType, RnipRequestType requestType, String request, String messageId) {
         processed = false;
         eventTime = new Date();
         lastUpdate = new Date();
         this.contragent = contragent;
         this.eventType = eventType;
-        this.requestId = requestId;
+        this.requestType = requestType;
+        this.request = request;
+        this.messageId = messageId;
     }
 
     public Long getIdOfRnipMessage() {
@@ -84,12 +90,12 @@ public class RnipMessage {
         this.response = response;
     }
 
-    public String getRequestId() {
-        return requestId;
+    public String getMessageId() {
+        return messageId;
     }
 
-    public void setRequestId(String requestId) {
-        this.requestId = requestId;
+    public void setMessageId(String messageId) {
+        this.messageId = messageId;
     }
 
     public String getResponseMessage() {
@@ -108,12 +114,12 @@ public class RnipMessage {
         this.contragent = contragent;
     }
 
-    public Date getLastRnipUpdate() {
-        return lastRnipUpdate;
+    public Date getEndDate() {
+        return endDate;
     }
 
-    public void setLastRnipUpdate(Date lastRnipUpdate) {
-        this.lastRnipUpdate = lastRnipUpdate;
+    public void setEndDate(Date lastRnipUpdate) {
+        this.endDate = lastRnipUpdate;
     }
 
     public Boolean getProcessed() {
@@ -130,5 +136,37 @@ public class RnipMessage {
 
     public void setLastUpdate(Date lastUpdate) {
         this.lastUpdate = lastUpdate;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Integer getPaging() {
+        return paging;
+    }
+
+    public void setPaging(Integer paging) {
+        this.paging = paging;
+    }
+
+    public Boolean getAckSent() {
+        return ackSent;
+    }
+
+    public void setAckSent(Boolean ackSent) {
+        this.ackSent = ackSent;
+    }
+
+    public RnipRequestType getRequestType() {
+        return requestType;
+    }
+
+    public void setRequestType(RnipRequestType requestType) {
+        this.requestType = requestType;
     }
 }

@@ -15,28 +15,28 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;restriction base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}Conditions">
+ *     &lt;restriction base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}Conditions">
  *       &lt;choice>
- *         &lt;element name="ChargesConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}ChargesConditionsType"/>
+ *         &lt;element name="ChargesConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}ChargesConditionsType"/>
  *         &lt;element name="PayersConditions">
  *           &lt;complexType>
  *             &lt;complexContent>
- *               &lt;restriction base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}PayersConditionsType">
+ *               &lt;restriction base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}PayersConditionsType">
  *                 &lt;sequence>
  *                   &lt;sequence>
- *                     &lt;element name="PayerIdentifier" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PayerIdentifierType" maxOccurs="100"/>
+ *                     &lt;element name="PayerIdentifier" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PayerIdentifierType" maxOccurs="100"/>
  *                   &lt;/sequence>
- *                   &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}TimeInterval" minOccurs="0"/>
- *                   &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}KBKlist" minOccurs="0"/>
+ *                   &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}TimeInterval" minOccurs="0"/>
+ *                   &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}KBKlist" minOccurs="0"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element name="PaymentsConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}PaymentsConditionsType"/>
- *         &lt;element name="TimeConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}TimeConditionsType"/>
+ *         &lt;element name="PaymentsConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}PaymentsConditionsType"/>
+ *         &lt;element name="TimeConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}TimeConditionsType"/>
  *       &lt;/choice>
- *       &lt;attribute name="kind" use="required" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}ExportPaymentsKindType" />
+ *       &lt;attribute name="kind" use="required" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}ExportPaymentsKindType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>

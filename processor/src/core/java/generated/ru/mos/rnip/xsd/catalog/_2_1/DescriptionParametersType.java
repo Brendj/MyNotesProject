@@ -16,8 +16,8 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice maxOccurs="unbounded">
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Catalog/2.1.0}DescriptionSimpleParameter"/>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Catalog/2.1.0}DescriptionComplexParameter"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Catalog/2.1.1}DescriptionSimpleParameter"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Catalog/2.1.1}DescriptionComplexParameter"/>
  *       &lt;/choice>
  *     &lt;/restriction>
  *   &lt;/complexContent>

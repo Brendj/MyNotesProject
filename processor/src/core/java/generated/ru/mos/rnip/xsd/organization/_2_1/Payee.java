@@ -14,9 +14,9 @@ import javax.xml.bind.annotation.*;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Organization/2.1.0}OrganizationType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Organization/2.1.1}OrganizationType">
  *       &lt;sequence>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}OrgAccount"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}OrgAccount"/>
  *       &lt;/sequence>
  *       &lt;attribute name="subsystemId" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/extension>
@@ -35,7 +35,7 @@ public class Payee
     extends OrganizationType
 {
 
-    @XmlElement(name = "OrgAccount", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", required = true)
+    @XmlElement(name = "OrgAccount", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", required = true)
     protected OrgAccount orgAccount;
     @XmlAttribute(name = "subsystemId")
     protected String subsystemId;

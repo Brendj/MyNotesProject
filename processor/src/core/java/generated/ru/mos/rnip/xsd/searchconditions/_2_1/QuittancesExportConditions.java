@@ -15,22 +15,22 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;restriction base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}Conditions">
+ *     &lt;restriction base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}Conditions">
  *       &lt;choice>
  *         &lt;element name="ChargesConditions">
  *           &lt;complexType>
  *             &lt;complexContent>
- *               &lt;restriction base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}ChargesConditionsType">
+ *               &lt;restriction base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}ChargesConditionsType">
  *                 &lt;sequence>
- *                   &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType" maxOccurs="100"/>
+ *                   &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType" maxOccurs="100"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element name="TimeConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}TimeConditionsType"/>
+ *         &lt;element name="TimeConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}TimeConditionsType"/>
  *       &lt;/choice>
- *       &lt;attribute name="kind" use="required" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}ExportQuittancesKindType" />
+ *       &lt;attribute name="kind" use="required" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}ExportQuittancesKindType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>

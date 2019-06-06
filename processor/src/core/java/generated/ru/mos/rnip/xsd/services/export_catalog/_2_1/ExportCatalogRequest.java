@@ -15,9 +15,9 @@ import javax.xml.bind.annotation.*;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}ExportRequestType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}ExportRequestType">
  *       &lt;sequence>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}CatalogExportConditions"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}CatalogExportConditions"/>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>
@@ -35,7 +35,7 @@ public class ExportCatalogRequest
     extends ExportRequestType
 {
 
-    @XmlElement(name = "CatalogExportConditions", namespace = "http://rnip.mos.ru/xsd/SearchConditions/2.1.0", required = true)
+    @XmlElement(name = "CatalogExportConditions", namespace = "http://rnip.mos.ru/xsd/SearchConditions/2.1.1", required = true)
     protected CatalogExportConditions catalogExportConditions;
 
     /**

@@ -26,12 +26,12 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence minOccurs="0">
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}Discount" minOccurs="0"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}Discount" minOccurs="0"/>
  *         &lt;element name="Refund" maxOccurs="20" minOccurs="0">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                 &lt;attribute name="refundId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}RefundIdType" />
+ *                 &lt;attribute name="refundId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}RefundIdType" />
  *                 &lt;attribute name="amount" use="required" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -40,7 +40,7 @@ import java.util.List;
  *       &lt;/sequence>
  *       &lt;attribute name="supplierBillID" use="required">
  *         &lt;simpleType>
- *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType">
+ *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType">
  *             &lt;simpleType>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *                 &lt;pattern value="\d{15}"/>
@@ -51,11 +51,11 @@ import java.util.List;
  *       &lt;/attribute>
  *       &lt;attribute name="totalAmount" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
  *       &lt;attribute name="creationDate" use="required" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
- *       &lt;attribute name="billStatus" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AcknowledgmentStatusType" />
+ *       &lt;attribute name="billStatus" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AcknowledgmentStatusType" />
  *       &lt;attribute name="balance" type="{http://www.w3.org/2001/XMLSchema}long" />
  *       &lt;attribute name="paymentId" use="required">
  *         &lt;simpleType>
- *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType">
+ *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType">
  *             &lt;simpleType>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *                 &lt;enumeration value="PaymentNotLoaded"/>
@@ -65,18 +65,18 @@ import java.util.List;
  *         &lt;/simpleType>
  *       &lt;/attribute>
  *       &lt;attribute name="amountPayment" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
- *       &lt;attribute name="payeeINN" type="{http://rnip.mos.ru/xsd/Common/2.1.0}INNType" />
+ *       &lt;attribute name="payeeINN" type="{http://rnip.mos.ru/xsd/Common/2.1.1}INNType" />
  *       &lt;attribute name="payeeKPP">
  *         &lt;simpleType>
- *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.0}KPPType {http://www.w3.org/2001/XMLSchema}string">
+ *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.1}KPPType {http://www.w3.org/2001/XMLSchema}string">
  *           &lt;/union>
  *         &lt;/simpleType>
  *       &lt;/attribute>
- *       &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KBKType" />
- *       &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.0}OKTMOType" />
- *       &lt;attribute name="payerIdentifier" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PayerIdentifierType" />
- *       &lt;attribute name="accountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AccountNumType" />
- *       &lt;attribute name="bik" type="{http://rnip.mos.ru/xsd/Common/2.1.0}BIKType" />
+ *       &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KBKType" />
+ *       &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.1}OKTMOType" />
+ *       &lt;attribute name="payerIdentifier" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PayerIdentifierType" />
+ *       &lt;attribute name="accountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AccountNumType" />
+ *       &lt;attribute name="bik" type="{http://rnip.mos.ru/xsd/Common/2.1.1}BIKType" />
  *       &lt;attribute name="isRevoked" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -92,7 +92,7 @@ import java.util.List;
 })
 public class QuittanceType {
 
-    @XmlElementRef(name = "Discount", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", type = JAXBElement.class, required = false)
+    @XmlElementRef(name = "Discount", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", type = JAXBElement.class, required = false)
     protected JAXBElement<? extends DiscountType> discount;
     @XmlElement(name = "Refund")
     protected List<QuittanceType.Refund> refund;
@@ -560,7 +560,7 @@ public class QuittanceType {
      * &lt;complexType>
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;attribute name="refundId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}RefundIdType" />
+     *       &lt;attribute name="refundId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}RefundIdType" />
      *       &lt;attribute name="amount" use="required" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
      *     &lt;/restriction>
      *   &lt;/complexContent>

@@ -17,9 +17,9 @@ import java.util.List;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}ResponseType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}ResponseType">
  *       &lt;sequence minOccurs="0">
- *         &lt;element name="Refund" type="{http://rnip.mos.ru/xsd/Refund/2.1.0}RefundType" maxOccurs="100"/>
+ *         &lt;element name="Refund" type="{http://rnip.mos.ru/xsd/Refund/2.1.1}RefundType" maxOccurs="100"/>
  *       &lt;/sequence>
  *       &lt;attribute name="hasMore" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/extension>

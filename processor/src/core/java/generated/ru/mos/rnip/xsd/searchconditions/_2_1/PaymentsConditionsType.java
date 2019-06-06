@@ -21,11 +21,11 @@ import java.util.List;
  *       &lt;sequence>
  *         &lt;element name="PaymentId" maxOccurs="100">
  *           &lt;simpleType>
- *             &lt;restriction base="{http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType">
+ *             &lt;restriction base="{http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType">
  *             &lt;/restriction>
  *           &lt;/simpleType>
  *         &lt;/element>
- *         &lt;element name="ServicesCodesList" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}ServicesConditionsType" minOccurs="0"/>
+ *         &lt;element name="ServicesCodesList" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}ServicesConditionsType" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>

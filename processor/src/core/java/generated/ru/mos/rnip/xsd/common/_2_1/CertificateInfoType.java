@@ -16,7 +16,7 @@ import javax.xml.bind.annotation.XmlType;
  * &lt;complexType name="CertificateInfoType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="ownership" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}URNType" />
+ *       &lt;attribute name="ownership" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}URNType" />
  *       &lt;attribute name="serialNumber">
  *         &lt;simpleType>
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">

@@ -15,10 +15,10 @@ import javax.xml.bind.annotation.*;
  * &lt;complexType name="OrganizationType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="name" use="required" type="{http://rnip.mos.ru/xsd/Organization/2.1.0}OrgNameType" />
- *       &lt;attribute name="inn" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}INNType" />
- *       &lt;attribute name="kpp" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KPPType" />
- *       &lt;attribute name="ogrn" type="{http://rnip.mos.ru/xsd/Common/2.1.0}OGRNType" />
+ *       &lt;attribute name="name" use="required" type="{http://rnip.mos.ru/xsd/Organization/2.1.1}OrgNameType" />
+ *       &lt;attribute name="inn" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}INNType" />
+ *       &lt;attribute name="kpp" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KPPType" />
+ *       &lt;attribute name="ogrn" type="{http://rnip.mos.ru/xsd/Common/2.1.1}OGRNType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>

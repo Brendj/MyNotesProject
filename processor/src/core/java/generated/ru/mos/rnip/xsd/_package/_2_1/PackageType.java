@@ -16,9 +16,9 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice>
- *         &lt;element name="ImportedCharge" type="{http://rnip.mos.ru/xsd/Package/2.1.0}ImportedChargeType" maxOccurs="100"/>
- *         &lt;element name="ImportedPayment" type="{http://rnip.mos.ru/xsd/Package/2.1.0}ImportedPaymentType" maxOccurs="100"/>
- *         &lt;element name="ImportedRefund" type="{http://rnip.mos.ru/xsd/Package/2.1.0}ImportedRefundType" maxOccurs="100"/>
+ *         &lt;element name="ImportedCharge" type="{http://rnip.mos.ru/xsd/Package/2.1.1}ImportedChargeType" maxOccurs="100"/>
+ *         &lt;element name="ImportedPayment" type="{http://rnip.mos.ru/xsd/Package/2.1.1}ImportedPaymentType" maxOccurs="100"/>
+ *         &lt;element name="ImportedRefund" type="{http://rnip.mos.ru/xsd/Package/2.1.1}ImportedRefundType" maxOccurs="100"/>
  *       &lt;/choice>
  *     &lt;/restriction>
  *   &lt;/complexContent>

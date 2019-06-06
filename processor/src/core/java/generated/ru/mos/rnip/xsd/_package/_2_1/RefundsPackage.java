@@ -15,9 +15,9 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;restriction base="{http://rnip.mos.ru/xsd/Package/2.1.0}PackageType">
+ *     &lt;restriction base="{http://rnip.mos.ru/xsd/Package/2.1.1}PackageType">
  *       &lt;choice>
- *         &lt;element name="ImportedRefund" type="{http://rnip.mos.ru/xsd/Package/2.1.0}ImportedRefundType" maxOccurs="100"/>
+ *         &lt;element name="ImportedRefund" type="{http://rnip.mos.ru/xsd/Package/2.1.1}ImportedRefundType" maxOccurs="100"/>
  *       &lt;/choice>
  *     &lt;/restriction>
  *   &lt;/complexContent>

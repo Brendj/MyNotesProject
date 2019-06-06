@@ -17,9 +17,9 @@ import java.util.List;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}ResponseType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}ResponseType">
  *       &lt;sequence>
- *         &lt;element name="ImportProtocol" type="{http://rnip.mos.ru/xsd/Common/2.1.0}ImportProtocolType" maxOccurs="100"/>
+ *         &lt;element name="ImportProtocol" type="{http://rnip.mos.ru/xsd/Common/2.1.1}ImportProtocolType" maxOccurs="100"/>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>

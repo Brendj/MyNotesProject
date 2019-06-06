@@ -19,10 +19,10 @@ import java.util.List;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}ResponseType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}ResponseType">
  *       &lt;sequence>
- *         &lt;element name="Service" type="{http://rnip.mos.ru/xsd/Catalog/2.1.0}ServiceType" maxOccurs="100" minOccurs="0"/>
- *         &lt;element name="Error" type="{http://rnip.mos.ru/xsd/Catalog/2.1.0}ErrorType" minOccurs="0"/>
+ *         &lt;element name="Service" type="{http://rnip.mos.ru/xsd/Catalog/2.1.1}ServiceType" maxOccurs="100" minOccurs="0"/>
+ *         &lt;element name="Error" type="{http://rnip.mos.ru/xsd/Catalog/2.1.1}ErrorType" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="hasMore" use="required" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="revisionDate" use="required" type="{http://www.w3.org/2001/XMLSchema}date" />

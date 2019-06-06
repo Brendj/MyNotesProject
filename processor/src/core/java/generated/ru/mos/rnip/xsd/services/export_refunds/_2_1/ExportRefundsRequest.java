@@ -15,9 +15,9 @@ import javax.xml.bind.annotation.*;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}ExportRequestType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}ExportRequestType">
  *       &lt;sequence>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}RefundsExportConditions"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}RefundsExportConditions"/>
  *       &lt;/sequence>
  *       &lt;attribute name="external" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/extension>
@@ -36,7 +36,7 @@ public class ExportRefundsRequest
     extends ExportRequestType
 {
 
-    @XmlElement(name = "RefundsExportConditions", namespace = "http://rnip.mos.ru/xsd/SearchConditions/2.1.0", required = true)
+    @XmlElement(name = "RefundsExportConditions", namespace = "http://rnip.mos.ru/xsd/SearchConditions/2.1.1", required = true)
     protected RefundsExportConditions refundsExportConditions;
     @XmlAttribute(name = "external")
     protected Boolean external;

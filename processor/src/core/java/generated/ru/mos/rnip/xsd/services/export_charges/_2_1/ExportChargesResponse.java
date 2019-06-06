@@ -17,14 +17,14 @@ import java.util.List;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}ResponseType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}ResponseType">
  *       &lt;sequence minOccurs="0">
  *         &lt;element name="ChargeInfo" maxOccurs="100">
  *           &lt;complexType>
  *             &lt;complexContent>
- *               &lt;extension base="{http://rnip.mos.ru/xsd/Charge/2.1.0}ChargeType">
+ *               &lt;extension base="{http://rnip.mos.ru/xsd/Charge/2.1.1}ChargeType">
  *                 &lt;attribute name="amountToPay" use="required" type="{http://www.w3.org/2001/XMLSchema}long" />
- *                 &lt;attribute name="acknowledgmentStatus" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AcknowledgmentStatusType" />
+ *                 &lt;attribute name="acknowledgmentStatus" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AcknowledgmentStatusType" />
  *               &lt;/extension>
  *             &lt;/complexContent>
  *           &lt;/complexType>
@@ -137,9 +137,9 @@ public class ExportChargesResponse
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
-     *     &lt;extension base="{http://rnip.mos.ru/xsd/Charge/2.1.0}ChargeType">
+     *     &lt;extension base="{http://rnip.mos.ru/xsd/Charge/2.1.1}ChargeType">
      *       &lt;attribute name="amountToPay" use="required" type="{http://www.w3.org/2001/XMLSchema}long" />
-     *       &lt;attribute name="acknowledgmentStatus" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AcknowledgmentStatusType" />
+     *       &lt;attribute name="acknowledgmentStatus" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AcknowledgmentStatusType" />
      *     &lt;/extension>
      *   &lt;/complexContent>
      * &lt;/complexType>

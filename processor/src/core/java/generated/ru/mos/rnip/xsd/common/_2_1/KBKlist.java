@@ -16,7 +16,7 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="KBK" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KBKType" maxOccurs="10"/>
+ *         &lt;element name="KBK" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KBKType" maxOccurs="10"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>

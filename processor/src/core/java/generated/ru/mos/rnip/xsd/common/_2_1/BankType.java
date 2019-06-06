@@ -27,8 +27,8 @@ import javax.xml.bind.annotation.XmlType;
  *           &lt;/restriction>
  *         &lt;/simpleType>
  *       &lt;/attribute>
- *       &lt;attribute name="bik" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}BIKType" />
- *       &lt;attribute name="correspondentBankAccount" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AccountNumType" />
+ *       &lt;attribute name="bik" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}BIKType" />
+ *       &lt;attribute name="correspondentBankAccount" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AccountNumType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>

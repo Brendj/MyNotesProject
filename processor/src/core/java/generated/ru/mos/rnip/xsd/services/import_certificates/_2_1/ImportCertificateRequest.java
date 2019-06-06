@@ -17,9 +17,9 @@ import java.util.List;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}RequestType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}RequestType">
  *       &lt;sequence>
- *         &lt;element name="RequestEntry" type="{http://rnip.mos.ru/xsd/Common/2.1.0}ImportCertificateEntryType" maxOccurs="100"/>
+ *         &lt;element name="RequestEntry" type="{http://rnip.mos.ru/xsd/Common/2.1.1}ImportCertificateEntryType" maxOccurs="100"/>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>

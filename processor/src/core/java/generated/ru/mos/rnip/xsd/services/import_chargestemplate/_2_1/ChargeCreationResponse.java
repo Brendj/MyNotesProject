@@ -15,9 +15,9 @@ import javax.xml.bind.annotation.*;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}ResponseType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}ResponseType">
  *       &lt;sequence>
- *         &lt;element name="Charge" type="{http://rnip.mos.ru/xsd/Charge/2.1.0}ChargeType"/>
+ *         &lt;element name="Charge" type="{http://rnip.mos.ru/xsd/Charge/2.1.1}ChargeType"/>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>

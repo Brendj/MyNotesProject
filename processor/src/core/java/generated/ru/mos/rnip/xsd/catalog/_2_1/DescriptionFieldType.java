@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.*;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence minOccurs="0">
- *         &lt;element name="AllowedValues" type="{http://rnip.mos.ru/xsd/Catalog/2.1.0}AllowedValuesType" minOccurs="0"/>
+ *         &lt;element name="AllowedValues" type="{http://rnip.mos.ru/xsd/Catalog/2.1.1}AllowedValuesType" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *       &lt;attribute name="label" use="required">

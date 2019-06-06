@@ -19,9 +19,9 @@ import java.util.List;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}ResponseType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}ResponseType">
  *       &lt;sequence minOccurs="0">
- *         &lt;element name="Quittance" type="{http://rnip.mos.ru/xsd/Quittance/2.1.0}QuittanceType" maxOccurs="100" minOccurs="0"/>
+ *         &lt;element name="Quittance" type="{http://rnip.mos.ru/xsd/Quittance/2.1.1}QuittanceType" maxOccurs="100" minOccurs="0"/>
  *         &lt;element name="PossibleData" maxOccurs="100" minOccurs="0">
  *           &lt;complexType>
  *             &lt;complexContent>
@@ -33,7 +33,7 @@ import java.util.List;
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;attribute name="paymentId" use="required">
  *                             &lt;simpleType>
- *                               &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType">
+ *                               &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType">
  *                                 &lt;simpleType>
  *                                   &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *                                     &lt;enumeration value="PaymentNotLoaded"/>
@@ -45,16 +45,16 @@ import java.util.List;
  *                           &lt;attribute name="comparisonWeight" use="required" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
  *                           &lt;attribute name="comparisonDate" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
  *                           &lt;attribute name="amountPayment" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
- *                           &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KBKType" />
- *                           &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.0}OKTMOType" />
- *                           &lt;attribute name="accountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AccountNumType" />
- *                           &lt;attribute name="bik" type="{http://rnip.mos.ru/xsd/Common/2.1.0}BIKType" />
+ *                           &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KBKType" />
+ *                           &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.1}OKTMOType" />
+ *                           &lt;attribute name="accountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AccountNumType" />
+ *                           &lt;attribute name="bik" type="{http://rnip.mos.ru/xsd/Common/2.1.1}BIKType" />
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
  *                     &lt;/complexType>
  *                   &lt;/element>
  *                 &lt;/sequence>
- *                 &lt;attribute name="supplierBillID" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType" />
+ *                 &lt;attribute name="supplierBillID" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType" />
  *                 &lt;attribute name="totalAmount" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -177,7 +177,7 @@ public class ExportQuittancesResponse
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;attribute name="paymentId" use="required">
      *                   &lt;simpleType>
-     *                     &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType">
+     *                     &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType">
      *                       &lt;simpleType>
      *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
      *                           &lt;enumeration value="PaymentNotLoaded"/>
@@ -189,16 +189,16 @@ public class ExportQuittancesResponse
      *                 &lt;attribute name="comparisonWeight" use="required" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
      *                 &lt;attribute name="comparisonDate" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
      *                 &lt;attribute name="amountPayment" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
-     *                 &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KBKType" />
-     *                 &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.0}OKTMOType" />
-     *                 &lt;attribute name="accountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AccountNumType" />
-     *                 &lt;attribute name="bik" type="{http://rnip.mos.ru/xsd/Common/2.1.0}BIKType" />
+     *                 &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KBKType" />
+     *                 &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.1}OKTMOType" />
+     *                 &lt;attribute name="accountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AccountNumType" />
+     *                 &lt;attribute name="bik" type="{http://rnip.mos.ru/xsd/Common/2.1.1}BIKType" />
      *               &lt;/restriction>
      *             &lt;/complexContent>
      *           &lt;/complexType>
      *         &lt;/element>
      *       &lt;/sequence>
-     *       &lt;attribute name="supplierBillID" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType" />
+     *       &lt;attribute name="supplierBillID" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType" />
      *       &lt;attribute name="totalAmount" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -310,7 +310,7 @@ public class ExportQuittancesResponse
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;attribute name="paymentId" use="required">
          *         &lt;simpleType>
-         *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType">
+         *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType">
          *             &lt;simpleType>
          *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
          *                 &lt;enumeration value="PaymentNotLoaded"/>
@@ -322,10 +322,10 @@ public class ExportQuittancesResponse
          *       &lt;attribute name="comparisonWeight" use="required" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
          *       &lt;attribute name="comparisonDate" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
          *       &lt;attribute name="amountPayment" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
-         *       &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KBKType" />
-         *       &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.0}OKTMOType" />
-         *       &lt;attribute name="accountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AccountNumType" />
-         *       &lt;attribute name="bik" type="{http://rnip.mos.ru/xsd/Common/2.1.0}BIKType" />
+         *       &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KBKType" />
+         *       &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.1}OKTMOType" />
+         *       &lt;attribute name="accountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AccountNumType" />
+         *       &lt;attribute name="bik" type="{http://rnip.mos.ru/xsd/Common/2.1.1}BIKType" />
          *     &lt;/restriction>
          *   &lt;/complexContent>
          * &lt;/complexType>

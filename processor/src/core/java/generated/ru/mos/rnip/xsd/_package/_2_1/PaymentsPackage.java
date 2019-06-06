@@ -15,9 +15,9 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;restriction base="{http://rnip.mos.ru/xsd/Package/2.1.0}PackageType">
+ *     &lt;restriction base="{http://rnip.mos.ru/xsd/Package/2.1.1}PackageType">
  *       &lt;sequence>
- *         &lt;element name="ImportedPayment" type="{http://rnip.mos.ru/xsd/Package/2.1.0}ImportedPaymentType" maxOccurs="100"/>
+ *         &lt;element name="ImportedPayment" type="{http://rnip.mos.ru/xsd/Package/2.1.1}ImportedPaymentType" maxOccurs="100"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>

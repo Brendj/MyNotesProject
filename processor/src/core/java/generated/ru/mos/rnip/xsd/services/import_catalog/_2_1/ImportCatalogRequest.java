@@ -15,10 +15,10 @@ import javax.xml.bind.annotation.*;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}RequestType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}RequestType">
  *       &lt;choice>
- *         &lt;element name="Changes" type="{http://rnip.mos.ru/xsd/Catalog/2.1.0}ServiceCatalogType"/>
- *         &lt;element name="ServiceCatalog" type="{http://rnip.mos.ru/xsd/Catalog/2.1.0}ServiceCatalogType"/>
+ *         &lt;element name="Changes" type="{http://rnip.mos.ru/xsd/Catalog/2.1.1}ServiceCatalogType"/>
+ *         &lt;element name="ServiceCatalog" type="{http://rnip.mos.ru/xsd/Catalog/2.1.1}ServiceCatalogType"/>
  *       &lt;/choice>
  *     &lt;/extension>
  *   &lt;/complexContent>

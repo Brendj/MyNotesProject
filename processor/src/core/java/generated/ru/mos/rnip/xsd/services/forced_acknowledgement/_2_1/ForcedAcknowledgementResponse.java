@@ -19,7 +19,7 @@ import java.util.List;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}ResponseType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}ResponseType">
  *       &lt;choice>
  *         &lt;sequence>
  *           &lt;element name="ForcedAcknowledgementItemResponse" maxOccurs="100">
@@ -29,7 +29,7 @@ import java.util.List;
  *                   &lt;sequence>
  *                     &lt;choice>
  *                       &lt;sequence>
- *                         &lt;element name="Quittance" type="{http://rnip.mos.ru/xsd/Quittance/2.1.0}QuittanceType" maxOccurs="100" minOccurs="0"/>
+ *                         &lt;element name="Quittance" type="{http://rnip.mos.ru/xsd/Quittance/2.1.1}QuittanceType" maxOccurs="100" minOccurs="0"/>
  *                       &lt;/sequence>
  *                       &lt;element name="Error">
  *                         &lt;complexType>
@@ -140,7 +140,7 @@ public class ForcedAcknowledgementResponse
      *       &lt;sequence>
      *         &lt;choice>
      *           &lt;sequence>
-     *             &lt;element name="Quittance" type="{http://rnip.mos.ru/xsd/Quittance/2.1.0}QuittanceType" maxOccurs="100" minOccurs="0"/>
+     *             &lt;element name="Quittance" type="{http://rnip.mos.ru/xsd/Quittance/2.1.1}QuittanceType" maxOccurs="100" minOccurs="0"/>
      *           &lt;/sequence>
      *           &lt;element name="Error">
      *             &lt;complexType>

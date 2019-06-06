@@ -21,7 +21,7 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Service" type="{http://rnip.mos.ru/xsd/Catalog/2.1.0}ServiceType" maxOccurs="unbounded"/>
+ *         &lt;element name="Service" type="{http://rnip.mos.ru/xsd/Catalog/2.1.1}ServiceType" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *       &lt;attribute name="Id" type="{http://www.w3.org/2001/XMLSchema}ID" />
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />

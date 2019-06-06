@@ -59,7 +59,7 @@ import java.math.BigInteger;
  *                     &lt;/restriction>
  *                   &lt;/simpleType>
  *                 &lt;/attribute>
- *                 &lt;attribute name="personINN" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PersonINNType" />
+ *                 &lt;attribute name="personINN" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PersonINNType" />
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
@@ -70,7 +70,7 @@ import java.math.BigInteger;
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;attribute name="personINN" use="required">
  *                   &lt;simpleType>
- *                     &lt;restriction base="{http://rnip.mos.ru/xsd/Common/2.1.0}PersonINNType">
+ *                     &lt;restriction base="{http://rnip.mos.ru/xsd/Common/2.1.1}PersonINNType">
  *                       &lt;pattern value="\d{12}"/>
  *                       &lt;length value="12"/>
  *                     &lt;/restriction>
@@ -248,7 +248,7 @@ public class EsiaUserInfoType {
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;attribute name="personINN" use="required">
      *         &lt;simpleType>
-     *           &lt;restriction base="{http://rnip.mos.ru/xsd/Common/2.1.0}PersonINNType">
+     *           &lt;restriction base="{http://rnip.mos.ru/xsd/Common/2.1.1}PersonINNType">
      *             &lt;pattern value="\d{12}"/>
      *             &lt;length value="12"/>
      *           &lt;/restriction>
@@ -343,7 +343,7 @@ public class EsiaUserInfoType {
      *           &lt;/restriction>
      *         &lt;/simpleType>
      *       &lt;/attribute>
-     *       &lt;attribute name="personINN" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PersonINNType" />
+     *       &lt;attribute name="personINN" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PersonINNType" />
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>

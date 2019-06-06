@@ -24,11 +24,11 @@ import java.util.List;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;choice>
- *           &lt;element name="PayerIdentifier" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PayerIdentifierType" maxOccurs="100"/>
- *           &lt;element name="PayerIdentification" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PayerIdentificationType"/>
+ *           &lt;element name="PayerIdentifier" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PayerIdentifierType" maxOccurs="100"/>
+ *           &lt;element name="PayerIdentification" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PayerIdentificationType"/>
  *         &lt;/choice>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}TimeInterval" minOccurs="0"/>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}KBKlist" minOccurs="0"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}TimeInterval" minOccurs="0"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}KBKlist" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -50,9 +50,9 @@ public class PayersConditionsType {
     protected List<String> payerIdentifier;
     @XmlElement(name = "PayerIdentification")
     protected PayerIdentificationType payerIdentification;
-    @XmlElement(name = "TimeInterval", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0")
+    @XmlElement(name = "TimeInterval", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1")
     protected TimeIntervalType timeInterval;
-    @XmlElement(name = "KBKlist", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0")
+    @XmlElement(name = "KBKlist", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1")
     protected KBKlist kbKlist;
 
     /**

@@ -23,30 +23,30 @@ import java.util.List;
  * <pre>
  * &lt;complexType name="ChargeType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Charge/2.1.0}AbstractChargeType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Charge/2.1.1}AbstractChargeType">
  *       &lt;sequence>
  *         &lt;element name="LinkedChargesIdentifiers" minOccurs="0">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType" maxOccurs="10"/>
+ *                   &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType" maxOccurs="10"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Organization/2.1.0}Payee"/>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Charge/2.1.0}Payer"/>
- *         &lt;element name="BudgetIndex" type="{http://rnip.mos.ru/xsd/Common/2.1.0}BudgetIndexType"/>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}ChangeStatus"/>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}Discount" minOccurs="0"/>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}AdditionalData" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Organization/2.1.1}Payee"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Charge/2.1.1}Payer"/>
+ *         &lt;element name="BudgetIndex" type="{http://rnip.mos.ru/xsd/Common/2.1.1}BudgetIndexType"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}ChangeStatus"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}Discount" minOccurs="0"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}AdditionalData" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
- *       &lt;attGroup ref="{http://rnip.mos.ru/xsd/Charge/2.1.0}commonAttributeGroup"/>
+ *       &lt;attGroup ref="{http://rnip.mos.ru/xsd/Charge/2.1.1}commonAttributeGroup"/>
  *       &lt;attribute name="supplierBillID" use="required">
  *         &lt;simpleType>
- *           &lt;restriction base="{http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType">
+ *           &lt;restriction base="{http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType">
  *             &lt;pattern value="(\w{20})|(\d{25})"/>
  *           &lt;/restriction>
  *         &lt;/simpleType>
@@ -86,17 +86,17 @@ public class ChargeType
 
     @XmlElement(name = "LinkedChargesIdentifiers")
     protected ChargeType.LinkedChargesIdentifiers linkedChargesIdentifiers;
-    @XmlElement(name = "Payee", namespace = "http://rnip.mos.ru/xsd/Organization/2.1.0", required = true)
+    @XmlElement(name = "Payee", namespace = "http://rnip.mos.ru/xsd/Organization/2.1.1", required = true)
     protected Payee payee;
     @XmlElement(name = "Payer", required = true)
     protected Payer payer;
     @XmlElement(name = "BudgetIndex", required = true)
     protected BudgetIndexType budgetIndex;
-    @XmlElement(name = "ChangeStatus", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", required = true)
+    @XmlElement(name = "ChangeStatus", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", required = true)
     protected ChangeStatus changeStatus;
-    @XmlElementRef(name = "Discount", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", type = JAXBElement.class, required = false)
+    @XmlElementRef(name = "Discount", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", type = JAXBElement.class, required = false)
     protected JAXBElement<? extends DiscountType> discount;
-    @XmlElement(name = "AdditionalData", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0")
+    @XmlElement(name = "AdditionalData", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1")
     protected List<AdditionalDataType> additionalData;
     @XmlAttribute(name = "supplierBillID", required = true)
     protected String supplierBillID;
@@ -606,7 +606,7 @@ public class ChargeType
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType" maxOccurs="10"/>
+     *         &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType" maxOccurs="10"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>

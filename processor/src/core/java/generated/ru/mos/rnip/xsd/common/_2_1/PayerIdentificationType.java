@@ -20,8 +20,8 @@ import java.util.List;
  *       &lt;sequence>
  *         &lt;element name="ServiceCode" type="{http://www.w3.org/2001/XMLSchema}string" minOccurs="0"/>
  *         &lt;choice maxOccurs="unbounded">
- *           &lt;element name="SimpleParameter" type="{http://rnip.mos.ru/xsd/Common/2.1.0}SimpleParameterType"/>
- *           &lt;element name="ComplexParameter" type="{http://rnip.mos.ru/xsd/Common/2.1.0}ComplexParameterType"/>
+ *           &lt;element name="SimpleParameter" type="{http://rnip.mos.ru/xsd/Common/2.1.1}SimpleParameterType"/>
+ *           &lt;element name="ComplexParameter" type="{http://rnip.mos.ru/xsd/Common/2.1.1}ComplexParameterType"/>
  *         &lt;/choice>
  *       &lt;/sequence>
  *     &lt;/restriction>

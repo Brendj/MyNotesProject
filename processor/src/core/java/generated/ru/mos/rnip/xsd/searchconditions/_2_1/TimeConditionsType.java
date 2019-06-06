@@ -19,20 +19,20 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}TimeInterval"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}TimeInterval"/>
  *         &lt;element name="Beneficiary" maxOccurs="10" minOccurs="0">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                 &lt;attribute name="inn" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}INNType" />
- *                 &lt;attribute name="kpp" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KPPType" />
+ *                 &lt;attribute name="inn" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}INNType" />
+ *                 &lt;attribute name="kpp" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KPPType" />
  *                 &lt;attribute name="subsystemId" type="{http://www.w3.org/2001/XMLSchema}string" />
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}KBKlist" minOccurs="0"/>
- *         &lt;element name="ServicesCodesList" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}ServicesConditionsType" minOccurs="0"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}KBKlist" minOccurs="0"/>
+ *         &lt;element name="ServicesCodesList" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}ServicesConditionsType" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -50,11 +50,11 @@ import java.util.List;
 })
 public class TimeConditionsType {
 
-    @XmlElement(name = "TimeInterval", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", required = true)
+    @XmlElement(name = "TimeInterval", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", required = true)
     protected TimeIntervalType timeInterval;
     @XmlElement(name = "Beneficiary")
     protected List<TimeConditionsType.Beneficiary> beneficiary;
-    @XmlElement(name = "KBKlist", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0")
+    @XmlElement(name = "KBKlist", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1")
     protected KBKlist kbKlist;
     @XmlElement(name = "ServicesCodesList")
     protected ServicesConditionsType servicesCodesList;
@@ -170,8 +170,8 @@ public class TimeConditionsType {
      * &lt;complexType>
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *       &lt;attribute name="inn" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}INNType" />
-     *       &lt;attribute name="kpp" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KPPType" />
+     *       &lt;attribute name="inn" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}INNType" />
+     *       &lt;attribute name="kpp" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KPPType" />
      *       &lt;attribute name="subsystemId" type="{http://www.w3.org/2001/XMLSchema}string" />
      *     &lt;/restriction>
      *   &lt;/complexContent>

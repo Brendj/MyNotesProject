@@ -14,12 +14,12 @@ import javax.xml.bind.annotation.*;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;choice>
- *         &lt;element name="ChargesConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}ChargesConditionsType"/>
- *         &lt;element name="PayersConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}PayersConditionsType"/>
- *         &lt;element name="PaymentsConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}PaymentsConditionsType"/>
- *         &lt;element name="TimeConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}TimeConditionsType"/>
- *         &lt;element name="RefundsConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}RefundsConditionsType"/>
- *         &lt;element name="CatalogConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}CatalogConditionsType"/>
+ *         &lt;element name="ChargesConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}ChargesConditionsType"/>
+ *         &lt;element name="PayersConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}PayersConditionsType"/>
+ *         &lt;element name="PaymentsConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}PaymentsConditionsType"/>
+ *         &lt;element name="TimeConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}TimeConditionsType"/>
+ *         &lt;element name="RefundsConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}RefundsConditionsType"/>
+ *         &lt;element name="CatalogConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}CatalogConditionsType"/>
  *       &lt;/choice>
  *       &lt;attribute name="kind" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>

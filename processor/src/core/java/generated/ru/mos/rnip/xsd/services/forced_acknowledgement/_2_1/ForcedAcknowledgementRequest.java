@@ -18,7 +18,7 @@ import java.util.List;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}RequestType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}RequestType">
  *       &lt;choice>
  *         &lt;element name="Reconcile" maxOccurs="100">
  *           &lt;complexType>
@@ -26,13 +26,13 @@ import java.util.List;
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;choice>
  *                   &lt;sequence>
- *                     &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType" maxOccurs="100"/>
+ *                     &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType" maxOccurs="100"/>
  *                   &lt;/sequence>
  *                   &lt;element name="PaymentNotLoaded" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/choice>
  *                 &lt;attribute name="supplierBillId" use="required">
  *                   &lt;simpleType>
- *                     &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType">
+ *                     &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType">
  *                       &lt;simpleType>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *                           &lt;pattern value="\d{15}"/>
@@ -52,13 +52,13 @@ import java.util.List;
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;choice>
  *                   &lt;sequence>
- *                     &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType" maxOccurs="100"/>
+ *                     &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType" maxOccurs="100"/>
  *                   &lt;/sequence>
  *                   &lt;element name="PaymentNotLoaded" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
  *                 &lt;/choice>
  *                 &lt;attribute name="supplierBillId" use="required">
  *                   &lt;simpleType>
- *                     &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType">
+ *                     &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType">
  *                       &lt;simpleType>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *                           &lt;pattern value="\d{15}"/>
@@ -77,7 +77,7 @@ import java.util.List;
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType" maxOccurs="100"/>
+ *                   &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType" maxOccurs="100"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -88,14 +88,14 @@ import java.util.List;
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType" maxOccurs="100"/>
+ *                   &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType" maxOccurs="100"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
  *       &lt;/choice>
- *       &lt;attribute name="originatorId" type="{http://rnip.mos.ru/xsd/Common/2.1.0}URNType" />
+ *       &lt;attribute name="originatorId" type="{http://rnip.mos.ru/xsd/Common/2.1.1}URNType" />
  *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -268,13 +268,13 @@ public class ForcedAcknowledgementRequest
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;choice>
      *         &lt;sequence>
-     *           &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType" maxOccurs="100"/>
+     *           &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType" maxOccurs="100"/>
      *         &lt;/sequence>
      *         &lt;element name="PaymentNotLoaded" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/choice>
      *       &lt;attribute name="supplierBillId" use="required">
      *         &lt;simpleType>
-     *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType">
+     *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType">
      *             &lt;simpleType>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
      *                 &lt;pattern value="\d{15}"/>
@@ -424,7 +424,7 @@ public class ForcedAcknowledgementRequest
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType" maxOccurs="100"/>
+     *         &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType" maxOccurs="100"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -485,13 +485,13 @@ public class ForcedAcknowledgementRequest
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;choice>
      *         &lt;sequence>
-     *           &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType" maxOccurs="100"/>
+     *           &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType" maxOccurs="100"/>
      *         &lt;/sequence>
      *         &lt;element name="PaymentNotLoaded" type="{http://www.w3.org/2001/XMLSchema}boolean"/>
      *       &lt;/choice>
      *       &lt;attribute name="supplierBillId" use="required">
      *         &lt;simpleType>
-     *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType">
+     *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType">
      *             &lt;simpleType>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
      *                 &lt;pattern value="\d{15}"/>
@@ -641,7 +641,7 @@ public class ForcedAcknowledgementRequest
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType" maxOccurs="100"/>
+     *         &lt;element name="PaymentId" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType" maxOccurs="100"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>

@@ -21,8 +21,8 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType" maxOccurs="100"/>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}TimeInterval" minOccurs="0"/>
+ *         &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType" maxOccurs="100"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}TimeInterval" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>
@@ -40,7 +40,7 @@ public class ChargesConditionsType {
 
     @XmlElement(name = "SupplierBillID", required = true)
     protected List<String> supplierBillID;
-    @XmlElement(name = "TimeInterval", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0")
+    @XmlElement(name = "TimeInterval", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1")
     protected TimeIntervalType timeInterval;
 
     /**

@@ -16,7 +16,7 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Value" type="{http://rnip.mos.ru/xsd/Common/2.1.0}ParamValueType" maxOccurs="unbounded"/>
+ *         &lt;element name="Value" type="{http://rnip.mos.ru/xsd/Common/2.1.1}ParamValueType" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *       &lt;attribute name="name" use="required" type="{http://www.w3.org/2001/XMLSchema}string" />
  *     &lt;/restriction>

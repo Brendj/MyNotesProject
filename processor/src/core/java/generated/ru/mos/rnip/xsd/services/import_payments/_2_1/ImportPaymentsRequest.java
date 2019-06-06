@@ -15,9 +15,9 @@ import javax.xml.bind.annotation.*;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}RequestType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}RequestType">
  *       &lt;sequence>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Package/2.1.0}PaymentsPackage"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Package/2.1.1}PaymentsPackage"/>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>
@@ -35,7 +35,7 @@ public class ImportPaymentsRequest
     extends RequestType
 {
 
-    @XmlElement(name = "PaymentsPackage", namespace = "http://rnip.mos.ru/xsd/Package/2.1.0", required = true)
+    @XmlElement(name = "PaymentsPackage", namespace = "http://rnip.mos.ru/xsd/Package/2.1.1", required = true)
     protected PaymentsPackage paymentsPackage;
 
     /**

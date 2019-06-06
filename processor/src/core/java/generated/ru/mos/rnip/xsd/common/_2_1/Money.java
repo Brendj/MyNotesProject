@@ -14,7 +14,7 @@ import java.math.BigInteger;
  * &lt;complexType name="Money">
  *   &lt;simpleContent>
  *     &lt;extension base="&lt;http://www.w3.org/2001/XMLSchema>long">
- *       &lt;attribute name="currency" type="{http://rnip.mos.ru/xsd/Common/2.1.0}CurrencyCodeType" default="RUR" />
+ *       &lt;attribute name="currency" type="{http://rnip.mos.ru/xsd/Common/2.1.1}CurrencyCodeType" default="RUR" />
  *       &lt;attribute name="exponent" default="2">
  *         &lt;simpleType>
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}integer">

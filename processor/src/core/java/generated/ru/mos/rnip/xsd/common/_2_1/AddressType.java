@@ -48,7 +48,7 @@ import java.util.List;
  *                     &lt;/simpleType>
  *                   &lt;/element>
  *                 &lt;/sequence>
- *                 &lt;attribute name="type" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AddressKindType" />
+ *                 &lt;attribute name="type" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AddressKindType" />
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
@@ -200,7 +200,7 @@ public class AddressType {
      *           &lt;/simpleType>
      *         &lt;/element>
      *       &lt;/sequence>
-     *       &lt;attribute name="type" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AddressKindType" />
+     *       &lt;attribute name="type" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AddressKindType" />
      *     &lt;/restriction>
      *   &lt;/complexContent>
      * &lt;/complexType>

@@ -32,7 +32,7 @@ import java.math.BigInteger;
  *           &lt;/restriction>
  *         &lt;/simpleType>
  *       &lt;/attribute>
- *       &lt;attribute name="supplierID" type="{http://rnip.mos.ru/xsd/Common/2.1.0}UUID" />
+ *       &lt;attribute name="supplierID" type="{http://rnip.mos.ru/xsd/Common/2.1.1}UUID" />
  *       &lt;attribute name="isId" type="{http://www.w3.org/2001/XMLSchema}integer" />
  *       &lt;attribute name="visible" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *       &lt;attribute name="forSearch" type="{http://www.w3.org/2001/XMLSchema}boolean" />

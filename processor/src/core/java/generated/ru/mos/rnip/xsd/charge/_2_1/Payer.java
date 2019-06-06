@@ -14,7 +14,7 @@ import javax.xml.bind.annotation.*;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}PayerType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}PayerType">
  *       &lt;attribute name="payerName" use="required">
  *         &lt;simpleType>
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
@@ -25,7 +25,7 @@ import javax.xml.bind.annotation.*;
  *       &lt;/attribute>
  *       &lt;attribute name="additionalPayerIdentifier">
  *         &lt;simpleType>
- *           &lt;restriction base="{http://rnip.mos.ru/xsd/Common/2.1.0}PayerIdentifierType">
+ *           &lt;restriction base="{http://rnip.mos.ru/xsd/Common/2.1.1}PayerIdentifierType">
  *             &lt;pattern value="(1((0[1-9])|(1[0-5])|(2[12456789])|(3[0])|(99))[0-9a-zA-Zа-яА-Я]{19})|(200\d{14}[A-Z0-9]{2}\d{3})|(300\d{14}[A-Z0-9]{2}\d{3}|3[0]{7}\d{9}[A-Z0-9]{2}\d{3})|(4[0]{9}\d{12})"/>
  *           &lt;/restriction>
  *         &lt;/simpleType>

@@ -24,14 +24,14 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _Discount_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.0", "Discount");
-    private final static QName _MultiplierSize_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.0", "MultiplierSize");
-    private final static QName _TimeInterval_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.0", "TimeInterval");
-    private final static QName _DiscountFixed_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.0", "DiscountFixed");
-    private final static QName _Address_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.0", "Address");
-    private final static QName _AdditionalData_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.0", "AdditionalData");
-    private final static QName _DiscountSize_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.0", "DiscountSize");
-    private final static QName _Contact_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.0", "Contact");
+    private final static QName _Discount_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.1", "Discount");
+    private final static QName _MultiplierSize_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.1", "MultiplierSize");
+    private final static QName _TimeInterval_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.1", "TimeInterval");
+    private final static QName _DiscountFixed_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.1", "DiscountFixed");
+    private final static QName _Address_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.1", "Address");
+    private final static QName _AdditionalData_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.1", "AdditionalData");
+    private final static QName _DiscountSize_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.1", "DiscountSize");
+    private final static QName _Contact_QNAME = new QName("http://rnip.mos.ru/xsd/Common/2.1.1", "Contact");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: ru.mos.rnip.xsd.common._2_1
@@ -356,7 +356,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link DiscountType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", name = "Discount")
+    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", name = "Discount")
     public JAXBElement<DiscountType> createDiscount(DiscountType value) {
         return new JAXBElement<DiscountType>(_Discount_QNAME, DiscountType.class, null, value);
     }
@@ -365,7 +365,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link MultiplierSize }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", name = "MultiplierSize", substitutionHeadNamespace = "http://rnip.mos.ru/xsd/Common/2.1.0", substitutionHeadName = "Discount")
+    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", name = "MultiplierSize", substitutionHeadNamespace = "http://rnip.mos.ru/xsd/Common/2.1.1", substitutionHeadName = "Discount")
     public JAXBElement<MultiplierSize> createMultiplierSize(MultiplierSize value) {
         return new JAXBElement<MultiplierSize>(_MultiplierSize_QNAME, MultiplierSize.class, null, value);
     }
@@ -374,7 +374,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link TimeIntervalType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", name = "TimeInterval")
+    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", name = "TimeInterval")
     public JAXBElement<TimeIntervalType> createTimeInterval(TimeIntervalType value) {
         return new JAXBElement<TimeIntervalType>(_TimeInterval_QNAME, TimeIntervalType.class, null, value);
     }
@@ -383,7 +383,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link DiscountFixed }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", name = "DiscountFixed", substitutionHeadNamespace = "http://rnip.mos.ru/xsd/Common/2.1.0", substitutionHeadName = "Discount")
+    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", name = "DiscountFixed", substitutionHeadNamespace = "http://rnip.mos.ru/xsd/Common/2.1.1", substitutionHeadName = "Discount")
     public JAXBElement<DiscountFixed> createDiscountFixed(DiscountFixed value) {
         return new JAXBElement<DiscountFixed>(_DiscountFixed_QNAME, DiscountFixed.class, null, value);
     }
@@ -392,7 +392,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link AddressType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", name = "Address")
+    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", name = "Address")
     public JAXBElement<AddressType> createAddress(AddressType value) {
         return new JAXBElement<AddressType>(_Address_QNAME, AddressType.class, null, value);
     }
@@ -401,7 +401,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link AdditionalDataType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", name = "AdditionalData")
+    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", name = "AdditionalData")
     public JAXBElement<AdditionalDataType> createAdditionalData(AdditionalDataType value) {
         return new JAXBElement<AdditionalDataType>(_AdditionalData_QNAME, AdditionalDataType.class, null, value);
     }
@@ -410,7 +410,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link DiscountSize }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", name = "DiscountSize", substitutionHeadNamespace = "http://rnip.mos.ru/xsd/Common/2.1.0", substitutionHeadName = "Discount")
+    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", name = "DiscountSize", substitutionHeadNamespace = "http://rnip.mos.ru/xsd/Common/2.1.1", substitutionHeadName = "Discount")
     public JAXBElement<DiscountSize> createDiscountSize(DiscountSize value) {
         return new JAXBElement<DiscountSize>(_DiscountSize_QNAME, DiscountSize.class, null, value);
     }
@@ -419,7 +419,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link ContactType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", name = "Contact")
+    @XmlElementDecl(namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", name = "Contact")
     public JAXBElement<ContactType> createContact(ContactType value) {
         return new JAXBElement<ContactType>(_Contact_QNAME, ContactType.class, null, value);
     }

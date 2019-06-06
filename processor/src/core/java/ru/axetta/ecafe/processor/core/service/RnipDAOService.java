@@ -4,12 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
+import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.SendRequestRequest;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.SendRequestResponse;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.RnipEventType;
 import ru.axetta.ecafe.processor.core.persistence.RnipMessage;
+import ru.axetta.ecafe.processor.core.persistence.RnipRequestType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.slf4j.Logger;
@@ -21,6 +23,9 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.Marshaller;
+import java.io.StringWriter;
 import java.util.Date;
 import java.util.List;
 
@@ -32,11 +37,18 @@ import java.util.List;
 public class RnipDAOService {
     private final static Logger logger = LoggerFactory.getLogger(RnipDAOService.class);
 
+    private static JAXBContext sendRequestContext;
+
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
     public static RnipDAOService getInstance() {
         return RuntimeContext.getAppContext().getBean(RnipDAOService.class);
+    }
+
+    private JAXBContext getSendRequestContext() throws Exception {
+        if (sendRequestContext == null) sendRequestContext = JAXBContext.newInstance(SendRequestRequest.class);
+        return sendRequestContext;
     }
 
     @Transactional
@@ -46,8 +58,13 @@ public class RnipDAOService {
     }
 
     @Transactional
-    public void saveRnipMessage(SendRequestResponse requestResponse, Contragent contragent, RnipEventType eventType) {
-        RnipMessage rnipMessage = new RnipMessage(contragent, eventType, requestResponse.getMessageMetadata().getMessageId());
+    public void saveRnipMessage(SendRequestResponse requestResponse, Contragent contragent, RnipEventType eventType, RnipRequestType requestType) throws Exception {
+        JAXBContext jaxbContext = getSendRequestContext();
+        Marshaller marshaller = jaxbContext.createMarshaller();
+        StringWriter writer = new StringWriter();
+        marshaller.marshal(requestResponse, writer);
+        String message = writer.toString();
+        RnipMessage rnipMessage = new RnipMessage(contragent, eventType, requestType, message, requestResponse.getMessageMetadata().getMessageId());
         entityManager.merge(rnipMessage);
     }
 

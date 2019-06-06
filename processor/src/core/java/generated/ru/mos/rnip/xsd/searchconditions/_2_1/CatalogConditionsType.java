@@ -22,9 +22,9 @@ import java.util.List;
  *           &lt;element name="BeneficiaryWithInnKpp">
  *             &lt;complexType>
  *               &lt;complexContent>
- *                 &lt;extension base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}AbstractBeneficiaryType">
- *                   &lt;attribute name="inn" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}INNType" />
- *                   &lt;attribute name="kpp" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KPPType" />
+ *                 &lt;extension base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}AbstractBeneficiaryType">
+ *                   &lt;attribute name="inn" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}INNType" />
+ *                   &lt;attribute name="kpp" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KPPType" />
  *                 &lt;/extension>
  *               &lt;/complexContent>
  *             &lt;/complexType>
@@ -32,14 +32,14 @@ import java.util.List;
  *           &lt;element name="BeneficiaryWithPayeeId">
  *             &lt;complexType>
  *               &lt;complexContent>
- *                 &lt;extension base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}AbstractBeneficiaryType">
- *                   &lt;attribute name="payeeId" use="required" type="{http://rnip.mos.ru/xsd/Catalog/2.1.0}PayeeIDType" />
+ *                 &lt;extension base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}AbstractBeneficiaryType">
+ *                   &lt;attribute name="payeeId" use="required" type="{http://rnip.mos.ru/xsd/Catalog/2.1.1}PayeeIDType" />
  *                 &lt;/extension>
  *               &lt;/complexContent>
  *             &lt;/complexType>
  *           &lt;/element>
  *         &lt;/choice>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}TimeInterval" minOccurs="0"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}TimeInterval" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="allDateCatalog" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/restriction>
@@ -61,7 +61,7 @@ public class CatalogConditionsType {
         @XmlElement(name = "BeneficiaryWithPayeeId", type = CatalogConditionsType.BeneficiaryWithPayeeId.class)
     })
     protected List<AbstractBeneficiaryType> beneficiaryWithInnKppOrBeneficiaryWithPayeeId;
-    @XmlElement(name = "TimeInterval", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0")
+    @XmlElement(name = "TimeInterval", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1")
     protected TimeIntervalType timeInterval;
     @XmlAttribute(name = "allDateCatalog")
     protected Boolean allDateCatalog;
@@ -154,9 +154,9 @@ public class CatalogConditionsType {
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
-     *     &lt;extension base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}AbstractBeneficiaryType">
-     *       &lt;attribute name="inn" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}INNType" />
-     *       &lt;attribute name="kpp" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KPPType" />
+     *     &lt;extension base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}AbstractBeneficiaryType">
+     *       &lt;attribute name="inn" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}INNType" />
+     *       &lt;attribute name="kpp" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KPPType" />
      *     &lt;/extension>
      *   &lt;/complexContent>
      * &lt;/complexType>
@@ -234,8 +234,8 @@ public class CatalogConditionsType {
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
-     *     &lt;extension base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}AbstractBeneficiaryType">
-     *       &lt;attribute name="payeeId" use="required" type="{http://rnip.mos.ru/xsd/Catalog/2.1.0}PayeeIDType" />
+     *     &lt;extension base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}AbstractBeneficiaryType">
+     *       &lt;attribute name="payeeId" use="required" type="{http://rnip.mos.ru/xsd/Catalog/2.1.1}PayeeIDType" />
      *     &lt;/extension>
      *   &lt;/complexContent>
      * &lt;/complexType>

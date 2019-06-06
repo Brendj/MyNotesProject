@@ -20,10 +20,7 @@ import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogReque
 import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogResponse;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.RnipEventType;
-import ru.axetta.ecafe.processor.core.persistence.RnipMessage;
+import ru.axetta.ecafe.processor.core.persistence.*;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -35,7 +32,10 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
 
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.ObjectFactory;
 
@@ -64,7 +64,9 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
             RnipEventType eventType = null;
             if (requestType == REQUEST_MODIFY_CATALOG) eventType = RnipEventType.CONTRAGENT_EDIT;
             else if (requestType == REQUEST_CREATE_CATALOG) eventType = RnipEventType.CONTRAGENT_CREATE;
-            RnipDAOService.getInstance().saveRnipMessage(requestResponse, contragent, eventType);
+            RnipDAOService.getInstance().saveRnipMessage(requestResponse, contragent, eventType, RnipRequestType.SEND_REQUEST);
+        } else {
+            hasError.set("Получен ошибочный InteractionStatusType");
         }
         return requestResponse;
     }
@@ -82,10 +84,11 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         switch(requestType) {
             case REQUEST_MODIFY_CATALOG:
             case REQUEST_CREATE_CATALOG:
-                return executeModifyCatalog20(requestType, contragent, updateDate, startDate, endDate);
+                return executeModifyCatalogV21(requestType, contragent, updateDate, startDate, endDate);
             case REQUEST_LOAD_PAYMENTS:
             case REQUEST_LOAD_PAYMENTS_MODIFIED:
-                requests = new HashMap<Contragent, Integer>();
+                return executeLoadPaymentsV21(requestType, contragent, updateDate, startDate, endDate, 1);
+                /*requests = new HashMap<Contragent, Integer>();
                 int attempt = 1;
                 String uuid = UUID.randomUUID().toString();
 
@@ -101,7 +104,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
                     if (error != null) throw new Exception(String.format("RNIP v 2.1 check error: %s", error));
                     result.add(messageDataType);
                 }
-                return result;
+                return result;*/
         }
         return null;
     }
@@ -207,13 +210,15 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         SendRequestResponse response = null;
         try {
             response = port21.sendRequest(sendRequestRequest);
+            hasError.set(null);
         } catch (Exception e) {
             logger.error("Error in request to rnip 2.1", e);
+            hasError.set(e.getMessage());
         }
         return response;
     }
 
-    public SendRequestResponse executeModifyCatalog20(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
+    public SendRequestResponse executeModifyCatalogV21(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
         InitRNIP21Service();
 
         String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
@@ -515,7 +520,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
 
         GetResponseRequest.OriginalMessageID originalMessageID = requestObjectFactory.createGetResponseRequestOriginalMessageID();
         originalMessageID.setId(RNIPSecuritySOAPHandlerV21.SIGN_ID);
-        originalMessageID.setValue(rnipMessage.getRequestId());
+        originalMessageID.setValue(rnipMessage.getMessageId());
         getResponseRequest.setOriginalMessageID(originalMessageID);
         GetResponseRequest.Sender sender = requestObjectFactory.createGetResponseRequestSender();
         sender.setMnemonic(getMacroPart(rnipMessage.getContragent(), "CONTRAGENT_ID"));

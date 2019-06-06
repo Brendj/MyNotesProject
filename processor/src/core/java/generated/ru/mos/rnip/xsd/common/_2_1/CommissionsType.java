@@ -19,7 +19,7 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Commission" type="{http://rnip.mos.ru/xsd/Common/2.1.0}CommissionType" maxOccurs="unbounded"/>
+ *         &lt;element name="Commission" type="{http://rnip.mos.ru/xsd/Common/2.1.1}CommissionType" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>

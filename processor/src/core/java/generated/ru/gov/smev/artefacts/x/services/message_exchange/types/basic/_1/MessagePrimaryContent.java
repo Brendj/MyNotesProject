@@ -38,30 +38,30 @@ import javax.xml.bind.annotation.*;
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
  *         &lt;choice>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-chargestemplate/2.1.0}ChargeCreationRequest"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-catalog/2.1.0}ExportCatalogRequest"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-charges/2.1.0}ExportChargesRequest"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-payments/2.1.0}ExportPaymentsRequest"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-quittances/2.1.0}ExportQuittancesRequest"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-refunds/2.1.0}ExportRefundsRequest"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/forced-acknowledgement/2.1.0}ForcedAcknowledgementRequest"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-catalog/2.1.0}ImportCatalogRequest"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-certificates/2.1.0}ImportCertificateRequest"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-charges/2.1.0}ImportChargesRequest"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-payments/2.1.0}ImportPaymentsRequest"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-refunds/2.1.0}ImportRefundsRequest"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-chargestemplate/2.1.0}ChargeCreationResponse"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-catalog/2.1.0}ExportCatalogResponse"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-charges/2.1.0}ExportChargesResponse"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-payments/2.1.0}ExportPaymentsResponse"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-quittances/2.1.0}ExportQuittancesResponse"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-refunds/2.1.0}ExportRefundsResponse"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/forced-acknowledgement/2.1.0}ForcedAcknowledgementResponse"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-catalog/2.1.0}ImportCatalogResponse"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-certificates/2.1.0}ImportCertificateResponse"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-charges/2.1.0}ImportChargesResponse"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-payments/2.1.0}ImportPaymentsResponse"/>
- *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-refunds/2.1.0}ImportRefundsResponse"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-chargestemplate/2.1.1}ChargeCreationRequest"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-catalog/2.1.1}ExportCatalogRequest"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-charges/2.1.1}ExportChargesRequest"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-payments/2.1.1}ExportPaymentsRequest"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-quittances/2.1.1}ExportQuittancesRequest"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-refunds/2.1.1}ExportRefundsRequest"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/forced-acknowledgement/2.1.1}ForcedAcknowledgementRequest"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-catalog/2.1.1}ImportCatalogRequest"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-certificates/2.1.1}ImportCertificateRequest"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-charges/2.1.1}ImportChargesRequest"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-payments/2.1.1}ImportPaymentsRequest"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-refunds/2.1.1}ImportRefundsRequest"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-chargestemplate/2.1.1}ChargeCreationResponse"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-catalog/2.1.1}ExportCatalogResponse"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-charges/2.1.1}ExportChargesResponse"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-payments/2.1.1}ExportPaymentsResponse"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-quittances/2.1.1}ExportQuittancesResponse"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/export-refunds/2.1.1}ExportRefundsResponse"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/forced-acknowledgement/2.1.1}ForcedAcknowledgementResponse"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-catalog/2.1.1}ImportCatalogResponse"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-certificates/2.1.1}ImportCertificateResponse"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-charges/2.1.1}ImportChargesResponse"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-payments/2.1.1}ImportPaymentsResponse"/>
+ *           &lt;element ref="{urn://rnip.mos.ru/xsd/services/import-refunds/2.1.1}ImportRefundsResponse"/>
  *         &lt;/choice>
  *       &lt;/sequence>
  *     &lt;/restriction>
@@ -101,53 +101,53 @@ import javax.xml.bind.annotation.*;
 @XmlRootElement(name = "MessagePrimaryContent")
 public class MessagePrimaryContent {
 
-    @XmlElement(name = "ChargeCreationRequest", namespace = "urn://rnip.mos.ru/xsd/services/import-chargestemplate/2.1.0")
+    @XmlElement(name = "ChargeCreationRequest", namespace = "urn://rnip.mos.ru/xsd/services/import-chargestemplate/2.1.1")
     protected ChargeCreationRequest chargeCreationRequest;
-    @XmlElement(name = "ExportCatalogRequest", namespace = "urn://rnip.mos.ru/xsd/services/export-catalog/2.1.0")
+    @XmlElement(name = "ExportCatalogRequest", namespace = "urn://rnip.mos.ru/xsd/services/export-catalog/2.1.1")
     protected ExportCatalogRequest exportCatalogRequest;
-    @XmlElement(name = "ExportChargesRequest", namespace = "urn://rnip.mos.ru/xsd/services/export-charges/2.1.0")
+    @XmlElement(name = "ExportChargesRequest", namespace = "urn://rnip.mos.ru/xsd/services/export-charges/2.1.1")
     protected ExportChargesRequest exportChargesRequest;
-    @XmlElement(name = "ExportPaymentsRequest", namespace = "urn://rnip.mos.ru/xsd/services/export-payments/2.1.0")
+    @XmlElement(name = "ExportPaymentsRequest", namespace = "urn://rnip.mos.ru/xsd/services/export-payments/2.1.1")
     protected ExportPaymentsRequest exportPaymentsRequest;
-    @XmlElement(name = "ExportQuittancesRequest", namespace = "urn://rnip.mos.ru/xsd/services/export-quittances/2.1.0")
+    @XmlElement(name = "ExportQuittancesRequest", namespace = "urn://rnip.mos.ru/xsd/services/export-quittances/2.1.1")
     protected ExportQuittancesRequest exportQuittancesRequest;
-    @XmlElement(name = "ExportRefundsRequest", namespace = "urn://rnip.mos.ru/xsd/services/export-refunds/2.1.0")
+    @XmlElement(name = "ExportRefundsRequest", namespace = "urn://rnip.mos.ru/xsd/services/export-refunds/2.1.1")
     protected ExportRefundsRequest exportRefundsRequest;
-    @XmlElement(name = "ForcedAcknowledgementRequest", namespace = "urn://rnip.mos.ru/xsd/services/forced-acknowledgement/2.1.0")
+    @XmlElement(name = "ForcedAcknowledgementRequest", namespace = "urn://rnip.mos.ru/xsd/services/forced-acknowledgement/2.1.1")
     protected ForcedAcknowledgementRequest forcedAcknowledgementRequest;
-    @XmlElement(name = "ImportCatalogRequest", namespace = "urn://rnip.mos.ru/xsd/services/import-catalog/2.1.0")
+    @XmlElement(name = "ImportCatalogRequest", namespace = "urn://rnip.mos.ru/xsd/services/import-catalog/2.1.1")
     protected ImportCatalogRequest importCatalogRequest;
-    @XmlElement(name = "ImportCertificateRequest", namespace = "urn://rnip.mos.ru/xsd/services/import-certificates/2.1.0")
+    @XmlElement(name = "ImportCertificateRequest", namespace = "urn://rnip.mos.ru/xsd/services/import-certificates/2.1.1")
     protected ImportCertificateRequest importCertificateRequest;
-    @XmlElement(name = "ImportChargesRequest", namespace = "urn://rnip.mos.ru/xsd/services/import-charges/2.1.0")
+    @XmlElement(name = "ImportChargesRequest", namespace = "urn://rnip.mos.ru/xsd/services/import-charges/2.1.1")
     protected ImportChargesRequest importChargesRequest;
-    @XmlElement(name = "ImportPaymentsRequest", namespace = "urn://rnip.mos.ru/xsd/services/import-payments/2.1.0")
+    @XmlElement(name = "ImportPaymentsRequest", namespace = "urn://rnip.mos.ru/xsd/services/import-payments/2.1.1")
     protected ImportPaymentsRequest importPaymentsRequest;
-    @XmlElement(name = "ImportRefundsRequest", namespace = "urn://rnip.mos.ru/xsd/services/import-refunds/2.1.0")
+    @XmlElement(name = "ImportRefundsRequest", namespace = "urn://rnip.mos.ru/xsd/services/import-refunds/2.1.1")
     protected ImportRefundsRequest importRefundsRequest;
-    @XmlElement(name = "ChargeCreationResponse", namespace = "urn://rnip.mos.ru/xsd/services/import-chargestemplate/2.1.0")
+    @XmlElement(name = "ChargeCreationResponse", namespace = "urn://rnip.mos.ru/xsd/services/import-chargestemplate/2.1.1")
     protected ChargeCreationResponse chargeCreationResponse;
-    @XmlElement(name = "ExportCatalogResponse", namespace = "urn://rnip.mos.ru/xsd/services/export-catalog/2.1.0")
+    @XmlElement(name = "ExportCatalogResponse", namespace = "urn://rnip.mos.ru/xsd/services/export-catalog/2.1.1")
     protected ExportCatalogResponse exportCatalogResponse;
-    @XmlElement(name = "ExportChargesResponse", namespace = "urn://rnip.mos.ru/xsd/services/export-charges/2.1.0")
+    @XmlElement(name = "ExportChargesResponse", namespace = "urn://rnip.mos.ru/xsd/services/export-charges/2.1.1")
     protected ExportChargesResponse exportChargesResponse;
-    @XmlElement(name = "ExportPaymentsResponse", namespace = "urn://rnip.mos.ru/xsd/services/export-payments/2.1.0")
+    @XmlElement(name = "ExportPaymentsResponse", namespace = "urn://rnip.mos.ru/xsd/services/export-payments/2.1.1")
     protected ExportPaymentsResponse exportPaymentsResponse;
-    @XmlElement(name = "ExportQuittancesResponse", namespace = "urn://rnip.mos.ru/xsd/services/export-quittances/2.1.0")
+    @XmlElement(name = "ExportQuittancesResponse", namespace = "urn://rnip.mos.ru/xsd/services/export-quittances/2.1.1")
     protected ExportQuittancesResponse exportQuittancesResponse;
-    @XmlElement(name = "ExportRefundsResponse", namespace = "urn://rnip.mos.ru/xsd/services/export-refunds/2.1.0")
+    @XmlElement(name = "ExportRefundsResponse", namespace = "urn://rnip.mos.ru/xsd/services/export-refunds/2.1.1")
     protected ExportRefundsResponse exportRefundsResponse;
-    @XmlElement(name = "ForcedAcknowledgementResponse", namespace = "urn://rnip.mos.ru/xsd/services/forced-acknowledgement/2.1.0")
+    @XmlElement(name = "ForcedAcknowledgementResponse", namespace = "urn://rnip.mos.ru/xsd/services/forced-acknowledgement/2.1.1")
     protected ForcedAcknowledgementResponse forcedAcknowledgementResponse;
-    @XmlElement(name = "ImportCatalogResponse", namespace = "urn://rnip.mos.ru/xsd/services/import-catalog/2.1.0")
+    @XmlElement(name = "ImportCatalogResponse", namespace = "urn://rnip.mos.ru/xsd/services/import-catalog/2.1.1")
     protected ImportCatalogResponse importCatalogResponse;
-    @XmlElement(name = "ImportCertificateResponse", namespace = "urn://rnip.mos.ru/xsd/services/import-certificates/2.1.0")
+    @XmlElement(name = "ImportCertificateResponse", namespace = "urn://rnip.mos.ru/xsd/services/import-certificates/2.1.1")
     protected ImportCertificateResponse importCertificateResponse;
-    @XmlElement(name = "ImportChargesResponse", namespace = "urn://rnip.mos.ru/xsd/services/import-charges/2.1.0")
+    @XmlElement(name = "ImportChargesResponse", namespace = "urn://rnip.mos.ru/xsd/services/import-charges/2.1.1")
     protected ImportPackageResponseType importChargesResponse;
-    @XmlElement(name = "ImportPaymentsResponse", namespace = "urn://rnip.mos.ru/xsd/services/import-payments/2.1.0")
+    @XmlElement(name = "ImportPaymentsResponse", namespace = "urn://rnip.mos.ru/xsd/services/import-payments/2.1.1")
     protected ImportPackageResponseType importPaymentsResponse;
-    @XmlElement(name = "ImportRefundsResponse", namespace = "urn://rnip.mos.ru/xsd/services/import-refunds/2.1.0")
+    @XmlElement(name = "ImportRefundsResponse", namespace = "urn://rnip.mos.ru/xsd/services/import-refunds/2.1.1")
     protected ImportPackageResponseType importRefundsResponse;
 
     /**

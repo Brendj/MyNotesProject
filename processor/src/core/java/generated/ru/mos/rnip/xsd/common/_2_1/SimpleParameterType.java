@@ -17,9 +17,9 @@ import java.util.List;
  * <pre>
  * &lt;complexType name="SimpleParameterType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}ParameterType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}ParameterType">
  *       &lt;sequence>
- *         &lt;element name="Value" type="{http://rnip.mos.ru/xsd/Common/2.1.0}ParamValueType" maxOccurs="unbounded"/>
+ *         &lt;element name="Value" type="{http://rnip.mos.ru/xsd/Common/2.1.1}ParamValueType" maxOccurs="unbounded"/>
  *       &lt;/sequence>
  *     &lt;/extension>
  *   &lt;/complexContent>

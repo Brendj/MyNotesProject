@@ -42,7 +42,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *           &lt;/restriction>
  *         &lt;/simpleType>
  *       &lt;/attribute>
- *       &lt;attribute name="recipientIdentifier" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}URNType" />
+ *       &lt;attribute name="recipientIdentifier" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}URNType" />
  *       &lt;attribute name="timestamp" use="required" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
  *     &lt;/restriction>
  *   &lt;/complexContent>

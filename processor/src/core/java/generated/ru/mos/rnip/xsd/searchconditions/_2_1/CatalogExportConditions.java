@@ -15,11 +15,11 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;restriction base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}Conditions">
+ *     &lt;restriction base="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}Conditions">
  *       &lt;sequence>
- *         &lt;element name="CatalogConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}CatalogConditionsType"/>
+ *         &lt;element name="CatalogConditions" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}CatalogConditionsType"/>
  *       &lt;/sequence>
- *       &lt;attribute name="kind" use="required" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.0}ExportCatalogKindType" />
+ *       &lt;attribute name="kind" use="required" type="{http://rnip.mos.ru/xsd/SearchConditions/2.1.1}ExportCatalogKindType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>

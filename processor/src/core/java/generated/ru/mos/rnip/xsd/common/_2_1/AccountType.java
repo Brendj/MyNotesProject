@@ -16,9 +16,9 @@ import javax.xml.bind.annotation.*;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="Bank" type="{http://rnip.mos.ru/xsd/Common/2.1.0}BankType"/>
+ *         &lt;element name="Bank" type="{http://rnip.mos.ru/xsd/Common/2.1.1}BankType"/>
  *       &lt;/sequence>
- *       &lt;attribute name="accountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AccountNumType" />
+ *       &lt;attribute name="accountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AccountNumType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>

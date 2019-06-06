@@ -12,8 +12,8 @@ import javax.xml.bind.annotation.*;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Organization/2.1.0}OrganizationType">
- *       &lt;attribute name="codeUBP" use="required" type="{http://rnip.mos.ru/xsd/Organization/2.1.0}kodUBPType" />
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Organization/2.1.1}OrganizationType">
+ *       &lt;attribute name="codeUBP" use="required" type="{http://rnip.mos.ru/xsd/Organization/2.1.1}kodUBPType" />
  *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>

@@ -15,7 +15,7 @@ import javax.xml.bind.annotation.*;
  * &lt;complexType name="PayerType">
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *       &lt;attribute name="payerIdentifier" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PayerIdentifierType" />
+ *       &lt;attribute name="payerIdentifier" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PayerIdentifierType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>

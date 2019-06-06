@@ -27,7 +27,7 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Organization/2.1.0}RefundPayer"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Organization/2.1.1}RefundPayer"/>
  *         &lt;element name="RefundApplication">
  *           &lt;complexType>
  *             &lt;complexContent>
@@ -41,7 +41,7 @@ import java.util.List;
  *                   &lt;/simpleType>
  *                 &lt;/attribute>
  *                 &lt;attribute name="appDate" use="required" type="{http://www.w3.org/2001/XMLSchema}date" />
- *                 &lt;attribute name="paymentId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType" />
+ *                 &lt;attribute name="paymentId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType" />
  *                 &lt;attribute name="cashType" use="required">
  *                   &lt;simpleType>
  *                     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}int">
@@ -99,10 +99,10 @@ import java.util.List;
  *         &lt;element name="RefundPayee">
  *           &lt;complexType>
  *             &lt;complexContent>
- *               &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}PayerType">
+ *               &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}PayerType">
  *                 &lt;sequence>
- *                   &lt;element name="BankAccountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AccountType"/>
- *                   &lt;element name="PayeeAccount" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PayeeAccountType" minOccurs="0"/>
+ *                   &lt;element name="BankAccountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AccountType"/>
+ *                   &lt;element name="PayeeAccount" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PayeeAccountType" minOccurs="0"/>
  *                 &lt;/sequence>
  *                 &lt;attribute name="name" use="required">
  *                   &lt;simpleType>
@@ -112,16 +112,16 @@ import java.util.List;
  *                     &lt;/restriction>
  *                   &lt;/simpleType>
  *                 &lt;/attribute>
- *                 &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KBKType" />
- *                 &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.0}OKTMOType" />
+ *                 &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KBKType" />
+ *                 &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.1}OKTMOType" />
  *               &lt;/extension>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}ChangeStatus"/>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}AdditionalData" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}ChangeStatus"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}AdditionalData" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
- *       &lt;attribute name="refundId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}RefundIdType" />
+ *       &lt;attribute name="refundId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}RefundIdType" />
  *       &lt;attribute name="refundDocDate" use="required" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
  *       &lt;attribute name="budgetLevel" use="required">
  *         &lt;simpleType>
@@ -135,8 +135,8 @@ import java.util.List;
  *           &lt;/restriction>
  *         &lt;/simpleType>
  *       &lt;/attribute>
- *       &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KBKType" />
- *       &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.0}OKTMOType" />
+ *       &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KBKType" />
+ *       &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.1}OKTMOType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -158,7 +158,7 @@ import java.util.List;
 })
 public class RefundType {
 
-    @XmlElement(name = "RefundPayer", namespace = "http://rnip.mos.ru/xsd/Organization/2.1.0", required = true)
+    @XmlElement(name = "RefundPayer", namespace = "http://rnip.mos.ru/xsd/Organization/2.1.1", required = true)
     protected RefundPayer refundPayer;
     @XmlElement(name = "RefundApplication", required = true)
     protected RefundType.RefundApplication refundApplication;
@@ -166,9 +166,9 @@ public class RefundType {
     protected RefundType.RefundBasis refundBasis;
     @XmlElement(name = "RefundPayee", required = true)
     protected RefundType.RefundPayee refundPayee;
-    @XmlElement(name = "ChangeStatus", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", required = true)
+    @XmlElement(name = "ChangeStatus", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", required = true)
     protected ChangeStatus changeStatus;
-    @XmlElement(name = "AdditionalData", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0")
+    @XmlElement(name = "AdditionalData", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1")
     protected List<AdditionalDataType> additionalData;
     @XmlAttribute(name = "refundId", required = true)
     protected String refundId;
@@ -471,7 +471,7 @@ public class RefundType {
      *         &lt;/simpleType>
      *       &lt;/attribute>
      *       &lt;attribute name="appDate" use="required" type="{http://www.w3.org/2001/XMLSchema}date" />
-     *       &lt;attribute name="paymentId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType" />
+     *       &lt;attribute name="paymentId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType" />
      *       &lt;attribute name="cashType" use="required">
      *         &lt;simpleType>
      *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}int">
@@ -789,10 +789,10 @@ public class RefundType {
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
-     *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}PayerType">
+     *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}PayerType">
      *       &lt;sequence>
-     *         &lt;element name="BankAccountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AccountType"/>
-     *         &lt;element name="PayeeAccount" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PayeeAccountType" minOccurs="0"/>
+     *         &lt;element name="BankAccountNumber" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AccountType"/>
+     *         &lt;element name="PayeeAccount" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PayeeAccountType" minOccurs="0"/>
      *       &lt;/sequence>
      *       &lt;attribute name="name" use="required">
      *         &lt;simpleType>
@@ -802,8 +802,8 @@ public class RefundType {
      *           &lt;/restriction>
      *         &lt;/simpleType>
      *       &lt;/attribute>
-     *       &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KBKType" />
-     *       &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.0}OKTMOType" />
+     *       &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KBKType" />
+     *       &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.1}OKTMOType" />
      *     &lt;/extension>
      *   &lt;/complexContent>
      * &lt;/complexType>

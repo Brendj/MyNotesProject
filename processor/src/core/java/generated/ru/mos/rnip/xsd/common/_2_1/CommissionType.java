@@ -32,8 +32,8 @@ import java.math.BigDecimal;
  *           &lt;/simpleType>
  *         &lt;/element>
  *         &lt;element name="Percent" type="{http://www.w3.org/2001/XMLSchema}decimal" minOccurs="0"/>
- *         &lt;element name="MinValue" type="{http://rnip.mos.ru/xsd/Common/2.1.0}Money" minOccurs="0"/>
- *         &lt;element name="MaxValue" type="{http://rnip.mos.ru/xsd/Common/2.1.0}Money" minOccurs="0"/>
+ *         &lt;element name="MinValue" type="{http://rnip.mos.ru/xsd/Common/2.1.1}Money" minOccurs="0"/>
+ *         &lt;element name="MaxValue" type="{http://rnip.mos.ru/xsd/Common/2.1.1}Money" minOccurs="0"/>
  *       &lt;/sequence>
  *     &lt;/restriction>
  *   &lt;/complexContent>

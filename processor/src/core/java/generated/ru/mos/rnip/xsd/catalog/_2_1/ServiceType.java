@@ -23,14 +23,14 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="ServiceCategory" type="{http://rnip.mos.ru/xsd/Catalog/2.1.0}ServiceCategoryType"/>
- *         &lt;element name="PaymentParameters" type="{http://rnip.mos.ru/xsd/Catalog/2.1.0}DescriptionParametersType" minOccurs="0"/>
+ *         &lt;element name="ServiceCategory" type="{http://rnip.mos.ru/xsd/Catalog/2.1.1}ServiceCategoryType"/>
+ *         &lt;element name="PaymentParameters" type="{http://rnip.mos.ru/xsd/Catalog/2.1.1}DescriptionParametersType" minOccurs="0"/>
  *         &lt;element name="CurrenciesServices" minOccurs="0">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="CurrencyCode" type="{http://rnip.mos.ru/xsd/Common/2.1.0}CurrencyCodeType" maxOccurs="unbounded"/>
+ *                   &lt;element name="CurrencyCode" type="{http://rnip.mos.ru/xsd/Common/2.1.1}CurrencyCodeType" maxOccurs="unbounded"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -39,27 +39,27 @@ import java.util.List;
  *         &lt;element name="Payee">
  *           &lt;complexType>
  *             &lt;complexContent>
- *               &lt;extension base="{http://rnip.mos.ru/xsd/Organization/2.1.0}OrganizationType">
+ *               &lt;extension base="{http://rnip.mos.ru/xsd/Organization/2.1.1}OrganizationType">
  *                 &lt;sequence>
- *                   &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}OrgAccount"/>
- *                   &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}Address" maxOccurs="unbounded" minOccurs="0"/>
- *                   &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}Contact" maxOccurs="unbounded" minOccurs="0"/>
+ *                   &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}OrgAccount"/>
+ *                   &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}Address" maxOccurs="unbounded" minOccurs="0"/>
+ *                   &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}Contact" maxOccurs="unbounded" minOccurs="0"/>
  *                 &lt;/sequence>
- *                 &lt;attribute name="oktmo" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}OKTMOType" />
+ *                 &lt;attribute name="oktmo" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}OKTMOType" />
  *                 &lt;attribute name="subsystemId" type="{http://www.w3.org/2001/XMLSchema}string" />
  *               &lt;/extension>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element name="MinAmount" type="{http://rnip.mos.ru/xsd/Common/2.1.0}Money" minOccurs="0"/>
- *         &lt;element name="MaxAmount" type="{http://rnip.mos.ru/xsd/Common/2.1.0}Money" minOccurs="0"/>
- *         &lt;element name="Commissions" type="{http://rnip.mos.ru/xsd/Common/2.1.0}CommissionsType" minOccurs="0"/>
+ *         &lt;element name="MinAmount" type="{http://rnip.mos.ru/xsd/Common/2.1.1}Money" minOccurs="0"/>
+ *         &lt;element name="MaxAmount" type="{http://rnip.mos.ru/xsd/Common/2.1.1}Money" minOccurs="0"/>
+ *         &lt;element name="Commissions" type="{http://rnip.mos.ru/xsd/Common/2.1.1}CommissionsType" minOccurs="0"/>
  *         &lt;element name="Regions" minOccurs="0">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="Region" type="{http://rnip.mos.ru/xsd/Common/2.1.0}RegionType" maxOccurs="unbounded"/>
+ *                   &lt;element name="Region" type="{http://rnip.mos.ru/xsd/Common/2.1.1}RegionType" maxOccurs="unbounded"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -70,13 +70,13 @@ import java.util.List;
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="service" type="{http://rnip.mos.ru/xsd/Catalog/2.1.0}ServiceType" maxOccurs="unbounded"/>
+ *                   &lt;element name="service" type="{http://rnip.mos.ru/xsd/Catalog/2.1.1}ServiceType" maxOccurs="unbounded"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}AdditionalData" minOccurs="0"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}AdditionalData" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="name" use="required">
  *         &lt;simpleType>
@@ -147,7 +147,7 @@ public class ServiceType {
     protected ServiceType.Regions regions;
     @XmlElement(name = "Subservices")
     protected ServiceType.Subservices subservices;
-    @XmlElement(name = "AdditionalData", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0")
+    @XmlElement(name = "AdditionalData", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1")
     protected AdditionalDataType additionalData;
     @XmlAttribute(name = "name", required = true)
     protected String name;
@@ -603,7 +603,7 @@ public class ServiceType {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="CurrencyCode" type="{http://rnip.mos.ru/xsd/Common/2.1.0}CurrencyCodeType" maxOccurs="unbounded"/>
+     *         &lt;element name="CurrencyCode" type="{http://rnip.mos.ru/xsd/Common/2.1.1}CurrencyCodeType" maxOccurs="unbounded"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -661,13 +661,13 @@ public class ServiceType {
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
-     *     &lt;extension base="{http://rnip.mos.ru/xsd/Organization/2.1.0}OrganizationType">
+     *     &lt;extension base="{http://rnip.mos.ru/xsd/Organization/2.1.1}OrganizationType">
      *       &lt;sequence>
-     *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}OrgAccount"/>
-     *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}Address" maxOccurs="unbounded" minOccurs="0"/>
-     *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}Contact" maxOccurs="unbounded" minOccurs="0"/>
+     *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}OrgAccount"/>
+     *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}Address" maxOccurs="unbounded" minOccurs="0"/>
+     *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}Contact" maxOccurs="unbounded" minOccurs="0"/>
      *       &lt;/sequence>
-     *       &lt;attribute name="oktmo" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}OKTMOType" />
+     *       &lt;attribute name="oktmo" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}OKTMOType" />
      *       &lt;attribute name="subsystemId" type="{http://www.w3.org/2001/XMLSchema}string" />
      *     &lt;/extension>
      *   &lt;/complexContent>
@@ -686,11 +686,11 @@ public class ServiceType {
         extends OrganizationType
     {
 
-        @XmlElement(name = "OrgAccount", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", required = true)
+        @XmlElement(name = "OrgAccount", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", required = true)
         protected OrgAccount orgAccount;
-        @XmlElement(name = "Address", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0")
+        @XmlElement(name = "Address", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1")
         protected List<AddressType> address;
-        @XmlElement(name = "Contact", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0")
+        @XmlElement(name = "Contact", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1")
         protected List<ContactType> contact;
         @XmlAttribute(name = "oktmo", required = true)
         protected String oktmo;
@@ -840,7 +840,7 @@ public class ServiceType {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="Region" type="{http://rnip.mos.ru/xsd/Common/2.1.0}RegionType" maxOccurs="unbounded"/>
+     *         &lt;element name="Region" type="{http://rnip.mos.ru/xsd/Common/2.1.1}RegionType" maxOccurs="unbounded"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -900,7 +900,7 @@ public class ServiceType {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="service" type="{http://rnip.mos.ru/xsd/Catalog/2.1.0}ServiceType" maxOccurs="unbounded"/>
+     *         &lt;element name="service" type="{http://rnip.mos.ru/xsd/Catalog/2.1.1}ServiceType" maxOccurs="unbounded"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>

@@ -15,11 +15,11 @@ import javax.xml.bind.annotation.XmlType;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;restriction base="{http://rnip.mos.ru/xsd/Common/2.1.0}AccountType">
+ *     &lt;restriction base="{http://rnip.mos.ru/xsd/Common/2.1.1}AccountType">
  *       &lt;sequence>
- *         &lt;element name="Bank" type="{http://rnip.mos.ru/xsd/Common/2.1.0}BankType"/>
+ *         &lt;element name="Bank" type="{http://rnip.mos.ru/xsd/Common/2.1.1}BankType"/>
  *       &lt;/sequence>
- *       &lt;attribute name="accountNumber" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AccountNumType" />
+ *       &lt;attribute name="accountNumber" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AccountNumType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>

@@ -13,7 +13,7 @@ import java.net.URL;
  * Generated source version: 2.2
  * 
  */
-@WebServiceClient(name = "SMEVMessageExchangeService", targetNamespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/1.2", wsdlLocation = "file:/D:/Doc/rnip/2.1/MainService.wsdl")
+@WebServiceClient(name = "SMEVMessageExchangeService", targetNamespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/1.2", wsdlLocation = "http://test.rnip.mos.ru/frontend-service/MainService?wsdl")
 public class SMEVMessageExchangeService
     extends Service
 {
@@ -26,7 +26,7 @@ public class SMEVMessageExchangeService
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("file:/D:/Doc/rnip/2.1/MainService.wsdl");
+            url = new URL("http://test.rnip.mos.ru/frontend-service/MainService?wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }

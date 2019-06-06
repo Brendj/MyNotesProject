@@ -26,7 +26,7 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _ImportChargesResponse_QNAME = new QName("urn://rnip.mos.ru/xsd/services/import-charges/2.1.0", "ImportChargesResponse");
+    private final static QName _ImportChargesResponse_QNAME = new QName("urn://rnip.mos.ru/xsd/services/import-charges/2.1.1", "ImportChargesResponse");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: ru.mos.rnip.xsd.services.import_charges._2_1
@@ -47,7 +47,7 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link ImportPackageResponseType }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "urn://rnip.mos.ru/xsd/services/import-charges/2.1.0", name = "ImportChargesResponse")
+    @XmlElementDecl(namespace = "urn://rnip.mos.ru/xsd/services/import-charges/2.1.1", name = "ImportChargesResponse")
     public JAXBElement<ImportPackageResponseType> createImportChargesResponse(ImportPackageResponseType value) {
         return new JAXBElement<ImportPackageResponseType>(_ImportChargesResponse_QNAME, ImportPackageResponseType.class, null, value);
     }

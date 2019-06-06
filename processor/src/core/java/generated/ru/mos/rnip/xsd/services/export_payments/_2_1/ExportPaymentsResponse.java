@@ -18,19 +18,19 @@ import java.util.List;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}ResponseType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}ResponseType">
  *       &lt;sequence minOccurs="0">
  *         &lt;element name="PaymentInfo" maxOccurs="100">
  *           &lt;complexType>
  *             &lt;complexContent>
- *               &lt;extension base="{http://rnip.mos.ru/xsd/Payment/2.1.0}PaymentType">
+ *               &lt;extension base="{http://rnip.mos.ru/xsd/Payment/2.1.1}PaymentType">
  *                 &lt;sequence>
  *                   &lt;element name="AcknowledgmentInfo" minOccurs="0">
  *                     &lt;complexType>
  *                       &lt;complexContent>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                           &lt;choice>
- *                             &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType"/>
+ *                             &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType"/>
  *                             &lt;element name="ServiceProvided" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                           &lt;/choice>
  *                         &lt;/restriction>
@@ -41,7 +41,7 @@ import java.util.List;
  *                     &lt;complexType>
  *                       &lt;complexContent>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
- *                           &lt;attribute name="refundId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}RefundIdType" />
+ *                           &lt;attribute name="refundId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}RefundIdType" />
  *                           &lt;attribute name="amount" use="required" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
  *                         &lt;/restriction>
  *                       &lt;/complexContent>
@@ -129,14 +129,14 @@ public class ExportPaymentsResponse
      * <pre>
      * &lt;complexType>
      *   &lt;complexContent>
-     *     &lt;extension base="{http://rnip.mos.ru/xsd/Payment/2.1.0}PaymentType">
+     *     &lt;extension base="{http://rnip.mos.ru/xsd/Payment/2.1.1}PaymentType">
      *       &lt;sequence>
      *         &lt;element name="AcknowledgmentInfo" minOccurs="0">
      *           &lt;complexType>
      *             &lt;complexContent>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *                 &lt;choice>
-     *                   &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType"/>
+     *                   &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType"/>
      *                   &lt;element name="ServiceProvided" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *                 &lt;/choice>
      *               &lt;/restriction>
@@ -147,7 +147,7 @@ public class ExportPaymentsResponse
      *           &lt;complexType>
      *             &lt;complexContent>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-     *                 &lt;attribute name="refundId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}RefundIdType" />
+     *                 &lt;attribute name="refundId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}RefundIdType" />
      *                 &lt;attribute name="amount" use="required" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
      *               &lt;/restriction>
      *             &lt;/complexContent>
@@ -239,7 +239,7 @@ public class ExportPaymentsResponse
          *   &lt;complexContent>
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
          *       &lt;choice>
-         *         &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType"/>
+         *         &lt;element name="SupplierBillID" type="{http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType"/>
          *         &lt;element name="ServiceProvided" type="{http://www.w3.org/2001/XMLSchema}string"/>
          *       &lt;/choice>
          *     &lt;/restriction>
@@ -321,7 +321,7 @@ public class ExportPaymentsResponse
          * &lt;complexType>
          *   &lt;complexContent>
          *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
-         *       &lt;attribute name="refundId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}RefundIdType" />
+         *       &lt;attribute name="refundId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}RefundIdType" />
          *       &lt;attribute name="amount" use="required" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
          *     &lt;/restriction>
          *   &lt;/complexContent>

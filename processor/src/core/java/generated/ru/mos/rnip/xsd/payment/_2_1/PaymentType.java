@@ -28,14 +28,14 @@ import java.util.List;
  *   &lt;complexContent>
  *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *       &lt;sequence>
- *         &lt;element name="PaymentOrg" type="{http://rnip.mos.ru/xsd/Organization/2.1.0}PaymentOrgType"/>
+ *         &lt;element name="PaymentOrg" type="{http://rnip.mos.ru/xsd/Organization/2.1.1}PaymentOrgType"/>
  *         &lt;element name="Payer" minOccurs="0">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;attribute name="payerIdentifier" use="required">
  *                   &lt;simpleType>
- *                     &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.0}PayerIdentifierType">
+ *                     &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.1}PayerIdentifierType">
  *                       &lt;simpleType>
  *                         &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *                           &lt;pattern value="0"/>
@@ -63,17 +63,17 @@ import java.util.List;
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Organization/2.1.0}Payee"/>
- *         &lt;element name="BudgetIndex" type="{http://rnip.mos.ru/xsd/Common/2.1.0}BudgetIndexType" minOccurs="0"/>
- *         &lt;element name="AccDoc" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AccDocType" minOccurs="0"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Organization/2.1.1}Payee"/>
+ *         &lt;element name="BudgetIndex" type="{http://rnip.mos.ru/xsd/Common/2.1.1}BudgetIndexType" minOccurs="0"/>
+ *         &lt;element name="AccDoc" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AccDocType" minOccurs="0"/>
  *         &lt;element name="PartialPayt" minOccurs="0">
  *           &lt;complexType>
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="AccDoc" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AccDocType"/>
+ *                   &lt;element name="AccDoc" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AccDocType"/>
  *                 &lt;/sequence>
- *                 &lt;attribute name="transKind" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}TransKindType" />
+ *                 &lt;attribute name="transKind" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}TransKindType" />
  *                 &lt;attribute name="paytNo">
  *                   &lt;simpleType>
  *                     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
@@ -93,13 +93,13 @@ import java.util.List;
  *             &lt;/complexContent>
  *           &lt;/complexType>
  *         &lt;/element>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}ChangeStatus"/>
- *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.0}AdditionalData" maxOccurs="unbounded" minOccurs="0"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}ChangeStatus"/>
+ *         &lt;element ref="{http://rnip.mos.ru/xsd/Common/2.1.1}AdditionalData" maxOccurs="unbounded" minOccurs="0"/>
  *       &lt;/sequence>
- *       &lt;attribute name="paymentId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}PaymentIdType" />
+ *       &lt;attribute name="paymentId" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}PaymentIdType" />
  *       &lt;attribute name="supplierBillID">
  *         &lt;simpleType>
- *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.0}SupplierBillIDType">
+ *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.1}SupplierBillIDType">
  *             &lt;simpleType>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
  *                 &lt;pattern value="\d{15}"/>
@@ -120,8 +120,8 @@ import java.util.List;
  *       &lt;attribute name="amount" use="required" type="{http://www.w3.org/2001/XMLSchema}unsignedLong" />
  *       &lt;attribute name="paymentDate" use="required" type="{http://www.w3.org/2001/XMLSchema}dateTime" />
  *       &lt;attribute name="receiptDate" type="{http://www.w3.org/2001/XMLSchema}date" />
- *       &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.0}KBKType" />
- *       &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.0}OKTMOType" />
+ *       &lt;attribute name="kbk" type="{http://rnip.mos.ru/xsd/Common/2.1.1}KBKType" />
+ *       &lt;attribute name="oktmo" type="{http://rnip.mos.ru/xsd/Common/2.1.1}OKTMOType" />
  *       &lt;attribute name="deliveryDate" type="{http://www.w3.org/2001/XMLSchema}date" />
  *       &lt;attribute name="ESIA_ID">
  *         &lt;simpleType>
@@ -132,7 +132,7 @@ import java.util.List;
  *           &lt;/restriction>
  *         &lt;/simpleType>
  *       &lt;/attribute>
- *       &lt;attribute name="transKind" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}TransKindType" />
+ *       &lt;attribute name="transKind" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}TransKindType" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -161,7 +161,7 @@ public class PaymentType {
     protected PaymentOrgType paymentOrg;
     @XmlElement(name = "Payer")
     protected PaymentType.Payer payer;
-    @XmlElement(name = "Payee", namespace = "http://rnip.mos.ru/xsd/Organization/2.1.0", required = true)
+    @XmlElement(name = "Payee", namespace = "http://rnip.mos.ru/xsd/Organization/2.1.1", required = true)
     protected Payee payee;
     @XmlElement(name = "BudgetIndex")
     protected BudgetIndexType budgetIndex;
@@ -169,9 +169,9 @@ public class PaymentType {
     protected AccDocType accDoc;
     @XmlElement(name = "PartialPayt")
     protected PaymentType.PartialPayt partialPayt;
-    @XmlElement(name = "ChangeStatus", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0", required = true)
+    @XmlElement(name = "ChangeStatus", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1", required = true)
     protected ChangeStatus changeStatus;
-    @XmlElement(name = "AdditionalData", namespace = "http://rnip.mos.ru/xsd/Common/2.1.0")
+    @XmlElement(name = "AdditionalData", namespace = "http://rnip.mos.ru/xsd/Common/2.1.1")
     protected List<AdditionalDataType> additionalData;
     @XmlAttribute(name = "paymentId", required = true)
     protected String paymentId;
@@ -672,9 +672,9 @@ public class PaymentType {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="AccDoc" type="{http://rnip.mos.ru/xsd/Common/2.1.0}AccDocType"/>
+     *         &lt;element name="AccDoc" type="{http://rnip.mos.ru/xsd/Common/2.1.1}AccDocType"/>
      *       &lt;/sequence>
-     *       &lt;attribute name="transKind" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.0}TransKindType" />
+     *       &lt;attribute name="transKind" use="required" type="{http://rnip.mos.ru/xsd/Common/2.1.1}TransKindType" />
      *       &lt;attribute name="paytNo">
      *         &lt;simpleType>
      *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
@@ -848,7 +848,7 @@ public class PaymentType {
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;attribute name="payerIdentifier" use="required">
      *         &lt;simpleType>
-     *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.0}PayerIdentifierType">
+     *           &lt;union memberTypes=" {http://rnip.mos.ru/xsd/Common/2.1.1}PayerIdentifierType">
      *             &lt;simpleType>
      *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}string">
      *                 &lt;pattern value="0"/>

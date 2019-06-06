@@ -17,13 +17,21 @@
         <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="request" column="request" type="string"/>
         <property name="response" column="response" type="string"/>
-        <property name="requestId" column="requestid" type="string" not-null="true"/>
+        <property name="messageId" column="messageid" type="string" not-null="true"/>
+        <property name="paging" column="paging" type="integer"/>
         <property name="responseMessage" column="responsemessage" type="string"/>
-        <property name="lastRnipUpdate" column="lastrnipupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="startDate" column="startdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="endDate" column="enddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="processed" column="processed" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="ackSent" column="acksent" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <property name="eventType" column="eventType" not-null="true">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.RnipEventType</param>
+            </type>
+        </property>
+        <property name="requestType" column="requestType" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.RnipRequestType</param>
             </type>
         </property>
     </class>

@@ -16,8 +16,8 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  * <pre>
  * &lt;complexType name="ImportedChargeType">
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Charge/2.1.0}ChargeType">
- *       &lt;attribute name="originatorId" type="{http://rnip.mos.ru/xsd/Common/2.1.0}URNType" />
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Charge/2.1.1}ChargeType">
+ *       &lt;attribute name="originatorId" type="{http://rnip.mos.ru/xsd/Common/2.1.1}URNType" />
  *       &lt;attribute name="Id" use="required">
  *         &lt;simpleType>
  *           &lt;restriction base="{http://www.w3.org/2001/XMLSchema}ID">

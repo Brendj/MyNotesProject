@@ -15,11 +15,11 @@ import javax.xml.bind.annotation.*;
  * <pre>
  * &lt;complexType>
  *   &lt;complexContent>
- *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.0}RequestType">
+ *     &lt;extension base="{http://rnip.mos.ru/xsd/Common/2.1.1}RequestType">
  *       &lt;sequence>
- *         &lt;element name="ChargeTemplate" type="{http://rnip.mos.ru/xsd/Charge/2.1.0}ChargeTemplateType"/>
+ *         &lt;element name="ChargeTemplate" type="{http://rnip.mos.ru/xsd/Charge/2.1.1}ChargeTemplateType"/>
  *       &lt;/sequence>
- *       &lt;attribute name="originatorId" type="{http://rnip.mos.ru/xsd/Common/2.1.0}URNType" />
+ *       &lt;attribute name="originatorId" type="{http://rnip.mos.ru/xsd/Common/2.1.1}URNType" />
  *     &lt;/extension>
  *   &lt;/complexContent>
  * &lt;/complexType>
