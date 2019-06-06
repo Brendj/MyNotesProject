@@ -8342,6 +8342,76 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public CultureEnterInfo getCultureEnterInfo(@WebParam(name = "cardId") String cardId) {
+        authenticateRequest(null);
+        Session session = null;
+        try {
+            CultureEnterInfo cultureEnterInfo = new CultureEnterInfo();
+            session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
+            Long lCardId = Long.parseLong(cardId);
+            lCardId = SummaryCardsMSRService.convertCardId(lCardId);
+            Card card = DAOUtils.findCardByCardNo(session, lCardId);
+            if (card == null) {
+                return new CultureEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
+            }
+            Client client = card.getClient();
+            if (client == null) {
+                return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+            }
+            Date currentDate = new Date();
+            //Получаем все опекаемых для опекуна
+            List<Client> childsList = ClientManager.findChildsByClient(session, client.getIdOfClient());
+            if (childsList.isEmpty())
+            {
+                //Если клиент школьник
+                cultureEnterInfo.setGuid(client.getClientGUID());
+                cultureEnterInfo.setFullAge("false");
+                cultureEnterInfo.setGroupName(client.getClientGroup().getGroupName());
+                boolean clientPredefined = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                        && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() > ClientGroup.Predefined.CLIENT_DELETED.getValue()
+                        && (client.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_SCHOOL]));
+                if ((card.getState() == CardState.ISSUED.getValue() || card.getState() == CardState.TEMPISSUED.getValue())
+                        && card.getValidTime().after(currentDate) && !clientPredefined) {
+                    cultureEnterInfo.setValidityCard("true");
+                } else if (clientPredefined) {
+                    cultureEnterInfo.setValidityCard("false");
+                }
+
+            }
+            else
+            {
+                //Если клиент опекун
+                cultureEnterInfo.setFullAge("true");
+                cultureEnterInfo.setGroupName(client.getClientGroup().getGroupName());
+                for (Client child: childsList)
+                {
+                    boolean clientPredefined = child.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            && child.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() > ClientGroup.Predefined.CLIENT_DELETED.getValue()
+                            && (child.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL]) || child.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_OUT])
+                            || child.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_STEP]));
+                    //Добавляем в список только дошкольников
+                    if (clientPredefined)
+                        cultureEnterInfo.getChild().add(child.getClientGUID());
+                }
+                if ((card.getState() == CardState.ISSUED.getValue() || card.getState() == CardState.TEMPISSUED.getValue())
+                        && card.getValidTime().after(currentDate)) {
+                    cultureEnterInfo.setValidityCard("true");
+                } else {
+                    cultureEnterInfo.setValidityCard("false");
+                }
+            }
+            cultureEnterInfo.resultCode = RC_OK;
+            cultureEnterInfo.description = RC_OK_DESC;
+            return cultureEnterInfo;
+        } catch (Exception e) {
+            logger.error("Error in getCultureEnterInfo method:", e);
+            return new CultureEnterInfo(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    @Override
     public Result enterMuseum(@WebParam(name = "guid") String guid, @WebParam(name = "museumCode") String museumCode,
             @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "ticketStatus") Integer ticketStatus) {

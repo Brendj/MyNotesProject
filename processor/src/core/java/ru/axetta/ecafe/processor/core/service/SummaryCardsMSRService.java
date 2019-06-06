@@ -150,7 +150,7 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
                     + " where cf_clients.idofclientgroup not between :group_employees and :group_deleted\n"
                     + " and cf_clients.clientguid is not null  \n"
                     + " and cf_cards.state in (:card_states)  \n"
-                    + " and cf_client_guardian.deletedstate is false  \n"
+                    + " and cf_client_guardian.deletedstate is false and cf_client_guardian.disabled = 0 \n"
                     + " and cf_clients.agetypegroup in (:schoolchild)";
 
             query = entityManager.createNativeQuery(query_str);
@@ -183,7 +183,7 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
             logger.info(success ? "MSR upload file successful" : "MSR upload file error");
         }
         if (file.exists()) {
-            file.delete();
+            //file.delete();
         }
     }
 
