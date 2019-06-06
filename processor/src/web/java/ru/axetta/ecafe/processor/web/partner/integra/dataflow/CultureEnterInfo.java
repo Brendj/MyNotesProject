@@ -12,7 +12,8 @@ import java.util.ArrayList;
 public class CultureEnterInfo extends Result {
 
     private String validityCard;
-    private ArrayList<String> child = new ArrayList<>();
+    private ArrayList<CultureEnterInfo> child;
+    private ArrayList<CultureEnterInfo> childrens;
     private String guid;
     private String fullAge;
     private String groupName;
@@ -49,11 +50,13 @@ public class CultureEnterInfo extends Result {
         this.groupName = groupName;
     }
 
-    public ArrayList<String> getChild() {
+    public ArrayList<CultureEnterInfo> getChild() {
+        if (child == null)
+            child = new ArrayList<>();
         return child;
     }
 
-    public void setChild(ArrayList<String> child) {
+    public void setChild(ArrayList<CultureEnterInfo> child) {
         this.child = child;
     }
 
@@ -63,5 +66,15 @@ public class CultureEnterInfo extends Result {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    public ArrayList<CultureEnterInfo> getChildrens() {
+        if (childrens == null)
+            childrens = new ArrayList<>();
+        return childrens;
+    }
+
+    public void setChildrens(ArrayList<CultureEnterInfo> childrens) {
+        this.childrens = childrens;
     }
 }

@@ -8314,7 +8314,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (card == null) {
                 return new MuseumEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
             }
-            Client client = (card == null ? null : card.getClient());
+            Client client = card.getClient();
             if (client == null) {
                 return new MuseumEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
@@ -8359,6 +8359,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
             Date currentDate = new Date();
+            boolean clientPredefined = false;
             //Получаем все опекаемых для опекуна
             List<Client> childsList = ClientManager.findChildsByClient(session, client.getIdOfClient());
             if (childsList.isEmpty())
@@ -8367,38 +8368,51 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 cultureEnterInfo.setGuid(client.getClientGUID());
                 cultureEnterInfo.setFullAge("false");
                 cultureEnterInfo.setGroupName(client.getClientGroup().getGroupName());
-                boolean clientPredefined = client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-                        && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() > ClientGroup.Predefined.CLIENT_DELETED.getValue()
-                        && (client.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_SCHOOL]));
-                if ((card.getState() == CardState.ISSUED.getValue() || card.getState() == CardState.TEMPISSUED.getValue())
-                        && card.getValidTime().after(currentDate) && !clientPredefined) {
-                    cultureEnterInfo.setValidityCard("true");
-                } else if (clientPredefined) {
-                    cultureEnterInfo.setValidityCard("false");
+                if (client.getAgeTypeGroup() != null) {
+                    clientPredefined = (client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                            || client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() > ClientGroup.Predefined.CLIENT_DELETED.getValue())
+                            && (client.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_SCHOOL]));
                 }
-
             }
             else
             {
                 //Если клиент опекун
                 cultureEnterInfo.setFullAge("true");
                 cultureEnterInfo.setGroupName(client.getClientGroup().getGroupName());
+                boolean clientPredefinedchild = false;
+                cultureEnterInfo.getChildrens().add(new CultureEnterInfo());
                 for (Client child: childsList)
                 {
-                    boolean clientPredefined = child.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-                            && child.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() > ClientGroup.Predefined.CLIENT_DELETED.getValue()
-                            && (child.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL]) || child.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_OUT])
-                            || child.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_STEP]));
-                    //Добавляем в список только дошкольников
-                    if (clientPredefined)
-                        cultureEnterInfo.getChild().add(child.getClientGUID());
+                    if (child.getAgeTypeGroup() != null) {
+                        clientPredefined = (child.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                                || child.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() > ClientGroup.Predefined.CLIENT_DELETED.getValue())
+                                && (child.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL]) || child
+                                .getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_OUT]) || child.getAgeTypeGroup()
+                                .equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_STEP]));
+                        //Добавляем в список только дошкольников
+                        if (clientPredefined) {
+                            clientPredefinedchild = true;
+                            CultureEnterInfo cultureEnterInfoChield = new CultureEnterInfo();
+                            cultureEnterInfoChield.setGuid(child.getClientGUID());
+                            cultureEnterInfoChield.setGroupName(child.getClientGroup().getGroupName());
+                            List<Client> grandchildsList = ClientManager.findChildsByClient(session, child.getIdOfClient());
+                            if (grandchildsList.isEmpty())
+                                cultureEnterInfoChield.setFullAge("false");
+                            else
+                                cultureEnterInfoChield.setFullAge("true");
+                            cultureEnterInfo.getChildrens().get(0).getChild().add(cultureEnterInfoChield);
+                        }
+                    }
                 }
-                if ((card.getState() == CardState.ISSUED.getValue() || card.getState() == CardState.TEMPISSUED.getValue())
-                        && card.getValidTime().after(currentDate)) {
-                    cultureEnterInfo.setValidityCard("true");
-                } else {
-                    cultureEnterInfo.setValidityCard("false");
-                }
+                //Если хотя-бы один из опекаемых подходит
+                if (clientPredefinedchild)
+                    clientPredefined = true;
+            }
+            if ((card.getState() == CardState.ISSUED.getValue() || card.getState() == CardState.TEMPISSUED.getValue())
+                    && card.getValidTime().after(currentDate) && clientPredefined) {
+                cultureEnterInfo.setValidityCard("true");
+            } else {
+                cultureEnterInfo.setValidityCard("false");
             }
             cultureEnterInfo.resultCode = RC_OK;
             cultureEnterInfo.description = RC_OK_DESC;

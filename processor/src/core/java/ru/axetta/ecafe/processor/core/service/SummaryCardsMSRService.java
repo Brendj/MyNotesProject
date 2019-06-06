@@ -183,7 +183,7 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
             logger.info(success ? "MSR upload file successful" : "MSR upload file error");
         }
         if (file.exists()) {
-            //file.delete();
+            file.delete();
         }
     }
 
