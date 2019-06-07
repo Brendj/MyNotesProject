@@ -32,6 +32,11 @@
             <module name="org.codehaus.jackson.jackson-core-asl" />
             <module name="org.codehaus.jackson.jackson-mapper-asl" />
             <module name="org.codehaus.jackson.jackson-xc" />
+            <module name="net.sf.jasperreports" />
+            <module name="net.sf.jasperreports-fonts" />
+            <module name="net.sourceforge.dynamicreports" />
+            <module name="org.apache.commons.digester"/>
+            <module name="org.apache.poi"/>
         </dependencies>
         <exclusions>
             <module name="javax.faces.api" slot="main" />

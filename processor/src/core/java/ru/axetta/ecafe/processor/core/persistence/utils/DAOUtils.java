@@ -9,8 +9,8 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -4131,5 +4131,16 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         criteria.add(Restrictions.eq("groupName", "Сотрудники"));
         return (ClientGroup) criteria.uniqueResult();
+    }
+
+    public static List<Long> findFriendlyOrgsIds(Session session, List<Long> orgIdList) {
+        Query query = session
+                .createSQLQuery("select friendlyorg from cf_friendly_organization where currentorg in (:idOfOrgList)")
+                .setParameterList("idOfOrgList", orgIdList);
+        List<Long> result = new ArrayList<Long>();
+        for (Object o: query.list()) {
+            result.add(((BigInteger)o).longValue());
+        }
+        return result;
     }
 }
