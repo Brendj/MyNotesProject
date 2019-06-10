@@ -28,6 +28,7 @@ public class MigrantItem implements Comparable {
     private String orgVisit;
     private Date visitStartDate;
     private Date visitEndDate;
+    private String status;
     private String resolution;
     private String guid;
     private String section;
@@ -58,6 +59,7 @@ public class MigrantItem implements Comparable {
         VisitReqResolutionHist visitReqResolutionHistFirst = MigrantsUtils.getFirstResolutionForMigrant(session, migrant);
         if (visitReqResolutionHistFirst != null) {
             this.createDateTime = visitReqResolutionHistFirst.getResolutionDateTime(); //дата создания
+            this.status = MigrantsUtils.getResolutionString(visitReqResolutionHistFirst.getResolution()); //Статус заявки
         }
         this.initiator = migrant.getInitiator().toString();
         this.fio = migrant.getClientMigrate().getPerson().getFullName();
@@ -287,5 +289,13 @@ public class MigrantItem implements Comparable {
 
     public void setIdOfOrgRegistry(Long idOfOrgRegistry) {
         this.idOfOrgRegistry = idOfOrgRegistry;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }
