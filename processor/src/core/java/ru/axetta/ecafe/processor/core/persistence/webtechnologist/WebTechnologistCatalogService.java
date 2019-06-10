@@ -5,10 +5,12 @@
 package ru.axetta.ecafe.processor.core.persistence.webtechnologist;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.MatchMode;
@@ -20,6 +22,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 @Component
 public class WebTechnologistCatalogService {
@@ -30,10 +33,8 @@ public class WebTechnologistCatalogService {
             Boolean showOnlyActive)
             throws Exception {
         Session session = null;
-        Transaction transaction = null;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
-            transaction = session.beginTransaction();
 
             Criteria criteria = session.createCriteria(WebTechnologistCatalog.class);
             if (!StringUtils.isEmpty(catalogName)) {
@@ -45,12 +46,12 @@ public class WebTechnologistCatalogService {
             if(showOnlyActive){
                 criteria.add(Restrictions.eq("deleteState", false));
             }
+
             return criteria.list();
         } catch (Exception e) {
             logger.error("Can't load catalogs from DB: ", e);
             throw e;
         } finally {
-            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
     }
@@ -72,6 +73,9 @@ public class WebTechnologistCatalogService {
             selectedItem.setLastUpdate(new Date());
 
             session.update(selectedItem);
+
+            transaction.commit();
+            transaction = null;
         } catch (Exception e) {
             logger.error("Can't load catalogs from DB: ", e);
             throw e;
@@ -79,5 +83,49 @@ public class WebTechnologistCatalogService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    public Long createNewCatalog(String catalogName, User userCreate) throws Exception{
+        if(userCreate == null){
+            throw new IllegalArgumentException("User is NULL");
+        } else if(StringUtils.isBlank(catalogName)){
+            throw new IllegalArgumentException("Catalog name is not valid");
+        }
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Date createDate = new Date();
+            String GUID = UUID.randomUUID().toString();
+            Long nextVersion = getNextVersionForCatalog(session);
+
+            WebTechnologistCatalog catalog = new WebTechnologistCatalog();
+            catalog.setCatalogName(catalogName);
+            catalog.setUserCreator(userCreate);
+            catalog.setCreateDate(createDate);
+            catalog.setLastUpdate(createDate);
+            catalog.setGUID(GUID);
+            catalog.setVersion(nextVersion);
+            catalog.setDeleteState(false);
+
+            session.save(catalog);
+            transaction.commit();
+            transaction = null;
+
+            return catalog.getIdOfWebTechnologistCatalog();
+        } catch (Exception e) {
+            logger.error("Can't create catalog: ", e);
+            throw e;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    private Long getNextVersionForCatalog(Session session) {
+        Query sqlQuery = session.createQuery("SELECT MAX(version) FROM WebTechnologistCatalog");
+        return (Long) sqlQuery.uniqueResult() + 1L;
     }
 }
