@@ -83,4 +83,8 @@ public class WebTechnologistCatalogItem {
     public void setDeleteState(Boolean deleteState) {
         this.deleteState = deleteState;
     }
+
+    public String getDeleteStateAsString(){
+        return deleteState ? "Удален" : "Активен";
+    }
 }
