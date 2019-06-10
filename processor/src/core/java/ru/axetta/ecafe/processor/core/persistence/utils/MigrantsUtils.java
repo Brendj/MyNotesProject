@@ -55,17 +55,7 @@ public class MigrantsUtils {
         criteria.add(Restrictions.eq("clientMigrate.idOfClient", idOfClient));
         criteria.add(Restrictions.le("visitStartDate", date));
         criteria.add(Restrictions.ge("visitEndDate", date));
-        List<Migrant> migrants = criteria.list();
-        for(Migrant migrant : migrants){
-            Query query = session.createQuery("from VisitReqResolutionHist where migrant=:migrant order by resolutionDateTime desc");
-            query.setParameter("migrant", migrant);
-            query.setMaxResults(1);
-            VisitReqResolutionHist res = (VisitReqResolutionHist) query.uniqueResult();
-            if(res.getResolution().equals(1)){
-                result.add(migrant);
-            }
-        }
-        return result;
+        return criteria.list();
     }
 
 
