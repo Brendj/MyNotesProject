@@ -8360,13 +8360,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             Date currentDate = new Date();
             boolean clientPredefined = false;
+
+            cultureEnterInfo.setFullAge(getFullAge(client));
+
             //Получаем все опекаемых для опекуна
             List<Client> childsList = ClientManager.findChildsByClient(session, client.getIdOfClient());
             if (childsList.isEmpty())
             {
                 //Если клиент школьник
                 cultureEnterInfo.setGuid(client.getClientGUID());
-                cultureEnterInfo.setFullAge("false");
                 cultureEnterInfo.setGroupName(client.getClientGroup().getGroupName());
                 if (client.getAgeTypeGroup() != null) {
                     clientPredefined = (client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
@@ -8377,7 +8379,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             else
             {
                 //Если клиент опекун
-                cultureEnterInfo.setFullAge("true");
                 cultureEnterInfo.setGroupName(client.getClientGroup().getGroupName());
                 boolean clientPredefinedchild = false;
                 cultureEnterInfo.getChildrens().add(new CultureEnterInfo());
@@ -8395,11 +8396,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             CultureEnterInfo cultureEnterInfoChield = new CultureEnterInfo();
                             cultureEnterInfoChield.setGuid(child.getClientGUID());
                             cultureEnterInfoChield.setGroupName(child.getClientGroup().getGroupName());
-                            List<Client> grandchildsList = ClientManager.findChildsByClient(session, child.getIdOfClient());
-                            if (grandchildsList.isEmpty())
-                                cultureEnterInfoChield.setFullAge("false");
-                            else
-                                cultureEnterInfoChield.setFullAge("true");
+                            cultureEnterInfo.setFullAge(getFullAge(child));
                             cultureEnterInfo.getChildrens().get(0).getChild().add(cultureEnterInfoChield);
                         }
                     }
@@ -8423,6 +8420,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } finally {
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private String getFullAge (Client client)
+    {
+        boolean fullAge = (client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() <= ClientGroup.Predefined.CLIENT_OTHERS.getValue());
+        //boolean chieldAge = (client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() <= ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue()
+        //        || client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DISPLACED.getValue()));
+        if (fullAge)
+            return "true";
+        else
+            return "false";
     }
 
     @Override
