@@ -965,35 +965,35 @@
     <rich:panelMenuItem id="orgSettingsReport" binding="#{orgSettingsReportPage.mainMenuComponent}"
                         label="Настройки ОО" action="#{orgSettingsReportPage.show}" reRender="workspaceForm" />
 
-    <rich:panelMenuGroup id="webTechnologistGroupMenuItem" label="WEB-Технолог">
-        <a4j:support event="onclick" reRender="workspaceForm" />
+    <rich:panelMenuGroup id="webTechnologistGroupMenuItem" label="WEB-Технолог"
+                         binding="#{mainPage.webTechnologistGroupPage.mainMenuComponent}"
+                         rendered="#{mainPage.eligibleToServiceAdmin}">
+        <a4j:support event="onclick" reRender="workspaceForm" action="#{mainPage.showWebTechnologistGroupPage}" />
+        <%-- <rich:panelMenuGroup id="webTechnologistGroupDish"
+                              binding="#{.mainMenuComponent}" label="Блюда"
+                              rendered="#{mainPage.eligibleToServiceAdmin}">
+             <a4j:support event="onclick" action="#{}" reRender="workspaceForm" />
 
-        <rich:panelMenuGroup id="webTechnologistGroupDish" binding="#{mainPage.nsiGroupContingentPage.mainMenuComponent}"
-                             label="Блюда" rendered="#{mainPage.eligibleToServiceAdmin}">
-            <a4j:support event="onclick" action="#{mainPage.showNSIGroupContingentPage}" reRender="workspaceForm" />
+             <rich:panelMenuItem id="webTechnologistGroupDishList" binding="#{.mainMenuComponent}"
+                                 label="Список блюд" action="#{.show}" reRender="workspaceForm" />
 
-            <rich:panelMenuItem id="webTechnologistGroupDishList" binding="#{pupilCatalogFindPage.mainMenuComponent}"
-                                label="Список блюд" action="#{pupilCatalogFindPage.show}" reRender="workspaceForm" />
-
-            <rich:panelMenuItem id="webTechnologistGroupDishCreate" binding="#{NSIOrgRegistrySynchPage.mainMenuComponent}"
-                                label="Создать" action="#{NSIOrgRegistrySynchPage.show}"
+             <rich:panelMenuItem id="webTechnologistGroupDishCreate"
+                                 binding="#(.mainMenuComponent}" label="Создать"
+                                 action="#{.show}" reRender="workspaceForm" />
+         </rich:panelMenuGroup>--%>
+        <rich:panelMenuGroup id="webTechnologistCatalogs" label="Справочники" binding="#{mainPage.webTechnologistCatalogGroupPage.mainMenuComponent}">
+            <a4j:support event="onclick" reRender="workspaceForm"
+                         action="#{mainPage.showWebTechnologistCatalogGroupPage}"/>
+            <%--@elvariable id="webTechnologistCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.CatalogListPage"--%>
+            <rich:panelMenuItem id="webTechnologistCatalogsList"
+                                binding="#{webTechnologistCatalogListPage.mainMenuComponent}"
+                                label="Список справочников" action="#{webTechnologistCatalogListPage.show}"
                                 reRender="workspaceForm" />
-
-        </rich:panelMenuGroup>
-
-        <rich:panelMenuGroup id="webTechnologistCatalogs" binding="#{mainPage.nsiGroupOrgPage.mainMenuComponent}"
-                             label="Справочники" rendered="#{mainPage.eligibleToServiceAdmin}">
-            <a4j:support event="onclick" action="#{mainPage.showNSIGroupOrgPage}" reRender="workspaceForm" />
-
-
-            <rich:panelMenuItem id="webTechnologistCatalogsList" binding="#{orgCatalogFindPage.mainMenuComponent}"
-                                label="Список справочников" action="#{orgCatalogFindPage.show}"
+            <%--@elvariable id="webTechnologistCatalogCreatePage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.CatalogCreatePage"--%>
+            <rich:panelMenuItem id="webTechnologistCatalogsCreate"
+                                binding="#{webTechnologistCatalogCreatePage.mainMenuComponent}"
+                                label="Создать справочник" action="#{webTechnologistCatalogCreatePage.show}"
                                 reRender="workspaceForm" />
-
-            <rich:panelMenuItem id="nsiOrgsRegistrySync" binding="#{NSIOrgsRegistrySynchPage.mainMenuComponent}"
-                                label="Создать справочник" action="#{NSIOrgsRegistrySynchPage.show}"
-                                reRender="workspaceForm" />
-
         </rich:panelMenuGroup>
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>

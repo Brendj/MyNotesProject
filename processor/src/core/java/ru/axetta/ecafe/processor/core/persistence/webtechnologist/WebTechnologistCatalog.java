@@ -99,4 +99,21 @@ public class WebTechnologistCatalog {
     public String getDeleteStateAsString(){
         return deleteState ? "Удален" : "Активен";
     }
+
+    @Override
+    public int hashCode(){
+        return idOfWebTechnologistCatalog.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(this == o){
+            return true;
+        }
+        if(!(o instanceof WebTechnologistCatalog)){
+            return false;
+        }
+        WebTechnologistCatalog catalog = (WebTechnologistCatalog) o;
+        return this.idOfWebTechnologistCatalog.equals(catalog.idOfWebTechnologistCatalog);
+    }
 }
