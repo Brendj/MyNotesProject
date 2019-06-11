@@ -55,11 +55,11 @@ public class MigrantItem implements Comparable {
             if (visitReqResolutionHistLast.getInitiator() != null) this.resolution += " (" + visitReqResolutionHistLast.getInitiator().toString() + ")";
             resolutionValue = visitReqResolutionHistLast.getResolution();
             this.lastUpdateDateTime = visitReqResolutionHistLast.getResolutionDateTime();
+            this.status = MigrantsUtils.getResolutionString(resolutionValue); //Последний статус заявки
         }
         VisitReqResolutionHist visitReqResolutionHistFirst = MigrantsUtils.getFirstResolutionForMigrant(session, migrant);
         if (visitReqResolutionHistFirst != null) {
             this.createDateTime = visitReqResolutionHistFirst.getResolutionDateTime(); //дата создания
-            this.status = MigrantsUtils.getResolutionString(visitReqResolutionHistFirst.getResolution()); //Статус заявки
         }
         this.initiator = migrant.getInitiator().toString();
         this.fio = migrant.getClientMigrate().getPerson().getFullName();
