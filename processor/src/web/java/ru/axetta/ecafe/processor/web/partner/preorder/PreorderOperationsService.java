@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.ProductionCalendar;
 import ru.axetta.ecafe.processor.core.persistence.RegularPreorder;
 import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportServiceParam;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.slf4j.Logger;
@@ -30,12 +31,12 @@ import java.util.Map;
 public class PreorderOperationsService {
     private static final Logger logger = LoggerFactory.getLogger(PreorderOperationsService.class);
 
-    public void relevancePreorders() {
+    public void relevancePreorders(PreorderRequestsReportServiceParam params) {
         try {
             logger.info("Start process relevance preorders");
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgs();
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu();
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgFlag();
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgs(params);
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu(params);
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgFlag(params);
             logger.info("Successful end process relevance preorders");
         } catch(Exception e) {
             logger.error("Error in process relevance preorders");
@@ -55,10 +56,10 @@ public class PreorderOperationsService {
         }
     }
 
-    public void additionalTasksForPreorders() {
+    public void additionalTasksForPreorders(PreorderRequestsReportServiceParam params) {
         Date dateTo = CalendarUtils.addDays(new Date(), PreorderComplex.getDaysOfRegularPreorders()-1);
         List<ProductionCalendar> productionCalendar = DAOReadonlyService.getInstance().getProductionCalendar(new Date(), dateTo);
-        List list = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getAllActualPreorders();
+        List list = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getAllActualPreorders(params);
         Date currentDate = CalendarUtils.startOfDay(new Date());
         Map<Long, List<SpecialDate>> specialDatesMap = new HashMap<Long, List<SpecialDate>>();
         for (Object obj : list) {

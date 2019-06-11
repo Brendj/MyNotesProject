@@ -25,7 +25,8 @@ import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.SyncStatsManager;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
-import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
+import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
@@ -48,7 +49,7 @@ import static ru.axetta.ecafe.processor.core.service.ImportRegisterFileService.*
 
 @Component
 @Scope("session")
-public class OtherActionsPage extends BasicWorkspacePage {
+public class OtherActionsPage extends OnlineReportPage {
 
     private String passwordForSearch;
     private String orgsForGenerateGuardians;
@@ -72,6 +73,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
         super();
         summaryDate = new Date();
         summaryFinOperatorDate = new Date();
+        startDate = CalendarUtils.addDays(new Date(), 2);
     }
 
     public void rubBIExport() throws Exception {
@@ -472,7 +474,8 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     public void sendGoodRequestsNewReports() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean("PreorderRequestsReportService", PreorderRequestsReportService.class).runTask();
+            RuntimeContext.getAppContext().getBean("PreorderRequestsReportService",
+                    PreorderRequestsReportService.class).runGeneratePreorderRequests(new PreorderRequestsReportServiceParam(new Date()));
             printMessage("Отправка отчетов завершена");
         } catch (Exception e) {
             getLogger().error("Error send PreorderRequestsReport: ", e);
@@ -482,7 +485,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     public void createRegularPreorders() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().generatePreordersBySchedule();
+            RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().generatePreordersBySchedule(new PreorderRequestsReportServiceParam(new Date()));
             printMessage("Создание регулярных предзаказов завершено");
         } catch (Exception e) {
             getLogger().error("Error create RegularPreorders: ", e);
@@ -492,7 +495,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     public void relevancePreordersToOrgs() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgs();
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgs(new PreorderRequestsReportServiceParam(new Date()));
             printMessage("Проверка соответствия ОО клиента и предзаказа завершена");
         } catch (Exception e) {
             getLogger().error("Error create relevancePreordersToOrgs: ", e);
@@ -502,7 +505,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     public void relevancePreordersToMenu() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu();
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu(new PreorderRequestsReportServiceParam(new Date()));
             printMessage("Проверка соответствия меню и предзаказа завершена");
         } catch (Exception e) {
             getLogger().error("Error create relevancePreordersToMenu: ", e);
@@ -512,12 +515,30 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     public void relevancePreordersToOrgFlag() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgFlag();
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgFlag(new PreorderRequestsReportServiceParam(new Date()));
             printMessage("Проверка соответствия флага включения функционала предзаказа ОО завершена");
         } catch (Exception e) {
             getLogger().error("Error create relevancePreordersToOrgFlag: ", e);
             printError("Во время проверки соответствия флага включения функционала предзаказа ОО произошла ошибка с текстом " + e.getMessage());
         }
+    }
+
+    public void preorderRequestsManualGenerate() throws Exception {
+        PreorderRequestsReportServiceParam params = new PreorderRequestsReportServiceParam(startDate);
+        params.getIdOfOrgList().clear();
+        if (idOfOrgList != null) params.getIdOfOrgList().addAll(idOfOrgList);
+        params.getIdOfClientList().clear();
+        if (getClientList() != null) {
+            for (ClientSelectListPage.Item item : getClientList()) {
+                params.getIdOfClientList().add(item.getIdOfClient());
+            }
+        }
+        if (params.isEmpty()) {
+            printError("Не указаны организация или клиент для выборочной генерации заявок");
+            return;
+        }
+        RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).runTask(params);
+        printMessage("Операция по созданию заявок выполнена");
     }
 
     public void runApplicationForFoodProcessingService() throws Exception {
