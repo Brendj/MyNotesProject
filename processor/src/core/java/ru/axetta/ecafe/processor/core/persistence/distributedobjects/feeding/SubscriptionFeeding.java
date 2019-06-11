@@ -52,6 +52,7 @@ public class SubscriptionFeeding extends DistributedObject{
     private String guidOfStaff;
     private InformationContents informationContent = InformationContents.ONLY_CURRENT_ORG;
     private SubscriptionFeedingType feedingType;
+    private Long idOfOrgLastChange;
 
     @Override
     public void createProjections(Criteria criteria) {
@@ -181,6 +182,7 @@ public class SubscriptionFeeding extends DistributedObject{
         } else {
             setFeedingType(SubscriptionFeedingType.ABON_TYPE);
         }
+        setIdOfOrgLastChange(getIdOfSyncOrg());
 
         guidOfStaff = XMLUtils.getStringAttributeValue(node, "GuidOfStaff", 36);
 
@@ -326,5 +328,13 @@ public class SubscriptionFeeding extends DistributedObject{
 
     public void setFeedingType(SubscriptionFeedingType subscriptionFeedingType) {
         this.feedingType = subscriptionFeedingType;
+    }
+
+    public Long getIdOfOrgLastChange() {
+        return idOfOrgLastChange;
+    }
+
+    public void setIdOfOrgLastChange(Long idOfOrgLastChange) {
+        this.idOfOrgLastChange = idOfOrgLastChange;
     }
 }

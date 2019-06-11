@@ -69,7 +69,7 @@
         </h:selectBooleanCheckbox>
     </h:panelGrid>
     <h:panelGrid columns="2">
-        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.contragentPreordersReportPage.buildReport}"
+        <a4j:commandButton value="Генерировать отчет" action="#{mainPage.contragentPreordersReportPage.buildHTMLReport}"
                            reRender="contragentPreordersReportTablePanel" styleClass="command-button" status="reportGenerateStatus" />
         <h:commandButton value="Генерировать отчет в Excel"
                          action="#{mainPage.contragentPreordersReportPage.exportToXLS}"

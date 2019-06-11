@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -28,9 +29,9 @@ import javax.faces.context.FacesContext;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.LinkedList;
 import java.util.Map;
 
 @Component
@@ -78,15 +79,8 @@ public class ContragentPreordersReportPage extends OnlineReportPage implements O
             orgFilter = "Не выбрано";
             idOfOrgList.clear();
         } else {
-            StringBuilder orgsNameBuilder = new StringBuilder();
-            idOfOrgList = new LinkedList<Long>();
-            for(Long idOfOrg : orgMap.keySet()) {
-                idOfOrgList.add(idOfOrg);
-                orgsNameBuilder.append(orgMap.get(idOfOrg));
-                orgsNameBuilder.append(";");
-            }
-            orgsNameBuilder.deleteCharAt(orgsNameBuilder.length()-1);
-            orgFilter = orgsNameBuilder.toString();
+            idOfOrgList = new ArrayList<Long>(orgMap.keySet());
+            orgFilter = StringUtils.join(orgMap.values(), "; ");
         }
     }
 
@@ -109,32 +103,12 @@ public class ContragentPreordersReportPage extends OnlineReportPage implements O
         this.showOnlyUnpaidItems = showOnlyUnpaidItems;
     }
 
-    public Object buildReport() {
+    public Object buildHTMLReport() {
         htmlReport="";
         if (!validateFormData()) {
             return null;
         }
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        BasicReportJob report = null;
-        try {
-            ContragentPreordersReport.Builder builder = new ContragentPreordersReport.Builder();
-            builder.setContragent(this.contragent);
-            builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
-            builder.getReportProperties().setProperty("showOnlyUnpaidItems", showOnlyUnpaidItems.toString());
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed export report : ", e);
-            printError("Ошибка при подготовке отчета: " + e.getMessage());
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
+        BasicReportJob report = buildReport();
         if (report != null) {
             try {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -162,27 +136,7 @@ public class ContragentPreordersReportPage extends OnlineReportPage implements O
         if (!validateFormData()) {
             return;
         }
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        BasicReportJob report = null;
-        try {
-            ContragentPreordersReport.Builder builder = new ContragentPreordersReport.Builder();
-            builder.setContragent(this.contragent);
-            builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
-            builder.getReportProperties().setProperty("showOnlyUnpaidItems", showOnlyUnpaidItems.toString());
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed export report : ", e);
-            printError("Ошибка при подготовке отчета: " + e.getMessage());
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
+        BasicReportJob report = buildReport();
         if (report != null) {
             try {
                 FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -207,7 +161,34 @@ public class ContragentPreordersReportPage extends OnlineReportPage implements O
                 logger.error("Failed build report ", e);
             }
         }
-        return;
+    }
+
+    private BasicReportJob buildReport(){
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        BasicReportJob report = null;
+        try {
+            ContragentPreordersReport.Builder builder = new ContragentPreordersReport.Builder();
+            builder.setContragent(this.contragent);
+            builder.getReportProperties().setProperty("idOfOrgList", getGetStringIdOfOrgList());
+            builder.getReportProperties().setProperty("showOnlyUnpaidItems", showOnlyUnpaidItems.toString());
+
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return report;
     }
 
     private boolean validateFormData() {

@@ -3344,6 +3344,12 @@ public class Processor implements SyncProcessor {
                                 payment.getIdOfOrder()));
             }
 
+            if (payment.getIdOfCashier() == null) {
+                return new ResPaymentRegistryItem(payment.getIdOfOrder(), 201,
+                        String.format("Cashier attribute not found, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
+                                payment.getIdOfOrder()));
+            }
+
             Long idOfOrgPayment = payment.getIdOfOrg();
             boolean isFromFriendlyOrg = false;
             if (null != idOfOrgPayment) {
