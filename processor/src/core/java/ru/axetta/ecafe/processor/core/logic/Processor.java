@@ -3524,7 +3524,7 @@ public class Processor implements SyncProcessor {
                             String.format("Invalid total sum by order, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
                                     payment.getIdOfOrder()));
                 }
-                if (payment.getRSum() != payment.getSumByCard() + payment.getSumByCash()) {
+                if (payment.getRSum() != payment.getSumByCard() + payment.getSumByCash() + payment.getSummFromCBHR()) {
                     return new ResPaymentRegistryItem(payment.getIdOfOrder(), 310,
                             String.format("Invalid sum of order card and cash payments, IdOfOrg == %s, IdOfOrder == %s",
                                     idOfOrg, payment.getIdOfOrder()));
