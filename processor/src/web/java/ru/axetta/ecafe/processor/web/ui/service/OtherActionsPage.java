@@ -472,7 +472,7 @@ public class OtherActionsPage extends BasicWorkspacePage {
 
     public void sendGoodRequestsNewReports() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean("PreorderRequestsReportService", PreorderRequestsReportService.class).runGeneratePreorderRequests(new Date());
+            RuntimeContext.getAppContext().getBean("PreorderRequestsReportService", PreorderRequestsReportService.class).runTask();
             printMessage("Отправка отчетов завершена");
         } catch (Exception e) {
             getLogger().error("Error send PreorderRequestsReport: ", e);
