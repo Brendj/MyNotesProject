@@ -90,7 +90,8 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
                             continue;
                         }
                         //если прежний статус - Создано, а новый Аннулировано, восстанавливаем баланс
-                        if (clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.CREATED)) {
+                        if (clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.CREATED)
+                                || clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.SUBSCRIBED)) {
                             RuntimeContext.getAppContext().getBean(FinancialOpsManager.class)
                                     .declineClientBalanceNonTransactional(session, clientBalanceHold);
                         }
