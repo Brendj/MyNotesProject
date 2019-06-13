@@ -7,16 +7,22 @@ package ru.axetta.ecafe.processor.core.persistence.orgsettings;
 import java.util.HashMap;
 import java.util.Map;
 
+/*
+UPDATE cf_orgsettings
+SET settingGroup = settingGroup + 1;
+*/
+
 public enum OrgSettingGroup {
-    CashierCheckPrinter(0,"Настройки принтера кассового чека"),
-    SalesReportPrinter(1,"Настройка принтера отчета по продажам"),
-    CardBalanceReportPrinter(2,"Настройка принтера отчета по балансам карт"),
-    AutoPlanPaymentSetting(3,"Настройка автооплаты льготного питания"),
-    SubscriberFeeding(4,"Настройки персонализированного питания"),
-    ReplacingMissingBeneficiaries(5,"Режим замены отсутствующих льготников"),
-    PreOrderFeeding(6,"Настройки питания по предзаказу"),
-    PreOrderAutopay(7,"Настройка автооплаты предзаказа"),
-    ARMsSetting(8,"Настройки АРМа");
+    UnknownSetting(0, "Неизвестно"),
+    CashierCheckPrinter(1,"Настройки принтера кассового чека"),
+    SalesReportPrinter(2,"Настройка принтера отчета по продажам"),
+    CardBalanceReportPrinter(3,"Настройка принтера отчета по балансам карт"),
+    AutoPlanPaymentSetting(4,"Настройка автооплаты льготного питания"),
+    SubscriberFeeding(5,"Настройки персонализированного питания"),
+    ReplacingMissingBeneficiaries(6,"Режим замены отсутствующих льготников"),
+    PreOrderFeeding(7,"Настройки питания по предзаказу"),
+    PreOrderAutopay(8,"Настройка автооплаты предзаказа"),
+    ARMsSetting(9,"Настройки АРМа");
 
     private Integer id;
     private String description;

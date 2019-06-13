@@ -36,6 +36,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendar
 import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendarSupplierRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingBuilder;
@@ -2694,6 +2696,7 @@ public class SyncRequest {
             builders.add(new ClientBalanceHoldData.Builder(idOfOrg));
             builders.add(new RequestFeedingBuilder(idOfOrg));
             builders.add(new ClientDiscountDTSZNBuilder(idOfOrg));
+            builders.add(new OrgSettingsBuilder(idOfOrg));
             return builders;
         }
 
@@ -2971,6 +2974,10 @@ public class SyncRequest {
 
     public ClientDiscountsDTSZNRequest getClientDiscountDSZNRequest() {
         return this.<ClientDiscountsDTSZNRequest>findSection(ClientDiscountsDTSZNRequest.class);
+    }
+
+    public OrgSettingsRequest getOrgSettingsRequest(){
+        return this.<OrgSettingsRequest>findSection(OrgSettingsRequest.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

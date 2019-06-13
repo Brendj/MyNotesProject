@@ -21,12 +21,12 @@ import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.ResMenusCalen
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsData;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.ResMigrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
+import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ResReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
-import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingData;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.ResSpecialDates;
@@ -1202,6 +1202,7 @@ public class SyncResponse {
     private ResRequestFeeding resRequestFeeding;
     private RequestFeedingData requestFeedingData;
     private ClientDiscountDTSZN clientDiscountDTSZN;
+    private OrgSettingSection orgSetting;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1223,7 +1224,7 @@ public class SyncResponse {
             ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections,
             ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData,
             ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
-            ResClientBalanceHoldData resClientBalanceHoldData) {
+            ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1279,6 +1280,7 @@ public class SyncResponse {
         this.menusCalendarData = menusCalendarData;
         this.clientBalanceHoldFeeding = clientBalanceHoldFeeding;
         this.resClientBalanceHoldData = resClientBalanceHoldData;
+        this.orgSetting = orgSetting;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
