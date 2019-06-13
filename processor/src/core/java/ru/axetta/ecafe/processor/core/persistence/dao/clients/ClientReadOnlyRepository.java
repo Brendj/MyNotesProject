@@ -51,9 +51,10 @@ public class ClientReadOnlyRepository  extends BaseJpaDao {
     @Transactional(readOnly = true)
     public List<Client> findAllActiveByOrg(List<Long> idOfOrg) {
         Query query = entityManager
-                .createQuery("from Client c where c.org.idOfOrg in (:idOfOrg) and c.idOfClientGroup < :idOfClientGroup ")
+                .createQuery("from Client c where c.org.idOfOrg in (:idOfOrg) and (c.idOfClientGroup < :idOfClientGroup or c.idOfClientGroup = :idOfDisplacedGroup) ")
                 .setParameter("idOfOrg", idOfOrg)
-                .setParameter("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                .setParameter("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue())
+                .setParameter("idOfDisplacedGroup", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
 
         return query.getResultList();
     }
@@ -62,10 +63,11 @@ public class ClientReadOnlyRepository  extends BaseJpaDao {
     public List<Client> findAllActiveByOrgAndUpdateDate(List<Long> idOfOrgs, Date lastAccRegistrySync) {
         Query query = entityManager
                 .createQuery("select c from Client c where c.org.idOfOrg in (:idOfOrgs) "
-                        + " and c.idOfClientGroup<:idOfClientGroup "
+                        + " and (c.idOfClientGroup < :idOfClientGroup or c.idOfClientGroup = :idOfDisplacedGroup) "
                         + " and c.updateTime >  :lastAccRegistrySync ")
                 .setParameter("idOfOrgs", idOfOrgs)
                 .setParameter("idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue())
+                .setParameter("idOfDisplacedGroup", ClientGroup.Predefined.CLIENT_DISPLACED.getValue())
                 .setParameter("lastAccRegistrySync", lastAccRegistrySync);
 
         return query.getResultList();

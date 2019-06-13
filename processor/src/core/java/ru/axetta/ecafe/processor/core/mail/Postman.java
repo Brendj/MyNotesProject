@@ -239,9 +239,7 @@ public class Postman implements AutoReportPostman {
 
     private static void postText(MailSettings mailSettings, String address, String subject, String text, List<ru.axetta.ecafe.processor.core.mail.File> files, boolean sendCopyEmail)
             throws Exception {
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format("Posting text with subject \"%s\" to \"%s\"", subject, address));
-        }
+        logger.info(String.format("Posting text with subject \"%s\" to \"%s\"", subject, address));
         Session mailSession = createMailSession(mailSettings);
         MimeMessage mailMessage = new MimeMessage(mailSession);
         mailMessage.setFrom(mailSettings.getFromAddress());
@@ -283,18 +281,14 @@ public class Postman implements AutoReportPostman {
             mailMessage.setDataHandler(new DataHandler(byteArrayDataSource));
         }
 
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format("Starting posting text with subject \"%s\" to \"%s\"", subject, address));
-        }
+        logger.info(String.format("Starting posting text with subject \"%s\" to \"%s\"", subject, address));
         try {
             Transport.send(mailMessage);
         } catch (Exception e) {
             logger.error("Failed to transfer email", e);
             throw e;
         }
-        if (logger.isDebugEnabled()) {
-            logger.debug(String.format("Finished posting text with subject \"%s\" to \"%s\"", subject, address));
-        }
+        logger.info(String.format("Finished posting text with subject \"%s\" to \"%s\"", subject, address));
     }
 
 }

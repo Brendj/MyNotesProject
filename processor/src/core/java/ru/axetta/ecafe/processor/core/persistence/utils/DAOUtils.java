@@ -9,8 +9,8 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -21,6 +21,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.EC
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.PreOrderFeedingSettingValue;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
@@ -28,10 +30,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
-import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.*;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -4131,5 +4130,27 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         criteria.add(Restrictions.eq("groupName", "Сотрудники"));
         return (ClientGroup) criteria.uniqueResult();
+    }
+
+    public static List<String> getAllDistinctDepartmentsFromOrgs(Session session) {
+        SQLQuery query = session.createSQLQuery("select distinct district from cf_orgs where district is not null and district not like ''");
+        return query.list();
+    }
+
+    public static  Long getLastVersionOfOrgSettings(Session session){
+        SQLQuery query = session.createSQLQuery("SELECT MAX(version) FROM CF_OrgSettings");
+        return DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
+    }
+
+    public static  Long getLastVersionOfOrgSettingsItem(Session session){
+        SQLQuery query = session.createSQLQuery("SELECT MAX(version) FROM CF_OrgSettings_Items");
+        return DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
+    }
+
+    public static OrgSetting getOrgSettingByOrgAndType(Session session, Long idOfOrg, Integer settingGroupId) {
+        Criteria criteria = session.createCriteria(OrgSetting.class);
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg))
+                .add(Restrictions.eq("settingGroup", OrgSettingGroup.getGroupById(settingGroupId)));
+        return (OrgSetting) criteria.uniqueResult();
     }
 }

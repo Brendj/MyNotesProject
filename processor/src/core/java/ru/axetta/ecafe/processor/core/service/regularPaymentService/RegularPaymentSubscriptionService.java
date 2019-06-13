@@ -117,7 +117,7 @@ public class RegularPaymentSubscriptionService {
     }
 
     protected boolean notifyAboutExpiredSubscription() {
-        return true;
+        return false;
     }
 
     private boolean isOn() {

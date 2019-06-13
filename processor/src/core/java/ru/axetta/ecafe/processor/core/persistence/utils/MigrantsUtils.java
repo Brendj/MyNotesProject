@@ -242,6 +242,14 @@ public class MigrantsUtils {
         return criteria.list();
     }
 
+    public static List<Migrant> getOutcomeMigrantsForOrgsWithoutDate(Session session, List<Long> idOfOrgs){
+        Criteria criteria = session.createCriteria(Migrant.class)
+                .createCriteria("orgRegistry", "org")
+                .add(Restrictions.in("org.idOfOrg", idOfOrgs));
+
+        return criteria.list();
+    }
+
     public static List<Migrant> getIncomeMigrantsForOrgsByDate(Session session, List<Long> idOfOrgs,
             Date startDate, Date endDate){
         Criteria criteria = session.createCriteria(Migrant.class);
@@ -249,6 +257,14 @@ public class MigrantsUtils {
         criteria.add(Restrictions.in("org.idOfOrg", idOfOrgs));
         criteria.add(Restrictions.or(Restrictions.between("visitStartDate", startDate, endDate),
                 Restrictions.between("visitEndDate", startDate, endDate)));
+        return criteria.list();
+    }
+
+    public static List<Migrant> getIncomeMigrantsForOrgsWithoutDate(Session session, List<Long> idOfOrgs){
+        Criteria criteria = session.createCriteria(Migrant.class)
+                .createCriteria("orgVisit", "org")
+                .add(Restrictions.in("org.idOfOrg", idOfOrgs));
+
         return criteria.list();
     }
 

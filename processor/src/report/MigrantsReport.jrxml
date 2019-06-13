@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MigrantsReport" pageWidth="2520" pageHeight="20000" orientation="Landscape" columnWidth="2520" leftMargin="0" rightMargin="0" topMargin="0" bottomMargin="0" uuid="0c4cd73d-08d1-4515-a0fc-371d19370122">
 	<property name="ireport.zoom" value="0.7500000000000001"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="13"/>
 	<property name="ireport.y" value="0"/>
 	<parameter name="startDate" class="java.lang.String"/>
 	<parameter name="endDate" class="java.lang.String"/>
@@ -12,6 +12,7 @@
 	<parameter name="isOutcome" class="java.lang.Boolean">
 		<defaultValueExpression><![CDATA[true]]></defaultValueExpression>
 	</parameter>
+	<parameter name="showAllMigrants" class="java.lang.Boolean"/>
 	<field name="outcomeList" class="java.util.List"/>
 	<field name="incomeList" class="java.util.List"/>
 	<background>
@@ -31,7 +32,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="16" isBold="true"/>
 				</textElement>
-				<textFieldExpression><![CDATA["Период отчета: " + $P{startDate} + " - " + $P{endDate}]]></textFieldExpression>
+				<textFieldExpression><![CDATA["Период отчета: " + ($P{showAllMigrants} ? "За всё время" : $P{startDate} + " - " + $P{endDate})]]></textFieldExpression>
 			</textField>
 		</band>
 	</title>
@@ -41,6 +42,9 @@
 				<reportElement uuid="27e30eef-861c-41fd-926e-e73d2afe83af" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="2520" height="0" isPrintWhenDetailOverflows="true">
 					<printWhenExpression><![CDATA[$F{outcomeList}.size() > 0]]></printWhenExpression>
 				</reportElement>
+				<subreportParameter name="showAllMigrants">
+					<subreportParameterExpression><![CDATA[$P{showAllMigrants}]]></subreportParameterExpression>
+				</subreportParameter>
 				<subreportParameter name="isOutcome">
 					<subreportParameterExpression><![CDATA[true]]></subreportParameterExpression>
 				</subreportParameter>
@@ -58,6 +62,9 @@
 				<reportElement uuid="de4a646a-65a9-4826-9e47-8dcb352e049a" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="2520" height="0" isPrintWhenDetailOverflows="true">
 					<printWhenExpression><![CDATA[$F{incomeList}.size() > 0]]></printWhenExpression>
 				</reportElement>
+				<subreportParameter name="showAllMigrants">
+					<subreportParameterExpression><![CDATA[$P{showAllMigrants}]]></subreportParameterExpression>
+				</subreportParameter>
 				<subreportParameter name="isOutcome">
 					<subreportParameterExpression><![CDATA[false]]></subreportParameterExpression>
 				</subreportParameter>
