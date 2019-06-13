@@ -634,4 +634,15 @@ public class OtherActionsPage extends BasicWorkspacePage {
         service.run(startDate, endDate,
                 ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue(), true);
     }
+
+
+    public void updateESZMigrants() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean("ESZMigrantsUpdateService", ESZMigrantsUpdateService.class).updateMigrants();
+            printMessage("Обработка мигрантов завершена");
+        } catch (Exception e) {
+            getLogger().error("Error run update ESZ migrants: ", e);
+            printError("Во время обработки произошла ошибка с текстом " + e.getMessage());
+        }
+    }
 }
