@@ -53,6 +53,13 @@ public class Client {
     public static final int DISCOUNT_MODE_BY_CATEGORY = 3;
     public static final String[] DISCOUNT_MODE_NAMES = {"Отсутствует", "Дотация", "Бесплатно", "Льгота по категориям"};
 
+    public static final int GROUP_SCHOOL = 0;
+    public static final int GROUP_BEFORE_SCHOOL_OUT = 1;
+    public static final int GROUP_BEFORE_SCHOOL_STEP = 2;
+    public static final int GROUP_BEFORE_SCHOOL = 3;
+    public static final String[] GROUP_NAME = {"Средняя школа", "Дошкольное (из внешней системы для записи в школу)", "Дошкольная ступень", "Дошкольное"};
+
+
     private Long idOfClient;
     private long version;
     private Org org;

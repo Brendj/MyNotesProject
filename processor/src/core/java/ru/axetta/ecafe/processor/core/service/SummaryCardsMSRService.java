@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
+import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.FTPUploader;
@@ -18,6 +19,8 @@ import org.springframework.stereotype.Component;
 
 import javax.persistence.Query;
 import java.io.File;
+import java.io.IOException;
+import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -39,12 +42,20 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
     public static final String FTP_PASSWORD = "ecafe.processor.download.msr.ftp.password";
     public static final String FTP_FOLDER = "ecafe.processor.download.msr.ftp.folder";
     private static final List card_states;
+    private static final List before_school_group;
     private static final String FILENAME_PREFIX = "ISPP_CARDS_";
+    private static final String FILENAME_PREFIX_CLIENT = "ISPP_CARDS_CLIENTS_";
 
     static {
         card_states = new ArrayList<Integer>();
         card_states.add(CardState.ISSUED.getValue());
         card_states.add(CardState.TEMPISSUED.getValue());
+    }
+    static {
+        before_school_group = new ArrayList<String>();
+        before_school_group.add(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL]);
+        before_school_group.add(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_OUT]);
+        before_school_group.add(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_STEP]);
     }
 
     protected String getNode() {
@@ -97,26 +108,115 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
                     counter++;
                 }
             }
-
-            File file = new File(filename);
-            FileUtils.writeLines(file, result);
-
-            String server = RuntimeContext.getInstance().getPropertiesValue(FTP_SERVER, null);
-            int port = RuntimeContext.getInstance().getPropertiesValue(FTP_PORT, 0);
-            String user = RuntimeContext.getInstance().getPropertiesValue(FTP_USER, null);
-            String password = RuntimeContext.getInstance().getPropertiesValue(FTP_PASSWORD, null);
-            String remoteFolder = RuntimeContext.getInstance().getPropertiesValue(FTP_FOLDER, null);
-            if (server != null && port != 0 && user != null && password != null && remoteFolder != null) {
-                FTPUploader ftpUploader = new FTPUploader(server, port, user, password);
-                boolean success = ftpUploader.uploadTextFile(filename, remoteFolder);
-                logger.info(success ? "MSR upload file successful" : "MSR upload file error");
-            }
-            if (file.exists()) {
-                file.delete();
-            }
+            uploadFile (filename, result);
+            culture (startDate, endDate);
         } catch (Exception e) {
             logger.error("Error build and upload summary clients file for MSR", e);
         }
+    }
+
+    public void culture(Date startDate, Date endDate) throws RuntimeException {
+        try {
+            String filename = RuntimeContext.getInstance().getPropertiesValue(FOLDER_PROPERTY, null);
+            if (filename == null) {
+                throw new Exception(String.format("Not found property %s in application config", FOLDER_PROPERTY));
+            }
+            SimpleDateFormat df = new SimpleDateFormat("yyMMdd");
+            filename += "/" + FILENAME_PREFIX_CLIENT + df.format(endDate) + ".csv";
+
+            String query_str = "select card.cardNo, client.clientGUID from Card card inner join card.client client "
+                    + "where client.clientGroup.compositeIdOfClientGroup.idOfClientGroup NOT between :group_employees and :group_deleted "
+                    + "and card.state in (:card_states) and card.validTime > :date "
+                    + "and client.ageTypeGroup = :schoolchild and client.clientGUID is not null";
+
+            Query query = entityManager.createQuery(query_str);
+
+            query.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("group_deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
+            query.setParameter("card_states", card_states);
+            query.setParameter("schoolchild", Client.GROUP_NAME[Client.GROUP_SCHOOL]);
+            query.setParameter("date", startDate);
+
+            List<String> result = new ArrayList<String>();
+
+            result = formatedList (query.getResultList(), result, false, null);
+
+
+            query_str = " select distinct cf_cards.cardno, cf_clients.clientguid, cf_cards.ValidDate\n"
+                    + " from cf_clients\n"
+                    + " inner join cf_client_guardian on cf_client_guardian.idofchildren = cf_clients.idofclient\n"
+                    + " inner join cf_cards on cf_client_guardian.idofguardian = cf_cards.idofclient\n"
+                    + " inner join cf_clientgroups on cf_clientgroups.idofclientgroup = cf_clients.idofclientgroup\n"
+                    + " where cf_clients.idofclientgroup not between :group_employees and :group_deleted\n"
+                    + " and cf_clients.clientguid is not null  \n"
+                    + " and cf_cards.state in (:card_states)  \n"
+                    + " and cf_client_guardian.deletedstate is false and cf_client_guardian.disabled = 0 \n"
+                    + " and cf_clients.agetypegroup in (:schoolchild)";
+
+            query = entityManager.createNativeQuery(query_str);
+
+            query.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("group_deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
+            query.setParameter("card_states", card_states);
+            query.setParameter("schoolchild", before_school_group);
+
+            result = formatedList (query.getResultList(), result, true, startDate);
+            uploadFile (filename, result);
+
+        } catch (Exception e) {
+            logger.error("Error build and upload summary clients file for MSR", e);
+        }
+    }
+
+    private void uploadFile (String filename, List<String>  result) throws IOException {
+        File file = new File(filename);
+        FileUtils.writeLines(file, result);
+
+        String server = RuntimeContext.getInstance().getPropertiesValue(FTP_SERVER, null);
+        int port = RuntimeContext.getInstance().getPropertiesValue(FTP_PORT, 0);
+        String user = RuntimeContext.getInstance().getPropertiesValue(FTP_USER, null);
+        String password = RuntimeContext.getInstance().getPropertiesValue(FTP_PASSWORD, null);
+        String remoteFolder = RuntimeContext.getInstance().getPropertiesValue(FTP_FOLDER, null);
+        if (server != null && port != 0 && user != null && password != null && remoteFolder != null) {
+            FTPUploader ftpUploader = new FTPUploader(server, port, user, password);
+            boolean success = ftpUploader.uploadTextFile(filename, remoteFolder);
+            logger.info(success ? "MSR upload file successful" : "MSR upload file error");
+        }
+        if (file.exists()) {
+            file.delete();
+        }
+    }
+
+    private List<String> formatedList (List list, List<String>  result, boolean parent, Date startDate)
+    {
+        Long time = 0L;
+        if (startDate != null)
+            time = startDate.getTime();
+        for (Object o : list) {
+            Object row[] = (Object[]) o;
+            //guid не пустой
+            if (!StringUtils.isEmpty((String)row[1])) {
+                Long cardId;
+                if (parent)
+                    cardId = ((BigInteger) row[0]).longValue();
+                else
+                    cardId = (Long) row[0];
+                cardId = convertCardId(cardId);
+                StringBuilder b = new StringBuilder();
+                if (parent) {
+                    if ((((BigInteger) row[2]).longValue() > time)) {
+                        b.append(row[1]).append("\t").append(cardId).append("\t").append("1");
+                        result.add(b.toString());
+                    }
+                }
+                else
+                {
+                    b.append(row[1]).append("\t").append(cardId).append("\t").append("0");
+                    result.add(b.toString());
+                }
+            }
+        }
+        return result;
     }
 
     public static Long convertCardId(Long cardId) {
