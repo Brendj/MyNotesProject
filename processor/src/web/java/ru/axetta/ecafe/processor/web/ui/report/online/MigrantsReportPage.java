@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.MigrantsReport;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
@@ -46,13 +47,29 @@ public class MigrantsReportPage extends OnlineReportPage {
     private final String reportName = MigrantsReport.REPORT_NAME;
     private final String reportNameForMenu = MigrantsReport.REPORT_NAME_FOR_MENU;
 
+
     private String htmlReport = null;
     private Boolean applyUserSettings = false;
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
     private String migrantType;
+    private Boolean showAllMigrants = false;
+    private Integer selectedPeriodType = MigrantsReport.PERIOD_TYPE_VISIT;
+    private List<SelectItem> migrantPeriodTypes = buildPeriodTypes();
+
+    private List<SelectItem> buildPeriodTypes() {
+        List<SelectItem> periodTypes = new LinkedList<>();
+        periodTypes.add(new SelectItem(MigrantsReport.PERIOD_TYPE_VISIT, "По дате посещения"));
+        periodTypes.add(new SelectItem(MigrantsReport.PERIOD_TYPE_CHANGED, "По дате изменения"));
+        return periodTypes;
+    }
 
     public MigrantsReportPage() {
         super();
+        initDateFilter();
+    }
+
+    public void initDateFilter(){
+        periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+        this.startDate = CalendarUtils.getFirstDayOfMonth(new Date());
         localCalendar.setTime(this.startDate);
         localCalendar.add(Calendar.DATE, 7);
         localCalendar.add(Calendar.SECOND, -1);
@@ -66,29 +83,7 @@ public class MigrantsReportPage extends OnlineReportPage {
     public Object buildReportHTML() {
         htmlReport = null;
         if (validateFormData())  return null;
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String templateFilename = checkIsExistFile(".jasper");
-        if (StringUtils.isEmpty(templateFilename)) {
-            return null;
-        }
-        MigrantsReport.Builder builder = new MigrantsReport.Builder(templateFilename);
-        builder.setReportProperties(buildProperties());
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        BasicReportJob report = null;
-        try {
-            persistenceSession = runtimeContext.createReportPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            report =  builder.build(persistenceSession, startDate, endDate, localCalendar);
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } catch (Exception e) {
-            logger.error("Failed export report : ", e);
-            printError("Ошибка при подготовке отчета: " + e.getMessage());
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
+        BasicReportJob report = buildReport();
         if (report != null) {
             try {
                 ByteArrayOutputStream os = new ByteArrayOutputStream();
@@ -112,43 +107,12 @@ public class MigrantsReportPage extends OnlineReportPage {
         return null;
     }
 
-    private String checkIsExistFile(String suffix) {
-        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateShortFileName = MigrantsReport.class.getSimpleName() + suffix;
-        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
-        if(!(new File(templateFilename)).exists()){
-            printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
+    private BasicReportJob buildReport() {
+        String templateFilename = checkIsExistFile(".jasper");
+        if (StringUtils.isEmpty(templateFilename)) {
             return null;
         }
-        return templateFilename;
-    }
-
-    private boolean validateFormData() {
-        if(CollectionUtils.isEmpty(idOfOrgList)){
-            printError("Выберите список организаций");
-            return true;
-        }
-        if(startDate==null){
-            printError("Не указано дата выборки от");
-            return true;
-        }
-        if(endDate==null){
-            printError("Не указано дата выборки до");
-            return true;
-        }
-        if(startDate.after(endDate)){
-            printError("Дата выборки от меньше дата выборки до");
-            return true;
-        }
-        return false;
-    }
-
-    public void exportToXLS(ActionEvent actionEvent){
-        if (validateFormData()) return;
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String templateFilename = checkIsExistFile(".jasper");
-        if (StringUtils.isEmpty(templateFilename)) return ;
-        Date generateTime = new Date();
         MigrantsReport.Builder builder = new MigrantsReport.Builder(templateFilename);
         builder.setReportProperties(buildProperties());
         Session persistenceSession = null;
@@ -167,7 +131,46 @@ public class MigrantsReportPage extends OnlineReportPage {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+        return report;
+    }
 
+    private String checkIsExistFile(String suffix) {
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateShortFileName = MigrantsReport.class.getSimpleName() + suffix;
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFileName;
+        if(!(new File(templateFilename)).exists()){
+            printError(String.format("Не найден файл шаблона '%s'", templateShortFileName));
+            return null;
+        }
+        return templateFilename;
+    }
+
+    private boolean validateFormData() {
+        if(CollectionUtils.isEmpty(idOfOrgList)){
+            printError("Выберите список организаций");
+            return true;
+        }
+        if(!showAllMigrants) {
+            if (startDate == null) {
+                printError("Не указано дата выборки от");
+                return true;
+            }
+            if (endDate == null) {
+                printError("Не указано дата выборки до");
+                return true;
+            }
+            if (startDate.after(endDate)) {
+                printError("Дата выборки от меньше дата выборки до");
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public void exportToXLS(ActionEvent actionEvent){
+        if (validateFormData()) return;
+        Date generateTime = new Date();
+        BasicReportJob report = buildReport();
         if(report!=null){
             try {
                 FacesContext facesContext = FacesContext.getCurrentInstance();
@@ -201,11 +204,13 @@ public class MigrantsReportPage extends OnlineReportPage {
         Properties properties = new Properties();
         String idOfOrgString = "";
         if(idOfOrgList != null) {
-            idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
+            idOfOrgString = StringUtils.join(idOfOrgList, ",");
         }
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
         properties.setProperty(MigrantsReport.P_MIGRANTS_TYPES, MigrantsUtils.MigrantsEnumType
                 .getNameByDescription(migrantType));
+        properties.setProperty("showAllMigrants", showAllMigrants.toString());
+        properties.setProperty("periodType", selectedPeriodType.toString());
         return properties;
     }
 
@@ -259,5 +264,29 @@ public class MigrantsReportPage extends OnlineReportPage {
 
     public String getReportNameForMenu() {
         return reportNameForMenu;
+    }
+
+    public Boolean getShowAllMigrants() {
+        return showAllMigrants;
+    }
+
+    public void setShowAllMigrants(Boolean showAllMigrants) {
+        this.showAllMigrants = showAllMigrants;
+    }
+
+    public Integer getSelectedPeriodType() {
+        return selectedPeriodType;
+    }
+
+    public void setSelectedPeriodType(Integer selectedPeriodType) {
+        this.selectedPeriodType = selectedPeriodType;
+    }
+
+    public List<SelectItem> getMigrantPeriodTypes() {
+        return migrantPeriodTypes;
+    }
+
+    public void setMigrantPeriodTypes(List<SelectItem> migrantPeriodTypes) {
+        this.migrantPeriodTypes = migrantPeriodTypes;
     }
 }

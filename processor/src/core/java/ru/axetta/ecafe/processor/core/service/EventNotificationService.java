@@ -252,7 +252,7 @@ public class EventNotificationService {
             String emailText = getNotificationText(type, TYPE_EMAIL_TEXT), emailSubject = getNotificationText(type,
                     TYPE_EMAIL_SUBJECT);
             if (emailText == null || emailSubject == null) {
-                logger.warn(String.format("No email text is specified for type '%s'. Email is not sent", type));
+                logger.info(String.format("No email text is specified for type '%s'. Email is not sent", type));
                 return false;
             } else {
                 emailText = formatMessage(emailText, values);
