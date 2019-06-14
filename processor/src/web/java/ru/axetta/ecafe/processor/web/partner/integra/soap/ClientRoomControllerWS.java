@@ -8355,62 +8355,46 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return new CultureEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
             }
             Client client = card.getClient();
-            if (client == null) {
+            if (client == null || client.isDeletedOrLeaving() || !card.isActive()) {
                 return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
-            Date currentDate = new Date();
-            boolean clientPredefined = false;
 
-            cultureEnterInfo.setFullAge(getFullAge(client));
-
-            //Получаем все опекаемых для опекуна
-            List<Client> childsList = ClientManager.findChildsByClient(session, client.getIdOfClient());
-            if (childsList.isEmpty())
+            if (client.getAgeTypeGroup() != null && client.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_SCHOOL]))
             {
                 //Если клиент школьник
+                if (StringUtils.isEmpty(client.getClientGUID())) return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+                cultureEnterInfo.setFullAge(getFullAge(client));
                 cultureEnterInfo.setGuid(client.getClientGUID());
                 cultureEnterInfo.setGroupName(client.getClientGroup().getGroupName());
-                if (client.getAgeTypeGroup() != null) {
-                    clientPredefined = (client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-                            || client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() > ClientGroup.Predefined.CLIENT_DELETED.getValue())
-                            && (client.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_SCHOOL]));
-                }
             }
             else
             {
+                List<Client> childsList = ClientManager.findChildsByClient(session, client.getIdOfClient());
+                if (childsList.size() == 0) return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
                 //Если клиент опекун
                 cultureEnterInfo.setGroupName(client.getClientGroup().getGroupName());
-                boolean clientPredefinedchild = false;
                 cultureEnterInfo.getChildrens().add(new CultureEnterInfo());
+                cultureEnterInfo.setFullAge(getFullAge(client));
                 for (Client child: childsList)
                 {
                     if (child.getAgeTypeGroup() != null) {
-                        clientPredefined = (child.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                        boolean clientPredefined = (child.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
                                 || child.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() > ClientGroup.Predefined.CLIENT_DELETED.getValue())
                                 && (child.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL]) || child
                                 .getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_OUT]) || child.getAgeTypeGroup()
                                 .equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_STEP]));
                         //Добавляем в список только дошкольников
                         if (clientPredefined) {
-                            clientPredefinedchild = true;
                             CultureEnterInfo cultureEnterInfoChield = new CultureEnterInfo();
                             cultureEnterInfoChield.setGuid(child.getClientGUID());
                             cultureEnterInfoChield.setGroupName(child.getClientGroup().getGroupName());
-                            cultureEnterInfo.setFullAge(getFullAge(child));
+                            cultureEnterInfoChield.setFullAge(getFullAge(child));
                             cultureEnterInfo.getChildrens().get(0).getChild().add(cultureEnterInfoChield);
                         }
                     }
                 }
-                //Если хотя-бы один из опекаемых подходит
-                if (clientPredefinedchild)
-                    clientPredefined = true;
             }
-            if ((card.getState() == CardState.ISSUED.getValue() || card.getState() == CardState.TEMPISSUED.getValue())
-                    && card.getValidTime().after(currentDate) && clientPredefined) {
-                cultureEnterInfo.setValidityCard("true");
-            } else {
-                cultureEnterInfo.setValidityCard("false");
-            }
+            cultureEnterInfo.setValidityCard(true);
             cultureEnterInfo.resultCode = RC_OK;
             cultureEnterInfo.description = RC_OK_DESC;
             return cultureEnterInfo;
@@ -8422,16 +8406,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
     }
 
-    private String getFullAge (Client client)
+    private Boolean getFullAge (Client client)
     {
-        boolean fullAge = (client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+        return (client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
                 && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() <= ClientGroup.Predefined.CLIENT_OTHERS.getValue());
-        //boolean chieldAge = (client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() <= ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue()
-        //        || client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DISPLACED.getValue()));
-        if (fullAge)
-            return "true";
-        else
-            return "false";
     }
 
     @Override

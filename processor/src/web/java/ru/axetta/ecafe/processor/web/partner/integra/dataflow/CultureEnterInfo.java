@@ -11,11 +11,11 @@ import java.util.ArrayList;
  */
 public class CultureEnterInfo extends Result {
 
-    private String validityCard;
+    private Boolean validityCard;
     private ArrayList<CultureEnterInfo> child;
     private ArrayList<CultureEnterInfo> childrens;
     private String guid;
-    private String fullAge;
+    private Boolean fullAge;
     private String groupName;
 
     public CultureEnterInfo() {
@@ -26,19 +26,19 @@ public class CultureEnterInfo extends Result {
         this.description = description;
     }
 
-    public String isValidityCard() {
+    public Boolean isValidityCard() {
         return validityCard;
     }
 
-    public void setValidityCard(String validityCard) {
+    public void setValidityCard(Boolean validityCard) {
         this.validityCard = validityCard;
     }
 
-    public String isFullAge() {
+    public Boolean isFullAge() {
         return fullAge;
     }
 
-    public void setFullAge(String fullAge) {
+    public void setFullAge(Boolean fullAge) {
         this.fullAge = fullAge;
     }
 

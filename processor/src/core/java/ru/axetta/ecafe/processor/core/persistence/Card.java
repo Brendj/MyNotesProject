@@ -108,6 +108,11 @@ public class Card {
         this.lifeState = lifeState;
     }
 
+    public boolean isActive() {
+        if (state == null) return false;
+        return state.equals(CardState.ISSUED.getValue()) || state.equals(CardState.TEMPISSUED.getValue());
+    }
+
     public Long getIdOfCard() {
         return idOfCard;
     }
