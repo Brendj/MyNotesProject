@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.PropertyUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -152,10 +153,10 @@ public class ImportMigrantsService {
                     migrantNew.setResolutionCodeGroup(request.getIdOfServiceClass());
                     session.save(migrantNew);
 
-                    session.save(createResolutionHistory(session, client, compositeIdOfMigrant.getIdOfRequest(),
+                    session.save(createResolutionHistoryInternal(session, client, compositeIdOfMigrant.getIdOfRequest(),
                             VisitReqResolutionHist.RES_CREATED, date));
                     session.flush();
-                    session.save(createResolutionHistory(session, client, compositeIdOfMigrant.getIdOfRequest(), resolution,
+                    session.save(createResolutionHistoryInternal(session, client, compositeIdOfMigrant.getIdOfRequest(), resolution,
                             CalendarUtils.addSeconds(date, 1)));
                 } else {    // сравниваем, если надо - обновляем
                     if (!migrant.getOrgRegVendor().equals(client.getOrg().getDefaultSupplier())) {
@@ -199,7 +200,7 @@ public class ImportMigrantsService {
 
                     VisitReqResolutionHist hist = MigrantsUtils.getLastResolutionForMigrant(session, migrant);
                     if (!resolution.equals(hist.getResolution())) {
-                        session.save(createResolutionHistory(session, client, migrant.getCompositeIdOfMigrant().getIdOfRequest(),
+                        session.save(createResolutionHistoryInternal(session, client, migrant.getCompositeIdOfMigrant().getIdOfRequest(),
                                 resolution, date));
                     }
                 }
@@ -226,6 +227,19 @@ public class ImportMigrantsService {
         Long idOfResol = MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, client.getOrg().getIdOfOrg());
         CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(idOfResol,
                 idOfRequest, client.getOrg().getIdOfOrg());
+
+        // создаем новую запись в истории
+        return new VisitReqResolutionHist(comIdOfHist, client.getOrg(),
+                resolution, date, null, null, null,
+                VisitReqResolutionHist.NOT_SYNCHRONIZED, VisitReqResolutionHistInitiatorEnum.INITIATOR_ESZ);
+    }
+
+    public static VisitReqResolutionHist createResolutionHistoryInternal(Session session, Client client, Long idOfRequest,
+            Integer resolution, Date date) throws Exception {
+        Long idOfESZSchool = PropertyUtils.getIdOfESZOrg();
+        Long idOfResol = MigrantsUtils.nextIdOfProcessorMigrantResolutions(session, idOfESZSchool);
+        CompositeIdOfVisitReqResolutionHist comIdOfHist = new CompositeIdOfVisitReqResolutionHist(idOfResol,
+                idOfRequest, idOfESZSchool);
 
         // создаем новую запись в истории
         return new VisitReqResolutionHist(comIdOfHist, client.getOrg(),
