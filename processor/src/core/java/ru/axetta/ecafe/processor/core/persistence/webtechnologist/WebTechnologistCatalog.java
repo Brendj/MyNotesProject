@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.webtechnologist;
 import ru.axetta.ecafe.processor.core.persistence.User;
 
 import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 public class WebTechnologistCatalog {
@@ -19,6 +20,9 @@ public class WebTechnologistCatalog {
     private Boolean deleteState;
     private User userCreator;
     private Set<WebTechnologistCatalogItem> items;
+
+    // For web interface only
+    private Boolean isChanged = false;
 
     public WebTechnologistCatalog(){
         // For Hibernate
@@ -89,6 +93,9 @@ public class WebTechnologistCatalog {
     }
 
     public Set<WebTechnologistCatalogItem> getItems() {
+        if(items == null){
+            items = new HashSet<>();
+        }
         return items;
     }
 
@@ -115,5 +122,17 @@ public class WebTechnologistCatalog {
         }
         WebTechnologistCatalog catalog = (WebTechnologistCatalog) o;
         return this.idOfWebTechnologistCatalog.equals(catalog.idOfWebTechnologistCatalog);
+    }
+
+    public Boolean getChanged() {
+        return isChanged;
+    }
+
+    public void setChanged(Boolean changed) {
+        isChanged = changed;
+    }
+
+    public void hasBeenChanged() {
+        isChanged = true;
     }
 }

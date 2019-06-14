@@ -989,11 +989,6 @@
                                 binding="#{webTechnologistCatalogListPage.mainMenuComponent}"
                                 label="Список справочников" action="#{webTechnologistCatalogListPage.show}"
                                 reRender="workspaceForm" />
-            <%--@elvariable id="webTechnologistCatalogCreatePage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.CatalogCreatePage"--%>
-            <rich:panelMenuItem id="webTechnologistCatalogsCreate"
-                                binding="#{webTechnologistCatalogCreatePage.mainMenuComponent}"
-                                label="Создать справочник" action="#{webTechnologistCatalogCreatePage.show}"
-                                reRender="workspaceForm" />
         </rich:panelMenuGroup>
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>

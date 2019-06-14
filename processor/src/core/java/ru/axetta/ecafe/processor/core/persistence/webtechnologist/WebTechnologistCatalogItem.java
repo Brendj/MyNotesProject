@@ -16,6 +16,9 @@ public class WebTechnologistCatalogItem {
     private Long version;
     private Boolean deleteState;
 
+    // For web interface only
+    private Boolean isChanged = false;
+
     public WebTechnologistCatalogItem(){
         // For Hibernate
     }
@@ -86,5 +89,17 @@ public class WebTechnologistCatalogItem {
 
     public String getDeleteStateAsString(){
         return deleteState ? "Удален" : "Активен";
+    }
+
+    public Boolean getChanged() {
+        return isChanged;
+    }
+
+    public void setChanged(Boolean changed) {
+        isChanged = changed;
+    }
+
+    public void hasBeenChanged() {
+        isChanged = true;
     }
 }

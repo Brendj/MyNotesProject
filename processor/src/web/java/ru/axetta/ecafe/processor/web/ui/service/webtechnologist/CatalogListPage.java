@@ -5,11 +5,15 @@
 package ru.axetta.ecafe.processor.web.ui.service.webtechnologist;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.webtechnologist.WebTechnologistCatalog;
+import ru.axetta.ecafe.processor.core.persistence.webtechnologist.WebTechnologistCatalogItem;
 import ru.axetta.ecafe.processor.core.persistence.webtechnologist.WebTechnologistCatalogService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -25,13 +29,18 @@ import java.util.List;
 @Scope("session")
 @DependsOn("runtimeContext")
 public class CatalogListPage extends BasicWorkspacePage {
+
     private static Logger logger = LoggerFactory.getLogger(CatalogListPage.class);
 
     private String catalogNameFilter;
     private String GUIDfilter;
     private List<WebTechnologistCatalog> itemList = Collections.emptyList();
+    // TODO delete POJO entity's, change to simple DTO
     private WebTechnologistCatalog selectedItem;
+    private WebTechnologistCatalogItem selectedCatalogElement;
     private Boolean showOnlyActive = false;
+    private String createdCatalogName;
+    private String createdCatalogElementDescription;
 
     public void updateCatalogList() {
         WebTechnologistCatalogService service = RuntimeContext.getAppContext()
@@ -71,13 +80,27 @@ public class CatalogListPage extends BasicWorkspacePage {
                 .getBean(WebTechnologistCatalogService.class);
         try {
             service.deleteItem(selectedItem);
-            if (showOnlyActive) {
-                itemList.remove(selectedItem);
-            }
         } catch (Exception e) {
             logger.error("Не удалось обновить состояние каталога GUID " + selectedItem.getGUID() + ", ошибка: ", e);
             printMessage("Не удалось обновить состояние каталога GUID " + selectedItem.getGUID() + ", ошибка: " + e
                     .getMessage());
+        }
+    }
+
+    public void createNewCatalog() {
+        if (StringUtils.isEmpty(createdCatalogName)) {
+            printError("Введите имя справочника");
+            return;
+        }
+        try {
+            User currentUser = MainPage.getSessionInstance().getCurrentUser();
+            WebTechnologistCatalogService service = RuntimeContext.getAppContext()
+                    .getBean(WebTechnologistCatalogService.class);
+            WebTechnologistCatalog newCatalog = service.createNewCatalog(createdCatalogName, currentUser);
+            itemList.add(newCatalog);
+        } catch (Exception e) {
+            logger.error("Can't create new catalog: ", e);
+            printError("Не удалось создать новый справочник: " + e.getMessage());
         }
     }
 
@@ -93,11 +116,60 @@ public class CatalogListPage extends BasicWorkspacePage {
             WebTechnologistCatalogService service = RuntimeContext.getAppContext()
                     .getBean(WebTechnologistCatalogService.class);
             itemList = service.getAllCatalogs(session);
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Exception when prepared the CatalogListPage: ", e);
             throw e;
         } finally {
             HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void deleteCatalogElement() {
+        if (selectedCatalogElement == null) {
+            printError("Ошибка при попытке удаль элемент: элемент не был выбран");
+            return;
+        }
+        WebTechnologistCatalogService service = RuntimeContext.getAppContext()
+                .getBean(WebTechnologistCatalogService.class);
+        try {
+            service.deleteCatalogElement(selectedItem, selectedCatalogElement);
+
+        } catch (Exception e) {
+            logger.error("Не удалось обновить состояние элемента каталога GUID " + selectedCatalogElement.getGUID()
+                    + ", ошибка: ", e);
+            printMessage("Не удалось обновить состояние элемента каталога GUID " + selectedCatalogElement.getGUID()
+                    + ", ошибка: " + e.getMessage());
+        }
+    }
+
+    public void addElementToSelectedCatalog() {
+        if(StringUtils.isBlank(createdCatalogElementDescription)){
+            printError("Введите описание элемента справочника");
+            return;
+        }
+        WebTechnologistCatalogService service = RuntimeContext.getAppContext()
+                .getBean(WebTechnologistCatalogService.class);
+        try {
+            WebTechnologistCatalogItem newItem = service.createNewElementOfCatalog(selectedItem, createdCatalogElementDescription);
+            selectedItem.getItems().add(newItem);
+        } catch (Exception e){
+            logger.error("Не удалось создать элемент для справочника GUID:" + selectedItem.getGUID()
+                    + ", ошибка: ", e);
+            printMessage("Не удалось создать элемент для справочника GUID:" + selectedItem.getGUID()
+                    + ", ошибка: " + e.getMessage());
+        }
+    }
+
+    public void applyChange() {
+        WebTechnologistCatalogService service = RuntimeContext.getAppContext()
+                .getBean(WebTechnologistCatalogService.class);
+        try{
+            service.applyChange(selectedItem);
+        } catch (Exception e){
+            logger.error("Не удалось применить изменения для справочника GUID:" + selectedItem.getGUID()
+                    + ", ошибка: ", e);
+            printMessage("Не удалось применить изменения элемент для справочника GUID:" + selectedItem.getGUID()
+                    + ", ошибка: " + e.getMessage());
         }
     }
 
@@ -145,5 +217,29 @@ public class CatalogListPage extends BasicWorkspacePage {
 
     public void setShowOnlyActive(Boolean showOnlyActive) {
         this.showOnlyActive = showOnlyActive;
+    }
+
+    public String getCreatedCatalogName() {
+        return createdCatalogName;
+    }
+
+    public void setCreatedCatalogName(String createdCatalogName) {
+        this.createdCatalogName = createdCatalogName;
+    }
+
+    public String getCreatedCatalogElementDescription() {
+        return createdCatalogElementDescription;
+    }
+
+    public void setCreatedCatalogElementDescription(String createdCatalogElementDescription) {
+        this.createdCatalogElementDescription = createdCatalogElementDescription;
+    }
+
+    public WebTechnologistCatalogItem getSelectedCatalogElement() {
+        return selectedCatalogElement;
+    }
+
+    public void setSelectedCatalogElement(WebTechnologistCatalogItem selectedCatalogElement) {
+        this.selectedCatalogElement = selectedCatalogElement;
     }
 }
