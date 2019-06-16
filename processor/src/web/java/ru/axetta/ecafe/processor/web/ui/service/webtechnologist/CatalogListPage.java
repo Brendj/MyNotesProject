@@ -35,7 +35,6 @@ public class CatalogListPage extends BasicWorkspacePage {
     private String catalogNameFilter;
     private String GUIDfilter;
     private List<WebTechnologistCatalog> itemList = Collections.emptyList();
-    // TODO delete POJO entity's, change to simple DTO
     private WebTechnologistCatalog selectedItem;
     private WebTechnologistCatalogItem selectedCatalogElement;
     private Boolean showOnlyActive = false;
@@ -110,6 +109,7 @@ public class CatalogListPage extends BasicWorkspacePage {
         catalogNameFilter = "";
         GUIDfilter = "";
         selectedItem = null;
+        selectedCatalogElement = null;
         itemList.clear();
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();

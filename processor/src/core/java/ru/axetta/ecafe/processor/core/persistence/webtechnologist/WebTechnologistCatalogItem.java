@@ -102,4 +102,21 @@ public class WebTechnologistCatalogItem {
     public void hasBeenChanged() {
         isChanged = true;
     }
+
+    @Override
+    public int hashCode(){
+        return idOfWebTechnologistCatalogItem.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof WebTechnologistCatalogItem)) {
+            return false;
+        }
+        WebTechnologistCatalogItem catalogItem = (WebTechnologistCatalogItem) o;
+        return this.idOfWebTechnologistCatalogItem.equals(catalogItem.idOfWebTechnologistCatalogItem);
+    }
 }

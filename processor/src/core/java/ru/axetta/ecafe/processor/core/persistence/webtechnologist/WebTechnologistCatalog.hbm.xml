@@ -16,7 +16,7 @@
         <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="version" column="version" type="long" not-null="true"/>
         <property name="deleteState" column="deleteState " type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
-        <many-to-one name="userCreator" column="idOfUserCreator" class="ru.axetta.ecafe.processor.core.persistence.User" not-null="true"/>
+        <many-to-one name="userCreator" column="idOfUserCreator" class="ru.axetta.ecafe.processor.core.persistence.User" not-null="true" lazy="false"/>
         <set table="cf_webTechnologist_catalog_items" name="items" lazy="false">
             <key column="idOfWebTechnologistCatalog"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webtechnologist.WebTechnologistCatalogItem"/>
