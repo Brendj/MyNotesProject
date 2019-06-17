@@ -38,8 +38,8 @@ public class CatalogListPage extends BasicWorkspacePage {
     private WebTechnologistCatalog selectedItem;
     private WebTechnologistCatalogItem selectedCatalogElement;
     private Boolean showOnlyActive = false;
-    private String createdCatalogName;
-    private String createdCatalogElementDescription;
+    private String nameForNewCatalog;
+    private String descriptionForNewElement;
 
     public void updateCatalogList() {
         WebTechnologistCatalogService service = RuntimeContext.getAppContext()
@@ -87,7 +87,7 @@ public class CatalogListPage extends BasicWorkspacePage {
     }
 
     public void createNewCatalog() {
-        if (StringUtils.isEmpty(createdCatalogName)) {
+        if (StringUtils.isEmpty(nameForNewCatalog)) {
             printError("Введите имя справочника");
             return;
         }
@@ -95,7 +95,7 @@ public class CatalogListPage extends BasicWorkspacePage {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
             WebTechnologistCatalogService service = RuntimeContext.getAppContext()
                     .getBean(WebTechnologistCatalogService.class);
-            WebTechnologistCatalog newCatalog = service.createNewCatalog(createdCatalogName, currentUser);
+            WebTechnologistCatalog newCatalog = service.createNewCatalog(nameForNewCatalog, currentUser);
             itemList.add(newCatalog);
         } catch (Exception e) {
             logger.error("Can't create new catalog: ", e);
@@ -137,26 +137,25 @@ public class CatalogListPage extends BasicWorkspacePage {
         } catch (Exception e) {
             logger.error("Не удалось обновить состояние элемента каталога GUID " + selectedCatalogElement.getGUID()
                     + ", ошибка: ", e);
-            printMessage("Не удалось обновить состояние элемента каталога GUID " + selectedCatalogElement.getGUID()
+            printError("Не удалось обновить состояние элемента каталога GUID " + selectedCatalogElement.getGUID()
                     + ", ошибка: " + e.getMessage());
         }
     }
 
     public void addElementToSelectedCatalog() {
-        if(StringUtils.isBlank(createdCatalogElementDescription)){
+        if (StringUtils.isBlank(descriptionForNewElement)) {
             printError("Введите описание элемента справочника");
             return;
         }
         WebTechnologistCatalogService service = RuntimeContext.getAppContext()
                 .getBean(WebTechnologistCatalogService.class);
         try {
-            WebTechnologistCatalogItem newItem = service.createNewElementOfCatalog(selectedItem, createdCatalogElementDescription);
-            selectedItem.getItems().add(newItem);
-        } catch (Exception e){
-            logger.error("Не удалось создать элемент для справочника GUID:" + selectedItem.getGUID()
-                    + ", ошибка: ", e);
-            printMessage("Не удалось создать элемент для справочника GUID:" + selectedItem.getGUID()
-                    + ", ошибка: " + e.getMessage());
+            WebTechnologistCatalogItem newItem = service
+                    .createNewElementOfCatalog(selectedItem, descriptionForNewElement);
+        } catch (Exception e) {
+            logger.error("Не удалось создать элемент для справочника GUID:" + selectedItem.getGUID() + ", ошибка: ", e);
+            printError("Не удалось создать элемент для справочника GUID:" + selectedItem.getGUID() + ", ошибка: " + e
+                    .getMessage());
         }
     }
 
@@ -168,9 +167,25 @@ public class CatalogListPage extends BasicWorkspacePage {
         } catch (Exception e){
             logger.error("Не удалось применить изменения для справочника GUID:" + selectedItem.getGUID()
                     + ", ошибка: ", e);
-            printMessage("Не удалось применить изменения элемент для справочника GUID:" + selectedItem.getGUID()
+            printError("Не удалось применить изменения элемент для справочника GUID:" + selectedItem.getGUID()
                     + ", ошибка: " + e.getMessage());
         }
+    }
+
+    public String getNameForNewCatalog() {
+        return nameForNewCatalog;
+    }
+
+    public void setNameForNewCatalog(String nameForNewCatalog) {
+        this.nameForNewCatalog = nameForNewCatalog;
+    }
+
+    public String getDescriptionForNewElement() {
+        return descriptionForNewElement;
+    }
+
+    public void setDescriptionForNewElement(String descriptionForNewElement) {
+        this.descriptionForNewElement = descriptionForNewElement;
     }
 
     public String getCatalogNameFilter() {
@@ -217,22 +232,6 @@ public class CatalogListPage extends BasicWorkspacePage {
 
     public void setShowOnlyActive(Boolean showOnlyActive) {
         this.showOnlyActive = showOnlyActive;
-    }
-
-    public String getCreatedCatalogName() {
-        return createdCatalogName;
-    }
-
-    public void setCreatedCatalogName(String createdCatalogName) {
-        this.createdCatalogName = createdCatalogName;
-    }
-
-    public String getCreatedCatalogElementDescription() {
-        return createdCatalogElementDescription;
-    }
-
-    public void setCreatedCatalogElementDescription(String createdCatalogElementDescription) {
-        this.createdCatalogElementDescription = createdCatalogElementDescription;
     }
 
     public WebTechnologistCatalogItem getSelectedCatalogElement() {

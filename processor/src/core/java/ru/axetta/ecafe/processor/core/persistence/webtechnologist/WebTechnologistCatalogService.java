@@ -164,7 +164,7 @@ public class WebTechnologistCatalogService {
         }
     }
 
-    public WebTechnologistCatalogItem createNewElementOfCatalog(WebTechnologistCatalog webTechnologistCatalog,
+    public void createNewElementOfCatalog(WebTechnologistCatalog webTechnologistCatalog,
             String createdCatalogElementDescription) throws Exception {
         if(StringUtils.isBlank(createdCatalogElementDescription)){
             throw  new IllegalArgumentException("Description of element is not valid");
@@ -191,11 +191,11 @@ public class WebTechnologistCatalogService {
 
             webTechnologistCatalog.setVersion(getNextVersionForCatalog(session));
             webTechnologistCatalog.setLastUpdate(createDate);
+            webTechnologistCatalog.getItems().add(item);
             session.update(webTechnologistCatalog);
 
             transaction.commit();
             transaction = null;
-            return item;
         }  catch (Exception e) {
             logger.error("Can't create catalogs element from DB: ", e);
             throw e;
