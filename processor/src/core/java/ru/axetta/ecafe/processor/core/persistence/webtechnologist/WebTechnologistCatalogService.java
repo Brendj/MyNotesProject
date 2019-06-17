@@ -147,11 +147,11 @@ public class WebTechnologistCatalogService {
             selectedCatalogElement.setDeleteState(true);
             selectedCatalogElement.setLastUpdate(lastUpdateDate);
             selectedCatalogElement.setVersion(getNextVersionForCatalogItem(session));
-            session.update(selectedCatalogElement);
+            session.merge(selectedCatalogElement);
 
             webTechnologistCatalog.setLastUpdate(lastUpdateDate);
             webTechnologistCatalog.setVersion(getNextVersionForCatalog(session));
-            session.update(webTechnologistCatalog);
+            session.merge(webTechnologistCatalog);
 
             transaction.commit();
             transaction = null;
@@ -192,7 +192,7 @@ public class WebTechnologistCatalogService {
             webTechnologistCatalog.setVersion(getNextVersionForCatalog(session));
             webTechnologistCatalog.setLastUpdate(createDate);
             webTechnologistCatalog.getItems().add(item);
-            session.update(webTechnologistCatalog);
+            session.merge(webTechnologistCatalog);
 
             transaction.commit();
             transaction = null;
@@ -225,7 +225,7 @@ public class WebTechnologistCatalogService {
                     item.setLastUpdate(lastUpdateDate);
                 }
             }
-            session.update(changedCatalog);
+            session.merge(changedCatalog);
 
             transaction.commit();
             transaction = null;

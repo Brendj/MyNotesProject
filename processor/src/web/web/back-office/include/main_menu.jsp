@@ -984,10 +984,10 @@
         <rich:panelMenuGroup id="webTechnologistCatalogs" label="Справочники" binding="#{mainPage.webTechnologistCatalogGroupPage.mainMenuComponent}">
             <a4j:support event="onclick" reRender="workspaceForm"
                          action="#{mainPage.showWebTechnologistCatalogGroupPage}"/>
-            <%--@elvariable id="webTechnologistCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.CatalogListPage"--%>
+            <%--@elvariable id="catalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.CatalogListPage"--%>
             <rich:panelMenuItem id="webTechnologistCatalogsList"
-                                binding="#{webTechnologistCatalogListPage.mainMenuComponent}"
-                                label="Список справочников" action="#{webTechnologistCatalogListPage.show}"
+                                binding="#{catalogListPage.mainMenuComponent}"
+                                label="Список справочников" action="#{catalogListPage.show}"
                                 reRender="workspaceForm" />
         </rich:panelMenuGroup>
     </rich:panelMenuGroup>

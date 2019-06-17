@@ -8,25 +8,24 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="webTechnologistCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.CatalogListPage"--%>
-<h:panelGrid id="webTechnologistCatalogListPagePanelGrid" binding="#{webTechnologistCatalogListPage.pageComponent}"
+<%--@elvariable id="catalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.CatalogListPage"--%>
+<h:panelGrid id="webTechnologistCatalogListPagePanelGrid" binding="#{catalogListPage.pageComponent}"
              styleClass="borderless-grid">
     <rich:simpleTogglePanel label="Фильтр " switchType="client" eventsQueue="mainFormEventsQueue" opened="false"
                             headerClass="filter-panel-header">
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Название справочника" styleClass="output-text" />
-            <h:inputText value="#{webTechnologistCatalogListPage.catalogNameFilter}" styleClass="input-text" />
+            <h:inputText value="#{catalogListPage.catalogNameFilter}" styleClass="input-text" />
             <h:outputText escape="true" value="GUID справочника" styleClass="output-text" />
-            <h:inputText value="#{webTechnologistCatalogListPage.GUIDfilter}" maxlength="36" styleClass="input-text"
-                         size="50" />
+            <h:inputText value="#{catalogListPage.GUIDfilter}" maxlength="36" styleClass="input-text" size="50" />
             <h:outputText escape="true" value="Показать только активные справочники" styleClass="output-text" />
-            <h:selectBooleanCheckbox value="#{webTechnologistCatalogListPage.showOnlyActive}" />
+            <h:selectBooleanCheckbox value="#{catalogListPage.showOnlyActive}" />
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
-            <a4j:commandButton value="Применить" action="#{webTechnologistCatalogListPage.updateCatalogList}"
+            <a4j:commandButton value="Применить" action="#{catalogListPage.updateCatalogList()}"
                                reRender="workspaceTogglePanel" styleClass="command-button"
                                status="WebTechnologCatalogProcessStatus" />
-            <a4j:commandButton value="Очистить" action="#{webTechnologistCatalogListPage.dropAndReloadCatalogList}"
+            <a4j:commandButton value="Очистить" action="#{catalogListPage.dropAndReloadCatalogList()}"
                                status="WebTechnologCatalogProcessStatus" reRender="workspaceTogglePanel"
                                ajaxSingle="true" styleClass="command-button" />
         </h:panelGrid>
@@ -52,8 +51,8 @@
             </a4j:commandLink>
         </f:facet>
         <rich:dataTable id="webtechnologistCatalogListElementsTable"
-                        value="#{webTechnologistCatalogListPage.selectedItem.items.toArray()}" var="catalogViewElement"
-                        rows="20" footerClass="data-table-footer"
+                        value="#{catalogListPage.selectedItem.items.toArray()}" var="catalogViewElement" rows="20"
+                        footerClass="data-table-footer"
                         columnClasses="center-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
             <rich:column headerClass="column-header">
                 <f:facet name="header">
@@ -104,7 +103,7 @@
         </rich:dataTable>
     </rich:modalPanel>
     <!-- ********* EDIT MODAL PANEL ********* -->
-    <rich:modalPanel id="webtechnologistCatalogEditPanel" width="650" height="600" resizeable="false">
+    <rich:modalPanel id="webtechnologistCatalogEditPanel" width="800" height="600" resizeable="false" domElementAttachment="form">
         <f:facet name="header">
             <h:panelGroup>
                 <h:outputText value="Редактирование справочника" />
@@ -117,12 +116,12 @@
         </f:facet>
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText value="Название справочника" styleClass="output-text" />
-            <h:inputText onchange="#{webTechnologistCatalogListPage.selectedItem.hasBeenChanged()}"
-                         value="#{webTechnologistCatalogListPage.selectedItem.catalogName}" styleClass="input-text" />
+            <h:inputText onchange="#{catalogListPage.selectedItem.hasBeenChanged()}"
+                         value="#{catalogListPage.selectedItem.catalogName}" styleClass="input-text" />
         </h:panelGrid>
         <rich:dataTable id="webtechnologistCatalogEditListElementsTable"
-                        value="#{webTechnologistCatalogListPage.selectedItem.items.toArray()}" var="catalogEditElement"
-                        rows="20" footerClass="data-table-footer"
+                        value="#{catalogListPage.selectedItem.items.toArray()}" var="catalogEditElement" rows="20"
+                        footerClass="data-table-footer"
                         columnClasses="center-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
             <rich:column headerClass="column-header">
                 <f:facet name="header">
@@ -165,11 +164,11 @@
                     <h:outputText value="Удалить" escape="true" />
                 </f:facet>
                 <a4j:commandLink ajaxSingle="true" styleClass="command-link"
-                                 action="#{webTechnologistCatalogListPage.deleteCatalogElement}"
+                                 action="#{catalogListPage.deleteCatalogElement()}"
                                  reRender="webtechnologistCatalogEditListElementsTable">
                     <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                     <f:setPropertyActionListener value="#{catalogEditElement}"
-                                                 target="#{webTechnologistCatalogListPage.selectedCatalogElement}" />
+                                                 target="#{catalogListPage.selectedCatalogElement}" />
                 </a4j:commandLink>
             </rich:column>
             <f:facet name="footer">
@@ -184,23 +183,23 @@
                 </rich:datascroller>
             </f:facet>
         </rich:dataTable>
-        <h:panelGrid columns="1">
-            <h:inputText value="#{webTechnologistCatalogListPage.descriptionForNewElement}" styleClass="input-text" />
-            <a4j:commandButton action="#{webTechnologistCatalogListPage.addElementToSelectedCatalog}"
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:inputText value="#{catalogListPage.descriptionForNewElement}" styleClass="input-text" />
+            <a4j:commandButton action="#{catalogListPage.addElementToSelectedCatalog()}"
                                reRender="webtechnologistCatalogEditListElementsTable" value="Добавить элемент"
                                status="WebTechnologCatalogProcessStatus" />
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <a4j:commandButton onclick="Richfaces.hideModalPanel('webtechnologistCatalogEditPanel')"
-                               reRender="this, workspaceTogglePanel" value="Закрыть"
+                               reRender="workspaceTogglePanel" value="Закрыть"
                                status="WebTechnologCatalogProcessStatus" />
-            <a4j:commandButton reRender="this, workspaceTogglePanel"
-                               action="#{webTechnologistCatalogListPage.applyChange}"
-                               status="WebTechnologCatalogProcessStatus" value="Сохранить изменения" />
+            <a4j:commandButton reRender="webtechnologistCatalogEditListElementsTable"
+                               action="#{catalogListPage.applyChange()}" status="WebTechnologCatalogProcessStatus"
+                               value="Сохранить изменения" />
         </h:panelGrid>
     </rich:modalPanel>
     <!-- ********* CREATE MODAL PANEL ********* -->
-    <rich:modalPanel id="webtechnologistCatalogCreatePanel" width="300" height="150" resizeable="false">
+    <rich:modalPanel id="webtechnologistCatalogCreatePanel" width="300" height="150" resizeable="false" domElementAttachment="form">
         <f:facet name="header">
             <h:panelGroup>
                 <h:outputText value="Создание справочника" />
@@ -213,19 +212,16 @@
         </f:facet>
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Название справочника" styleClass="output-text" />
-            <h:inputText value="#{webTechnologistCatalogListPage.nameForNewCatalog}" styleClass="input-text" />
-        </h:panelGrid>
-        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:inputText value="#{catalogListPage.nameForNewCatalog}" styleClass="input-text" />
             <a4j:commandButton onclick="Richfaces.hideModalPanel('webtechnologistCatalogCreatePanel')" value="Закрыть"
                                status="WebTechnologCatalogProcessStatus" />
             <a4j:commandButton oncomplete="Richfaces.hideModalPanel('webtechnologistCatalogCreatePanel')"
-                               reRender="webtechnologistCatalogListTable"
-                               action="#{webTechnologistCatalogListPage.createNewCatalog}"
+                               reRender="webtechnologistCatalogListTable" action="#{catalogListPage.createNewCatalog()}"
                                status="WebTechnologCatalogProcessStatus" value="Создать" />
         </h:panelGrid>
     </rich:modalPanel>
-    <rich:dataTable id="webtechnologistCatalogListTable" value="#{webTechnologistCatalogListPage.itemList}" var="item"
-                    rows="30" footerClass="data-table-footer"
+    <rich:dataTable id="webtechnologistCatalogListTable" value="#{catalogListPage.itemList}" var="item" rows="30"
+                    footerClass="data-table-footer"
                     columnClasses="center-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -272,9 +268,9 @@
                 <h:outputText escape="true" value="Состав каталога" />
             </f:facet>
             <a4j:commandLink value="Просмотр" rendered="#{not empty item.items}" ajaxSingle="true"
-                             onclick="Richfaces.showModalPanel('webtechnologistCatalogElementListPanel');"
+                             oncomplete="Richfaces.showModalPanel('webtechnologistCatalogElementListPanel');"
                              styleClass="command-link" reRender="webtechnologistCatalogListElementsTable">
-                <f:setPropertyActionListener value="#{item}" target="#{webTechnologistCatalogListPage.selectedItem}" />
+                <f:setPropertyActionListener value="#{item}" target="#{catalogListPage.selectedItem}" />
             </a4j:commandLink>
             <h:outputText escape="true" value="Элементы отсуствуют" rendered="#{empty item.items}" />
         </rich:column>
@@ -286,17 +282,17 @@
                              oncomplete="Richfaces.showModalPanel('webtechnologistCatalogEditPanel')"
                              reRender="webtechnologistCatalogEditPanel">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{item}" target="#{webTechnologistCatalogListPage.selectedItem}" />
+                <f:setPropertyActionListener value="#{item}" target="#{catalogListPage.selectedItem}" />
             </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText value="Удалить" escape="true" />
             </f:facet>
-            <a4j:commandLink ajaxSingle="true" styleClass="command-link"
-                             action="#{webTechnologistCatalogListPage.deleteItem}" reRender="workspaceTogglePanel">
+            <a4j:commandLink ajaxSingle="true" styleClass="command-link" action="#{catalogListPage.deleteItem()}"
+                             reRender="workspaceTogglePanel">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{item}" target="#{webTechnologistCatalogListPage.selectedItem}" />
+                <f:setPropertyActionListener value="#{item}" target="#{catalogListPage.selectedItem}" />
             </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">

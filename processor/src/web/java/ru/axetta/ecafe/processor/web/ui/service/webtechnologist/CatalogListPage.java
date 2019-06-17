@@ -25,7 +25,7 @@ import org.springframework.stereotype.Component;
 import java.util.Collections;
 import java.util.List;
 
-@Component("webTechnologistCatalogListPage")
+@Component
 @Scope("session")
 @DependsOn("runtimeContext")
 public class CatalogListPage extends BasicWorkspacePage {
@@ -150,8 +150,7 @@ public class CatalogListPage extends BasicWorkspacePage {
         WebTechnologistCatalogService service = RuntimeContext.getAppContext()
                 .getBean(WebTechnologistCatalogService.class);
         try {
-            WebTechnologistCatalogItem newItem = service
-                    .createNewElementOfCatalog(selectedItem, descriptionForNewElement);
+            service.createNewElementOfCatalog(selectedItem, descriptionForNewElement);
         } catch (Exception e) {
             logger.error("Не удалось создать элемент для справочника GUID:" + selectedItem.getGUID() + ", ошибка: ", e);
             printError("Не удалось создать элемент для справочника GUID:" + selectedItem.getGUID() + ", ошибка: " + e
