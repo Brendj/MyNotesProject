@@ -24,10 +24,10 @@
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <a4j:commandButton value="Применить" action="#{catalogListPage.updateCatalogList()}"
                                reRender="workspaceTogglePanel" styleClass="command-button"
-                               status="WebTechnologCatalogProcessStatus" />
+                               status="WebTechnologCatalogProcessStatus"  />
             <a4j:commandButton value="Очистить" action="#{catalogListPage.dropAndReloadCatalogList()}"
                                status="WebTechnologCatalogProcessStatus" reRender="workspaceTogglePanel"
-                               ajaxSingle="true" styleClass="command-button" />
+                                styleClass="command-button" />
         </h:panelGrid>
     </rich:simpleTogglePanel>
     <a4j:status id="WebTechnologCatalogProcessStatus">
@@ -116,8 +116,8 @@
         </f:facet>
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText value="Название справочника" styleClass="output-text" />
-            <h:inputText onchange="#{catalogListPage.selectedItem.hasBeenChanged()}"
-                         value="#{catalogListPage.selectedItem.catalogName}" styleClass="input-text" />
+            <h:inputText onchange="if(#{not catalogListPage.selectedItem == null}) #{catalogListPage.selectedItem.isChanged()}"
+                         value="if(#{not catalogListPage.selectedItem == null}) #{catalogListPage.selectedItem.catalogName}" styleClass="input-text" />
         </h:panelGrid>
         <rich:dataTable id="webtechnologistCatalogEditListElementsTable"
                         value="#{catalogListPage.selectedItem.items.toArray()}" var="catalogEditElement" rows="20"
@@ -163,7 +163,7 @@
                 <f:facet name="header">
                     <h:outputText value="Удалить" escape="true" />
                 </f:facet>
-                <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                <a4j:commandLink  styleClass="command-link"
                                  action="#{catalogListPage.deleteCatalogElement()}"
                                  reRender="webtechnologistCatalogEditListElementsTable">
                     <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
@@ -192,7 +192,7 @@
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <a4j:commandButton onclick="Richfaces.hideModalPanel('webtechnologistCatalogEditPanel')"
                                reRender="workspaceTogglePanel" value="Закрыть"
-                               status="WebTechnologCatalogProcessStatus" />
+                               status="WebTechnologCatalogProcessStatus"/>
             <a4j:commandButton reRender="webtechnologistCatalogEditListElementsTable"
                                action="#{catalogListPage.applyChange()}" status="WebTechnologCatalogProcessStatus"
                                value="Сохранить изменения" />
@@ -267,7 +267,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Состав каталога" />
             </f:facet>
-            <a4j:commandLink value="Просмотр" rendered="#{not empty item.items}" ajaxSingle="true"
+            <a4j:commandLink value="Просмотр" rendered="#{not empty item.items}"
                              oncomplete="Richfaces.showModalPanel('webtechnologistCatalogElementListPanel');"
                              styleClass="command-link" reRender="webtechnologistCatalogListElementsTable">
                 <f:setPropertyActionListener value="#{item}" target="#{catalogListPage.selectedItem}" />
@@ -278,10 +278,10 @@
             <f:facet name="header">
                 <h:outputText value="Изменить" escape="true" />
             </f:facet>
-            <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+            <a4j:commandLink  styleClass="command-link"
                              oncomplete="Richfaces.showModalPanel('webtechnologistCatalogEditPanel')"
                              reRender="webtechnologistCatalogEditPanel">
-                <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
+                <h:graphicImage value="/images/16x16/edit.png" style="border: 0;"/>
                 <f:setPropertyActionListener value="#{item}" target="#{catalogListPage.selectedItem}" />
             </a4j:commandLink>
         </rich:column>
@@ -289,7 +289,7 @@
             <f:facet name="header">
                 <h:outputText value="Удалить" escape="true" />
             </f:facet>
-            <a4j:commandLink ajaxSingle="true" styleClass="command-link" action="#{catalogListPage.deleteItem()}"
+            <a4j:commandLink  styleClass="command-link" action="#{catalogListPage.deleteItem()}"
                              reRender="workspaceTogglePanel">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item}" target="#{catalogListPage.selectedItem}" />

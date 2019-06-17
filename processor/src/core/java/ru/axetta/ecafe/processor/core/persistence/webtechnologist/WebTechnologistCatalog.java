@@ -132,7 +132,7 @@ public class WebTechnologistCatalog {
         isChanged = changed;
     }
 
-    public void hasBeenChanged() {
+    public void isChanged() {
         isChanged = true;
     }
 }
