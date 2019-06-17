@@ -8393,6 +8393,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         }
                     }
                 }
+                if (cultureEnterInfo.getChildrens().get(0).getChild().size() == 0) return new CultureEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
             }
             cultureEnterInfo.setValidityCard(true);
             cultureEnterInfo.resultCode = RC_OK;
