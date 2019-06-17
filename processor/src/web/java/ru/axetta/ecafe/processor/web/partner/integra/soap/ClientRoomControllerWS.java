@@ -8351,11 +8351,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Long lCardId = Long.parseLong(cardId);
             lCardId = SummaryCardsMSRService.convertCardId(lCardId);
             Card card = DAOUtils.findCardByCardNo(session, lCardId);
-            if (card == null) {
+            if (card == null || !card.isActive()) {
                 return new CultureEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
             }
             Client client = card.getClient();
-            if (client == null || client.isDeletedOrLeaving() || !card.isActive()) {
+            if (client == null || client.isDeletedOrLeaving()) {
                 return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
 
