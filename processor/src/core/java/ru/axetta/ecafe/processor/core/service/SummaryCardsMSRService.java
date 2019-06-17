@@ -116,6 +116,7 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
     }
 
     public void culture(Date startDate, Date endDate) throws RuntimeException {
+        logger.info("Start culture summary task");
         try {
             String filename = RuntimeContext.getInstance().getPropertiesValue(FOLDER_PROPERTY, null);
             if (filename == null) {
@@ -146,7 +147,7 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
                     + " from cf_clients\n"
                     + " inner join cf_client_guardian on cf_client_guardian.idofchildren = cf_clients.idofclient\n"
                     + " inner join cf_cards on cf_client_guardian.idofguardian = cf_cards.idofclient\n"
-                    + " inner join cf_clientgroups on cf_clientgroups.idofclientgroup = cf_clients.idofclientgroup\n"
+                    + " inner join cf_clientgroups on cf_clientgroups.idofclientgroup = cf_clients.idofclientgroup and cf_clientgroups.idoforg = cf_clients.idoforg\n"
                     + " where cf_clients.idofclientgroup not between :group_employees and :group_deleted\n"
                     + " and cf_clients.clientguid is not null  \n"
                     + " and cf_cards.state in (:card_states)  \n"
@@ -169,6 +170,7 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
     }
 
     private void uploadFile (String filename, List<String>  result) throws IOException {
+        logger.info("Start upload file to ftp task");
         File file = new File(filename);
         FileUtils.writeLines(file, result);
 
