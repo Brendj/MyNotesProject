@@ -2094,8 +2094,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                             .put(CoverageNutritionDynamicBean.ORG_CARD_COMPLEXES, new HashMap<String, List<String>>());
                 }
 
-                if (!complexMap.get(CoverageNutritionDynamicBean.ORG_CARD_COMPLEXES).containsKey(foodType) && !foodType
-                        .startsWith(CoverageNutritionDynamicBean.MENU_TYPE_BUFFET)) {
+                if (!complexMap.get(CoverageNutritionDynamicBean.ORG_CARD_COMPLEXES).containsKey(foodType)) {
                     complexMap.get(CoverageNutritionDynamicBean.ORG_CARD_COMPLEXES)
                             .put(foodType, new ArrayList<String>());
                 }
