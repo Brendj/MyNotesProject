@@ -61,17 +61,17 @@ public class WebTechnologistCatalogService {
         return criteria.list();
     }
 
-    public void deleteItem(WebTechnologistCatalog webTechnologistCatalog) {
+    public void deleteItem(WebTechnologistCatalog webTechnologistCatalog)throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
             webTechnologistCatalog.setDeleteState(true);
             webTechnologistCatalog.setLastUpdate(new Date());
 
-            session.update(webTechnologistCatalog);
+            session.merge(webTechnologistCatalog);
 
             transaction.commit();
             transaction = null;
@@ -136,11 +136,11 @@ public class WebTechnologistCatalogService {
     }
 
     public void deleteCatalogElement(WebTechnologistCatalog webTechnologistCatalog,
-            WebTechnologistCatalogItem selectedCatalogElement) {
+            WebTechnologistCatalogItem selectedCatalogElement) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             Date lastUpdateDate = new Date();
 
@@ -172,7 +172,7 @@ public class WebTechnologistCatalogService {
         Session session = null;
         Transaction transaction = null;
         try{
-            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
             String GUID = UUID.randomUUID().toString();
@@ -205,27 +205,30 @@ public class WebTechnologistCatalogService {
         }
     }
 
-    public void applyChange(WebTechnologistCatalog changedCatalog) {
+    public void applyChange(WebTechnologistCatalog changedCatalog) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
-            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             Long nextVersionForCatalog = getNextVersionForCatalog(session);
             Long nextVersionForCatalogItem = getNextVersionForCatalogItem(session);
             Date lastUpdateDate = new Date();
+            boolean catalogChanged = false;
 
-            if(changedCatalog.getChanged()){
-                changedCatalog.setVersion(nextVersionForCatalog);
-                changedCatalog.setLastUpdate(lastUpdateDate);
-            }
             for(WebTechnologistCatalogItem item : changedCatalog.getItems()){
                 if(item.getChanged()){
                     item.setVersion(nextVersionForCatalogItem);
                     item.setLastUpdate(lastUpdateDate);
+                    catalogChanged = true;
+                    session.merge(item);
                 }
             }
-            session.merge(changedCatalog);
+            if(catalogChanged) {
+                changedCatalog.setVersion(nextVersionForCatalog);
+                changedCatalog.setLastUpdate(lastUpdateDate);
+                session.merge(changedCatalog);
+            }
 
             transaction.commit();
             transaction = null;

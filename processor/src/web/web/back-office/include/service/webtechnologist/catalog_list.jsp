@@ -111,13 +111,12 @@
         </f:facet>
         <f:facet name="controls">
             <h:panelGroup>
-                <rich:componentControl for="groupCreatePanel" attachTo="hidelink" operation="hide" event="onclick" />
+                <rich:componentControl for="webtechnologistCatalogEditPanel" attachTo="hidelink" operation="hide" event="onclick" />
             </h:panelGroup>
         </f:facet>
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText value="Название справочника" styleClass="output-text" />
-            <h:inputText onchange="if(#{not catalogListPage.selectedItem == null}) #{catalogListPage.selectedItem.isChanged()}"
-                         value="if(#{not catalogListPage.selectedItem == null}) #{catalogListPage.selectedItem.catalogName}" styleClass="input-text" />
+            <h:inputText value="#{catalogListPage.catalogNameOfSelectedItem}" styleClass="input-text" />
         </h:panelGrid>
         <rich:dataTable id="webtechnologistCatalogEditListElementsTable"
                         value="#{catalogListPage.selectedItem.items.toArray()}" var="catalogEditElement" rows="20"
@@ -127,7 +126,7 @@
                 <f:facet name="header">
                     <h:outputText escape="true" value="Описание" />
                 </f:facet>
-                <h:inputText onchange="#{catalogEditElement.hasBeenChanged()}" value="#{catalogEditElement.description}"
+                <h:inputText onchange="#{catalogEditElement.isChanged()}" value="#{catalogEditElement.description}"
                              styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
@@ -207,7 +206,7 @@
         </f:facet>
         <f:facet name="controls">
             <h:panelGroup>
-                <rich:componentControl for="groupCreatePanel" attachTo="hidelink" operation="hide" event="onclick" />
+                <rich:componentControl for="webtechnologistCatalogCreatePanel" attachTo="hidelink" operation="hide" event="onclick" />
             </h:panelGroup>
         </f:facet>
         <h:panelGrid columns="2" styleClass="borderless-grid">
@@ -283,6 +282,7 @@
                              reRender="webtechnologistCatalogEditPanel">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;"/>
                 <f:setPropertyActionListener value="#{item}" target="#{catalogListPage.selectedItem}" />
+                <f:setPropertyActionListener value="#{item.catalogName}" target="#{catalogListPage.catalogNameOfSelectedItem}" />
             </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">

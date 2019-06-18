@@ -40,6 +40,7 @@ public class CatalogListPage extends BasicWorkspacePage {
     private Boolean showOnlyActive = false;
     private String nameForNewCatalog;
     private String descriptionForNewElement;
+    private String catalogNameOfSelectedItem;
 
     public void updateCatalogList() {
         WebTechnologistCatalogService service = RuntimeContext.getAppContext()
@@ -159,6 +160,9 @@ public class CatalogListPage extends BasicWorkspacePage {
     }
 
     public void applyChange() {
+        if(selectedItem != null && !StringUtils.isBlank(catalogNameOfSelectedItem) && !selectedItem.getCatalogName().equals(catalogNameOfSelectedItem)){
+            selectedItem.setCatalogName(catalogNameOfSelectedItem);
+        }
         WebTechnologistCatalogService service = RuntimeContext.getAppContext()
                 .getBean(WebTechnologistCatalogService.class);
         try{
@@ -239,5 +243,13 @@ public class CatalogListPage extends BasicWorkspacePage {
 
     public void setSelectedCatalogElement(WebTechnologistCatalogItem selectedCatalogElement) {
         this.selectedCatalogElement = selectedCatalogElement;
+    }
+
+    public String getCatalogNameOfSelectedItem() {
+        return catalogNameOfSelectedItem;
+    }
+
+    public void setCatalogNameOfSelectedItem(String catalogNameOfSelectedItem) {
+        this.catalogNameOfSelectedItem = catalogNameOfSelectedItem;
     }
 }

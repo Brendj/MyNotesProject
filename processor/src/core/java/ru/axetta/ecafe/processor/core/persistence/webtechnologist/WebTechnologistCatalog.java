@@ -21,9 +21,6 @@ public class WebTechnologistCatalog {
     private User userCreator;
     private Set<WebTechnologistCatalogItem> items;
 
-    // For web interface only
-    private Boolean isChanged = false;
-
     public WebTechnologistCatalog(){
         // For Hibernate
     }
@@ -122,17 +119,5 @@ public class WebTechnologistCatalog {
         }
         WebTechnologistCatalog catalog = (WebTechnologistCatalog) o;
         return this.idOfWebTechnologistCatalog.equals(catalog.idOfWebTechnologistCatalog);
-    }
-
-    public Boolean getChanged() {
-        return isChanged;
-    }
-
-    public void setChanged(Boolean changed) {
-        isChanged = changed;
-    }
-
-    public void isChanged() {
-        isChanged = true;
     }
 }

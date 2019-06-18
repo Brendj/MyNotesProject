@@ -99,7 +99,7 @@ public class WebTechnologistCatalogItem {
         isChanged = changed;
     }
 
-    public void hasBeenChanged() {
+    public void isChanged(){
         isChanged = true;
     }
 
