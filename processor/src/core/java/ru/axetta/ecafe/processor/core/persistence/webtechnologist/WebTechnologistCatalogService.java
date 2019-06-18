@@ -240,4 +240,25 @@ public class WebTechnologistCatalogService {
             HibernateUtils.close(session, logger);
         }
     }
+
+    public WebTechnologistCatalog refreshCatalog(WebTechnologistCatalog catalog) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+
+            session.refresh(catalog);
+
+            transaction.commit();
+            transaction = null;
+            return catalog;
+        }  catch (Exception e) {
+            logger.error("Can't apply change for catalog: ", e);
+            throw e;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
 }

@@ -98,6 +98,7 @@ public class CatalogListPage extends BasicWorkspacePage {
                     .getBean(WebTechnologistCatalogService.class);
             WebTechnologistCatalog newCatalog = service.createNewCatalog(nameForNewCatalog, currentUser);
             itemList.add(newCatalog);
+            nameForNewCatalog = "";
         } catch (Exception e) {
             logger.error("Can't create new catalog: ", e);
             printError("Не удалось создать новый справочник: " + e.getMessage());
@@ -111,6 +112,9 @@ public class CatalogListPage extends BasicWorkspacePage {
         GUIDfilter = "";
         selectedItem = null;
         selectedCatalogElement = null;
+        catalogNameOfSelectedItem = "";
+        nameForNewCatalog = "";
+        descriptionForNewElement = "";
         itemList.clear();
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
@@ -134,7 +138,6 @@ public class CatalogListPage extends BasicWorkspacePage {
                 .getBean(WebTechnologistCatalogService.class);
         try {
             service.deleteCatalogElement(selectedItem, selectedCatalogElement);
-
         } catch (Exception e) {
             logger.error("Не удалось обновить состояние элемента каталога GUID " + selectedCatalogElement.getGUID()
                     + ", ошибка: ", e);
@@ -152,6 +155,7 @@ public class CatalogListPage extends BasicWorkspacePage {
                 .getBean(WebTechnologistCatalogService.class);
         try {
             service.createNewElementOfCatalog(selectedItem, descriptionForNewElement);
+            descriptionForNewElement = "";
         } catch (Exception e) {
             logger.error("Не удалось создать элемент для справочника GUID:" + selectedItem.getGUID() + ", ошибка: ", e);
             printError("Не удалось создать элемент для справочника GUID:" + selectedItem.getGUID() + ", ошибка: " + e
@@ -172,6 +176,26 @@ public class CatalogListPage extends BasicWorkspacePage {
                     + ", ошибка: ", e);
             printError("Не удалось применить изменения элемент для справочника GUID:" + selectedItem.getGUID()
                     + ", ошибка: " + e.getMessage());
+        }
+    }
+
+    public void clearNameForNewCatalog() {
+        nameForNewCatalog = "";
+    }
+
+    public void clearDescriptionForNewElementAndDropChanges() {
+        descriptionForNewElement = "";
+        if(selectedItem != null){
+            WebTechnologistCatalogService service = RuntimeContext.getAppContext()
+                    .getBean(WebTechnologistCatalogService.class);
+            try{
+                service.refreshCatalog(selectedItem);
+            } catch (Exception e){
+                logger.error("Не удалось сбросить изменения для каталога:" + selectedItem.getGUID()
+                        + ", ошибка: ", e);
+                printError("Не удалось сбросить изменения для каталога:" + selectedItem.getGUID()
+                        + ", ошибка: " + e.getMessage());
+            }
         }
     }
 

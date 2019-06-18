@@ -189,8 +189,8 @@
                                status="WebTechnologCatalogProcessStatus" />
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
-            <a4j:commandButton onclick="Richfaces.hideModalPanel('webtechnologistCatalogEditPanel')"
-                               reRender="workspaceTogglePanel" value="Закрыть"
+            <a4j:commandButton oncomplete="Richfaces.hideModalPanel('webtechnologistCatalogEditPanel')"
+                               reRender="workspaceTogglePanel, webtechnologistCatalogEditPanel" value="Закрыть" action="#{catalogListPage.clearDescriptionForNewElementAndDropChanges()}"
                                status="WebTechnologCatalogProcessStatus"/>
             <a4j:commandButton reRender="webtechnologistCatalogEditListElementsTable"
                                action="#{catalogListPage.applyChange()}" status="WebTechnologCatalogProcessStatus"
@@ -212,13 +212,14 @@
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Название справочника" styleClass="output-text" />
             <h:inputText value="#{catalogListPage.nameForNewCatalog}" styleClass="input-text" />
-            <a4j:commandButton onclick="Richfaces.hideModalPanel('webtechnologistCatalogCreatePanel')" value="Закрыть"
-                               status="WebTechnologCatalogProcessStatus" />
+            <a4j:commandButton oncomplete="Richfaces.hideModalPanel('webtechnologistCatalogCreatePanel')" value="Закрыть"
+                               status="WebTechnologCatalogProcessStatus"  action="#{catalogListPage.clearNameForNewCatalog()}" reRender="webtechnologistCatalogCreatePanel"/>
             <a4j:commandButton oncomplete="Richfaces.hideModalPanel('webtechnologistCatalogCreatePanel')"
-                               reRender="webtechnologistCatalogListTable" action="#{catalogListPage.createNewCatalog()}"
+                               reRender="webtechnologistCatalogListTable, webtechnologistCatalogCreatePanel" action="#{catalogListPage.createNewCatalog()}"
                                status="WebTechnologCatalogProcessStatus" value="Создать" />
         </h:panelGrid>
     </rich:modalPanel>
+    <!-- Main page -->
     <rich:dataTable id="webtechnologistCatalogListTable" value="#{catalogListPage.itemList}" var="item" rows="30"
                     footerClass="data-table-footer"
                     columnClasses="center-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
