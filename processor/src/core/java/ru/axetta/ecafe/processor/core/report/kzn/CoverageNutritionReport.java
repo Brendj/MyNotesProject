@@ -234,8 +234,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
 
             if (showComplexesByOrgCard && !managerList.isEmpty()) {
                 HashMap<String, HashMap<String, List<String>>> orgCardComplexMap = loadOrgCardComplexMap(session,
-                        itemHashMap.keySet(), startDate, endDate, managerList, showYoungerClasses, showMiddleClasses,
-                        showOlderClasses, showFreeNutrition, showPaidNutrition, showBuffet);
+                        itemHashMap.keySet(), startDate, endDate, managerList, showFreeNutrition, showPaidNutrition,
+                        showBuffet);
                 updateTemplateByComplexMap(reportBuilder, orgCardComplexMap, columnTitleGroupBuilderList, true);
                 loadComplexByOrgCardData(session, itemHashMap, startDate, endDate, managerList);
                 loadBuffetByOrgCardData(session, itemHashMap, startDate, endDate, managerList);
@@ -1444,20 +1444,26 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<String>();
             List<String> classesNotConditionList = new ArrayList<String>();
-            if (showYoungerClasses) {
-                classesConditionList.add(String.format(conditionString, "", 1, 4));
-            } else {
-                classesNotConditionList.add(String.format(conditionString, "not", 1, 4));
+            if (null != showYoungerClasses) {
+                if (showYoungerClasses) {
+                    classesConditionList.add(String.format(conditionString, "", 1, 4));
+                } else {
+                    classesNotConditionList.add(String.format(conditionString, "not", 1, 4));
+                }
             }
-            if (showMiddleClasses) {
-                classesConditionList.add(String.format(conditionString, "", 5, 9));
-            } else {
-                classesNotConditionList.add(String.format(conditionString, "not", 5, 9));
+            if (null != showMiddleClasses) {
+                if (showMiddleClasses) {
+                    classesConditionList.add(String.format(conditionString, "", 5, 9));
+                } else {
+                    classesNotConditionList.add(String.format(conditionString, "not", 5, 9));
+                }
             }
-            if (showOlderClasses) {
-                classesConditionList.add(String.format(conditionString, "", 10, 11));
-            } else {
-                classesNotConditionList.add(String.format(conditionString, "not", 10, 11));
+            if (null != showOlderClasses) {
+                if (showOlderClasses) {
+                    classesConditionList.add(String.format(conditionString, "", 10, 11));
+                } else {
+                    classesNotConditionList.add(String.format(conditionString, "not", 10, 11));
+                }
             }
             if (showComplexesByOrgCard && !managerList.isEmpty()) {
                 classesConditionList.add(String.format("c.idofclient in (%s)", StringUtils.join(managerList, ",")));
@@ -2051,11 +2057,10 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
 
         private HashMap<String, HashMap<String, List<String>>> loadOrgCardComplexMap(Session session,
                 Collection<Long> idOfOrgList, Date startDate, Date endDate, List<Long> managerList,
-                Boolean showYoungerClasses, Boolean showMiddleClasses, Boolean showOlderClasses,
                 Boolean showFreeNutrition, Boolean showPaidNutrition, Boolean showBuffet) {
             HashMap<String, HashMap<String, List<String>>> complexMap = new HashMap<>();
             String sqlString = "select distinct "
-                    + "   case when od.menutype between 50 and 99 then od.menudetailname else '' end as complexname, "
+                    + "   case when od.menutype between 50 and 99 or od.menutype = 0 then od.menudetailname else '' end as complexname, "
                     + "   case when (od.menutype between 50 and 99 or od.menutype = 0) and od.rprice > 0 then od.rprice "
                     + "       when (od.menutype between 50 and 99 or od.menutype = 0) and od.rprice = 0 and od.discount > 0 then od.discount else 0 end as price, "
                     + "   case when od.menutype = 0 and od.menuorigin in (0, 1) then 'Буфет горячее' "
@@ -2069,8 +2074,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and od.menutype < 150 "
                     + "     and og.organizationtype = 0 and c.idofclient in (:managerList)";
 
-            sqlString += generateQueryConditions(managerList, showYoungerClasses, showMiddleClasses, showOlderClasses,
-                    true, showFreeNutrition, showPaidNutrition, showBuffet, true);
+            sqlString += generateQueryConditions(managerList, null, null, null, true, showFreeNutrition,
+                    showPaidNutrition, showBuffet, true);
             Query query = session.createSQLQuery(sqlString);
             query.setParameterList("idOfOrgList", idOfOrgList);
             query.setParameter("startDate", startDate.getTime());
@@ -2089,7 +2094,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                             .put(CoverageNutritionDynamicBean.ORG_CARD_COMPLEXES, new HashMap<String, List<String>>());
                 }
 
-                if (!complexMap.get(CoverageNutritionDynamicBean.ORG_CARD_COMPLEXES).containsKey(foodType)) {
+                if (!complexMap.get(CoverageNutritionDynamicBean.ORG_CARD_COMPLEXES).containsKey(foodType) && !foodType
+                        .startsWith(CoverageNutritionDynamicBean.MENU_TYPE_BUFFET)) {
                     complexMap.get(CoverageNutritionDynamicBean.ORG_CARD_COMPLEXES)
                             .put(foodType, new ArrayList<String>());
                 }
