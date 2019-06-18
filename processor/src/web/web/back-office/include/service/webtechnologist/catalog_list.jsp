@@ -38,7 +38,7 @@
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
     <!-- ********* VIEW MODAL PANEL ********* -->
-    <rich:modalPanel id="webtechnologistCatalogElementListPanel" width="600" height="600">
+    <rich:modalPanel id="webtechnologistCatalogElementListPanel" width="750" height="600">
         <f:facet name="header">
             <h:panelGroup>
                 <h:outputText value="Просмотр элементов справочника" />
