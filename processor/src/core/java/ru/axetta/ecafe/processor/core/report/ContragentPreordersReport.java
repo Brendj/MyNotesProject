@@ -172,34 +172,33 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
             if(!CollectionUtils.isEmpty(idOfOrgList)){
                 query.setParameterList("idOfOrgList", idOfOrgList);
             }
-
             List<Object[]> dataFromDB = query.list();
-            if(dataFromDB != null){
-                for(Object[] row : dataFromDB) {
-                    Long idOfContragent = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
-                    String contragentName = (String) row[1];
-                    Long idOfOrg = DataBaseSafeConverterUtils. getLongFromBigIntegerOrNull(row[2]);
-                    String orgShortName = (String) row[3];
-                    String orgShortAddress = (String) row[4];
-                    Long clientContractId = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[5]);
-                    Date preorderDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[6]);
-                    String complexName = (String) row[7];
-                    Integer amount = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[8]).intValue();
-                    String dish = (String) row[9];
-                    Long complexPrice = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[10]);
-                    Date cancelDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[11]);
-                    String reversed = (String) row[12];
-                    Date createdDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[13]);
-                    Long orderSum = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[14]);
-                    Long idOfOrder = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[15]);
-                    String isPaid = (String) row[16];
-                    ContragentPreordersReportItem item = new ContragentPreordersReportItem(
-                            idOfContragent, contragentName, idOfOrg, orgShortName, orgShortAddress, clientContractId,
-                            preorderDate, complexName, amount, dish, complexPrice, cancelDate,
-                            reversed, createdDate, orderSum, idOfOrder, isPaid
-                            );
-                    result.add(item);
-                }
+
+            if (CollectionUtils.isEmpty(dataFromDB)) {
+                throw new Exception("Нет данных для построения отчета");
+            }
+            for (Object[] row : dataFromDB) {
+                Long idOfContragent = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
+                String contragentName = (String) row[1];
+                Long idOfOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[2]);
+                String orgShortName = (String) row[3];
+                String orgShortAddress = (String) row[4];
+                Long clientContractId = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[5]);
+                Date preorderDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[6]);
+                String complexName = (String) row[7];
+                Integer amount = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[8]).intValue();
+                String dish = (String) row[9];
+                Long complexPrice = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[10]);
+                Date cancelDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[11]);
+                String reversed = (String) row[12];
+                Date createdDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[13]);
+                Long orderSum = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[14]);
+                Long idOfOrder = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[15]);
+                String isPaid = (String) row[16];
+                ContragentPreordersReportItem item = new ContragentPreordersReportItem(idOfContragent, contragentName,
+                        idOfOrg, orgShortName, orgShortAddress, clientContractId, preorderDate, complexName, amount,
+                        dish, complexPrice, cancelDate, reversed, createdDate, orderSum, idOfOrder, isPaid);
+                result.add(item);
             }
             return new JRBeanCollectionDataSource(result);
         }
