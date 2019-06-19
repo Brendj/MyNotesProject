@@ -103,7 +103,7 @@
         </rich:dataTable>
     </rich:modalPanel>
     <!-- ********* EDIT MODAL PANEL ********* -->
-    <rich:modalPanel id="webtechnologistCatalogEditPanel" width="800" height="600" resizeable="false" domElementAttachment="form">
+    <rich:modalPanel id="webtechnologistCatalogEditPanel" width="830" height="600" resizeable="false" domElementAttachment="form">
         <f:facet name="header">
             <h:panelGroup>
                 <h:outputText value="Редактирование справочника" />
@@ -126,7 +126,7 @@
                 <f:facet name="header">
                     <h:outputText escape="true" value="Описание" />
                 </f:facet>
-                <h:inputText onchange="#{catalogEditElement.isChanged()}" value="#{catalogEditElement.description}"
+                <h:inputText value="#{catalogEditElement.description}"
                              styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
@@ -160,12 +160,19 @@
             </rich:column>
             <rich:column headerClass="column-header">
                 <f:facet name="header">
-                    <h:outputText value="Удалить" escape="true" />
+                    <h:outputText value="Удалить/Восстановить" escape="true" />
                 </f:facet>
-                <a4j:commandLink  styleClass="command-link"
+                <a4j:commandLink  styleClass="command-link" rendered="#{not catalogEditElement.deleteState}"
                                  action="#{catalogListPage.deleteCatalogElement()}"
                                  reRender="webtechnologistCatalogEditListElementsTable">
                     <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                    <f:setPropertyActionListener value="#{catalogEditElement}"
+                                                 target="#{catalogListPage.selectedCatalogElement}" />
+                </a4j:commandLink>
+                <a4j:commandLink  styleClass="command-link" rendered="#{catalogEditElement.deleteState}"
+                                  action="#{catalogListPage.restoreCatalogElement()}"
+                                  reRender="webtechnologistCatalogEditListElementsTable">
+                    <h:graphicImage value="/images/tips/add.png" style="border: 0;" />
                     <f:setPropertyActionListener value="#{catalogEditElement}"
                                                  target="#{catalogListPage.selectedCatalogElement}" />
                 </a4j:commandLink>
@@ -198,7 +205,7 @@
         </h:panelGrid>
     </rich:modalPanel>
     <!-- ********* CREATE MODAL PANEL ********* -->
-    <rich:modalPanel id="webtechnologistCatalogCreatePanel" width="300" height="150" resizeable="false" domElementAttachment="form">
+    <rich:modalPanel id="webtechnologistCatalogCreatePanel" width="300" height="120" resizeable="false" domElementAttachment="form">
         <f:facet name="header">
             <h:panelGroup>
                 <h:outputText value="Создание справочника" />
@@ -288,12 +295,21 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText value="Удалить" escape="true" />
+                <h:outputText value="Удалить/Восстановить" escape="true" />
             </f:facet>
-            <a4j:commandLink  styleClass="command-link" action="#{catalogListPage.deleteItem()}"
-                             reRender="workspaceTogglePanel">
+            <a4j:commandLink  styleClass="command-link" rendered="#{not item.deleteState}"
+                              action="#{catalogListPage.deleteItem()}"
+                              reRender="webtechnologistCatalogListTable">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{item}" target="#{catalogListPage.selectedItem}" />
+                <f:setPropertyActionListener value="#{item}"
+                                             target="#{catalogListPage.selectedItem}" />
+            </a4j:commandLink>
+            <a4j:commandLink  styleClass="command-link" rendered="#{item.deleteState}"
+                              action="#{catalogListPage.restoreItem()}"
+                              reRender="webtechnologistCatalogListTable">
+                <h:graphicImage value="/images/tips/add.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{item}"
+                                             target="#{catalogListPage.selectedItem}" />
             </a4j:commandLink>
         </rich:column>
         <f:facet name="footer">

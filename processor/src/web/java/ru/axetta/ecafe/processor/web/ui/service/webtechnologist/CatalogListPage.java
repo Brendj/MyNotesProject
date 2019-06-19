@@ -81,8 +81,24 @@ public class CatalogListPage extends BasicWorkspacePage {
         try {
             service.deleteItem(selectedItem);
         } catch (Exception e) {
-            logger.error("Не удалось обновить состояние каталога GUID " + selectedItem.getGUID() + ", ошибка: ", e);
-            printMessage("Не удалось обновить состояние каталога GUID " + selectedItem.getGUID() + ", ошибка: " + e
+            logger.error("Не удалось обновить состояние справочнка GUID " + selectedItem.getGUID() + ", ошибка: ", e);
+            printMessage("Не удалось обновить состояние справочнка GUID " + selectedItem.getGUID() + ", ошибка: " + e
+                    .getMessage());
+        }
+    }
+
+    public void restoreItem() {
+        if (selectedItem == null) {
+            printError("Ошибка при попытке восстановить справочник: элемент не был выбран");
+            return;
+        }
+        WebTechnologistCatalogService service = RuntimeContext.getAppContext()
+                .getBean(WebTechnologistCatalogService.class);
+        try {
+            service.restoreItem(selectedItem);
+        } catch (Exception e) {
+            logger.error("Не удалось обновить состояние справочнка GUID " + selectedItem.getGUID() + ", ошибка: ", e);
+            printMessage("Не удалось обновить состояние справочнка GUID " + selectedItem.getGUID() + ", ошибка: " + e
                     .getMessage());
         }
     }
@@ -139,9 +155,26 @@ public class CatalogListPage extends BasicWorkspacePage {
         try {
             service.deleteCatalogElement(selectedItem, selectedCatalogElement);
         } catch (Exception e) {
-            logger.error("Не удалось обновить состояние элемента каталога GUID " + selectedCatalogElement.getGUID()
+            logger.error("Не удалось обновить состояние элемента справочнка GUID " + selectedCatalogElement.getGUID()
                     + ", ошибка: ", e);
-            printError("Не удалось обновить состояние элемента каталога GUID " + selectedCatalogElement.getGUID()
+            printError("Не удалось обновить состояние элемента справочнка GUID " + selectedCatalogElement.getGUID()
+                    + ", ошибка: " + e.getMessage());
+        }
+    }
+
+    public void restoreCatalogElement() {
+        if (selectedCatalogElement == null) {
+            printError("Ошибка при попытке восстановить элемент: элемент не был выбран");
+            return;
+        }
+        WebTechnologistCatalogService service = RuntimeContext.getAppContext()
+                .getBean(WebTechnologistCatalogService.class);
+        try {
+            service.restoreCatalogElement(selectedItem, selectedCatalogElement);
+        } catch (Exception e) {
+            logger.error("Не удалось обновить состояние элемента справочнка GUID " + selectedCatalogElement.getGUID()
+                    + ", ошибка: ", e);
+            printError("Не удалось обновить состояние элемента справочнка GUID " + selectedCatalogElement.getGUID()
                     + ", ошибка: " + e.getMessage());
         }
     }
@@ -164,16 +197,18 @@ public class CatalogListPage extends BasicWorkspacePage {
     }
 
     public void applyChange() {
-        if(selectedItem != null && !StringUtils.isBlank(catalogNameOfSelectedItem) && !selectedItem.getCatalogName().equals(catalogNameOfSelectedItem)){
+        boolean catalogIsChanged = false;
+        if (selectedItem != null && !StringUtils.isBlank(catalogNameOfSelectedItem) && !selectedItem.getCatalogName()
+                .equals(catalogNameOfSelectedItem)) {
             selectedItem.setCatalogName(catalogNameOfSelectedItem);
+            catalogIsChanged = true;
         }
         WebTechnologistCatalogService service = RuntimeContext.getAppContext()
                 .getBean(WebTechnologistCatalogService.class);
-        try{
-            service.applyChange(selectedItem);
-        } catch (Exception e){
-            logger.error("Не удалось применить изменения для справочника GUID:" + selectedItem.getGUID()
-                    + ", ошибка: ", e);
+        try {
+            service.applyChange(selectedItem, catalogIsChanged);
+        } catch (Exception e) {
+            logger.error("Не удалось применить изменения для справочника GUID:" + selectedItem.getGUID() + ", ошибка: ", e);
             printError("Не удалось применить изменения элемент для справочника GUID:" + selectedItem.getGUID()
                     + ", ошибка: " + e.getMessage());
         }
@@ -185,16 +220,15 @@ public class CatalogListPage extends BasicWorkspacePage {
 
     public void clearDescriptionForNewElementAndDropChanges() {
         descriptionForNewElement = "";
-        if(selectedItem != null){
+        if (selectedItem != null) {
             WebTechnologistCatalogService service = RuntimeContext.getAppContext()
                     .getBean(WebTechnologistCatalogService.class);
-            try{
+            try {
                 service.refreshCatalog(selectedItem);
-            } catch (Exception e){
-                logger.error("Не удалось сбросить изменения для каталога:" + selectedItem.getGUID()
-                        + ", ошибка: ", e);
-                printError("Не удалось сбросить изменения для каталога:" + selectedItem.getGUID()
-                        + ", ошибка: " + e.getMessage());
+            } catch (Exception e) {
+                logger.error("Не удалось сбросить изменения для справочнка:" + selectedItem.getGUID() + ", ошибка: ", e);
+                printError("Не удалось сбросить изменения для справочнка:" + selectedItem.getGUID() + ", ошибка: " + e
+                        .getMessage());
             }
         }
     }
