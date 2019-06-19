@@ -27,6 +27,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 @Component("ESZMigrantsUpdateService")
@@ -68,32 +69,42 @@ public class ESZMigrantsUpdateService {
 
             logger.info("Start updating esz migrants");
 
-            Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
-            criteria.createAlias("migrant", "m");
-            criteria.createAlias("m.clientMigrate", "client");
-            criteria.createAlias("client.org", "o");
-            criteria.add(Restrictions.eq("o.idOfOrg", idOfESZOrg));
-            criteria.add(Restrictions.ne("client.idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
-            Disjunction disjunction = Restrictions.disjunction();
-            disjunction.add(Restrictions.le("m.visitEndDate", currentDate));
-            disjunction.add(Restrictions.eq("resolution", VisitReqResolutionHist.RES_CANCELED));
-            disjunction.add(Restrictions.eq("resolution", VisitReqResolutionHist.RES_REJECTED));
-            criteria.add(disjunction);
-            criteria.setProjection(
-                    Projections.projectionList().add(Projections.distinct(Projections.property("m.clientMigrate")))
-                            .add(Projections.property("m.compositeIdOfMigrant")));
+            Criteria clientsCriteria = createMigrantCriteria(session, idOfESZOrg, currentDate, null);
 
-            List list = criteria.list();
-            for (Object o : list) {
-                Object[] row = (Object[]) o;
-                Client client = (Client) row[0];
-                CompositeIdOfMigrant idOfMigrant = (CompositeIdOfMigrant) row[1];
-                closeMigrantRequest(session, idOfMigrant, client);
-                ClientManager.ClientFieldConfigForUpdate fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
-                fieldConfig
-                        .setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
-                ClientManager.modifyClientTransactionFree(fieldConfig, null, "", client, session);
-                addGroupHistory(session, client, ClientGroup.Predefined.CLIENT_LEAVING);
+            List<Client> list = clientsCriteria.list();
+            for (Client client : list) {
+                Criteria migrantsCriteria = createMigrantCriteria(session, idOfESZOrg, currentDate, client);
+                List<Migrant> migrantList = migrantsCriteria.list();
+
+                boolean allMigrantRequestClosed = true;
+                for (Migrant migrant : migrantList) {
+                    VisitReqResolutionHist lastHistory;
+                    LinkedList<VisitReqResolutionHist> histList = new LinkedList<>(
+                            migrant.getVisitReqResolutionHists());
+                    if (histList.isEmpty()) {
+                        logger.error(String.format(
+                                "Empty resolutions history for migrant request: idOfOrgRegistry=%d, idOfRequest=%d",
+                                migrant.getCompositeIdOfMigrant().getIdOfOrgRegistry(),
+                                migrant.getCompositeIdOfMigrant().getIdOfRequest()));
+                        allMigrantRequestClosed = false;
+                        continue;
+                    }
+                    lastHistory = histList.getLast();
+                    if (Migrant.CLOSED != migrant.getSyncState() && migrant.getVisitEndDate().getTime() <= currentDate
+                            .getTime() && (lastHistory.getResolution().equals(VisitReqResolutionHist.RES_CANCELED)
+                            || (lastHistory.getResolution().equals(VisitReqResolutionHist.RES_REJECTED)))) {
+                        closeMigrantRequest(session, migrant, client);
+                    }
+
+                    allMigrantRequestClosed &= (migrant.getSyncState().equals(Migrant.CLOSED));
+                }
+
+                if (allMigrantRequestClosed) {
+                    ClientManager.ClientFieldConfigForUpdate fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
+                    fieldConfig.setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+                    ClientManager.modifyClientTransactionFree(fieldConfig, null, "", client, session);
+                    addGroupHistory(session, client, ClientGroup.Predefined.CLIENT_LEAVING);
+                }
             }
 
             transaction.commit();
@@ -106,13 +117,35 @@ public class ESZMigrantsUpdateService {
         }
     }
 
-    private void closeMigrantRequest(Session session, CompositeIdOfMigrant idOfMigrant, Client client) {
-        Migrant migrant = (Migrant) session.load(Migrant.class, idOfMigrant);
+    private Criteria createMigrantCriteria(Session session, Long idOfESZOrg, Date currentDate, Client client) {
+        Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
+        criteria.createAlias("migrant", "migrant");
+        criteria.createAlias("migrant.clientMigrate", "clientMigrate");
+        criteria.createAlias("clientMigrate.org", "org");
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfESZOrg));
+        criteria.add(Restrictions.ne("client.idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
+        if (null == client) {
+            Disjunction disjunction = Restrictions.disjunction();
+            disjunction.add(Restrictions.le("migrant.visitEndDate", currentDate));
+            disjunction.add(Restrictions.eq("resolution", VisitReqResolutionHist.RES_CANCELED));
+            disjunction.add(Restrictions.eq("resolution", VisitReqResolutionHist.RES_REJECTED));
+            criteria.add(disjunction);
+            criteria.add(Restrictions.ne("syncState", Migrant.CLOSED));
+            criteria.setProjection(Projections.distinct(Projections.property("migrant.clientMigrate")));
+        } else {
+            criteria.add(Restrictions.eq("migrant.clientMigrate", client));
+            criteria.setProjection(Projections.distinct(Projections.property("migrant")));
+        }
+        return criteria;
+    }
+
+    private void closeMigrantRequest(Session session, Migrant migrant, Client client) {
         if (null != migrant) {
             migrant.setSyncState(Migrant.CLOSED);
             session.merge(migrant);
-            session.save(ImportMigrantsService.createResolutionHistory(session, client, idOfMigrant.getIdOfRequest(),
-                    VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date()));
+            session.save(ImportMigrantsService
+                    .createResolutionHistory(session, client, migrant.getCompositeIdOfMigrant().getIdOfRequest(),
+                            VisitReqResolutionHist.RES_OVERDUE_SERVER, new Date()));
         }
     }
 
