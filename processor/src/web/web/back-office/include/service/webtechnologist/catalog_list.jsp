@@ -38,7 +38,7 @@
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
     <!-- ********* VIEW MODAL PANEL ********* -->
-    <rich:modalPanel id="webtechnologistCatalogElementListPanel" width="750" height="600">
+    <rich:modalPanel id="webtechnologistCatalogElementListPanel" minWidth="750" minHeight="600">
         <f:facet name="header">
             <h:panelGroup>
                 <h:outputText value="Просмотр элементов справочника" />
@@ -103,7 +103,7 @@
         </rich:dataTable>
     </rich:modalPanel>
     <!-- ********* EDIT MODAL PANEL ********* -->
-    <rich:modalPanel id="webtechnologistCatalogEditPanel" width="830" height="600" resizeable="false" domElementAttachment="form">
+    <rich:modalPanel id="webtechnologistCatalogEditPanel" minWidth="830" minHeight="600" resizeable="false" domElementAttachment="form">
         <f:facet name="header">
             <h:panelGroup>
                 <h:outputText value="Редактирование справочника" />
@@ -205,7 +205,7 @@
         </h:panelGrid>
     </rich:modalPanel>
     <!-- ********* CREATE MODAL PANEL ********* -->
-    <rich:modalPanel id="webtechnologistCatalogCreatePanel" width="300" height="120" resizeable="false" domElementAttachment="form">
+    <rich:modalPanel id="webtechnologistCatalogCreatePanel" minWidth="300" minHeight="120" resizeable="false" domElementAttachment="form">
         <f:facet name="header">
             <h:panelGroup>
                 <h:outputText value="Создание справочника" />

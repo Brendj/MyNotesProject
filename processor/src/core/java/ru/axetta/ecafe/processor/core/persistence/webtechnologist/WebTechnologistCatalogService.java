@@ -268,7 +268,7 @@ public class WebTechnologistCatalogService {
 
             for (WebTechnologistCatalogItem item : changedCatalog.getItems()) {
                 WebTechnologistCatalogItem itemFromDB = mapCatalogItemsFromDB.get(item.getIdOfWebTechnologistCatalogItem());
-                if (itemFromDB != null && !itemFromDB.getDescription().equals(item.getDescription())) {
+                if (itemFromDB != null && !(itemFromDB.getDescription().equals(item.getDescription()) && itemFromDB.getDeleteState().equals(item.getDeleteState()))) {
                     item.setVersion(nextVersionForCatalogItem);
                     item.setLastUpdate(lastUpdateDate);
                     catalogIsChanged = true;

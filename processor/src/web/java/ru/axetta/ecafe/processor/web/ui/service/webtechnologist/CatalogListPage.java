@@ -150,16 +150,7 @@ public class CatalogListPage extends BasicWorkspacePage {
             printError("Ошибка при попытке удаль элемент: элемент не был выбран");
             return;
         }
-        WebTechnologistCatalogService service = RuntimeContext.getAppContext()
-                .getBean(WebTechnologistCatalogService.class);
-        try {
-            service.deleteCatalogElement(selectedItem, selectedCatalogElement);
-        } catch (Exception e) {
-            logger.error("Не удалось обновить состояние элемента справочнка GUID " + selectedCatalogElement.getGUID()
-                    + ", ошибка: ", e);
-            printError("Не удалось обновить состояние элемента справочнка GUID " + selectedCatalogElement.getGUID()
-                    + ", ошибка: " + e.getMessage());
-        }
+        selectedCatalogElement.setDeleteState(true);
     }
 
     public void restoreCatalogElement() {
@@ -167,16 +158,7 @@ public class CatalogListPage extends BasicWorkspacePage {
             printError("Ошибка при попытке восстановить элемент: элемент не был выбран");
             return;
         }
-        WebTechnologistCatalogService service = RuntimeContext.getAppContext()
-                .getBean(WebTechnologistCatalogService.class);
-        try {
-            service.restoreCatalogElement(selectedItem, selectedCatalogElement);
-        } catch (Exception e) {
-            logger.error("Не удалось обновить состояние элемента справочнка GUID " + selectedCatalogElement.getGUID()
-                    + ", ошибка: ", e);
-            printError("Не удалось обновить состояние элемента справочнка GUID " + selectedCatalogElement.getGUID()
-                    + ", ошибка: " + e.getMessage());
-        }
+        selectedCatalogElement.setDeleteState(false);
     }
 
     public void addElementToSelectedCatalog() {
