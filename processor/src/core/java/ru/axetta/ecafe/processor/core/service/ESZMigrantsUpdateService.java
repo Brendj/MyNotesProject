@@ -90,9 +90,9 @@ public class ESZMigrantsUpdateService {
                         continue;
                     }
                     lastHistory = histList.getLast();
-                    if (Migrant.CLOSED != migrant.getSyncState() && migrant.getVisitEndDate().getTime() <= currentDate
-                            .getTime() && (lastHistory.getResolution().equals(VisitReqResolutionHist.RES_CANCELED)
-                            || (lastHistory.getResolution().equals(VisitReqResolutionHist.RES_REJECTED)))) {
+                    if (Migrant.CLOSED != migrant.getSyncState() && (migrant.getVisitEndDate().getTime() <= currentDate
+                            .getTime() || (lastHistory.getResolution().equals(VisitReqResolutionHist.RES_CANCELED)
+                            || (lastHistory.getResolution().equals(VisitReqResolutionHist.RES_REJECTED))))) {
                         closeMigrantRequest(session, migrant, client);
                     }
 
@@ -123,7 +123,7 @@ public class ESZMigrantsUpdateService {
         criteria.createAlias("migrant.clientMigrate", "clientMigrate");
         criteria.createAlias("clientMigrate.org", "org");
         criteria.add(Restrictions.eq("org.idOfOrg", idOfESZOrg));
-        criteria.add(Restrictions.ne("client.idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
+        criteria.add(Restrictions.ne("clientMigrate.idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
         if (null == client) {
             Disjunction disjunction = Restrictions.disjunction();
             disjunction.add(Restrictions.le("migrant.visitEndDate", currentDate));
