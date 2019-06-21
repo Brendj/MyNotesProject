@@ -179,7 +179,7 @@ public class ESZMigrantsUpdateService {
         }
         try {
             logger.info("Scheduling update esz migrants service job: " + syncSchedule);
-            JobDetail job = new JobDetail("ImportMigrantsFile", Scheduler.DEFAULT_GROUP, ESZMigrantsUpdateJob.class);
+            JobDetail job = new JobDetail("ESZMigrantsUpdate", Scheduler.DEFAULT_GROUP, ESZMigrantsUpdateJob.class);
 
             SchedulerFactory sfb = new StdSchedulerFactory();
             Scheduler scheduler = sfb.getScheduler();
