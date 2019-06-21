@@ -189,10 +189,10 @@
                 </rich:datascroller>
             </f:facet>
         </rich:dataTable>
-        <h:panelGrid columns="2" styleClass="borderless-grid">
+        <h:panelGrid columns="2" styleClass="borderless-grid" id="addNewElementToCatalogPanelGrid">
             <h:inputText value="#{catalogListPage.descriptionForNewElement}" styleClass="input-text" />
             <a4j:commandButton action="#{catalogListPage.addElementToSelectedCatalog()}"
-                               reRender="webtechnologistCatalogEditListElementsTable" value="Добавить элемент"
+                               reRender="webtechnologistCatalogEditListElementsTable, addNewElementToCatalogPanelGrid" value="Добавить элемент"
                                status="WebTechnologCatalogProcessStatus" />
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
