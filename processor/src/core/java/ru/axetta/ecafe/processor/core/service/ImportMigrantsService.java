@@ -107,6 +107,13 @@ public class ImportMigrantsService {
                             (request.getSecondname() == null) ? "" : request.getSecondname(),
                             (request.getClientGuid() == null) ? "" : request.getClientGuid());
                     client = (Client) session.load(Client.class, idOfClient);
+                    if (client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
+                        ClientManager.ClientFieldConfigForUpdate fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
+                        fieldConfig.setValue(ClientManager.FieldId.GROUP,
+                                ClientGroup.Predefined.CLIENT_OTHER_ORG.getNameOfGroup());
+                        ClientManager.modifyClientTransactionFree(fieldConfig, null, "", client, session);
+                        ESZMigrantsUpdateService.addGroupHistory(session, client, ClientGroup.Predefined.CLIENT_LEAVING);
+                    }
                 }
                 else {
                     if (null != request.getIdOfESZ() && !request.getIdOfESZ().equals(client.getExternalId())) {

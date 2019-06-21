@@ -159,7 +159,7 @@ public class ESZMigrantsUpdateService {
         }
     }
 
-    private void addGroupHistory(Session session, Client client, ClientGroup.Predefined predefinedClientGroup)
+    public static void addGroupHistory(Session session, Client client, ClientGroup.Predefined predefinedClientGroup)
             throws Exception {
         ClientGroupMigrationHistory migrationHistory = new ClientGroupMigrationHistory(client.getOrg(), client);
         migrationHistory.setComment(ClientGroupMigrationHistory.MODIFY_IN_ISPP);
