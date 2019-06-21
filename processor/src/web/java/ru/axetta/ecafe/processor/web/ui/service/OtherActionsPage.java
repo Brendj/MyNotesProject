@@ -662,4 +662,15 @@ public class OtherActionsPage extends OnlineReportPage {
         RuntimeContext.getAppContext().getBean(SummaryCardsMSRService.class).run(startDate, endDate);
         printMessage("Выгрузка в МСР выполнена.");
     }
+
+
+    public void updateESZMigrants() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean("ESZMigrantsUpdateService", ESZMigrantsUpdateService.class).updateMigrants();
+            printMessage("Обработка мигрантов завершена");
+        } catch (Exception e) {
+            getLogger().error("Error run update ESZ migrants: ", e);
+            printError("Во время обработки произошла ошибка с текстом " + e.getMessage());
+        }
+    }
 }
