@@ -12,10 +12,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.PropertyUtils;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Criteria;
-import org.hibernate.FlushMode;
-import org.hibernate.Session;
-import org.hibernate.Transaction;
+import org.hibernate.*;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
@@ -72,6 +69,7 @@ public class ESZMigrantsUpdateService {
             Criteria clientsCriteria = createMigrantCriteria(session, idOfESZOrg, currentDate, null);
 
             List<Client> list = clientsCriteria.list();
+            list.addAll(createClientQuery(session, idOfESZOrg).list());
             for (Client client : list) {
                 Criteria migrantsCriteria = createMigrantCriteria(session, idOfESZOrg, currentDate, client);
                 List<Migrant> migrantList = migrantsCriteria.list();
@@ -90,9 +88,11 @@ public class ESZMigrantsUpdateService {
                         continue;
                     }
                     lastHistory = histList.getLast();
-                    if (Migrant.CLOSED != migrant.getSyncState() && (migrant.getVisitEndDate().getTime() <= currentDate
-                            .getTime() || (lastHistory.getResolution().equals(VisitReqResolutionHist.RES_CANCELED)
-                            || (lastHistory.getResolution().equals(VisitReqResolutionHist.RES_REJECTED))))) {
+                    if (Migrant.CLOSED != migrant.getSyncState() && (
+                            migrant.getVisitEndDate().getTime() <= currentDate.getTime() || (
+                                    lastHistory.getResolution().equals(VisitReqResolutionHist.RES_CANCELED)
+                                            || (lastHistory.getResolution()
+                                            .equals(VisitReqResolutionHist.RES_REJECTED))))) {
                         closeMigrantRequest(session, migrant, client);
                     }
 
@@ -101,7 +101,8 @@ public class ESZMigrantsUpdateService {
 
                 if (allMigrantRequestClosed) {
                     ClientManager.ClientFieldConfigForUpdate fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
-                    fieldConfig.setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
+                    fieldConfig.setValue(ClientManager.FieldId.GROUP,
+                            ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                     ClientManager.modifyClientTransactionFree(fieldConfig, null, "", client, session);
                     addGroupHistory(session, client, ClientGroup.Predefined.CLIENT_LEAVING);
                 }
@@ -123,7 +124,8 @@ public class ESZMigrantsUpdateService {
         criteria.createAlias("migrant.clientMigrate", "clientMigrate");
         criteria.createAlias("clientMigrate.org", "org");
         criteria.add(Restrictions.eq("org.idOfOrg", idOfESZOrg));
-        criteria.add(Restrictions.ne("clientMigrate.idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
+        criteria.add(
+                Restrictions.ne("clientMigrate.idOfClientGroup", ClientGroup.Predefined.CLIENT_LEAVING.getValue()));
         if (null == client) {
             Disjunction disjunction = Restrictions.disjunction();
             disjunction.add(Restrictions.le("migrant.visitEndDate", currentDate));
@@ -137,6 +139,14 @@ public class ESZMigrantsUpdateService {
             criteria.setProjection(Projections.distinct(Projections.property("migrant")));
         }
         return criteria;
+    }
+
+    // достаем клиентов оо есз, у которых нет заявок
+    private Query createClientQuery(Session session, Long idOfESZOrg) {
+        Query query = session.createQuery(
+                "from Migrant m right join m.clientMigrate c join c.org o where m.compositeIdOfMigrant is null and o.idOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfESZOrg);
+        return query;
     }
 
     private void closeMigrantRequest(Session session, Migrant migrant, Client client) {
