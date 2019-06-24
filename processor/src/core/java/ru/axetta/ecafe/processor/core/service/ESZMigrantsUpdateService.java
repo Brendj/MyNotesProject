@@ -104,7 +104,7 @@ public class ESZMigrantsUpdateService {
                     fieldConfig.setValue(ClientManager.FieldId.GROUP,
                             ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                     ClientManager.modifyClientTransactionFree(fieldConfig, null, "", client, session);
-                    addGroupHistory(session, client, ClientGroup.Predefined.CLIENT_LEAVING);
+                    addGroupHistory(session, client, ClientGroup.Predefined.CLIENT_LEAVING.getValue());
                 }
             }
 
@@ -159,7 +159,7 @@ public class ESZMigrantsUpdateService {
         }
     }
 
-    public static void addGroupHistory(Session session, Client client, ClientGroup.Predefined predefinedClientGroup)
+    public static void addGroupHistory(Session session, Client client, Long idOfClientGroup)
             throws Exception {
         ClientGroupMigrationHistory migrationHistory = new ClientGroupMigrationHistory(client.getOrg(), client);
         migrationHistory.setComment(ClientGroupMigrationHistory.MODIFY_IN_ISPP);
@@ -169,10 +169,10 @@ public class ESZMigrantsUpdateService {
         }
 
         ClientGroup clientGroup = DAOUtils.findClientGroup(session,
-                new CompositeIdOfClientGroup(client.getOrg().getIdOfOrg(), predefinedClientGroup.getValue()));
+                new CompositeIdOfClientGroup(client.getOrg().getIdOfOrg(), idOfClientGroup));
         if (null == clientGroup) {
             logger.error(String.format("Unable to find client group: idOfOrg=%d, idOfClientGroup=%d",
-                    client.getOrg().getIdOfOrg(), predefinedClientGroup.getValue()));
+                    client.getOrg().getIdOfOrg(), idOfClientGroup));
             return;
         }
         migrationHistory.setNewGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
