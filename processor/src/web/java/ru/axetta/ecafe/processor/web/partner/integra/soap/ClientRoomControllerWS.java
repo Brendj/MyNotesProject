@@ -8314,7 +8314,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (card == null) {
                 return new MuseumEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
             }
-            Client client = (card == null ? null : card.getClient());
+            Client client = card.getClient();
             if (client == null) {
                 return new MuseumEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
@@ -8339,6 +8339,78 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } finally {
             HibernateUtils.close(session, logger);
         }
+    }
+
+    @Override
+    public CultureEnterInfo getCultureEnterInfo(@WebParam(name = "cardId") String cardId) {
+        authenticateRequest(null);
+        Session session = null;
+        try {
+            CultureEnterInfo cultureEnterInfo = new CultureEnterInfo();
+            session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
+            Long lCardId = Long.parseLong(cardId);
+            lCardId = SummaryCardsMSRService.convertCardId(lCardId);
+            Card card = DAOUtils.findCardByCardNo(session, lCardId);
+            if (card == null || !card.isActive()) {
+                return new CultureEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
+            }
+            Client client = card.getClient();
+            if (client == null || client.isDeletedOrLeaving()) {
+                return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+            }
+
+            if (client.getAgeTypeGroup() != null && client.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_SCHOOL]))
+            {
+                //Если клиент школьник
+                if (StringUtils.isEmpty(client.getClientGUID())) return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+                cultureEnterInfo.setFullAge(getFullAge(client));
+                cultureEnterInfo.setGuid(client.getClientGUID());
+                cultureEnterInfo.setGroupName(client.getClientGroup().getGroupName());
+            }
+            else
+            {
+                List<Client> childsList = ClientManager.findChildsByClient(session, client.getIdOfClient());
+                if (childsList.size() == 0) return new CultureEnterInfo(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+                //Если клиент опекун
+                cultureEnterInfo.setGroupName(client.getClientGroup().getGroupName());
+                cultureEnterInfo.getChildrens().add(new CultureEnterInfo());
+                cultureEnterInfo.setFullAge(getFullAge(client));
+                for (Client child: childsList)
+                {
+                    if (child.getAgeTypeGroup() != null) {
+                        boolean clientPredefined = (child.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                                || child.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() > ClientGroup.Predefined.CLIENT_DELETED.getValue())
+                                && (child.getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL]) || child
+                                .getAgeTypeGroup().equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_OUT]) || child.getAgeTypeGroup()
+                                .equals(Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_STEP]));
+                        //Добавляем в список только дошкольников
+                        if (clientPredefined) {
+                            CultureEnterInfo cultureEnterInfoChield = new CultureEnterInfo();
+                            cultureEnterInfoChield.setGuid(child.getClientGUID());
+                            cultureEnterInfoChield.setGroupName(child.getClientGroup().getGroupName());
+                            cultureEnterInfoChield.setFullAge(getFullAge(child));
+                            cultureEnterInfo.getChildrens().get(0).getChild().add(cultureEnterInfoChield);
+                        }
+                    }
+                }
+                if (cultureEnterInfo.getChildrens().get(0).getChild().size() == 0) return new CultureEnterInfo(RC_CARD_NOT_FOUND, RC_CARD_NOT_FOUND_DESC);
+            }
+            cultureEnterInfo.setValidityCard(true);
+            cultureEnterInfo.resultCode = RC_OK;
+            cultureEnterInfo.description = RC_OK_DESC;
+            return cultureEnterInfo;
+        } catch (Exception e) {
+            logger.error("Error in getCultureEnterInfo method:", e);
+            return new CultureEnterInfo(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    private Boolean getFullAge (Client client)
+    {
+        return (client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() <= ClientGroup.Predefined.CLIENT_OTHERS.getValue());
     }
 
     @Override

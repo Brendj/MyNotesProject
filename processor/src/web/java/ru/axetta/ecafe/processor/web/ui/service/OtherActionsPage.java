@@ -633,7 +633,7 @@ public class OtherActionsPage extends OnlineReportPage {
             printMessage("Преобразование номеров карт завершено");
         } catch (Exception e) {
             getLogger().error("Error update card uids: ", e);
-            printError("Вов время преобразования номеров карт произошла ошибка с текстом " + e.getMessage());
+            printError("Во время преобразования номеров карт произошла ошибка с текстом " + e.getMessage());
         }
     }
 
@@ -654,6 +654,13 @@ public class OtherActionsPage extends OnlineReportPage {
         Date endDate = CalendarUtils.endOfDay(dates[1]);
         service.run(startDate, endDate,
                 ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue(), true);
+    }
+
+    public void runMSRToFTP() {
+        Date endDate = CalendarUtils.endOfDay(new Date());
+        Date startDate = CalendarUtils.truncateToDayOfMonth(new Date());
+        RuntimeContext.getAppContext().getBean(SummaryCardsMSRService.class).run(startDate, endDate);
+        printMessage("Выгрузка в МСР выполнена.");
     }
 
 

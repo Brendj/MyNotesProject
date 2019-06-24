@@ -140,6 +140,8 @@
                            styleClass="command-button" />
     <a4j:commandButton value="Итого за неделю" action="#{otherActionsPage.runEventNotificationServiceForWeekly}" id="runEventNotificationServiceForWeekly"
                                                                              styleClass="command-button" />
+        <a4j:commandButton value="Выгрузка на FTP МСР" action="#{otherActionsPage.runMSRToFTP()}" id="runMSRToFTP"
+                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" id="specialDatesFileLoaderPanel" >
         <rich:panel>
