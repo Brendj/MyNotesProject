@@ -964,6 +964,33 @@
     <%--@elvariable id="orgSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.OrgSettingsReportPage"--%>
     <rich:panelMenuItem id="orgSettingsReport" binding="#{orgSettingsReportPage.mainMenuComponent}"
                         label="Настройки ОО" action="#{orgSettingsReportPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuGroup id="webTechnologistGroupMenuItem" label="WEB-Технолог"
+                         binding="#{mainPage.webTechnologistGroupPage.mainMenuComponent}"
+                         rendered="#{mainPage.eligibleToServiceAdmin}">
+        <a4j:support event="onclick" reRender="workspaceForm" action="#{mainPage.showWebTechnologistGroupPage}" />
+        <%-- <rich:panelMenuGroup id="webTechnologistGroupDish"
+                              binding="#{.mainMenuComponent}" label="Блюда"
+                              rendered="#{mainPage.eligibleToServiceAdmin}">
+             <a4j:support event="onclick" action="#{}" reRender="workspaceForm" />
+
+             <rich:panelMenuItem id="webTechnologistGroupDishList" binding="#{.mainMenuComponent}"
+                                 label="Список блюд" action="#{.show}" reRender="workspaceForm" />
+
+             <rich:panelMenuItem id="webTechnologistGroupDishCreate"
+                                 binding="#(.mainMenuComponent}" label="Создать"
+                                 action="#{.show}" reRender="workspaceForm" />
+         </rich:panelMenuGroup>--%>
+        <rich:panelMenuGroup id="webTechnologistCatalogs" label="Справочники" binding="#{mainPage.webTechnologistCatalogGroupPage.mainMenuComponent}">
+            <a4j:support event="onclick" reRender="workspaceForm"
+                         action="#{mainPage.showWebTechnologistCatalogGroupPage}"/>
+            <%--@elvariable id="catalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.CatalogListPage"--%>
+            <rich:panelMenuItem id="webTechnologistCatalogsList"
+                                binding="#{catalogListPage.mainMenuComponent}"
+                                label="Список справочников" action="#{catalogListPage.show}"
+                                reRender="workspaceForm" />
+        </rich:panelMenuGroup>
+    </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"

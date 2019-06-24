@@ -1,0 +1,30 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.webtechnologist.WebTechnologistDish" table="cf_webTechnologist_dishes">
+        <cache usage="transactional"/>
+        <id name="idOfWebTechnologistDish" column="idOfWebTechnologistDish" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="dishName" column="dishName" type="string" not-null="true"/>
+        <property name="componentsOfDish" column="componentsOfDish" type="string" not-null="true"/>
+        <property name="code" column="code" type="integer"/>
+        <property name="dateOfBeginMenuIncluding" column="dateOfBeginMenuIncluding" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="dateOfEndMenuIncluding" column="dateOfEndMenuIncluding" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="price" column="price" type="long" not-null="true"/>
+        <property name="createDate" column="createDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="version" column="version" type="long" not-null="true"/>
+        <property name="deleteState" column="deleteState " type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="GUID" column="GUID" type="string" not-null="true"/>
+        <many-to-one name="userOwner" column="idOfUserOwner" class="ru.axetta.ecafe.processor.core.persistence.User" not-null="true"/>
+        <set table="cf_webTechnologist_dish_catalog_relationships" name="catalogTypes" lazy="false">
+            <key column="idOfWebTechnologistDish"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webtechnologist.WebTechnologistCatalogItem"/>
+        </set>
+    </class>
+</hibernate-mapping>
