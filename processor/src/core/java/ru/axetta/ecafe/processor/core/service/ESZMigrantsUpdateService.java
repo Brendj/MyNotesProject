@@ -144,7 +144,7 @@ public class ESZMigrantsUpdateService {
     // достаем клиентов оо есз, у которых нет заявок
     private Query createClientQuery(Session session, Long idOfESZOrg) {
         Query query = session.createQuery(
-                "from Migrant m right join m.clientMigrate c join c.org o where m.compositeIdOfMigrant is null and o.idOfOrg = :idOfOrg");
+                "select c from Migrant m right join m.clientMigrate c join c.org o where m.compositeIdOfMigrant is null and o.idOfOrg = :idOfOrg");
         query.setParameter("idOfOrg", idOfESZOrg);
         return query;
     }
