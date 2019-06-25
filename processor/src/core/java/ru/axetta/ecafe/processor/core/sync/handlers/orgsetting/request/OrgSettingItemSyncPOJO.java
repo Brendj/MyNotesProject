@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.OrgSettingsDataTypes;
+
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
@@ -18,7 +20,12 @@ public class OrgSettingItemSyncPOJO {
         Element element = document.createElement("OSI");
         element.setAttribute("GlobalId", globalID.toString());
         element.setAttribute("SType", type.toString());
-        element.setAttribute("SValue", value);
+        if(type.equals(OrgSettingsDataTypes.BOOLEAN.ordinal())){
+            boolean boolVal = Boolean.valueOf(value);
+            element.setAttribute("SValue", boolVal ? "1" : "0");
+        } else {
+            element.setAttribute("SValue", value);
+        }
         element.setAttribute("V", version.toString());
         return element;
     }

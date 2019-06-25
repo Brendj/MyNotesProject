@@ -10,31 +10,30 @@ import java.util.HashMap;
 import java.util.Map;
 
 public enum ARMsSettingsType implements SettingType {
-    CARD_DUPLICATE_ENABLED(0,"Дубликаты для основных карт", Boolean.class),
-    REVERSE_MONTH_OF_SALE(1,"Оплата/сторнирование месяц продажи", Boolean.class);
+    CARD_DUPLICATE_ENABLED(1300,"Дубликаты для основных карт", OrgSettingsDataTypes.BOOLEAN),
+    REVERSE_MONTH_OF_SALE(1,"Оплата/сторнирование месяц продажи", OrgSettingsDataTypes.BOOLEAN);
 
-    private Integer id;
+    private Integer globalId;
     private String description;
-    private Class expectedClass;
+    private OrgSettingsDataTypes expectedClass;
 
-    private static Map<Integer, OrgSettingGroup> mapInt = new HashMap<Integer,OrgSettingGroup>();
-    private static Map<String,OrgSettingGroup> mapStr = new HashMap<String,OrgSettingGroup>();
+    private static Map<Integer, SettingType> mapInt = new HashMap<Integer,SettingType>();
+
     static {
-        for (OrgSettingGroup orgSettingGroup : OrgSettingGroup.values()) {
+        for (SettingType orgSettingGroup : ARMsSettingsType.values()) {
             mapInt.put(orgSettingGroup.getId(), orgSettingGroup);
-            mapStr.put(orgSettingGroup.toString(), orgSettingGroup);
         }
     }
 
-    ARMsSettingsType(Integer id, String description, Class expectedClass) {
-        this.id = id;
+    ARMsSettingsType(Integer globalId, String description, OrgSettingsDataTypes expectedClass) {
+        this.globalId = globalId;
         this.description = description;
         this.expectedClass = expectedClass;
     }
 
     @Override
     public Integer getId() {
-        return id;
+        return globalId;
     }
 
     @Override
@@ -49,11 +48,20 @@ public enum ARMsSettingsType implements SettingType {
 
     @Override
     public Class getExpectedClass() {
-        return expectedClass;
+        return expectedClass.getDataType();
     }
 
     @Override
     public Boolean validateSettingValue(Object value){
-        return expectedClass.isInstance(value);
+        return expectedClass.validateSettingValue(value);
+    }
+
+    @Override
+    public Integer getSyncDataTypeId() {
+        return expectedClass.ordinal();
+    }
+
+    static public Map<Integer, SettingType> getSettingTypeAsMap() {
+        return mapInt;
     }
 }

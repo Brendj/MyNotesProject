@@ -13,4 +13,6 @@ public interface SettingType {
     Class getExpectedClass();
 
     Boolean validateSettingValue(Object value);
+
+    Integer getSyncDataTypeId();
 }

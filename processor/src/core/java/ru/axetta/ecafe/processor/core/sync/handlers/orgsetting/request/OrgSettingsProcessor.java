@@ -6,7 +6,9 @@ package ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request;
 
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.SettingType;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
 import org.hibernate.Session;
@@ -14,6 +16,7 @@ import org.hibernate.Session;
 import java.util.List;
 
 public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
+
     private final OrgSettingsRequest orgSettingsRequest;
 
     public OrgSettingsProcessor(Session session, OrgSettingsRequest orgSettingsRequest) {
@@ -28,22 +31,32 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
         Long idOfOrg = orgSettingsRequest.getIdOfOrgSource();
 
         Long maxVersionFromDB = OrgSettingDAOUtils.getMaxVersionOfOrgSettingForFriendlyOrgGroup(idOfOrg, session);
-        List<OrgSetting> settingsFromDB = OrgSettingDAOUtils.getOrgSettingsForAllFriendlyOrgByIdOfOrgAndMaxVersion(idOfOrg, maxVersionFromARM, session);
+        List<OrgSetting> settingsFromDB = OrgSettingDAOUtils
+                .getOrgSettingsForAllFriendlyOrgByIdOfOrgAndMaxVersion(idOfOrg, maxVersionFromARM, session);
 
         section.setMaxVersion(maxVersionFromDB);
-        for(OrgSetting settingFromDB : settingsFromDB){
+        for (OrgSetting settingFromDB : settingsFromDB) {
             OrgSettingSyncPOJO settingPojo = new OrgSettingSyncPOJO();
             settingPojo.setIdOfOrg(settingFromDB.getIdOfOrg().intValue());
             settingPojo.setGroupID(settingFromDB.getSettingGroup().getId());
-            for(OrgSettingItem settingItem : settingFromDB.getOrgSettingItems()){
+            for (OrgSettingItem settingItem : settingFromDB.getOrgSettingItems()) {
+                SettingType typeForCurrentItem = OrgSettingGroup
+                        .getSettingTypeByGroupIdAndGlobalId(settingFromDB.getSettingGroup().getId(),
+                                settingItem.getSettingType());
+
                 OrgSettingItemSyncPOJO itemSyncPOJO = new OrgSettingItemSyncPOJO();
                 itemSyncPOJO.setVersion(settingItem.getVersion());
                 itemSyncPOJO.setValue(settingItem.getSettingValue());
                 itemSyncPOJO.setGlobalID(settingItem.getSettingType());
-                // TODO ADD TYPE
+
+                if(typeForCurrentItem != null){
+                    itemSyncPOJO.setType(typeForCurrentItem.getSyncDataTypeId());
+                }
                 settingPojo.getItems().add(itemSyncPOJO);
             }
             section.getItems().add(settingPojo);
+            //TODO apply change from ARM
+
         }
         return section;
     }
