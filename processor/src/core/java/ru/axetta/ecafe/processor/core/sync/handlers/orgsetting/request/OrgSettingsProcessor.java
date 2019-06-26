@@ -13,7 +13,10 @@ import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
 import org.hibernate.Session;
 
+import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
 
@@ -26,10 +29,38 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
 
     @Override
     public OrgSettingSection process() throws Exception {
-        OrgSettingSection section = new OrgSettingSection();
         Long maxVersionFromARM = orgSettingsRequest.getMaxVersion();
         Long idOfOrg = orgSettingsRequest.getIdOfOrgSource();
+        Date syncData = new Date();
 
+        for(OrgSettingSyncPOJO pojo : orgSettingsRequest.getItems()){
+            OrgSetting setting = OrgSettingDAOUtils.getOrgSettingByGroupIdAndOrg(session, pojo.getGroupID(), pojo.getIdOfOrg());
+            if(setting != null && setting.getVersion() <= maxVersionFromARM){
+                Map<Integer, OrgSettingItem> orgSettingItemMap = buildMap(setting);
+                for(OrgSettingItemSyncPOJO itemSyncPOJO : pojo.getItems()){
+                    OrgSettingItem settingItem = orgSettingItemMap.get(itemSyncPOJO.getGlobalID());
+                    if(settingItem == null){
+                        settingItem = new OrgSettingItem();
+                        settingItem.setCreatedDate(syncData);
+                        settingItem.setLastUpdate(syncData);
+                        settingItem.setVersion(maxVersionFromARM);
+                        settingItem.setOrgSetting(setting);
+                        settingItem.setSettingType(itemSyncPOJO.getGlobalID());
+                        settingItem.setSettingValue(itemSyncPOJO.getValue());
+                        session.save(settingItem);
+
+                        setting.getOrgSettingItems().add(settingItem);
+                        setting.setLastUpdate(syncData);
+                    } else if(settingItem.getVersion() <= itemSyncPOJO.getVersion()){
+                        settingItem.setLastUpdate(syncData);
+                        settingItem.setSettingValue(itemSyncPOJO.getValue());
+                    }
+                }
+            }
+            session.merge(setting);
+        }
+
+        OrgSettingSection section = new OrgSettingSection();
         Long maxVersionFromDB = OrgSettingDAOUtils.getMaxVersionOfOrgSettingForFriendlyOrgGroup(idOfOrg, session);
         List<OrgSetting> settingsFromDB = OrgSettingDAOUtils
                 .getOrgSettingsForAllFriendlyOrgByIdOfOrgAndMaxVersion(idOfOrg, maxVersionFromARM, session);
@@ -55,9 +86,15 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
                 settingPojo.getItems().add(itemSyncPOJO);
             }
             section.getItems().add(settingPojo);
-            //TODO apply change from ARM
-
         }
         return section;
+    }
+
+    private Map<Integer, OrgSettingItem> buildMap(OrgSetting setting) {
+        Map<Integer, OrgSettingItem> result = new HashMap<>();
+        for(OrgSettingItem item : setting.getOrgSettingItems()){
+            result.put(item.getSettingType(), item);
+        }
+        return result;
     }
 }

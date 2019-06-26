@@ -35,4 +35,11 @@ public class OrgSettingDAOUtils {
         query.setParameterList("orgIds", friendlyOrgsIds);
         return (Long) query.uniqueResult();
     }
+
+    public static OrgSetting getOrgSettingByGroupIdAndOrg(Session session, Integer groupID, Integer idOfOrg) {
+        Criteria criteria = session.createCriteria(OrgSetting.class);
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg.longValue()));
+        criteria.add(Restrictions.eq("settingGroup", OrgSettingGroup.getGroupById(groupID)));
+        return (OrgSetting) criteria.uniqueResult();
+    }
 }
