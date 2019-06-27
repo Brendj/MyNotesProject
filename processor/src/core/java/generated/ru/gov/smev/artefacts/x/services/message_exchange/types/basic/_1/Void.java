@@ -8,7 +8,7 @@ import javax.xml.bind.annotation.XmlType;
 
 
 /**
- * ��� ��������, ������� ������� ���������� ������ ������ �������.
+ * Тип элемента, который передаёт информацию фактом своего наличия.
  * 
  * <p>Java class for Void complex type.
  * 

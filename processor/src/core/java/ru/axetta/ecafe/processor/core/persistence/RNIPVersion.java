@@ -14,7 +14,8 @@ package ru.axetta.ecafe.processor.core.persistence;
 public enum RNIPVersion {
 
     RNIP_V115("1.15"),
-    RNIP_V116("1.16");
+    RNIP_V116("1.16"),
+    RNIP_V21("2.1");
 
     private final String description;
 

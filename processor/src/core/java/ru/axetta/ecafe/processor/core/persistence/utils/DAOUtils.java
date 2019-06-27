@@ -4153,4 +4153,15 @@ public class DAOUtils {
                 .add(Restrictions.eq("settingGroup", OrgSettingGroup.getGroupById(settingGroupId)));
         return (OrgSetting) criteria.uniqueResult();
     }
+
+    public static List<Long> findFriendlyOrgsIds(Session session, List<Long> orgIdList) {
+        Query query = session
+                .createSQLQuery("select friendlyorg from cf_friendly_organization where currentorg in (:idOfOrgList)")
+                .setParameterList("idOfOrgList", orgIdList);
+        List<Long> result = new ArrayList<Long>();
+        for (Object o: query.list()) {
+            result.add(((BigInteger)o).longValue());
+        }
+        return result;
+    }
 }

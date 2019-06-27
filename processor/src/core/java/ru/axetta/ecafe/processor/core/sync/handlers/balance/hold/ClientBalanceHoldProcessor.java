@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.balance.hold;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -12,7 +13,9 @@ import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -25,6 +28,7 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
     private final ClientBalanceHoldRequest clientBalanceHoldRequest;
     private final ClientBalanceHoldData clientBalanceHoldData;
     private final static Logger logger = LoggerFactory.getLogger(ClientBalanceHoldProcessor.class);
+    private static final String WRONG_STATUS = "Заявление не может быть аннулировано";
 
     public ClientBalanceHoldProcessor(Session persistenceSession, ClientBalanceHoldRequest clientBalanceHoldRequest, ClientBalanceHoldData clientBalanceHoldData) {
         super(persistenceSession);
@@ -57,7 +61,9 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
                 items.add(resItem);
                 continue;
             }
-            ClientBalanceHold clientBalanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getClientBalanceHoldByGuid(item.getGuid());
+            Criteria criteria = session.createCriteria(ClientBalanceHold.class);
+            criteria.add(Restrictions.eq("guid", item.getGuid()));
+            ClientBalanceHold clientBalanceHold = (ClientBalanceHold) criteria.uniqueResult();
 
             try {
                 Client declarer = (item.getIdOfDeclarer() == null) ? null : DAOReadonlyService.getInstance().findClientById(item.getIdOfDeclarer());
@@ -74,6 +80,22 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
                             newOrg, oldContragent, newContragent, createStatus, requestStatus, item.getPhoneOfDeclarer(),
                             item.getDeclarerInn(), item.getDeclarerAccount(), item.getDeclarerBank(), item.getDeclarerBik(), item.getDeclarerCorrAccount(), nextVersion);
                 } else {
+                    //Проверяем пришедший статус. если приходит аннулирование, то заявление на тек. момент может быть только в статусе создания. Иной статус - ошибка
+                    if (item.getRequestStatus().equals(ClientBalanceHoldRequestStatus.ANNULLED.ordinal())) {
+                        if (!clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.ANNULLED)
+                                && !clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.CREATED)
+                                && !clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.SUBSCRIBED)) {
+                            ClientBalanceHoldItem resItem = new ClientBalanceHoldItem(item.getGuid(), 102, WRONG_STATUS, null);
+                            items.add(resItem);
+                            continue;
+                        }
+                        //если прежний статус - Создано, а новый Аннулировано, восстанавливаем баланс
+                        if (clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.CREATED)
+                                || clientBalanceHold.getRequestStatus().equals(ClientBalanceHoldRequestStatus.SUBSCRIBED)) {
+                            RuntimeContext.getAppContext().getBean(FinancialOpsManager.class)
+                                    .declineClientBalanceNonTransactional(session, clientBalanceHold);
+                        }
+                    }
                     //Если объект найден в БД, то меняем только статусы, данные о заявителе и версию
                     clientBalanceHold.setVersion(nextVersion);
                     clientBalanceHold.setCreateStatus(ClientBalanceHoldCreateStatus.fromInteger(item.getCreateStatus()));

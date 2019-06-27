@@ -30,35 +30,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Timestamp }
+     * Create an instance of {@link Void }
      * 
      */
-    public Timestamp createTimestamp() {
-        return new Timestamp();
-    }
-
-    /**
-     * Create an instance of {@link XMLDSigSignatureType }
-     * 
-     */
-    public XMLDSigSignatureType createXMLDSigSignatureType() {
-        return new XMLDSigSignatureType();
-    }
-
-    /**
-     * Create an instance of {@link SmevFault }
-     * 
-     */
-    public SmevFault createSmevFault() {
-        return new SmevFault();
-    }
-
-    /**
-     * Create an instance of {@link AckTargetMessage }
-     * 
-     */
-    public AckTargetMessage createAckTargetMessage() {
-        return new AckTargetMessage();
+    public Void createVoid() {
+        return new Void();
     }
 
     /**
@@ -67,6 +43,14 @@ public class ObjectFactory {
      */
     public MessagePrimaryContent createMessagePrimaryContent() {
         return new MessagePrimaryContent();
+    }
+
+    /**
+     * Create an instance of {@link XMLDSigSignatureType }
+     * 
+     */
+    public XMLDSigSignatureType createXMLDSigSignatureType() {
+        return new XMLDSigSignatureType();
     }
 
     /**
@@ -102,11 +86,11 @@ public class ObjectFactory {
     }
 
     /**
-     * Create an instance of {@link Void }
+     * Create an instance of {@link SmevFault }
      * 
      */
-    public Void createVoid() {
-        return new Void();
+    public SmevFault createSmevFault() {
+        return new SmevFault();
     }
 
     /**
@@ -142,11 +126,27 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link Timestamp }
+     * 
+     */
+    public Timestamp createTimestamp() {
+        return new Timestamp();
+    }
+
+    /**
      * Create an instance of {@link MessageTypeSelector }
      * 
      */
     public MessageTypeSelector createMessageTypeSelector() {
         return new MessageTypeSelector();
+    }
+
+    /**
+     * Create an instance of {@link AckTargetMessage }
+     * 
+     */
+    public AckTargetMessage createAckTargetMessage() {
+        return new AckTargetMessage();
     }
 
     /**

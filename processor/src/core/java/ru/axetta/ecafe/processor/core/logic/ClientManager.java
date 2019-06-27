@@ -15,10 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
-import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -1147,9 +1144,7 @@ public class ClientManager {
 
     public static long forceGetClientESZ(Session session, Long eszId, String surname, String firstName, String secondName,
             String clientGuid) throws Exception {
-        String strNSIOrg = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.esz.migrants.eszOrg", "");
-        if (StringUtils.isEmpty(strNSIOrg)) throw new Exception("Не найдена организация ЕСЗ");
-        Long idOfESZOrg = Long.parseLong(strNSIOrg);
+        Long idOfESZOrg = PropertyUtils.getIdOfESZOrg();
         Query query = session.createQuery("select c.idOfClient from Client c where c.externalId = :externalId");
         query.setParameter("externalId", eszId);
         Long idOfClient = (Long)query.uniqueResult();

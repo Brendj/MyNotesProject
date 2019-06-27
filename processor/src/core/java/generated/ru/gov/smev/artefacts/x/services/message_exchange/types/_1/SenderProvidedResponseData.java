@@ -49,7 +49,7 @@ import java.util.List;
  *               &lt;complexContent>
  *                 &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                   &lt;sequence>
- *                     &lt;element name="StatusCode" type="{http://www.w3.org/2001/XMLSchema}int"/>
+ *                     &lt;element name="StatusCode" type="{http://www.w3.org/2001/XMLSchema}string"/>
  *                     &lt;element name="StatusParameter" maxOccurs="unbounded" minOccurs="0">
  *                       &lt;complexType>
  *                         &lt;complexContent>
@@ -70,6 +70,17 @@ import java.util.List;
  *           &lt;/element>
  *           &lt;element ref="{urn://x-artefacts-smev-gov-ru/services/message-exchange/types/1.2}AsyncProcessingStatus"/>
  *         &lt;/choice>
+ *         &lt;element name="Sender">
+ *           &lt;complexType>
+ *             &lt;complexContent>
+ *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+ *                 &lt;sequence>
+ *                   &lt;element name="Mnemonic" type="{urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2}string-50"/>
+ *                 &lt;/sequence>
+ *               &lt;/restriction>
+ *             &lt;/complexContent>
+ *           &lt;/complexType>
+ *         &lt;/element>
  *       &lt;/sequence>
  *       &lt;attribute name="Id" type="{http://www.w3.org/2001/XMLSchema}ID" />
  *     &lt;/restriction>
@@ -89,7 +100,8 @@ import java.util.List;
     "refAttachmentHeaderList",
     "requestRejected",
     "requestStatus",
-    "asyncProcessingStatus"
+    "asyncProcessingStatus",
+    "sender"
 })
 @XmlRootElement(name = "SenderProvidedResponseData")
 public class SenderProvidedResponseData {
@@ -112,6 +124,8 @@ public class SenderProvidedResponseData {
     protected SenderProvidedResponseData.RequestStatus requestStatus;
     @XmlElement(name = "AsyncProcessingStatus")
     protected AsyncProcessingStatus asyncProcessingStatus;
+    @XmlElement(name = "Sender", required = true)
+    protected SenderProvidedResponseData.Sender sender;
     @XmlAttribute(name = "Id")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
     @XmlID
@@ -167,7 +181,7 @@ public class SenderProvidedResponseData {
     }
 
     /**
-     * �������������� ����� ������, XML-��������.
+     * Содержательная часть ответа, XML-документ.
      * 
      * @return
      *     possible object is
@@ -215,7 +229,7 @@ public class SenderProvidedResponseData {
     }
 
     /**
-     * ��������� ��������� ������.
+     * Заголовки вложенных файлов.
      * 
      * @return
      *     possible object is
@@ -239,7 +253,7 @@ public class SenderProvidedResponseData {
     }
 
     /**
-     * ��������� ������ �� ������.
+     * Заголовки файлов по ссылке.
      * 
      * @return
      *     possible object is
@@ -340,6 +354,30 @@ public class SenderProvidedResponseData {
     }
 
     /**
+     * Gets the value of the sender property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link SenderProvidedResponseData.Sender }
+     *     
+     */
+    public SenderProvidedResponseData.Sender getSender() {
+        return sender;
+    }
+
+    /**
+     * Sets the value of the sender property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link SenderProvidedResponseData.Sender }
+     *     
+     */
+    public void setSender(SenderProvidedResponseData.Sender value) {
+        this.sender = value;
+    }
+
+    /**
      * Gets the value of the id property.
      * 
      * @return
@@ -392,7 +430,6 @@ public class SenderProvidedResponseData {
     public static class RequestRejected {
 
         @XmlElement(name = "RejectionReasonCode", required = true)
-        @XmlSchemaType(name = "string")
         protected RejectCode rejectionReasonCode;
         @XmlElement(name = "RejectionReasonDescription", required = true)
         protected String rejectionReasonDescription;
@@ -458,7 +495,7 @@ public class SenderProvidedResponseData {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="StatusCode" type="{http://www.w3.org/2001/XMLSchema}int"/>
+     *         &lt;element name="StatusCode" type="{http://www.w3.org/2001/XMLSchema}string"/>
      *         &lt;element name="StatusParameter" maxOccurs="unbounded" minOccurs="0">
      *           &lt;complexType>
      *             &lt;complexContent>
@@ -488,8 +525,8 @@ public class SenderProvidedResponseData {
     })
     public static class RequestStatus {
 
-        @XmlElement(name = "StatusCode")
-        protected int statusCode;
+        @XmlElement(name = "StatusCode", required = true)
+        protected String statusCode;
         @XmlElement(name = "StatusParameter")
         protected List<SenderProvidedResponseData.RequestStatus.StatusParameter> statusParameter;
         @XmlElement(name = "StatusDescription", required = true)
@@ -498,16 +535,24 @@ public class SenderProvidedResponseData {
         /**
          * Gets the value of the statusCode property.
          * 
+         * @return
+         *     possible object is
+         *     {@link String }
+         *     
          */
-        public int getStatusCode() {
+        public String getStatusCode() {
             return statusCode;
         }
 
         /**
          * Sets the value of the statusCode property.
          * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *     
          */
-        public void setStatusCode(int value) {
+        public void setStatusCode(String value) {
             this.statusCode = value;
         }
 
@@ -645,6 +690,61 @@ public class SenderProvidedResponseData {
                 this.value = value;
             }
 
+        }
+
+    }
+
+
+    /**
+     * <p>Java class for anonymous complex type.
+     * 
+     * <p>The following schema fragment specifies the expected content contained within this class.
+     * 
+     * <pre>
+     * &lt;complexType>
+     *   &lt;complexContent>
+     *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
+     *       &lt;sequence>
+     *         &lt;element name="Mnemonic" type="{urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2}string-50"/>
+     *       &lt;/sequence>
+     *     &lt;/restriction>
+     *   &lt;/complexContent>
+     * &lt;/complexType>
+     * </pre>
+     * 
+     * 
+     */
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+        "mnemonic"
+    })
+    public static class Sender {
+
+        @XmlElement(name = "Mnemonic", required = true)
+        protected String mnemonic;
+
+        /**
+         * Gets the value of the mnemonic property.
+         * 
+         * @return
+         *     possible object is
+         *     {@link String }
+         *     
+         */
+        public String getMnemonic() {
+            return mnemonic;
+        }
+
+        /**
+         * Sets the value of the mnemonic property.
+         * 
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *     
+         */
+        public void setMnemonic(String value) {
+            this.mnemonic = value;
         }
 
     }
