@@ -10,7 +10,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
 
 
 /**
- * ���������� ����������, ����������� ����.
+ * Маршрутная информация, заполняемая СМЭВ.
  * 
  * <p>Java class for anonymous complex type.
  * 
@@ -28,7 +28,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="Mnemonic" type="{urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2}string-50" minOccurs="0"/>
+ *                   &lt;element name="Mnemonic" type="{urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2}string-50"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -40,7 +40,7 @@ import javax.xml.datatype.XMLGregorianCalendar;
  *             &lt;complexContent>
  *               &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
  *                 &lt;sequence>
- *                   &lt;element name="Mnemonic" type="{urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2}string-100" minOccurs="0"/>
+ *                   &lt;element name="Mnemonic" type="{urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2}string-100"/>
  *                 &lt;/sequence>
  *               &lt;/restriction>
  *             &lt;/complexContent>
@@ -73,7 +73,6 @@ public class MessageMetadata {
     @XmlElement(name = "MessageId")
     protected String messageId;
     @XmlElement(name = "MessageType", required = true)
-    @XmlSchemaType(name = "string")
     protected MessageTypeType messageType;
     @XmlElement(name = "Sender")
     protected MessageMetadata.Sender sender;
@@ -86,7 +85,6 @@ public class MessageMetadata {
     @XmlSchemaType(name = "dateTime")
     protected XMLGregorianCalendar deliveryTimestamp;
     @XmlElement(name = "Status")
-    @XmlSchemaType(name = "string")
     protected InteractionStatusType status;
     @XmlAttribute(name = "Id")
     @XmlJavaTypeAdapter(CollapsedStringAdapter.class)
@@ -297,7 +295,7 @@ public class MessageMetadata {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="Mnemonic" type="{urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2}string-100" minOccurs="0"/>
+     *         &lt;element name="Mnemonic" type="{urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2}string-100"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -312,7 +310,7 @@ public class MessageMetadata {
     })
     public static class Recipient {
 
-        @XmlElement(name = "Mnemonic")
+        @XmlElement(name = "Mnemonic", required = true)
         protected String mnemonic;
 
         /**
@@ -352,7 +350,7 @@ public class MessageMetadata {
      *   &lt;complexContent>
      *     &lt;restriction base="{http://www.w3.org/2001/XMLSchema}anyType">
      *       &lt;sequence>
-     *         &lt;element name="Mnemonic" type="{urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2}string-50" minOccurs="0"/>
+     *         &lt;element name="Mnemonic" type="{urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2}string-50"/>
      *       &lt;/sequence>
      *     &lt;/restriction>
      *   &lt;/complexContent>
@@ -367,7 +365,7 @@ public class MessageMetadata {
     })
     public static class Sender {
 
-        @XmlElement(name = "Mnemonic")
+        @XmlElement(name = "Mnemonic", required = true)
         protected String mnemonic;
 
         /**
