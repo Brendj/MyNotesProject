@@ -30,3 +30,5 @@ create table cf_rnip_messages (
 CREATE INDEX cf_rnip_messages_eventtime_idx ON cf_rnip_messages (eventtime);
 CREATE INDEX cf_rnip_messages_contragent_idx ON cf_rnip_messages (idofcontragent);
 CREATE INDEX cf_rnip_messages_eventtime_processed_idx ON cf_rnip_messages (eventtime, processed);
+
+--! ФИНАЛИЗИРОВАН 27.06.2019, НЕ МЕНЯТЬ
