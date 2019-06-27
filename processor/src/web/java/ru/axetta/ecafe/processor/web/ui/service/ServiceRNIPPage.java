@@ -64,7 +64,7 @@ public class ServiceRNIPPage extends BasicWorkspacePage {
         }
         logger.error("Manual launch RNIPService startDate:" + getStartDate() + ", endDate:" + getEndDate());
 
-        RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getInstance();
+        RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
         rnipLoadPaymentsService.run(sDate,eDate);
     }
 

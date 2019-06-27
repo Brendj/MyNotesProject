@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.service;
 
+import ru.CryptoPro.JCP.JCP;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.w3c.dom.Document;
@@ -22,7 +24,11 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.io.ByteArrayInputStream;
+import java.security.KeyStore;
+import java.security.PrivateKey;
 import java.security.Provider;
+import java.security.Security;
+import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -31,9 +37,30 @@ public class RNIPSecuritySOAPHandlerV21 extends RNIPSecuritySOAPHandler implemen
 
     private static final Logger logger = LoggerFactory.getLogger(RNIPSecuritySOAPHandlerV21.class);
     public static final String SIGN_ID = "I_52d85fa5-18ae-11e5-b50b-bcaec5d977ce";
+    public static final String CONFIG = "resource/jcp.xml";
 
     public RNIPSecuritySOAPHandlerV21(String containerAlias, String containerPassword, IRNIPMessageToLog messageLogger) {
         super(containerAlias, containerPassword, messageLogger);
+    }
+
+    @Override
+    protected void initKeys() throws Exception {
+        if (privateKey == null) {
+            Security.insertProviderAt(new JCP(), 1);
+            keyStore = KeyStore.getInstance((new JCP()).HD_STORE_NAME);
+            keyStore.load(null, null);
+            privateKey = (PrivateKey) keyStore.getKey(containerAlias, containerPassword.toCharArray());
+            cert = (X509Certificate) keyStore.getCertificate(containerAlias);
+            //System.setProperty("org.apache.xml.security.resource.config", "resource/jcp.xml");
+            org.apache.xml.security.Init.init();
+            /*ru.CryptoPro.JCPxml.xmldsig.JCPXMLDSigInit.init();
+            try {
+                org.apache.xml.security.transforms.Transform.register(SmevTransformSpi.ALGORITHM_URN, SmevTransformSpi.class.getName());
+                logger.info("SmevTransformSpi has been initialized");
+            } catch (AlgorithmAlreadyRegisteredException e) {
+                logger.info("SmevTransformSpi Algorithm already registered: " + e.getMessage());
+            }*/
+        }
     }
 
     @Override
@@ -61,6 +88,10 @@ public class RNIPSecuritySOAPHandlerV21 extends RNIPSecuritySOAPHandler implemen
                         org.apache.xml.security.transforms.Transforms.TRANSFORM_C14N_EXCL_OMIT_COMMENTS,
                         (XMLStructure) null);
                 transformList.add(transformC14N);
+                //final Transform transformSMEV = fac.newTransform(
+                //        SmevTransformSpi.ALGORITHM_URN,
+                //        (XMLStructure) null);
+                //transformList.add(transformSMEV);
 
                 Element token = (Element)doc.getElementsByTagName("ns2:CallerInformationSystemSignature").item(0);
                 Element assertionNode = (Element)doc.getElementsByTagName("ns2:SenderProvidedRequestData").item(0);
@@ -68,7 +99,12 @@ public class RNIPSecuritySOAPHandlerV21 extends RNIPSecuritySOAPHandler implemen
                     assertionNode.setIdAttribute("Id", true);
                 } catch (NullPointerException npe) {
                     assertionNode = (Element)doc.getElementsByTagName("ns2:OriginalMessageID").item(0);
-                    assertionNode.setIdAttribute("Id", true);
+                    try {
+                        assertionNode.setIdAttribute("Id", true);
+                    } catch (NullPointerException npe2) {
+                        assertionNode = (Element)doc.getElementsByTagName("AckTargetMessage").item(0);
+                        assertionNode.setIdAttribute("Id", true);
+                    }
                 }
 
                 // Ссылка на подписываемые данные с алгоритмом хеширования ГОСТ 34.11.

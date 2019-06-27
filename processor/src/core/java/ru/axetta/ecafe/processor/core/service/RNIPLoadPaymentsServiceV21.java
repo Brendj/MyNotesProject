@@ -7,8 +7,8 @@ package ru.axetta.ecafe.processor.core.service;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.SMEVMessageExchangePortType;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange._1.SMEVMessageExchangeService;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.*;
+import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.AckTargetMessage;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.MessagePrimaryContent;
-import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.ObjectFactory;
 import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.XMLDSigSignatureType;
 import generated.ru.mos.rnip.xsd.catalog._2_1.*;
 import generated.ru.mos.rnip.xsd.common._2_1.*;
@@ -16,11 +16,15 @@ import generated.ru.mos.rnip.xsd.searchconditions._2_1.ExportPaymentsKindType;
 import generated.ru.mos.rnip.xsd.searchconditions._2_1.PaymentsExportConditions;
 import generated.ru.mos.rnip.xsd.searchconditions._2_1.TimeConditionsType;
 import generated.ru.mos.rnip.xsd.services.export_payments._2_1.ExportPaymentsRequest;
+import generated.ru.mos.rnip.xsd.services.export_payments._2_1.ExportPaymentsResponse;
 import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogRequest;
 import generated.ru.mos.rnip.xsd.services.import_catalog._2_1.ImportCatalogResponse;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.RnipEventType;
+import ru.axetta.ecafe.processor.core.persistence.RnipMessage;
 
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -32,12 +36,8 @@ import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.net.MalformedURLException;
 import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
-
-import generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.ObjectFactory;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Created by nuc on 17.10.2018.
@@ -50,8 +50,11 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     private static SMEVMessageExchangeService service21;
     private static SMEVMessageExchangePortType port21;
     private static BindingProvider bindingProvider21;
+    private static final Object sync = new Object();
 
-    public static final int PAGING_VALUE = 100;
+    public static final int PAGING_VALUE = 2147483647;
+    public static final String SUCCESS_CODE = "0 -";
+    public static final String NODATA_CODE = "NO_DATA -";
 
     private final static ThreadLocal<String> hasError = new ThreadLocal<String>(){
         @Override protected String initialValue() { return null; }
@@ -59,16 +62,31 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
 
     @Override
     public Object executeRequest(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
+        if(startDate == null) {
+            startDate = getStartDateByLastUpdateDate(updateDate);
+        }
+        if (endDate == null) {
+            endDate = getEndDateByStartDate(startDate);
+        }
         SendRequestResponse requestResponse = (SendRequestResponse)executeRequest21(requestType, contragent, updateDate, startDate, endDate);
         if (isRequestQueued(requestResponse)) {
-            RnipEventType eventType = null;
-            if (requestType == REQUEST_MODIFY_CATALOG) eventType = RnipEventType.CONTRAGENT_EDIT;
-            else if (requestType == REQUEST_CREATE_CATALOG) eventType = RnipEventType.CONTRAGENT_CREATE;
-            RnipDAOService.getInstance().saveRnipMessage(requestResponse, contragent, eventType, RnipRequestType.SEND_REQUEST);
+            RnipEventType eventType = getEventType(requestType);
+            RnipDAOService.getInstance().saveRnipMessage(requestResponse, contragent, eventType, startDate, endDate);
+            return requestResponse;
         } else {
             hasError.set("Получен ошибочный InteractionStatusType");
+            return null;
         }
-        return requestResponse;
+    }
+
+    private RnipEventType getEventType(int requestType) {
+        switch (requestType) {
+            case REQUEST_MODIFY_CATALOG : return RnipEventType.CONTRAGENT_EDIT;
+            case REQUEST_CREATE_CATALOG : return RnipEventType.CONTRAGENT_CREATE;
+            case REQUEST_LOAD_PAYMENTS : return RnipEventType.PAYMENT;
+            case REQUEST_LOAD_PAYMENTS_MODIFIED : return RnipEventType.PAYMENT_MODIFIED;
+        }
+        return null;
     }
 
     private boolean isRequestQueued(SendRequestResponse requestResponse) {
@@ -145,14 +163,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     }
 
     public SendRequestResponse executeLoadPaymentsV21(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate, int attempt) throws Exception {
-        InitRNIP21Service();
-
-        String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
-        String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
-        final RNIPSecuritySOAPHandlerV21 pfrSecuritySOAPHandler = new RNIPSecuritySOAPHandlerV21(alias, pass, getPacketLogger(contragent));
-        final List<Handler> handlerChain = new ArrayList<Handler>();
-        handlerChain.add(pfrSecuritySOAPHandler);
-        bindingProvider21.getBinding().setHandlerChain(handlerChain);
+        InitRNIP21Service(contragent);
 
         SendRequestRequest sendRequestRequest = getMessageHeaderV21(contragent);
 
@@ -219,14 +230,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     }
 
     public SendRequestResponse executeModifyCatalogV21(int requestType, Contragent contragent, Date updateDate, Date startDate, Date endDate) throws Exception {
-        InitRNIP21Service();
-
-        String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
-        String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
-        final RNIPSecuritySOAPHandlerV21 pfrSecuritySOAPHandler = new RNIPSecuritySOAPHandlerV21(alias, pass, getPacketLogger(contragent));
-        final List<Handler> handlerChain = new ArrayList<Handler>();
-        handlerChain.add(pfrSecuritySOAPHandler);
-        bindingProvider21.getBinding().setHandlerChain(handlerChain);
+        InitRNIP21Service(contragent);
 
         SendRequestRequest sendRequestRequest = getMessageHeaderV21(contragent);
 
@@ -270,7 +274,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         DescriptionSimpleParameter descriptionSimpleParameter1 = serviceTypeObjectFactory.createDescriptionSimpleParameter();
         descriptionSimpleParameter1.setForPayment(true);
         descriptionSimpleParameter1.setForSearch(false);
-        descriptionSimpleParameter1.setLabel("Код гос. услуги");
+        descriptionSimpleParameter1.setLabel("Код услуги");
         descriptionSimpleParameter1.setName("SRV_CODE");
         descriptionSimpleParameter1.setReadonly(true);
         descriptionSimpleParameter1.setRequired(true);
@@ -303,7 +307,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         descriptionSimpleParameter4.setForSearch(false);
         descriptionSimpleParameter4.setLabel("Статус плательщика");
         descriptionSimpleParameter4.setName("STATUS");
-        descriptionSimpleParameter4.setReadonly(false);
+        descriptionSimpleParameter4.setReadonly(true);
         descriptionSimpleParameter4.setRequired(true);
         descriptionSimpleParameter4.setVisible(false);
         descriptionSimpleParameter4.setDefaultValue("00");
@@ -313,7 +317,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         descriptionSimpleParameter5.setForSearch(false);
         descriptionSimpleParameter5.setLabel("Тип платежа");
         descriptionSimpleParameter5.setName("PAYMENTTYPE");
-        descriptionSimpleParameter5.setReadonly(false);
+        descriptionSimpleParameter5.setReadonly(true);
         descriptionSimpleParameter5.setRequired(true);
         descriptionSimpleParameter5.setVisible(false);
         descriptionSimpleParameter5.setDefaultValue("0");
@@ -322,8 +326,8 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         descriptionSimpleParameter6.setForPayment(true);
         descriptionSimpleParameter6.setForSearch(false);
         descriptionSimpleParameter6.setLabel("Основание платежа");
-        descriptionSimpleParameter6.setName("PURPOSE");
-        descriptionSimpleParameter6.setReadonly(false);
+        descriptionSimpleParameter6.setName("paytReason");
+        descriptionSimpleParameter6.setReadonly(true);
         descriptionSimpleParameter6.setRequired(true);
         descriptionSimpleParameter6.setVisible(false);
         descriptionSimpleParameter6.setDefaultValue("0");
@@ -333,7 +337,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         descriptionSimpleParameter7.setForSearch(false);
         descriptionSimpleParameter7.setLabel("Налоговый период");
         descriptionSimpleParameter7.setName("TAXPERIOD");
-        descriptionSimpleParameter7.setReadonly(false);
+        descriptionSimpleParameter7.setReadonly(true);
         descriptionSimpleParameter7.setRequired(true);
         descriptionSimpleParameter7.setVisible(false);
         descriptionSimpleParameter7.setDefaultValue("0");
@@ -343,7 +347,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         descriptionSimpleParameter8.setForSearch(false);
         descriptionSimpleParameter8.setLabel("Показатель номера документа");
         descriptionSimpleParameter8.setName("TAXDOCNUMBER");
-        descriptionSimpleParameter8.setReadonly(false);
+        descriptionSimpleParameter8.setReadonly(true);
         descriptionSimpleParameter8.setRequired(true);
         descriptionSimpleParameter8.setVisible(false);
         descriptionSimpleParameter8.setDefaultValue("0");
@@ -353,7 +357,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         descriptionSimpleParameter9.setForSearch(false);
         descriptionSimpleParameter9.setLabel("Показатель даты документа");
         descriptionSimpleParameter9.setName("TAXDOCDATE");
-        descriptionSimpleParameter9.setReadonly(false);
+        descriptionSimpleParameter9.setReadonly(true);
         descriptionSimpleParameter9.setRequired(true);
         descriptionSimpleParameter9.setVisible(false);
         descriptionSimpleParameter9.setDefaultValue("0");
@@ -382,7 +386,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         descriptionSimpleParameter12.setForPayment(true);
         descriptionSimpleParameter12.setForSearch(false);
         descriptionSimpleParameter12.setLabel("Назначение платежа");
-        descriptionSimpleParameter12.setName("Narrative");
+        descriptionSimpleParameter12.setName("PURPOSE");
         descriptionSimpleParameter12.setReadonly(false);
         descriptionSimpleParameter12.setRequired(true);
         descriptionSimpleParameter12.setVisible(true);
@@ -472,25 +476,37 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         return null;
     }
 
-    private void InitRNIP21Service() throws MalformedURLException {
-        if (port21 == null) {
-            service21 = new SMEVMessageExchangeService();
-            port21 = service21.getSMEVMessageExchangeEndpoint();
-            bindingProvider21 = (BindingProvider) port21;
-            URL endpoint = new URL(getRNIPUrl());
-            setEndpointAddress(bindingProvider21, endpoint.toString());
+    private void InitRNIP21Service(Contragent contragent) throws MalformedURLException {
+        synchronized (sync) {
+            if (port21 == null) {
+                service21 = new SMEVMessageExchangeService();
+                port21 = service21.getSMEVMessageExchangeEndpoint();
+                bindingProvider21 = (BindingProvider) port21;
+                URL endpoint = new URL(getRNIPUrl());
+                setEndpointAddress(bindingProvider21, endpoint.toString());
+            }
         }
+        String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
+        String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
+        final RNIPSecuritySOAPHandlerV21 pfrSecuritySOAPHandler = new RNIPSecuritySOAPHandlerV21(alias, pass, getPacketLogger(contragent));
+        final List<Handler> handlerChain = new ArrayList<Handler>();
+        handlerChain.add(pfrSecuritySOAPHandler);
+        bindingProvider21.getBinding().setHandlerChain(handlerChain);
     }
 
     @Override
     public String checkError(Object response) {
-        if (response != null && response instanceof List) {
-            return null; //возвращаем ОК для вызовов где параметром передается List, т.к. для элементов проверка уже пройдена
+        if (response != null) {
+            return hasError.get();
         }
-        return hasError.get();
+        return "Unexpected error";
     }
 
-    protected void forceRunGetResponse() {
+    public void runGetResponse() {
+        if (!isOn()) {
+            return;
+        }
+        logger.info("Start processing rnip GetResponses");
         List<RnipMessage> messages = RnipDAOService.getInstance().getRnipMessages();
         for (RnipMessage rnipMessage : messages) {
             try {
@@ -499,22 +515,62 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
                 logger.error("Error in processing rnip message async", e);
             }
         }
+        logger.info("End processing rnip GetResponses");
+    }
+
+    public void runSendAck() {
+        if (!isOn()) {
+            return;
+        }
+        logger.info("Start processing rnip SendAck");
+        List<RnipMessage> messages = RnipDAOService.getInstance().getProcessedRnipMessages();
+        for (RnipMessage rnipMessage : messages) {
+            try {
+                sendAckRnipMessage(rnipMessage);
+            } catch (Exception e) {
+                logger.error("Error in sending ack message async", e);
+            }
+        }
+        logger.info("End processing rnip SendAck");
+    }
+
+    private void sendAckRnipMessage(RnipMessage rnipMessage) throws Exception {
+        InitRNIP21Service(rnipMessage.getContragent());
+
+        generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.ObjectFactory requestObjectFactory =
+                new generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.ObjectFactory();
+
+        AckRequest ackRequest = requestObjectFactory.createAckRequest();
+
+        generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.ObjectFactory messageExchangeObjectFactory =
+                new generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.ObjectFactory();
+        XMLDSigSignatureType callerInformationSystemSignature = messageExchangeObjectFactory.createXMLDSigSignatureType();
+        ackRequest.setCallerInformationSystemSignature(callerInformationSystemSignature);
+
+        AckTargetMessage ackTargetMessage = messageExchangeObjectFactory.createAckTargetMessage();
+        ackTargetMessage.setId(RNIPSecuritySOAPHandlerV21.SIGN_ID);
+        ackTargetMessage.setAccepted(true);
+        ackTargetMessage.setValue(rnipMessage.getResponseMessageId());
+        ackRequest.setAckTargetMessage(ackTargetMessage);
+
+        try {
+            port21.ack(ackRequest);
+            RnipDAOService.getInstance().saveAsAckSent(rnipMessage);
+        } catch (Exception e) {
+            logger.error("Error in request to rnip 2.1", e);
+            return;
+        }
     }
 
     private void processRnipMessage(RnipMessage rnipMessage) throws Exception {
-        InitRNIP21Service();
-        String alias = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_ALIAS);
-        String pass = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_CRYPTO_PASSWORD);
-        final RNIPSecuritySOAPHandlerV21 pfrSecuritySOAPHandler = new RNIPSecuritySOAPHandlerV21(alias, pass, getPacketLogger(rnipMessage.getContragent()));
-        final List<Handler> handlerChain = new ArrayList<Handler>();
-        handlerChain.add(pfrSecuritySOAPHandler);
-        bindingProvider21.getBinding().setHandlerChain(handlerChain);
+        InitRNIP21Service(rnipMessage.getContragent());
 
         generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.ObjectFactory requestObjectFactory =
                 new generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.ObjectFactory();
         GetResponseRequest getResponseRequest = requestObjectFactory.createGetResponseRequest();
 
-        generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.ObjectFactory messageExchangeObjectFactory = new ObjectFactory();
+        generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.ObjectFactory messageExchangeObjectFactory =
+                new generated.ru.gov.smev.artefacts.x.services.message_exchange.types.basic._1.ObjectFactory();
         XMLDSigSignatureType callerInformationSystemSignature = messageExchangeObjectFactory.createXMLDSigSignatureType();
         getResponseRequest.setCallerInformationSystemSignature(callerInformationSystemSignature);
 
@@ -527,20 +583,164 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         getResponseRequest.setSender(sender);
 
         GetResponseResponse response = null;
+        String[] responseMessageToSave = {"", ""};
         try {
             response = port21.getResponse(getResponseRequest);
             GetResponseResponse.ResponseMessage responseMessage = response.getResponseMessage();
             Response internalResponse = responseMessage.getResponse();
-            SenderProvidedResponseData senderProvidedResponseData = internalResponse.getSenderProvidedResponseData();
-            MessagePrimaryContent messagePrimaryContent = senderProvidedResponseData.getMessagePrimaryContent();
-            ImportCatalogResponse importCatalogResponse = messagePrimaryContent.getImportCatalogResponse();
-            SingleImportProtocolType importProtocolType = importCatalogResponse.getImportProtocol();
-            String responseMessageToSave = importProtocolType.getCode() + " " + importProtocolType.getDescription();
-            RnipDAOService.getInstance().saveAsProcessed(rnipMessage, responseMessageToSave);
+            responseMessageToSave = checkResponseByEventType(internalResponse, rnipMessage);
+            if (noErrors(responseMessageToSave[0]) && isPaymentRequest(rnipMessage)) {
+                info("Разбор новых платежей для контрагента %s..", rnipMessage.getContragent().getContragentName());
+                boolean hasMore = internalResponse.getSenderProvidedResponseData().getMessagePrimaryContent().getExportPaymentsResponse().isHasMore();
+                RNIPPaymentsResponse res = parsePayments(internalResponse);
+                info("Получено %s новых платежей для контрагента %s, применение..", res.getPayments().size(), rnipMessage.getContragent().getContragentName());
+                boolean isAutoRun = true; //todo тут было условие (startDate == null);
+                addPaymentsToDb(res.getPayments(), isAutoRun);
+
+                //Сохранение по новому даты-времени lastRnipUpdate для контрагента в БД
+                //Если это автоматический запуск, то меняем дату последнего получения платежей контрагента
+                //А если это ручной запуск за выбранный период времени, то дату последнего получения платежей не трогаем
+
+                //Сохранили
+
+                info("Все новые платежи для контрагента %s обработаны", rnipMessage.getContragent().getContragentName());
+                if (hasMore) {
+                    //не нужно, т.к. размер страницы установлен в PAGING_VALUE = 2147483647
+                } else {
+                    if (isAutoRun) {
+                        Date lastUpdateDate = getLastUpdateDate(rnipMessage.getEventType().getCode(), rnipMessage.getContragent());
+                        saveEndDate(rnipMessage.getEventType().getCode(), rnipMessage.getContragent(), lastUpdateDate, res.getRnipDate());
+                    }
+                }
+            }
         } catch (Exception e) {
+            responseMessageToSave[0] = "100 - Internal Error";
             logger.error("Error in request to rnip 2.1", e);
-            return;
         }
+        RnipDAOService.getInstance().saveAsProcessed(rnipMessage, responseMessageToSave[0], responseMessageToSave[1], rnipMessage.getEventType());
+    }
+
+    private boolean isPaymentRequest(RnipMessage rnipMessage) {
+        return rnipMessage.getEventType().equals(RnipEventType.PAYMENT) || rnipMessage.getEventType().equals(RnipEventType.PAYMENT_MODIFIED);
+    }
+
+    public static boolean noErrors(String message) {
+        return message.startsWith(SUCCESS_CODE);
+    }
+
+    public static boolean noData(String message) {
+        return message.startsWith(NODATA_CODE);
+    }
+
+    public static boolean isCatalogMessage(RnipEventType eventType) {
+        return eventType.equals(RnipEventType.CONTRAGENT_CREATE) || eventType.equals(RnipEventType.CONTRAGENT_EDIT);
+    }
+
+    private RNIPPaymentsResponse parsePayments(Response internalResponse) {
+        ExportPaymentsResponse exportPaymentsResponse = internalResponse.getSenderProvidedResponseData().getMessagePrimaryContent().getExportPaymentsResponse();
+        List<ExportPaymentsResponse.PaymentInfo> paymentInfos = exportPaymentsResponse.getPaymentInfo();
+        List<Map<String, String>> result = new ArrayList<Map<String, String>>();
+        Date rnipDate = getRnipDate(internalResponse.getSenderProvidedResponseData().getMessagePrimaryContent().getExportPaymentsResponse().getTimestamp());
+        for (ExportPaymentsResponse.PaymentInfo paymentInfo : paymentInfos) {
+            try {
+                Map<String, String> map = parsePayment(paymentInfo);
+                result.add(map);
+            } catch (Exception e) {
+                logger.error("Can't parse rnip payment", e);
+            }
+        }
+        RNIPPaymentsResponse res = new RNIPPaymentsResponse(result, rnipDate);
+        return res;
+    }
+
+    public Boolean receiveContragentPayments(int requestType, Contragent contragent, Date startDate, Date endDate) throws Exception{
+        //  Получаем id контрагента в системе РНИП - он будет использоваться при отправке запроса
+        String RNIPIdOfContragent = getRNIPIdFromRemarks(contragent.getRemarks());
+        if (RNIPIdOfContragent == null || RNIPIdOfContragent.length() < 1) {
+            return true; //ошибки нет, у контрагента нет ремарки рнипа
+        }
+        Date lastUpdateDate = getLastUpdateDate(requestType, contragent);
+
+        info("Постановка в очередь запроса на получение платежей для контрагента %s", contragent.getContragentName());
+        //  Отправка запроса на получение платежей
+        SendRequestResponse response = null;
+        try {
+            response = (SendRequestResponse)executeRequest(requestType, contragent, lastUpdateDate, startDate, endDate);
+        } catch (Exception e) {
+            logger.error("Failed to request data from RNIP service", e);
+        }
+
+        if (response == null) {
+            return false;
+        }
+
+        boolean isAutoRun = (startDate == null);
+
+        //Сохранение по новому даты-времени lastRnipUpdate для контрагента в БД
+        //Если это автоматический запуск, то меняем дату последнего получения платежей контрагента
+        //А если это ручной запуск за выбранный период времени, то дату последнего получения платежей не трогаем
+        if (isAutoRun) {
+            saveEndDate(requestType, contragent, lastUpdateDate, getRnipDate(response.getMessageMetadata().getSendingTimestamp()));
+        }
+        //Сохранили
+
+        info("Запрос на получение платежей для контрагента %s отправлен в очередь", contragent.getContragentName());
+        return true;
+    }
+
+
+    public Map<String, String> parsePayment(ExportPaymentsResponse.PaymentInfo payment) {
+        Map<String, String> vals = new HashMap<String, String>();
+        vals.put(SYSTEM_IDENTIFIER_KEY, payment.getPaymentId());
+        vals.put(AMOUNT_KEY, payment.getAmount().toString());
+        Date rnipDate = getRnipDate(payment.getPaymentDate());
+        vals.put(PAYMENT_DATE_KEY, new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(rnipDate));
+        vals.put(BIK_KEY, payment.getPayee().getOrgAccount().getBank().getBik());
+        vals.put(CHANGE_STATUS_KEY, payment.getChangeStatus().getMeaning());
+        for (AdditionalDataType dataType : payment.getAdditionalData()) {
+            if (dataType.getName().equals(PAYMENT_TO_KEY)) {
+                vals.put(PAYMENT_TO_KEY, dataType.getValue());
+            }
+            if (dataType.getName().equals(SRV_CODE_KEY)) {
+                vals.put(SRV_CODE_KEY, dataType.getValue());
+            }
+        }
+        return vals;
+    }
+
+    private String[] checkResponseByEventType(Response internalResponse, RnipMessage rnipMessage) {
+        SenderProvidedResponseData senderProvidedResponseData = internalResponse.getSenderProvidedResponseData();
+        String[] result = {"", ""};
+        switch (rnipMessage.getEventType()) {
+            case PAYMENT :
+            case PAYMENT_MODIFIED :
+                List<SenderProvidedResponseData.RequestRejected> requestRejectedList = senderProvidedResponseData.getRequestRejected();
+                if (requestRejectedList != null && requestRejectedList.size() > 0) {
+                    for (SenderProvidedResponseData.RequestRejected requestRejected : requestRejectedList) {
+                        result[0] += requestRejected.getRejectionReasonCode() + " - " + requestRejected.getRejectionReasonDescription() + ",";
+                    }
+                    result[1] = senderProvidedResponseData.getMessageID();
+                    break;
+                } else {
+                    result[0] = "0 - OK";
+                    result[1] = internalResponse.getMessageMetadata().getMessageId();
+                }
+
+                break;
+            case CONTRAGENT_EDIT :
+            case CONTRAGENT_CREATE :
+                MessagePrimaryContent messagePrimaryContent = senderProvidedResponseData.getMessagePrimaryContent();
+                if (messagePrimaryContent != null) {
+                    ImportCatalogResponse importCatalogResponse = messagePrimaryContent.getImportCatalogResponse();
+                    SingleImportProtocolType importProtocolType = importCatalogResponse.getImportProtocol();
+                    result[0] = importProtocolType.getCode() + " - " + importProtocolType.getDescription();
+
+                }
+                result[1] = senderProvidedResponseData.getMessageID();
+                break;
+        }
+
+        return result;
     }
 
 }

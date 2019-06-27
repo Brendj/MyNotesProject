@@ -14,10 +14,10 @@ public class RnipMessage {
     private long version;
     private Date eventTime;
     private RnipEventType eventType;
-    private RnipRequestType requestType;
     private String request;
     private String response;
     private String messageId;
+    private String responseMessageId;
     private Integer paging;
     private String responseMessage;
     private Contragent contragent;
@@ -25,21 +25,26 @@ public class RnipMessage {
     private Date endDate;
     private Boolean processed;
     private Boolean ackSent;
+    private Boolean succeeded;
     private Date lastUpdate;
 
     public RnipMessage() {
 
     }
 
-    public RnipMessage(Contragent contragent, RnipEventType eventType, RnipRequestType requestType, String request, String messageId) {
+    public RnipMessage(Contragent contragent, RnipEventType eventType, String request,
+            String messageId, Date startDate, Date endDate) {
         processed = false;
         eventTime = new Date();
         lastUpdate = new Date();
         this.contragent = contragent;
+        this.startDate = startDate;
+        this.endDate = endDate;
         this.eventType = eventType;
-        this.requestType = requestType;
         this.request = request;
         this.messageId = messageId;
+        this.ackSent = false;
+        this.succeeded = false;
     }
 
     public Long getIdOfRnipMessage() {
@@ -162,11 +167,19 @@ public class RnipMessage {
         this.ackSent = ackSent;
     }
 
-    public RnipRequestType getRequestType() {
-        return requestType;
+    public Boolean getSucceeded() {
+        return succeeded;
     }
 
-    public void setRequestType(RnipRequestType requestType) {
-        this.requestType = requestType;
+    public void setSucceeded(Boolean succeeded) {
+        this.succeeded = succeeded;
+    }
+
+    public String getResponseMessageId() {
+        return responseMessageId;
+    }
+
+    public void setResponseMessageId(String responseMessageId) {
+        this.responseMessageId = responseMessageId;
     }
 }

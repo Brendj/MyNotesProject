@@ -263,19 +263,6 @@ public class RNIPLoadPaymentsService {
         info("Каталог для контрагента %s добавлен в очередь обработки РНиП", contragent.getContragentName());
     }
 
-
-    public void runGetResponse() {
-        if (!isOn()) {
-            //return;
-        }
-        RNIPLoadPaymentsService rnipLoadPaymentsService = getRNIPServiceBean();
-        rnipLoadPaymentsService.forceRunGetResponse();
-    }
-
-    protected void forceRunGetResponse() {
-        //в версии 1.15 ничего не делаем
-    }
-
     public void runRequests() {
         run(null, null);
     }
@@ -309,6 +296,7 @@ public class RNIPLoadPaymentsService {
                 logger.error("Failed to receive or proceed payments", e);
             }
         }
+        if (this instanceof RNIPLoadPaymentsServiceV21) isSuccessEnd = true;
         SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(
                 SecurityJournalProcess.EventType.RNIP, new Date());
         processEnd.saveWithSuccess(isSuccessEnd);
@@ -379,7 +367,7 @@ public class RNIPLoadPaymentsService {
         return true;
     }
 
-    private void saveEndDate(int requestType, Contragent contragent, Date lastUpdateDate, Date dateFromRnip) {
+    protected void saveEndDate(int requestType, Contragent contragent, Date lastUpdateDate, Date dateFromRnip) {
         Date edate = getEndDateByStartDate(getStartDateByLastUpdateDate(lastUpdateDate));
         if (dateFromRnip != null && dateFromRnip.before(edate)) {
             edate = dateFromRnip;

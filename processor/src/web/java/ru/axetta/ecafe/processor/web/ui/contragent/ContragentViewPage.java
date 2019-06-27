@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.contragent;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Person;
-import ru.axetta.ecafe.processor.core.persistence.RnipEventType;
+import ru.axetta.ecafe.processor.core.persistence.RnipMessage;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.service.RnipDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -27,6 +27,14 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 public class ContragentViewPage extends BasicWorkspacePage {
+
+    public List<ContragentRnipLogItem> getRnipLogItems() {
+        return rnipLogItems;
+    }
+
+    public void setRnipLogItems(List<ContragentRnipLogItem> rnipLogItems) {
+        this.rnipLogItems = rnipLogItems;
+    }
 
     public static class PersonItem {
 
@@ -94,24 +102,11 @@ public class ContragentViewPage extends BasicWorkspacePage {
     private String ogrn;
     private String defaultPayContragent;
     private boolean payByCashier;
+    private List<ContragentRnipLogItem> rnipLogItems;
 
     public boolean hasRnip() {
         RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
         return !StringUtils.isEmpty(rnipLoadPaymentsService.getRNIPIdFromRemarks (this.remarks));
-    }
-
-    public String getRnipLogEdit() {
-        List<RnipEventType> list = new ArrayList<>();
-        list.add(RnipEventType.CONTRAGENT_CREATE);
-        list.add(RnipEventType.CONTRAGENT_EDIT);
-        return RuntimeContext.getAppContext().getBean(RnipDAOService.class).getRnipInfoResultString(idOfContragent, list);
-    }
-
-    public String getRnipLogPayment() {
-        List<RnipEventType> list = new ArrayList<>();
-        list.add(RnipEventType.PAYMENT);
-        list.add(RnipEventType.PAYMENT_MODIFIED);
-        return RuntimeContext.getAppContext().getBean(RnipDAOService.class).getRnipInfoResultString(idOfContragent, list);
     }
 
     public Long getIdOfContragent() {
@@ -296,6 +291,21 @@ public class ContragentViewPage extends BasicWorkspacePage {
         }else {
             this.payByCashier = contragent.isPayByCashier();
         }
+
+        this.rnipLogItems = getLogItems();
+
+    }
+
+    private List<ContragentRnipLogItem> getLogItems() {
+        List<ContragentRnipLogItem> result = new ArrayList<>();
+        List<RnipMessage> list = RuntimeContext.getAppContext().getBean(RnipDAOService.class).getTodayRnipMessages(this.idOfContragent);
+        for (RnipMessage rnipMessage : list) {
+            ContragentRnipLogItem item = new ContragentRnipLogItem(rnipMessage.getEventTime(), rnipMessage.getEventType(),
+                    rnipMessage.getMessageId(), rnipMessage.getStartDate(), rnipMessage.getEndDate(), rnipMessage.getResponseMessage(),
+                    rnipMessage.getSucceeded());
+            result.add(item);
+        }
+        return result;
     }
 
     public boolean isTSP(){

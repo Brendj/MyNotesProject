@@ -23,25 +23,3 @@ CREATE TABLE cf_kzn_clients_statistic (
 CREATE UNIQUE INDEX cf_kzn_clients_statistic_idoforg_idx ON cf_kzn_clients_statistic (idoforg);
 
 --! ФИНАЛИЗИРОВАН 16.05.2019, НЕ МЕНЯТЬ
-
---временно добавляю новые объекты
-create table cf_rnip_messages (
-  idofrnipmessage bigserial NOT NULL,
-  version bigint,
-  eventtime bigint NOT NULL,  --время отправки
-  eventtype integer NOT NULL, --каталог или экспорт платежей
-  requesttype integer NOT NULL, --тип запроса (SendRequestRequest, GetResponseRequest и т.п.)
-  request text,
-  response text,
-  messageid character varying(100) NOT NULL, --ид в исходящем пакете
-  idofcontragent bigint NOT NULL,
-  startdate bigint, --время начала интервала запроса
-  enddate bigint, --время окончания интервала запроса
-  paging integer, --paging из запроса (смещение для пакета ответа)
-  processed integer NOT NULL DEFAULT 0, --признак, что асинхронный ответ получен и разобран
-  acksent integer NOT NULL DEFAULT 0,
-  responsemessage character varying(256),
-  lastupdate bigint,
-  constraint cf_rnip_messages_pk PRIMARY KEY (idofrnipmessage),
-  CONSTRAINT cf_rnip_messages_contragent_fk FOREIGN KEY (idofcontragent) REFERENCES cf_contragents(idofcontragent)
-);

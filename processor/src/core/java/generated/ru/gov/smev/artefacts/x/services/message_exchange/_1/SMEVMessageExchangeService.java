@@ -1,6 +1,9 @@
 
 package generated.ru.gov.smev.artefacts.x.services.message_exchange._1;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
+
 import javax.xml.namespace.QName;
 import javax.xml.ws.*;
 import java.net.MalformedURLException;
@@ -26,7 +29,7 @@ public class SMEVMessageExchangeService
         URL url = null;
         WebServiceException e = null;
         try {
-            url = new URL("http://test.rnip.mos.ru/frontend-service/MainService?wsdl");
+            url = new URL(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V20) + "?wsdl");
         } catch (MalformedURLException ex) {
             e = new WebServiceException(ex);
         }

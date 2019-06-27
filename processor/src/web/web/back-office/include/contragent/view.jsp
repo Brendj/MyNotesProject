@@ -90,12 +90,63 @@
                      styleClass="input-text" />
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid" rendered="#{mainPage.contragentViewPage.hasRnip()}">
-    <h:outputText escape="true" value="Лог взаимодействия с каталогом РНиП (последние 10 записей)" styleClass="output-text" />
-    <h:outputText escape="false" value="#{mainPage.contragentViewPage.rnipLogEdit}" styleClass="output-text" />
-</h:panelGrid>
-<h:panelGrid styleClass="borderless-grid" rendered="#{mainPage.contragentViewPage.hasRnip()}">
-    <h:outputText escape="true" value="Лог экспорта платежей из РНиП (последние 10 записей)" styleClass="output-text" />
-    <h:outputText escape="false" value="#{mainPage.contragentViewPage.rnipLogPayment}" styleClass="output-text" />
+    <h:outputText escape="true" value="Лог взаимодействия с РНиП за сегодня" styleClass="output-text" />
+    <rich:dataTable id="contragentRNIPlog" value="#{mainPage.contragentViewPage.rnipLogItems}" var="rnipLogItem"
+                    rows="20" footerClass="data-table-footer">
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Время запроса"/>
+            </f:facet>
+            <h:outputText value="#{rnipLogItem.eventTime}" converter="timeConverter"/>
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Тип запроса"/>
+            </f:facet>
+            <h:outputText value="#{rnipLogItem.eventType}"/>
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Message ID"/>
+            </f:facet>
+            <h:outputText value="#{rnipLogItem.messageId}"/>
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Начало интервала"/>
+            </f:facet>
+            <h:outputText value="#{rnipLogItem.startDate}" converter="timeConverter"/>
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Конец интервала"/>
+            </f:facet>
+            <h:outputText value="#{rnipLogItem.endDate}" converter="timeConverter"/>
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Ответ"/>
+            </f:facet>
+            <h:outputText value="#{rnipLogItem.responseMessage}"/>
+        </rich:column>
+        <rich:column>
+            <f:facet name="header">
+                <h:outputText value="Есть платежи"/>
+            </f:facet>
+            <h:outputText value="#{rnipLogItem.succeeded}"/>
+        </rich:column>
+        <f:facet name="footer">
+            <rich:datascroller for="contragentRNIPlog" renderIfSinglePage="false" fastControls="hide"
+                               stepControls="auto" boundaryControls="hide">
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+            </rich:datascroller>
+        </f:facet>
+    </rich:dataTable>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Редактировать" action="#{mainPage.showContragentEditPage}"
