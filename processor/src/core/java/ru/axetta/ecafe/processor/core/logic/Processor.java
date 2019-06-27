@@ -871,6 +871,19 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        try {
+            OrgSettingsRequest orgSettingsRequest = request.getOrgSettingsRequest();
+            orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
+            if (orgSettingsRequest != null) {
+                orgSettingSection = processOrgSettings(orgSettingsRequest);
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process OrgSettingSetting: %s", e.getMessage());
+            processorUtils
+                    .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
         logger.info("Full sync performance info: " + performanceLogger.toString());
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -6361,7 +6374,7 @@ public class Processor implements SyncProcessor {
                 orgSetting = processOrgSettings(orgSettingsRequest);
             }
         } catch (Exception e) {
-            String message = String.format("processOrgSetting: %s", e.getMessage());
+            String message = String.format("Error when process OrgSettingSetting: %s", e.getMessage());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);

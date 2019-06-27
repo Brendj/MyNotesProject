@@ -33,6 +33,7 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
         Long idOfOrg = orgSettingsRequest.getIdOfOrgSource();
         Date syncData = new Date();
 
+        //Apply change from ARM
         for(OrgSettingSyncPOJO pojo : orgSettingsRequest.getItems()){
             OrgSetting setting = OrgSettingDAOUtils.getOrgSettingByGroupIdAndOrg(session, pojo.getGroupID(), pojo.getIdOfOrg());
             if(setting != null && setting.getVersion() <= maxVersionFromARM){
@@ -60,6 +61,7 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
             session.merge(setting);
         }
 
+        //Build section for response
         OrgSettingSection section = new OrgSettingSection();
         Long maxVersionFromDB = OrgSettingDAOUtils.getMaxVersionOfOrgSettingForFriendlyOrgGroup(idOfOrg, session);
         List<OrgSetting> settingsFromDB = OrgSettingDAOUtils
