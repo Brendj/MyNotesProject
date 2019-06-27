@@ -13,7 +13,7 @@ create table cf_rnip_messages (
   request text,
   response text,
   messageid character varying(100) NOT NULL,
-  responsemessageid character varying(100) NOT NULL,
+  responsemessageid character varying(100),
   idofcontragent bigint NOT NULL,
   startdate bigint,
   enddate bigint,
