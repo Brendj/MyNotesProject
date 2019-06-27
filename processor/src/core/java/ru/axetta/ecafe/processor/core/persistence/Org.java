@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 
 import org.apache.commons.codec.binary.Base64;
@@ -78,6 +79,7 @@ public class Org implements Serializable {
     private Set<DiaryTimesheet> diaryTimesheets = new HashSet<DiaryTimesheet>();
     private Set<DiaryClass> diaryClasses = new HashSet<DiaryClass>();
     private Set<DiaryValue> diaryValues = new HashSet<DiaryValue>();
+    private Set<OrgSetting> orgSettings = new HashSet<OrgSetting>();
     private String OGRN;
     private String INN;
     private Set<CategoryOrg> categoriesInternal = new HashSet<CategoryOrg>();
@@ -1174,5 +1176,13 @@ public class Org implements Serializable {
         } else {
             return this.multiCardModeEnabled;
         }
+    }
+
+    public Set<OrgSetting> getOrgSettings() {
+        return orgSettings;
+    }
+
+    public void setOrgSettings(Set<OrgSetting> orgSettings) {
+        this.orgSettings = orgSettings;
     }
 }

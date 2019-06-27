@@ -173,7 +173,7 @@ public class MigrantsProcessor extends AbstractProcessor<ResMigrants> {
             inMigReqItem = new ResIncomeMigrationRequestsItem(migrant);
             inMigReqItem.setIdOfOrgReg(migrant.getOrgRegistry().getIdOfOrg());
             inMigReqItem.setIdOfVendorOrgReg(migrant.getOrgRegVendor().getIdOfContragent());
-            inMigReqItem.setNameOrgReg(migrant.getOrgRegistry().getShortName());
+            inMigReqItem.setNameOrgReg(migrant.getOrgRegistry().getShortNameInfoService());
             inMigReqItem.setRequestNumber(migrant.getRequestNumber());
             inMigReqItem.setIdOfMigrClient(migrant.getClientMigrate().getIdOfClient());
             Person person = migrant.getClientMigrate().getPerson();

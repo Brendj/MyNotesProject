@@ -115,6 +115,9 @@
     <a4j:commandButton value="Обработка мигрантов" action="#{otherActionsPage.loadESZMigrants()}" id="loadESZMigrants"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
 
+    <a4j:commandButton value="Обработка мигрантов (перевод в выбывшие)" action="#{otherActionsPage.updateESZMigrants()}" id="updateESZMigrants"
+                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+
     <a4j:commandButton value="Запустить сервис обработки ЗЛП" action="#{otherActionsPage.runApplicationForFoodProcessingService()}" id="runApplicationForFoodProcessingService"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <a4j:commandButton value="Запустить сверку льгот ДТСЗН с реестрами 2.0" action="#{otherActionsPage.runDTSZNDiscountsReviseService()}" id="runDTSZNDiscountsReviseService"
@@ -137,6 +140,8 @@
                            styleClass="command-button" />
     <a4j:commandButton value="Итого за неделю" action="#{otherActionsPage.runEventNotificationServiceForWeekly}" id="runEventNotificationServiceForWeekly"
                                                                              styleClass="command-button" />
+        <a4j:commandButton value="Выгрузка на FTP МСР" action="#{otherActionsPage.runMSRToFTP()}" id="runMSRToFTP"
+                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" id="specialDatesFileLoaderPanel" >
         <rich:panel>
@@ -174,6 +179,43 @@
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
                 <a4j:commandButton value="Проверка соответствия флага включения функционала предзаказа ОО" action="#{otherActionsPage.relevancePreordersToOrgFlag()}" id="relevancePreordersToOrgFlag"
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+            </h:panelGrid>
+        </rich:panel>
+        <rich:panel>
+            <h:panelGrid columns="2">
+                <h:outputText escape="true" value="Выборочная генерация заявок по предзаказам" styleClass="output-text" /><br/>
+                <h:outputText styleClass="output-text" escape="true" value="Список организаций" />
+                <h:panelGroup>
+                    <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
+                                       reRender="modalOrgListSelectorPanel"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;">
+                        <f:setPropertyActionListener value="#{otherActionsPage.getStringIdOfOrgList}"
+                                                     target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
+                    </a4j:commandButton>
+                    <h:outputText styleClass="output-text" escape="true" value=" {#{otherActionsPage.filter}}" />
+                </h:panelGroup>
+
+                <h:outputText styleClass="output-text" escape="true" value="Физ. лицо" />
+                <h:panelGroup id="clientFilter">
+                    <a4j:commandButton value="..." action="#{mainPage.showClientSelectListPage(otherActionsPage.getClientList())}"
+                                       reRender="modalClientListSelectorPanel,selectedClientList"
+                                       oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalClientListSelectorPanel')}.show();"
+                                       styleClass="command-link" style="width: 25px;">
+                        <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}" />
+                        <f:setPropertyActionListener value="#{otherActionsPage.getStringClientList}"
+                                                     target="#{mainPage.clientSelectListPage.clientFilter}" />
+                    </a4j:commandButton>
+                    <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
+                                  value=" {#{otherActionsPage.stringClientList}}" />
+                </h:panelGroup>
+                <h:outputText escape="true" value="Дата" styleClass="output-text" />
+                <rich:calendar value="#{otherActionsPage.startDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                </rich:calendar>
+                <a4j:commandButton value="Создать заявки по выбранным параметрам" action="#{otherActionsPage.preorderRequestsManualGenerate()}" id="preorderRequestsManualGenerate"
+                                   styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" /><br/>
             </h:panelGrid>
         </rich:panel>
     </h:panelGrid>

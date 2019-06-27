@@ -75,101 +75,52 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
         }
 
         private JRDataSource createDataSource(Session session, Contragent contragent, Date startTime, Date endTime,
-                List<Long> idOfOrgList, Boolean showOnlyUnpaidItems) throws Exception{
+                List<Long> idOfOrgList, Boolean showOnlyUnpaidItems) throws Exception {
             List<ContragentPreordersReportItem> result = new LinkedList<ContragentPreordersReportItem>();
             String idOfOrgsCondition = CollectionUtils.isEmpty(idOfOrgList) ? "" : " and o.idoforg in (:idOfOrgList) " ;
             String idOfContragentCondition = contragent == null ? "" : " and ctg.idofcontragent = :idOfContragent ";
-            String getDataQuery;
+            String simpleCondition = showOnlyUnpaidItems ? " where isPaid like 'Нет' " : "";
 
-            if(showOnlyUnpaidItems) {
-                getDataQuery = getUnpaidComplexesQueryPart(idOfContragentCondition, idOfOrgsCondition);;
-            } else {
-                getDataQuery = " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, "
-                        + "o.shortnameinfoservice, o.address, c.contractId, pc.preorderDate, "
-                        + "pc.complexName, cast(pl.qty as bigint) as amount, '' as dish, "
-                        + "cast((pc.complexPrice * pl.qty) as bigint), co.createddate as cancelDate, "
-                        + "case coalesce(ord.state, 0) when 0 then 'Нет' else 'Да' end as reversed, "
-                        + "ord.orderDate, pl.qty*pl.price as orderSum, pl.idOfOrder, case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as isPaid "
-                        + "from cf_preorder_complex pc "
-                        + "join cf_clients c on pc.idofclient = c.idofclient "
-                        + "join cf_orgs o on c.idOfOrg = o.idOfOrg "
-                        + "join cf_contragents ctg on o.defaultsupplier = ctg.idOfContragent "
-                        + "join cf_preorder_linkod pl on pl.preorderguid = pc.guid "
-                        + "left join cf_orders ord on ord.idOfOrg = pl.idOfOrg and ord.idOfOrder = pl.idOfOrder "
-                        + "left join cf_transactions tr on ord.idoftransaction = tr.idoftransaction "
-                        + "left join cf_canceledorders co on ord.idOfOrder = co.idOfOrder and ord.idOfOrg = co.idOfOrg "
-                        + " where pc.deletedstate = 0 and pc.amount > 0 and o.PreordersEnabled = 1 "
-                        + " and pc.preorderDate BETWEEN :startDate and :endDate "
-                        + idOfOrgsCondition
-                        + idOfContragentCondition
-                        + " union"
-                        + " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, o.shortNameInfoService, o.address, c.contractId, pc.preorderDate, "
-                        + " pc.complexName, cast(1 as bigint) as amount, array_to_string(array_agg(pmd.menudetailname), ', ') as dish, "
-                        + " cast(sum(pmd.menudetailprice * pmd.amount) as bigint), co.createddate as cancelDate, "
-                        + " case coalesce(ord.state, 0) when 0 then 'Нет' else 'Да' end as reversed, "
-                        + " ord.orderDate, pl.qty*pl.price as orderSum, pl.idOfOrder,  case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as isPaid "
-                        + " from cf_preorder_menudetail pmd "
-                        + " join cf_clients c on pmd.idofclient = c.idofclient "
-                        + " join cf_orgs o on c.idOfOrg = o.idOfOrg  "
-                        + " join cf_contragents ctg on o.defaultsupplier = ctg.idOfContragent "
-                        + " join cf_preorder_complex pc on pmd.idofpreordercomplex = pc.idofpreordercomplex "
-                        + " join cf_preorder_linkod pl on pl.preorderguid = pc.guid "
-                        + " left join cf_orders ord on ord.idOfOrg = pl.idOfOrg and ord.idOfOrder = pl.idOfOrder"
-                        + " left join cf_transactions tr on ord.idoftransaction = tr.idoftransaction"
-                        + " left join cf_canceledorders co on ord.idOfOrder = co.idOfOrder and ord.idOfOrg = co.idOfOrg"
-                        + " where pc.deletedstate = 0 and pmd.deletedstate = 0 and pmd.amount > 0 and o.PreordersEnabled = 1"
-                        + " and pmd.preorderDate BETWEEN :startDate and :endDate "
-                        + idOfOrgsCondition
-                        + idOfContragentCondition
-                        + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17"
-                        + " UNION"
-                        + getUnpaidComplexesQueryPart(idOfContragentCondition, idOfOrgsCondition);
-            }
-
-            Query query = session.createSQLQuery(getDataQuery);
-            query.setParameter("startDate", startTime.getTime())
-                 .setParameter("endDate", endTime.getTime());
-
-            if(contragent != null) {
-                query.setParameter("idOfContragent", contragent.getIdOfContragent());
-            }
-            if(!CollectionUtils.isEmpty(idOfOrgList)){
-                query.setParameterList("idOfOrgList", idOfOrgList);
-            }
-
-            List<Object[]> dataFromDB = query.list();
-            if(dataFromDB != null){
-                for(Object[] row : dataFromDB) {
-                    Long idOfContragent = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
-                    String contragentName = (String) row[1];
-                    Long idOfOrg =DataBaseSafeConverterUtils. getLongFromBigIntegerOrNull(row[2]);
-                    String orgShortName = (String) row[3];
-                    String orgShortAddress = (String) row[4];
-                    Long clientContractId = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[5]);
-                    Date preorderDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[6]);
-                    String complexName = (String) row[7];
-                    Integer amount = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[8]).intValue();
-                    String dish = (String) row[9];
-                    Long complexPrice = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[10]);
-                    Date cancelDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[11]);
-                    String reversed = (String) row[12];
-                    Date createdDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[13]);
-                    Long orderSum = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[14]);
-                    Long idOfOrder = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[15]);
-                    String isPaid = (String) row[16];
-                    ContragentPreordersReportItem item = new ContragentPreordersReportItem(
-                            idOfContragent, contragentName, idOfOrg, orgShortName, orgShortAddress, clientContractId,
-                            preorderDate, complexName, amount, dish, complexPrice, cancelDate,
-                            reversed, createdDate, orderSum, idOfOrder, isPaid
-                            );
-                    result.add(item);
-                }
-            }
-            return new JRBeanCollectionDataSource(result);
-        }
-
-        private String getUnpaidComplexesQueryPart(String idOfContragentCondition, String idOfOrgsCondition) {
-            return " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, "
+            String getDataQuery  = "with contragent_preorders_table AS ( "
+                    + " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, "
+                    + "o.shortnameinfoservice, o.address, c.contractId, pc.preorderDate, "
+                    + "pc.complexName, cast(pl.qty as bigint) as amount, '' as dish, "
+                    + "cast((pc.complexPrice * pl.qty) as bigint), co.createddate as cancelDate, "
+                    + "case coalesce(ord.state, 0) when 0 then 'Нет' else 'Да' end as reversed, "
+                    + "ord.orderDate, pl.qty*pl.price as orderSum, pl.idOfOrder, case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as isPaid "
+                    + "from cf_preorder_complex pc "
+                    + "join cf_clients c on pc.idofclient = c.idofclient "
+                    + "join cf_orgs o on c.idOfOrg = o.idOfOrg "
+                    + "join cf_contragents ctg on o.defaultsupplier = ctg.idOfContragent "
+                    + "join cf_preorder_linkod pl on pl.preorderguid = pc.guid "
+                    + "left join cf_orders ord on ord.idOfOrg = pl.idOfOrg and ord.idOfOrder = pl.idOfOrder "
+                    + "left join cf_transactions tr on ord.idoftransaction = tr.idoftransaction "
+                    + "left join cf_canceledorders co on ord.idOfOrder = co.idOfOrder and ord.idOfOrg = co.idOfOrg "
+                    + " where pc.deletedstate = 0 and pc.amount > 0 and o.PreordersEnabled = 1 "
+                    + " and pc.preorderDate BETWEEN :startDate and :endDate "
+                    + idOfOrgsCondition
+                    + idOfContragentCondition
+                    + " union"
+                    + " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, o.shortNameInfoService, o.address, c.contractId, pc.preorderDate, "
+                    + " pc.complexName, cast(1 as bigint) as amount, array_to_string(array_agg(pmd.menudetailname), ', ') as dish, "
+                    + " cast(sum(pmd.menudetailprice * pmd.amount) as bigint), co.createddate as cancelDate, "
+                    + " case coalesce(ord.state, 0) when 0 then 'Нет' else 'Да' end as reversed, "
+                    + " ord.orderDate, pl.qty*pl.price as orderSum, pl.idOfOrder,  case coalesce(ord.state, 1) when 1 then 'Нет' else 'Да' end as isPaid "
+                    + " from cf_preorder_menudetail pmd "
+                    + " join cf_clients c on pmd.idofclient = c.idofclient "
+                    + " join cf_orgs o on c.idOfOrg = o.idOfOrg  "
+                    + " join cf_contragents ctg on o.defaultsupplier = ctg.idOfContragent "
+                    + " join cf_preorder_complex pc on pmd.idofpreordercomplex = pc.idofpreordercomplex "
+                    + " join cf_preorder_linkod pl on pl.preorderguid = pc.guid "
+                    + " left join cf_orders ord on ord.idOfOrg = pl.idOfOrg and ord.idOfOrder = pl.idOfOrder"
+                    + " left join cf_transactions tr on ord.idoftransaction = tr.idoftransaction"
+                    + " left join cf_canceledorders co on ord.idOfOrder = co.idOfOrder and ord.idOfOrg = co.idOfOrg"
+                    + " where pc.deletedstate = 0 and pmd.deletedstate = 0 and pmd.amount > 0 and o.PreordersEnabled = 1"
+                    + " and pmd.preorderDate BETWEEN :startDate and :endDate "
+                    + idOfOrgsCondition
+                    + idOfContragentCondition + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17"
+                    + " UNION "
+                    + " select ctg.idOfContragent, ctg.contragentName, o.idOfOrg, "
                     + " o.shortNameInfoService, o.address, c.contractId, pc.preorderDate,"
                     + " pc.complexName, cast((pc.amount - coalesce(q.payed, 0)) as bigint) as amount, '' as dish, cast((pc.complexPrice * (pc.amount - coalesce(q.payed, 0))) as bigint) as complexPrice,"
                     + " cast(null as bigint) as createddate, 'Нет'  as reversed,"
@@ -204,8 +155,52 @@ public class ContragentPreordersReport extends BasicReportForContragentJob {
                     + " and pc.preorderDate BETWEEN :startDate and :endDate "
                     + idOfOrgsCondition
                     + idOfContragentCondition
-                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17 "
+                    + " group by 1, 2, 3, 4, 5, 6, 7, 8, 9, 12, 13, 14, 15, 16, 17 )"
+                    + " select * from contragent_preorders_table "
+                    + simpleCondition
                     + " order by 1, 6 desc, 2, 3, 4 ";
+
+
+
+            Query query = session.createSQLQuery(getDataQuery);
+            query.setParameter("startDate", startTime.getTime())
+                 .setParameter("endDate", endTime.getTime());
+
+            if(contragent != null) {
+                query.setParameter("idOfContragent", contragent.getIdOfContragent());
+            }
+            if(!CollectionUtils.isEmpty(idOfOrgList)){
+                query.setParameterList("idOfOrgList", idOfOrgList);
+            }
+            List<Object[]> dataFromDB = query.list();
+
+            if (CollectionUtils.isEmpty(dataFromDB)) {
+                throw new Exception("Нет данных для построения отчета");
+            }
+            for (Object[] row : dataFromDB) {
+                Long idOfContragent = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[0]);
+                String contragentName = (String) row[1];
+                Long idOfOrg = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[2]);
+                String orgShortName = (String) row[3];
+                String orgShortAddress = (String) row[4];
+                Long clientContractId = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[5]);
+                Date preorderDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[6]);
+                String complexName = (String) row[7];
+                Integer amount = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[8]).intValue();
+                String dish = (String) row[9];
+                Long complexPrice = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[10]);
+                Date cancelDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[11]);
+                String reversed = (String) row[12];
+                Date createdDate = DataBaseSafeConverterUtils.getDateFromBigIntegerOrNull(row[13]);
+                Long orderSum = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[14]);
+                Long idOfOrder = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(row[15]);
+                String isPaid = (String) row[16];
+                ContragentPreordersReportItem item = new ContragentPreordersReportItem(idOfContragent, contragentName,
+                        idOfOrg, orgShortName, orgShortAddress, clientContractId, preorderDate, complexName, amount,
+                        dish, complexPrice, cancelDate, reversed, createdDate, orderSum, idOfOrder, isPaid);
+                result.add(item);
+            }
+            return new JRBeanCollectionDataSource(result);
         }
     }
 

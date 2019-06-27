@@ -141,4 +141,17 @@ public class VisitReqResolutionHist implements Serializable {
     public void setInitiator(VisitReqResolutionHistInitiatorEnum initiator) {
         this.initiator = initiator;
     }
+
+    @Override
+    public int hashCode() {
+        return compositeIdOfVisitReqResolutionHist.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (o instanceof VisitReqResolutionHist) {
+            return this.hashCode() == o.hashCode();
+        }
+        return false;
+    }
 }
