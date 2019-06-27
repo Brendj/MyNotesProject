@@ -2443,7 +2443,7 @@ public class MainPage implements Serializable {
                     .updateContragentRNIP(persistenceSession, selectedIdOfContragent, prevRNIPId);
             if (upd != null && upd == true) {
                 facesContext.addMessage(null,
-                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента успешно загружены в РНИП",
+                        new FacesMessage(FacesMessage.SEVERITY_INFO, "Данные контрагента успешно добавлены в очередь обработки РНИП",
                                 null));
             } else if (upd != null && upd == false) {
                 facesContext.addMessage(null,

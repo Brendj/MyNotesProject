@@ -42,7 +42,6 @@ public class AsyncProcessingStatus {
     @XmlElement(name = "OriginalMessageId", required = true)
     protected String originalMessageId;
     @XmlElement(name = "StatusCategory", required = true)
-    @XmlSchemaType(name = "string")
     protected InteractionStatusType statusCategory;
     @XmlElement(name = "StatusDetails")
     protected String statusDetails;

@@ -45,7 +45,8 @@ public class SendRequestRequest {
     protected XMLDSigSignatureType callerInformationSystemSignature;
 
     /**
-     * �������������� ����� ������� + ��������� ������, ����������� ������������.
+     * Содержательная часть запроса + служебные данные, заполняемые отправителем.
+     * 						
      * 
      * @return
      *     possible object is
@@ -69,7 +70,9 @@ public class SendRequestRequest {
     }
 
     /**
-     * ��������� ����� - ����������. ���������� �������� ��-��� ��-��, ����� �� �������� ������ MTOM.
+     * Вложенные файлы - содержимое. Содержимое вынесено из-под ЭП-ОВ, чтобы не
+     * 							нарушать работу MTOM.
+     * 						
      * 
      * @return
      *     possible object is

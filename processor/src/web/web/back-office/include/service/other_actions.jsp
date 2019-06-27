@@ -115,6 +115,9 @@
     <a4j:commandButton value="Обработка мигрантов" action="#{otherActionsPage.loadESZMigrants()}" id="loadESZMigrants"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
 
+    <a4j:commandButton value="Обработка мигрантов (перевод в выбывшие)" action="#{otherActionsPage.updateESZMigrants()}" id="updateESZMigrants"
+                       styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+
     <a4j:commandButton value="Запустить сервис обработки ЗЛП" action="#{otherActionsPage.runApplicationForFoodProcessingService()}" id="runApplicationForFoodProcessingService"
                        styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     <a4j:commandButton value="Запустить сверку льгот ДТСЗН с реестрами 2.0" action="#{otherActionsPage.runDTSZNDiscountsReviseService()}" id="runDTSZNDiscountsReviseService"

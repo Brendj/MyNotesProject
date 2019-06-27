@@ -28,6 +28,7 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
  *         &lt;element name="SenderInformationSystemSignature" type="{urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2}XMLDSigSignatureType" minOccurs="0"/>
  *       &lt;/sequence>
  *       &lt;attribute name="Id" type="{http://www.w3.org/2001/XMLSchema}ID" />
+ *       &lt;attribute name="external" type="{http://www.w3.org/2001/XMLSchema}boolean" />
  *     &lt;/restriction>
  *   &lt;/complexContent>
  * &lt;/complexType>
@@ -67,6 +68,8 @@ public class Response {
     @XmlID
     @XmlSchemaType(name = "ID")
     protected String id;
+    @XmlAttribute(name = "external")
+    protected Boolean external;
 
     /**
      * Gets the value of the originalMessageId property.
@@ -258,6 +261,30 @@ public class Response {
      */
     public void setId(String value) {
         this.id = value;
+    }
+
+    /**
+     * Gets the value of the external property.
+     * 
+     * @return
+     *     possible object is
+     *     {@link Boolean }
+     *     
+     */
+    public Boolean isExternal() {
+        return external;
+    }
+
+    /**
+     * Sets the value of the external property.
+     * 
+     * @param value
+     *     allowed object is
+     *     {@link Boolean }
+     *     
+     */
+    public void setExternal(Boolean value) {
+        this.external = value;
     }
 
 }

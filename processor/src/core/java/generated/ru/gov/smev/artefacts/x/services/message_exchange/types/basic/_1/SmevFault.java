@@ -33,11 +33,11 @@ import javax.xml.bind.annotation.*;
 })
 @XmlSeeAlso({
     InvalidContent.class,
-    SignatureVerificationFault.class,
     DestinationOverflow.class,
     QuoteLimitExceeded.class,
     AttachmentSizeLimitExceeded.class,
-    BusinessDataTypeIsNotSupported.class
+    BusinessDataTypeIsNotSupported.class,
+    SignatureVerificationFault.class
 })
 public class SmevFault
     extends Void

@@ -1283,6 +1283,7 @@
         <rich:panelMenuItem id="clientTransactionsReportMenuItem" binding="#{mainPage.clientTransactionsReportPage.mainMenuComponent}"
                             label="Транзакции клиента" action="#{mainPage.showClientTransactionsReportPage}" reRender="workspaceForm" />
         <a4j:support event="onclick" action="#{mainPage.showBudgetFoodGroupMenu}" reRender="workspaceForm" />
+        <%--rendered="#{mainPage.eligibleToViewCoverageNutritionReport}"--%>
         <rich:panelMenuGroup id="coverageNutritionReportGroupMenu" label="Отчет по охвату питания">
             <%--@elvariable id="coverageNutritionReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CoverageNutritionReportPage"--%>
             <rich:panelMenuItem id="coverageNutritionReport" binding="#{coverageNutritionReportPage.mainMenuComponent}"
