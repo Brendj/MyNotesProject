@@ -105,10 +105,8 @@ public class CryptoSign {
 
                     //Если тип карты поддерживает данный более 128 байт
                     if (card.getMemSize() == 1) {
-                        //Шифрование по SHA-1
-                        final MessageDigest messageDigest = MessageDigest.getInstance("SHA1");
                         //Подписывание
-                        sign = CryptoSign.sign(messageDigest.digest(card_data), pk);
+                        sign = CryptoSign.sign(card_data, pk);
                     } else {
                         if (card.getMemSize() == 2) {
                             sign = SCrypt.generate(pk.getEncoded(), card_data, //данные карты используем как "соль"
