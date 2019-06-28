@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingManager;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ARMsSettingsType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -222,8 +223,8 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     logger.info("Try apply settings for Org ID: " + item.getIdOfOrg());
                     Org org = (Org) session.load(Org.class, item.getIdOfOrg());
 
-                    Long lastVersionOfOrgSetting = DAOUtils.getLastVersionOfOrgSettings(session);
-                    Long lastVersionOfOrgSettingItem = DAOUtils.getLastVersionOfOrgSettingsItem(session);
+                    Long lastVersionOfOrgSetting = OrgSettingDAOUtils.getLastVersionOfOrgSettings(session);
+                    Long lastVersionOfOrgSettingItem = OrgSettingDAOUtils.getLastVersionOfOrgSettingsItem(session);
 
                     org.setUsePaydableSubscriptionFeeding(item.getUsePaydableSubscriptionFeeding());
                     org.setVariableFeeding(item.getVariableFeeding());

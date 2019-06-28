@@ -5,9 +5,11 @@
 package ru.axetta.ecafe.processor.core.persistence.orgsettings;
 
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.DataBaseSafeConverterUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
@@ -41,5 +43,15 @@ public class OrgSettingDAOUtils {
         criteria.add(Restrictions.eq("idOfOrg", idOfOrg.longValue()));
         criteria.add(Restrictions.eq("settingGroup", OrgSettingGroup.getGroupById(groupID)));
         return (OrgSetting) criteria.uniqueResult();
+    }
+
+    public static  Long getLastVersionOfOrgSettings(Session session){
+        SQLQuery query = session.createSQLQuery("SELECT MAX(version) FROM CF_OrgSettings");
+        return DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
+    }
+
+    public static  Long getLastVersionOfOrgSettingsItem(Session session){
+        SQLQuery query = session.createSQLQuery("SELECT MAX(version) FROM CF_OrgSettings_Items");
+        return DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
     }
 }
