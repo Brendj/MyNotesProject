@@ -231,7 +231,7 @@ public class RNIPLoadPaymentsService {
             logger.error(String.format("Ошибка при добавлении каталога для контрагента %s: %s", contragent.getContragentName(), soapError));
             throw new IllegalStateException ("Ошибка во время обращения к РНИП: " + soapError);
         }
-        info("Каталог для контрагента %s создан", contragent.getContragentName());
+        info("Каталог для контрагента %s добавлен в очередь обработки РНиП", contragent.getContragentName());
     }
 
 
@@ -260,13 +260,13 @@ public class RNIPLoadPaymentsService {
             logger.error(String.format("Ошибка при изменении каталога для контрагента %s: %s", contragent.getContragentName(), soapError));
             throw new IllegalStateException ("Ошибка во время обращения к РНИП: " + soapError);
         }
-        info("Каталог для контрагента %s изменен", contragent.getContragentName());
+        info("Каталог для контрагента %s добавлен в очередь обработки РНиП", contragent.getContragentName());
     }
 
-
-    public void run() {
+    public void runRequests() {
         run(null, null);
     }
+
     public void run(Date startDate, Date endDate) {
         if (!isOn()) {
             return;
@@ -296,6 +296,7 @@ public class RNIPLoadPaymentsService {
                 logger.error("Failed to receive or proceed payments", e);
             }
         }
+        if (this instanceof RNIPLoadPaymentsServiceV21) isSuccessEnd = true;
         SecurityJournalProcess processEnd = SecurityJournalProcess.createJournalRecordEnd(
                 SecurityJournalProcess.EventType.RNIP, new Date());
         processEnd.saveWithSuccess(isSuccessEnd);
@@ -366,7 +367,7 @@ public class RNIPLoadPaymentsService {
         return true;
     }
 
-    private void saveEndDate(int requestType, Contragent contragent, Date lastUpdateDate, Date dateFromRnip) {
+    protected void saveEndDate(int requestType, Contragent contragent, Date lastUpdateDate, Date dateFromRnip) {
         Date edate = getEndDateByStartDate(getStartDateByLastUpdateDate(lastUpdateDate));
         if (dateFromRnip != null && dateFromRnip.before(edate)) {
             edate = dateFromRnip;
@@ -413,17 +414,7 @@ public class RNIPLoadPaymentsService {
     }
 
     protected String getRNIPUrl() {
-        RNIPVersion version = RNIPVersion.getType(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_WORKING_VERSION));
-        String url = null;
-        switch (version) {
-            case RNIP_V115:
-                url = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL);
-                break;
-            case RNIP_V116:
-                url = RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL_V116);
-                break;
-        }
-        return url;
+        return RuntimeContext.getInstance().getOptionValueString(Option.OPTION_IMPORT_RNIP_PAYMENTS_URL);
     }
 
 
@@ -462,6 +453,8 @@ public class RNIPLoadPaymentsService {
                 return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsService", RNIPLoadPaymentsService.class);
             case RNIP_V116:
                 return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV116", RNIPLoadPaymentsServiceV116.class);
+            case RNIP_V21:
+                return RuntimeContext.getAppContext().getBean("RNIPLoadPaymentsServiceV21", RNIPLoadPaymentsServiceV21.class);
         }
         return null;
     }

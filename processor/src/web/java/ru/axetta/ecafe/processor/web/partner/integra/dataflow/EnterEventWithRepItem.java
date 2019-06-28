@@ -49,6 +49,8 @@ public class EnterEventWithRepItem {
     protected String childPassChecker;
     @XmlAttribute(name = "ChildPassCheckerContractId")
     protected Long childPassCheckerContractId;
+    @XmlAttribute(name = "ChildPassCheckerMethod")
+    protected Integer childPassCheckerMethod;
 
     @XmlAttribute(name = "LastUpdateDate")
     @XmlSchemaType(name = "dateTime")
@@ -220,5 +222,13 @@ public class EnterEventWithRepItem {
 
     public void setLastUpdateDate(XMLGregorianCalendar lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
+    }
+
+    public Integer getChildPassCheckerMethod() {
+        return childPassCheckerMethod;
+    }
+
+    public void setChildPassCheckerMethod(Integer childPassCheckerMethod) {
+        this.childPassCheckerMethod = childPassCheckerMethod;
     }
 }

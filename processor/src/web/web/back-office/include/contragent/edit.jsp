@@ -101,10 +101,15 @@
 </h:panelGrid>
 <h:panelGrid columns="2" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{mainPage.updateContragent}" reRender="mainMenu, workspaceTogglePanel"
-                       styleClass="command-button" />
+                       styleClass="command-button" status="reportGenerateStatus" />
     <a4j:commandButton value="Восстановить" action="#{mainPage.showContragentEditPage}"
                        reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
 </h:panelGrid>
+<a4j:status id="reportGenerateStatus">
+    <f:facet name="start">
+        <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+    </f:facet>
+</a4j:status>
 <h:panelGrid styleClass="borderless-grid">
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />

@@ -145,12 +145,12 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{introductionQueue}]]></textFieldExpression>
 			</textField>
-			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+			<textField pattern="" isBlankWhenNull="true">
 				<reportElement uuid="ee0cda4f-bab3-432c-989f-5cb17ea14fbd" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="573" y="0" width="74" height="41">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
-				<textFieldExpression><![CDATA[$F{lastSuccessfulBalanceSync}]]></textFieldExpression>
+				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm").format($F{lastSuccessfulBalanceSync})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
 				<reportElement uuid="bbd6e985-58fc-4cdb-8180-a1dd32abe3d4" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="762" y="0" width="103" height="41">

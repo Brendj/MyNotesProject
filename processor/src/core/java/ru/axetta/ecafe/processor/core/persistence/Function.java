@@ -137,6 +137,8 @@ public class Function {
     public static final String FUNCD_FEEDING_SETTINGS_ADMIN = "Настройки платного питания - админ";
     public static final String FUNC_HELPDESK = "helpdesk";
     public static final String FUNCD_HELPDESK = "Заявки в службу помощи";
+    public static final String FUNC_COVERAGENUTRITION = "coverageNutritionRprt";
+    public static final String FUNCD_COVERAGENUTRITION = "Отчет по охвату питания";
 
     private Long idOfFunction;
     private String functionName;

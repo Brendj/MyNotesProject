@@ -9,8 +9,8 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * 
- *                 ������ �� ����, ����������� � ����-���������.
- *             
+ * 				Ссылка на файл, приложенный к СМЭВ-сообщению.
+ * 			
  * 
  * <p>Java class for RefAttachmentHeaderType complex type.
  * 

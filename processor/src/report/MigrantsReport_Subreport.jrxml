@@ -9,7 +9,7 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
 	<property name="ireport.zoom" value="1.0"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="1345"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -36,6 +36,7 @@
 		<defaultValueExpression><![CDATA["C:\\projects\\jboss7\\processor\\src\\report\\"]]></defaultValueExpression>
 	</parameter>
 	<parameter name="isOutcome" class="java.lang.Boolean"/>
+	<parameter name="showAllMigrants" class="java.lang.Boolean"/>
 	<parameter name="1" class="java.lang.Boolean">
 		<defaultValueExpression><![CDATA[true]]></defaultValueExpression>
 	</parameter>
@@ -76,9 +77,13 @@
 			<crosstab ignoreWidth="false">
 				<reportElement uuid="18809f71-24bf-4060-8dce-ccdfd7bab269" x="0" y="0" width="2520" height="50" isPrintWhenDetailOverflows="true" forecolor="#FFFFFF">
 					<property name="isOutcome" value="$P{isOutcome}"/>
+					<property name="showAllMigrants" value="$P{showAllMigrants}"/>
 				</reportElement>
 				<crosstabParameter name="isOutcome" class="java.lang.Boolean">
 					<parameterValueExpression><![CDATA[$P{isOutcome}]]></parameterValueExpression>
+				</crosstabParameter>
+				<crosstabParameter name="showAllMigrants" class="java.lang.Boolean">
+					<parameterValueExpression><![CDATA[$P{showAllMigrants}]]></parameterValueExpression>
 				</crosstabParameter>
 				<crosstabHeaderCell>
 					<cellContents>
@@ -752,7 +757,7 @@
 						</box>
 						<textField isStretchWithOverflow="true">
 							<reportElement uuid="609b4bcd-d848-49ce-8a16-d7d48b1fdf22" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" x="0" y="0" width="110" height="30" isPrintWhenDetailOverflows="true">
-								<printWhenExpression><![CDATA[!$V{gtStartDate}]]></printWhenExpression>
+								<printWhenExpression><![CDATA[!$V{gtStartDate} || $P{showAllMigrants}]]></printWhenExpression>
 							</reportElement>
 							<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
 								<pen lineWidth="0.5"/>
@@ -768,7 +773,7 @@
 						</textField>
 						<textField isStretchWithOverflow="true">
 							<reportElement uuid="609b4bcd-d848-49ce-8a16-d7d48b1fdf22" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="0" y="0" width="110" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF9999">
-								<printWhenExpression><![CDATA[$V{gtStartDate}]]></printWhenExpression>
+								<printWhenExpression><![CDATA[$V{gtStartDate} && !$P{showAllMigrants}]]></printWhenExpression>
 							</reportElement>
 							<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
 								<pen lineWidth="0.5"/>
@@ -784,7 +789,7 @@
 						</textField>
 						<textField isStretchWithOverflow="true">
 							<reportElement uuid="609b4bcd-d848-49ce-8a16-d7d48b1fdf22" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" x="110" y="0" width="110" height="30" isPrintWhenDetailOverflows="true">
-								<printWhenExpression><![CDATA[!$V{gtEndDate}]]></printWhenExpression>
+								<printWhenExpression><![CDATA[!$V{gtEndDate} || $P{showAllMigrants}]]></printWhenExpression>
 							</reportElement>
 							<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
 								<pen lineWidth="0.5"/>
@@ -800,7 +805,7 @@
 						</textField>
 						<textField isStretchWithOverflow="true">
 							<reportElement uuid="609b4bcd-d848-49ce-8a16-d7d48b1fdf22" style="Crosstab Data Text" positionType="Float" stretchType="RelativeToBandHeight" mode="Opaque" x="110" y="0" width="110" height="30" isPrintWhenDetailOverflows="true" backcolor="#FF9999">
-								<printWhenExpression><![CDATA[$V{gtEndDate}]]></printWhenExpression>
+								<printWhenExpression><![CDATA[$V{gtEndDate} && !$P{showAllMigrants}]]></printWhenExpression>
 							</reportElement>
 							<box topPadding="3" leftPadding="3" bottomPadding="3" rightPadding="3">
 								<pen lineWidth="0.5"/>

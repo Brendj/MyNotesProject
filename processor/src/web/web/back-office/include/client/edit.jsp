@@ -409,6 +409,9 @@
 
     <h:outputText escape="true" value="Особенности в питании" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.specialMenu}" styleClass="output-text" />
+    <h:outputText escape="true" value="Клиент может подтверждать групповые платежи (для сотрудников школы, отвечающих за работу с системой)" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.canConfirmGroupPayment}" styleClass="output-text"
+                             disabled="true"  readonly="true"/>
 
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">

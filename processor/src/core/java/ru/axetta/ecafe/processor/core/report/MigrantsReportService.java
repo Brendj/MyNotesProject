@@ -7,8 +7,14 @@ package ru.axetta.ecafe.processor.core.report;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
+import org.hibernate.SQLQuery;
 import org.hibernate.Session;
+import org.hibernate.transform.Transformers;
+import org.hibernate.type.BooleanType;
+import org.hibernate.type.LongType;
+import org.hibernate.type.StringType;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -35,29 +41,199 @@ public class MigrantsReportService {
         this.session = session;
     }
 
-    public List<ReportItem> buildReportItems(Date startTime, Date endTime, String migrantsTypes, List<Long> idOfOrgList){
+    public List<ReportItem> buildReportItems(Date startTime, Date endTime, String migrantsTypes, List<Long> idOfOrgList,
+            Boolean showAllMigrants, Integer periodType){
         List<ReportItem> reportItemList = new ArrayList<ReportItem>();
-        if(migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.ALL.getName())){
-            ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
-            reportItem.getOutcomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), true));
-            reportItem.getIncomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), false));
-            reportItemList.add(reportItem);
-        }
-        if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.OUTCOME.getName())) {
-            ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
-            reportItem.getOutcomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), true));
-            reportItemList.add(reportItem);
-        }
-        if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.INCOME.getName())){
-            ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
-            reportItem.getIncomeList().addAll(buildMigrantItems(startTime, endTime,
-                    MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime), false));
-            reportItemList.add(reportItem);
+        ReportItem reportItem = new ReportItem(new ArrayList<MigrantItem>(), new ArrayList<MigrantItem>());
+        if(showAllMigrants || periodType.equals(MigrantsReport.PERIOD_TYPE_VISIT)) {
+            if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.ALL.getName())) {
+                reportItem.getOutcomeList().addAll(buildMigrantItems(startTime, endTime,
+                        buildOutcomeMigrants(session, idOfOrgList, startTime, endTime, showAllMigrants),
+                        true));
+                reportItem.getIncomeList().addAll(buildMigrantItems(startTime, endTime,
+                        buildIncomeMigrants(session, idOfOrgList, startTime, endTime, showAllMigrants),
+                        false));
+                reportItemList.add(reportItem);
+            } else if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.OUTCOME.getName())) {
+                reportItem.getOutcomeList().addAll(buildMigrantItems(startTime, endTime,
+                        buildOutcomeMigrants(session, idOfOrgList, startTime, endTime, showAllMigrants),
+                        true));
+                reportItemList.add(reportItem);
+            } else if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.INCOME.getName())) {
+                reportItem.getIncomeList().addAll(buildMigrantItems(startTime, endTime,
+                        buildIncomeMigrants(session, idOfOrgList, startTime, endTime, showAllMigrants),
+                        false));
+                reportItemList.add(reportItem);
+            }
+        } else if(periodType.equals(MigrantsReport.PERIOD_TYPE_CHANGED)){
+            if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.ALL.getName())) {
+                reportItem.getOutcomeList().addAll(getOutcomeMigrantsForOrgsByResolutionDate(session, idOfOrgList, startTime, endTime));
+                reportItem.getIncomeList().addAll(getIncomeMigrantsForOrgsByResolutionDate(session, idOfOrgList, startTime, endTime));
+                reportItemList.add(reportItem);
+            } else if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.OUTCOME.getName())) {
+                reportItem.getOutcomeList().addAll(getOutcomeMigrantsForOrgsByResolutionDate(session, idOfOrgList, startTime, endTime));
+                reportItemList.add(reportItem);
+            } else if (migrantsTypes.equals(MigrantsUtils.MigrantsEnumType.INCOME.getName())) {
+                reportItem.getIncomeList().addAll(getIncomeMigrantsForOrgsByResolutionDate(session, idOfOrgList, startTime, endTime));
+                reportItemList.add(reportItem);
+            }
         }
         return reportItemList;
+    }
+
+    private List<MigrantItem> getIncomeMigrantsForOrgsByResolutionDate(Session session, List<Long> idOfOrgList, Date startTime, Date endTime) {
+        SQLQuery query = session.createSQLQuery(
+                     "SELECT orgVisit.idoforg                                               AS idOfOrg,\n"
+                        + "       orgVisit.shortname                                           AS orgShortName,\n"
+                        + "       orgVisit.address                                             AS orgAddress,\n"
+                        + "       orgReg.idoforg                                               AS idOfOrg2,\n"
+                        + "       orgReg.shortname                                             AS orgShortName2,\n"
+                        + "       orgReg.address                                               AS orgAddress2,\n"
+                        + getQueryMainPart()
+                        + "WHERE m.idoforgvisit IN (:idOfOrgs)\n"
+                        + "  AND lastResol.resolutiondatetime BETWEEN :startDate AND :endDate");
+
+        query
+                .setParameter("resComferm", VisitReqResolutionHist.RES_CONFIRMED)
+                .setParameter("clientStudentBegin", ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())
+                .setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue())
+                .setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue())
+                .setParameter("startDate", startTime.getTime())
+                .setParameter("endDate", endTime.getTime())
+                .setParameterList("idOfOrgs", idOfOrgList);
+
+        setScalarsForQuery(query);
+        query.setResultTransformer(Transformers.aliasToBean(MigrantItem.class));
+
+        return query.list();
+    }
+
+    private List<MigrantItem> getOutcomeMigrantsForOrgsByResolutionDate(Session session, List<Long> idOfOrgList, Date startTime, Date endTime) {
+        SQLQuery query = session.createSQLQuery(
+                "SELECT orgReg.idoforg                                              AS idOfOrg,\n"
+                + "       orgReg.shortname                                             AS orgShortName,\n"
+                + "       orgReg.address                                               AS orgAddress,\n"
+                + "       orgVisit.idoforg                                             AS idOfOrg2,\n"
+                + "       orgVisit.shortname                                           AS orgShortName2,\n"
+                + "       orgVisit.address                                             AS orgAddress2,\n"
+                + getQueryMainPart()
+                + "WHERE m.idoforgregistry IN (:idOfOrgs)\n"
+                + "  AND lastResol.resolutiondatetime BETWEEN :startDate AND :endDate");
+
+        query
+                .setParameter("resComferm", VisitReqResolutionHist.RES_CONFIRMED)
+                .setParameter("clientStudentBegin", ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())
+                .setParameter("employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue())
+                .setParameter("parents", ClientGroup.Predefined.CLIENT_PARENTS.getValue())
+                .setParameter("startDate", startTime.getTime())
+                .setParameter("endDate", endTime.getTime())
+                .setParameterList("idOfOrgs", idOfOrgList);
+
+        setScalarsForQuery(query);
+        query.setResultTransformer(Transformers.aliasToBean(MigrantItem.class));
+
+        return query.list();
+    }
+
+    private String getQueryMainPart(){
+        return  "       m.requestnumber                                              AS number,\n"
+                + "       CASE\n"
+                + "           WHEN firstResol.resolutionCause is null then '-'\n"
+                + "           ELSE firstResol.resolutionCause\n"
+                + "           END                                                      AS resolutionCause,\n"
+                + "       CASE\n"
+                + "           WHEN firstResol.contactinfo is null then '-'\n"
+                + "           ELSE firstResol.contactinfo\n"
+                + "           END                                                      AS contactInfo,\n"
+                + "       c.contractid                                                 AS contractId,\n"
+                + "       (p.surname || ' ' || p.firstname || ' ' || p.secondname)     AS name,\n"
+                + ""
+                + "       CASE\n"
+                + "           WHEN cg.groupname is NULL then 'Неизвестно'\n"
+                + "           ELSE cg.groupname\n"
+                + "           END                                                      AS groupName,\n"
+                + "       CASE\n"
+                + "           WHEN lastResol.resolution = :resComferm THEN\n"
+                + "               CASE\n"
+                + "                   WHEN cg.idofclientgroup is NULL then 'Неизвестно'\n"
+                + "                   WHEN cg.idofclientgroup BETWEEN :clientStudentBegin AND :employees - 1 THEN 'Обучающиеся других ОО'\n"
+                + "                   WHEN cg.idofclientgroup = :parents THEN 'Родители'\n"
+                + "                   WHEN cg.idofclientgroup BETWEEN :employees AND :parents - 1 THEN 'Сотрудники других ОО'\n"
+                + "                   ELSE 'Неизвестно'\n"
+                + "                   END\n"
+                + "           WHEN v.resolution IS NOT NULL THEN 'Выбывшие'\n"
+                + "           ELSE '-'\n"
+                + "           END                                                      AS groupNameInOrgVisit,\n"
+                + "       to_char(to_timestamp(m.visitstartdate / 1000), 'dd.MM.yyyy') AS startDate,\n"
+                + "       (:startDate > m.visitstartdate)                              AS gtStartDate,\n"
+                + "       to_char(to_timestamp(m.visitenddate / 1000), 'dd.MM.yyyy')   AS endDate,\n"
+                + "       (m.visitenddate > :endDate)                                  AS gtEndDate,\n"
+                + " CASE\n"
+                + "           WHEN lastResol.resolution = 0 THEN 'Создана'\n"
+                + "           WHEN lastResol.resolution = 1 THEN 'Подтверждена'\n"
+                + "           WHEN lastResol.resolution = 2 THEN 'Отклонена и сдана в архив'\n"
+                + "           WHEN lastResol.resolution = 3 THEN 'Аннулирована и сдана в архив'\n"
+                + "           WHEN lastResol.resolution = 4 OR lastResol.resolution = 5 THEN 'Сдана в архив по истечению срока действия'\n"
+                + "           END                                                      AS resolution "
+                + "FROM cf_migrants AS m\n"
+                + "         JOIN cf_orgs AS orgReg ON m.idoforgregistry = orgReg.idoforg\n"
+                + "         JOIN cf_orgs AS orgVisit ON m.idoforgvisit = orgVisit.idoforg\n"
+                + "         JOIN cf_clients AS c ON m.idofclientmigrate = c.idofclient\n"
+                + "         JOIN cf_clientgroups AS cg ON c.idoforg = cg.idoforg AND c.idofclientgroup = cg.idofclientgroup\n"
+                + "         JOIN cf_persons AS p ON c.idofperson = p.idofperson\n"
+                + "         LEFT JOIN cf_visitreqresolutionhist AS v\n"
+                + "                   ON m.idoforgregistry = v.idoforgregistry AND m.idofrequest = v.idofrequest and v.resolution = :resComferm\n"
+                + "         JOIN (SELECT DISTINCT ON (idofrequest, idoforgregistry) *\n"
+                + "               FROM cf_visitreqresolutionhist\n"
+                + "               ORDER BY idofrequest, idoforgregistry, resolutiondatetime DESC) AS lastResol\n"
+                + "              ON m.idofrequest = lastResol.idofrequest AND m.idoforgregistry = lastResol.idoforgregistry\n"
+                + "         JOIN (SELECT DISTINCT ON (idofrequest, idoforgregistry) *\n"
+                + "               FROM cf_visitreqresolutionhist\n"
+                + "               ORDER BY idofrequest, idoforgregistry, resolutiondatetime) AS firstResol\n"
+                + "              ON m.idofrequest = firstResol.idofrequest AND m.idoforgregistry = firstResol.idoforgregistry\n";
+    }
+
+    private void setScalarsForQuery(SQLQuery query) {
+        query
+                .addScalar("idOfOrg", LongType.INSTANCE)
+                .addScalar("orgShortName", StringType.INSTANCE)
+                .addScalar("orgAddress", StringType.INSTANCE)
+                .addScalar("idOfOrg2", LongType.INSTANCE)
+                .addScalar("orgShortName2", StringType.INSTANCE)
+                .addScalar("orgAddress2", StringType.INSTANCE)
+                .addScalar("number", StringType.INSTANCE)
+                .addScalar("resolutionCause", StringType.INSTANCE)
+                .addScalar("contactInfo", StringType.INSTANCE)
+                .addScalar("contractId", LongType.INSTANCE)
+                .addScalar("name", StringType.INSTANCE)
+                .addScalar("groupName", StringType.INSTANCE)
+                .addScalar("resolutionCause", StringType.INSTANCE)
+                .addScalar("groupNameInOrgVisit", StringType.INSTANCE)
+                .addScalar("startDate", StringType.INSTANCE)
+                .addScalar("gtStartDate", BooleanType.INSTANCE)
+                .addScalar("endDate", StringType.INSTANCE)
+                .addScalar("gtEndDate", BooleanType.INSTANCE)
+                .addScalar("resolution", StringType.INSTANCE);
+    }
+
+    private List<Migrant> buildOutcomeMigrants(Session session, List<Long> idOfOrgList, Date startTime, Date endTime, Boolean showAllMigrants) {
+        List<Migrant> result;
+        if(showAllMigrants) {
+            result =  MigrantsUtils.getOutcomeMigrantsForOrgsWithoutDate(session, idOfOrgList);
+        } else {
+            result = MigrantsUtils.getOutcomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime);
+        }
+        return result;
+    }
+
+    private List<Migrant> buildIncomeMigrants(Session session, List<Long> idOfOrgList, Date startTime, Date endTime, Boolean showAllMigrants) {
+        List<Migrant> result;
+        if(showAllMigrants) {
+            result =  MigrantsUtils.getIncomeMigrantsForOrgsWithoutDate(session, idOfOrgList);
+        } else {
+            result = MigrantsUtils.getIncomeMigrantsForOrgsByDate(session, idOfOrgList, startTime, endTime);
+        }
+        return result;
     }
 
     private List<MigrantItem> buildMigrantItems(Date startTime, Date endTime, List<Migrant> migrants, boolean isOutcome){
@@ -116,6 +292,10 @@ public class MigrantsReportService {
         private Boolean gtEndDate;
         private String resolution;
 
+        public MigrantItem(){
+
+        }
+
         public MigrantItem(Migrant migrant, Date startTime, Date endTime,
                 List<VisitReqResolutionHist> resolutions, boolean isOutcome) {
             Org org;
@@ -133,10 +313,17 @@ public class MigrantsReportService {
             idOfOrg2 = org2.getIdOfOrg();
             orgShortName2 = org2.getShortName();
             orgAddress2 = org2.getAddress();
-            Long numberLong = migrant.getCompositeIdOfMigrant().getIdOfRequest()/10L;
             number = migrant.getRequestNumber();
-            resolutionCause = resolutions.get(0).getResolutionCause() != null ? resolutions.get(0).getResolutionCause() : NO_DATA;
-            contactInfo = resolutions.get(0).getContactInfo() != null ? resolutions.get(0).getContactInfo() : NO_DATA;
+            if(!CollectionUtils.isEmpty(resolutions)) {
+                resolutionCause =
+                        resolutions.get(0).getResolutionCause() != null ? resolutions.get(0).getResolutionCause() : NO_DATA;
+                contactInfo = resolutions.get(0).getContactInfo() != null ? resolutions.get(0).getContactInfo() : NO_DATA;
+                resolution = MigrantsUtils.getResolutionString(resolutions.get(resolutions.size() - 1).getResolution());
+            } else {
+                resolutionCause = NO_DATA;
+                contactInfo = NO_DATA;
+                resolution = NO_DATA;
+            }
             contractId = migrant.getClientMigrate().getContractId();
             name = migrant.getClientMigrate().getPerson().getFullName();
             groupName = getGroupNameByClient(migrant.getClientMigrate());
@@ -146,10 +333,10 @@ public class MigrantsReportService {
             gtStartDate = startTime.after(migrant.getVisitStartDate());
             endDate = CalendarUtils.dateShortToStringFullYear(migrant.getVisitEndDate());
             gtEndDate = migrant.getVisitEndDate().after(endTime);
-            resolution = MigrantsUtils.getResolutionString(resolutions.get(resolutions.size() - 1).getResolution());
         }
 
         private static String getGroupNameForOrgVisitByClient(Client client, List<VisitReqResolutionHist> resolutions){
+            if(CollectionUtils.isEmpty(resolutions)) return NO_DATA;
             List<Integer> resolInts = new ArrayList<Integer>();
             for(VisitReqResolutionHist v : resolutions){
                 resolInts.add(v.getResolution());

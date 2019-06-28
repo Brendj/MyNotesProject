@@ -33,6 +33,13 @@
         </property>
         <property name="section" column="section" type="string" length="256"/>
         <property name="resolutionCodeGroup" column="ResolutionCodeGroup" type="long"/>
+        <set name="visitReqResolutionHists" inverse="true" cascade="all" lazy="false" order-by="resolutionDateTime">
+            <key>
+                <column name="IdOfRequest"/>
+                <column name="IdOfOrgRegistry"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.VisitReqResolutionHist"/>
+        </set>
     </class>
 </hibernate-mapping>
 

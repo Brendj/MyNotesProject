@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -31,6 +32,7 @@ public class Migrant implements Serializable{
     private MigrantInitiatorEnum initiator;
     private String section;
     private Long resolutionCodeGroup;
+    private Set<VisitReqResolutionHist> visitReqResolutionHists;
 
     public Migrant() {
     }
@@ -156,5 +158,13 @@ public class Migrant implements Serializable{
 
     public void setResolutionCodeGroup(Long resolutionCodeGroup) {
         this.resolutionCodeGroup = resolutionCodeGroup;
+    }
+
+    public Set<VisitReqResolutionHist> getVisitReqResolutionHists() {
+        return visitReqResolutionHists;
+    }
+
+    public void setVisitReqResolutionHists(Set<VisitReqResolutionHist> visitReqResolutionHists) {
+        this.visitReqResolutionHists = visitReqResolutionHists;
     }
 }

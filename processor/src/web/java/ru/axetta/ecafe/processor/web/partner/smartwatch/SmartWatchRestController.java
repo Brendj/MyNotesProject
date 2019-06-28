@@ -108,14 +108,12 @@ public class SmartWatchRestController {
             }
 
             String token = DAOService.getInstance().generateLinkingTokenForSmartWatch(session, mobilePhone);
-            String message = "Код безопасности: " + token;
 
             RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                     .sendMessageAsync(client, EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED,
-                            new String[]{"linkingToken", message}, new Date());
+                            new String[]{"linkingToken", token}, new Date());
 
             token = "";
-            message = "";
 
             transaction.commit();
             transaction = null;

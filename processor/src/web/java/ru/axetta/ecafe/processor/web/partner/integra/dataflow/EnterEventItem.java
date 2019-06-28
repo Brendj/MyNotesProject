@@ -62,6 +62,10 @@ public class EnterEventItem {
     protected String address;
     @XmlAttribute(name = "ShortNameInfoService")
     protected String shortNameInfoService;
+    @XmlAttribute(name = "ChildPassChecker")
+    protected String childPassChecker;
+    @XmlAttribute(name = "ChildPassCheckerMethod")
+    protected Integer childPassCheckerMethod;
 
     /**
      * Gets the value of the dateTime property.
@@ -253,5 +257,21 @@ public class EnterEventItem {
 
     public void setShortNameInfoService(String shortNameInfoService) {
         this.shortNameInfoService = shortNameInfoService;
+    }
+
+    public String getChildPassChecker() {
+        return childPassChecker;
+    }
+
+    public void setChildPassChecker(String childPassChecker) {
+        this.childPassChecker = childPassChecker;
+    }
+
+    public Integer getChildPassCheckerMethod() {
+        return childPassCheckerMethod;
+    }
+
+    public void setChildPassCheckerMethod(Integer childPassCheckerMethod) {
+        this.childPassCheckerMethod = childPassCheckerMethod;
     }
 }

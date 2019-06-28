@@ -4,13 +4,20 @@
 
 package ru.axetta.ecafe.processor.web.ui.contragent;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Person;
+import ru.axetta.ecafe.processor.core.persistence.RnipMessage;
+import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
+import ru.axetta.ecafe.processor.core.service.RnipDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 
 /**
  * Created by IntelliJ IDEA.
@@ -20,6 +27,14 @@ import java.util.Date;
  * To change this template use File | Settings | File Templates.
  */
 public class ContragentViewPage extends BasicWorkspacePage {
+
+    public List<ContragentRnipLogItem> getRnipLogItems() {
+        return rnipLogItems;
+    }
+
+    public void setRnipLogItems(List<ContragentRnipLogItem> rnipLogItems) {
+        this.rnipLogItems = rnipLogItems;
+    }
 
     public static class PersonItem {
 
@@ -87,6 +102,12 @@ public class ContragentViewPage extends BasicWorkspacePage {
     private String ogrn;
     private String defaultPayContragent;
     private boolean payByCashier;
+    private List<ContragentRnipLogItem> rnipLogItems;
+
+    public boolean hasRnip() {
+        RNIPLoadPaymentsService rnipLoadPaymentsService = RNIPLoadPaymentsService.getRNIPServiceBean();
+        return !StringUtils.isEmpty(rnipLoadPaymentsService.getRNIPIdFromRemarks (this.remarks));
+    }
 
     public Long getIdOfContragent() {
         return idOfContragent;
@@ -270,6 +291,21 @@ public class ContragentViewPage extends BasicWorkspacePage {
         }else {
             this.payByCashier = contragent.isPayByCashier();
         }
+
+        this.rnipLogItems = getLogItems();
+
+    }
+
+    private List<ContragentRnipLogItem> getLogItems() {
+        List<ContragentRnipLogItem> result = new ArrayList<>();
+        List<RnipMessage> list = RuntimeContext.getAppContext().getBean(RnipDAOService.class).getTodayRnipMessages(this.idOfContragent);
+        for (RnipMessage rnipMessage : list) {
+            ContragentRnipLogItem item = new ContragentRnipLogItem(rnipMessage.getEventTime(), rnipMessage.getEventType(),
+                    rnipMessage.getMessageId(), rnipMessage.getStartDate(), rnipMessage.getEndDate(), rnipMessage.getResponseMessage(),
+                    rnipMessage.getSucceeded());
+            result.add(item);
+        }
+        return result;
     }
 
     public boolean isTSP(){
