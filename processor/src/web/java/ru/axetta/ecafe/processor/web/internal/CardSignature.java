@@ -42,6 +42,10 @@ public class CardSignature extends HttpServlet {
         {
             return ErrorMessage ("Поставщик не найден");
         }
+        if (requestCardForSigns.size() > 100)
+        {
+            return ErrorMessage ("Количество карт для подписи должно быть менее 100");
+        }
         //Проверяем подпись поставщика
         try {
             if (!test)
