@@ -8,6 +8,7 @@ import ru.CryptoPro.JCP.JCP;
 
 import ru.axetta.ecafe.processor.core.persistence.CardSign;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.service.SummaryCardsMSRService;
 
 import org.apache.commons.codec.binary.Base64;
 import org.bouncycastle.crypto.generators.SCrypt;
@@ -49,14 +50,8 @@ public class CryptoSign {
 
     //Проверка карты на её наличие в базе
     private static boolean verifyCardforDuble(Long num) {
-        byte[] res = new byte[8];
-        byte[] fiz = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(num).array();
-        res[4] = fiz[7];
-        res[5] = fiz[6];
-        res[6] = fiz[5];
-        res[7] = fiz[4];
-        Long longRes = ByteBuffer.wrap(res).getLong();
-        if (DAOReadonlyService.getInstance().getCardfromNum(longRes) == null) {
+        Long shortNum = SummaryCardsMSRService.convertCardId(num);
+        if (DAOReadonlyService.getInstance().getCardfromNum(shortNum) == null) {
             return true;
         } else {
             return false;
