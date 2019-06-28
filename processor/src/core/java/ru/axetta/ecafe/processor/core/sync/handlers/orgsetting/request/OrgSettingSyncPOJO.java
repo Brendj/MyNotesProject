@@ -49,6 +49,6 @@ public class OrgSettingSyncPOJO {
     }
 
     public void setIdOfOrg(Integer idOfOrg) {
-        idOfOrg = idOfOrg;
+        this.idOfOrg = idOfOrg;
     }
 }

@@ -13,6 +13,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class OrgSettingSection implements AbstractToElement {
+
     private List<OrgSettingSyncPOJO> items;
     private Long maxVersion;
 
@@ -20,14 +21,14 @@ public class OrgSettingSection implements AbstractToElement {
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("OrgSettings");
         element.setAttribute("V", maxVersion.toString());
-        for(OrgSettingSyncPOJO item : items){
+        for (OrgSettingSyncPOJO item : getItems()) {
             element.appendChild(item.toElement(document));
         }
         return element;
     }
 
     public List<OrgSettingSyncPOJO> getItems() {
-        if(items == null){
+        if (items == null) {
             items = new LinkedList<>();
         }
         return items;

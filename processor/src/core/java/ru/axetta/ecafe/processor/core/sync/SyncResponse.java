@@ -1563,6 +1563,10 @@ public class SyncResponse {
         if (clientDiscountDTSZN != null) {
             envelopeElement.appendChild(clientDiscountDTSZN.toElement(document));
         }
+
+        if(orgSetting != null){
+            envelopeElement.appendChild(orgSetting.toElement(document));
+        }
     }
 
     public Long getIdOfOrg() {

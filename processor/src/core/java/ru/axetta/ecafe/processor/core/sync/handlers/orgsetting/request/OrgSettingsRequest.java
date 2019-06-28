@@ -43,11 +43,11 @@ public class OrgSettingsRequest implements SectionRequest {
                         item.setVersion(XMLUtils.getLongAttributeValue(nodeItem, "V"));
                         setting.getItems().add(item);
                     }
-                    nodeItem.getNextSibling();
+                    nodeItem = nodeItem.getNextSibling();
                 }
                 items.add(setting);
             }
-            nodeElement.getNextSibling();
+            nodeElement = nodeElement.getNextSibling();
         }
     }
 

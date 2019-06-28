@@ -11,7 +11,7 @@ import java.util.Map;
 
 public enum ARMsSettingsType implements SettingType {
     CARD_DUPLICATE_ENABLED(1300,"Дубликаты для основных карт", OrgSettingsDataTypes.BOOLEAN),
-    REVERSE_MONTH_OF_SALE(1,"Оплата/сторнирование месяц продажи", OrgSettingsDataTypes.BOOLEAN);
+    REVERSE_MONTH_OF_SALE(1301,"Оплата/сторнирование месяц продажи", OrgSettingsDataTypes.BOOLEAN);
 
     private Integer globalId;
     private String description;
