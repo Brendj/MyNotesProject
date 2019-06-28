@@ -359,8 +359,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 dynamicPropertyList.put(String.format("%d", (group + foodType + complexName + priceFormat(price)
                         + CoverageNutritionDynamicBean.ORDERS_COUNT).hashCode()), new DynamicProperty(orderCount));
 
-                Long totalValue = item
-                        .getStatisticDataPerGroup(CoverageNutritionDynamicBean.findClassInString(group), false);
+                Long totalValue = item.getStatisticDataPerGroup(CoverageNutritionDynamicBean.findClassInString(group),
+                        CoverageNutritionDynamicBean.FREE_NUTRITION.equals(foodType));
                 dynamicPropertyList.put(String.format("%d", (group + foodType + complexName + priceFormat(price)
                         + CoverageNutritionDynamicBean.PERCENTAGE_OF_UNIQUE_CLIENTS).hashCode()), new DynamicProperty(
                         !totalValue.equals(0L) ? clientCount.doubleValue() / totalValue.doubleValue() * 100 : 0D));
@@ -551,7 +551,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                         new DynamicProperty(orderCount));
 
                 Long totalValue = item
-                        .getStatisticDataPerGroup(CoverageNutritionDynamicBean.findClassInString(group), false);
+                        .getStatisticDataPerGroup(CoverageNutritionDynamicBean.findClassInString(group), null);
                 dynamicPropertyList.put(String.format("%d",
                         (group + foodType + CoverageNutritionDynamicBean.PERCENTAGE_OF_UNIQUE_CLIENTS).hashCode()),
                         new DynamicProperty(
@@ -630,7 +630,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                                 + CoverageNutritionDynamicBean.CLIENTS_COUNT_TOTAL_SUBTITLE).hashCode()),
                         new DynamicProperty(clientCount));
                 Long totalValue = item
-                        .getStatisticDataPerGroup(CoverageNutritionDynamicBean.findClassInString(group), false);
+                        .getStatisticDataPerGroup(CoverageNutritionDynamicBean.findClassInString(group), null);
                 dynamicPropertyList.put(String.format("%d",
                         (group + CoverageNutritionDynamicBean.PERCENTAGE_OF_ACTIVE_CLIENTS
                                 + CoverageNutritionDynamicBean.PERCENTAGE_OF_ACTIVE_CLIENTS_SUBTITLE).hashCode()),
@@ -2332,22 +2332,31 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
 
         public Long getStatisticDataPerGroup(String group, Boolean benefit) {
             if (ClassType.YOUNG.getValue().equals(group)) {
+                if (null == benefit) {
+                    return this.studentsCountYoung;
+                }
                 if (benefit) {
                     return this.benefitStudentsCountYoung;
                 }
-                return this.studentsCountYoung;
+                return this.studentsCountYoung - this.benefitStudentsCountYoung;
             }
             if (ClassType.MIDDLE.getValue().equals(group)) {
+                if (null == benefit) {
+                    return this.studentsCountMiddle;
+                }
                 if (benefit) {
                     return this.benefitStudentsCountMiddle;
                 }
-                return this.studentsCountMiddle;
+                return this.studentsCountMiddle - this.benefitStudentsCountMiddle;
             }
             if (ClassType.OLD.getValue().equals(group)) {
+                if (null == benefit) {
+                    return this.studentsCountOld;
+                }
                 if (benefit) {
                     return this.benefitStudentsCountOld;
                 }
-                return this.studentsCountOld;
+                return this.studentsCountOld - this.benefitStudentsCountOld;
             }
             return 0L;
         }
