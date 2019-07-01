@@ -113,7 +113,7 @@ public class CryptoSign {
                                     16384, 8, 1, 20);
                         } else {
                             sign = new byte[]{0};
-                            responseCardSign.setMessage("Тип подписи для карты задан некорректно");
+                            responseCardSign.setMessage("Тип карты задан некорректно");
                             sucsess = false;
                         }
                     }
