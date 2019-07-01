@@ -120,6 +120,8 @@ public class CardSignViewPage extends BasicWorkspacePage {
     }
 
     public Boolean getNewProvider() {
+        if (newProvider == null)
+            return false;
         return newProvider;
     }
 

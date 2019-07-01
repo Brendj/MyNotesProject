@@ -42,6 +42,15 @@
                 <f:setPropertyActionListener value="#{card}" target="#{cardSignGroupPage.currentCard}"/>
             </a4j:commandLink>
         </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Тип регистрации карт" />
+            </f:facet>
+            <a4j:commandLink reRender="mainMenu, workspaceTogglePanel" action="#{cardSignViewPage.show}" styleClass="command-link">
+                <h:outputText escape="true" value="#{card.getProviderType()}" styleClass="output-text" />
+                <f:setPropertyActionListener value="#{card}" target="#{cardSignGroupPage.currentCard}"/>
+            </a4j:commandLink>
+        </rich:column>
         <rich:column styleClass="center-aligned-column">
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактирование" />

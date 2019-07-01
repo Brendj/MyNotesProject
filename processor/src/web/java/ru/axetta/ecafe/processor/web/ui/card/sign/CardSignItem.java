@@ -18,6 +18,9 @@ public class CardSignItem {
     private byte[] signData;
     protected Boolean newProvider;
 
+    private static final String NEW_PROVIDER = "По ключу производителя";//Поставщик по новому типу
+    private static final String OLD_PROVIDER = "По ключу карты";//Поставщик по старому типу
+
     public CardSignItem(CardSign cardSign) {
         this.idOfCardSign = cardSign.getIdOfCardSign();
         this.manufacturerCode = cardSign.getManufacturerCode();
@@ -29,6 +32,8 @@ public class CardSignItem {
         else
             signTypeProvider = null;
         newProvider = cardSign.getNewtypeprovider();
+        if (newProvider == null)
+            newProvider = false;
     }
 
     public static String getSignTypeFromString(String sType) {
@@ -36,6 +41,14 @@ public class CardSignItem {
         if (sType.equals(CardSign.CARDSIGN_ECDSA_TYPE)) return "1";
         if (sType.equals(CardSign.CARDSIGN_GOST2012_TYPE)) return "2";
         return "0";
+    }
+
+    public String getProviderType()
+    {
+        if (newProvider)
+            return NEW_PROVIDER;
+        else
+            return OLD_PROVIDER;
     }
 
     public String getPrintedName() {
@@ -91,6 +104,8 @@ public class CardSignItem {
     }
 
     public Boolean getNewProvider() {
+        if (newProvider == null)
+            return false;
         return newProvider;
     }
 
