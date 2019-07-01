@@ -111,7 +111,6 @@ public class CryptoSign {
                         if (card.getMemSize() == 2) {
                             sign = SCrypt.generate(pk.getEncoded(), card_data, //данные карты используем как "соль"
                                     16384, 8, 1, 20);
-
                         } else {
                             sign = new byte[]{0};
                             responseCardSign.setMessage("Тип подписи для карты задан некорректно");
