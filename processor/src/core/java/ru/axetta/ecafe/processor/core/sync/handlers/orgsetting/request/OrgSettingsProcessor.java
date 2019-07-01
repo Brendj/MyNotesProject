@@ -32,8 +32,8 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
         Long maxVersionFromARM = orgSettingsRequest.getMaxVersion();
         Long idOfOrg = orgSettingsRequest.getIdOfOrgSource();
         Date syncData = new Date();
-        Long lastVersionOfOrgSetting = OrgSettingDAOUtils.getLastVersionOfOrgSettings(session);
-        Long lastVersionOfOrgSettingItem = OrgSettingDAOUtils.getLastVersionOfOrgSettingsItem(session);
+        Long nextVersionOfOrgSetting = OrgSettingDAOUtils.getNextVersionOfOrgSettings(session);
+        Long nextVersionOfOrgSettingItem = OrgSettingDAOUtils.getNextVersionOfOrgSettingItem(session);
 
         //Apply change from ARM
         for (OrgSettingSyncPOJO pojo : orgSettingsRequest.getItems()) {
@@ -41,13 +41,13 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
                     .getOrgSettingByGroupIdAndOrg(session, pojo.getGroupID(), pojo.getIdOfOrg());
             if (setting == null) {
                 setting = new OrgSetting();
-                setting.setVersion(lastVersionOfOrgSetting);
+                setting.setVersion(nextVersionOfOrgSetting);
                 setting.setLastUpdate(syncData);
                 setting.setCreatedDate(syncData);
                 setting.setSettingGroup(OrgSettingGroup.getGroupById(pojo.getGroupID()));
                 setting.setIdOfOrg(pojo.getIdOfOrg().longValue());
                 for (OrgSettingItemSyncPOJO itemSyncPOJO : pojo.getItems()) {
-                    OrgSettingItem item = buildFromPOJO(lastVersionOfOrgSettingItem, itemSyncPOJO, syncData, setting);
+                    OrgSettingItem item = buildFromPOJO(nextVersionOfOrgSettingItem, itemSyncPOJO, syncData, setting);
                     setting.getOrgSettingItems().add(item);
                 }
             } else if (setting.getVersion() <= maxVersionFromARM) {
@@ -55,16 +55,16 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
                 for (OrgSettingItemSyncPOJO itemSyncPOJO : pojo.getItems()) {
                     OrgSettingItem settingItem = orgSettingItemMap.get(itemSyncPOJO.getGlobalID());
                     if (settingItem == null) {
-                        settingItem = buildFromPOJO(lastVersionOfOrgSettingItem, itemSyncPOJO, syncData, setting);
+                        settingItem = buildFromPOJO(nextVersionOfOrgSettingItem, itemSyncPOJO, syncData, setting);
                         setting.getOrgSettingItems().add(settingItem);
                     } else if (settingItem.getVersion() <= itemSyncPOJO.getVersion()) {
                         settingItem.setLastUpdate(syncData);
                         settingItem.setSettingValue(itemSyncPOJO.getValue());
-                        settingItem.setVersion(lastVersionOfOrgSettingItem);
+                        settingItem.setVersion(nextVersionOfOrgSettingItem);
                     }
                 }
                 setting.setLastUpdate(syncData);
-                setting.setVersion(lastVersionOfOrgSetting);
+                setting.setVersion(nextVersionOfOrgSetting);
             }
             session.saveOrUpdate(setting);
         }
@@ -100,12 +100,12 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
         return section;
     }
 
-    private OrgSettingItem buildFromPOJO(Long lastVersionOfOrgSettingItem, OrgSettingItemSyncPOJO itemSyncPOJO,
+    private OrgSettingItem buildFromPOJO(Long nextVersionOfOrgSettingItem, OrgSettingItemSyncPOJO itemSyncPOJO,
             Date syncData, OrgSetting setting) {
         OrgSettingItem settingItem = new OrgSettingItem();
         settingItem.setCreatedDate(syncData);
         settingItem.setLastUpdate(syncData);
-        settingItem.setVersion(lastVersionOfOrgSettingItem);
+        settingItem.setVersion(nextVersionOfOrgSettingItem);
         settingItem.setOrgSetting(setting);
         settingItem.setSettingType(itemSyncPOJO.getGlobalID());
         settingItem.setSettingValue(itemSyncPOJO.getValue());
