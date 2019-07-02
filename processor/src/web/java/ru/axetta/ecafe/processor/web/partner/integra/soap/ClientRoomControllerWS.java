@@ -9436,7 +9436,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public ContragentData getContragentForClient(@WebParam(name = "clientId") Long clientId){
+    public ContragentData getContragentForClient(@WebParam(name = "contractId") Long contractId){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -9444,11 +9444,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Client client = DAOUtils.getClientReference(persistenceSession, clientId);
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
             if (client == null) {
                 throw new NullPointerException();
             }
-            Contragent contragent = DAOUtils.getContragentbyClientId(persistenceSession, clientId);
+            Contragent contragent = DAOUtils.getContragentbyContractId(persistenceSession, contractId);
             contragentData.setIdOfContragent(contragent.getIdOfContragent());
             contragentData.setContragentName(contragent.getContragentName());
 

@@ -588,7 +588,7 @@ public interface ClientRoomController {
             @WebParam(name = "serviceNumber") String serviceNumber);
 
     @WebMethod(operationName = "getContragentForClient")
-    ContragentData getContragentForClient(@WebParam(name = "clientId") Long clientId);
+    ContragentData getContragentForClient(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName = "getETPDiscounts")
     ETPDiscountsResult getETPDiscounts();

@@ -4158,11 +4158,11 @@ public class DAOUtils {
         return result;
     }
     
-        public static Contragent getContragentbyClientId(Session persistenceSession, Long clientId) throws Exception {
+        public static Contragent getContragentbyContractId(Session persistenceSession, Long contractId) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Contragent.class);
         criteria.createAlias("orgsInternal", "orgs");
         criteria.createAlias("orgs.clientsInternal", "client");
-        criteria.add(Restrictions.eq("client.idOfClient", clientId));
+        criteria.add(Restrictions.eq("client.contractId", contractId));
         return (Contragent) criteria.uniqueResult();
     }
 }
