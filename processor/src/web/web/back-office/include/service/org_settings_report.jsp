@@ -69,7 +69,6 @@
             <a4j:support event="onchange" reRender="orgSettingsTable" />
         </h:selectBooleanCheckbox>
     </h:panelGrid>
-
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{orgSettingsReportPage.buildHTML}"
                            reRender="orgSettingsTable" styleClass="command-button"
@@ -80,13 +79,11 @@
             <a4j:support status="reportGenerateStatus" id="buildXLSButtonSupport"/>
         </h:commandButton>
     </h:panelGrid>
-
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
         </f:facet>
     </a4j:status>
-
     <rich:dataTable id="orgSettingsTable" value="#{orgSettingsReportPage.items}" var="item" rows="25"
                     sortMode="single"
                     rowClasses="center-aligned-column" lang="rus"
@@ -342,9 +339,6 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
-
-    <rich:separator align="center" height = "5" width="270px"/>
-
     <h:panelGrid styleClass="borderless-grid" columns="1">
         <a4j:commandButton value="Применить изменения" action="#{orgSettingsReportPage.applyChanges}"
                            reRender="orgSettingsTable" styleClass="command-button"
@@ -353,5 +347,4 @@
 
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
-
 </h:panelGrid>

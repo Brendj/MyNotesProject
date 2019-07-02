@@ -63,7 +63,7 @@ public class ClientBalanceHoldData implements SectionRequest {
             if (StringUtils.isEmpty(guid)) {
                 errorMessage.append("Attribute Guid not found.");
             }
-            String phoneOfDeclarer = XMLUtils.getAttributeValue(itemNode, "DeclarerPhone");
+            String phoneOfDeclarer = XMLUtils.getAttributeValue(itemNode, "PhoneOfDeclarer");
             Long idOfClient = (Long)getValue(itemNode, "ClientId", errorMessage, false, 'L');
             Long idOfDeclarer = (Long)getValue(itemNode, "DeclarerId", errorMessage, true, 'L');
             Long holdSum = (Long)getValue(itemNode, "HoldSum", errorMessage, false, 'L');

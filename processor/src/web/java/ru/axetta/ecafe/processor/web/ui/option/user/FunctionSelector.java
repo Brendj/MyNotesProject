@@ -82,8 +82,8 @@ public class FunctionSelector {
     private static final String[] notAdminFunctions = new String[]{
             "cardRprts", "clientRprts", "clientsBenefitsRprt", "electronicReconciliationRprt", "enterEventRprt",
             "financialControl", "informRprts", "onlineRprtActivity", "onlineRprtBenefit", "onlineRprtComplex",
-            "onlineRprtCoverageNutrition", "onlineRprtMeals", "onlineRprtRefill", "onlineRprtRequest", "paidFood",
-            "salesRprt", "statisticDifferences", "subscriptionFeeding", "totalServicesRprt", "transactionsRprt"};
+            "onlineRprtMeals", "onlineRprtRefill", "onlineRprtRequest", "paidFood", "salesRprt", "statisticDifferences",
+            "subscriptionFeeding", "totalServicesRprt", "transactionsRprt"};
     private static final String[] securityAdminFunctions = new String[]{
             "viewUser", "editUser", "deleteUser", "workOption"};
 
@@ -321,7 +321,7 @@ public class FunctionSelector {
                     .getFunctionName().equals("feedingSettingsSupplier") || item.getFunctionName()
                     .equals("feedingSettingsAdmin") || item.getFunctionName().equals("manualRprt") || item
                     .getFunctionName().equals("messageARMinOO") || item.getFunctionName()
-                    .equals("onlineRprtCoverageNutrition")) {
+                    .equals("coverageNutritionRprt")) {
                 onlineReportItems.add(item);
             }
         }
@@ -443,7 +443,7 @@ public class FunctionSelector {
                     .getFunctionName().equals("feedingSettingsSupplier") || item.getFunctionName()
                     .equals("feedingSettingsAdmin") || item.getFunctionName().equals("manualRprt") || item
                     .getFunctionName().equals("messageARMinOO") || item.getFunctionName()
-                    .equals("onlineRprtCoverageNutrition")) {
+                    .equals("coverageNutritionRprt")) {
                 if (selectedFunctions != null && selectedFunctions.contains(function)) {
                     item.setSelected(true);
                 }

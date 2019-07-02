@@ -72,12 +72,12 @@ public class OrgSettingItem {
             return false;
         }
         OrgSettingItem setting = (OrgSettingItem) o;
-        return this.idOfOrgSettingItem.equals(setting.getIdOfOrgSettingItem());
+        return this.settingType.equals(setting.settingType);
     }
 
     @Override
     public int hashCode(){
-        return idOfOrgSettingItem.hashCode();
+        return settingType.hashCode();
     }
 
     public Long getVersion() {

@@ -27,26 +27,26 @@ import javax.xml.namespace.QName;
 @XmlRegistry
 public class ObjectFactory {
 
-    private final static QName _BusinessDataTypeIsNotSupported_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "BusinessDataTypeIsNotSupported");
-    private final static QName _InvalidMessageIdFormat_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "InvalidMessageIdFormat");
-    private final static QName _DestinationOverflow_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "DestinationOverflow");
-    private final static QName _RecipientIsNotFound_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "RecipientIsNotFound");
-    private final static QName _AttachmentSizeLimitExceeded_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "AttachmentSizeLimitExceeded");
-    private final static QName _SMEVFailure_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "SMEVFailure");
-    private final static QName _QuoteLimitExceeded_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "QuoteLimitExceeded");
-    private final static QName _SignatureVerificationFault_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "SignatureVerificationFault");
-    private final static QName _AccessDenied_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "AccessDenied");
-    private final static QName _RequestIsNotFound_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "RequestIsNotFound");
     private final static QName _StaleMessageId_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "StaleMessageId");
-    private final static QName _TargetMessageIsNotFound_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "TargetMessageIsNotFound");
     private final static QName _UnknownMessageType_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "UnknownMessageType");
+    private final static QName _SignatureVerificationFault_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "SignatureVerificationFault");
+    private final static QName _BusinessDataTypeIsNotSupported_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "BusinessDataTypeIsNotSupported");
+    private final static QName _IncorrectResponseContentType_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "IncorrectResponseContentType");
+    private final static QName _AccessDenied_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "AccessDenied");
+    private final static QName _TargetMessageIsNotFound_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "TargetMessageIsNotFound");
+    private final static QName _RequestIsNotFound_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "RequestIsNotFound");
+    private final static QName _TransactionCodeInvalid_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "TransactionCodeInvalid");
+    private final static QName _AttachmentContentMiscoordination_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "AttachmentContentMiscoordination");
+    private final static QName _EndOfLifeReached_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "EndOfLifeReached");
+    private final static QName _QuoteLimitExceeded_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "QuoteLimitExceeded");
+    private final static QName _AttachmentSizeLimitExceeded_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "AttachmentSizeLimitExceeded");
+    private final static QName _InvalidMessageIdFormat_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "InvalidMessageIdFormat");
+    private final static QName _RecipientIsNotFound_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "RecipientIsNotFound");
+    private final static QName _DestinationOverflow_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "DestinationOverflow");
     private final static QName _InvalidContent_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "InvalidContent");
     private final static QName _MessageIsAlreadySent_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "MessageIsAlreadySent");
     private final static QName _SenderIsNotRegistered_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "SenderIsNotRegistered");
-    private final static QName _EndOfLifeReached_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "EndOfLifeReached");
-    private final static QName _IncorrectResponseContentType_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "IncorrectResponseContentType");
-    private final static QName _AttachmentContentMiscoordination_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "AttachmentContentMiscoordination");
-    private final static QName _TransactionCodeInvalid_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "TransactionCodeInvalid");
+    private final static QName _SMEVFailure_QNAME = new QName("urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", "SMEVFailure");
 
     /**
      * Create a new ObjectFactory that can be used to create new instances of schema derived classes for package: ru.gov.smev.artefacts.x.services.message_exchange.types.faults._1
@@ -61,14 +61,6 @@ public class ObjectFactory {
      */
     public InvalidContent createInvalidContent() {
         return new InvalidContent();
-    }
-
-    /**
-     * Create an instance of {@link SignatureVerificationFault }
-     * 
-     */
-    public SignatureVerificationFault createSignatureVerificationFault() {
-        return new SignatureVerificationFault();
     }
 
     /**
@@ -104,101 +96,19 @@ public class ObjectFactory {
     }
 
     /**
+     * Create an instance of {@link SignatureVerificationFault }
+     * 
+     */
+    public SignatureVerificationFault createSignatureVerificationFault() {
+        return new SignatureVerificationFault();
+    }
+
+    /**
      * Create an instance of {@link InvalidContent.ValidationError }
      * 
      */
     public InvalidContent.ValidationError createInvalidContentValidationError() {
         return new InvalidContent.ValidationError();
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link BusinessDataTypeIsNotSupported }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "BusinessDataTypeIsNotSupported")
-    public JAXBElement<BusinessDataTypeIsNotSupported> createBusinessDataTypeIsNotSupported(BusinessDataTypeIsNotSupported value) {
-        return new JAXBElement<BusinessDataTypeIsNotSupported>(_BusinessDataTypeIsNotSupported_QNAME, BusinessDataTypeIsNotSupported.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "InvalidMessageIdFormat")
-    public JAXBElement<Void> createInvalidMessageIdFormat(Void value) {
-        return new JAXBElement<Void>(_InvalidMessageIdFormat_QNAME, Void.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link DestinationOverflow }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "DestinationOverflow")
-    public JAXBElement<DestinationOverflow> createDestinationOverflow(DestinationOverflow value) {
-        return new JAXBElement<DestinationOverflow>(_DestinationOverflow_QNAME, DestinationOverflow.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "RecipientIsNotFound")
-    public JAXBElement<Void> createRecipientIsNotFound(Void value) {
-        return new JAXBElement<Void>(_RecipientIsNotFound_QNAME, Void.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link AttachmentSizeLimitExceeded }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "AttachmentSizeLimitExceeded")
-    public JAXBElement<AttachmentSizeLimitExceeded> createAttachmentSizeLimitExceeded(AttachmentSizeLimitExceeded value) {
-        return new JAXBElement<AttachmentSizeLimitExceeded>(_AttachmentSizeLimitExceeded_QNAME, AttachmentSizeLimitExceeded.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "SMEVFailure")
-    public JAXBElement<Void> createSMEVFailure(Void value) {
-        return new JAXBElement<Void>(_SMEVFailure_QNAME, Void.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link QuoteLimitExceeded }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "QuoteLimitExceeded")
-    public JAXBElement<QuoteLimitExceeded> createQuoteLimitExceeded(QuoteLimitExceeded value) {
-        return new JAXBElement<QuoteLimitExceeded>(_QuoteLimitExceeded_QNAME, QuoteLimitExceeded.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link SignatureVerificationFault }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "SignatureVerificationFault")
-    public JAXBElement<SignatureVerificationFault> createSignatureVerificationFault(SignatureVerificationFault value) {
-        return new JAXBElement<SignatureVerificationFault>(_SignatureVerificationFault_QNAME, SignatureVerificationFault.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "AccessDenied")
-    public JAXBElement<Void> createAccessDenied(Void value) {
-        return new JAXBElement<Void>(_AccessDenied_QNAME, Void.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "RequestIsNotFound")
-    public JAXBElement<Void> createRequestIsNotFound(Void value) {
-        return new JAXBElement<Void>(_RequestIsNotFound_QNAME, Void.class, null, value);
     }
 
     /**
@@ -214,6 +124,51 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
      * 
      */
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "UnknownMessageType")
+    public JAXBElement<Void> createUnknownMessageType(Void value) {
+        return new JAXBElement<Void>(_UnknownMessageType_QNAME, Void.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SignatureVerificationFault }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "SignatureVerificationFault")
+    public JAXBElement<SignatureVerificationFault> createSignatureVerificationFault(SignatureVerificationFault value) {
+        return new JAXBElement<SignatureVerificationFault>(_SignatureVerificationFault_QNAME, SignatureVerificationFault.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link BusinessDataTypeIsNotSupported }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "BusinessDataTypeIsNotSupported")
+    public JAXBElement<BusinessDataTypeIsNotSupported> createBusinessDataTypeIsNotSupported(BusinessDataTypeIsNotSupported value) {
+        return new JAXBElement<BusinessDataTypeIsNotSupported>(_BusinessDataTypeIsNotSupported_QNAME, BusinessDataTypeIsNotSupported.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "IncorrectResponseContentType")
+    public JAXBElement<Void> createIncorrectResponseContentType(Void value) {
+        return new JAXBElement<Void>(_IncorrectResponseContentType_QNAME, Void.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "AccessDenied")
+    public JAXBElement<Void> createAccessDenied(Void value) {
+        return new JAXBElement<Void>(_AccessDenied_QNAME, Void.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
+     * 
+     */
     @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "TargetMessageIsNotFound")
     public JAXBElement<Void> createTargetMessageIsNotFound(Void value) {
         return new JAXBElement<Void>(_TargetMessageIsNotFound_QNAME, Void.class, null, value);
@@ -223,9 +178,81 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "UnknownMessageType")
-    public JAXBElement<Void> createUnknownMessageType(Void value) {
-        return new JAXBElement<Void>(_UnknownMessageType_QNAME, Void.class, null, value);
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "RequestIsNotFound")
+    public JAXBElement<Void> createRequestIsNotFound(Void value) {
+        return new JAXBElement<Void>(_RequestIsNotFound_QNAME, Void.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link SmevFault }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "TransactionCodeInvalid")
+    public JAXBElement<SmevFault> createTransactionCodeInvalid(SmevFault value) {
+        return new JAXBElement<SmevFault>(_TransactionCodeInvalid_QNAME, SmevFault.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "AttachmentContentMiscoordination")
+    public JAXBElement<Void> createAttachmentContentMiscoordination(Void value) {
+        return new JAXBElement<Void>(_AttachmentContentMiscoordination_QNAME, Void.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "EndOfLifeReached")
+    public JAXBElement<Void> createEndOfLifeReached(Void value) {
+        return new JAXBElement<Void>(_EndOfLifeReached_QNAME, Void.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link QuoteLimitExceeded }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "QuoteLimitExceeded")
+    public JAXBElement<QuoteLimitExceeded> createQuoteLimitExceeded(QuoteLimitExceeded value) {
+        return new JAXBElement<QuoteLimitExceeded>(_QuoteLimitExceeded_QNAME, QuoteLimitExceeded.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link AttachmentSizeLimitExceeded }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "AttachmentSizeLimitExceeded")
+    public JAXBElement<AttachmentSizeLimitExceeded> createAttachmentSizeLimitExceeded(AttachmentSizeLimitExceeded value) {
+        return new JAXBElement<AttachmentSizeLimitExceeded>(_AttachmentSizeLimitExceeded_QNAME, AttachmentSizeLimitExceeded.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "InvalidMessageIdFormat")
+    public JAXBElement<Void> createInvalidMessageIdFormat(Void value) {
+        return new JAXBElement<Void>(_InvalidMessageIdFormat_QNAME, Void.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "RecipientIsNotFound")
+    public JAXBElement<Void> createRecipientIsNotFound(Void value) {
+        return new JAXBElement<Void>(_RecipientIsNotFound_QNAME, Void.class, null, value);
+    }
+
+    /**
+     * Create an instance of {@link JAXBElement }{@code <}{@link DestinationOverflow }{@code >}}
+     * 
+     */
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "DestinationOverflow")
+    public JAXBElement<DestinationOverflow> createDestinationOverflow(DestinationOverflow value) {
+        return new JAXBElement<DestinationOverflow>(_DestinationOverflow_QNAME, DestinationOverflow.class, null, value);
     }
 
     /**
@@ -259,36 +286,9 @@ public class ObjectFactory {
      * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
      * 
      */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "EndOfLifeReached")
-    public JAXBElement<Void> createEndOfLifeReached(Void value) {
-        return new JAXBElement<Void>(_EndOfLifeReached_QNAME, Void.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "IncorrectResponseContentType")
-    public JAXBElement<Void> createIncorrectResponseContentType(Void value) {
-        return new JAXBElement<Void>(_IncorrectResponseContentType_QNAME, Void.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link Void }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "AttachmentContentMiscoordination")
-    public JAXBElement<Void> createAttachmentContentMiscoordination(Void value) {
-        return new JAXBElement<Void>(_AttachmentContentMiscoordination_QNAME, Void.class, null, value);
-    }
-
-    /**
-     * Create an instance of {@link JAXBElement }{@code <}{@link SmevFault }{@code >}}
-     * 
-     */
-    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "TransactionCodeInvalid")
-    public JAXBElement<SmevFault> createTransactionCodeInvalid(SmevFault value) {
-        return new JAXBElement<SmevFault>(_TransactionCodeInvalid_QNAME, SmevFault.class, null, value);
+    @XmlElementDecl(namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/faults/1.2", name = "SMEVFailure")
+    public JAXBElement<Void> createSMEVFailure(Void value) {
+        return new JAXBElement<Void>(_SMEVFailure_QNAME, Void.class, null, value);
     }
 
 }

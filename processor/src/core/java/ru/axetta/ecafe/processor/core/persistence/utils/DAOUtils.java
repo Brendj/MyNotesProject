@@ -30,7 +30,10 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
-import ru.axetta.ecafe.processor.core.utils.*;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
+import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -4137,16 +4140,6 @@ public class DAOUtils {
         return query.list();
     }
 
-    public static  Long getLastVersionOfOrgSettings(Session session){
-        SQLQuery query = session.createSQLQuery("SELECT MAX(version) FROM CF_OrgSettings");
-        return DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
-    }
-
-    public static  Long getLastVersionOfOrgSettingsItem(Session session){
-        SQLQuery query = session.createSQLQuery("SELECT MAX(version) FROM CF_OrgSettings_Items");
-        return DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
-    }
-
     public static OrgSetting getOrgSettingByOrgAndType(Session session, Long idOfOrg, Integer settingGroupId) {
         Criteria criteria = session.createCriteria(OrgSetting.class);
         criteria.add(Restrictions.eq("idOfOrg", idOfOrg))
@@ -4154,7 +4147,18 @@ public class DAOUtils {
         return (OrgSetting) criteria.uniqueResult();
     }
 
-    public static Contragent getContragentbyClientId(Session persistenceSession, Long clientId) throws Exception {
+    public static List<Long> findFriendlyOrgsIds(Session session, List<Long> orgIdList) {
+        Query query = session
+                .createSQLQuery("select friendlyorg from cf_friendly_organization where currentorg in (:idOfOrgList)")
+                .setParameterList("idOfOrgList", orgIdList);
+        List<Long> result = new ArrayList<Long>();
+        for (Object o: query.list()) {
+            result.add(((BigInteger)o).longValue());
+        }
+        return result;
+    }
+    
+        public static Contragent getContragentbyClientId(Session persistenceSession, Long clientId) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Contragent.class);
         criteria.createAlias("orgsInternal", "orgs");
         criteria.createAlias("orgs.clientsInternal", "client");
@@ -4162,3 +4166,5 @@ public class DAOUtils {
         return (Contragent) criteria.uniqueResult();
     }
 }
+
+
