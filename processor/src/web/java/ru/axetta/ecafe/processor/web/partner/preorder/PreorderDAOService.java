@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService;
+import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportServiceParam;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.ClientSummaryBase;
@@ -63,13 +64,13 @@ public class PreorderDAOService {
     public void createPreorderDAOOperationsImpl() {
         IPreorderDAOOperations impl = new IPreorderDAOOperations() {
             @Override
-            public void generatePreordersBySchedule() {
-                generatePreordersByScheduleInternal();
+            public void generatePreordersBySchedule(PreorderRequestsReportServiceParam params) {
+                generatePreordersByScheduleInternal(params);
             }
 
             @Override
-            public void relevancePreorders() {
-                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).relevancePreorders();
+            public void relevancePreorders(PreorderRequestsReportServiceParam params) {
+                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).relevancePreorders(params);
             }
         };
         RuntimeContext.getAppContext().getBean(DAOService.class).setPreorderDAOOperationsImpl(impl);
@@ -642,11 +643,13 @@ public class PreorderDAOService {
     }
 
     @Transactional
-    public void relevancePreordersToOrgs() {
+    public void relevancePreordersToOrgs(PreorderRequestsReportServiceParam params) {
         logger.info("Start relevancePreordersToOrgs process");
         long nextVersion = nextVersionByPreorderComplex();
         Query query = em.createQuery("select pc, c.org.idOfOrg from PreorderComplex pc join pc.client c "
-                + "where pc.preorderDate > :date and pc.deletedState = false order by pc.preorderDate");
+                + "where pc.preorderDate > :date and pc.deletedState = false "
+                + params.getJPACondition()
+                + "order by pc.preorderDate");
         query.setParameter("date", new Date());
         List list = query.getResultList();
         for (Object obj : list) {
@@ -663,11 +666,13 @@ public class PreorderDAOService {
     }
 
     @Transactional
-    public void relevancePreordersToMenu() {
+    public void relevancePreordersToMenu(PreorderRequestsReportServiceParam params) {
         logger.info("Start relevancePreordersToMenu process");
         long nextVersion = nextVersionByPreorderComplex();
         Query query = em.createQuery("select pc from PreorderComplex pc "
-                + "where pc.preorderDate > :date and pc.deletedState = false order by pc.preorderDate");
+                + "where pc.preorderDate > :date and pc.deletedState = false "
+                + params.getJPACondition()
+                + "order by pc.preorderDate");
         query.setParameter("date", new Date());
         List<PreorderComplex> list = query.getResultList();
         for (PreorderComplex preorderComplex : list) {
@@ -708,11 +713,13 @@ public class PreorderDAOService {
     }
 
     @Transactional
-    public void relevancePreordersToOrgFlag() {
+    public void relevancePreordersToOrgFlag(PreorderRequestsReportServiceParam params) {
         logger.info("Start relevancePreordersToOrgFlag process");
         long nextVersion = nextVersionByPreorderComplex();
         Query query = em.createQuery("select pc from PreorderComplex pc join pc.client.org o "
-                + "where pc.preorderDate > :date and pc.deletedState = false and o.preordersEnabled = false order by pc.preorderDate");
+                + "where pc.preorderDate > :date and pc.deletedState = false and o.preordersEnabled = false "
+                + params.getJPACondition()
+                + "order by pc.preorderDate");
         query.setParameter("date", new Date());
         List<PreorderComplex> list = query.getResultList();
         for (PreorderComplex preorderComplex : list) {
@@ -751,24 +758,28 @@ public class PreorderDAOService {
         }
     }
 
-    private void generatePreordersByScheduleInternal() {
+    private void generatePreordersByScheduleInternal(PreorderRequestsReportServiceParam params) {
         try {
             logger.info("Start of generating regular preorders");
-            RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).generatePreordersBySchedule();
+            if (params.isEmpty()) {
+                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).generatePreordersBySchedule();
+            }
             logger.info("Successful end of generating regular preorders");
         } catch (Exception e) {
             logger.error("Error in generating regular preorders: ", e);
         }
         try {
             logger.info("Start additional tasks for preorders");
-            RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).additionalTasksForPreorders();
+            RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).additionalTasksForPreorders(params);
             logger.info("Successful end additional tasks for preorders");
         } catch (Exception e) {
             logger.error("Error in additional tasks for preorders: ", e);
         }
         try {
             logger.info("Start additional tasks for regulars");
-            RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).additionalTasksForRegulars();
+            if (params.isEmpty()) {
+                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).additionalTasksForRegulars();
+            }
             logger.info("Successful end additional tasks for regulars");
         } catch (Exception e) {
             logger.error("Error in additional tasks for regualrs: ", e);
@@ -1077,9 +1088,9 @@ public class PreorderDAOService {
     }
 
     @Transactional
-    public List getAllActualPreorders() {
+    public List getAllActualPreorders(PreorderRequestsReportServiceParam params) {
         Query query = em.createQuery("select pc, pc.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup from PreorderComplex pc "
-                + "where pc.deletedState = false and pc.preorderDate > :date");
+                + "where pc.deletedState = false and pc.preorderDate > :date" + params.getJPACondition());
         query.setParameter("date", new Date());
         return query.getResultList();
     }

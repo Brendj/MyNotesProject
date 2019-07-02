@@ -11,8 +11,8 @@ import javax.xml.bind.annotation.XmlType;
 
 /**
  * 
- *                 ���������� ������� � ������� XMLDSig.
- *             
+ * 				Элекронная подпись в формате XMLDSig.
+ * 			
  * 
  * <p>Java class for XMLDSigSignatureType complex type.
  * 

@@ -7,8 +7,8 @@
         </id>
         <property name="guid" column="guid" type="string" length="36" update="false" not-null="true"/>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient" not-null="true" update="false"/>
-        <many-to-one name="declarer" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfDeclarer" update="false"/>
-        <property name="phoneOfDeclarer" column="phoneOfDeclarer" type="string" length="20" update="false"/>
+        <many-to-one name="declarer" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfDeclarer"/>
+        <property name="phoneOfDeclarer" column="phoneOfDeclarer" type="string" length="20"/>
         <many-to-one name="oldOrg" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOldOrg" not-null="true" update="false"/>
         <many-to-one name="newOrg" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfNewOrg" update="false"/>
         <many-to-one name="oldContragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="IdOfOldContragent" not-null="true"

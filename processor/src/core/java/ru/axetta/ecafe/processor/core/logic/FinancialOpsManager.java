@@ -552,7 +552,7 @@ public class FinancialOpsManager {
         if (client.getBalance() - holdSum < 0L) throw new Exception("Not enough balance");
         Session session = (Session)em.getDelegate();
         AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
-                null, -holdSum, "", AccountTransaction.CLIENT_BALANCE_HOLD, null, new Date());
+                null, -holdSum, "", AccountTransaction.CLIENT_BALANCE_HOLD, oldOrg.getIdOfOrg(), new Date());
         ClientBalanceHold clientBalanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
                 .createClientBalanceHold(session, guid, client, holdSum, oldOrg, newOrg, oldContragent, newContragent, createStatus,
                         requestStatus, declarer, phoneOfDeclarer, declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, version);
@@ -566,8 +566,15 @@ public class FinancialOpsManager {
         ClientBalanceHold clientBalanceHold = (ClientBalanceHold)session.get(ClientBalanceHold.class, idOfClientBalanceHold);
         ClientAccountManager.processAccountTransaction(session, clientBalanceHold.getClient(),
                 null, clientBalanceHold.getHoldSum(), clientBalanceHold.getAccountTransaction().getIdOfTransaction().toString(),
-                AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, null, new Date());
+                AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, clientBalanceHold.getOldOrg().getIdOfOrg(), new Date());
         RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).setStatusWithValue(idOfClientBalanceHold, status);
         session.save(clientBalanceHold);
+    }
+
+    @Transactional
+    public void declineClientBalanceNonTransactional(Session session, ClientBalanceHold clientBalanceHold) throws Exception {
+        ClientAccountManager.processAccountTransaction(session, clientBalanceHold.getClient(),
+                null, clientBalanceHold.getHoldSum(), clientBalanceHold.getAccountTransaction().getIdOfTransaction().toString(),
+                AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, clientBalanceHold.getOldOrg().getIdOfOrg(), new Date());
     }
 }

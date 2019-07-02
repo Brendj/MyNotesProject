@@ -9,9 +9,10 @@ import javax.xml.bind.annotation.adapters.XmlJavaTypeAdapter;
 
 /**
  * 
- *                 ���������� ���������� �����.
- *                 �������� �������� attachmentId ������ ���� ��������� ����� ���� ��������� � ��������� ����-���������, ������� ��� xs:ID.
- *             
+ * 				Содержимое вложенного файла.
+ * 				Значение атрибута attachmentId должно быть уникально среди всех элементов и атрибутов СМЭВ-сообщения,
+ * 				имеющих тип xs:ID.
+ * 			
  * 
  * <p>Java class for AttachmentContentType complex type.
  * 

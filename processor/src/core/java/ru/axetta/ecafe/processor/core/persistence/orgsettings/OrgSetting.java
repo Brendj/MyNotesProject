@@ -77,12 +77,16 @@ public class OrgSetting {
             return false;
         }
         OrgSetting setting = (OrgSetting) o;
-        return this.idOfOrgSetting.equals(setting.idOfOrgSetting);
+        if(idOfOrgSetting != null) {
+            return this.idOfOrgSetting.equals(setting.idOfOrgSetting);
+        } else {
+            return idOfOrg.equals(setting.idOfOrg) && settingGroup.getId().equals(setting.settingGroup.getId());
+        }
     }
 
     @Override
     public int hashCode(){
-        return idOfOrgSetting.hashCode();
+        return idOfOrg.hashCode() + settingGroup.getId().hashCode();
     }
 
     public Long getVersion() {

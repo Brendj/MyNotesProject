@@ -94,9 +94,9 @@ public class OrgSettingManager {
         }
     }
 
-    private OrgSetting getTargetSetting(Org org, Integer settingId){
+    private OrgSetting getTargetSetting(Org org, Integer settingGroup){
         for(OrgSetting setting : org.getOrgSettings()){
-            if(setting.getSettingGroup().getId().equals(settingId)){
+            if(setting.getSettingGroup().getId().equals(settingGroup)){
                 return setting;
             }
         }
