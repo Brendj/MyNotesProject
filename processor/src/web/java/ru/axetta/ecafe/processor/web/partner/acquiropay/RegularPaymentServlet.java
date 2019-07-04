@@ -68,14 +68,14 @@ public class RegularPaymentServlet extends HttpServlet {
                 error = HttpServletResponse.SC_BAD_REQUEST;
                 return;
             }
-            logger.debug("Callback request <status> value: {}", callback.getStatus());
+            logger.info("Callback request <status> value: {}", callback.getStatus());
             if (mfrRequest.getRequestType() == MfrRequest.REQUEST_TYPE_ACTIVATION) {
                 service.processSubscriptionActivated(mfrRequest.getIdOfRequest(), callback);
             } else if (mfrRequest.getRequestType() == MfrRequest.REQUEST_TYPE_PAYMENT) {
                 service.processRegularPayment(mfrRequest.getIdOfRequest(), callback);
             }
         } catch (Exception ex) {
-            logger.error(ex.getMessage());
+            logger.error("Error in RegularPaymentServlet", ex);
             error = HttpServletResponse.SC_INTERNAL_SERVER_ERROR;
         } finally {
             processResponse(resp, error);
@@ -89,7 +89,7 @@ public class RegularPaymentServlet extends HttpServlet {
                 response.sendError(errorCode);
             }
         } catch (IOException e) {
-            logger.error(e.getMessage());
+            logger.error("Error in process response: ", e);
         }
     }
 }
