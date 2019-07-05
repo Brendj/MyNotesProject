@@ -40,8 +40,8 @@ import javax.xml.bind.DatatypeConverter;
 import java.net.ConnectException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 @Component
 public class DTSZNDiscountsReviseService {
@@ -89,6 +89,9 @@ public class DTSZNDiscountsReviseService {
 
     public static final String DATA_SOURCE_TYPE_MARKER_NSI = "nsiir";
     public static final String DATA_SOURCE_TYPE_MARKER_OU = "ou";
+    public static final String DATA_SOURCE_TYPE_MARKER_ARM = "arm";
+
+    public static final String OTHER_DISCOUNT_DESCRIPTION = "Иное";
 
     private static Logger logger = LoggerFactory.getLogger(DTSZNDiscountsReviseService.class);
     private static ReviseLogger reviseLogger = RuntimeContext.getAppContext().getBean(ReviseLogger.class);
@@ -105,8 +108,8 @@ public class DTSZNDiscountsReviseService {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String instance = runtimeContext.getNodeName();
         String reqInstance = runtimeContext.getConfigProperties().getProperty(NODE);
-        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim().equals(
-                reqInstance.trim())) {
+        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim()
+                .equals(reqInstance.trim())) {
             return false;
         }
         return true;
@@ -137,9 +140,15 @@ public class DTSZNDiscountsReviseService {
         Integer sourceType = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DATA_SOURCE);
 
         switch (sourceType) {
-            case 1: runTaskRest(); break;   //DATA_SOURCE_TYPE_NSI
-            case 2: runTaskDB(); break;     //DATA_SOURCE_TYPE_DB
-            default: runTaskRest(); break;
+            case 1:
+                runTaskRest();
+                break;   //DATA_SOURCE_TYPE_NSI
+            case 2:
+                runTaskDB();
+                break;     //DATA_SOURCE_TYPE_DB
+            default:
+                runTaskRest();
+                break;
         }
     }
 
@@ -173,7 +182,8 @@ public class DTSZNDiscountsReviseService {
 
         do {
             try {
-                NSIPersonBenefitResponse response = loadPersonBenefits(currentPage, pageSize, entityIdList, filterDate, guid);
+                NSIPersonBenefitResponse response = loadPersonBenefits(currentPage, pageSize, entityIdList, filterDate,
+                        guid);
 
                 session = runtimeContext.createPersistenceSession();
                 session.setFlushMode(FlushMode.MANUAL);
@@ -211,12 +221,13 @@ public class DTSZNDiscountsReviseService {
                         if (null == discountInfo) {
                             discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
                                     item.getBenefit().getBenefitForm(),
-                                    item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
-                                    item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), DATA_SOURCE_TYPE_MARKER_NSI,
+                                    item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED
+                                            : ClientDTISZNDiscountStatus.NOT_CONFIRMED, item.getDsznDateBeginAsDate(),
+                                    item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), DATA_SOURCE_TYPE_MARKER_NSI,
                                     clientDTISZNDiscountVersion);
-                            discountInfo.setArchived(item.getDeleted() ||
-                                    item.getDateEndAsDate().getTime() <= fireTime.getTime() ||
-                                    !item.getBenefitConfirmed());
+                            discountInfo.setArchived(
+                                    item.getDeleted() || item.getDateEndAsDate().getTime() <= fireTime.getTime()
+                                            || !item.getBenefitConfirmed());
                             session.save(discountInfo);
                         } else {
                             if (discountInfo.getDtisznCode().equals(item.getBenefit().getDsznCode())) {
@@ -231,12 +242,16 @@ public class DTSZNDiscountsReviseService {
                                     discountInfo.setDateEnd(item.getDsznDateEndAsDate());
                                     wasModified = true;
                                 }
-                                if (item.getBenefitConfirmed() && (discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED) || discountInfo.getArchived())) {
+                                if (item.getBenefitConfirmed() && (
+                                        discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED)
+                                                || discountInfo.getArchived())) {
                                     discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
                                     discountInfo.setArchived(false);
                                     wasModified = true;
                                 }
-                                if (!item.getBenefitConfirmed() && (discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) || !discountInfo.getArchived())) {
+                                if (!item.getBenefitConfirmed() && (
+                                        discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)
+                                                || !discountInfo.getArchived())) {
                                     discountInfo.setStatus(ClientDTISZNDiscountStatus.NOT_CONFIRMED);
                                     discountInfo.setArchived(true);
                                     wasModified = true;
@@ -264,12 +279,14 @@ public class DTSZNDiscountsReviseService {
 
                                 discountInfo = new ClientDtisznDiscountInfo(client, item.getBenefit().getDsznCode(),
                                         item.getBenefit().getBenefitForm(),
-                                        item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
-                                        item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(), item.getCreatedAtAsDate(), DATA_SOURCE_TYPE_MARKER_NSI,
+                                        item.getBenefitConfirmed() ? ClientDTISZNDiscountStatus.CONFIRMED
+                                                : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
+                                        item.getDsznDateBeginAsDate(), item.getDsznDateEndAsDate(),
+                                        item.getCreatedAtAsDate(), DATA_SOURCE_TYPE_MARKER_NSI,
                                         clientDTISZNDiscountVersion);
-                                discountInfo.setArchived(item.getDeleted() ||
-                                        item.getDateEndAsDate().getTime() <= fireTime.getTime() ||
-                                        !item.getBenefitConfirmed());
+                                discountInfo.setArchived(
+                                        item.getDeleted() || item.getDateEndAsDate().getTime() <= fireTime.getTime()
+                                                || !item.getBenefitConfirmed());
                                 session.save(discountInfo);
                             }
                         }
@@ -278,8 +295,9 @@ public class DTSZNDiscountsReviseService {
                             session.clear();
                         }
                     } catch (Exception e) {
-                        logger.error(String.format("Unable to update ClientDtisznDiscountInfo for person with guid = {%s}",
-                                item.getPerson().getEntityId()), e);
+                        logger.error(
+                                String.format("Unable to update ClientDtisznDiscountInfo for person with guid = {%s}",
+                                        item.getPerson().getEntityId()), e);
                     }
                 }
                 transaction.commit();
@@ -375,13 +393,14 @@ public class DTSZNDiscountsReviseService {
 
     private Boolean getDisableUpdatedAtFilter() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String disableUpdatedAtFilterString = runtimeContext.getConfigProperties().getProperty(DISABLE_UPDATED_AT_FILTER_PROPERTY);
+        String disableUpdatedAtFilterString = runtimeContext.getConfigProperties()
+                .getProperty(DISABLE_UPDATED_AT_FILTER_PROPERTY);
         if (null == disableUpdatedAtFilterString) {
             return DEFAULT_DISABLE_UPDATED_AT_FILTER;
         }
         return Boolean.parseBoolean(disableUpdatedAtFilterString);
     }
-    
+
     private NSIRequest buildDictBenefitRequest(Long page, Long pageSize) {
         List<NSIRequestParam> paramList = new ArrayList<NSIRequestParam>();
         paramList.add(new NSIRequestParam("deleted-at", OPERATOR_IS_NULL, false));
@@ -389,15 +408,16 @@ public class DTSZNDiscountsReviseService {
         return new NSIRequest(paramList, page, "DictBenefit", pageSize);
     }
 
-    private NSIRequest buildPersonBenefitRequest(Long page, Long pageSize, List<String> entityIdList, String date, String guid) {
+    private NSIRequest buildPersonBenefitRequest(Long page, Long pageSize, List<String> entityIdList, String date,
+            String guid) {
         List<NSIRequestParam> paramList = new ArrayList<NSIRequestParam>();
         if (!disableOUFilter) {
             paramList.add(new NSIRequestParam("person/student/institution-groups/institution-group/age-group",
                     OPERATOR_EQUAL, "ОУ", false));
         }
-        paramList.add(new NSIRequestParam("benefit-form/entity-id", OPERATOR_IN,
-                StringUtils.join(entityIdList, ","), false));
-        paramList.add(new NSIRequestParam("deleted-at", OPERATOR_IS_NULL, false ));
+        paramList.add(new NSIRequestParam("benefit-form/entity-id", OPERATOR_IN, StringUtils.join(entityIdList, ","),
+                false));
+        paramList.add(new NSIRequestParam("deleted-at", OPERATOR_IS_NULL, false));
         paramList.add(new NSIRequestParam("dszn-date-begin", OPERATOR_IS_NULL, true));
         paramList.add(new NSIRequestParam("dszn-date-end", OPERATOR_IS_NULL, true));
         paramList.add(new NSIRequestParam("benefit-confirmed", OPERATOR_IS_NULL, true));
@@ -453,7 +473,8 @@ public class DTSZNDiscountsReviseService {
         return null;
     }
 
-    private NSIPersonBenefitResponse loadPersonBenefits(Long page, Long pageSize, List<String> entityIdList, String filterDate, String guid) throws ConnectException {
+    private NSIPersonBenefitResponse loadPersonBenefits(Long page, Long pageSize, List<String> entityIdList,
+            String filterDate, String guid) throws ConnectException {
         HttpClient httpClient = new HttpClient();
 
         httpClient.getHostConfiguration().setHost(serviceURL.getHost(), serviceURL.getPort(),
@@ -498,10 +519,7 @@ public class DTSZNDiscountsReviseService {
         ObjectMapper objectMapper = new ObjectMapper();
         String serialized = objectMapper.writeValueAsString(request);
 
-        StringRequestEntity requestEntity = new StringRequestEntity(
-                serialized,
-                "application/json",
-                "UTF-8");
+        StringRequestEntity requestEntity = new StringRequestEntity(serialized, "application/json", "UTF-8");
         method.setRequestEntity(requestEntity);
         reviseLogger.logRequest(method);
     }
@@ -565,8 +583,9 @@ public class DTSZNDiscountsReviseService {
                         transaction = session.beginTransaction();
                     }
                     clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, applicationForFood.getClient());
-                    if (clientInfoList.isEmpty())
+                    if (clientInfoList.isEmpty()) {
                         continue;
+                    }
                     Boolean isDiscountOk = false;
                     Boolean isDateOk = true;
 
@@ -576,16 +595,17 @@ public class DTSZNDiscountsReviseService {
                                 isDateOk = false;
                                 break;
                             }
-                            isDiscountOk = info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) &&
-                                    CalendarUtils.betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd()) &&
-                                    !info.getArchived();
+                            isDiscountOk =
+                                    info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
+                                            .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd())
+                                            && !info.getArchived();
                             break;
                         }
                     }
 
                     if (!isDateOk) {
-                        logger.info(String.format("Updating applications: %d/%d",
-                                counter++, applicationForFoodList.size()));
+                        logger.info(String.format("Updating applications: %d/%d", counter++,
+                                applicationForFoodList.size()));
                         continue;
                     }
 
@@ -594,40 +614,49 @@ public class DTSZNDiscountsReviseService {
 
                     LinkedList<ETPMVScheduledStatus> statusList = new LinkedList<ETPMVScheduledStatus>();
                     //7705
-                    applicationForFood = DAOUtils.updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
-                            new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED, null),
-                            applicationVersion, historyVersion);
-                    statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(), applicationForFood.getStatus().getApplicationForFoodState(),
+                    applicationForFood = DAOUtils
+                            .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
+                                    new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED,
+                                            null), applicationVersion, historyVersion);
+                    statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
+                            applicationForFood.getStatus().getApplicationForFoodState(),
                             applicationForFood.getStatus().getDeclineReason()));
                     if (isDiscountOk) {
                         //1052
-                        applicationForFood = DAOUtils.updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
-                                new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null),
-                                applicationVersion, historyVersion);
-                        statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(), applicationForFood.getStatus().getApplicationForFoodState(),
+                        applicationForFood = DAOUtils
+                                .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
+                                        new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null),
+                                        applicationVersion, historyVersion);
+                        statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
+                                applicationForFood.getStatus().getApplicationForFoodState(),
                                 applicationForFood.getStatus().getDeclineReason()));
 
                         //1075
-                        applicationForFood = DAOUtils.updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
-                                new ApplicationForFoodStatus(ApplicationForFoodState.OK, null), applicationVersion,
-                                historyVersion);
-                        statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(), applicationForFood.getStatus().getApplicationForFoodState(),
+                        applicationForFood = DAOUtils
+                                .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
+                                        new ApplicationForFoodStatus(ApplicationForFoodState.OK, null),
+                                        applicationVersion, historyVersion);
+                        statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
+                                applicationForFood.getStatus().getApplicationForFoodState(),
                                 applicationForFood.getStatus().getDeclineReason()));
                     } else {
                         //1080.3
-                        applicationForFood = DAOUtils.updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
-                                new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.INFORMATION_CONFLICT),
-                                applicationVersion, historyVersion);
-                        statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(), applicationForFood.getStatus().getApplicationForFoodState(),
+                        applicationForFood = DAOUtils
+                                .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
+                                        new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
+                                                ApplicationForFoodDeclineReason.INFORMATION_CONFLICT),
+                                        applicationVersion, historyVersion);
+                        statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
+                                applicationForFood.getStatus().getApplicationForFoodState(),
                                 applicationForFood.getStatus().getDeclineReason()));
                     }
                     service.sendStatusesAsync(statusList);
-                    logger.info(String.format("Updating applications: %d/%d",
-                            counter++, applicationForFoodList.size()));
+                    logger.info(
+                            String.format("Updating applications: %d/%d", counter++, applicationForFoodList.size()));
 
                 } catch (Exception e) {
-                    logger.error(String.format("Error in updateApplicationsForFoodTask: " +
-                                    "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo={%s}",
+                    logger.error(String.format("Error in updateApplicationsForFoodTask: "
+                                    + "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo={%s}",
                             applicationForFood.getClient().getIdOfClient(), StringUtils.join(clientInfoList, ",")));
                 } finally {
                     if (null != transaction && transaction.isActive()) {
@@ -653,7 +682,8 @@ public class DTSZNDiscountsReviseService {
 
     public void updateApplicationForFood(Session session, Client client, List<ClientDtisznDiscountInfo> infoList) {
         ApplicationForFood application = DAOUtils.findActiveApplicationForFoodByClient(session, client);
-        if (null == application || !application.getStatus().equals(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null))) {
+        if (null == application || !application.getStatus()
+                .equals(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null))) {
             return;
         }
 
@@ -663,10 +693,9 @@ public class DTSZNDiscountsReviseService {
             Boolean isOk = false;
 
             for (ClientDtisznDiscountInfo info : infoList) {
-                if (application.getDtisznCode().equals(info.getDtisznCode()) &&
-                        info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) &&
-                        CalendarUtils.betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd()) &&
-                        !info.getArchived()) {
+                if (application.getDtisznCode().equals(info.getDtisznCode()) && info.getStatus()
+                        .equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
+                        .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd()) && !info.getArchived()) {
                     isOk = true;
                     break;
                 }
@@ -681,13 +710,14 @@ public class DTSZNDiscountsReviseService {
                 }
             }
         } catch (Exception e) {
-            logger.error(String.format("Error in updateApplicationForFood: " +
-                    "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo={%s}",
+            logger.error(String.format("Error in updateApplicationForFood: "
+                            + "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo={%s}",
                     client.getIdOfClient(), StringUtils.join(infoList, ",")));
         }
     }
 
-    public void processDiscounts(Session session, Client client, List<ClientDtisznDiscountInfo> infoList, Long otherDiscountCode) throws Exception {
+    public void processDiscounts(Session session, Client client, List<ClientDtisznDiscountInfo> infoList,
+            Long otherDiscountCode) throws Exception {
 
         Date fireTime = new Date();
 
@@ -701,12 +731,13 @@ public class DTSZNDiscountsReviseService {
             try {
                 discountCode = Long.parseLong(discount);
             } catch (NumberFormatException e) {
-                logger.warn(String.format("Unable to parse discount code=%s for client with id=%d",
-                        discount, client.getIdOfClient()));
+                logger.warn(String.format("Unable to parse discount code=%s for client with id=%d", discount,
+                        client.getIdOfClient()));
                 continue;
             }
 
-            List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOUtils.getCategoryDiscountDSZNByCategoryDiscountCode(session, discountCode);
+            List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOUtils
+                    .getCategoryDiscountDSZNByCategoryDiscountCode(session, discountCode);
             if (categoryDiscountDSZNList.isEmpty() || discountCode.equals(otherDiscountCode)) {
                 categoryDiscountsList.add(discountCode);
                 continue;
@@ -716,14 +747,14 @@ public class DTSZNDiscountsReviseService {
                 discountCodeList.add(categoryDiscountDSZN.getCode().longValue());
             }
 
-            List<ClientDtisznDiscountInfo> clientDtisznDiscountInfoList = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, client, discountCodeList);
+            List<ClientDtisznDiscountInfo> clientDtisznDiscountInfoList = DAOUtils
+                    .getDTISZNDiscountInfoByClientAndCode(session, client, discountCodeList);
 
             Boolean isOk = true;
 
             for (ClientDtisznDiscountInfo info : clientDtisznDiscountInfoList) {
                 isOk &= info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
-                        .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd())
-                        && !info.getArchived();
+                        .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd()) && !info.getArchived();
             }
 
             if (!clientDtisznDiscountInfoList.isEmpty() && isOk) {
@@ -749,7 +780,8 @@ public class DTSZNDiscountsReviseService {
         }
         newDiscounts = StringUtils.join(discountCodes, ",");
         Integer oldDiscountMode = client.getDiscountMode();
-        Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+        Integer newDiscountMode =
+                StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 
         if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
             client.setCategoriesDiscounts(newDiscounts);
@@ -801,18 +833,19 @@ public class DTSZNDiscountsReviseService {
                 }
 
                 Client client = (Client) session.load(Client.class, idOfClient);
-                List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, client);
+                List<ClientDtisznDiscountInfo> clientInfoList = DAOUtils
+                        .getDTISZNDiscountsInfoByClient(session, client);
                 if (!clientInfoList.isEmpty()) {
                     processDiscounts(session, client, clientInfoList, otherDiscountCode);
                 }
                 transaction.commit();
                 transaction = null;
-                if (0 == clientCounter%maxRecords) {
+                if (0 == clientCounter % maxRecords) {
                     session.flush();
                     session.clear();
                 }
-                logger.info(String.format("Updating discounts for clients: client %d/%d",
-                        clientCounter++, clientList.size()));
+                logger.info(String.format("Updating discounts for clients: client %d/%d", clientCounter++,
+                        clientList.size()));
             }
             session.flush();
             session.clear();
@@ -838,8 +871,8 @@ public class DTSZNDiscountsReviseService {
             Long nextVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
 
             Query query = session.createSQLQuery(
-                    "update cf_client_dtiszn_discount_info set archived = 1, version = :version, "
-                    +" lastupdate = :lastUpdate where lastreceiveddate not between :start and :end or lastreceiveddate is null");
+                    "update cf_client_dtiszn_discount_info set archived = 1, version = :version, lastupdate = :lastUpdate "
+                     + "where (lastreceiveddate not between :start and :end or lastreceiveddate is null) and dtiszncode is not null");
             query.setParameter("start", CalendarUtils.startOfDay(fireTime).getTime());
             query.setParameter("end", CalendarUtils.endOfDay(fireTime).getTime());
             query.setParameter("version", nextVersion);
@@ -870,7 +903,8 @@ public class DTSZNDiscountsReviseService {
         if (StringUtils.isEmpty(guid)) {
             Integer delta = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DELTA);
             Date deltaDate = CalendarUtils.addHours(new Date(), -delta);
-            discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsUpdatedSinceDate(deltaDate);
+            discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class)
+                    .getDiscountsUpdatedSinceDate(deltaDate);
         } else {
             discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsByGUID(guid);
             if (discountItemList.isEmpty()) {
@@ -919,15 +953,12 @@ public class DTSZNDiscountsReviseService {
                         .getDTISZNDiscountInfoByClientAndCode(session, client, item.getDsznCode().longValue());
 
                 if (null == discountInfo) {
-                    discountInfo = new ClientDtisznDiscountInfo(client, item.getDsznCode().longValue(),
-                            item.getTitle(),
-                            item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
-                            item.getSdDszn(), item.getFdDszn(), item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU,
-                            clientDTISZNDiscountVersion);
-                    discountInfo.setArchived(item.getDeleted() ||
-                            item.getFd().getTime() <= fireTime.getTime() ||
-                            item.getFdDszn().getTime() <= fireTime.getTime() ||
-                            !item.getBenefitConfirm());
+                    discountInfo = new ClientDtisznDiscountInfo(client, item.getDsznCode().longValue(), item.getTitle(),
+                            item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED
+                                    : ClientDTISZNDiscountStatus.NOT_CONFIRMED, item.getSdDszn(), item.getFdDszn(),
+                            item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion);
+                    discountInfo.setArchived(item.getDeleted() || item.getFd().getTime() <= fireTime.getTime()
+                            || item.getFdDszn().getTime() <= fireTime.getTime() || !item.getBenefitConfirm());
                     session.save(discountInfo);
                 } else {
                     if (discountInfo.getDtisznCode().equals(item.getDsznCode().longValue())) {
@@ -942,17 +973,22 @@ public class DTSZNDiscountsReviseService {
                             discountInfo.setDateEnd(item.getFdDszn());
                             wasModified = true;
                         }
-                        if (item.getBenefitConfirm() && (discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED) || discountInfo.getArchived())) {
+                        if (item.getBenefitConfirm() && (
+                                discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.NOT_CONFIRMED)
+                                        || discountInfo.getArchived())) {
                             discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
                             discountInfo.setArchived(false);
                             wasModified = true;
                         }
-                        if (!item.getBenefitConfirm() && (discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) || !discountInfo.getArchived())) {
+                        if (!item.getBenefitConfirm() && (
+                                discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) || !discountInfo
+                                        .getArchived())) {
                             discountInfo.setStatus(ClientDTISZNDiscountStatus.NOT_CONFIRMED);
                             discountInfo.setArchived(true);
                             wasModified = true;
                         }
-                        if (item.getDeleted() || item.getFd().getTime() <= fireTime.getTime() || item.getFdDszn().getTime() <= fireTime.getTime()) {
+                        if (item.getDeleted() || item.getFd().getTime() <= fireTime.getTime()
+                                || item.getFdDszn().getTime() <= fireTime.getTime()) {
                             discountInfo.setArchived(true);
                             wasModified = true;
                         } else if (item.getBenefitConfirm() && discountInfo.getArchived()) {
@@ -974,14 +1010,11 @@ public class DTSZNDiscountsReviseService {
                         session.merge(discountInfo);
 
                         discountInfo = new ClientDtisznDiscountInfo(client, item.getDsznCode().longValue(),
-                                item.getTitle(),
-                                item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED : ClientDTISZNDiscountStatus.NOT_CONFIRMED,
-                                item.getSdDszn(), item.getFdDszn(), item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU,
-                                clientDTISZNDiscountVersion);
-                        discountInfo.setArchived(item.getDeleted() ||
-                                item.getFd().getTime() <= fireTime.getTime() ||
-                                item.getFdDszn().getTime() <= fireTime.getTime() ||
-                                !item.getBenefitConfirm());
+                                item.getTitle(), item.getBenefitConfirm() ? ClientDTISZNDiscountStatus.CONFIRMED
+                                : ClientDTISZNDiscountStatus.NOT_CONFIRMED, item.getSdDszn(), item.getFdDszn(),
+                                item.getUpdatedAt(), DATA_SOURCE_TYPE_MARKER_OU, clientDTISZNDiscountVersion);
+                        discountInfo.setArchived(item.getDeleted() || item.getFd().getTime() <= fireTime.getTime()
+                                || item.getFdDszn().getTime() <= fireTime.getTime() || !item.getBenefitConfirm());
                         session.save(discountInfo);
                     }
                 }
@@ -1019,7 +1052,7 @@ public class DTSZNDiscountsReviseService {
             Long nextVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
             Query query = session.createSQLQuery(
                     "update cf_client_dtiszn_discount_info set archived = 1, version = :version, "
-                     + " lastupdate = :lastUpdate where dateend <= :now and status = :confirmed and archived = 0");
+                            + " lastupdate = :lastUpdate where dateend <= :now and status = :confirmed and archived = 0");
             query.setParameter("version", nextVersion);
             query.setParameter("lastUpdate", fireTime.getTime());
             query.setParameter("now", CalendarUtils.addDays(fireTime, -1).getTime());
@@ -1048,20 +1081,28 @@ public class DTSZNDiscountsReviseService {
         Integer sourceType = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DATA_SOURCE);
 
         switch (sourceType) {
-            case 1: runTaskRest(guid); break;   //DATA_SOURCE_TYPE_NSI
-            case 2: runTaskDB(guid); break;     //DATA_SOURCE_TYPE_DB
-            default: runTaskRest(guid); break;
+            case 1:
+                runTaskRest(guid);
+                break;   //DATA_SOURCE_TYPE_NSI
+            case 2:
+                runTaskDB(guid);
+                break;     //DATA_SOURCE_TYPE_DB
+            default:
+                runTaskRest(guid);
+                break;
         }
     }
 
     public void scheduleSync() throws Exception {
-        String syncSchedule = RuntimeContext.getInstance().getConfigProperties().getProperty(CRON_EXPRESSION_PROPERTY, "");
+        String syncSchedule = RuntimeContext.getInstance().getConfigProperties()
+                .getProperty(CRON_EXPRESSION_PROPERTY, "");
         if (syncSchedule.equals("")) {
             return;
         }
         try {
             logger.info("Scheduling revise 2.0 service job: " + syncSchedule);
-            JobDetail job = new JobDetail("DTSZNDiscountsReviseService", Scheduler.DEFAULT_GROUP, DTSZNDiscountsReviseServiceJob.class);
+            JobDetail job = new JobDetail("DTSZNDiscountsReviseService", Scheduler.DEFAULT_GROUP,
+                    DTSZNDiscountsReviseServiceJob.class);
 
             SchedulerFactory sfb = new StdSchedulerFactory();
             Scheduler scheduler = sfb.getScheduler();
@@ -1074,12 +1115,13 @@ public class DTSZNDiscountsReviseService {
                 scheduler.scheduleJob(job, trigger);
             }
             scheduler.start();
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.error("Failed to schedule revise 2.0 service job:", e);
         }
     }
 
     public static class DTSZNDiscountsReviseServiceJob implements Job {
+
         @Override
         public void execute(JobExecutionContext arg0) throws JobExecutionException {
             try {
