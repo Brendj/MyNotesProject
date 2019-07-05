@@ -152,10 +152,10 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                 ApplicationForFoodHistory history = DAOUtils
                         .getLastApplicationForFoodHistory(session, applicationForFood);
                 RequestFeedingItem resItem = null;
-                if (null != applicationForFood.getDtisznCode()) {
+                if (null == applicationForFood.getDtisznCode()) {
                     ClientDtisznDiscountInfo discountInfo = DAOUtils
                             .getDTISZNDiscountInfoByClientAndCode(session, applicationForFood.getClient(),
-                                    applicationForFood.getDtisznCode());
+                                    DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE);
                     if (null != discountInfo) {
                         resItem = new RequestFeedingItem(applicationForFood, history.getCreatedDate(), discountInfo);
                     }
@@ -178,10 +178,10 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
             return;
         }
         ClientDtisznDiscountInfo discountInfo = DAOUtils
-                .getDTISZNDiscountInfoByClientAndCode(session, client, item.getDtisznCode());
+                .getDTISZNDiscountInfoByClientAndCode(session, client, DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE);
         if (null == discountInfo) {
             Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
-            discountInfo = new ClientDtisznDiscountInfo(client, item.getDtisznCode(),
+            discountInfo = new ClientDtisznDiscountInfo(client, DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE,
                     DTSZNDiscountsReviseService.OTHER_DISCOUNT_DESCRIPTION, ClientDTISZNDiscountStatus.CONFIRMED,
                     item.getOtherDiscountStartDate(), item.getOtherDiscountEndDate(), new Date(),
                     DTSZNDiscountsReviseService.DATA_SOURCE_TYPE_MARKER_ARM, clientDTISZNDiscountVersion);

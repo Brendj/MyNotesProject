@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.request.feeding;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Document;
@@ -100,7 +101,7 @@ public class RequestFeedingItem {
     public RequestFeedingItem(ApplicationForFood applicationForFood, Date statusCreatedDate, ClientDtisznDiscountInfo discountInfo) {
         this(applicationForFood, statusCreatedDate);
         // Только иное
-        if (null != discountInfo.getDtisznCode()) {
+        if (!DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE.equals(discountInfo.getDtisznCode())) {
             return;
         }
         this.otherDiscountStartDate = discountInfo.getDateStart();
