@@ -12,7 +12,7 @@
             <generator class="identity"/>
         </id>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="idOfClient" not-null="true"/>
-        <property name="dtisznCode" column="DTISZNCode" type="long" not-null="true"/>
+        <property name="dtisznCode" column="DTISZNCode" type="long"/>
         <property name="dtisznDescription" column="DTISZNDescription" type="string" length="512"/>
         <property name="status" column="Status" not-null="true">
             <type name="org.hibernate.type.EnumType">
