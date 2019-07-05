@@ -183,7 +183,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
             Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
             discountInfo = new ClientDtisznDiscountInfo(client, item.getDtisznCode(),
                     DTSZNDiscountsReviseService.OTHER_DISCOUNT_DESCRIPTION, ClientDTISZNDiscountStatus.CONFIRMED,
-                    item.getOtherDiscountStartDate(), item.getOtherDiscountEndDate(), item.getStatusCreatedDate(),
+                    item.getOtherDiscountStartDate(), item.getOtherDiscountEndDate(), new Date(),
                     DTSZNDiscountsReviseService.DATA_SOURCE_TYPE_MARKER_ARM, clientDTISZNDiscountVersion);
             session.save(discountInfo);
         } else {
