@@ -95,7 +95,9 @@
         <!--        <task:scheduled ref="MSRStopListLoader" method="initCards" fixed-delay="45000" />-->
         <!--Убрано по задаче EP-266<task:scheduled ref="BIDataExportService" method="run" cron="0 0 5 * * ?"/>-->
         <task:scheduled ref="synchCleanupService" method="run" cron="0 10 0 ? * *"/>
-        <task:scheduled ref="RNIPLoadPaymentsService" method="run" fixed-delay="60000"/>
+        <task:scheduled ref="RNIPLoadPaymentsService" method="runRequests" fixed-delay="60000"/>
+        <task:scheduled ref="RNIPLoadPaymentsServiceV21" method="runGetResponse" cron="5 0/1 * * * ?"/>
+        <task:scheduled ref="RNIPLoadPaymentsServiceV21" method="runSendAck" cron="45 0/1 * * * ?"/>
         <task:scheduled ref="EMPProcessor" method="runStorageMerge" cron="0 0/5 * * * ?"/>
         <task:scheduled ref="syncStatsManager" method="shortDataLog" cron="0 0/10 * * * ?"/>
         <task:scheduled ref="syncStatsManager" method="processLogData" cron="0 0 1 * * ?"/>

@@ -176,7 +176,7 @@ public class FunctionViewer {
                     || item.getFunctionName().equals("totalServicesRprt") || item.getFunctionName()
                     .equals("clientsBenefitsRprt") || item.getFunctionName().equals("transactionsRprt") || item
                     .getFunctionName().equals("cardRprts") || item.getFunctionName().equals("countCP") || item.getFunctionName().equals("messageARMinOO")
-                    ||item.getFunctionName().equals("onlineRprtCoverageNutrition")) {
+                    ||item.getFunctionName().equals("coverageNutritionRprt")) {
                 onlineReportItems.add(item);
             } else if (item.getFunctionName().equals("cardOperator")) {
                 cardOperatorItems.add(item);

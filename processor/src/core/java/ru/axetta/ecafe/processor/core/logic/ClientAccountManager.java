@@ -71,7 +71,7 @@ public class ClientAccountManager {
             String source, int sourceType, Long idOfSourceOrg, Date transactionTime) throws Exception {
         AccountTransaction accountTransaction = new AccountTransaction(client, card, client.getContractId(), transactionSum, source,
                 sourceType, transactionTime);
-        if (sourceType == AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE && idOfSourceOrg != null) {
+        if (idOfSourceOrg != null) {
             Org o = (Org)session.load(Org.class, idOfSourceOrg);
             accountTransaction.setOrg(o);
         } else {
@@ -80,7 +80,6 @@ public class ClientAccountManager {
         accountTransaction.setBalanceAfterTransaction(client.getBalance() + transactionSum);
         session.save(accountTransaction);
         DAOUtils.changeClientBalance(session, client, transactionSum, transactionTime);
-        //client.addBalanceNotForSave(transactionSum);
         return accountTransaction;
     }
 
