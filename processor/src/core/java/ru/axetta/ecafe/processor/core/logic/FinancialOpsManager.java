@@ -244,7 +244,7 @@ public class FinancialOpsManager {
                 canceledOrder.setIdOfTransaction(transaction.getIdOfTransaction());
                 ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
             }
-            if (0 != payment.getSummFromCBHR()) {
+            if (payment != null && 0 != payment.getSummFromCBHR()) {
                 BalanceHoldTransaction cancelBalanceHoldTransaction = ClientBalanceHoldService
                         .processClientBalanceHoldTransaction(session, payment.getGuidOfCBHR(), payment.getSummFromCBHR(), payment.isCommit());
                 session.save(cancelBalanceHoldTransaction);
