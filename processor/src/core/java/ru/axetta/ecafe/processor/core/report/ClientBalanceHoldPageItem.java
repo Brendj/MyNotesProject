@@ -18,7 +18,6 @@ public class ClientBalanceHoldPageItem {
     private Long idOfClientBalanceHold;
     private Date createdDate;
     private Long contractId;
-    private String group;
     private String fio;
     private Long declarerContractId;
     private String declarerPhone;
@@ -26,6 +25,11 @@ public class ClientBalanceHoldPageItem {
     private Long balance;
     private Long balanceHold;
     private String requestStatus;
+    private String inn;
+    private String rs;
+    private String bank;
+    private String bik;
+    private String korr;
 
     public ClientBalanceHoldPageItem() {
 
@@ -35,7 +39,6 @@ public class ClientBalanceHoldPageItem {
         this.idOfClientBalanceHold = clientBalanceHold.getIdOfClientBalanceHold();
         this.createdDate = clientBalanceHold.getCreatedDate();
         this.contractId = clientBalanceHold.getClient().getContractId();
-        this.group = clientBalanceHold.getClient().getClientGroup().getGroupName();
         this.fio = clientBalanceHold.getClient().getPerson().getFullName();
         if (clientBalanceHold.getDeclarer() != null) {
             this.declarerContractId = clientBalanceHold.getDeclarer().getContractId();
@@ -45,6 +48,11 @@ public class ClientBalanceHoldPageItem {
         this.balance = clientBalanceHold.getClient().getBalance();
         this.balanceHold = clientBalanceHold.getHoldSum();
         this.requestStatus = clientBalanceHold.getRequestStatus().toString();
+        this.inn = clientBalanceHold.getDeclarerInn();
+        this.rs = clientBalanceHold.getDeclarerAccount();
+        this.bank = clientBalanceHold.getDeclarerBank();
+        this.bik = clientBalanceHold.getDeclarerBik();
+        this.korr = clientBalanceHold.getDeclarerCorrAccount();
     }
 
     public boolean showButton() {
@@ -77,14 +85,6 @@ public class ClientBalanceHoldPageItem {
 
     public void setContractId(Long contractId) {
         this.contractId = contractId;
-    }
-
-    public String getGroup() {
-        return group;
-    }
-
-    public void setGroup(String group) {
-        this.group = group;
     }
 
     public String getFio() {
@@ -157,5 +157,45 @@ public class ClientBalanceHoldPageItem {
 
     public void setIdOfClientBalanceHold(Long idOfClientBalanceHold) {
         this.idOfClientBalanceHold = idOfClientBalanceHold;
+    }
+
+    public String getInn() {
+        return inn;
+    }
+
+    public void setInn(String inn) {
+        this.inn = inn;
+    }
+
+    public String getRs() {
+        return rs;
+    }
+
+    public void setRs(String rs) {
+        this.rs = rs;
+    }
+
+    public String getBank() {
+        return bank;
+    }
+
+    public void setBank(String bank) {
+        this.bank = bank;
+    }
+
+    public String getBik() {
+        return bik;
+    }
+
+    public void setBik(String bik) {
+        this.bik = bik;
+    }
+
+    public String getKorr() {
+        return korr;
+    }
+
+    public void setKorr(String korr) {
+        this.korr = korr;
     }
 }
