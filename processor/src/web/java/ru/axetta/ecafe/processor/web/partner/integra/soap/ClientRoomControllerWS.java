@@ -9129,10 +9129,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result addRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "guardianMobile") String guardianMobile,
+    public CashOutResult addRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "guardianMobile") String guardianMobile,
             @WebParam(name = "sum") Long sum, @WebParam(name = "guardianDataForCashOut") GuardianDataForCashOut guardianDataForCashOut) {
         authenticateRequest(contractId);
-        Result result = new Result();
+        CashOutResult result = new CashOutResult();
         Session session = null;
         Transaction transaction = null;
 
@@ -9167,6 +9167,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (client.getBalance() - preordersSum < sum) {
                 result.resultCode = RC_NOT_ENOUGH_BALANCE;
                 result.description = RC_NOT_ENOUGH_BALANCE_DESC;
+                result.sumOver = sum - client.getBalance() - preordersSum;
                 return result;
             }
             String declarerInn = (guardianDataForCashOut == null) ? null : guardianDataForCashOut.getDeclarerInn();
