@@ -3615,7 +3615,7 @@ public class Processor implements SyncProcessor {
                         SecurityJournalBalance.saveSecurityJournalBalance(journalBalance, true, "OK");
                     }
                     // Update client balance
-                    RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
+                    RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order, payment);
                     persistenceSession.flush();
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
