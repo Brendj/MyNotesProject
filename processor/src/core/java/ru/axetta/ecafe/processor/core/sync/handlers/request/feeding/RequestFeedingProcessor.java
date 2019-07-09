@@ -174,7 +174,8 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
 
     private void saveOtherDiscount(Session session, RequestFeedingItem item, Client client) {
         if (null != item.getDtisznCode() && (null == item.getOtherDiscountStartDate() || null == item
-                .getOtherDiscountEndDate())) {
+                .getOtherDiscountEndDate()) || null == item.getOtherDiscountStartDate() || null == item
+                .getOtherDiscountEndDate()) {
             return;
         }
         ClientDtisznDiscountInfo discountInfo = DAOUtils
