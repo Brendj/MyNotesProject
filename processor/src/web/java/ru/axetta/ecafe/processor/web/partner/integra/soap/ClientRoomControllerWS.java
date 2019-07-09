@@ -9167,7 +9167,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (client.getBalance() - preordersSum < sum) {
                 result.resultCode = RC_NOT_ENOUGH_BALANCE;
                 result.description = RC_NOT_ENOUGH_BALANCE_DESC;
-                result.sumOver = sum - client.getBalance() - preordersSum;
+                result.sumAvailable = client.getBalance() - preordersSum;
                 return result;
             }
             String declarerInn = (guardianDataForCashOut == null) ? null : guardianDataForCashOut.getDeclarerInn();
