@@ -31,7 +31,7 @@ public class ClientBalanceHold {
     private String declarerBank;
     private String declarerBik;
     private String declarerCorrAccount;
-    private long idOfOrgLastChange;
+    private Long idOfOrgLastChange;
 
     public ClientBalanceHold() {
 
@@ -205,11 +205,11 @@ public class ClientBalanceHold {
         this.declarerCorrAccount = declarerCorrAccount;
     }
 
-    public long getIdOfOrgLastChange() {
+    public Long getIdOfOrgLastChange() {
         return idOfOrgLastChange;
     }
 
-    public void setIdOfOrgLastChange(long idOfOrgLastChange) {
+    public void setIdOfOrgLastChange(Long idOfOrgLastChange) {
         this.idOfOrgLastChange = idOfOrgLastChange;
     }
 }
