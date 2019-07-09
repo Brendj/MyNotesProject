@@ -37,7 +37,8 @@ public class ClientBalanceHoldService {
     public ClientBalanceHold createClientBalanceHold(Session session, String guid, Client client, Long holdSum, Org oldOrg, Org newOrg,
             Contragent oldContragent, Contragent newContragent, ClientBalanceHoldCreateStatus createStatus,
             ClientBalanceHoldRequestStatus requestStatus, Client declarer, String phoneOfDeclarer,
-            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, Long version) {
+            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, Long version,
+            Long idOfOrgLastChange) {
         if (version == null) version = DAOUtils.nextVersionByClientBalanceHold(session);
         ClientBalanceHold clientBalanceHold = new ClientBalanceHold();
         clientBalanceHold.setGuid(guid == null ? UUID.randomUUID().toString() : guid);
@@ -59,15 +60,16 @@ public class ClientBalanceHoldService {
         clientBalanceHold.setDeclarerBik(declarerBik);
         clientBalanceHold.setDeclarerCorrAccount(declarerCorrAccount);
         clientBalanceHold.setVersion(version);
+        clientBalanceHold.setIdOfOrgLastChange(idOfOrgLastChange);
         return clientBalanceHold;
     }
 
     public void holdClientBalance(String guid, Client client, Long holdSum, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
             ClientBalanceHoldCreateStatus createStatus, ClientBalanceHoldRequestStatus requestStatus, String phoneOfDeclarer,
-            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, Long version) throws Exception {
+            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, Long version, Long idOfOrgLastChange) throws Exception {
         if (client.getBalance() - holdSum < 0L) throw new Exception("Not enough balance");
         RuntimeContext.getFinancialOpsManager().holdClientBalance(guid, client, holdSum, declarer, oldOrg, newOrg, oldContragent,
-                newContragent, createStatus, requestStatus, phoneOfDeclarer, declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, version);
+                newContragent, createStatus, requestStatus, phoneOfDeclarer, declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, version, idOfOrgLastChange);
     }
 
     public void declineClientBalance(Long idOfClientBalanceHold, ClientBalanceHoldRequestStatus status) throws Exception {

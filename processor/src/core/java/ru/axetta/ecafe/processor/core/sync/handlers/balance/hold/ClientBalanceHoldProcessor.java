@@ -78,7 +78,8 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
                     ClientBalanceHoldRequestStatus requestStatus = ClientBalanceHoldRequestStatus.fromInteger(item.getRequestStatus());
                     RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).holdClientBalance(item.getGuid(), client, item.getHoldSum(), declarer, oldOrg,
                             newOrg, oldContragent, newContragent, createStatus, requestStatus, item.getPhoneOfDeclarer(),
-                            item.getDeclarerInn(), item.getDeclarerAccount(), item.getDeclarerBank(), item.getDeclarerBik(), item.getDeclarerCorrAccount(), nextVersion);
+                            item.getDeclarerInn(), item.getDeclarerAccount(), item.getDeclarerBank(), item.getDeclarerBik(), item.getDeclarerCorrAccount(), nextVersion,
+                            item.getIdOfOrgLastChange());
                 } else {
                     //Проверяем пришедший статус. если приходит аннулирование, то заявление на тек. момент может быть только в статусе создания. Иной статус - ошибка
                     if (item.getRequestStatus().equals(ClientBalanceHoldRequestStatus.ANNULLED.ordinal())) {
@@ -108,6 +109,7 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
                     clientBalanceHold.setDeclarerInn(item.getDeclarerInn());
                     clientBalanceHold.setDeclarerCorrAccount(item.getDeclarerCorrAccount());
                     clientBalanceHold.setLastUpdate(new Date());
+                    clientBalanceHold.setIdOfOrgLastChange(item.getIdOfOrgLastChange());
                     session.update(clientBalanceHold);
                 }
             } catch (Exception e) {
