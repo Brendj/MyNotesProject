@@ -2600,4 +2600,15 @@ public class DAOService {
         LogService logService = new LogService(type, message);
         entityManager.merge(logService);
     }
+
+    public boolean findCardsignByManufactureCodeForNewTypeProvider (Integer manufactureCode)
+    {
+        Query query = entityManager.createQuery("select cs from CardSign cs where cs.manufacturerCode = :manufactureCode and cs.newtypeprovider = true");
+        query.setParameter("manufactureCode", manufactureCode);
+        try {
+            return !query.getResultList().isEmpty();
+        } catch (NoResultException e) {
+            return false;
+        }
+    }
 }

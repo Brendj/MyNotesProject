@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.card.sign;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CardSign;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -54,6 +55,12 @@ public class CardSignEditPage extends CardSignDataBasicPage {
     public Object save(boolean newProvider) {
         if (signData == null || manufacturerCode == null || manufacturerCode == 0 || StringUtils.isEmpty(manufacturerName)) {
             printError("Все поля на форме обязательны для заполнения. Файл с данными ключа также должен быть загружен");
+            return null;
+        }
+        boolean cardSignCur = DAOService.getInstance().findCardsignByManufactureCodeForNewTypeProvider(manufacturerCode);
+        //Если поставщик нового типа с таким кодом производителя уже зарегистрирован + сечас идет создание также нового типа
+        if (cardSignCur && newProvider) {
+            printError("Поставщик с данным кодом производителя уже зарегистрирован");
             return null;
         }
         Session session = null;
