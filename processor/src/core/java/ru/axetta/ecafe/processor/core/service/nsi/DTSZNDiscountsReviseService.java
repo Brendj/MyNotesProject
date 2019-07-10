@@ -873,11 +873,12 @@ public class DTSZNDiscountsReviseService {
 
             Query query = session.createSQLQuery(
                     "update cf_client_dtiszn_discount_info set archived = 1, version = :version, lastupdate = :lastUpdate "
-                     + "where (lastreceiveddate not between :start and :end or lastreceiveddate is null) and dtiszncode is not null");
+                   + "where (lastreceiveddate not between :start and :end or lastreceiveddate is null) and dtiszncode <> :otherDiscountCode");
             query.setParameter("start", CalendarUtils.startOfDay(fireTime).getTime());
             query.setParameter("end", CalendarUtils.endOfDay(fireTime).getTime());
             query.setParameter("version", nextVersion);
             query.setParameter("lastUpdate", fireTime.getTime());
+            query.setParameter("otherDiscountCode", OTHER_DISCOUNT_CODE);
             int rows = query.executeUpdate();
             if (0 != rows) {
                 logger.info(String.format("%d discounts marked as archived", rows));
