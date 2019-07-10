@@ -19,19 +19,24 @@ public class ExternalEvent {
     private ExternalEventType evtType;
     private ExternalEventStatus evtStatus;
     private Long version;
+    private Long cardNo;
+    private Integer cardType;
 
     public ExternalEvent() {
         //default constructor
     }
 
     public ExternalEvent(Client client, String orgCode, String orgName, ExternalEventType evtType,
-            Date evtDateTime, ExternalEventStatus evtStatus, ISetExternalEventVersion handlerVersion) throws IllegalArgumentException {
+            Date evtDateTime, ExternalEventStatus evtStatus, Long cardNo, Integer cardType,
+            ISetExternalEventVersion handlerVersion) throws IllegalArgumentException {
         this.client = client;
         this.orgCode = orgCode;
         this.orgName = orgName;
         this.evtType = evtType;
         this.evtDateTime = evtDateTime;
         this.evtStatus = evtStatus;
+        this.cardNo = cardNo;
+        this.cardType = cardType;
         this.version = handlerVersion.getVersion();
         buildEnterName(evtStatus);
     }
@@ -123,5 +128,21 @@ public class ExternalEvent {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public Long getCardNo() {
+        return cardNo;
+    }
+
+    public void setCardNo(Long cardNo) {
+        this.cardNo = cardNo;
+    }
+
+    public Integer getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(Integer cardType) {
+        this.cardType = cardType;
     }
 }

@@ -8438,9 +8438,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (museumName != null && museumName.length() > 255) {
                 museumName = museumName.substring(0, 255);
             }
+            Card card = cl.findActiveCard(session, null);
             ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
             ExternalEvent event = new ExternalEvent(cl, museumCode, museumName, ExternalEventType.MUSEUM, accessTime,
-                    ExternalEventStatus.fromInteger(ticketStatus), handler);
+                    ExternalEventStatus.fromInteger(ticketStatus), card == null ? null : card.getCardNo(),
+                    card == null ? null : card.getCardType(), handler);
             session.save(event);
             transaction.commit();
             transaction = null;
