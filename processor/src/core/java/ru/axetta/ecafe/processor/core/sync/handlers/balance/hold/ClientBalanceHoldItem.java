@@ -51,7 +51,8 @@ public class ClientBalanceHoldItem {
         this.declarerBank = clientBalanceHold.getDeclarerBank();
         this.declarerBik = clientBalanceHold.getDeclarerBik();
         this.declarerCorrAccount = clientBalanceHold.getDeclarerCorrAccount();
-        this.idOfOrgLastChange = clientBalanceHold.getIdOfOrgLastChange();
+        this.idOfOrgLastChange =
+                clientBalanceHold.getIdOfOrgLastChange() == null ? new Long(clientBalanceHold.getLastChangeStatus().getValue()) : clientBalanceHold.getIdOfOrgLastChange();
     }
 
     public ClientBalanceHoldItem(Long idOfClient, Long idOfDeclarer, String phoneOfDeclarer, String guid, Long holdSum,

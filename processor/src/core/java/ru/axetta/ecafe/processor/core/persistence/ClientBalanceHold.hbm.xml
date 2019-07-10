@@ -38,5 +38,10 @@
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientBalanceHoldRequestStatus</param>
             </type>
         </property>
+        <property name="lastChangeStatus" column="lastChangeStatus">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientBalanceHoldLastChangeStatus</param>
+            </type>
+        </property>
     </class>
 </hibernate-mapping>

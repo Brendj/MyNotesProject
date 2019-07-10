@@ -55,7 +55,8 @@ public class ClientMigrationHistoryService {
                     RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
                             .holdClientBalance(UUID.randomUUID().toString(), clientMigration.getClient(), holdSum, null,
                                     clientMigration.getOldOrg(), clientMigration.getOrg(), clientMigration.getOldContragent(), clientMigration.getNewContragent(),
-                                    ClientBalanceHoldCreateStatus.CHANGE_SUPPLIER, ClientBalanceHoldRequestStatus.CREATED, null, null, null, null, null, null, null, null);
+                                    ClientBalanceHoldCreateStatus.CHANGE_SUPPLIER, ClientBalanceHoldRequestStatus.CREATED, null, null, null, null, null, null, null,
+                                    null, ClientBalanceHoldLastChangeStatus.PROCESSING);
                     counter++;
                 } catch (Exception e) {
                     logger.error("Error in processOrgChange service: ", e);
