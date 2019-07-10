@@ -6,9 +6,9 @@ package ru.axetta.ecafe.processor.web.ui.service.webtechnologist;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.webtechnologist.WebTechnologistCatalog;
-import ru.axetta.ecafe.processor.core.persistence.webtechnologist.WebTechnologistCatalogItem;
-import ru.axetta.ecafe.processor.core.persistence.webtechnologist.WebTechnologistCatalogService;
+import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.usercatalog.WTUserCatalog;
+import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.usercatalog.WTUserCatalogItem;
+import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.usercatalog.WebTechnologistCatalogService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -29,14 +29,13 @@ import java.util.List;
 @Scope("session")
 @DependsOn("runtimeContext")
 public class CatalogListPage extends BasicWorkspacePage {
-
     private static Logger logger = LoggerFactory.getLogger(CatalogListPage.class);
 
     private String catalogNameFilter;
     private String GUIDfilter;
-    private List<WebTechnologistCatalog> itemList = Collections.emptyList();
-    private WebTechnologistCatalog selectedItem;
-    private WebTechnologistCatalogItem selectedCatalogElement;
+    private List<WTUserCatalog> itemList = Collections.emptyList();
+    private WTUserCatalog selectedItem;
+    private WTUserCatalogItem selectedCatalogElement;
     private Boolean showOnlyActive = false;
     private String nameForNewCatalog;
     private String descriptionForNewElement;
@@ -112,7 +111,7 @@ public class CatalogListPage extends BasicWorkspacePage {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
             WebTechnologistCatalogService service = RuntimeContext.getAppContext()
                     .getBean(WebTechnologistCatalogService.class);
-            WebTechnologistCatalog newCatalog = service.createNewCatalog(nameForNewCatalog, currentUser);
+            WTUserCatalog newCatalog = service.createNewCatalog(nameForNewCatalog, currentUser);
             itemList.add(newCatalog);
             nameForNewCatalog = "";
         } catch (Exception e) {
@@ -248,19 +247,19 @@ public class CatalogListPage extends BasicWorkspacePage {
     }
 
 
-    public List<WebTechnologistCatalog> getItemList() {
+    public List<WTUserCatalog> getItemList() {
         return itemList;
     }
 
-    public void setItemList(List<WebTechnologistCatalog> itemList) {
+    public void setItemList(List<WTUserCatalog> itemList) {
         this.itemList = itemList;
     }
 
-    public WebTechnologistCatalog getSelectedItem() {
+    public WTUserCatalog getSelectedItem() {
         return selectedItem;
     }
 
-    public void setSelectedItem(WebTechnologistCatalog selectedItem) {
+    public void setSelectedItem(WTUserCatalog selectedItem) {
         this.selectedItem = selectedItem;
     }
 
@@ -277,11 +276,11 @@ public class CatalogListPage extends BasicWorkspacePage {
         this.showOnlyActive = showOnlyActive;
     }
 
-    public WebTechnologistCatalogItem getSelectedCatalogElement() {
+    public WTUserCatalogItem getSelectedCatalogElement() {
         return selectedCatalogElement;
     }
 
-    public void setSelectedCatalogElement(WebTechnologistCatalogItem selectedCatalogElement) {
+    public void setSelectedCatalogElement(WTUserCatalogItem selectedCatalogElement) {
         this.selectedCatalogElement = selectedCatalogElement;
     }
 

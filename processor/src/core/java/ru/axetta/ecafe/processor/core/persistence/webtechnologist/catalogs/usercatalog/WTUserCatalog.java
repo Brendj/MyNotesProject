@@ -2,7 +2,7 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.webtechnologist;
+package ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.usercatalog;
 
 import ru.axetta.ecafe.processor.core.persistence.User;
 
@@ -10,8 +10,8 @@ import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
-public class WebTechnologistCatalog {
-    private Long idOfWebTechnologistCatalog;
+public class WTUserCatalog {
+    private Long idOfUserCatalog;
     private String catalogName;
     private String GUID;
     private Date createDate;
@@ -19,18 +19,18 @@ public class WebTechnologistCatalog {
     private Long version;
     private Boolean deleteState;
     private User userCreator;
-    private Set<WebTechnologistCatalogItem> items;
+    private Set<WTUserCatalogItem> items;
 
-    public WebTechnologistCatalog(){
+    public WTUserCatalog(){
         // For Hibernate
     }
 
-    public Long getIdOfWebTechnologistCatalog() {
-        return idOfWebTechnologistCatalog;
+    public Long getIdOfUserCatalog() {
+        return idOfUserCatalog;
     }
 
-    public void setIdOfWebTechnologistCatalog(Long idOfWebTechnologistCatalog) {
-        this.idOfWebTechnologistCatalog = idOfWebTechnologistCatalog;
+    public void setIdOfUserCatalog(Long idOfUserCatalog) {
+        this.idOfUserCatalog = idOfUserCatalog;
     }
 
     public String getCatalogName() {
@@ -89,14 +89,14 @@ public class WebTechnologistCatalog {
         this.userCreator = userCreator;
     }
 
-    public Set<WebTechnologistCatalogItem> getItems() {
+    public Set<WTUserCatalogItem> getItems() {
         if(items == null){
             items = new HashSet<>();
         }
         return items;
     }
 
-    public void setItems(Set<WebTechnologistCatalogItem> items) {
+    public void setItems(Set<WTUserCatalogItem> items) {
         this.items = items;
     }
 
@@ -106,7 +106,7 @@ public class WebTechnologistCatalog {
 
     @Override
     public int hashCode(){
-        return idOfWebTechnologistCatalog.hashCode();
+        return idOfUserCatalog.hashCode();
     }
 
     @Override
@@ -114,10 +114,10 @@ public class WebTechnologistCatalog {
         if(this == o){
             return true;
         }
-        if(!(o instanceof WebTechnologistCatalog)){
+        if(!(o instanceof WTUserCatalog)){
             return false;
         }
-        WebTechnologistCatalog catalog = (WebTechnologistCatalog) o;
-        return this.idOfWebTechnologistCatalog.equals(catalog.idOfWebTechnologistCatalog);
+        WTUserCatalog catalog = (WTUserCatalog) o;
+        return this.idOfUserCatalog.equals(catalog.idOfUserCatalog);
     }
 }

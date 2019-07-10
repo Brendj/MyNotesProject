@@ -2,13 +2,13 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.webtechnologist;
+package ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.usercatalog;
 
 import java.util.Date;
 
-public class WebTechnologistCatalogItem {
-    private Long idOfWebTechnologistCatalogItem;
-    private WebTechnologistCatalog catalog;
+public class WTUserCatalogItem {
+    private Long idOfUserCatalogItem;
+    private WTUserCatalog catalog;
     private String description;
     private String GUID;
     private Date createDate;
@@ -16,23 +16,23 @@ public class WebTechnologistCatalogItem {
     private Long version;
     private Boolean deleteState;
 
-    public WebTechnologistCatalogItem(){
+    public WTUserCatalogItem(){
         // For Hibernate
     }
 
-    public Long getIdOfWebTechnologistCatalogItem() {
-        return idOfWebTechnologistCatalogItem;
+    public Long getIdOfUserCatalogItem() {
+        return idOfUserCatalogItem;
     }
 
-    public void setIdOfWebTechnologistCatalogItem(Long idOfWebTechnologistCatalogItem) {
-        this.idOfWebTechnologistCatalogItem = idOfWebTechnologistCatalogItem;
+    public void setIdOfUserCatalogItem(Long idOfUserCatalogItem) {
+        this.idOfUserCatalogItem = idOfUserCatalogItem;
     }
 
-    public WebTechnologistCatalog getCatalog() {
+    public WTUserCatalog getCatalog() {
         return catalog;
     }
 
-    public void setCatalog(WebTechnologistCatalog catalog) {
+    public void setCatalog(WTUserCatalog catalog) {
         this.catalog = catalog;
     }
 
@@ -90,7 +90,7 @@ public class WebTechnologistCatalogItem {
 
     @Override
     public int hashCode(){
-        return idOfWebTechnologistCatalogItem.hashCode();
+        return idOfUserCatalogItem.hashCode();
     }
 
     @Override
@@ -98,10 +98,10 @@ public class WebTechnologistCatalogItem {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof WebTechnologistCatalogItem)) {
+        if (!(o instanceof WTUserCatalogItem)) {
             return false;
         }
-        WebTechnologistCatalogItem catalogItem = (WebTechnologistCatalogItem) o;
-        return this.idOfWebTechnologistCatalogItem.equals(catalogItem.idOfWebTechnologistCatalogItem);
+        WTUserCatalogItem catalogItem = (WTUserCatalogItem) o;
+        return this.idOfUserCatalogItem.equals(catalogItem.idOfUserCatalogItem);
     }
 }

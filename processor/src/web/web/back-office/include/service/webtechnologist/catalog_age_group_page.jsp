@@ -1,0 +1,122 @@
+<%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
+<%--
+  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+  --%>
+
+<%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
+<%@ taglib prefix="h" uri="http://java.sun.com/jsf/html" %>
+<%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
+<%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
+
+<%--@elvariable id="ageGroupCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.AgeGroupCatalogListPage"--%>
+<h:panelGrid id="webTechnologistAgeGroupCatalogItemListPagePanelGrid" binding="#{ageGroupCatalogListPage.pageComponent}"
+             styleClass="borderless-grid">
+    <rich:simpleTogglePanel label="Фильтр " switchType="client" eventsQueue="mainFormEventsQueue" opened="false"
+                            headerClass="filter-panel-header">
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Название справочника" styleClass="output-text" />
+            <h:inputText value="#{ageGroupCatalogListPage.descriptionFilter}" styleClass="input-text" />
+            <h:outputText escape="true" value="GUID справочника" styleClass="output-text" />
+            <h:inputText value="#{ageGroupCatalogListPage.GUIDfilter}" maxlength="36" styleClass="input-text" size="50" />
+        </h:panelGrid>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <a4j:commandButton value="Применить" action="#{ageGroupCatalogListPage.updateCatalogList()}"
+                               reRender="workspaceTogglePanel" styleClass="command-button"
+                               status="WebTechnologCatalogProcessStatus"  />
+            <a4j:commandButton value="Очистить" action="#{ageGroupCatalogListPage.dropAndReloadCatalogList()}"
+                               status="WebTechnologCatalogProcessStatus" reRender="workspaceTogglePanel"
+                               styleClass="command-button" />
+        </h:panelGrid>
+    </rich:simpleTogglePanel>
+    <a4j:status id="WebTechnologHardCodeCatalogItemProcessStatus">
+        <f:facet name="start">
+            <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
+        </f:facet>
+    </a4j:status>
+    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                   warnClass="warn-messages" />
+    <!-- ********* CREATE MODAL PANEL ********* -->
+    <rich:modalPanel id="webtechnologistHardCodeItemCreatePanel" minWidth="300" minHeight="120" resizeable="false" domElementAttachment="form">
+        <f:facet name="header">
+            <h:panelGroup>
+                <h:outputText value="Создание справочника" />
+            </h:panelGroup>
+        </f:facet>
+        <f:facet name="controls">
+            <h:panelGroup>
+                <rich:componentControl for="webtechnologistHardCodeItemCreatePanel" attachTo="hidelink" operation="hide" event="onclick" />
+            </h:panelGroup>
+        </f:facet>
+        <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Название справочника" styleClass="output-text" />
+            <h:inputText value="#{ageGroupCatalogListPage.descriptionForNewItem}" styleClass="input-text" />
+            <a4j:commandButton oncomplete="Richfaces.hideModalPanel('webtechnologistHardCodeItemCreatePanel')" value="Закрыть"
+                               status="WebTechnologHardCodeCatalogItemProcessStatus"  action="#{ageGroupCatalogListPage.clearDescriptionForNewCatalog()}" reRender="webtechnologistHardCodeItemCreatePanel"/>
+            <a4j:commandButton oncomplete="Richfaces.hideModalPanel('webtechnologistHardCodeItemCreatePanel')"
+                               reRender="webtechnologistAgeGroupCatalogItemListTable, webtechnologistHardCodeItemCreatePanel" action="#{ageGroupCatalogListPage.createNewItem()}"
+                               status="WebTechnologHardCodeCatalogItemProcessStatus" value="Создать" />
+        </h:panelGrid>
+    </rich:modalPanel>
+    <!-- Main page -->
+    <rich:dataTable id="webtechnologistAgeGroupCatalogItemListTable" value="#{ageGroupCatalogListPage.catalogListItem}" var="item" rows="30"
+                    footerClass="data-table-footer"
+                    columnClasses="center-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Описание" />
+            </f:facet>
+            <h:inputText value="#{item.description}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="GUID" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.GUID}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Создал пользователь" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.user.userName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата создания" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.createDate}" styleClass="output-text">
+                <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+            </h:outputText>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Последнее обновление" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.lastUpdate}" styleClass="output-text">
+                <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
+            </h:outputText>
+        </rich:column>
+        <f:facet name="footer">
+            <rich:datascroller for="webtechnologistAgeGroupCatalogItemListTable" renderIfSinglePage="false" maxPages="5"
+                               fastControls="hide" stepControls="auto" boundaryControls="hide">
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+            </rich:datascroller>
+        </f:facet>
+    </rich:dataTable>
+    <h:panelGrid styleClass="borderless-grid" columns="1">
+        <a4j:commandButton value="Создать новый справочник"
+                           onclick="Richfaces.showModalPanel('webtechnologistHardCodeItemCreatePanel');"
+                           id="showCreateAgeGroupItemModalPanelButton" />
+    </h:panelGrid>
+    <h:panelGrid styleClass="borderless-grid" columns="1">
+        <a4j:commandButton value="Сохранить изменения"
+                           onclick="Richfaces.showModalPanel('webtechnologistHardCodeItemCreatePanel');"
+                           id="showCreateAgeGroupItemModalPanelButton" />
+    </h:panelGrid>
+</h:panelGrid>
+
+

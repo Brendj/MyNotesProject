@@ -2,7 +2,7 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.webtechnologist;
+package ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.usercatalog;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.User;
@@ -27,13 +27,13 @@ public class WebTechnologistCatalogService {
 
     private static Logger logger = LoggerFactory.getLogger(WebTechnologistCatalogService.class);
 
-    public List<WebTechnologistCatalog> getItemsListByCatalogNameOrGUID(String catalogName, String GUID,
+    public List<WTUserCatalog> getItemsListByCatalogNameOrGUID(String catalogName, String GUID,
             Boolean showOnlyActive) throws Exception {
         Session session = null;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
 
-            Criteria criteria = session.createCriteria(WebTechnologistCatalog.class);
+            Criteria criteria = session.createCriteria(WTUserCatalog.class);
             if (!StringUtils.isEmpty(catalogName)) {
                 criteria.add(Restrictions.ilike("catalogName", catalogName, MatchMode.ANYWHERE));
             }
@@ -53,23 +53,23 @@ public class WebTechnologistCatalogService {
         }
     }
 
-    public List<WebTechnologistCatalog> getAllCatalogs(Session session) {
-        Criteria criteria = session.createCriteria(WebTechnologistCatalog.class);
+    public List<WTUserCatalog> getAllCatalogs(Session session) {
+        Criteria criteria = session.createCriteria(WTUserCatalog.class);
         criteria.addOrder(Order.desc("createDate"));
         return criteria.list();
     }
 
-    public void deleteItem(WebTechnologistCatalog webTechnologistCatalog) throws Exception {
+    public void deleteItem(WTUserCatalog userCatalog) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            webTechnologistCatalog.setDeleteState(true);
-            webTechnologistCatalog.setLastUpdate(new Date());
+            userCatalog.setDeleteState(true);
+            userCatalog.setLastUpdate(new Date());
 
-            session.merge(webTechnologistCatalog);
+            session.merge(userCatalog);
 
             transaction.commit();
             transaction = null;
@@ -82,17 +82,17 @@ public class WebTechnologistCatalogService {
         }
     }
 
-    public void restoreItem(WebTechnologistCatalog webTechnologistCatalog) throws Exception {
+    public void restoreItem(WTUserCatalog userCatalog) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            webTechnologistCatalog.setDeleteState(false);
-            webTechnologistCatalog.setLastUpdate(new Date());
+            userCatalog.setDeleteState(false);
+            userCatalog.setLastUpdate(new Date());
 
-            session.merge(webTechnologistCatalog);
+            session.merge(userCatalog);
 
             transaction.commit();
             transaction = null;
@@ -105,7 +105,7 @@ public class WebTechnologistCatalogService {
         }
     }
 
-    public WebTechnologistCatalog createNewCatalog(String catalogName, User userCreate) throws Exception {
+    public WTUserCatalog createNewCatalog(String catalogName, User userCreate) throws Exception {
         if (userCreate == null) {
             throw new IllegalArgumentException("User is NULL");
         } else if (StringUtils.isBlank(catalogName)) {
@@ -121,7 +121,7 @@ public class WebTechnologistCatalogService {
             String GUID = UUID.randomUUID().toString();
             Long nextVersion = getNextVersionForCatalog(session);
 
-            WebTechnologistCatalog catalog = new WebTechnologistCatalog();
+            WTUserCatalog catalog = new WTUserCatalog();
             catalog.setCatalogName(catalogName);
             catalog.setUserCreator(userCreate);
             catalog.setCreateDate(createDate);
@@ -145,19 +145,19 @@ public class WebTechnologistCatalogService {
     }
 
     private Long getNextVersionForCatalog(Session session) {
-        Query sqlQuery = session.createQuery("SELECT MAX(version) FROM WebTechnologistCatalog");
+        Query sqlQuery = session.createQuery("SELECT MAX(version) FROM WTUserCatalog");
         Long maxVersion = (sqlQuery.uniqueResult() == null ? 0L : (Long) sqlQuery.uniqueResult()) + 1L;
         return maxVersion + 1L;
     }
 
     private Long getNextVersionForCatalogItem(Session session) {
-        Query sqlQuery = session.createQuery("SELECT MAX(version) FROM WebTechnologistCatalogItem");
+        Query sqlQuery = session.createQuery("SELECT MAX(version) FROM WTUserCatalogItem");
         Long maxVersion = (sqlQuery.uniqueResult() == null ? 0L : (Long) sqlQuery.uniqueResult()) + 1L;
         return maxVersion + 1L;
     }
 
-    public void deleteCatalogElement(WebTechnologistCatalog webTechnologistCatalog,
-            WebTechnologistCatalogItem selectedCatalogElement) throws Exception {
+    public void deleteCatalogElement(WTUserCatalog userCatalog,
+            WTUserCatalogItem selectedCatalogElement) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -170,9 +170,9 @@ public class WebTechnologistCatalogService {
             selectedCatalogElement.setVersion(getNextVersionForCatalogItem(session));
             session.merge(selectedCatalogElement);
 
-            webTechnologistCatalog.setLastUpdate(lastUpdateDate);
-            webTechnologistCatalog.setVersion(getNextVersionForCatalog(session));
-            session.merge(webTechnologistCatalog);
+            userCatalog.setLastUpdate(lastUpdateDate);
+            userCatalog.setVersion(getNextVersionForCatalog(session));
+            session.merge(userCatalog);
 
             transaction.commit();
             transaction = null;
@@ -185,8 +185,8 @@ public class WebTechnologistCatalogService {
         }
     }
 
-    public void restoreCatalogElement(WebTechnologistCatalog webTechnologistCatalog,
-            WebTechnologistCatalogItem selectedCatalogElement) throws Exception {
+    public void restoreCatalogElement(WTUserCatalog userCatalog,
+            WTUserCatalogItem selectedCatalogElement) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -199,9 +199,9 @@ public class WebTechnologistCatalogService {
             selectedCatalogElement.setVersion(getNextVersionForCatalogItem(session));
             session.merge(selectedCatalogElement);
 
-            webTechnologistCatalog.setLastUpdate(lastUpdateDate);
-            webTechnologistCatalog.setVersion(getNextVersionForCatalog(session));
-            session.merge(webTechnologistCatalog);
+            userCatalog.setLastUpdate(lastUpdateDate);
+            userCatalog.setVersion(getNextVersionForCatalog(session));
+            session.merge(userCatalog);
 
             transaction.commit();
             transaction = null;
@@ -214,7 +214,7 @@ public class WebTechnologistCatalogService {
         }
     }
 
-    public void createNewElementOfCatalog(WebTechnologistCatalog webTechnologistCatalog,
+    public void createNewElementOfCatalog(WTUserCatalog userCatalog,
             String createdCatalogElementDescription) throws Exception {
         if (StringUtils.isBlank(createdCatalogElementDescription)) {
             throw new IllegalArgumentException("Description of element is not valid");
@@ -229,20 +229,20 @@ public class WebTechnologistCatalogService {
             Long nextVersion = getNextVersionForCatalogItem(session);
             Date createDate = new Date();
 
-            WebTechnologistCatalogItem item = new WebTechnologistCatalogItem();
+            WTUserCatalogItem item = new WTUserCatalogItem();
             item.setDescription(createdCatalogElementDescription);
             item.setGUID(GUID);
             item.setVersion(nextVersion);
-            item.setCatalog(webTechnologistCatalog);
+            item.setCatalog(userCatalog);
             item.setCreateDate(createDate);
             item.setLastUpdate(createDate);
             item.setDeleteState(false);
             session.save(item);
 
-            webTechnologistCatalog.setVersion(getNextVersionForCatalog(session));
-            webTechnologistCatalog.setLastUpdate(createDate);
-            webTechnologistCatalog.getItems().add(item);
-            session.merge(webTechnologistCatalog);
+            userCatalog.setVersion(getNextVersionForCatalog(session));
+            userCatalog.setLastUpdate(createDate);
+            userCatalog.getItems().add(item);
+            session.merge(userCatalog);
 
             transaction.commit();
             transaction = null;
@@ -255,7 +255,7 @@ public class WebTechnologistCatalogService {
         }
     }
 
-    public void applyChange(WebTechnologistCatalog changedCatalog, boolean catalogIsChanged) throws Exception {
+    public void applyChange(WTUserCatalog changedCatalog, boolean catalogIsChanged) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -264,10 +264,10 @@ public class WebTechnologistCatalogService {
             Long nextVersionForCatalog = getNextVersionForCatalog(session);
             Long nextVersionForCatalogItem = getNextVersionForCatalogItem(session);
             Date lastUpdateDate = new Date();
-            Map<Long, WebTechnologistCatalogItem> mapCatalogItemsFromDB = buildMapOfCatalogItemsByCatalog(changedCatalog,session);
+            Map<Long, WTUserCatalogItem> mapCatalogItemsFromDB = buildMapOfCatalogItemsByCatalog(changedCatalog,session);
 
-            for (WebTechnologistCatalogItem item : changedCatalog.getItems()) {
-                WebTechnologistCatalogItem itemFromDB = mapCatalogItemsFromDB.get(item.getIdOfWebTechnologistCatalogItem());
+            for (WTUserCatalogItem item : changedCatalog.getItems()) {
+                WTUserCatalogItem itemFromDB = mapCatalogItemsFromDB.get(item.getIdOfUserCatalogItem());
                 if (itemFromDB != null && !(itemFromDB.getDescription().equals(item.getDescription()) && itemFromDB.getDeleteState().equals(item.getDeleteState()))) {
                     item.setVersion(nextVersionForCatalogItem);
                     item.setLastUpdate(lastUpdateDate);
@@ -292,22 +292,22 @@ public class WebTechnologistCatalogService {
         }
     }
 
-    private Map<Long, WebTechnologistCatalogItem> buildMapOfCatalogItemsByCatalog(
-            WebTechnologistCatalog catalogIsChanged, Session session) {
-        Map<Long, WebTechnologistCatalogItem> result = new HashMap<>();
+    private Map<Long, WTUserCatalogItem> buildMapOfCatalogItemsByCatalog(
+            WTUserCatalog catalogIsChanged, Session session) {
+        Map<Long, WTUserCatalogItem> result = new HashMap<>();
 
-        Criteria criteria = session.createCriteria(WebTechnologistCatalogItem.class, "catalogItem");
+        Criteria criteria = session.createCriteria(WTUserCatalogItem.class, "catalogItem");
         criteria.createAlias("catalogItem.catalog", "catalog");
-        criteria.add(Restrictions.eq("catalog.idOfWebTechnologistCatalog", catalogIsChanged.getIdOfWebTechnologistCatalog()));
-        List<WebTechnologistCatalogItem> catalogItemsFromDB = criteria.list();
+        criteria.add(Restrictions.eq("catalog.idOfWebTechnologistCatalog", catalogIsChanged.getIdOfUserCatalog()));
+        List<WTUserCatalogItem> catalogItemsFromDB = criteria.list();
 
-        for (WebTechnologistCatalogItem item : catalogItemsFromDB) {
-            result.put(item.getIdOfWebTechnologistCatalogItem(), item);
+        for (WTUserCatalogItem item : catalogItemsFromDB) {
+            result.put(item.getIdOfUserCatalogItem(), item);
         }
         return result;
     }
 
-    public WebTechnologistCatalog refreshCatalog(WebTechnologistCatalog catalog) throws Exception {
+    public WTUserCatalog refreshCatalog(WTUserCatalog catalog) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {

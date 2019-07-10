@@ -5,9 +5,9 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.webtechnologist.WebTechnologistCatalog" table="cf_webTechnologist_catalogs">
+    <class name="ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.usercatalog.WTUserCatalog" table="cf_wt_UserCatalogs">
         <cache usage="transactional"/>
-        <id name="idOfWebTechnologistCatalog" column="idOfWebTechnologistCatalog">
+        <id name="idOfUserCatalog" column="idOfUserCatalog">
             <generator class="identity"/>
         </id>
         <property name="catalogName" column="catalogName" type="string" not-null="true"/>
@@ -18,8 +18,8 @@
         <property name="deleteState" column="deleteState " type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <many-to-one name="userCreator" column="idOfUserCreator" class="ru.axetta.ecafe.processor.core.persistence.User" not-null="true" lazy="false"/>
         <set table="cf_webTechnologist_catalog_items" name="items" lazy="false">
-            <key column="idOfWebTechnologistCatalog"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webtechnologist.WebTechnologistCatalogItem"/>
+            <key column="idOfUserCatalog"/>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.usercatalog.WTUserCatalogItem"/>
         </set>
     </class>
 </hibernate-mapping>

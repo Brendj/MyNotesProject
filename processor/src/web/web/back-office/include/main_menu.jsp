@@ -969,26 +969,28 @@
                          binding="#{mainPage.webTechnologistGroupPage.mainMenuComponent}"
                          rendered="#{mainPage.eligibleToServiceAdmin}">
         <a4j:support event="onclick" reRender="workspaceForm" action="#{mainPage.showWebTechnologistGroupPage}" />
-        <%-- <rich:panelMenuGroup id="webTechnologistGroupDish"
-                              binding="#{.mainMenuComponent}" label="Блюда"
-                              rendered="#{mainPage.eligibleToServiceAdmin}">
-             <a4j:support event="onclick" action="#{}" reRender="workspaceForm" />
-
-             <rich:panelMenuItem id="webTechnologistGroupDishList" binding="#{.mainMenuComponent}"
-                                 label="Список блюд" action="#{.show}" reRender="workspaceForm" />
-
-             <rich:panelMenuItem id="webTechnologistGroupDishCreate"
-                                 binding="#(.mainMenuComponent}" label="Создать"
-                                 action="#{.show}" reRender="workspaceForm" />
-         </rich:panelMenuGroup>--%>
         <rich:panelMenuGroup id="webTechnologistCatalogs" label="Справочники" binding="#{mainPage.webTechnologistCatalogGroupPage.mainMenuComponent}">
             <a4j:support event="onclick" reRender="workspaceForm"
                          action="#{mainPage.showWebTechnologistCatalogGroupPage}"/>
             <%--@elvariable id="catalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.CatalogListPage"--%>
-            <rich:panelMenuItem id="webTechnologistCatalogsList"
+            <rich:panelMenuItem id="webTechnologistUserCatalogsList"
                                 binding="#{catalogListPage.mainMenuComponent}"
                                 label="Список справочников" action="#{catalogListPage.show}"
                                 reRender="workspaceForm" />
+            <%--@elvariable id="ageGroupCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.AgeGroupCatalogListPage"--%>
+            <rich:panelMenuItem id="webTechnologistAgeGroupItemList"
+                                binding="#{ageGroupCatalogListPage.mainMenuComponent}"
+                                label="Возростная группа" action="#{ageGroupCatalogListPage.show}"
+                                reRender="workspaceForm" />
+            <%--<rich:panelMenuItem id="webTechnologistTypeOfProductionItemList"
+                                label="Тип производства" action="#{hardCodeCatalogListPage}"
+                                reRender="workspaceForm" />
+            <rich:panelMenuItem id="webTechnologistCategoryCatalogsItemList"
+                                label="Категории блюд" action="#{hardCodeCatalogListPage}"
+                                reRender="workspaceForm" />
+            <rich:panelMenuItem id="webTechnologistGroupCatalogsItemsList"
+                                label="Группы блюд" action="#{hardCodeCatalogListPage}"
+                                reRender="workspaceForm" />--%>
         </rich:panelMenuGroup>
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>
