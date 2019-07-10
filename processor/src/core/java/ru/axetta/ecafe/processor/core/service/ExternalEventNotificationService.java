@@ -36,6 +36,10 @@ public class ExternalEventNotificationService {
     public static String SURNAME = "surname";
     public static String NAME = "name";
     public static String ACCOUNT = "account";
+    public static String BALANCE = "balance";
+    public static String ADDRESS = "address";
+    public static String SHORTNAMEINFOSERVICE = "shortnameinfoservice";
+    private String cultureShortName;
 
     public void sendNotification(Client client, ExternalEvent event) throws Exception {
         String type = null;
@@ -44,6 +48,13 @@ public class ExternalEventNotificationService {
                 type = EventNotificationService.NOTIFICATION_ENTER_MUSEUM;
             } else if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
                 type = EventNotificationService.NOTIFICATION_NOENTER_MUSEUM;
+            }
+        }
+        if (event.getEvtType().equals(ExternalEventType.CULTURE)) {
+            if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
+                type = EventNotificationService.NOTIFICATION_ENTER_CULTURE;
+            } else if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
+                type = EventNotificationService.NOTIFICATION_EXIT_CULTURE;
             }
         }
         if (type == null) return;
@@ -61,11 +72,13 @@ public class ExternalEventNotificationService {
             //отправка представителям
             if (!(guardians == null || guardians.isEmpty())) {
                 for (Client destGuardian : guardians) {
+
                     if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
-                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_MUSEUM.getValue())) {
+                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue())) {
                         notificationService
                                 .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                     }
+
                 }
             }
             //отправка клиенту
@@ -84,13 +97,42 @@ public class ExternalEventNotificationService {
     private String[] generateNotificationParams(Client client, ExternalEvent event) {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(event.getEvtDateTime());
-        return new String[] {
-                EMP_TIME, empTime,
-                PLACE_NAME, event.getOrgName(),
-                PLACE_CODE, event.getOrgCode(),
-                SURNAME, client.getPerson().getSurname(),
-                NAME, client.getPerson().getFirstName(),
-                ACCOUNT, client.getContractId().toString()
-        };
+        if (event.getEvtType().equals(ExternalEventType.MUSEUM)) {
+            return new String[] {
+                    EMP_TIME, empTime,
+                    PLACE_NAME, event.getOrgName(),
+                    PLACE_CODE, event.getOrgCode(),
+                    SURNAME, client.getPerson().getSurname(),
+                    NAME, client.getPerson().getFirstName(),
+                    ACCOUNT, client.getContractId().toString()
+            };
+        }
+        if (event.getEvtType().equals(ExternalEventType.CULTURE)) {
+            String shortName = null;
+            if (cultureShortName == null)
+                shortName = event.getOrgName();
+            else
+                shortName = cultureShortName;
+            return new String[] {
+                    SURNAME, client.getPerson().getSurname(),
+                    NAME, client.getPerson().getFirstName(),
+                    PLACE_NAME, event.getOrgName(),
+                    EMP_TIME, empTime,
+                    BALANCE, String.valueOf(client.getBalance()),
+                    ADDRESS, event.getAddress(),
+                    SHORTNAMEINFOSERVICE, shortName,
+                    NAME, client.getPerson().getFirstName(),
+                    ACCOUNT, client.getContractId().toString()
+            };
+        }
+        return null;
+    }
+
+    public String getCultureShortName() {
+        return cultureShortName;
+    }
+
+    public void setCultureShortName(String cultureShortName) {
+        this.cultureShortName = cultureShortName;
     }
 }

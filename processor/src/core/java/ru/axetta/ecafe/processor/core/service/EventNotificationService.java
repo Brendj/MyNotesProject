@@ -60,6 +60,8 @@ public class EventNotificationService {
     public static String NOTIFICATION_LOW_BALANCE = "lowBalance";
     public static String NOTIFICATION_ENTER_MUSEUM = "enterMuseum";
     public static String NOTIFICATION_NOENTER_MUSEUM = "noEnterMuseum";
+    public static String NOTIFICATION_ENTER_CULTURE = "enterCulture";
+    public static String NOTIFICATION_EXIT_CULTURE = "exitCulture";
     public static String NOTIFICATION_CLIENT_NEWPASSWORD = "clientNewPassword";
     public static String NOTIFICATION_EXPIRED_REGULAR_PAYMENT = "regularPaymentExpired";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";

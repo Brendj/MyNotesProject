@@ -8464,6 +8464,59 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "orgCode") String orgCode,
+            @WebParam(name = "CultureName") String CultureName, @WebParam(name = "CultureShortName") String CultureShortName,
+            @WebParam(name = "CultureAddress") String CultureAddress, @WebParam(name = "accessTime") Date accessTime,
+            @WebParam(name = "eventsStatus") Integer eventsStatus) {
+
+        authenticateRequest(null);
+        if (StringUtils.isEmpty(guid)) {
+            return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
+        }
+        if (accessTime == null) {
+            return new Result(RC_INVALID_DATA, "Время события не может быть пустым");
+        }
+
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client cl = DAOUtils.findClientByGuid(session, guid);
+            if (cl == null) {
+                return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
+            }
+            //здесь сохранение события в таблицу и отправка уведомления
+            if (CultureName != null && CultureName.length() > 255) {
+                CultureName = CultureName.substring(0, 255);
+            }
+            ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
+            ExternalEvent event = new ExternalEvent(cl, orgCode, CultureName, CultureAddress, ExternalEventType.CULTURE,
+                    accessTime, ExternalEventStatus.fromInteger(eventsStatus), handler);
+            session.save(event);
+            transaction.commit();
+            transaction = null;
+
+            //отправка уведомления
+            if (CalendarUtils.isDateToday(accessTime)) {
+                ExternalEventNotificationService notificationService = RuntimeContext.getAppContext().getBean(ExternalEventNotificationService.class);
+                notificationService.setCultureShortName(CultureShortName);
+                notificationService.sendNotification(cl, event);
+            }
+            return new Result(RC_OK, RC_OK_DESC);
+        } catch (IllegalArgumentException e) {
+            logger.error("Error in enterCulture method:", e);
+            return new Result(RC_INTERNAL_ERROR, e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error in enterCulture method:", e);
+            return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    @Override
     public ClientSummaryBaseListResult getSummaryByGuardMobileMin(String guardMobile) {
         HTTPData data = new HTTPData();
         HTTPDataHandler handler = new HTTPDataHandler(data);
