@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientBalanceHold;
+import ru.axetta.ecafe.processor.core.persistence.ClientBalanceHoldLastChangeStatus;
 import ru.axetta.ecafe.processor.core.persistence.ClientBalanceHoldRequestStatus;
 import ru.axetta.ecafe.processor.core.report.ClientBalanceHoldPageItem;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
@@ -99,7 +100,7 @@ public class ClientBalanceHoldPage extends OnlineReportPage {
         for (ClientBalanceHoldPageItem item : items) {
             if (item.equals(currentItem)) {
                 RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).setStatusWithValue(item.getIdOfClientBalanceHold(),
-                        ClientBalanceHoldRequestStatus.REFUNDED);
+                        ClientBalanceHoldRequestStatus.REFUNDED, ClientBalanceHoldLastChangeStatus.PROCESSING);
                 currentItem.setRequestStatus(ClientBalanceHoldRequestStatus.REFUNDED.toString());
                 break;
             }
@@ -113,7 +114,8 @@ public class ClientBalanceHoldPage extends OnlineReportPage {
             for (ClientBalanceHoldPageItem item : items) {
                 if (item.equals(currentItem)) {
                     RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
-                            .declineClientBalance(item.getIdOfClientBalanceHold(), ClientBalanceHoldRequestStatus.DECLINED);
+                            .declineClientBalance(item.getIdOfClientBalanceHold(), ClientBalanceHoldRequestStatus.DECLINED,
+                                    ClientBalanceHoldLastChangeStatus.PROCESSING);
                     currentItem.setRequestStatus(ClientBalanceHoldRequestStatus.DECLINED.toString());
                     break;
                 }

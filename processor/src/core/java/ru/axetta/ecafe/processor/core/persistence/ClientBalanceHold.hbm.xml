@@ -27,6 +27,7 @@
         <property name="declarerBank" column="declarerBank" type="string" length="90"/>
         <property name="declarerBik" column="declarerBik" type="string" length="20"/>
         <property name="declarerCorrAccount" column="declarerCorrAccount" type="string" length="20"/>
+        <property name="idOfOrgLastChange" column="idOfOrgLastChange" type="long" />
         <property name="createStatus" column="createStatus">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientBalanceHoldCreateStatus</param>
@@ -35,6 +36,11 @@
         <property name="requestStatus" column="requestStatus">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientBalanceHoldRequestStatus</param>
+            </type>
+        </property>
+        <property name="lastChangeStatus" column="lastChangeStatus">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.ClientBalanceHoldLastChangeStatus</param>
             </type>
         </property>
     </class>

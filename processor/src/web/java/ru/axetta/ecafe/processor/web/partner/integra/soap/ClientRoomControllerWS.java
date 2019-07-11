@@ -9181,7 +9181,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).holdClientBalance(UUID.randomUUID().toString(),
                     client, sum, declarer, client.getOrg(), null, client.getOrg().getDefaultSupplier(), null,
                     ClientBalanceHoldCreateStatus.PORTAL, ClientBalanceHoldRequestStatus.CREATED, guardianMobile,
-                    declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, null);
+                    declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, null, null,
+                    ClientBalanceHoldLastChangeStatus.PORTAL);
 
             transaction.commit();
             transaction = null;
@@ -9263,7 +9264,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
-                    .declineClientBalance(clientBalanceHold.getIdOfClientBalanceHold(), ClientBalanceHoldRequestStatus.ANNULLED);
+                    .declineClientBalance(clientBalanceHold.getIdOfClientBalanceHold(), ClientBalanceHoldRequestStatus.ANNULLED,
+                            ClientBalanceHoldLastChangeStatus.PORTAL);
 
             transaction.commit();
             transaction = null;

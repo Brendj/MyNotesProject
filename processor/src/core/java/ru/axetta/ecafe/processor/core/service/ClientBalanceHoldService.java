@@ -37,7 +37,8 @@ public class ClientBalanceHoldService {
     public ClientBalanceHold createClientBalanceHold(Session session, String guid, Client client, Long holdSum, Org oldOrg, Org newOrg,
             Contragent oldContragent, Contragent newContragent, ClientBalanceHoldCreateStatus createStatus,
             ClientBalanceHoldRequestStatus requestStatus, Client declarer, String phoneOfDeclarer,
-            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, Long version) {
+            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, Long version,
+            Long idOfOrgLastChange, ClientBalanceHoldLastChangeStatus lastChangeStatus) {
         if (version == null) version = DAOUtils.nextVersionByClientBalanceHold(session);
         ClientBalanceHold clientBalanceHold = new ClientBalanceHold();
         clientBalanceHold.setGuid(guid == null ? UUID.randomUUID().toString() : guid);
@@ -59,6 +60,8 @@ public class ClientBalanceHoldService {
         clientBalanceHold.setDeclarerBik(declarerBik);
         clientBalanceHold.setDeclarerCorrAccount(declarerCorrAccount);
         clientBalanceHold.setVersion(version);
+        clientBalanceHold.setIdOfOrgLastChange(idOfOrgLastChange);
+        clientBalanceHold.setLastChangeStatus(lastChangeStatus);
         return clientBalanceHold;
     }
 
@@ -76,14 +79,16 @@ public class ClientBalanceHoldService {
 
     public void holdClientBalance(String guid, Client client, Long holdSum, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
             ClientBalanceHoldCreateStatus createStatus, ClientBalanceHoldRequestStatus requestStatus, String phoneOfDeclarer,
-            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, Long version) throws Exception {
+            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, Long version, Long idOfOrgLastChange,
+            ClientBalanceHoldLastChangeStatus lastChangeStatus) throws Exception {
         if (client.getBalance() - holdSum < 0L) throw new Exception("Not enough balance");
         RuntimeContext.getFinancialOpsManager().holdClientBalance(guid, client, holdSum, declarer, oldOrg, newOrg, oldContragent,
-                newContragent, createStatus, requestStatus, phoneOfDeclarer, declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, version);
+                newContragent, createStatus, requestStatus, phoneOfDeclarer, declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, version,
+                idOfOrgLastChange, lastChangeStatus);
     }
 
-    public void declineClientBalance(Long idOfClientBalanceHold, ClientBalanceHoldRequestStatus status) throws Exception {
-        RuntimeContext.getFinancialOpsManager().declineClientBalance(idOfClientBalanceHold, status);
+    public void declineClientBalance(Long idOfClientBalanceHold, ClientBalanceHoldRequestStatus status, ClientBalanceHoldLastChangeStatus lastChangeStatus) throws Exception {
+        RuntimeContext.getFinancialOpsManager().declineClientBalance(idOfClientBalanceHold, status, lastChangeStatus);
     }
 
     public List<ClientBalanceHold> getClientBalanceHoldForOrgSinceVersion(Session session,
@@ -109,15 +114,16 @@ public class ClientBalanceHoldService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
-    public void setStatusWithValue(Long idOfClientBalanceHold, ClientBalanceHoldRequestStatus status) {
+    public void setStatusWithValue(Long idOfClientBalanceHold, ClientBalanceHoldRequestStatus status, ClientBalanceHoldLastChangeStatus lastChangeStatus) {
         Session session = (Session)em.getDelegate();
         Long nextVersion = DAOUtils.nextVersionByClientBalanceHold(session);
         javax.persistence.Query query = em.createQuery("update ClientBalanceHold set requestStatus = :status, version = :version, "
-                + "lastUpdate = :lastUpdate where idOfClientBalanceHold = :id");
+                + "lastUpdate = :lastUpdate, lastChangeStatus = :lastChangeStatus, idOfOrgLastChange = null where idOfClientBalanceHold = :id");
         query.setParameter("status", status);
         query.setParameter("id", idOfClientBalanceHold);
         query.setParameter("version", nextVersion);
         query.setParameter("lastUpdate", new Date());
+        query.setParameter("lastChangeStatus", lastChangeStatus);
         query.executeUpdate();
     }
 
