@@ -137,8 +137,13 @@ public class FinancialOpsManager {
             Long idOfOrgPayment) throws Exception {
         // By default we have no transaction
         AccountTransaction orderTransaction = null;
-        // If "card part" of payment is specified...
-        if (0 != payment.getSumByCard()) {
+
+        if (0 != payment.getSummFromCBHR()) {
+            BalanceHoldTransaction balanceHoldTransaction = ClientBalanceHoldService
+                    .processClientBalanceHoldTransaction(session, payment.getGuidOfCBHR(), payment.getSummFromCBHR(), payment.isCommit());
+            session.save(balanceHoldTransaction);
+        }
+        if (0 != payment.getSumByCard()) { // If "card part" of payment is specified...
             if(payment.getOrderType()==null){
                 // поддержка старых версий
                 orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
@@ -215,7 +220,7 @@ public class FinancialOpsManager {
         return supplier;
     }
 
-    public void cancelOrder(Session session, Order order) throws Exception {
+    public void cancelOrder(Session session, Order order, Payment payment) throws Exception {
         if (order.getState() != Order.STATE_COMMITED) {
         } else {
             order.setState(Order.STATE_CANCELED);
@@ -238,6 +243,11 @@ public class FinancialOpsManager {
                 AccountTransaction transaction = order.getTransaction();
                 canceledOrder.setIdOfTransaction(transaction.getIdOfTransaction());
                 ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
+            }
+            if (payment != null && 0 != payment.getSummFromCBHR()) {
+                BalanceHoldTransaction cancelBalanceHoldTransaction = ClientBalanceHoldService
+                        .processClientBalanceHoldTransaction(session, payment.getGuidOfCBHR(), payment.getSummFromCBHR(), payment.isCommit());
+                session.save(cancelBalanceHoldTransaction);
             }
 
             session.save(canceledOrder);

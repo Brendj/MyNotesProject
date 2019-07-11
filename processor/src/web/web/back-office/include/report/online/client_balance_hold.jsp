@@ -69,9 +69,6 @@
                     <h:outputText escape="true" value="Номер л/с обучающегося" />
                 </rich:column>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Группа" />
-                </rich:column>
-                <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="ФИО обучающегося" />
                 </rich:column>
                 <rich:column headerClass="column-header">
@@ -82,6 +79,21 @@
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="ФИО заявителя" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="ИНН заявителя" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Р/с заявителя" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Наименование банка" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="БИК банка" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Корр. счет банка" />
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Размер баланса" />
@@ -104,9 +116,6 @@
             <h:outputText styleClass="output-text" value="#{item.contractId}" />
         </rich:column>
         <rich:column>
-            <h:outputText styleClass="output-text" value="#{item.group}" />
-        </rich:column>
-        <rich:column>
             <h:outputText styleClass="output-text" value="#{item.fio}" />
         </rich:column>
         <rich:column>
@@ -117,6 +126,21 @@
         </rich:column>
         <rich:column>
             <h:outputText styleClass="output-text" value="#{item.declarerFio}" />
+        </rich:column>
+        <rich:column>
+            <h:outputText styleClass="output-text" value="#{item.inn}" />
+        </rich:column>
+        <rich:column>
+            <h:outputText styleClass="output-text" value="#{item.rs}" />
+        </rich:column>
+        <rich:column>
+            <h:outputText styleClass="output-text" value="#{item.bank}" />
+        </rich:column>
+        <rich:column>
+            <h:outputText styleClass="output-text" value="#{item.bik}" />
+        </rich:column>
+        <rich:column>
+            <h:outputText styleClass="output-text" value="#{item.korr}" />
         </rich:column>
         <rich:column>
             <h:outputText styleClass="output-text" value="#{item.balance}" converter="copeckSumConverter" />

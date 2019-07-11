@@ -3553,7 +3553,7 @@ public class Processor implements SyncProcessor {
                             String.format("Invalid total sum by order, IdOfOrg == %s, IdOfOrder == %s", idOfOrg,
                                     payment.getIdOfOrder()));
                 }
-                if (payment.getRSum() != payment.getSumByCard() + payment.getSumByCash()) {
+                if (payment.getRSum() != payment.getSumByCard() + payment.getSumByCash() + payment.getSummFromCBHR()) {
                     return new ResPaymentRegistryItem(payment.getIdOfOrder(), 310,
                             String.format("Invalid sum of order card and cash payments, IdOfOrg == %s, IdOfOrder == %s",
                                     idOfOrg, payment.getIdOfOrder()));
@@ -3644,7 +3644,7 @@ public class Processor implements SyncProcessor {
                         SecurityJournalBalance.saveSecurityJournalBalance(journalBalance, true, "OK");
                     }
                     // Update client balance
-                    RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
+                    RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order, payment);
                     persistenceSession.flush();
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
