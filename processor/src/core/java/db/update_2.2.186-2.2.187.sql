@@ -29,3 +29,8 @@ add column lastChangeStatus integer not null default 0;
 alter table cf_clientbalance_hold add CONSTRAINT cf_clientbalance_hold_orglastchange_fk
 FOREIGN KEY (idOfOrgLastChange) REFERENCES cf_orgs(idoforg);
 
+--97
+ALTER TABLE cf_card_signs ADD COLUMN publickeyprovider bytea;
+ALTER TABLE cf_card_signs ADD COLUMN privatekeycard bytea;
+ALTER TABLE cf_card_signs ADD COLUMN signtypeprov int4;
+ALTER TABLE cf_card_signs ADD COLUMN newtypeprovider bool;

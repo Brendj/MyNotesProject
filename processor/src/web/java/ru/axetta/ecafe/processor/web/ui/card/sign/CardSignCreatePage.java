@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.card.sign;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.card.CryptoSign;
 import ru.axetta.ecafe.processor.core.persistence.CardSign;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -15,6 +16,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
+
+import java.security.KeyPair;
+import java.security.PrivateKey;
+import java.security.PublicKey;
 
 /**
  * Created by i.semenov on 27.09.2017.
@@ -29,21 +34,36 @@ public class CardSignCreatePage extends CardSignDataBasicPage {
         return "card/sign/create";
     }
 
-    public void createCardSign() {
+    public void createCardSign(Long type) throws Exception {
         if (signData == null || manufacturerCode == null || manufacturerCode == 0 || StringUtils.isEmpty(manufacturerName)) {
             printError("Все поля на форме обязательны для заполнения. Файл с данными ключа также должен быть загружен");
             return;
         }
         Session session = null;
         Transaction transaction = null;
+        //Генерация ключей для подписи и проверки карт
+        KeyPair pair = CryptoSign.keyPairGen();
+        PrivateKey privateKey = pair.getPrivate();
+        PublicKey publicKey = pair.getPublic();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
             CardSign cardSign = new CardSign();
-            cardSign.setSignType(new Integer(signType));
+            cardSign.setSignType(new Integer(signTypeCard));
             cardSign.setManufacturerCode(getManufacturerCode());
             cardSign.setManufacturerName(getManufacturerName());
-            cardSign.setSignData(signData);
+
+            if (type == 1) {
+                cardSign.setSignData(publicKey.getEncoded());
+                cardSign.setPublickeyprovider(signData);
+                cardSign.setSigntypeprov(new Integer(signTypeProvider));
+                cardSign.setPrivatekeycard(privateKey.getEncoded());
+                cardSign.setNewtypeprovider(true);
+            }
+            else {
+                cardSign.setSignData(signData);
+                cardSign.setNewtypeprovider(false);
+            }
             session.save(cardSign);
             transaction.commit();
             transaction = null;

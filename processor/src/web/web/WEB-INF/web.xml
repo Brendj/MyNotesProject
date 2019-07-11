@@ -197,9 +197,20 @@
         <url-pattern>/preorder/*</url-pattern>
     </servlet-mapping>-->
 
+
+    <servlet>
+        <servlet-name>SignCardControllerWS</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.internal.CardSignature</servlet-class>
+    </servlet>
+
     <servlet-mapping>
         <servlet-name>Faces Servlet</servlet-name>
         <url-pattern>*.faces</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SignCardControllerWS</servlet-name>
+        <url-pattern>/soap/signcards</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
