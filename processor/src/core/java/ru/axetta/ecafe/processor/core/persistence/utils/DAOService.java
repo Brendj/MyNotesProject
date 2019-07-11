@@ -2601,14 +2601,15 @@ public class DAOService {
         entityManager.merge(logService);
     }
 
-    public boolean findCardsignByManufactureCodeForNewTypeProvider (Integer manufactureCode)
+    public List findCardsignByManufactureCodeForNewTypeProvider (Integer manufactureCode)
     {
-        Query query = entityManager.createQuery("select cs from CardSign cs where cs.manufacturerCode = :manufactureCode and cs.newtypeprovider = true");
+        Query query = entityManager.createQuery("select cs from CardSign cs where cs.manufacturerCode = :manufactureCode "
+                + "and cs.newtypeprovider = true");
         query.setParameter("manufactureCode", manufactureCode);
         try {
-            return !query.getResultList().isEmpty();
+            return query.getResultList();
         } catch (NoResultException e) {
-            return false;
+            return null;
         }
     }
 }

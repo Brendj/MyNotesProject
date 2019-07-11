@@ -18,6 +18,8 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.List;
+
 /**
  * Created by i.semenov on 28.09.2017.
  */
@@ -57,11 +59,18 @@ public class CardSignEditPage extends CardSignDataBasicPage {
             printError("Все поля на форме обязательны для заполнения. Файл с данными ключа также должен быть загружен");
             return null;
         }
-        boolean cardSignCur = DAOService.getInstance().findCardsignByManufactureCodeForNewTypeProvider(manufacturerCode);
-        //Если поставщик нового типа с таким кодом производителя уже зарегистрирован + сечас идет создание также нового типа
-        if (cardSignCur && newProvider) {
-            printError("Поставщик с данным кодом производителя уже зарегистрирован");
-            return null;
+        //Только для нового типа поставщика
+        if (newProvider) {
+            List<CardSign> cardsignList = DAOService.getInstance().findCardsignByManufactureCodeForNewTypeProvider(manufacturerCode);
+            if (!cardsignList.isEmpty()) {
+                for (CardSign cardSign : cardsignList) {
+                    //Если среди найденных записей есть другие кроме редактируемого
+                    if (!cardSign.getIdOfCardSign().equals(groupPage.getCurrentCard().getIdOfCardSign())) {
+                        printError("Поставщик с данным кодом производителя уже зарегистрирован");
+                        return null;
+                    }
+                }
+            }
         }
         Session session = null;
         Transaction transaction = null;
