@@ -34,3 +34,5 @@ ALTER TABLE cf_card_signs ADD COLUMN publickeyprovider bytea;
 ALTER TABLE cf_card_signs ADD COLUMN privatekeycard bytea;
 ALTER TABLE cf_card_signs ADD COLUMN signtypeprov int4;
 ALTER TABLE cf_card_signs ADD COLUMN newtypeprovider bool;
+
+--! ФИНАЛИЗИРОВАН 11.07.2019, НЕ МЕНЯТЬ
