@@ -982,16 +982,18 @@
                                 binding="#{ageGroupCatalogListPage.mainMenuComponent}"
                                 label="Возростная группа" action="#{ageGroupCatalogListPage.show}"
                                 reRender="workspaceForm" />
-
-            <%--<rich:panelMenuItem id="webTechnologistTypeOfProductionItemList"
-                                label="Тип производства" action="#{hardCodeCatalogListPage}"
+            <%--@elvariable id="typeOfProductionCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.TypeOfProductionCatalogListPage"--%>
+            <rich:panelMenuItem id="webTechnologistTypeOfProductionItemList"
+                                label="Тип производства" action="#{typeOfProductionCatalogListPage.show}"
                                 reRender="workspaceForm" />
-            <%--<rich:panelMenuItem id="webTechnologistCategoryCatalogsItemList"
-                                label="Категории блюд" action="#{hardCodeCatalogListPage}"
+            <%--@elvariable id="categoryItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.CategoryItemCatalogListPage"--%>
+            <rich:panelMenuItem id="webTechnologistCategoryCatalogsItemList"
+                                label="Категории блюд" action="#{categoryItemCatalogListPage.show}"
                                 reRender="workspaceForm" />
+            <%--@elvariable id="groupItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.GroupItemCatalogListPage"--%>
             <rich:panelMenuItem id="webTechnologistGroupCatalogsItemsList"
-                                label="Группы блюд" action="#{hardCodeCatalogListPage}"
-                                reRender="workspaceForm" />--%>
+                                label="Группы блюд" action="#{groupItemCatalogListPage.show}"
+                                reRender="workspaceForm" />
         </rich:panelMenuGroup>
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>

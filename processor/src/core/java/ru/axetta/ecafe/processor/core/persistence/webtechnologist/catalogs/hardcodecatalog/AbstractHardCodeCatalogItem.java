@@ -6,8 +6,6 @@ package ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.hard
 
 import ru.axetta.ecafe.processor.core.persistence.User;
 
-import org.hibernate.annotations.Type;
-
 import javax.persistence.*;
 import java.util.Date;
 
@@ -31,10 +29,6 @@ public abstract class AbstractHardCodeCatalogItem {
     @Version
     @Column(nullable = false)
     private Long version;
-
-    @Column(nullable = false)
-    @Type(type = "ru.axetta.ecafe.processor.core.persistence.BoolType")
-    private Boolean deleteState;
 
     @ManyToOne()
     @JoinColumn(name = "idOfUser")
@@ -78,14 +72,6 @@ public abstract class AbstractHardCodeCatalogItem {
 
     public void setVersion(Long version) {
         this.version = version;
-    }
-
-    public Boolean getDeleteState() {
-        return deleteState;
-    }
-
-    public void setDeleteState(Boolean deleteState) {
-        this.deleteState = deleteState;
     }
 
     public User getUser() {

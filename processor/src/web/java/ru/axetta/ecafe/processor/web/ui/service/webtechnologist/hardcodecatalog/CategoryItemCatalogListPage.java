@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.hardcodecatalog.HardCodeCatalogService;
-import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.hardcodecatalog.WTAgeGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.hardcodecatalog.WTCategoryItem;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
@@ -23,18 +23,18 @@ import java.util.List;
 @Component
 @Scope("session")
 @DependsOn("runtimeContext")
-public class AgeGroupCatalogListPage extends BasicWorkspacePage {
-    private static final Logger logger = LoggerFactory.getLogger(AgeGroupCatalogListPage.class);
+public class CategoryItemCatalogListPage extends BasicWorkspacePage {
+    private static final Logger logger = LoggerFactory.getLogger(CategoryItemCatalogListPage.class);
 
     private String descriptionFilter;
     private String GUIDfilter;
     private String descriptionForNewItem;
-    private List<WTAgeGroupItem> catalogListItem;
+    private List<WTCategoryItem> catalogListItem;
 
     @Override
     public void onShow() throws Exception {
         HardCodeCatalogService service = RuntimeContext.getAppContext().getBean(HardCodeCatalogService.class);
-        catalogListItem = service.getAllAgeGroupItems();
+        catalogListItem = service.getAllCategoryItem();
         GUIDfilter = "";
         descriptionForNewItem = "";
         descriptionFilter = "";
@@ -46,12 +46,12 @@ public class AgeGroupCatalogListPage extends BasicWorkspacePage {
 
     public void createNewItem() {
         if(StringUtils.isBlank(descriptionForNewItem)){
-            printError("ВВедите описание элемента");
+            printError("Введите описание элемента");
         }
         try {
             HardCodeCatalogService service = RuntimeContext.getAppContext().getBean(HardCodeCatalogService.class);
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
-            WTAgeGroupItem item =  service.createAgeGroupItem(descriptionForNewItem, currentUser);
+            WTCategoryItem item =  service.createCategoryItem(descriptionForNewItem, currentUser);
             catalogListItem.add(item);
         } catch (Exception e){
             logger.error("Can't create new element: ", e);
@@ -59,11 +59,11 @@ public class AgeGroupCatalogListPage extends BasicWorkspacePage {
         }
     }
 
-    public List<WTAgeGroupItem> getCatalogListItem() {
+    public List<WTCategoryItem> getCatalogListItem() {
         return catalogListItem;
     }
 
-    public void setCatalogListItem(List<WTAgeGroupItem> catalogListItem) {
+    public void setCatalogListItem(List<WTCategoryItem> catalogListItem) {
         this.catalogListItem = catalogListItem;
     }
 
@@ -86,9 +86,9 @@ public class AgeGroupCatalogListPage extends BasicWorkspacePage {
     public void updateCatalogList() {
         try{
             HardCodeCatalogService service = RuntimeContext.getAppContext().getBean(HardCodeCatalogService.class);
-            catalogListItem = service.findAgeGroupItemsByDescriptionOrGUID(descriptionFilter, GUIDfilter);
+            catalogListItem = service.findCategoryItemByDescriptionOrGUID(descriptionFilter, GUIDfilter);
         }catch (Exception e){
-            printError("Не удалось нати элементы: " + e.getMessage());
+            printError("Не удалось найти элементы: " + e.getMessage());
             logger.error("", e);
         }
     }
@@ -106,6 +106,6 @@ public class AgeGroupCatalogListPage extends BasicWorkspacePage {
 
     @Override
     public String getPageFilename() {
-        return "service/webtechnologist/catalog_age_group_page";
+        return "service/webtechnologist/catalog_category_item_page";
     }
 }

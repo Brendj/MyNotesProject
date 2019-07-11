@@ -24,7 +24,7 @@ import java.util.List;
 @Scope("session")
 @DependsOn("runtimeContext")
 public class TypeOfProductionCatalogListPage extends BasicWorkspacePage {
-    private static Logger logger = LoggerFactory.getLogger(TypeOfProductionCatalogListPage.class);
+    private static final Logger logger = LoggerFactory.getLogger(TypeOfProductionCatalogListPage.class);
 
     private String descriptionFilter;
     private String GUIDfilter;
@@ -46,7 +46,7 @@ public class TypeOfProductionCatalogListPage extends BasicWorkspacePage {
 
     public void createNewItem() {
         if(StringUtils.isBlank(descriptionForNewItem)){
-            printError("ВВедите описание элемента");
+            printError("Введите описание элемента");
         }
         try {
             HardCodeCatalogService service = RuntimeContext.getAppContext().getBean(HardCodeCatalogService.class);
@@ -88,7 +88,7 @@ public class TypeOfProductionCatalogListPage extends BasicWorkspacePage {
             HardCodeCatalogService service = RuntimeContext.getAppContext().getBean(HardCodeCatalogService.class);
             catalogListItem = service.findProductionTypeItemsByDescriptionOrGUID(descriptionFilter, GUIDfilter);
         }catch (Exception e){
-            printError("Не удалось нати элементы: " + e.getMessage());
+            printError("Не удалось найти элементы: " + e.getMessage());
             logger.error("", e);
         }
     }
@@ -106,6 +106,6 @@ public class TypeOfProductionCatalogListPage extends BasicWorkspacePage {
 
     @Override
     public String getPageFilename() {
-        return "service/webtechnologist/catalog_age_group_page";
+        return "service/webtechnologist/catalog_type_of_prod_page";
     }
 }

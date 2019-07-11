@@ -119,7 +119,6 @@ public class HardCodeCatalogService {
 
         item.setCreateDate(createdDate);
         item.setLastUpdate(createdDate);
-        item.setDeleteState(false);
         item.setUser(user);
         item.setDescription(description);
         item.setGUID(UUID.randomUUID().toString());

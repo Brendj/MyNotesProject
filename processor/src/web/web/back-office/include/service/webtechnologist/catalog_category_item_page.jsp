@@ -8,27 +8,27 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="ageGroupCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.AgeGroupCatalogListPage"--%>
-<h:panelGrid id="webTechnologistAgeGroupCatalogItemListPagePanelGrid" binding="#{ageGroupCatalogListPage.pageComponent}"
+<%--@elvariable id="categoryItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.CategoryItemCatalogListPage"--%>
+<h:panelGrid id="webTechnologistcategoryItemCatalogItemListPagePanelGrid" binding="#{categoryItemCatalogListPage.pageComponent}"
              styleClass="borderless-grid">
     <rich:simpleTogglePanel label="Фильтр " switchType="client" eventsQueue="mainFormEventsQueue" opened="false"
                             headerClass="filter-panel-header">
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Название справочника" styleClass="output-text" />
-            <h:inputText value="#{ageGroupCatalogListPage.descriptionFilter}" styleClass="input-text" />
+            <h:inputText value="#{categoryItemCatalogListPage.descriptionFilter}" styleClass="input-text" />
             <h:outputText escape="true" value="GUID справочника" styleClass="output-text" />
-            <h:inputText value="#{ageGroupCatalogListPage.GUIDfilter}" maxlength="36" styleClass="input-text" size="50" />
+            <h:inputText value="#{categoryItemCatalogListPage.GUIDfilter}" maxlength="36" styleClass="input-text" size="50" />
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
-            <a4j:commandButton value="Применить" action="#{ageGroupCatalogListPage.updateCatalogList()}"
+            <a4j:commandButton value="Применить" action="#{categoryItemCatalogListPage.updateCatalogList()}"
                                reRender="workspaceTogglePanel" styleClass="command-button"
                                status="WebTechnologCatalogProcessStatus"  />
-            <a4j:commandButton value="Очистить" action="#{ageGroupCatalogListPage.dropAndReloadCatalogList()}"
+            <a4j:commandButton value="Очистить" action="#{categoryItemCatalogListPage.dropAndReloadCatalogList()}"
                                status="WebTechnologCatalogProcessStatus" reRender="workspaceTogglePanel"
                                styleClass="command-button" />
         </h:panelGrid>
     </rich:simpleTogglePanel>
-    <a4j:status id="WebTechnologAgeGroupCatalogItemProcessStatus">
+    <a4j:status id="WebTechnologcategoryItemCatalogItemProcessStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
         </f:facet>
@@ -36,7 +36,7 @@
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
     <!-- ********* CREATE MODAL PANEL ********* -->
-    <rich:modalPanel id="webtechnologistAgeGroupItemCreatePanel" minWidth="150" minHeight="70" resizeable="false" domElementAttachment="form">
+    <rich:modalPanel id="webtechnologistcategoryItemItemCreatePanel" minWidth="150" minHeight="70" resizeable="false" domElementAttachment="form">
         <f:facet name="header">
             <h:panelGroup>
                 <h:outputText value="Создание Элемента" />
@@ -44,21 +44,21 @@
         </f:facet>
         <f:facet name="controls">
             <h:panelGroup>
-                <rich:componentControl for="webtechnologistAgeGroupItemCreatePanel" attachTo="hidelink" operation="hide" event="onclick" />
+                <rich:componentControl for="webtechnologistcategoryItemItemCreatePanel" attachTo="hidelink" operation="hide" event="onclick" />
             </h:panelGroup>
         </f:facet>
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Описание элемента" styleClass="output-text" />
-            <h:inputText value="#{ageGroupCatalogListPage.descriptionForNewItem}" styleClass="input-text" />
-            <a4j:commandButton oncomplete="Richfaces.hideModalPanel('webtechnologistAgeGroupItemCreatePanel')" value="Закрыть"
-                               status="WebTechnologAgeGroupCatalogItemProcessStatus"  action="#{ageGroupCatalogListPage.clearDescriptionForNewCatalog()}" reRender="webtechnologistAgeGroupItemCreatePanel"/>
-            <a4j:commandButton oncomplete="Richfaces.hideModalPanel('webtechnologistAgeGroupItemCreatePanel')"
-                               reRender="webtechnologistAgeGroupCatalogItemListTable, webtechnologistAgeGroupItemCreatePanel" action="#{ageGroupCatalogListPage.createNewItem()}"
-                               status="WebTechnologAgeGroupCatalogItemProcessStatus" value="Создать" />
+            <h:inputText value="#{categoryItemCatalogListPage.descriptionForNewItem}" styleClass="input-text" />
+            <a4j:commandButton oncomplete="Richfaces.hideModalPanel('webtechnologistcategoryItemItemCreatePanel')" value="Закрыть"
+                               status="WebTechnologcategoryItemCatalogItemProcessStatus"  action="#{categoryItemCatalogListPage.clearDescriptionForNewCatalog()}" reRender="webtechnologistcategoryItemItemCreatePanel"/>
+            <a4j:commandButton oncomplete="Richfaces.hideModalPanel('webtechnologistcategoryItemItemCreatePanel')"
+                               reRender="webtechnologistcategoryItemCatalogItemListTable, webtechnologistcategoryItemItemCreatePanel" action="#{categoryItemCatalogListPage.createNewItem()}"
+                               status="WebTechnologcategoryItemCatalogItemProcessStatus" value="Создать" />
         </h:panelGrid>
     </rich:modalPanel>
     <!-- Main page -->
-    <rich:dataTable id="webtechnologistAgeGroupCatalogItemListTable" value="#{ageGroupCatalogListPage.catalogListItem}" var="item" rows="30"
+    <rich:dataTable id="webtechnologistcategoryItemCatalogItemListTable" value="#{categoryItemCatalogListPage.catalogListItem}" var="item" rows="30"
                     footerClass="data-table-footer"
                     columnClasses="center-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
         <rich:column headerClass="column-header">
@@ -96,7 +96,7 @@
             </h:outputText>
         </rich:column>
         <f:facet name="footer">
-            <rich:datascroller for="webtechnologistAgeGroupCatalogItemListTable" renderIfSinglePage="false" maxPages="5"
+            <rich:datascroller for="webtechnologistcategoryItemCatalogItemListTable" renderIfSinglePage="false" maxPages="5"
                                fastControls="hide" stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png" />
@@ -109,14 +109,12 @@
     </rich:dataTable>
     <h:panelGrid styleClass="borderless-grid" columns="1">
         <a4j:commandButton value="Создать новый справочник"
-                           onclick="Richfaces.showModalPanel('webtechnologistAgeGroupItemCreatePanel');"
-                           id="showCreateAgeGroupItemModalPanelButton" />
+                           onclick="Richfaces.showModalPanel('webtechnologistcategoryItemItemCreatePanel');"
+                           id="showCreatecategoryItemItemModalPanelButton" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="1">
         <a4j:commandButton value="Сохранить изменения"
-                           onclick="Richfaces.showModalPanel('webtechnologistAgeGroupItemCreatePanel');"
+                           onclick="Richfaces.showModalPanel('webtechnologistcategoryItemItemCreatePanel');"
                            id="showApplyChangeButton" />
     </h:panelGrid>
 </h:panelGrid>
-
-
