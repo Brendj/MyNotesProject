@@ -36,10 +36,10 @@
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
     <!-- ********* CREATE MODAL PANEL ********* -->
-    <rich:modalPanel id="webtechnologistHardCodeItemCreatePanel" minWidth="300" minHeight="120" resizeable="false" domElementAttachment="form">
+    <rich:modalPanel id="webtechnologistHardCodeItemCreatePanel" minWidth="150" minHeight="70" resizeable="false" domElementAttachment="form">
         <f:facet name="header">
             <h:panelGroup>
-                <h:outputText value="Создание справочника" />
+                <h:outputText value="Создание Элемента" />
             </h:panelGroup>
         </f:facet>
         <f:facet name="controls">
@@ -48,7 +48,7 @@
             </h:panelGroup>
         </f:facet>
         <h:panelGrid columns="2" styleClass="borderless-grid">
-            <h:outputText escape="true" value="Название справочника" styleClass="output-text" />
+            <h:outputText escape="true" value="Описание элемента" styleClass="output-text" />
             <h:inputText value="#{ageGroupCatalogListPage.descriptionForNewItem}" styleClass="input-text" />
             <a4j:commandButton oncomplete="Richfaces.hideModalPanel('webtechnologistHardCodeItemCreatePanel')" value="Закрыть"
                                status="WebTechnologHardCodeCatalogItemProcessStatus"  action="#{ageGroupCatalogListPage.clearDescriptionForNewCatalog()}" reRender="webtechnologistHardCodeItemCreatePanel"/>
@@ -115,7 +115,7 @@
     <h:panelGrid styleClass="borderless-grid" columns="1">
         <a4j:commandButton value="Сохранить изменения"
                            onclick="Richfaces.showModalPanel('webtechnologistHardCodeItemCreatePanel');"
-                           id="showCreateAgeGroupItemModalPanelButton" />
+                           id="showApplyChangeButton" />
     </h:panelGrid>
 </h:panelGrid>
 

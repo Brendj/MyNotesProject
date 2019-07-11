@@ -982,10 +982,11 @@
                                 binding="#{ageGroupCatalogListPage.mainMenuComponent}"
                                 label="Возростная группа" action="#{ageGroupCatalogListPage.show}"
                                 reRender="workspaceForm" />
+
             <%--<rich:panelMenuItem id="webTechnologistTypeOfProductionItemList"
                                 label="Тип производства" action="#{hardCodeCatalogListPage}"
                                 reRender="workspaceForm" />
-            <rich:panelMenuItem id="webTechnologistCategoryCatalogsItemList"
+            <%--<rich:panelMenuItem id="webTechnologistCategoryCatalogsItemList"
                                 label="Категории блюд" action="#{hardCodeCatalogListPage}"
                                 reRender="workspaceForm" />
             <rich:panelMenuItem id="webTechnologistGroupCatalogsItemsList"

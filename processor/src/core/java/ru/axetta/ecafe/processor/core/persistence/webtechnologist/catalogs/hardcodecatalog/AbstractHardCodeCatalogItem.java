@@ -21,11 +21,11 @@ public abstract class AbstractHardCodeCatalogItem {
     private String GUID;
 
     @Column(nullable = false)
-    @Type(type = "ru.axetta.ecafe.processor.core.persistence.DateType")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date createDate;
 
     @Column(nullable = false)
-    @Type(type = "ru.axetta.ecafe.processor.core.persistence.DateType")
+    @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdate;
 
     @Version

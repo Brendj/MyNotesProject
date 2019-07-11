@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.hardcodecatalog;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.Id;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 @Entity
 @Table(name = "cf_wt_agegroup_items")
@@ -15,13 +12,14 @@ public class WTAgeGroupItem extends AbstractHardCodeCatalogItem {
 
     @Id
     @Column
-    private Long idOfGroupItem;
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long idOfAgeGroupItem;
 
-    public Long getIdOfGroupItem() {
-        return idOfGroupItem;
+    public Long getIdOfAgeGroupItem() {
+        return idOfAgeGroupItem;
     }
 
-    public void setIdOfGroupItem(Long idOfGroupItem) {
-        this.idOfGroupItem = idOfGroupItem;
+    public void setIdOfAgeGroupItem(Long idOfAgeGroupItem) {
+        this.idOfAgeGroupItem = idOfAgeGroupItem;
     }
 }
