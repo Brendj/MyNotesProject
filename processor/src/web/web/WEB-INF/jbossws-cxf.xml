@@ -158,4 +158,10 @@ the signature crypto configuration.  See SignaturePropRefId. -->
             implementor='ru.axetta.ecafe.processor.web.internal.SpecialCardsController'>
     </jaxws:endpoint>
 
+    <jaxws:endpoint
+            id="CardSignature"
+            address='http://localhost:8080/processor/soap/signcards'
+            implementor='ru.axetta.ecafe.processor.web.internal.CardSignature'>
+    </jaxws:endpoint>
+
 </beans>

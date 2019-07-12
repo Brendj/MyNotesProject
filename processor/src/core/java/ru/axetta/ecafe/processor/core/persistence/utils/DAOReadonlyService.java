@@ -444,6 +444,38 @@ public class DAOReadonlyService {
         }
     }
 
+    public CardSign getSignInform(Integer manufacturerCode) {
+        try {
+            Query query = entityManager.createQuery("From CardSign cs " + "where cs.manufacturerCode = :manufacturerCode");
+            query.setParameter("manufacturerCode", manufacturerCode);
+            List<CardSign> allSign = query.getResultList();
+            for (CardSign cardSign : allSign)
+            {
+                //В таблице обязательно должен быть новый тип поставщиков с нашей ЭЦП
+                if (cardSign.getNewtypeprovider())
+                {
+                    return cardSign;
+                }
+            }
+            return allSign.get(0);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public Card getCardfromNum(Long cardNo) {
+        try {
+            Query query = entityManager.createQuery("From Card c " + "where c.cardNo = :cardNo");
+            query.setParameter("cardNo", cardNo);
+            List<Card> cards = query.getResultList();
+            if (cards.isEmpty())
+                return null;
+            return cards.get(0);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public HelpRequest findHelpRequest(Long idOfOrg, String guid) {
         try {
             Query query = entityManager.createQuery("SELECT help from HelpRequest help "

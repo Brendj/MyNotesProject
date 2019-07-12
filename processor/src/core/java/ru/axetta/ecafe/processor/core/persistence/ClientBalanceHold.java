@@ -26,11 +26,13 @@ public class ClientBalanceHold {
     private Long version;
     private ClientBalanceHoldCreateStatus createStatus;
     private ClientBalanceHoldRequestStatus requestStatus;
+    private ClientBalanceHoldLastChangeStatus lastChangeStatus;
     private String declarerInn;
     private String declarerAccount;
     private String declarerBank;
     private String declarerBik;
     private String declarerCorrAccount;
+    private Long idOfOrgLastChange;
 
     public ClientBalanceHold() {
 
@@ -202,5 +204,21 @@ public class ClientBalanceHold {
 
     public void setDeclarerCorrAccount(String declarerCorrAccount) {
         this.declarerCorrAccount = declarerCorrAccount;
+    }
+
+    public Long getIdOfOrgLastChange() {
+        return idOfOrgLastChange;
+    }
+
+    public void setIdOfOrgLastChange(Long idOfOrgLastChange) {
+        this.idOfOrgLastChange = idOfOrgLastChange;
+    }
+
+    public ClientBalanceHoldLastChangeStatus getLastChangeStatus() {
+        return lastChangeStatus;
+    }
+
+    public void setLastChangeStatus(ClientBalanceHoldLastChangeStatus lastChangeStatus) {
+        this.lastChangeStatus = lastChangeStatus;
     }
 }

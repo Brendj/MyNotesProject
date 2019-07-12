@@ -22,10 +22,12 @@ import org.springframework.stereotype.Component;
 @Scope("session")
 public class CardSignViewPage extends BasicWorkspacePage {
     private Integer idOfCardSign;
-    private String signType;
+    private String signTypeCard;
+    private String  signTypeProvider;
     private byte[] signData;
     private Integer manufacturerCode;
     private String manufacturerName;
+    private Boolean newProvider;
 
     @Autowired
     CardSignGroupPage groupPage;
@@ -47,10 +49,15 @@ public class CardSignViewPage extends BasicWorkspacePage {
             transaction = session.beginTransaction();
             idOfCardSign = groupPage.getCurrentCard().getIdOfCardSign();
             CardSign cardSign = (CardSign)session.get(CardSign.class, idOfCardSign);
-            signType = CardSign.CARDSIGN_TYPES[cardSign.getSignType()];
+            signTypeCard = CardSign.CARDSIGN_TYPES[cardSign.getSignType()];
+            if (cardSign.getSigntypeprov() != null)
+                signTypeProvider = CardSign.CARDSIGN_TYPES[cardSign.getSigntypeprov()];
+            else
+                signTypeProvider = null;
             signData = cardSign.getSignData();
             manufacturerCode = cardSign.getManufacturerCode();
             manufacturerName = cardSign.getManufacturerName();
+            newProvider = cardSign.getNewtypeprovider();
             transaction.commit();
             transaction = null;
         } finally {
@@ -70,14 +77,6 @@ public class CardSignViewPage extends BasicWorkspacePage {
 
     public void setIdOfCardSign(Integer idOfCardSign) {
         this.idOfCardSign = idOfCardSign;
-    }
-
-    public String getSignType() {
-        return signType;
-    }
-
-    public void setSignType(String signType) {
-        this.signType = signType;
     }
 
     public byte[] getSignData() {
@@ -102,5 +101,31 @@ public class CardSignViewPage extends BasicWorkspacePage {
 
     public void setManufacturerName(String manufacturerName) {
         this.manufacturerName = manufacturerName;
+    }
+
+    public String getSignTypeCard() {
+        return signTypeCard;
+    }
+
+    public void setSignTypeCard(String signTypeCard) {
+        this.signTypeCard = signTypeCard;
+    }
+
+    public String getSignTypeProvider() {
+        return signTypeProvider;
+    }
+
+    public void setSignTypeProvider(String signTypeProvider) {
+        this.signTypeProvider = signTypeProvider;
+    }
+
+    public Boolean getNewProvider() {
+        if (newProvider == null)
+            return false;
+        return newProvider;
+    }
+
+    public void setNewProvider(Boolean newProvider) {
+        this.newProvider = newProvider;
     }
 }
