@@ -76,13 +76,11 @@ public class ExternalEventNotificationService {
             if (!(guardians == null || guardians.isEmpty())) {
                 for (Client destGuardian : guardians) {
                     if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
-                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue())) {
+                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue())
+                            || event.getEvtType() == ExternalEventType.CULTURE) {
                         notificationService
                                 .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                     }
-                    notificationService
-                                .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
-
                 }
             }
             //отправка клиенту
