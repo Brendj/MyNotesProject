@@ -13,6 +13,7 @@ public class ExternalEvent {
     private Long idOfExternalEvent;
     private String orgCode;
     private String orgName;
+    private String orgShortName;
     private String enterName;
     private String address;
     private Client client;
@@ -41,7 +42,7 @@ public class ExternalEvent {
         this.version = handlerVersion.getVersion();
         buildEnterName(evtStatus);
     }
-    public ExternalEvent(Client cl, String orgCode, String CultureName, String CultureAddress, ExternalEventType evtType,
+    public ExternalEvent(Client cl, String orgCode, String CultureName, String CultureShortName, String CultureAddress, ExternalEventType evtType,
             Date evtDateTime, ExternalEventStatus evtStatus, ISetExternalEventVersion handlerVersion) throws IllegalArgumentException {
         this.orgCode = orgCode;
         this.orgName = CultureName;
@@ -166,5 +167,13 @@ public class ExternalEvent {
 
     public void setAddress(String address) {
         this.address = address;
+    }
+
+    public String getOrgShortName() {
+        return orgShortName;
+    }
+
+    public void setOrgShortName(String orgShortName) {
+        this.orgShortName = orgShortName;
     }
 }

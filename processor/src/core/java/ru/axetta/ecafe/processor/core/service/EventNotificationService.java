@@ -189,7 +189,17 @@ public class EventNotificationService {
             NOTIFICATION_ENTER_MUSEUM + "." + TYPE_SMS,
             "[surname] [name] (л/с: [account]): посещение музея [event_place_code]",
             NOTIFICATION_NOENTER_MUSEUM + "." + TYPE_SMS,
-            "[surname] [name] (л/с: [account]): возврат билета в музей [event_place_code]"
+            "[surname] [name] (л/с: [account]): возврат билета в музей [event_place_code]",
+
+            NOTIFICATION_ENTER_CULTURE + "." + TYPE_SMS,
+            "<html>\n" + "<body>\n" + "<b>Здравствуйте!<br/><br/>\n"
+                    + "[empDate] в [empTime]</b> [surname] [name] зашел в здание культуры по адресу: [address]([shortnameinfoservice]).\n"
+                    + "</body>\n" + "</html>",
+
+            NOTIFICATION_EXIT_CULTURE + "." + TYPE_SMS,
+            "<html>\n" + "<body>\n" + "<b>Здравствуйте!<br/><br/>\n"
+                    + "[empDate] в [empTime]</b> [surname] [name] вышел из здания культуры по адресу: [address]([shortnameinfoservice]).\n"
+                    + "</body>\n" + "</html>"
     };                       // короткое имя школы
 
     String getDefaultText(String name) {
@@ -493,6 +503,10 @@ public class EventNotificationService {
                 clientSMSType = ClientSms.TYPE_LOW_BALANCE_NOTIFICATION;
             } else if (type.equals(NOTIFICATION_ENTER_MUSEUM)) {
                 clientSMSType = ClientSms.TYPE_ENTER_MUSEUM_NOTIFICATION;
+            } else if (type.equals(NOTIFICATION_ENTER_CULTURE)) {
+                clientSMSType = ClientSms.TYPE_ENTER_CULTURE_NOTIFICATION;
+            } else if (type.equals(NOTIFICATION_EXIT_CULTURE)) {
+                clientSMSType = ClientSms.TYPE_EXIT_CULTURE_NOTIFICATION;
             } else if (type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
                 clientSMSType = ClientSms.TYPE_NOENTER_MUSEUM_NOTIFICATION;
             } else {
@@ -920,13 +934,31 @@ public class EventNotificationService {
                 } else {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.NOENTER_MUSEUM_EVENT, destClient);
                 }
+            } else if (type.equals(NOTIFICATION_ENTER_CULTURE)) {
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_CULTURE_EVENT, dataClient, destClient);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_CULTURE_EVENT, destClient);
+                }
+            } else if (type.equals(NOTIFICATION_EXIT_CULTURE)) {
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.EXIT_CULTURE_EVENT, dataClient, destClient);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.EXIT_CULTURE_EVENT, destClient);
+                }
             }
-
             if (type.equals(NOTIFICATION_ENTER_MUSEUM) || type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
                 String eventPlaceCode = findValueInParams(new String[]{ExternalEventNotificationService.PLACE_CODE}, values);
                 empType.getParameters().put(ExternalEventNotificationService.PLACE_CODE, eventPlaceCode);
                 String eventPlaceName = findValueInParams(new String[]{ExternalEventNotificationService.PLACE_NAME}, values);
                 empType.getParameters().put(ExternalEventNotificationService.PLACE_NAME, eventPlaceName);
+                putGenderParams(empType, values);
+            }
+            if (type.equals(NOTIFICATION_ENTER_CULTURE) || type.equals(NOTIFICATION_EXIT_CULTURE)) {
+                String eventPlaceCode = findValueInParams(new String[]{ExternalEventNotificationService.ADDRESS}, values);
+                empType.getParameters().put(ExternalEventNotificationService.ADDRESS, eventPlaceCode);
+                String eventPlaceName = findValueInParams(new String[]{ExternalEventNotificationService.SHORTNAMEINFOSERVICE}, values);
+                empType.getParameters().put(ExternalEventNotificationService.SHORTNAMEINFOSERVICE, eventPlaceName);
                 putGenderParams(empType, values);
             }
 

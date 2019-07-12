@@ -36,6 +36,8 @@ public class EMPEventTypeFactory {
     public static final int LEAVE_WITH_CHECKER        = 901240017;
     public static final int INFO_MAILING_EVENT        = 901240056;
     public static final int CLIENT_NEWPASSWORD_EVENT  = 901240057;
+    public static final int ENTER_CULTURE_EVENT       = 901240018;
+    public static final int EXIT_CULTURE_EVENT        = 901240019;
 
     public static final EMPEventType buildEvent(int type, Client client) {
         return buildEvent(type, client, Collections.EMPTY_MAP);
@@ -116,6 +118,12 @@ public class EMPEventTypeFactory {
                 break;
             case LEAVE_WITH_CHECKER:
                 event = new EMPLeaveWithCheckerEventType();
+                break;
+            case ENTER_CULTURE_EVENT:
+                event = new EMPEnterCultureEventType();
+                break;
+            case EXIT_CULTURE_EVENT:
+                event = new EMPExitCultureEventType();
                 break;
             default:
                 throw new IllegalArgumentException("Unknown type");

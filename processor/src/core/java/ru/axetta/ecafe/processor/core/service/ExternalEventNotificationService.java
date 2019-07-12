@@ -17,6 +17,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.List;
 
 /**
@@ -31,6 +32,7 @@ public class ExternalEventNotificationService {
     //private EntityManager entityManager;
 
     public static String EMP_TIME = "empTime";
+    public static String EMP_DATE = "empDate";
     public static String PLACE_NAME = "event_place";
     public static String PLACE_CODE = "event_place_code";
     public static String SURNAME = "surname";
@@ -72,12 +74,13 @@ public class ExternalEventNotificationService {
             //отправка представителям
             if (!(guardians == null || guardians.isEmpty())) {
                 for (Client destGuardian : guardians) {
-
                     if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
                             client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue())) {
                         notificationService
                                 .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                     }
+                    notificationService
+                                .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
 
                 }
             }
@@ -93,11 +96,10 @@ public class ExternalEventNotificationService {
             HibernateUtils.close(persistenceSession, logger);
         }
     }
-
     private String[] generateNotificationParams(Client client, ExternalEvent event) {
-        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-        String empTime = df.format(event.getEvtDateTime());
         if (event.getEvtType().equals(ExternalEventType.MUSEUM)) {
+            DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+            String empTime = df.format(event.getEvtDateTime());
             return new String[] {
                     EMP_TIME, empTime,
                     PLACE_NAME, event.getOrgName(),
@@ -108,6 +110,11 @@ public class ExternalEventNotificationService {
             };
         }
         if (event.getEvtType().equals(ExternalEventType.CULTURE)) {
+            SimpleDateFormat dateFormat = null;
+            dateFormat = new SimpleDateFormat("dd.MM.YYYY");
+            String empDate = dateFormat.format(event.getEvtDateTime());
+            dateFormat = new SimpleDateFormat("HH:mm");
+            String empTime = dateFormat.format(event.getEvtDateTime());
             String shortName = null;
             if (cultureShortName == null)
                 shortName = event.getOrgName();
@@ -115,10 +122,10 @@ public class ExternalEventNotificationService {
                 shortName = cultureShortName;
             return new String[] {
                     SURNAME, client.getPerson().getSurname(),
-                    NAME, client.getPerson().getFirstName(),
                     PLACE_NAME, event.getOrgName(),
-                    EMP_TIME, empTime,
+                    EMP_DATE, empDate,
                     BALANCE, String.valueOf(client.getBalance()),
+                    EMP_TIME, empTime,
                     ADDRESS, event.getAddress(),
                     SHORTNAMEINFOSERVICE, shortName,
                     NAME, client.getPerson().getFirstName(),
