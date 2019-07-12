@@ -23,6 +23,7 @@ import java.io.IOException;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -84,12 +85,16 @@ public class SummaryCardsMSRService extends SummaryDownloadBaseService {
 
             String query_str = "select card.cardNo, client.clientGUID from Card card inner join card.client client "
                     + "where client.clientGroup.compositeIdOfClientGroup.idOfClientGroup NOT between :group_employees and :group_deleted "
-                    + "and card.state in (:card_states) and card.validTime > :date";
+                    + "and card.state in (:card_states) and card.validTime > :date and client.ageTypeGroup not in :ageTypeGroupList";
             Query query = entityManager.createQuery(query_str);
             query.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             query.setParameter("group_deleted", ClientGroup.Predefined.CLIENT_DELETED.getValue());
             query.setParameter("card_states", card_states);
             query.setParameter("date", startDate);
+            String[] beforeSchoolTypeGroups = {Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_OUT],
+                                               Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL_STEP],
+                                               Client.GROUP_NAME[Client.GROUP_BEFORE_SCHOOL]};
+            query.setParameter("ageTypeGroupList", Arrays.asList(beforeSchoolTypeGroups));
             //query.setMaxResults(10);
 
             List list = query.getResultList();

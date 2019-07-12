@@ -8438,9 +8438,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (museumName != null && museumName.length() > 255) {
                 museumName = museumName.substring(0, 255);
             }
+            Card card = cl.findActiveCard(session, null);
             ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
             ExternalEvent event = new ExternalEvent(cl, museumCode, museumName, ExternalEventType.MUSEUM, accessTime,
-                    ExternalEventStatus.fromInteger(ticketStatus), handler);
+                    ExternalEventStatus.fromInteger(ticketStatus), card == null ? null : card.getCardNo(),
+                    card == null ? null : card.getCardType(), handler);
             session.save(event);
             transaction.commit();
             transaction = null;
@@ -9182,10 +9184,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result addRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "guardianMobile") String guardianMobile,
+    public CashOutResult addRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "guardianMobile") String guardianMobile,
             @WebParam(name = "sum") Long sum, @WebParam(name = "guardianDataForCashOut") GuardianDataForCashOut guardianDataForCashOut) {
         authenticateRequest(contractId);
-        Result result = new Result();
+        CashOutResult result = new CashOutResult();
         Session session = null;
         Transaction transaction = null;
 
@@ -9220,6 +9222,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (client.getBalance() - preordersSum < sum) {
                 result.resultCode = RC_NOT_ENOUGH_BALANCE;
                 result.description = RC_NOT_ENOUGH_BALANCE_DESC;
+                result.sumAvailable = client.getBalance() - preordersSum;
                 return result;
             }
             String declarerInn = (guardianDataForCashOut == null) ? null : guardianDataForCashOut.getDeclarerInn();
@@ -9231,7 +9234,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).holdClientBalance(UUID.randomUUID().toString(),
                     client, sum, declarer, client.getOrg(), null, client.getOrg().getDefaultSupplier(), null,
                     ClientBalanceHoldCreateStatus.PORTAL, ClientBalanceHoldRequestStatus.CREATED, guardianMobile,
-                    declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, null);
+                    declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, null, null,
+                    ClientBalanceHoldLastChangeStatus.PORTAL);
 
             transaction.commit();
             transaction = null;
@@ -9313,7 +9317,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
-                    .declineClientBalance(clientBalanceHold.getIdOfClientBalanceHold(), ClientBalanceHoldRequestStatus.ANNULLED);
+                    .declineClientBalance(clientBalanceHold.getIdOfClientBalanceHold(), ClientBalanceHoldRequestStatus.ANNULLED,
+                            ClientBalanceHoldLastChangeStatus.PORTAL);
 
             transaction.commit();
             transaction = null;

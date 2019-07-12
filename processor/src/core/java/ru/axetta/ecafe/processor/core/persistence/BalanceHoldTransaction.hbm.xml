@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.BalanceHoldTransaction" table="CF_Balancehold_Transactions">
+        <id name="idOfTransaction" column="IdOfTransaction" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="clientBalanceHold" class="ru.axetta.ecafe.processor.core.persistence.ClientBalanceHold" column="IdOfClientBalanceHold"
+                     not-null="true" update="false"/>
+
+        <property name="transactionSum" column="TransactionSum" type="long" not-null="true" update="false"/>
+        <property name="balanceBefore" column="BalanceBefore" type="long" update="false"/>
+        <property name="transactionDate" column="TransactionDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+    </class>
+</hibernate-mapping>
+
+

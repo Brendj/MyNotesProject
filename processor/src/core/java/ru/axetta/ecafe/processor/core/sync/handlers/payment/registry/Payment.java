@@ -42,6 +42,8 @@ public class Payment {
     private final String comments;
     private final OrderTypeEnumType orderType;
     private final List<Purchase> posPurchases;
+    private final String guidOfCBHR;
+    private final Long summFromCBHR;
 
     public static Payment build(Node paymentNode, LoadContext loadContext) throws Exception {
         NamedNodeMap namedNodeMap = paymentNode.getAttributes();
@@ -119,13 +121,22 @@ public class Payment {
             state = Integer.parseInt(stateStr);
         }
 
+        String guidOfCBHR = getStringValueNullSafe(namedNodeMap, "GuidOfCBHR");
+        Long summOfCBHR = getLongValueNullSafe(namedNodeMap, "SummFromCBHR");
+        if (summOfCBHR == null) summOfCBHR = 0L;
+        //для случая, когда заказ частью оплачивается из заблокированных средств, а частью с основного баланса - уменьшаем сумму по карте
+        //на сумму из заблокированных средств. В обработке заказа в FinancialOpsManager.createOrderCharge в этом случае будет две
+        //транзакции - по обычному балансу и по заблокированному. Если sumByCard == summOfCBHR, то заказ целиком по заблокированному балансу
+        sumByCard = sumByCard - summOfCBHR;
+
         return new Payment(cardNo, date, orderDate, socDiscount, trdDiscount, grant, idOfOrg, idOfClient, idOfPayForClient, idOfOrder,
-                idOfCashier, sumByCard, sumByCash, rSum, idOfPOS,confirmerId, state, comments, OrderTypeEnumType.fromInteger(orderType), purchases);
+                idOfCashier, sumByCard, sumByCash, rSum, idOfPOS,confirmerId, state, comments, OrderTypeEnumType.fromInteger(orderType),
+                purchases, guidOfCBHR, summOfCBHR);
     }
 
     public Payment(Long cardNo, Date time, Date orderDate, long socDiscount, long trdDiscount, long grant, Long IdOfOrg, Long idOfClient,
             Long idOfPayForClient, long idOfOrder, Long idOfCashier, long sumByCard, long sumByCash, long RSum, Long idOfPOS,
-            Long confirmerId, int state, String comments, OrderTypeEnumType orderType, List<Purchase> posPurchases) {
+            Long confirmerId, int state, String comments, OrderTypeEnumType orderType, List<Purchase> posPurchases, String guidOfCBHR, Long summOfCBHR) {
         this.cardNo = cardNo;
         this.time = time;
         this.orderDate = orderDate;
@@ -146,6 +157,8 @@ public class Payment {
         this.comments = comments;
         this.orderType = orderType;
         this.posPurchases = posPurchases;
+        this.guidOfCBHR = guidOfCBHR;
+        this.summFromCBHR = summOfCBHR;
     }
 
     public Long getCardNo() {
@@ -232,4 +245,11 @@ public class Payment {
         return state== Order.STATE_COMMITED;
     }
 
+    public String getGuidOfCBHR() {
+        return guidOfCBHR;
+    }
+
+    public Long getSummFromCBHR() {
+        return summFromCBHR;
+    }
 }
