@@ -193,12 +193,24 @@ public class EventNotificationService {
 
             NOTIFICATION_ENTER_CULTURE + "." + TYPE_SMS,
             "<html>\n" + "<body>\n" + "<b>Здравствуйте!<br/><br/>\n"
-                    + "[empDate] в [empTime]</b> [surname] [name] зашел в здание культуры по адресу: [address]([shortnameinfoservice]).\n"
+                    + "[empDate] в [empTimeH]</b> [surname] [name] зашел в здание культуры по адресу: [address]([shortnameinfoservice]).\n"
                     + "</body>\n" + "</html>",
 
             NOTIFICATION_EXIT_CULTURE + "." + TYPE_SMS,
             "<html>\n" + "<body>\n" + "<b>Здравствуйте!<br/><br/>\n"
-                    + "[empDate] в [empTime]</b> [surname] [name] вышел из здания культуры по адресу: [address]([shortnameinfoservice]).\n"
+                    + "[empDate] в [empTimeH]</b> [surname] [name] вышел из здания культуры по адресу: [address]([shortnameinfoservice]).\n"
+                    + "</body>\n" + "</html>",
+            NOTIFICATION_ENTER_CULTURE + "." + TYPE_EMAIL_SUBJECT,
+            "Уведомление о заходе в здание культуры",
+            NOTIFICATION_ENTER_CULTURE + "." + TYPE_EMAIL_TEXT,
+            "<html>\n" + "<body>\n" + "<b>Здравствуйте!<br/><br/>\n"
+                    + "[empDate] в [empTimeH]</b> [surname] [name] зашел в здание культуры по адресу: [address]([shortnameinfoservice]).\n"
+                    + "</body>\n" + "</html>",
+            NOTIFICATION_EXIT_CULTURE + "." + TYPE_EMAIL_SUBJECT,
+            "Уведомление о выходе из здания культуры",
+            NOTIFICATION_EXIT_CULTURE + "." + TYPE_EMAIL_TEXT,
+            "<html>\n" + "<body>\n" + "<b>Здравствуйте!<br/><br/>\n"
+                    + "[empDate] в [empTimeH]</b> [surname] [name] вышел из здания культуры по адресу: [address]([shortnameinfoservice]).\n"
                     + "</body>\n" + "</html>"
     };                       // короткое имя школы
 
@@ -955,10 +967,14 @@ public class EventNotificationService {
                 putGenderParams(empType, values);
             }
             if (type.equals(NOTIFICATION_ENTER_CULTURE) || type.equals(NOTIFICATION_EXIT_CULTURE)) {
-                String eventPlaceCode = findValueInParams(new String[]{ExternalEventNotificationService.ADDRESS}, values);
-                empType.getParameters().put(ExternalEventNotificationService.ADDRESS, eventPlaceCode);
-                String eventPlaceName = findValueInParams(new String[]{ExternalEventNotificationService.SHORTNAMEINFOSERVICE}, values);
-                empType.getParameters().put(ExternalEventNotificationService.SHORTNAMEINFOSERVICE, eventPlaceName);
+                String eventAdress = findValueInParams(new String[]{ExternalEventNotificationService.ADDRESS}, values);
+                empType.getParameters().put(ExternalEventNotificationService.ADDRESS, eventAdress);
+                String eventShortName = findValueInParams(new String[]{ExternalEventNotificationService.SHORTNAMEINFOSERVICE}, values);
+                empType.getParameters().put(ExternalEventNotificationService.SHORTNAMEINFOSERVICE, eventShortName);
+                String eventDate = findValueInParams(new String[]{ExternalEventNotificationService.EMP_DATE}, values);
+                empType.getParameters().put(ExternalEventNotificationService.EMP_DATE, eventDate);
+                String eventTime = findValueInParams(new String[]{ExternalEventNotificationService.EMP_TIME}, values);
+                empType.getParameters().put(ExternalEventNotificationService.EMP_TIME_H, eventTime);
                 putGenderParams(empType, values);
             }
 

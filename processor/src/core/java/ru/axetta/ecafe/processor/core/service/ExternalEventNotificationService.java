@@ -32,6 +32,7 @@ public class ExternalEventNotificationService {
     //private EntityManager entityManager;
 
     public static String EMP_TIME = "empTime";
+    public static String EMP_TIME_H = "empTimeH";
     public static String EMP_DATE = "empDate";
     public static String PLACE_NAME = "event_place";
     public static String PLACE_CODE = "event_place_code";
@@ -97,9 +98,9 @@ public class ExternalEventNotificationService {
         }
     }
     private String[] generateNotificationParams(Client client, ExternalEvent event) {
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        String empTime = df.format(event.getEvtDateTime());
         if (event.getEvtType().equals(ExternalEventType.MUSEUM)) {
-            DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
-            String empTime = df.format(event.getEvtDateTime());
             return new String[] {
                     EMP_TIME, empTime,
                     PLACE_NAME, event.getOrgName(),
@@ -114,7 +115,7 @@ public class ExternalEventNotificationService {
             dateFormat = new SimpleDateFormat("dd.MM.YYYY");
             String empDate = dateFormat.format(event.getEvtDateTime());
             dateFormat = new SimpleDateFormat("HH:mm");
-            String empTime = dateFormat.format(event.getEvtDateTime());
+            String empTimeH = dateFormat.format(event.getEvtDateTime());
             String shortName = null;
             if (cultureShortName == null)
                 shortName = event.getOrgName();
@@ -126,6 +127,7 @@ public class ExternalEventNotificationService {
                     EMP_DATE, empDate,
                     BALANCE, String.valueOf(client.getBalance()),
                     EMP_TIME, empTime,
+                    EMP_TIME_H, empTimeH,
                     ADDRESS, event.getAddress(),
                     SHORTNAMEINFOSERVICE, shortName,
                     NAME, client.getPerson().getFirstName(),
