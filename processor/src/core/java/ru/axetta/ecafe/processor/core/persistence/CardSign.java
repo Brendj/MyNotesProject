@@ -13,12 +13,15 @@ public class CardSign {
     private byte[] signData;
     private Integer manufacturerCode;
     private String manufacturerName;
+    private byte[] privatekeycard;
+    private byte[] publickeyprovider;
+    private Integer signtypeprov;
+    private Boolean newtypeprovider;
 
     public static final String CARDSIGN_SCRIPT_TYPE = "Scrypt";
     public static final String CARDSIGN_ECDSA_TYPE = "ECDSA";
     public static final String CARDSIGN_GOST2012_TYPE = "Gost2012_256";
     public static final String[] CARDSIGN_TYPES = {CARDSIGN_SCRIPT_TYPE, CARDSIGN_ECDSA_TYPE, CARDSIGN_GOST2012_TYPE};
-
     public CardSign() {
 
     }
@@ -68,5 +71,37 @@ public class CardSign {
 
     public void setManufacturerName(String manufacturerName) {
         this.manufacturerName = manufacturerName;
+    }
+
+    public byte[] getPrivatekeycard() {
+        return privatekeycard;
+    }
+
+    public void setPrivatekeycard(byte[] privatekeycard) {
+        this.privatekeycard = privatekeycard;
+    }
+
+    public byte[] getPublickeyprovider() {
+        return publickeyprovider;
+    }
+
+    public void setPublickeyprovider(byte[] publickeyprovider) {
+        this.publickeyprovider = publickeyprovider;
+    }
+
+    public Integer getSigntypeprov() {
+        return signtypeprov;
+    }
+
+    public void setSigntypeprov(Integer signtypeprov) {
+        this.signtypeprov = signtypeprov;
+    }
+
+    public Boolean getNewtypeprovider() {
+        return newtypeprovider;
+    }
+
+    public void setNewtypeprovider(Boolean newtypeprovider) {
+        this.newtypeprovider = newtypeprovider;
     }
 }

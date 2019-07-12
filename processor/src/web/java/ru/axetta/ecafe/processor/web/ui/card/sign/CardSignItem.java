@@ -13,8 +13,13 @@ public class CardSignItem {
     private Integer idOfCardSign;
     private Integer manufacturerCode;
     private String manufacturerName;
-    private String signType;
+    private String signType;//Это тип подписи карты
+    private String signTypeProvider;//Это тип подписи поставщика
     private byte[] signData;
+    protected Boolean newProvider;
+
+    private static final String NEW_PROVIDER = "По ключу производителя";//Поставщик по новому типу
+    private static final String OLD_PROVIDER = "По ключу карты";//Поставщик по старому типу
 
     public CardSignItem(CardSign cardSign) {
         this.idOfCardSign = cardSign.getIdOfCardSign();
@@ -22,6 +27,13 @@ public class CardSignItem {
         this.manufacturerName = cardSign.getManufacturerName();
         signType = CardSign.CARDSIGN_TYPES[cardSign.getSignType()];
         signData = cardSign.getSignData();
+        if (cardSign.getSigntypeprov() != null)
+            signTypeProvider = CardSign.CARDSIGN_TYPES[cardSign.getSigntypeprov()];
+        else
+            signTypeProvider = null;
+        newProvider = cardSign.getNewtypeprovider();
+        if (newProvider == null)
+            newProvider = false;
     }
 
     public static String getSignTypeFromString(String sType) {
@@ -29,6 +41,14 @@ public class CardSignItem {
         if (sType.equals(CardSign.CARDSIGN_ECDSA_TYPE)) return "1";
         if (sType.equals(CardSign.CARDSIGN_GOST2012_TYPE)) return "2";
         return "0";
+    }
+
+    public String getProviderType()
+    {
+        if (newProvider)
+            return NEW_PROVIDER;
+        else
+            return OLD_PROVIDER;
     }
 
     public String getPrintedName() {
@@ -73,5 +93,23 @@ public class CardSignItem {
 
     public void setSignData(byte[] signData) {
         this.signData = signData;
+    }
+
+    public String getSignTypeProvider() {
+        return signTypeProvider;
+    }
+
+    public void setSignTypeProvider(String signTypeProvider) {
+        this.signTypeProvider = signTypeProvider;
+    }
+
+    public Boolean getNewProvider() {
+        if (newProvider == null)
+            return false;
+        return newProvider;
+    }
+
+    public void setNewProvider(Boolean newProvider) {
+        this.newProvider = newProvider;
     }
 }
