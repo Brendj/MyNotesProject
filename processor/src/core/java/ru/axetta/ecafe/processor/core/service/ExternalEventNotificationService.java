@@ -75,9 +75,11 @@ public class ExternalEventNotificationService {
             //отправка представителям
             if (!(guardians == null || guardians.isEmpty())) {
                 for (Client destGuardian : guardians) {
+                    //Если произошел проход в здание культуры или в здание музея...
                     if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
-                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue())
-                            || event.getEvtType() == ExternalEventType.CULTURE) {
+                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_MUSEUM.getValue())
+                            || ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
+                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue())) {
                         notificationService
                                 .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                     }

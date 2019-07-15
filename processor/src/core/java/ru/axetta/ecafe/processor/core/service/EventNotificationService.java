@@ -564,9 +564,9 @@ public class EventNotificationService {
     private Object getExpiredRegularPaymentSubscriptionNotificationObject(Client destClient, Client dataClient, String[] values) {
         EMPEventType empType = null;
         if (dataClient != null)
-            empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.REGULAR_PAYMENT_EXPIRATION_EVENT, dataClient, destClient);
+            empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.REGULAR_PAYMENT_EXPIRATION_EVENT, dataClient, destClient, 0);
         else
-            empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.REGULAR_PAYMENT_EXPIRATION_EVENT, destClient);
+            empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.REGULAR_PAYMENT_EXPIRATION_EVENT, destClient, 0);
         for (int i = 0; i < values.length-1; i=i+2) {
             empType.getParameters().put(values[i], values[i+1]);
         }
@@ -594,15 +594,15 @@ public class EventNotificationService {
         EMPEventType empType = null;
         if(type.equals(NOTIFICATION_SUMMARY_BY_DAY)) {
             if (dataClient != null)
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_DAILY_EVENT, dataClient, destClient);
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_DAILY_EVENT, dataClient, destClient, 0);
             else
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_DAILY_EVENT, destClient);
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_DAILY_EVENT, destClient, 0);
         }
         if(type.equals(NOTIFICATION_SUMMARY_BY_WEEK)) {
             if (dataClient != null)
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_WEEKLY_EVENT, dataClient, destClient);
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_WEEKLY_EVENT, dataClient, destClient, 0);
             else
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_WEEKLY_EVENT, destClient);
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SUMMARY_WEEKLY_EVENT, destClient, 0);
         }
 
         for (int i = 0; i < values.length-1; i=i+2) {
@@ -659,7 +659,7 @@ public class EventNotificationService {
     }
 
     private Object getInfoMailingNotificationObject(Client destClient, String[] values) {
-        EMPEventType empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.INFO_MAILING_EVENT, destClient);
+        EMPEventType empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.INFO_MAILING_EVENT, destClient, 0);
         for (int i = 0; i < values.length-1; i=i+2) {
             empType.getParameters().put(values[i], values[i+1]);
         }
@@ -667,7 +667,7 @@ public class EventNotificationService {
     }
 
     private Object getClientNewPasswordNotificationObject(Client destClient, String[] values) {
-        EMPEventType empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.CLIENT_NEWPASSWORD_EVENT, destClient);
+        EMPEventType empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.CLIENT_NEWPASSWORD_EVENT, destClient, 0);
         for (int i = 0; i < values.length-1; i=i+2) {
             empType.getParameters().put(values[i], values[i+1]);
         }
@@ -825,9 +825,9 @@ public class EventNotificationService {
                 type = EMPEventTypeFactory.LEAVE_EVENT;
         }
         if (dataClient != null) {
-            empType = EMPEventTypeFactory.buildEvent(type, dataClient, destClient);
+            empType = EMPEventTypeFactory.buildEvent(type, dataClient, destClient, 0);
         } else {
-            empType = EMPEventTypeFactory.buildEvent(type, destClient);
+            empType = EMPEventTypeFactory.buildEvent(type, destClient,0 );
         }
         return empType;
     }
@@ -845,18 +845,18 @@ public class EventNotificationService {
             } else if(type.equals(NOTIFICATION_PASS_WITH_GUARDIAN) && direction != null &&
                     (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)) {
                 if (dataClient != null) {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_WITH_GUARDIAN_EVENT, dataClient, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_WITH_GUARDIAN_EVENT, dataClient, destClient, 0);
                 } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_WITH_GUARDIAN_EVENT, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_WITH_GUARDIAN_EVENT, destClient, 0);
                 }
                 putGuardianParams(guardianClient, empType);
                 putOrgParams(empType, values);
             } else if(type.equals(NOTIFICATION_BALANCE_TOPUP)) {
 
                 if (dataClient != null) {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.FILL_EVENT, dataClient, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.FILL_EVENT, dataClient, destClient, 0);
                 } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.FILL_EVENT, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.FILL_EVENT, destClient, 0);
                 }
 
                 String amount = findValueInParams(new String[]{"paySum"}, values);
@@ -871,14 +871,14 @@ public class EventNotificationService {
                     (direction == EnterEvent.EXIT || direction == EnterEvent.RE_EXIT)) {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory
-                            .buildEvent(EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT, dataClient, destClient);
+                            .buildEvent(EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT, dataClient, destClient, 0);
                 } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT, destClient, 0);
                 }
                 putGuardianParams(guardianClient, empType);
                 putOrgParams(empType, values);
             } else if(type.equals(MESSAGE_LINKING_TOKEN_GENERATED)) {
-                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.TOKEN_GENERATED_EVENT, destClient);
+                empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.TOKEN_GENERATED_EVENT, destClient, 0);
                 String token = findValueInParams(new String [] {"linkingToken"}, values);
                 empType.getParameters().put("token", token);
             }  else if(type.equals(MESSAGE_PAYMENT)) {
@@ -894,9 +894,9 @@ public class EventNotificationService {
                 }
 
                 if (dataClient != null) {
-                    empType = EMPEventTypeFactory.buildEvent(empEventType, dataClient, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(empEventType, dataClient, destClient, 0);
                 } else {
-                    empType = EMPEventTypeFactory.buildEvent(empEventType, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(empEventType, destClient, 0);
                 }
 
 
@@ -928,35 +928,35 @@ public class EventNotificationService {
                 putGenderParams(empType, values);
             } else if (type.equals(NOTIFICATION_LOW_BALANCE)) {
                 if (dataClient != null) {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LOW_BALANCE_EVENT, dataClient, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LOW_BALANCE_EVENT, dataClient, destClient, 0);
                 } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LOW_BALANCE_EVENT, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LOW_BALANCE_EVENT, destClient, 0);
                 }
                 String balanceToNotify = findValueInParams(new String[]{PARAM_BALANCE_TO_NOTIFY}, values);
                 empType.getParameters().put(PARAM_BALANCE_TO_NOTIFY, balanceToNotify);
             } else if (type.equals(NOTIFICATION_ENTER_MUSEUM)) {
                 if (dataClient != null) {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_MUSEUM_EVENT, dataClient, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_MUSEUM_EVENT, dataClient, destClient, 0);
                 } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_MUSEUM_EVENT, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_MUSEUM_EVENT, destClient, 0);
                 }
             } else if (type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
                 if (dataClient != null) {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.NOENTER_MUSEUM_EVENT, dataClient, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.NOENTER_MUSEUM_EVENT, dataClient, destClient, 0);
                 } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.NOENTER_MUSEUM_EVENT, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.NOENTER_MUSEUM_EVENT, destClient, 0);
                 }
             } else if (type.equals(NOTIFICATION_ENTER_CULTURE)) {
                 if (dataClient != null) {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_CULTURE_EVENT, dataClient, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_EVENT, dataClient, destClient, 1);
                 } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_CULTURE_EVENT, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_EVENT, destClient, 1);
                 }
             } else if (type.equals(NOTIFICATION_EXIT_CULTURE)) {
                 if (dataClient != null) {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.EXIT_CULTURE_EVENT, dataClient, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, dataClient, destClient, 1);
                 } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.EXIT_CULTURE_EVENT, destClient);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, destClient, 1);
                 }
             }
             if (type.equals(NOTIFICATION_ENTER_MUSEUM) || type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
