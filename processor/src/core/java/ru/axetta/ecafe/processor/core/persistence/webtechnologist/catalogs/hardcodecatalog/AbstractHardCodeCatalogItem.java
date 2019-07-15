@@ -26,7 +26,6 @@ public abstract class AbstractHardCodeCatalogItem {
     @Temporal(TemporalType.TIMESTAMP)
     private Date lastUpdate;
 
-    @Version
     @Column(nullable = false)
     private Long version;
 
@@ -80,5 +79,10 @@ public abstract class AbstractHardCodeCatalogItem {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    @Override
+    public int hashCode(){
+        return this.GUID.hashCode();
     }
 }

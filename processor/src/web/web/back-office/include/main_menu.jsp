@@ -975,7 +975,7 @@
             <%--@elvariable id="catalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.CatalogListPage"--%>
             <rich:panelMenuItem id="webTechnologistUserCatalogsList"
                                 binding="#{catalogListPage.mainMenuComponent}"
-                                label="Список справочников" action="#{catalogListPage.show}"
+                                label="Пользовательские справочники групп блюд" action="#{catalogListPage.show}"
                                 reRender="workspaceForm" />
             <%--@elvariable id="ageGroupCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.AgeGroupCatalogListPage"--%>
             <rich:panelMenuItem id="webTechnologistAgeGroupItemList"

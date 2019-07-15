@@ -12,7 +12,7 @@ public class WTCategoryItem extends AbstractHardCodeCatalogItem {
 
     @Id
     @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
     private Long idOfCategoryItem;
 
     public Long getIdOfCategoryItem() {
@@ -21,5 +21,17 @@ public class WTCategoryItem extends AbstractHardCodeCatalogItem {
 
     public void setIdOfCategoryItem(Long idOfCategoryItem) {
         this.idOfCategoryItem = idOfCategoryItem;
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(o == null){
+            return false;
+        } else if(!(o instanceof WTCategoryItem)){
+            return false;
+        }
+        WTCategoryItem item = (WTCategoryItem) o;
+
+        return this.getGUID().equals(item.getGUID());
     }
 }

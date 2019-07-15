@@ -22,9 +22,9 @@
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <a4j:commandButton value="Применить" action="#{ageGroupCatalogListPage.updateCatalogList()}"
                                reRender="workspaceTogglePanel" styleClass="command-button"
-                               status="WebTechnologCatalogProcessStatus"  />
+                               status="WebTechnologAgeGroupCatalogItemProcessStatus"  />
             <a4j:commandButton value="Очистить" action="#{ageGroupCatalogListPage.dropAndReloadCatalogList()}"
-                               status="WebTechnologCatalogProcessStatus" reRender="workspaceTogglePanel"
+                               status="WebTechnologAgeGroupCatalogItemProcessStatus" reRender="workspaceTogglePanel"
                                styleClass="command-button" />
         </h:panelGrid>
     </rich:simpleTogglePanel>
@@ -95,6 +95,18 @@
                 <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
             </h:outputText>
         </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Удалить" escape="true" />
+            </f:facet>
+            <a4j:commandLink  styleClass="command-link"
+                              action="#{ageGroupCatalogListPage.deleteItem()}"
+                              reRender="webtechnologistAgeGroupCatalogItemListTable">
+                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{item}"
+                                             target="#{ageGroupCatalogListPage.selectedItem}" />
+            </a4j:commandLink>
+        </rich:column>
         <f:facet name="footer">
             <rich:datascroller for="webtechnologistAgeGroupCatalogItemListTable" renderIfSinglePage="false" maxPages="5"
                                fastControls="hide" stepControls="auto" boundaryControls="hide">
@@ -110,12 +122,21 @@
     <h:panelGrid styleClass="borderless-grid" columns="1">
         <a4j:commandButton value="Создать новый справочник"
                            onclick="Richfaces.showModalPanel('webtechnologistAgeGroupItemCreatePanel');"
-                           id="showCreateAgeGroupItemModalPanelButton" />
+                           id="showCreateAgeGroupItemModalPanelButton"
+                           status="WebTechnologAgeGroupCatalogItemProcessStatus"/>
     </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid" columns="1">
+    <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Сохранить изменения"
-                           onclick="Richfaces.showModalPanel('webtechnologistAgeGroupItemCreatePanel');"
-                           id="showApplyChangeButton" />
+                           action="#{ageGroupCatalogListPage.applyChanges()}"
+                           reRender="webtechnologistAgeGroupCatalogItemListTable"
+                           id="ageGroupApplyChangeButton"
+                           status="WebTechnologAgeGroupCatalogItemProcessStatus"/>
+
+        <a4j:commandButton value="Восстановить значения"
+                           action="#{ageGroupCatalogListPage.refreshItems()}"
+                           reRender="webtechnologistAgeGroupCatalogItemListTable"
+                           id="ageGroupRestoreButton"
+                           status="WebTechnologAgeGroupCatalogItemProcessStatus"/>
     </h:panelGrid>
 </h:panelGrid>
 

@@ -11,8 +11,8 @@ import javax.persistence.*;
 public class WTAgeGroupItem extends AbstractHardCodeCatalogItem {
 
     @Id
-    @Column
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @Column(name = "idOfAgeGroupItem")
     private Long idOfAgeGroupItem;
 
     public Long getIdOfAgeGroupItem() {
@@ -21,5 +21,17 @@ public class WTAgeGroupItem extends AbstractHardCodeCatalogItem {
 
     public void setIdOfAgeGroupItem(Long idOfAgeGroupItem) {
         this.idOfAgeGroupItem = idOfAgeGroupItem;
+    }
+
+    @Override
+    public boolean equals(Object o){
+        if(o == null){
+            return false;
+        } else if(!(o instanceof WTAgeGroupItem)){
+            return false;
+        }
+        WTAgeGroupItem item = (WTAgeGroupItem) o;
+
+        return this.getGUID().equals(item.getGUID());
     }
 }

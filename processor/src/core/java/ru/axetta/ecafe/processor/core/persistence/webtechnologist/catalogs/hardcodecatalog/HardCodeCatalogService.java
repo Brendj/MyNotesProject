@@ -14,6 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -98,9 +99,11 @@ public class HardCodeCatalogService {
             transaction = session.beginTransaction();
 
             WTAgeGroupItem item = new WTAgeGroupItem();
-            fillItem(item, description, user);
+            Long nextVersion =  getLastVersionAgeGroup(session) + 1L;
+            fillItem(item, description, user, nextVersion);
 
             session.save(item);
+
             transaction.commit();
             transaction = null;
 
@@ -114,7 +117,7 @@ public class HardCodeCatalogService {
         }
     }
 
-    private AbstractHardCodeCatalogItem fillItem(AbstractHardCodeCatalogItem item, String description, User user) {
+    private AbstractHardCodeCatalogItem fillItem(AbstractHardCodeCatalogItem item, String description, User user, Long version) {
         Date createdDate = new Date();
 
         item.setCreateDate(createdDate);
@@ -122,6 +125,7 @@ public class HardCodeCatalogService {
         item.setUser(user);
         item.setDescription(description);
         item.setGUID(UUID.randomUUID().toString());
+        item.setVersion(version);
 
         return item;
     }
@@ -197,7 +201,8 @@ public class HardCodeCatalogService {
             transaction = session.beginTransaction();
 
             WTTypeOfProductionItem item = new WTTypeOfProductionItem();
-            fillItem(item, description, user);
+            Long nextVersion = getLastVersionProductionType(session) + 1L;
+            fillItem(item, description, user, nextVersion);
 
             session.save(item);
             transaction.commit();
@@ -284,7 +289,8 @@ public class HardCodeCatalogService {
             transaction = session.beginTransaction();
 
             WTCategoryItem item = new WTCategoryItem();
-            fillItem(item, description, user);
+            Long nextVersion = getLastVersionCategoryItem(session) + 1L;
+            fillItem(item, description, user, nextVersion);
 
             session.save(item);
             transaction.commit();
@@ -371,7 +377,8 @@ public class HardCodeCatalogService {
             transaction = session.beginTransaction();
 
             WTGroupItem item = new WTGroupItem();
-            fillItem(item, description, user);
+            Long nextVersion = getLastVersionGroupItem(session) + 1L;
+            fillItem(item, description, user, nextVersion);
 
             session.save(item);
             transaction.commit();
@@ -385,5 +392,29 @@ public class HardCodeCatalogService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    public Long getLastVersionAgeGroup(Session session) {
+        Criteria criteria = session.createCriteria(WTAgeGroupItem.class);
+        criteria.setProjection(Projections.max("version"));
+        return (Long) criteria.uniqueResult();
+    }
+
+    private Long getLastVersionProductionType(Session session) {
+        Criteria criteria = session.createCriteria(WTTypeOfProductionItem.class);
+        criteria.setProjection(Projections.max("version"));
+        return (Long) criteria.uniqueResult();
+    }
+
+    private Long getLastVersionCategoryItem(Session session) {
+        Criteria criteria = session.createCriteria(WTCategoryItem.class);
+        criteria.setProjection(Projections.max("version"));
+        return (Long) criteria.uniqueResult();
+    }
+
+    private Long getLastVersionGroupItem(Session session){
+        Criteria criteria = session.createCriteria(WTGroupItem.class);
+        criteria.setProjection(Projections.max("version"));
+        return (Long) criteria.uniqueResult();
     }
 }
