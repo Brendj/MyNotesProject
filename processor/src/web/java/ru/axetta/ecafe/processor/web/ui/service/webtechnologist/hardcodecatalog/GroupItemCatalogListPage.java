@@ -57,16 +57,17 @@ public class GroupItemCatalogListPage extends BasicWorkspacePage {
 
     public void createNewItem() {
         if (StringUtils.isBlank(descriptionForNewItem)) {
-            printError("ВВедите описание элемента");
+            printError("Введите описание элемента");
         }
         try {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
             WTGroupItem item = service.createGroupItem(descriptionForNewItem, currentUser);
             catalogListItem.add(item);
-            descriptionForNewItem = "";
         } catch (Exception e) {
             logger.error("Can't create new element: ", e);
             printError("Ошибка при попытке создать элемент: " + e.getMessage());
+        } finally {
+            descriptionForNewItem = "";
         }
     }
 

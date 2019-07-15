@@ -113,10 +113,11 @@ public class CatalogListPage extends BasicWorkspacePage {
                     .getBean(WebTechnologistCatalogService.class);
             WTUserCatalog newCatalog = service.createNewCatalog(nameForNewCatalog, currentUser);
             itemList.add(newCatalog);
-            nameForNewCatalog = "";
         } catch (Exception e) {
             logger.error("Can't create new catalog: ", e);
             printError("Не удалось создать новый справочник: " + e.getMessage());
+        } finally {
+            nameForNewCatalog = "";
         }
     }
 
@@ -169,11 +170,12 @@ public class CatalogListPage extends BasicWorkspacePage {
                 .getBean(WebTechnologistCatalogService.class);
         try {
             service.createNewElementOfCatalog(selectedItem, descriptionForNewElement);
-            descriptionForNewElement = "";
         } catch (Exception e) {
             logger.error("Не удалось создать элемент для справочника GUID:" + selectedItem.getGUID() + ", ошибка: ", e);
             printError("Не удалось создать элемент для справочника GUID:" + selectedItem.getGUID() + ", ошибка: " + e
                     .getMessage());
+        } finally {
+            descriptionForNewElement = "";
         }
     }
 

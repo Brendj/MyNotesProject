@@ -61,10 +61,11 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
             WTCategoryItem item =  service.createCategoryItem(descriptionForNewItem, currentUser);
             catalogListItem.add(item);
-            descriptionForNewItem = "";
         } catch (Exception e){
             logger.error("Can't create new element: ", e);
             printError("Ошибка при попытке создать элемент: " + e.getMessage());
+        } finally {
+            descriptionForNewItem = "";
         }
     }
 

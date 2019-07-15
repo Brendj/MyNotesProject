@@ -54,17 +54,18 @@ public class AgeGroupCatalogListPage extends BasicWorkspacePage {
     }
 
     public void createNewItem() {
-        if(StringUtils.isBlank(descriptionForNewItem)){
+        if (StringUtils.isBlank(descriptionForNewItem)) {
             printError("ВВедите описание элемента");
         }
         try {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
             WTAgeGroupItem item = service.createAgeGroupItem(descriptionForNewItem, currentUser);
             catalogListItem.add(item);
-            descriptionForNewItem = "";
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("Can't create new element: ", e);
             printError("Ошибка при попытке создать элемент: " + e.getMessage());
+        } finally {
+            descriptionForNewItem = "";
         }
     }
 

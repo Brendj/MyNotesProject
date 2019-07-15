@@ -61,10 +61,11 @@ public class TypeOfProductionCatalogListPage extends BasicWorkspacePage {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
             WTTypeOfProductionItem item =  service.createProductTypeItem(descriptionForNewItem, currentUser);
             catalogListItem.add(item);
-            descriptionForNewItem = "";
         } catch (Exception e){
             logger.error("Can't create new element: ", e);
             printError("Ошибка при попытке создать элемент: " + e.getMessage());
+        } finally {
+            descriptionForNewItem = "";
         }
     }
 

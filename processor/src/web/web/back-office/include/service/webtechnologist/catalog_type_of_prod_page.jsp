@@ -65,7 +65,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Описание" />
             </f:facet>
-            <h:inputText value="#{item.description}" styleClass="output-text" />
+            <h:inputText value="#{item.description}" size="50" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

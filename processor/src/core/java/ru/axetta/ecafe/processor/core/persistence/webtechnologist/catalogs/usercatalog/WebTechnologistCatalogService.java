@@ -298,7 +298,7 @@ public class WebTechnologistCatalogService {
 
         Criteria criteria = session.createCriteria(WTUserCatalogItem.class, "catalogItem");
         criteria.createAlias("catalogItem.catalog", "catalog");
-        criteria.add(Restrictions.eq("catalog.idOfWebTechnologistCatalog", catalogIsChanged.getIdOfUserCatalog()));
+        criteria.add(Restrictions.eq("catalog.idOfUserCatalog", catalogIsChanged.getIdOfUserCatalog()));
         List<WTUserCatalogItem> catalogItemsFromDB = criteria.list();
 
         for (WTUserCatalogItem item : catalogItemsFromDB) {
