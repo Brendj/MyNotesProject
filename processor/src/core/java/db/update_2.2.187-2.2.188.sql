@@ -11,5 +11,3 @@ INSERT INTO cf_clientgroups VALUES (2504,1100000080,'Перемещенные');
 INSERT INTO cf_clientgroups VALUES (100,1100000080,'Перемещенные');
 INSERT INTO cf_clientgroups VALUES (324,1100000080,'Перемещенные');
 INSERT INTO cf_clientgroups VALUES (57,1100000080,'Перемещенные');
-
---! ФИНАЛИЗИРОВАН 11.07.2019, НЕ МЕНЯТЬ
