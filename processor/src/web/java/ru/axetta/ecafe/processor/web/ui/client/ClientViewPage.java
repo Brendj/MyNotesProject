@@ -211,6 +211,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Boolean visitsSections;
     private String parallel;
     private Boolean canConfirmGroupPayment;
+    private Boolean userOP;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -576,6 +577,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.passportSeries = client.getPassportSeries();
         this.cardRequest = DAOUtils.getCardRequestString(session, client);
         this.parallel = client.getParallel();
+        this.userOP = client.getUserOP();
 
         balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getBalanceHoldListAsString(session, client.getIdOfClient());
 
@@ -711,5 +713,13 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     public boolean isLastConfirmMobileEmpty() {
         return getLastConfirmMobile() == null;
+    }
+
+    public Boolean getUserOP() {
+        return userOP;
+    }
+
+    public void setUserOP(Boolean userOP) {
+        this.userOP = userOP;
     }
 }

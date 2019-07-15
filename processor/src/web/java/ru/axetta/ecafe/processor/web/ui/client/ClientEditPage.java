@@ -323,6 +323,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean inOrgEnabledMultiCardMode;
     private String parallel;
     private Boolean canConfirmGroupPayment;
+    private Boolean userOP;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -1108,6 +1109,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setPassportSeries(this.passportSeries);
         client.setParallel(this.parallel);
 
+        //TODO: check group
+
         persistenceSession.update(client);
 
         fill(persistenceSession, client);
@@ -1239,6 +1242,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.parallel = StringUtils.defaultString(client.getParallel());
         this.clientDiscountItems = ClientViewPage.buildClientDiscountItem(session, client);
         this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
+        this.userOP = client.getUserOP();
     }
 
     public String getIdOfCategoryListString() {
@@ -1283,6 +1287,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public boolean isLastConfirmMobileEmpty() {
         return getLastConfirmMobile() == null;
+    }
+
+    public Boolean getUserOP() {
+        return userOP;
+    }
+
+    public void setUserOP(Boolean userOP) {
+        this.userOP = userOP;
     }
 
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws HibernateException {
