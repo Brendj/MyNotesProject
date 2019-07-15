@@ -9479,7 +9479,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             contragentData.resultCode = RC_OK;
             contragentData.description = RC_OK_DESC;
         } catch (NullPointerException e){
-            contragentData.resultCode = RC_CLIENT_NOT_FOUND;
+            contragentData.resultCode = 100L;
             contragentData.description = RC_CLIENT_NOT_FOUND_DESC;
         } catch (Exception e) {
             logger.error("Error in getContragentForClient", e);
