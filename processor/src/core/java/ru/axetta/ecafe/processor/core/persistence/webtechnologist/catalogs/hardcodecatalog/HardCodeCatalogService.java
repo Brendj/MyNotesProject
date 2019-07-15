@@ -397,24 +397,28 @@ public class HardCodeCatalogService {
     public Long getLastVersionAgeGroup(Session session) {
         Criteria criteria = session.createCriteria(WTAgeGroupItem.class);
         criteria.setProjection(Projections.max("version"));
-        return (Long) criteria.uniqueResult();
+        Long result = (Long) criteria.uniqueResult();
+        return result == null ? 0L : result;
     }
 
     private Long getLastVersionProductionType(Session session) {
         Criteria criteria = session.createCriteria(WTTypeOfProductionItem.class);
         criteria.setProjection(Projections.max("version"));
-        return (Long) criteria.uniqueResult();
+        Long result = (Long) criteria.uniqueResult();
+        return result == null ? 0L : result;
     }
 
     private Long getLastVersionCategoryItem(Session session) {
         Criteria criteria = session.createCriteria(WTCategoryItem.class);
         criteria.setProjection(Projections.max("version"));
-        return (Long) criteria.uniqueResult();
+        Long result = (Long) criteria.uniqueResult();
+        return result == null ? 0L : result;
     }
 
     private Long getLastVersionGroupItem(Session session){
         Criteria criteria = session.createCriteria(WTGroupItem.class);
         criteria.setProjection(Projections.max("version"));
-        return (Long) criteria.uniqueResult();
+        Long result = (Long) criteria.uniqueResult();
+        return result == null ? 0L : result;
     }
 }

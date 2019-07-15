@@ -22,9 +22,9 @@
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <a4j:commandButton value="Применить" action="#{categoryItemCatalogListPage.updateCatalogList()}"
                                reRender="workspaceTogglePanel" styleClass="command-button"
-                               status="WebTechnologCatalogProcessStatus"  />
+                               status="WebTechnologcategoryItemCatalogItemProcessStatus"  />
             <a4j:commandButton value="Очистить" action="#{categoryItemCatalogListPage.dropAndReloadCatalogList()}"
-                               status="WebTechnologCatalogProcessStatus" reRender="workspaceTogglePanel"
+                               status="WebTechnologcategoryItemCatalogItemProcessStatus" reRender="workspaceTogglePanel"
                                styleClass="command-button" />
         </h:panelGrid>
     </rich:simpleTogglePanel>
@@ -95,6 +95,18 @@
                 <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
             </h:outputText>
         </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText value="Удалить" escape="true" />
+            </f:facet>
+            <a4j:commandLink  styleClass="command-link"
+                              action="#{categoryItemCatalogListPage.deleteItem()}"
+                              reRender="webtechnologistcategoryItemCatalogItemListTable">
+                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{item}"
+                                             target="#{categoryItemCatalogListPage.selectedItem}" />
+            </a4j:commandLink>
+        </rich:column>
         <f:facet name="footer">
             <rich:datascroller for="webtechnologistcategoryItemCatalogItemListTable" renderIfSinglePage="false" maxPages="5"
                                fastControls="hide" stepControls="auto" boundaryControls="hide">
@@ -112,9 +124,17 @@
                            onclick="Richfaces.showModalPanel('webtechnologistcategoryItemItemCreatePanel');"
                            id="showCreatecategoryItemItemModalPanelButton" />
     </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid" columns="1">
+    <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Сохранить изменения"
-                           onclick="Richfaces.showModalPanel('webtechnologistcategoryItemItemCreatePanel');"
-                           id="showApplyChangeButton" />
+                           action="#{categoryItemCatalogListPage.applyChanges()}"
+                           reRender="webtechnologistcategoryItemCatalogItemListTable"
+                           id="categoryItemApplyChangeButton"
+                           status="WebTechnologcategoryItemCatalogItemProcessStatus"/>
+
+        <a4j:commandButton value="Восстановить значения"
+                           action="#{categoryItemCatalogListPage.refreshItems()}"
+                           reRender="webtechnologistcategoryItemCatalogItemListTable"
+                           id="categoryItemRestoreButton"
+                           status="WebTechnologcategoryItemCatalogItemProcessStatus"/>
     </h:panelGrid>
 </h:panelGrid>

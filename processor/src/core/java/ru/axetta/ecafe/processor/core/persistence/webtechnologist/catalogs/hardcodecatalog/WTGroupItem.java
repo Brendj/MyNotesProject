@@ -11,7 +11,7 @@ import javax.persistence.*;
 public class WTGroupItem extends AbstractHardCodeCatalogItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idOfGroupItem;
 
     public Long getIdOfGroupItem() {

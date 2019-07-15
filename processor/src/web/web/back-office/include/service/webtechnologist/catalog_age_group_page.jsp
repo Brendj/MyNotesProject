@@ -36,7 +36,7 @@
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
     <!-- ********* CREATE MODAL PANEL ********* -->
-    <rich:modalPanel id="webtechnologistAgeGroupItemCreatePanel" minWidth="150" minHeight="70" resizeable="false" domElementAttachment="form">
+    <rich:modalPanel id="webtechnologistAgeGroupItemCreatePanel" minWidth="70" minHeight="70" resizeable="false" domElementAttachment="form">
         <f:facet name="header">
             <h:panelGroup>
                 <h:outputText value="Создание Элемента" />

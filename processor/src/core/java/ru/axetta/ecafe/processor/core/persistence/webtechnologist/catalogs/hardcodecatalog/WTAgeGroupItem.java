@@ -11,7 +11,7 @@ import javax.persistence.*;
 public class WTAgeGroupItem extends AbstractHardCodeCatalogItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idOfAgeGroupItem")
     private Long idOfAgeGroupItem;
 

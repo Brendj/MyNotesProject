@@ -11,7 +11,7 @@ import javax.persistence.*;
 public class WTTypeOfProductionItem extends AbstractHardCodeCatalogItem {
 
     @Id
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idOfTypeProductionItem;
 
     public Long getIdOfTypeProductionItem() {

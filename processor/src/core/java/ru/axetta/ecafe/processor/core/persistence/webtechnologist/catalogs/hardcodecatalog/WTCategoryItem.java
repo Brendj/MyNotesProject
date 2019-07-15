@@ -12,7 +12,7 @@ public class WTCategoryItem extends AbstractHardCodeCatalogItem {
 
     @Id
     @Column
-    @GeneratedValue(strategy = GenerationType.SEQUENCE)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long idOfCategoryItem;
 
     public Long getIdOfCategoryItem() {
