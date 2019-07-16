@@ -37,6 +37,7 @@ public class OkuRestController {
 
             ClientData clientData = RuntimeContext.getAppContext().getBean(OkuDAOService.class)
                     .checkClient(contractId, surname);
+            RuntimeContext.getAppContext().getBean(OkuDAOService.class).setClientAsUserOP(contractId);
 
             return Response.status(HttpURLConnection.HTTP_OK).entity(clientData).build();
         } catch (IllegalArgumentException e) {

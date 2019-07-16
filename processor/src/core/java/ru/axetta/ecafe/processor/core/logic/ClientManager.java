@@ -2054,4 +2054,22 @@ public class ClientManager {
             }
         }
     }
+
+    public static void checkUserOPFlag(Session session, Org oldOrg, Org newOrg, Long idOfClientGroup, Client client) {
+        if (!client.getUserOP()) {
+            return;
+        }
+        if (!oldOrg.equals(newOrg)) {
+            if (!DAOUtils.isFriendlyOrganizations(session, oldOrg, newOrg)) {
+                client.setUserOP(false);
+            }
+        }
+
+        if (!ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue().equals(idOfClientGroup)
+                && !ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue().equals(idOfClientGroup)
+                && !ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue().equals(idOfClientGroup)
+                && !ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue().equals(idOfClientGroup)) {
+            client.setUserOP(false);
+        }
+    }
 }

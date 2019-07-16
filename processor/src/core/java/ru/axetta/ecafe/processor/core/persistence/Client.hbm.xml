@@ -112,7 +112,7 @@
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
 
         <property name="parallel" column="parallel" type="string" length="255"/>
-        <property name="userOP" column="userop" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="userOP" column="userop" type="boolean"/>
 
         <set name="notificationSettings" lazy="true" inverse="true" cascade="all-delete-orphan">
             <key column="IdOfClient"/>

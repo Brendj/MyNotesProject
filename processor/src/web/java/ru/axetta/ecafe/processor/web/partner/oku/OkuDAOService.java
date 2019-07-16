@@ -27,7 +27,7 @@ public class OkuDAOService {
 
     private static final Logger logger = LoggerFactory.getLogger(OkuDAOService.class);
 
-    private List<Long> clientGroupList = new ArrayList<>();
+    private static List<Long> clientGroupList = new ArrayList<>();
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
@@ -56,5 +56,19 @@ public class OkuDAOService {
             logger.info(String.format("Unable to find client with contractId=%s, surname=%s", contractId, surname));
             throw e;
         }
+    }
+
+    @Transactional(rollbackFor = Exception.class)
+    public void setClientAsUserOP(Long contractId) throws Exception {
+        Query query = em.createQuery("update Client c set c.userOP = true where c.contractId = :contractId");
+        query.setParameter("contractId", contractId);
+        int res = query.executeUpdate();
+        if (res != 1) {
+            throw new Exception("Client not found");
+        }
+    }
+
+    public static List<Long> getClientGroupList() {
+        return clientGroupList;
     }
 }

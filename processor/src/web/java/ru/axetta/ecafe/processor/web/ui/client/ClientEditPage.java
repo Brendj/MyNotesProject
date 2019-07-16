@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
+import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -927,6 +928,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             runtimeContext.getProcessor().disableClientCardsIfChangeOrg(client, orgSet, org.getIdOfOrg());
 
         }
+        ClientManager.checkUserOPFlag(persistenceSession, client.getOrg(), org, this.idOfClientGroup, client);
         client.setOrg(org);
         client.setPerson(person);
         client.setContractPerson(contractPerson);
@@ -1108,8 +1110,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setPassportNumber(this.passportNumber);
         client.setPassportSeries(this.passportSeries);
         client.setParallel(this.parallel);
-
-        //TODO: check group
 
         persistenceSession.update(client);
 
@@ -1332,5 +1332,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             result[i+1] = new SelectItem(i, ClientGuardianRelationType.fromInteger(i).toString());
         }
         return result;
+    }
+
+    public boolean isEligibleToViewUserOP() {
+        if (null == this.idOfClientGroup) {
+            return false;
+        }
+        return OkuDAOService.getClientGroupList().contains(this.idOfClientGroup);
     }
 }

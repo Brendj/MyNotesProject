@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -419,6 +420,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             if(clientGroup==null) clientGroup = DAOUtils.createClientGroup(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED);
             for (Item item : this.items) {
                 Client client =  DAOUtils.findClient(session,item.idOfClient);
+                ClientManager.checkUserOPFlag(session, client.getOrg(), org, clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), client);
                 Set<Long> idOfFriendlyOrg = DAOUtils.getIdOfFriendlyOrg(session, client.getOrg().getIdOfOrg());
                 Boolean flag = !idOfFriendlyOrg.contains(org.getIdOfOrg());
                 org.hibernate.Query query = session.createQuery("update Client set org.idOfOrg = :newOrg, clientRegistryVersion=:clientRegistryVersion, idOfClientGroup=:idOfClientGroup where idOfClient=:idOfClient");
