@@ -14,9 +14,9 @@
     <rich:simpleTogglePanel label="Фильтр " switchType="client" eventsQueue="mainFormEventsQueue" opened="false"
                             headerClass="filter-panel-header">
         <h:panelGrid columns="2" styleClass="borderless-grid">
-            <h:outputText escape="true" value="Название справочника" styleClass="output-text" />
+            <h:outputText escape="true" value="Название элемента" styleClass="output-text" />
             <h:inputText value="#{typeOfProductionCatalogListPage.descriptionFilter}" styleClass="input-text" />
-            <h:outputText escape="true" value="GUID справочника" styleClass="output-text" />
+            <h:outputText escape="true" value="GUID элемента" styleClass="output-text" />
             <h:inputText value="#{typeOfProductionCatalogListPage.GUIDfilter}" maxlength="36" styleClass="input-text" size="50" />
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
@@ -120,7 +120,7 @@
         </f:facet>
     </rich:dataTable>
     <h:panelGrid styleClass="borderless-grid" columns="1">
-        <a4j:commandButton value="Создать новый справочник"
+        <a4j:commandButton value="Создать новый элемент"
                            onclick="Richfaces.showModalPanel('webtechnologisttypeOfProductionItemCreatePanel');"
                            id="showCreatetypeOfProductionItemModalPanelButton" />
     </h:panelGrid>

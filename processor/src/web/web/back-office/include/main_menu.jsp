@@ -972,20 +972,21 @@
         <rich:panelMenuGroup id="webTechnologistCatalogs" label="Справочники" binding="#{mainPage.webTechnologistCatalogGroupPage.mainMenuComponent}">
             <a4j:support event="onclick" reRender="workspaceForm"
                          action="#{mainPage.showWebTechnologistCatalogGroupPage}"/>
+            <%-- TODO: Функционал по задаче https://gitlab.iteco.mobi/ispp/processor/issues/148 отключен до востребования
             <%--@elvariable id="catalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.CatalogListPage"--%>
-            <rich:panelMenuItem id="webTechnologistUserCatalogsList"
+            <%--<rich:panelMenuItem id="webTechnologistUserCatalogsList"
                                 binding="#{catalogListPage.mainMenuComponent}"
-                                label="Пользовательские справочники групп блюд" action="#{catalogListPage.show}"
-                                reRender="workspaceForm" />
+                                label="Пользовательские справочники категорий блюд" action="#{catalogListPage.show}"
+                                reRender="workspaceForm" />--%>
             <%--@elvariable id="ageGroupCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.AgeGroupCatalogListPage"--%>
             <rich:panelMenuItem id="webTechnologistAgeGroupItemList"
                                 binding="#{ageGroupCatalogListPage.mainMenuComponent}"
-                                label="Возрастная группа" action="#{ageGroupCatalogListPage.show}"
+                                label="Возрастная категория" action="#{ageGroupCatalogListPage.show}"
                                 reRender="workspaceForm" />
             <%--@elvariable id="typeOfProductionCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.TypeOfProductionCatalogListPage"--%>
             <rich:panelMenuItem id="webTechnologistTypeOfProductionItemList"
                                 binding="#{typeOfProductionCatalogListPage.mainMenuComponent}"
-                                label="Тип производства" action="#{typeOfProductionCatalogListPage.show}"
+                                label="Вид производства" action="#{typeOfProductionCatalogListPage.show}"
                                 reRender="workspaceForm" />
             <%--@elvariable id="categoryItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.CategoryItemCatalogListPage"--%>
             <rich:panelMenuItem id="webTechnologistCategoryCatalogsItemList"
