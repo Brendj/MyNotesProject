@@ -49,7 +49,7 @@ public class OrderCancelProcessorImpl implements OrderCancelProcessor {
                 // Update client balance
                 Client client = order.getClient();
                 if (null != client && 0 != order.getSumByCard()) {
-                    RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order);
+                    RuntimeContext.getFinancialOpsManager().cancelOrder(persistenceSession, order, null);
                 }
             }
 

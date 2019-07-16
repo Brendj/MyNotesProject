@@ -32,6 +32,7 @@ public class ClientBalanceHoldItem {
     private String declarerCorrAccount;
     private String errorMessage;
     private Integer resCode;
+    private Long idOfOrgLastChange;
 
     public ClientBalanceHoldItem(ClientBalanceHold clientBalanceHold) {
         this.idOfClient = clientBalanceHold.getClient().getIdOfClient();
@@ -50,11 +51,14 @@ public class ClientBalanceHoldItem {
         this.declarerBank = clientBalanceHold.getDeclarerBank();
         this.declarerBik = clientBalanceHold.getDeclarerBik();
         this.declarerCorrAccount = clientBalanceHold.getDeclarerCorrAccount();
+        this.idOfOrgLastChange =
+                clientBalanceHold.getIdOfOrgLastChange() == null ? new Long(clientBalanceHold.getLastChangeStatus().getValue()) : clientBalanceHold.getIdOfOrgLastChange();
     }
 
     public ClientBalanceHoldItem(Long idOfClient, Long idOfDeclarer, String phoneOfDeclarer, String guid, Long holdSum,
             Long idOfOldOrg, Long idOfNewOrg, Date createdDate, Long version, Integer createStatus, Integer requestStatus,
-            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, String errorMessage) {
+            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount,
+            String errorMessage, Long idOfOrgLastChange) {
         this.idOfClient = idOfClient;
         this.idOfDeclarer = idOfDeclarer;
         this.phoneOfDeclarer = phoneOfDeclarer;
@@ -72,6 +76,7 @@ public class ClientBalanceHoldItem {
         this.declarerBik = declarerBik;
         this.declarerCorrAccount = declarerCorrAccount;
         this.errorMessage = errorMessage;
+        this.idOfOrgLastChange = idOfOrgLastChange;
     }
 
     public ClientBalanceHoldItem(String guid, Integer resCode, String errorMessage, Long version) {
@@ -138,6 +143,9 @@ public class ClientBalanceHoldItem {
         }
         if (null != errorMessage) {
             element.setAttribute("ErrorMessage", errorMessage);
+        }
+        if (null != idOfOrgLastChange) {
+            element.setAttribute("LastChangeOrgId", Long.toString(idOfOrgLastChange));
         }
 
         return element;
@@ -285,5 +293,13 @@ public class ClientBalanceHoldItem {
 
     public void setDeclarerCorrAccount(String declarerCorrAccount) {
         this.declarerCorrAccount = declarerCorrAccount;
+    }
+
+    public Long getIdOfOrgLastChange() {
+        return idOfOrgLastChange;
+    }
+
+    public void setIdOfOrgLastChange(Long idOfOrgLastChange) {
+        this.idOfOrgLastChange = idOfOrgLastChange;
     }
 }
