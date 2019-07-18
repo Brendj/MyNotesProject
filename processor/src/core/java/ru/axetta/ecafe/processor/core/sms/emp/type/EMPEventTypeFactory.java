@@ -72,7 +72,7 @@ public class EMPEventTypeFactory {
                 break;
             case LEAVE_EVENT:
                 if (modifired == 1)
-                    event = new EMPEnterCultureEventType();
+                    event = new EMPExitCultureEventType();
                 else
                     event = new EMPLeaveEventType();
                 break;

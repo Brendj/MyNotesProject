@@ -10,7 +10,7 @@ import java.util.Map;
 
 public class EMPEnterCultureEventType extends EMPAbstractEventType {
     protected static final String NAME = "Посещение здания культуры";
-    protected static final String TEXT = "%empDate% в %empTime% %surname% %name% зашел в здание культуры по адресу: %address%(%shortnameinfoservice%)";
+    protected static final String TEXT = "%empDate% в %empTimeH% %surname% %name% зашел в здание культуры по адресу: %address%(%shortnameinfoservice%)";
 
 
     public EMPEnterCultureEventType() {

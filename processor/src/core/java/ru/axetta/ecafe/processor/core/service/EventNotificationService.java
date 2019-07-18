@@ -973,7 +973,7 @@ public class EventNotificationService {
                 empType.getParameters().put(ExternalEventNotificationService.SHORTNAMEINFOSERVICE, eventShortName);
                 String eventDate = findValueInParams(new String[]{ExternalEventNotificationService.EMP_DATE}, values);
                 empType.getParameters().put(ExternalEventNotificationService.EMP_DATE, eventDate);
-                String eventTime = findValueInParams(new String[]{ExternalEventNotificationService.EMP_TIME}, values);
+                String eventTime = findValueInParams(new String[]{ExternalEventNotificationService.EMP_TIME_H}, values);
                 empType.getParameters().put(ExternalEventNotificationService.EMP_TIME_H, eventTime);
                 putGenderParams(empType, values);
             }
