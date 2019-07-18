@@ -19,7 +19,8 @@ public class Order {
     @JsonSerialize(using = JsonDateSerializer.class)
     @JsonProperty(value = "ordered_at")
     private Date orderDate;
-    private List<IOrderEntry> composition = new ArrayList<>();
+    private List<Complex> complexes = new ArrayList<>();
+    private List<Dish> dishes = new ArrayList<>();
 
     public Order(Long idOfOrder, Long idOfOrg, Date orderDate) {
         this.idOfOrder = idOfOrder;
@@ -51,11 +52,19 @@ public class Order {
         this.orderDate = orderDate;
     }
 
-    public List<IOrderEntry> getComposition() {
-        return composition;
+    public List<Complex> getComplexes() {
+        return complexes;
     }
 
-    public void setComposition(List<IOrderEntry> composition) {
-        this.composition = composition;
+    public void setComplexes(List<Complex> complexes) {
+        this.complexes = complexes;
+    }
+
+    public List<Dish> getDishes() {
+        return dishes;
+    }
+
+    public void setDishes(List<Dish> dishes) {
+        this.dishes = dishes;
     }
 }

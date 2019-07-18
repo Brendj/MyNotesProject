@@ -4,11 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.partner.oku.dataflow;
 
-public class Dish implements IOrderEntry {
+public class Dish {
     private String name;
+    private String productionType;
 
-    public Dish(String name) {
+    public Dish(String name, String productionType) {
         this.name = name;
+        this.productionType = productionType;
     }
 
     public Dish() {
@@ -21,5 +23,13 @@ public class Dish implements IOrderEntry {
 
     public void setName(String name) {
         this.name = name;
+    }
+
+    public String getProductionType() {
+        return productionType;
+    }
+
+    public void setProductionType(String productionType) {
+        this.productionType = productionType;
     }
 }

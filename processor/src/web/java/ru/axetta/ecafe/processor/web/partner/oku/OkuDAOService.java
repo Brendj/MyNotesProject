@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.oku;
 
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfOrder;
-import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.web.partner.oku.dataflow.ClientData;
 import ru.axetta.ecafe.processor.web.partner.oku.dataflow.Complex;
 import ru.axetta.ecafe.processor.web.partner.oku.dataflow.Dish;
@@ -92,22 +89,26 @@ public class OkuDAOService {
     @Transactional(readOnly = true)
     public Collection<Order> getOrdersByContractIdFromDate(Long contractId, Date orderedFrom) {
         Query query = emReport.createNativeQuery(
-                "select o.idoforder, o.idoforg, o.createddate, od.menudetailname as complex_name, a.menudetailname as dish_name, g.guid "
+                "select o.idoforder, o.idoforg, o.createddate, od.menudetailname as complex_name, a.menudetailname as dish_name, "
+                 + "    g.guid, a.menuorigin as dish_menuorigin "
                  + "from cf_orders o "
-                 + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg and menutype between :typeComplexMin and :typeComplexMax "
+                 + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
+                 + "    and menutype between :typeComplexMin and :typeComplexMax "
                  + "join cf_clients c on c.idofclient = o.idofclient "
                  + "left join cf_goods g on g.idofgood = od.idofgood "
-                 + "join (select _od.idoforder, _od.idoforg, _od.menudetailname, _od.menutype "
+                 + "join (select _od.idoforder, _od.idoforg, _od.menudetailname, _od.menutype, _od.menuorigin "
                  + "    from cf_orderdetails _od "
                  + "    where _od.menutype between :typeComplexItemMin and :typeComplexItemMax "
                  + ") a on a.idoforder = o.idoforder and a.idoforg = o.idoforg and (a.menutype = od.menutype + 100) "
-                 + "where c.contractid = :contractId and o.orderdate > :orderedFrom "
+                 + "where c.contractid = :contractId and o.orderdate > :orderedFrom and o.ordertype in (0,1,2,3,7) "
                  + "union all "
-                 + "select o.idoforder, o.idoforg, o.createddate, null as complex_name, od.menudetailname as dish_name, null as guid "
+                 + "select o.idoforder, o.idoforg, o.createddate, null as complex_name, od.menudetailname as dish_name, "
+                 + "    null as guid, od.menuorigin as dish_menuorigin "
                  + "from cf_orders o "
                  + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg and menutype = :typeDish "
                  + "join cf_clients c on c.idofclient = o.idofclient "
-                 + "where c.contractid = :contractId and o.orderdate > :orderedFrom");
+                 + "where c.contractid = :contractId and o.orderdate > :orderedFrom and "
+                 + "    o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription)");
         query.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
         query.setParameter("typeComplexItemMin", OrderDetail.TYPE_COMPLEX_ITEM_MIN);
@@ -115,6 +116,11 @@ public class OkuDAOService {
         query.setParameter("contractId", contractId);
         query.setParameter("orderedFrom", orderedFrom.getTime());
         query.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
+        query.setParameter("orderTypeDefault", OrderTypeEnumType.UNKNOWN.ordinal());
+        query.setParameter("orderTypeUnknown", OrderTypeEnumType.DEFAULT.ordinal());
+        query.setParameter("orderTypeVending", OrderTypeEnumType.VENDING.ordinal());
+        query.setParameter("orderTypePayPlan", OrderTypeEnumType.PAY_PLAN.ordinal());
+        query.setParameter("orderTypeSubscription", OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
 
         List list = query.getResultList();
 
@@ -128,6 +134,7 @@ public class OkuDAOService {
             String complexName = (null == row[3]) ? null : ((String) row[3]).replaceAll("^\"|\"$|(?<=\")\"", "");
             String dishName = (null == row[4]) ? null : ((String) row[4]).replaceAll("^\"|\"$|(?<=\")\"", "");
             String complexGuid = (null == row[5]) ? null : ((String) row[5]).replaceAll("^\"|\"$|(?<=\")\"", "");
+            String dishMenuOrigin = (null == row[6]) ? "unknown" : OrderDetail.getMenuOriginAsCode((Integer) row[6]);
 
             CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(idOfOrg, idOfOrder);
             if (!orderHashMap.containsKey(compositeIdOfOrder)) {
@@ -135,7 +142,7 @@ public class OkuDAOService {
             }
 
             if (StringUtils.isEmpty(complexName)) {
-                orderHashMap.get(compositeIdOfOrder).getComposition().add(new Dish(dishName));
+                orderHashMap.get(compositeIdOfOrder).getDishes().add(new Dish(dishName, dishMenuOrigin));
             } else {
                 if (!complexHashMap.containsKey(compositeIdOfOrder)) {
                     complexHashMap.put(compositeIdOfOrder, new HashMap<String, Complex>());
@@ -143,9 +150,9 @@ public class OkuDAOService {
                 if (!complexHashMap.get(compositeIdOfOrder).containsKey(complexGuid)) {
                     Complex complex = new Complex(complexName, complexGuid);
                     complexHashMap.get(compositeIdOfOrder).put(complexGuid, complex);
-                    orderHashMap.get(compositeIdOfOrder).getComposition().add(complex);
+                    orderHashMap.get(compositeIdOfOrder).getComplexes().add(complex);
                 }
-                complexHashMap.get(compositeIdOfOrder).get(complexGuid).getDishList().add(new Dish(dishName));
+                complexHashMap.get(compositeIdOfOrder).get(complexGuid).getDishList().add(new Dish(dishName, dishMenuOrigin));
             }
         }
         return orderHashMap.values();

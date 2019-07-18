@@ -9,7 +9,7 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.ArrayList;
 import java.util.List;
 
-public class Complex implements IOrderEntry {
+public class Complex {
     private String name;
     private String guid;
     @JsonProperty(value = "dishes")
