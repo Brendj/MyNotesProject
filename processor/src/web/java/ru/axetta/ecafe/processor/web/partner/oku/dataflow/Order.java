@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
+@JsonSerialize(include = JsonSerialize.Inclusion.NON_NULL)
 public class Order {
     @JsonProperty(value = "order_id")
     private Long idOfOrder;
@@ -21,8 +22,17 @@ public class Order {
     private Date orderDate;
     private List<Complex> complexes = new ArrayList<>();
     private List<Dish> dishes = new ArrayList<>();
+    @JsonProperty(value = "contract_id")
+    private Long contractId;
 
     public Order(Long idOfOrder, Long idOfOrg, Date orderDate) {
+        this.idOfOrder = idOfOrder;
+        this.idOfOrg = idOfOrg;
+        this.orderDate = orderDate;
+    }
+
+    public Order(Long contractId, Long idOfOrder, Long idOfOrg, Date orderDate) {
+        this.contractId = contractId;
         this.idOfOrder = idOfOrder;
         this.idOfOrg = idOfOrg;
         this.orderDate = orderDate;
@@ -66,5 +76,13 @@ public class Order {
 
     public void setDishes(List<Dish> dishes) {
         this.dishes = dishes;
+    }
+
+    public Long getContractId() {
+        return contractId;
+    }
+
+    public void setContractId(Long contractId) {
+        this.contractId = contractId;
     }
 }

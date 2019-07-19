@@ -5,10 +5,8 @@
 package ru.axetta.ecafe.processor.web.partner.oku;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.web.partner.oku.dataflow.ClientData;
-import ru.axetta.ecafe.processor.web.partner.oku.dataflow.Complex;
-import ru.axetta.ecafe.processor.web.partner.oku.dataflow.Dish;
 import ru.axetta.ecafe.processor.web.partner.oku.dataflow.Order;
+import ru.axetta.ecafe.processor.web.partner.oku.dataflow.*;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -25,7 +23,7 @@ import java.math.BigInteger;
 import java.util.*;
 
 @Component
-@Scope("singleton")
+@Scope
 public class OkuDAOService {
 
     private static final Logger logger = LoggerFactory.getLogger(OkuDAOService.class);
@@ -100,7 +98,8 @@ public class OkuDAOService {
                  + "    from cf_orderdetails _od "
                  + "    where _od.menutype between :typeComplexItemMin and :typeComplexItemMax "
                  + ") a on a.idoforder = o.idoforder and a.idoforg = o.idoforg and (a.menutype = od.menutype + 100) "
-                 + "where c.contractid = :contractId and o.orderdate > :orderedFrom and o.ordertype in (0,1,2,3,7) "
+                 + "where c.contractid = :contractId and o.orderdate > :orderedFrom "
+                 + "    and o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription) "
                  + "union all "
                  + "select o.idoforder, o.idoforg, o.createddate, null as complex_name, od.menudetailname as dish_name, "
                  + "    null as guid, od.menuorigin as dish_menuorigin "
@@ -156,6 +155,108 @@ public class OkuDAOService {
             }
         }
         return orderHashMap.values();
+    }
+
+    @Transactional(readOnly = true)
+    public Collection<Order> getOrders(Date orderedFrom, Date orderedTo, Integer limit, Integer offset) {
+        List<Long> clientIdList = getClients();
+        Query query = emReport.createNativeQuery(
+                "select a.contractid, a.idoforder, a.idoforg, a.createddate, od.menudetailname as complex_name, "
+                 + "    odd.menudetailname as dish_name, g.guid, odd.menuorigin as dish_menuorigin "
+                 + "from ( "
+                 + "    select o.idoforder, o.idoforg, c.contractid, o.createddate "
+                 + "    from cf_orders o "
+                 + "    join cf_clients c on o.idofclient = c.idofclient "
+                 + "    where c.idofclient in (:clientIdList) and o.createddate between :orderedFrom and :orderedTo "
+                 + "        and o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription) "
+                 + "    limit :_limit "
+                 + "    offset :_offset "
+                 + ") a "
+                 + "left join cf_orderdetails od on a.idoforder = od.idoforder and a.idoforg = od.idoforg "
+                 + "    and od.menutype between :typeComplexMin and :typeComplexMax "
+                 + "left join cf_goods g on g.idofgood = od.idofgood "
+                 + "left join cf_orderdetails odd on odd.idoforder = a.idoforder and odd.idoforg = a.idoforg "
+                 + "    and (odd.menutype = od.menutype + 100 or odd.menutype = :typeDish)");
+        query.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("orderedFrom", orderedFrom.getTime());
+        query.setParameter("orderedTo", orderedTo.getTime());
+        query.setParameter("typeDish", OrderDetail.TYPE_DISH_ITEM);
+        query.setParameter("orderTypeDefault", OrderTypeEnumType.UNKNOWN.ordinal());
+        query.setParameter("orderTypeUnknown", OrderTypeEnumType.DEFAULT.ordinal());
+        query.setParameter("orderTypeVending", OrderTypeEnumType.VENDING.ordinal());
+        query.setParameter("orderTypePayPlan", OrderTypeEnumType.PAY_PLAN.ordinal());
+        query.setParameter("orderTypeSubscription", OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
+        query.setParameter("_limit", limit);
+        query.setParameter("_offset", offset);
+        query.setParameter("clientIdList", clientIdList);
+
+        List list = query.getResultList();
+
+        HashMap<CompositeIdOfOrder, Order> orderHashMap = new HashMap<>();
+        HashMap<CompositeIdOfOrder, HashMap<String, Complex>> complexHashMap = new HashMap<>();
+        for (Object o : list) {
+            Object[] row = (Object[]) o;
+            Long contractId = ((BigInteger) row[0]).longValue();
+            Long idOfOrder = ((BigInteger) row[1]).longValue();
+            Long idOfOrg = ((BigInteger) row[2]).longValue();
+            Date orderDate = new Date(((BigInteger) row[3]).longValue());
+            String complexName = (null == row[4]) ? null : ((String) row[4]).replaceAll("^\"|\"$|(?<=\")\"", "");
+            String dishName = (null == row[5]) ? null : ((String) row[5]).replaceAll("^\"|\"$|(?<=\")\"", "");
+            String complexGuid = (null == row[6]) ? null : ((String) row[6]).replaceAll("^\"|\"$|(?<=\")\"", "");
+            String dishMenuOrigin = (null == row[7]) ? "unknown" : OrderDetail.getMenuOriginAsCode((Integer) row[7]);
+
+            CompositeIdOfOrder compositeIdOfOrder = new CompositeIdOfOrder(idOfOrg, idOfOrder);
+            if (!orderHashMap.containsKey(compositeIdOfOrder)) {
+                orderHashMap.put(compositeIdOfOrder, new Order(contractId, idOfOrder, idOfOrg, orderDate));
+            }
+
+            if (StringUtils.isEmpty(complexName)) {
+                orderHashMap.get(compositeIdOfOrder).getDishes().add(new Dish(dishName, dishMenuOrigin));
+            } else {
+                if (!complexHashMap.containsKey(compositeIdOfOrder)) {
+                    complexHashMap.put(compositeIdOfOrder, new HashMap<String, Complex>());
+                }
+                if (!complexHashMap.get(compositeIdOfOrder).containsKey(complexGuid)) {
+                    Complex complex = new Complex(complexName, complexGuid);
+                    complexHashMap.get(compositeIdOfOrder).put(complexGuid, complex);
+                    orderHashMap.get(compositeIdOfOrder).getComplexes().add(complex);
+                }
+                complexHashMap.get(compositeIdOfOrder).get(complexGuid).getDishList().add(new Dish(dishName, dishMenuOrigin));
+            }
+        }
+        return orderHashMap.values();
+    }
+
+    @Transactional(readOnly = true)
+    public List<Long> getClients() {
+        Query query = emReport.createQuery("select c.idOfClient from Client c join c.person p where c.userOP = true");
+        return query.getResultList();
+    }
+
+    @Transactional(readOnly = true)
+    public Organization getOrganizationInfo(Long idOfOrg) {
+        Query query = emReport.createQuery("select o from Org o where o.idOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        Org org = (Org) query.getSingleResult();
+
+        return new Organization(org);
+    }
+
+    @Transactional(readOnly = true)
+    public List<Organization> getOrganizationInfoList(Integer limit, Integer offset) {
+        List<Organization> organizationList = new ArrayList<>();
+        Query query = emReport.createQuery("select o from Client c join c.org o where c.userOP = true");
+        query.setMaxResults(limit);
+        query.setFirstResult(offset);
+
+        List<Org> list = query.getResultList();
+
+        for (Org o : list) {
+            organizationList.add(new Organization(o));
+        }
+
+        return organizationList;
     }
 
     public static List<Long> getClientGroupList() {
