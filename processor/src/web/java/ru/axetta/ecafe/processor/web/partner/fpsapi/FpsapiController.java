@@ -3,11 +3,10 @@
  */
 
 package ru.axetta.ecafe.processor.web.partner.fpsapi;
-import ru.axetta.ecafe.processor.web.partner.smartwatch.IJsonBase;
-import ru.axetta.ecafe.processor.web.partner.smartwatch.ResponseCodes;
+import ru.axetta.ecafe.processor.web.partner.fpsapi.IfpsapiBase;
+import ru.axetta.ecafe.processor.web.partner.fpsapi.ResponseSales;
 
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.RequestMapping;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -34,7 +33,7 @@ public class FpsapiController {
         return resultOK(responseSales);
     }
 
-    private <T extends IJsonBase> Response resultOK(T result) {
+    private <T extends IfpsapiBase> Response resultOK(T result) {
         result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
         result.getResult().description = ResponseCodes.RC_OK.toString();
         return Response.status(HttpURLConnection.HTTP_OK)
