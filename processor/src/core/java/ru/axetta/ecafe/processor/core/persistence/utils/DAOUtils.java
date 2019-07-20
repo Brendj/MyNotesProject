@@ -171,6 +171,14 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
+    public static Client findClientByIacregid(Session persistenceSession, String iacregid) {
+        Criteria criteria = persistenceSession.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("iacRegId", iacregid));
+        List<Client> resultList = (List<Client>) criteria.list();
+        return resultList.isEmpty() ? null : resultList.get(0);
+    }
+
+    @SuppressWarnings("unchecked")
     public static List<Client> findClientBySan(Session persistenceSession, String san) {
         Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
         clientCriteria.add(Restrictions.ilike("san", san, MatchMode.EXACT));
@@ -444,6 +452,13 @@ public class DAOUtils {
     public static OrderDetail findOrderDetail(Session persistenceSession,
             CompositeIdOfOrderDetail compositeIdOfOrderDetail) throws Exception {
         return (OrderDetail) persistenceSession.get(OrderDetail.class, compositeIdOfOrderDetail);
+    }
+
+    public static List findOrdersbyIdofclientandBetweenTime(Session persistenceSession, Client client, Date startDate, Date endDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(Order.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.between("createTime", startDate, endDate));
+        return criteria.list();
     }
 
     public static Org getOrgReference(Session persistenceSession, long idOfOrg) throws Exception {

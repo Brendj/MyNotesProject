@@ -12,9 +12,14 @@ import java.util.List;
 
 public class ResponseSales implements IfpsapiBase {
     private Result result;
-    private Date dateserverTimestamp;
+    private Date serverTimestamp;
     private List<SalesItem> sales;
 
+
+    public ResponseSales(){
+        this.result = new Result();
+        this.sales = new LinkedList<SalesItem>();
+    }
     public Result getResult() {
         return result;
     }
@@ -23,18 +28,15 @@ public class ResponseSales implements IfpsapiBase {
         this.result = result;
     }
 
-    public Date getdateserverTimestamp() {
-        return dateserverTimestamp;
+    public Date getserverTimestamp() {
+        return serverTimestamp;
     }
 
-    public void setdateserverTimestamp(Date dateserverTimestamp) {
-        this.dateserverTimestamp = dateserverTimestamp;
+    public void setserverTimestamp(Date dateserverTimestamp) {
+        this.serverTimestamp = dateserverTimestamp;
     }
 
     public List<SalesItem> getSales() {
-        if(sales == null){
-            sales = new LinkedList<SalesItem>();
-        }
         return sales;
     }
 
