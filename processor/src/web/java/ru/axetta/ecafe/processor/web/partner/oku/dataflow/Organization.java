@@ -16,16 +16,24 @@ public class Organization {
     private String district;
     @JsonProperty(value = "organization_type")
     private String organizationType;
+    @JsonProperty(value = "supplier_id")
+    private Long idOfContragent;
+    @JsonProperty(value = "supplier_name")
+    private String contragentName;
 
-    public Organization(String name, String address, String district, Integer organizationType) {
+    public Organization(String name, String address, String district, Integer organizationType, Long idOfContragent,
+            String contragentName) {
         this.name = name;
         this.address = address;
         this.district = district;
         this.organizationType = OrganizationType.getCodeTypeByCode(organizationType);
+        this.idOfContragent = idOfContragent;
+        this.contragentName = contragentName;
     }
 
     public Organization(Org org) {
-        this(org.getShortNameInfoService(), org.getShortAddress(), org.getDistrict(), org.getType().getCode());
+        this(org.getShortNameInfoService(), org.getShortAddress(), org.getDistrict(), org.getType().getCode(),
+                org.getDefaultSupplier().getIdOfContragent(), org.getDefaultSupplier().getContragentName());
     }
 
     public String getName() {
@@ -58,5 +66,21 @@ public class Organization {
 
     public void setOrganizationType(String organizationType) {
         this.organizationType = organizationType;
+    }
+
+    public Long getIdOfContragent() {
+        return idOfContragent;
+    }
+
+    public void setIdOfContragent(Long idOfContragent) {
+        this.idOfContragent = idOfContragent;
+    }
+
+    public String getContragentName() {
+        return contragentName;
+    }
+
+    public void setContragentName(String contragentName) {
+        this.contragentName = contragentName;
     }
 }
