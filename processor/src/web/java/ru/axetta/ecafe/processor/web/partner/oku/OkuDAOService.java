@@ -45,8 +45,8 @@ public class OkuDAOService {
 
     @Transactional(readOnly = true)
     public ClientData checkClient(Long contractId, String surname) {
-        Query query = emReport.createQuery(
-                "select c from Client c join c.person p where c.contractId = :contractId and lower(p.surname) = :surname");
+        Query query = emReport.createQuery("select c from Client c join c.person p "
+                + " join c.org o where c.contractId = :contractId and lower(p.surname) = :surname and o.participantOP = true");
         query.setParameter("contractId", contractId);
         query.setParameter("surname", surname.toLowerCase());
         query.setMaxResults(1);
@@ -71,8 +71,8 @@ public class OkuDAOService {
 
     @Transactional(readOnly = true)
     public Boolean checkClientByContractId(Long contractId) {
-        Query query = emReport.createQuery(
-                "select c from Client c join c.person p where c.contractId = :contractId and c.userOP = true");
+        Query query = emReport.createQuery("select c from Client c join c.person p "
+                + "join c.org o where c.contractId = :contractId and c.userOP = true and o.participantOP = true");
         query.setParameter("contractId", contractId);
         query.setMaxResults(1);
         try {
@@ -88,26 +88,26 @@ public class OkuDAOService {
     public Collection<Order> getOrdersByContractIdFromDate(Long contractId, Date orderedFrom) {
         Query query = emReport.createNativeQuery(
                 "select o.idoforder, o.idoforg, o.createddate, od.menudetailname as complex_name, a.menudetailname as dish_name, "
-                 + "    g.guid, a.menuorigin as dish_menuorigin "
-                 + "from cf_orders o "
-                 + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
-                 + "    and menutype between :typeComplexMin and :typeComplexMax "
-                 + "join cf_clients c on c.idofclient = o.idofclient "
-                 + "left join cf_goods g on g.idofgood = od.idofgood "
-                 + "join (select _od.idoforder, _od.idoforg, _od.menudetailname, _od.menutype, _od.menuorigin "
-                 + "    from cf_orderdetails _od "
-                 + "    where _od.menutype between :typeComplexItemMin and :typeComplexItemMax "
-                 + ") a on a.idoforder = o.idoforder and a.idoforg = o.idoforg and (a.menutype = od.menutype + 100) "
-                 + "where c.contractid = :contractId and o.orderdate > :orderedFrom "
-                 + "    and o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription) "
-                 + "union all "
-                 + "select o.idoforder, o.idoforg, o.createddate, null as complex_name, od.menudetailname as dish_name, "
-                 + "    null as guid, od.menuorigin as dish_menuorigin "
-                 + "from cf_orders o "
-                 + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg and menutype = :typeDish "
-                 + "join cf_clients c on c.idofclient = o.idofclient "
-                 + "where c.contractid = :contractId and o.orderdate > :orderedFrom and "
-                 + "    o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription)");
+                        + "    g.guid, a.menuorigin as dish_menuorigin " + "from cf_orders o "
+                        + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
+                        + "    and menutype between :typeComplexMin and :typeComplexMax "
+                        + "join cf_clients c on c.idofclient = o.idofclient "
+                        + "join cf_orgs org on org.idoforg = c.idoforg "
+                        + "left join cf_goods g on g.idofgood = od.idofgood "
+                        + "join (select _od.idoforder, _od.idoforg, _od.menudetailname, _od.menutype, _od.menuorigin "
+                        + "    from cf_orderdetails _od "
+                        + "    where _od.menutype between :typeComplexItemMin and :typeComplexItemMax "
+                        + ") a on a.idoforder = o.idoforder and a.idoforg = o.idoforg and (a.menutype = od.menutype + 100) "
+                        + "where c.contractid = :contractId and o.orderdate > :orderedFrom and c.userop = true and org.participantop = true "
+                        + "    and o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription) "
+                        + "union all "
+                        + "select o.idoforder, o.idoforg, o.createddate, null as complex_name, od.menudetailname as dish_name, "
+                        + "    null as guid, od.menuorigin as dish_menuorigin " + "from cf_orders o "
+                        + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg and menutype = :typeDish "
+                        + "join cf_clients c on c.idofclient = o.idofclient "
+                        + "join cf_orgs org on org.idoforg = c.idoforg "
+                        + "where c.contractid = :contractId and o.orderdate > :orderedFrom and c.userop = true and org.participantop = true and "
+                        + "    o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription)");
         query.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
         query.setParameter("typeComplexItemMin", OrderDetail.TYPE_COMPLEX_ITEM_MIN);
@@ -147,11 +147,12 @@ public class OkuDAOService {
                     complexHashMap.put(compositeIdOfOrder, new HashMap<String, Complex>());
                 }
                 if (!complexHashMap.get(compositeIdOfOrder).containsKey(complexGuid)) {
-                    Complex complex = new Complex(complexName, complexGuid);
+                    Complex complex = new Complex(complexName);
                     complexHashMap.get(compositeIdOfOrder).put(complexGuid, complex);
                     orderHashMap.get(compositeIdOfOrder).getComplexes().add(complex);
                 }
-                complexHashMap.get(compositeIdOfOrder).get(complexGuid).getDishList().add(new Dish(dishName, dishMenuOrigin));
+                complexHashMap.get(compositeIdOfOrder).get(complexGuid).getDishList()
+                        .add(new Dish(dishName, dishMenuOrigin));
             }
         }
         return orderHashMap.values();
@@ -162,21 +163,17 @@ public class OkuDAOService {
         List<Long> clientIdList = getClients();
         Query query = emReport.createNativeQuery(
                 "select a.contractid, a.idoforder, a.idoforg, a.createddate, od.menudetailname as complex_name, "
-                 + "    odd.menudetailname as dish_name, g.guid, odd.menuorigin as dish_menuorigin "
-                 + "from ( "
-                 + "    select o.idoforder, o.idoforg, c.contractid, o.createddate "
-                 + "    from cf_orders o "
-                 + "    join cf_clients c on o.idofclient = c.idofclient "
-                 + "    where c.idofclient in (:clientIdList) and o.createddate between :orderedFrom and :orderedTo "
-                 + "        and o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription) "
-                 + "    limit :_limit "
-                 + "    offset :_offset "
-                 + ") a "
-                 + "left join cf_orderdetails od on a.idoforder = od.idoforder and a.idoforg = od.idoforg "
-                 + "    and od.menutype between :typeComplexMin and :typeComplexMax "
-                 + "left join cf_goods g on g.idofgood = od.idofgood "
-                 + "left join cf_orderdetails odd on odd.idoforder = a.idoforder and odd.idoforg = a.idoforg "
-                 + "    and (odd.menutype = od.menutype + 100 or odd.menutype = :typeDish)");
+                        + "    odd.menudetailname as dish_name, g.guid, odd.menuorigin as dish_menuorigin " + "from ( "
+                        + "    select o.idoforder, o.idoforg, c.contractid, o.createddate " + "    from cf_orders o "
+                        + "    join cf_clients c on o.idofclient = c.idofclient "
+                        + "    where c.idofclient in (:clientIdList) and o.createddate between :orderedFrom and :orderedTo "
+                        + "        and o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription) "
+                        + "    limit :_limit " + "    offset :_offset " + ") a "
+                        + "left join cf_orderdetails od on a.idoforder = od.idoforder and a.idoforg = od.idoforg "
+                        + "    and od.menutype between :typeComplexMin and :typeComplexMax "
+                        + "left join cf_goods g on g.idofgood = od.idofgood "
+                        + "left join cf_orderdetails odd on odd.idoforder = a.idoforder and odd.idoforg = a.idoforg "
+                        + "    and (odd.menutype = od.menutype + 100 or odd.menutype = :typeDish)");
         query.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
         query.setParameter("orderedFrom", orderedFrom.getTime());
@@ -218,11 +215,12 @@ public class OkuDAOService {
                     complexHashMap.put(compositeIdOfOrder, new HashMap<String, Complex>());
                 }
                 if (!complexHashMap.get(compositeIdOfOrder).containsKey(complexGuid)) {
-                    Complex complex = new Complex(complexName, complexGuid);
+                    Complex complex = new Complex(complexName);
                     complexHashMap.get(compositeIdOfOrder).put(complexGuid, complex);
                     orderHashMap.get(compositeIdOfOrder).getComplexes().add(complex);
                 }
-                complexHashMap.get(compositeIdOfOrder).get(complexGuid).getDishList().add(new Dish(dishName, dishMenuOrigin));
+                complexHashMap.get(compositeIdOfOrder).get(complexGuid).getDishList()
+                        .add(new Dish(dishName, dishMenuOrigin));
             }
         }
         return orderHashMap.values();
@@ -230,13 +228,14 @@ public class OkuDAOService {
 
     @Transactional(readOnly = true)
     public List<Long> getClients() {
-        Query query = emReport.createQuery("select c.idOfClient from Client c join c.person p where c.userOP = true");
+        Query query = emReport.createQuery("select c.idOfClient from Client c join c.person p "
+                + "join c.org o where c.userOP = true and o.participantOP = true");
         return query.getResultList();
     }
 
     @Transactional(readOnly = true)
     public Organization getOrganizationInfo(Long idOfOrg) {
-        Query query = emReport.createQuery("select o from Org o where o.idOfOrg = :idOfOrg");
+        Query query = emReport.createQuery("select o from Org o where o.idOfOrg = :idOfOrg and o.participantOP = true");
         query.setParameter("idOfOrg", idOfOrg);
         Org org = (Org) query.getSingleResult();
 
@@ -246,7 +245,8 @@ public class OkuDAOService {
     @Transactional(readOnly = true)
     public List<Organization> getOrganizationInfoList(Date updatedFrom, Integer limit, Integer offset) {
         List<Organization> organizationList = new ArrayList<>();
-        Query query = emReport.createQuery("select o from Client c join c.org o where c.userOP = true and o.updateTime > :updatedFrom");
+        Query query = emReport.createQuery(
+                "select o from Org o where o.participantOP = true and o.updateTime > :updatedFrom");
         query.setMaxResults(limit);
         query.setParameter("updatedFrom", updatedFrom);
         query.setFirstResult(offset);

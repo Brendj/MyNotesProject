@@ -11,6 +11,8 @@ import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Organization {
 
+    @JsonProperty(value = "organization_id")
+    private Long idOfOrg;
     private String name;
     private String address;
     private String district;
@@ -21,8 +23,9 @@ public class Organization {
     @JsonProperty(value = "supplier_name")
     private String contragentName;
 
-    public Organization(String name, String address, String district, Integer organizationType, Long idOfContragent,
-            String contragentName) {
+    public Organization(Long idOfOrg, String name, String address, String district, Integer organizationType,
+            Long idOfContragent, String contragentName) {
+        this.idOfOrg = idOfOrg;
         this.name = name;
         this.address = address;
         this.district = district;
@@ -32,8 +35,9 @@ public class Organization {
     }
 
     public Organization(Org org) {
-        this(org.getShortNameInfoService(), org.getShortAddress(), org.getDistrict(), org.getType().getCode(),
-                org.getDefaultSupplier().getIdOfContragent(), org.getDefaultSupplier().getContragentName());
+        this(org.getIdOfOrg(), org.getShortNameInfoService(), org.getShortAddress(), org.getDistrict(),
+                org.getType().getCode(), org.getDefaultSupplier().getIdOfContragent(),
+                org.getDefaultSupplier().getContragentName());
     }
 
     public String getName() {
@@ -82,5 +86,13 @@ public class Organization {
 
     public void setContragentName(String contragentName) {
         this.contragentName = contragentName;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 }
