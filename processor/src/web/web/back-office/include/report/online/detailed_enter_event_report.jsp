@@ -72,12 +72,6 @@
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText escape="true" value="Номер лицевого счета клиента" styleClass="output-text" />
-        <h:inputText value="#{mainPage.detailedEnterEventReportPage.clientFilter.contractId}" maxlength="16"
-                     styleClass="input-text" />
-    </h:panelGrid>
-
-    <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.detailedEnterEventReportPage.buildReportHTML}"
                            reRender="detailedEnterEventReportPanel" styleClass="command-button"
                            status="reportGenerateStatus" />
