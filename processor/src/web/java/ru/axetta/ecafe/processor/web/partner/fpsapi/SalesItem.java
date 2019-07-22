@@ -12,9 +12,9 @@ public class SalesItem {
     private Date date_creation;
     private Long productid;
     private String productname;
-    private Integer quantity;
-    private Float sum;
-    private Integer discount;
+    private Long quantity;
+    private Long sum;
+    private Long discount;
     private Date removed;
     private Integer account_type;
     private String account_name;
@@ -60,27 +60,27 @@ public class SalesItem {
         this.productname = productname;
     }
 
-    public Integer getQuantity() {
+    public Long getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Integer quantity) {
+    public void setQuantity(Long quantity) {
         this.quantity = quantity;
     }
 
-    public Float getSum() {
+    public Long getSum() {
         return sum;
     }
 
-    public void setSum(Float sum) {
+    public void setSum(Long sum) {
         this.sum = sum;
     }
 
-    public Integer getDiscount() {
+    public Long getDiscount() {
         return discount;
     }
 
-    public void setDiscount(Integer discount) {
+    public void setDiscount(Long discount) {
         this.discount = discount;
     }
 

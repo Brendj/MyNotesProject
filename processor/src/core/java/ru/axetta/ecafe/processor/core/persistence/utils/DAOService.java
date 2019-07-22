@@ -964,10 +964,6 @@ public class DAOService {
         return DAOUtils.findClientByGuid(entityManager, guid);
     }
 
-    public Client getClientByIacregid(String iacregid) {
-        return DAOUtils.findClientByIacregid((Session)entityManager.getDelegate(), iacregid);
-    }
-
     public Client getClientByMobilePhone(String mobile) {
         return DAOUtils.getClientByMobilePhone(entityManager, mobile);
     }

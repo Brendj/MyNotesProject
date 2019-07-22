@@ -10,7 +10,7 @@ import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ResponseSales implements IfpsapiBase {
+public class ResponseSales{
     private Result result;
     private Date serverTimestamp;
     private List<SalesItem> sales;
