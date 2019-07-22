@@ -244,10 +244,11 @@ public class OkuDAOService {
     }
 
     @Transactional(readOnly = true)
-    public List<Organization> getOrganizationInfoList(Integer limit, Integer offset) {
+    public List<Organization> getOrganizationInfoList(Date updatedFrom, Integer limit, Integer offset) {
         List<Organization> organizationList = new ArrayList<>();
-        Query query = emReport.createQuery("select o from Client c join c.org o where c.userOP = true");
+        Query query = emReport.createQuery("select o from Client c join c.org o where c.userOP = true and o.updateTime > :updatedFrom");
         query.setMaxResults(limit);
+        query.setParameter("updatedFrom", updatedFrom);
         query.setFirstResult(offset);
 
         List<Org> list = query.getResultList();
