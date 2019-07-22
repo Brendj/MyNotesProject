@@ -12,7 +12,7 @@ import java.util.List;
 
 public class ResponseSales{
     private Result result;
-    private Date serverTimestamp;
+    private String serverTimestamp;
     private List<SalesItem> sales;
 
 
@@ -28,11 +28,11 @@ public class ResponseSales{
         this.result = result;
     }
 
-    public Date getserverTimestamp() {
+    public String getserverTimestamp() {
         return serverTimestamp;
     }
 
-    public void setserverTimestamp(Date dateserverTimestamp) {
+    public void setserverTimestamp(String dateserverTimestamp) {
         this.serverTimestamp = dateserverTimestamp;
     }
 

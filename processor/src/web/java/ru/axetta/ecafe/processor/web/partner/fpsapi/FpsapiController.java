@@ -23,6 +23,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
+import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
@@ -46,7 +47,7 @@ public class FpsapiController {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            responseSales.setserverTimestamp(new Date());
+            responseSales.setserverTimestamp(timeConverter(new Date()));
             Client client = DAOUtils.findClientByIacregid(persistenceSession, regID);
             if (client == null) {
                 throw new IllegalArgumentException("Client with regID = " + regID + " is not found");
@@ -88,7 +89,7 @@ public class FpsapiController {
                             || order.getOrderType() == OrderTypeEnumType.VENDING) {
                         for (OrderDetail orderDetail : order.getOrderDetails()) {
                             if (orderDetail.getMenuType() == 0) {
-                                responseSales.getSales().add(setParametrs(order, orderDetail));
+                                responseSales.getSales().add(setParametrs(order, orderDetail, SalesOrderType.BUFFET));
                             }
                         }
                     }
@@ -100,7 +101,7 @@ public class FpsapiController {
                             || order.getOrderType() == OrderTypeEnumType.SUBSCRIPTION_FEEDING) {
                         for (OrderDetail orderDetail : order.getOrderDetails()) {
                             if (orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail().equals(idComplex)) {
-                                responseSales.getSales().add(setParametrs(order, orderDetail));
+                                responseSales.getSales().add(setParametrs(order, orderDetail, SalesOrderType.HOT_FOOD));
                             }
                         }
                     }
@@ -120,11 +121,12 @@ public class FpsapiController {
 
     }
 
-    private SalesItem setParametrs (Order order, OrderDetail orderDetail)
+    private SalesItem setParametrs (Order order, OrderDetail orderDetail, SalesOrderType salesOrderType)
     {
         SalesItem salesItem = new SalesItem();
         salesItem.setId(order.getCompositeIdOfOrder().getIdOfOrder());
-        salesItem.setDate_creation(order.getCreateTime());
+        salesItem.setTimestamp(timeConverter(order.getOrderDate()));
+        salesItem.setDate_creation(timeConverter(order.getCreateTime()));
         salesItem.setProductid(orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
         salesItem.setProductname(orderDetail.getMenuDetailName());
         salesItem.setQuantity(orderDetail.getQty());
@@ -132,18 +134,25 @@ public class FpsapiController {
         salesItem.setDiscount(orderDetail.getDiscount());
         /////////
         if (order.getState() == 1) {
-            salesItem.setRemoved(order.getTransaction().getTransactionTime());
+            salesItem.setRemoved(timeConverter(order.getTransaction().getTransactionTime()));
         }
         /////////
-        salesItem.setAccount_type(orderDetail.getMenuType());
-        if (SalesOrderType.HOT_FOOD.getCode() == orderDetail.getMenuType()) {
+        if (SalesOrderType.HOT_FOOD.getCode() == salesOrderType.getCode()) {
+            salesItem.setAccount_type(SalesOrderType.HOT_FOOD.getCode());
             salesItem.setAccount_name(SalesOrderType.HOT_FOOD.getDescription());
         }
-        if (SalesOrderType.BUFFET.getCode() == orderDetail.getMenuType()) {
+        if (SalesOrderType.BUFFET.getCode() == salesOrderType.getCode()) {
+            salesItem.setAccount_type(SalesOrderType.BUFFET.getCode());
             salesItem.setAccount_name(SalesOrderType.BUFFET.getDescription());
         }
         salesItem.setTransactionid(order.getTransaction().getIdOfTransaction());
         return salesItem;
+    }
+
+    private String timeConverter (Date date)
+    {
+        String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
+        return timeStamp.replace(' ', 'T');
     }
 
     private Response resultOK(ResponseSales result) {

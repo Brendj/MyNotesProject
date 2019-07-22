@@ -4,18 +4,16 @@
 
 package ru.axetta.ecafe.processor.web.partner.fpsapi;
 
-import java.util.Date;
-
 public class SalesItem {
     private Long id;
-    private Date timestamp;
-    private Date date_creation;
+    private String timestamp;
+    private String date_creation;
     private Long productid;
     private String productname;
     private Long quantity;
     private Long sum;
     private Long discount;
-    private Date removed;
+    private String removed;
     private Integer account_type;
     private String account_name;
     private Long transactionid;
@@ -28,19 +26,19 @@ public class SalesItem {
         this.id = id;
     }
 
-    public Date getTimestamp() {
+    public String getTimestamp() {
         return timestamp;
     }
 
-    public void setTimestamp(Date timestamp) {
+    public void setTimestamp(String timestamp) {
         this.timestamp = timestamp;
     }
 
-    public Date getDate_creation() {
+    public String getDate_creation() {
         return date_creation;
     }
 
-    public void setDate_creation(Date date_creation) {
+    public void setDate_creation(String date_creation) {
         this.date_creation = date_creation;
     }
 
@@ -84,11 +82,11 @@ public class SalesItem {
         this.discount = discount;
     }
 
-    public Date getRemoved() {
+    public String getRemoved() {
         return removed;
     }
 
-    public void setRemoved(Date removed) {
+    public void setRemoved(String removed) {
         this.removed = removed;
     }
 
