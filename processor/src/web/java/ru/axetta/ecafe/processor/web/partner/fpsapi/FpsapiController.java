@@ -57,7 +57,7 @@ public class FpsapiController {
                     .findOrdersbyIdofclientandBetweenTime(persistenceSession, client, new Date(dateFrom),
                             new Date(dateTo));
             if (orders.isEmpty()) {
-                return resultOK(null);
+                return resultOK(responseSales);
             }
             for (Order order : orders) {
                 boolean complex = false;
