@@ -175,7 +175,7 @@ public class FpsapiController {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllergetns(@QueryParam(value = "regID") String regId) {
+    public Response getAllergetns(@QueryParam(value = "RegID") String regId) {
         AllergenResult result = new AllergenResult();
 
         Session session = null;
