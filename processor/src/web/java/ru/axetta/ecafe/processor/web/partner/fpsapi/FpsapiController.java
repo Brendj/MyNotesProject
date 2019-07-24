@@ -23,6 +23,7 @@ import javax.ws.rs.QueryParam;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
@@ -36,14 +37,25 @@ public class FpsapiController {
 
     @GET
     @Path(value = "/netrika/mobile/v1/sales")
-    public Response getSales(@QueryParam(value = "regID") String regID, @QueryParam(value = "DateFrom") Long dateFrom,
-            @QueryParam(value = "DateTo") Long dateTo) throws Exception {
+    public Response getSales(@QueryParam(value = "RegId") String regID, @QueryParam(value = "DateFrom") String dateFrom,
+            @QueryParam(value = "DateTo") String dateTo) throws Exception {
         ResponseSales responseSales = new ResponseSales();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         //Вычисление результата запроса
         try {
+            Date dateFromD;
+            Date dateToD;
+            try {
+                dateFromD = new SimpleDateFormat("yyyy-MM-dd").parse(dateFrom);
+                dateToD = new SimpleDateFormat("yyyy-MM-dd").parse(dateTo);
+            }
+            catch (ParseException e) {
+                logger.error("Ошибка в формате даты", e);
+                return resultBadArgs(responseSales, 2);
+            }
+
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
@@ -54,8 +66,8 @@ public class FpsapiController {
             }
 
             List<Order> orders = DAOUtils
-                    .findOrdersbyIdofclientandBetweenTime(persistenceSession, client, new Date(dateFrom),
-                            new Date(dateTo));
+                    .findOrdersbyIdofclientandBetweenTime(persistenceSession, client, dateFromD,
+                            dateToD);
             if (orders.isEmpty()) {
                 return resultOK(responseSales);
             }
@@ -113,7 +125,10 @@ public class FpsapiController {
             return resultOK(responseSales);
         } catch (IllegalArgumentException e) {
             logger.error("Can't find client", e);
-            return resultBadArgs(responseSales);
+            return resultBadArgs(responseSales, 1);
+        } catch (Exception e) {
+            logger.error("InternalError", e);
+            return resultError(responseSales);
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -132,11 +147,9 @@ public class FpsapiController {
         salesItem.setQuantity(orderDetail.getQty());
         salesItem.setSum(orderDetail.getQty() * orderDetail.getRPrice());
         salesItem.setDiscount(orderDetail.getDiscount());
-        /////////
         if (order.getState() == 1) {
             salesItem.setRemoved(timeConverter(order.getTransaction().getTransactionTime()));
         }
-        /////////
         if (SalesOrderType.HOT_FOOD.getCode() == salesOrderType.getCode()) {
             salesItem.setAccount_type(SalesOrderType.HOT_FOOD.getCode());
             salesItem.setAccount_name(SalesOrderType.HOT_FOOD.getDescription());
@@ -145,7 +158,8 @@ public class FpsapiController {
             salesItem.setAccount_type(SalesOrderType.BUFFET.getCode());
             salesItem.setAccount_name(SalesOrderType.BUFFET.getDescription());
         }
-        salesItem.setTransactionid(order.getTransaction().getIdOfTransaction());
+        if (order.getTransaction() != null)
+            salesItem.setTransactionid(order.getTransaction().getIdOfTransaction());
         return salesItem;
     }
 
@@ -161,10 +175,22 @@ public class FpsapiController {
         return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
     }
 
-    private Response resultBadArgs(ResponseSales result) {
-        result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-        result.getResult().description = ResponseCodes.RC_INTERNAL_ERROR.toString();
+    private Response resultBadArgs(ResponseSales result, Integer type) {
+        if (type == 1) {
+            result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
+            result.getResult().description = ResponseCodes.RC_INTERNAL_ERROR.toString();
+        }
+        if (type == 2) {
+            result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
+            result.getResult().description = "Переданы некорректные параметры";
+        }
         return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
+    }
+
+    private Response resultError(ResponseSales result) {
+        result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
+        result.getResult().description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
+        return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(result).build();
     }
 
 }
