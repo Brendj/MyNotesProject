@@ -6,19 +6,18 @@ package ru.axetta.ecafe.processor.web.partner.fpsapi;
 
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 
-import java.util.Date;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ResponseSales implements IfpsapiBase{
+public class ResponseAverage implements IfpsapiBase{
     private Result result;
     private String serverTimestamp;
-    private List<SalesItem> sales;
+    private List<AverageItem> average;
 
 
-    public ResponseSales(){
+    public ResponseAverage(){
         this.result = new Result();
-        this.sales = new LinkedList<SalesItem>();
+        this.average = new LinkedList<AverageItem>();
     }
     public Result getResult() {
         return result;
@@ -36,11 +35,11 @@ public class ResponseSales implements IfpsapiBase{
         this.serverTimestamp = dateserverTimestamp;
     }
 
-    public List<SalesItem> getSales() {
-        return sales;
+    public List<AverageItem> getAverage() {
+        return average;
     }
 
-    public void setSales(List<SalesItem> sales) {
-        this.sales = sales;
+    public void setAverage(List<AverageItem> average) {
+        this.average = average;
     }
 }

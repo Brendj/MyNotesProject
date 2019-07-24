@@ -9,12 +9,15 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Data;
 
+import org.apache.poi.hssf.record.formula.functions.T;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.ws.rs.GET;
 import javax.ws.rs.Path;
@@ -25,8 +28,7 @@ import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Path(value = "")
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
@@ -34,6 +36,7 @@ import java.util.List;
 public class FpsapiController {
 
     private Logger logger = LoggerFactory.getLogger(FpsapiController.class);
+    private static final Integer RANGES_DAYS = 14;
 
     @GET
     @Path(value = "/netrika/mobile/v1/sales")
@@ -136,6 +139,123 @@ public class FpsapiController {
 
     }
 
+
+    @GET
+    @Path(value = "/netrika/mobile/v1/average")
+    public Response getAverage(@QueryParam(value = "RegId") String regID, @QueryParam(value = "Date") String date,
+            @QueryParam(value = "Range") Integer range) throws Exception {
+        ResponseAverage responseAverage = new ResponseAverage();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        //Вычисление результата запроса
+        try {
+            //Дата до
+            Date dateTo;
+            //Дата с
+            Date dateFrom;
+            //Общая сумма покупок в период
+            Long sum = 0L;
+            //Массив дат, когда школьник питался
+            HashSet<String> datesEat = new HashSet<>();
+
+            Integer rangeDate;
+            //Если дата задана
+            if (date != null) {
+                try {
+                    dateTo = new SimpleDateFormat("yyyy-MM-dd").parse(date);
+                } catch (ParseException e) {
+                    logger.error("Ошибка в формате даты", e);
+                    return resultBadArgs(responseAverage, 2);
+                }
+            }
+            else
+                //Иначе берем текущую дату
+                dateTo = new Date();
+            //Если радиус задан
+            if (range != null)
+            {
+                rangeDate = range;
+            }
+            else
+            {
+                //Берём константу
+                rangeDate = RANGES_DAYS;
+            }
+            Calendar cal = Calendar.getInstance();
+            cal.setTime(dateTo);
+            cal.add(Calendar.DATE, -rangeDate);
+            dateFrom = cal.getTime();
+
+
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            responseAverage.setserverTimestamp(timeConverter(new Date()));
+            Client client = DAOUtils.findClientByIacregid(persistenceSession, regID);
+            if (client == null) {
+                throw new IllegalArgumentException("Client with regID = " + regID + " is not found");
+            }
+
+            List<Order> orders = DAOUtils
+                    .findOrdersbyIdofclientandBetweenTime(persistenceSession, client, dateFrom,
+                            dateTo);
+            if (orders.isEmpty()) {
+                return resultOK(responseAverage);
+            }
+            for (Order order : orders) {
+                //Не обрабатываем заказы данного типа
+                if (order.getOrderType() == OrderTypeEnumType.REDUCED_PRICE_PLAN
+                        || order.getOrderType() == OrderTypeEnumType.DAILY_SAMPLE
+                        || order.getOrderType() == OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE
+                        || order.getOrderType() == OrderTypeEnumType.CORRECTION_TYPE
+                        || order.getOrderType() == OrderTypeEnumType.TEST_EMULATOR
+                        || order.getOrderType() == OrderTypeEnumType.WATER_ACCOUNTING
+                        || order.getOrderType() == OrderTypeEnumType.DISCOUNT_PLAN_CHANGE
+                        || order.getOrderType() == OrderTypeEnumType.RECYCLING_RETIONS) {
+                    continue;
+                }
+                //Берем только валидные заказы
+                if (order.getState() == 1) {
+                    continue;
+                }
+                //Считаем сумму по всем заказам
+                if (order.getRSum() != null)
+                    sum+=order.getRSum();
+
+                if (order.getOrderDate() != null)
+                {
+                    datesEat.add(new SimpleDateFormat("yyyy-MM-dd").format(order.getOrderDate()));
+                }
+            }
+
+            AverageItem averageItem = new AverageItem();
+
+            averageItem.setDate(new SimpleDateFormat("yyyy-MM-dd").format(dateFrom));
+            averageItem.setRange(rangeDate);
+            averageItem.setSum(sum);
+            averageItem.setAveragesum(sum.floatValue()/(float)datesEat.size());
+            averageItem.setDaycount(datesEat.size());
+            averageItem.setAccounttypeid(1);
+            responseAverage.getAverage().add(averageItem);
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return resultOK(responseAverage);
+        } catch (IllegalArgumentException e) {
+            logger.error("Can't find client", e);
+            return resultBadArgs(responseAverage, 1);
+        } catch (Exception e) {
+            logger.error("InternalError", e);
+            return resultError(responseAverage);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+    }
+
     private SalesItem setParametrs (Order order, OrderDetail orderDetail, SalesOrderType salesOrderType)
     {
         SalesItem salesItem = new SalesItem();
@@ -147,9 +267,10 @@ public class FpsapiController {
         salesItem.setQuantity(orderDetail.getQty());
         salesItem.setSum(orderDetail.getQty() * orderDetail.getRPrice());
         salesItem.setDiscount(orderDetail.getDiscount());
-        if (order.getState() == 1) {
+        if (order.getState() == 1 && order.getTransaction() != null)
             salesItem.setRemoved(timeConverter(order.getTransaction().getTransactionTime()));
-        }
+        else
+            salesItem.setRemoved("");
         if (SalesOrderType.HOT_FOOD.getCode() == salesOrderType.getCode()) {
             salesItem.setAccount_type(SalesOrderType.HOT_FOOD.getCode());
             salesItem.setAccount_name(SalesOrderType.HOT_FOOD.getDescription());
@@ -169,13 +290,13 @@ public class FpsapiController {
         return timeStamp.replace(' ', 'T');
     }
 
-    private Response resultOK(ResponseSales result) {
+    private <T extends IfpsapiBase> Response resultOK(T result) {
         result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
         result.getResult().description = ResponseCodes.RC_OK.toString();
         return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
     }
 
-    private Response resultBadArgs(ResponseSales result, Integer type) {
+    private <T extends IfpsapiBase> Response resultBadArgs(T result, Integer type) {
         if (type == 1) {
             result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
             result.getResult().description = ResponseCodes.RC_INTERNAL_ERROR.toString();
@@ -187,7 +308,7 @@ public class FpsapiController {
         return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
     }
 
-    private Response resultError(ResponseSales result) {
+    private <T extends IfpsapiBase> Response resultError(T result) {
         result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
         result.getResult().description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
         return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(result).build();
