@@ -322,6 +322,7 @@ public class DTSZNDiscountsReviseService {
             if (StringUtils.isEmpty(guid)) {
                 updateArchivedFlagForDiscounts();
             }
+            updateArchivedFlagForDiscountsDB();
             runTaskPart2(fireTime);
             updateApplicationsForFoodTask();
         }
