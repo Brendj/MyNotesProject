@@ -56,13 +56,15 @@ public class FpsapiController {
             }
             catch (ParseException e) {
                 logger.error("Ошибка в формате даты", e);
-                return resultBadArgs(responseSales, 2);
+                responseSales.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode());
+                responseSales.setErrorMessage("Переданы некорректные параметры");
+                return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseSales).build();
             }
 
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            responseSales.setserverTimestamp(timeConverter(new Date()));
+            responseSales.setServerTimestamp(new Date());
             Client client = DAOUtils.findClientByIacregid(persistenceSession, regID);
             if (client == null) {
                 throw new IllegalArgumentException("Client with regID = " + regID + " is not found");
@@ -72,7 +74,9 @@ public class FpsapiController {
                     .findOrdersbyIdofclientandBetweenTime(persistenceSession, client, dateFromD,
                             dateToD);
             if (orders.isEmpty()) {
-                return resultOK(responseSales);
+                responseSales.setErrorCode(ResponseCodes.RC_OK.getCode());
+                responseSales.setErrorMessage(ResponseCodes.RC_OK.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(responseSales).build();
             }
             for (Order order : orders) {
                 boolean complex = false;
@@ -125,13 +129,19 @@ public class FpsapiController {
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return resultOK(responseSales);
+            responseSales.setErrorCode(ResponseCodes.RC_OK.getCode());
+            responseSales.setErrorMessage(ResponseCodes.RC_OK.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseSales).build();
         } catch (IllegalArgumentException e) {
             logger.error("Can't find client", e);
-            return resultBadArgs(responseSales, 1);
+            responseSales.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode());
+            responseSales.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseSales).build();
         } catch (Exception e) {
             logger.error("InternalError", e);
-            return resultError(responseSales);
+            responseSales.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode());
+            responseSales.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(responseSales).build();
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -166,7 +176,10 @@ public class FpsapiController {
                     dateTo = new SimpleDateFormat("yyyy-MM-dd").parse(date);
                 } catch (ParseException e) {
                     logger.error("Ошибка в формате даты", e);
-                    return resultBadArgs(responseAverage, 2);
+                    responseAverage.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode());
+                    responseAverage.setErrorMessage("Переданы некорректные параметры");
+                    return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseAverage).build();
+
                 }
             }
             else
@@ -191,7 +204,7 @@ public class FpsapiController {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            responseAverage.setserverTimestamp(timeConverter(new Date()));
+            responseAverage.setServerTimestamp(new Date());
             Client client = DAOUtils.findClientByIacregid(persistenceSession, regID);
             if (client == null) {
                 throw new IllegalArgumentException("Client with regID = " + regID + " is not found");
@@ -201,7 +214,9 @@ public class FpsapiController {
                     .findOrdersbyIdofclientandBetweenTime(persistenceSession, client, dateFrom,
                             dateTo);
             if (orders.isEmpty()) {
-                return resultOK(responseAverage);
+                responseAverage.setErrorCode(ResponseCodes.RC_OK.getCode());
+                responseAverage.setErrorMessage(ResponseCodes.RC_OK.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(responseAverage).build();
             }
             for (Order order : orders) {
                 //Не обрабатываем заказы данного типа
@@ -242,13 +257,19 @@ public class FpsapiController {
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            return resultOK(responseAverage);
+            responseAverage.setErrorCode(ResponseCodes.RC_OK.getCode());
+            responseAverage.setErrorMessage(ResponseCodes.RC_OK.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseAverage).build();
         } catch (IllegalArgumentException e) {
             logger.error("Can't find client", e);
-            return resultBadArgs(responseAverage, 1);
+            responseAverage.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode());
+            responseAverage.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseAverage).build();
         } catch (Exception e) {
             logger.error("InternalError", e);
-            return resultError(responseAverage);
+            responseAverage.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode());
+            responseAverage.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(responseAverage).build();
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -288,30 +309,6 @@ public class FpsapiController {
     {
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
         return timeStamp.replace(' ', 'T');
-    }
-
-    private <T extends IfpsapiBase> Response resultOK(T result) {
-        result.getResult().resultCode = ResponseCodes.RC_OK.getCode();
-        result.getResult().description = ResponseCodes.RC_OK.toString();
-        return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
-    }
-
-    private <T extends IfpsapiBase> Response resultBadArgs(T result, Integer type) {
-        if (type == 1) {
-            result.getResult().resultCode = ResponseCodes.RC_INTERNAL_ERROR.getCode();
-            result.getResult().description = ResponseCodes.RC_INTERNAL_ERROR.toString();
-        }
-        if (type == 2) {
-            result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-            result.getResult().description = "Переданы некорректные параметры";
-        }
-        return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
-    }
-
-    private <T extends IfpsapiBase> Response resultError(T result) {
-        result.getResult().resultCode = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode();
-        result.getResult().description = ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString();
-        return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(result).build();
     }
 
     @Path("/netrika/mobile/v1/allergens")
