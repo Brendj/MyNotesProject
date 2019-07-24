@@ -6,25 +6,29 @@ package ru.axetta.ecafe.processor.web.partner.fpsapi;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.partner.fpsapi.dataflow.Allergen;
+import ru.axetta.ecafe.processor.web.partner.fpsapi.dataflow.AllergenResult;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
+import javax.persistence.NoResultException;
+import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 @Path(value = "")
@@ -167,4 +171,110 @@ public class FpsapiController {
         return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(result).build();
     }
 
+    @Path("/netrika/mobile/v1/allergens")
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response getAllergetns(@QueryParam(value = "regID") String regId) {
+        AllergenResult result = new AllergenResult();
+
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            if (StringUtils.isEmpty(regId)) {
+                throw new IllegalArgumentException("Couldn't find all parameters");
+            }
+
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createReportPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByIacregid(session, regId);
+
+            if (null == client) {
+                throw new IllegalArgumentException(String.format("Unable to find client by regId=%s", regId));
+            }
+
+            Menu menu = DAOUtils.findLastMenuByOrgBeforeDate(session, client.getOrg().getIdOfOrg(), new Date());
+
+            if (null == menu) {
+                throw new NoResultException(String.format("Unable to find menu for client with regId=%s", regId));
+            }
+
+            result.setAllergens(findAllergens(session, client, menu));
+
+            transaction.commit();
+            transaction = null;
+
+            result.setErrorCode(ResponseCodes.RC_OK.getCode());
+            result.setErrorMessage(ResponseCodes.RC_OK.toString());
+            result.setServerTimestamp(new Date());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        } catch (IllegalArgumentException e) {
+            logger.error(e.getMessage(), e);
+            result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode());
+            result.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
+            result.setServerTimestamp(new Date());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        } catch (NoResultException e) {
+            logger.error(e.getMessage(), e);
+            result.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode());
+            result.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+            result.setServerTimestamp(new Date());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    private List<Allergen> findAllergens(Session session, Client client, Menu menu) {
+        List<Allergen> allergenList = new ArrayList<>();
+        Query query = session.createSQLQuery("select p.idofprohibitions, p.filtertext, md.groupname from cf_menu m "
+                + "join cf_menudetails md on md.idofmenu = m.idofmenu "
+                + "join cf_prohibitions p on p.filtertext = md.menudetailname and p.idofclient = :idOfClient "
+                + "where m.idoforg = :idOfOrg and m.idofmenu = :idOfMenu and p.deletedstate = false");
+        query.setParameter("idOfClient", client.getIdOfClient());
+        query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
+        query.setParameter("idOfMenu", menu.getIdOfMenu());
+
+        List list = query.list();
+
+        if (!list.isEmpty()) {
+            HashMap<String, Integer> typeIdHashMap = new HashMap<>();
+            for (Object o : list) {
+                Object[] res = (Object[]) o;
+                Long idOfProhibition = ((BigInteger) res[0]).longValue();
+                String filterText = (String) res[1];
+                String groupName = (String) res[2];
+                if (!typeIdHashMap.containsKey(groupName)) {
+                    typeIdHashMap.put(groupName, typeIdHashMap.keySet().size());
+                }
+                allergenList.add(new Allergen(idOfProhibition, filterText, typeIdHashMap.get(groupName), groupName, true));
+            }
+            return allergenList;
+        }
+
+        query = session.createSQLQuery(
+                "select m.idofmenu, md.menudetailname, md.groupname from cf_menu m "
+                        + "join cf_menudetails md on md.idofmenu = m.idofmenu "
+                        + "where m.idoforg = :idOfOrg and m.idofmenu = :idOfMenu");
+        query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
+        query.setParameter("idOfMenu", menu.getIdOfMenu());
+
+        list = query.list();
+
+        HashMap<String, Integer> typeIdHashMap = new HashMap<>();
+        for (Object o : list) {
+            Object[] res = (Object[]) o;
+            Long idOfMenu = ((BigInteger) res[0]).longValue();
+            String menuDetailName = (String) res[1];
+            String groupName = (String) res[2];
+            if (!typeIdHashMap.containsKey(groupName)) {
+                typeIdHashMap.put(groupName, typeIdHashMap.keySet().size());
+            }
+            allergenList.add(new Allergen(idOfMenu, menuDetailName, typeIdHashMap.get(groupName), groupName, false));
+        }
+        return allergenList;
+    }
 }
