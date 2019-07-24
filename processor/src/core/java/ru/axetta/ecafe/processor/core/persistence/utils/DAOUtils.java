@@ -4172,4 +4172,14 @@ public class DAOUtils {
         }
         return result;
     }
+
+    public static Menu findLastMenuByOrgBeforeDate(Session session, Long idOfOrg, Date date) {
+        Criteria criteria = session.createCriteria(Menu.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.le("menuDate", date));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("menuDate"));
+        criteria.setMaxResults(1);
+        List list = criteria.list();
+        return ((list.isEmpty()) ? null : (Menu) list.get(0));
+    }
 }
