@@ -9,13 +9,13 @@ import org.codehaus.jackson.map.annotate.JsonSerialize;
 import java.util.Date;
 
 public class Result {
-    private Long errorCode;
+    private String errorCode;
     private String errorMessage;
 
     @JsonSerialize(using = JsonDateSerializer.class)
     private Date serverTimestamp;
 
-    public Result(Long errorCode, String errorMessage, Date serverTimestamp) {
+    public Result(String errorCode, String errorMessage, Date serverTimestamp) {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
         this.serverTimestamp = serverTimestamp;
@@ -25,11 +25,11 @@ public class Result {
 
     }
 
-    public Long getErrorCode() {
+    public String getErrorCode() {
         return errorCode;
     }
 
-    public void setErrorCode(Long errorCode) {
+    public void setErrorCode(String errorCode) {
         this.errorCode = errorCode;
     }
 

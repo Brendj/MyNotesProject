@@ -56,7 +56,7 @@ public class FpsapiController {
             }
             catch (ParseException e) {
                 logger.error("Ошибка в формате даты", e);
-                responseSales.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode());
+                responseSales.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
                 responseSales.setErrorMessage("Переданы некорректные параметры");
                 return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseSales).build();
             }
@@ -74,7 +74,7 @@ public class FpsapiController {
                     .findOrdersbyIdofclientandBetweenTime(persistenceSession, client, dateFromD,
                             dateToD);
             if (orders.isEmpty()) {
-                responseSales.setErrorCode(ResponseCodes.RC_OK.getCode());
+                responseSales.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
                 responseSales.setErrorMessage(ResponseCodes.RC_OK.toString());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(responseSales).build();
             }
@@ -129,17 +129,17 @@ public class FpsapiController {
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            responseSales.setErrorCode(ResponseCodes.RC_OK.getCode());
+            responseSales.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
             responseSales.setErrorMessage(ResponseCodes.RC_OK.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseSales).build();
         } catch (IllegalArgumentException e) {
             logger.error("Can't find client", e);
-            responseSales.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode());
+            responseSales.setErrorCode(Long.toString(ResponseCodes.RC_INTERNAL_ERROR.getCode()));
             responseSales.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseSales).build();
         } catch (Exception e) {
             logger.error("InternalError", e);
-            responseSales.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode());
+            responseSales.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
             responseSales.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
             return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(responseSales).build();
         } finally {
@@ -176,7 +176,7 @@ public class FpsapiController {
                     dateTo = new SimpleDateFormat("yyyy-MM-dd").parse(date);
                 } catch (ParseException e) {
                     logger.error("Ошибка в формате даты", e);
-                    responseAverage.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode());
+                    responseAverage.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
                     responseAverage.setErrorMessage("Переданы некорректные параметры");
                     return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseAverage).build();
 
@@ -214,7 +214,7 @@ public class FpsapiController {
                     .findOrdersbyIdofclientandBetweenTime(persistenceSession, client, dateFrom,
                             dateTo);
             if (orders.isEmpty()) {
-                responseAverage.setErrorCode(ResponseCodes.RC_OK.getCode());
+                responseAverage.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
                 responseAverage.setErrorMessage(ResponseCodes.RC_OK.toString());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(responseAverage).build();
             }
@@ -247,27 +247,27 @@ public class FpsapiController {
             AverageItem averageItem = new AverageItem();
 
             averageItem.setDate(new SimpleDateFormat("yyyy-MM-dd").format(dateFrom));
-            averageItem.setRange(rangeDate);
-            averageItem.setSum(sum);
-            averageItem.setAveragesum(sum.floatValue()/(float)datesEat.size());
-            averageItem.setDaycount(datesEat.size());
-            averageItem.setAccounttypeid(1);
+            averageItem.setRange(Integer.toString(rangeDate));
+            averageItem.setSum(Long.toString(sum));
+            averageItem.setAveragesum(Float.toString(sum.floatValue()/(float)datesEat.size()));
+            averageItem.setDaycount(Integer.toString(datesEat.size()));
+            averageItem.setAccounttypeid("1");
             responseAverage.getAverage().add(averageItem);
 
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
-            responseAverage.setErrorCode(ResponseCodes.RC_OK.getCode());
+            responseAverage.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
             responseAverage.setErrorMessage(ResponseCodes.RC_OK.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseAverage).build();
         } catch (IllegalArgumentException e) {
             logger.error("Can't find client", e);
-            responseAverage.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode());
+            responseAverage.setErrorCode(Long.toString(ResponseCodes.RC_INTERNAL_ERROR.getCode()));
             responseAverage.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseAverage).build();
         } catch (Exception e) {
             logger.error("InternalError", e);
-            responseAverage.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode());
+            responseAverage.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
             responseAverage.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
             return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(responseAverage).build();
         } finally {
@@ -280,28 +280,28 @@ public class FpsapiController {
     private SalesItem setParametrs (Order order, OrderDetail orderDetail, SalesOrderType salesOrderType)
     {
         SalesItem salesItem = new SalesItem();
-        salesItem.setId(order.getCompositeIdOfOrder().getIdOfOrder());
+        salesItem.setId(Long.toString(order.getCompositeIdOfOrder().getIdOfOrder()));
         salesItem.setTimestamp(timeConverter(order.getOrderDate()));
         salesItem.setDate_creation(timeConverter(order.getCreateTime()));
-        salesItem.setProductid(orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
+        salesItem.setProductid(Long.toString(orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail()));
         salesItem.setProductname(orderDetail.getMenuDetailName());
-        salesItem.setQuantity(orderDetail.getQty());
-        salesItem.setSum(orderDetail.getQty() * orderDetail.getRPrice());
-        salesItem.setDiscount(orderDetail.getDiscount());
+        salesItem.setQuantity(orderDetail.getQty().toString());
+        salesItem.setSum(Long.toString(orderDetail.getQty() * orderDetail.getRPrice()));
+        salesItem.setDiscount(Long.toString(orderDetail.getDiscount()));
         if (order.getState() == 1 && order.getTransaction() != null)
             salesItem.setRemoved(timeConverter(order.getTransaction().getTransactionTime()));
         else
             salesItem.setRemoved("");
         if (SalesOrderType.HOT_FOOD.getCode() == salesOrderType.getCode()) {
-            salesItem.setAccount_type(SalesOrderType.HOT_FOOD.getCode());
+            salesItem.setAccount_type(Integer.toString(SalesOrderType.HOT_FOOD.getCode()));
             salesItem.setAccount_name(SalesOrderType.HOT_FOOD.getDescription());
         }
         if (SalesOrderType.BUFFET.getCode() == salesOrderType.getCode()) {
-            salesItem.setAccount_type(SalesOrderType.BUFFET.getCode());
+            salesItem.setAccount_type(Integer.toString(SalesOrderType.BUFFET.getCode()));
             salesItem.setAccount_name(SalesOrderType.BUFFET.getDescription());
         }
         if (order.getTransaction() != null)
-            salesItem.setTransactionid(order.getTransaction().getIdOfTransaction());
+            salesItem.setTransactionid(Long.toString(order.getTransaction().getIdOfTransaction()));
         return salesItem;
     }
 
@@ -346,19 +346,19 @@ public class FpsapiController {
             transaction.commit();
             transaction = null;
 
-            result.setErrorCode(ResponseCodes.RC_OK.getCode());
+            result.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
             result.setErrorMessage(ResponseCodes.RC_OK.toString());
             result.setServerTimestamp(new Date());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage(), e);
-            result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode());
+            result.setErrorCode(Long.toString(ResponseCodes.RC_INTERNAL_ERROR.getCode()));
             result.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
             result.setServerTimestamp(new Date());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         } catch (NoResultException e) {
             logger.error(e.getMessage(), e);
-            result.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode());
+            result.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
             result.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
             result.setServerTimestamp(new Date());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();

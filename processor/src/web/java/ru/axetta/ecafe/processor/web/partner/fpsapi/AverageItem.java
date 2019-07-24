@@ -6,11 +6,11 @@ package ru.axetta.ecafe.processor.web.partner.fpsapi;
 
 public class AverageItem {
    private String date;
-   private Integer range;
-   private Long sum;
-   private Float averagesum;
-   private Integer daycount;
-   private Integer accounttypeid;
+   private String range;
+   private String sum;
+   private String averagesum;
+   private String daycount;
+   private String accounttypeid;
 
     public String getDate() {
         return date;
@@ -20,43 +20,43 @@ public class AverageItem {
         this.date = date;
     }
 
-    public Integer getRange() {
+    public String getRange() {
         return range;
     }
 
-    public void setRange(Integer range) {
+    public void setRange(String range) {
         this.range = range;
     }
 
-    public Long getSum() {
+    public String getSum() {
         return sum;
     }
 
-    public void setSum(Long sum) {
+    public void setSum(String sum) {
         this.sum = sum;
     }
 
-    public Float getAveragesum() {
+    public String getAveragesum() {
         return averagesum;
     }
 
-    public void setAveragesum(Float averagesum) {
+    public void setAveragesum(String averagesum) {
         this.averagesum = averagesum;
     }
 
-    public Integer getDaycount() {
+    public String getDaycount() {
         return daycount;
     }
 
-    public void setDaycount(Integer daycount) {
+    public void setDaycount(String daycount) {
         this.daycount = daycount;
     }
 
-    public Integer getAccounttypeid() {
+    public String getAccounttypeid() {
         return accounttypeid;
     }
 
-    public void setAccounttypeid(Integer accounttypeid) {
+    public void setAccounttypeid(String accounttypeid) {
         this.accounttypeid = accounttypeid;
     }
 }
