@@ -592,6 +592,9 @@ public interface ClientRoomController {
     Result updateStatusOfApplicationForFood(@WebParam(name = "state") Integer state, @WebParam(name = "declineReason") Integer declineReason,
             @WebParam(name = "serviceNumber") String serviceNumber);
 
+    @WebMethod(operationName = "getContragentForClient")
+    ContragentData getContragentForClient(@WebParam(name = "contractId") Long contractId);
+
     @WebMethod(operationName = "getETPDiscounts")
     ETPDiscountsResult getETPDiscounts();
 

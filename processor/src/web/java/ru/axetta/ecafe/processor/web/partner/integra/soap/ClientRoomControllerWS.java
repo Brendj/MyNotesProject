@@ -9494,6 +9494,63 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public ContragentData getContragentForClient(@WebParam(name = "contractId") Long contractId){
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ContragentData contragentData = new ContragentData();
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
+            if (client == null) {
+                throw new NullPointerException();
+            }
+            Contragent contragent = DAOUtils.getContragentbyContractId(persistenceSession, contractId);
+            contragentData.setIdOfContragent(contragent.getIdOfContragent());
+            contragentData.setContragentName(contragent.getContragentName());
+
+            contragentData.getContactPerson().setSurname(contragent.getContactPerson().getSurname());
+            contragentData.getContactPerson().setFirstName(contragent.getContactPerson().getFirstName());
+            contragentData.getContactPerson().setSecondName(contragent.getContactPerson().getSecondName());
+            contragentData.getContactPerson().setTitle(contragent.getTitle());
+
+            contragentData.setAddress(contragent.getAddress());
+            contragentData.setPhone(contragent.getPhone());
+            contragentData.setMobile(contragent.getMobile());
+            contragentData.setEmail(contragent.getEmail());
+            contragentData.setFax(contragent.getFax());
+            contragentData.setInn(contragent.getInn());
+            contragentData.setBank(contragent.getBank());
+            contragentData.setBic(contragent.getBic());
+            contragentData.setCorrAccount(contragent.getCorrAccount());
+            contragentData.setAccount(contragent.getAccount());
+            contragentData.setKpp(contragent.getKpp());
+            contragentData.setOgrn(contragent.getOgrn());
+            contragentData.setOkato(contragent.getOkato());
+            contragentData.setOktmo(contragent.getOktmo());
+            contragentData.setRemarks(contragent.getRemarks());
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+            contragentData.resultCode = RC_OK;
+            contragentData.description = RC_OK_DESC;
+        } catch (NullPointerException e){
+            contragentData.resultCode = 100L;
+            contragentData.description = RC_CLIENT_NOT_FOUND_DESC;
+        } catch (Exception e) {
+            logger.error("Error in getContragentForClient", e);
+            contragentData.resultCode = RC_INTERNAL_ERROR;
+            contragentData.description = RC_INTERNAL_ERROR_DESC;
+        }finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return contragentData;
+    }
+
+    @Override
     public ETPDiscountsResult getETPDiscounts() {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
