@@ -210,6 +210,12 @@
             </f:facet>
             <h:outputText escape="true" value="#{clientSection.visitEndDate}" styleClass="output-text" converter="dateConverter"/>
         </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Статус" />
+            </f:facet>
+            <h:outputText escape="true" value="#{clientSection.status}" styleClass="output-text"/>
+        </rich:column>
     </rich:dataTable>
 
     <h:outputText escape="true" value="Опекуны" styleClass="output-text"/>
