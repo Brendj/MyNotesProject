@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.fpsapi.dataflow.Allergen;
 import ru.axetta.ecafe.processor.web.partner.fpsapi.dataflow.AllergenResult;
+import ru.axetta.ecafe.processor.web.partner.fpsapi.dataflow.Result;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
@@ -175,7 +176,7 @@ public class FpsapiController {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    public Response getAllergetns(@QueryParam(value = "RegID") String regId) {
+    public Response getAllergens(@QueryParam(value = "RegId") String regId) {
         AllergenResult result = new AllergenResult();
 
         Session session = null;
@@ -206,19 +207,19 @@ public class FpsapiController {
             transaction.commit();
             transaction = null;
 
-            result.setErrorCode(ResponseCodes.RC_OK.getCode());
+            result.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_OK.toString());
             result.setServerTimestamp(new Date());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         } catch (IllegalArgumentException e) {
             logger.error(e.getMessage(), e);
-            result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode());
+            result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
             result.setServerTimestamp(new Date());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
         } catch (NoResultException e) {
             logger.error(e.getMessage(), e);
-            result.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode());
+            result.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
             result.setServerTimestamp(new Date());
             return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
@@ -230,7 +231,7 @@ public class FpsapiController {
 
     private List<Allergen> findAllergens(Session session, Client client, Menu menu) {
         List<Allergen> allergenList = new ArrayList<>();
-        Query query = session.createSQLQuery("select p.idofprohibitions, p.filtertext, md.groupname from cf_menu m "
+        Query query = session.createSQLQuery("select distinct p.idofprohibitions, p.filtertext, md.groupname from cf_menu m "
                 + "join cf_menudetails md on md.idofmenu = m.idofmenu "
                 + "join cf_prohibitions p on p.filtertext = md.menudetailname and p.idofclient = :idOfClient "
                 + "where m.idoforg = :idOfOrg and m.idofmenu = :idOfMenu and p.deletedstate = false");
@@ -256,7 +257,7 @@ public class FpsapiController {
         }
 
         query = session.createSQLQuery(
-                "select m.idofmenu, md.menudetailname, md.groupname from cf_menu m "
+                "select md.idofmenudetail, md.menudetailname, md.groupname from cf_menu m "
                         + "join cf_menudetails md on md.idofmenu = m.idofmenu "
                         + "where m.idoforg = :idOfOrg and m.idofmenu = :idOfMenu");
         query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
@@ -277,4 +278,75 @@ public class FpsapiController {
         }
         return allergenList;
     }
+
+    @Path("/netrika/mobile/v1/allergens/create")
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    public Response createAllergen(@QueryParam(value = "RegId") String regId,
+            @QueryParam(value = "AllergenId") Long allergenId, @QueryParam(value = "Active") Integer active) {
+        Result result = new Result();
+
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            if (StringUtils.isEmpty(regId) || (null == allergenId) || (null == active)) {
+                throw new IllegalArgumentException("Couldn't find all parameters");
+            }
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            session = runtimeContext.createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByIacregid(session, regId);
+
+            if (null == client) {
+                throw new IllegalArgumentException(String.format("Unable to find client by regId=%s", regId));
+            }
+
+            if (0 == active) {
+                ProhibitionMenu prohibitionMenu = DAOUtils.findProhibitionMenuByIdAndClientId(session, allergenId, client.getIdOfClient());
+                if (null == prohibitionMenu) {
+                    throw new IllegalArgumentException(String.format("Unable to find prohibitionMenu by id = %d and idOfClient = %d", allergenId, client.getIdOfClient()));
+                }
+                prohibitionMenu.setDeletedState(true);
+                prohibitionMenu.setUpdateDate(new Date());
+                prohibitionMenu.setVersion(DAOUtils.nextVersionByProhibitionsMenu(session));
+                session.save(prohibitionMenu);
+            } else {
+
+                ProhibitionMenu prohibitionMenu = new ProhibitionMenu();
+                prohibitionMenu.setVersion(DAOUtils.nextVersionByProhibitionsMenu(session));
+                prohibitionMenu.setClient(client);
+                prohibitionMenu.setCreateDate(new Date());
+                prohibitionMenu.setFilterText(DAOUtils.findMenudetailNameByIdOfMenudetail(session, allergenId));
+                prohibitionMenu.setProhibitionFilterType(ProhibitionFilterType.PROHIBITION_BY_GOODS_NAME);
+                prohibitionMenu.setDeletedState(false);
+                session.save(prohibitionMenu);
+            }
+
+            transaction.commit();
+            transaction = null;
+
+            result.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_OK.toString());
+            result.setServerTimestamp(new Date());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        } catch (NoResultException e) {
+            logger.error(e.getMessage(), e);
+            result.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+            result.setServerTimestamp(new Date());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
+            result.setServerTimestamp(new Date());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(result).build();
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
 }

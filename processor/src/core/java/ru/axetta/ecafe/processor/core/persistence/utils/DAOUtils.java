@@ -4182,4 +4182,20 @@ public class DAOUtils {
         List list = criteria.list();
         return ((list.isEmpty()) ? null : (Menu) list.get(0));
     }
+
+    public static ProhibitionMenu findProhibitionMenuByIdAndClientId(Session session, Long idOfProhibitionMenu, Long idOfClient) {
+        Criteria criteria = session.createCriteria(Prohibition.class);
+        criteria.add(Restrictions.eq("idOfProhibitions", idOfProhibitionMenu));
+        criteria.add(Restrictions.eq("idOfClient", idOfClient));
+        criteria.setMaxResults(1);
+        List list = criteria.list();
+        return ((list.isEmpty()) ? null : (ProhibitionMenu) list.get(0));
+    }
+
+    public static String findMenudetailNameByIdOfMenudetail(Session session, Long idOfMenuDetail) {
+        Criteria criteria = session.createCriteria(MenuDetail.class);
+        criteria.add(Restrictions.eq("idOfMenuDetail", idOfMenuDetail));
+        criteria.setProjection(Projections.property("menuDetailName"));
+        return (String) criteria.uniqueResult();
+    }
 }
