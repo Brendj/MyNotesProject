@@ -231,50 +231,31 @@ public class FpsapiController {
 
     private List<Allergen> findAllergens(Session session, Client client, Menu menu) {
         List<Allergen> allergenList = new ArrayList<>();
-        Query query = session.createSQLQuery("select distinct p.idofprohibitions, p.filtertext, md.groupname from cf_menu m "
+        Query query = session.createSQLQuery("select distinct "
+                + "case when p.idofprohibitions is not null then p.idofprohibitions else md.idofmenudetail end as id, "
+                + "case when p.idofprohibitions is not null then p.filtertext else md.menudetailname end as name, "
+                + "md.groupname, p.idofprohibitions is not null as active "
+                + "from cf_menu m "
                 + "join cf_menudetails md on md.idofmenu = m.idofmenu "
-                + "join cf_prohibitions p on p.filtertext = md.menudetailname and p.idofclient = :idOfClient "
-                + "where m.idoforg = :idOfOrg and m.idofmenu = :idOfMenu and p.deletedstate = false");
+                + "left join cf_prohibitions p on p.filtertext = md.menudetailname and p.idofclient = :idOfClient and p.deletedstate = false "
+                + "where m.idoforg = :idOfOrg and m.idofmenu = :idOfMenu ");
         query.setParameter("idOfClient", client.getIdOfClient());
         query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
         query.setParameter("idOfMenu", menu.getIdOfMenu());
 
         List list = query.list();
 
-        if (!list.isEmpty()) {
-            HashMap<String, Integer> typeIdHashMap = new HashMap<>();
-            for (Object o : list) {
-                Object[] res = (Object[]) o;
-                Long idOfProhibition = ((BigInteger) res[0]).longValue();
-                String filterText = (String) res[1];
-                String groupName = (String) res[2];
-                if (!typeIdHashMap.containsKey(groupName)) {
-                    typeIdHashMap.put(groupName, typeIdHashMap.keySet().size());
-                }
-                allergenList.add(new Allergen(idOfProhibition, filterText, typeIdHashMap.get(groupName), groupName, true));
-            }
-            return allergenList;
-        }
-
-        query = session.createSQLQuery(
-                "select md.idofmenudetail, md.menudetailname, md.groupname from cf_menu m "
-                        + "join cf_menudetails md on md.idofmenu = m.idofmenu "
-                        + "where m.idoforg = :idOfOrg and m.idofmenu = :idOfMenu");
-        query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
-        query.setParameter("idOfMenu", menu.getIdOfMenu());
-
-        list = query.list();
-
         HashMap<String, Integer> typeIdHashMap = new HashMap<>();
         for (Object o : list) {
             Object[] res = (Object[]) o;
-            Long idOfMenu = ((BigInteger) res[0]).longValue();
-            String menuDetailName = (String) res[1];
+            Long idOfProhibition = ((BigInteger) res[0]).longValue();
+            String filterText = (String) res[1];
             String groupName = (String) res[2];
+            Boolean active = (Boolean) res[3];
             if (!typeIdHashMap.containsKey(groupName)) {
                 typeIdHashMap.put(groupName, typeIdHashMap.keySet().size());
             }
-            allergenList.add(new Allergen(idOfMenu, menuDetailName, typeIdHashMap.get(groupName), groupName, false));
+            allergenList.add(new Allergen(idOfProhibition, filterText, typeIdHashMap.get(groupName), groupName, active));
         }
         return allergenList;
     }

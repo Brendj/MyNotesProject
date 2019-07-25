@@ -4184,9 +4184,9 @@ public class DAOUtils {
     }
 
     public static ProhibitionMenu findProhibitionMenuByIdAndClientId(Session session, Long idOfProhibitionMenu, Long idOfClient) {
-        Criteria criteria = session.createCriteria(Prohibition.class);
+        Criteria criteria = session.createCriteria(ProhibitionMenu.class);
         criteria.add(Restrictions.eq("idOfProhibitions", idOfProhibitionMenu));
-        criteria.add(Restrictions.eq("idOfClient", idOfClient));
+        criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
         criteria.setMaxResults(1);
         List list = criteria.list();
         return ((list.isEmpty()) ? null : (ProhibitionMenu) list.get(0));

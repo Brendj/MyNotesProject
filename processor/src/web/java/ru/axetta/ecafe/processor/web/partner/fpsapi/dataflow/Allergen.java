@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.fpsapi.dataflow;
 import org.codehaus.jackson.annotate.JsonProperty;
 
 public class Allergen {
-    @JsonProperty(value = "allegenid")
+    @JsonProperty(value = "allergenid")
     private String allergenId;
 
     @JsonProperty(value = "allergenname")
