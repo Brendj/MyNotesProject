@@ -37,6 +37,8 @@ public class FpsapiController {
 
     private Logger logger = LoggerFactory.getLogger(FpsapiController.class);
     private static final Integer RANGES_DAYS = 14;
+    private static final String ERROR_DATE_FORMAT = "Ошибка в формате даты";
+    private static final String ERROR_REQUEST_PARAMETRS = "Переданы некорректные параметры";
 
     @GET
     @Path(value = "/netrika/mobile/v1/sales")
@@ -48,18 +50,8 @@ public class FpsapiController {
         Transaction persistenceTransaction = null;
         //Вычисление результата запроса
         try {
-            Date dateFromD;
-            Date dateToD;
-            try {
-                dateFromD = new SimpleDateFormat("yyyy-MM-dd").parse(dateFrom);
-                dateToD = new SimpleDateFormat("yyyy-MM-dd").parse(dateTo);
-            }
-            catch (ParseException e) {
-                logger.error("Ошибка в формате даты", e);
-                responseSales.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
-                responseSales.setErrorMessage("Переданы некорректные параметры");
-                return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseSales).build();
-            }
+            Date dateFromD = new SimpleDateFormat("yyyy-MM-dd").parse(dateFrom);
+            Date dateToD = new SimpleDateFormat("yyyy-MM-dd").parse(dateTo);
 
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -71,8 +63,7 @@ public class FpsapiController {
             }
 
             List<Order> orders = DAOUtils
-                    .findOrdersbyIdofclientandBetweenTime(persistenceSession, client, dateFromD,
-                            dateToD);
+                    .findOrdersbyIdofclientandBetweenTime(persistenceSession, client, dateFromD, dateToD);
             if (orders.isEmpty()) {
                 responseSales.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
                 responseSales.setErrorMessage(ResponseCodes.RC_OK.toString());
@@ -112,9 +103,7 @@ public class FpsapiController {
                             }
                         }
                     }
-                }
-                else
-                {
+                } else {
                     //Если комплекс, то ДОЛЖЕН быть одного из 2-ух типов: "План платного питания" или "Абонементное питание"
                     if (order.getOrderType() == OrderTypeEnumType.PAY_PLAN
                             || order.getOrderType() == OrderTypeEnumType.SUBSCRIPTION_FEEDING) {
@@ -132,6 +121,11 @@ public class FpsapiController {
             responseSales.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
             responseSales.setErrorMessage(ResponseCodes.RC_OK.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseSales).build();
+        } catch (ParseException e) {
+            logger.error(ERROR_DATE_FORMAT, e);
+            responseSales.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
+            responseSales.setErrorMessage(ERROR_REQUEST_PARAMETRS);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseSales).build();
         } catch (IllegalArgumentException e) {
             logger.error("Can't find client", e);
             responseSales.setErrorCode(Long.toString(ResponseCodes.RC_INTERNAL_ERROR.getCode()));
@@ -175,23 +169,21 @@ public class FpsapiController {
                 try {
                     dateTo = new SimpleDateFormat("yyyy-MM-dd").parse(date);
                 } catch (ParseException e) {
-                    logger.error("Ошибка в формате даты", e);
+                    logger.error(ERROR_DATE_FORMAT, e);
                     responseAverage.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
-                    responseAverage.setErrorMessage("Переданы некорректные параметры");
+                    responseAverage.setErrorMessage(ERROR_REQUEST_PARAMETRS);
                     return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseAverage).build();
 
                 }
-            }
-            else
-                //Иначе берем текущую дату
+            } else
+            //Иначе берем текущую дату
+            {
                 dateTo = new Date();
-            //Если радиус задан
-            if (range != null)
-            {
-                rangeDate = range;
             }
-            else
-            {
+            //Если радиус задан
+            if (range != null) {
+                rangeDate = range;
+            } else {
                 //Берём константу
                 rangeDate = RANGES_DAYS;
             }
@@ -211,8 +203,7 @@ public class FpsapiController {
             }
 
             List<Order> orders = DAOUtils
-                    .findOrdersbyIdofclientandBetweenTime(persistenceSession, client, dateFrom,
-                            dateTo);
+                    .findOrdersbyIdofclientandBetweenTime(persistenceSession, client, dateFrom, dateTo);
             if (orders.isEmpty()) {
                 responseAverage.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
                 responseAverage.setErrorMessage(ResponseCodes.RC_OK.toString());
@@ -235,11 +226,11 @@ public class FpsapiController {
                     continue;
                 }
                 //Считаем сумму по всем заказам
-                if (order.getRSum() != null)
-                    sum+=order.getRSum();
+                if (order.getRSum() != null) {
+                    sum += order.getRSum();
+                }
 
-                if (order.getOrderDate() != null)
-                {
+                if (order.getOrderDate() != null) {
                     datesEat.add(new SimpleDateFormat("yyyy-MM-dd").format(order.getOrderDate()));
                 }
             }
@@ -249,7 +240,7 @@ public class FpsapiController {
             averageItem.setDate(new SimpleDateFormat("yyyy-MM-dd").format(dateFrom));
             averageItem.setRange(Integer.toString(rangeDate));
             averageItem.setSum(Long.toString(sum));
-            averageItem.setAveragesum(Float.toString(sum.floatValue()/(float)datesEat.size()));
+            averageItem.setAveragesum(Float.toString(sum.floatValue() / (float) datesEat.size()));
             averageItem.setDaycount(Integer.toString(datesEat.size()));
             averageItem.setAccounttypeid("1");
             responseAverage.getAverage().add(averageItem);
@@ -278,9 +269,25 @@ public class FpsapiController {
     }
 
     @GET
+    @Path(value = "/netrika/mobile/v1/transactionsbydate")
+    public Response getTransactionsbyDate(@QueryParam(value = "RegId") String regID,
+            @QueryParam(value = "LastTransactionId") Long lastTransactionId,
+            @QueryParam(value = "DateFrom") String dateFrom, @QueryParam(value = "DateTo") String dateTo)
+            throws Exception {
+        return workWithTransactions(regID, null, lastTransactionId, dateFrom, dateTo, 1);
+    }
+
+    @GET
     @Path(value = "/netrika/mobile/v1/transactions")
-    public Response getTransactions(@QueryParam(value = "RegId") String regID, @QueryParam(value = "Count") Integer count,
-            @QueryParam(value = "LastTransactionId") Long lastTransactionId) throws Exception {
+    public Response getTransactions(@QueryParam(value = "RegId") String regID,
+            @QueryParam(value = "Count") Integer count, @QueryParam(value = "LastTransactionId") Long lastTransactionId)
+            throws Exception {
+        return workWithTransactions(regID, count, lastTransactionId, null, null, 0);
+
+    }
+    //type - определяет тип выборки: по количесву или по дате
+    private Response workWithTransactions(String regID, Integer count, Long lastTransactionId, String dateFrom,
+            String dateTo, Integer type) {
         ResponseTransactions responseTransactions = new ResponseTransactions();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -289,23 +296,41 @@ public class FpsapiController {
         try {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+            Date dateToT = new Date();
+            Date dateFromT = new Date();
             //Получаем клиента
             Client client = DAOUtils.findClientByIacregid(persistenceSession, regID);
             if (client == null) {
                 throw new IllegalArgumentException("Client with regID = " + regID + " is not found");
             }
-            if (count == null)
-            {
+            if (count == null && type == 0) {
                 logger.error("Отсутствет количество выбираемых записей");
                 responseTransactions.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
-                responseTransactions.setErrorMessage("Переданы некорректные параметры");
+                responseTransactions.setErrorMessage(ERROR_REQUEST_PARAMETRS);
                 return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseTransactions).build();
             }
-
-            List<AccountTransaction> accountTransactions = DAOUtils.getAccountTransactionsForClientbyLast(persistenceSession,client,lastTransactionId,count);
-            if (accountTransactions == null)
-            {
-                throw new  Exception();
+            if (type == 1) {
+                dateToT = new SimpleDateFormat("yyyy-MM-dd").parse(dateTo);
+                dateFromT = new SimpleDateFormat("yyyy-MM-dd").parse(dateFrom);
+                //Сдвиг на 1 день
+                Calendar cal = Calendar.getInstance();
+                cal.setTime(dateToT);
+                cal.add(Calendar.DATE, -1);
+                dateToT = cal.getTime();
+            }
+            List<AccountTransaction> accountTransactions = new ArrayList<>();
+            if (type == 0) {
+                accountTransactions = DAOUtils
+                        .getAccountTransactionsForClientbyLast(persistenceSession, client, lastTransactionId, count,
+                                null, null);
+            }
+            if (type == 1) {
+                accountTransactions = DAOUtils
+                        .getAccountTransactionsForClientbyLast(persistenceSession, client, lastTransactionId, null,
+                                dateFromT, dateToT);
+            }
+            if (accountTransactions == null) {
+                throw new Exception();
             }
             responseTransactions.setServerTimestamp(new Date());
 
@@ -319,31 +344,31 @@ public class FpsapiController {
             for (AccountTransaction accountTransaction : accountTransactions) {
                 TransactionItem transactionItem = new TransactionItem();
                 transactionItem.setId(Long.toString(accountTransaction.getIdOfTransaction()));
-                transactionItem.setAccounttypeid("1");
-                transactionItem.setAccounttypename("Горячее питание");
+                transactionItem.setAccounttypeid(Integer.toString(SalesOrderType.HOT_FOOD.getCode()));
+                transactionItem.setAccounttypename(SalesOrderType.HOT_FOOD.getDescription());
                 transactionItem.setSum(Long.toString(accountTransaction.getTransactionSum()));
                 transactionItem.setTimestamp(timeConverter(accountTransaction.getTransactionTime()));
 
-                if (isPositive(accountTransaction.getTransactionSum()))
-                {
+                if (isPositive(accountTransaction.getTransactionSum())) {
                     if (accountTransaction.getSourceType() == AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE
                             || accountTransaction.getSourceType() == AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE
                             || accountTransaction.getSourceType() == AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE
-                            || accountTransaction.getSourceType() == AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE)
-                    {
+                            || accountTransaction.getSourceType()
+                            == AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE) {
                         transactionItem.setTransactiontypeid("2");
                         transactionItem.setTransactiontypename("Пополнение");
                     }
-                }
-                else
-                {
+                } else {
                     if (accountTransaction.getSourceType() == AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE
                             || accountTransaction.getSourceType() == AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE
-                            || accountTransaction.getSourceType() == AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE
-                            || accountTransaction.getSourceType() == AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE
-                            || accountTransaction.getSourceType() == AccountTransaction.ACCOUNT_REFUND_TRANSACTION_SOURCE_TYPE
-                            || accountTransaction.getSourceType() == AccountTransaction.CUSTOMERS_CARD_REVEALING_TRANSACTION_SOURCE_TYPE)
-                    {
+                            || accountTransaction.getSourceType()
+                            == AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE
+                            || accountTransaction.getSourceType()
+                            == AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE
+                            || accountTransaction.getSourceType()
+                            == AccountTransaction.ACCOUNT_REFUND_TRANSACTION_SOURCE_TYPE
+                            || accountTransaction.getSourceType()
+                            == AccountTransaction.CUSTOMERS_CARD_REVEALING_TRANSACTION_SOURCE_TYPE) {
                         transactionItem.setTransactiontypeid("3");
                         transactionItem.setTransactiontypename("Списание");
                     }
@@ -359,6 +384,11 @@ public class FpsapiController {
             responseTransactions.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
             responseTransactions.setErrorMessage(ResponseCodes.RC_OK.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseTransactions).build();
+        } catch (ParseException e) {
+            logger.error(ERROR_DATE_FORMAT, e);
+            responseTransactions.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
+            responseTransactions.setErrorMessage(ERROR_REQUEST_PARAMETRS);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseTransactions).build();
         } catch (IllegalArgumentException e) {
             logger.error("Can't find client", e);
             responseTransactions.setErrorCode(Long.toString(ResponseCodes.RC_INTERNAL_ERROR.getCode()));
@@ -373,17 +403,19 @@ public class FpsapiController {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-
     }
 
-    private Boolean isPositive (long i) {
-        if (i == 0) return true;
-        if (i >> 63 != 0) return false;
+    private Boolean isPositive(long i) {
+        if (i == 0) {
+            return true;
+        }
+        if (i >> 63 != 0) {
+            return false;
+        }
         return true;
     }
 
-    private SalesItem setParametrs (Order order, OrderDetail orderDetail, SalesOrderType salesOrderType)
-    {
+    private SalesItem setParametrs(Order order, OrderDetail orderDetail, SalesOrderType salesOrderType) {
         SalesItem salesItem = new SalesItem();
         salesItem.setId(Long.toString(order.getCompositeIdOfOrder().getIdOfOrder()));
         salesItem.setTimestamp(timeConverter(order.getOrderDate()));
@@ -393,10 +425,11 @@ public class FpsapiController {
         salesItem.setQuantity(orderDetail.getQty().toString());
         salesItem.setSum(Long.toString(orderDetail.getQty() * orderDetail.getRPrice()));
         salesItem.setDiscount(Long.toString(orderDetail.getDiscount()));
-        if (order.getState() == 1 && order.getTransaction() != null)
+        if (order.getState() == 1 && order.getTransaction() != null) {
             salesItem.setRemoved(timeConverter(order.getTransaction().getTransactionTime()));
-        else
+        } else {
             salesItem.setRemoved("");
+        }
         if (SalesOrderType.HOT_FOOD.getCode() == salesOrderType.getCode()) {
             salesItem.setAccount_type(Integer.toString(SalesOrderType.HOT_FOOD.getCode()));
             salesItem.setAccount_name(SalesOrderType.HOT_FOOD.getDescription());
@@ -405,13 +438,13 @@ public class FpsapiController {
             salesItem.setAccount_type(Integer.toString(SalesOrderType.BUFFET.getCode()));
             salesItem.setAccount_name(SalesOrderType.BUFFET.getDescription());
         }
-        if (order.getTransaction() != null)
+        if (order.getTransaction() != null) {
             salesItem.setTransactionid(Long.toString(order.getTransaction().getIdOfTransaction()));
+        }
         return salesItem;
     }
 
-    private String timeConverter (Date date)
-    {
+    private String timeConverter(Date date) {
         String timeStamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(date);
         return timeStamp.replace(' ', 'T');
     }
@@ -495,15 +528,15 @@ public class FpsapiController {
                 if (!typeIdHashMap.containsKey(groupName)) {
                     typeIdHashMap.put(groupName, typeIdHashMap.keySet().size());
                 }
-                allergenList.add(new Allergen(idOfProhibition, filterText, typeIdHashMap.get(groupName), groupName, true));
+                allergenList
+                        .add(new Allergen(idOfProhibition, filterText, typeIdHashMap.get(groupName), groupName, true));
             }
             return allergenList;
         }
 
-        query = session.createSQLQuery(
-                "select m.idofmenu, md.menudetailname, md.groupname from cf_menu m "
-                        + "join cf_menudetails md on md.idofmenu = m.idofmenu "
-                        + "where m.idoforg = :idOfOrg and m.idofmenu = :idOfMenu");
+        query = session.createSQLQuery("select m.idofmenu, md.menudetailname, md.groupname from cf_menu m "
+                + "join cf_menudetails md on md.idofmenu = m.idofmenu "
+                + "where m.idoforg = :idOfOrg and m.idofmenu = :idOfMenu");
         query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
         query.setParameter("idOfMenu", menu.getIdOfMenu());
 
