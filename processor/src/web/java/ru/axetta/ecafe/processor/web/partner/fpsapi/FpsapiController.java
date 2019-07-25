@@ -277,6 +277,111 @@ public class FpsapiController {
 
     }
 
+    @GET
+    @Path(value = "/netrika/mobile/v1/transactions")
+    public Response getTransactions(@QueryParam(value = "RegId") String regID, @QueryParam(value = "Count") Integer count,
+            @QueryParam(value = "LastTransactionId") Long lastTransactionId) throws Exception {
+        ResponseTransactions responseTransactions = new ResponseTransactions();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        //Вычисление результата запроса
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            //Получаем клиента
+            Client client = DAOUtils.findClientByIacregid(persistenceSession, regID);
+            if (client == null) {
+                throw new IllegalArgumentException("Client with regID = " + regID + " is not found");
+            }
+            if (count == null)
+            {
+                logger.error("Отсутствет количество выбираемых записей");
+                responseTransactions.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
+                responseTransactions.setErrorMessage("Переданы некорректные параметры");
+                return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseTransactions).build();
+            }
+
+            List<AccountTransaction> accountTransactions = DAOUtils.getAccountTransactionsForClientbyLast(persistenceSession,client,lastTransactionId,count);
+            if (accountTransactions == null)
+            {
+                throw new  Exception();
+            }
+            responseTransactions.setServerTimestamp(new Date());
+
+            //В указанный период нет транзакций
+            if (accountTransactions.isEmpty()) {
+                responseTransactions.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
+                responseTransactions.setErrorMessage(ResponseCodes.RC_OK.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(responseTransactions).build();
+            }
+
+            for (AccountTransaction accountTransaction : accountTransactions) {
+                TransactionItem transactionItem = new TransactionItem();
+                transactionItem.setId(Long.toString(accountTransaction.getIdOfTransaction()));
+                transactionItem.setAccounttypeid("1");
+                transactionItem.setAccounttypename("Горячее питание");
+                transactionItem.setSum(Long.toString(accountTransaction.getTransactionSum()));
+                transactionItem.setTimestamp(timeConverter(accountTransaction.getTransactionTime()));
+
+                if (isPositive(accountTransaction.getTransactionSum()))
+                {
+                    if (accountTransaction.getSourceType() == AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE
+                            || accountTransaction.getSourceType() == AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE
+                            || accountTransaction.getSourceType() == AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE
+                            || accountTransaction.getSourceType() == AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE)
+                    {
+                        transactionItem.setTransactiontypeid("2");
+                        transactionItem.setTransactiontypename("Пополнение");
+                    }
+                }
+                else
+                {
+                    if (accountTransaction.getSourceType() == AccountTransaction.PAYMENT_SYSTEM_TRANSACTION_SOURCE_TYPE
+                            || accountTransaction.getSourceType() == AccountTransaction.CASHBOX_TRANSACTION_SOURCE_TYPE
+                            || accountTransaction.getSourceType() == AccountTransaction.CLIENT_ORDER_TRANSACTION_SOURCE_TYPE
+                            || accountTransaction.getSourceType() == AccountTransaction.ACCOUNT_TRANSFER_TRANSACTION_SOURCE_TYPE
+                            || accountTransaction.getSourceType() == AccountTransaction.ACCOUNT_REFUND_TRANSACTION_SOURCE_TYPE
+                            || accountTransaction.getSourceType() == AccountTransaction.CUSTOMERS_CARD_REVEALING_TRANSACTION_SOURCE_TYPE)
+                    {
+                        transactionItem.setTransactiontypeid("3");
+                        transactionItem.setTransactiontypename("Списание");
+                    }
+                }
+
+                transactionItem.setTransactiontag("");
+
+                responseTransactions.getTransaction().add(transactionItem);
+            }
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            responseTransactions.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
+            responseTransactions.setErrorMessage(ResponseCodes.RC_OK.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseTransactions).build();
+        } catch (IllegalArgumentException e) {
+            logger.error("Can't find client", e);
+            responseTransactions.setErrorCode(Long.toString(ResponseCodes.RC_INTERNAL_ERROR.getCode()));
+            responseTransactions.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseTransactions).build();
+        } catch (Exception e) {
+            logger.error("InternalError", e);
+            responseTransactions.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
+            responseTransactions.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(responseTransactions).build();
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+    }
+
+    private Boolean isPositive (long i) {
+        if (i == 0) return true;
+        if (i >> 63 != 0) return false;
+        return true;
+    }
+
     private SalesItem setParametrs (Order order, OrderDetail orderDetail, SalesOrderType salesOrderType)
     {
         SalesItem salesItem = new SalesItem();

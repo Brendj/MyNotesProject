@@ -1381,6 +1381,32 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    @SuppressWarnings("unchecked")
+    public static List<AccountTransaction> getAccountTransactionsForClientbyLast(Session persistenceSession, Client client,
+            Long lastTransactionId, Integer count) {
+        try
+        {
+        Criteria criteria = persistenceSession.createCriteria(AccountTransaction.class);
+        criteria.add(Restrictions.eq("client", client));
+        //Типы транзакций, который НЕ должны учитываться
+        criteria.add(Restrictions.not(
+                Restrictions.eq("sourceType", AccountTransaction.INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE)));
+        criteria.add(Restrictions.not(
+                Restrictions.eq("sourceType", AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE)));
+        criteria.add(Restrictions.not(
+                Restrictions.eq("sourceType", AccountTransaction.CLIENT_BALANCE_HOLD)));
+        //Определяем начальную точку отсчёта
+        if (lastTransactionId != null)
+            criteria.add(Restrictions.le("idOfTransaction", lastTransactionId));   // <=
+        //Сортировка по убыванию
+        criteria.addOrder(org.hibernate.criterion.Order.desc("idOfTransaction"));
+        return criteria.setMaxResults(count).list();
+        } catch (Exception e)
+        {
+            return null;
+        }
+    }
+
     /**
      * Возвращает список данных синхронизации укзанного типа за интервал времени для указанной организации
      *
