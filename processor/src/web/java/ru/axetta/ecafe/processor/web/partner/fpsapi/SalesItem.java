@@ -5,24 +5,24 @@
 package ru.axetta.ecafe.processor.web.partner.fpsapi;
 
 public class SalesItem {
-    private Long id;
+    private String id;
     private String timestamp;
     private String date_creation;
-    private Long productid;
+    private String productid;
     private String productname;
-    private Long quantity;
-    private Long sum;
-    private Long discount;
+    private String quantity;
+    private String sum;
+    private String discount;
     private String removed;
-    private Integer account_type;
+    private String account_type;
     private String account_name;
-    private Long transactionid;
+    private String transactionid;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -42,11 +42,11 @@ public class SalesItem {
         this.date_creation = date_creation;
     }
 
-    public Long getProductid() {
+    public String getProductid() {
         return productid;
     }
 
-    public void setProductid(Long productid) {
+    public void setProductid(String productid) {
         this.productid = productid;
     }
 
@@ -58,27 +58,27 @@ public class SalesItem {
         this.productname = productname;
     }
 
-    public Long getQuantity() {
+    public String getQuantity() {
         return quantity;
     }
 
-    public void setQuantity(Long quantity) {
+    public void setQuantity(String quantity) {
         this.quantity = quantity;
     }
 
-    public Long getSum() {
+    public String getSum() {
         return sum;
     }
 
-    public void setSum(Long sum) {
+    public void setSum(String sum) {
         this.sum = sum;
     }
 
-    public Long getDiscount() {
+    public String getDiscount() {
         return discount;
     }
 
-    public void setDiscount(Long discount) {
+    public void setDiscount(String discount) {
         this.discount = discount;
     }
 
@@ -90,11 +90,11 @@ public class SalesItem {
         this.removed = removed;
     }
 
-    public Integer getAccount_type() {
+    public String getAccount_type() {
         return account_type;
     }
 
-    public void setAccount_type(Integer account_type) {
+    public void setAccount_type(String account_type) {
         this.account_type = account_type;
     }
 
@@ -106,11 +106,11 @@ public class SalesItem {
         this.account_name = account_name;
     }
 
-    public Long getTransactionid() {
+    public String getTransactionid() {
         return transactionid;
     }
 
-    public void setTransactionid(Long transactionid) {
+    public void setTransactionid(String transactionid) {
         this.transactionid = transactionid;
     }
 }

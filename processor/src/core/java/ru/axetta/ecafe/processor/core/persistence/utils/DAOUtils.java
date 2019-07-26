@@ -1380,6 +1380,46 @@ public class DAOUtils {
         }
         return criteria.list();
     }
+    /**
+     * Возвращает список транзакций произведенных либо в заданном интервале времени, либо по их максимальному количеству,
+     * которые могут быть меньше определенного id
+     * @param persistenceSession ссылка на сессию
+     * @param client ссылка клиента (обязательно)
+     * @param lastTransactionId идентификатор начальной транзакции (не обязательно)
+     * @param count максимальное количество выбираемых транзакций (не обязательно)
+     * @param startDate минимальная дата в выборке (не обязательно)
+     * @param endDate максимальная дата в выборке (не обязательно)
+     * @return возвращается список транзакций клиентов
+     */
+    @SuppressWarnings("unchecked")
+    public static List<AccountTransaction> getAccountTransactionsForClientbyLast(Session persistenceSession, Client client,
+            Long lastTransactionId, Integer count, Date startDate, Date endDate) {
+        try
+        {
+        Criteria criteria = persistenceSession.createCriteria(AccountTransaction.class);
+        criteria.add(Restrictions.eq("client", client));
+        //Типы транзакций, который НЕ должны учитываться
+        criteria.add(Restrictions.not(
+                Restrictions.eq("sourceType", AccountTransaction.INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE)));
+        criteria.add(Restrictions.not(
+                Restrictions.eq("sourceType", AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE)));
+        criteria.add(Restrictions.not(
+                Restrictions.eq("sourceType", AccountTransaction.CLIENT_BALANCE_HOLD)));
+        //Определяем начальную точку отсчёта
+        if (lastTransactionId != null)
+            criteria.add(Restrictions.le("idOfTransaction", lastTransactionId));   // <=
+        //Сортировка по убыванию
+        criteria.addOrder(org.hibernate.criterion.Order.desc("idOfTransaction"));
+        if (count != null)
+            criteria.setMaxResults(count);
+        if (startDate != null && endDate != null)
+            criteria.add(Restrictions.between("transactionTime", startDate, endDate));
+        return criteria.list();
+        } catch (Exception e)
+        {
+            return null;
+        }
+    }
 
     /**
      * Возвращает список данных синхронизации укзанного типа за интервал времени для указанной организации
