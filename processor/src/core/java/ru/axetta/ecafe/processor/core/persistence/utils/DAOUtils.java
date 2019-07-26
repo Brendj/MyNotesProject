@@ -171,6 +171,14 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
+    public static Client findClientByIacregid(Session persistenceSession, String iacregid) {
+        Criteria criteria = persistenceSession.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("iacRegId", iacregid));
+        List<Client> resultList = (List<Client>) criteria.list();
+        return resultList.isEmpty() ? null : resultList.get(0);
+    }
+
+    @SuppressWarnings("unchecked")
     public static List<Client> findClientBySan(Session persistenceSession, String san) {
         Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
         clientCriteria.add(Restrictions.ilike("san", san, MatchMode.EXACT));
@@ -444,6 +452,13 @@ public class DAOUtils {
     public static OrderDetail findOrderDetail(Session persistenceSession,
             CompositeIdOfOrderDetail compositeIdOfOrderDetail) throws Exception {
         return (OrderDetail) persistenceSession.get(OrderDetail.class, compositeIdOfOrderDetail);
+    }
+
+    public static List findOrdersbyIdofclientandBetweenTime(Session persistenceSession, Client client, Date startDate, Date endDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(Order.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.between("createTime", startDate, endDate));
+        return criteria.list();
     }
 
     public static Org getOrgReference(Session persistenceSession, long idOfOrg) throws Exception {
@@ -4157,7 +4172,7 @@ public class DAOUtils {
         }
         return result;
     }
-    
+
         public static Contragent getContragentbyContractId(Session persistenceSession, Long contractId) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Contragent.class);
         criteria.createAlias("orgsInternal", "orgs");
@@ -4165,6 +4180,30 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("client.contractId", contractId));
         return (Contragent) criteria.uniqueResult();
     }
+
+    public static Menu findLastMenuByOrgBeforeDate(Session session, Long idOfOrg, Date date) {
+        Criteria criteria = session.createCriteria(Menu.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.le("menuDate", date));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("menuDate"));
+        criteria.setMaxResults(1);
+        List list = criteria.list();
+        return ((list.isEmpty()) ? null : (Menu) list.get(0));
+    }
+
+    public static ProhibitionMenu findProhibitionMenuByIdAndClientId(Session session, Long idOfProhibitionMenu, Long idOfClient) {
+        Criteria criteria = session.createCriteria(ProhibitionMenu.class);
+        criteria.add(Restrictions.eq("idOfProhibitions", idOfProhibitionMenu));
+        criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
+        criteria.setMaxResults(1);
+        List list = criteria.list();
+        return ((list.isEmpty()) ? null : (ProhibitionMenu) list.get(0));
+    }
+
+    public static String findMenudetailNameByIdOfMenudetail(Session session, Long idOfMenuDetail) {
+        Criteria criteria = session.createCriteria(MenuDetail.class);
+        criteria.add(Restrictions.eq("idOfMenuDetail", idOfMenuDetail));
+        criteria.setProjection(Projections.property("menuDetailName"));
+        return (String) criteria.uniqueResult();
+    }
 }
-
-
