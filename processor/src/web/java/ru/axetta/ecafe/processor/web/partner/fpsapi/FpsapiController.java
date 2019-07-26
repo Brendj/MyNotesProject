@@ -43,7 +43,7 @@ public class FpsapiController {
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/sales")
     public Response getSales(@QueryParam(value = "RegId") String regID, @QueryParam(value = "DateFrom") String dateFrom,
             @QueryParam(value = "DateTo") String dateTo) throws Exception {
@@ -149,7 +149,7 @@ public class FpsapiController {
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/average")
     public Response getAverage(@QueryParam(value = "RegId") String regID, @QueryParam(value = "Date") String date,
             @QueryParam(value = "Range") Integer range) throws Exception {
@@ -275,7 +275,7 @@ public class FpsapiController {
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/transactionsbydate")
     public Response getTransactionsbyDate(@QueryParam(value = "RegId") String regID,
             @QueryParam(value = "LastTransactionId") Long lastTransactionId,
@@ -286,7 +286,7 @@ public class FpsapiController {
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/transactions")
     public Response getTransactions(@QueryParam(value = "RegId") String regID,
             @QueryParam(value = "Count") Integer count, @QueryParam(value = "LastTransactionId") Long lastTransactionId)
