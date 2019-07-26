@@ -462,7 +462,7 @@ public class FpsapiController {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-    public Response getAllergens(@QueryParam(value = "RegId") String regId) {
+    public Response getAllergens(@FormParam(value = "RegId") String regId) {
         AllergenResult result = new AllergenResult();
 
         Session session = null;
@@ -550,8 +550,8 @@ public class FpsapiController {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-    public Response createAllergen(@QueryParam(value = "RegId") String regId,
-            @QueryParam(value = "AllergenId") Long allergenId, @QueryParam(value = "Active") Integer active) {
+    public Response createAllergen(@FormParam(value = "RegId") String regId,
+            @FormParam(value = "AllergenId") Long allergenId, @FormParam(value = "Active") Integer active) {
         Result result = new Result();
 
         Session session = null;
