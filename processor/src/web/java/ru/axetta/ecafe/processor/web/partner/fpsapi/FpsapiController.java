@@ -37,8 +37,8 @@ public class FpsapiController {
 
     private Logger logger = LoggerFactory.getLogger(FpsapiController.class);
     private static final Integer RANGES_DAYS = 14;
-    private static final String ERROR_DATE_FORMAT = "Ошибка в формате даты";
-    private static final String ERROR_REQUEST_PARAMETRS = "Переданы некорректные параметры";
+    private static final String ERROR_DATE_FORMAT = "Date format error";
+    private static final String ERROR_REQUEST_PARAMETRS = "Invalid parameters passed";
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
