@@ -9,8 +9,8 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -4245,5 +4245,12 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("idOfMenuDetail", idOfMenuDetail));
         criteria.setProjection(Projections.property("menuDetailName"));
         return (String) criteria.uniqueResult();
+    }
+
+    public static List findEventsByIdOfClientBetweenTime(Session persistenceSession, Client client, Date startDate, Date endDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(EnterEvent.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.between("evtDateTime", startDate, endDate));
+        return criteria.list();
     }
 }

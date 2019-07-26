@@ -617,4 +617,130 @@ public class FpsapiController {
         }
     }
 
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+    @Path(value = "/netrika/mobile/v1/enterEvents")
+    public Response enterEvent (@FormParam(value="RegId") String regID,
+            @FormParam(value="DateFrom") String dateFrom,
+            @FormParam (value="DateTo") String dateTo)throws Exception{
+        ResponseEnterEvent responseEnterEvent = new ResponseEnterEvent();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            Date dateFromD = new SimpleDateFormat("yyyy-MM-dd").parse(dateFrom);
+            Date dateToD = new SimpleDateFormat("yyyy-MM-dd").parse(dateTo);
+
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            responseEnterEvent.setServerTimestamp(new Date());
+            Client client = DAOUtils.findClientByIacregid(persistenceSession, regID);
+            if (client == null) {
+                throw new IllegalArgumentException("Client with regID = " + regID + " is not found");
+            }
+            List<EnterEvent> events = DAOUtils
+                    .findEventsByIdOfClientBetweenTime(persistenceSession, client, dateFromD, dateToD);
+            if (events.isEmpty()) {
+                responseEnterEvent.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
+                responseEnterEvent.setErrorMessage(ResponseCodes.RC_OK.toString());
+                return Response.status(HttpURLConnection.HTTP_OK).entity(responseEnterEvent).build();
+            }
+            for(EnterEvent event: events) {
+                if(event.getPassDirection() == 0
+                        || event.getPassDirection() == 1
+                        || event.getPassDirection() == 6
+                        || event.getPassDirection() == 7) {
+                    responseEnterEvent.getEnterEvents().add(enterEventFilling(event));
+                }
+                else {
+                    continue;
+                }
+            }
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            responseEnterEvent.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
+            responseEnterEvent.setErrorMessage(ResponseCodes.RC_OK.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseEnterEvent).build();
+        } catch (IllegalArgumentException e)
+        {
+            logger.error("Can't find client", e);
+            responseEnterEvent.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
+            responseEnterEvent.setErrorMessage(ResponseCodes.RC_OK.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseEnterEvent).build();
+        } catch (Exception e){
+            logger.error("InternalError", e);
+            responseEnterEvent.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
+            responseEnterEvent.setErrorMessage(ResponseCodes.RC_OK.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseEnterEvent).build();
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private EnterEventItem enterEventFilling (EnterEvent enterEvent){
+        EnterEventItem eventItem = new EnterEventItem();
+        eventItem.setEvtDateTime(timeConverter(enterEvent.getEvtDateTime()));
+        eventItem.setDirection(enterEvent.getPassDirection());
+        eventItem.setName(enterEvent.getEnterName());
+        eventItem.setAddress(enterEvent.getOrg().getAddress());
+        eventItem.setShortNameInfoService(enterEvent.getOrg().getShortNameInfoService());
+        return eventItem;
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
+    @Path(value = "/netrika/mobile/v1/accounts")
+    public Response Accounts (@FormParam(value="RegId") String regID)
+            throws Exception {
+        ResponseAccounts responseAccounts = new ResponseAccounts();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            responseAccounts.setServerTimestamp(new Date());
+            Client client = DAOUtils.findClientByIacregid(persistenceSession, regID);
+            if (client == null) {
+                throw new IllegalArgumentException("Client with regID = " + regID + " is not found");
+            } else {
+                responseAccounts.getAccounts().add(AccountsFilling(client));
+            }
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            responseAccounts.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
+            responseAccounts.setErrorMessage(ResponseCodes.RC_OK.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseAccounts).build();
+        } catch (IllegalArgumentException e) {
+            logger.error("Can't find client", e);
+            responseAccounts.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
+            responseAccounts.setErrorMessage(ResponseCodes.RC_OK.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseAccounts).build();
+        } catch (Exception e) {
+            logger.error("InternalError", e);
+            responseAccounts.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
+            responseAccounts.setErrorMessage(ResponseCodes.RC_OK.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseAccounts).build();
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+    private AccountsItem AccountsFilling(Client client){
+        AccountsItem accountsItem = new AccountsItem();
+        accountsItem.setId(client.getContractId());
+        accountsItem.setSum(client.getBalance());
+        accountsItem.setAccouttypename(accountsItem.getAccouttypename());
+        accountsItem.setAccounttypeid(accountsItem.getAccounttypeid());
+        accountsItem.setTimestamp(accountsItem.getTimestamp());
+        return accountsItem;
+        }
 }
