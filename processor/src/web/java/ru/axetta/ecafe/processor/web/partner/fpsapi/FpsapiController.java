@@ -40,7 +40,9 @@ public class FpsapiController {
     private static final String ERROR_DATE_FORMAT = "Ошибка в формате даты";
     private static final String ERROR_REQUEST_PARAMETRS = "Переданы некорректные параметры";
 
-    @GET
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "/netrika/mobile/v1/sales")
     public Response getSales(@QueryParam(value = "RegId") String regID, @QueryParam(value = "DateFrom") String dateFrom,
             @QueryParam(value = "DateTo") String dateTo) throws Exception {
@@ -144,7 +146,9 @@ public class FpsapiController {
     }
 
 
-    @GET
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "/netrika/mobile/v1/average")
     public Response getAverage(@QueryParam(value = "RegId") String regID, @QueryParam(value = "Date") String date,
             @QueryParam(value = "Range") Integer range) throws Exception {
@@ -268,7 +272,9 @@ public class FpsapiController {
 
     }
 
-    @GET
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "/netrika/mobile/v1/transactionsbydate")
     public Response getTransactionsbyDate(@QueryParam(value = "RegId") String regID,
             @QueryParam(value = "LastTransactionId") Long lastTransactionId,
@@ -277,7 +283,9 @@ public class FpsapiController {
         return workWithTransactions(regID, null, lastTransactionId, dateFrom, dateTo, 1);
     }
 
-    @GET
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "/netrika/mobile/v1/transactions")
     public Response getTransactions(@QueryParam(value = "RegId") String regID,
             @QueryParam(value = "Count") Integer count, @QueryParam(value = "LastTransactionId") Long lastTransactionId)
@@ -450,8 +458,8 @@ public class FpsapiController {
     }
 
     @Path("/netrika/mobile/v1/allergens")
-    @GET
-    @Consumes(MediaType.APPLICATION_JSON)
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON)
     public Response getAllergetns(@QueryParam(value = "RegID") String regId) {
         AllergenResult result = new AllergenResult();
