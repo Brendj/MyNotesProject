@@ -45,8 +45,8 @@ public class FpsapiController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/sales")
-    public Response getSales(@QueryParam(value = "RegId") String regID, @QueryParam(value = "DateFrom") String dateFrom,
-            @QueryParam(value = "DateTo") String dateTo) throws Exception {
+    public Response getSales(@FormParam(value = "RegId") String regID, @FormParam(value = "DateFrom") String dateFrom,
+            @FormParam(value = "DateTo") String dateTo) throws Exception {
         ResponseSales responseSales = new ResponseSales();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -151,8 +151,8 @@ public class FpsapiController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/average")
-    public Response getAverage(@QueryParam(value = "RegId") String regID, @QueryParam(value = "Date") String date,
-            @QueryParam(value = "Range") Integer range) throws Exception {
+    public Response getAverage(@FormParam(value = "RegId") String regID, @FormParam(value = "Date") String date,
+            @FormParam(value = "Range") Integer range) throws Exception {
         ResponseAverage responseAverage = new ResponseAverage();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -277,9 +277,9 @@ public class FpsapiController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/transactionsbydate")
-    public Response getTransactionsbyDate(@QueryParam(value = "RegId") String regID,
-            @QueryParam(value = "LastTransactionId") Long lastTransactionId,
-            @QueryParam(value = "DateFrom") String dateFrom, @QueryParam(value = "DateTo") String dateTo)
+    public Response getTransactionsbyDate(@FormParam(value = "RegId") String regID,
+            @FormParam(value = "LastTransactionId") Long lastTransactionId,
+            @FormParam(value = "DateFrom") String dateFrom, @FormParam(value = "DateTo") String dateTo)
             throws Exception {
         return workWithTransactions(regID, null, lastTransactionId, dateFrom, dateTo, 1);
     }
@@ -288,8 +288,8 @@ public class FpsapiController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/transactions")
-    public Response getTransactions(@QueryParam(value = "RegId") String regID,
-            @QueryParam(value = "Count") Integer count, @QueryParam(value = "LastTransactionId") Long lastTransactionId)
+    public Response getTransactions(@FormParam(value = "RegId") String regID,
+            @FormParam(value = "Count") Integer count, @FormParam(value = "LastTransactionId") Long lastTransactionId)
             throws Exception {
         return workWithTransactions(regID, count, lastTransactionId, null, null, 0);
 
