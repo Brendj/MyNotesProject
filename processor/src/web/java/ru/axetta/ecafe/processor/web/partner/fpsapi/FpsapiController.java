@@ -354,7 +354,8 @@ public class FpsapiController {
                 transactionItem.setId(Long.toString(accountTransaction.getIdOfTransaction()));
                 transactionItem.setAccounttypeid(Integer.toString(SalesOrderType.HOT_FOOD.getCode()));
                 transactionItem.setAccounttypename(SalesOrderType.HOT_FOOD.getDescription());
-                transactionItem.setSum(Long.toString(accountTransaction.getTransactionSum()));
+                String sum = Long.toString(accountTransaction.getTransactionSum());
+                transactionItem.setSum(sum.substring(0, sum.length()-2) + "." + sum.substring(sum.length()-2, sum.length()));
                 transactionItem.setTimestamp(timeConverter(accountTransaction.getTransactionTime()));
 
                 if (isPositive(accountTransaction.getTransactionSum())) {
