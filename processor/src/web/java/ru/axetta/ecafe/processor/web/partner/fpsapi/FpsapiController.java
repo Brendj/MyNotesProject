@@ -173,9 +173,9 @@ public class FpsapiController {
     }
 
     @Path("/netrika/mobile/v1/allergens")
-    @GET
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @POST
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
     public Response getAllergens(@QueryParam(value = "RegId") String regId) {
         AllergenResult result = new AllergenResult();
 
@@ -262,8 +262,8 @@ public class FpsapiController {
 
     @Path("/netrika/mobile/v1/allergens/create")
     @POST
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
+    @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
+    @Produces(MediaType.APPLICATION_FORM_URLENCODED)
     public Response createAllergen(@QueryParam(value = "RegId") String regId,
             @QueryParam(value = "AllergenId") Long allergenId, @QueryParam(value = "Active") Integer active) {
         Result result = new Result();
