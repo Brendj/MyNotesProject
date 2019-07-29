@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.web.partner.sberbank_msk;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
 import ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet;
 
@@ -109,6 +111,7 @@ public class SBMSKOnlinePaymentServlet extends HttpServlet {
             logger.info(String.format("New request: %s", payRequest.toString()));
             try {
                 response = runtimeContext.getOnlinePaymentProcessor().processPayRequest(payRequest);
+                addSBMSKInfoToResponse(response);
             } catch (Exception e) {
                 logger.error("Failed to process request", e);
                 logger.error("Request string: " + requestParser.getQueryString(httpRequest));
@@ -132,6 +135,18 @@ public class SBMSKOnlinePaymentServlet extends HttpServlet {
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
         }
+    }
+
+    private void addSBMSKInfoToResponse(OnlinePaymentProcessor.PayResponse response) {
+        Contragent contragent = DAOReadExternalsService.getInstance().findContragentByClient(response.getClientId());
+        response.setInn(getValueNullSafe(contragent.getInn()));
+        response.setNazn(getValueNullSafe(contragent.getContragentName()));
+        response.setBic(getValueNullSafe(contragent.getBic()));
+        response.setRasch(getValueNullSafe(contragent.getAccount()));
+    }
+
+    private String getValueNullSafe(String value) {
+        return value == null ? "" : value.trim();
     }
 
     public void doGet(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
