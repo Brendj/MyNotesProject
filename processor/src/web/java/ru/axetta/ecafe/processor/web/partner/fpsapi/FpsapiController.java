@@ -243,7 +243,8 @@ public class FpsapiController {
 
             averageItem.setDate(new SimpleDateFormat("yyyy-MM-dd").format(dateFrom));
             averageItem.setRange(Integer.toString(rangeDate));
-            averageItem.setSum(Float.toString(sum.floatValue()));
+            String sumStr = Long.toString(sum);
+            averageItem.setSum(sumStr.substring(0, sumStr.length()-2) + "." + sumStr.substring(sumStr.length()-2, sumStr.length()));
             averageItem.setAveragesum(Float.toString(sum.floatValue() / (float) datesEat.size()));
             averageItem.setDaycount(Integer.toString(datesEat.size()));
             averageItem.setAccounttypeid("1");
