@@ -618,7 +618,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
             }
         } catch (Exception e) {
             responseMessageToSave[0] = "100 - Internal Error";
-            logger.error("Error in request to rnip 2.1", e);
+            logger.error("Error in GetResponseRequest to rnip 2.1", e);
         }
         RnipDAOService.getInstance().saveAsProcessed(rnipMessage, responseMessageToSave[0], responseMessageToSave[1], rnipMessage.getEventType());
     }
@@ -698,7 +698,8 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         vals.put(AMOUNT_KEY, payment.getAmount().toString());
         Date rnipDate = getRnipDate(payment.getPaymentDate());
         vals.put(PAYMENT_DATE_KEY, new SimpleDateFormat(RNIP_DATE_TIME_FORMAT).format(rnipDate));
-        vals.put(BIK_KEY, payment.getPayee().getOrgAccount().getBank().getBik());
+        //vals.put(BIK_KEY, payment.getPayee().getOrgAccount().getBank().getBik());
+        vals.put(BIK_KEY, payment.getPaymentOrg().getBank().getBik());
         vals.put(CHANGE_STATUS_KEY, payment.getChangeStatus().getMeaning());
         for (AdditionalDataType dataType : payment.getAdditionalData()) {
             if (dataType.getName().equals(PAYMENT_TO_KEY)) {
