@@ -243,9 +243,9 @@ public class FpsapiController {
 
             averageItem.setDate(new SimpleDateFormat("yyyy-MM-dd").format(dateFrom));
             averageItem.setRange(Integer.toString(rangeDate));
-            String sumStr = Long.toString(sum);
-            averageItem.setSum(sumStr.substring(0, sumStr.length()-2) + "." + sumStr.substring(sumStr.length()-2, sumStr.length()));
-            averageItem.setAveragesum(Float.toString(sum.floatValue() / (float) datesEat.size()));
+            averageItem.setSum(converMoney(sum));
+            averageItem.setAveragesum(converMoney(sum / datesEat.size()));
+
             averageItem.setDaycount(Integer.toString(datesEat.size()));
             averageItem.setAccounttypeid("1");
             responseAverage.getAverage().add(averageItem);
@@ -355,8 +355,7 @@ public class FpsapiController {
                 transactionItem.setId(Long.toString(accountTransaction.getIdOfTransaction()));
                 transactionItem.setAccounttypeid(Integer.toString(SalesOrderType.HOT_FOOD.getCode()));
                 transactionItem.setAccounttypename(SalesOrderType.HOT_FOOD.getDescription());
-                String sum = Long.toString(accountTransaction.getTransactionSum());
-                transactionItem.setSum(sum.substring(0, sum.length()-2) + "." + sum.substring(sum.length()-2, sum.length()));
+                transactionItem.setSum(converMoney(accountTransaction.getTransactionSum()));
                 transactionItem.setTimestamp(timeConverter(accountTransaction.getTransactionTime()));
 
                 if (isPositive(accountTransaction.getTransactionSum())) {
@@ -425,6 +424,15 @@ public class FpsapiController {
         return true;
     }
 
+    private String converMoney (Long sum)
+    {
+        String sumStr = Long.toString(sum);
+        if(sum >= 100)
+            return sumStr.substring(0, sumStr.length()-2) + "." + sumStr.substring(sumStr.length()-2, sumStr.length());
+        else
+            return "0." + sumStr;
+    }
+
     private SalesItem setParametrs(Order order, OrderDetail orderDetail, SalesOrderType salesOrderType) {
         SalesItem salesItem = new SalesItem();
         salesItem.setId(Long.toString(order.getCompositeIdOfOrder().getIdOfOrder()));
@@ -433,7 +441,7 @@ public class FpsapiController {
         salesItem.setProductid(Long.toString(orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail()));
         salesItem.setProductname(orderDetail.getMenuDetailName());
         salesItem.setQuantity(orderDetail.getQty().toString());
-        salesItem.setSum(Long.toString(orderDetail.getQty() * orderDetail.getRPrice()));
+        salesItem.setSum(converMoney(orderDetail.getQty() * orderDetail.getRPrice()));
         salesItem.setDiscount(Long.toString(orderDetail.getDiscount()));
         if (order.getState() == 1 && order.getTransaction() != null) {
             salesItem.setRemoved(timeConverter(order.getTransaction().getTransactionTime()));
