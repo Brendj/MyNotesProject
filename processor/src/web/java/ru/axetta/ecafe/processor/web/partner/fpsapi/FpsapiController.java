@@ -623,7 +623,7 @@ public class FpsapiController {
     @Path(value = "/netrika/mobile/v1/enterEvents")
     public Response enterEvent (@FormParam(value="RegId") String regID,
             @FormParam(value="DateFrom") String dateFrom,
-            @FormParam (value="DateTo") String dateTo)throws Exception{
+            @FormParam (value="DateTo") String dateTo)throws Exception {
         ResponseEnterEvent responseEnterEvent = new ResponseEnterEvent();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -647,14 +647,12 @@ public class FpsapiController {
                 responseEnterEvent.setErrorMessage(ResponseCodes.RC_OK.toString());
                 return Response.status(HttpURLConnection.HTTP_OK).entity(responseEnterEvent).build();
             }
-            for(EnterEvent event: events) {
-                if(event.getPassDirection() == 0
-                        || event.getPassDirection() == 1
-                        || event.getPassDirection() == 6
+
+            for (EnterEvent event : events) {
+                if (event.getPassDirection() == 0 || event.getPassDirection() == 1 || event.getPassDirection() == 6
                         || event.getPassDirection() == 7) {
                     responseEnterEvent.getEnterEvents().add(enterEventFilling(event));
-                }
-                else {
+                } else {
                     continue;
                 }
             }
@@ -664,17 +662,21 @@ public class FpsapiController {
             responseEnterEvent.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
             responseEnterEvent.setErrorMessage(ResponseCodes.RC_OK.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseEnterEvent).build();
-        } catch (IllegalArgumentException e)
-        {
+        } catch (ParseException e) {
+            logger.error(ERROR_DATE_FORMAT, e);
+            responseEnterEvent.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
+            responseEnterEvent.setErrorMessage(ERROR_REQUEST_PARAMETRS);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseEnterEvent).build();
+        } catch (IllegalArgumentException e) {
             logger.error("Can't find client", e);
-            responseEnterEvent.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
-            responseEnterEvent.setErrorMessage(ResponseCodes.RC_OK.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(responseEnterEvent).build();
+            responseEnterEvent.setErrorCode(Long.toString(ResponseCodes.RC_INTERNAL_ERROR.getCode()));
+            responseEnterEvent.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseEnterEvent).build();
         } catch (Exception e){
             logger.error("InternalError", e);
-            responseEnterEvent.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
-            responseEnterEvent.setErrorMessage(ResponseCodes.RC_OK.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(responseEnterEvent).build();
+            responseEnterEvent.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
+            responseEnterEvent.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(responseEnterEvent).build();
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -685,6 +687,11 @@ public class FpsapiController {
         EnterEventItem eventItem = new EnterEventItem();
         eventItem.setEvtDateTime(timeConverter(enterEvent.getEvtDateTime()));
         eventItem.setDirection(enterEvent.getPassDirection());
+        if(enterEvent.getPassDirection() == 1) {
+            enterEvent.setEnterName("Выход из здания");
+        } else {
+            enterEvent.setEnterName("Вход в здание");
+        }
         eventItem.setName(enterEvent.getEnterName());
         eventItem.setAddress(enterEvent.getOrg().getAddress());
         eventItem.setShortNameInfoService(enterEvent.getOrg().getShortNameInfoService());
@@ -719,16 +726,21 @@ public class FpsapiController {
             responseAccounts.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
             responseAccounts.setErrorMessage(ResponseCodes.RC_OK.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseAccounts).build();
+        } catch(ParseException e) {
+            logger.error(ERROR_DATE_FORMAT,e);
+            responseAccounts.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
+            responseAccounts.setErrorMessage(ERROR_REQUEST_PARAMETRS);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseAccounts).build();
         } catch (IllegalArgumentException e) {
             logger.error("Can't find client", e);
-            responseAccounts.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
-            responseAccounts.setErrorMessage(ResponseCodes.RC_OK.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(responseAccounts).build();
+            responseAccounts.setErrorCode(Long.toString(ResponseCodes.RC_INTERNAL_ERROR.getCode()));
+            responseAccounts.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseAccounts).build();
         } catch (Exception e) {
             logger.error("InternalError", e);
-            responseAccounts.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
-            responseAccounts.setErrorMessage(ResponseCodes.RC_OK.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(responseAccounts).build();
+            responseAccounts.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
+            responseAccounts.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(responseAccounts).build();
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
@@ -737,7 +749,7 @@ public class FpsapiController {
     private AccountsItem AccountsFilling(Client client){
         AccountsItem accountsItem = new AccountsItem();
         accountsItem.setId(client.getContractId());
-        accountsItem.setSum(client.getBalance());
+        accountsItem.setSum((double)client.getBalance());
         accountsItem.setAccouttypename(accountsItem.getAccouttypename());
         accountsItem.setAccounttypeid(accountsItem.getAccounttypeid());
         return accountsItem;

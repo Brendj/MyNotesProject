@@ -8,7 +8,7 @@ public class AccountsItem {
     private Long id;
     private String accounttypeid = "1";
     private String accouttypename = "Горячее питание";
-    private Long sum;
+    private Double sum;
 
     public Long getId() {
         return id;
@@ -34,11 +34,11 @@ public class AccountsItem {
         this.accouttypename = accouttypename;
     }
 
-    public Long getSum() {
+    public Double getSum() {
         return sum;
     }
 
-    public void setSum(Long sum) {
-        this.sum = sum;
+    public void setSum(Double sum) {
+        this.sum = sum/100;
     }
 }
