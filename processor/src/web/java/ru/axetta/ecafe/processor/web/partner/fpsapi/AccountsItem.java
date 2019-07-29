@@ -5,19 +5,10 @@
 package ru.axetta.ecafe.processor.web.partner.fpsapi;
 
 public class AccountsItem {
-    private String timestamp;
     private Long id;
     private String accounttypeid = "1";
     private String accouttypename = "Горячее питание";
     private Long sum;
-
-    public String getTimestamp() {
-        return timestamp;
-    }
-
-    public void setTimestamp(String timestamp) {
-        this.timestamp = timestamp;
-    }
 
     public Long getId() {
         return id;

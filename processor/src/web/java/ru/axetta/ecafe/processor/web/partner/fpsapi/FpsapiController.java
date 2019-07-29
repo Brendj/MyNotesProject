@@ -740,7 +740,6 @@ public class FpsapiController {
         accountsItem.setSum(client.getBalance());
         accountsItem.setAccouttypename(accountsItem.getAccouttypename());
         accountsItem.setAccounttypeid(accountsItem.getAccounttypeid());
-        accountsItem.setTimestamp(accountsItem.getTimestamp());
         return accountsItem;
         }
 }
