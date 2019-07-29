@@ -552,6 +552,9 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         ackTargetMessage.setAccepted(true);
         ackTargetMessage.setValue(rnipMessage.getResponseMessageId());
         ackRequest.setAckTargetMessage(ackTargetMessage);
+        AckRequest.Sender sender = requestObjectFactory.createAckRequestSender();
+        sender.setMnemonic(getMacroPart(rnipMessage.getContragent(), "CONTRAGENT_ID"));
+        ackRequest.setSender(sender);
 
         try {
             port21.ack(ackRequest);

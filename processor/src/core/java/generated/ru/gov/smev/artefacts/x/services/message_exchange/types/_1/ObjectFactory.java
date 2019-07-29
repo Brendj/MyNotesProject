@@ -235,6 +235,10 @@ public class ObjectFactory {
         return new GetResponseRequest.Sender();
     }
 
+    public AckRequest.Sender createAckRequestSender() {
+        return new AckRequest.Sender();
+    }
+
     /**
      * Create an instance of {@link AckRequest }
      * 
