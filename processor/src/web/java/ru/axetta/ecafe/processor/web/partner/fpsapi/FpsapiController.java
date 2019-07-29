@@ -427,10 +427,15 @@ public class FpsapiController {
     private String converMoney (Long sum)
     {
         String sumStr = Long.toString(sum);
-        if(sum >= 100)
+        if(sum >= 100 || sum <=-100)
             return sumStr.substring(0, sumStr.length()-2) + "." + sumStr.substring(sumStr.length()-2, sumStr.length());
-        else
-            return "0." + sumStr;
+        else {
+            if (sum >= 0)
+                return "0." + sumStr;
+            else {
+                return "-0." + sumStr.substring(1, sumStr.length());
+            }
+        }
     }
 
     private SalesItem setParametrs(Order order, OrderDetail orderDetail, SalesOrderType salesOrderType) {
