@@ -4147,6 +4147,14 @@ public class DAOUtils {
         return (OrgSetting) criteria.uniqueResult();
     }
 
+<<<<<<< HEAD
+    public static Contragent getContragentbyClientId(Session persistenceSession, Long clientId) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(Contragent.class);
+        criteria.createAlias("orgsInternal", "orgs");
+        criteria.createAlias("orgs.clientsInternal", "client");
+        criteria.add(Restrictions.eq("client.idOfClient", clientId));
+        return (Contragent) criteria.uniqueResult();
+=======
     public static List<Long> findFriendlyOrgsIds(Session session, List<Long> orgIdList) {
         Query query = session
                 .createSQLQuery("select friendlyorg from cf_friendly_organization where currentorg in (:idOfOrgList)")
@@ -4156,15 +4164,6 @@ public class DAOUtils {
             result.add(((BigInteger)o).longValue());
         }
         return result;
-    }
-    
-        public static Contragent getContragentbyContractId(Session persistenceSession, Long contractId) throws Exception {
-        Criteria criteria = persistenceSession.createCriteria(Contragent.class);
-        criteria.createAlias("orgsInternal", "orgs");
-        criteria.createAlias("orgs.clientsInternal", "client");
-        criteria.add(Restrictions.eq("client.contractId", contractId));
-        return (Contragent) criteria.uniqueResult();
+>>>>>>> features
     }
 }
-
-
