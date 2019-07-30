@@ -9,8 +9,8 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -4212,7 +4212,7 @@ public class DAOUtils {
         }
         return result;
     }
-    
+
     public static Contragent getContragentbyContractId(Session persistenceSession, Long contractId) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Contragent.class);
         criteria.createAlias("orgsInternal", "orgs");
@@ -4220,7 +4220,7 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("client.contractId", contractId));
         return (Contragent) criteria.uniqueResult();
     }
-    
+
     public static Menu findLastMenuByOrgBeforeDate(Session session, Long idOfOrg, Date date) {
         Criteria criteria = session.createCriteria(Menu.class);
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
@@ -4230,6 +4230,26 @@ public class DAOUtils {
         List list = criteria.list();
         return ((list.isEmpty()) ? null : (Menu) list.get(0));
     }
+    public static ProhibitionMenu findProhibitionMenuByIdAndClientId(Session session, Long idOfProhibitionMenu, Long idOfClient) {
+        Criteria criteria = session.createCriteria(ProhibitionMenu.class);
+        criteria.add(Restrictions.eq("idOfProhibitions", idOfProhibitionMenu));
+        criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
+        criteria.setMaxResults(1);
+        List list = criteria.list();
+        return ((list.isEmpty()) ? null : (ProhibitionMenu) list.get(0));
+    }
+
+    public static String findMenudetailNameByIdOfMenudetail(Session session, Long idOfMenuDetail) {
+        Criteria criteria = session.createCriteria(MenuDetail.class);
+        criteria.add(Restrictions.eq("idOfMenuDetail", idOfMenuDetail));
+        criteria.setProjection(Projections.property("menuDetailName"));
+        return (String) criteria.uniqueResult();
+    }
+
+    public static List findEventsByIdOfClientBetweenTime(Session persistenceSession, Client client, Date startDate, Date endDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(EnterEvent.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.between("evtDateTime", startDate, endDate));
+        return criteria.list();
+    }
 }
-
-
