@@ -133,7 +133,8 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         if(!amount.matches("\\d+\\.\\d{2}")){
             throw new InvalidPaymentSumException("Invalid format of amount");
         }
-        String paymentId = parseResult.getParam("PAY_ID");
+        String paymentId = parseResult.getParam("INFO");
+        if (paymentId == null) paymentId = parseResult.getParam("PAY_ID");
         if(!paymentId.matches("\\d*")){
             throw new InvalidPayIdException("PAY_ID contain non num charters");
         }
