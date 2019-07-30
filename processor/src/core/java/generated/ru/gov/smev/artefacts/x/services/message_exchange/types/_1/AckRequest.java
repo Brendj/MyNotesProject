@@ -30,6 +30,7 @@ import javax.xml.bind.annotation.*;
 @XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "", propOrder = {
     "ackTargetMessage",
+    "sender",
     "callerInformationSystemSignature"
 })
 @XmlRootElement(name = "AckRequest")
@@ -37,8 +38,18 @@ public class AckRequest {
 
     @XmlElement(name = "AckTargetMessage", namespace = "urn://x-artefacts-smev-gov-ru/services/message-exchange/types/basic/1.2", required = true)
     protected AckTargetMessage ackTargetMessage;
+    @XmlElement(name = "Sender", required = true)
+    protected AckRequest.Sender sender;
     @XmlElement(name = "CallerInformationSystemSignature")
     protected XMLDSigSignatureType callerInformationSystemSignature;
+
+    public AckRequest.Sender getSender() {
+        return sender;
+    }
+
+    public void setSender(AckRequest.Sender value) {
+        this.sender = value;
+    }
 
     /**
      * Gets the value of the ackTargetMessage property.
@@ -86,6 +97,41 @@ public class AckRequest {
      */
     public void setCallerInformationSystemSignature(XMLDSigSignatureType value) {
         this.callerInformationSystemSignature = value;
+    }
+
+    @XmlAccessorType(XmlAccessType.FIELD)
+    @XmlType(name = "", propOrder = {
+            "mnemonic"
+    })
+    public static class Sender {
+
+        @XmlElement(name = "Mnemonic", required = true)
+        protected String mnemonic;
+
+        /**
+         * Gets the value of the mnemonic property.
+         *
+         * @return
+         *     possible object is
+         *     {@link String }
+         *
+         */
+        public String getMnemonic() {
+            return mnemonic;
+        }
+
+        /**
+         * Sets the value of the mnemonic property.
+         *
+         * @param value
+         *     allowed object is
+         *     {@link String }
+         *
+         */
+        public void setMnemonic(String value) {
+            this.mnemonic = value;
+        }
+
     }
 
 }

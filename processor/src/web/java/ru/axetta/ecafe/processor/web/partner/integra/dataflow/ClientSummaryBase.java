@@ -50,6 +50,8 @@ public class ClientSummaryBase {
     protected Integer guardianCreatedWhere;
     @XmlAttribute(name = "GroupPredefined")
     private Integer groupPredefined;
+    @XmlAttribute(name = "Gender")
+    private Integer gender;
     /**
      *
      * Gets the value of the contractId property.
@@ -327,5 +329,13 @@ public class ClientSummaryBase {
 
     public void setInformedSpecialMenu(Integer informedSpecialMenu) {
         this.informedSpecialMenu = informedSpecialMenu;
+    }
+
+    public Integer getGender() {
+        return gender;
+    }
+
+    public void setGender(Integer gender) {
+        this.gender = gender;
     }
 }
