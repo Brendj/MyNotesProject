@@ -171,6 +171,14 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
+    public static Client findClientByIacregid(Session persistenceSession, String iacregid) {
+        Criteria criteria = persistenceSession.createCriteria(Client.class);
+        criteria.add(Restrictions.eq("iacRegId", iacregid));
+        List<Client> resultList = (List<Client>) criteria.list();
+        return resultList.isEmpty() ? null : resultList.get(0);
+    }
+
+    @SuppressWarnings("unchecked")
     public static List<Client> findClientBySan(Session persistenceSession, String san) {
         Criteria clientCriteria = persistenceSession.createCriteria(Client.class);
         clientCriteria.add(Restrictions.ilike("san", san, MatchMode.EXACT));
@@ -444,6 +452,13 @@ public class DAOUtils {
     public static OrderDetail findOrderDetail(Session persistenceSession,
             CompositeIdOfOrderDetail compositeIdOfOrderDetail) throws Exception {
         return (OrderDetail) persistenceSession.get(OrderDetail.class, compositeIdOfOrderDetail);
+    }
+
+    public static List findOrdersbyIdofclientandBetweenTime(Session persistenceSession, Client client, Date startDate, Date endDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(Order.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.between("createTime", startDate, endDate));
+        return criteria.list();
     }
 
     public static Org getOrgReference(Session persistenceSession, long idOfOrg) throws Exception {
@@ -1364,6 +1379,46 @@ public class DAOUtils {
             criteria.add(Restrictions.in("sourceType", sourceType));
         }
         return criteria.list();
+    }
+    /**
+     * Возвращает список транзакций произведенных либо в заданном интервале времени, либо по их максимальному количеству,
+     * которые могут быть меньше определенного id
+     * @param persistenceSession ссылка на сессию
+     * @param client ссылка клиента (обязательно)
+     * @param lastTransactionId идентификатор начальной транзакции (не обязательно)
+     * @param count максимальное количество выбираемых транзакций (не обязательно)
+     * @param startDate минимальная дата в выборке (не обязательно)
+     * @param endDate максимальная дата в выборке (не обязательно)
+     * @return возвращается список транзакций клиентов
+     */
+    @SuppressWarnings("unchecked")
+    public static List<AccountTransaction> getAccountTransactionsForClientbyLast(Session persistenceSession, Client client,
+            Long lastTransactionId, Integer count, Date startDate, Date endDate) {
+        try
+        {
+        Criteria criteria = persistenceSession.createCriteria(AccountTransaction.class);
+        criteria.add(Restrictions.eq("client", client));
+        //Типы транзакций, который НЕ должны учитываться
+        criteria.add(Restrictions.not(
+                Restrictions.eq("sourceType", AccountTransaction.INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE)));
+        criteria.add(Restrictions.not(
+                Restrictions.eq("sourceType", AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE)));
+        criteria.add(Restrictions.not(
+                Restrictions.eq("sourceType", AccountTransaction.CLIENT_BALANCE_HOLD)));
+        //Определяем начальную точку отсчёта
+        if (lastTransactionId != null)
+            criteria.add(Restrictions.le("idOfTransaction", lastTransactionId));   // <=
+        //Сортировка по убыванию
+        criteria.addOrder(org.hibernate.criterion.Order.desc("idOfTransaction"));
+        if (count != null)
+            criteria.setMaxResults(count);
+        if (startDate != null && endDate != null)
+            criteria.add(Restrictions.between("transactionTime", startDate, endDate));
+        return criteria.list();
+        } catch (Exception e)
+        {
+            return null;
+        }
     }
 
     /**
@@ -4158,12 +4213,22 @@ public class DAOUtils {
         return result;
     }
     
-        public static Contragent getContragentbyContractId(Session persistenceSession, Long contractId) throws Exception {
+    public static Contragent getContragentbyContractId(Session persistenceSession, Long contractId) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(Contragent.class);
         criteria.createAlias("orgsInternal", "orgs");
         criteria.createAlias("orgs.clientsInternal", "client");
         criteria.add(Restrictions.eq("client.contractId", contractId));
         return (Contragent) criteria.uniqueResult();
+    }
+    
+    public static Menu findLastMenuByOrgBeforeDate(Session session, Long idOfOrg, Date date) {
+        Criteria criteria = session.createCriteria(Menu.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.le("menuDate", date));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("menuDate"));
+        criteria.setMaxResults(1);
+        List list = criteria.list();
+        return ((list.isEmpty()) ? null : (Menu) list.get(0));
     }
 }
 
