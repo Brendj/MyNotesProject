@@ -5,16 +5,16 @@
 package ru.axetta.ecafe.processor.web.partner.fpsapi;
 
 public class AccountsItem {
-    private Long id;
+    private String id;
     private String accounttypeid = "1";
     private String accouttypename = "Горячее питание";
-    private Double sum;
+    private String sum;
 
-    public Long getId() {
+    public String getId() {
         return id;
     }
 
-    public void setId(Long id) {
+    public void setId(String id) {
         this.id = id;
     }
 
@@ -34,11 +34,11 @@ public class AccountsItem {
         this.accouttypename = accouttypename;
     }
 
-    public Double getSum() {
+    public String getSum() {
         return sum;
     }
 
-    public void setSum(Double sum) {
-        this.sum = sum/100;
+    public void setSum(String sum) {
+        this.sum = sum;
     }
 }

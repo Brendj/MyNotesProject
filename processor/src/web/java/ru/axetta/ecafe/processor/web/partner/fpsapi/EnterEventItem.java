@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.fpsapi;
 
 public class EnterEventItem {
     private String evtDateTime;
-    private Integer direction;
+    private String direction;
     private String name;
     private String address;
     private String shortNameInfoService;
@@ -19,11 +19,11 @@ public class EnterEventItem {
         this.evtDateTime = evtDateTime;
     }
 
-    public Integer getDirection() {
+    public String getDirection() {
         return direction;
     }
 
-    public void setDirection(Integer direction) {
+    public void setDirection(String direction) {
         this.direction = direction;
     }
 

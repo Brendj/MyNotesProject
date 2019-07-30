@@ -649,8 +649,8 @@ public class FpsapiController {
             }
 
             for (EnterEvent event : events) {
-                if (event.getPassDirection() == 0 || event.getPassDirection() == 1 || event.getPassDirection() == 6
-                        || event.getPassDirection() == 7) {
+                if (event.getPassDirection() == EnterEvent.ENTRY || event.getPassDirection() == EnterEvent.EXIT || event.getPassDirection() == EnterEvent.RE_ENTRY
+                        || event.getPassDirection() == EnterEvent.RE_EXIT) {
                     responseEnterEvent.getEnterEvents().add(enterEventFilling(event));
                 } else {
                     continue;
@@ -686,7 +686,7 @@ public class FpsapiController {
     private EnterEventItem enterEventFilling (EnterEvent enterEvent){
         EnterEventItem eventItem = new EnterEventItem();
         eventItem.setEvtDateTime(timeConverter(enterEvent.getEvtDateTime()));
-        eventItem.setDirection(enterEvent.getPassDirection());
+        eventItem.setDirection(Integer.toString(enterEvent.getPassDirection()));
         if(enterEvent.getPassDirection() == 1) {
             enterEvent.setEnterName("Выход из здания");
         } else {
@@ -717,7 +717,7 @@ public class FpsapiController {
             if (client == null) {
                 throw new IllegalArgumentException("Client with regID = " + regID + " is not found");
             } else {
-                responseAccounts.getAccounts().add(AccountsFilling(client));
+                responseAccounts.getAccounts().add(accountsFilling(client));
             }
 
             persistenceSession.flush();
@@ -746,10 +746,10 @@ public class FpsapiController {
             HibernateUtils.close(persistenceSession, logger);
         }
     }
-    private AccountsItem AccountsFilling(Client client){
+    private AccountsItem accountsFilling(Client client){
         AccountsItem accountsItem = new AccountsItem();
-        accountsItem.setId(client.getContractId());
-        accountsItem.setSum((double)client.getBalance());
+        accountsItem.setId(Long.toString(client.getContractId()));
+        accountsItem.setSum(Double.toString(client.getBalance().doubleValue()/100));
         accountsItem.setAccouttypename(accountsItem.getAccouttypename());
         accountsItem.setAccounttypeid(accountsItem.getAccounttypeid());
         return accountsItem;
