@@ -4,27 +4,24 @@
 
 package ru.axetta.ecafe.processor.core.persistence.orgsettings;
 
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ARMsSettingsType;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.SettingType;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.*;
 
 import java.util.HashMap;
 import java.util.Map;
 
-/*
-UPDATE cf_orgsettings
-SET settingGroup = settingGroup + 1;
+/* TODO:
+   Часть классов возращают NULL и emptyCollection. По мере появлении новых настроек необходимо расширять ENUM'ы
 */
-
 public enum OrgSettingGroup {
-    UnknownSetting(0, "Неизвестно", null),
-    CashierCheckPrinter(1,"Настройки принтера кассового чека", null),
-    SalesReportPrinter(2,"Настройка принтера отчета по продажам", null),
-    CardBalanceReportPrinter(3,"Настройка принтера отчета по балансам карт", null),
-    AutoPlanPaymentSetting(4,"Настройка автооплаты льготного питания", null),
-    SubscriberFeeding(5,"Настройки персонализированного питания", null),
-    ReplacingMissingBeneficiaries(6,"Режим замены отсутствующих льготников", null),
-    PreOrderFeeding(7,"Настройки питания по предзаказу", null),
-    PreOrderAutoPay(8,"Настройка автооплаты предзаказа", null),
+    UnknownSetting(0, "Неизвестно", UnknownSettingsType.getSettingTypeAsMap()),
+    CashierCheckPrinter(1,"Настройки принтера кассового чека", CashierCheckPrinterType.getSettingTypeAsMap()),
+    SalesReportPrinter(2,"Настройка принтера отчета по продажам", SalesReportPrinterType.getSettingTypeAsMap()),
+    CardBalanceReportPrinter(3,"Настройка принтера отчета по балансам карт", CardBalanceReportPrinterType.getSettingTypeAsMap()),
+    AutoPlanPaymentSetting(4,"Настройка автооплаты льготного питания", AutoPlanPaymentSettingType.getSettingTypeAsMap()),
+    SubscriberFeeding(5,"Настройки персонализированного питания", SubscriberFeedingType.getSettingTypeAsMap()),
+    ReplacingMissingBeneficiaries(6,"Режим замены отсутствующих льготников", ReplacingMissingBeneficiariesType.getSettingTypeAsMap()),
+    PreOrderFeeding(7,"Настройки питания по предзаказу", PreOrderFeedingType.getSettingTypeAsMap()),
+    PreOrderAutoPay(8,"Настройка автооплаты предзаказа", PreOrderAutoPayType.getSettingTypeAsMap()),
     ARMsSetting(9,"Настройки АРМа", ARMsSettingsType.getSettingTypeAsMap());
 
     private Integer id;

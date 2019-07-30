@@ -92,6 +92,8 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
 
                 if (typeForCurrentItem != null) {
                     itemSyncPOJO.setType(typeForCurrentItem.getSyncDataTypeId());
+                } else {
+                    itemSyncPOJO.setType(settingItem.getSettingType());
                 }
                 settingPojo.getItems().add(itemSyncPOJO);
             }
