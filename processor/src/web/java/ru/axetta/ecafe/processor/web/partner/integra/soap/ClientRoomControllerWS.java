@@ -1799,6 +1799,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryBase.setOrgType(client.getOrg().getType());
         clientSummaryBase.setGuid(client.getClientGUID());
         clientSummaryBase.setSpecialMenu(client.getSpecialMenu() == null || !client.getSpecialMenu() ? 0 : 1);
+        clientSummaryBase.setGender(client.getGender());
         return clientSummaryBase;
     }
 
@@ -1905,6 +1906,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryExt.setOrgType(client.getOrg().getType());
 
         clientSummaryExt.setLastConfirmMobile(toXmlDateTime(client.getLastConfirmMobile()));
+        clientSummaryExt.setGender(client.getGender());
 
         data.setClientSummaryExt(clientSummaryExt);
     }
