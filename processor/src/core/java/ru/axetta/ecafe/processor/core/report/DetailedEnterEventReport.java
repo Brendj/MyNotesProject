@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.report.model.autoenterevent.MapKeyModel;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.ShortBuilding;
 import ru.axetta.ecafe.processor.core.report.model.autoenterevent.StClass;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -39,21 +40,23 @@ import java.util.*;
 public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
 
     /*
-        * Параметры отчета для добавления в правила и шаблоны
-        *
-        * При создании любого отчета необходимо добавить параметры:
-        * REPORT_NAME - название отчета на русском
-        * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
-        * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
-        * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
-        * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
-        *
-        * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
-        */
+     * Параметры отчета для добавления в правила и шаблоны
+     *
+     * При создании любого отчета необходимо добавить параметры:
+     * REPORT_NAME - название отчета на русском
+     * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+     * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+     * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+     * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+     *
+     * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+     */
     public static final String REPORT_NAME = "Детализированный отчет по посещению";
     public static final String[] TEMPLATE_FILE_NAMES = {"AutoEnterEventV2Report.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = true;
     public static final int[] PARAM_HINTS = new int[]{-46, -47, -48};
+    final public static String P_ID_OF_CLIENTS = "idOfClients";
+    final public static String P_ALL_FRIENDLY_ORGS = "friendsOrg";
 
     private final static Logger logger = LoggerFactory.getLogger(DetailedEnterEventReport.class);
 
@@ -84,8 +87,6 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
     public static class Builder extends BasicReportForAllOrgJob.Builder {
 
         private final String templateFilename;
-        private Long idOfOrg;
-        private Boolean allFriendlyOrgs;
 
         public Builder(String templateFilename) {
             this.templateFilename = templateFilename;
@@ -97,6 +98,10 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
             Date generateTime = new Date();
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             startTime = CalendarUtils.roundToBeginOfDay(startTime);
+
+            String idOfOrgString = StringUtils
+                    .trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+            Long idOfOrg = Long.parseLong(idOfOrgString);
 
             Org orgLoad = (Org) session.load(Org.class, idOfOrg);
 
@@ -133,6 +138,9 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
 
             Set<Long> ids = new HashSet<Long>();
             String friendlyOrgsIds = "" + org.getIdOfOrg();
+
+            String allFriendOrgsString = StringUtils.trimToEmpty(reportProperties.getProperty(P_ALL_FRIENDLY_ORGS));
+            Boolean allFriendlyOrgs = Boolean.parseBoolean(allFriendOrgsString);
 
             if (allFriendlyOrgs) {
                 ids.add(org.getIdOfOrg());
@@ -174,11 +182,45 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
 
             ClientDao clientDao = RuntimeContext.getAppContext().getBean(ClientDao.class);
 
-            List<Client> allByOrg;
+            List<Client> allByOrg = null;
 
-            if (!groupList.isEmpty()) {
+            //Фильтр по клиентам
+            String idOfClientsString = StringUtils.trimToEmpty(reportProperties.getProperty(P_ID_OF_CLIENTS));
+            List<String> stringClientsIdList = Arrays.asList(StringUtils.split(idOfClientsString, ','));
+            
+            String clientIdWhere = "";
+            if (!stringClientsIdList.isEmpty()) {
+                int i = 0;
+                String clientIdQuery = "";
+                for (String client : stringClientsIdList) {
+                    clientIdQuery = clientIdQuery + "'" + client + "'";
+                    if (i < groupList.size() - 1) {
+                        clientIdQuery = clientIdQuery + ", ";
+                    }
+                    i++;
+                }
+                clientIdWhere = " AND cs.idofclient in (" + clientIdQuery + ") ";
+            }
+
+            List<Long> filterClientIdList = new ArrayList<>();
+            for (String idOfClient : stringClientsIdList) {
+                Long idOfClientLong = Long.parseLong(idOfClient);
+                filterClientIdList.add(idOfClientLong);
+            }
+
+            if (!groupList.isEmpty() && filterClientIdList.isEmpty()) {
                 allByOrg = clientDao.findAllByOrgAndGroupNames(ids, groupList);
-            } else {
+            }
+
+            if (!filterClientIdList.isEmpty() && groupList.isEmpty()) {
+                allByOrg = clientDao.findAllByOrgAndСlientId(ids, filterClientIdList);
+            }
+
+            if (!filterClientIdList.isEmpty() && !groupList.isEmpty()) {
+                allByOrg = clientDao.findAllByOrgAndClientIdAndGroupNames(ids, filterClientIdList, groupList);
+            }
+
+            if (filterClientIdList.isEmpty() && groupList.isEmpty()) {
                 allByOrg = clientDao.findAllByOrg(ids);
             }
 
@@ -186,15 +228,18 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
             Map<String, StClass> stClassMap = new HashMap<String, StClass>();
 
             List<Long> clientIdList = new LinkedList<Long>();
-            for (Client client : allByOrg) {
-                if (!stClassMap.containsKey(client.getClientGroup().getGroupName())) {
-                    stClassMap.put(client.getClientGroup().getGroupName(),
-                            new StClass(client.getClientGroup().getGroupName(), friendlyOrgs, new LinkedList<Data>()));
-                }
-                currentClassList = stClassMap.get(client.getClientGroup().getGroupName()).getDataList();
-                if (!clientIdList.contains(client.getIdOfClient())) {
-                    currentClassList.addAll(prepareDataList(client, friendlyOrgs, startTime, endTime));
-                    clientIdList.add(client.getIdOfClient());
+            if (allByOrg != null) {
+                for (Client client : allByOrg) {
+                    if (!stClassMap.containsKey(client.getClientGroup().getGroupName())) {
+                        stClassMap.put(client.getClientGroup().getGroupName(),
+                                new StClass(client.getClientGroup().getGroupName(), friendlyOrgs,
+                                        new LinkedList<Data>()));
+                    }
+                    currentClassList = stClassMap.get(client.getClientGroup().getGroupName()).getDataList();
+                    if (!clientIdList.contains(client.getIdOfClient())) {
+                        currentClassList.addAll(prepareDataList(client, friendlyOrgs, startTime, endTime));
+                        clientIdList.add(client.getIdOfClient());
+                    }
                 }
             }
 
@@ -211,7 +256,7 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                             + friendlyOrgsIds + ") AND cs.idoforg IN (" + friendlyOrgsIds + ") "
                             + " AND ee.evtdatetime BETWEEN " + startTime.getTime() + " AND " + endTime.getTime()
                             + " AND ee.idofclient IS NOT null AND ee.PassDirection in (0, 1, 6, 7) "
-                            + "     AND cs.idofclientgroup != 1100000060 " + groupNameWhere
+                            + "     AND cs.idofclientgroup != 1100000060 " + groupNameWhere + clientIdWhere
                             + "     ORDER BY os.officialname, cg.groupname, ee.idofclient,ee.evtdatetime");
 
             query.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP);
@@ -501,18 +546,6 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                             "" + (hours < 10 ? "0" + hours : hours) + ":" + (minutes < 10 ? "0" + minutes : minutes));
                 }
             }
-        }
-
-        public Long getIdOfOrg() {
-            return idOfOrg;
-        }
-
-        public void setIdOfOrg(Long idOfOrg) {
-            this.idOfOrg = idOfOrg;
-        }
-
-        public void setAllFriendlyOrgs(Boolean allFriendlyOrgs) {
-            this.allFriendlyOrgs = allFriendlyOrgs;
         }
     }
 }

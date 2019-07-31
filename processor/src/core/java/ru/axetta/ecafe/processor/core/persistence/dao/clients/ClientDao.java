@@ -94,12 +94,32 @@ public class ClientDao extends WritableJpaDao {
     }
 
     @Transactional
+    public List<Client> findAllByOrgAndСlientId(Set<Long> orgsIdList, List<Long> clientIdList) {
+        TypedQuery<Client> query = entityManager.createQuery(
+                "from Client c left join fetch c.clientGroup left join fetch c.person "
+                        + " where c.org.id  in :orgsIdList and c.idOfClientGroup <> 1100000070 and c.idOfClientGroup <> 1100000060 and c.idOfClient in :clientIdList",
+                Client.class).setParameter("orgsIdList", orgsIdList).setParameter("clientIdList", clientIdList);
+        return query.getResultList();
+    }
+
+    @Transactional
     public List<Client> findAllByOrgAndContractIdAndGroupNames(Set<Long> orgsIdList, List<Long> contractIdList,
             List<String> groupNamesList) {
         TypedQuery<Client> query = entityManager.createQuery(
                 "from Client c left join fetch c.clientGroup left join fetch c.person "
                         + " where c.org.id  in :orgsIdList and c.idOfClientGroup <> 1100000070 and c.idOfClientGroup <> 1100000060 and c.contractId in :contractIdList and c.clientGroup.groupName in :groupNamesList",
                 Client.class).setParameter("orgsIdList", orgsIdList).setParameter("contractIdList", contractIdList)
+                .setParameter("groupNamesList", groupNamesList);
+        return query.getResultList();
+    }
+
+    @Transactional
+    public List<Client> findAllByOrgAndClientIdAndGroupNames(Set<Long> orgsIdList, List<Long> clientIdList,
+            List<String> groupNamesList) {
+        TypedQuery<Client> query = entityManager.createQuery(
+                "from Client c left join fetch c.clientGroup left join fetch c.person "
+                        + " where c.org.id  in :orgsIdList and c.idOfClientGroup <> 1100000070 and c.idOfClientGroup <> 1100000060 and c.idOfClient in :clientIdList and c.clientGroup.groupName in :groupNamesList",
+                Client.class).setParameter("orgsIdList", orgsIdList).setParameter("clientIdList", clientIdList)
                 .setParameter("groupNamesList", groupNamesList);
         return query.getResultList();
     }
