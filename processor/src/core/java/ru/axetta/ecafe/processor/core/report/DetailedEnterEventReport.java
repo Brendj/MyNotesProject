@@ -194,7 +194,7 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                 String clientIdQuery = "";
                 for (String client : stringClientsIdList) {
                     clientIdQuery = clientIdQuery + "'" + client + "'";
-                    if (i < groupList.size() - 1) {
+                    if (i < stringClientsIdList.size() - 1) {
                         clientIdQuery = clientIdQuery + ", ";
                     }
                     i++;
