@@ -31,6 +31,7 @@ public class OrgSync implements Serializable {
     private Date lastAccRegistrySync;
     private Integer errorState;
     private String sqlServerVersion;
+    private Double databaseSize;
 
     public Long getIdOfOrg() {
         return idOfOrg;
@@ -131,5 +132,13 @@ public class OrgSync implements Serializable {
 
     public void setSqlServerVersion(String sqlServerVersion) {
         this.sqlServerVersion = sqlServerVersion;
+    }
+
+    public Double getDatabaseSize() {
+        return databaseSize;
+    }
+
+    public void setDatabaseSize(Double databaseSize) {
+        this.databaseSize = databaseSize;
     }
 }

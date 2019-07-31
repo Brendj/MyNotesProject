@@ -70,6 +70,12 @@
             </h:panelGroup>
         </h:panelGrid>
     </h:panelGrid>
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText escape="true" value="Размер локальной БД" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{mainPage.syncMonitorPage.showDBSize}" styleClass="checkboxes">
+            <a4j:support event="onchange" />
+        </h:selectBooleanCheckbox>
+    </h:panelGrid>
 
     <h:panelGrid columns="1" columnClasses="valign, valign">
         <rich:dataTable id="orgUnsychMonitorListTable" value="#{mainPage.syncMonitorPage.itemList}" var="item" rows="50"
@@ -143,6 +149,15 @@
                     <h:outputText escape="true" value="Версия MySQL" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.sqlServerVersion}"
+                              style="#{(item.lastSuccessfulBalanceSync!=null and mainPage.syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
+                              styleClass="output-text" />
+            </rich:column>
+
+            <rich:column headerClass="column-header" rendered="#{mainPage.syncMonitorPage.showDBSize}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Размер БД" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.databaseSize}"
                               style="#{(item.lastSuccessfulBalanceSync!=null and mainPage.syncMonitorPage.currentTimeMillis - item.lastSuccessfulBalanceSync.time > 1000 * 60 * 10) ? 'color:red' : ''}"
                               styleClass="output-text" />
             </rich:column>
