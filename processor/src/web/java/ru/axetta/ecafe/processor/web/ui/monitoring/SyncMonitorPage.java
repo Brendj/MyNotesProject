@@ -47,7 +47,6 @@ public class SyncMonitorPage extends OnlineReportPage {
     private Date lastUpdate;
 
     private Boolean showVersion = false;
-    private Boolean showDBSize = false;
     private Integer[] versionTitles;
     private HashMap<Integer, SelectItem> availableVersions;
 
@@ -225,11 +224,4 @@ public class SyncMonitorPage extends OnlineReportPage {
         return "monitoring/sync_monitor";
     }
 
-    public Boolean getShowDBSize() {
-        return showDBSize;
-    }
-
-    public void setShowDBSize(Boolean showDBSize) {
-        this.showDBSize = showDBSize;
-    }
 }

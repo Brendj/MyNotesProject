@@ -70,13 +70,6 @@
             </h:panelGroup>
         </h:panelGrid>
     </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText escape="true" value="Размер локальной БД" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.syncMonitorPage.showDBSize}" styleClass="checkboxes">
-            <a4j:support event="onchange" />
-        </h:selectBooleanCheckbox>
-    </h:panelGrid>
-
     <h:panelGrid columns="1" columnClasses="valign, valign">
         <rich:dataTable id="orgUnsychMonitorListTable" value="#{mainPage.syncMonitorPage.itemList}" var="item" rows="50"
                         footerClass="data-table-footer" columnClasses="center-aligned-column" reRender="lastOrgUpdateTime">
@@ -153,7 +146,7 @@
                               styleClass="output-text" />
             </rich:column>
 
-            <rich:column headerClass="column-header" rendered="#{mainPage.syncMonitorPage.showDBSize}">
+            <rich:column headerClass="column-header">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Размер БД" />
                 </f:facet>
