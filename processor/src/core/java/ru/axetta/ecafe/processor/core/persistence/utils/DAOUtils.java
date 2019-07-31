@@ -2039,7 +2039,7 @@ public class DAOUtils {
         Query query = persistenceSession.createQuery(
                  "update OrgSync "
                  + " set remoteAddress=:remoteAddress, clientVersion=:clientVersion, sqlServerVersion = :sqlServerVersion "
-                         + databaseSize == null ? "" : ", databaseSize = :databaseSize "
+                         + (databaseSize == null ? "" : ", databaseSize = :databaseSize ")
                  + " where idOfOrg=:idOfOrg ");
         query.setParameter("remoteAddress", remoteAddress);
         query.setParameter("clientVersion", clientVersion);
