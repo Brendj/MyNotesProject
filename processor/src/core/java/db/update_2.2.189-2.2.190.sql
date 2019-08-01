@@ -6,3 +6,5 @@
 
 --Размер БД в Арме ОО
 ALTER TABLE cf_orgs_sync ADD COLUMN databaseSize numeric (10, 2);
+
+--! ФИНАЛИЗИРОВАН 01.08.2019, НЕ МЕНЯТЬ
