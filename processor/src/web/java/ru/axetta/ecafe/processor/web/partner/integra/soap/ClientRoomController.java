@@ -521,6 +521,11 @@ public interface ClientRoomController {
             @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "ticketStatus") Integer ticketStatus);
 
+    @WebMethod Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "orgCode") String orgCode,
+            @WebParam(name = "CultureName") String CultureName, @WebParam(name = "CultureShortName") String CultureShortName,
+            @WebParam(name = "CultureAddress") String CultureAddress, @WebParam(name = "accessTime") Date accessTime,
+            @WebParam(name = "eventsStatus") Integer eventsStatus);
+
     @WebMethod ClientSummaryBaseListResult getSummaryByGuardMobileMin(@WebParam(name = "guardMobile") String guardMobile);
 
     @WebMethod TransactionInfoListResult getOrderTransactions();
@@ -566,7 +571,7 @@ public interface ClientRoomController {
     CardInfo getClientCardInfo(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName = "addRequestForCashOut")
-    Result addRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "guardianMobile") String guardianMobile,
+    CashOutResult addRequestForCashOut(@WebParam(name = "contractId") Long contractId, @WebParam(name = "guardianMobile") String guardianMobile,
             @WebParam(name = "sum") Long sum, @WebParam(name = "guardianDataForCashOut") GuardianDataForCashOut guardianDataForCashOut);
 
     @WebMethod(operationName = "getRequestForCashOutList")
@@ -586,6 +591,9 @@ public interface ClientRoomController {
     @WebMethod(operationName = "updateStatusOfApplicationForFood")
     Result updateStatusOfApplicationForFood(@WebParam(name = "state") Integer state, @WebParam(name = "declineReason") Integer declineReason,
             @WebParam(name = "serviceNumber") String serviceNumber);
+
+    @WebMethod(operationName = "getContragentForClient")
+    ContragentData getContragentForClient(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName = "getETPDiscounts")
     ETPDiscountsResult getETPDiscounts();

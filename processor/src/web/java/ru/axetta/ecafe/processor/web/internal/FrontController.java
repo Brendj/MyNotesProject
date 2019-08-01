@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.web.internal;
 
+import sun.security.provider.X509Factory;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
@@ -47,8 +49,12 @@ import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.ws.WebServiceContext;
 import javax.xml.ws.handler.MessageContext;
+import java.io.ByteArrayInputStream;
 import java.io.IOException;
+import java.net.URLDecoder;
+import java.nio.charset.StandardCharsets;
 import java.security.PublicKey;
+import java.security.cert.CertificateFactory;
 import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
@@ -1242,27 +1248,54 @@ public class FrontController extends HttpServlet {
     }
 
     private void checkRequestValidity(Long orgId) throws FrontControllerException {
-        if (RuntimeContext.getInstance().isTestMode()){
+        if (RuntimeContext.getInstance().isTestMode()) {
             return;
         }
-
-        MessageContext msgContext = wsContext.getMessageContext();
-        HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
-        X509Certificate[] cert = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
-
-        //X509Certificate cert = (X509Certificate)((WSSecurityEngineResult)wsContext.getMessageContext().get(WSS4JInInterceptor.SIGNATURE_RESULT)).get(WSSecurityEngineResult.TAG_X509_CERTIFICATE);
-
-        if (cert==null || cert.length==0) throw new FrontControllerException("В запросе нет валидных сертификатов, idOfOrg: " + orgId);
-        Org org = DAOService.getInstance().getOrg(orgId);
-        if (org==null) throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
-        PublicKey publicKey = null;
+        X509Certificate[] certs;
+        PublicKey publicKey;
         try {
+            MessageContext msgContext = wsContext.getMessageContext();
+            HttpServletRequest request = (HttpServletRequest) msgContext.get(MessageContext.SERVLET_REQUEST);
+            certs = getCertificateFromContextOrHeaders(request);
+
+            if (certs == null || certs.length == 0) {
+                throw new FrontControllerException("В запросе нет валидных сертификатов, idOfOrg: " + orgId);
+            }
+
+            Org org = DAOService.getInstance().getOrg(orgId);
+            if (org == null) {
+                throw new FrontControllerException(String.format("Неизвестная организация: %d", orgId));
+            }
+
             publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
+            if (!publicKey.equals(certs[0].getPublicKey())) {
+                throw new FrontControllerException(String.format("Ключ сертификата невалиден: %d", orgId));
+            }
+        } catch (FrontControllerException e) {
+            throw e;
         } catch (Exception e) {
             throw new FrontControllerException("Внутренняя ошибка", e);
         }
-        if (!publicKey.equals(cert[0].getPublicKey())) throw new FrontControllerException(
-                String.format("Ключ сертификата невалиден: %d", orgId));
+    }
+
+    // Получение клиенсткого сертификата из контекста или из заголовка запроса
+    private X509Certificate[] getCertificateFromContextOrHeaders(HttpServletRequest request) throws Exception {
+        X509Certificate[] certs = (X509Certificate[]) request.getAttribute("javax.servlet.request.X509Certificate");
+        if (certs != null && certs.length > 0) {
+            return certs;
+        } else {
+            String urlCert = request.getHeader("X-SSL-CERT");
+            if(StringUtils.isEmpty(urlCert)){
+                return null;
+            }
+            String strCert = URLDecoder.decode(urlCert, StandardCharsets.UTF_8.name());
+            strCert = strCert.replaceAll(X509Factory.BEGIN_CERT, "").replaceAll(X509Factory.END_CERT, "");
+            byte[] decodedCert = Base64.decode(strCert);
+            X509Certificate cert = (X509Certificate) CertificateFactory.getInstance("X.509").generateCertificate(new ByteArrayInputStream(decodedCert));
+
+            certs = new X509Certificate[]{cert};
+            return certs;
+        }
     }
 
     @WebMethod(operationName = "generateLinkingToken")

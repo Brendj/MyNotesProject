@@ -12,7 +12,8 @@ import java.util.Map;
  */
 public enum ExternalEventType {
 
-    /*0*/ MUSEUM("Проход в музей");
+    /*0*/ MUSEUM("Проход в музей"),
+    /*1*/ CULTURE("Проход в здание культуры");
 
     private final String description;
     static Map<Integer,ExternalEventType> map = new HashMap<Integer,ExternalEventType>();

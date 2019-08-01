@@ -1049,6 +1049,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             if (clientGroup == null) {
                 clientGroup = DAOUtils.findClientGroupByIdOfClientGroupAndIdOfOrg(persistenceSession, org.getIdOfOrg(),
                         ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+                //Если такая круппа не найдена у целевой ОО, то она созается
+                if (clientGroup == null)
+                    clientGroup = DAOUtils.createClientGroup(persistenceSession, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED);
             }
 
             clientMigration.setNewGroupName(this.clientGroupName);

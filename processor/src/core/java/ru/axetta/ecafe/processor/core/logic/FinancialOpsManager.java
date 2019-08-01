@@ -137,8 +137,13 @@ public class FinancialOpsManager {
             Long idOfOrgPayment) throws Exception {
         // By default we have no transaction
         AccountTransaction orderTransaction = null;
-        // If "card part" of payment is specified...
-        if (0 != payment.getSumByCard()) {
+
+        if (0 != payment.getSummFromCBHR()) {
+            BalanceHoldTransaction balanceHoldTransaction = ClientBalanceHoldService
+                    .processClientBalanceHoldTransaction(session, payment.getGuidOfCBHR(), payment.getSummFromCBHR(), payment.isCommit());
+            session.save(balanceHoldTransaction);
+        }
+        if (0 != payment.getSumByCard()) { // If "card part" of payment is specified...
             if(payment.getOrderType()==null){
                 // поддержка старых версий
                 orderTransaction = ClientAccountManager.processAccountTransaction(session, client, card,
@@ -215,7 +220,7 @@ public class FinancialOpsManager {
         return supplier;
     }
 
-    public void cancelOrder(Session session, Order order) throws Exception {
+    public void cancelOrder(Session session, Order order, Payment payment) throws Exception {
         if (order.getState() != Order.STATE_COMMITED) {
         } else {
             order.setState(Order.STATE_CANCELED);
@@ -238,6 +243,11 @@ public class FinancialOpsManager {
                 AccountTransaction transaction = order.getTransaction();
                 canceledOrder.setIdOfTransaction(transaction.getIdOfTransaction());
                 ClientAccountManager.cancelAccountTransaction(session, transaction, new Date());
+            }
+            if (payment != null && 0 != payment.getSummFromCBHR()) {
+                BalanceHoldTransaction cancelBalanceHoldTransaction = ClientBalanceHoldService
+                        .processClientBalanceHoldTransaction(session, payment.getGuidOfCBHR(), payment.getSummFromCBHR(), payment.isCommit());
+                session.save(cancelBalanceHoldTransaction);
             }
 
             session.save(canceledOrder);
@@ -548,26 +558,29 @@ public class FinancialOpsManager {
     @Transactional
     public void holdClientBalance(String guid, Client client, Long holdSum, Client declarer, Org oldOrg, Org newOrg, Contragent oldContragent, Contragent newContragent,
             ClientBalanceHoldCreateStatus createStatus, ClientBalanceHoldRequestStatus requestStatus, String phoneOfDeclarer,
-            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, Long version) throws Exception {
+            String declarerInn, String declarerAccount, String declarerBank, String declarerBik, String declarerCorrAccount, Long version, Long idOfOrgLastChange,
+            ClientBalanceHoldLastChangeStatus lastChangeStatus) throws Exception {
         if (client.getBalance() - holdSum < 0L) throw new Exception("Not enough balance");
         Session session = (Session)em.getDelegate();
         AccountTransaction accountTransaction = ClientAccountManager.processAccountTransaction(session, client,
                 null, -holdSum, "", AccountTransaction.CLIENT_BALANCE_HOLD, oldOrg.getIdOfOrg(), new Date());
         ClientBalanceHold clientBalanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class)
                 .createClientBalanceHold(session, guid, client, holdSum, oldOrg, newOrg, oldContragent, newContragent, createStatus,
-                        requestStatus, declarer, phoneOfDeclarer, declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, version);
+                        requestStatus, declarer, phoneOfDeclarer, declarerInn, declarerAccount, declarerBank, declarerBik, declarerCorrAccount, version,
+                        idOfOrgLastChange, lastChangeStatus);
         clientBalanceHold.setAccountTransaction(accountTransaction);
         session.save(clientBalanceHold);
     }
 
     @Transactional
-    public void declineClientBalance(Long idOfClientBalanceHold, ClientBalanceHoldRequestStatus status) throws Exception {
+    public void declineClientBalance(Long idOfClientBalanceHold, ClientBalanceHoldRequestStatus status,
+            ClientBalanceHoldLastChangeStatus lastChangeStatus) throws Exception {
         Session session = (Session)em.getDelegate();
         ClientBalanceHold clientBalanceHold = (ClientBalanceHold)session.get(ClientBalanceHold.class, idOfClientBalanceHold);
         ClientAccountManager.processAccountTransaction(session, clientBalanceHold.getClient(),
                 null, clientBalanceHold.getHoldSum(), clientBalanceHold.getAccountTransaction().getIdOfTransaction().toString(),
                 AccountTransaction.CANCEL_TRANSACTION_SOURCE_TYPE, clientBalanceHold.getOldOrg().getIdOfOrg(), new Date());
-        RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).setStatusWithValue(idOfClientBalanceHold, status);
+        RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).setStatusWithValue(idOfClientBalanceHold, status, lastChangeStatus);
         session.save(clientBalanceHold);
     }
 

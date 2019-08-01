@@ -17,6 +17,7 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -64,13 +65,13 @@ public class SyncMonitorReport extends BasicReportForAllOrgJob {
             String sqlQuery =
                     "SELECT o.idoforg, o.shortnameinfoservice, o.district, o.shortaddress, o.organizationtype, "
                   + "   o.introductionqueue, os.lastsucbalancesync, os.remoteaddress, os.clientversion, "
-                  + "   count(se.idoforg) AS exceptions, os.sqlServerVersion "
+                  + "   count(se.idoforg) AS exceptions, os.sqlServerVersion, os.databaseSize "
                   + "FROM cf_orgs o "
                   + "INNER JOIN cf_orgs_sync os ON os.idoforg=o.idoforg "
                   + "LEFT JOIN cf_synchistory_exceptions se ON se.idoforg=o.idoforg "
                   + "WHERE state<>0 " + ((null != versionsList && !versionsList.isEmpty()) ? "AND os.clientversion IN (:versions) " : "")
                   + "GROUP BY o.idoforg, o.tag, o.shortname, o.district, os.lastsucbalancesync, os.lastunsucbalancesync, "
-                  + "   os.remoteaddress, os.clientversion, os.sqlServerVersion "
+                  + "   os.remoteaddress, os.clientversion, os.sqlServerVersion, os.databaseSize "
                   + "ORDER BY os.lastSucBalanceSync";
 
             Query query = session.createSQLQuery(sqlQuery);
@@ -96,10 +97,11 @@ public class SyncMonitorReport extends BasicReportForAllOrgJob {
                 String clientVersion = (String)vals[8];
                 Long exceptionsCount = ((BigInteger)vals[9]).longValue();
                 String sqlServerVersion = (String) vals[10];
+                Double databaseSize = vals[11] == null ? null : ((BigDecimal) vals[11]).doubleValue();
 
                 items.add(new DashboardResponse.OrgSyncStatItem(idOfOrg, shortName, address, organizationTypeName,
                         introductionQueue, successfulBalanceSync, remoteAddress, clientVersion, exceptionsCount,
-                        district, sqlServerVersion));
+                        district, sqlServerVersion, databaseSize));
             }
 
             return items;
