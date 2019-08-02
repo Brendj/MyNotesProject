@@ -250,7 +250,13 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
 
     private String checkIsExistFile() {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateShortFilename = "AutoEnterEventByDaysReport.jasper";
+        String templateShortFilename = "";
+        if (getFilterClient() == null || getFilterClient() == "")
+        {
+            templateShortFilename = "AutoEnterEventByDaysReport.jasper";
+        }
+        else
+            templateShortFilename = "AutoEnterEventByDaysReportClient.jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFilename;
         if (!(new File(templateFilename)).exists()) {
             printError(String.format("Не найден файл шаблона '%s'", templateFilename));
