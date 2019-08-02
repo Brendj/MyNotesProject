@@ -4,5 +4,5 @@
 
 -- 167
 
-
-ADD COLUMN eligibletodelete integer not null default 0;
+ALTER TABLE cf_categorydiscounts
+    ADD COLUMN eligibletodelete integer not null default 0;
