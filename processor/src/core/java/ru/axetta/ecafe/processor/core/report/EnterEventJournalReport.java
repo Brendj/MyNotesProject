@@ -173,7 +173,9 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                             + " left join cf_visitors v on v.idOfVisitor = ee.idofvisitor "
                             + " left join cf_persons p on p.idofperson = c.idofperson or p.idofperson = v.idofperson "
                             + joinMigrants
-                            + " left join cf_clientgroups gr on gr.idoforg = c.idoforg and gr.idofclientgroup = c.idofclientgroup "
+                            + " left join cf_clientgroups gr on gr.idoforg = c.idoforg "
+                                   //Убрано ограничение, что группа клиента должна быть обязательно в ОУ, куда совершен проход
+                                   //+ "and gr.idofclientgroup = c.idofclientgroup "
                             + " where ee.evtdatetime between :startTime and :endTime "
                             + orgCondition
                             + clientIdWhere
