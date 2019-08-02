@@ -9,8 +9,8 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -4200,6 +4200,11 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("idOfOrg", idOfOrg))
                 .add(Restrictions.eq("settingGroup", OrgSettingGroup.getGroupById(settingGroupId)));
         return (OrgSetting) criteria.uniqueResult();
+    }
+
+    public static List<CategoryDiscount> getCategoryDiscountList(Session session) {
+        Query q = session.createQuery("from CategoryDiscount order by idOfCategoryDiscount");
+        return (List<CategoryDiscount>)q.list();
     }
 
     public static List<Long> findFriendlyOrgsIds(Session session, List<Long> orgIdList) {

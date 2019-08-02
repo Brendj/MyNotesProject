@@ -918,11 +918,18 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
         Boolean isReplaceOrg = !(client.getOrg().getIdOfOrg().equals(org.getIdOfOrg()));
+        Boolean isFriendlyReplaceOrg = false;
         if (isReplaceOrg) {
             clientMigration = new ClientMigration(client.getOrg());
 
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             Set<Org> orgSet = client.getOrg().getFriendlyOrg();
+            for (Org o : orgSet) {
+                if(o.getIdOfOrg().equals(org.getIdOfOrg())){
+                    isFriendlyReplaceOrg = true;
+                    break;
+                }
+            }
             runtimeContext.getProcessor().disableClientCardsIfChangeOrg(client, orgSet, org.getIdOfOrg());
 
         }
@@ -985,6 +992,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         if (this.idOfCategoryList.size() != 0) {
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
+            if(isReplaceOrg) {
+                if(!isFriendlyReplaceOrg) {
+                    categoryCriteria.add(Restrictions.eq("eligibleToDelete",false));
+                }
+            }
             categoryCriteria.addOrder(Order.asc("idOfCategoryDiscount"));
             for (Object object : categoryCriteria.list()) {
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;

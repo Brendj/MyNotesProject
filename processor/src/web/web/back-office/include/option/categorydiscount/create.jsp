@@ -34,6 +34,8 @@
     </h:selectOneMenu>
     <h:outputText escape="true" value="Запрет изменения в АРМ" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{categoryDiscountCreatePage.blockedToChange}" styleClass="output-text"/>
+    <h:outputText escape="true" value="Удалять при переводе" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{categoryDiscountCreatePage.eligibleToDelete}" styleClass="output-text"/>
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
     <a4j:commandButton value="Зарегистрировать категорию" action="#{categoryDiscountCreatePage.onSave}"

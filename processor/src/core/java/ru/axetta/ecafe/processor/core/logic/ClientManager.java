@@ -2054,4 +2054,32 @@ public class ClientManager {
             }
         }
     }
+
+    public static void deleteDiscount(Client client, Session session) throws Exception {
+        Integer oldDiscountMode = client.getDiscountMode();
+        String oldDiscounts = client.getCategoriesDiscounts();
+        Set<CategoryDiscount> discounts = client.getCategories();
+        for(CategoryDiscount discount : discounts) {
+            if (discount.getEligibleToDelete())
+                client.getCategories().remove(discount);
+        }
+        String newDiscounts = "";
+        for(CategoryDiscount discount : client.getCategories()){
+            if(!newDiscounts.isEmpty()){
+                newDiscounts += ",";
+            }
+            newDiscounts += discount.getIdOfCategoryDiscount();
+        }
+        Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+        if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
+            client.setCategoriesDiscounts(newDiscounts);
+            client.setDiscountMode(newDiscountMode);
+            DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
+                    newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
+            discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_BY_TRANSITION);
+            session.save(discountChangeHistory);
+            client.setLastDiscountsUpdate(new Date());
+        }
+        session.update(client);
+    }
 }

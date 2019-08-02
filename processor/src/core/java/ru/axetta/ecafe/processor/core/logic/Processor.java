@@ -3732,6 +3732,7 @@ public class Processor implements SyncProcessor {
                 //Проверяем, если у клиента меняется организация, то блокируем ему карты в старой организации
                 Client client = DAOUtils.findClient(persistenceSession, clientParamItem.getIdOfClient());
                 disableClientCardsIfChangeOrg(client, orgSet, idOfOrg);
+                removeClientDiscountIfChangeOrg(client,persistenceSession,orgSet,idOfOrg);
 
                 /*ClientGroup clientGroup = orgMap.get(2L).get(clientParamItem.getGroupName());
                 *//* если группы нет то создаем *//*
@@ -6314,6 +6315,24 @@ public class Processor implements SyncProcessor {
         }
         return clientDiscountDTSZN;
     }
+
+    public void removeClientDiscountIfChangeOrg(Client client, Session session , Set<Org> oldOrgs, long newIdOfOrg) throws Exception {
+        if (client == null) {
+            return;
+        }
+        Boolean isReplaceOrg = !client.getOrg().getIdOfOrg()
+                .equals(newIdOfOrg); //сравниваем старую организацию клиента с новой
+        for (Org o : oldOrgs) {
+            if (o.getIdOfOrg().equals(newIdOfOrg)) {                             //и с дружественными организациями
+                isReplaceOrg = false;
+                break;
+            }
+        }
+        //Если новая организация не совпадает ни со старой, ни с дружественными старой, то удаляем льготы
+        if (isReplaceOrg) {
+            ClientManager.deleteDiscount(client, session);
+            }
+        }
 
     private SyncResponse buildOrgSettingsSectionsResponse(SyncRequest request, Date syncStartTime, int syncResult) {
         SyncHistory syncHistory = null;
