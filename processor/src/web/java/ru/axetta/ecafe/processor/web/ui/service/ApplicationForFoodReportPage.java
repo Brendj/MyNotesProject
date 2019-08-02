@@ -12,9 +12,11 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.ApplicationForFoodHistoryReportItem;
 import ru.axetta.ecafe.processor.core.report.ApplicationForFoodReportItem;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
+import ru.axetta.ecafe.processor.web.ui.report.online.PeriodTypeMenu;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -83,7 +85,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     }
 
     public ApplicationForFoodReportPage() {
-
+        periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
     }
 
     public void reload() {
@@ -110,7 +112,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 }
             }
             List<ApplicationForFood> list = DAOUtils.getApplicationForFoodListByOrgs(session, idOfOrgList, statusCondition,
-                    benefitCondition, idOfClientList, number);
+                    benefitCondition, idOfClientList, number, CalendarUtils.startOfDay(startDate), CalendarUtils.endOfDay(endDate));
             for (ApplicationForFood applicationForFood : list) {
                 ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(applicationForFood);
                 items.add(item);

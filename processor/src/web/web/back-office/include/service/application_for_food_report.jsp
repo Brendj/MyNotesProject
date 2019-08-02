@@ -100,6 +100,30 @@
         </h:panelGroup>
         <h:outputText styleClass="output-text" escape="true" value="Номер заявления" />
         <h:inputText value="#{applicationForFoodReportPage.number}" styleClass="input-text long-field" />
+
+        <h:outputText escape="true" value="Дата заявления от" styleClass="output-text" />
+        <rich:calendar value="#{applicationForFoodReportPage.startDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+            <a4j:support event="onchanged" reRender="endDateCalendar,applicationForFoodPanelGrid"
+                         actionListener="#{applicationForFoodReportPage.onReportPeriodChanged}" />
+        </rich:calendar>
+
+        <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
+        <h:selectOneMenu id="endDatePeriodSelect"
+                         value="#{applicationForFoodReportPage.periodTypeMenu.periodType}"
+                         styleClass="input-text" style="width: 250px;">
+            <f:converter converterId="periodTypeConverter" />
+            <f:selectItems value="#{applicationForFoodReportPage.periodTypeMenu.items}" />
+            <a4j:support event="onchange" reRender="endDateCalendar,applicationForFoodPanelGrid"
+                         actionListener="#{applicationForFoodReportPage.onReportPeriodChanged}" />
+        </h:selectOneMenu>
+        <h:outputText escape="true" value="Дата заявления до" styleClass="output-text" />
+        <rich:calendar id="endDateCalendar" value="#{applicationForFoodReportPage.endDate}"
+                       datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text"
+                       showWeeksBar="false">
+            <a4j:support event="onchanged" reRender="endDatePeriodSelect,applicationForFoodPanelGrid"
+                         actionListener="#{applicationForFoodReportPage.onEndDateSpecified}" />
+        </rich:calendar>
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="1">
