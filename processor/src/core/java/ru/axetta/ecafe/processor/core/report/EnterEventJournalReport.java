@@ -136,8 +136,16 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                 clientGroupCondition = " and gr.groupname in (:groupList) ";
             }
 
-            String idOfClients = StringUtils.trimToEmpty(reportProperties.getProperty(P_ID_CLIENT));
-            List<String> stringClientsList = Arrays.asList(StringUtils.split(idOfClients, ','));
+            List<String> stringClientsList;
+            try
+            {
+                String idOfClients = StringUtils.trimToEmpty(reportProperties.getProperty(P_ID_CLIENT));
+                stringClientsList = Arrays.asList(StringUtils.split(idOfClients, ','));
+            } catch (Exception e)
+            {
+                stringClientsList = new ArrayList<>();
+            }
+
 
             String clientIdWhere = "";
             if (!stringClientsList.isEmpty()) {
