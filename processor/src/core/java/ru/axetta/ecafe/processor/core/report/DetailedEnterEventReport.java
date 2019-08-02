@@ -256,7 +256,7 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                             + friendlyOrgsIds + ") AND cs.idoforg IN (" + friendlyOrgsIds + ") "
                             + " AND ee.evtdatetime BETWEEN " + startTime.getTime() + " AND " + endTime.getTime()
                             + " AND ee.idofclient IS NOT null AND ee.PassDirection in (0, 1, 6, 7) "
-                            + "     AND cs.idofclientgroup != 1100000060 " + groupNameWhere + clientIdWhere
+                            + groupNameWhere + clientIdWhere
                             + "     ORDER BY os.officialname, cg.groupname, ee.idofclient,ee.evtdatetime");
 
             query.setResultTransformer(Criteria.ALIAS_TO_ENTITY_MAP);
