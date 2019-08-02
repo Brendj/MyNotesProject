@@ -97,6 +97,14 @@ public class SyncRequest {
         this.sqlServerVersion = sqlServerVersion;
     }
 
+    public Double getDatabaseSize() {
+        return databaseSize;
+    }
+
+    public void setDatabaseSize(Double databaseSize) {
+        this.databaseSize = databaseSize;
+    }
+
     public static class ClientParamRegistry implements SectionRequest {
 
         public static final String SECTION_NAME = "ClientParams";
@@ -2615,6 +2623,7 @@ public class SyncRequest {
             SyncType syncType = getSyncType(namedNodeMap);
             String clientVersion = getClientVersion(namedNodeMap);
             String sqlServerVersion = getSQLServerVersion(namedNodeMap);
+            Double databaseSize = getDatabaseSizeValue(namedNodeMap);
             Date syncTime = timeFormat.parse(idOfSync);
             Long idOfPacket = getIdOfPacket(namedNodeMap);
             List<SectionRequest> result = new ArrayList<SectionRequest>();
@@ -2628,12 +2637,22 @@ public class SyncRequest {
             Manager manager = createManagerSyncRO(envelopeNode, syncType, org);
             String message = getMessage(envelopeNode);
             return new SyncRequest(remoteAddr, version, syncType, clientVersion, org, syncTime, idOfPacket, message,
-                    result, manager, sqlServerVersion);
+                    result, manager, sqlServerVersion, databaseSize);
         }
 
         private String getSQLServerVersion(NamedNodeMap namedNodeMap) {
             return namedNodeMap.getNamedItem("SqlServerVersion") == null ?
                     null : namedNodeMap.getNamedItem("SqlServerVersion").getTextContent();
+        }
+
+        private Double getDatabaseSizeValue(NamedNodeMap namedNodeMap) {
+            try {
+                return namedNodeMap.getNamedItem("DatabaseSize") == null ? null
+                        : Double.parseDouble(namedNodeMap.getNamedItem("DatabaseSize").getTextContent().replace(',', '.'));
+            } catch (Exception e) {
+                logger.error("Error in get database size from packet: ", e);
+                return null;
+            }
         }
 
         private SectionRequest buildSeactionRequest(Node envelopeNode, SectionRequestBuilder builder) {
@@ -2762,10 +2781,11 @@ public class SyncRequest {
     private String clientVersion;
     private Manager manager;
     private String sqlServerVersion;
+    private Double databaseSize;
     private final List<SectionRequest> sectionRequests = new ArrayList<SectionRequest>();
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket,
-            String message, List<SectionRequest> sectionRequests, Manager manager, String sqlServerVersion) {
+            String message, List<SectionRequest> sectionRequests, Manager manager, String sqlServerVersion, Double databaseSize) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2778,6 +2798,7 @@ public class SyncRequest {
         this.manager = manager;
         this.sectionRequests.addAll(sectionRequests);
         this.sqlServerVersion = sqlServerVersion;
+        this.databaseSize = databaseSize;
     }
 
     public String getClientVersion() {
