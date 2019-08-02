@@ -114,10 +114,12 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
             List<Long> contractIdList = new ArrayList<Long>();
 
             //л/с
-            String contractId;
+            String wherecontractId = "";
             if (reportProperties.getProperty("contractId") != null && !reportProperties.getProperty("contractId").equals("null")) {
+                String contractId;
                 contractId = reportProperties.getProperty("contractId");
                 contractIdList.add(Long.valueOf(contractId));
+                wherecontractId = " AND cs.contractid = " + contractId + " ";
             }
 
             ArrayList<String> groupList = new ArrayList<String>();
@@ -221,7 +223,7 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
                             + "    LEFT JOIN  cf_orgs os ON ee.idoforg = os.idoforg WHERE ee.idoforg IN ("
                             + friendlyOrgsIds + ") AND cs.idoforg IN (" + friendlyOrgsIds + ") "
                             + " AND ee.evtdatetime BETWEEN " + startTime.getTime() + " AND " + endTime.getTime()
-                            + " AND ee.idofclient IS NOT null AND ee.PassDirection in (0, 1, 6, 7) "
+                            + " AND ee.idofclient IS NOT null AND ee.PassDirection in (0, 1, 6, 7) " + wherecontractId
                             + "     AND cs.idofclientgroup != 1100000060 " + groupStr +
                             "     ORDER BY os.officialname, cg.groupname, ee.idofclient,ee.evtdatetime     --limit 100");
 
