@@ -44,6 +44,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     private Integer benefit;
     private String number = "";
     private final static Integer ALL_BENEFITS = -1;
+    private Boolean showPeriod = false;
 
     private static List<SelectItem> readAllItems() {
         ApplicationForFoodState[] states = ApplicationForFoodState.values();
@@ -112,7 +113,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 }
             }
             List<ApplicationForFood> list = DAOUtils.getApplicationForFoodListByOrgs(session, idOfOrgList, statusCondition,
-                    benefitCondition, idOfClientList, number, CalendarUtils.startOfDay(startDate), CalendarUtils.endOfDay(endDate));
+                    benefitCondition, idOfClientList, number, CalendarUtils.startOfDay(startDate), CalendarUtils.endOfDay(endDate), showPeriod);
             for (ApplicationForFood applicationForFood : list) {
                 ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(applicationForFood);
                 items.add(item);
@@ -294,5 +295,13 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public Boolean getShowPeriod() {
+        return showPeriod;
+    }
+
+    public void setShowPeriod(Boolean showPeriod) {
+        this.showPeriod = showPeriod;
     }
 }

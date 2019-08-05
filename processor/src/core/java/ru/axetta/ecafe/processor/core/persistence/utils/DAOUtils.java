@@ -3864,17 +3864,19 @@ public class DAOUtils {
     }
 
     public static List<ApplicationForFood> getApplicationForFoodListByOrgs(Session session, List<Long> idOfOrgs,
-            ApplicationForFoodStatus status, Long benefit, List<Long> idOfClientList, String number, Date startDate, Date endDate) {
+            ApplicationForFoodStatus status, Long benefit, List<Long> idOfClientList, String number, Date startDate, Date endDate, Boolean showPeriod) {
         String condition = "where 1=1 ";
         condition += (idOfOrgs.size() == 0 ? "" : "and a.client.org.idOfOrg in :idOfOrgs");
         condition += status == null ? "" : " and a.status = :status";
         condition += benefit == null ? "" : (benefit.equals(0L) ? " and a.dtisznCode is null" : " and a.dtisznCode = :code");
         condition += (idOfClientList.size() == 0) ? "" : " and a.client.idOfClient in :idOfClientList";
         condition += (StringUtils.isEmpty(number)) ? "" : " and a.serviceNumber like :number";
-        condition += " and a.createdDate between :startDate and :endDate";
+        condition += showPeriod ? " and a.createdDate between :startDate and :endDate" : "";
         Query query = session.createQuery("select a from ApplicationForFood a " + condition + " order by a.createdDate, a.serviceNumber");
-        query.setParameter("startDate", startDate);
-        query.setParameter("endDate", endDate);
+        if (showPeriod) {
+            query.setParameter("startDate", startDate);
+            query.setParameter("endDate", endDate);
+        }
         if (idOfOrgs.size() > 0) query.setParameterList("idOfOrgs", idOfOrgs);
         if (status != null) query.setParameter("status", status);
         if (benefit != null && benefit > 0L) query.setParameter("code", benefit);
