@@ -27,6 +27,10 @@ public class ErrorResult implements IResponseEntity {
         return new ErrorResult(HttpURLConnection.HTTP_BAD_REQUEST, "Bad Request");
     }
 
+    public static ErrorResult unauthorized() {
+        return new ErrorResult(HttpURLConnection.HTTP_UNAUTHORIZED, "Unauthorized");
+    }
+
     public Integer getCode() {
         return code;
     }
