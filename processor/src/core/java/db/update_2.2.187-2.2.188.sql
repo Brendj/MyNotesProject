@@ -6,3 +6,6 @@
 
 --190
 ALTER TABLE cf_clients ADD COLUMN userop bool;
+
+--195
+ALTER TABLE cf_orgs ADD COLUMN participantop bool;

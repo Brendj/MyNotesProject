@@ -4157,4 +4157,10 @@ public class DAOUtils {
         }
         return result;
     }
+
+    public static void removeUserOPFlag(Session session, Long idOfOrg) {
+        Query query = session.createSQLQuery("update cf_clients set userop = false where idoforg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.executeUpdate();
+    }
 }

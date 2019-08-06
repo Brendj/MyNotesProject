@@ -11,13 +11,11 @@ import java.util.List;
 
 public class Complex {
     private String name;
-    private String guid;
     @JsonProperty(value = "dishes")
     private List<Dish> dishList = new ArrayList<>();
 
-    public Complex(String name, String guid) {
+    public Complex(String name) {
         this.name = name;
-        this.guid = guid;
     }
 
     public Complex() {
@@ -30,14 +28,6 @@ public class Complex {
 
     public void setName(String name) {
         this.name = name;
-    }
-
-    public String getGuid() {
-        return guid;
-    }
-
-    public void setGuid(String guid) {
-        this.guid = guid;
     }
 
     public List<Dish> getDishList() {

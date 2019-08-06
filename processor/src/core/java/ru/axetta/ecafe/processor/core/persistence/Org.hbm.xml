@@ -260,6 +260,7 @@
         <property name="requestForVisitsToOtherOrg" column="RequestForVisitsToOtherOrg" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="preordersEnabled" column="preordersEnabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="multiCardModeEnabled" column="multiCardModeEnabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="participantOP" column="participantOP" type="boolean"/>
     </class>
 </hibernate-mapping>
 
