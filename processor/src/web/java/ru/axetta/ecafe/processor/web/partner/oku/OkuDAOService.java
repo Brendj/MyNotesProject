@@ -45,10 +45,12 @@ public class OkuDAOService {
 
     @Transactional(readOnly = true)
     public ClientData checkClient(Long contractId, String surname) {
-        Query query = emReport.createQuery("select c from Client c join c.person p "
-                + " join c.org o where c.contractId = :contractId and lower(p.surname) = :surname and o.participantOP = true");
+        Query query = emReport.createQuery("select c from Client c join c.person p  join c.org o "
+                + "where c.contractId = :contractId and lower(p.surname) = :surname and o.participantOP = true "
+                + "     and c.clientGroup.compositeIdOfClientGroup.idOfClientGroup in (:clientGroupList)");
         query.setParameter("contractId", contractId);
         query.setParameter("surname", surname.toLowerCase());
+        query.setParameter("clientGroupList", clientGroupList);
         query.setMaxResults(1);
         try {
             Client client = (Client) query.getSingleResult();
