@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.web.partner.sberbank_msk;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
 
 import javax.servlet.http.HttpServletRequest;
@@ -61,7 +63,7 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
             stringBuilder.append(String.format("<REG_DATE>%s</REG_DATE>", date));
         }
         SBMSKPaymentsCodes result = SBMSKPaymentsCodes.getFromPaymentProcessResultCode(response.getResultCode());
-
+        addSBMSKInfoToResponse(response);
         int resultCode = result.getCode();
         stringBuilder.append(String.format("<CODE>%d</CODE>",resultCode));
         stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",result.toString()));
@@ -80,6 +82,20 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         stringBuilder.append("</response>");
         rsp = new String(stringBuilder.toString().getBytes("UTF-8"), "windows-1251");
         printToStream(rsp, httpResponse);
+    }
+
+    private void addSBMSKInfoToResponse(OnlinePaymentProcessor.PayResponse response) {
+        try {
+            Contragent contragent = DAOReadExternalsService.getInstance().findContragentByClient(response.getClientId());
+            response.setInn(getValueNullSafe(contragent.getInn()));
+            response.setNazn(getValueNullSafe(contragent.getContragentName()));
+            response.setBic(getValueNullSafe(contragent.getBic()));
+            response.setRasch(getValueNullSafe(contragent.getAccount()));
+        } catch (Exception ignore) {}
+    }
+
+    private String getValueNullSafe(String value) {
+        return value == null ? "" : value.trim();
     }
 
     public void serializeResponseIfException(HttpServletResponse httpResponse, SBMSKPaymentsCodes error)
@@ -112,7 +128,7 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         try {
             contractId = Long.parseLong(account);
         } catch (Exception e) {
-            contractId = -1L;
+            throw new InvalidContractIdFormatException("Invalid contractId format");
         }
         return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, true ,defaultContragentId,
                 null, paymentMethod, contractId,
@@ -127,7 +143,7 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         try {
             contractId = Long.parseLong(account);
         } catch (Exception e) {
-            contractId = -1L;
+            throw new InvalidContractIdFormatException("Invalid contractId format");
         }
         String amount = parseResult.getParam("AMOUNT");
         if(!amount.matches("\\d+\\.\\d{2}")){

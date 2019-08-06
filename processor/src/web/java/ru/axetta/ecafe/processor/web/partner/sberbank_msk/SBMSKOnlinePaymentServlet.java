@@ -6,8 +6,6 @@ package ru.axetta.ecafe.processor.web.partner.sberbank_msk;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Contragent;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
 import ru.axetta.ecafe.processor.web.partner.paystd.StdOnlinePaymentServlet;
 
@@ -89,29 +87,28 @@ public class SBMSKOnlinePaymentServlet extends HttpServlet {
             long contragentId = getDefaultIdOfContragent();
             try {
                 payRequest = requestParser.parsePayRequest(contragentId, httpRequest);
-            } catch (InvalidPayIdException e) {
-                logger.error("Failed to parse request", e);
-                logger.error("Request string: " + requestParser.getQueryString(httpRequest));
-                requestParser.serializeResponseIfException(httpResponse, SBMSKPaymentsCodes.INVALID_PAY_ID_VALUE_ERROR);
-                httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
-                return;
-            } catch (InvalidDateException e){
-                logger.error("Failed to parse request", e);
-                logger.error("Request string: " + requestParser.getQueryString(httpRequest));
-                requestParser.serializeResponseIfException(httpResponse, SBMSKPaymentsCodes.INVALID_DATE_VALUE_ERROR);
-                httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
-                return;
-            } catch (InvalidPaymentSumException e){
-                logger.error("Failed to parse request", e);
-                logger.error("Request string: " + requestParser.getQueryString(httpRequest));
-                requestParser.serializeResponseIfException(httpResponse, SBMSKPaymentsCodes.INVALID_PAYMENT_SUM_ERROR);
+            } catch (Exception e) {
+                logger.error("Failed to parse request. Request string: " + requestParser.getQueryString(httpRequest), e);
+                SBMSKPaymentsCodes code = null;
+                if (e instanceof InvalidContractIdFormatException) {
+                    code = SBMSKPaymentsCodes.ILLEGAL_CONTRACT_ID_ERROR;
+                } else if (e instanceof InvalidPayIdException) {
+                    code = SBMSKPaymentsCodes.INVALID_PAY_ID_VALUE_ERROR;
+                } else if (e instanceof InvalidDateException) {
+                    code = SBMSKPaymentsCodes.INVALID_DATE_VALUE_ERROR;
+                } else if (e instanceof InvalidPaymentSumException) {
+                    code = SBMSKPaymentsCodes.INVALID_PAYMENT_SUM_ERROR;
+                } else {
+                    code = SBMSKPaymentsCodes.INTERNAL_ERROR;
+                }
+                requestParser.serializeResponseIfException(httpResponse, code);
                 httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
                 return;
             }
             logger.info(String.format("New request: %s", payRequest.toString()));
             try {
                 response = runtimeContext.getOnlinePaymentProcessor().processPayRequest(payRequest);
-                addSBMSKInfoToResponse(response);
+
             } catch (Exception e) {
                 logger.error("Failed to process request", e);
                 logger.error("Request string: " + requestParser.getQueryString(httpRequest));
@@ -135,18 +132,6 @@ public class SBMSKOnlinePaymentServlet extends HttpServlet {
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
             httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
         }
-    }
-
-    private void addSBMSKInfoToResponse(OnlinePaymentProcessor.PayResponse response) {
-        Contragent contragent = DAOReadExternalsService.getInstance().findContragentByClient(response.getClientId());
-        response.setInn(getValueNullSafe(contragent.getInn()));
-        response.setNazn(getValueNullSafe(contragent.getContragentName()));
-        response.setBic(getValueNullSafe(contragent.getBic()));
-        response.setRasch(getValueNullSafe(contragent.getAccount()));
-    }
-
-    private String getValueNullSafe(String value) {
-        return value == null ? "" : value.trim();
     }
 
     public void doGet(HttpServletRequest httpRequest, HttpServletResponse httpResponse)
