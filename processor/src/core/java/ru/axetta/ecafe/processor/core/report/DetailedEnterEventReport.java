@@ -180,9 +180,9 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                 groupNameWhere = " AND cg.groupname in (" + groupNameQuery + ")";
             }
 
-            ClientDao clientDao = RuntimeContext.getAppContext().getBean(ClientDao.class);
-
-            List<Client> allByOrg = null;
+            //ClientDao clientDao = RuntimeContext.getAppContext().getBean(ClientDao.class);
+            //
+            //List<Client> allByOrg = null;
 
             //Фильтр по клиентам
             String idOfClientsString = StringUtils.trimToEmpty(reportProperties.getProperty(P_ID_OF_CLIENTS));
@@ -202,56 +202,58 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                 clientIdWhere = " AND cs.idofclient in (" + clientIdQuery + ") ";
             }
 
-            List<Long> filterClientIdList = new ArrayList<>();
-            for (String idOfClient : stringClientsIdList) {
-                Long idOfClientLong = Long.parseLong(idOfClient);
-                filterClientIdList.add(idOfClientLong);
-            }
-
-            if (!groupList.isEmpty() && filterClientIdList.isEmpty()) {
-                allByOrg = clientDao.findAllByOrgAndGroupNames(ids, groupList);
-            }
-
-            if (!filterClientIdList.isEmpty() && groupList.isEmpty()) {
-                allByOrg = clientDao.findAllByOrgAndСlientId(ids, filterClientIdList);
-            }
-
-            if (!filterClientIdList.isEmpty() && !groupList.isEmpty()) {
-                allByOrg = clientDao.findAllByOrgAndClientIdAndGroupNames(ids, filterClientIdList, groupList);
-            }
-
-            if (filterClientIdList.isEmpty() && groupList.isEmpty()) {
-                allByOrg = clientDao.findAllByOrg(ids);
-            }
-
             List<Data> currentClassList;
             Map<String, StClass> stClassMap = new HashMap<String, StClass>();
 
             List<Long> clientIdList = new LinkedList<Long>();
-            if (allByOrg != null) {
-                for (Client client : allByOrg) {
-                    if (!stClassMap.containsKey(client.getClientGroup().getGroupName())) {
-                        stClassMap.put(client.getClientGroup().getGroupName(),
-                                new StClass(client.getClientGroup().getGroupName(), friendlyOrgs,
-                                        new LinkedList<Data>()));
-                    }
-                    currentClassList = stClassMap.get(client.getClientGroup().getGroupName()).getDataList();
-                    if (!clientIdList.contains(client.getIdOfClient())) {
-                        currentClassList.addAll(prepareDataList(client, friendlyOrgs, startTime, endTime));
-                        clientIdList.add(client.getIdOfClient());
-                    }
-                }
-            }
+
+
+            //List<Long> filterClientIdList = new ArrayList<>();
+            //for (String idOfClient : stringClientsIdList) {
+            //    Long idOfClientLong = Long.parseLong(idOfClient);
+            //    filterClientIdList.add(idOfClientLong);
+            //}
+
+            //if (!groupList.isEmpty() && filterClientIdList.isEmpty()) {
+            //    allByOrg = clientDao.findAllByOrgAndGroupNames(ids, groupList);
+            //}
+            //
+            //if (!filterClientIdList.isEmpty() && groupList.isEmpty()) {
+            //    allByOrg = clientDao.findAllByOrgAndСlientId(ids, filterClientIdList);
+            //}
+            //
+            //if (!filterClientIdList.isEmpty() && !groupList.isEmpty()) {
+            //    allByOrg = clientDao.findAllByOrgAndClientIdAndGroupNames(ids, filterClientIdList, groupList);
+            //}
+            //
+            //if (filterClientIdList.isEmpty() && groupList.isEmpty()) {
+            //    allByOrg = clientDao.findAllByOrg(ids);
+            //}
+
+            //if (allByOrg != null) {
+            //    for (Client client : allByOrg) {
+            //        if (!stClassMap.containsKey(client.getClientGroup().getGroupName())) {
+            //            stClassMap.put(client.getClientGroup().getGroupName(),
+            //                    new StClass(client.getClientGroup().getGroupName(), friendlyOrgs,
+            //                            new LinkedList<Data>()));
+            //        }
+            //        currentClassList = stClassMap.get(client.getClientGroup().getGroupName()).getDataList();
+            //        if (!clientIdList.contains(client.getIdOfClient())) {
+            //            currentClassList.addAll(prepareDataList(client, friendlyOrgs, startTime, endTime));
+            //            clientIdList.add(client.getIdOfClient());
+            //        }
+            //    }
+            //}
+
 
             //данные для отчета
-
             Query query = session.createSQLQuery(
                     "SELECT  ee.idofenterevent, ee.idoforg, ee.passdirection, ee.eventcode, ee.idofclient,ee.evtdatetime, "
                             + "    pn.firstname, pn.surname, pn.secondname, cg.groupname, os.shortaddress "
                             + "    FROM cf_enterevents ee "
                             + "    LEFT JOIN cf_clients cs  ON ee.idofclient = cs.idofclient "
                             + "    LEFT JOIN cf_persons pn ON pn.idofperson = cs.idofperson "
-                            + "    LEFT JOIN cf_clientgroups cg ON cg.idofclientgroup = cs.idofclientgroup AND cs.idoforg = cg.idoforg "
+                            + "    LEFT JOIN cf_clientgroups cg ON cg.idofclientgroup = ee.idofclientgroup AND cs.idoforg = cg.idoforg "
                             + "    LEFT JOIN  cf_orgs os ON ee.idoforg = os.idoforg WHERE ee.idoforg IN ("
                             + friendlyOrgsIds + ") AND cs.idoforg IN (" + friendlyOrgsIds + ") "
                             + " AND ee.evtdatetime BETWEEN " + startTime.getTime() + " AND " + endTime.getTime()
@@ -263,33 +265,49 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
             List rList = query.list();
 
             //парсим данные
-            for (Object o : rList) {
-                Map<String, Object> row = (Map<String, Object>) o;
-                if (!stClassMap.containsKey(row.get("groupname"))) {
-                    stClassMap.put((String) row.get("groupname"),
-                            new StClass((String) row.get("groupname"), friendlyOrgs, new LinkedList<Data>()));
-                }
-                currentClassList = stClassMap.get((String) row.get("groupname")).getDataList();
+                for (Object o : rList) {
+                    Map<String, Object> row = (Map<String, Object>) o;
+                    if (!stClassMap.containsKey(row.get("groupname"))) {
+                        stClassMap.put((String) row.get("groupname"),
+                                new StClass((String) row.get("groupname"), friendlyOrgs, new LinkedList<Data>()));
+                    }
+                    currentClassList = stClassMap.get((String) row.get("groupname")).getDataList();
 
-                if (!clientIdList.contains(((BigInteger) row.get("idofclient")).longValue())) {
-                    currentClassList.addAll(prepareDataList(row, friendlyOrgs, startTime, endTime));
-                    clientIdList.add(((BigInteger) row.get("idofclient")).longValue());
+                    if (!clientIdList.contains(((BigInteger) row.get("idofclient")).longValue())) {
+                        currentClassList.addAll(prepareDataList(row, friendlyOrgs, startTime, endTime));
+                        clientIdList.add(((BigInteger) row.get("idofclient")).longValue());
+                    }
+                    for (Data event : currentClassList) {
+                        //Добавлена проверка на null
+                        if (event.getF01() != null && event.getF03() != null && event.getF04() != null
+                              && event.getF05() != null ) {
+                            if ((event.getF01().equals(((BigInteger) row.get("idofclient")).toString())) && (event.getF03().equals((String) row.get("groupname"))) && (event.getF04().equals(CalendarUtils
+                                    .dateShortToString(new Date(((BigInteger) row.get("evtdatetime")).longValue())))) && (event.getF05().equals((String) row.get("shortaddress")))) {
+                                updateEventData(event, row);
+                            }
+                        }
+                    }
                 }
-                for (Data event : currentClassList) {
-                    if ((event.getF01().equals(((BigInteger) row.get("idofclient")).toString())) && (event.getF03()
-                            .equals((String) row.get("groupname"))) && (event.getF04().equals(CalendarUtils
-                            .dateShortToString(new Date(((BigInteger) row.get("evtdatetime")).longValue())))) && (event
-                            .getF05().equals((String) row.get("shortaddress")))) {
-                        updateEventData(event, row);
+
+            for (Map.Entry entry: stClassMap.entrySet()) {
+                StClass value = (StClass) entry.getValue();
+                for (ListIterator<Data> i = value.getDataList().listIterator(); i.hasNext(); ) {
+                    Data el = i.next();
+                    if((el.getF06() == null || el.getF06() == "") && (el.getF07() == null || el.getF07() == "")) {
+                        i.remove();
                     }
                 }
             }
+
+
             Map<MapKeyModel, Long> usersEntrySummaryMap = new HashMap<MapKeyModel, Long>();
             //заполняем время внутри
 
             List<MapKeyModel> mapKeyModelList = new ArrayList<MapKeyModel>();
 
             List<StClass> stClassList = new LinkedList<StClass>(stClassMap.values());
+
+
             for (StClass stClass : stClassList) {
                 if (stClass.getDataList() == null || stClass.getDataList().size() == 0) {
                     logger.error("Data for AutoEnterEventV2Report not found. IdOfOrg = " + org.getIdOfOrg());
