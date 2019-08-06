@@ -4,7 +4,9 @@
 
 package ru.axetta.ecafe.processor.web.ui.monitoring;
 
-import net.sf.jasperreports.engine.export.*;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
@@ -221,4 +223,5 @@ public class SyncMonitorPage extends OnlineReportPage {
     public String getPageFilename() {
         return "monitoring/sync_monitor";
     }
+
 }

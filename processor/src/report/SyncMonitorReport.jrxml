@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SyncMonitorReport" pageWidth="905" pageHeight="595" orientation="Landscape" columnWidth="865" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="716ced14-f7b3-4bb2-a948-9b5cfd7d7894">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SyncMonitorReport" pageWidth="957" pageHeight="595" orientation="Landscape" columnWidth="917" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="716ced14-f7b3-4bb2-a948-9b5cfd7d7894">
 	<property name="ireport.zoom" value="1.0245201830476065"/>
 	<property name="ireport.x" value="0"/>
 	<property name="ireport.y" value="0"/>
@@ -25,13 +25,14 @@
 	<field name="version" class="java.lang.String"/>
 	<field name="remoteAddr" class="java.lang.String"/>
 	<field name="sqlServerVersion" class="java.lang.String"/>
+	<field name="databaseSize" class="java.lang.String"/>
 	<background>
 		<band splitType="Stretch"/>
 	</background>
 	<title>
 		<band height="98" splitType="Stretch">
 			<textField>
-				<reportElement uuid="571e7f1b-b8e0-48b8-a703-5d7bbbbec024" x="0" y="0" width="865" height="20"/>
+				<reportElement uuid="571e7f1b-b8e0-48b8-a703-5d7bbbbec024" x="0" y="0" width="917" height="20"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="12" isBold="true"/>
 				</textElement>
@@ -79,7 +80,7 @@
 				<text><![CDATA[Версия MySQL]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="ce3d8771-d459-4805-b967-042dddcd005e" x="762" y="47" width="103" height="41"/>
+				<reportElement uuid="ce3d8771-d459-4805-b967-042dddcd005e" x="814" y="47" width="103" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[IP-адрес]]></text>
 			</staticText>
@@ -87,6 +88,11 @@
 				<reportElement uuid="004b0416-ce7f-41d2-bdce-bf36d23e7c46" x="647" y="47" width="63" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<text><![CDATA[Версия клиента]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="9544a83b-6087-4e44-b32c-79e9717cc5fa" x="762" y="47" width="52" height="41"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<text><![CDATA[Размер БД (МБ)]]></text>
 			</staticText>
 		</band>
 	</title>
@@ -153,7 +159,7 @@
 				<textFieldExpression><![CDATA[new SimpleDateFormat("dd.MM.yyyy HH:mm").format($F{lastSuccessfulBalanceSync})]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" pattern="###0.00;-###0.00" isBlankWhenNull="true">
-				<reportElement uuid="bbd6e985-58fc-4cdb-8180-a1dd32abe3d4" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="762" y="0" width="103" height="41">
+				<reportElement uuid="bbd6e985-58fc-4cdb-8180-a1dd32abe3d4" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="814" y="0" width="103" height="41">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
@@ -163,6 +169,11 @@
 				<reportElement uuid="50fe26f8-cf91-410f-b390-e08b8e31d459" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="710" y="0" width="52" height="41"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{sqlServerVersion}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="a13d805d-dccd-4139-9bb3-9f8c5e5820ab" style="Crosstab Data Text" stretchType="RelativeToBandHeight" x="762" y="0" width="52" height="41"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{databaseSize}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

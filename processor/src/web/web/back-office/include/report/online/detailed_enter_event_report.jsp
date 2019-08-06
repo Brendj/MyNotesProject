@@ -71,7 +71,6 @@
         </h:selectOneMenu>
     </h:panelGrid>
 
-
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.detailedEnterEventReportPage.buildReportHTML}"
                            reRender="detailedEnterEventReportPanel" styleClass="command-button"

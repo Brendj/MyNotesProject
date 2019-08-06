@@ -1799,6 +1799,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryBase.setOrgType(client.getOrg().getType());
         clientSummaryBase.setGuid(client.getClientGUID());
         clientSummaryBase.setSpecialMenu(client.getSpecialMenu() == null || !client.getSpecialMenu() ? 0 : 1);
+        clientSummaryBase.setGender(client.getGender());
         return clientSummaryBase;
     }
 
@@ -1905,6 +1906,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         clientSummaryExt.setOrgType(client.getOrg().getType());
 
         clientSummaryExt.setLastConfirmMobile(toXmlDateTime(client.getLastConfirmMobile()));
+        clientSummaryExt.setGender(client.getGender());
 
         data.setClientSummaryExt(clientSummaryExt);
     }
@@ -8466,6 +8468,59 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "orgCode") String orgCode,
+            @WebParam(name = "CultureName") String CultureName, @WebParam(name = "CultureShortName") String CultureShortName,
+            @WebParam(name = "CultureAddress") String CultureAddress, @WebParam(name = "accessTime") Date accessTime,
+            @WebParam(name = "eventsStatus") Integer eventsStatus) {
+
+        authenticateRequest(null);
+        if (StringUtils.isEmpty(guid)) {
+            return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
+        }
+        if (accessTime == null) {
+            return new Result(RC_INVALID_DATA, "Время события не может быть пустым");
+        }
+
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Client cl = DAOUtils.findClientByGuid(session, guid);
+            if (cl == null) {
+                return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
+            }
+            //здесь сохранение события в таблицу и отправка уведомления
+            if (CultureName != null && CultureName.length() > 255) {
+                CultureName = CultureName.substring(0, 255);
+            }
+            ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
+            ExternalEvent event = new ExternalEvent(cl, orgCode, CultureName, CultureShortName, CultureAddress, ExternalEventType.CULTURE,
+                    accessTime, ExternalEventStatus.fromInteger(eventsStatus), handler);
+            session.save(event);
+            transaction.commit();
+            transaction = null;
+
+            //отправка уведомления
+            if (CalendarUtils.isDateToday(accessTime)) {
+                ExternalEventNotificationService notificationService = RuntimeContext.getAppContext().getBean(ExternalEventNotificationService.class);
+                notificationService.setCultureShortName(CultureShortName);
+                notificationService.sendNotification(cl, event);
+            }
+            return new Result(RC_OK, RC_OK_DESC);
+        } catch (IllegalArgumentException e) {
+            logger.error("Error in enterCulture method:", e);
+            return new Result(RC_INTERNAL_ERROR, e.getMessage());
+        } catch (Exception e) {
+            logger.error("Error in enterCulture method:", e);
+            return new Result(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    @Override
     public ClientSummaryBaseListResult getSummaryByGuardMobileMin(String guardMobile) {
         HTTPData data = new HTTPData();
         HTTPDataHandler handler = new HTTPDataHandler(data);
@@ -9438,6 +9493,63 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(persistenceSession, logger);
         }
         return result;
+    }
+
+    @Override
+    public ContragentData getContragentForClient(@WebParam(name = "contractId") Long contractId){
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ContragentData contragentData = new ContragentData();
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
+            if (client == null) {
+                throw new NullPointerException();
+            }
+            Contragent contragent = DAOUtils.getContragentbyContractId(persistenceSession, contractId);
+            contragentData.setIdOfContragent(contragent.getIdOfContragent());
+            contragentData.setContragentName(contragent.getContragentName());
+
+            contragentData.getContactPerson().setSurname(contragent.getContactPerson().getSurname());
+            contragentData.getContactPerson().setFirstName(contragent.getContactPerson().getFirstName());
+            contragentData.getContactPerson().setSecondName(contragent.getContactPerson().getSecondName());
+            contragentData.getContactPerson().setTitle(contragent.getTitle());
+
+            contragentData.setAddress(contragent.getAddress());
+            contragentData.setPhone(contragent.getPhone());
+            contragentData.setMobile(contragent.getMobile());
+            contragentData.setEmail(contragent.getEmail());
+            contragentData.setFax(contragent.getFax());
+            contragentData.setInn(contragent.getInn());
+            contragentData.setBank(contragent.getBank());
+            contragentData.setBic(contragent.getBic());
+            contragentData.setCorrAccount(contragent.getCorrAccount());
+            contragentData.setAccount(contragent.getAccount());
+            contragentData.setKpp(contragent.getKpp());
+            contragentData.setOgrn(contragent.getOgrn());
+            contragentData.setOkato(contragent.getOkato());
+            contragentData.setOktmo(contragent.getOktmo());
+            contragentData.setRemarks(contragent.getRemarks());
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+
+            contragentData.resultCode = RC_OK;
+            contragentData.description = RC_OK_DESC;
+        } catch (NullPointerException e){
+            contragentData.resultCode = 100L;
+            contragentData.description = RC_CLIENT_NOT_FOUND_DESC;
+        } catch (Exception e) {
+            logger.error("Error in getContragentForClient", e);
+            contragentData.resultCode = RC_INTERNAL_ERROR;
+            contragentData.description = RC_INTERNAL_ERROR_DESC;
+        }finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return contragentData;
     }
 
     @Override

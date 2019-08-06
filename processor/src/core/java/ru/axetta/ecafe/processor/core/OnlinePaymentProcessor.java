@@ -202,6 +202,10 @@ public class OnlinePaymentProcessor {
         private final Long tspContragentId;
         private final HashMap<String, String> addInfo;
         private Long idOfClientPayment;
+        private String inn;
+        private String nazn;
+        private String bic;
+        private String rasch;
 
         public PayResponse(int protoVersion, boolean bCheckOnly, int resultCode, String resultDescription, Long tspContragentId, Long clientId, String paymentId,
                 Long balance, Long subBalance1, String clientFirstName, String clientSurname, String clientSecondName, Long cardPrintedNo, HashMap<String, String> addInfo) {
@@ -392,6 +396,38 @@ public class OnlinePaymentProcessor {
                     ", resultDescription='" + resultDescription + '\'' +
                     ", tspContragentId=" + tspContragentId +
                     '}';
+        }
+
+        public String getInn() {
+            return inn;
+        }
+
+        public void setInn(String inn) {
+            this.inn = inn;
+        }
+
+        public String getNazn() {
+            return nazn;
+        }
+
+        public void setNazn(String nazn) {
+            this.nazn = nazn;
+        }
+
+        public String getBic() {
+            return bic;
+        }
+
+        public void setBic(String bic) {
+            this.bic = bic;
+        }
+
+        public String getRasch() {
+            return rasch;
+        }
+
+        public void setRasch(String rasch) {
+            this.rasch = rasch;
         }
     }
 

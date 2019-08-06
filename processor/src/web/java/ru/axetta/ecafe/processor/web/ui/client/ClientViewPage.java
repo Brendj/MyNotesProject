@@ -564,7 +564,7 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         this.clientWardItems = loadWardsByClient(session, idOfClient);
 
-        List<Migrant> migrants = MigrantsUtils.getActiveMigrantsByIdOfClient(session, idOfClient);
+        List<Migrant> migrants = MigrantsUtils.getAllMigrantsByIdOfClient(session, idOfClient);
         clientSectionsItems = buildClientSectionsItem(session, migrants);
         visitsSections = !clientSectionsItems.isEmpty();
 

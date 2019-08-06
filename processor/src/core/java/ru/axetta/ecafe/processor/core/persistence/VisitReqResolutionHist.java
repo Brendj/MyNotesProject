@@ -17,12 +17,12 @@ public class VisitReqResolutionHist implements Serializable {
     public static final int NOT_SYNCHRONIZED = 0;
     public static final int SYNCHRONIZED = 1;
 
-    public static final int RES_CREATED = 0;
-    public static final int RES_CONFIRMED = 1;
-    public static final int RES_REJECTED = 2;
-    public static final int RES_CANCELED = 3;
-    public static final int RES_OVERDUE = 4;
-    public static final int RES_OVERDUE_SERVER = 5;
+    public static final int RES_CREATED = 0; /*Создана*/
+    public static final int RES_CONFIRMED = 1; /*Подтверждена*/
+    public static final int RES_REJECTED = 2; /*Отклонена*/
+    public static final int RES_CANCELED = 3; /*Аннулирована*/
+    public static final int RES_OVERDUE = 4; /*Истек срок*/
+    public static final int RES_OVERDUE_SERVER = 5 /*Истек срок*/;
 
     private CompositeIdOfVisitReqResolutionHist compositeIdOfVisitReqResolutionHist;
     private Org orgResol; // Организация, в которой была вынесена резолюция
