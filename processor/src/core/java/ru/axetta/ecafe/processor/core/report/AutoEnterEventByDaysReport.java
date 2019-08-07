@@ -55,6 +55,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
     public static final String REPORT_NAME = "Сводный отчет по посещению";
     public static final String[] TEMPLATE_FILE_NAMES = {"AutoEnterEventByDaysReport.jasper"};
     public static final String[] TEMPLATE_FILE_NAMES_FOR_CLIENT = {"AutoEnterEventByDaysReportClient.jasper"};
+    public static final String P_ID_CLIENT = "idOfClients";
     public static final boolean IS_TEMPLATE_REPORT = true;
     public static final int[] PARAM_HINTS = new int[]{28, 29, -3, 22, 23, 24};
 
@@ -315,14 +316,15 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             }
 
             //Фильтр по клиенту
-            String idOfContract;
-            if (reportProperties.getProperty("idOfContract") == null) {
-                idOfContract = null;
-            } else {
-                idOfContract = reportProperties.getProperty("idOfContract");
+            List<String> stringClientsList;
+            try
+            {
+                String idOfClients = StringUtils.trimToEmpty(reportProperties.getProperty(P_ID_CLIENT));
+                stringClientsList = Arrays.asList(StringUtils.split(idOfClients, ','));
+            } catch (Exception e)
+            {
+                stringClientsList = new ArrayList<>();
             }
-
-            
 
             //группа фильтр
             String groupName;
@@ -345,6 +347,10 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             clientCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
             //clientCriteria.add(Property.forName("org.idOfOrg").in(orgCriteria));
             clientCriteria.add(Restrictions.in("org.idOfOrg", ids));
+
+            if (!stringClientsList.isEmpty()) {
+                clientCriteria.add(Restrictions.in("idOfClient", stringClientsList));
+            }
             clientCriteria.add(Restrictions.ne("idOfClientGroup", 1100000060L)); // Исключаем из списка Выбывших
             if (!groupList.isEmpty()) {
                 clientCriteria.add(Restrictions.in("cg.groupName", groupList));

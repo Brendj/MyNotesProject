@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -521,8 +522,9 @@ public class ReportRepository extends BaseJpaDao {
                 properties.setProperty("groupName", reportParameters.getGroupName());
             }
 
-            if (reportParameters.getIdOfContract() != null) {
-                properties.setProperty("idOfContract", String.valueOf(reportParameters.getIdOfContract()));
+            if(reportParameters.getIdOfContract() != null){
+                Client client = DAOService.getInstance().getClientByContractId(reportParameters.getIdOfContract());
+                properties.setProperty(AutoEnterEventByDaysReport.P_ID_CLIENT, client.getIdOfClient().toString());
             }
 
             if (reportParameters.getIsAllFriendlyOrgs() != null) {

@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
+import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -136,14 +137,7 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
                         org.getShortName(), org.getOfficialName(), org.getAddress());
                 builder.setOrg(orgShortItem);
 
-                Properties properties = new Properties();
-                if (allFriendlyOrgs) {
-                    properties.setProperty("isAllFriendlyOrgs", String.valueOf(allFriendlyOrgs));
-                }
-
-                String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
-                properties.setProperty("groupName", groupNamesString);
-                builder.setReportProperties(properties);
+                builder.setReportProperties(buildProperties(persistenceSession));
 
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
@@ -202,14 +196,7 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
                         org.getShortName(), org.getOfficialName(), org.getAddress());
                 builder.setOrg(orgShortItem);
 
-                Properties properties = new Properties();
-                if (allFriendlyOrgs) {
-                    properties.setProperty("isAllFriendlyOrgs", String.valueOf(allFriendlyOrgs));
-                }
-
-                String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
-                properties.setProperty("groupName", groupNamesString);
-                builder.setReportProperties(properties);
+                builder.setReportProperties(buildProperties(persistenceSession));
 
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
@@ -248,19 +235,34 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
         }
     }
 
+    private Properties buildProperties(Session persistenceSession) throws Exception {
+        Properties properties = new Properties();
+        String idOfClients = "";
+        if (getClientList() != null && getClientList().size() > 0) {
+            for (ClientSelectListPage.Item item : getClientList()) {
+                idOfClients += item.getIdOfClient() + ",";
+            }
+            idOfClients = idOfClients.substring(0, idOfClients.length() - 1);
+        }
+        properties.setProperty(AutoEnterEventByDaysReport.P_ID_CLIENT, idOfClients);
+        String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
+        properties.setProperty("groupName", groupNamesString);
+        if (allFriendlyOrgs) {
+            properties.setProperty("isAllFriendlyOrgs", String.valueOf(allFriendlyOrgs));
+        }
+
+        return properties;
+    }
+
     private String checkIsExistFile() {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
         String templateShortFilename = "";
-        //if (getFilterClient().equals("Не выбрано"))
-        //{
-        //    templateShortFilename = "AutoEnterEventByDaysReport.jasper";
-        //}
-        //else
-        //    templateShortFilename = "AutoEnterEventByDaysReportClient.jasper";
-
-        templateShortFilename = "AutoEnterEventByDaysReportClient.jasper";
-
-        //
+        if (getFilterClient().equals("Не выбрано"))
+        {
+            templateShortFilename = "AutoEnterEventByDaysReport.jasper";
+        }
+        else
+            templateShortFilename = "AutoEnterEventByDaysReportClient.jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFilename;
         if (!(new File(templateFilename)).exists()) {
             printError(String.format("Не найден файл шаблона '%s'", templateFilename));
