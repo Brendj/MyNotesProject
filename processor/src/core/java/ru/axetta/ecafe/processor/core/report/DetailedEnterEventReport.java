@@ -288,14 +288,23 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                         }
                     }
                 }
-
+            Integer counter;
             for (Map.Entry entry: stClassMap.entrySet()) {
                 StClass value = (StClass) entry.getValue();
                 for (ListIterator<Data> i = value.getDataList().listIterator(); i.hasNext(); ) {
                     Data el = i.next();
-                    if((el.getF06() == null || el.getF06() == "") && (el.getF07() == null || el.getF07() == "")) {
+                    if((el.getF06() == null || el.getF06().equals("")) && (el.getF07() == null || el.getF07().equals(""))) {
                         i.remove();
                     }
+                }
+                counter = 1;
+                String cur = "";
+                for (Data i : value.getDataList()) {
+                    if (!cur.equals(i.getF01()))
+                        counter = 1;
+                    cur = i.getF01();
+                    i.setF11(counter);
+                    counter ++;
                 }
             }
 
