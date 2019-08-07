@@ -104,7 +104,7 @@
                    warnClass="warn-messages" />
     <h:panelGrid styleClass="borderless-grid" id="reportPanel">
         <c:if test="${not empty  mainPage.detailedEnterEventReportPage.htmlReport}">
-            <h:outputText escape="true" value="Детализированный отчет по проходам" styleClass="output-text" />
+            <h:outputText escape="true" value="Детализированный отчет по посещению" styleClass="output-text" />
             <f:verbatim>
                 <style type="text/css">
                     div.htmlReportContent :empty {
