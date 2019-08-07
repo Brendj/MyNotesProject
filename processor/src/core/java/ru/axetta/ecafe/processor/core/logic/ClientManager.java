@@ -2056,7 +2056,7 @@ public class ClientManager {
     }
 
     public static void checkUserOPFlag(Session session, Org oldOrg, Org newOrg, Long idOfClientGroup, Client client) {
-        if (!client.getUserOP()) {
+        if (null == client.getUserOP() || !client.getUserOP()) {
             return;
         }
         if (!oldOrg.equals(newOrg)) {
