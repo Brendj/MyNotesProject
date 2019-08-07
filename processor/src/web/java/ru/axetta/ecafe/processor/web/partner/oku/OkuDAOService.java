@@ -163,6 +163,9 @@ public class OkuDAOService {
     @Transactional(readOnly = true)
     public Collection<Order> getOrders(Date orderedFrom, Date orderedTo, Integer limit, Integer offset) {
         List<Long> clientIdList = getClients();
+        if (clientIdList.isEmpty()) {
+            return new ArrayList<>();
+        }
         Query query = emReport.createNativeQuery(
                 "select a.contractid, a.idoforder, a.idoforg, a.createddate, od.menudetailname as complex_name, "
                         + "    odd.menudetailname as dish_name, g.guid, odd.menuorigin as dish_menuorigin " + "from ( "
