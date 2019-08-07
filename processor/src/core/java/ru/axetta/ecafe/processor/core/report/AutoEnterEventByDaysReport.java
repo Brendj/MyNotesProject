@@ -105,6 +105,8 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             private void addEntryTime(Long day, Long dateTime) {
                 int dayOfMonth = CalendarUtils.getDayOfMonth(new Date(day)) - 1;
                 List<Date> date = dayEntry.get(dayOfMonth);
+                if (date == null)
+                    date = new ArrayList<>();
                 date.add(new Date(dateTime));
                 dayEntry.put(dayOfMonth, date);
 
@@ -113,6 +115,8 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             private void addExitTime(Long day, Long dateTime) {
                 int dayOfMonth = CalendarUtils.getDayOfMonth(new Date(day)) - 1;
                 List<Date> date = dayExit.get(dayOfMonth);
+                if (date == null)
+                    date = new ArrayList<>();
                 date.add(new Date(dateTime));
                 dayExit.put(dayOfMonth, date);
             }
@@ -317,14 +321,19 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
 
             //Фильтр по клиенту
             List<String> stringClientsList;
+            List<Long> clientsList = new ArrayList<>();
             try
             {
                 String idOfClients = StringUtils.trimToEmpty(reportProperties.getProperty(P_ID_CLIENT));
                 stringClientsList = Arrays.asList(StringUtils.split(idOfClients, ','));
+                for (String clientId: stringClientsList)
+                    clientsList.add(Long.valueOf(clientId));
             } catch (Exception e)
             {
                 stringClientsList = new ArrayList<>();
+                clientsList = new ArrayList<>();
             }
+
 
             //группа фильтр
             String groupName;
@@ -348,8 +357,8 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             //clientCriteria.add(Property.forName("org.idOfOrg").in(orgCriteria));
             clientCriteria.add(Restrictions.in("org.idOfOrg", ids));
 
-            if (!stringClientsList.isEmpty()) {
-                clientCriteria.add(Restrictions.in("idOfClient", stringClientsList));
+            if (!clientsList.isEmpty()) {
+                clientCriteria.add(Restrictions.in("idOfClient", clientsList));
             }
             clientCriteria.add(Restrictions.ne("idOfClientGroup", 1100000060L)); // Исключаем из списка Выбывших
             if (!groupList.isEmpty()) {
