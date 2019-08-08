@@ -411,6 +411,16 @@
                     <h:inputText value="#{optionPage.RNIPPaymentsPassword}" styleClass="input-text" size="40" />
                 </h:panelGrid>
             </rich:panel>
+            <rich:panel>
+                <f:facet name="header"><h:outputText styleClass="column-header"
+                                                     value="Взаимодействие с МТС банк" /></f:facet>
+                <h:panelGrid styleClass="borderless-grid" columns="2">
+                    <h:outputText escape="true" value="Путь к файлу сертификата" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.regularPaymentCertPath}" styleClass="input-text" size="40" />
+                    <h:outputText escape="true" value="Пароль" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.regularPaymentCertPassword}" styleClass="input-text" size="40" />
+                </h:panelGrid>
+            </rich:panel>
         </h:panelGrid>
     </rich:tab>
 

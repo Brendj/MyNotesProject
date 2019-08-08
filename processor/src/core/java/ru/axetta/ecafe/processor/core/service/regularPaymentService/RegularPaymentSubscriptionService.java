@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service.regularPaymentService;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.SecurityJournalProcess;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
@@ -13,11 +14,19 @@ import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.Reg
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CryptoUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
+import ru.axetta.ecafe.processor.core.utils.ssl.EasyX509TrustManager;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.HttpStatus;
 import org.apache.commons.httpclient.methods.PostMethod;
 import org.apache.commons.lang.StringUtils;
+import org.apache.http.HttpResponse;
+import org.apache.http.client.entity.UrlEncodedFormEntity;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.conn.scheme.Scheme;
+import org.apache.http.conn.ssl.SSLSocketFactory;
+import org.apache.http.impl.client.DefaultHttpClient;
+import org.apache.http.message.BasicNameValuePair;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
@@ -33,6 +42,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Node;
 
 import javax.annotation.PostConstruct;
+import javax.net.ssl.KeyManagerFactory;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
@@ -44,8 +57,12 @@ import javax.xml.transform.Transformer;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
+import java.io.FileInputStream;
 import java.io.InputStream;
 import java.io.StringWriter;
+import java.security.KeyStore;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -79,6 +96,8 @@ public class RegularPaymentSubscriptionService {
     private SubscriptionDeleteRequest subscriptionDeleteRequest;
     @Autowired
     private SubscriptionRegRequest subscriptionRegRequest;
+
+    private static Scheme scheme;
 
     public MfrRequest createRequestForSubscriptionReg(Long contractId, Long paymentAmount, Long thresholdAmount,
             int period) {
@@ -201,7 +220,7 @@ public class RegularPaymentSubscriptionService {
         return sendSubscriptionRequest(subscriptionId, statusCheckRequest);
     }
 
-    protected PaymentResponse sendRequest(String uri, Map<String, String> params) {
+    protected PaymentResponse sendRequest_old(String uri, Map<String, String> params) {
         PostMethod httpMethod = new PostMethod(uri);
         StringBuilder sb = new StringBuilder();
         for (Map.Entry<String, String> entry : params.entrySet()) {
@@ -229,6 +248,69 @@ public class RegularPaymentSubscriptionService {
             logger.error("Error in mfr send request: ", ex);
         } finally {
             httpMethod.releaseConnection();
+            logger.info("Response from MFR: {}", paymentResponse.toString());
+        }
+        return paymentResponse;
+    }
+
+    private void initScheme() throws Exception {
+        if (scheme != null) return;
+
+        KeyStore ks = KeyStore.getInstance("PKCS12");
+        FileInputStream fis = new FileInputStream(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_REGULAR_PAYMENT_CERT_PATH));
+        ks.load(fis, RuntimeContext.getInstance().getOptionValueString(Option.OPTION_REGULAR_PAYMENT_CERT_PASSWORD).toCharArray());
+        KeyManagerFactory kmf = KeyManagerFactory.getInstance("SunX509");
+        kmf.init(ks, RuntimeContext.getInstance().getOptionValueString(Option.OPTION_REGULAR_PAYMENT_CERT_PASSWORD).toCharArray());
+        SSLContext sc = SSLContext.getInstance("TLSv1.2");
+        X509TrustManager tm = new EasyX509TrustManager(null) {
+
+            public void checkClientTrusted(X509Certificate[] xcs, String string) throws CertificateException {
+            }
+
+            public void checkServerTrusted(X509Certificate[] xcs, String string) throws CertificateException {
+            }
+
+            public X509Certificate[] getAcceptedIssuers() {
+                return null;
+            }
+        };
+        sc.init(kmf.getKeyManagers(), new TrustManager[]{tm}, null);
+
+        SSLSocketFactory sf = new SSLSocketFactory(sc);
+        sf.setHostnameVerifier(SSLSocketFactory.ALLOW_ALL_HOSTNAME_VERIFIER);
+        scheme = new Scheme("https", sf, 443);
+    }
+
+    protected PaymentResponse sendRequest(String uri, Map<String, String> params) {
+        PaymentResponse paymentResponse = new PaymentResponse();
+        try {
+            initScheme();
+            DefaultHttpClient httpClient = new DefaultHttpClient();
+            httpClient.getConnectionManager().getSchemeRegistry().register(scheme);
+
+            HttpPost httpPost = new HttpPost(uri);
+            List<org.apache.http.NameValuePair> paramsPost = new ArrayList<org.apache.http.NameValuePair>();
+            StringBuilder sb = new StringBuilder();
+            for (Map.Entry<String, String> entry : params.entrySet()) {
+                paramsPost.add(new BasicNameValuePair(entry.getKey(), entry.getValue()));
+                sb.append(entry.getKey()).append("=").append(entry.getValue()).append(", ");
+            }
+            httpPost.setEntity(new UrlEncodedFormEntity(paramsPost));
+            httpPost.setHeader("Content-type", "application/json;charset=UTF-8");
+
+            logger.info("Sending request to MFR: {}", sb.toString());
+
+            HttpResponse response = httpClient.execute(httpPost);
+            int statusCode = response.getStatusLine().getStatusCode();
+            paymentResponse.setStatusCode(statusCode);
+            if (statusCode == HttpStatus.SC_OK) {
+                logger.info("OK response from MFR");
+            } else {
+                logger.error("Http request has status {}", statusCode);
+            }
+        } catch (Exception ex) {
+            logger.error("Error in mfr send request: ", ex);
+        } finally {
             logger.info("Response from MFR: {}", paymentResponse.toString());
         }
         return paymentResponse;

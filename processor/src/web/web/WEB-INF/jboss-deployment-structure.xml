@@ -4,6 +4,8 @@
             <module name="org.apache.commons.logging"/>
             <module name="org.apache.commons.collections"/>
             <module name="org.apache.xerces"/>
+            <module name="org.apache.httpcomponents"/>
+            <module name="org.bouncycastle"/>
             <module name="org.hibernate"/>
             <module name="org.slf4j"/>
             <module name="org.apache.cxf"/>

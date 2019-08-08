@@ -130,6 +130,8 @@ public class OptionPage extends BasicWorkspacePage {
     private Integer reviseDelta;
     private Boolean logInfoService;
     private String methodsInfoService;
+    private String regularPaymentCertPath;
+    private String regularPaymentCertPassword;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString(), RNIPVersion.RNIP_V21.toString()};
 
@@ -915,6 +917,8 @@ public class OptionPage extends BasicWorkspacePage {
         RNIPTSAServer = runtimeContext.getOptionValueString(Option.OPTION_IMPORT_RNIP_TSA_SERVER);
         logInfoService = runtimeContext.getOptionValueBool(Option.OPTION_LOG_INFOSERVICE);
         methodsInfoService = runtimeContext.getOptionValueString(Option.OPTION_METHODS_INFOSERVICE);
+        regularPaymentCertPath = runtimeContext.getOptionValueString(Option.OPTION_REGULAR_PAYMENT_CERT_PATH);
+        regularPaymentCertPassword = runtimeContext.getOptionValueString(Option.OPTION_REGULAR_PAYMENT_CERT_PASSWORD);
 
         readerForWebInterfaceString = runtimeContext.getOptionValueString(Option.OPTION_READER_FOR_WEB_STRING);
 
@@ -1073,6 +1077,8 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_REVISE_DELTA, reviseDelta);
             runtimeContext.setOptionValue(Option.OPTION_LOG_INFOSERVICE, logInfoService);
             runtimeContext.setOptionValue(Option.OPTION_METHODS_INFOSERVICE, methodsInfoService);
+            runtimeContext.setOptionValue(Option.OPTION_REGULAR_PAYMENT_CERT_PATH, regularPaymentCertPath);
+            runtimeContext.setOptionValue(Option.OPTION_REGULAR_PAYMENT_CERT_PASSWORD, regularPaymentCertPassword);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
@@ -1177,5 +1183,21 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setMethodsInfoService(String methodsInfoService) {
         this.methodsInfoService = methodsInfoService;
+    }
+
+    public String getRegularPaymentCertPath() {
+        return regularPaymentCertPath;
+    }
+
+    public void setRegularPaymentCertPath(String regularPaymentCertPath) {
+        this.regularPaymentCertPath = regularPaymentCertPath;
+    }
+
+    public String getRegularPaymentCertPassword() {
+        return regularPaymentCertPassword;
+    }
+
+    public void setRegularPaymentCertPassword(String regularPaymentCertPassword) {
+        this.regularPaymentCertPassword = regularPaymentCertPassword;
     }
 }
