@@ -76,7 +76,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
 
             private String fio = null;
             private List<String> timeList = new ArrayList<String>(Arrays.asList(data));
-            private List <String> timeinWeekList = new ArrayList<String>(Arrays.asList(data));
+            private List <String> timeinWeekList = new ArrayList<String>();
             //private Map<Integer, Date> dayMaxMin = new HashMap<Integer, Date>();
             private MultiValueMap dayMaxMin = new MultiValueMap();
             //Массив входов для одного дня
@@ -139,14 +139,6 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                             timeList.add(day, s);
                             timeInOrg += Math.abs(duration / 60000);
                             countDays++;
-                            if (day == 6)
-                                timeinWeekLong.add(timeInOrg);
-                            if (day == 13)
-                                timeinWeekLong.add(timeInOrg - timeinWeekLong.get(0));
-                            if (day == 20)
-                                timeinWeekLong.add(timeInOrg - (timeinWeekLong.get(1) + timeinWeekLong.get(0)));
-                            if (day == 27)
-                                timeinWeekLong.add(timeInOrg - (timeinWeekLong.get(2) + timeinWeekLong.get(1) + timeinWeekLong.get(0)));
                         } else {
                             // Если только вход
                             if (dateEntry != null) {
@@ -158,6 +150,14 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                             }
                         }
                     }
+                    if (day == 6)
+                        timeinWeekLong.add(timeInOrg);
+                    if (day == 13)
+                        timeinWeekLong.add(timeInOrg - timeinWeekLong.get(0));
+                    if (day == 20)
+                        timeinWeekLong.add(timeInOrg - (timeinWeekLong.get(1) + timeinWeekLong.get(0)));
+                    if (day == 27)
+                        timeinWeekLong.add(timeInOrg - (timeinWeekLong.get(2) + timeinWeekLong.get(1) + timeinWeekLong.get(0)));
                 }
                 if (countDays > 0) {
 
