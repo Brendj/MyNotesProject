@@ -309,6 +309,10 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
 
+        for (Org o : selectOrg) {
+            o.setParticipantOP(participantOP);
+        }
+
         org.setCommodityAccounting(changeCommodityAccounting);
         if(changeCommodityAccounting){
 

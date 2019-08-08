@@ -128,10 +128,10 @@ public class OkuRestController {
         try {
             checkParameter("organization_id", idOfOrg);
 
-            Organization organization = RuntimeContext.getAppContext().getBean(OkuDAOService.class)
+            List<Organization> organizationList = RuntimeContext.getAppContext().getBean(OkuDAOService.class)
                     .getOrganizationInfo(idOfOrg);
 
-            return Response.status(HttpURLConnection.HTTP_OK).entity(organization).build();
+            return Response.status(HttpURLConnection.HTTP_OK).entity(organizationList).build();
         } catch (IllegalArgumentException e) {
             logger.error("Couldn't find all parameters", e);
             return generateResponse(HttpURLConnection.HTTP_BAD_REQUEST, ErrorResult.badRequest());

@@ -239,12 +239,25 @@ public class OkuDAOService {
     }
 
     @Transactional(readOnly = true)
-    public Organization getOrganizationInfo(Long idOfOrg) {
-        Query query = emReport.createQuery("select o from Org o where o.idOfOrg = :idOfOrg and o.participantOP = true");
+    public List<Organization> getOrganizationInfo(Long idOfOrg) {
+        List<Long> friendlyOrgsIdList = new ArrayList<>();
+        Query query = emReport.createNativeQuery("select friendlyorg from cf_friendly_organization where currentorg=:idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);
-        Org org = (Org) query.getSingleResult();
+        for (Object o: query.getResultList()) {
+            friendlyOrgsIdList.add(((BigInteger)o).longValue());
+        }
 
-        return new Organization(org);
+
+        query = emReport.createQuery("select o from Org o where o.idOfOrg in (:idOfOrgList) and o.participantOP = true");
+        query.setParameter("idOfOrgList", friendlyOrgsIdList);
+        List<Org> orgList = query.getResultList();
+
+        List<Organization> resultList = new ArrayList<>();
+        for (Org org : orgList) {
+            resultList.add(new Organization(org));
+        }
+
+        return resultList;
     }
 
     @Transactional(readOnly = true)
