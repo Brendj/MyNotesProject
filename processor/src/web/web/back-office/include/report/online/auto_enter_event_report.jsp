@@ -23,7 +23,7 @@
         <h:outputText styleClass="output-text" escape="true" value="Месяц" />
         <h:selectOneMenu id="month"
                          value="#{mainPage.autoEnterEventReportPage.monthYearTypeMenu.mounthType}"
-                         styleClass="input-text" style="width: 250px;">
+                         styleClass="input-text" style="width: 100px;">
             <f:converter converterId="mouthTypeConverter" />
             <f:selectItems value="#{mainPage.autoEnterEventReportPage.monthYearTypeMenu.itemsMonth}" />
         </h:selectOneMenu>
@@ -31,7 +31,7 @@
         <h:outputText styleClass="output-text" escape="true" value="Год" />
         <h:selectOneMenu id="year"
                          value="#{mainPage.autoEnterEventReportPage.monthYearTypeMenu.selectedYear}"
-                         styleClass="input-text" style="width: 250px;">
+                         styleClass="input-text" style="width: 100px;">
             <f:selectItems value="#{mainPage.autoEnterEventReportPage.monthYearTypeMenu.itemsYears}" />
         </h:selectOneMenu>
 
