@@ -137,7 +137,8 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                             String s = String.format("%s-%s", CalendarUtils.timeToString(getMaxMinDate(dateEntry, false)),
                                     CalendarUtils.timeToString(getMaxMinDate(dateExit, true)));
                             timeList.add(day, s);
-                            timeInOrg += Math.abs(duration / 60000);
+                            //timeInOrg += Math.abs(duration / 60000);
+                            timeInOrg += duration;
                             countDays++;
                         } else {
                             // Если только вход
@@ -169,7 +170,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
 
             private String getStringTime (Long time)
             {
-                long result = time;
+                long result = time/1000;
                 long h = result / 60;
                 long m = result % 60;
                 return String.format("%02d:%02d", h, m);
@@ -251,6 +252,14 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
 
             public void setPresenceOfDay(String presenceOfDay) {
                 this.presenceOfDay = presenceOfDay;
+            }
+
+            public List<String> getTimeinWeekList() {
+                return timeinWeekList;
+            }
+
+            public void setTimeinWeekList(List<String> timeinWeekList) {
+                this.timeinWeekList = timeinWeekList;
             }
         }
 
