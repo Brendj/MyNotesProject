@@ -64,6 +64,7 @@ public class ReportRepository extends BaseJpaDao {
     private final String REPORT_DAILY_SALES_BY_GROUPS_REPORT = "DailySalesByGroupsReport";
     private final String REPORT_DAILY_SALES_BY_GROUPS_REPORT_SUBJECT = "Дневные продажи по категориям";
     private final String REPORT_AUTO_ENTER_EVENTS= "AutoEnterEventByDaysReport";
+    private final String REPORT_AUTO_ENTER_EVENTS_BY_CLIENT = "AutoEnterEventByDaysForClientReport";
     private final String REPORT_AUTO_ENTER_EVENTS_SUBJECT = "Сводный отчет по посещению";
     private final String REPORT_AUTO_ENTER_EVENTS_V2= "AutoEnterEventV2Report";
     private final String REPORT_AUTO_ENTER_EVENTS_V2_SUBJECT = "Детализированный отчет по посещению";
@@ -108,7 +109,7 @@ public class ReportRepository extends BaseJpaDao {
         } else if (reportType.equals(REPORT_REGISTER_STAMP_SUBSCRIPTION_FEEDING)) {
             return getRegisterStampSubscriptionFeedingReport(parameters,
                     REPORT_REGISTER_STAMP_SUBSCRIPTION_FEEDING_SUBJECT);
-        } else if (reportType.equals(REPORT_AUTO_ENTER_EVENTS)) {
+        } else if (reportType.equals(REPORT_AUTO_ENTER_EVENTS) ||  (reportType.equals(REPORT_AUTO_ENTER_EVENTS_BY_CLIENT))) {
             return getAutoEnterEventByDaysReport(parameters, REPORT_AUTO_ENTER_EVENTS_SUBJECT);
         } else if (reportType.equals(REPORT_AUTO_ENTER_EVENTS_V2)) {
             return getAutoEnterEventV2Report(parameters, REPORT_AUTO_ENTER_EVENTS_V2_SUBJECT);
@@ -503,8 +504,15 @@ public class ReportRepository extends BaseJpaDao {
     private BasicJasperReport buildAutoEnterEventByDaysReport(Session session, ReportParameters reportParameters)
             throws Exception {
         AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
-        String templateFilename =
-                autoReportGenerator.getReportsTemplateFilePath() + AutoEnterEventByDaysReport.class.getSimpleName() + ".jasper";
+        String templateFilename;
+
+        if(reportParameters.getIdOfContract() == null){
+            templateFilename =
+                    autoReportGenerator.getReportsTemplateFilePath() + AutoEnterEventByDaysReport.class.getSimpleName() + ".jasper";
+        }
+        else
+            templateFilename = autoReportGenerator.getReportsTemplateFilePath() + AutoEnterEventByDaysReport.TEMPLATE_FILE_NAMES_FOR_CLIENT;
+
         AutoEnterEventByDaysReport.Builder builder = new AutoEnterEventByDaysReport.Builder(templateFilename);
         try {
             Org org = (Org) session.load(Org.class, reportParameters.getIdOfOrg());

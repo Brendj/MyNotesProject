@@ -54,7 +54,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
      */
     public static final String REPORT_NAME = "Сводный отчет по посещению";
     public static final String[] TEMPLATE_FILE_NAMES = {"AutoEnterEventByDaysReport.jasper"};
-    public static final String[] TEMPLATE_FILE_NAMES_FOR_CLIENT = {"AutoEnterEventByDaysReportClient.jasper"};
+    public static final String TEMPLATE_FILE_NAMES_FOR_CLIENT = "AutoEnterEventByDaysReportClient.jasper";
     public static final String P_ID_CLIENT = "idOfClients";
     public static final boolean IS_TEMPLATE_REPORT = true;
     public static final int[] PARAM_HINTS = new int[]{28, 29, -3, 22, 23, 24};
@@ -312,10 +312,10 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             //по все корпусам фильтр
             Boolean isAllFriendlyOrgs;
 
-            if (reportProperties.getProperty("isAllFriendlyOrgs") == null) {
-                isAllFriendlyOrgs = true;
-            } else {
+            if (reportProperties.getProperty("isAllFriendlyOrgs") != null) {
                 isAllFriendlyOrgs = Boolean.valueOf(reportProperties.getProperty("isAllFriendlyOrgs"));
+            } else {
+                isAllFriendlyOrgs = true;
             }
 
             Set<Long> ids = new HashSet<Long>();
