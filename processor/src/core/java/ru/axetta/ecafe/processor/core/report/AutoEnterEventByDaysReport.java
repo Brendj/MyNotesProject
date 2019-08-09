@@ -161,19 +161,25 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                         timeinWeekLong.add(timeInOrg - (timeinWeekLong.get(2) + timeinWeekLong.get(1) + timeinWeekLong.get(0)));
                 }
                 if (countDays > 0) {
-
                     presenceOfDay = getStringTime (timeInOrg);
-                    for (int i = 0; i < 4; i++)
-                        timeinWeekList.add(getStringTime(timeinWeekLong.get(i)));
                 }
+                for (int i = 0; i < 4; i++)
+                    timeinWeekList.add(getStringTime(timeinWeekLong.get(i)));
             }
 
             private String getStringTime (Long time)
             {
                 long result = time/1000;
-                long h = result / 60;
-                long m = result % 60;
-                return String.format("%02d:%02d", h, m);
+                long min = result / 60;
+                long sec = result % 60;
+                if (min < 60)
+                    return String.format("%02d:%02d", min, sec);
+                else
+                {
+                    long hour = min/60;
+                    min = min%60;
+                    return String.format("%02d:%02d:%02d", hour, min, sec);
+                }
             }
 
             //Функция для получения максимально/минимальной даты из списка
