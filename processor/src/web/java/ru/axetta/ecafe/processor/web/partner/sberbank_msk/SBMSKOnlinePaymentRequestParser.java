@@ -80,7 +80,7 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         }
 
         stringBuilder.append("</response>");
-        rsp = new String(stringBuilder.toString().getBytes("windows-1251"));
+        rsp = new String(stringBuilder.toString().getBytes("Cp1251"));
         printToStream(rsp, httpResponse);
     }
 
@@ -103,7 +103,7 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         String rsp = "";
         StringBuilder stringBuilder = new StringBuilder("<?xml version=\"1.0\" encoding=\"windows-1251\"?><response>");
 
-        String message = new String(error.toString().getBytes("windows-1251"));
+        String message = new String(error.toString().getBytes("Cp1251"));
         int resultCode = error.getCode();
         stringBuilder.append(String.format("<CODE>%d</CODE>",resultCode));
         stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",message));
