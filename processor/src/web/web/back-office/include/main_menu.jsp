@@ -978,26 +978,26 @@
                                 binding="#{catalogListPage.mainMenuComponent}"
                                 label="Пользовательские справочники категорий блюд" action="#{catalogListPage.show}"
                                 reRender="workspaceForm" />--%>
-            <%--@elvariable id="ageGroupCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.AgeGroupCatalogListPage"--%>
+            <%--@elvariable id="ageGroupCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.AgeGroupCatalogListPage"
             <rich:panelMenuItem id="webTechnologistAgeGroupItemList"
                                 binding="#{ageGroupCatalogListPage.mainMenuComponent}"
                                 label="Возрастная категория" action="#{ageGroupCatalogListPage.show}"
                                 reRender="workspaceForm" />
-            <%--@elvariable id="typeOfProductionCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.TypeOfProductionCatalogListPage"--%>
+            @elvariable id="typeOfProductionCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.TypeOfProductionCatalogListPage"
             <rich:panelMenuItem id="webTechnologistTypeOfProductionItemList"
                                 binding="#{typeOfProductionCatalogListPage.mainMenuComponent}"
                                 label="Вид производства" action="#{typeOfProductionCatalogListPage.show}"
-                                reRender="workspaceForm" />
+                                reRender="workspaceForm" />--%>
             <%--@elvariable id="categoryItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.CategoryItemCatalogListPage"--%>
             <rich:panelMenuItem id="webTechnologistCategoryCatalogsItemList"
                                 binding="#{categoryItemCatalogListPage.mainMenuComponent}"
                                 label="Категории блюд" action="#{categoryItemCatalogListPage.show}"
                                 reRender="workspaceForm" />
-            <%--@elvariable id="groupItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.GroupItemCatalogListPage"--%>
+            <%--@elvariable id="groupItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.GroupItemCatalogListPage"
             <rich:panelMenuItem id="webTechnologistGroupCatalogsItemsList"
                                 binding="#{groupItemCatalogListPage.mainMenuComponent}"
                                 label="Группы блюд" action="#{groupItemCatalogListPage.show}"
-                                reRender="workspaceForm" />
+                                reRender="workspaceForm" />--%>
         </rich:panelMenuGroup>
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>
