@@ -430,7 +430,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         DescriptionSimpleParameter descriptionSimpleParameter1 = catOf.createDescriptionSimpleParameter();
         descriptionSimpleParameter1.setForPayment(true);
         descriptionSimpleParameter1.setForSearch(false);
-        descriptionSimpleParameter1.setLabel("Код гос. услуги");
+        descriptionSimpleParameter1.setLabel("Код услуги");
         descriptionSimpleParameter1.setName("SRV_CODE");
         descriptionSimpleParameter1.setReadonly(true);
         descriptionSimpleParameter1.setRequired(true);
@@ -463,7 +463,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter4.setForSearch(false);
         descriptionSimpleParameter4.setLabel("Статус плательщика");
         descriptionSimpleParameter4.setName("STATUS");
-        descriptionSimpleParameter4.setReadonly(false);
+        descriptionSimpleParameter4.setReadonly(true);
         descriptionSimpleParameter4.setRequired(true);
         descriptionSimpleParameter4.setVisible(false);
         descriptionSimpleParameter4.setDefaultValue("00");
@@ -473,7 +473,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter5.setForSearch(false);
         descriptionSimpleParameter5.setLabel("Тип платежа");
         descriptionSimpleParameter5.setName("PAYMENTTYPE");
-        descriptionSimpleParameter5.setReadonly(false);
+        descriptionSimpleParameter5.setReadonly(true);
         descriptionSimpleParameter5.setRequired(true);
         descriptionSimpleParameter5.setVisible(false);
         descriptionSimpleParameter5.setDefaultValue("0");
@@ -483,7 +483,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter6.setForSearch(false);
         descriptionSimpleParameter6.setLabel("Основание платежа");
         descriptionSimpleParameter6.setName("PURPOSE");
-        descriptionSimpleParameter6.setReadonly(false);
+        descriptionSimpleParameter6.setReadonly(true);
         descriptionSimpleParameter6.setRequired(true);
         descriptionSimpleParameter6.setVisible(false);
         descriptionSimpleParameter6.setDefaultValue("0");
@@ -493,7 +493,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter7.setForSearch(false);
         descriptionSimpleParameter7.setLabel("Налоговый период");
         descriptionSimpleParameter7.setName("TAXPERIOD");
-        descriptionSimpleParameter7.setReadonly(false);
+        descriptionSimpleParameter7.setReadonly(true);
         descriptionSimpleParameter7.setRequired(true);
         descriptionSimpleParameter7.setVisible(false);
         descriptionSimpleParameter7.setDefaultValue("0");
@@ -503,7 +503,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter8.setForSearch(false);
         descriptionSimpleParameter8.setLabel("Показатель номера документа");
         descriptionSimpleParameter8.setName("TAXDOCNUMBER");
-        descriptionSimpleParameter8.setReadonly(false);
+        descriptionSimpleParameter8.setReadonly(true);
         descriptionSimpleParameter8.setRequired(true);
         descriptionSimpleParameter8.setVisible(false);
         descriptionSimpleParameter8.setDefaultValue("0");
@@ -513,7 +513,7 @@ public class RNIPLoadPaymentsServiceV116 extends RNIPLoadPaymentsService {
         descriptionSimpleParameter9.setForSearch(false);
         descriptionSimpleParameter9.setLabel("Показатель даты документа");
         descriptionSimpleParameter9.setName("TAXDOCDATE");
-        descriptionSimpleParameter9.setReadonly(false);
+        descriptionSimpleParameter9.setReadonly(true);
         descriptionSimpleParameter9.setRequired(true);
         descriptionSimpleParameter9.setVisible(false);
         descriptionSimpleParameter9.setDefaultValue("0");

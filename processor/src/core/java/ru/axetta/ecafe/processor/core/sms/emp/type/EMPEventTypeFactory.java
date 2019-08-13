@@ -37,34 +37,44 @@ public class EMPEventTypeFactory {
     public static final int INFO_MAILING_EVENT        = 901240056;
     public static final int CLIENT_NEWPASSWORD_EVENT  = 901240057;
 
-    public static final EMPEventType buildEvent(int type, Client client) {
-        return buildEvent(type, client, Collections.EMPTY_MAP);
+
+    //Параметр modifired введен для определения: точно ли произошедшее событие соответствует коду события по умолчанию
+    //Например для события прохода код только один (901240001), а могут произойти 2 события: проход в школу и проход в здание культуры
+
+    public static final EMPEventType buildEvent(int type, Client client, int modifired) {
+        return buildEvent(type, client, Collections.EMPTY_MAP, modifired);
     }
 
-    public static final EMPEventType buildEvent(int type, Client child, Client guardian) {
-        return buildEvent(type, child, guardian, Collections.EMPTY_MAP);
+    public static final EMPEventType buildEvent(int type, Client child, Client guardian, int modifired) {
+        return buildEvent(type, child, guardian, Collections.EMPTY_MAP, modifired);
     }
 
-    public static final EMPEventType buildEvent(int type, Client client, Map<String, Object> additionalParams) {
-        EMPEventType event = getEmpEventType(type);
+    public static final EMPEventType buildEvent(int type, Client client, Map<String, Object> additionalParams, int modifired) {
+        EMPEventType event = getEmpEventType(type, modifired);
         event.parse(client, additionalParams);
         return event;
     }
 
-    public static final EMPEventType buildEvent(int type, Client child, Client guardian, Map<String, Object> additionalParams) {
-        EMPEventType event = getEmpEventType(type);
+    public static final EMPEventType buildEvent(int type, Client child, Client guardian, Map<String, Object> additionalParams, int modifired) {
+        EMPEventType event = getEmpEventType(type, modifired);
         event.parse(child, guardian, additionalParams);
         return event;
     }
 
-    private static EMPEventType getEmpEventType(int type) {
+    private static EMPEventType getEmpEventType(int type, int modifired) {
         EMPEventType event;
         switch (type) {
             case ENTER_EVENT:
-                event = new EMPEnterEventType();
+                if (modifired == 1)
+                    event = new EMPEnterCultureEventType();
+                else
+                    event = new EMPEnterEventType();
                 break;
             case LEAVE_EVENT:
-                event = new EMPLeaveEventType();
+                if (modifired == 1)
+                    event = new EMPExitCultureEventType();
+                else
+                    event = new EMPLeaveEventType();
                 break;
             case ENTER_WITH_GUARDIAN_EVENT:
                 event = new EMPEnterWithGuardianEventType();
@@ -123,5 +133,4 @@ public class EMPEventTypeFactory {
         event.setTime(System.currentTimeMillis());
         return event;
     }
-
 }

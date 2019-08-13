@@ -87,28 +87,28 @@ public class SBMSKOnlinePaymentServlet extends HttpServlet {
             long contragentId = getDefaultIdOfContragent();
             try {
                 payRequest = requestParser.parsePayRequest(contragentId, httpRequest);
-            } catch (InvalidPayIdException e) {
-                logger.error("Failed to parse request", e);
-                logger.error("Request string: " + requestParser.getQueryString(httpRequest));
-                requestParser.serializeResponseIfException(httpResponse, SBMSKPaymentsCodes.INVALID_PAY_ID_VALUE_ERROR);
-                httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
-                return;
-            } catch (InvalidDateException e){
-                logger.error("Failed to parse request", e);
-                logger.error("Request string: " + requestParser.getQueryString(httpRequest));
-                requestParser.serializeResponseIfException(httpResponse, SBMSKPaymentsCodes.INVALID_DATE_VALUE_ERROR);
-                httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
-                return;
-            } catch (InvalidPaymentSumException e){
-                logger.error("Failed to parse request", e);
-                logger.error("Request string: " + requestParser.getQueryString(httpRequest));
-                requestParser.serializeResponseIfException(httpResponse, SBMSKPaymentsCodes.INVALID_PAYMENT_SUM_ERROR);
+            } catch (Exception e) {
+                logger.error("Failed to parse request. Request string: " + requestParser.getQueryString(httpRequest), e);
+                SBMSKPaymentsCodes code = null;
+                if (e instanceof InvalidContractIdFormatException) {
+                    code = SBMSKPaymentsCodes.ILLEGAL_CONTRACT_ID_ERROR;
+                } else if (e instanceof InvalidPayIdException) {
+                    code = SBMSKPaymentsCodes.INVALID_PAY_ID_VALUE_ERROR;
+                } else if (e instanceof InvalidDateException) {
+                    code = SBMSKPaymentsCodes.INVALID_DATE_VALUE_ERROR;
+                } else if (e instanceof InvalidPaymentSumException) {
+                    code = SBMSKPaymentsCodes.INVALID_PAYMENT_SUM_ERROR;
+                } else {
+                    code = SBMSKPaymentsCodes.INTERNAL_ERROR;
+                }
+                requestParser.serializeResponseIfException(httpResponse, code);
                 httpRequest.setAttribute(ONLINE_PS_ERROR, e.getMessage());
                 return;
             }
             logger.info(String.format("New request: %s", payRequest.toString()));
             try {
                 response = runtimeContext.getOnlinePaymentProcessor().processPayRequest(payRequest);
+
             } catch (Exception e) {
                 logger.error("Failed to process request", e);
                 logger.error("Request string: " + requestParser.getQueryString(httpRequest));

@@ -13,7 +13,9 @@ public class ExternalEvent {
     private Long idOfExternalEvent;
     private String orgCode;
     private String orgName;
+    private String orgShortName;
     private String enterName;
+    private String address;
     private Client client;
     private Date evtDateTime;
     private ExternalEventType evtType;
@@ -40,12 +42,25 @@ public class ExternalEvent {
         this.version = handlerVersion.getVersion();
         buildEnterName(evtStatus);
     }
+    public ExternalEvent(Client cl, String orgCode, String CultureName, String CultureShortName, String CultureAddress, ExternalEventType evtType,
+            Date evtDateTime, ExternalEventStatus evtStatus, ISetExternalEventVersion handlerVersion) throws IllegalArgumentException {
+        this.orgCode = orgCode;
+        this.orgName = CultureName;
+        this.evtType = evtType;
+        this.client = cl;
+        this.evtDateTime = evtDateTime;
+        this.evtStatus = evtStatus;
+        this.version = handlerVersion.getVersion();
+        this.address = CultureAddress;
+        buildEnterName(evtStatus);
+    }
+
 
     protected void buildEnterName(ExternalEventStatus evtStatus) throws IllegalArgumentException {
         String name = "";
         if (evtType == null) throw new IllegalArgumentException("Неверный тип события");
         if (evtStatus == null) throw new IllegalArgumentException("Неверный статус");
-        if (evtType.equals(ExternalEventType.MUSEUM)) {
+        if (evtType.equals(ExternalEventType.MUSEUM) || evtType.equals(ExternalEventType.CULTURE)) {
             if (getEvtStatus().equals(ExternalEventStatus.TICKET_GIVEN)) {
                 name = String.format("Вход (%s)", getOrgName());
             } else if (getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
@@ -144,5 +159,21 @@ public class ExternalEvent {
 
     public void setCardType(Integer cardType) {
         this.cardType = cardType;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
+    }
+
+    public String getOrgShortName() {
+        return orgShortName;
+    }
+
+    public void setOrgShortName(String orgShortName) {
+        this.orgShortName = orgShortName;
     }
 }

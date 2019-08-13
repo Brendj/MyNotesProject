@@ -48,6 +48,12 @@ public class MigrantsUtils {
         return (VisitReqResolutionHist) persistenceSession.get(VisitReqResolutionHist.class, compositeId);
     }
 
+    public static List<Migrant> getAllMigrantsByIdOfClient(Session session, Long idOfClient) throws Exception {
+        Criteria criteria = session.createCriteria(Migrant.class);
+        criteria.add(Restrictions.eq("clientMigrate.idOfClient", idOfClient));
+        return criteria.list();
+    }
+
     public static List<Migrant> getActiveMigrantsByIdOfClient(Session session, Long idOfClient) throws Exception {
         List<Migrant> result = new ArrayList<Migrant>();
         Date date = new Date();
