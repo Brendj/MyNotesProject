@@ -12,8 +12,12 @@ import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -55,7 +59,6 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
     @Override
     public void serializeResponse(OnlinePaymentProcessor.PayResponse response, HttpServletResponse httpResponse)
             throws Exception {
-        String rsp = "";
         StringBuilder stringBuilder = new StringBuilder("<?xml version=\"1.0\" encoding=\"windows-1251\"?><response>");
 
         if(action.equals(ACTION_PAYMENT)){
@@ -80,8 +83,15 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         }
 
         stringBuilder.append("</response>");
-        rsp = new String(stringBuilder.toString().getBytes("Cp1251"));
-        printToStream(rsp, httpResponse);
+        printToStream(stringBuilder.toString(), httpResponse);
+    }
+
+    protected void printToStream(String s, HttpServletResponse httpResponse) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteBuffer byteBuffer = Charset.forName("windows-1251").encode(s);
+        byte[] tmp = byteBuffer.array();
+        outputStream.write(tmp, 0, byteBuffer.limit());
+        outputStream.writeTo(httpResponse.getOutputStream());
     }
 
     private void addSBMSKInfoToResponse(OnlinePaymentProcessor.PayResponse response) {
@@ -100,7 +110,6 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
 
     public void serializeResponseIfException(HttpServletResponse httpResponse, SBMSKPaymentsCodes error)
     throws Exception {
-        String rsp = "";
         StringBuilder stringBuilder = new StringBuilder("<?xml version=\"1.0\" encoding=\"windows-1251\"?><response>");
 
         String message = new String(error.toString().getBytes("Cp1251"));
@@ -109,8 +118,7 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",message));
 
         stringBuilder.append("</response>");
-        rsp = stringBuilder.toString();
-        printToStream(rsp, httpResponse);
+        printToStream(stringBuilder.toString(), httpResponse);
     }
 
     @Override
