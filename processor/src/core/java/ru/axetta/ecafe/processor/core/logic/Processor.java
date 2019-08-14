@@ -6316,7 +6316,8 @@ public class Processor implements SyncProcessor {
         return clientDiscountDTSZN;
     }
 
-    public void removeClientDiscountIfChangeOrg(Client client, Session session , Set<Org> oldOrgs, long newIdOfOrg) throws Exception {
+    public void removeClientDiscountIfChangeOrg(Client client, Session session, Set<Org> oldOrgs, long newIdOfOrg)
+            throws Exception {
         if (client == null) {
             return;
         }
@@ -6331,8 +6332,8 @@ public class Processor implements SyncProcessor {
         //Если новая организация не совпадает ни со старой, ни с дружественными старой, то удаляем льготы
         if (isReplaceOrg) {
             ClientManager.deleteDiscount(client, session);
-            }
         }
+    }
 
     private SyncResponse buildOrgSettingsSectionsResponse(SyncRequest request, Date syncStartTime, int syncResult) {
         SyncHistory syncHistory = null;

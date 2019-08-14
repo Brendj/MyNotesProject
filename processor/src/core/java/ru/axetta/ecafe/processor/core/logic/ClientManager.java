@@ -2059,9 +2059,11 @@ public class ClientManager {
         Integer oldDiscountMode = client.getDiscountMode();
         String oldDiscounts = client.getCategoriesDiscounts();
         Set<CategoryDiscount> discounts = client.getCategories();
-        for(CategoryDiscount discount : discounts) {
-            if (discount.getEligibleToDelete())
+        for (CategoryDiscount discount : discounts) {
+            if (discount.getEligibleToDelete()) {
                 client.getCategories().remove(discount);
+                archiveDtisznDiscount(client, session, discount.getIdOfCategoryDiscount());
+            }
         }
         String newDiscounts = "";
         for(CategoryDiscount discount : client.getCategories()){
@@ -2081,5 +2083,35 @@ public class ClientManager {
             client.setLastDiscountsUpdate(new Date());
         }
         session.update(client);
+    }
+
+    public static void archiveDtisznDiscount(Client client, Session session, Long idOfCategoryDiscount) {
+        List<Integer> list = DAOUtils.getDsznCodeListByCategoryDiscountCode(session, idOfCategoryDiscount);
+        Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+        Long applicationForFoodVersion = DAOUtils.nextVersionByApplicationForFood(session);
+
+        for (Integer dsznCode : list) {
+            ClientDtisznDiscountInfo info = DAOUtils
+                    .getDTISZNDiscountInfoByClientAndCode(session, client, dsznCode.longValue());
+            if (null != info) {
+                if (!info.getArchived()) {
+                    info.setArchived(true);
+                    info.setVersion(clientDTISZNDiscountVersion);
+                    info.setLastUpdate(new Date());
+                    session.update(info);
+                }
+            } else {
+                ApplicationForFood food = DAOUtils
+                        .getApplicationForFoodByClientAndCode(session, client, dsznCode.longValue());
+                if (null != food) {
+                    if (!food.getArchived()) {
+                        food.setArchived(true);
+                        food.setVersion(applicationForFoodVersion);
+                        food.setLastUpdate(new Date());
+                        session.update(food);
+                    }
+                }
+            }
+        }
     }
 }

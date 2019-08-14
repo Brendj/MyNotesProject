@@ -4257,4 +4257,18 @@ public class DAOUtils {
         criteria.add(Restrictions.between("evtDateTime", startDate, endDate));
         return criteria.list();
     }
+
+    public static List<Integer> getDsznCodeListByCategoryDiscountCode(Session session, Long idOfCategoryDiscount) {
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        criteria.add(Restrictions.eq("categoryDiscount.idOfCategoryDiscount", idOfCategoryDiscount));
+        criteria.setProjection(Projections.property("code"));
+        return criteria.list();
+    }
+
+    public static ApplicationForFood getApplicationForFoodByClientAndCode(Session session, Client client, Long code) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.eq("dtisznCode", code));
+        return (ApplicationForFood) criteria.uniqueResult();
+    }
 }

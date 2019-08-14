@@ -992,14 +992,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         if (this.idOfCategoryList.size() != 0) {
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
             categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
-            if(isReplaceOrg) {
-                if(!isFriendlyReplaceOrg) {
-                    categoryCriteria.add(Restrictions.eq("eligibleToDelete",false));
-                }
-            }
             categoryCriteria.addOrder(Order.asc("idOfCategoryDiscount"));
             for (Object object : categoryCriteria.list()) {
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;
+                if(isReplaceOrg && !isFriendlyReplaceOrg && categoryDiscount.getEligibleToDelete()){
+                    archiveDtisznDiscount(client, persistenceSession, categoryDiscount.getIdOfCategoryDiscount());
+                    continue;
+                }
                 clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
                 clientCategories.append(",");
                 categoryDiscountSet.add(categoryDiscount);
