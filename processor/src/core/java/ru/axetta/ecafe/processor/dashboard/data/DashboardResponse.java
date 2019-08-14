@@ -415,10 +415,11 @@ public class DashboardResponse {
         private String organizationTypeName;
         private String introductionQueue;
         private String sqlServerVersion;
+        private String databaseSize;
 
         public OrgSyncStatItem(Long idOfOrg, String orgName, String address, String organizationTypeName,
                 String introductionQueue, Date lastSuccessfulBalanceSync, String remoteAddr, String version,
-                Long errorsCount, String district, String sqlServerVersion) {
+                Long errorsCount, String district, String sqlServerVersion, Double databaseSize) {
             this.idOfOrg = idOfOrg;
             this.orgName = orgName;
             this.district = district;
@@ -430,6 +431,7 @@ public class DashboardResponse {
             this.organizationTypeName = organizationTypeName;
             this.introductionQueue = introductionQueue;
             this.sqlServerVersion = sqlServerVersion;
+            this.databaseSize = databaseSize == null ? "" : String.format("%.2f", databaseSize);
         }
 
         public String getOrgName() {
@@ -483,6 +485,14 @@ public class DashboardResponse {
 
         public void setSqlServerVersion(String sqlServerVersion) {
             this.sqlServerVersion = sqlServerVersion;
+        }
+
+        public String getDatabaseSize() {
+            return databaseSize;
+        }
+
+        public void setDatabaseSize(String databaseSize) {
+            this.databaseSize = databaseSize;
         }
     }
 

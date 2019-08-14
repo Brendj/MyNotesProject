@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.web.partner.sberbank_msk;
 
 import ru.axetta.ecafe.processor.core.OnlinePaymentProcessor;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
 
 import javax.servlet.http.HttpServletRequest;
@@ -18,6 +20,8 @@ import java.util.Date;
 import java.util.Locale;
 
 public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
+    public static final String ACTION_CHECK = "check";
+    public static final String ACTION_PAYMENT = "payment";
     private String date;
     private String action;
 
@@ -39,10 +43,10 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
             throws Exception {
         ParseResult parseResult = getRequestParams();
         action = parseResult.getParam("ACTION");
-        if(action.equals("check")){
+        if(action.equals(ACTION_CHECK)){
             return parseForCheckAccount(defaultContragentId, parseResult);
         }
-        else if(action.equals("payment")){
+        else if(action.equals(ACTION_PAYMENT)){
             return parseForPayment(defaultContragentId, parseResult);
         }
         return null;
@@ -54,25 +58,44 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         String rsp = "";
         StringBuilder stringBuilder = new StringBuilder("<?xml version=\"1.0\" encoding=\"windows-1251\"?><response>");
 
-        if(action.equals("payment")){
+        if(action.equals(ACTION_PAYMENT)){
             date = timeFormat.format(new Date());
             stringBuilder.append(String.format("<REG_DATE>%s</REG_DATE>", date));
         }
         SBMSKPaymentsCodes result = SBMSKPaymentsCodes.getFromPaymentProcessResultCode(response.getResultCode());
-
-        String message = new String(result.toString().getBytes("UTF-8"), "windows-1251"); // output windows-1251 as UTF-8
+        addSBMSKInfoToResponse(response);
         int resultCode = result.getCode();
         stringBuilder.append(String.format("<CODE>%d</CODE>",resultCode));
-        stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",message));
+        stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",result.toString()));
 
-        if(action.equals("check") && response.getBalance() != null){
-            BigDecimal balance = new BigDecimal(response.getBalance() / 100.0); //  rounding error if use double
-            stringBuilder.append(String.format(Locale.US, "<BALANCE>%.2f</BALANCE>", balance));
+        if(action.equals(ACTION_CHECK)) {
+            stringBuilder.append(String.format("<INN>%s</INN>", response.getInn()));
+            stringBuilder.append(String.format("<NAZN>%s</NAZN>", response.getNazn()));
+            stringBuilder.append(String.format("<BIC>%s</BIC>", response.getBic()));
+            stringBuilder.append(String.format("<RASCH>%s</RASCH>", response.getRasch()));
+            if (response.getBalance() != null) {
+                BigDecimal balance = new BigDecimal(response.getBalance() / 100.0); //  rounding error if use double
+                stringBuilder.append(String.format(Locale.US, "<BALANCE>%.2f</BALANCE>", balance));
+            }
         }
 
         stringBuilder.append("</response>");
-        rsp = stringBuilder.toString();
+        rsp = new String(stringBuilder.toString().getBytes("UTF-8"), "windows-1251");
         printToStream(rsp, httpResponse);
+    }
+
+    private void addSBMSKInfoToResponse(OnlinePaymentProcessor.PayResponse response) {
+        try {
+            Contragent contragent = DAOReadExternalsService.getInstance().findContragentByClient(response.getClientId());
+            response.setInn(getValueNullSafe(contragent.getInn()));
+            response.setNazn(getValueNullSafe(contragent.getContragentName()));
+            response.setBic(getValueNullSafe(contragent.getBic()));
+            response.setRasch(getValueNullSafe(contragent.getAccount()));
+        } catch (Exception ignore) {}
+    }
+
+    private String getValueNullSafe(String value) {
+        return value == null ? "" : value.trim();
     }
 
     public void serializeResponseIfException(HttpServletResponse httpResponse, SBMSKPaymentsCodes error)
@@ -105,7 +128,7 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         try {
             contractId = Long.parseLong(account);
         } catch (Exception e) {
-            contractId = -1L;
+            throw new InvalidContractIdFormatException("Invalid contractId format");
         }
         return new OnlinePaymentProcessor.PayRequest(OnlinePaymentProcessor.PayRequest.V_0, true ,defaultContragentId,
                 null, paymentMethod, contractId,
@@ -120,13 +143,14 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         try {
             contractId = Long.parseLong(account);
         } catch (Exception e) {
-            contractId = -1L;
+            throw new InvalidContractIdFormatException("Invalid contractId format");
         }
         String amount = parseResult.getParam("AMOUNT");
         if(!amount.matches("\\d+\\.\\d{2}")){
             throw new InvalidPaymentSumException("Invalid format of amount");
         }
-        String paymentId = parseResult.getParam("PAY_ID");
+        String paymentId = parseResult.getParam("INFO");
+        if (paymentId == null) paymentId = parseResult.getParam("PAY_ID");
         if(!paymentId.matches("\\d*")){
             throw new InvalidPayIdException("PAY_ID contain non num charters");
         }

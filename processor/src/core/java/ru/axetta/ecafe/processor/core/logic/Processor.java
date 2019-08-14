@@ -348,7 +348,7 @@ public class Processor implements SyncProcessor {
         syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
                 request.getRemoteAddr(), request.getSyncType().getValue());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
-                request.getRemoteAddr(), request.getSqlServerVersion());
+                request.getRemoteAddr(), request.getSqlServerVersion(), request.getDatabaseSize());
         timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "Begin sync", timeForDelta);
 
         processMigrantsSections(request, syncHistory, responseSections, null);
@@ -912,7 +912,7 @@ public class Processor implements SyncProcessor {
         syncHistory = createSyncHistory(request.getIdOfOrg(), idOfPacket, syncStartTime, request.getClientVersion(),
                 request.getRemoteAddr(), request.getSyncType().getValue());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(),
-                request.getRemoteAddr(), request.getSqlServerVersion());
+                request.getRemoteAddr(), request.getSqlServerVersion(), request.getDatabaseSize());
 
         // мигранты
         processMigrantsSectionsWithClientsData(request, syncHistory, responseSections);
@@ -4208,14 +4208,14 @@ public class Processor implements SyncProcessor {
     }
 
     private void addClientVersionAndRemoteAddressByOrg(Long idOfOrg, String clientVersion, String remoteAddress,
-            String sqlServerVersion) {
+            String sqlServerVersion, Double databaseSize) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             updateClientVersionAndRemoteAddressByOrg(persistenceSession, idOfOrg, clientVersion, remoteAddress,
-                    sqlServerVersion);
+                    sqlServerVersion, databaseSize);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         }catch(Exception e){
