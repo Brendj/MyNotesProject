@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<!--
+  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.AtolCompany" table="CF_atol_company">
+        <id name="idOfAtolCompany" column="idOfAtolCompany" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="emailOrg" column="email_org" type="string" />
+        <property name="taxType" column="tax_type" type="string" />
+        <property name="inn" column="inn" type="string" />
+        <property name="place" column="place" type="string" />
+        <property name="emailCheck" column="email_check" type="string" />
+
+        <set name="contragents" table="cf_atol_company_contragents">
+            <key column="idOfAtolCompany"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="IdOfContragent"/>
+        </set>
+    </class>
+</hibernate-mapping>
+
+
