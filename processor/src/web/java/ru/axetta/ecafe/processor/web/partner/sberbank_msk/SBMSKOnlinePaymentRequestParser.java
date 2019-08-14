@@ -112,10 +112,9 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
     throws Exception {
         StringBuilder stringBuilder = new StringBuilder("<?xml version=\"1.0\" encoding=\"windows-1251\"?><response>");
 
-        String message = new String(error.toString().getBytes("Cp1251"));
         int resultCode = error.getCode();
         stringBuilder.append(String.format("<CODE>%d</CODE>",resultCode));
-        stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",message));
+        stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",error.toString()));
 
         stringBuilder.append("</response>");
         printToStream(stringBuilder.toString(), httpResponse);
