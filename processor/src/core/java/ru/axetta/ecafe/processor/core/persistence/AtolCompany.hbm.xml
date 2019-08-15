@@ -17,7 +17,7 @@
         <property name="place" column="place" type="string" />
         <property name="emailCheck" column="email_check" type="string" />
 
-        <set name="contragents" table="cf_atol_company_contragents">
+        <set name="contragents" table="cf_atol_company_contragents" lazy="false">
             <key column="idOfAtolCompany"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Contragent" column="IdOfContragent"/>
         </set>
