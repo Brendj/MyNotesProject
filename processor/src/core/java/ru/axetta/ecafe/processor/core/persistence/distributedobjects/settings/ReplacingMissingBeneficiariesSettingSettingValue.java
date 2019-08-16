@@ -4,9 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ReplacingMissingBeneficiariesType;
+
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -38,6 +38,11 @@ public class ReplacingMissingBeneficiariesSettingSettingValue extends AbstractPa
     @Override
     public boolean check() {
         return true;
+    }
+
+    @Override
+    protected Integer gettypeByIndex(Integer index) {
+        return ReplacingMissingBeneficiariesType.getGlobalIdByECafeSettingValueIndex(index);
     }
 
     public String getValue() {

@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.SalesReportPrinterType;
+
 import java.text.ParseException;
 
 /**
@@ -47,6 +49,11 @@ public class SalesReportPrinterSettingValue extends AbstractParserBySettingValue
         int d1 = getValuesByD();
         int d2 = Integer.parseInt(d);
         return d1==d2;
+    }
+
+    @Override
+    protected Integer gettypeByIndex(Integer index) {
+        return SalesReportPrinterType.getGlobalIdByECafeSettingValueIndex(index);
     }
 
     public Integer getValuesByD(){

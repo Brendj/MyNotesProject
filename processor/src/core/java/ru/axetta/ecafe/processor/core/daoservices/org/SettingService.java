@@ -8,9 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -35,28 +33,9 @@ public class SettingService {
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
-    @Autowired
-    private DAOService daoService;
 
     public ECafeSettings save(ECafeSettings settings) throws Exception{
-        //settings.setGlobalVersion(daoService.updateVersionByDistributedObjects(ECafeSettings.class.getSimpleName()));
-        final String qlString = "from DOVersion where distributedObjectClassName=:distributedObjectClassName";
-        TypedQuery<DOVersion> query = entityManager.createQuery(qlString, DOVersion.class);
-        query.setParameter("distributedObjectClassName", "ECafeSettings");
-        List<DOVersion> doVersionList = query.getResultList();
-        DOVersion doVersion = null;
-        Long version = null;
-        if (doVersionList.size() == 0) {
-            doVersion = new DOVersion();
-            doVersion.setCurrentVersion(0L);
-            version = 0L;
-        } else {
-            doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
-            version = doVersion.getCurrentVersion() + 1;
-            doVersion.setCurrentVersion(version);
-        }
-        doVersion.setDistributedObjectClassName("ECafeSettings");
-        entityManager.persist(doVersion);
+        Long version = updateAndGetDOVersion();
         settings.setGlobalVersion(version);
         settings.setLastUpdate(new Date());
         return entityManager.merge(settings);
@@ -65,12 +44,25 @@ public class SettingService {
     public void create(ECafeSettings settings) throws Exception{
         settings.setSendAll(SendToAssociatedOrgs.SendToSelf);
         settings.setCreatedDate(new Date());
+        Long version = updateAndGetDOVersion();
+        String updateString = "update ECafeSettings set deletedState=true, deleteDate=:deleteDate where orgOwner=:idoforg and settingsId=:settingsId";
+        Query updateQ = entityManager.createQuery(updateString);
+        updateQ.setParameter("deleteDate",new Date());
+        updateQ.setParameter("idoforg",settings.getOrgOwner());
+        updateQ.setParameter("settingsId",settings.getSettingsId());
+        updateQ.executeUpdate();
+        settings.setGlobalVersion(version);
+        settings.setGlobalVersionOnCreate(version);
+        entityManager.persist(settings);
+    }
+
+    private Long updateAndGetDOVersion() {
         final String qlString = "from DOVersion where distributedObjectClassName=:distributedObjectClassName";
         TypedQuery<DOVersion> query = entityManager.createQuery(qlString, DOVersion.class);
         query.setParameter("distributedObjectClassName", "ECafeSettings");
         List<DOVersion> doVersionList = query.getResultList();
-        DOVersion doVersion = null;
-        Long version = null;
+        DOVersion doVersion;
+        Long version;
         if (doVersionList.size() == 0) {
             doVersion = new DOVersion();
             doVersion.setCurrentVersion(0L);
@@ -82,16 +74,7 @@ public class SettingService {
         }
         doVersion.setDistributedObjectClassName("ECafeSettings");
         entityManager.persist(doVersion);
-        String updateString = "update ECafeSettings set deletedState=true, deleteDate=:deleteDate where orgOwner=:idoforg and settingsId=:settingsId";
-        Query updateQ = entityManager.createQuery(updateString);
-        updateQ.setParameter("deleteDate",new Date());
-        updateQ.setParameter("idoforg",settings.getOrgOwner());
-        updateQ.setParameter("settingsId",settings.getSettingsId());
-        updateQ.executeUpdate();
-        //Long version = daoService.updateVersionByDistributedObjects(ECafeSettings.class.getSimpleName());
-        settings.setGlobalVersion(version);
-        settings.setGlobalVersionOnCreate(version);
-        entityManager.persist(settings);
+        return version;
     }
 
     /* Вывести список всех возможных принтеров организации */

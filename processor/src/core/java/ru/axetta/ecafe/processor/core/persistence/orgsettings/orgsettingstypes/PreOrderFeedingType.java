@@ -19,11 +19,15 @@ public enum PreOrderFeedingType implements SettingType {
     private OrgSettingsDataTypes expectedClass;
 
     private static Map<Integer, SettingType> mapInt = new HashMap<Integer,SettingType>();
+    private static Map<Integer, Integer> eCafeSettingIndexGlobalIdMap = new HashMap<>();
 
     static {
         for (SettingType orgSettingGroup : PreOrderFeedingType.values()) {
             mapInt.put(orgSettingGroup.getId(), orgSettingGroup);
         }
+        /* Индекс настройки из ECafeSetting сопоставляется с GlobalId  OrgSettingsItem */
+        eCafeSettingIndexGlobalIdMap.put(0, DAYS_ON_WHICH_APPLICATIONS_ARE_MADE.globalId);
+        eCafeSettingIndexGlobalIdMap.put(1, DAYS_WHEN_BLOCKED_EDITION_ON_WEBSITE.globalId);
     }
 
     PreOrderFeedingType(Integer globalId, String description, OrgSettingsDataTypes expectedClass) {
@@ -55,6 +59,10 @@ public enum PreOrderFeedingType implements SettingType {
     @Override
     public Integer getSyncDataTypeId() {
         return expectedClass.ordinal();
+    }
+
+    public static Integer getGlobalIdByECafeSettingValueIndex(Integer index) {
+        return eCafeSettingIndexGlobalIdMap.containsKey(index) ? eCafeSettingIndexGlobalIdMap.get(index) : index;
     }
 
     static public Map<Integer, SettingType> getSettingTypeAsMap() {

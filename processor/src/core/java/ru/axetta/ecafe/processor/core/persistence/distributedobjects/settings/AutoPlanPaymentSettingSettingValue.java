@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.AutoPlanPaymentSettingType;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -38,6 +40,11 @@ public class AutoPlanPaymentSettingSettingValue extends AbstractParserBySettingV
     @Override
     public boolean check() {
         return true;
+    }
+
+    @Override
+    protected Integer gettypeByIndex(Integer index) {
+        return AutoPlanPaymentSettingType.getGlobalIdByECafeSettingValueIndex(index);
     }
 
     public boolean isOffOnFlag() {

@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.CashierCheckPrinterType;
+
 import java.text.ParseException;
 
 /**
@@ -49,6 +51,11 @@ public class CashierCheckPrinterSettingValue extends AbstractParserBySettingValu
         int d1 = getValuesByD();
         int d2 = Integer.parseInt(d);
         return d1==d2;
+    }
+
+    @Override
+    protected Integer gettypeByIndex(Integer index) {
+        return CashierCheckPrinterType.getGlobalIdByECafeSettingValueIndex(index);
     }
 
     public Integer getValuesByD(){

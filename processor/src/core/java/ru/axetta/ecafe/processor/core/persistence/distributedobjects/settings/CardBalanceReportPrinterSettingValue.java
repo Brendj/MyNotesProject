@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.CardBalanceReportPrinterType;
+
 import java.text.ParseException;
 
 /**
@@ -9,7 +11,7 @@ import java.text.ParseException;
  * Time: 16:44
  * To change this template use File | Settings | File Templates.
  */
-public class CardBalanceReportPrinterSettingValue  extends AbstractParserBySettingValue{
+public class CardBalanceReportPrinterSettingValue extends AbstractParserBySettingValue{
 
     private String a; //a: Microsoft XPS Document Writer - название принтера
     private String b; //b: 42 - общая ширина ленты принтера (возможные значения 42,48, по умолчанию 42)
@@ -53,6 +55,11 @@ public class CardBalanceReportPrinterSettingValue  extends AbstractParserBySetti
         int d1 = getValuesByD();
         int d2 = Integer.parseInt(d);
         return d1==d2;
+    }
+
+    @Override
+    protected Integer gettypeByIndex(Integer index) {
+        return CardBalanceReportPrinterType.getGlobalIdByECafeSettingValueIndex(index);
     }
 
     public String getA() {

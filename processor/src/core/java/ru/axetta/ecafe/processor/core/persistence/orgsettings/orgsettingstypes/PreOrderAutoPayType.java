@@ -36,6 +36,10 @@ public class PreOrderAutoPayType implements SettingType {
         return null;
     }
 
+    public static Integer getGlobalIdByECafeSettingValueIndex(Integer index) {
+        return index;
+    }
+
     static public Map<Integer, SettingType> getSettingTypeAsMap() {
         return Collections.emptyMap();
     }

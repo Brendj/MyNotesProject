@@ -24,6 +24,8 @@ public enum OrgSettingGroup {
     PreOrderAutoPay(8,"Настройка автооплаты предзаказа", PreOrderAutoPayType.getSettingTypeAsMap()),
     ARMsSetting(9,"Настройки АРМа", ARMsSettingsType.getSettingTypeAsMap());
 
+    public static final Integer OFFSET_IN_RELATION_TO_ECAFESETTING = 1;
+
     private Integer id;
     private String description;
     private Map<Integer, SettingType> nestedEnumMap;

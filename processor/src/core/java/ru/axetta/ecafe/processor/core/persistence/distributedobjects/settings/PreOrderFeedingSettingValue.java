@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.PreOrderFeedingType;
+
 import java.text.ParseException;
 
 public class PreOrderFeedingSettingValue extends AbstractParserBySettingValue{
@@ -29,6 +31,11 @@ public class PreOrderFeedingSettingValue extends AbstractParserBySettingValue{
     @Override
     public boolean check() {
         return true;
+    }
+
+    @Override
+    protected Integer gettypeByIndex(Integer index) {
+        return PreOrderFeedingType.getGlobalIdByECafeSettingValueIndex(index);
     }
 
     public int getDaysCount() {

@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.SubscriberFeedingType;
+
 import java.text.ParseException;
 
 /**
@@ -67,7 +69,6 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
 
     @Override
     public String build() {
-        //return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + dayForbidChange + ";";
         return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + hoursForbidChange + ";" + (
                 sixWorkWeek ? 1 : 0) + ";" + daysToForbidChangeInPos + ";" + dayCreateVP + ";" + hoursForbidVP + ";"
                 + hoursForbidPP + ";";
@@ -76,6 +77,11 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     @Override
     public boolean check() {
         return true;
+    }
+
+    @Override
+    protected Integer gettypeByIndex(Integer index) {
+        return SubscriberFeedingType.getGlobalIdByECafeSettingValueIndex(index);
     }
 
     public int getDayRequest() {
@@ -101,14 +107,6 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     public void setEnableFeeding(boolean enableFeeding) {
         this.enableFeeding = enableFeeding;
     }
-
-    //public int getDayForbidChange() {
-    //    return dayForbidChange;
-    //}
-    //
-    //public void setDayForbidChange(int dayForbidChange) {
-    //    this.dayForbidChange = dayForbidChange;
-    //}
 
     public int getHoursForbidChange() {
         return hoursForbidChange;
