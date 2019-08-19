@@ -22,6 +22,8 @@ public class CashierCheckPrinterSettingValue extends AbstractParserBySettingValu
     private String g;//g: 8 – ширина колонки цена (возможные значения 6,7,8,9,10,11, по умолчанию 10)
     private String h;//h: текстовое поле выводимое на принтере
 
+    private static final int DEFAULT_CAPACITY = 8;
+
     public CashierCheckPrinterSettingValue(String[] values) throws ParseException {
         super(values);
     }
@@ -54,8 +56,18 @@ public class CashierCheckPrinterSettingValue extends AbstractParserBySettingValu
     }
 
     @Override
-    protected Integer gettypeByIndex(Integer index) {
+    protected int getECafeSettingArrayCapacity() {
+        return DEFAULT_CAPACITY;
+    }
+
+    @Override
+    protected Integer getOrgSettingTypeByIndex(Integer index) {
         return CashierCheckPrinterType.getGlobalIdByECafeSettingValueIndex(index);
+    }
+
+    @Override
+    protected Integer getIndexByOrgSettingType(Integer type) {
+        return CashierCheckPrinterType.getECafeSettingValueIndexByGlobalId(type);
     }
 
     public Integer getValuesByD(){

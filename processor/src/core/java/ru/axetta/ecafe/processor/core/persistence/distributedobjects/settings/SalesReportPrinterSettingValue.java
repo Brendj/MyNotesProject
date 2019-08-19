@@ -21,6 +21,8 @@ public class SalesReportPrinterSettingValue extends AbstractParserBySettingValue
     private String f;//f: 12 - ширина колонки стоимость (возможные значения 10,11,12,13,14,15, по умолчанию 12)
     private String g;//g: текстовое поле выводимое на принтере
 
+    private static final int DEFAULT_CAPACITY = 7;
+
     public SalesReportPrinterSettingValue(String[] values) throws ParseException {
         super(values);
     }
@@ -52,8 +54,18 @@ public class SalesReportPrinterSettingValue extends AbstractParserBySettingValue
     }
 
     @Override
-    protected Integer gettypeByIndex(Integer index) {
+    protected int getECafeSettingArrayCapacity() {
+        return DEFAULT_CAPACITY;
+    }
+
+    @Override
+    protected Integer getOrgSettingTypeByIndex(Integer index) {
         return SalesReportPrinterType.getGlobalIdByECafeSettingValueIndex(index);
+    }
+
+    @Override
+    protected Integer getIndexByOrgSettingType(Integer type) {
+        return SalesReportPrinterType.getECafeSettingValueIndexByGlobalId(type);
     }
 
     public Integer getValuesByD(){

@@ -40,6 +40,10 @@ public class SalesReportPrinterType implements SettingType {
         return index;
     }
 
+    public static Integer getECafeSettingValueIndexByGlobalId(Integer globalId){
+        return globalId;
+    }
+
     static public Map<Integer, SettingType> getSettingTypeAsMap() {
         return Collections.emptyMap();
     }

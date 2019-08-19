@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes;
 
+import com.google.common.collect.BiMap;
+import com.google.common.collect.HashBiMap;
+
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
 
 import java.util.HashMap;
@@ -22,7 +25,7 @@ public enum SubscriberFeedingType implements SettingType {
     private OrgSettingsDataTypes expectedClass;
 
     private static final Map<Integer, SettingType> mapInt = new HashMap<Integer,SettingType>();
-    private static final Map<Integer, Integer> eCafeSettingIndexGlobalIdMap = new HashMap<>();
+    private static final BiMap<Integer, Integer> eCafeSettingIndexGlobalIdMap = new HashBiMap<>();
 
     static {
         for (SettingType orgSettingGroup : SubscriberFeedingType.values()) {
@@ -69,6 +72,11 @@ public enum SubscriberFeedingType implements SettingType {
 
     public static Integer getGlobalIdByECafeSettingValueIndex(Integer index) {
         return eCafeSettingIndexGlobalIdMap.containsKey(index) ? eCafeSettingIndexGlobalIdMap.get(index) : index;
+    }
+
+    public static Integer getECafeSettingValueIndexByGlobalId(Integer globalId){
+        BiMap<Integer, Integer> inverse =  eCafeSettingIndexGlobalIdMap.inverse();
+        return inverse.containsKey(globalId) ?inverse.get(globalId) : globalId;
     }
 
     static public Map<Integer, SettingType> getSettingTypeAsMap() {

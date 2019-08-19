@@ -23,6 +23,8 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     private int hoursForbidVP; //Количество часов, в течение которых запрещено редактировать заявки вариативного питания
     private int hoursForbidPP; //Количество часов, в течение которых запрещено редактировать заявки по предзаказам
 
+    private static final int DEFAULT_CAPACITY = 9;
+
     //значения по умолчанию
     private static final int DAY_REQUEST = 5; //5;2;0;1;0;3
     private static final int DAY_DEACTIVATE = 2;
@@ -80,8 +82,18 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     }
 
     @Override
-    protected Integer gettypeByIndex(Integer index) {
+    protected int getECafeSettingArrayCapacity() {
+        return DEFAULT_CAPACITY;
+    }
+
+    @Override
+    protected Integer getOrgSettingTypeByIndex(Integer index) {
         return SubscriberFeedingType.getGlobalIdByECafeSettingValueIndex(index);
+    }
+
+    @Override
+    protected Integer getIndexByOrgSettingType(Integer type) {
+        return SubscriberFeedingType.getECafeSettingValueIndexByGlobalId(type);
     }
 
     public int getDayRequest() {

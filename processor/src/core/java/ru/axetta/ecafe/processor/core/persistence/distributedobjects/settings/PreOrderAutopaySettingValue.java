@@ -16,6 +16,8 @@ public class PreOrderAutopaySettingValue extends AbstractParserBySettingValue{
     private Date processingTime_Preorder; // время срабатывания автооплаты
     private static SimpleDateFormat dateOnlyFormat = new SimpleDateFormat("HH:mm");
 
+    private static final int DEFAULT_CAPACITY = 2;
+
     public PreOrderAutopaySettingValue(String[] values) throws ParseException {
         super(values);
     }
@@ -37,10 +39,19 @@ public class PreOrderAutopaySettingValue extends AbstractParserBySettingValue{
     }
 
     @Override
-    protected Integer gettypeByIndex(Integer index) {
+    protected int getECafeSettingArrayCapacity() {
+        return DEFAULT_CAPACITY;
+    }
+
+    @Override
+    protected Integer getOrgSettingTypeByIndex(Integer index) {
         return PreOrderAutoPayType.getGlobalIdByECafeSettingValueIndex(index);
     }
 
+    @Override
+    protected Integer getIndexByOrgSettingType(Integer type) {
+        return PreOrderAutoPayType.getGlobalIdByECafeSettingValueIndex(type);
+    }
 
     public boolean getIsActivePreorder() {
         return isActivePreorder;

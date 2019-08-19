@@ -30,6 +30,9 @@ public abstract class AbstractParserBySettingValue {
 
     public abstract String build();
     public abstract boolean check();
+    protected abstract int getECafeSettingArrayCapacity();
+    protected abstract Integer getOrgSettingTypeByIndex(Integer index);
+    protected abstract Integer getIndexByOrgSettingType(Integer type);
 
     public Set<OrgSettingItem> buildSetOfOrgSettingItem(OrgSetting setting, Long orgSettingNextVersion){
         Set<OrgSettingItem> result = new HashSet<>();
@@ -45,12 +48,23 @@ public abstract class AbstractParserBySettingValue {
             item.setVersion(orgSettingNextVersion);
 
             item.setSettingValue(values[i]);
-            item.setSettingType(gettypeByIndex(i));
+            item.setSettingType(getOrgSettingTypeByIndex(i));
 
             result.add(item);
         }
         return result;
     }
 
-    protected abstract Integer gettypeByIndex(Integer index);
+    public String[] buildChangedValueByOrgSetting(OrgSetting setting) throws Exception {
+        String[] result = new String[getECafeSettingArrayCapacity()];
+        for(OrgSettingItem val : setting.getOrgSettingItems()){
+            Integer index = getIndexByOrgSettingType(val.getSettingType());
+            if(result.length <= index){
+                throw new Exception(String.format("By settingType %d get index %d , but resultArray length is %d",
+                        val.getSettingType(), index, result.length));
+            }
+            result[index] = val.getSettingValue();
+        }
+        return result;
+    }
 }

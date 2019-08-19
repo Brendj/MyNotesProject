@@ -41,7 +41,7 @@ public class SettingService {
         return entityManager.merge(settings);
     }
 
-    public void create(ECafeSettings settings) throws Exception{
+    public void create(ECafeSettings settings) throws Exception {
         settings.setSendAll(SendToAssociatedOrgs.SendToSelf);
         settings.setCreatedDate(new Date());
         Long version = updateAndGetDOVersion();

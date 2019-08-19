@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 import javax.faces.event.ValueChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.

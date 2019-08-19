@@ -21,6 +21,8 @@ public class CardBalanceReportPrinterSettingValue extends AbstractParserBySettin
     private String f;//f: 12 - ширина колонки баланс (возможные значения 7,8,9,10,11,12, по умолчанию 12)
     private String g;//g: текстовое поле выводимое на принтере
 
+    private static final int DEFAULT_CAPACITY = 7;
+
     public CardBalanceReportPrinterSettingValue(String[] values) throws ParseException {
         super(values);
     }
@@ -58,8 +60,18 @@ public class CardBalanceReportPrinterSettingValue extends AbstractParserBySettin
     }
 
     @Override
-    protected Integer gettypeByIndex(Integer index) {
+    protected int getECafeSettingArrayCapacity() {
+        return DEFAULT_CAPACITY;
+    }
+
+    @Override
+    protected Integer getOrgSettingTypeByIndex(Integer index) {
         return CardBalanceReportPrinterType.getGlobalIdByECafeSettingValueIndex(index);
+    }
+
+    @Override
+    protected Integer getIndexByOrgSettingType(Integer type) {
+        return CardBalanceReportPrinterType.getECafeSettingValueIndexByGlobalId(type);
     }
 
     public String getA() {
