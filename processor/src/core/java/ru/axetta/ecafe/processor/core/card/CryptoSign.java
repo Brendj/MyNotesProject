@@ -11,10 +11,12 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.SummaryCardsMSRService;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.crypto.generators.SCrypt;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 
+import javax.xml.bind.DatatypeConverter;
 import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.KeySpec;
@@ -221,7 +223,15 @@ public class CryptoSign {
     }
 
     public static PublicKey loadPubKey(byte[] data) throws Exception {
-        KeySpec ks = new X509EncodedKeySpec(data);
+        List<String> arrayKey = Arrays.asList(StringUtils.split(new String(data), '\n'));
+        String rezult = "";
+        for (int i=1; i<arrayKey.size()-1;i++)
+        {
+            rezult+=arrayKey.get(i) + "\n";
+        }
+        rezult = rezult.substring(0, rezult.length() - 1);
+        byte[] newFormatData = DatatypeConverter.parseBase64Binary(rezult);
+        KeySpec ks = new X509EncodedKeySpec(newFormatData);
         KeyFactory key_f = KeyFactory.getInstance(KEY_FACTOR);
         return key_f.generatePublic(ks);
     }
