@@ -81,6 +81,9 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
                 stringBuilder.append(String.format(Locale.US, "<BALANCE>%.2f</BALANCE>", balance));
             }
         }
+        if (action.equals(ACTION_PAYMENT)) {
+            stringBuilder.append(String.format("<EXT_ID>%s</EXT_ID>", response.getIdOfClientPayment()));
+        }
 
         stringBuilder.append("</response>");
         printToStream(stringBuilder.toString(), httpResponse);
