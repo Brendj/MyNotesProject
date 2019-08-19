@@ -12,7 +12,6 @@
 
 <%-- Панель просмотра карточки цифровой подписи --%>
 <%--@elvariable id="cardSignEditPage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignEditPage"--%>
-<%--@elvariable id="cardSignCreatePage" type="ru.axetta.ecafe.processor.web.ui.card.sign.CardSignCreatePage"--%>
 <h:panelGrid binding="#{cardSignEditPage.pageComponent}">
     <h:panelGrid id="cardSignEditGrid"  styleClass="borderless-grid" rendered="#{cardSignEditPage.newProvider}" columns="2">
         <h:outputText escape="true" value="Номер ключа" styleClass="output-text" />
@@ -61,7 +60,7 @@
         <h:inputText value="#{cardSignEditPage.idOfCardSign}" styleClass="input-text" readonly="true" />
         <h:outputText escape="true" value="Тип ключа" styleClass="output-text" />
         <h:selectOneMenu value="#{cardSignEditPage.signTypeCard}" styleClass="input-text">
-            <f:selectItems value="#{cardSignCreatePage.getTypes(1)}" />
+            <f:selectItems value="#{cardSignEditPage.getTypes(1)}" />
         </h:selectOneMenu>
         <h:outputText escape="true" value="Данные ключа" styleClass="output-text" />
         <h:outputText value="#{cardSignEditPage.signDataSize}" styleClass="output-text" />
@@ -96,7 +95,7 @@
 </h:panelGrid>
 
 <h:panelGrid styleClass="borderless-grid">
-    <a4j:commandButton value="Сохранить" action="#{cardSignEditPage.save(cardSignCreatePage.newProvider)}"
+    <a4j:commandButton value="Сохранить" action="#{cardSignEditPage.save(cardSignEditPage.newProvider)}"
                        styleClass="command-button" reRender="mainMenu, workspaceForm" />
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
