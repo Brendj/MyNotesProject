@@ -53,6 +53,8 @@ public class Option {
             OPTION_MAX_NUM_DAYS_NOTIFICATION_GOOD_REQUEST_CHANGE =1015, //максимальное количество дней для выборки(7-31)
             OPTION_ARRAY_OF_FILTER_TEXT =1016, //Список выражений по фильтраций комплексов АП, выражения разделяются через ';
             OPTION_VALID_REGISTRY_DATE = 1017,
+            OPTION_REVISE_LAST_DATE = 1018,
+            OPTION_REVISE_LIMIT = 1019,
 
             OPTION_NSI_LAST_SYNC_TIME=10001,
             OPTION_STOP_LIST_LAST_UPDATE=10010,
@@ -183,6 +185,8 @@ public class Option {
             OPTION_MAX_NUM_DAYS_NOTIFICATION_GOOD_REQUEST_CHANGE, "7", // по умолчанию неделя максимально до 31 дня
             OPTION_ARRAY_OF_FILTER_TEXT, "сотрудник;",
             OPTION_VALID_REGISTRY_DATE, "0",
+            OPTION_REVISE_LAST_DATE, "",
+            OPTION_REVISE_LIMIT, "10000",
             OPTION_NSI_LAST_SYNC_TIME, null,
             OPTION_STOP_LIST_LAST_UPDATE, null,
             OPTION_MSR_STOPLIST_ON, "0",

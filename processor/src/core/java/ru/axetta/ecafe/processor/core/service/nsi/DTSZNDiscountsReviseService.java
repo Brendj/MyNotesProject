@@ -865,15 +865,19 @@ public class DTSZNDiscountsReviseService {
     }
 
     public void runTaskDB(String guid) throws Exception {
-        List<ReviseDAOService.DiscountItem> discountItemList;
+        ReviseDAOService.DiscountItemsWithTimestamp discountItemList;
 
         if (StringUtils.isEmpty(guid)) {
-            Integer delta = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DELTA);
-            Date deltaDate = CalendarUtils.addHours(new Date(), -delta);
+            Date deltaDate = null;
+            try {
+                deltaDate = CalendarUtils.parseDateWithDayTime(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_REVISE_LAST_DATE));
+            } catch (Exception e) {
+                deltaDate = CalendarUtils.addHours(new Date(), -24);
+            }
             discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsUpdatedSinceDate(deltaDate);
         } else {
             discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsByGUID(guid);
-            if (discountItemList.isEmpty()) {
+            if (discountItemList.getItems().isEmpty()) {
                 throw new Exception(String.format("По гуиду \"%s\" ничего не найдено", guid));
             }
         }
@@ -890,7 +894,8 @@ public class DTSZNDiscountsReviseService {
             Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
 
             Integer counter = 0;
-            for (ReviseDAOService.DiscountItem item : discountItemList) {
+            Map<Long, Boolean> orgData = new HashMap<>();
+            for (ReviseDAOService.DiscountItem item : discountItemList.getItems()) {
                 if (null == transaction || !transaction.isActive()) {
                     transaction = session.beginTransaction();
                 }
@@ -904,7 +909,12 @@ public class DTSZNDiscountsReviseService {
                     continue;
                 }
 
-                if (!client.getOrg().getChangesDSZN()) {
+                Boolean changesDSZN = orgData.get(client.getOrg().getIdOfOrg());
+                if (changesDSZN == null) {
+                    orgData.put(client.getOrg().getIdOfOrg(), client.getOrg().getChangesDSZN());
+                    changesDSZN = orgData.get(client.getOrg().getIdOfOrg());
+                }
+                if (!changesDSZN) {
                     logger.info(String.format(
                             "Organization has no \"Changes DSZN\" flag. Client with guid = { %s } was skipped",
                             item.getRegistryGUID()));
@@ -1006,6 +1016,9 @@ public class DTSZNDiscountsReviseService {
         updateArchivedFlagForDiscountsDB();
         runTaskPart2(fireTime);
         updateApplicationsForFoodTask();
+        if (StringUtils.isEmpty(guid) && discountItemList != null && discountItemList.getDate() != null) {
+            RuntimeContext.getInstance().setOptionValue(Option.OPTION_REVISE_LAST_DATE, CalendarUtils.dateTimeToString(discountItemList.getDate()));
+        }
     }
 
     public void updateArchivedFlagForDiscountsDB() throws Exception {
