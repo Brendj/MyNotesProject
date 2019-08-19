@@ -4,11 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request;
 
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.SettingType;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
 import org.hibernate.Session;
@@ -66,7 +69,8 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
                 setting.setLastUpdate(syncData);
                 setting.setVersion(nextVersionOfOrgSetting);
             }
-            session.saveOrUpdate(setting);
+            updateECafeSettingByOrgSetting(setting);
+            session.persist(setting);
         }
 
         //Build section for response
@@ -100,6 +104,13 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
             section.getItems().add(settingPojo);
         }
         return section;
+    }
+
+    private void updateECafeSettingByOrgSetting(OrgSetting setting) {
+        ECafeSettings eCafeSettings = DAOUtils.getECafeSettingByIdOfOrgAndSettingId(session, setting.getIdOfOrg(),
+                SettingsIds.fromInteger(setting.getSettingGroup().getId() - OrgSettingGroup.OFFSET_IN_RELATION_TO_ECAFESETTING));
+
+//TODO СДЕЛАТЬ ПОЛУЧЕНИЕ ИНДЕКСА ПО ГРУППЕ НАСТОЕК 
     }
 
     private OrgSettingItem buildFromPOJO(Long nextVersionOfOrgSettingItem, OrgSettingItemSyncPOJO itemSyncPOJO,

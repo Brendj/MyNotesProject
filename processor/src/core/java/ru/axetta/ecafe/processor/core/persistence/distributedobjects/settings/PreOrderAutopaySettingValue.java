@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.PreOrderAutoPayType;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -32,6 +34,11 @@ public class PreOrderAutopaySettingValue extends AbstractParserBySettingValue{
     @Override
     public boolean check() {
         return true;
+    }
+
+    @Override
+    protected Integer gettypeByIndex(Integer index) {
+        return PreOrderAutoPayType.getGlobalIdByECafeSettingValueIndex(index);
     }
 
 

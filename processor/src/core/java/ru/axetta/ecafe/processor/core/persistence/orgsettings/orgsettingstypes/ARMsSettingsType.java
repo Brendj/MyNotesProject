@@ -61,7 +61,13 @@ public enum ARMsSettingsType implements SettingType {
         return expectedClass.ordinal();
     }
 
+    public static Integer getGlobalIdByECafeSettingValueIndex(Integer index) {
+        return index;
+    }
+
     static public Map<Integer, SettingType> getSettingTypeAsMap() {
         return mapInt;
     }
+
+
 }

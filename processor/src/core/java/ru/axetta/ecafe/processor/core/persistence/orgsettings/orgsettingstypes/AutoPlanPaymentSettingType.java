@@ -9,7 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
 import java.util.Collections;
 import java.util.Map;
 
-public class AutoPlanPaymentSettingType implements  SettingType {
+public class AutoPlanPaymentSettingType implements SettingType {
 
     @Override
     public Integer getSettingGroupId() {
@@ -34,6 +34,10 @@ public class AutoPlanPaymentSettingType implements  SettingType {
     @Override
     public Integer getSyncDataTypeId() {
         return null;
+    }
+
+    public static Integer getGlobalIdByECafeSettingValueIndex(Integer index) {
+        return index;
     }
 
     static public Map<Integer, SettingType> getSettingTypeAsMap() {

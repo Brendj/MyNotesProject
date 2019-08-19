@@ -11,6 +11,7 @@ import java.util.Map;
 
 public enum SubscriberFeedingType implements SettingType {
 
+    AP_DAYS_ON_WHICH_APPLICATIONS_ARE_MADE(10101, "АП. Количество раб. дней, на которые оформляются заявки", OrgSettingsDataTypes.INT32),
     AP_TIME_OF_CREATION_CANNOT_BE_EDITED(10104, "АП.Время после создания заявки, в которое нельзя редактировать заяку, в часах", OrgSettingsDataTypes.INT32),
     AP_DAYS_WHEN_BLOCKED_CASHBOX(10106,"АП.Кол-во раб. дней, на которое блокируются средства на кассах", OrgSettingsDataTypes.INT32),
     VP_DAYS_ON_WHICH_APPLICATIONS_ARE_MADE(10201, "ВП.Количество раб. дней, на которые оформляются заявки", OrgSettingsDataTypes.INT32),
@@ -20,12 +21,19 @@ public enum SubscriberFeedingType implements SettingType {
     private String description;
     private OrgSettingsDataTypes expectedClass;
 
-    private static Map<Integer, SettingType> mapInt = new HashMap<Integer,SettingType>();
+    private static final Map<Integer, SettingType> mapInt = new HashMap<Integer,SettingType>();
+    private static final Map<Integer, Integer> eCafeSettingIndexGlobalIdMap = new HashMap<>();
 
     static {
         for (SettingType orgSettingGroup : SubscriberFeedingType.values()) {
             mapInt.put(orgSettingGroup.getId(), orgSettingGroup);
         }
+        /* Индекс настройки из ECafeSetting сопоставляется с GlobalId  OrgSettingsItem */
+        eCafeSettingIndexGlobalIdMap.put(0, AP_DAYS_ON_WHICH_APPLICATIONS_ARE_MADE.globalId);
+        eCafeSettingIndexGlobalIdMap.put(3, AP_TIME_OF_CREATION_CANNOT_BE_EDITED.globalId);
+        eCafeSettingIndexGlobalIdMap.put(5, AP_DAYS_WHEN_BLOCKED_CASHBOX.globalId);
+        eCafeSettingIndexGlobalIdMap.put(6, VP_DAYS_ON_WHICH_APPLICATIONS_ARE_MADE.globalId);
+        eCafeSettingIndexGlobalIdMap.put(7, VP_TIME_OF_CREATION_CANNOT_BE_EDITED.globalId);
     }
 
     SubscriberFeedingType(Integer globalId, String description, OrgSettingsDataTypes expectedClass) {
@@ -57,6 +65,10 @@ public enum SubscriberFeedingType implements SettingType {
     @Override
     public Integer getSyncDataTypeId() {
         return expectedClass.ordinal();
+    }
+
+    public static Integer getGlobalIdByECafeSettingValueIndex(Integer index) {
+        return eCafeSettingIndexGlobalIdMap.containsKey(index) ? eCafeSettingIndexGlobalIdMap.get(index) : index;
     }
 
     static public Map<Integer, SettingType> getSettingTypeAsMap() {
