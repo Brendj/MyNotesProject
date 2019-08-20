@@ -140,17 +140,21 @@ public class PaymentProcessorImpl implements PaymentProcessor {
                             PaymentProcessResult.CONTRAGENT_NOT_FOUND.getDescription(), idOfContragent,
                             payment.getContractId()), null);
         }
-        if (DAOReadExternalsService.getInstance().existClientPayment(contragent, payment)) {
+        Long idOfClientPayment = DAOReadExternalsService.getInstance().existingClientPayment(contragent, payment);
+        if (idOfClientPayment != null) {
             SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, false,
                     "Платеж с такими атрибутами уже зарегистрирован", null);
             logger.warn(
                     String.format("Payment request with duplicated attributes IdOfContragent == %s, payment == %s",
                             idOfContragent, payment.toString()));
-            return new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
+            PaymentResponse.ResPaymentRegistry.Item result =
+                new PaymentResponse.ResPaymentRegistry.Item(payment, null, null, null, null, null, null,
                     PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getCode(),
                     String.format("%s. IdOfContragent == %s, IdOfPayment == %s",
                             PaymentProcessResult.PAYMENT_ALREADY_REGISTERED.getDescription(), idOfContragent,
                             payment.getIdOfPayment()), null);
+            result.setIdOfClientPayment(idOfClientPayment);
+            return result;
         }
 
         Integer subBalanceNum = null;
