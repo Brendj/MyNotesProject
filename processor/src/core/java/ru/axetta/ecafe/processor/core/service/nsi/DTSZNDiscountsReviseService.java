@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVScheduledStatus;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.revise.ReviseDAOService;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -874,10 +875,8 @@ public class DTSZNDiscountsReviseService {
         if (StringUtils.isEmpty(guid)) {
             Date deltaDate = null;
             try {
-                deltaDate = CalendarUtils.parseDateWithDayTime(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_REVISE_LAST_DATE));
-            } catch (Exception e) {
-                deltaDate = CalendarUtils.addHours(new Date(), -24);
-            }
+                deltaDate = CalendarUtils.parseDateWithDayTime(DAOService.getInstance().getOnlineOptionValue(Option.OPTION_REVISE_LAST_DATE));
+            } catch (Exception ignore) { }
             if (deltaDate == null) deltaDate = CalendarUtils.addHours(new Date(), -24);
             discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsUpdatedSinceDate(deltaDate);
         } else {
@@ -1022,7 +1021,7 @@ public class DTSZNDiscountsReviseService {
         runTaskPart2(fireTime);
         updateApplicationsForFoodTask();
         if (StringUtils.isEmpty(guid) && discountItemList != null && discountItemList.getDate() != null) {
-            RuntimeContext.getInstance().setOptionValue(Option.OPTION_REVISE_LAST_DATE, CalendarUtils.dateTimeToString(discountItemList.getDate()));
+            DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(discountItemList.getDate()), Option.OPTION_REVISE_LAST_DATE);
         }
     }
 

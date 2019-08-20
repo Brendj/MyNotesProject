@@ -2425,20 +2425,39 @@ public class DAOService {
     }*/
 
     @Transactional
+    public String getOnlineOptionValue(int option) throws Exception {
+        String str_query = "select optiontext from cf_options where idofoption = :idofoption";
+        Query q = entityManager.createNativeQuery(str_query);
+        q.setParameter("idofoption", option);
+        List list = q.getResultList();
+        if (list.size() == 0) throw new Exception(String.format("Option id=%s not found", option));
+        return (String)list.get(0);
+    }
+
+    @Transactional
+    public void setOnlineOptionValue(String value, int option) {
+        String str_query = "select optiontext from cf_options where idofoption = :idofoption";
+        Query q = entityManager.createNativeQuery(str_query);
+        q.setParameter("idofoption", option);
+        List list = q.getResultList();
+        if (list.size() == 0) {
+            str_query = "insert into cf_options (idofoption, optiontext) values(:idofoption, :value)";
+        } else {
+            str_query = "update cf_options set optiontext = :value where idofoption = :idofoption";
+        }
+        q = entityManager.createNativeQuery(str_query);
+        q.setParameter("value", value);
+        q.setParameter("idofoption", Option.OPTION_SVERKA_ENABLED);
+        q.executeUpdate();
+    }
+
+    @Transactional
     public Boolean isSverkaEnabled() {
         try {
-            String str_query = "select optiontext from cf_options where idofoption = :idofoption";
-            Query q = entityManager
-                    .createNativeQuery(str_query);
-            q.setParameter("idofoption", Option.OPTION_SVERKA_ENABLED);
-            List list = q.getResultList();
-            if (list.size() == 0) {
-                return true;
-            } else {
-                return ((String)list.get(0)).equals("1");
-            }
+            String option = getOnlineOptionValue(Option.OPTION_SVERKA_ENABLED);
+            return option.equals("1");
         } catch (Exception e) {
-            logger.error("Can't get sverka permission value");
+            logger.error("Can't get sverka permission value", e);
             return true;
         }
     }
@@ -2446,21 +2465,7 @@ public class DAOService {
     @Transactional
     public void setSverkaEnabled(Boolean value) {
         String val_str = value ? "1" : "0";
-        String str_query = "select optiontext from cf_options where idofoption = :idofoption";
-        Query q = entityManager
-                .createNativeQuery(str_query);
-        q.setParameter("idofoption", Option.OPTION_SVERKA_ENABLED);
-        List list = q.getResultList();
-        if (list.size() == 0) {
-            str_query = "insert into cf_options (idofoption, optiontext) values(:idofoption, :value)";
-        } else {
-            str_query = "update cf_options set optiontext = :value where idofoption = :idofoption";
-        }
-
-        q = entityManager.createNativeQuery(str_query);
-        q.setParameter("value", val_str);
-        q.setParameter("idofoption", Option.OPTION_SVERKA_ENABLED);
-        q.executeUpdate();
+        setOnlineOptionValue(val_str, Option.OPTION_SVERKA_ENABLED);
     }
 
     public void saveTradeAccountConfigChangeDirective(Long idOfOrg) {
