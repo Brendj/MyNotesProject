@@ -253,8 +253,8 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                             + "    FROM cf_enterevents ee "
                             + "    LEFT JOIN cf_clients cs  ON ee.idofclient = cs.idofclient "
                             + "    LEFT JOIN cf_persons pn ON pn.idofperson = cs.idofperson "
-                            + "    LEFT JOIN cf_clientgroups cg ON cg.idofclientgroup = ee.idofclientgroup AND "
-                            //+ " cs.idoforg = cg.idoforg "
+                            + "    LEFT JOIN cf_clientgroups cg ON cg.idofclientgroup = ee.idofclientgroup "
+                            //+ " AND cs.idoforg = cg.idoforg "
                             + "    LEFT JOIN  cf_orgs os ON ee.idoforg = os.idoforg WHERE ee.idoforg IN ("
                             + friendlyOrgsIds + ") AND cs.idoforg IN (" + friendlyOrgsIds + ") "
                             + " AND ee.evtdatetime BETWEEN " + startTime.getTime() + " AND " + endTime.getTime()
@@ -290,25 +290,33 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                     }
                 }
             Integer counter;
-            for (Map.Entry entry: stClassMap.entrySet()) {
+
+            //Удаление групп без клиентов и клиентов без времени входа и выхода
+            for(Iterator<Map.Entry<String, StClass>> it = stClassMap.entrySet().iterator(); it.hasNext(); ) {
+                Map.Entry<String, StClass> entry = it.next();
                 StClass value = (StClass) entry.getValue();
-                for (ListIterator<Data> i = value.getDataList().listIterator(); i.hasNext(); ) {
-                    Data el = i.next();
-                    if((el.getF06() == null || el.getF06().equals("")) && (el.getF07() == null || el.getF07().equals(""))) {
-                        i.remove();
+
+                if(value.getDataList().isEmpty()) {
+                    it.remove();
+                }
+                else {
+                    for (ListIterator<Data> i = value.getDataList().listIterator(); i.hasNext(); ) {
+                        Data el = i.next();
+                        if ((el.getF06() == null || el.getF06().equals("")) && (el.getF07() == null || el.getF07().equals(""))) {
+                            i.remove();
+                        }
+                    }
+                    counter = 1;
+                    String cur = "";
+                    for (Data i : value.getDataList()) {
+                        if (!cur.equals(i.getF01()))
+                            counter = 1;
+                        cur = i.getF01();
+                        i.setF11(counter);
+                        counter++;
                     }
                 }
-                counter = 1;
-                String cur = "";
-                for (Data i : value.getDataList()) {
-                    if (!cur.equals(i.getF01()))
-                        counter = 1;
-                    cur = i.getF01();
-                    i.setF11(counter);
-                    counter ++;
-                }
             }
-
 
             Map<MapKeyModel, Long> usersEntrySummaryMap = new HashMap<MapKeyModel, Long>();
             //заполняем время внутри
