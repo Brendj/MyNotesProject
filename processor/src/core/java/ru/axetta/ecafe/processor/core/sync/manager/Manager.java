@@ -917,9 +917,18 @@ public class Manager implements AbstractToElement {
 
         OrgSetting setting = OrgSettingDAOUtils.getOrgSettingByGroupIdAndOrg(persistenceSession,
                 eCafeSettings.getSettingsId().getId() + OrgSettingGroup.OFFSET_IN_RELATION_TO_ECAFESETTING, eCafeSettings.getOrgOwner().intValue());
-
-        setting.setLastUpdate(now);
-        setting.setVersion(nextVersionOfOrgSetting);
+        if(setting == null){
+            setting = new OrgSetting();
+            setting.setCreatedDate(now);
+            setting.setIdOfOrg(eCafeSettings.getOrgOwner());
+            setting.setSettingGroup(OrgSettingGroup.getGroupById(eCafeSettings.getSettingsId().getId() + OrgSettingGroup.OFFSET_IN_RELATION_TO_ECAFESETTING));
+            setting.setLastUpdate(now);
+            setting.setVersion(nextVersionOfOrgSetting);
+            persistenceSession.save(setting);
+        } else {
+            setting.setLastUpdate(now);
+            setting.setVersion(nextVersionOfOrgSetting);
+        }
 
         SettingValueParser valueParser = new SettingValueParser(eCafeSettings.getSettingValue(), eCafeSettings.getSettingsId());
         Set<OrgSettingItem> itemsFromECafeSetting = valueParser.getParserBySettingValue().buildSetOfOrgSettingItem(setting, nextVersionOfOrgSetting);
