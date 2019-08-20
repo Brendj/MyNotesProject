@@ -89,6 +89,10 @@ public class DTSZNDiscountsReviseService {
 
     public static final String DATA_SOURCE_TYPE_MARKER_NSI = "nsiir";
     public static final String DATA_SOURCE_TYPE_MARKER_OU = "ou";
+    public static final String DATA_SOURCE_TYPE_MARKER_ARM = "arm";
+
+    public static final String OTHER_DISCOUNT_DESCRIPTION = "Иное";
+    public static final Long OTHER_DISCOUNT_CODE = 0L;
 
     private static Logger logger = LoggerFactory.getLogger(DTSZNDiscountsReviseService.class);
     private static ReviseLogger reviseLogger = RuntimeContext.getAppContext().getBean(ReviseLogger.class);
@@ -874,6 +878,7 @@ public class DTSZNDiscountsReviseService {
             } catch (Exception e) {
                 deltaDate = CalendarUtils.addHours(new Date(), -24);
             }
+            if (deltaDate == null) deltaDate = CalendarUtils.addHours(new Date(), -24);
             discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsUpdatedSinceDate(deltaDate);
         } else {
             discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsByGUID(guid);
