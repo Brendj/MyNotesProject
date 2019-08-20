@@ -2424,14 +2424,22 @@ public class DAOService {
         }
     }*/
 
-    @Transactional
-    public String getOnlineOptionValue(int option) throws Exception {
+    private String getOnlineOptionValue(int option) throws Exception {
         String str_query = "select optiontext from cf_options where idofoption = :idofoption";
         Query q = entityManager.createNativeQuery(str_query);
         q.setParameter("idofoption", option);
         List list = q.getResultList();
         if (list.size() == 0) throw new Exception(String.format("Option id=%s not found", option));
         return (String)list.get(0);
+    }
+
+    @Transactional
+    public String getReviseLastDate() {
+        try {
+            return getOnlineOptionValue(Option.OPTION_REVISE_LAST_DATE);
+        } catch (Exception e) {
+            return "";
+        }
     }
 
     @Transactional

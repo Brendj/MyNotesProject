@@ -962,7 +962,7 @@ public class OptionPage extends BasicWorkspacePage {
         reviseSourceType = runtimeContext.getOptionValueInt(Option.OPTION_REVISE_DATA_SOURCE);
         reviseDelta = runtimeContext.getOptionValueInt(Option.OPTION_REVISE_DELTA);
         reviseLimit = runtimeContext.getOptionValueInt(Option.OPTION_REVISE_LIMIT);
-        reviseLastDate = runtimeContext.getOptionValueString(Option.OPTION_REVISE_LAST_DATE);
+        reviseLastDate = DAOService.getInstance().getReviseLastDate();
     }
 
     public Object save() {
@@ -1076,7 +1076,6 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_REVISE_DATA_SOURCE, reviseSourceType);
             runtimeContext.setOptionValue(Option.OPTION_REVISE_DELTA, reviseDelta);
             runtimeContext.setOptionValue(Option.OPTION_REVISE_LIMIT, reviseLimit);
-            runtimeContext.setOptionValue(Option.OPTION_REVISE_LAST_DATE, reviseLastDate);
 
             runtimeContext.setOptionValue(Option.OPTION_LOG_INFOSERVICE, logInfoService);
             runtimeContext.setOptionValue(Option.OPTION_METHODS_INFOSERVICE, methodsInfoService);

@@ -875,7 +875,7 @@ public class DTSZNDiscountsReviseService {
         if (StringUtils.isEmpty(guid)) {
             Date deltaDate = null;
             try {
-                deltaDate = CalendarUtils.parseDateWithDayTime(DAOService.getInstance().getOnlineOptionValue(Option.OPTION_REVISE_LAST_DATE));
+                deltaDate = CalendarUtils.parseDateWithDayTime(DAOService.getInstance().getReviseLastDate());
             } catch (Exception ignore) { }
             if (deltaDate == null) deltaDate = CalendarUtils.addHours(new Date(), -24);
             discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsUpdatedSinceDate(deltaDate);
