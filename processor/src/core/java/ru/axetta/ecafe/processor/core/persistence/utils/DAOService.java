@@ -2455,7 +2455,7 @@ public class DAOService {
         }
         q = entityManager.createNativeQuery(str_query);
         q.setParameter("value", value);
-        q.setParameter("idofoption", Option.OPTION_SVERKA_ENABLED);
+        q.setParameter("idofoption", option);
         q.executeUpdate();
     }
 
