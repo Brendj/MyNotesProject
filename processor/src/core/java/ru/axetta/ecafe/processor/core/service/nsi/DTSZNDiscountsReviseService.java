@@ -900,6 +900,7 @@ public class DTSZNDiscountsReviseService {
             Integer counter = 0;
             Map<Long, Boolean> orgData = new HashMap<>();
             for (ReviseDAOService.DiscountItem item : discountItemList.getItems()) {
+                logger.info(String.format("Processing record %s from %s", counter, discountItemList.getItems().size()));
                 if (null == transaction || !transaction.isActive()) {
                     transaction = session.beginTransaction();
                 }
