@@ -25,7 +25,7 @@ public enum SubscriberFeedingType implements SettingType {
     private OrgSettingsDataTypes expectedClass;
 
     private static final Map<Integer, SettingType> mapInt = new HashMap<Integer,SettingType>();
-    private static final BiMap<Integer, Integer> eCafeSettingIndexGlobalIdMap = new HashBiMap<>();
+    private static final BiMap<Integer, Integer> eCafeSettingIndexGlobalIdMap = HashBiMap.create();
 
     static {
         for (SettingType orgSettingGroup : SubscriberFeedingType.values()) {

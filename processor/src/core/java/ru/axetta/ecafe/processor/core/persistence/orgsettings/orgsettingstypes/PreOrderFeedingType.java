@@ -22,7 +22,7 @@ public enum PreOrderFeedingType implements SettingType {
     private OrgSettingsDataTypes expectedClass;
 
     private static Map<Integer, SettingType> mapInt = new HashMap<Integer,SettingType>();
-    private static BiMap<Integer, Integer> eCafeSettingIndexGlobalIdMap = new HashBiMap<>();
+    private static BiMap<Integer, Integer> eCafeSettingIndexGlobalIdMap = HashBiMap.create();
 
     static {
         for (SettingType orgSettingGroup : PreOrderFeedingType.values()) {

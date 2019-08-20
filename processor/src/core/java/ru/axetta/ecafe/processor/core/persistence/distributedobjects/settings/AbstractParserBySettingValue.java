@@ -65,6 +65,12 @@ public abstract class AbstractParserBySettingValue {
             }
             result[index] = val.getSettingValue();
         }
+        int len = values.length;
+        for(int i = 0; i < len; i++){
+            if(result[i] == null){
+                result[i] = values[i];
+            }
+        }
         return result;
     }
 }

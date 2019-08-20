@@ -14,7 +14,6 @@ import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.S
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -111,25 +110,42 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
 
     private void updateECafeSettingByOrgSetting(OrgSetting setting) {
         ECafeSettings eCafeSettings = DAOUtils.getECafeSettingByIdOfOrgAndSettingId(session, setting.getIdOfOrg(),
-                SettingsIds.fromInteger(setting.getSettingGroup().getId() - OrgSettingGroup.OFFSET_IN_RELATION_TO_ECAFESETTING));
+                SettingsIds.fromInteger(
+                        setting.getSettingGroup().getId() - OrgSettingGroup.OFFSET_IN_RELATION_TO_ECAFESETTING));
         if (eCafeSettings == null) {
             eCafeSettings = new ECafeSettings();
             eCafeSettings.setOrgOwner(setting.getIdOfOrg());
-            eCafeSettings.setSettingsId(SettingsIds.fromInteger(setting.getSettingGroup().getId() - OrgSettingGroup.OFFSET_IN_RELATION_TO_ECAFESETTING));
+            eCafeSettings.setSettingsId(SettingsIds.fromInteger(
+                    setting.getSettingGroup().getId() - OrgSettingGroup.OFFSET_IN_RELATION_TO_ECAFESETTING));
             eCafeSettings.setDeletedState(false);
             eCafeSettings.setCreatedDate(new Date());
             eCafeSettings.setLastUpdate(new Date());
         }
         try {
             String[] newValue = eCafeSettings.getSplitSettingValue().buildChangedValueByOrgSetting(setting);
+            eCafeSettings.setSettingValue(buildECafeSettingValue(newValue));
 
-            if(StringUtils.isBlank(eCafeSettings.getSettingValue())){
-                eCafeSettings.setSettingValue(StringUtils.join(newValue, ";"));
-            }
-        } catch (Exception e){
+
+            session.persist(eCafeSettings);
+        } catch (Exception e) {
             logger.error(String.format("Can't update or create ECafeSetting with SettingID %d for Org ID %d :",
                     eCafeSettings.getSettingsId().getId(), setting.getIdOfOrg()), e);
         }
+    }
+
+    private String buildECafeSettingValue(String[] splitValue){
+        if(splitValue == null || splitValue.length == 0){
+            throw new RuntimeException("Get empty ECafeSetting value array");
+        }
+        // array.length * 2: параметры в основном булевые + символ-сепаратор
+        StringBuilder sb = new StringBuilder(splitValue.length * 2);
+        for(String item : splitValue){
+            if(item != null) {
+                sb.append(item);
+            }
+            sb.append(';');
+        }
+        return sb.toString();
     }
 
     private OrgSettingItem buildFromPOJO(Long nextVersionOfOrgSettingItem, OrgSettingItemSyncPOJO itemSyncPOJO,
