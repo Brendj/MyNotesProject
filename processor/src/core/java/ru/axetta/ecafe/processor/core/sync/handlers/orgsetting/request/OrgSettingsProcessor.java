@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.daoservices.org.SettingService;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
@@ -109,6 +112,9 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
     }
 
     private void updateECafeSettingByOrgSetting(OrgSetting setting) {
+        SettingService settingService = RuntimeContext.getAppContext().getBean(SettingService.class);
+        Long DOVersion = settingService.updateAndGetDOVersion();
+
         ECafeSettings eCafeSettings = DAOUtils.getECafeSettingByIdOfOrgAndSettingId(session, setting.getIdOfOrg(),
                 SettingsIds.fromInteger(
                         setting.getSettingGroup().getId() - OrgSettingGroup.OFFSET_IN_RELATION_TO_ECAFESETTING));
@@ -120,11 +126,13 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
             eCafeSettings.setDeletedState(false);
             eCafeSettings.setCreatedDate(new Date());
             eCafeSettings.setLastUpdate(new Date());
+            eCafeSettings.setGlobalVersionOnCreate(DOVersion);
+            eCafeSettings.setSendAll(SendToAssociatedOrgs.SendToSelf);
         }
         try {
             String[] newValue = eCafeSettings.getSplitSettingValue().buildChangedValueByOrgSetting(setting);
             eCafeSettings.setSettingValue(buildECafeSettingValue(newValue));
-
+            eCafeSettings.setGlobalVersion(DOVersion);
 
             session.persist(eCafeSettings);
         } catch (Exception e) {

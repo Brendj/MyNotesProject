@@ -7,8 +7,16 @@ package ru.axetta.ecafe.processor.core.daoservices.org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingValueParser;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem;
 
+import org.hibernate.Session;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -16,9 +24,7 @@ import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import javax.persistence.TypedQuery;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,15 +36,75 @@ import java.util.List;
 @Service
 @Transactional
 public class SettingService {
+    private static final Logger logger = LoggerFactory.getLogger(SettingService.class);
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
-    public ECafeSettings save(ECafeSettings settings) throws Exception{
+    public ECafeSettings save(ECafeSettings settings) throws Exception {
         Long version = updateAndGetDOVersion();
         settings.setGlobalVersion(version);
         settings.setLastUpdate(new Date());
+        processOrgSetting(settings);
         return entityManager.merge(settings);
+    }
+
+    private void processOrgSetting(ECafeSettings settings) {
+        try {
+            Session persistenceSession = entityManager.unwrap(Session.class);
+            Date now = new Date();
+            Long lastVersionOfOrgSetting = OrgSettingDAOUtils.getLastVersionOfOrgSettings(persistenceSession);
+            Long lastVersionOfOrgSettingItem = OrgSettingDAOUtils.getLastVersionOfOrgSettingsItem(persistenceSession);
+
+            Long nextVersionOfOrgSetting = (lastVersionOfOrgSetting == null ? 0L : lastVersionOfOrgSetting) + 1L;
+            Long nextVersionOfOrgSettingItem =
+                    (lastVersionOfOrgSettingItem == null ? 0L : lastVersionOfOrgSettingItem) + 1L;
+
+            OrgSetting setting = OrgSettingDAOUtils.getOrgSettingByGroupIdAndOrg(persistenceSession,
+                    settings.getSettingsId().getId() + OrgSettingGroup.OFFSET_IN_RELATION_TO_ECAFESETTING,
+                    settings.getOrgOwner().intValue());
+            if (setting == null) {
+                setting = new OrgSetting();
+                setting.setCreatedDate(now);
+                setting.setIdOfOrg(settings.getOrgOwner());
+                setting.setSettingGroup(OrgSettingGroup.getGroupById(settings.getSettingsId().getId() + OrgSettingGroup.OFFSET_IN_RELATION_TO_ECAFESETTING));
+                setting.setLastUpdate(now);
+                setting.setVersion(nextVersionOfOrgSetting);
+                persistenceSession.save(setting);
+            } else {
+                setting.setLastUpdate(now);
+                setting.setVersion(nextVersionOfOrgSetting);
+            }
+
+            SettingValueParser valueParser = new SettingValueParser(settings.getSettingValue(), settings.getSettingsId());
+            Set<OrgSettingItem> itemsFromECafeSetting = valueParser.getParserBySettingValue()
+                    .buildSetOfOrgSettingItem(setting, nextVersionOfOrgSetting);
+            Map<Integer, OrgSettingItem> itemsFromOrgSetting = buildHashMap(setting.getOrgSettingItems());
+
+            for (OrgSettingItem item : itemsFromECafeSetting) {
+                if (!itemsFromOrgSetting.containsKey(item.getSettingType())) {
+                    setting.getOrgSettingItems().add(item);
+                    persistenceSession.persist(item);
+                } else {
+                    OrgSettingItem orgSettingItem = itemsFromOrgSetting.get(item.getSettingType());
+                    orgSettingItem.setLastUpdate(now);
+                    orgSettingItem.setVersion(nextVersionOfOrgSettingItem);
+                    orgSettingItem.setSettingValue(item.getSettingValue());
+                    persistenceSession.persist(orgSettingItem);
+                }
+            }
+            persistenceSession.persist(setting);
+        } catch (Exception e){
+            logger.error("Can't process OrgSetting by ECafeSetting: ", e);
+        }
+    }
+
+    private Map<Integer, OrgSettingItem> buildHashMap(Set<OrgSettingItem> orgSettingItems) {
+        Map<Integer, OrgSettingItem> map = new HashMap<>();
+        for(OrgSettingItem item : orgSettingItems){
+            map.put(item.getSettingType(), item);
+        }
+        return map;
     }
 
     public void create(ECafeSettings settings) throws Exception {
@@ -53,10 +119,11 @@ public class SettingService {
         updateQ.executeUpdate();
         settings.setGlobalVersion(version);
         settings.setGlobalVersionOnCreate(version);
+        processOrgSetting(settings);
         entityManager.persist(settings);
     }
 
-    private Long updateAndGetDOVersion() {
+    public Long updateAndGetDOVersion() {
         final String qlString = "from DOVersion where distributedObjectClassName=:distributedObjectClassName";
         TypedQuery<DOVersion> query = entityManager.createQuery(qlString, DOVersion.class);
         query.setParameter("distributedObjectClassName", "ECafeSettings");
@@ -88,5 +155,4 @@ public class SettingService {
         query.setParameter("settingsId",settingsIdsCollection);
         return query.getResultList();
     }
-
 }

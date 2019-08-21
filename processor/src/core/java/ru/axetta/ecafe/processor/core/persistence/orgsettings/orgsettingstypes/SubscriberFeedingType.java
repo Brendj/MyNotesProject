@@ -76,7 +76,7 @@ public enum SubscriberFeedingType implements SettingType {
 
     public static Integer getECafeSettingValueIndexByGlobalId(Integer globalId){
         BiMap<Integer, Integer> inverse =  eCafeSettingIndexGlobalIdMap.inverse();
-        return inverse.containsKey(globalId) ?inverse.get(globalId) : globalId;
+        return inverse.containsKey(globalId) ? inverse.get(globalId) : globalId;
     }
 
     static public Map<Integer, SettingType> getSettingTypeAsMap() {
