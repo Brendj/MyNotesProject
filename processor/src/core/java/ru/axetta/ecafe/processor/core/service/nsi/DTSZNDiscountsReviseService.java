@@ -653,7 +653,7 @@ public class DTSZNDiscountsReviseService {
                 } catch (Exception e) {
                     logger.error(String.format("Error in updateApplicationsForFoodTask: "
                                     + "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo={%s}",
-                            applicationForFood.getClient().getIdOfClient(), StringUtils.join(clientInfoList, ",")));
+                            applicationForFood.getClient().getIdOfClient(), StringUtils.join(clientInfoList, ",")), e);
                 } finally {
                     if (null != transaction && transaction.isActive()) {
                         transaction.commit();
