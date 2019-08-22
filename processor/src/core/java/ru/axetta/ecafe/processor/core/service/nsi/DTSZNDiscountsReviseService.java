@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVScheduledStatus;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.revise.ReviseDAOService;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -89,6 +90,10 @@ public class DTSZNDiscountsReviseService {
 
     public static final String DATA_SOURCE_TYPE_MARKER_NSI = "nsiir";
     public static final String DATA_SOURCE_TYPE_MARKER_OU = "ou";
+    public static final String DATA_SOURCE_TYPE_MARKER_ARM = "arm";
+
+    public static final String OTHER_DISCOUNT_DESCRIPTION = "Иное";
+    public static final Long OTHER_DISCOUNT_CODE = 0L;
 
     private static Logger logger = LoggerFactory.getLogger(DTSZNDiscountsReviseService.class);
     private static ReviseLogger reviseLogger = RuntimeContext.getAppContext().getBean(ReviseLogger.class);
@@ -865,15 +870,18 @@ public class DTSZNDiscountsReviseService {
     }
 
     public void runTaskDB(String guid) throws Exception {
-        List<ReviseDAOService.DiscountItem> discountItemList;
+        ReviseDAOService.DiscountItemsWithTimestamp discountItemList;
 
         if (StringUtils.isEmpty(guid)) {
-            Integer delta = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_DELTA);
-            Date deltaDate = CalendarUtils.addHours(new Date(), -delta);
+            Date deltaDate = null;
+            try {
+                deltaDate = CalendarUtils.parseDateWithDayTime(DAOService.getInstance().getReviseLastDate());
+            } catch (Exception ignore) { }
+            if (deltaDate == null) deltaDate = CalendarUtils.addHours(new Date(), -24);
             discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsUpdatedSinceDate(deltaDate);
         } else {
             discountItemList = RuntimeContext.getAppContext().getBean(ReviseDAOService.class).getDiscountsByGUID(guid);
-            if (discountItemList.isEmpty()) {
+            if (discountItemList.getItems().isEmpty()) {
                 throw new Exception(String.format("По гуиду \"%s\" ничего не найдено", guid));
             }
         }
@@ -890,7 +898,9 @@ public class DTSZNDiscountsReviseService {
             Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
 
             Integer counter = 0;
-            for (ReviseDAOService.DiscountItem item : discountItemList) {
+            Map<Long, Boolean> orgData = new HashMap<>();
+            for (ReviseDAOService.DiscountItem item : discountItemList.getItems()) {
+                logger.info(String.format("Processing record %s from %s", counter, discountItemList.getItems().size()));
                 if (null == transaction || !transaction.isActive()) {
                     transaction = session.beginTransaction();
                 }
@@ -904,7 +914,12 @@ public class DTSZNDiscountsReviseService {
                     continue;
                 }
 
-                if (!client.getOrg().getChangesDSZN()) {
+                Boolean changesDSZN = orgData.get(client.getOrg().getIdOfOrg());
+                if (changesDSZN == null) {
+                    orgData.put(client.getOrg().getIdOfOrg(), client.getOrg().getChangesDSZN());
+                    changesDSZN = orgData.get(client.getOrg().getIdOfOrg());
+                }
+                if (!changesDSZN) {
                     logger.info(String.format(
                             "Organization has no \"Changes DSZN\" flag. Client with guid = { %s } was skipped",
                             item.getRegistryGUID()));
@@ -1006,6 +1021,9 @@ public class DTSZNDiscountsReviseService {
         updateArchivedFlagForDiscountsDB();
         runTaskPart2(fireTime);
         updateApplicationsForFoodTask();
+        if (StringUtils.isEmpty(guid) && discountItemList != null && discountItemList.getDate() != null) {
+            DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(discountItemList.getDate()), Option.OPTION_REVISE_LAST_DATE);
+        }
     }
 
     public void updateArchivedFlagForDiscountsDB() throws Exception {
