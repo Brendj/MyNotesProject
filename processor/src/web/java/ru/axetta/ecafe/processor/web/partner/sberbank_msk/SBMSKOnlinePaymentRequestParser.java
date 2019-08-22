@@ -63,7 +63,6 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
             stringBuilder.append(String.format("<REG_DATE>%s</REG_DATE>", date));
         }
         SBMSKPaymentsCodes result = SBMSKPaymentsCodes.getFromPaymentProcessResultCode(response.getResultCode());
-        addSBMSKInfoToResponse(response);
         int resultCode = result.getCode();
         stringBuilder.append(String.format("<CODE>%d</CODE>",resultCode));
         stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",result.toString()));

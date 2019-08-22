@@ -277,7 +277,8 @@ public class PaymentProcessorImpl implements PaymentProcessor {
         PaymentResponse.ResPaymentRegistry.Item result = new PaymentResponse.ResPaymentRegistry.Item(payment,
                 idOfClient, client.getContractId(), paymentTspContragentId, null, client.getBalance(),
                 PaymentProcessResult.OK.getCode(), PaymentProcessResult.OK.getDescription(), client,
-                client.getSubBalance1(), payAddInfo);
+                client.getSubBalance1(), payAddInfo, defaultTsp.getInn(), defaultTsp.getContragentName(), defaultTsp.getBic(),
+                defaultTsp.getAccount());
         if (clientPayment != null) {
             result.setIdOfClientPayment(clientPayment.getIdOfClientPayment());
         }

@@ -12,6 +12,8 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
 import ru.axetta.ecafe.util.ConversionUtils;
 
+import org.apache.commons.lang.StringUtils;
+
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.security.Signature;
@@ -128,6 +130,14 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
                 vals.addLast(e.getKey());
                 vals.addLast(e.getValue());
             }
+        }
+        if (!StringUtils.isEmpty(response.getInn())) {
+            vals.addLast("INN");
+            vals.addLast(response.getInn());
+        }
+        if (!StringUtils.isEmpty(response.getNazn())) {
+            vals.addLast("NameContragent");
+            vals.addLast(response.getNazn());
         }
 
         super.serializeResponseUrlEncoded(vals, httpResponse);
