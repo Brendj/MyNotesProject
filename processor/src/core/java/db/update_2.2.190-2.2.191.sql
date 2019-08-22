@@ -6,3 +6,5 @@
 
 --Расширяем поле cf_bank_subscriptions.paymentid
 ALTER TABLE cf_bank_subscriptions ALTER COLUMN paymentid TYPE character varying(36);
+
+--! ФИНАЛИЗИРОВАН 22.08.2019, НЕ МЕНЯТЬ
