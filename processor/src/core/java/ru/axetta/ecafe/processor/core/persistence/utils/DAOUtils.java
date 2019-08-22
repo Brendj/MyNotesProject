@@ -3568,9 +3568,13 @@ public class DAOUtils {
         return (LinkingTokenForSmartWatch) criteria.uniqueResult();
     }
 
-    public static List<ClientGuardian> findListOfClientGuardianByIdOfGuardian(Session session, Long idOfClient) {
+    public static List<ClientGuardian> findListOfClientGuardianByIdOfGuardian(Session session, List<Client> clients) {
+        List<Long> list = new ArrayList<>();
+        for (Client client : clients) {
+            list.add(client.getIdOfClient());
+        }
         Criteria criteria = session.createCriteria(ClientGuardian.class);
-        criteria.add(Restrictions.eq("idOfGuardian", idOfClient));
+        criteria.add(Restrictions.in("idOfGuardian", list));
         criteria.add(Restrictions.eq("deletedState", false));
         criteria.add(Restrictions.eq("disabled", false));
         return criteria.list();
