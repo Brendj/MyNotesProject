@@ -22,7 +22,7 @@
         <property name="active" column="IsActive" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
         <property name="status" column="Status" type="string"/>
-        <property name="paymentId" column="PaymentId" type="string" length="32"/>
+        <property name="paymentId" column="PaymentId" type="string" length="36"/>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client" column="IdOfClient"
                      not-null="true" lazy="proxy"/>
         <property name="san" column="San" type="string" length="11"/>

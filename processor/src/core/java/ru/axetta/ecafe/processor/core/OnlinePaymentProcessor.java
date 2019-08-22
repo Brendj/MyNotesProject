@@ -62,6 +62,10 @@ public class OnlinePaymentProcessor {
                     (client == null || client.getPerson() == null) ? null : client.getPerson().getSecondName(),
                     getCardPrintedNo(processResult.getCard()), processResult.getAddInfo());
             payResponse.setIdOfClientPayment(processResult.getIdOfClientPayment());
+            payResponse.setInn(processResult.getInn());
+            payResponse.setNazn(processResult.getNazn());
+            payResponse.setBic(processResult.getBic());
+            payResponse.setRasch(processResult.getRasch());
             return payResponse;
         } catch (Exception e) {
             logger.error(String.format("Failed to process request: %s", request), e);

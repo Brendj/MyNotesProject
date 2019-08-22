@@ -119,15 +119,18 @@
                            showWeeksBar="false">
             </rich:calendar>
         </h:panelGrid>
-        <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:panelGrid styleClass="borderless-grid" columns="2" bgcolor="#CCCCCC">
             <h:outputText escape="true" value="Сверка 2.0 источник данных:" styleClass="output-text" />
             <h:selectOneRadio value="#{optionPage.reviseSourceType}" styleClass="input-text">
                 <f:selectItem itemValue="1" itemLabel="НСИ" />
                 <f:selectItem itemValue="2" itemLabel="мастер база" />
             </h:selectOneRadio>
-            <h:outputText escape="true" value="Сверка 2.0 дельта (в часах)"
-                          styleClass="output-text" />
+            <h:outputText escape="true" value="Сверка 2.0 дельта (в часах)" styleClass="output-text" />
             <h:inputText value="#{optionPage.reviseDelta}" styleClass="input-text" size="5" />
+            <h:outputText escape="true" value="Лимит записей в запросе к мастер базе" styleClass="output-text" />
+            <h:inputText value="#{optionPage.reviseLimit}" styleClass="input-text" size="6" />
+            <h:outputText escape="true" value="Обработано до: " styleClass="output-text" />
+            <h:inputText value="#{optionPage.reviseLastDate}" styleClass="input-text" readonly="true" />
         </h:panelGrid>
     </rich:tab>
     <rich:tab label="Платежные системы">
