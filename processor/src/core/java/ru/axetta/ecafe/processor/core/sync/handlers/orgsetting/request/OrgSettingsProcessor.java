@@ -28,7 +28,7 @@ import java.util.Map;
 
 public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
     private final OrgSettingsRequest orgSettingsRequest;
-    private final Logger logger = LoggerFactory.getLogger(OrgSettingsProcessor.class);
+    private static final Logger logger = LoggerFactory.getLogger(OrgSettingsProcessor.class);
 
     public OrgSettingsProcessor(Session session, OrgSettingsRequest orgSettingsRequest) {
         super(session);
@@ -112,6 +112,10 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
     }
 
     private void updateECafeSettingByOrgSetting(OrgSetting setting) {
+        if(setting.getSettingGroup().getId() > 8 || setting.getSettingGroup().getId() == 0){
+            // unsupported types
+            return;
+        }
         SettingService settingService = RuntimeContext.getAppContext().getBean(SettingService.class);
         Long DOVersion = settingService.updateAndGetDOVersion();
 
@@ -123,6 +127,7 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
             eCafeSettings.setOrgOwner(setting.getIdOfOrg());
             eCafeSettings.setSettingsId(SettingsIds.fromInteger(
                     setting.getSettingGroup().getId() - OrgSettingGroup.OFFSET_IN_RELATION_TO_ECAFESETTING));
+            setDefaultValue(eCafeSettings);
             eCafeSettings.setDeletedState(false);
             eCafeSettings.setCreatedDate(new Date());
             eCafeSettings.setLastUpdate(new Date());
@@ -138,6 +143,19 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
         } catch (Exception e) {
             logger.error(String.format("Can't update or create ECafeSetting with SettingID %d for Org ID %d :",
                     eCafeSettings.getSettingsId().getId(), setting.getIdOfOrg()), e);
+        }
+    }
+
+    private void setDefaultValue(ECafeSettings eCafeSettings) {
+        switch (eCafeSettings.getSettingsId().getId()){
+            case 0: eCafeSettings.setSettingValue("Microsoft XPS Document Writer;42;1;19;3;10;10;Спасибо;"); break;
+            case 1: eCafeSettings.setSettingValue("Microsoft XPS Document Writer;42;1;22;6;12;Спасибо;"); break;
+            case 2: eCafeSettings.setSettingValue("Microsoft XPS Document Writer;42;1;16;12;12;Спасибо;"); break;
+            case 3: eCafeSettings.setSettingValue("0;0:00;100;");break;
+            case 4: eCafeSettings.setSettingValue("5;2;0;2;");break;
+            case 5: eCafeSettings.setSettingValue("Резерв;2;");break;
+            case 6: eCafeSettings.setSettingValue("1;1;");break;
+            case 7: eCafeSettings.setSettingValue("0;0:00;"); break;
         }
     }
 

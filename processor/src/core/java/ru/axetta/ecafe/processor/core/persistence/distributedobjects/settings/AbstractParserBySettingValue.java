@@ -4,6 +4,8 @@ import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.text.ParseException;
 import java.util.Date;
@@ -18,7 +20,7 @@ import java.util.Set;
  * To change this template use File | Settings | File Templates.
  */
 public abstract class AbstractParserBySettingValue {
-
+    private static final Logger logger = LoggerFactory.getLogger(AbstractParserBySettingValue.class);
     private String[] values;
 
     protected AbstractParserBySettingValue(String[] values) throws ParseException {
@@ -55,15 +57,20 @@ public abstract class AbstractParserBySettingValue {
         return result;
     }
 
-    public String[] buildChangedValueByOrgSetting(OrgSetting setting) throws Exception {
+    public String[] buildChangedValueByOrgSetting(OrgSetting setting) {
         String[] result = new String[getECafeSettingArrayCapacity()];
         for(OrgSettingItem val : setting.getOrgSettingItems()){
-            Integer index = getIndexByOrgSettingType(val.getSettingType());
-            if(result.length <= index){
-                throw new Exception(String.format("By settingType %d get index %d , but resultArray length is %d",
-                        val.getSettingType(), index, result.length));
+            try {
+                Integer index = getIndexByOrgSettingType(val.getSettingType());
+                if (result.length <= index) {
+                    throw new IndexOutOfBoundsException(
+                            String.format("By settingType %d get index %d , but resultArray length is %d", val.getSettingType(), index, result.length));
+                }
+                result[index] = val.getSettingValue();
+            } catch (IndexOutOfBoundsException e){
+                logger.error("Error in cycle: ", e);
+                logger.warn("After IndexOutOfBoundsException cycle is continue");
             }
-            result[index] = val.getSettingValue();
         }
         int len = values.length;
         for(int i = 0; i < len; i++){
