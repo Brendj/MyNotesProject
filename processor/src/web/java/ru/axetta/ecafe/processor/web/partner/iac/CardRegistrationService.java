@@ -43,7 +43,7 @@ public class CardRegistrationService {
         fieldConfig.setValue(ClientManager.FieldId.SECONDNAME, emptyIfNull(secondName));
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         fieldConfig.setValue(ClientManager.FieldId.BIRTH_DATE, dateFormat.format(birthDate));
-        fieldConfig.setValue(ClientManager.FieldId.IAC_REG_ID, extId);
+        fieldConfig.setValue(ClientManager.FieldId.IAC_REG_ID, convertRegId(extId));
         fieldConfig.setValue(ClientManager.FieldId.GROUP, group);
         //fieldConfig.setValue(ClientManager.FieldId.BENEFIT, benefit);
         fieldConfig.setValue(ClientManager.FieldId.COMMENTS, COMMENT_ADDED_FROM_IAC);
@@ -56,6 +56,21 @@ public class CardRegistrationService {
         Long idOfClient = ClientManager.registerClient(org.getIdOfOrg(), fieldConfig, false, true);
 
         return (Client) session.load(Client.class, idOfClient);
+    }
+
+    private String convertRegId(String regId) {
+        if (regId == null) return null;
+        regId = regId.trim();
+        int len = regId.length();
+        int st = 0;
+        char[] val = regId.toCharArray();
+        while ((st < len) && (val[st] == '{')) {
+            st++;
+        }
+        while ((st < len) && (val[len - 1] == '}')) {
+            len--;
+        }
+        return ((st > 0) || (len < regId.length())) ? regId.substring(st, len) : regId;
     }
 
     public void registerCard(Session session, Long cardId, Date validDate, Client client) throws Exception {

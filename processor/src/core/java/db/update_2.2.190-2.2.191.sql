@@ -2,7 +2,9 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- 167
+-- Пакет обновлений 191
 
-ALTER TABLE cf_categorydiscounts
-    ADD COLUMN eligibletodelete integer not null default 0;
+--Расширяем поле cf_bank_subscriptions.paymentid
+ALTER TABLE cf_bank_subscriptions ALTER COLUMN paymentid TYPE character varying(36);
+
+--! ФИНАЛИЗИРОВАН 22.08.2019, НЕ МЕНЯТЬ

@@ -95,15 +95,17 @@ public class DAOReadExternalsService {
         }
     }
 
-    public boolean existClientPayment(Contragent contragent, PaymentRequest.PaymentRegistry.Payment payment) {
+    public Long existingClientPayment(Contragent contragent, PaymentRequest.PaymentRegistry.Payment payment) {
         String additionalCondition = "";
         if (payment.getAddIdOfPayment() == null || !payment.getAddIdOfPayment().startsWith(RNIPLoadPaymentsService.SERVICE_NAME)) {
             additionalCondition = String.format(" and cp.contragent.idOfContragent = %s", contragent.getIdOfContragent());
         }
         Query query = entityManager
-                .createQuery("select count(cp.idOfClientPayment) from ClientPayment cp where cp.idOfPayment = :idOfPayment" + additionalCondition);
+                .createQuery("select cp.idOfClientPayment from ClientPayment cp where cp.idOfPayment = :idOfPayment" + additionalCondition);
         query.setParameter("idOfPayment", payment.getIdOfPayment());
-        return (Long)query.getSingleResult() > 0;
+        List<Long> list = query.getResultList();
+        if (list.size() == 0) return null;
+        return list.get(0);
     }
 
     /*

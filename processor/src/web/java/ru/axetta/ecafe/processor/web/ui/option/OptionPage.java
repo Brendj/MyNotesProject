@@ -128,6 +128,8 @@ public class OptionPage extends BasicWorkspacePage {
     private Date validRegistryDate;
     private Integer reviseSourceType;
     private Integer reviseDelta;
+    private Integer reviseLimit;
+    private String reviseLastDate;
     private Boolean logInfoService;
     private String methodsInfoService;
 
@@ -959,6 +961,8 @@ public class OptionPage extends BasicWorkspacePage {
 
         reviseSourceType = runtimeContext.getOptionValueInt(Option.OPTION_REVISE_DATA_SOURCE);
         reviseDelta = runtimeContext.getOptionValueInt(Option.OPTION_REVISE_DELTA);
+        reviseLimit = runtimeContext.getOptionValueInt(Option.OPTION_REVISE_LIMIT);
+        reviseLastDate = DAOService.getInstance().getReviseLastDate();
     }
 
     public Object save() {
@@ -1071,6 +1075,8 @@ public class OptionPage extends BasicWorkspacePage {
 
             runtimeContext.setOptionValue(Option.OPTION_REVISE_DATA_SOURCE, reviseSourceType);
             runtimeContext.setOptionValue(Option.OPTION_REVISE_DELTA, reviseDelta);
+            runtimeContext.setOptionValue(Option.OPTION_REVISE_LIMIT, reviseLimit);
+
             runtimeContext.setOptionValue(Option.OPTION_LOG_INFOSERVICE, logInfoService);
             runtimeContext.setOptionValue(Option.OPTION_METHODS_INFOSERVICE, methodsInfoService);
 
@@ -1177,5 +1183,21 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setMethodsInfoService(String methodsInfoService) {
         this.methodsInfoService = methodsInfoService;
+    }
+
+    public Integer getReviseLimit() {
+        return reviseLimit;
+    }
+
+    public void setReviseLimit(Integer reviseLimit) {
+        this.reviseLimit = reviseLimit;
+    }
+
+    public String getReviseLastDate() {
+        return reviseLastDate;
+    }
+
+    public void setReviseLastDate(String reviseLastDate) {
+        this.reviseLastDate = reviseLastDate;
     }
 }
