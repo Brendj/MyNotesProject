@@ -97,18 +97,17 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkAndConvertPhone(mobilePhone);
-            Client client = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
-            if(client == null){
+            List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(mobilePhone);
+            if(clients.isEmpty()){
                 throw new IllegalArgumentException("No clients found for this mobilePhone number: " + mobilePhone);
             }
-            if(!isGuardian(session, client)){
-                throw new IllegalArgumentException("Client with contractID: " + client.getContractId()
-                        + ", found by mobilePhone number: " + mobilePhone
+            if(!isGuardian(session, clients)){
+                throw new IllegalArgumentException("Client found by mobilePhone number: " + mobilePhone
                         + ", is not a guardian");
             }
 
             String token = DAOService.getInstance().generateLinkingTokenForSmartWatch(session, mobilePhone);
-
+            Client client = clients.get(0);
             RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                     .sendMessageAsync(client, EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED,
                             new String[]{"linkingToken", token}, new Date());
@@ -154,9 +153,9 @@ public class SmartWatchRestController {
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
             token = "";
 
-            Client parent = findParentByMobile(mobilePhone);
+            List<Client> parents = findParentsByMobile(mobilePhone);
 
-            List<JsonChildrenDataInfoItem> items = buildChildrenDataInfoItems(session, parent);
+            List<JsonChildrenDataInfoItem> items = buildChildrenDataInfoItems(session, parents);
             result.setItems(items);
 
             transaction.commit();
@@ -191,19 +190,7 @@ public class SmartWatchRestController {
 
             mobilePhone = inputParamsIsValidOrTrowException(session, trackerId, trackerUid, mobilePhone, token);
 
-            if(contractId == null){
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if(child == null){
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if(!isRelatives(session, parent, child)){
-                throw new IllegalArgumentException("Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId()
-                        + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             if(childHasAnActiveSmartWatch(session, child)){
                 throw new IllegalArgumentException("The client witch contractID: " + child.getContractId()
@@ -316,6 +303,22 @@ public class SmartWatchRestController {
         }
     }
 
+    private Client findClientWithCheckOnParent(Session session, String mobilePhone, Long contractId) throws Exception {
+        if(contractId == null){
+            throw new IllegalArgumentException("ContractID is null");
+        }
+        List<Client> parents = findParentsByMobile(mobilePhone);
+
+        Client child = DAOUtils.findClientByContractId(session, contractId);
+        if(child == null){
+            throw new IllegalArgumentException("No clients found by contractID: " + contractId);
+        }
+        if(!isRelatives(session, parents, child)){
+            throw new IllegalArgumentException(String.format("Not found parent for child with contractId=%s", contractId));
+        }
+        return child;
+    }
+
     @GET
     @Path(value="getEnterEvents")
     public Response getEnterEvents(@QueryParam(value="mobilePhone") String mobilePhone,
@@ -330,21 +333,7 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
-            token = "";
-
-            if(contractId == null){
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if(child == null){
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if(!isRelatives(session, parent, child)){
-                throw new IllegalArgumentException("Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             if(startDateTime == null){
                 logger.warn("Start date is Null, set as now");
@@ -388,22 +377,7 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
-            token = "";
-
-            if (contractId == null) {
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if (child == null) {
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if (!isRelatives(session, parent, child)) {
-                throw new IllegalArgumentException(
-                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             Date startDate;
             Date endDate = null;
@@ -452,22 +426,7 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
-            token = "";
-
-            if (contractId == null) {
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if (child == null) {
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if (!isRelatives(session, parent, child)) {
-                throw new IllegalArgumentException(
-                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             Date startDate;
             Date endDate = null;
@@ -549,22 +508,7 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
-            token = "";
-
-            if (contractId == null) {
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if (child == null) {
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if (!isRelatives(session, parent, child)) {
-                throw new IllegalArgumentException(
-                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             Date startDate;
             Date endDate = null;
@@ -611,22 +555,7 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
-            token = "";
-
-            if (contractId == null) {
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if (child == null) {
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if (!isRelatives(session, parent, child)) {
-                throw new IllegalArgumentException(
-                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             JsonBalanceInfo info = buildBalanceInfo(session, child);
             result.setBalanceInfo(info);
@@ -660,22 +589,7 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
-            token = "";
-
-            if (contractId == null) {
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if (child == null) {
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if (!isRelatives(session, parent, child)) {
-                throw new IllegalArgumentException(
-                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             Date startDate;
             Date endDate;
@@ -811,9 +725,9 @@ public class SmartWatchRestController {
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
             token = "";
 
-            Client parent = findParentByMobile(mobilePhone);
+            List<Client> parents = findParentsByMobile(mobilePhone);
 
-            List<Client> children = findChildrenByGuardian(session, parent);
+            List<Client> children = findChildrenByGuardians(session, parents);
 
             for(Client child : children) {
                 JsonLocationsInfo locations = buildLocations(session, child);
@@ -835,8 +749,8 @@ public class SmartWatchRestController {
         }
     }
 
-    private List<Client> findChildrenByGuardian(Session session, Client parent) {
-        List<ClientGuardian> listOfClientGuardianByIdOfGuardian = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, parent.getIdOfClient());
+    private List<Client> findChildrenByGuardians(Session session, List<Client> parents) {
+        List<ClientGuardian> listOfClientGuardianByIdOfGuardian = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, parents);
         if(CollectionUtils.isEmpty(listOfClientGuardianByIdOfGuardian)){
             return Collections.emptyList();
         }
@@ -1168,8 +1082,15 @@ public class SmartWatchRestController {
     }
 
     private boolean isRelatives(Session session, Client parent, Client child) throws Exception {
-        ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, child.getIdOfClient(), parent.getIdOfClient());
-        return clientGuardian != null;
+        return DAOUtils.findClientGuardian(session, child.getIdOfClient(), parent.getIdOfClient()) != null;
+    }
+
+    private boolean isRelatives(Session session, List<Client> parents, Client child) throws Exception {
+        for (Client parent : parents) {
+            boolean guardianFound = isRelatives(session, parent, child);
+            if (guardianFound) return true;
+        }
+        return false;
     }
 
     private boolean childHasAnActiveSmartWatch(Session session, Client child) throws Exception {
@@ -1188,14 +1109,16 @@ public class SmartWatchRestController {
         return false;
     }
 
-    private List<JsonChildrenDataInfoItem> buildChildrenDataInfoItems(Session session, Client guardian) throws Exception{
+    private List<JsonChildrenDataInfoItem> buildChildrenDataInfoItems(Session session, List<Client> guardians) throws Exception{
         List<JsonChildrenDataInfoItem> resultList = new LinkedList<JsonChildrenDataInfoItem>();
+        Set<Client> uniqueChildren = new HashSet<>();
         try{
-            List<ClientGuardian> childes = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, guardian.getIdOfClient());
+            List<ClientGuardian> childes = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, guardians);
             for(ClientGuardian el : childes){
-                JsonChildrenDataInfoItem item = new JsonChildrenDataInfoItem();
-
                 Client child = (Client) session.get(Client.class, el.getIdOfChildren());
+                if (uniqueChildren.contains(child)) continue;
+                uniqueChildren.add(child);
+                JsonChildrenDataInfoItem item = new JsonChildrenDataInfoItem();
 
                 item.setContractID(child.getContractId());
                 if(child.getPerson() != null) {
@@ -1268,11 +1191,11 @@ public class SmartWatchRestController {
         return mobilePhone;
     }
 
-    private boolean isGuardian(Session session, Client client) throws Exception {
+    private boolean isGuardian(Session session, List<Client> clients) throws Exception {
         try {
-            List<ClientGuardian> dataFromDB = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, client.getIdOfClient());
+            List<ClientGuardian> dataFromDB = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, clients);
             if (dataFromDB == null || dataFromDB.isEmpty()) {
-                logger.warn("No data about Guardians by Clients with contractID: " + client.getContractId());
+                logger.warn("No data about Guardians by Clients with contractID: ");
                 return false;
             }
             return true;
@@ -1338,13 +1261,13 @@ public class SmartWatchRestController {
         return mobilePhone;
     }
 
-    private Client findParentByMobile(String mobilePhone) throws Exception {
-        Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
-        if(parent == null){
+    private List<Client> findParentsByMobile(String mobilePhone) throws Exception {
+        List<Client> parents = DAOService.getInstance().getClientsListByMobilePhone(mobilePhone);
+        if(parents.isEmpty()){
             throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
                     + ", but passed the TokenValidator");
         }
-        return parent;
+        return parents;
     }
 
     private JsonPurchaseDetailItem fillPurchaseDetailItem(Order order) {

@@ -12,9 +12,11 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.ApplicationForFoodHistoryReportItem;
 import ru.axetta.ecafe.processor.core.report.ApplicationForFoodReportItem;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
+import ru.axetta.ecafe.processor.web.ui.report.online.PeriodTypeMenu;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -42,6 +44,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     private Integer benefit;
     private String number = "";
     private final static Integer ALL_BENEFITS = -1;
+    private Boolean showPeriod = false;
 
     private static List<SelectItem> readAllItems() {
         ApplicationForFoodState[] states = ApplicationForFoodState.values();
@@ -83,7 +86,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     }
 
     public ApplicationForFoodReportPage() {
-
+        periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
     }
 
     public void reload() {
@@ -110,7 +113,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 }
             }
             List<ApplicationForFood> list = DAOUtils.getApplicationForFoodListByOrgs(session, idOfOrgList, statusCondition,
-                    benefitCondition, idOfClientList, number);
+                    benefitCondition, idOfClientList, number, CalendarUtils.startOfDay(startDate), CalendarUtils.endOfDay(endDate), showPeriod);
             for (ApplicationForFood applicationForFood : list) {
                 ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(applicationForFood);
                 items.add(item);
@@ -292,5 +295,13 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public Boolean getShowPeriod() {
+        return showPeriod;
+    }
+
+    public void setShowPeriod(Boolean showPeriod) {
+        this.showPeriod = showPeriod;
     }
 }
