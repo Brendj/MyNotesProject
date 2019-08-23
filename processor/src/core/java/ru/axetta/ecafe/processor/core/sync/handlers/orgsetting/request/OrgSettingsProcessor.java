@@ -45,6 +45,7 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
 
         //Apply change from ARM
         for (OrgSettingSyncPOJO pojo : orgSettingsRequest.getItems()) {
+            boolean isChanged = false;
             OrgSetting setting = OrgSettingDAOUtils
                     .getOrgSettingByGroupIdAndOrg(session, pojo.getGroupID(), pojo.getIdOfOrg());
             if (setting == null) {
@@ -58,6 +59,7 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
                     OrgSettingItem item = buildFromPOJO(nextVersionOfOrgSettingItem, itemSyncPOJO, syncData, setting);
                     setting.getOrgSettingItems().add(item);
                 }
+                isChanged = true;
             } else if (setting.getVersion() <= maxVersionFromARM) {
                 Map<Integer, OrgSettingItem> orgSettingItemMap = buildMap(setting);
                 for (OrgSettingItemSyncPOJO itemSyncPOJO : pojo.getItems()) {
@@ -65,17 +67,22 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
                     if (settingItem == null) {
                         settingItem = buildFromPOJO(nextVersionOfOrgSettingItem, itemSyncPOJO, syncData, setting);
                         setting.getOrgSettingItems().add(settingItem);
-                    } else if (settingItem.getVersion() <= itemSyncPOJO.getVersion()) {
+                        isChanged = true;
+                    } else if (settingItem.getVersion() <= itemSyncPOJO.getVersion()
+                            && !settingItem.getSettingValue().equals(itemSyncPOJO.getValue())) {
                         settingItem.setLastUpdate(syncData);
                         settingItem.setSettingValue(itemSyncPOJO.getValue());
                         settingItem.setVersion(nextVersionOfOrgSettingItem);
+                        isChanged = true;
                     }
                 }
+            }
+            if(isChanged) {
                 setting.setLastUpdate(syncData);
                 setting.setVersion(nextVersionOfOrgSetting);
+                updateECafeSettingByOrgSetting(setting);
+                session.persist(setting);
             }
-            updateECafeSettingByOrgSetting(setting);
-            session.persist(setting);
         }
 
         //Build section for response
