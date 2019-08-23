@@ -11,10 +11,12 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.SummaryCardsMSRService;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.bouncycastle.crypto.generators.SCrypt;
 import org.bouncycastle.jce.ECNamedCurveTable;
 import org.bouncycastle.jce.spec.ECParameterSpec;
 
+import javax.xml.bind.DatatypeConverter;
 import java.nio.ByteBuffer;
 import java.security.*;
 import java.security.spec.KeySpec;
@@ -161,9 +163,9 @@ public class CryptoSign {
         //17 байт информация об одной карте
         byte[] card_data = new byte[17];
         for (int i = 0; i < cards.size(); i++) {
-            byte[] num = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(cards.get(i).getUid()).array();
+            byte[] fiz = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(cards.get(i).getUid()).array();
             byte[] type = ByteBuffer.allocate(Short.SIZE / Byte.SIZE).putShort(cards.get(i).getTypeId()).array();
-            byte[] fiz = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(cards.get(i).getPrinted_no()).array();
+            byte[] num = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(cards.get(i).getPrinted_no()).array();
             byte[] data = new byte[3];
             data[0] = (byte) (cards.get(i).getIssuedate().get(Calendar.YEAR) - 2000);
             data[1] = (byte) (cards.get(i).getIssuedate().get(Calendar.MONTH) + 1);
@@ -171,9 +173,9 @@ public class CryptoSign {
             byte[] memSize = ByteBuffer.allocate(Short.SIZE / Byte.SIZE).putShort((short) (cards.get(i).getMemSize()))
                     .array();
             //17 байт информация об одной карте
-            System.arraycopy(fiz, 1, card_data, 0, 7);
-            System.arraycopy(type, 1, card_data, 7, 1);
-            System.arraycopy(num, 3, card_data, 8, 5);
+            System.arraycopy(num, 3, card_data, 0, 5);
+            System.arraycopy(type, 1, card_data, 5, 1);
+            System.arraycopy(fiz, 1, card_data, 6, 7);
             System.arraycopy(data, 0, card_data, 13, 3);
             System.arraycopy(memSize, 1, card_data, 16, 1);
             //Добавляем в общий массив данных
@@ -221,7 +223,15 @@ public class CryptoSign {
     }
 
     public static PublicKey loadPubKey(byte[] data) throws Exception {
-        KeySpec ks = new X509EncodedKeySpec(data);
+        List<String> arrayKey = Arrays.asList(StringUtils.split(new String(data), '\n'));
+        String rezult = "";
+        for (int i=1; i<arrayKey.size()-1;i++)
+        {
+            rezult+=arrayKey.get(i) + "\n";
+        }
+        rezult = rezult.substring(0, rezult.length() - 1);
+        byte[] newFormatData = DatatypeConverter.parseBase64Binary(rezult);
+        KeySpec ks = new X509EncodedKeySpec(newFormatData);
         KeyFactory key_f = KeyFactory.getInstance(KEY_FACTOR);
         return key_f.generatePublic(ks);
     }
