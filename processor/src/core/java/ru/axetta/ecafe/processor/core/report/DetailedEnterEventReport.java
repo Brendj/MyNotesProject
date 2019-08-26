@@ -256,7 +256,8 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                             + "    LEFT JOIN cf_clientgroups cg ON cg.idofclientgroup = ee.idofclientgroup "
                             + "    AND cs.idoforg = cg.idoforg "
                             + "    LEFT JOIN  cf_orgs os ON ee.idoforg = os.idoforg WHERE ee.idoforg IN ("
-                            + friendlyOrgsIds + ") AND cs.idoforg IN (" + friendlyOrgsIds + ") "
+                            + friendlyOrgsIds + ") "
+                            //+ " AND cs.idoforg IN (" + friendlyOrgsIds + ") "
                             + " AND ee.evtdatetime BETWEEN " + startTime.getTime() + " AND " + endTime.getTime()
                             + " AND ee.idofclient IS NOT null AND ee.PassDirection in (0, 1, 6, 7) "
                             + groupNameWhere + clientIdWhere
