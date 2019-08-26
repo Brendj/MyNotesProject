@@ -296,13 +296,14 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                     sb.append(org.getShortAddress()).append(", ");
                 }
                 parameterMap.put("allAdress", "В отчете представлена фиксация событий посещения любого здания ОО");
+                parameterMap.put("shortAddress", sb.substring(0, sb.length() - 2));
             }
-            else
+            else {
                 parameterMap.put("allAdress", "В отчете представлена фиксация событий посещения главного здания ОО");
+                parameterMap.put("shortAddress", orgLoad.getShortAddress());
+            }
 
             parameterMap.put("shortNameInfoService", orgLoad.getShortNameInfoService());
-            parameterMap.put("shortAddress",
-                    sb.length() == 0 ? orgLoad.getShortAddress() : sb.substring(0, sb.length() - 2));
             calendar.setTime(startTime);
             Date firtstDayOfMonth = CalendarUtils.getFirstDayOfMonth(startTime);
             for (int day = 1; day <= 31; day++) {
