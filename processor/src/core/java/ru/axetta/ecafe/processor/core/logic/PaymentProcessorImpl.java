@@ -280,6 +280,7 @@ public class PaymentProcessorImpl implements PaymentProcessor {
                 client.getSubBalance1(), payAddInfo);
         if (clientPayment != null) {
             result.setIdOfClientPayment(clientPayment.getIdOfClientPayment());
+            RuntimeContext.getInstance().getPaymentAdditionalTasksProcessor().savePayment(clientPayment);
         }
 
         SecurityJournalBalance.saveSecurityJournalBalanceFromPayment(journal, true, "OK", clientPayment);
