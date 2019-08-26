@@ -233,11 +233,14 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
             //парсим данные
             for (Object o : rList) {
                 Map<String, Object> row = (Map<String, Object>) o;
-                if (!stClassMap.containsKey(row.get("groupname"))) {
-                    stClassMap.put((String) row.get("groupname"),
-                            new StClass((String) row.get("groupname"), friendlyOrgs, new LinkedList<Data>()));
+                Object groupNamed = row.get("groupname");
+                if (groupNamed == null)
+                    groupNamed = "Группа не существует";
+                if (!stClassMap.containsKey(groupNamed)) {
+                    stClassMap.put((String) groupNamed,
+                            new StClass((String) groupNamed, friendlyOrgs, new LinkedList<Data>()));
                 }
-                currentClassList = stClassMap.get((String) row.get("groupname")).getDataList();
+                currentClassList = stClassMap.get((String) groupNamed).getDataList();
 
                 if (!clientIdList.contains(((BigInteger) row.get("idofclient")).longValue())) {
                     currentClassList.addAll(prepareDataList(row, friendlyOrgs, startTime, endTime));
@@ -245,7 +248,7 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
                 }
                 for (Data event : currentClassList) {
                     if ((event.getF01().equals(((BigInteger) row.get("idofclient")).toString())) && (event.getF03()
-                            .equals((String) row.get("groupname"))) && (event.getF04().equals(CalendarUtils
+                            .equals((String) groupNamed)) && (event.getF04().equals(CalendarUtils
                             .dateShortToString(new Date(((BigInteger) row.get("evtdatetime")).longValue())))) && (event
                             .getF05().equals((String) row.get("shortaddress")))) {
                         updateEventData(event, row);
