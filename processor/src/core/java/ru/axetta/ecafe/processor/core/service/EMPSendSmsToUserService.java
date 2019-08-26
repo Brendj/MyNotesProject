@@ -32,9 +32,9 @@ public class EMPSendSmsToUserService implements IAuthorizeUserBySms {
     @Override
     public String sendCodeAndGetError(User user, String code) {
         NameValuePair[] parameters = new NameValuePair[] {
-                new NameValuePair("token", RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.sms.service.emp.token", "")),
+                new NameValuePair("token", RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.userCode.service.token", "")),
                 new NameValuePair("destination", user.getPhone()),
-                new NameValuePair("message", user.getPhone()),
+                new NameValuePair("message",  String.format("Код авторизации - %s", code)),
                 new NameValuePair("source", RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.userCode.service.source", "")),
                 new NameValuePair("message_id", ""),
                 };
