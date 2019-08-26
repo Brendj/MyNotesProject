@@ -279,9 +279,27 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             List<String> daysOfMonth = new ArrayList<String>(31); // 1 Вс	2 Пн	3 Вт	4 Ср ...
             Org orgLoad = (Org) session.load(Org.class, org.getIdOfOrg());
             StringBuilder sb = new StringBuilder();
-            for (Org org : orgLoad.getFriendlyOrg()) {
-                sb.append(org.getShortAddress()).append(", ");
+
+            //Название главного корпуса
+            sb.append(orgLoad.getShortName());
+            Boolean isAllFriendlyOrgs;
+            if (reportProperties.getProperty("isAllFriendlyOrgs") != null) {
+                isAllFriendlyOrgs = Boolean.valueOf(reportProperties.getProperty("isAllFriendlyOrgs"));
+            } else {
+                isAllFriendlyOrgs = true;
             }
+            //Если строим отчет по всем корпусам, то добавляем их названия
+            if (isAllFriendlyOrgs)
+            {
+                sb.append(", ");
+                for (Org org : orgLoad.getFriendlyOrg()) {
+                    sb.append(org.getShortAddress()).append(", ");
+                }
+                parameterMap.put("allAdress", "В отчете представлена фиксация событий посещения любого здания ОО");
+            }
+            else
+                parameterMap.put("allAdress", "В отчете представлена фиксация событий посещения главного здания ОО");
+
             parameterMap.put("shortNameInfoService", orgLoad.getShortNameInfoService());
             parameterMap.put("shortAddress",
                     sb.length() == 0 ? orgLoad.getShortAddress() : sb.substring(0, sb.length() - 2));
