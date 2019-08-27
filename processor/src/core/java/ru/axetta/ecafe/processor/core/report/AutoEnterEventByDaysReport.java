@@ -66,17 +66,21 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
         public static class ReportItem {
 
             private static String[] data = new String[31];
+            private static String[] dataweek = new String[4];
             private static SimpleDateFormat ft = new SimpleDateFormat("hh:mm");
 
             static {
                 for (int day = 0; day < 31; day++) {
                     data[day] = "";
                 }
+                for (int week = 0; week < 4; week++) {
+                    dataweek[week] = "";
+                }
             }
 
             private String fio = null;
             private List<String> timeList = new ArrayList<String>(Arrays.asList(data));
-            private List <String> timeinWeekList = new ArrayList<String>();
+            private List <String> timeinWeekList = new ArrayList<String>(Arrays.asList(dataweek));
             //private Map<Integer, Date> dayMaxMin = new HashMap<Integer, Date>();
             private MultiValueMap dayMaxMin = new MultiValueMap();
             //Массив входов для одного дня
