@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.ClientPaymentAddon" table="CF_ClientPayment_Addons">
+        <id name="idOfClientPaymentAddon" column="IdOfClientPaymentAddon" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="clientPayment" class="ru.axetta.ecafe.processor.core.persistence.ClientPayment"
+                     column="IdOfClientPayment" not-null="true" update="false" fetch="join"/>
+        <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+        <property name="atolStatus" column="AtolStatus" type="integer" />
+        <property name="atolUpdate" column="AtolUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="true" update="false"/>
+    </class>
+</hibernate-mapping>
+
+

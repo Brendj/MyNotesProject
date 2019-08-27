@@ -30,3 +30,17 @@ CREATE TABLE cf_atol_company_contragents
   REFERENCES cf_contragents (idofcontragent) MATCH SIMPLE
   ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+--Таблица для хранения платежей, подлежащих отправке в сторонние сервисы
+create table cf_clientPayment_addons
+(
+  IdOfClientPaymentAddon bigserial NOT NULL,
+  IdOfClientPayment bigint NOT NULL,
+  createdDate bigint,
+  atolStatus integer,
+  atolUpdate bigint,
+  CONSTRAINT cf_IdOfClientPaymentAddon_pk PRIMARY KEY (IdOfClientPaymentAddon),
+  CONSTRAINT cf_cf_clientPayment_addons_clientpayment FOREIGN KEY (IdOfClientPayment)
+  REFERENCES cf_clientpayments (idofclientpayment) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION
+);
