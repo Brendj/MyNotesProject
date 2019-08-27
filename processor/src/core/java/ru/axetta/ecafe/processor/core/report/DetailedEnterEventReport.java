@@ -319,6 +319,9 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                         i.setF11(counter);
                         counter++;
                     }
+                    if(value.getDataList().isEmpty()) {
+                        it.remove();
+                    }
                 }
             }
 
