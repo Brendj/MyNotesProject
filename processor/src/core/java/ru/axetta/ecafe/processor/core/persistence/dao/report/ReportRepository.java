@@ -535,11 +535,14 @@ public class ReportRepository extends BaseJpaDao {
                 properties.setProperty(AutoEnterEventByDaysReport.P_ID_CLIENT, client.getIdOfClient().toString());
             }
 
-            if (reportParameters.getIsAllFriendlyOrgs() != null) {
-                properties.setProperty("isAllFriendlyOrgs", reportParameters.getIsAllFriendlyOrgs());
-            } else {
-                properties.setProperty("isAllFriendlyOrgs", "true");
-            }
+            //Изменено 27.08.19
+
+            //if (reportParameters.getIsAllFriendlyOrgs() != null) {
+            //    properties.setProperty("isAllFriendlyOrgs", reportParameters.getIsAllFriendlyOrgs());
+            //} else {
+            //    properties.setProperty("isAllFriendlyOrgs", "true");
+            //}
+            properties.setProperty("isAllFriendlyOrgs", "true");
 
             builder.setReportProperties(properties);
 

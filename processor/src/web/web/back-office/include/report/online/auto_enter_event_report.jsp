@@ -48,12 +48,12 @@
 
     </h:panelGrid>
 
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText escape="false" value="Построить по всем дружественным организациям" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.autoEnterEventReportPage.allFriendlyOrgs}"
-                                 styleClass="output-text">
-        </h:selectBooleanCheckbox>
-    </h:panelGrid>
+    <%--<h:panelGrid styleClass="borderless-grid" columns="2">--%>
+        <%--<h:outputText escape="false" value="Построить по всем дружественным организациям" styleClass="output-text" />--%>
+        <%--<h:selectBooleanCheckbox value="#{mainPage.autoEnterEventReportPage.allFriendlyOrgs}"--%>
+                                 <%--styleClass="output-text">--%>
+        <%--</h:selectBooleanCheckbox>--%>
+    <%--</h:panelGrid>--%>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Группа" styleClass="output-text" />

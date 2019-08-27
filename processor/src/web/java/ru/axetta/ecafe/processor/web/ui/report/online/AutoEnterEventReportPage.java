@@ -206,6 +206,8 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
         properties.setProperty(AutoEnterEventByDaysReport.P_ID_CLIENT, idOfClients);
         String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
         properties.setProperty("groupName", groupNamesString);
+        //Изменено 27.08.19
+        setAllFriendlyOrgs(true);
         properties.setProperty("isAllFriendlyOrgs", String.valueOf(allFriendlyOrgs));
 
         return properties;
