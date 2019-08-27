@@ -207,45 +207,6 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
 
             List<Long> clientIdList = new LinkedList<Long>();
 
-
-            //List<Long> filterClientIdList = new ArrayList<>();
-            //for (String idOfClient : stringClientsIdList) {
-            //    Long idOfClientLong = Long.parseLong(idOfClient);
-            //    filterClientIdList.add(idOfClientLong);
-            //}
-
-            //if (!groupList.isEmpty() && filterClientIdList.isEmpty()) {
-            //    allByOrg = clientDao.findAllByOrgAndGroupNames(ids, groupList);
-            //}
-            //
-            //if (!filterClientIdList.isEmpty() && groupList.isEmpty()) {
-            //    allByOrg = clientDao.findAllByOrgAndСlientId(ids, filterClientIdList);
-            //}
-            //
-            //if (!filterClientIdList.isEmpty() && !groupList.isEmpty()) {
-            //    allByOrg = clientDao.findAllByOrgAndClientIdAndGroupNames(ids, filterClientIdList, groupList);
-            //}
-            //
-            //if (filterClientIdList.isEmpty() && groupList.isEmpty()) {
-            //    allByOrg = clientDao.findAllByOrg(ids);
-            //}
-
-            //if (allByOrg != null) {
-            //    for (Client client : allByOrg) {
-            //        if (!stClassMap.containsKey(client.getClientGroup().getGroupName())) {
-            //            stClassMap.put(client.getClientGroup().getGroupName(),
-            //                    new StClass(client.getClientGroup().getGroupName(), friendlyOrgs,
-            //                            new LinkedList<Data>()));
-            //        }
-            //        currentClassList = stClassMap.get(client.getClientGroup().getGroupName()).getDataList();
-            //        if (!clientIdList.contains(client.getIdOfClient())) {
-            //            currentClassList.addAll(prepareDataList(client, friendlyOrgs, startTime, endTime));
-            //            clientIdList.add(client.getIdOfClient());
-            //        }
-            //    }
-            //}
-
-
             //данные для отчета
             Query query = session.createSQLQuery(
                     "SELECT  ee.idofenterevent, ee.idoforg, ee.passdirection, ee.eventcode, ee.idofclient,ee.evtdatetime, "

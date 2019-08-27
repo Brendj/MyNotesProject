@@ -212,16 +212,17 @@ public class AutoEnterEventV2Report extends BasicReportForMainBuildingOrgJob {
 
 
             //данные для отчета
-
             Query query = session.createSQLQuery(
                     "SELECT  ee.idofenterevent, ee.idoforg, ee.passdirection, ee.eventcode, ee.idofclient,ee.evtdatetime, "
                             + "    pn.firstname, pn.surname, pn.secondname, cg.groupname, os.shortaddress "
                             + "    FROM cf_enterevents ee "
                             + "    LEFT JOIN cf_clients cs  ON ee.idofclient = cs.idofclient "
                             + "    LEFT JOIN cf_persons pn ON pn.idofperson = cs.idofperson "
-                            + "    LEFT JOIN cf_clientgroups cg ON cg.idofclientgroup = cs.idofclientgroup AND cs.idoforg = cg.idoforg "
+                            + "    LEFT JOIN cf_clientgroups cg ON cg.idofclientgroup = cs.idofclientgroup"
+                            + "    AND cs.idoforg = cg.idoforg "
                             + "    LEFT JOIN  cf_orgs os ON ee.idoforg = os.idoforg WHERE ee.idoforg IN ("
-                            + friendlyOrgsIds + ") AND cs.idoforg IN (" + friendlyOrgsIds + ") "
+                            + friendlyOrgsIds + ") "
+                            //+ " AND cs.idoforg IN (" + friendlyOrgsIds + ") "
                             + " AND ee.evtdatetime BETWEEN " + startTime.getTime() + " AND " + endTime.getTime()
                             + " AND ee.idofclient IS NOT null AND ee.PassDirection in (0, 1, 6, 7) " + wherecontractId
                             + "     AND cs.idofclientgroup != 1100000060 " + groupStr +
