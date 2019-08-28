@@ -22,7 +22,6 @@ import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcess
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.partner.sbrt.SBRTConfig;
 import ru.axetta.ecafe.processor.core.partner.stdpay.StdPayConfig;
-import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.payment.PaymentLogger;
 import ru.axetta.ecafe.processor.core.payment.PaymentProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -156,10 +155,6 @@ public class RuntimeContext implements ApplicationContextAware {
         this.methodsInfoService = methodsInfoService;
     }
 
-    public PaymentAdditionalTasksProcessor getPaymentAdditionalTasksProcessor() {
-        return paymentAdditionalTasksProcessor;
-    }
-
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -231,7 +226,6 @@ public class RuntimeContext implements ApplicationContextAware {
 
     private OnlinePaymentProcessor onlinePaymentProcessor;
     private ClientPaymentOrderProcessor clientPaymentOrderProcessor;
-    private PaymentAdditionalTasksProcessor paymentAdditionalTasksProcessor;
     private PrivateKey syncPrivateKey;
     private PrivateKey paymentPrivateKey;
     private ClientAuthenticator clientAuthenticator;
@@ -713,7 +707,6 @@ public class RuntimeContext implements ApplicationContextAware {
             paymentProcessor = createPaymentProcessor(properties, sessionFactory, eventNotificator);
             clientPaymentOrderProcessor = createClientPaymentOrderProcessor(properties, sessionFactory, eventNotificator);
             orderCancelProcessor = createOrderCancelProcessor(properties, sessionFactory, eventNotificator);
-            paymentAdditionalTasksProcessor = new PaymentAdditionalTasksProcessor();
 
             this.onlinePaymentProcessor = new OnlinePaymentProcessor(processor);
 

@@ -8,12 +8,13 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.atol.AtolPaymentNotificator;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.ClientPaymentAddon;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
+import org.springframework.context.annotation.Scope;
+import org.springframework.stereotype.Component;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -21,6 +22,9 @@ import java.util.List;
 /**
  * Created by i.semenov on 26.08.2019.
  */
+@Component
+@Scope("singleton")
+@DependsOn("runtimeContext")
 public class PaymentAdditionalTasksProcessor {
 
     private static final Logger logger = LoggerFactory.getLogger(PaymentAdditionalTasksProcessor.class);
@@ -39,15 +43,30 @@ public class PaymentAdditionalTasksProcessor {
         }
     }
 
-    public void savePayment(ClientPayment clientPayment) {
+    public void savePayment(Session session, ClientPayment clientPayment) {
+        if (!isToSavePayment(clientPayment)) return;
         ClientPaymentAddon clientPaymentAddon = new ClientPaymentAddon(clientPayment);
         for (IPaymentNotificator notificator : listTasks) {
-            notificator.addInitialValue(clientPaymentAddon);
+            notificator.addNotificatorValues(clientPaymentAddon, clientPayment);
         }
-        saveClientPaymentAddon(clientPaymentAddon);
+        session.save(clientPaymentAddon);
+        //saveClientPaymentAddon(clientPaymentAddon);
     }
 
-    private void saveClientPaymentAddon(ClientPaymentAddon clientPaymentAddon) {
+    private boolean isToSavePayment(ClientPayment clientPayment) {
+        for (IPaymentNotificator notificator : listTasks) {
+            if (notificator.isToSave(clientPayment)) return true;
+        }
+        return false;
+    }
+
+    public void runNotifications() {
+        for (IPaymentNotificator notificator : listTasks) {
+            notificator.sendNotifications();
+        }
+    }
+
+    /*private void saveClientPaymentAddon(ClientPaymentAddon clientPaymentAddon) {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -62,5 +81,5 @@ public class PaymentAdditionalTasksProcessor {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
-    }
+    }*/
 }

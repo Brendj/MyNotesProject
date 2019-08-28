@@ -2,7 +2,7 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.partner.atol;
+package ru.axetta.ecafe.processor.core.partner.atol.json;
 
 import org.codehaus.jackson.annotate.*;
 import org.codehaus.jackson.map.annotate.JsonSerialize;

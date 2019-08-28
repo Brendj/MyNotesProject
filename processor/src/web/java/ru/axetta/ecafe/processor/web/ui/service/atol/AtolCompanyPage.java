@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service.atol;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.atol.AtolDAOService;
 import ru.axetta.ecafe.processor.core.persistence.AtolCompany;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -81,8 +82,7 @@ public class AtolCompanyPage extends OnlineReportPage implements ContragentListS
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
-            Criteria criteria = session.createCriteria(AtolCompany.class);
-            atolCompany = (AtolCompany)criteria.uniqueResult();
+            atolCompany = AtolDAOService.getInstance().getAtolCompany(session);
             if (atolCompany == null) {
                 atolCompany = new AtolCompany();
                 atolCompany.setContragents(new HashSet<Contragent>());

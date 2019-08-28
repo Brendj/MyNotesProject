@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.payment;
 
+import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.ClientPaymentAddon;
 
 /**
@@ -11,8 +12,10 @@ import ru.axetta.ecafe.processor.core.persistence.ClientPaymentAddon;
  */
 public interface IPaymentNotificator {
 
-    public void sendNotification();
+    public boolean isToSave(ClientPayment clientPayment);
 
-    public void addInitialValue(ClientPaymentAddon clientPaymentAddon);
+    public void sendNotifications();
+
+    public void addNotificatorValues(ClientPaymentAddon clientPaymentAddon, ClientPayment clientPayment);
 
 }

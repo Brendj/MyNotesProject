@@ -44,3 +44,8 @@ create table cf_clientPayment_addons
   REFERENCES cf_clientpayments (idofclientpayment) MATCH SIMPLE
   ON UPDATE NO ACTION ON DELETE NO ACTION
 );
+
+CREATE INDEX cf_clientPayment_addons_atolstatus_partial_idx
+  ON cf_clientPayment_addons
+  USING btree (atolStatus)
+  WHERE atolStatus = 0;
