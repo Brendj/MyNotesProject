@@ -37,7 +37,7 @@ public class EMPSendSmsToUserService implements IAuthorizeUserBySms {
         EMPReqestSmsType empReqestSmsType = new EMPReqestSmsType(
                 RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.userCode.service.token", ""),
                 user.getPhone(),
-                String.format("Код - %s", code),
+                String.format("Код авторизации - %s", "1234"),
                 RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.userCode.service.source", ""));
 
         PostMethod httpMethod = new PostMethod(RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.userCode.service.url", ""));
