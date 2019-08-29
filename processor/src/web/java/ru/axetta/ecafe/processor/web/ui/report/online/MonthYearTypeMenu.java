@@ -47,32 +47,6 @@ public class MonthYearTypeMenu {
         }
     }
 
-    public enum MonthTypeEnum {
-        JANUARY("Январь"),
-        FEBRUARY("Февраль"),
-        MARCH("Март"),
-        APRIL("Апрель"),
-        MAY("Май"),
-        JUNE("Июнь"),
-        JULY("Июль"),
-        AUGUST("Август"),
-        SEPTEMBER("Сентябрь"),
-        OCTOBER("Октябрь"),
-        NOVEMBER("Ноябрь"),
-        DECEMBER("Декабрь");
-
-        private final String description;
-
-        private MonthTypeEnum(String description) {
-            this.description = description;
-        }
-
-        @Override
-        public String toString() {
-            return description;
-        }
-    }
-
     public static List<Integer> getYears() {
         if (years == null) {
             years = new ArrayList<>();
@@ -85,8 +59,36 @@ public class MonthYearTypeMenu {
         this.years = years;
     }
 
+    private boolean firstAsc = true;
     public MonthTypeEnum getMounthType() {
-        return mounthType;
+        if (firstAsc) {
+            firstAsc = false;
+            return translateNumberToStringMonth();
+        }
+        else
+            return mounthType;
+    }
+
+    //Определяем текущий месяц
+    private MonthTypeEnum translateNumberToStringMonth()
+    {
+        Integer num = CalendarUtils.getCurrentMonth();
+        num++;
+        switch (num) {
+            case (1): return MonthTypeEnum.JANUARY;
+            case (2): return MonthTypeEnum.FEBRUARY;
+            case (3): return MonthTypeEnum.MARCH;
+            case (4): return MonthTypeEnum.APRIL;
+            case (5): return MonthTypeEnum.MAY;
+            case (6): return MonthTypeEnum.JUNE;
+            case (7): return MonthTypeEnum.JULY;
+            case (8): return MonthTypeEnum.AUGUST;
+            case (9): return MonthTypeEnum.SEPTEMBER;
+            case (10): return MonthTypeEnum.OCTOBER;
+            case (11): return MonthTypeEnum.NOVEMBER;
+            case (12): return MonthTypeEnum.DECEMBER;
+            default: return MonthTypeEnum.JANUARY;
+        }
     }
 
     public void setMounthType(MonthTypeEnum mounthType) {
@@ -115,5 +117,31 @@ public class MonthYearTypeMenu {
 
     public void setSelectedYear(Integer selectedYear) {
         this.selectedYear = selectedYear;
+    }
+
+    public enum MonthTypeEnum {
+        JANUARY("Январь"),
+        FEBRUARY("Февраль"),
+        MARCH("Март"),
+        APRIL("Апрель"),
+        MAY("Май"),
+        JUNE("Июнь"),
+        JULY("Июль"),
+        AUGUST("Август"),
+        SEPTEMBER("Сентябрь"),
+        OCTOBER("Октябрь"),
+        NOVEMBER("Ноябрь"),
+        DECEMBER("Декабрь");
+
+        private final String description;
+
+        private MonthTypeEnum(String description) {
+            this.description = description;
+        }
+
+        @Override
+        public String toString() {
+            return description;
+        }
     }
 }
