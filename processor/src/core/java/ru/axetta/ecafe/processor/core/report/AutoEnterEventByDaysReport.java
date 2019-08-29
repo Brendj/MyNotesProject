@@ -389,39 +389,41 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                     groupList.add(str);
                 }
             }
+            List<Client> clientList;
+            if (clientsList.isEmpty()) {
+                Criteria clientCriteria = session.createCriteria(Client.class);
+                clientCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
+                //clientCriteria.add(Property.forName("org.idOfOrg").in(orgCriteria));
+                clientCriteria.add(Restrictions.in("org.idOfOrg", ids));
 
-            Criteria clientCriteria = session.createCriteria(Client.class);
-            clientCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
-            //clientCriteria.add(Property.forName("org.idOfOrg").in(orgCriteria));
-            clientCriteria.add(Restrictions.in("org.idOfOrg", ids));
-
-            if (!clientsList.isEmpty()) {
+                if (!clientsList.isEmpty()) {
+                    clientCriteria.add(Restrictions.in("idOfClient", clientsList));
+                }
+                //clientCriteria.add(Restrictions.ne("idOfClientGroup", 1100000060L)); // Исключаем из списка Выбывших
+                if (!groupList.isEmpty()) {
+                    clientCriteria.add(Restrictions.in("cg.groupName", groupList));
+                }
+                if (typeConditionsValue != null) {
+                    // значения могут перечисляться через запятую, однако данный параметр может принимать только 1 из "все", "учащиеся", "все_без_учащихся"
+                    String typeConditionsValues[] = typeConditionsValue.split(RuleProcessor.DELIMETER);
+                    if (typeConditionsValues.length > 1) {
+                        throw new Exception(String.format("%s: Параметр enterEventType не может принимать несколько значений.",
+                                AutoEnterEventByDaysReport.class.getSimpleName()));
+                    }
+                    if ((typeConditionsValues[0].trim().equals(RuleCondition.ENTEREVENT_TYPE_TEXT[RuleCondition.ENTEREVENT_TYPE_STUDS]))) {
+                        clientCriteria.add(Restrictions.lt("idOfClientGroup", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES));
+                    } else if ((typeConditionsValues[0].trim().equals(RuleCondition.ENTEREVENT_TYPE_TEXT[RuleCondition.ENTEREVENT_TYPE_WITHOUTSTUDS]))) {
+                        clientCriteria.add(Restrictions.ge("idOfClientGroup", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES));
+                    }
+                }
+                clientList = clientCriteria.list();
+            }
+            else
+            {
+                Criteria clientCriteria = session.createCriteria(Client.class);
                 clientCriteria.add(Restrictions.in("idOfClient", clientsList));
+                clientList = clientCriteria.list();
             }
-            clientCriteria.add(Restrictions.ne("idOfClientGroup", 1100000060L)); // Исключаем из списка Выбывших
-            if (!groupList.isEmpty()) {
-                clientCriteria.add(Restrictions.in("cg.groupName", groupList));
-            }
-            if (typeConditionsValue != null) {
-                // значения могут перечисляться через запятую, однако данный параметр может принимать только 1 из "все", "учащиеся", "все_без_учащихся"
-                String typeConditionsValues[] = typeConditionsValue.split(RuleProcessor.DELIMETER);
-                if (typeConditionsValues.length > 1) {
-                    throw new Exception(
-                            String.format("%s: Параметр enterEventType не может принимать несколько значений.",
-                                    AutoEnterEventByDaysReport.class.getSimpleName()));
-                }
-                if ((typeConditionsValues[0].trim()
-                        .equals(RuleCondition.ENTEREVENT_TYPE_TEXT[RuleCondition.ENTEREVENT_TYPE_STUDS]))) {
-                    clientCriteria
-                            .add(Restrictions.lt("idOfClientGroup", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES));
-                } else if ((typeConditionsValues[0].trim()
-                        .equals(RuleCondition.ENTEREVENT_TYPE_TEXT[RuleCondition.ENTEREVENT_TYPE_WITHOUTSTUDS]))) {
-                    clientCriteria
-                            .add(Restrictions.ge("idOfClientGroup", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES));
-                }
-            }
-            List<Client> clientList = clientCriteria.list();
-
             for (Client client : clientList) {
                 ReportItem reportItem = new ReportItem();
                 reportItem.setGroupName(client.getClientGroup().getGroupName());
