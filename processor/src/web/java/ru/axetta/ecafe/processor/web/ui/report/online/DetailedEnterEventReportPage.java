@@ -171,8 +171,7 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
     public void generateXLS(ActionEvent event) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile();
-        if (templateFilename == null) {
-        } else {
+        if (templateFilename != null) {
             DetailedEnterEventReport.Builder builder = new DetailedEnterEventReport.Builder(templateFilename);
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;

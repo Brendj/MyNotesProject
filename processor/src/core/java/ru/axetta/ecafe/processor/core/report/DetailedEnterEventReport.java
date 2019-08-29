@@ -254,9 +254,9 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
                         }
                     }
                 }
-            Integer counter;
 
             //Удаление групп без клиентов и клиентов без времени входа и выхода
+            Integer counter;
             for(Iterator<Map.Entry<String, StClass>> it = stClassMap.entrySet().iterator(); it.hasNext(); ) {
                 Map.Entry<String, StClass> entry = it.next();
                 StClass value = (StClass) entry.getValue();
