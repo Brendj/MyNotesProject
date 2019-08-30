@@ -50,7 +50,7 @@ public class PreOrderAutopaySettingValue extends AbstractParserBySettingValue{
 
     @Override
     protected Integer getIndexByOrgSettingType(Integer type) {
-        return PreOrderAutoPayType.getGlobalIdByECafeSettingValueIndex(type);
+        return PreOrderAutoPayType.getECafeSettingValueIndexByGlobalId(type);
     }
 
     public boolean getIsActivePreorder() {

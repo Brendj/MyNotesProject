@@ -47,12 +47,14 @@ public class OrgSettingDAOUtils {
 
     public static  Long getLastVersionOfOrgSettings(Session session){
         SQLQuery query = session.createSQLQuery("SELECT MAX(version) FROM CF_OrgSettings");
-        return DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
+        Long maxVersion = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
+        return maxVersion == null ? 0 : maxVersion;
     }
 
     public static  Long getLastVersionOfOrgSettingsItem(Session session){
         SQLQuery query = session.createSQLQuery("SELECT MAX(version) FROM CF_OrgSettings_Items");
-        return DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
+        Long maxVersion = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
+        return maxVersion == null ? 0 : maxVersion;
     }
 
     public static Long getNextVersionOfOrgSettings(Session session){
