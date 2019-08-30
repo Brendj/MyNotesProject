@@ -27,6 +27,7 @@ public class PreorderJournalReport extends BasicReportForListOrgsJob {
     private static final Logger logger = LoggerFactory.getLogger(PreorderJournalReport.class);
     final public static String P_ID_OF_CLIENTS="idOfClients";
     final public static String P_LINE_SEPARATOR="line_separator";
+    final public static String ALL_FRIENDLY_SCHOOL="friendsSchool";
 
     public PreorderJournalReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime) {
