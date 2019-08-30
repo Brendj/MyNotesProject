@@ -44,8 +44,9 @@ public class AtolDAOService {
     }
 
     public List<ClientPaymentAddon> getPaymentsToSend() {
-        Query query = entityManager.createQuery("select cpa from ClientPaymentAddon cpa join fetch cpa.clientPayment "
-                + "join fetch cpa.clientPayment.transaction.client "
+        Query query = entityManager.createQuery("select cpa from ClientPaymentAddon cpa join fetch cpa.clientPayment cp "
+                + "join fetch cp.transaction t "
+                + "join fetch t.client c "
                 + "where cpa.atolStatus = :status order by cpa.createdDate");
         query.setParameter("status", AtolPaymentNotificator.ATOL_NEW);
         query.setMaxResults(AtolPaymentNotificator.LIMIT_PER_RUN);

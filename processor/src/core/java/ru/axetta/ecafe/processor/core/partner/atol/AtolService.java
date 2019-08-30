@@ -42,7 +42,7 @@ public class AtolService {
     private static final String ATOL_USER_PROPERTY = "ecafe.processing.atol.user";
     private static final String ATOL_PASSWORD_PROPERTY = "ecafe.processing.atol.password";
     private static final String ATOL_CALLBACK_URL = "ecafe.processor.atol.callback.url";
-    private static final String ATOL_GROUP_CODE = "ecafe.processor.atol/group.code";
+    private static final String ATOL_GROUP_CODE = "ecafe.processor.atol.group.code";
     //private static final String DEFAULT_ADDRESS = "https://testonline.atol.ru/possystem/v4/";
     //private static final String DEFAULT_USER = "v4-online-atol-ru";
     //private static final String DEFAULT_PASSWORD = "iGFFuihss";
@@ -86,23 +86,33 @@ public class AtolService {
         return null;
     }
 
-    public void sendPayment(ClientPaymentAddon clientPaymentAddon) throws Exception {
-        AtolPaymentRequest request = getAtolPaymentRequest(clientPaymentAddon);
-        URL url = new URL(getServiceAddress() + getAtolGroupCode() + "/" + OPERATION);
-        PostMethod httpMethod = new PostMethod(url.getPath());
-        httpMethod.setRequestHeader("Content-type", "application/json; charset=utf-8");
-        httpMethod.setRequestHeader("Token", getToken());
-
-        ObjectMapper mapper = new ObjectMapper();
-        String JSONString = mapper.writeValueAsString(request);
-        StringRequestEntity requestEntity = new StringRequestEntity(
-                JSONString,
-                "application/json",
-                "UTF-8");
-        httpMethod.setRequestEntity(requestEntity);
+    public void sendPayment(ClientPaymentAddon clientPaymentAddon) {
         try {
-            HttpClient httpClient = getHttpClient(url);
-            int statusCode = httpClient.executeMethod(httpMethod);
+            AtolPaymentRequest request = getAtolPaymentRequest(clientPaymentAddon);
+            URL url = new URL(getServiceAddress() + getAtolGroupCode() + "/" + OPERATION);
+            PostMethod httpMethod = new PostMethod(url.getPath());
+            httpMethod.setRequestHeader("Content-type", "application/json; charset=utf-8");
+            httpMethod.setRequestHeader("Token", getToken());
+
+            ObjectMapper mapper = new ObjectMapper();
+            String jsonString = mapper.writeValueAsString(request);
+            logger.info("Send request to Atol. Request: " + jsonString);
+            StringRequestEntity requestEntity = new StringRequestEntity(jsonString, "application/json", "UTF-8");
+            httpMethod.setRequestEntity(requestEntity);
+            try {
+                HttpClient httpClient = getHttpClient(url);
+                int statusCode = httpClient.executeMethod(httpMethod);
+                if (statusCode == HttpStatus.SC_OK) {
+                    String responseBody = httpMethod.getResponseBodyAsString();
+                    logger.info(responseBody);
+                } else {
+                    logger.error(String.format("Got error from Atol. Status code = %s, Response body - ", statusCode, httpMethod.getResponseBodyAsString()));
+                }
+            } finally {
+                httpMethod.releaseConnection();
+            }
+        } catch (Exception e) {
+            logger.error("Error in send payment to Atol: ", e);
         }
     }
 
@@ -161,6 +171,7 @@ public class AtolService {
         item.setPaymentMethod(AtolJsonItem.PaymentMethod.FULL_PAYMENT);
         item.setPaymentObject(AtolJsonItem.PaymentObject.SERVICE);
         List<AtolJsonItem> itemsList = new ArrayList<>();
+        itemsList.add(item);
         receipt.setItems(itemsList);
 
         request.setReceipt(receipt);
