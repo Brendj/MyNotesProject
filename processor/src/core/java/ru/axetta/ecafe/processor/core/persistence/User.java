@@ -525,6 +525,7 @@ public class User {
     }
 
     public static boolean needEnterSmsCode(String userName) throws Exception {
+        if (RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.userCode.service.enabled", "true").equals("false")) return false;
         User user = DAOService.getInstance().findUserByUserName(userName);
         if (StringUtils.isEmpty(user.getPhone()) || user.getPhone().equals("''")) {
             return false; //если не указан номер телефона, то и смс отправить некуда.

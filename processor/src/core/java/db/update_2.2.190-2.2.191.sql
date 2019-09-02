@@ -2,10 +2,9 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений 2.2.191
+-- Пакет обновлений 191
 
---190
-ALTER TABLE cf_clients ADD COLUMN userop bool;
+--Расширяем поле cf_bank_subscriptions.paymentid
+ALTER TABLE cf_bank_subscriptions ALTER COLUMN paymentid TYPE character varying(36);
 
---195
-ALTER TABLE cf_orgs ADD COLUMN participantop bool;
+--! ФИНАЛИЗИРОВАН 22.08.2019, НЕ МЕНЯТЬ

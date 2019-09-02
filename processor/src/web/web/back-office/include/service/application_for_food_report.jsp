@@ -58,7 +58,7 @@
         <rich:spacer height="20px" />
         <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('applicationForFoodMessageBenefitPanel')" style="width: 180px;" ajaxSingle="true" />
     </rich:modalPanel>
-    <h:panelGrid styleClass="borderless-grid" columns="2">
+    <h:panelGrid styleClass="borderless-grid" columns="2" id="applicationForFoodParameters">
         <h:outputText styleClass="output-text" escape="true" value="Список организаций" />
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
@@ -100,6 +100,35 @@
         </h:panelGroup>
         <h:outputText styleClass="output-text" escape="true" value="Номер заявления" />
         <h:inputText value="#{applicationForFoodReportPage.number}" styleClass="input-text long-field" />
+
+        <h:outputText styleClass="output-text" escape="true" value="Выбрать период" />
+        <h:selectBooleanCheckbox value="#{applicationForFoodReportPage.showPeriod}" styleClass="checkboxes">
+            <a4j:support event="onchange" reRender="applicationForFoodParameters" />
+        </h:selectBooleanCheckbox>
+
+        <h:outputText escape="true" value="Дата заявления от" styleClass="output-text" rendered="#{applicationForFoodReportPage.showPeriod}"/>
+        <rich:calendar value="#{applicationForFoodReportPage.startDate}" datePattern="dd.MM.yyyy"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false" rendered="#{applicationForFoodReportPage.showPeriod}">
+            <a4j:support event="onchanged" reRender="endDateCalendar,applicationForFoodPanelGrid"
+                         actionListener="#{applicationForFoodReportPage.onReportPeriodChanged}" />
+        </rich:calendar>
+
+        <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" rendered="#{applicationForFoodReportPage.showPeriod}"/>
+        <h:selectOneMenu id="endDatePeriodSelect"
+                         value="#{applicationForFoodReportPage.periodTypeMenu.periodType}"
+                         styleClass="input-text" style="width: 250px;" rendered="#{applicationForFoodReportPage.showPeriod}">
+            <f:converter converterId="periodTypeConverter" />
+            <f:selectItems value="#{applicationForFoodReportPage.periodTypeMenu.items}" />
+            <a4j:support event="onchange" reRender="endDateCalendar,applicationForFoodPanelGrid"
+                         actionListener="#{applicationForFoodReportPage.onReportPeriodChanged}" />
+        </h:selectOneMenu>
+        <h:outputText escape="true" value="Дата заявления до" styleClass="output-text" rendered="#{applicationForFoodReportPage.showPeriod}"/>
+        <rich:calendar id="endDateCalendar" value="#{applicationForFoodReportPage.endDate}"
+                       datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text"
+                       showWeeksBar="false" rendered="#{applicationForFoodReportPage.showPeriod}">
+            <a4j:support event="onchanged" reRender="endDatePeriodSelect,applicationForFoodPanelGrid"
+                         actionListener="#{applicationForFoodReportPage.onEndDateSpecified}" />
+        </rich:calendar>
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="1">

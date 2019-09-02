@@ -12,6 +12,7 @@ import generated.etp.ObjectFactory;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.codec.binary.Hex;
 import org.apache.commons.lang.StringUtils;
@@ -178,8 +179,7 @@ public class ETPMVService {
 
     private boolean testForApplicationForFoodStatus(ApplicationForFood applicationForFood) {
         if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DELIVERY_ERROR)) return true; //103099
-        if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.OK)
-                && applicationForFood.getArchived() != null && applicationForFood.getArchived()) return true; //1075 + признак архивности
+        if (applicationForFood.getArchived() != null && applicationForFood.getArchived()) return true; //признак архивности
         if (applicationForFood.getStatus().getApplicationForFoodState().equals(ApplicationForFoodState.DENIED)
                 && (applicationForFood.getStatus().getDeclineReason().equals(ApplicationForFoodDeclineReason.NO_DOCS)
                 || applicationForFood.getStatus().getDeclineReason().equals(ApplicationForFoodDeclineReason.NO_APPROVAL)
@@ -281,8 +281,11 @@ public class ETPMVService {
                 !RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.etp.isOn", "false").equals("true")) {
             return;
         }
+        logger.info("Start resend statuses from EtpOutgoingMessage");
         List<EtpOutgoingMessage> messages = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).getNotSendedMessages();
+        int counter = 1;
         for (EtpOutgoingMessage message : messages) {
+            logger.info(String.format("Resend status %s from %s", counter, messages.size()));
             boolean success = false;
             try {
                 RuntimeContext.getAppContext().getBean(ETPMVClient.class).sendStatus(message.getEtpMessagePayload());
@@ -291,7 +294,30 @@ public class ETPMVService {
                 logger.error("Error in sendErrorStatus: ", e);
             }
             RuntimeContext.getAppContext().getBean(ETPMVDaoService.class).updateOutgoingStatus(message, success);
+            counter++;
         }
+        logger.info("End resend statuses from EtpOutgoingMessage");
+        resendApplicationForFoodStatuses();
+    }
+
+    public void resendApplicationForFoodStatuses() {
+        logger.info("Start resend resendApplicationForFood statuses");
+        Date startDate = CalendarUtils.addDays(new Date(), -7);
+        Date endDate = CalendarUtils.addHours(new Date(), -3);
+        List<ApplicationForFoodHistory> list = RuntimeContext.getAppContext().getBean(ETPMVDaoService.class)
+                .getNotSendedApplicationForFoodHistory(startDate, endDate);
+        int counter = 1;
+        for (ApplicationForFoodHistory history : list) {
+            try {
+                logger.info(String.format("Resend status %s from %s", counter, list.size()));
+                long begin_time = System.currentTimeMillis();
+                sendStatus(begin_time, history.getApplicationForFood().getServiceNumber(), history.getStatus().getApplicationForFoodState(), history.getStatus().getDeclineReason(), null);
+                counter++;
+            } catch (Exception e) {
+                logger.error(String.format("Error in resendApplicationForFood status, serviceNumber = %s:", history.getApplicationForFood().getServiceNumber()), e);
+            }
+        }
+        logger.info("End resend resendApplicationForFood statuses");
     }
 
     public void sendToAISContingent() throws Exception {
