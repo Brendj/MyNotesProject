@@ -168,7 +168,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                     presenceOfDay = getStringTime (timeInOrg);
                 }
                 for (int i = 0; i < 4; i++)
-                    timeinWeekList.add(getStringTime(timeinWeekLong.get(i)));
+                    timeinWeekList.add(i, getStringTime(timeinWeekLong.get(i)));
             }
 
             private String getStringTime (Long time)
