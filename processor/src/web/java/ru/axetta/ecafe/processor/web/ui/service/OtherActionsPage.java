@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
+import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
@@ -521,6 +522,10 @@ public class OtherActionsPage extends OnlineReportPage {
             getLogger().error("Error create relevancePreordersToOrgFlag: ", e);
             printError("Во время проверки соответствия флага включения функционала предзаказа ОО произошла ошибка с текстом " + e.getMessage());
         }
+    }
+
+    public void sendToAtol() {
+        RuntimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).runNotifications();
     }
 
     public void preorderRequestsManualGenerate() throws Exception {

@@ -25,7 +25,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
 import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Date;
@@ -102,11 +104,12 @@ public class AtolService {
             try {
                 HttpClient httpClient = getHttpClient(url);
                 int statusCode = httpClient.executeMethod(httpMethod);
+                InputStream inputStream = httpMethod.getResponseBodyAsStream();
+                String responseBody = responseToString(inputStream);
                 if (statusCode == HttpStatus.SC_OK) {
-                    String responseBody = httpMethod.getResponseBodyAsString();
                     logger.info(responseBody);
                 } else {
-                    logger.error(String.format("Got error from Atol. Status code = %s, Response body - ", statusCode, httpMethod.getResponseBodyAsString()));
+                    logger.error(String.format("Got error from Atol. Status code = %s, Response body - ", statusCode, responseBody));
                 }
             } finally {
                 httpMethod.releaseConnection();
@@ -114,6 +117,17 @@ public class AtolService {
         } catch (Exception e) {
             logger.error("Error in send payment to Atol: ", e);
         }
+    }
+
+    private String responseToString(InputStream inputStream) throws Exception {
+        StringBuilder stringBuilder = new StringBuilder();
+        String line = null;
+        try (BufferedReader bufferedReader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"))) {
+            while ((line = bufferedReader.readLine()) != null) {
+                stringBuilder.append(line);
+            }
+        }
+        return stringBuilder.toString();
     }
 
     private HttpClient getHttpClient(URL url) {
