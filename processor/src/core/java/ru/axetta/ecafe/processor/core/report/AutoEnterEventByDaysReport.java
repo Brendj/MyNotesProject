@@ -426,8 +426,14 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             }
             for (Client client : clientList) {
                 ReportItem reportItem = new ReportItem();
-                reportItem.setGroupName(client.getClientGroup().getGroupName());
-                reportItem.setFio(client.getPerson().getFullName());
+                if (client.getClientGroup() != null && client.getClientGroup().getGroupName() != null)
+                    reportItem.setGroupName(client.getClientGroup().getGroupName());
+                else
+                    reportItem.setGroupName("Не найдена");
+                if (client.getPerson() != null && client.getPerson().getFullName() != null)
+                    reportItem.setFio(client.getPerson().getFullName());
+                else
+                    reportItem.setFio("Не найдена");
                 map.put(client.getIdOfClient(), reportItem);
             }
 
