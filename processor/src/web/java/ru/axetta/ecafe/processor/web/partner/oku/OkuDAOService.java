@@ -102,6 +102,7 @@ public class OkuDAOService {
                         + ") a on a.idoforder = o.idoforder and a.idoforg = o.idoforg and (a.menutype = od.menutype + 100) "
                         + "where c.contractid = :contractId and o.orderdate > :orderedFrom and c.userop = true and org.participantop = true "
                         + "    and o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription) "
+                        + "    and o.state = :orderCommittedState "
                         + "union all "
                         + "select o.idoforder, o.idoforg, o.createddate, null as complex_name, od.menudetailname as dish_name, "
                         + "    null as guid, od.menuorigin as dish_menuorigin " + "from cf_orders o "
@@ -109,7 +110,8 @@ public class OkuDAOService {
                         + "join cf_clients c on c.idofclient = o.idofclient "
                         + "join cf_orgs org on org.idoforg = c.idoforg "
                         + "where c.contractid = :contractId and o.orderdate > :orderedFrom and c.userop = true and org.participantop = true and "
-                        + "    o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription)");
+                        + "    o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription) "
+                        + "    and o.state = :orderCommittedState");
         query.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
         query.setParameter("typeComplexItemMin", OrderDetail.TYPE_COMPLEX_ITEM_MIN);
@@ -122,6 +124,7 @@ public class OkuDAOService {
         query.setParameter("orderTypeVending", OrderTypeEnumType.VENDING.ordinal());
         query.setParameter("orderTypePayPlan", OrderTypeEnumType.PAY_PLAN.ordinal());
         query.setParameter("orderTypeSubscription", OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
+        query.setParameter("orderCommittedState", ru.axetta.ecafe.processor.core.persistence.Order.STATE_COMMITED);
 
         List list = query.getResultList();
 
@@ -173,6 +176,7 @@ public class OkuDAOService {
                         + "    join cf_clients c on o.idofclient = c.idofclient "
                         + "    where c.idofclient in (:clientIdList) and o.createddate between :orderedFrom and :orderedTo "
                         + "        and o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription) "
+                        + "        and o.state = :orderCommittedState "
                         + "    limit :_limit " + "    offset :_offset " + ") a "
                         + "left join cf_orderdetails od on a.idoforder = od.idoforder and a.idoforg = od.idoforg "
                         + "    and od.menutype between :typeComplexMin and :typeComplexMax "
@@ -192,6 +196,7 @@ public class OkuDAOService {
         query.setParameter("_limit", limit);
         query.setParameter("_offset", offset);
         query.setParameter("clientIdList", clientIdList);
+        query.setParameter("orderCommittedState", ru.axetta.ecafe.processor.core.persistence.Order.STATE_COMMITED);
 
         List list = query.getResultList();
 
