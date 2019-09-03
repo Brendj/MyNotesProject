@@ -810,6 +810,7 @@ public class ReportRepository extends BaseJpaDao {
         Date startDate = null;
         Date endDate = null;
         Long idOfOrg = null;
+        Long sourceOrg = null;
         DateFormat safeDateFormat = dateFormat.get();
         try {
             for (ReportParameter parameter : parameters) {
@@ -822,11 +823,14 @@ public class ReportRepository extends BaseJpaDao {
                 else if (parameter.getParameterName().equals("idOfOrg")) {
                     idOfOrg = Long.parseLong(parameter.getParameterValue());
                 }
+                else if (parameter.getParameterName().equals("sourceOrg")) {
+                    sourceOrg = Long.parseLong(parameter.getParameterValue());
+                }
             }
         } catch (Exception e) {
             return true;
         }
-        if (idOfOrg == null || startDate == null || endDate == null || startDate.after(endDate)) {
+        if ((idOfOrg == null && sourceOrg == null) || startDate == null || endDate == null || startDate.after(endDate)) {
             return true; //не переданы или заполнены с ошибкой обязательные параметры
         } else {
             return false;
