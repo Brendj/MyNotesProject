@@ -83,18 +83,18 @@ public class AtolJsonPayment {
 
     public enum Type {
 
-        _0(0.0D),
-        _1(1.0D),
-        _2(2.0D),
-        _3(3.0D),
-        _4(4.0D),
-        _5(5.0D),
-        _6(6.0D),
-        _7(7.0D),
-        _8(8.0D),
-        _9(9.0D);
-        private final Double value;
-        private final static Map<Double, AtolJsonPayment.Type> CONSTANTS = new HashMap<Double, AtolJsonPayment.Type>();
+        _0(0),
+        _1(1),
+        _2(2),
+        _3(3),
+        _4(4),
+        _5(5),
+        _6(6),
+        _7(7),
+        _8(8),
+        _9(9);
+        private final Integer value;
+        private final static Map<Integer, AtolJsonPayment.Type> CONSTANTS = new HashMap<Integer, AtolJsonPayment.Type>();
 
         static {
             for (AtolJsonPayment.Type c: values()) {
@@ -102,17 +102,17 @@ public class AtolJsonPayment {
             }
         }
 
-        private Type(Double value) {
+        private Type(Integer value) {
             this.value = value;
         }
 
         @JsonValue
-        public Double value() {
+        public Integer value() {
             return this.value;
         }
 
         @JsonCreator
-        public static AtolJsonPayment.Type fromValue(Double value) {
+        public static AtolJsonPayment.Type fromValue(Float value) {
             AtolJsonPayment.Type constant = CONSTANTS.get(value);
             if (constant == null) {
                 throw new IllegalArgumentException((value +""));

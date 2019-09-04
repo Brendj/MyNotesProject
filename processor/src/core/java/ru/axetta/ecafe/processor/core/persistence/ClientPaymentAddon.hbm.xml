@@ -15,8 +15,7 @@
         <property name="createdDate" column="CreatedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" update="false"/>
         <property name="atolStatus" column="AtolStatus" type="integer" />
-        <property name="atolUpdate" column="AtolUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
-                  not-null="true" update="false"/>
+        <property name="atolUpdate" column="AtolUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
     </class>
 </hibernate-mapping>
 

@@ -49,3 +49,23 @@ CREATE INDEX cf_clientPayment_addons_atolstatus_partial_idx
   ON cf_clientPayment_addons
   USING btree (atolStatus)
   WHERE atolStatus = 0;
+
+--таблица отправленных пакетов в Атол
+CREATE TABLE cf_atol_packets
+(
+  idOfAtolPacket bigserial NOT NULL,
+  IdOfClientPaymentAddon bigint NOT NULL,
+  request text NOT NULL,
+  response text,
+  atolUUid character varying(36),
+  createdDate bigint NOT NULL,
+  lastUpdate bigint,
+  CONSTRAINT cf_atol_packets_pk PRIMARY KEY (idOfAtolPacket),
+  CONSTRAINT cf_atol_packets_clientpaymentaddon FOREIGN KEY (IdOfClientPaymentAddon)
+  REFERENCES cf_clientpayment_addons (IdOfClientPaymentAddon) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION
+);
+
+CREATE INDEX cf_atol_packets_idofclientpaymentaddon
+ON cf_atol_packets
+USING btree (IdOfClientPaymentAddon);

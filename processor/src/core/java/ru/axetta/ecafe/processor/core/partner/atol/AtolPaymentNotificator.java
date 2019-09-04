@@ -57,15 +57,16 @@ public class AtolPaymentNotificator implements IPaymentNotificator {
 
     @Override
     public void sendNotifications() {
+        logger.info("Start ATOL payment notifications task");
         List<ClientPaymentAddon> list = AtolDAOService.getInstance().getPaymentsToSend();
         for (ClientPaymentAddon clientPaymentAddon : list) {
             sendNotification(clientPaymentAddon);
         }
+        logger.info("End ATOL payment notifications task");
     }
 
     private void sendNotification(ClientPaymentAddon clientPaymentAddon) {
         RuntimeContext.getAppContext().getBean(AtolService.class).sendPayment(clientPaymentAddon);
-
     }
 
     @Override

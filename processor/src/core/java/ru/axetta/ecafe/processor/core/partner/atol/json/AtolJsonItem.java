@@ -47,7 +47,7 @@ public class AtolJsonItem {
      * 
      */
     @JsonProperty("quantity")
-    private Double quantity;
+    private Integer quantity;
     /**
      * 
      * (Required)
@@ -72,7 +72,7 @@ public class AtolJsonItem {
     @JsonProperty("user_data")
     private String userData;
     @JsonProperty("excise")
-    private Double excise;
+    private Float excise;
     @JsonProperty("country_code")
     private String countryCode;
     @JsonProperty("declaration_number")
@@ -126,7 +126,7 @@ public class AtolJsonItem {
      * 
      */
     @JsonProperty("quantity")
-    public Double getQuantity() {
+    public Integer getQuantity() {
         return quantity;
     }
 
@@ -136,7 +136,7 @@ public class AtolJsonItem {
      * 
      */
     @JsonProperty("quantity")
-    public void setQuantity(Double quantity) {
+    public void setQuantity(Integer quantity) {
         this.quantity = quantity;
     }
 
@@ -241,12 +241,12 @@ public class AtolJsonItem {
     }
 
     @JsonProperty("excise")
-    public Double getExcise() {
+    public Float getExcise() {
         return excise;
     }
 
     @JsonProperty("excise")
-    public void setExcise(Double excise) {
+    public void setExcise(Float excise) {
         this.excise = excise;
     }
 

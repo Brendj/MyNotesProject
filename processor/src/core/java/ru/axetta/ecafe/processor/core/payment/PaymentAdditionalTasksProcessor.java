@@ -9,7 +9,10 @@ import ru.axetta.ecafe.processor.core.partner.atol.AtolPaymentNotificator;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.ClientPaymentAddon;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.quartz.*;
+import org.quartz.impl.StdSchedulerFactory;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
@@ -30,6 +33,9 @@ public class PaymentAdditionalTasksProcessor {
     private static final Logger logger = LoggerFactory.getLogger(PaymentAdditionalTasksProcessor.class);
     List<IPaymentNotificator> listTasks;
     public static final String NOTIFICATORS_CONFIG_PROPERTY = "ecafe.processor.payment.notificators";
+    public static final String NOTIFICATORS_CRON_CONFIG_PROPERTY = "ecafe.processor.payment.notificators.cron";
+    public static final String NOTIFICATORS_NODE_CONFIG_PROPERTY = "ecafe.processor.payment.notificators.node";
+    public static final String SCHEDULE_NAME = "Payment_Notification";
 
     public PaymentAdditionalTasksProcessor() {
         listTasks = new ArrayList<IPaymentNotificator>();
@@ -39,6 +45,22 @@ public class PaymentAdditionalTasksProcessor {
             switch (notificator) {
                 case "ATOL" : listTasks.add(new AtolPaymentNotificator());
                     break;
+            }
+        }
+        String syncScheduleCron = RuntimeContext.getInstance().getConfigProperties().getProperty(NOTIFICATORS_CRON_CONFIG_PROPERTY, "");
+        if (RuntimeContext.getInstance().actionIsOnByNode(NOTIFICATORS_NODE_CONFIG_PROPERTY) && !StringUtils.isEmpty(syncScheduleCron)) {
+            try {
+                JobDetail jobDetail = new JobDetail(SCHEDULE_NAME, Scheduler.DEFAULT_GROUP, NotificationJob.class);
+                SchedulerFactory sfb = new StdSchedulerFactory();
+                Scheduler scheduler = sfb.getScheduler();
+                CronTrigger triggerDaily = new CronTrigger(SCHEDULE_NAME, Scheduler.DEFAULT_GROUP);
+                triggerDaily.setCronExpression(syncScheduleCron);
+                if (scheduler.getTrigger(SCHEDULE_NAME, Scheduler.DEFAULT_GROUP) != null) {
+                    scheduler.deleteJob(SCHEDULE_NAME, Scheduler.DEFAULT_GROUP);
+                }
+                scheduler.scheduleJob(jobDetail, triggerDaily);
+            } catch (Exception e) {
+                logger.error("Error in schedule payment notification task: ", e);
             }
         }
     }
@@ -61,25 +83,17 @@ public class PaymentAdditionalTasksProcessor {
     }
 
     public void runNotifications() {
+        logger.info("Start payment notifications task");
         for (IPaymentNotificator notificator : listTasks) {
             notificator.sendNotifications();
         }
+        logger.info("End payment notifications task");
     }
 
-    /*private void saveClientPaymentAddon(ClientPaymentAddon clientPaymentAddon) {
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-            session.save(clientPaymentAddon);
-            transaction.commit();
-            transaction = null;
-        } catch (Exception e) {
-            logger.error("Error in save clientPaymentAddon object: ", e);
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
+    public static class NotificationJob implements StatefulJob {
+        @Override
+        public void execute(JobExecutionContext arg0) throws JobExecutionException {
+            RuntimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).runNotifications();
         }
-    }*/
+    }
 }

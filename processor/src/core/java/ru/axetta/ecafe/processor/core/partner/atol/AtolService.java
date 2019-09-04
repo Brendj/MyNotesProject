@@ -99,6 +99,7 @@ public class AtolService {
             ObjectMapper mapper = new ObjectMapper();
             String jsonString = mapper.writeValueAsString(request);
             logger.info("Send request to Atol. Request: " + jsonString);
+            AtolDAOService.getInstance().saveAtolPacket(clientPaymentAddon, jsonString);
             StringRequestEntity requestEntity = new StringRequestEntity(jsonString, "application/json", "UTF-8");
             httpMethod.setRequestEntity(requestEntity);
             try {
@@ -106,10 +107,13 @@ public class AtolService {
                 int statusCode = httpClient.executeMethod(httpMethod);
                 InputStream inputStream = httpMethod.getResponseBodyAsStream();
                 String responseBody = responseToString(inputStream);
-                if (statusCode == HttpStatus.SC_OK) {
-                    logger.info(responseBody);
+
+                logger.info(String.format("Got response from Atol. Status code = %s, Response body - %s", statusCode, responseBody));
+                AtolPaymentResponse atolResponse = mapper.readValue(responseBody, AtolPaymentResponse.class);
+                if (statusCode == HttpStatus.SC_OK || !StringUtils.isEmpty(atolResponse.getUuid())) {
+                    AtolDAOService.getInstance().saveWithSuccess(clientPaymentAddon, atolResponse.getUuid(), responseBody);
                 } else {
-                    logger.error(String.format("Got error from Atol. Status code = %s, Response body - ", statusCode, responseBody));
+                    AtolDAOService.getInstance().saveWithError(clientPaymentAddon, statusCode);
                 }
             } finally {
                 httpMethod.releaseConnection();
@@ -177,7 +181,7 @@ public class AtolService {
         AtolJsonItem item = new AtolJsonItem();
         item.setName(String.format(NAME_FORMAT, clientPaymentAddon.getClientPayment().getTransaction().getClient().getContractId()));
         item.setPrice(paymentSum);
-        item.setQuantity(1.000);
+        item.setQuantity(1);
         item.setSum(paymentSum);
         Vat vat = new Vat();
         vat.setType(Vat.Type.VAT_20);
@@ -193,7 +197,7 @@ public class AtolService {
     }
 
     private Double doubleValue(Long value) {
-        return new Double(value / 100);
+        return new Double(value) / 100d;
     }
 
     private AtolJsonClient getClientInfo(ClientPaymentAddon clientPaymentAddon, AtolCompany atolCompany) {
