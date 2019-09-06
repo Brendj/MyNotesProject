@@ -66,9 +66,9 @@ public class FpsapiController {
         Transaction persistenceTransaction = null;
         //Вычисление результата запроса
         try {
-            String regID = extractParamByName(request.getParameterMap(), REG_ID);
-            String dateFrom =  extractParamByName(request.getParameterMap(), DATE_FROM);
-            String dateTo =  extractParamByName(request.getParameterMap(), DATE_TO);
+            String regID = extractParamByName(request.getParameterMap(), REG_ID, true);
+            String dateFrom =  extractParamByName(request.getParameterMap(), DATE_FROM, true);
+            String dateTo =  extractParamByName(request.getParameterMap(), DATE_TO, true);
             Date dateFromD = new SimpleDateFormat("yyyy-MM-dd").parse(dateFrom);
             Date dateToD = new SimpleDateFormat("yyyy-MM-dd").parse(dateTo);
 
@@ -174,10 +174,13 @@ public class FpsapiController {
         Transaction persistenceTransaction = null;
         //Вычисление результата запроса
         try {
-            String regID =  extractParamByName(request.getParameterMap(), REG_ID);
-            String date = extractParamByName(request.getParameterMap(), DATE);
-            Integer range = Integer.parseInt(extractParamByName(request.getParameterMap(), RANGE));
-            //Дата до
+            String regID =  extractParamByName(request.getParameterMap(), REG_ID, true);
+            String date = extractParamByName(request.getParameterMap(), DATE, true);
+            String rangeStr = extractParamByName(request.getParameterMap(), RANGE, true);
+            Integer range = null;
+            if(!StringUtils.isEmpty(rangeStr)) {
+                range = Integer.parseInt(rangeStr);
+            }
             Date dateTo;
             //Дата с
             Date dateFrom;
@@ -315,13 +318,27 @@ public class FpsapiController {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+        String dateTo = "";
+        String dateFrom = "";
         //Вычисление результата запроса
         try {
-            String regID = extractParamByName(paramMap, REG_ID);
-            String dateFrom = extractParamByName(paramMap, DATE_FROM);
-            String dateTo = extractParamByName(paramMap, DATE_TO);
-            Integer count = Integer.parseInt(extractParamByName(paramMap, COUNT));
-            Long lastTransactionId = Long.parseLong(extractParamByName(paramMap, LAST_TRANSACTION_ID));
+            String regID = extractParamByName(paramMap, REG_ID, true);
+            if(type == 1) {
+                dateFrom = extractParamByName(paramMap, DATE_FROM, true);
+                dateTo = extractParamByName(paramMap, DATE_TO, true);
+            }
+
+            String countStr = extractParamByName(paramMap, COUNT, true);
+            Integer count = null;
+            if(!StringUtils.isEmpty(countStr)) {
+                count = Integer.parseInt(countStr);
+            }
+            String lastTransactionIdStr = extractParamByName(paramMap, LAST_TRANSACTION_ID, false);
+            Long lastTransactionId = null;
+            if(!StringUtils.isEmpty(lastTransactionIdStr)) {
+                lastTransactionId = Long.parseLong(lastTransactionIdStr);
+            }
+
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Date dateToT = new Date();
@@ -501,7 +518,7 @@ public class FpsapiController {
         Session session = null;
         Transaction transaction = null;
         try {
-            String regID = extractParamByName(request.getParameterMap(), REG_ID);
+            String regID = extractParamByName(request.getParameterMap(), REG_ID, true);
             if (StringUtils.isEmpty(regID)) {
                 throw new IllegalArgumentException("Couldn't find all parameters");
             }
@@ -590,9 +607,20 @@ public class FpsapiController {
         Session session = null;
         Transaction transaction = null;
         try {
-            String regID = extractParamByName(request.getParameterMap(), REG_ID);
-            Long allergenId = Long.parseLong(extractParamByName(request.getParameterMap(),ALLERGEN_ID));
-            Integer active = Integer.parseInt(extractParamByName(request.getParameterMap(), ACTIVE));
+            String regID = extractParamByName(request.getParameterMap(), REG_ID, true);
+
+
+            String activeStr = extractParamByName(request.getParameterMap(), ACTIVE, true);
+            Integer active = null;
+            if(!StringUtils.isEmpty(activeStr)) {
+                active = Integer.parseInt(activeStr);
+            }
+            String allergenIdStr = extractParamByName(request.getParameterMap(), ALLERGEN_ID, true);
+            Long allergenId = null;
+            if(!StringUtils.isEmpty(allergenIdStr)) {
+                allergenId = Long.parseLong(allergenIdStr);
+            }
+
             if (StringUtils.isEmpty(regID) || (null == allergenId) || (null == active)) {
                 throw new IllegalArgumentException("Couldn't find all parameters");
             }
@@ -666,9 +694,9 @@ public class FpsapiController {
         Transaction persistenceTransaction = null;
 
         try {
-            String regID = extractParamByName(request.getParameterMap(), REG_ID);
-            String dateFrom = extractParamByName(request.getParameterMap(), DATE_FROM);
-            String dateTo = extractParamByName(request.getParameterMap(), DATE_TO);
+            String regID = extractParamByName(request.getParameterMap(), REG_ID, true);
+            String dateFrom = extractParamByName(request.getParameterMap(), DATE_FROM, true);
+            String dateTo = extractParamByName(request.getParameterMap(), DATE_TO, true);
             
             Date dateFromD = new SimpleDateFormat("yyyy-MM-dd").parse(dateFrom);
             Date dateToD = new SimpleDateFormat("yyyy-MM-dd").parse(dateTo);
@@ -751,7 +779,7 @@ public class FpsapiController {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            String regID = extractParamByName(request.getParameterMap(), REG_ID);
+            String regID = extractParamByName(request.getParameterMap(), REG_ID, true);
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
@@ -799,14 +827,14 @@ public class FpsapiController {
         return accountsItem;
     }
 
-    private String extractParamByName(Map<String, String[]> parametersMap, String name) {
+    private String extractParamByName(Map<String, String[]> parametersMap, String name, Boolean mandatory) {
         for (String key : parametersMap.keySet()) {
             String tmpString = key.toLowerCase();
             if (!tmpString.equals(name)) {
                 continue;
             }
             String[] paramValue = parametersMap.get(key);
-            if (paramValue.length > 1 || paramValue.length == 0) {
+            if (paramValue.length > 1 || paramValue.length == 0 && mandatory) {
                 throw new IllegalArgumentException("Unexpected " + name + " size");
             }
             return paramValue[0];
