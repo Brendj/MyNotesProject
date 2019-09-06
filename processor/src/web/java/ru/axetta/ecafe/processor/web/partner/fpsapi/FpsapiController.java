@@ -21,7 +21,9 @@ import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 
 import javax.persistence.NoResultException;
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.math.BigInteger;
@@ -29,7 +31,6 @@ import java.net.HttpURLConnection;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
-
 
 @Path(value = "")
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
@@ -41,11 +42,13 @@ public class FpsapiController {
     private static final String ERROR_DATE_FORMAT = "Date format error";
     private static final String ERROR_REQUEST_PARAMETRS = "Invalid parameters passed";
 
+    private static final String REG_ID = "regid";
+
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/sales")
-    public Response getSales(@FormParam(value = "RegId") String regID, @FormParam(value = "DateFrom") String dateFrom,
+    public Response getSales(@Context HttpServletRequest request, @FormParam(value = "DateFrom") String dateFrom,
             @FormParam(value = "DateTo") String dateTo) throws Exception {
         ResponseSales responseSales = new ResponseSales();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -53,6 +56,7 @@ public class FpsapiController {
         Transaction persistenceTransaction = null;
         //Вычисление результата запроса
         try {
+            String regID = extractRegId(request.getParameterMap());
             Date dateFromD = new SimpleDateFormat("yyyy-MM-dd").parse(dateFrom);
             Date dateToD = new SimpleDateFormat("yyyy-MM-dd").parse(dateTo);
 
@@ -151,7 +155,7 @@ public class FpsapiController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/average")
-    public Response getAverage(@FormParam(value = "RegId") String regID, @FormParam(value = "Date") String date,
+    public Response getAverage(@Context HttpServletRequest request, @FormParam(value = "Date") String date,
             @FormParam(value = "Range") Integer range) throws Exception {
         ResponseAverage responseAverage = new ResponseAverage();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -159,6 +163,7 @@ public class FpsapiController {
         Transaction persistenceTransaction = null;
         //Вычисление результата запроса
         try {
+            String regID = extractRegId(request.getParameterMap());
             //Дата до
             Date dateTo;
             //Дата с
@@ -278,25 +283,25 @@ public class FpsapiController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/transactionsbydate")
-    public Response getTransactionsbyDate(@FormParam(value = "RegId") String regID,
+    public Response getTransactionsbyDate(@Context HttpServletRequest request,
             @FormParam(value = "LastTransactionId") Long lastTransactionId,
             @FormParam(value = "DateFrom") String dateFrom, @FormParam(value = "DateTo") String dateTo)
             throws Exception {
-        return workWithTransactions(regID, null, lastTransactionId, dateFrom, dateTo, 1);
+        return workWithTransactions(request.getParameterMap(), null, lastTransactionId, dateFrom, dateTo, 1);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/transactions")
-    public Response getTransactions(@FormParam(value = "RegId") String regID,
+    public Response getTransactions(@Context HttpServletRequest request,
             @FormParam(value = "Count") Integer count, @FormParam(value = "LastTransactionId") Long lastTransactionId)
             throws Exception {
-        return workWithTransactions(regID, count, lastTransactionId, null, null, 0);
+        return workWithTransactions(request.getParameterMap(), count, lastTransactionId, null, null, 0);
 
     }
     //type - определяет тип выборки: по количесву или по дате
-    private Response workWithTransactions(String regID, Integer count, Long lastTransactionId, String dateFrom,
+    private Response workWithTransactions(Map<String, String[]> paramMap, Integer count, Long lastTransactionId, String dateFrom,
             String dateTo, Integer type) {
         ResponseTransactions responseTransactions = new ResponseTransactions();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -304,6 +309,7 @@ public class FpsapiController {
         Transaction persistenceTransaction = null;
         //Вычисление результата запроса
         try {
+            String regID = extractRegId(paramMap);
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Date dateToT = new Date();
@@ -477,13 +483,14 @@ public class FpsapiController {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-    public Response getAllergens(@FormParam(value = "RegId") String regId) {
+    public Response getAllergens(@Context HttpServletRequest request) {
         AllergenResult result = new AllergenResult();
 
         Session session = null;
         Transaction transaction = null;
         try {
-            if (StringUtils.isEmpty(regId)) {
+            String regID = extractRegId(request.getParameterMap());
+            if (StringUtils.isEmpty(regID)) {
                 throw new IllegalArgumentException("Couldn't find all parameters");
             }
 
@@ -491,16 +498,16 @@ public class FpsapiController {
             session = runtimeContext.createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            Client client = DAOUtils.findClientByIacregid(session, regId);
+            Client client = DAOUtils.findClientByIacregid(session, regID);
 
             if (null == client) {
-                throw new IllegalArgumentException(String.format("Unable to find client by regId=%s", regId));
+                throw new IllegalArgumentException(String.format("Unable to find client by regId=%s", regID));
             }
 
             Menu menu = DAOUtils.findLastMenuByOrgBeforeDate(session, client.getOrg().getIdOfOrg(), new Date());
 
             if (null == menu) {
-                throw new NoResultException(String.format("Unable to find menu for client with regId=%s", regId));
+                throw new NoResultException(String.format("Unable to find menu for client with regId=%s", regID));
             }
 
             result.setAllergens(findAllergens(session, client, menu));
@@ -565,24 +572,25 @@ public class FpsapiController {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-    public Response createAllergen(@FormParam(value = "RegId") String regId,
+    public Response createAllergen(@Context HttpServletRequest request,
             @FormParam(value = "AllergenId") Long allergenId, @FormParam(value = "Active") Integer active) {
         Result result = new Result();
 
         Session session = null;
         Transaction transaction = null;
         try {
-            if (StringUtils.isEmpty(regId) || (null == allergenId) || (null == active)) {
+            String regID = extractRegId(request.getParameterMap());
+            if (StringUtils.isEmpty(regID) || (null == allergenId) || (null == active)) {
                 throw new IllegalArgumentException("Couldn't find all parameters");
             }
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             session = runtimeContext.createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Client client = DAOUtils.findClientByIacregid(session, regId);
+            Client client = DAOUtils.findClientByIacregid(session, regID);
 
             if (null == client) {
-                throw new IllegalArgumentException(String.format("Unable to find client by regId=%s", regId));
+                throw new IllegalArgumentException(String.format("Unable to find client by regId=%s", regID));
             }
 
             if (0 == active) {
@@ -635,7 +643,7 @@ public class FpsapiController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/enterEvents")
-    public Response enterEvent (@FormParam(value="RegId") String regID,
+    public Response enterEvent (@Context HttpServletRequest request,
             @FormParam(value="DateFrom") String dateFrom,
             @FormParam (value="DateTo") String dateTo)throws Exception {
         ResponseEnterEvent responseEnterEvent = new ResponseEnterEvent();
@@ -643,6 +651,7 @@ public class FpsapiController {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
+            String regID = extractRegId(request.getParameterMap());
             Date dateFromD = new SimpleDateFormat("yyyy-MM-dd").parse(dateFrom);
             Date dateToD = new SimpleDateFormat("yyyy-MM-dd").parse(dateTo);
 
@@ -716,13 +725,15 @@ public class FpsapiController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/accounts")
-    public Response Accounts (@FormParam(value="RegId") String regID)
+    public Response Accounts (@Context HttpServletRequest request)
             throws Exception {
         ResponseAccounts responseAccounts = new ResponseAccounts();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
+
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
+            String regID = extractRegId(request.getParameterMap());
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
@@ -767,5 +778,20 @@ public class FpsapiController {
         accountsItem.setAccouttypename(accountsItem.getAccouttypename());
         accountsItem.setAccounttypeid(accountsItem.getAccounttypeid());
         return accountsItem;
+    }
+
+     private String extractRegId(Map<String, String[]> parametersMap) {
+        for(String key : parametersMap.keySet()) {
+            String tmpString = key.toLowerCase();
+            if (!tmpString.equals(REG_ID)) {
+                continue;
+            }
+            String [] paramValue = parametersMap.get(key);
+            if(paramValue.length > 1 || paramValue.length == 0) {
+                throw new IllegalArgumentException("Unexpected regid size");
+            }
+            return paramValue[0];
         }
+        return null;
+     }
 }
