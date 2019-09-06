@@ -28,6 +28,7 @@ public class ApplicationForFoodReportItem {
     private boolean isChanged;
     private List<ApplicationForFoodStatus> statuses;
     private String mobile;
+    private Boolean movedToArchieve;
 
     public ApplicationForFoodReportItem() {
 
@@ -49,6 +50,7 @@ public class ApplicationForFoodReportItem {
         isChanged = false;
         this.mobile = applicationForFood.getMobile();
         statuses = new ArrayList<ApplicationForFoodStatus>();
+        this.movedToArchieve = false;
     }
 
     public String getApplicationForFoodStateString() {
@@ -70,6 +72,10 @@ public class ApplicationForFoodReportItem {
     public Boolean getIsResumed() {
         if (!isInoe) return false;
         return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.RESUME);
+    }
+
+    public Boolean canBeMovedToArchieve() {
+        return isInoe;
     }
 
     public String getArchieved() {
@@ -194,5 +200,13 @@ public class ApplicationForFoodReportItem {
 
     public void setApplicantFio(String applicantFio) {
         this.applicantFio = applicantFio;
+    }
+
+    public Boolean getMovedToArchieve() {
+        return movedToArchieve;
+    }
+
+    public void setMovedToArchieve(Boolean movedToArchieve) {
+        this.movedToArchieve = movedToArchieve;
     }
 }

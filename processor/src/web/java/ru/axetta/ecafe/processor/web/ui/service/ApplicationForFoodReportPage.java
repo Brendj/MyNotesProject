@@ -141,6 +141,16 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.NO_DOCS));
     }
 
+    public void makeArchieved() {
+        for (ApplicationForFoodReportItem item : items) {
+            if (item.getApplicationForFood().getIdOfApplicationForFood().equals(currentItem.getApplicationForFood().getIdOfApplicationForFood())) {
+                item.setMovedToArchieve(true);
+                item.setChanged(true);
+                break;
+            }
+        }
+    }
+
     private void setStatus(ApplicationForFoodStatus status) {
         for (ApplicationForFoodReportItem item : items) {
             if (item.getApplicationForFood().getIdOfApplicationForFood().equals(currentItem.getApplicationForFood().getIdOfApplicationForFood())) {
