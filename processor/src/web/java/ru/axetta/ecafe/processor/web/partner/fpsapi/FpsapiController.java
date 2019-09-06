@@ -22,7 +22,10 @@ import org.springframework.stereotype.Controller;
 
 import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServletRequest;
-import javax.ws.rs.*;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.POST;
+import javax.ws.rs.Path;
+import javax.ws.rs.Produces;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
@@ -43,20 +46,29 @@ public class FpsapiController {
     private static final String ERROR_REQUEST_PARAMETRS = "Invalid parameters passed";
 
     private static final String REG_ID = "regid";
+    private static final String DATE_TO = "dateto";
+    private static final String DATE_FROM = "datefrom";
+    private static final String DATE = "date";
+    private static final String RANGE = "range";
+    private static final String COUNT = "count";
+    private static final String LAST_TRANSACTION_ID = "lasttransactionid";
+    private static final String ALLERGEN_ID = "allergenid";
+    private static final String ACTIVE = "active";
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/sales")
-    public Response getSales(@Context HttpServletRequest request, @FormParam(value = "DateFrom") String dateFrom,
-            @FormParam(value = "DateTo") String dateTo) throws Exception {
+    public Response getSales(@Context HttpServletRequest request) throws Exception {
         ResponseSales responseSales = new ResponseSales();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         //Вычисление результата запроса
         try {
-            String regID = extractRegId(request.getParameterMap());
+            String regID = extractParamByName(request.getParameterMap(), REG_ID);
+            String dateFrom =  extractParamByName(request.getParameterMap(), DATE_FROM);
+            String dateTo =  extractParamByName(request.getParameterMap(), DATE_TO);
             Date dateFromD = new SimpleDateFormat("yyyy-MM-dd").parse(dateFrom);
             Date dateToD = new SimpleDateFormat("yyyy-MM-dd").parse(dateTo);
 
@@ -155,15 +167,16 @@ public class FpsapiController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/average")
-    public Response getAverage(@Context HttpServletRequest request, @FormParam(value = "Date") String date,
-            @FormParam(value = "Range") Integer range) throws Exception {
+    public Response getAverage(@Context HttpServletRequest request) throws Exception {
         ResponseAverage responseAverage = new ResponseAverage();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         //Вычисление результата запроса
         try {
-            String regID = extractRegId(request.getParameterMap());
+            String regID =  extractParamByName(request.getParameterMap(), REG_ID);
+            String date = extractParamByName(request.getParameterMap(), DATE);
+            Integer range = Integer.parseInt(extractParamByName(request.getParameterMap(), RANGE));
             //Дата до
             Date dateTo;
             //Дата с
@@ -283,33 +296,32 @@ public class FpsapiController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/transactionsbydate")
-    public Response getTransactionsbyDate(@Context HttpServletRequest request,
-            @FormParam(value = "LastTransactionId") Long lastTransactionId,
-            @FormParam(value = "DateFrom") String dateFrom, @FormParam(value = "DateTo") String dateTo)
-            throws Exception {
-        return workWithTransactions(request.getParameterMap(), null, lastTransactionId, dateFrom, dateTo, 1);
+    public Response getTransactionsbyDate(@Context HttpServletRequest request) throws Exception {
+        return workWithTransactions(request.getParameterMap(), 1);
     }
 
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/transactions")
-    public Response getTransactions(@Context HttpServletRequest request,
-            @FormParam(value = "Count") Integer count, @FormParam(value = "LastTransactionId") Long lastTransactionId)
-            throws Exception {
-        return workWithTransactions(request.getParameterMap(), count, lastTransactionId, null, null, 0);
+    public Response getTransactions(@Context HttpServletRequest request) throws Exception {
+        return workWithTransactions(request.getParameterMap(), 0);
 
     }
+
     //type - определяет тип выборки: по количесву или по дате
-    private Response workWithTransactions(Map<String, String[]> paramMap, Integer count, Long lastTransactionId, String dateFrom,
-            String dateTo, Integer type) {
+    private Response workWithTransactions(Map<String, String[]> paramMap, Integer type) {
         ResponseTransactions responseTransactions = new ResponseTransactions();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         //Вычисление результата запроса
         try {
-            String regID = extractRegId(paramMap);
+            String regID = extractParamByName(paramMap, REG_ID);
+            String dateFrom = extractParamByName(paramMap, DATE_FROM);
+            String dateTo = extractParamByName(paramMap, DATE_TO);
+            Integer count = Integer.parseInt(extractParamByName(paramMap, COUNT));
+            Long lastTransactionId = Long.parseLong(extractParamByName(paramMap, LAST_TRANSACTION_ID));
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Date dateToT = new Date();
@@ -431,15 +443,15 @@ public class FpsapiController {
         return true;
     }
 
-    private String converMoney (Long sum)
-    {
+    private String converMoney(Long sum) {
         String sumStr = Long.toString(sum);
-        if(sum >= 100 || sum <=-100)
-            return sumStr.substring(0, sumStr.length()-2) + "." + sumStr.substring(sumStr.length()-2, sumStr.length());
-        else {
-            if (sum >= 0)
+        if (sum >= 100 || sum <= -100) {
+            return sumStr.substring(0, sumStr.length() - 2) + "." + sumStr
+                    .substring(sumStr.length() - 2, sumStr.length());
+        } else {
+            if (sum >= 0) {
                 return "0." + sumStr;
-            else {
+            } else {
                 return "-0." + sumStr.substring(1, sumStr.length());
             }
         }
@@ -489,7 +501,7 @@ public class FpsapiController {
         Session session = null;
         Transaction transaction = null;
         try {
-            String regID = extractRegId(request.getParameterMap());
+            String regID = extractParamByName(request.getParameterMap(), REG_ID);
             if (StringUtils.isEmpty(regID)) {
                 throw new IllegalArgumentException("Couldn't find all parameters");
             }
@@ -542,8 +554,7 @@ public class FpsapiController {
         Query query = session.createSQLQuery("select distinct "
                 + "case when p.idofprohibitions is not null then p.idofprohibitions else md.idofmenudetail end as id, "
                 + "case when p.idofprohibitions is not null then p.filtertext else md.menudetailname end as name, "
-                + "md.groupname, p.idofprohibitions is not null as active "
-                + "from cf_menu m "
+                + "md.groupname, p.idofprohibitions is not null as active " + "from cf_menu m "
                 + "join cf_menudetails md on md.idofmenu = m.idofmenu "
                 + "left join cf_prohibitions p on p.filtertext = md.menudetailname and p.idofclient = :idOfClient and p.deletedstate = false "
                 + "where m.idoforg = :idOfOrg and m.idofmenu = :idOfMenu ");
@@ -563,7 +574,8 @@ public class FpsapiController {
             if (!typeIdHashMap.containsKey(groupName)) {
                 typeIdHashMap.put(groupName, typeIdHashMap.keySet().size());
             }
-            allergenList.add(new Allergen(idOfProhibition, filterText, typeIdHashMap.get(groupName), groupName, active));
+            allergenList
+                    .add(new Allergen(idOfProhibition, filterText, typeIdHashMap.get(groupName), groupName, active));
         }
         return allergenList;
     }
@@ -572,14 +584,15 @@ public class FpsapiController {
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-    public Response createAllergen(@Context HttpServletRequest request,
-            @FormParam(value = "AllergenId") Long allergenId, @FormParam(value = "Active") Integer active) {
+    public Response createAllergen(@Context HttpServletRequest request) {
         Result result = new Result();
 
         Session session = null;
         Transaction transaction = null;
         try {
-            String regID = extractRegId(request.getParameterMap());
+            String regID = extractParamByName(request.getParameterMap(), REG_ID);
+            Long allergenId = Long.parseLong(extractParamByName(request.getParameterMap(),ALLERGEN_ID));
+            Integer active = Integer.parseInt(extractParamByName(request.getParameterMap(), ACTIVE));
             if (StringUtils.isEmpty(regID) || (null == allergenId) || (null == active)) {
                 throw new IllegalArgumentException("Couldn't find all parameters");
             }
@@ -594,9 +607,12 @@ public class FpsapiController {
             }
 
             if (0 == active) {
-                ProhibitionMenu prohibitionMenu = DAOUtils.findProhibitionMenuByIdAndClientId(session, allergenId, client.getIdOfClient());
+                ProhibitionMenu prohibitionMenu = DAOUtils
+                        .findProhibitionMenuByIdAndClientId(session, allergenId, client.getIdOfClient());
                 if (null == prohibitionMenu) {
-                    throw new IllegalArgumentException(String.format("Unable to find prohibitionMenu by id = %d and idOfClient = %d", allergenId, client.getIdOfClient()));
+                    throw new IllegalArgumentException(
+                            String.format("Unable to find prohibitionMenu by id = %d and idOfClient = %d", allergenId,
+                                    client.getIdOfClient()));
                 }
                 prohibitionMenu.setDeletedState(true);
                 prohibitionMenu.setUpdateDate(new Date());
@@ -643,15 +659,17 @@ public class FpsapiController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/enterEvents")
-    public Response enterEvent (@Context HttpServletRequest request,
-            @FormParam(value="DateFrom") String dateFrom,
-            @FormParam (value="DateTo") String dateTo)throws Exception {
+    public Response enterEvent(@Context HttpServletRequest request) throws Exception {
         ResponseEnterEvent responseEnterEvent = new ResponseEnterEvent();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+
         try {
-            String regID = extractRegId(request.getParameterMap());
+            String regID = extractParamByName(request.getParameterMap(), REG_ID);
+            String dateFrom = extractParamByName(request.getParameterMap(), DATE_FROM);
+            String dateTo = extractParamByName(request.getParameterMap(), DATE_TO);
+            
             Date dateFromD = new SimpleDateFormat("yyyy-MM-dd").parse(dateFrom);
             Date dateToD = new SimpleDateFormat("yyyy-MM-dd").parse(dateTo);
 
@@ -672,7 +690,8 @@ public class FpsapiController {
             }
 
             for (EnterEvent event : events) {
-                if (event.getPassDirection() == EnterEvent.ENTRY || event.getPassDirection() == EnterEvent.EXIT || event.getPassDirection() == EnterEvent.RE_ENTRY
+                if (event.getPassDirection() == EnterEvent.ENTRY || event.getPassDirection() == EnterEvent.EXIT
+                        || event.getPassDirection() == EnterEvent.RE_ENTRY
                         || event.getPassDirection() == EnterEvent.RE_EXIT) {
                     responseEnterEvent.getEnterEvents().add(enterEventFilling(event));
                 } else {
@@ -695,7 +714,7 @@ public class FpsapiController {
             responseEnterEvent.setErrorCode(Long.toString(ResponseCodes.RC_INTERNAL_ERROR.getCode()));
             responseEnterEvent.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseEnterEvent).build();
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("InternalError", e);
             responseEnterEvent.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
             responseEnterEvent.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
@@ -706,11 +725,11 @@ public class FpsapiController {
         }
     }
 
-    private EnterEventItem enterEventFilling (EnterEvent enterEvent){
+    private EnterEventItem enterEventFilling(EnterEvent enterEvent) {
         EnterEventItem eventItem = new EnterEventItem();
         eventItem.setEvtDateTime(timeConverter(enterEvent.getEvtDateTime()));
         eventItem.setDirection(Integer.toString(enterEvent.getPassDirection()));
-        if(enterEvent.getPassDirection() == 1) {
+        if (enterEvent.getPassDirection() == 1) {
             enterEvent.setEnterName("Выход из здания");
         } else {
             enterEvent.setEnterName("Вход в здание");
@@ -725,15 +744,14 @@ public class FpsapiController {
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
     @Path(value = "/netrika/mobile/v1/accounts")
-    public Response Accounts (@Context HttpServletRequest request)
-            throws Exception {
+    public Response Accounts(@Context HttpServletRequest request) throws Exception {
         ResponseAccounts responseAccounts = new ResponseAccounts();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
-            String regID = extractRegId(request.getParameterMap());
+            String regID = extractParamByName(request.getParameterMap(), REG_ID);
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
@@ -751,8 +769,8 @@ public class FpsapiController {
             responseAccounts.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
             responseAccounts.setErrorMessage(ResponseCodes.RC_OK.toString());
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseAccounts).build();
-        } catch(ParseException e) {
-            logger.error(ERROR_DATE_FORMAT,e);
+        } catch (ParseException e) {
+            logger.error(ERROR_DATE_FORMAT, e);
             responseAccounts.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
             responseAccounts.setErrorMessage(ERROR_REQUEST_PARAMETRS);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseAccounts).build();
@@ -771,27 +789,29 @@ public class FpsapiController {
             HibernateUtils.close(persistenceSession, logger);
         }
     }
-    private AccountsItem accountsFilling(Client client){
+
+    private AccountsItem accountsFilling(Client client) {
         AccountsItem accountsItem = new AccountsItem();
         accountsItem.setId(Long.toString(client.getContractId()));
-        accountsItem.setSum(Double.toString(client.getBalance().doubleValue()/100));
+        accountsItem.setSum(Double.toString(client.getBalance().doubleValue() / 100));
         accountsItem.setAccouttypename(accountsItem.getAccouttypename());
         accountsItem.setAccounttypeid(accountsItem.getAccounttypeid());
         return accountsItem;
     }
 
-     private String extractRegId(Map<String, String[]> parametersMap) {
-        for(String key : parametersMap.keySet()) {
+    private String extractParamByName(Map<String, String[]> parametersMap, String name) {
+        for (String key : parametersMap.keySet()) {
             String tmpString = key.toLowerCase();
-            if (!tmpString.equals(REG_ID)) {
+            if (!tmpString.equals(name)) {
                 continue;
             }
-            String [] paramValue = parametersMap.get(key);
-            if(paramValue.length > 1 || paramValue.length == 0) {
-                throw new IllegalArgumentException("Unexpected regid size");
+            String[] paramValue = parametersMap.get(key);
+            if (paramValue.length > 1 || paramValue.length == 0) {
+                throw new IllegalArgumentException("Unexpected " + name + " size");
             }
             return paramValue[0];
         }
         return null;
-     }
+    }
+
 }
