@@ -293,8 +293,6 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             if (isAllFriendlyOrgs)
             {
                 StringBuilder sb = new StringBuilder();
-                //Адресс главного корпуса
-                sb.append(orgLoad.getShortAddress());
                 sb.append(", ");
                 for (Org org : orgLoad.getFriendlyOrg()) {
                     sb.append(org.getShortAddress()).append(", ");
