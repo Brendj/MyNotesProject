@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.AutoPlanPaymentSettingType;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -17,6 +19,8 @@ public class AutoPlanPaymentSettingSettingValue extends AbstractParserBySettingV
     private Date payTime; //  0:00 - время автооплаты
     private int porog;//100 - порог срабатывания (от 0 до 100)
     private static SimpleDateFormat dateOnlyFormat = new SimpleDateFormat("HH:mm");
+
+    private static final int DEFAULT_CAPACITY = 3;
 
 
     public AutoPlanPaymentSettingSettingValue(String[] values) throws ParseException {
@@ -38,6 +42,21 @@ public class AutoPlanPaymentSettingSettingValue extends AbstractParserBySettingV
     @Override
     public boolean check() {
         return true;
+    }
+
+    @Override
+    protected int getECafeSettingArrayCapacity() {
+        return DEFAULT_CAPACITY;
+    }
+
+    @Override
+    protected Integer getOrgSettingTypeByIndex(Integer index) {
+        return AutoPlanPaymentSettingType.getGlobalIdByECafeSettingValueIndex(index);
+    }
+
+    @Override
+    protected Integer getIndexByOrgSettingType(Integer type) {
+        return AutoPlanPaymentSettingType.getECafeSettingValueIndexByGlobalId(type);
     }
 
     public boolean isOffOnFlag() {

@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.SalesReportPrinterType;
+
 import java.text.ParseException;
 
 /**
@@ -18,6 +20,8 @@ public class SalesReportPrinterSettingValue extends AbstractParserBySettingValue
     private String e;//e: 6 - ширина колонки количество (возможные значения 6,7,8, по умолчанию 6)
     private String f;//f: 12 - ширина колонки стоимость (возможные значения 10,11,12,13,14,15, по умолчанию 12)
     private String g;//g: текстовое поле выводимое на принтере
+
+    private static final int DEFAULT_CAPACITY = 7;
 
     public SalesReportPrinterSettingValue(String[] values) throws ParseException {
         super(values);
@@ -47,6 +51,21 @@ public class SalesReportPrinterSettingValue extends AbstractParserBySettingValue
         int d1 = getValuesByD();
         int d2 = Integer.parseInt(d);
         return d1==d2;
+    }
+
+    @Override
+    protected int getECafeSettingArrayCapacity() {
+        return DEFAULT_CAPACITY;
+    }
+
+    @Override
+    protected Integer getOrgSettingTypeByIndex(Integer index) {
+        return SalesReportPrinterType.getGlobalIdByECafeSettingValueIndex(index);
+    }
+
+    @Override
+    protected Integer getIndexByOrgSettingType(Integer type) {
+        return SalesReportPrinterType.getECafeSettingValueIndexByGlobalId(type);
     }
 
     public Integer getValuesByD(){
