@@ -35,7 +35,8 @@ public class OrgSettingDAOUtils {
 
         Query query = session.createQuery("SELECT MAX(os.version) FROM OrgSetting AS os WHERE os.idOfOrg in (:orgIds)");
         query.setParameterList("orgIds", friendlyOrgsIds);
-        return (Long) query.uniqueResult();
+        Long maxVer = (Long) query.uniqueResult();
+        return maxVer == null ? 0 : maxVer;
     }
 
     public static OrgSetting getOrgSettingByGroupIdAndOrg(Session session, Integer groupID, Integer idOfOrg) {
