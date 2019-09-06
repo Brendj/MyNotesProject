@@ -78,6 +78,7 @@ public class CryptoSign {
                     sucsess = false;
                 }
                 if (card.getTypeId() != 1 && card.getTypeId() != 9 && card.getTypeId() != 10 && card.getTypeId() != 11
+                        && card.getTypeId() != 12 && card.getTypeId() != 13 && card.getTypeId() != 14
                         && card.getTypeId() != 15) {
                     responseCardSign.setMessage("Неверный тип носителя");
                     sucsess = false;
