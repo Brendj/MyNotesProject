@@ -18,6 +18,8 @@ import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.PeriodTypeMenu;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -28,7 +30,9 @@ import org.springframework.stereotype.Component;
 import javax.faces.model.SelectItem;
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
+import java.util.Iterator;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @Scope("session")
@@ -37,6 +41,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     Logger logger = LoggerFactory.getLogger(ApplicationForFoodReportPage.class);
     private List<ApplicationForFoodReportItem> items = new ArrayList<ApplicationForFoodReportItem>();
     private ApplicationForFoodReportItem currentItem;
+    private List<ApplicationForFoodReportItem> deletedItems = new ArrayList<>();
 
     private List<SelectItem> statuses = readAllItems();
     private String status;
@@ -45,6 +50,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     private String number = "";
     private final static Integer ALL_BENEFITS = -1;
     private Boolean showPeriod = false;
+    private static final String ARCHIEVE_COMMENT = "ЗЛП заархивировано";
 
     private static List<SelectItem> readAllItems() {
         ApplicationForFoodState[] states = ApplicationForFoodState.values();
@@ -91,6 +97,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
 
     public void reload() {
         items.clear();
+        deletedItems.clear();
         Session session = null;
         Transaction transaction = null;
         try {
@@ -142,10 +149,12 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     }
 
     public void makeArchieved() {
-        for (ApplicationForFoodReportItem item : items) {
+        Iterator<ApplicationForFoodReportItem> iterator = items.iterator();
+        while (iterator.hasNext()) {
+            ApplicationForFoodReportItem item = iterator.next();
             if (item.getApplicationForFood().getIdOfApplicationForFood().equals(currentItem.getApplicationForFood().getIdOfApplicationForFood())) {
-                item.setMovedToArchieve(true);
-                item.setChanged(true);
+                deletedItems.add(item);
+                iterator.remove();
                 break;
             }
         }
@@ -190,6 +199,30 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                     }
                 }
             }
+            CategoryDiscountDSZN discountInoe = getDiscountInoe(session);
+            for (ApplicationForFoodReportItem item : deletedItems) {
+                item.getApplicationForFood().setArchived(true);
+                item.getApplicationForFood().setVersion(nextVersion);
+                session.update(item.getApplicationForFood());
+
+                Client client = item.getApplicationForFood().getClient();
+                Set<CategoryDiscount> discounts = client.getCategories();
+                if (discounts.contains(discountInoe.getCategoryDiscount())) {
+                    String oldDiscounts = client.getCategoriesDiscounts();
+                    String newDiscounts = "";
+                    for (String str : oldDiscounts.split(",")) {
+                        if (!str.equals(discountInoe.getCode()))
+                            newDiscounts += str + ",";
+                    }
+                    if (!StringUtils.isEmpty(newDiscounts))
+                        newDiscounts = newDiscounts.substring(0, newDiscounts.length()-1);
+                    Integer oldDiscountMode = client.getDiscountMode();
+                    Integer newDiscountMode =
+                            StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+                    ClientManager
+                            .renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode, ARCHIEVE_COMMENT);
+                }
+            }
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
@@ -201,6 +234,11 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
         }
         reload();
         printMessage(wereChanges ? "Операция выполнена" : "Нет измененных записей");
+    }
+
+    private CategoryDiscountDSZN getDiscountInoe(Session session) {
+        Query query = session.createQuery("select d from CategoryDiscountDSZN d where d.ETPCode is null and NOT d.deleted");
+        return (CategoryDiscountDSZN)query.uniqueResult();
     }
 
     public String getStatusString(ApplicationForFoodStatus status) {

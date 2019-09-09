@@ -541,6 +541,26 @@ public class ClientManager {
         }
     }
 
+    public static void renewDiscounts(Session session, Client client, String newDiscounts, String oldDiscounts,
+            Integer newDiscountMode, Integer oldDiscountMode, String historyComment) throws Exception {
+        client.setCategoriesDiscounts(newDiscounts);
+        client.setDiscountMode(newDiscountMode);
+
+        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
+                newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
+        discountChangeHistory.setComment(historyComment);
+        session.save(discountChangeHistory);
+        client.setLastDiscountsUpdate(new Date());
+        try {
+            client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
+        } catch (Exception e) {
+            logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
+        }
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+        client.setClientRegistryVersion(clientRegistryVersion);
+        session.update(client);
+    }
+
     public static Set<CategoryDiscount> getCategoriesSet(Session session, String categories) {
         if(StringUtils.isEmpty(categories)) {
             return new HashSet<CategoryDiscount>();
