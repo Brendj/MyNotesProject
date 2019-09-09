@@ -19,9 +19,10 @@ import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.PeriodTypeMenu;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Query;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -30,7 +31,7 @@ import org.springframework.stereotype.Component;
 import javax.faces.model.SelectItem;
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
-import java.util.Iterator;
+import java.util.Date;
 import java.util.List;
 import java.util.Set;
 
@@ -149,12 +150,10 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     }
 
     public void makeArchieved() {
-        Iterator<ApplicationForFoodReportItem> iterator = items.iterator();
-        while (iterator.hasNext()) {
-            ApplicationForFoodReportItem item = iterator.next();
+        for (ApplicationForFoodReportItem item : items) {
             if (item.getApplicationForFood().getIdOfApplicationForFood().equals(currentItem.getApplicationForFood().getIdOfApplicationForFood())) {
                 deletedItems.add(item);
-                iterator.remove();
+                item.setArchieved(true);
                 break;
             }
         }
@@ -200,18 +199,22 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 }
             }
             CategoryDiscountDSZN discountInoe = getDiscountInoe(session);
+            String isppCodeInoe = Long.toString(discountInoe.getCategoryDiscount().getIdOfCategoryDiscount());
             for (ApplicationForFoodReportItem item : deletedItems) {
-                item.getApplicationForFood().setArchived(true);
-                item.getApplicationForFood().setVersion(nextVersion);
-                session.update(item.getApplicationForFood());
+                wereChanges = true;
+                ApplicationForFood applicationForFood = (ApplicationForFood)session.load(ApplicationForFood.class, item.getApplicationForFood().getIdOfApplicationForFood());
+                applicationForFood.setArchived(true);
+                applicationForFood.setVersion(nextVersion);
+                applicationForFood.setLastUpdate(new Date());
+                session.update(applicationForFood);
 
-                Client client = item.getApplicationForFood().getClient();
+                Client client = DAOUtils.findClient(session, applicationForFood.getClient().getIdOfClient());
                 Set<CategoryDiscount> discounts = client.getCategories();
                 if (discounts.contains(discountInoe.getCategoryDiscount())) {
                     String oldDiscounts = client.getCategoriesDiscounts();
                     String newDiscounts = "";
                     for (String str : oldDiscounts.split(",")) {
-                        if (!str.equals(discountInoe.getCode()))
+                        if (!str.equals(isppCodeInoe))
                             newDiscounts += str + ",";
                     }
                     if (!StringUtils.isEmpty(newDiscounts))
@@ -237,8 +240,10 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     }
 
     private CategoryDiscountDSZN getDiscountInoe(Session session) {
-        Query query = session.createQuery("select d from CategoryDiscountDSZN d where d.ETPCode is null and NOT d.deleted");
-        return (CategoryDiscountDSZN)query.uniqueResult();
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        criteria.add(Restrictions.isNull("ETPCode"));
+        criteria.add(Restrictions.eq("deleted", false));
+        return (CategoryDiscountDSZN)criteria.uniqueResult();
     }
 
     public String getStatusString(ApplicationForFoodStatus status) {

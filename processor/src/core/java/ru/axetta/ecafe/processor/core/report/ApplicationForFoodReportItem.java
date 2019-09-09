@@ -28,7 +28,7 @@ public class ApplicationForFoodReportItem {
     private boolean isChanged;
     private List<ApplicationForFoodStatus> statuses;
     private String mobile;
-    private Boolean movedToArchieve;
+    private Boolean archieved;
 
     public ApplicationForFoodReportItem() {
 
@@ -50,7 +50,7 @@ public class ApplicationForFoodReportItem {
         isChanged = false;
         this.mobile = applicationForFood.getMobile();
         statuses = new ArrayList<ApplicationForFoodStatus>();
-        this.movedToArchieve = false;
+        this.archieved = applicationForFood.getArchived();
     }
 
     public String getApplicationForFoodStateString() {
@@ -75,11 +75,15 @@ public class ApplicationForFoodReportItem {
     }
 
     public Boolean canBeMovedToArchieve() {
-        return isInoe;
+        return isInoe && !archieved;
     }
 
     public String getArchieved() {
-        return applicationForFood.getArchived() ? "Да" : "Нет";
+        return this.archieved ? "Да" : "Нет";
+    }
+
+    public void setArchieved(Boolean archieved) {
+        this.archieved = archieved;
     }
 
     public String getServiceNumber() {
@@ -202,11 +206,4 @@ public class ApplicationForFoodReportItem {
         this.applicantFio = applicantFio;
     }
 
-    public Boolean getMovedToArchieve() {
-        return movedToArchieve;
-    }
-
-    public void setMovedToArchieve(Boolean movedToArchieve) {
-        this.movedToArchieve = movedToArchieve;
-    }
 }

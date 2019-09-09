@@ -236,7 +236,7 @@
                              action="#{applicationForFoodReportPage.makeArchieved()}" styleClass="important-command-link">
                 <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}" />
             </a4j:commandLink>
-            <h:outputText escape="false" value="Перенесено в архив" rendered="#{item.movedToArchieve}" style="color: red"/>
+
         </rich:column>
         <rich:column headerClass="column-header">
             <a4j:commandButton value="..." reRender="applicationForFoodHistoryTable,applicationForFoodMessagePanel" ajaxSingle="true"
