@@ -884,6 +884,9 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
+        fullProcessingRequestFeeding(request, syncHistory, responseSections);
+        fullProcessingClientDiscountDSZN(request, syncHistory, responseSections);
+
         logger.info("Full sync performance info: " + performanceLogger.toString());
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -1039,6 +1042,12 @@ public class Processor implements SyncProcessor {
         fullProcessingRequestFeeding(request, syncHistory, responseSections);
 
         fullProcessingClientDiscountDSZN(request, syncHistory, responseSections);
+
+        fullProcessingOrgSettings(request, syncHistory, responseSections);
+
+        fullProcessingCardRequests(request, syncHistory, responseSections);
+
+        fullProcessingMenusCalendar(request, syncHistory, responseSections);
 
         // время окончания обработки
         Date syncEndTime = new Date();
@@ -6291,6 +6300,55 @@ public class Processor implements SyncProcessor {
             }
         } catch (Exception e) {
             String message = String.format("fullProcessingClientDiscountDSZN: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingOrgSettings(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {
+        try {
+            OrgSettingsRequest orgSettingsRequest = request.getOrgSettingsRequest();
+            if (orgSettingsRequest != null) {
+                orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
+                OrgSettingSection orgSettingSection = processOrgSettings(orgSettingsRequest);
+                addToResponseSections(orgSettingSection, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process OrgSettingSetting: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingCardRequests(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {
+        try {
+            CardRequests cardRequest = request.getCardRequests();
+            if (cardRequest != null) {
+                CardRequestsData cardRequestsData = processCardRequestsData(request.getCardRequests());
+                addToResponseSections(cardRequestsData, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process CardRequests: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingMenusCalendar(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {
+        try {
+            MenusCalendarSupplierRequest menusCalendarSupplierRequest = request.getMenusCalendarSupplierRequest();
+            if (menusCalendarSupplierRequest != null) {
+                ResMenusCalendar resMenusCalendar = processMenusCalendarSupplier(menusCalendarSupplierRequest);
+                addToResponseSections(resMenusCalendar, responseSections);
+            }
+
+            MenusCalendarRequest menusCalendarRequest = request.getMenusCalendarRequest();
+            if (menusCalendarRequest != null) {
+                MenusCalendarData menusCalendarData = processMenusCalendarData(menusCalendarRequest);
+                addToResponseSections(menusCalendarData, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process CardRequests: %s", e.getMessage());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }

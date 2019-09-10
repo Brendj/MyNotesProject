@@ -417,6 +417,11 @@
     <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.canConfirmGroupPayment}" styleClass="output-text"
                              disabled="true"  readonly="true"/>
 
+    <h:outputText escape="true" value="Пользователь ОП" styleClass="output-text"
+                  rendered="#{mainPage.clientViewPage.isEligibleToViewUserOP()}" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.userOP}" styleClass="output-text" disabled="true"
+                             readonly="true" rendered="#{mainPage.clientViewPage.isEligibleToViewUserOP()}" />
+
     <h:outputText escape="true" value="Дата и время подтверждения номера телефона" styleClass="output-text"
                  rendered="#{!mainPage.clientViewPage.isLastConfirmMobileEmpty()}" />
     <h:inputText value="#{mainPage.clientViewPage.lastConfirmMobile}" readonly="true" converter="timeConverter"

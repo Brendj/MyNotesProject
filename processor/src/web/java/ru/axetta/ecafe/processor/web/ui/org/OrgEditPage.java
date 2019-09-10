@@ -130,6 +130,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean helpdeskEnabled;
     private Boolean preordersEnabled;
     private Boolean multiCardModeEnabled;
+    private Boolean participantOP;
 
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
@@ -308,6 +309,10 @@ public class OrgEditPage extends BasicWorkspacePage
             }
         }
 
+        for (Org o : selectOrg) {
+            o.setParticipantOP(participantOP);
+        }
+
         org.setCommodityAccounting(changeCommodityAccounting);
         if(changeCommodityAccounting){
 
@@ -382,6 +387,11 @@ public class OrgEditPage extends BasicWorkspacePage
         }
         if(!multiCardModeEnabled){
             ClientManager.resetMultiCardModeToAllClientsAndBlockCardsAndUpRegVersion(org, session);
+        }
+
+        org.setParticipantOP(participantOP);
+        if (!participantOP) {
+            DAOUtils.removeUserOPFlag(session, org.getIdOfOrg());
         }
 
         org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
@@ -542,6 +552,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.requestForVisitsToOtherOrg = org.getRequestForVisitsToOtherOrg();
         this.preordersEnabled = org.getPreordersEnabled();
         this.multiCardModeEnabled = org.multiCardModeIsEnabled();
+        this.participantOP = org.getParticipantOP();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1332,5 +1343,13 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setRequestForVisitsToOtherOrg(Boolean requestForVisitsToOtherOrg) {
         this.requestForVisitsToOtherOrg = requestForVisitsToOtherOrg;
+    }
+
+    public Boolean getParticipantOP() {
+        return participantOP;
+    }
+
+    public void setParticipantOP(Boolean participantOP) {
+        this.participantOP = participantOP;
     }
 }

@@ -307,6 +307,8 @@ public class OrderDetail {
     public final static String[] PRODUCTION_NAMES_TYPES = {
             "Собственное", "Централизованное", "Централизованное с доготовкой", "Закупленное", "Вендинг",
             "Коммерческое питание"};
+    public final static String[] PRODUCTION_CODE_TYPES = {
+            "own", "centralize", "centralize_cook", "purchase", "vending", "commercial"};
 
     public static String getMenuOriginAsString(int menuOrigin) {
         if (menuOrigin==PRODUCT_OWN) return PRODUCTION_NAMES_TYPES[0];
@@ -316,6 +318,25 @@ public class OrderDetail {
         else if (menuOrigin==PRODUCT_VENDING) return PRODUCTION_NAMES_TYPES[4];
         else if (menuOrigin==PRODUCT_COMMERCIAL) return PRODUCTION_NAMES_TYPES[5];
         return "Неизвестное";
+    }
+
+    public static String getMenuOriginAsCode(int menuOrigin) {
+        switch (menuOrigin) {
+            case PRODUCT_OWN:
+                return PRODUCTION_CODE_TYPES[0];
+            case PRODUCT_CENTRALIZE:
+                return PRODUCTION_CODE_TYPES[1];
+            case PRODUCT_CENTRALIZE_COOK:
+                return PRODUCTION_CODE_TYPES[2];
+            case PRODUCT_PURCHASE:
+                return PRODUCTION_CODE_TYPES[3];
+            case PRODUCT_VENDING:
+                return PRODUCTION_CODE_TYPES[4];
+            case PRODUCT_COMMERCIAL:
+                return PRODUCTION_CODE_TYPES[5];
+            default:
+                return "unknown";
+        }
     }
 
     public boolean isComplex() {
