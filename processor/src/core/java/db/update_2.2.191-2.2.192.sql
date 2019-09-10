@@ -9,3 +9,5 @@ ALTER TABLE cf_clients ADD COLUMN userop bool;
 
 --195
 ALTER TABLE cf_orgs ADD COLUMN participantop bool;
+
+--! ФИНАЛИЗИРОВАН 10.09.2019, НЕ МЕНЯТЬ
