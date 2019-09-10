@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SalesReport" pageWidth="2380" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="2340" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="691a2cc4-4642-4234-8e81-02d681bc8669">
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SalesReport" pageWidth="2650" pageHeight="595" orientation="Landscape" whenNoDataType="AllSectionsNoDetail" columnWidth="2610" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="691a2cc4-4642-4234-8e81-02d681bc8669">
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.1" value="pageHeader"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.xls.exclude.origin.keep.first.band.1" value="columnHeader"/>
@@ -8,9 +8,9 @@
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.band.2" value="pageFooter"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.1" value="columnHeader"/>
 	<property name="net.sf.jasperreports.export.csv.exclude.origin.keep.first.band.2" value="columnFooter"/>
-	<property name="ireport.zoom" value="1.0000000000000306"/>
-	<property name="ireport.x" value="0"/>
-	<property name="ireport.y" value="15"/>
+	<property name="ireport.zoom" value="1.2100000000000377"/>
+	<property name="ireport.x" value="2072"/>
+	<property name="ireport.y" value="62"/>
 	<style name="table">
 		<box>
 			<pen lineWidth="1.0" lineColor="#000000"/>
@@ -27,26 +27,20 @@
 	<field name="groupName" class="java.lang.String"/>
 	<field name="fio" class="java.lang.String"/>
 	<field name="presenceOfDay" class="java.lang.String"/>
+	<field name="timeinWeekList" class="java.util.List"/>
 	<group name="origin">
 		<groupExpression><![CDATA[$F{groupName}]]></groupExpression>
 		<groupHeader>
-			<band height="96">
-				<staticText>
-					<reportElement style="table" x="36" y="56" width="67" height="40" uuid="bad7ce92-782b-4721-b5cf-0c0729a2db25"/>
-					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
-						<font size="9" isBold="true"/>
-					</textElement>
-					<text><![CDATA[ФИО]]></text>
-				</staticText>
+			<band height="105">
 				<textField>
-					<reportElement style="table" stretchType="RelativeToTallestObject" x="103" y="56" width="2233" height="20" uuid="3d1db738-6b77-4db7-b5f8-057d564ecf2a"/>
+					<reportElement style="table" stretchType="RelativeToTallestObject" x="103" y="56" width="2505" height="20" uuid="3d1db738-6b77-4db7-b5f8-057d564ecf2a"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font size="9" isBold="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{monthName}]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement style="table" x="0" y="56" width="36" height="40" uuid="38497000-846b-4def-88c5-c776e1050518"/>
+					<reportElement style="table" x="0" y="56" width="36" height="49" uuid="38497000-846b-4def-88c5-c776e1050518"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 						<font size="9" isBold="true"/>
 					</textElement>
@@ -60,7 +54,7 @@
 					<text><![CDATA[]]></text>
 				</staticText>
 				<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-					<reportElement style="table" stretchType="RelativeToTallestObject" x="0" y="36" width="2336" height="20" uuid="8e7adb87-7969-4539-933e-5fce84424071"/>
+					<reportElement style="table" stretchType="RelativeToTallestObject" x="0" y="36" width="2608" height="20" uuid="8e7adb87-7969-4539-933e-5fce84424071"/>
 					<textElement verticalAlignment="Middle" markup="none">
 						<font isBold="true"/>
 						<paragraph leftIndent="10"/>
@@ -68,228 +62,263 @@
 					<textFieldExpression><![CDATA[$F{groupName}]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="103" y="76" width="68" height="20" uuid="03338e7f-4bd6-45ba-882d-72d558714081"/>
+					<reportElement style="table" x="103" y="76" width="68" height="29" uuid="03338e7f-4bd6-45ba-882d-72d558714081"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(0)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="171" y="76" width="68" height="20" uuid="4fa65b2f-828e-43fb-b5f4-14b22e9c48fc"/>
+					<reportElement style="table" x="171" y="76" width="68" height="29" uuid="4fa65b2f-828e-43fb-b5f4-14b22e9c48fc"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(1)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="239" y="76" width="68" height="20" uuid="81426c4e-5ee3-47cd-afb5-759f7978ce2c"/>
+					<reportElement style="table" x="239" y="76" width="68" height="29" uuid="81426c4e-5ee3-47cd-afb5-759f7978ce2c"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(2)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="307" y="76" width="68" height="20" uuid="8103d774-5168-4b6d-a93f-99af5e05e419"/>
+					<reportElement style="table" x="307" y="76" width="68" height="29" uuid="8103d774-5168-4b6d-a93f-99af5e05e419"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(3)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="375" y="76" width="68" height="20" uuid="0e4fc18d-a554-4e43-b6bb-3cb53ef21fe8"/>
+					<reportElement style="table" x="375" y="76" width="68" height="29" uuid="0e4fc18d-a554-4e43-b6bb-3cb53ef21fe8"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(4)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="443" y="76" width="68" height="20" uuid="511c8ae2-c11f-424b-a160-d893f914027c"/>
+					<reportElement style="table" x="443" y="76" width="68" height="29" uuid="511c8ae2-c11f-424b-a160-d893f914027c"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(5)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="579" y="76" width="68" height="20" uuid="bb418edc-3dcd-4bdd-a1be-b763a25ed843"/>
+					<reportElement style="table" x="647" y="76" width="68" height="29" uuid="bb418edc-3dcd-4bdd-a1be-b763a25ed843"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(7)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="511" y="76" width="68" height="20" uuid="5009bd8c-084f-4304-b3a9-3dd0476b5037"/>
+					<reportElement style="table" x="511" y="76" width="68" height="29" uuid="5009bd8c-084f-4304-b3a9-3dd0476b5037"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(6)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="715" y="76" width="68" height="20" uuid="1369f866-95cf-4400-966d-e1ec2aec0bd6"/>
+					<reportElement style="table" x="783" y="76" width="68" height="29" uuid="1369f866-95cf-4400-966d-e1ec2aec0bd6"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(9)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="851" y="76" width="68" height="20" uuid="aaa6d8df-6127-4cbc-89d6-bd9b2410f52a"/>
+					<reportElement style="table" x="919" y="76" width="68" height="29" uuid="aaa6d8df-6127-4cbc-89d6-bd9b2410f52a"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(11)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="647" y="76" width="68" height="20" uuid="bc91b6b6-9d66-4aa6-9d24-272203a02538"/>
+					<reportElement style="table" x="715" y="76" width="68" height="29" uuid="bc91b6b6-9d66-4aa6-9d24-272203a02538"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(8)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="783" y="76" width="68" height="20" uuid="c318fbe8-0c36-4bec-9c74-97b44d41b294"/>
+					<reportElement style="table" x="851" y="76" width="68" height="29" uuid="c318fbe8-0c36-4bec-9c74-97b44d41b294"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(10)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="919" y="76" width="68" height="20" uuid="2121b510-1137-479e-9ae8-834b34d4ae17"/>
+					<reportElement style="table" x="987" y="76" width="68" height="29" uuid="2121b510-1137-479e-9ae8-834b34d4ae17"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(12)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1667" y="76" width="68" height="20" uuid="a84eae10-262c-40b7-9ac2-740314dd8fef"/>
+					<reportElement style="table" x="1871" y="76" width="68" height="29" uuid="a84eae10-262c-40b7-9ac2-740314dd8fef"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(23)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1123" y="76" width="68" height="20" uuid="9863cb40-e6be-43c8-b259-9befafeaf579"/>
+					<reportElement style="table" x="1259" y="76" width="68" height="29" uuid="9863cb40-e6be-43c8-b259-9befafeaf579"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(15)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1327" y="76" width="68" height="20" uuid="bf4f9d54-0962-4ff3-8264-f723c8265b4a"/>
+					<reportElement style="table" x="1463" y="76" width="68" height="29" uuid="bf4f9d54-0962-4ff3-8264-f723c8265b4a"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(18)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1463" y="76" width="68" height="20" uuid="481f8f90-a1eb-478d-a919-d6215935e1ef"/>
+					<reportElement style="table" x="1599" y="76" width="68" height="29" uuid="481f8f90-a1eb-478d-a919-d6215935e1ef"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(20)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1599" y="76" width="68" height="20" uuid="fb3c5734-a9bb-44f2-8677-6d766e26bf8b"/>
+					<reportElement style="table" x="1803" y="76" width="68" height="29" uuid="fb3c5734-a9bb-44f2-8677-6d766e26bf8b"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(22)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="987" y="76" width="68" height="20" uuid="8dc4f6d4-e245-4b1e-a1b2-aa912a703f7b"/>
+					<reportElement style="table" x="1055" y="76" width="68" height="29" uuid="8dc4f6d4-e245-4b1e-a1b2-aa912a703f7b"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(13)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1055" y="76" width="68" height="20" uuid="fb5bf778-f099-4ebd-ae1d-8f3adc720964"/>
+					<reportElement style="table" x="1191" y="76" width="68" height="29" uuid="fb5bf778-f099-4ebd-ae1d-8f3adc720964"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(14)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1259" y="76" width="68" height="20" uuid="8c1c05d8-4abf-489b-9974-122fd29c4d8b"/>
+					<reportElement style="table" x="1395" y="76" width="68" height="29" uuid="8c1c05d8-4abf-489b-9974-122fd29c4d8b"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(17)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1191" y="76" width="68" height="20" uuid="a4f2b8bf-2bd9-438c-9e61-7fb68ae5b06f"/>
+					<reportElement style="table" x="1327" y="76" width="68" height="29" uuid="a4f2b8bf-2bd9-438c-9e61-7fb68ae5b06f"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(16)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1395" y="76" width="68" height="20" uuid="ef12644a-4af9-4dea-984e-94b66d968725"/>
+					<reportElement style="table" x="1531" y="76" width="68" height="29" uuid="ef12644a-4af9-4dea-984e-94b66d968725"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(19)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1531" y="76" width="68" height="20" uuid="950767d0-7c34-4ab4-aaf9-a994a2ab6e68"/>
+					<reportElement style="table" x="1735" y="76" width="68" height="29" uuid="950767d0-7c34-4ab4-aaf9-a994a2ab6e68"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(21)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1803" y="76" width="68" height="20" uuid="f429fafb-d6c1-45a5-8fb0-5842ecb72d60"/>
+					<reportElement style="table" x="2007" y="76" width="68" height="29" uuid="f429fafb-d6c1-45a5-8fb0-5842ecb72d60"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(25)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1735" y="76" width="68" height="20" uuid="646d15c9-c62b-4f09-9991-193b7c1cf6ad"/>
+					<reportElement style="table" x="1939" y="76" width="68" height="29" uuid="646d15c9-c62b-4f09-9991-193b7c1cf6ad"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(24)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1871" y="76" width="68" height="20" uuid="6f715cf7-2a1c-4c74-bfc1-a902d21995de"/>
+					<reportElement style="table" x="2075" y="76" width="68" height="29" uuid="6f715cf7-2a1c-4c74-bfc1-a902d21995de"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(26)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="1939" y="76" width="68" height="20" uuid="0e3fd0f4-38a8-4572-a235-15e4ba811640"/>
+					<reportElement style="table" x="2143" y="76" width="68" height="29" uuid="0e3fd0f4-38a8-4572-a235-15e4ba811640"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(27)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="2007" y="76" width="68" height="20" uuid="48bd81da-5011-4b03-9cb7-e1ff6eae775c"/>
+					<reportElement style="table" x="2279" y="76" width="68" height="29" uuid="48bd81da-5011-4b03-9cb7-e1ff6eae775c"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(28)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="2143" y="76" width="68" height="20" uuid="f75cb745-c0e5-4c1f-8f64-0a5c0109110e"/>
+					<reportElement style="table" x="2415" y="76" width="68" height="29" uuid="f75cb745-c0e5-4c1f-8f64-0a5c0109110e"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(30)]]></textFieldExpression>
 				</textField>
 				<textField isBlankWhenNull="true">
-					<reportElement style="table" x="2075" y="76" width="68" height="20" uuid="0d63e534-fdac-4e11-8095-bfa36bf5f47e"/>
+					<reportElement style="table" x="2347" y="76" width="68" height="29" uuid="0d63e534-fdac-4e11-8095-bfa36bf5f47e"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
 						<font fontName="DejaVu Sans" size="9" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 					</textElement>
 					<textFieldExpression><![CDATA[$P{days}.get(29)]]></textFieldExpression>
 				</textField>
 				<staticText>
-					<reportElement style="table" stretchType="RelativeToTallestObject" x="2211" y="76" width="125" height="20" uuid="39cc42da-e93b-46e7-b2dc-37f356032541"/>
+					<reportElement style="table" stretchType="RelativeToTallestObject" x="2483" y="76" width="125" height="29" uuid="39cc42da-e93b-46e7-b2dc-37f356032541"/>
 					<textElement textAlignment="Center" verticalAlignment="Middle">
-						<font size="8"/>
+						<font fontName="DejaVu Sans" size="9" isBold="true"/>
 					</textElement>
-					<text><![CDATA[Присутствие в течение дня]]></text>
+					<text><![CDATA[Итого]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="36" y="56" width="67" height="49" uuid="bad7ce92-782b-4721-b5cf-0c0729a2db25"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<text><![CDATA[ФИО]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="579" y="76" width="68" height="29" uuid="bad7ce92-782b-4721-b5cf-0c0729a2db25"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Итого за неделю]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="1123" y="76" width="68" height="29" uuid="528c81b0-8a7c-4663-b76e-40f8b48b2dd6"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Итого за неделю]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="1667" y="76" width="68" height="29" uuid="4be96663-893b-4a44-8309-788e22a78ae2"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Итого за неделю]]></text>
+				</staticText>
+				<staticText>
+					<reportElement style="table" x="2211" y="76" width="68" height="29" uuid="b8b8b729-0c82-4b67-9c11-30a3e1b7af4c"/>
+					<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+						<font size="9" isBold="true"/>
+					</textElement>
+					<text><![CDATA[Итого за неделю]]></text>
 				</staticText>
 			</band>
 		</groupHeader>
@@ -436,7 +465,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(5)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="579" y="0" width="68" height="20" uuid="e61937e1-daff-4fda-87e4-0bf12bd501e2">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="647" y="0" width="68" height="20" uuid="e61937e1-daff-4fda-87e4-0bf12bd501e2">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -445,7 +474,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(7)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="919" y="0" width="68" height="20" uuid="50b92db6-6210-4896-a0a1-30f8720a481a">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="987" y="0" width="68" height="20" uuid="50b92db6-6210-4896-a0a1-30f8720a481a">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -454,7 +483,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(12)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="783" y="0" width="68" height="20" uuid="4f11de66-c433-451b-b3e3-5288d992e7e8">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="851" y="0" width="68" height="20" uuid="4f11de66-c433-451b-b3e3-5288d992e7e8">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -463,7 +492,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(10)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="987" y="0" width="68" height="20" uuid="6d61a6a8-d035-4117-baaa-33ecc021c037">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1055" y="0" width="68" height="20" uuid="6d61a6a8-d035-4117-baaa-33ecc021c037">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -472,7 +501,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(13)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="851" y="0" width="68" height="20" uuid="95bab36e-2568-4da8-91bc-a0139ad5dae4">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="919" y="0" width="68" height="20" uuid="95bab36e-2568-4da8-91bc-a0139ad5dae4">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -481,7 +510,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(11)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="715" y="0" width="68" height="20" uuid="0b969a4b-2e8e-4baa-9d59-bcc5bfe15eed">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="783" y="0" width="68" height="20" uuid="0b969a4b-2e8e-4baa-9d59-bcc5bfe15eed">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -490,7 +519,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(9)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="647" y="0" width="68" height="20" uuid="9c03ec01-abdf-44a0-9ac5-64ef88806b1d">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="715" y="0" width="68" height="20" uuid="9c03ec01-abdf-44a0-9ac5-64ef88806b1d">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -499,7 +528,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(8)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1055" y="0" width="68" height="20" uuid="eaabdee0-2120-4584-bc77-94e99f15bc14">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1191" y="0" width="68" height="20" uuid="eaabdee0-2120-4584-bc77-94e99f15bc14">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -508,7 +537,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(14)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1395" y="0" width="68" height="20" uuid="abab2cea-d07d-4755-9b0e-8ec0bd515eb9">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1531" y="0" width="68" height="20" uuid="abab2cea-d07d-4755-9b0e-8ec0bd515eb9">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -517,7 +546,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(19)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1803" y="0" width="68" height="20" uuid="43e56c86-f65b-4744-a14c-10d01c765197">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2007" y="0" width="68" height="20" uuid="43e56c86-f65b-4744-a14c-10d01c765197">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -526,7 +555,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(25)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1259" y="0" width="68" height="20" uuid="af48d5f1-cff8-40b2-b219-c7bac09f2de7">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1395" y="0" width="68" height="20" uuid="af48d5f1-cff8-40b2-b219-c7bac09f2de7">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -535,7 +564,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(17)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1667" y="0" width="68" height="20" uuid="33030376-fd19-42ae-bcf5-36cc015b9d6f">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1871" y="0" width="68" height="20" uuid="33030376-fd19-42ae-bcf5-36cc015b9d6f">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -544,7 +573,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(23)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1599" y="0" width="68" height="20" uuid="598a6a10-8170-4577-923f-acec70de748a">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1803" y="0" width="68" height="20" uuid="598a6a10-8170-4577-923f-acec70de748a">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -553,7 +582,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(22)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1463" y="0" width="68" height="20" uuid="0a65cf09-deb2-4372-bc7e-f1a2e60f0a00">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1599" y="0" width="68" height="20" uuid="0a65cf09-deb2-4372-bc7e-f1a2e60f0a00">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -562,7 +591,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(20)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1327" y="0" width="68" height="20" uuid="9cb84a36-0eee-498e-80b9-95462309a7f5">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1463" y="0" width="68" height="20" uuid="9cb84a36-0eee-498e-80b9-95462309a7f5">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -571,7 +600,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(18)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1191" y="0" width="68" height="20" uuid="fb80da5a-ea2f-4e12-b13e-415c1d2c54b5">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1327" y="0" width="68" height="20" uuid="fb80da5a-ea2f-4e12-b13e-415c1d2c54b5">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -580,7 +609,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(16)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1735" y="0" width="68" height="20" uuid="280ee531-b1dc-4014-a56e-2719fb9b8b03">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1939" y="0" width="68" height="20" uuid="280ee531-b1dc-4014-a56e-2719fb9b8b03">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -589,7 +618,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(24)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1531" y="0" width="68" height="20" uuid="0395ada0-3b63-49d1-b9fe-1321a007834b">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1735" y="0" width="68" height="20" uuid="0395ada0-3b63-49d1-b9fe-1321a007834b">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -598,7 +627,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(21)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1871" y="0" width="68" height="20" uuid="c42bf9f3-7bca-41cd-84d8-77061bffb2ce">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2075" y="0" width="68" height="20" uuid="c42bf9f3-7bca-41cd-84d8-77061bffb2ce">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -607,7 +636,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(26)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1123" y="0" width="68" height="20" uuid="0ea20631-e925-4b34-9bef-9cf59eace668">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1259" y="0" width="68" height="20" uuid="0ea20631-e925-4b34-9bef-9cf59eace668">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -616,7 +645,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(15)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="1939" y="0" width="68" height="20" uuid="5cdb669f-005d-49b8-8355-ce15ae278c73">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2143" y="0" width="68" height="20" uuid="5cdb669f-005d-49b8-8355-ce15ae278c73">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -625,7 +654,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(27)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2075" y="0" width="68" height="20" uuid="fa5b9cad-94c5-47d2-b12b-6254c2e59e71">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2347" y="0" width="68" height="20" uuid="fa5b9cad-94c5-47d2-b12b-6254c2e59e71">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -634,7 +663,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(29)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2143" y="0" width="68" height="20" uuid="702b9a8f-0a93-487b-aeea-e0f08524fd17">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2415" y="0" width="68" height="20" uuid="702b9a8f-0a93-487b-aeea-e0f08524fd17">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -643,7 +672,7 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(30)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2007" y="0" width="68" height="20" uuid="b840fb42-d220-4977-a44c-8d04408ed9e6">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2279" y="0" width="68" height="20" uuid="b840fb42-d220-4977-a44c-8d04408ed9e6">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
@@ -652,13 +681,49 @@
 				<textFieldExpression><![CDATA[$F{timeList}.get(28)]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2211" y="0" width="125" height="20" uuid="298d7674-db78-4175-b12a-f56ebd4cb78c">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2483" y="0" width="125" height="20" uuid="298d7674-db78-4175-b12a-f56ebd4cb78c">
 					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
 				</reportElement>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="8" isBold="false"/>
 				</textElement>
 				<textFieldExpression><![CDATA[$F{presenceOfDay}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="579" y="0" width="68" height="20" uuid="4b1acfd8-fdac-43c2-8fbd-2318c856ef0c">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{timeinWeekList}.get(0)]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1123" y="0" width="68" height="20" uuid="8289cfdd-a42f-4bc1-adf9-6ec65bddb1d5">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{timeinWeekList}.get(1)]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1667" y="0" width="68" height="20" uuid="f798dafd-e157-406f-a85c-965d62e4ccab">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{timeinWeekList}.get(2)]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2211" y="0" width="68" height="20" uuid="a0b6d917-1d78-4ed6-9a7f-073afc6a62c5">
+					<property name="net.sf.jasperreports.export.xls.row.outline.level.1" value="body"/>
+				</reportElement>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font size="8"/>
+				</textElement>
+				<textFieldExpression><![CDATA[$F{timeinWeekList}.get(3)]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
