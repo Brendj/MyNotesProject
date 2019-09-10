@@ -219,6 +219,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 session.update(applicationForFood);
 
                 Client client = DAOUtils.findClient(session, applicationForFood.getClient().getIdOfClient());
+                if (applicationForFoodInoeExists(session, client, applicationForFood.getCreatedDate())) continue;
                 Set<CategoryDiscount> discounts = client.getCategories();
                 if (discounts.contains(discountInoe.getCategoryDiscount())) {
                     String oldDiscounts = client.getCategoriesDiscounts();
@@ -247,6 +248,15 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
         }
         reload();
         printMessage(wereChanges ? "Операция выполнена" : "Нет измененных записей");
+    }
+
+    private boolean applicationForFoodInoeExists(Session session, Client client, Date date) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.gt("createdDate", date));
+        ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.OK, null);
+        criteria.add(Restrictions.eq("status", status));
+        return criteria.list().size() > 0;
     }
 
     private CategoryDiscountDSZN getDiscountInoe(Session session) {
