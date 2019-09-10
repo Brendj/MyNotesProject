@@ -65,12 +65,12 @@ public class ApplicationForFoodReportItem {
     }
 
     public Boolean getIsPaused() {
-        if (!isInoe) return false;
+        if (!isInoe || archieved) return false;
         return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.PAUSED);
     }
 
     public Boolean getIsResumed() {
-        if (!isInoe) return false;
+        if (!isInoe || archieved) return false;
         return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.RESUME);
     }
 

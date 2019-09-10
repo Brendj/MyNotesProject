@@ -52,6 +52,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     private final static Integer ALL_BENEFITS = -1;
     private Boolean showPeriod = false;
     private static final String ARCHIEVE_COMMENT = "ЗЛП заархивировано";
+    private Boolean needAction = false;
 
     private static List<SelectItem> readAllItems() {
         ApplicationForFoodState[] states = ApplicationForFoodState.values();
@@ -97,6 +98,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     }
 
     public void reload() {
+        needAction = false;
         items.clear();
         deletedItems.clear();
         Session session = null;
@@ -138,15 +140,18 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
 
     public void makeResume() {
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.RESUME, null));
+        needAction = true;
     }
 
     public void makeOK() {
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null));
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null));
+        needAction = true;
     }
 
     public void makeDenied() {
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.NO_DOCS));
+        needAction = true;
     }
 
     public void makeArchieved() {
@@ -157,6 +162,11 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 break;
             }
         }
+        needAction = true;
+    }
+
+    public Boolean needAction() {
+        return needAction;
     }
 
     private void setStatus(ApplicationForFoodStatus status) {

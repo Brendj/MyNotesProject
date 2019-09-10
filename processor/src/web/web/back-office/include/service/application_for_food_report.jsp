@@ -141,6 +141,8 @@
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
         </f:facet>
     </a4j:status>
+    <h:outputText escape="true" value="Есть несохраненные изменения. Нажмите \"Подтвердить\" чтобы сохранить их"
+                  rendered="#{applicationForFoodReportPage.needAction()}" style="color:red" />
 
     <rich:dataTable id="applicationForFoodTable" value="#{applicationForFoodReportPage.items}" var="item" rows="25"
                     footerClass="data-table-footer">
@@ -212,27 +214,27 @@
             <h:outputText escape="true" value="#{item.orgName}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
-            <a4j:commandLink value="#{item.benefit}" styleClass="command-link" reRender="applicationForFoodMessageBenefitPanel" ajaxSingle="true"
+            <a4j:commandLink value="#{item.benefit}" styleClass="command-link" reRender="applicationForFoodPanelGrid" ajaxSingle="true"
                                oncomplete="Richfaces.showModalPanel('applicationForFoodMessageBenefitPanel');">
                 <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}" />
             </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
-            <a4j:commandLink reRender="applicationForFoodTable" rendered="#{item.isPaused}" value="Принесли документы"
+            <a4j:commandLink reRender="applicationForFoodPanelGrid" rendered="#{item.isPaused}" value="Принесли документы"
                              action="#{applicationForFoodReportPage.makeResume()}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}" />
             </a4j:commandLink>
-            <a4j:commandLink reRender="applicationForFoodTable" rendered="#{item.isResumed}" value="Решение положительное"
+            <a4j:commandLink reRender="applicationForFoodPanelGrid" rendered="#{item.isResumed}" value="Решение положительное"
                              action="#{applicationForFoodReportPage.makeOK()}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}" />
             </a4j:commandLink>
             <h:outputText escape="false" value="<br/>" rendered="#{item.isResumed}" />
-            <a4j:commandLink reRender="applicationForFoodTable" rendered="#{item.isResumed}" value="Решение отрицательное"
+            <a4j:commandLink reRender="applicationForFoodPanelGrid" rendered="#{item.isResumed}" value="Решение отрицательное"
                              action="#{applicationForFoodReportPage.makeDenied()}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}" />
             </a4j:commandLink>
             <h:outputText escape="false" value="<br/>" rendered="#{item.canBeMovedToArchieve()}" />
-            <a4j:commandLink reRender="applicationForFoodTable" rendered="#{item.canBeMovedToArchieve()}" value="Архивировать"
+            <a4j:commandLink reRender="applicationForFoodPanelGrid" rendered="#{item.canBeMovedToArchieve()}" value="Архивировать"
                              action="#{applicationForFoodReportPage.makeArchieved()}" styleClass="important-command-link">
                 <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}" />
             </a4j:commandLink>
