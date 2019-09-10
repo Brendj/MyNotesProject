@@ -1726,6 +1726,14 @@
       <JAVADOC />
       <SOURCES />
     </library>
+    <library name="bcpkix-jdk15on-1.50">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/bcpkix-jdk15on-1.50.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/bcprov-jdk15on-1.50.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
     <library name="client-room">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/clientRoomWSClientLib/activation.jar!/" />
@@ -1862,6 +1870,14 @@
         <root url="jar://$USER_HOME$/.ideaLibSources/hibernate-entitymanager-4.0.1.Final-sources.jar!/" />
         <root url="jar://$USER_HOME$/.ideaLibSources/jboss-logging-3.1.0.GA-sources.jar!/" />
       </SOURCES>
+    </library>
+    <library name="httpclient-4.1.2">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/apache/httpclient-4.1.2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/httpcore-4.1.4.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="infinispan-core-5.1.2.FINAL">
       <CLASSES>
