@@ -414,8 +414,8 @@
                              disabled="true"  readonly="true"/>
     <h:outputText escape="true" value="Пользователь ОП" styleClass="output-text"
                   rendered="#{mainPage.clientEditPage.isEligibleToViewUserOP()}" />
-    <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.userOP}" styleClass="output-text"
-                             rendered="#{mainPage.clientEditPage.isEligibleToViewUserOP()}" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.userOP}" styleClass="output-text" disabled="true"
+                             readonly="true" rendered="#{mainPage.clientEditPage.isEligibleToViewUserOP()}" />
 
 </h:panelGrid>
 <h:panelGrid styleClass="borderless-grid">
