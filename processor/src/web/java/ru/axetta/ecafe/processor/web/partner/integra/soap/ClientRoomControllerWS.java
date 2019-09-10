@@ -8986,7 +8986,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public AddRegistrationCardResult addRegistrationCard(String regid, String suid, String organizationSuid, String cardId,
             Date validdate, String firstName, String surname, String secondName, Date birthDate, String grade,
-            String codeBenefit, Date startDate, Date endDate) {
+            String codeBenefit, Date startDate, Date endDate, String lsnum) {
         authenticateRequest(null);
         AddRegistrationCardResult result = new AddRegistrationCardResult();
         Session session = null;
@@ -8996,11 +8996,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
+            if (!StringUtils.isEmpty(lsnum)) {
+                Client clientByContractId = DAOUtils.findClientByContractId(session, Long.valueOf(lsnum));
+                if (clientByContractId != null) throw new Exception("Client already found by contract Id");
+            }
             Client client = DAOUtils.findClientByGuid(session, suid);
 
             if (null == client) {
                 client = service.registerNewClient(session, firstName, secondName, surname, birthDate, suid, regid,
-                        organizationSuid, grade, codeBenefit);
+                        organizationSuid, grade, codeBenefit, lsnum);
             }
 
             Org org = DAOUtils.findOrgByGuid(session, organizationSuid);
