@@ -15,7 +15,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -36,7 +35,7 @@ public class CardRegistrationService {
     public static final String COMMENT_ADDED_FROM_IAC = "{Добавлен из ИАЦ}";
 
     public Client registerNewClient(Session session, String firstName, String secondName, String surname, Date birthDate, String guid,
-            String extId, String organizationGuid, String group, String benefit, String lsnum) throws Exception {
+            String extId, String organizationGuid, String group, String benefit, Long contractId) throws Exception {
         ClientManager.ClientFieldConfig fieldConfig = new ClientManager.ClientFieldConfig();
         fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, guid);
         fieldConfig.setValue(ClientManager.FieldId.SURNAME, emptyIfNull(surname));
@@ -48,7 +47,7 @@ public class CardRegistrationService {
         fieldConfig.setValue(ClientManager.FieldId.GROUP, group);
         //fieldConfig.setValue(ClientManager.FieldId.BENEFIT, benefit);
         fieldConfig.setValue(ClientManager.FieldId.COMMENTS, COMMENT_ADDED_FROM_IAC);
-        if (!StringUtils.isEmpty(lsnum)) fieldConfig.setValue(ClientManager.FieldId.CONTRACT_ID, Long.valueOf(lsnum));
+        fieldConfig.setValue(ClientManager.FieldId.CONTRACT_ID, contractId);
 
         Org org = DAOUtils.findOrgByGuid(session, organizationGuid);
         if (null == org) {

@@ -8996,15 +8996,28 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            if (!StringUtils.isEmpty(lsnum)) {
-                Client clientByContractId = DAOUtils.findClientByContractId(session, Long.valueOf(lsnum));
-                if (clientByContractId != null) throw new Exception("Client already found by contract Id");
-            }
             Client client = DAOUtils.findClientByGuid(session, suid);
+            Long contractId;
+            try {
+                contractId = Long.valueOf(lsnum);
+            } catch (Exception e) {
+                throw new RequiredFieldsAreNotFilledException("lsnum not specified");
+            }
+            Client clientByContractId = DAOUtils.findClientByContractId(session, contractId);
 
             if (null == client) {
+                if (clientByContractId != null) throw new Exception("Client already found by contract Id");
                 client = service.registerNewClient(session, firstName, secondName, surname, birthDate, suid, regid,
-                        organizationSuid, grade, codeBenefit, lsnum);
+                        organizationSuid, grade, codeBenefit, contractId);
+            } else {
+                if (clientByContractId != null && !client.equals(clientByContractId))
+                    throw new Exception("Client already found by contract Id - 2");
+                if (!client.getContractId().equals(contractId)) {
+                    client.setContractId(contractId);
+                    long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+                    client.setClientRegistryVersion(clientRegistryVersion);
+                    session.update(client);
+                }
             }
 
             Org org = DAOUtils.findOrgByGuid(session, organizationSuid);
