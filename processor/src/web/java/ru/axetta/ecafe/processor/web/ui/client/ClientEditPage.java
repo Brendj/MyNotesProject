@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
+import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -323,6 +324,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean inOrgEnabledMultiCardMode;
     private String parallel;
     private Boolean canConfirmGroupPayment;
+    private Boolean userOP;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -926,6 +928,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             runtimeContext.getProcessor().disableClientCardsIfChangeOrg(client, orgSet, org.getIdOfOrg());
 
         }
+        ClientManager.checkUserOPFlag(persistenceSession, client.getOrg(), org, this.idOfClientGroup, client);
         client.setOrg(org);
         client.setPerson(person);
         client.setContractPerson(contractPerson);
@@ -1242,6 +1245,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.parallel = StringUtils.defaultString(client.getParallel());
         this.clientDiscountItems = ClientViewPage.buildClientDiscountItem(session, client);
         this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
+        this.userOP = client.getUserOP();
     }
 
     public String getIdOfCategoryListString() {
@@ -1288,6 +1292,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         return getLastConfirmMobile() == null;
     }
 
+    public Boolean getUserOP() {
+        return userOP;
+    }
+
+    public void setUserOP(Boolean userOP) {
+        this.userOP = userOP;
+    }
+
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws HibernateException {
         //To change body of implemented methods use File | Settings | File Templates.
         if (null != categoryMap) {
@@ -1323,5 +1335,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             result[i+1] = new SelectItem(i, ClientGuardianRelationType.fromInteger(i).toString());
         }
         return result;
+    }
+
+    public boolean isEligibleToViewUserOP() {
+        if (null == this.idOfClientGroup) {
+            return false;
+        }
+        return OkuDAOService.getClientGroupList().contains(this.idOfClientGroup);
     }
 }

@@ -9,8 +9,8 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -173,7 +173,7 @@ public class DAOUtils {
     @SuppressWarnings("unchecked")
     public static Client findClientByIacregid(Session persistenceSession, String iacregid) {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
-        criteria.add(Restrictions.eq("iacRegId", iacregid));
+        criteria.add(Restrictions.ilike("iacRegId", iacregid, MatchMode.ANYWHERE));
         List<Client> resultList = (List<Client>) criteria.list();
         return resultList.isEmpty() ? null : resultList.get(0);
     }
@@ -4262,5 +4262,11 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.between("evtDateTime", startDate, endDate));
         return criteria.list();
+    }
+
+    public static void removeUserOPFlag(Session session, Long idOfOrg) {
+        Query query = session.createSQLQuery("update cf_clients set userop = false where idoforg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.executeUpdate();
     }
 }

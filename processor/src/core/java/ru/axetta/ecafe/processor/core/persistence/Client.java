@@ -149,6 +149,8 @@ public class Client {
 
     private String parallel;
 
+    private Boolean userOP;
+
     protected Client() {
         // For Hibernate only
     }
@@ -1163,5 +1165,13 @@ public class Client {
 
     public void setParallel(String parallel) {
         this.parallel = parallel;
+    }
+
+    public Boolean getUserOP() {
+        return userOP;
+    }
+
+    public void setUserOP(Boolean userOP) {
+        this.userOP = userOP;
     }
 }

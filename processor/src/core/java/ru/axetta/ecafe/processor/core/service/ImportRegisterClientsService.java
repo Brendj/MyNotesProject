@@ -1538,6 +1538,7 @@ public class ImportRegisterClientsService {
 
     //@Transactional
     private void addClientMigrationEntry(Session session,Org oldOrg, Org newOrg, Client client, RegistryChange change){
+        ClientManager.checkUserOPFlag(session, oldOrg, newOrg, client.getIdOfClientGroup(), client);
         ClientMigration migration = new ClientMigration(client, newOrg, oldOrg);
         migration.setComment(ClientMigration.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
         if(client.getClientGroup() != null) {
