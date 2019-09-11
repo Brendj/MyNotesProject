@@ -781,7 +781,14 @@ public class DTSZNDiscountsReviseService {
                 StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 
         if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
-            client.setCategoriesDiscounts(newDiscounts);
+            try {
+                ClientManager
+                        .renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode,
+                                DiscountChangeHistory.MODIFY_IN_REGISTRY);
+            } catch (Exception e) {
+                logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
+            }
+            /*client.setCategoriesDiscounts(newDiscounts);
             client.setDiscountMode(newDiscountMode);
 
             DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
@@ -796,7 +803,7 @@ public class DTSZNDiscountsReviseService {
             }
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
             client.setClientRegistryVersion(clientRegistryVersion);
-            session.update(client);
+            session.update(client);*/
         }
         updateApplicationForFood(session, client, infoList);
     }
