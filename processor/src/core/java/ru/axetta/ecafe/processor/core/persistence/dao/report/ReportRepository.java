@@ -23,6 +23,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.io.IOUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.MatchMode;
@@ -381,13 +382,34 @@ public class ReportRepository extends BaseJpaDao {
                 autoReportGenerator.getReportsTemplateFilePath() + PreorderJournalReport.class.getSimpleName() + ".jasper";
         PreorderJournalReport.Builder builder = new PreorderJournalReport.Builder(templateFilename);
         try {
-            Org org = (Org) session.load(Org.class, reportParameters.getIdOfOrg());
-            if(org == null){
-                throw new EntityNotFoundException("Not found org by ID: " + reportParameters.getIdOfOrg());
+            Long idOrg;
+            Properties properties = new Properties();
+            if (reportParameters.getIdOfOrg() == null) {
+                idOrg = reportParameters.getSourceOrg();
+
+
+                List<Long> idOfOrgList = new ArrayList<>();
+                //Добавляем главный корпус
+                idOfOrgList.add(idOrg);
+
+                //Добавляем все дружественные корпуса
+                List<Org> friendlyOrgs = DAOUtils.findAllFriendlyOrgs(session, idOrg);
+                if (!friendlyOrgs.isEmpty())
+                {
+                    for (Org frOrg: friendlyOrgs)
+                    {
+                        idOfOrgList.add(frOrg.getIdOfOrg());
+                    }
+                }
+
+                properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG,
+                        StringUtils.join(idOfOrgList.iterator(), ","));
+            }
+            else {
+                idOrg = reportParameters.getIdOfOrg();
+                properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOrg.toString());
             }
 
-            Properties properties = new Properties();
-            properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, reportParameters.getIdOfOrg().toString());
             if(reportParameters.getIdOfContract() != null){
                 Client client = DAOUtils.findClientByContractId(session, reportParameters.getIdOfContract());
                 properties.setProperty(PreorderJournalReport.P_ID_OF_CLIENTS, client.getIdOfClient().toString());
@@ -487,11 +509,34 @@ public class ReportRepository extends BaseJpaDao {
                 autoReportGenerator.getReportsTemplateFilePath() + DailySalesByGroupsReport.class.getSimpleName() + ".jasper";
         DailySalesByGroupsReport.Builder builder = new DailySalesByGroupsReport.Builder(templateFilename);
         try {
-            Org org = (Org) session.load(Org.class, reportParameters.getIdOfOrg());
-            BasicReportJob.OrgShortItem orgShortItem = new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
-                    org.getShortName(), org.getOfficialName(), org.getAddress());
-            builder.setOrg(orgShortItem);
-            builder.setOrgShortItemList(Arrays.asList(orgShortItem));
+            List<BasicReportJob.OrgShortItem> orgShortItemList = new ArrayList<>();
+            Org org;
+
+            if (reportParameters.getIdOfOrg() == null) {
+
+                org = (Org) session.load(Org.class, reportParameters.getSourceOrg());
+
+                //Добавляем главный корпус
+                orgShortItemList.add(new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
+                        org.getShortName(), org.getOfficialName(), org.getAddress()));
+
+                //Добавляем все дружественные корпуса
+                List<Org> friendlyOrgs = DAOUtils.findAllFriendlyOrgs(session, org.getIdOfOrg());
+                for (Org orgFriend: friendlyOrgs)
+                {
+                    orgShortItemList.add(new BasicReportJob.OrgShortItem(orgFriend.getIdOfOrg(),
+                            orgFriend.getShortName(), orgFriend.getOfficialName(), orgFriend.getAddress()));
+                }
+                builder.setOrgShortItemList(orgShortItemList);
+            }
+            else {
+                org = (Org) session.load(Org.class, reportParameters.getIdOfOrg());
+
+                BasicReportJob.OrgShortItem orgShortItem = new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
+                        org.getShortName(), org.getOfficialName(), org.getAddress());
+                builder.setOrgShortItemList(Arrays.asList(orgShortItem));
+            }
+
             BasicJasperReport jasperReport = builder
                     .build(session, reportParameters.getStartDate(), reportParameters.getEndDate(), new GregorianCalendar());
             return jasperReport;
@@ -787,6 +832,7 @@ public class ReportRepository extends BaseJpaDao {
         Date startDate = null;
         Date endDate = null;
         Long idOfOrg = null;
+        Long sourceOrg = null;
         DateFormat safeDateFormat = dateFormat.get();
         try {
             for (ReportParameter parameter : parameters) {
@@ -799,11 +845,14 @@ public class ReportRepository extends BaseJpaDao {
                 else if (parameter.getParameterName().equals("idOfOrg")) {
                     idOfOrg = Long.parseLong(parameter.getParameterValue());
                 }
+                else if (parameter.getParameterName().equals("sourceOrg")) {
+                    sourceOrg = Long.parseLong(parameter.getParameterValue());
+                }
             }
         } catch (Exception e) {
             return true;
         }
-        if (idOfOrg == null || startDate == null || endDate == null || startDate.after(endDate)) {
+        if ((idOfOrg == null && sourceOrg == null) || startDate == null || endDate == null || startDate.after(endDate)) {
             return true; //не переданы или заполнены с ошибкой обязательные параметры
         } else {
             return false;
@@ -873,6 +922,7 @@ public class ReportRepository extends BaseJpaDao {
         private Date startDate;
         private Date endDate;
         private Long idOfOrg;
+        private Long sourceOrg;
         private Long idOfContragent;
         private Long idOfContract;
         private String region;
@@ -960,6 +1010,9 @@ public class ReportRepository extends BaseJpaDao {
                 else if (parameter.getParameterName().equals("idOfOrg")) {
                     idOfOrg = Long.parseLong(parameter.getParameterValue());
                 }
+                else if (parameter.getParameterName().equals("sourceOrg")) {
+                    sourceOrg = Long.parseLong(parameter.getParameterValue());
+                }
                 else if (parameter.getParameterName().equals("idOfContragent")) {
                     idOfContragent = Long.parseLong(parameter.getParameterValue());
                 }
@@ -995,7 +1048,8 @@ public class ReportRepository extends BaseJpaDao {
         }
 
         public boolean checkRequiredParameters() {
-          return   idOfOrg != null && startDate != null
+            //Либо указана целеваю организация, либо источник запроса
+          return   (idOfOrg != null || sourceOrg != null) && startDate != null
                     && endDate != null;
         }
 
@@ -1013,6 +1067,14 @@ public class ReportRepository extends BaseJpaDao {
 
         public void setSortedBySections(String sortedBySections) {
             this.sortedBySections = sortedBySections;
+        }
+
+        public Long getSourceOrg() {
+            return sourceOrg;
+        }
+
+        public void setSourceOrg(Long sourceOrg) {
+            this.sourceOrg = sourceOrg;
         }
     }
 }
