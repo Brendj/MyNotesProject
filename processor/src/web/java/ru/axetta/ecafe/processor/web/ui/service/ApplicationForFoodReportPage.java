@@ -240,7 +240,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
                 criteria.add(Restrictions.eq("client", client));
                 criteria.add(Restrictions.eq("archived", false));
-                criteria.add(Restrictions.eq("dtisznCode", discountInoe.getCode()));
+                criteria.add(Restrictions.eq("dtisznCode", new Long(discountInoe.getCode())));
                 List<ClientDtisznDiscountInfo> list = criteria.list();
                 for (ClientDtisznDiscountInfo info : list) {
                     info.setLastUpdate(new Date());
