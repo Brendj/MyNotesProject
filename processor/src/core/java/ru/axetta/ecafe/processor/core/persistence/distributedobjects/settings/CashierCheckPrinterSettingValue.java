@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.CashierCheckPrinterType;
+
 import java.text.ParseException;
 
 /**
@@ -19,6 +21,8 @@ public class CashierCheckPrinterSettingValue extends AbstractParserBySettingValu
     private String f;//f: 9 - ширина колонки стоимость (возможные значения 7,8,9,10,11, 12, по умолчанию 10)
     private String g;//g: 8 – ширина колонки цена (возможные значения 6,7,8,9,10,11, по умолчанию 10)
     private String h;//h: текстовое поле выводимое на принтере
+
+    private static final int DEFAULT_CAPACITY = 8;
 
     public CashierCheckPrinterSettingValue(String[] values) throws ParseException {
         super(values);
@@ -49,6 +53,21 @@ public class CashierCheckPrinterSettingValue extends AbstractParserBySettingValu
         int d1 = getValuesByD();
         int d2 = Integer.parseInt(d);
         return d1==d2;
+    }
+
+    @Override
+    protected int getECafeSettingArrayCapacity() {
+        return DEFAULT_CAPACITY;
+    }
+
+    @Override
+    protected Integer getOrgSettingTypeByIndex(Integer index) {
+        return CashierCheckPrinterType.getGlobalIdByECafeSettingValueIndex(index);
+    }
+
+    @Override
+    protected Integer getIndexByOrgSettingType(Integer type) {
+        return CashierCheckPrinterType.getECafeSettingValueIndexByGlobalId(type);
     }
 
     public Integer getValuesByD(){

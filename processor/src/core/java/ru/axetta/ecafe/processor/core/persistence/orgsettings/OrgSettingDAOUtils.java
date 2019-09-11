@@ -35,7 +35,8 @@ public class OrgSettingDAOUtils {
 
         Query query = session.createQuery("SELECT MAX(os.version) FROM OrgSetting AS os WHERE os.idOfOrg in (:orgIds)");
         query.setParameterList("orgIds", friendlyOrgsIds);
-        return (Long) query.uniqueResult();
+        Long maxVer = (Long) query.uniqueResult();
+        return maxVer == null ? 0 : maxVer;
     }
 
     public static OrgSetting getOrgSettingByGroupIdAndOrg(Session session, Integer groupID, Integer idOfOrg) {
@@ -47,12 +48,14 @@ public class OrgSettingDAOUtils {
 
     public static  Long getLastVersionOfOrgSettings(Session session){
         SQLQuery query = session.createSQLQuery("SELECT MAX(version) FROM CF_OrgSettings");
-        return DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
+        Long maxVersion = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
+        return maxVersion == null ? 0 : maxVersion;
     }
 
     public static  Long getLastVersionOfOrgSettingsItem(Session session){
         SQLQuery query = session.createSQLQuery("SELECT MAX(version) FROM CF_OrgSettings_Items");
-        return DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
+        Long maxVersion = DataBaseSafeConverterUtils.getLongFromBigIntegerOrNull(query.uniqueResult());
+        return maxVersion == null ? 0 : maxVersion;
     }
 
     public static Long getNextVersionOfOrgSettings(Session session){

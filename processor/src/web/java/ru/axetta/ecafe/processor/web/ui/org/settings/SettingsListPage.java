@@ -66,8 +66,8 @@ public class SettingsListPage extends BasicWorkspacePage implements OrgSelectPag
     }
 
     private void reload() {
-        final Long idOfOrg = (orgItem==null?null:orgItem.getIdOfOrg());
-        final SettingsIds settingsid = (settingsIds==null || settingsIds<0 ? null : SettingsIds.fromInteger(settingsIds));
+        final Long idOfOrg = (orgItem == null ? null : orgItem.getIdOfOrg());
+        final SettingsIds settingsid = (settingsIds == null || settingsIds < 0 ? null : SettingsIds.fromInteger(settingsIds));
         List<ECafeSettings> list = daoService.geteCafeSettingsesWithoutFiveElm(idOfOrg,settingsid,deleted);
         this.settingsList = new ListDataModel(list);
     }

@@ -327,7 +327,7 @@
 
         <h:panelGrid columns="2" id="settingsCreatePreorderAutopaySettingPanelGrid" rendered="#{settingCreatePage.settingsIds==7}" >
             <h:outputText escape="true" value="Активность для предзаказов" styleClass="output-text" />
-            <h:selectBooleanCheckbox value="#{settingCreatePage.parserBySettingValue.offisActivePreorderOnFlag}">
+            <h:selectBooleanCheckbox value="#{settingCreatePage.parserBySettingValue.isActivePreorder}">
                 <f:selectItem itemValue="true"/>
                 <f:selectItem itemValue="false"/>
             </h:selectBooleanCheckbox>
