@@ -220,6 +220,12 @@
     </converter>
 
     <converter>
+        <description>Mouth Type Converter</description>
+        <converter-id>mouthTypeConverter</converter-id>
+        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.MouthTypeConverter</converter-class>
+    </converter>
+
+    <converter>
         <description>Preorder Requests Type Converter</description>
         <converter-id>preorderTypeConverter</converter-id>
         <converter-class>ru.axetta.ecafe.processor.web.ui.converter.PreorderTypeConverter</converter-class>

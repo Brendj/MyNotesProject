@@ -484,6 +484,16 @@ public class CalendarUtils {
         return res;
     }
 
+    public static Integer getCurrentYear() {
+        GregorianCalendar gc = new GregorianCalendar();
+        return gc.get(Calendar.YEAR);
+    }
+
+    public static Integer getCurrentMonth() {
+        GregorianCalendar gc = new GregorianCalendar();
+        return gc.get(Calendar.MONTH);
+    }
+
     public static DateFormat getDateFormatLocal() {
         DateFormat df = new SimpleDateFormat("dd.MM.yyyy");
         df.setTimeZone(RuntimeContext.getInstance().getLocalTimeZone(null));

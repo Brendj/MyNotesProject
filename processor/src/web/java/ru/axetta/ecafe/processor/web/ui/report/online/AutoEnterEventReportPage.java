@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
+import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -40,7 +41,7 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
 
     private final static Logger logger = LoggerFactory.getLogger(AutoEnterEventReportPage.class);
 
-    private PeriodTypeMenu periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+    private MonthYearTypeMenu monthYearTypeMenu = new MonthYearTypeMenu();
 
     private String htmlReport = null;
 
@@ -60,59 +61,13 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
 
     private final ClientFilter clientFilter = new ClientFilter();
 
-    public void onReportPeriodChanged(javax.faces.event.ActionEvent event) {
-        htmlReport = null;
-        switch (periodTypeMenu.getPeriodType()) {
-            case ONE_DAY: {
-                setEndDate(startDate);
-            }
-            break;
-            case ONE_WEEK: {
-                setEndDate(CalendarUtils.addDays(startDate, 6));
-            }
-            break;
-            case TWO_WEEK: {
-                setEndDate(CalendarUtils.addDays(startDate, 13));
-            }
-            break;
-            case ONE_MONTH: {
-                setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
-            }
-            break;
-        }
-    }
-
-    public void onEndDateSpecified(javax.faces.event.ActionEvent event) {
-        htmlReport = null;
-        Date end = CalendarUtils.truncateToDayOfMonth(endDate);
-        if (CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)) {
-            periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
-        } else {
-            long diff = end.getTime() - startDate.getTime();
-            int noOfDays = (int) (diff / (24 * 60 * 60 * 1000));
-            switch (noOfDays) {
-                case 0:
-                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY);
-                    break;
-                case 6:
-                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
-                    break;
-                case 13:
-                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK);
-                    break;
-                default:
-                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY);
-                    break;
-            }
-        }
-        if (startDate.after(endDate)) {
-            printError("Дата выборки от меньше дата выборки до");
-        }
-    }
-
     public Object buildReportHTML() {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Date date = CalendarUtils.getDateOfLastDay(monthYearTypeMenu.getSelectedYear(), monthYearTypeMenu.getMounthType().ordinal()+1);
+        startDate = CalendarUtils.getFirstDayOfMonth(date);
+        endDate = CalendarUtils.getLastDayOfMonth(date);
         String templateFilename = checkIsExistFile();
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
         if (templateFilename == null) {
             return null;
         }
@@ -136,14 +91,7 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
                         org.getShortName(), org.getOfficialName(), org.getAddress());
                 builder.setOrg(orgShortItem);
 
-                Properties properties = new Properties();
-                if (allFriendlyOrgs) {
-                    properties.setProperty("isAllFriendlyOrgs", String.valueOf(allFriendlyOrgs));
-                }
-
-                String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
-                properties.setProperty("groupName", groupNamesString);
-                builder.setReportProperties(properties);
+                builder.setReportProperties(buildProperties(persistenceSession));
 
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
@@ -181,8 +129,13 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
     }
 
     public void generateXLS(ActionEvent event) {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Date date = CalendarUtils.getDateOfLastDay(monthYearTypeMenu.getSelectedYear(), monthYearTypeMenu.getMounthType().ordinal()+1);
+        startDate = CalendarUtils.getFirstDayOfMonth(date);
+        endDate = CalendarUtils.getLastDayOfMonth(date);
         String templateFilename = checkIsExistFile();
+
+
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
         if (templateFilename == null) {
         } else {
             AutoEnterEventByDaysReport.Builder builder = new AutoEnterEventByDaysReport.Builder(templateFilename);
@@ -202,14 +155,7 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
                         org.getShortName(), org.getOfficialName(), org.getAddress());
                 builder.setOrg(orgShortItem);
 
-                Properties properties = new Properties();
-                if (allFriendlyOrgs) {
-                    properties.setProperty("isAllFriendlyOrgs", String.valueOf(allFriendlyOrgs));
-                }
-
-                String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
-                properties.setProperty("groupName", groupNamesString);
-                builder.setReportProperties(properties);
+                builder.setReportProperties(buildProperties(persistenceSession));
 
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
@@ -248,9 +194,34 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
         }
     }
 
+    private Properties buildProperties(Session persistenceSession) throws Exception {
+        Properties properties = new Properties();
+        String idOfClients = "";
+        if (getClientList() != null && getClientList().size() > 0) {
+            for (ClientSelectListPage.Item item : getClientList()) {
+                idOfClients += item.getIdOfClient() + ",";
+            }
+            idOfClients = idOfClients.substring(0, idOfClients.length() - 1);
+        }
+        properties.setProperty(AutoEnterEventByDaysReport.P_ID_CLIENT, idOfClients);
+        String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
+        properties.setProperty("groupName", groupNamesString);
+        //Изменено 27.08.19
+        setAllFriendlyOrgs(true);
+        properties.setProperty("isAllFriendlyOrgs", String.valueOf(allFriendlyOrgs));
+
+        return properties;
+    }
+
     private String checkIsExistFile() {
         AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
-        String templateShortFilename = "AutoEnterEventByDaysReport.jasper";
+        String templateShortFilename = "";
+        if (getFilterClient().equals("Не выбрано"))
+        {
+            templateShortFilename = "AutoEnterEventByDaysReport.jasper";
+        }
+        else
+            templateShortFilename = "AutoEnterEventByDaysReportClient.jasper";
         String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFilename;
         if (!(new File(templateFilename)).exists()) {
             printError(String.format("Не найден файл шаблона '%s'", templateFilename));
@@ -353,5 +324,13 @@ public class AutoEnterEventReportPage extends OnlineReportPage {
         criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
         criteria.add(Restrictions.not(Restrictions.in("compositeIdOfClientGroup.idOfClientGroup", groupIds)));
         return criteria.list();
+    }
+
+    public MonthYearTypeMenu getMonthYearTypeMenu() {
+        return monthYearTypeMenu;
+    }
+
+    public void setMonthYearTypeMenu(MonthYearTypeMenu monthYearTypeMenu) {
+        this.monthYearTypeMenu = monthYearTypeMenu;
     }
 }
