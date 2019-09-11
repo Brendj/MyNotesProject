@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.ReportInfo;
 import ru.axetta.ecafe.processor.core.persistence.RuleCondition;
 import ru.axetta.ecafe.processor.core.persistence.dao.BaseJpaDao;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -540,30 +541,31 @@ public class ReportRepository extends BaseJpaDao {
 
     private BasicJasperReport buildAutoEnterEventV2Report(Session session, ReportParameters reportParameters)
             throws Exception {
-        AutoReportGenerator autoReportGenerator = getAutoReportGenerator();
-        String templateFilename =
-                autoReportGenerator.getReportsTemplateFilePath() + AutoEnterEventV2Report.class.getSimpleName() + ".jasper";
-        AutoEnterEventV2Report.Builder builder = new AutoEnterEventV2Report.Builder(templateFilename);
+
+        AutoReportGenerator autoReportGenerator = RuntimeContext.getInstance().getAutoReportGenerator();
+        String templateShortFilename = "AutoEnterEventV2Report.jasper";
+        String templateFilename = autoReportGenerator.getReportsTemplateFilePath() + templateShortFilename;
+
+        DetailedEnterEventReport.Builder builder = new DetailedEnterEventReport.Builder(templateFilename);
         try {
-            Org org = (Org) session.load(Org.class, reportParameters.getIdOfOrg());
-            BasicReportJob.OrgShortItem orgShortItem = new BasicReportJob.OrgShortItem(org.getIdOfOrg(),
-                    org.getShortName(), org.getOfficialName(), org.getAddress());
-            builder.setOrg(orgShortItem);
-            builder.setOrgShortItemList(Arrays.asList(orgShortItem));
             Properties properties = new Properties();
+
+
+            properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, reportParameters.getIdOfOrg().toString());
 
             if (reportParameters.getGroupName() != null) {
                 properties.setProperty("groupName", reportParameters.getGroupName());
             }
 
             if (reportParameters.getIdOfContract() != null) {
-                properties.setProperty("contractId", String.valueOf(reportParameters.getIdOfContract()));
+                Client client =  DAOService.getInstance().getClientByContractId(reportParameters.getIdOfContract());
+                properties.setProperty(DetailedEnterEventReport.P_ID_OF_CLIENTS, client.getIdOfClient().toString());
             }
 
             if (reportParameters.getIsAllFriendlyOrgs() != null) {
-                properties.setProperty("isAllFriendlyOrgs", reportParameters.getIsAllFriendlyOrgs());
+                properties.setProperty(DetailedEnterEventReport.P_ALL_FRIENDLY_ORGS, reportParameters.getIsAllFriendlyOrgs());
             } else {
-                properties.setProperty("isAllFriendlyOrgs", "true");
+                properties.setProperty(DetailedEnterEventReport.P_ALL_FRIENDLY_ORGS, "true");
             }
 
             builder.setReportProperties(properties);

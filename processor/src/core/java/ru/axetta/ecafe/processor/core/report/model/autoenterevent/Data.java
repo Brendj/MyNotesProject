@@ -28,6 +28,8 @@ public class Data {
     private String f09 ; // enters
     private String f10 ; // entersSummary
 
+    private Integer f11 ; // for sorting by date
+
     public Data() {
     }
 
@@ -147,5 +149,13 @@ public class Data {
 
     public void setF10(String f10) {
         this.f10 = f10;
+    }
+
+    public Integer getF11() {
+        return f11;
+    }
+
+    public void setF11(Integer f11) {
+        this.f11 = f11;
     }
 }
