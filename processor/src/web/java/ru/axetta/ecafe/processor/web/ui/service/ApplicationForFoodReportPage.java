@@ -210,6 +210,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
             }
             CategoryDiscountDSZN discountInoe = getDiscountInoe(session);
             String isppCodeInoe = Long.toString(discountInoe.getCategoryDiscount().getIdOfCategoryDiscount());
+            Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
             for (ApplicationForFoodReportItem item : deletedItems) {
                 wereChanges = true;
                 ApplicationForFood applicationForFood = (ApplicationForFood)session.load(ApplicationForFood.class, item.getApplicationForFood().getIdOfApplicationForFood());
@@ -235,6 +236,17 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                             StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
                     ClientManager
                             .renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode, ARCHIEVE_COMMENT);
+                }
+                Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+                criteria.add(Restrictions.eq("client", client));
+                criteria.add(Restrictions.eq("archived", false));
+                criteria.add(Restrictions.eq("dtisznCode", discountInoe.getCode()));
+                List<ClientDtisznDiscountInfo> list = criteria.list();
+                for (ClientDtisznDiscountInfo info : list) {
+                    info.setLastUpdate(new Date());
+                    info.setArchived(true);
+                    info.setVersion(clientDTISZNDiscountVersion);
+                    session.update(info);
                 }
             }
             transaction.commit();
