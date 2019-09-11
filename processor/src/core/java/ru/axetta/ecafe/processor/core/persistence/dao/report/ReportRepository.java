@@ -607,6 +607,10 @@ public class ReportRepository extends BaseJpaDao {
             if(reportParameters.getSortedBySections() != null){
                 properties.setProperty("sortedBySections", reportParameters.getSortedBySections());
             }
+            if(reportParameters.getIdOfContract() != null){
+                Client client = DAOService.getInstance().getClientByContractId(reportParameters.getIdOfContract());
+                properties.setProperty(EnterEventJournalReport.P_ID_CLIENT, client.getIdOfClient().toString());
+            }
             builder.setReportProperties(properties);
 
             boolean isAllFriendlyOrgs;
