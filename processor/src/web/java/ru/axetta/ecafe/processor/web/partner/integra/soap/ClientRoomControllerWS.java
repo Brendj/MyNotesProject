@@ -9030,7 +9030,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             CardRegistrationService.ExternalInfo externalInfo = service.loadExternalInfo(session, organizationSuid, suid, null);
 
-            result.setContractId(externalInfo.contractId);
+            result.setContractId(contractId);
             result.setSupplierName(externalInfo.contragentName);
             result.setSupplierINN(externalInfo.contragentInn);
             result.resultCode = RC_OK;
@@ -9053,7 +9053,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             logger.error("Error in addRegistrationCard", e);
             CardRegistrationService.ExternalInfo externalInfo =
                     service.loadExternalInfo(session, organizationSuid, null,  Long.parseLong(cardId,16));
-            result.setContractId(externalInfo.contractId);
+            result.setContractId(Long.valueOf(lsnum));
             result.setSupplierName(externalInfo.contragentName);
             result.setSupplierINN(externalInfo.contragentInn);
             result.resultCode = RC_ERROR_CARD_EXISTS;
