@@ -223,6 +223,13 @@ public class CycleDiagram extends DistributedObject{
         setGuidOfStaff(((CycleDiagram) distributedObject).getGuidOfStaff());
         setFeedingType(((CycleDiagram) distributedObject).getFeedingType());
         setStartWeekPosition(((CycleDiagram) distributedObject).getStartWeekPosition());
+        setMondayPrice(((CycleDiagram) distributedObject).getMondayPrice());
+        setTuesdayPrice(((CycleDiagram) distributedObject).getTuesdayPrice());
+        setWednesdayPrice(((CycleDiagram) distributedObject).getWednesdayPrice());
+        setThursdayPrice(((CycleDiagram) distributedObject).getThursdayPrice());
+        setFridayPrice(((CycleDiagram) distributedObject).getFridayPrice());
+        setSaturdayPrice(((CycleDiagram) distributedObject).getSaturdayPrice());
+        setIdOfOrgLastChange(distributedObject.getIdOfSyncOrg());
     }
 
     @Override
