@@ -214,6 +214,7 @@ public class CycleDiagram extends DistributedObject{
         setStateDiagram(((CycleDiagram) distributedObject).getStateDiagram());
         setMonday(((CycleDiagram) distributedObject).getMonday());
         setTuesday(((CycleDiagram) distributedObject).getTuesday());
+        setWednesday(((CycleDiagram) distributedObject).getWednesday());
         setThursday(((CycleDiagram) distributedObject).getThursday());
         setFriday(((CycleDiagram) distributedObject).getFriday());
         setSaturday(((CycleDiagram) distributedObject).getSaturday());
