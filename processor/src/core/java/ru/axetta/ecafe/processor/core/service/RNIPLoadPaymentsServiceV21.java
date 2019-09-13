@@ -604,8 +604,8 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
             if (responseMessage == null) {
                 //Если получаем пустой ответ, то повторяем запрос с другим MessageID
                 receiveContragentPayments(getRequestType(rnipMessage.getEventType()), rnipMessage.getContragent(), rnipMessage.getStartDate(), rnipMessage.getEndDate());
-                info(String.format("Получен пустой ответ на запрос с ид=%s, контрагент %s. Отправлен повторный запрос"), rnipMessage.getMessageId(),
-                        rnipMessage.getContragent().getContragentName());
+                info(String.format("Получен пустой ответ на запрос с ид=%s, контрагент %s. Отправлен повторный запрос", rnipMessage.getMessageId(),
+                        rnipMessage.getContragent().getContragentName()));
                 RnipDAOService.getInstance().saveAsProcessed(rnipMessage, EMPTY_PACKET, null, rnipMessage.getEventType());
                 return;
             }
