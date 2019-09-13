@@ -220,6 +220,15 @@ public class RegularPaymentSubscriptionService {
         return sendSubscriptionRequest(subscriptionId, statusCheckRequest);
     }
 
+    protected PaymentResponse sendRequest(String uri, Map<String, String> params) {
+        String s = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.acquiropay.mtsOldTeam", "");
+        if (StringUtils.isEmpty(s)) {
+            return sendRequest_new(uri, params);
+        } else {
+            return sendRequest_old(uri, params);
+        }
+    }
+
     protected PaymentResponse sendRequest_old(String uri, Map<String, String> params) {
         PostMethod httpMethod = new PostMethod(uri);
         StringBuilder sb = new StringBuilder();
@@ -281,7 +290,7 @@ public class RegularPaymentSubscriptionService {
         scheme = new Scheme("https", sf, 443);
     }
 
-    protected PaymentResponse sendRequest(String uri, Map<String, String> params) {
+    protected PaymentResponse sendRequest_new(String uri, Map<String, String> params) {
         PaymentResponse paymentResponse = new PaymentResponse();
         try {
             initScheme();
