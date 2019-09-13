@@ -36,20 +36,21 @@ public class ClientMigrationHistoryService {
     @Autowired
     ClientMigrationHistoryRepository repository;
     private static final Logger logger = LoggerFactory.getLogger(ClientMigrationHistoryService.class);
-    private static final String NODE_CHANGE_ORG = "ecafe.processor.client.balance.serviceNode";
+    private static final String NODE_BALANCE_CHANGE_ORG = "ecafe.processor.client.balance.serviceNode";
+    private static final String NODE_DISCOUNT_CHANGE_ORG = "ecafe.processor.clientMigrationHistory.discountDelete";
 
-    public List<ClientMigration> findAll(Org org, Client client){
-        return repository.findAll(org,client);
+    public List<ClientMigration> findAll(Org org, Client client) {
+        return repository.findAll(org, client);
     }
 
     public void processOrgChange() {
-        if(!isOnBalanceOrDiscount()) return;
+        if (!isOnBalanceOrDiscount()) { return; }
         logger.info("Start process Org change service");
         Date lastProcess = repository.getDateLastOrgChangeProcess();
         List<ClientMigration> list = repository.findAllSinceDate(lastProcess);
         Date nextDate = new Date();
         int counter = 0;
-        if(isOnBalanceHold()) {
+        if (isOn(NODE_BALANCE_CHANGE_ORG)) {
             for (ClientMigration clientMigration : list) {
                 if (clientMigration.getOldContragent() != null && clientMigration.getNewContragent() != null
                         && !clientMigration.getOldContragent().equals(clientMigration.getNewContragent())) {
@@ -76,26 +77,31 @@ public class ClientMigrationHistoryService {
             }
         }
 
-        if (isOnDiscountDelete()) {
+        if (isOn(NODE_DISCOUNT_CHANGE_ORG)) {
             for (ClientMigration clientMigration : list) {
-                if (!clientMigration.getOldOrg().equals(clientMigration.getOrg())) {
-                    Session session = null;
-                    Transaction transaction = null;
+                Session session = null;
+                Transaction transaction = null;
 
-                    try {
-                        session = RuntimeContext.getInstance().createPersistenceSession();
-                        transaction = session.beginTransaction();
-                        Client client = DAOUtils.findClient(session, clientMigration.getClient().getIdOfClient());
-                        ClientManager.deleteDiscount(client, session);
-                        transaction.commit();
-                        transaction = null;
-                        counter++;
-                    } catch (Exception e) {
-                        logger.error("Error in deleteDiscount");
-                    } finally {
-                        HibernateUtils.rollback(transaction, logger);
-                        HibernateUtils.close(session, logger);
+                try {
+                    session = RuntimeContext.getInstance().createPersistenceSession();
+                    transaction = session.beginTransaction();
+                    List<Org> friendlyOrgs = DAOUtils
+                            .findFriendlyOrgs(session, clientMigration.getOldOrg().getIdOfOrg());
+                    for (Org o : friendlyOrgs) {
+                        if (o.getIdOfOrg().equals(clientMigration.getOrg().getIdOfOrg())) {
+                            continue;
+                        }
                     }
+                    Client client = DAOUtils.findClient(session, clientMigration.getClient().getIdOfClient());
+                    ClientManager.deleteDiscount(client, session);
+                    transaction.commit();
+                    transaction = null;
+                    counter++;
+                } catch (Exception e) {
+                    logger.error("Error in deleteDiscount", e);
+                } finally {
+                    HibernateUtils.rollback(transaction, logger);
+                    HibernateUtils.close(session, logger);
                 }
             }
         }
@@ -105,10 +111,10 @@ public class ClientMigrationHistoryService {
                 counter));
     }
 
-    private boolean isOnBalanceHold() {
+    private boolean isOn(String nodeName) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String instance = runtimeContext.getNodeName();
-        String reqInstance = runtimeContext.getPropertiesValue(NODE_CHANGE_ORG, "");
+        String reqInstance = runtimeContext.getPropertiesValue(nodeName, "");
         if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim()
                 .equals(reqInstance.trim())) {
             return false;
@@ -116,17 +122,7 @@ public class ClientMigrationHistoryService {
         return true;
     }
 
-    private boolean isOnDiscountDelete() {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String reqInstance = runtimeContext
-                .getConfigProperties().getProperty("ecafe.processor.clientmigrationhistory.discountdelete", "false");
-        return Boolean.parseBoolean(reqInstance);
-    }
-
     private boolean isOnBalanceOrDiscount() {
-        if(isOnBalanceHold()||isOnDiscountDelete()) {
-            return true;
-        }
-        return false;
+        return (isOn(NODE_BALANCE_CHANGE_ORG) || isOn(NODE_DISCOUNT_CHANGE_ORG));
     }
 }
