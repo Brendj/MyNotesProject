@@ -11,7 +11,8 @@ import java.util.Map;
 
 public enum ARMsSettingsType implements SettingType {
     CARD_DUPLICATE_ENABLED(1300,"Дубликаты для основных карт", OrgSettingsDataTypes.BOOLEAN),
-    REVERSE_MONTH_OF_SALE(1301,"Оплата/сторнирование месяц продажи", OrgSettingsDataTypes.BOOLEAN);
+    REVERSE_MONTH_OF_SALE(1301,"Оплата/сторнирование месяц продажи", OrgSettingsDataTypes.BOOLEAN),
+    LP_DAYS_ON_WHICH_APPLICATIONS_ARE_MADE(11001, "ЛП. Количество дней, запрещенных к редактированию на сайте, начиная с текущего", OrgSettingsDataTypes.INT32);
 
     private Integer globalId;
     private String description;
@@ -61,7 +62,17 @@ public enum ARMsSettingsType implements SettingType {
         return expectedClass.ordinal();
     }
 
+    public static Integer getGlobalIdByECafeSettingValueIndex(Integer index) {
+        return index;
+    }
+
+    public static Integer getECafeSettingValueIndexByGlobalId(Integer globalId){
+        return globalId;
+    }
+
     static public Map<Integer, SettingType> getSettingTypeAsMap() {
         return mapInt;
     }
+
+
 }

@@ -19,7 +19,7 @@ public class OrgSettingItemSyncPOJO {
     public Node toResElement(Document document) {
         Element element = document.createElement("OSI");
         element.setAttribute("GlobalId", globalID.toString());
-        element.setAttribute("SType", type.toString());
+        element.setAttribute("SType", type.equals(-1) ? "" : type.toString());
         if(type.equals(OrgSettingsDataTypes.BOOLEAN.ordinal())){
             boolean boolVal = Boolean.valueOf(value);
             element.setAttribute("SValue", boolVal ? "1" : "0");

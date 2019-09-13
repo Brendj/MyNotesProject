@@ -18,8 +18,11 @@ import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.PeriodTypeMenu;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -28,7 +31,9 @@ import org.springframework.stereotype.Component;
 import javax.faces.model.SelectItem;
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @Scope("session")
@@ -37,6 +42,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     Logger logger = LoggerFactory.getLogger(ApplicationForFoodReportPage.class);
     private List<ApplicationForFoodReportItem> items = new ArrayList<ApplicationForFoodReportItem>();
     private ApplicationForFoodReportItem currentItem;
+    private List<ApplicationForFoodReportItem> deletedItems = new ArrayList<>();
 
     private List<SelectItem> statuses = readAllItems();
     private String status;
@@ -45,6 +51,8 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     private String number = "";
     private final static Integer ALL_BENEFITS = -1;
     private Boolean showPeriod = false;
+    private static final String ARCHIEVE_COMMENT = "ЗЛП заархивировано";
+    private Boolean needAction = false;
 
     private static List<SelectItem> readAllItems() {
         ApplicationForFoodState[] states = ApplicationForFoodState.values();
@@ -90,7 +98,9 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     }
 
     public void reload() {
+        needAction = false;
         items.clear();
+        deletedItems.clear();
         Session session = null;
         Transaction transaction = null;
         try {
@@ -130,15 +140,33 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
 
     public void makeResume() {
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.RESUME, null));
+        needAction = true;
     }
 
     public void makeOK() {
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null));
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null));
+        needAction = true;
     }
 
     public void makeDenied() {
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.NO_DOCS));
+        needAction = true;
+    }
+
+    public void makeArchieved() {
+        for (ApplicationForFoodReportItem item : items) {
+            if (item.getApplicationForFood().getIdOfApplicationForFood().equals(currentItem.getApplicationForFood().getIdOfApplicationForFood())) {
+                deletedItems.add(item);
+                item.setArchieved(true);
+                break;
+            }
+        }
+        needAction = true;
+    }
+
+    public Boolean needAction() {
+        return needAction;
     }
 
     private void setStatus(ApplicationForFoodStatus status) {
@@ -180,6 +208,47 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                     }
                 }
             }
+            CategoryDiscountDSZN discountInoe = getDiscountInoe(session);
+            String isppCodeInoe = Long.toString(discountInoe.getCategoryDiscount().getIdOfCategoryDiscount());
+            Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+            for (ApplicationForFoodReportItem item : deletedItems) {
+                wereChanges = true;
+                ApplicationForFood applicationForFood = (ApplicationForFood)session.load(ApplicationForFood.class, item.getApplicationForFood().getIdOfApplicationForFood());
+                applicationForFood.setArchived(true);
+                applicationForFood.setVersion(nextVersion);
+                applicationForFood.setLastUpdate(new Date());
+                session.update(applicationForFood);
+
+                Client client = DAOUtils.findClient(session, applicationForFood.getClient().getIdOfClient());
+                if (applicationForFoodInoeExists(session, client, applicationForFood.getCreatedDate())) continue;
+                Set<CategoryDiscount> discounts = client.getCategories();
+                if (discounts.contains(discountInoe.getCategoryDiscount())) {
+                    String oldDiscounts = client.getCategoriesDiscounts();
+                    String newDiscounts = "";
+                    for (String str : oldDiscounts.split(",")) {
+                        if (!str.equals(isppCodeInoe))
+                            newDiscounts += str + ",";
+                    }
+                    if (!StringUtils.isEmpty(newDiscounts))
+                        newDiscounts = newDiscounts.substring(0, newDiscounts.length()-1);
+                    Integer oldDiscountMode = client.getDiscountMode();
+                    Integer newDiscountMode =
+                            StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+                    ClientManager
+                            .renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode, ARCHIEVE_COMMENT);
+                }
+                Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+                criteria.add(Restrictions.eq("client", client));
+                criteria.add(Restrictions.eq("archived", false));
+                criteria.add(Restrictions.eq("dtisznCode", new Long(discountInoe.getCode())));
+                List<ClientDtisznDiscountInfo> list = criteria.list();
+                for (ClientDtisznDiscountInfo info : list) {
+                    info.setLastUpdate(new Date());
+                    info.setArchived(true);
+                    info.setVersion(clientDTISZNDiscountVersion);
+                    session.update(info);
+                }
+            }
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
@@ -191,6 +260,22 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
         }
         reload();
         printMessage(wereChanges ? "Операция выполнена" : "Нет измененных записей");
+    }
+
+    private boolean applicationForFoodInoeExists(Session session, Client client, Date date) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.gt("createdDate", date));
+        ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.OK, null);
+        criteria.add(Restrictions.eq("status", status));
+        return criteria.list().size() > 0;
+    }
+
+    private CategoryDiscountDSZN getDiscountInoe(Session session) {
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        criteria.add(Restrictions.isNull("ETPCode"));
+        criteria.add(Restrictions.eq("deleted", false));
+        return (CategoryDiscountDSZN)criteria.uniqueResult();
     }
 
     public String getStatusString(ApplicationForFoodStatus status) {

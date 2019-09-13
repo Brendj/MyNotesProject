@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.SubscriberFeedingType;
+
 import java.text.ParseException;
 
 /**
@@ -20,6 +22,8 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     private int dayCreateVP; //Количество дней, на которые создаются заявки вариативного питания
     private int hoursForbidVP; //Количество часов, в течение которых запрещено редактировать заявки вариативного питания
     private int hoursForbidPP; //Количество часов, в течение которых запрещено редактировать заявки по предзаказам
+
+    private static final int DEFAULT_CAPACITY = 9;
 
     //значения по умолчанию
     private static final int DAY_REQUEST = 5; //5;2;0;1;0;3
@@ -67,7 +71,6 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
 
     @Override
     public String build() {
-        //return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + dayForbidChange + ";";
         return dayRequest + ";" + dayDeActivate + ";" + (enableFeeding ? 1 : 0) + ";" + hoursForbidChange + ";" + (
                 sixWorkWeek ? 1 : 0) + ";" + daysToForbidChangeInPos + ";" + dayCreateVP + ";" + hoursForbidVP + ";"
                 + hoursForbidPP + ";";
@@ -76,6 +79,21 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     @Override
     public boolean check() {
         return true;
+    }
+
+    @Override
+    protected int getECafeSettingArrayCapacity() {
+        return DEFAULT_CAPACITY;
+    }
+
+    @Override
+    protected Integer getOrgSettingTypeByIndex(Integer index) {
+        return SubscriberFeedingType.getGlobalIdByECafeSettingValueIndex(index);
+    }
+
+    @Override
+    protected Integer getIndexByOrgSettingType(Integer type) {
+        return SubscriberFeedingType.getECafeSettingValueIndexByGlobalId(type);
     }
 
     public int getDayRequest() {
@@ -101,14 +119,6 @@ public class SubscriberFeedingSettingSettingValue extends AbstractParserBySettin
     public void setEnableFeeding(boolean enableFeeding) {
         this.enableFeeding = enableFeeding;
     }
-
-    //public int getDayForbidChange() {
-    //    return dayForbidChange;
-    //}
-    //
-    //public void setDayForbidChange(int dayForbidChange) {
-    //    this.dayForbidChange = dayForbidChange;
-    //}
 
     public int getHoursForbidChange() {
         return hoursForbidChange;

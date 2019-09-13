@@ -21,8 +21,7 @@
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
         <rich:calendar value="#{mainPage.detailedEnterEventReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text"
-                       showWeeksBar="false">
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDateCalendar,detailedEnterEventReportPanel"
                          actionListener="#{mainPage.detailedEnterEventReportPage.onReportPeriodChanged}" />
         </rich:calendar>
@@ -38,8 +37,7 @@
         </h:selectOneMenu>
         <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
         <rich:calendar id="endDateCalendar" value="#{mainPage.detailedEnterEventReportPage.endDate}"
-                       datePattern="dd.MM.yyyy" converter="dateConverter"
-                       inputClass="input-text" showWeeksBar="false">
+                       datePattern="dd.MM.yyyy" converter="dateConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDatePeriodSelect,detailedEnterEventReportPanel"
                          actionListener="#{mainPage.detailedEnterEventReportPage.onEndDateSpecified}" />
         </rich:calendar>
@@ -64,11 +62,29 @@
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Группа" styleClass="output-text" />
-        <h:selectOneMenu value="#{mainPage.detailedEnterEventReportPage.clientFilter.clientGroupId}" styleClass="input-text"
-                         style="width: 145px;">
+        <h:selectOneMenu value="#{mainPage.detailedEnterEventReportPage.clientFilter.clientGroupId}"
+                         styleClass="input-text" style="width: 145px;">
             <f:selectItems value="#{mainPage.detailedEnterEventReportPage.clientFilter.clientGroupsCustomItems}" />
             <a4j:support event="onchange" reRender="showDeletedClients" />
         </h:selectOneMenu>
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText styleClass="output-text" escape="true" value="Клиенты" />
+        <h:panelGroup id="clientFilter">
+            <a4j:commandButton value="..."
+                               action="#{mainPage.showClientSelectListPage(mainPage.detailedEnterEventReportPage.getClientList())}"
+                               reRender="modalClientListSelectorPanel,selectedClientList"
+                               oncomplete="if (#{facesContext.maximumSeverity == null})
+                                    #{rich:component('modalClientListSelectorPanel')}.show();" styleClass="command-link"
+                               style="width: 25px;" id="clientFilterButton">
+                <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}" />
+                <f:setPropertyActionListener value="#{mainPage.detailedEnterEventReportPage.getStringClientList}"
+                                             target="#{mainPage.clientSelectListPage.clientFilter}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
+                          value=" {#{mainPage.detailedEnterEventReportPage.filterClient}}" />
+        </h:panelGroup>
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -88,7 +104,7 @@
                    warnClass="warn-messages" />
     <h:panelGrid styleClass="borderless-grid" id="reportPanel">
         <c:if test="${not empty  mainPage.detailedEnterEventReportPage.htmlReport}">
-            <h:outputText escape="true" value="Детализированный отчет по проходам" styleClass="output-text" />
+            <h:outputText escape="true" value="Детализированный отчет по посещению" styleClass="output-text" />
             <f:verbatim>
                 <style type="text/css">
                     div.htmlReportContent :empty {

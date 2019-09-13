@@ -89,7 +89,7 @@ public class OkuDAOService {
     @Transactional(readOnly = true)
     public Collection<Order> getOrdersByContractIdFromDate(Long contractId, Date orderedFrom) {
         Query query = emReport.createNativeQuery(
-                "select o.idoforder, o.idoforg, o.createddate, od.menudetailname as complex_name, a.menudetailname as dish_name, "
+                "select distinct o.idoforder, o.idoforg, o.createddate, od.menudetailname as complex_name, a.menudetailname as dish_name, "
                         + "    g.guid, a.menuorigin as dish_menuorigin " + "from cf_orders o "
                         + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                         + "    and menutype between :typeComplexMin and :typeComplexMax "
@@ -104,7 +104,7 @@ public class OkuDAOService {
                         + "    and o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription) "
                         + "    and o.state = :orderCommittedState "
                         + "union all "
-                        + "select o.idoforder, o.idoforg, o.createddate, null as complex_name, od.menudetailname as dish_name, "
+                        + "select distinct o.idoforder, o.idoforg, o.createddate, null as complex_name, od.menudetailname as dish_name, "
                         + "    null as guid, od.menuorigin as dish_menuorigin " + "from cf_orders o "
                         + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg and menutype = :typeDish "
                         + "join cf_clients c on c.idofclient = o.idofclient "
@@ -170,7 +170,7 @@ public class OkuDAOService {
             return new ArrayList<>();
         }
         Query query = emReport.createNativeQuery(
-                "select a.contractid, a.idoforder, a.idoforg, a.createddate, od.menudetailname as complex_name, "
+                "select distinct a.contractid, a.idoforder, a.idoforg, a.createddate, od.menudetailname as complex_name, "
                         + "    odd.menudetailname as dish_name, g.guid, odd.menuorigin as dish_menuorigin " + "from ( "
                         + "    select o.idoforder, o.idoforg, c.contractid, o.createddate " + "    from cf_orders o "
                         + "    join cf_clients c on o.idofclient = c.idofclient "

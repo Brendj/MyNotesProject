@@ -1336,6 +1336,7 @@ public class SyncResponse {
         envelopeElement.setAttribute("Type",syncType.toString());
         envelopeElement.setAttribute("OrganizationType", String.valueOf(organizationType.ordinal()));
         envelopeElement.setAttribute("ReportService", (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.processor.report.service"));
+        envelopeElement.setAttribute("NodeName", RuntimeContext.getInstance().getNodeName());
         String timeService = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.time.service", "");
         if (!StringUtils.isEmpty(timeService)) {
             envelopeElement.setAttribute("TimeService", timeService);

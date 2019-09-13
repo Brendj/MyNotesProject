@@ -82,7 +82,7 @@ public class RnipDAOService {
     @Transactional
     public void saveAsProcessed(RnipMessage rnipMessage, String responseMessage, String responseMessageId, RnipEventType eventType) {
         boolean processed = RNIPLoadPaymentsServiceV21.noErrors(responseMessage) || RNIPLoadPaymentsServiceV21.noData(responseMessage)
-                || RNIPLoadPaymentsServiceV21.isCatalogMessage(eventType);
+                || RNIPLoadPaymentsServiceV21.isCatalogMessage(eventType) || RNIPLoadPaymentsServiceV21.emptyPacket(responseMessage);
         rnipMessage.setProcessed(processed);
         rnipMessage.setResponseMessage(responseMessage);
         rnipMessage.setResponseMessageId(responseMessageId);

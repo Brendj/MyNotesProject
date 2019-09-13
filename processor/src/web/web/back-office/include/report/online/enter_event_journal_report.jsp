@@ -85,6 +85,24 @@
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText styleClass="output-text" escape="true" value="Клиент" />
+        <h:panelGroup id="clientFilter">
+            <a4j:commandButton value="..."
+                               action="#{mainPage.showClientSelectListPage(mainPage.enterEventJournalReportPage.getClientList())}"
+                               reRender="modalClientListSelectorPanel,selectedClientList"
+                               oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalClientListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}" />
+                <f:setPropertyActionListener value="#{mainPage.enterEventJournalReportPage.getStringClientList}"
+                                             target="#{mainPage.clientSelectListPage.clientFilter}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
+                          value=" {#{mainPage.enterEventJournalReportPage.filterClient}}" />
+        </h:panelGroup>
+    </h:panelGrid>
+
+    <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="События" styleClass="output-text" />
         <h:selectOneMenu value="#{mainPage.enterEventJournalReportPage.selectedEventFilter}"
                          styleClass="input-text" style="width: 145px;">

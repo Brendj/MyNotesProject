@@ -55,6 +55,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     public static final int PAGING_VALUE = 2147483647;
     public static final String SUCCESS_CODE = "0 -";
     public static final String NODATA_CODE = "NO_DATA -";
+    public static final String EMPTY_PACKET = "Empty packet, rerequest sent";
 
     private final static ThreadLocal<String> hasError = new ThreadLocal<String>(){
         @Override protected String initialValue() { return null; }
@@ -87,6 +88,16 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
             case REQUEST_LOAD_PAYMENTS_MODIFIED : return RnipEventType.PAYMENT_MODIFIED;
         }
         return null;
+    }
+
+    private int getRequestType(RnipEventType eventType) {
+        switch (eventType) {
+            case CONTRAGENT_EDIT: return REQUEST_MODIFY_CATALOG;
+            case CONTRAGENT_CREATE: return REQUEST_CREATE_CATALOG;
+            case PAYMENT: return REQUEST_LOAD_PAYMENTS;
+            case PAYMENT_MODIFIED: return REQUEST_LOAD_PAYMENTS_MODIFIED;
+        }
+        return -1;
     }
 
     private boolean isRequestQueued(SendRequestResponse requestResponse) {
@@ -590,31 +601,25 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         try {
             response = port21.getResponse(getResponseRequest);
             GetResponseResponse.ResponseMessage responseMessage = response.getResponseMessage();
+            if (responseMessage == null) {
+                //Если получаем пустой ответ, то повторяем запрос с другим MessageID
+                receiveContragentPayments(getRequestType(rnipMessage.getEventType()), rnipMessage.getContragent(), rnipMessage.getStartDate(), rnipMessage.getEndDate());
+                info(String.format("Получен пустой ответ на запрос с ид=%s, контрагент %s. Отправлен повторный запрос", rnipMessage.getMessageId(),
+                        rnipMessage.getContragent().getContragentName()));
+                RnipDAOService.getInstance().saveAsProcessed(rnipMessage, EMPTY_PACKET, null, rnipMessage.getEventType());
+                return;
+            }
             Response internalResponse = responseMessage.getResponse();
             responseMessageToSave = checkResponseByEventType(internalResponse, rnipMessage);
             if (noErrors(responseMessageToSave[0]) && isPaymentRequest(rnipMessage)) {
                 info("Разбор новых платежей для контрагента %s..", rnipMessage.getContragent().getContragentName());
-                boolean hasMore = internalResponse.getSenderProvidedResponseData().getMessagePrimaryContent().getExportPaymentsResponse().isHasMore();
+
                 RNIPPaymentsResponse res = parsePayments(internalResponse);
                 info("Получено %s новых платежей для контрагента %s, применение..", res.getPayments().size(), rnipMessage.getContragent().getContragentName());
                 boolean isAutoRun = true; //todo тут было условие (startDate == null);
                 addPaymentsToDb(res.getPayments(), isAutoRun);
 
-                //Сохранение по новому даты-времени lastRnipUpdate для контрагента в БД
-                //Если это автоматический запуск, то меняем дату последнего получения платежей контрагента
-                //А если это ручной запуск за выбранный период времени, то дату последнего получения платежей не трогаем
-
-                //Сохранили
-
                 info("Все новые платежи для контрагента %s обработаны", rnipMessage.getContragent().getContragentName());
-                if (hasMore) {
-                    //не нужно, т.к. размер страницы установлен в PAGING_VALUE = 2147483647
-                } else {
-                    if (isAutoRun) {
-                        Date lastUpdateDate = getLastUpdateDate(rnipMessage.getEventType().getCode(), rnipMessage.getContragent());
-                        saveEndDate(rnipMessage.getEventType().getCode(), rnipMessage.getContragent(), lastUpdateDate, res.getRnipDate());
-                    }
-                }
             }
         } catch (Exception e) {
             responseMessageToSave[0] = "100 - Internal Error";
@@ -633,6 +638,10 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
 
     public static boolean noData(String message) {
         return message.startsWith(NODATA_CODE);
+    }
+
+    public static boolean emptyPacket(String message) {
+        return message.equals(EMPTY_PACKET);
     }
 
     public static boolean isCatalogMessage(RnipEventType eventType) {
