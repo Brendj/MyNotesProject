@@ -1294,6 +1294,10 @@ public class RuntimeContext implements ApplicationContextAware {
         if (properties.getProperty("ecafe.processor.userCode.service", "").equals("EMP")) {
             service = applicationContext.getBean(EMPAuthorizeUserBySmsService.class);
         }
+        else
+        {
+            service = applicationContext.getBean(EMPSendSmsToUserService.class);
+        }
         return service;
     }
 
