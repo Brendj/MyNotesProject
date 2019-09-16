@@ -70,6 +70,9 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
 
     }
 
+    public class AutoReportBuildJob extends BasicReportJob.AutoReportBuildJob {
+    }
+
     @Override
     public BasicReportForOrgJob createInstance() {
         return new DetailedEnterEventReport();

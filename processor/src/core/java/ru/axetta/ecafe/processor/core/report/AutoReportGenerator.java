@@ -1089,7 +1089,7 @@ public class AutoReportGenerator {
 
         REPORT_DEFS.add(new ReportDef(DetailedEnterEventReport.class, DetailedEnterEventReport.AutoReportBuildJob.class, new JobDetailCreator() {
             public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
-                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                Class jobClass = DetailedEnterEventReport.AutoReportBuildJob.class;
                 // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
                 String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + DetailedEnterEventReport.class.getSimpleName() + ".jasper";
 
