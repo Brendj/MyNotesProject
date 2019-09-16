@@ -68,6 +68,7 @@ public class OnlinePaymentProcessor {
             payResponse.setRasch(processResult.getRasch());
             payResponse.setBank(processResult.getBank());
             payResponse.setCorrAccount(processResult.getCorrAccount());
+            payResponse.setKpp(processResult.getKpp());
             return payResponse;
         } catch (Exception e) {
             logger.error(String.format("Failed to process request: %s", request), e);
@@ -214,6 +215,7 @@ public class OnlinePaymentProcessor {
         private String rasch;
         private String bank;
         private String corrAccount;
+        private String kpp;
 
         public PayResponse(int protoVersion, boolean bCheckOnly, int resultCode, String resultDescription, Long tspContragentId, Long clientId, String paymentId,
                 Long balance, Long subBalance1, String clientFirstName, String clientSurname, String clientSecondName, Long cardPrintedNo, HashMap<String, String> addInfo) {
@@ -452,6 +454,14 @@ public class OnlinePaymentProcessor {
 
         public void setCorrAccount(String corrAccount) {
             this.corrAccount = corrAccount;
+        }
+
+        public String getKpp() {
+            return kpp;
+        }
+
+        public void setKpp(String kpp) {
+            this.kpp = kpp;
         }
     }
 
