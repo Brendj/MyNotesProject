@@ -52,13 +52,14 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
      * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
      */
     public static final String REPORT_NAME = "Детализированный отчет по посещению";
-    public static final String[] TEMPLATE_FILE_NAMES = {"AutoEnterEventV2Report.jasper"};
+    public static final String[] TEMPLATE_FILE_NAMES = {"DetailedEnterEventReport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = true;
     public static final int[] PARAM_HINTS = new int[]{-46, -47, -48};
     final public static String P_ID_OF_CLIENTS = "idOfClients";
     final public static String P_ALL_FRIENDLY_ORGS = "friendsOrg";
 
     private final static Logger logger = LoggerFactory.getLogger(DetailedEnterEventReport.class);
+
 
     public DetailedEnterEventReport(Date generateTime, long generateDuration, JasperPrint jasperPrint, Date startTime,
             Date endTime, Long idOfOrg) {
@@ -296,7 +297,7 @@ public class DetailedEnterEventReport extends BasicReportForMainBuildingOrgJob {
 
             for (StClass stClass : stClassList) {
                 if (stClass.getDataList() == null || stClass.getDataList().size() == 0) {
-                    logger.error("Data for AutoEnterEventV2Report not found. IdOfOrg = " + org.getIdOfOrg());
+                    logger.error("Data for DetailedEnterEventReport not found. IdOfOrg = " + org.getIdOfOrg());
                 } else {
                     mapKeyModelList.add(new MapKeyModel(stClass.getDataList().get(0).getF04(),
                             stClass.getDataList().get(0).getF01()));
