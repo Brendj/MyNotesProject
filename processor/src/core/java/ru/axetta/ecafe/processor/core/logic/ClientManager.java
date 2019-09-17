@@ -2059,8 +2059,6 @@ public class ClientManager {
         Integer oldDiscountMode = client.getDiscountMode();
         String oldDiscounts = client.getCategoriesDiscounts();
         Set<CategoryDiscount> discounts = client.getCategories();
-        Collection<Client> clientCollection = new ArrayList<>();
-        clientCollection.add(client);
         for (CategoryDiscount discount : discounts) {
             if (discount.getEligibleToDelete()) {
                 client.getCategories().remove(discount);
