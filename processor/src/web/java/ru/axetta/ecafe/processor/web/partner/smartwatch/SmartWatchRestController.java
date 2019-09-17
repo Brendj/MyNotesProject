@@ -27,6 +27,7 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Controller;
 
 import javax.ws.rs.*;
@@ -41,6 +42,7 @@ import static java.lang.Math.abs;
 @Path(value = "")
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Controller
+@DependsOn("runtimeContext")
 public class SmartWatchRestController {
     private Logger logger = LoggerFactory.getLogger(SmartWatchRestController.class);
     private Map<Integer, String> cardState;
