@@ -2059,6 +2059,8 @@ public class ClientManager {
         Integer oldDiscountMode = client.getDiscountMode();
         String oldDiscounts = client.getCategoriesDiscounts();
         Set<CategoryDiscount> discounts = client.getCategories();
+        Collection<Client> clientCollection = new ArrayList<>();
+        clientCollection.add(client);
         for (CategoryDiscount discount : discounts) {
             if (discount.getEligibleToDelete()) {
                 client.getCategories().remove(discount);
@@ -2079,10 +2081,11 @@ public class ClientManager {
             DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
                     newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
             discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_BY_TRANSITION);
+            client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersionWithPessimisticLock());
             session.save(discountChangeHistory);
             client.setLastDiscountsUpdate(new Date());
+            session.update(client);
         }
-        session.update(client);
     }
 
     public static void archiveDtisznDiscount(Client client, Session session, Long idOfCategoryDiscount) {
