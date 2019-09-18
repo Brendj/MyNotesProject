@@ -107,9 +107,21 @@
         </rich:column>
         <rich:column sortable="true" sortBy="#{item.shortName}" headerClass="column-header" styleClass="#{item.style}" label="Название">
             <f:facet name="header">
-                <h:outputText escape="true" value="Название" />
+                <h:outputText escape="true" value="Название ПП" />
             </f:facet>
             <h:outputText escape="true" value="#{item.shortName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column sortable="true" sortBy="#{item.officialName}" headerClass="column-header" styleClass="#{item.style}" label="Название" rendered="#{orgSettingsReportPage.showRequisite}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Полное название" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.officialName}" styleClass="output-text" />
+        </rich:column>
+        <rich:column sortable="true" sortBy="#{item.shortNameInfoService}" headerClass="column-header" styleClass="#{item.style}" label="Название" rendered="#{orgSettingsReportPage.showRequisite}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Наименование" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.shortNameInfoService}" styleClass="output-text" />
         </rich:column>
         <rich:column sortable="true" sortBy="#{item.district}" headerClass="column-header" styleClass="#{item.style}" label="Округ">
             <f:facet name="header">

@@ -24,6 +24,8 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
     private String orgNumberInName;
     private Long idOfOrg;
     private String shortName;
+    private String officialName;
+    private String shortNameInfoService;
     private String district;
     private String shortAddress;
     private String type;
@@ -85,6 +87,8 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
         this.orgNumberInName = org.getOrgNumberInName();
         this.idOfOrg = org.getIdOfOrg();
         this.shortName = org.getShortName();
+        this.officialName = org.getOfficialName();
+        this.shortNameInfoService = org.getShortNameInfoService();
         this.district = org.getDistrict();
         this.shortAddress = org.getShortAddress();
         this.type = org.getType().getShortType();
@@ -435,5 +439,21 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
         }
 
         return -this.mainBuilding.compareTo(o.mainBuilding);
+    }
+
+    public String getOfficialName() {
+        return officialName;
+    }
+
+    public void setOfficialName(String officialName) {
+        this.officialName = officialName;
+    }
+
+    public String getShortNameInfoService() {
+        return shortNameInfoService;
+    }
+
+    public void setShortNameInfoService(String shortNameInfoService) {
+        this.shortNameInfoService = shortNameInfoService;
     }
 }
