@@ -2098,8 +2098,9 @@ public class ClientManager {
                 if (!info.getArchived()) {
                     info.setArchived(true);
                     if (null == clientDTISZNDiscountVersion) {
-                        info.setVersion(DAOUtils.nextVersionByClientDTISZNDiscountInfo(session));
+                        clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
                     }
+                    info.setVersion(clientDTISZNDiscountVersion);
                     info.setLastUpdate(new Date());
                     session.update(info);
                 }
@@ -2110,8 +2111,9 @@ public class ClientManager {
                 if (!food.getArchived()) {
                     food.setArchived(true);
                     if (null == applicationForFoodVersion) {
-                        food.setVersion(DAOUtils.nextVersionByApplicationForFood(session));
+                        applicationForFoodVersion = DAOUtils.nextVersionByApplicationForFood(session);
                     }
+                    food.setVersion(applicationForFoodVersion);
                     food.setLastUpdate(new Date());
                     session.update(food);
                 }
@@ -2125,9 +2127,10 @@ public class ClientManager {
 
         for (ApplicationForFood item : list) {
             item.setArchived(true);
-            if (applicationForFoodVersion == null) {
-                item.setVersion(DAOUtils.nextVersionByApplicationForFood(session));
+            if (null == applicationForFoodVersion) {
+                applicationForFoodVersion = DAOUtils.nextVersionByApplicationForFood(session);
             }
+            item.setVersion(applicationForFoodVersion);
             item.setLastUpdate(new Date());
             session.update(item);
         }
