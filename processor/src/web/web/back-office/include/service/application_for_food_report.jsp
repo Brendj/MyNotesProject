@@ -58,6 +58,27 @@
         <rich:spacer height="20px" />
         <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('applicationForFoodMessageBenefitPanel')" style="width: 180px;" ajaxSingle="true" />
     </rich:modalPanel>
+
+    <rich:modalPanel id="applicationForFoodChangeDatesPanel" autosized="true" minWidth="500" >
+        <f:facet name="header">
+            <h:outputText value="Изменение срока действия льготы по заявлению #{applicationForFoodReportPage.currentItem.serviceNumber}" />
+        </f:facet>
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <h:outputText styleClass="output-text" escape="true" value="Начальная дата" />
+            <rich:calendar value="#{applicationForFoodReportPage.benefitStartDate}" datePattern="dd.MM.yyyy" id="benefitStartDateCalendar"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                <a4j:support event="onchanged" ajaxSingle="true"/>
+            </rich:calendar>
+            <h:outputText styleClass="output-text" escape="true" value="Конечная дата" />
+            <rich:calendar value="#{applicationForFoodReportPage.benefitEndDate}" datePattern="dd.MM.yyyy" id="benefitEndDateCalendar"
+                       converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                <a4j:support event="onchanged" ajaxSingle="true"/>
+            </rich:calendar>
+            <a4j:commandButton value="Сохранить" action="#{applicationForFoodReportPage.changeDates()}" reRender="applicationForFoodPanelGrid"
+                       oncomplete="Richfaces.hideModalPanel('applicationForFoodChangeDatesPanel')" style="width: 180px;" ajaxSingle="true"/>
+            <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('applicationForFoodChangeDatesPanel')" style="width: 180px;" ajaxSingle="true" />
+        </h:panelGrid>
+    </rich:modalPanel>
     <h:panelGrid styleClass="borderless-grid" columns="2" id="applicationForFoodParameters">
         <h:outputText styleClass="output-text" escape="true" value="Список организаций" />
         <h:panelGroup>
@@ -238,6 +259,13 @@
                              action="#{applicationForFoodReportPage.makeArchieved()}" styleClass="important-command-link">
                 <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}" />
             </a4j:commandLink>
+            <h:outputText escape="false" value="<br/>" rendered="#{item.canChangeDates()}" />
+            <a4j:commandLink reRender="applicationForFoodPanelGrid,applicationForFoodChangeDatesPanel" rendered="#{item.canChangeDates()}" value="Изменить даты"
+                             styleClass="command-link" oncomplete="Richfaces.showModalPanel('applicationForFoodChangeDatesPanel');" ajaxSingle="true">
+                <f:setPropertyActionListener value="#{item.startDate}" target="#{applicationForFoodReportPage.benefitStartDate}" />
+                <f:setPropertyActionListener value="#{item.endDate}" target="#{applicationForFoodReportPage.benefitEndDate}" />
+                <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}" />
+            </a4j:commandLink>
 
         </rich:column>
         <rich:column headerClass="column-header">
@@ -267,7 +295,7 @@
 
     <h:panelGrid styleClass="borderless-grid" columns="1">
         <a4j:commandButton value="Подтвердить" action="#{applicationForFoodReportPage.apply}"
-                           reRender="applicationForFoodTable" styleClass="command-button"
+                           reRender="applicationForFoodPanelGrid" styleClass="command-button"
                            status="reportGenerateStatus" id="applyButton" />
     </h:panelGrid>
 

@@ -43,6 +43,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     private List<ApplicationForFoodReportItem> items = new ArrayList<ApplicationForFoodReportItem>();
     private ApplicationForFoodReportItem currentItem;
     private List<ApplicationForFoodReportItem> deletedItems = new ArrayList<>();
+    private List<ApplicationForFoodReportItem> changeDatesItems = new ArrayList<>();
 
     private List<SelectItem> statuses = readAllItems();
     private String status;
@@ -53,6 +54,9 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     private Boolean showPeriod = false;
     private static final String ARCHIEVE_COMMENT = "ЗЛП заархивировано";
     private Boolean needAction = false;
+    private Date benefitStartDate;
+    private Date benefitEndDate;
+    private String shit;
 
     private static List<SelectItem> readAllItems() {
         ApplicationForFoodState[] states = ApplicationForFoodState.values();
@@ -101,6 +105,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
         needAction = false;
         items.clear();
         deletedItems.clear();
+        changeDatesItems.clear();
         Session session = null;
         Transaction transaction = null;
         try {
@@ -126,6 +131,12 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                     benefitCondition, idOfClientList, number, CalendarUtils.startOfDay(startDate), CalendarUtils.endOfDay(endDate), showPeriod);
             for (ApplicationForFood applicationForFood : list) {
                 ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(applicationForFood);
+                ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, applicationForFood.getClient().getIdOfClient(),
+                        Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE));
+                if (info != null) {
+                    item.setStartDate(info.getDateStart());
+                    item.setEndDate(info.getDateEnd());
+                }
                 items.add(item);
             }
             transaction.commit();
@@ -163,6 +174,19 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
             }
         }
         needAction = true;
+    }
+
+    public void changeDates() {
+        for (ApplicationForFoodReportItem item : items) {
+            if (item.getApplicationForFood().getIdOfApplicationForFood().equals(currentItem.getApplicationForFood().getIdOfApplicationForFood())) {
+                item.setStartDate(benefitStartDate);
+                item.setEndDate(benefitEndDate);
+                changeDatesItems.add(item);
+                break;
+            }
+        }
+        needAction = true;
+        logger.info(shit);
     }
 
     public Boolean needAction() {
@@ -249,6 +273,17 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                     session.update(info);
                 }
             }
+
+            for (ApplicationForFoodReportItem item : changeDatesItems) {
+                wereChanges = true;
+                ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, item.getApplicationForFood().getClient().getIdOfClient(),
+                        Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE));
+                info.setDateStart(item.getStartDate());
+                info.setDateEnd(item.getEndDate());
+                info.setLastUpdate(new Date());
+                info.setVersion(clientDTISZNDiscountVersion);
+                session.update(info);
+            }
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
@@ -311,7 +346,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     }
 
     public ApplicationForFoodReportItem getCurrentItem() {
-        return currentItem;
+        return currentItem == null ? new ApplicationForFoodReportItem() : currentItem;
     }
 
     public void setCurrentItem(ApplicationForFoodReportItem currentItem) {
@@ -388,5 +423,29 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
 
     public void setShowPeriod(Boolean showPeriod) {
         this.showPeriod = showPeriod;
+    }
+
+    public Date getBenefitStartDate() {
+        return benefitStartDate;
+    }
+
+    public void setBenefitStartDate(Date benefitStartDate) {
+        this.benefitStartDate = benefitStartDate;
+    }
+
+    public Date getBenefitEndDate() {
+        return benefitEndDate;
+    }
+
+    public void setBenefitEndDate(Date benefitEndDate) {
+        this.benefitEndDate = benefitEndDate;
+    }
+
+    public String getShit() {
+        return shit;
+    }
+
+    public void setShit(String shit) {
+        this.shit = shit;
     }
 }
