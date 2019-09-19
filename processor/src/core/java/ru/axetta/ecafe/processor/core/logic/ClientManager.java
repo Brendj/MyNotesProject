@@ -2088,8 +2088,6 @@ public class ClientManager {
 
     public static void archiveDtisznDiscount(Client client, Session session, Long idOfCategoryDiscount) {
         List<Integer> list = DAOUtils.getDsznCodeListByCategoryDiscountCode(session, idOfCategoryDiscount);
-        Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
-        Long applicationForFoodVersion = DAOUtils.nextVersionByApplicationForFood(session);
 
         for (Integer dsznCode : list) {
             ClientDtisznDiscountInfo info = DAOUtils
@@ -2097,22 +2095,32 @@ public class ClientManager {
             if (null != info) {
                 if (!info.getArchived()) {
                     info.setArchived(true);
-                    info.setVersion(clientDTISZNDiscountVersion);
+                    info.setVersion(DAOUtils.nextVersionByClientDTISZNDiscountInfo(session));
                     info.setLastUpdate(new Date());
                     session.update(info);
                 }
-            } else {
-                ApplicationForFood food = DAOUtils
-                        .getApplicationForFoodByClientAndCode(session, client, dsznCode.longValue());
-                if (null != food) {
-                    if (!food.getArchived()) {
-                        food.setArchived(true);
-                        food.setVersion(applicationForFoodVersion);
-                        food.setLastUpdate(new Date());
-                        session.update(food);
-                    }
+            }
+            ApplicationForFood food = DAOUtils
+                    .getApplicationForFoodByClientAndCode(session, client, dsznCode.longValue());
+            if (null != food) {
+                if (!food.getArchived()) {
+                    food.setArchived(true);
+                    food.setVersion(DAOUtils.nextVersionByApplicationForFood(session));
+                    food.setLastUpdate(new Date());
+                    session.update(food);
                 }
             }
+        }
+    }
+
+    public static void archiveApplicationForFoodWithoutDiscount(Client client, Session session) {
+        List<ApplicationForFood> list = DAOUtils.getApplicationForFoodByClient(session, client);
+
+        for (ApplicationForFood item : list) {
+            item.setArchived(true);
+            item.setVersion(DAOUtils.nextVersionByApplicationForFood(session));
+            item.setLastUpdate(new Date());
+            session.update(item);
         }
     }
 }

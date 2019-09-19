@@ -4280,6 +4280,14 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.eq("dtisznCode", code));
+        criteria.add(Restrictions.eq("archived", 0));
         return (ApplicationForFood) criteria.uniqueResult();
+    }
+
+    public static List<ApplicationForFood> getApplicationForFoodByClient(Session session, Client client) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.eq("archived", false));
+        return criteria.list();
     }
 }

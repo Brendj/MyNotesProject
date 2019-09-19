@@ -931,7 +931,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 }
             }
             runtimeContext.getProcessor().disableClientCardsIfChangeOrg(client, orgSet, org.getIdOfOrg());
-
+            archiveApplicationForFoodWithoutDiscount(client,persistenceSession);
         }
         client.setOrg(org);
         client.setPerson(person);
