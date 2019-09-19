@@ -2088,6 +2088,8 @@ public class ClientManager {
 
     public static void archiveDtisznDiscount(Client client, Session session, Long idOfCategoryDiscount) {
         List<Integer> list = DAOUtils.getDsznCodeListByCategoryDiscountCode(session, idOfCategoryDiscount);
+        Long clientDTISZNDiscountVersion = null;
+        Long applicationForFoodVersion = null;
 
         for (Integer dsznCode : list) {
             ClientDtisznDiscountInfo info = DAOUtils
@@ -2095,7 +2097,9 @@ public class ClientManager {
             if (null != info) {
                 if (!info.getArchived()) {
                     info.setArchived(true);
-                    info.setVersion(DAOUtils.nextVersionByClientDTISZNDiscountInfo(session));
+                    if (null == clientDTISZNDiscountVersion) {
+                        info.setVersion(DAOUtils.nextVersionByClientDTISZNDiscountInfo(session));
+                    }
                     info.setLastUpdate(new Date());
                     session.update(info);
                 }
@@ -2105,7 +2109,9 @@ public class ClientManager {
             if (null != food) {
                 if (!food.getArchived()) {
                     food.setArchived(true);
-                    food.setVersion(DAOUtils.nextVersionByApplicationForFood(session));
+                    if (null == applicationForFoodVersion) {
+                        food.setVersion(DAOUtils.nextVersionByApplicationForFood(session));
+                    }
                     food.setLastUpdate(new Date());
                     session.update(food);
                 }
@@ -2115,10 +2121,13 @@ public class ClientManager {
 
     public static void archiveApplicationForFoodWithoutDiscount(Client client, Session session) {
         List<ApplicationForFood> list = DAOUtils.getApplicationForFoodByClient(session, client);
+        Long applicationForFoodVersion = null;
 
         for (ApplicationForFood item : list) {
             item.setArchived(true);
-            item.setVersion(DAOUtils.nextVersionByApplicationForFood(session));
+            if (applicationForFoodVersion == null) {
+                item.setVersion(DAOUtils.nextVersionByApplicationForFood(session));
+            }
             item.setLastUpdate(new Date());
             session.update(item);
         }
