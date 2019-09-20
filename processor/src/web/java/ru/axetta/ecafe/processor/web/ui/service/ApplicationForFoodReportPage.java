@@ -206,6 +206,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
         }
         for (ApplicationForFoodReportItem item : items) {
             if (item.getApplicationForFood().getIdOfApplicationForFood().equals(currentItem.getApplicationForFood().getIdOfApplicationForFood())) {
+                if (item.getStartDate() == null) continue;
                 if (!convertDate(item.getStartDate()).equals(convertDate(benefitStartDate))) {
                     if (convertDate(benefitStartDate).before(convertDate(new Date()))) {
                         errorMessage = "Начальная дата не может быть меньше текущей даты";
