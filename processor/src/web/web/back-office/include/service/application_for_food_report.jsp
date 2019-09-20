@@ -74,10 +74,11 @@
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false">
                 <a4j:support event="onchanged" ajaxSingle="true"/>
             </rich:calendar>
-            <a4j:commandButton value="Сохранить" action="#{applicationForFoodReportPage.changeDates()}" reRender="applicationForFoodPanelGrid"
-                       oncomplete="Richfaces.hideModalPanel('applicationForFoodChangeDatesPanel')" style="width: 180px;" ajaxSingle="true"/>
+            <a4j:commandButton value="Сохранить" action="#{applicationForFoodReportPage.changeDates()}" reRender="applicationForFoodPanelGrid,applicationForFoodChangeDatesPanel"
+                       oncomplete="if (#{!applicationForFoodReportPage.validateDates()}) Richfaces.showModalPanel('applicationForFoodChangeDatesPanel')" style="width: 180px;" ajaxSingle="true"/>
             <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('applicationForFoodChangeDatesPanel')" style="width: 180px;" ajaxSingle="true" />
         </h:panelGrid>
+        <h:outputText style="color: red" escape="true" value="#{applicationForFoodReportPage.errorMessage}" />
     </rich:modalPanel>
     <h:panelGrid styleClass="borderless-grid" columns="2" id="applicationForFoodParameters">
         <h:outputText styleClass="output-text" escape="true" value="Список организаций" />
@@ -261,7 +262,8 @@
             </a4j:commandLink>
             <h:outputText escape="false" value="<br/>" rendered="#{item.canChangeDates()}" />
             <a4j:commandLink reRender="applicationForFoodPanelGrid,applicationForFoodChangeDatesPanel" rendered="#{item.canChangeDates()}" value="Изменить даты"
-                             styleClass="command-link" oncomplete="Richfaces.showModalPanel('applicationForFoodChangeDatesPanel');" ajaxSingle="true">
+                             styleClass="command-link" oncomplete="Richfaces.showModalPanel('applicationForFoodChangeDatesPanel');" ajaxSingle="true"
+                            action="#{applicationForFoodReportPage.setErrorMessage(\"\")}">
                 <f:setPropertyActionListener value="#{item.startDate}" target="#{applicationForFoodReportPage.benefitStartDate}" />
                 <f:setPropertyActionListener value="#{item.endDate}" target="#{applicationForFoodReportPage.benefitEndDate}" />
                 <f:setPropertyActionListener value="#{item}" target="#{applicationForFoodReportPage.currentItem}" />

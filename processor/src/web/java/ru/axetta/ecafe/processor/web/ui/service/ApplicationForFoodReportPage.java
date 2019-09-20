@@ -56,7 +56,8 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     private Boolean needAction = false;
     private Date benefitStartDate;
     private Date benefitEndDate;
-    private String shit;
+    private Boolean noErrorsOnValidate;
+    private String errorMessage;
 
     private static List<SelectItem> readAllItems() {
         ApplicationForFoodState[] states = ApplicationForFoodState.values();
@@ -179,6 +180,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     public void changeDates() {
         for (ApplicationForFoodReportItem item : items) {
             if (item.getApplicationForFood().getIdOfApplicationForFood().equals(currentItem.getApplicationForFood().getIdOfApplicationForFood())) {
+                if (!validateDates()) return;
                 item.setStartDate(benefitStartDate);
                 item.setEndDate(benefitEndDate);
                 changeDatesItems.add(item);
@@ -186,7 +188,33 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
             }
         }
         needAction = true;
-        logger.info(shit);
+    }
+
+    private Date convertDate(Date date) {
+        return CalendarUtils.startOfDay(date);
+    }
+
+    public boolean validateDates() {
+        if (benefitStartDate == null || benefitEndDate == null) return false;
+        if (benefitStartDate.after(benefitEndDate)) {
+            errorMessage = "Начальная дата не может быть больше конечной";
+            return false;
+        }
+        if (convertDate(benefitEndDate).before(convertDate(new Date()))) {
+            errorMessage = "Конечная дата не может быть меньше текущей даты";
+            return false;
+        }
+        for (ApplicationForFoodReportItem item : items) {
+            if (item.getApplicationForFood().getIdOfApplicationForFood().equals(currentItem.getApplicationForFood().getIdOfApplicationForFood())) {
+                if (!convertDate(item.getStartDate()).equals(convertDate(benefitStartDate))) {
+                    if (convertDate(benefitStartDate).before(convertDate(new Date()))) {
+                        errorMessage = "Начальная дата не может быть меньше текущей даты";
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
     }
 
     public Boolean needAction() {
@@ -441,11 +469,19 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
         this.benefitEndDate = benefitEndDate;
     }
 
-    public String getShit() {
-        return shit;
+    public Boolean getNoErrorsOnValidate() {
+        return noErrorsOnValidate;
     }
 
-    public void setShit(String shit) {
-        this.shit = shit;
+    public void setNoErrorsOnValidate(Boolean noErrorsOnValidate) {
+        this.noErrorsOnValidate = noErrorsOnValidate;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }
