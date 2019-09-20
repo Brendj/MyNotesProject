@@ -67,13 +67,15 @@ public class ApplicationForFoodReportItem {
     }
 
     public Boolean getIsPaused() {
-        if (!isInoe || archieved) return false;
-        return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.PAUSED);
+        return false;
+        //if (!isInoe || archieved) return false;
+        //return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.PAUSED);
     }
 
     public Boolean getIsResumed() {
-        if (!isInoe || archieved) return false;
-        return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.RESUME);
+        return false;
+        //if (!isInoe || archieved) return false;
+        //return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.RESUME);
     }
 
     public Boolean canBeMovedToArchieve() {
