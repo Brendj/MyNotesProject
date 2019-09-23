@@ -537,7 +537,9 @@ public class User {
             needRegenerateCode = true;
         }
         if (needRegenerateCode) {
+            logger.info(String.format("Start of sending SMS code for the user %s", userName));
             requestSmsCode(userName);
+            logger.info(String.format("End of sending SMS code for the user %s", userName));
             return true;
         }
         if (user.getSmsCodeEnterDate() == null) {
@@ -554,10 +556,11 @@ public class User {
     public static void requestSmsCode(String userName) throws Exception {
         User user = DAOService.getInstance().findUserByUserName(userName);
         if (user == null) {
+            logger.error(String.format("Cannot find user %s", userName));
             throw new Exception(String.format("Cannot find user %s", userName));
         }
         String code = ProcessorUtils.generateSmsCode();
-
+        logger.info(String.format("Code generated successfully for user %s", userName));
         /*Client fakeClient = createFakeClient(user.getPhone());
         RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                 .sendMessageAsync(fakeClient, EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED,
@@ -568,8 +571,10 @@ public class User {
             user.setSmsCodeEnterDate(null);
             user.setSmsCodeGenerateDate(new Date(System.currentTimeMillis()));
             DAOService.getInstance().setUserInfo(user);
+            logger.info(String.format("User %s data updated", userName));
         } else {
-            throw new Exception(String.format("Ошибка при отправке СМС-сообщения. Ответ сервиса: %s", errCode));
+            logger.error(String.format("Error sending SMS message. Service response:%s", errCode));
+            throw new Exception(String.format("Error sending SMS message. Service response:%s", errCode));
         }
     }
 
@@ -595,10 +600,11 @@ public class User {
                 .createUserEditRecord(SecurityJournalAuthenticate.EventType.GENERATE_SMS, request.getRemoteAddr(),
                         user.getUserName(), user, true, null, comment);
         DAOService.getInstance().writeAuthJournalRecord(record);
+        logger.info("Successfully created a record in the database about the user login");
         if (RuntimeContext.getInstance().getSmsUserCodeSender() != null) {
             return RuntimeContext.getInstance().getSmsUserCodeSender().sendCodeAndGetError(user, code);
         }
-        return "В системе не определен сервис отправки смс";
+        return "SMS sending service is not defined in the system";
     }
 
 
