@@ -667,7 +667,7 @@ public class PreorderDAOService {
 
     @Transactional
     public List<PreorderComplex> getPreorderComplexListForRelevanceToMenu(PreorderRequestsReportServiceParam params) {
-        Query query = em.createQuery("select pc from PreorderComplex pc "
+        Query query = em.createQuery("select pc from PreorderComplex pc join fetch pc.preorderMenuDetails join fetch pc.client c join fetch c.org "
                 + "where pc.preorderDate > :date and pc.deletedState = false "
                 + params.getJPACondition()
                 + "order by pc.preorderDate");
