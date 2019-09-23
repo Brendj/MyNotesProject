@@ -18,10 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by nuc on 02.04.2019.
@@ -35,12 +32,31 @@ public class PreorderOperationsService {
         try {
             logger.info("Start process relevance preorders");
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgs(params);
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu(params);
+            //RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu(params);
+            runRelevancePreordersToMenu(params);
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgFlag(params);
             logger.info("Successful end process relevance preorders");
         } catch(Exception e) {
             logger.error("Error in process relevance preorders");
         }
+    }
+
+    public void runRelevancePreordersToMenu(PreorderRequestsReportServiceParam params) {
+        logger.info("Start relevancePreordersToMenu process");
+        long nextVersion = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).nextVersionByPreorderComplex();
+        List<PreorderComplex> list = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreorderComplexListForRelevanceToMenu(params);
+        int counter = 0;
+        List<ModifyMenu> modifyMenuList = new ArrayList<>();
+        for (PreorderComplex preorderComplex : list) {
+            logger.info(String.format("Start processing record %s from %s", ++counter, list.size()));
+            if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
+            List<ModifyMenu> mmList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu(preorderComplex, nextVersion);
+            if (mmList != null) {
+                modifyMenuList.addAll(mmList);
+            }
+        }
+        RuntimeContext.getAppContext().getBean(PreorderDAOService.class).changeLocalIdOfMenu(modifyMenuList, nextVersion);
+        logger.info("End relevancePreordersToMenu process");
     }
 
     public void generatePreordersBySchedule() {

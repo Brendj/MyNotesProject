@@ -25,6 +25,7 @@ import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 import ru.axetta.ecafe.processor.core.utils.SyncStatsManager;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
+import ru.axetta.ecafe.processor.web.partner.preorder.PreorderOperationsService;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
@@ -505,7 +506,7 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void relevancePreordersToMenu() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu(new PreorderRequestsReportServiceParam(new Date()));
+            RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).runRelevancePreordersToMenu(new PreorderRequestsReportServiceParam(new Date()));
             printMessage("Проверка соответствия меню и предзаказа завершена");
         } catch (Exception e) {
             getLogger().error("Error create relevancePreordersToMenu: ", e);
