@@ -32,6 +32,7 @@ public class PreorderMenuDetail {
     private String groupName;
     private Integer availableNow;
     private String shortName;
+    private Long idOfGood;
 
     public PreorderMenuDetail() {
 
@@ -242,5 +243,13 @@ public class PreorderMenuDetail {
 
     public void setShortName(String shortName) {
         this.shortName = shortName;
+    }
+
+    public Long getIdOfGood() {
+        return idOfGood;
+    }
+
+    public void setIdOfGood(Long idOfGood) {
+        this.idOfGood = idOfGood;
     }
 }

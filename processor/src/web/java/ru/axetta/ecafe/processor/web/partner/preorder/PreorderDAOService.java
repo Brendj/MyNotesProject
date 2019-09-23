@@ -1285,6 +1285,7 @@ public class PreorderDAOService {
         preorderMenuDetail.setMenuDetailOutput(md.getMenuDetailOutput());
         preorderMenuDetail.setProtein(md.getProtein());
         preorderMenuDetail.setShortName(md.getShortName());
+        preorderMenuDetail.setIdOfGood(md.getIdOfGood());
         return preorderMenuDetail;
     }
 
