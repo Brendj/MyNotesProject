@@ -45,9 +45,19 @@ public class User {
     private static final String PASS_SPECIAL_SYMBOLS = "0123456789[]{},.<>;:|\\/?!`~@#$%^&*()-_=+";
     private static final int MIN_PASSWORD_LENGTH = 6;
 
+    private static boolean successfullySendEMP = false;
+
     protected static Logger logger;
     static {
         try {  logger = LoggerFactory.getLogger(User.class); } catch (Throwable ignored) {}
+    }
+
+    public static boolean isSuccessfullySendEMP() {
+        return successfullySendEMP;
+    }
+
+    public static void setSuccessfullySendEMP(boolean successfullySendEMP) {
+        User.successfullySendEMP = successfullySendEMP;
     }
 
     public String getLastSmsCode() {
@@ -538,7 +548,7 @@ public class User {
         }
         if (needRegenerateCode) {
             logger.info(String.format("Start of sending SMS code for the user %s", userName));
-            requestSmsCode(userName);
+            setSuccessfullySendEMP(requestSmsCode(userName));
             logger.info(String.format("End of sending SMS code for the user %s", userName));
             return true;
         }
@@ -553,7 +563,7 @@ public class User {
         }
     }
 
-    public static void requestSmsCode(String userName) throws Exception {
+    public static boolean requestSmsCode(String userName) throws Exception {
         User user = DAOService.getInstance().findUserByUserName(userName);
         if (user == null) {
             logger.error(String.format("Cannot find user %s", userName));
@@ -572,9 +582,10 @@ public class User {
             user.setSmsCodeGenerateDate(new Date(System.currentTimeMillis()));
             DAOService.getInstance().setUserInfo(user);
             logger.info(String.format("User %s data updated", userName));
+            return true;
         } else {
             logger.error(String.format("Error sending SMS message. Service response:%s", errCode));
-            throw new Exception(String.format("Error sending SMS message. Service response:%s", errCode));
+            return false;
         }
     }
 
