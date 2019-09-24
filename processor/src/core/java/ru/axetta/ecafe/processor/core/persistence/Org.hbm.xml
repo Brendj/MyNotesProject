@@ -245,6 +245,12 @@
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Card"/>
         </set>
+
+        <set name="EZD" lazy="false" table="cf_ezd_to_org">
+            <key column="idoforg"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="idrequestsezd"/>
+        </set>
+
         <property name="registryUrl" column="registryUrl" type="string" length="256"/>
 
         <property name="interdistrictCouncil" column="interdistrictCouncil" type="string" length="256"/>

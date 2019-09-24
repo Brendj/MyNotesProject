@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+  -->
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd" table="cf_goods_requests_ezd">
+        <cache usage="transactional"/>
+        <id name="id" column="idrequestsezd" type="long">
+            <generator class="identity"/>
+        </id>
+
+        <set name="Orgs" lazy="false" table="cf_ezd_to_org">
+            <key column="idrequestsezd"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"/>
+        </set>
+
+        <property name="groupname" column="groupname" type="string" length="32"/>
+        <property name="dateappointment" column="dateappointment" type="long"/>
+        <property name="idofcomplex" column="idofcomplex" type="long"/>
+        <property name="complexname" column="complexname" type="string" length="32"/>
+        <property name="complexcount" column="complexcount" type="integer"/>
+        <property name="username" column="username" type="string" length="32"/>
+        <property name="createddate" column="createddate" type="long"/>
+        <property name="lastupdate" column="lastupdate" type="long"/>
+        <property name="versionrecord" column="versionrecord" type="integer"/>
+
+    </class>
+</hibernate-mapping>
+
