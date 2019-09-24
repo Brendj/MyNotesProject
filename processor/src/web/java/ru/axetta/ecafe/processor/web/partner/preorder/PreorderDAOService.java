@@ -1299,7 +1299,7 @@ public class PreorderDAOService {
         try {
             return (ComplexInfo)query.getSingleResult();
         } catch (Exception e) {
-            logger.error(String.format("Cant find complexInfo idOfComplex=%s, date=%s, idOfClient=%s", idOfComplex, date.getTime(), client.getIdOfClient()));
+            logger.error(String.format("Cant find complexInfo idOfComplex=%s, date=%s, idOfClient=%s", idOfComplex, date.getTime(), client.getIdOfClient()), e);
             return null;
         }
     }
