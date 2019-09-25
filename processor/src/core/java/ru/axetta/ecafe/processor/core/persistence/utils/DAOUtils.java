@@ -9,8 +9,8 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -3634,6 +3634,14 @@ public class DAOUtils {
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
         criteria.setMaxResults(1);
         return (Card) criteria.uniqueResult();
+    }
+
+    public static Card findCardByCardNoAndIdOfFriendlyOrgNullSafe(Session session, Long cardNo, Long idOfOrg){
+        try {
+            return findCardByCardNoAndIdOfFriendlyOrg(session, cardNo, idOfOrg);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static Card findCardByCardNoAndIdOfFriendlyOrg(Session session, Long cardNo, Long idOfOrg){

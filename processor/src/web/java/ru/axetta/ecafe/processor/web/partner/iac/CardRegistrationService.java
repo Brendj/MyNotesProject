@@ -79,7 +79,7 @@ public class CardRegistrationService {
         if (null == cardId)
             throw new RequiredFieldsAreNotFilledException("Required fields are not filled: cardId = null");
 
-        Card card = DAOUtils.findCardByCardNoAndIdOfFriendlyOrg(session, cardId, client.getOrg().getIdOfOrg());
+        Card card = DAOUtils.findCardByCardNoAndIdOfFriendlyOrgNullSafe(session, cardId, client.getOrg().getIdOfOrg());
 
         if (null == card) {
             blockAllOtherClientCards(client);
