@@ -2564,6 +2564,16 @@ public class DAOService {
         }
     }
 
+    public SpecialDate getSpecialCalendarByDate(Date date) {
+        Query query = entityManager.createQuery("select sd from SpecialDate sd where sd.date = :day");
+        query.setParameter("day", date);
+        try {
+            return (SpecialDate) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
     private String getStrForDate(String str) {
         return (str.length() == 1) ? "0" + str : str;
     }

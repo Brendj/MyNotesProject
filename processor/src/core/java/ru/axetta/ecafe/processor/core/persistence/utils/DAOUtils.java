@@ -23,6 +23,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Se
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
@@ -4211,6 +4212,14 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("idOfOrg", idOfOrg))
                 .add(Restrictions.eq("settingGroup", OrgSettingGroup.getGroupById(settingGroupId)));
         return (OrgSetting) criteria.uniqueResult();
+    }
+
+    public static OrgSettingItem getOrgSettingItemByOrgAndType(Session session, Long idOfOrg, Integer settingtype) {
+        Criteria criteria = session.createCriteria(OrgSettingItem.class);
+        criteria.add(Restrictions.eq("orgSetting.idOfOrg", idOfOrg))
+                .add(Restrictions.eq("settingType", settingtype))
+                .addOrder(org.hibernate.criterion.Order.desc("version"));
+        return (OrgSettingItem) criteria.uniqueResult();
     }
 
     public static List<Long> findFriendlyOrgsIds(Session session, List<Long> orgIdList) {
