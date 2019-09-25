@@ -143,7 +143,7 @@ public class CardRegistrationService {
             if (null != client)
                 externalInfo.contractId = client.getContractId();
         } else if (null != cardId) {
-            Card card = DAOUtils.findCardByCardNoAndOrg(session, cardId, org.getIdOfOrg());
+            Card card = DAOUtils.findCardByCardNoAndIdOfFriendlyOrgNullSafe(session, cardId, org.getIdOfOrg());
             externalInfo.contractId = card.getClient().getContractId();
         }
 
