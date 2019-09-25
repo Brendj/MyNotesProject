@@ -475,7 +475,7 @@
         </init-param>
         <init-param>
             <param-name>resteasy.servlet.mapping.prefix</param-name>
-            <param-value>/ezd/*</param-value>
+            <param-value>/ezd</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>

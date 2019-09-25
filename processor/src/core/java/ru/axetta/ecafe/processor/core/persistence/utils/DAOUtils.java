@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
@@ -4278,4 +4279,26 @@ public class DAOUtils {
         query.setParameter("idOfOrg", idOfOrg);
         query.executeUpdate();
     }
+
+    public static List getAllDateFromViewEZD(Session persistenceSession, Long idoforg, String groupname, Date startDate, Date endDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzdView.class);
+        criteria.add(Restrictions.eq("idoforg", idoforg));
+        criteria.add(Restrictions.eq("groupname", groupname));
+        criteria.add(Restrictions.between("menudate", startDate, endDate));
+        return criteria.list();
+    }
+
+    public static List<BigInteger> getOrgsAllId(Session persistenceSession) {
+        Query query = persistenceSession
+                .createSQLQuery("select idoforg  from cf_orgs");
+        return query.list();
+    }
+
+    public static List<GroupNamesToOrgs> findGroupsForOrg(Session persistenceSession, Long org) {
+        Criteria criteria = persistenceSession.createCriteria(GroupNamesToOrgs.class);
+        criteria.add(Restrictions.eq("idOfOrg", org));
+        return criteria.list();
+    }
+
+
 }

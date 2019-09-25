@@ -8,18 +8,19 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class ResponseDiscountComplex extends Result{
-    private List<DiscountComplexItem> days ;
+    private List<DiscountComplexOrg> org ;
 
 
     public ResponseDiscountComplex(){
-        this.days  = new LinkedList<DiscountComplexItem>();
+        this.org  = new LinkedList<DiscountComplexOrg>();
     }
 
-    public List<DiscountComplexItem> getDays() {
-        return days ;
+
+    public List<DiscountComplexOrg> getOrg() {
+        return org;
     }
 
-    public void setDays(List<DiscountComplexItem> days) {
-        this.days  = days;
+    public void setOrg(List<DiscountComplexOrg> org) {
+        this.org = org;
     }
 }

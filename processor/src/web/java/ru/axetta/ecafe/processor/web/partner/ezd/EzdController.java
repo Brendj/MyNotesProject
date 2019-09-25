@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.ezd;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -22,22 +23,23 @@ import org.springframework.stereotype.Controller;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.util.Date;
 import java.util.List;
 
 @Path(value = "")
-@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Controller
 public class EzdController {
 
     private Logger logger = LoggerFactory.getLogger(EzdController.class);
     private static final int SETTING_TYPE = 11001;
     private static final int THRESHOLD_VALUE = 39600000;//39600000 - Это время в миллесекундах между началом для (00:00) и 11:00
+    private static final int COUNT_DAYS = 5;//Количество дней для загрузки
     @POST
     @Consumes(MediaType.APPLICATION_FORM_URLENCODED)
     @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
-    @Path(value = "/discountComplexList")
+    @Path(value = "discountComplexList")
     public Response getComplexList(@FormParam(value="GuidOrg") String guidOrg,
              @FormParam(value="GroupName") String groupName) throws Exception {
         ResponseDiscountComplex responseDiscountComplex = new ResponseDiscountComplex();
@@ -51,77 +53,118 @@ public class EzdController {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Org org = DAOUtils
-                    .findOrgByGuid(persistenceSession, guidOrg);
-            if (org == null) {
-                throw new IllegalArgumentException("Org with guid = " + guidOrg + " is not found");
-            }
-            if (org.getState() == 0)
-            {
-                throw new IllegalArgumentException("Org with guid = " + guidOrg + " is inactive");
-            }
-            if (org.getType() == OrganizationType.SUPPLIER)
-            {
-                throw new IllegalArgumentException("Org with guid = " + guidOrg + " is supplier");
-            }
-
-            GroupNamesToOrgs groupNamesToOrgs = DAOUtils
-                    .getGroupNamesToOrgsByOrgAndGroupName(persistenceSession, org, groupName);
-
-            if (groupNamesToOrgs == null) {
-                throw new Exception("Org with guid = " + guidOrg + " is havent group " + groupName);
-            }
-
             Date date = new Date();
+
+            //До 11:00 ???
             Date startDay = CalendarUtils.startOfDay(date);
             Long currentTime = date.getTime() - startDay.getTime();
             if (currentTime >= THRESHOLD_VALUE)
             {
                 date = CalendarUtils.addOneDay(date);
             }
-            OrgSettingItem orgSettingItem = DAOUtils.getOrgSettingItemByOrgAndType(persistenceSession, org.getIdOfOrg(), SETTING_TYPE);
-            if (orgSettingItem != null)
-            {
-                try {
-                    int notEditDays = Integer.parseInt(orgSettingItem.getSettingValue());
-                    date = CalendarUtils.addDays(date, notEditDays);
-                }
-                catch (Exception e)
-                {
-                    logger.error("Cannot parse value " + orgSettingItem.getSettingValue() +
-                            " to Integer for OrgSettingItem = " + orgSettingItem.getIdOfOrgSettingItem());
-                }
-            }
+
 
             //Производственный календарь
             date = getProdaction(date);
 
-            //Учебный календарь
-            date = getSpecialDate(persistenceSession, date, groupName);
+            //Сохраняем общую начальную дату
+            Date currentDate = date;
 
-            for (int i=0;i<13;i++) {
-                DiscountComplexItem discountComplexItem = new DiscountComplexItem();
-                discountComplexItem.setDate(date.toString());
-                boolean stateForDate = getStateforDate(date);
-                discountComplexItem.setState(String.valueOf(stateForDate));
-                if (!stateForDate)
-                {
-                    List<ComplexInfo> complexInfos = DAOUtils.getComplexInfoForDate(persistenceSession, org, date);
-                    if (complexInfos != null)
-                    {
-                        for (ComplexInfo complexInfo: complexInfos) {
+            //Получаем id всех школ
+            List<BigInteger> orgIds = DAOUtils.getOrgsAllId(persistenceSession);
+
+            for (BigInteger orgid: orgIds) {
+                //Настройка с АРМ
+                date = currentDate;
+                OrgSettingItem orgSettingItem = DAOUtils
+                        .getOrgSettingItemByOrgAndType(persistenceSession, orgid.longValue(), SETTING_TYPE);
+                if (orgSettingItem != null) {
+                    try {
+                        int notEditDays = Integer.parseInt(orgSettingItem.getSettingValue());
+                        date = CalendarUtils.addDays(date, notEditDays);
+                    } catch (Exception e) {
+                        logger.error("Cannot parse value " + orgSettingItem.getSettingValue()
+                                + " to Integer for OrgSettingItem = " + orgSettingItem.getIdOfOrgSettingItem());
+                    }
+                }
+
+
+                List<GroupNamesToOrgs> groupNamesToOrgs = DAOUtils.findGroupsForOrg(persistenceSession, orgid.longValue());
+                //Сохраняем общую начальную дату
+                Date currentDateSchool = date;
+
+                for (GroupNamesToOrgs groupNamesToOrgs1: groupNamesToOrgs) {
+
+                    date = currentDateSchool;
+
+                    //Учебный календарь
+                    date = getSpecialDate(persistenceSession, date, groupNamesToOrgs1.getGroupName());
+
+                    //Получаем все данные для одной школы и одной группы для отправки в ЭЖД
+                    List<RequestsEzdView> requestsEzdViews = DAOUtils
+                            .getAllDateFromViewEZD(persistenceSession, orgid.longValue(),
+                                    groupNamesToOrgs1.getGroupName(), CalendarUtils.startOfDay(date),
+                                    CalendarUtils.endOfDay(CalendarUtils.addDays(date, COUNT_DAYS)));
+                    for (RequestsEzdView requestsEzdView : requestsEzdViews) {
+                        DiscountComplexOrg discountComplexOrg = null;
+                        for (DiscountComplexOrg discountComplexOrgset : responseDiscountComplex.getOrg()) {
+                            if (discountComplexOrgset.getIdOrg().equals(requestsEzdView.getIdoforg())) {
+                                discountComplexOrg = discountComplexOrgset;
+                                break;
+                            }
+                        }
+                        //Если организация с такой id не встречалась раньше, то создаем
+                        if (discountComplexOrg == null) {
+                            discountComplexOrg = new DiscountComplexOrg();
+                            discountComplexOrg.setIdOrg(requestsEzdView.getIdoforg());
+                        }
+                        responseDiscountComplex.getOrg().add(discountComplexOrg);
+
+                        //Достаем группы
+                        DiscountComplexGroup discountComplexGroup = null;
+                        for (DiscountComplexGroup discountComplexGroupset : discountComplexOrg.getGroups()) {
+                            if (discountComplexGroupset.getGroupName().equals(requestsEzdView.getGroupname())) {
+                                discountComplexGroup = discountComplexGroupset;
+                                break;
+                            }
+                        }
+                        //Если такой группы не было, то создаем
+                        if (discountComplexGroup == null) {
+                            discountComplexGroup = new DiscountComplexGroup();
+                            discountComplexGroup.setGroupName(requestsEzdView.getGroupname());
+                        }
+                        discountComplexOrg.getGroups().add(discountComplexGroup);
+
+
+                        boolean stateForDate = false;
+                        DiscountComplexItem discountComplexItem = null;
+                        //Достаем дни
+                        for (DiscountComplexItem discountComplexItemset : discountComplexGroup.getDays()) {
+                            if (discountComplexItemset.getDate()
+                                    .equals(CalendarUtils.startOfDay(requestsEzdView.getMenudate()).toString())) {
+                                discountComplexItem = discountComplexItemset;
+                                stateForDate = Boolean.valueOf(discountComplexItem.getState());
+                                break;
+                            }
+                        }
+                        //Если такой даты не было, то создаем
+                        if (discountComplexItem == null) {
+                            discountComplexItem = new DiscountComplexItem();
+                            stateForDate = getStateforDate(requestsEzdView.getMenudate());
+                            discountComplexItem.setState(String.valueOf(stateForDate));
+                            discountComplexItem.setDate(CalendarUtils.startOfDay(requestsEzdView.getMenudate()).toString());
+                        }
+                        discountComplexGroup.getDays().add(discountComplexItem);
+
+
+                        if (!stateForDate) {
                             ComplexesItem complexesItem = new ComplexesItem();
-                            Integer idComplex = complexInfo.getIdOfComplex();
-                            if (idComplex != null)
-                                complexesItem.setIdofcomplex(idComplex.toString());
-                            complexesItem.setComplexname(complexInfo.getComplexName());
+                            complexesItem.setComplexname(requestsEzdView.getComplexname());
+                            complexesItem.setIdofcomplex(requestsEzdView.getIdofcomplex().toString());
                             discountComplexItem.getComplexeslist().add(complexesItem);
                         }
                     }
                 }
-                responseDiscountComplex.getDays().add(discountComplexItem);
-                //К следующему дню
-                date = CalendarUtils.addOneDay(date);
             }
 
 
@@ -146,6 +189,7 @@ public class EzdController {
             HibernateUtils.close(persistenceSession, logger);
         }
     }
+
     private Date getProdaction (Date date)
     {
         //Прибавляем по одному дню, пока не выйдем из нерабочих дней по производственному календарю
