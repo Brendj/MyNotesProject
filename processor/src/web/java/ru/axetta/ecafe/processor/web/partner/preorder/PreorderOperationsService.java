@@ -29,10 +29,14 @@ public class PreorderOperationsService {
     private static final Logger logger = LoggerFactory.getLogger(PreorderOperationsService.class);
 
     public void relevancePreorders(PreorderRequestsReportServiceParam params) {
+        logger.info("Start process relevance preorders");
         try {
-            logger.info("Start process relevance preorders");
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgs(params);
-            //RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu(params);
+        } catch (Exception e) {
+            logger.error("Error in relevancePreordersToOrgs: ", e);
+        }
+        //RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu(params);
+        try {
             runRelevancePreordersToMenu(params);
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgFlag(params);
             logger.info("Successful end process relevance preorders");
@@ -48,11 +52,17 @@ public class PreorderOperationsService {
         int counter = 0;
         List<ModifyMenu> modifyMenuList = new ArrayList<>();
         for (PreorderComplex preorderComplex : list) {
-            logger.info(String.format("Start processing record %s from %s", ++counter, list.size()));
-            if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
-            List<ModifyMenu> mmList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu(preorderComplex, nextVersion);
-            if (mmList != null) {
-                modifyMenuList.addAll(mmList);
+            try {
+                logger.info(String.format("Start processing record %s from %s", ++counter, list.size()));
+                if (preorderComplex.getIdOfGoodsRequestPosition() != null)
+                    continue;
+                List<ModifyMenu> mmList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .relevancePreordersToMenu(preorderComplex, nextVersion);
+                if (mmList != null) {
+                    modifyMenuList.addAll(mmList);
+                }
+            } catch (Exception e) {
+                logger.error("Error in runRelevancePreordersToMenu: ", e);
             }
         }
         RuntimeContext.getAppContext().getBean(PreorderDAOService.class).changeLocalIdOfMenu(modifyMenuList, nextVersion);
