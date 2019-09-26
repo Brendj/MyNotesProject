@@ -79,7 +79,7 @@ public class CardRegistrationService {
         if (null == cardId)
             throw new RequiredFieldsAreNotFilledException("Required fields are not filled: cardId = null");
 
-        Card card = DAOUtils.findCardByCardNoAndIdOfFriendlyOrgNullSafe(session, cardId, client.getOrg().getIdOfOrg());
+        Card card = DAOUtils.findCardByCardNo(session, cardId);
 
         if (null == card) {
             blockAllOtherClientCards(client);
@@ -97,8 +97,9 @@ public class CardRegistrationService {
                     blockAllOtherClientCards(client);
                     card.setState(CardState.ISSUED.getValue());
                 } else {
-                    throw new CardAlreadyUsedException(String.format("Card already used: cardId = %d, orgId = %d, clientId = %d",
-                            cardId, client.getOrg().getIdOfOrg(), client.getIdOfClient()));
+                    RuntimeContext.getInstance().getCardManager().updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+                            CardState.ISSUED.getValue(), card.getValidTime(), card.getLifeState(), card.getLockReason(),
+                            card.getIssueTime(), card.getExternalId());
                 }
             }
         }
@@ -143,7 +144,7 @@ public class CardRegistrationService {
             if (null != client)
                 externalInfo.contractId = client.getContractId();
         } else if (null != cardId) {
-            Card card = DAOUtils.findCardByCardNoAndIdOfFriendlyOrgNullSafe(session, cardId, org.getIdOfOrg());
+            Card card = DAOUtils.findCardByCardNo(session, cardId);
             externalInfo.contractId = card.getClient().getContractId();
         }
 
