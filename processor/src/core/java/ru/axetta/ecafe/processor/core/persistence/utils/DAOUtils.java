@@ -4278,29 +4278,19 @@ public class DAOUtils {
         query.executeUpdate();
     }
 
-    public static List getAllDateFromViewEZD(Session persistenceSession, Long idoforg, String groupname, Date startDate, Date endDate) throws Exception {
+    public static List getAllDateFromViewEZD(Session persistenceSession, List<Org> orgs, String groupname, Date startDate) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(RequestsEzdView.class);
-        criteria.add(Restrictions.eq("idoforg", idoforg));
-        criteria.add(Restrictions.eq("groupname", groupname));
-        criteria.add(Restrictions.between("menudate", startDate, endDate));
-        return criteria.list();
-    }
-
-    public static List<BigInteger> getOrgsAllId(Session persistenceSession) {
-        Query query = persistenceSession
-                .createSQLQuery("select idoforg  from cf_orgs");
-        return query.list();
-    }
-
-    public static List<GroupNamesToOrgs> findGroupsForOrg(Session persistenceSession, Long org, String groupName) {
-        Criteria criteria = persistenceSession.createCriteria(GroupNamesToOrgs.class);
-        criteria.add(Restrictions.eq("idOfOrg", org));
-        if (groupName != null)
-        {
-            criteria.add(Restrictions.eq("groupName", groupName));
+        if (orgs != null && !orgs.isEmpty()) {
+            List<Long> ids = new ArrayList<>();
+            for (Org org: orgs)
+            {
+                ids.add(org.getIdOfOrg());
+            }
+            criteria.add(Restrictions.in("idoforg", ids));
         }
+        if (groupname != null)
+            criteria.add(Restrictions.eq("groupname", groupname));
+        criteria.add(Restrictions.gt("menudate", startDate));
         return criteria.list();
     }
-
-
 }

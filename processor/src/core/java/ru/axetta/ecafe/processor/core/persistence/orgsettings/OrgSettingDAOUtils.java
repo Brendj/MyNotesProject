@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.orgsettings;
 
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.DataBaseSafeConverterUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -15,7 +16,9 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 
 public class OrgSettingDAOUtils {
@@ -66,20 +69,22 @@ public class OrgSettingDAOUtils {
         return getLastVersionOfOrgSettingsItem(session) + 1L;
     }
 
-    public static Integer getOrgSettingItemByOrgAndType(Session session, Long idOfOrg, Integer settingtype) {
-        SQLQuery query = session.createSQLQuery("select osi.settingvalue from cf_orgsettings_Items osi\n"
+    public static Map<Long, Integer> getOrgSettingItemByOrgAndType(Session session, List<Long> idOfOrgs, Integer settingtype) {
+        SQLQuery query = session.createSQLQuery("select os.idoforg, osi.settingvalue from cf_orgsettings_Items osi\n"
                 + "left join cf_orgsettings os on os.idoforgsetting=osi.idoforgsetting "
                 + "where osi.settingtype = :settingtype "
-                + "and os.idoforg = :idOfOrgs order by osi.version");
-        query.setParameter("idOfOrgs", idOfOrg);
+                + "and os.idoforg in (:idOfOrgs) order by osi.version");
+        query.setParameterList("idOfOrgs", idOfOrgs);
         query.setParameter("settingtype", settingtype);
-        query.setMaxResults(1);
-        try {
-            return Integer.valueOf((String) query.uniqueResult());
-        }
-        catch (Exception e)
-        {
+        List resultList = query.list();
+        if (resultList.isEmpty())
             return null;
+        Map<Long, Integer> result = new HashMap<Long, Integer>();
+        for (int i=0; i<resultList.size();i++)
+        {
+            Object o[] = (Object[]) resultList.get(i);
+            result.put(HibernateUtils.getDbLong(o[0]), HibernateUtils.getDbInt(o[1]));
         }
+        return result;
     }
 }
