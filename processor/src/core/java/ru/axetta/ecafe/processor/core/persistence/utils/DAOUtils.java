@@ -3629,6 +3629,12 @@ public class DAOUtils {
         return (Org) criteria.uniqueResult();
     }
 
+    public static List<Org> findOrgsByGuid(Session session, String guid) {
+        Criteria criteria = session.createCriteria(Org.class);
+        criteria.add(Restrictions.eq("guid", guid));
+        return criteria.list();
+    }
+
     public static Card findCardByCardNoAndOrg(Session persistenceSession, long cardNo, long idOfOrg) {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
@@ -4215,14 +4221,6 @@ public class DAOUtils {
         return (OrgSetting) criteria.uniqueResult();
     }
 
-    public static OrgSettingItem getOrgSettingItemByOrgAndType(Session session, Long idOfOrg, Integer settingtype) {
-        Criteria criteria = session.createCriteria(OrgSettingItem.class);
-        criteria.add(Restrictions.eq("orgSetting.idOfOrg", idOfOrg))
-                .add(Restrictions.eq("settingType", settingtype))
-                .addOrder(org.hibernate.criterion.Order.desc("version"));
-        return (OrgSettingItem) criteria.uniqueResult();
-    }
-
     public static List<Long> findFriendlyOrgsIds(Session session, List<Long> orgIdList) {
         Query query = session
                 .createSQLQuery("select friendlyorg from cf_friendly_organization where currentorg in (:idOfOrgList)")
@@ -4294,9 +4292,13 @@ public class DAOUtils {
         return query.list();
     }
 
-    public static List<GroupNamesToOrgs> findGroupsForOrg(Session persistenceSession, Long org) {
+    public static List<GroupNamesToOrgs> findGroupsForOrg(Session persistenceSession, Long org, String groupName) {
         Criteria criteria = persistenceSession.createCriteria(GroupNamesToOrgs.class);
         criteria.add(Restrictions.eq("idOfOrg", org));
+        if (groupName != null)
+        {
+            criteria.add(Restrictions.eq("groupName", groupName));
+        }
         return criteria.list();
     }
 

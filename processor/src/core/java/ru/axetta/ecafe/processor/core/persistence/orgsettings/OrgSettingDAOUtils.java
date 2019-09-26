@@ -65,4 +65,21 @@ public class OrgSettingDAOUtils {
     public static Long getNextVersionOfOrgSettingItem(Session session){
         return getLastVersionOfOrgSettingsItem(session) + 1L;
     }
+
+    public static Integer getOrgSettingItemByOrgAndType(Session session, Long idOfOrg, Integer settingtype) {
+        SQLQuery query = session.createSQLQuery("select osi.settingvalue from cf_orgsettings_Items osi\n"
+                + "left join cf_orgsettings os on os.idoforgsetting=osi.idoforgsetting "
+                + "where osi.settingtype = :settingtype "
+                + "and os.idoforg = :idOfOrgs order by osi.version");
+        query.setParameter("idOfOrgs", idOfOrg);
+        query.setParameter("settingtype", settingtype);
+        query.setMaxResults(1);
+        try {
+            return Integer.valueOf((String) query.uniqueResult());
+        }
+        catch (Exception e)
+        {
+            return null;
+        }
+    }
 }
