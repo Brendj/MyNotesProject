@@ -29,6 +29,8 @@ public class ApplicationForFoodReportItem {
     private List<ApplicationForFoodStatus> statuses;
     private String mobile;
     private Boolean archieved;
+    private Date startDate;
+    private Date endDate;
 
     public ApplicationForFoodReportItem() {
 
@@ -65,17 +67,25 @@ public class ApplicationForFoodReportItem {
     }
 
     public Boolean getIsPaused() {
-        if (!isInoe || archieved) return false;
-        return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.PAUSED);
+        return false;
+        //if (!isInoe || archieved) return false;
+        //return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.PAUSED);
     }
 
     public Boolean getIsResumed() {
-        if (!isInoe || archieved) return false;
-        return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.RESUME);
+        return false;
+        //if (!isInoe || archieved) return false;
+        //return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.RESUME);
     }
 
     public Boolean canBeMovedToArchieve() {
         return isInoe && !archieved;
+    }
+
+    public Boolean canChangeDates() {
+        return isInoe && !archieved
+                && applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.OK)
+                && startDate != null && endDate != null;
     }
 
     public String getArchieved() {
@@ -206,4 +216,19 @@ public class ApplicationForFoodReportItem {
         this.applicantFio = applicantFio;
     }
 
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
+    }
 }
