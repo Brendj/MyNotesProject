@@ -53,7 +53,7 @@ import static ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomContr
 public class PreorderDAOService {
     private static final Logger logger = LoggerFactory.getLogger(PreorderDAOService.class);
     private final String NEW_LINE_DELIMITER = ";";
-
+    public static final long BASE_ID_MENU_VALUE_FOR_MODIFY = 7700000;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
@@ -666,50 +666,78 @@ public class PreorderDAOService {
     }
 
     @Transactional
-    public void relevancePreordersToMenu(PreorderRequestsReportServiceParam params) {
-        logger.info("Start relevancePreordersToMenu process");
-        long nextVersion = nextVersionByPreorderComplex();
-        Query query = em.createQuery("select pc from PreorderComplex pc "
+    public List<PreorderComplex> getPreorderComplexListForRelevanceToMenu(PreorderRequestsReportServiceParam params) {
+        Query query = em.createQuery("select pc from PreorderComplex pc join fetch pc.preorderMenuDetails join fetch pc.client c join fetch c.org "
                 + "where pc.preorderDate > :date and pc.deletedState = false "
                 + params.getJPACondition()
                 + "order by pc.preorderDate");
         query.setParameter("date", new Date());
-        List<PreorderComplex> list = query.getResultList();
-        for (PreorderComplex preorderComplex : list) {
-            if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
-            ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
-            if (complexInfo == null) {
-                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
-                continue;
+        return query.getResultList();
+    }
+
+    @Transactional
+    public List<ModifyMenu> relevancePreordersToMenu(PreorderComplex preorderComplex, long nextVersion) {
+        List<ModifyMenu> modifyMenuList = new ArrayList<>();
+
+        ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
+        if (complexInfo == null) {
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
+            return null;
+        }
+        if (preorderComplex.getAmount() > 0) {
+            if (!preorderComplex.getComplexPrice().equals(complexInfo.getCurrentPrice())) {
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false);
+                return null;
             }
-            if (preorderComplex.getAmount() > 0) {
-                if (!preorderComplex.getComplexPrice().equals(complexInfo.getCurrentPrice())) {
-                    testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false);
-                    continue;
-                }
-            } else {
-                for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
-                    if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) continue;
-                    if (!preorderMenuDetail.getDeletedState() && preorderMenuDetail.getAmount() > 0) {
-                        MenuDetail menuDetail = getMenuDetail(preorderComplex.getClient(), preorderMenuDetail.getItemCode(),
-                                preorderMenuDetail.getPreorderDate(), null, complexInfo.getIdOfComplexInfo());
-                        if (menuDetail == null) {
-                            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
+        } else {
+            for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
+                if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) continue;
+                if (!preorderMenuDetail.getDeletedState() && preorderMenuDetail.getAmount() > 0) {
+                    MenuDetail menuDetail = getMenuDetail(preorderComplex.getClient(), preorderMenuDetail.getItemCode(),
+                            preorderMenuDetail.getPreorderDate(), null, complexInfo.getIdOfComplexInfo());
+                    if (menuDetail == null) {
+                        testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
+                        break;
+                    } else {
+                        if (!preorderMenuDetail.getMenuDetailPrice().equals(menuDetail.getPrice())) {
+                            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false);
                             break;
-                        } else {
-                            if (!preorderMenuDetail.getMenuDetailPrice().equals(menuDetail.getPrice())) {
-                                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false);
-                                break;
-                            } else if (!preorderMenuDetail.getArmIdOfMenu().equals(menuDetail.getLocalIdOfMenu())) {
-                                preorderMenuDetail.modifyArmIdOfMenu(nextVersion, menuDetail.getLocalIdOfMenu());
-                                em.merge(preorderMenuDetail);
-                            }
+                        } else if (!preorderMenuDetail.getArmIdOfMenu().equals(menuDetail.getLocalIdOfMenu())) {
+                            logger.info(String.format("Change localIdOfMenu %s to %s at preorder %s adding to process list",
+                                    preorderMenuDetail.getArmIdOfMenu(), menuDetail.getLocalIdOfMenu(), preorderComplex));
+                            ModifyMenu modifyMenu = new ModifyMenu(menuDetail.getLocalIdOfMenu(),
+                                    preorderMenuDetail.getIdOfPreorderMenuDetail(), preorderComplex.getIdOfPreorderComplex());
+                            modifyMenuList.add(modifyMenu);
                         }
                     }
                 }
             }
         }
-        logger.info("End relevancePreordersToMenu process");
+        return modifyMenuList;
+    }
+
+    @Transactional
+    public void changeLocalIdOfMenu(List<ModifyMenu> modifyMenuList, Long nextVersion) {
+        logger.info("Start change localIdOfMenu");
+        doChangeLocalIdOfMenu(modifyMenuList, BASE_ID_MENU_VALUE_FOR_MODIFY, nextVersion, false);
+        doChangeLocalIdOfMenu(modifyMenuList, 0, nextVersion, true);
+        logger.info("End change localIdOfMenu");
+    }
+
+    private void doChangeLocalIdOfMenu(List<ModifyMenu> modifyMenuList, long offset, Long nextVersion, boolean updatePreorderComplex) {
+        for (ModifyMenu modifyMenu : modifyMenuList) {
+            Query query = em.createQuery("update PreorderMenuDetail set armIdOfMenu= :armIdOfMenu where idOfPreorderMenuDetail = :idOfPreorderMenuDetail");
+            query.setParameter("armIdOfMenu", offset + modifyMenu.getNewIdOfMenu());
+            query.setParameter("idOfPreorderMenuDetail", modifyMenu.getIdOfPreorderMenuDetail());
+            query.executeUpdate();
+            if (updatePreorderComplex) {
+                Query query2 = em.createQuery("update PreorderComplex set version = :version, lastUpdate = :lastUpdate where idOfPreorderComplex = :idOfPreorderComplex");
+                query2.setParameter("version", nextVersion);
+                query2.setParameter("lastUpdate", new Date());
+                query2.setParameter("idOfPreorderComplex", modifyMenu.getIdOfPreorderComplex());
+                query2.executeUpdate();
+            }
+        }
     }
 
     @Transactional
@@ -1359,6 +1387,7 @@ public class PreorderDAOService {
         return sum; // client.getBalance() - sum;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public long nextVersionByPreorderComplex() {
         Session session = (Session)em.getDelegate();
         return DAOUtils.nextVersionByPreorderComplex(session);
