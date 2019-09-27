@@ -480,7 +480,7 @@ public class DAOUtils {
         return (Card) persistenceSession.get(Card.class, idOfCard);
     }
 
-    public static Card findCardByCardNo(Session persistenceSession, long cardNo) throws Exception {
+    public static Card findCardByCardNo(Session persistenceSession, long cardNo) {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
@@ -3634,6 +3634,14 @@ public class DAOUtils {
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
         criteria.setMaxResults(1);
         return (Card) criteria.uniqueResult();
+    }
+
+    public static Card findCardByCardNoAndIdOfFriendlyOrgNullSafe(Session session, Long cardNo, Long idOfOrg){
+        try {
+            return findCardByCardNoAndIdOfFriendlyOrg(session, cardNo, idOfOrg);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static Card findCardByCardNoAndIdOfFriendlyOrg(Session session, Long cardNo, Long idOfOrg){
