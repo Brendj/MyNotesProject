@@ -47,6 +47,8 @@ import java.util.*;
 public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(RNIPLoadPaymentsServiceV21.class);
+    private static final org.slf4j.Logger loggerSendAck = LoggerFactory.getLogger(RNIPLoadPaymentsServiceV21.class);
+    private static final org.slf4j.Logger loggerGetResponse = LoggerFactory.getLogger(RNIPLoadPaymentsServiceV21.class);
     private static SMEVMessageExchangeService service21;
     private static SMEVMessageExchangePortType port21;
     private static BindingProvider bindingProvider21;
@@ -517,32 +519,32 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         if (!isOn()) {
             return;
         }
-        logger.info("Start processing rnip GetResponses");
+        loggerGetResponse.info("Start processing rnip GetResponses");
         List<RnipMessage> messages = RnipDAOService.getInstance().getRnipMessages();
         for (RnipMessage rnipMessage : messages) {
             try {
                 processRnipMessage(rnipMessage);
             } catch (Exception e) {
-                logger.error("Error in processing rnip message async", e);
+                loggerGetResponse.error("Error in processing rnip message async", e);
             }
         }
-        logger.info("End processing rnip GetResponses");
+        loggerGetResponse.info("End processing rnip GetResponses");
     }
 
     public void runSendAck() {
         if (!isOn()) {
             return;
         }
-        logger.info("Start processing rnip SendAck");
+        loggerSendAck.info("Start processing rnip SendAck");
         List<RnipMessage> messages = RnipDAOService.getInstance().getProcessedRnipMessages();
         for (RnipMessage rnipMessage : messages) {
             try {
                 sendAckRnipMessage(rnipMessage);
             } catch (Exception e) {
-                logger.error("Error in sending ack message async", e);
+                loggerSendAck.error("Error in sending ack message async", e);
             }
         }
-        logger.info("End processing rnip SendAck");
+        loggerSendAck.info("End processing rnip SendAck");
     }
 
     private void sendAckRnipMessage(RnipMessage rnipMessage) throws Exception {
@@ -571,7 +573,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
             port21.ack(ackRequest);
             RnipDAOService.getInstance().saveAsAckSent(rnipMessage);
         } catch (Exception e) {
-            logger.error("Error in request to rnip 2.1", e);
+            loggerSendAck.error("Error in request to rnip 2.1", e);
             return;
         }
     }
@@ -604,7 +606,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
             if (responseMessage == null) {
                 //Если получаем пустой ответ, то повторяем запрос с другим MessageID
                 receiveContragentPayments(getRequestType(rnipMessage.getEventType()), rnipMessage.getContragent(), rnipMessage.getStartDate(), rnipMessage.getEndDate());
-                info(String.format("Получен пустой ответ на запрос с ид=%s, контрагент %s. Отправлен повторный запрос", rnipMessage.getMessageId(),
+                loggerGetResponse.info(String.format("Получен пустой ответ на запрос с ид=%s, контрагент %s. Отправлен повторный запрос", rnipMessage.getMessageId(),
                         rnipMessage.getContragent().getContragentName()));
                 RnipDAOService.getInstance().saveAsProcessed(rnipMessage, EMPTY_PACKET, null, rnipMessage.getEventType());
                 return;
@@ -612,18 +614,18 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
             Response internalResponse = responseMessage.getResponse();
             responseMessageToSave = checkResponseByEventType(internalResponse, rnipMessage);
             if (noErrors(responseMessageToSave[0]) && isPaymentRequest(rnipMessage)) {
-                info("Разбор новых платежей для контрагента %s..", rnipMessage.getContragent().getContragentName());
+                loggerGetResponse.info(String.format("Разбор новых платежей для контрагента %s..", rnipMessage.getContragent().getContragentName()));
 
                 RNIPPaymentsResponse res = parsePayments(internalResponse);
                 info("Получено %s новых платежей для контрагента %s, применение..", res.getPayments().size(), rnipMessage.getContragent().getContragentName());
                 boolean isAutoRun = true; //todo тут было условие (startDate == null);
                 addPaymentsToDb(res.getPayments(), isAutoRun);
 
-                info("Все новые платежи для контрагента %s обработаны", rnipMessage.getContragent().getContragentName());
+                loggerGetResponse.info(String.format("Все новые платежи для контрагента %s обработаны", rnipMessage.getContragent().getContragentName()));
             }
         } catch (Exception e) {
             responseMessageToSave[0] = "100 - Internal Error";
-            logger.error("Error in GetResponseRequest to rnip 2.1", e);
+            loggerGetResponse.error("Error in GetResponseRequest to rnip 2.1", e);
         }
         RnipDAOService.getInstance().saveAsProcessed(rnipMessage, responseMessageToSave[0], responseMessageToSave[1], rnipMessage.getEventType());
     }
@@ -673,7 +675,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         }
         Date lastUpdateDate = getLastUpdateDate(requestType, contragent);
 
-        info("Постановка в очередь запроса на получение платежей для контрагента %s", contragent.getContragentName());
+        logger.info(String.format("Постановка в очередь запроса на получение платежей для контрагента %s", contragent.getContragentName()));
         //  Отправка запроса на получение платежей
         SendRequestResponse response = null;
         try {
@@ -696,7 +698,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         }
         //Сохранили
 
-        info("Запрос на получение платежей для контрагента %s отправлен в очередь", contragent.getContragentName());
+        logger.info(String.format("Запрос на получение платежей для контрагента %s отправлен в очередь", contragent.getContragentName()));
         return true;
     }
 
