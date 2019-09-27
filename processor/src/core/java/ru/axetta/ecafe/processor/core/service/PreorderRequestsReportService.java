@@ -411,7 +411,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "pc.createddate, "                                                                           //1
                             + "pc.idofpreordercomplex, "                                                                   //2
                             + "pmd.idofpreordermenudetail, "                                                               //3
-                            + "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "           //4
+                            + "   CASE WHEN (pc.amount = 0) THEN (case when md.idofgood is null then pmd.idofgood else md.idofgood end) ELSE ci.idofgood END AS idofgood, "           //4
                             + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount,"                 //5
                             + "   pc.preorderdate, "                                                                       //6
                             + "pc.complexprice, "                                                                          //7
