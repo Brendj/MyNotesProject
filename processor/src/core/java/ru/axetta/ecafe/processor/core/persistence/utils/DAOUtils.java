@@ -9,8 +9,8 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -480,7 +480,7 @@ public class DAOUtils {
         return (Card) persistenceSession.get(Card.class, idOfCard);
     }
 
-    public static Card findCardByCardNo(Session persistenceSession, long cardNo) throws Exception {
+    public static Card findCardByCardNo(Session persistenceSession, long cardNo) {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
@@ -3636,6 +3636,14 @@ public class DAOUtils {
         return (Card) criteria.uniqueResult();
     }
 
+    public static Card findCardByCardNoAndIdOfFriendlyOrgNullSafe(Session session, Long cardNo, Long idOfOrg){
+        try {
+            return findCardByCardNoAndIdOfFriendlyOrg(session, cardNo, idOfOrg);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public static Card findCardByCardNoAndIdOfFriendlyOrg(Session session, Long cardNo, Long idOfOrg){
         Integer state = CardState.ISSUED.getValue();
         Query query = session.createSQLQuery(" select cr.idofcard from cf_cards cr "
@@ -4007,6 +4015,16 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("deleted", false));
         criteria.addOrder(org.hibernate.criterion.Order.asc("code"));
         return criteria.list();
+    }
+
+    public static ClientDtisznDiscountInfo getActualDTISZNDiscountsInfoInoeByClient(Session session, Long idOfClient, Long code) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
+        criteria.add(Restrictions.eq("archived", false));
+        criteria.add(Restrictions.eq("dtisznCode", code));
+        List list = criteria.list();
+        if (list.size() == 0 || list.size() > 1) return null;
+        return (ClientDtisznDiscountInfo)list.get(0);
     }
 
     public static ApplicationForFood  updateApplicationForFoodByServiceNumberFullWithVersion(Session persistenceSession, String serviceNumber,
