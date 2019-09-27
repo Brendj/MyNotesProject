@@ -60,7 +60,7 @@ public class RnipDAOService {
     @Transactional
     public List<RnipMessage> getProcessedRnipMessages() {
         Query query = entityManager.createQuery("select rm from RnipMessage rm "
-                + "where rm.eventTime > :eventTime and rm.processed = true and rm.ackSent = false order by rm.eventTime");
+                + "where rm.eventTime > :eventTime and rm.processed = true and rm.ackSent = false and rm.responseMessageId is not null order by rm.eventTime");
         query.setParameter("eventTime", CalendarUtils.addDays(new Date(), -30));
         return query.getResultList();
     }
