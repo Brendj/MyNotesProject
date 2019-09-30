@@ -77,6 +77,7 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
                     }
                 }
             }
+
             if(isChanged) {
                 setting.setLastUpdate(syncData);
                 setting.setVersion(nextVersionOfOrgSetting);

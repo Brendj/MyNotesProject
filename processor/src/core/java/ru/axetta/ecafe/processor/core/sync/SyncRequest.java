@@ -49,6 +49,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedi
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDates;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.SyncSettingsRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperationBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.TempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ZeroTransactions;
@@ -2716,6 +2717,7 @@ public class SyncRequest {
             builders.add(new RequestFeedingBuilder(idOfOrg));
             builders.add(new ClientDiscountDTSZNBuilder(idOfOrg));
             builders.add(new OrgSettingsBuilder(idOfOrg));
+            builders.add(new SyncSettingsRequestBuilder(idOfOrg));
             return builders;
         }
 

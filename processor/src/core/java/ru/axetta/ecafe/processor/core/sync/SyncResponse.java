@@ -31,6 +31,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedi
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.ResSpecialDates;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesData;
+import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.ResSyncSettingsSection;
+import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.SyncSettingsSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ResZeroTransactions;
 import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ZeroTransactionData;
@@ -1203,6 +1205,8 @@ public class SyncResponse {
     private RequestFeedingData requestFeedingData;
     private ClientDiscountDTSZN clientDiscountDTSZN;
     private OrgSettingSection orgSetting;
+    private ResSyncSettingsSection resSyncSettingsSection;
+    private SyncSettingsSection syncSettingsSection;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1224,7 +1228,8 @@ public class SyncResponse {
             ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections,
             ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData,
             ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
-            ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting) {
+            ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, ResSyncSettingsSection resSyncSettingsSection,
+            SyncSettingsSection syncSettingsSection) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1281,6 +1286,8 @@ public class SyncResponse {
         this.clientBalanceHoldFeeding = clientBalanceHoldFeeding;
         this.resClientBalanceHoldData = resClientBalanceHoldData;
         this.orgSetting = orgSetting;
+        this.resSyncSettingsSection = resSyncSettingsSection;
+        this.syncSettingsSection = syncSettingsSection;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1567,6 +1574,13 @@ public class SyncResponse {
 
         if(orgSetting != null){
             envelopeElement.appendChild(orgSetting.toElement(document));
+        }
+
+        if(resSyncSettingsSection != null){
+            envelopeElement.appendChild(resSyncSettingsSection.toElement(document));
+        }
+        if(syncSettingsSection != null){
+            envelopeElement.appendChild(syncSettingsSection.toElement(document));
         }
     }
 
