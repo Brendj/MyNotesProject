@@ -51,6 +51,7 @@ public class AtolService {
 
     private static final String NAME_FORMAT = "Пополнение счета %s";
     private static final String OPERATION = "sell";
+    private static final String OPERATION_REFUND = "sell_refund";
 
     private AtolToken token;
 
@@ -88,10 +89,14 @@ public class AtolService {
         return null;
     }
 
+    private String getOperation(ClientPaymentAddon clientPaymentAddon) {
+        if (clientPaymentAddon.getClientPayment().getPaySum() > 0) return OPERATION; else return OPERATION_REFUND;
+    }
+
     public void sendPayment(ClientPaymentAddon clientPaymentAddon) {
         try {
             AtolPaymentRequest request = getAtolPaymentRequest(clientPaymentAddon);
-            URL url = new URL(getServiceAddress() + getAtolGroupCode() + "/" + OPERATION);
+            URL url = new URL(getServiceAddress() + getAtolGroupCode() + "/" + getOperation(clientPaymentAddon));
             PostMethod httpMethod = new PostMethod(url.getPath());
             httpMethod.setRequestHeader("Content-type", "application/json; charset=utf-8");
             httpMethod.setRequestHeader("Token", getToken());
@@ -162,6 +167,7 @@ public class AtolService {
         receipt.setCompany(company);
 
         Double paymentSum = doubleValue(clientPaymentAddon.getClientPayment().getPaySum());
+        if (paymentSum < 0) paymentSum = -paymentSum;
 
         //Секция Receipt/Client
         receipt.setClient(getClientInfo(clientPaymentAddon, atolCompany));
