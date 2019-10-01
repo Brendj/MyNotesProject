@@ -55,16 +55,9 @@ public class EzdController {
 
             Date date = new Date();
 
-            ////До 11:00 ???
-            //Date startDay = CalendarUtils.startOfDay(date);
-            //Long currentTime = date.getTime() - startDay.getTime();
-            //if (currentTime >= THRESHOLD_VALUE)
-            //{
-            //
-            //}
 
             date = CalendarUtils.addOneDay(date);
-
+            date = CalendarUtils.startOfDay(date);
             //Загружаем все данные учебного календаря
             List<RequestsEzdSpecialDateView> requestsEzdSpecialDateViews = DAOUtils.getAllDateFromsSpecialDatesForEZD(persistenceSession);
 
@@ -85,18 +78,22 @@ public class EzdController {
             List<DataOfDates> dataOfDates = new ArrayList<>();
             int counter = 0;
             String curguid = null;
+            String curgroupName = null;
             for (RequestsEzdView requestsEzdView : requestsEzdViews) {
                 counter++;
                 String curOrgGuid = requestsEzdView.getOrgguid();
                 String groupName = requestsEzdView.getGroupname();
-                if (curguid == null || groupName == null || !requestsEzdView.getOrgguid().equals(curguid)
-                        || !requestsEzdView.getGroupname().equals(groupName))
+
+                if (curguid == null || curgroupName == null || !curOrgGuid.equals(curguid)
+                        || !groupName.equals(curgroupName))
                 {
+                    curguid = curOrgGuid;
+                    curgroupName = groupName;
                     DataOfDates dataOfDates1 = new DataOfDates();
                     dataOfDates1.setGroupName(groupName);
                     dataOfDates1.setGuid(curOrgGuid);
                     //Находим даты
-                    Date curDate = CalendarUtils.startOfDay(date);
+                    Date curDate = date;
                     //Сколько дней пропустить
                     Integer countwait = allIdtoSetiings.get(requestsEzdView.getIdoforg());
                     boolean goodProd;
@@ -133,7 +130,7 @@ public class EzdController {
                                 countwait--;
                         }
                         curDate = CalendarUtils.addOneDay(curDate);
-                    } while (countGoodday < 5);
+                    } while (countGoodday < COUNT_DAYS);
                     dataOfDates.add(dataOfDates1);
                 }
             }
@@ -144,25 +141,30 @@ public class EzdController {
             DiscountComplexOrg discountComplexOrg = null;
             DiscountComplexGroup discountComplexGroup = null;
             DiscountComplexItem discountComplexItem = null;
-
-
+            List<Date> datesForThis = new ArrayList<>();
+            counter = 0;
             for (RequestsEzdView requestsEzdView : requestsEzdViews) {
-
+                counter++;
                 String curOrgGuid = requestsEzdView.getOrgguid();
                 String groupName = requestsEzdView.getGroupname();
+                //Текущая комбинация орг+группа не совпадает с предыщей, то ...
+                if (curOrgGuid == null || !curOrgGuid.equals(currentOrgGuid) ||
+                        currentGroupName == null || !currentGroupName.equals(requestsEzdView.getGroupname())) {
+                    for (DataOfDates data : dataOfDates) {
+                        if (data.getGroupName().equals(groupName) && data.getGuid().equals(curOrgGuid)) {
+                            datesForThis = data.getDates();
+                        }
+                    }
+                }
 
-
-
-                counter++;
-
-                Date curDate = requestsEzdView.getMenudate();
-                //Если полученная индивидуальная дата попадает под нужный диапазон дат, то
-                if (curDate.getTime() > CalendarUtils.startOfDay(date).getTime() &&
-                        curDate.getTime() < CalendarUtils.endOfDay(CalendarUtils.addDays(date, COUNT_DAYS)).getTime() ) {
+                Date curDate = CalendarUtils.startOfDay(requestsEzdView.getMenudate());
+                //Если для данной комбинации орг+группа есть такая дата, то ..
+                if (datesForThis.contains(curDate))
+                {
                     //Заполняем ответ
 
                     //Если организация с такой guid не встречалась раньше, то создаем
-                    if (curOrgGuid == null || curOrgGuid != currentOrgGuid)
+                    if (curOrgGuid == null || !curOrgGuid.equals(currentOrgGuid))
                     {
                         discountComplexOrg = new DiscountComplexOrg();
                         discountComplexOrg.setGuid(curOrgGuid);
@@ -183,7 +185,7 @@ public class EzdController {
 
 
                     boolean stateForDate = false;
-                    String curDates = CalendarUtils.startOfDay(curDate).toString();
+                    String curDates = curDate.toString();
                     //Достаем дни
                     if (currentDates == null || !currentDates.equals(curDates))
                     {
@@ -203,7 +205,6 @@ public class EzdController {
                         discountComplexItem.getComplexeslist().add(complexesItem);
                     }
                 }
-
             }
 
             persistenceSession.flush();
@@ -227,40 +228,6 @@ public class EzdController {
             HibernateUtils.close(persistenceSession, logger);
         }
     }
-
-    private Date getProdaction (Date date)
-    {
-        //Прибавляем по одному дню, пока не выйдем из нерабочих дней по производственному календарю
-        while (DAOService.getInstance().getProductionCalendarByDate(date) != null)
-        {
-            date = CalendarUtils.addOneDay(date);
-        }
-        return date;
-    }
-
-    //private Date getSpecialDate (Session persistenceSession, Date date, String groupName) throws Exception {
-    //    //Проверяем по учебному календарю
-    //    SpecialDate specialDate = DAOService.getInstance().getSpecialCalendarByDate(date);
-    //    if (specialDate != null && specialDate.getIsWeekend())
-    //    {
-    //        Long idOfOrg = specialDate.getIdOfOrg();
-    //        if (idOfOrg != null)
-    //        {
-    //            Org orgCalender = (Org) persistenceSession.load(Org.class, idOfOrg);
-    //            if (orgCalender.getClientGroups() == null)
-    //            {
-    //                date = CalendarUtils.addOneDay(date);
-    //            }
-    //            else {
-    //                if (DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, groupName)
-    //                        != null) {
-    //                    date = CalendarUtils.addOneDay(date);
-    //                }
-    //            }
-    //        }
-    //    }
-    //    return date;
-    //}
 
     private boolean getStateforDate (Date date)
     {
