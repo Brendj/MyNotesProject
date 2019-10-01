@@ -9,12 +9,10 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.partner.fpsapi.*;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -25,8 +23,8 @@ import org.springframework.stereotype.Controller;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
-import java.math.BigInteger;
 import java.net.HttpURLConnection;
+import java.text.SimpleDateFormat;
 import java.util.*;
 
 @Path(value = "")
@@ -35,18 +33,28 @@ public class EzdController {
 
     private Logger logger = LoggerFactory.getLogger(EzdController.class);
     private static final int SETTING_TYPE = 11001;
-    private static final int THRESHOLD_VALUE = 39600000;//39600000 - Это время в миллесекундах между началом для (00:00) и 11:00
-    private static final int COUNT_DAYS = 5;//Количество дней для загрузки
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "discountComplexList")
-    public Response getComplexList() throws Exception {
+    public Response getComplexList() {
         ResponseDiscountComplex responseDiscountComplex = new ResponseDiscountComplex();
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+
+        //Количество дней для загрузки
+        Integer countDayz;
+        try {
+            countDayz = Integer.valueOf(runtimeContext.getConfigProperties().getProperty("ecafe.processor.ezd.days", "1"));
+            if (countDayz == null)
+                countDayz = 1;
+        }catch (Exception e)
+        {
+            countDayz = 1;
+        }
         //Вычисление результата запроса
         try {
 
@@ -76,11 +84,9 @@ public class EzdController {
 
             //Составление сводной информации для всех организаций и групп
             List<DataOfDates> dataOfDates = new ArrayList<>();
-            int counter = 0;
             String curguid = null;
             String curgroupName = null;
             for (RequestsEzdView requestsEzdView : requestsEzdViews) {
-                counter++;
                 String curOrgGuid = requestsEzdView.getOrgguid();
                 String groupName = requestsEzdView.getGroupname();
 
@@ -130,7 +136,7 @@ public class EzdController {
                                 countwait--;
                         }
                         curDate = CalendarUtils.addOneDay(curDate);
-                    } while (countGoodday < COUNT_DAYS);
+                    } while (countGoodday < countDayz);
                     dataOfDates.add(dataOfDates1);
                 }
             }
@@ -142,24 +148,54 @@ public class EzdController {
             DiscountComplexGroup discountComplexGroup = null;
             DiscountComplexItem discountComplexItem = null;
             List<Date> datesForThis = new ArrayList<>();
-            counter = 0;
+            Integer clas;
+            int counter = 0;
+            boolean badComplex = false;
             for (RequestsEzdView requestsEzdView : requestsEzdViews) {
-                counter++;
+
                 String curOrgGuid = requestsEzdView.getOrgguid();
                 String groupName = requestsEzdView.getGroupname();
-                //Текущая комбинация орг+группа не совпадает с предыщей, то ...
-                if (curOrgGuid == null || !curOrgGuid.equals(currentOrgGuid) ||
-                        currentGroupName == null || !currentGroupName.equals(requestsEzdView.getGroupname())) {
-                    for (DataOfDates data : dataOfDates) {
-                        if (data.getGroupName().equals(groupName) && data.getGuid().equals(curOrgGuid)) {
-                            datesForThis = data.getDates();
+
+                //Проверка на то, что данный комплекс подходит для данной группы
+                String complexname = requestsEzdView.getComplexname();
+                if (currentGroupName == null || !currentGroupName.equals(requestsEzdView.getGroupname()))
+                {
+                    try {
+                        clas = extractDigits(groupName);
+                    } catch (NumberFormatException e) //т.е. в названии группы нет чисел
+                    {
+                        clas = 0;
+                    }
+                    if (clas>0 && clas<5)//1-4
+                    {
+                        if (complexname.contains("5-11"))
+                        {
+                            badComplex = true;
+                        }
+
+                    } else
+                    {
+                        if (clas>4 && clas<12)//5-11
+                        {
+                            if (complexname.contains("1-4"))
+                            {
+                                badComplex = true;
+                            }
                         }
                     }
                 }
 
+
+                //Текущая комбинация орг+группа не совпадает с предыщей, то ...
+                if (curOrgGuid == null || !curOrgGuid.equals(currentOrgGuid) ||
+                        currentGroupName == null || !currentGroupName.equals(requestsEzdView.getGroupname())) {
+                    datesForThis = dataOfDates.get(counter).getDates();
+                    counter++;
+                }
+
                 Date curDate = CalendarUtils.startOfDay(requestsEzdView.getMenudate());
-                //Если для данной комбинации орг+группа есть такая дата, то ..
-                if (datesForThis.contains(curDate))
+                //Если для данной комбинации орг+группа есть такая дата и компелекс подходит для группы, то ..
+                if (datesForThis.contains(curDate) && !badComplex)
                 {
                     //Заполняем ответ
 
@@ -192,7 +228,7 @@ public class EzdController {
                         discountComplexItem = new DiscountComplexItem();
                         stateForDate = getStateforDate(curDate);
                         discountComplexItem.setState(String.valueOf(stateForDate));
-                        discountComplexItem.setDate(curDates);
+                        discountComplexItem.setDate(new SimpleDateFormat("dd.MM.yyyy").format(curDate));
                         discountComplexGroup.getDays().add(discountComplexItem);
                         currentDates = curDates;
                     }
@@ -227,6 +263,21 @@ public class EzdController {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    public Integer extractDigits(String src) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < src.length(); i++) {
+            char c = src.charAt(i);
+            if (Character.isDigit(c)) {
+                builder.append(c);
+            }
+            else
+            {
+                return Integer.valueOf(builder.toString());
+            }
+        }
+        return Integer.valueOf(builder.toString());
     }
 
     private boolean getStateforDate (Date date)
