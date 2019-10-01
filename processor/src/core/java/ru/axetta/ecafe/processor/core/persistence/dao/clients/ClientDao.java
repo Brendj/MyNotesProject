@@ -256,7 +256,7 @@ public class ClientDao extends WritableJpaDao {
     public List<ClientGuardian> getGuardians(Session session, Long idOfClient) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfClient));
-        //criteria.add(Restrictions.eq("disabled", false));
+        criteria.addOrder(org.hibernate.criterion.Order.asc("deletedState"));
         return criteria.list();
     }
 
