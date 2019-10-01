@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.dao.clients;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.WritableJpaDao;
@@ -416,14 +417,16 @@ public class ClientDao extends WritableJpaDao {
             clientGuardian.setDeletedState(false);
             clientGuardian.setDisabled(false);
             clientGuardian.setVersion(ClientManager.generateNewClientGuardianVersion(session));
-            if (clientGuardian.getNotificationSettings() == null) {
-                Set<ClientGuardianNotificationSetting> set = new HashSet<ClientGuardianNotificationSetting>();
-                clientGuardian.setNotificationSettings(set);
+            Set<ClientNotificationSetting> settings = client.getNotificationSettings();
+            List<NotificationSettingItem> notificationSettings = new ArrayList<NotificationSettingItem>();
+            for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
+                if (predefined.getValue().equals(ClientGuardianNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue())) {
+                    continue;
+                }
+                notificationSettings.add(new NotificationSettingItem(predefined, settings));
             }
-            clientGuardian.getNotificationSettings().clear();
-            for (ClientNotificationSetting ns : client.getNotificationSettings()) {
-                clientGuardian.getNotificationSettings().add(new ClientGuardianNotificationSetting(clientGuardian, ns.getNotifyType()));
-            }
+
+            ClientManager.attachNotifications(clientGuardian, notificationSettings);
             session.update(clientGuardian);
         }
     }
