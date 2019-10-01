@@ -19,6 +19,7 @@ public class SyncSettingsRequest implements SectionRequest {
 
     private List<SyncSettingsSectionItem> itemList = new LinkedList<>();
     private Long maxVersion;
+    private Long owner;
 
     public SyncSettingsRequest(Node sectionElement) throws Exception {
         this.maxVersion = XMLUtils.getLongAttributeValue(sectionElement, "V");
@@ -68,5 +69,13 @@ public class SyncSettingsRequest implements SectionRequest {
     @Override
     public String getRequestSectionName() {
         return null;
+    }
+
+    public Long getOwner() {
+        return owner;
+    }
+
+    public void setOwner(Long owner) {
+        this.owner = owner;
     }
 }

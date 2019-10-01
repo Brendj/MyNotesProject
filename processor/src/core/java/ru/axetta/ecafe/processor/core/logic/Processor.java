@@ -87,6 +87,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDates;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesData;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.ResSyncSettingsSection;
+import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.SyncSettingProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.SyncSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.SyncSettingsSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
@@ -878,12 +879,30 @@ public class Processor implements SyncProcessor {
 
         try {
             OrgSettingsRequest orgSettingsRequest = request.getOrgSettingsRequest();
-            orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
             if (orgSettingsRequest != null) {
+                orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
                 orgSettingSection = processOrgSettings(orgSettingsRequest);
             }
         } catch (Exception e) {
-            String message = String.format("Error when process OrgSettingSetting: %s", e.getMessage());
+            String message = String.format("Error when process OrgSettings: %s", e.getMessage());
+            processorUtils
+                    .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        try {
+            SyncSettingsRequest syncSettingsRequest = request.findSection(SyncSettingsRequest.class);
+            if(syncSettingsRequest != null){
+                syncSettingsRequest.setOwner(request.getIdOfOrg());
+                SyncSettingProcessor processor = processSyncSettingRequest(syncSettingsRequest);
+                if(processor != null) {
+                    resSyncSettingsSection = processor.getResSyncSettingsSection();
+                    syncSettingsSection = processor.getSyncSettingsSection();
+                    processor = null;
+                }
+            }
+        } catch (Exception e){
+            String message = String.format("Error when process SyncSettings: %s", e.getMessage());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
@@ -6466,9 +6485,14 @@ public class Processor implements SyncProcessor {
         try {
             SyncSettingsRequest syncSettingsRequest = request.findSection(SyncSettingsRequest.class);
             if(syncSettingsRequest != null) {
-                syncSettingsSection = null;
+                syncSettingsRequest.setOwner(request.getIdOfOrg());
+                SyncSettingProcessor processor = processSyncSettingRequest(syncSettingsRequest);
+                if(processor != null) {
+                    resSyncSettingsSection = processor.getResSyncSettingsSection();
+                    syncSettingsSection = processor.getSyncSettingsSection();
+                    processor = null;
+                }
             }
-            resSyncSettingsSection = null;
         } catch (Exception e) {
             String message = String.format("Error when process SyncSettingSetting: %s", e.getMessage());
             processorUtils
@@ -6508,5 +6532,25 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return orgSetting;
+    }
+
+    private SyncSettingProcessor processSyncSettingRequest(SyncSettingsRequest syncSettingsRequest) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        SyncSettingProcessor processor = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            processor  = new SyncSettingProcessor(persistenceSession, syncSettingsRequest);
+            processor.process();
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return processor;
     }
 }
