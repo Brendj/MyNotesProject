@@ -14,6 +14,7 @@ public class RequestsEzdView {
 
     private Long id;
     private Long idoforg;
+    private String orgguid;
     private Integer idofcomplex;
     private String complexname;
     private String groupname;
@@ -66,5 +67,13 @@ public class RequestsEzdView {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public String getOrgguid() {
+        return orgguid;
+    }
+
+    public void setOrgguid(String orgguid) {
+        this.orgguid = orgguid;
     }
 }

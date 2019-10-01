@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -4291,6 +4292,17 @@ public class DAOUtils {
         if (groupname != null)
             criteria.add(Restrictions.eq("groupname", groupname));
         criteria.add(Restrictions.gt("menudate", startDate));
+        return criteria.list();
+    }
+
+    public static List getAllDateFromsSpecialDatesForEZD(Session persistenceSession) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzdSpecialDateView.class);
+        criteria.add(Restrictions.gt("specDate", new Date()));
+        return criteria.list();
+    }
+    public static List getAllDateFromProdactionCalendarForEZD(Session persistenceSession) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
+        criteria.add(Restrictions.gt("day", new Date()));
         return criteria.list();
     }
 }

@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.ezd;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem;
@@ -40,8 +41,7 @@ public class EzdController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "discountComplexList")
-    public Response getComplexList(@QueryParam(value="GuidOrg") String guidOrg,
-             @QueryParam(value="GroupName") String groupName) throws Exception {
+    public Response getComplexList() throws Exception {
         ResponseDiscountComplex responseDiscountComplex = new ResponseDiscountComplex();
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -55,64 +55,90 @@ public class EzdController {
 
             Date date = new Date();
 
-            //До 11:00 ???
-            Date startDay = CalendarUtils.startOfDay(date);
-            Long currentTime = date.getTime() - startDay.getTime();
-            if (currentTime >= THRESHOLD_VALUE)
-            {
-                date = CalendarUtils.addOneDay(date);
-            }
+            ////До 11:00 ???
+            //Date startDay = CalendarUtils.startOfDay(date);
+            //Long currentTime = date.getTime() - startDay.getTime();
+            //if (currentTime >= THRESHOLD_VALUE)
+            //{
+            //
+            //}
 
+            date = CalendarUtils.addOneDay(date);
 
-            //Производственный календарь
-            date = getProdaction(date);
+            //Загружаем все данные учебного календаря
+            List<RequestsEzdSpecialDateView> requestsEzdSpecialDateViews = DAOUtils.getAllDateFromsSpecialDatesForEZD(persistenceSession);
 
-            //Если guid задан, то получаем данные по школам
-            List <Org> orgs = new ArrayList<>();
-            if (guidOrg != null){
-                //Получаем все школы с данным guid
-                orgs = DAOUtils.findOrgsByGuid(persistenceSession, guidOrg);
-            }
-            //Получаем все данные для отправки в ЭЖД
-            List<RequestsEzdView> requestsEzdViews = DAOUtils
-                    .getAllDateFromViewEZD(persistenceSession, orgs,
-                            groupName, CalendarUtils.startOfDay(date));
+            //Загружаем все данные производственного календаря
+            List <ProductionCalendar> productionCalendars = DAOUtils.getAllDateFromProdactionCalendarForEZD(persistenceSession);
 
-            List<ConsolidationDadas> consolidationDadas = new ArrayList<>();
-
-            //Получаем все id школ, которые есть в таблице
-            List<Long> orgIds = new ArrayList<>();
-            for (RequestsEzdView requestsEzdView : requestsEzdViews) {
-                Long value = requestsEzdView.getIdoforg();
-                if(orgIds.indexOf(value) == -1)
-                {
-                    orgIds.add(value);
-                }
-                ConsolidationDadas consolidationDadas1 = new ConsolidationDadas();
-                consolidationDadas1.setIdOrg(value);
-                consolidationDadas1.setGroupName(requestsEzdView.getGroupname());
-                consolidationDadas.add(consolidationDadas1);
-            }
             //Настройка с АРМ для всех id Org
             Map<Long, Integer> allIdtoSetiings = OrgSettingDAOUtils
-                    .getOrgSettingItemByOrgAndType(persistenceSession, orgIds, SETTING_TYPE);
+                    .getOrgSettingItemByOrgAndType(persistenceSession, null, SETTING_TYPE);
 
-            for (ConsolidationDadas consolidationDadas1 : consolidationDadas) {
+            //Получаем все данные для отправки в ЭЖД
+            List<RequestsEzdView> requestsEzdViews = DAOUtils
+                    .getAllDateFromViewEZD(persistenceSession, null,
+                            null, CalendarUtils.startOfDay(date));
 
-                Integer offset = allIdtoSetiings.get(consolidationDadas1.getIdOrg());
-                if (offset != null) {
-                    consolidationDadas1.setDatebefore(CalendarUtils.addDays(date, offset));
-                } else {
-                    consolidationDadas1.setDatebefore(date);
+
+            //Составление сводной информации для всех организаций и групп
+            List<DataOfDates> dataOfDates = new ArrayList<>();
+            int counter = 0;
+            String curguid = null;
+            for (RequestsEzdView requestsEzdView : requestsEzdViews) {
+                counter++;
+                String curOrgGuid = requestsEzdView.getOrgguid();
+                String groupName = requestsEzdView.getGroupname();
+                if (curguid == null || groupName == null || !requestsEzdView.getOrgguid().equals(curguid)
+                        || !requestsEzdView.getGroupname().equals(groupName))
+                {
+                    DataOfDates dataOfDates1 = new DataOfDates();
+                    dataOfDates1.setGroupName(groupName);
+                    dataOfDates1.setGuid(curOrgGuid);
+                    //Находим даты
+                    Date curDate = CalendarUtils.startOfDay(date);
+                    //Сколько дней пропустить
+                    Integer countwait = allIdtoSetiings.get(requestsEzdView.getIdoforg());
+                    boolean goodProd;
+                    boolean goodSpec;
+                    int countGoodday = 0;
+
+                    do{
+                        goodProd = false;
+                        goodSpec = false;
+                        for (ProductionCalendar productionCalendar: productionCalendars)
+                        {
+                            if (productionCalendar.getDay().equals(curDate))
+                            {
+                                goodProd = true;
+                                break;
+                            }
+                        }
+                        if (!goodProd)
+                        {
+                            for (RequestsEzdSpecialDateView requestsEzdSpecialDateView: requestsEzdSpecialDateViews)
+                            {
+                                if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate()).equals(curDate))
+                                    goodSpec = true;
+                            }
+                        }
+                        if (!goodProd && !goodSpec)
+                        {
+                            if (countwait == null || countwait == 0)
+                            {
+                                dataOfDates1.getDates().add(curDate);
+                                countGoodday++;
+                            }
+                            else
+                                countwait--;
+                        }
+                        curDate = CalendarUtils.addOneDay(curDate);
+                    } while (countGoodday < 5);
+                    dataOfDates.add(dataOfDates1);
                 }
-                //Учебный календарь
-                consolidationDadas1.setDateafter(getSpecialDate(persistenceSession, consolidationDadas1.getDatebefore(),
-                        consolidationDadas1.getGroupName()));
             }
 
-
-            int counter = 0;
-            Long currentOrgId = null;
+            String currentOrgGuid = null;
             String currentGroupName = null;
             String currentDates = null;
             DiscountComplexOrg discountComplexOrg = null;
@@ -122,10 +148,10 @@ public class EzdController {
 
             for (RequestsEzdView requestsEzdView : requestsEzdViews) {
 
-                Long curOrgId = requestsEzdView.getIdoforg();
+                String curOrgGuid = requestsEzdView.getOrgguid();
+                String groupName = requestsEzdView.getGroupname();
 
-                //Получаем нужную дату
-                date = consolidationDadas.get(counter).getDateafter();
+
 
                 counter++;
 
@@ -135,13 +161,13 @@ public class EzdController {
                         curDate.getTime() < CalendarUtils.endOfDay(CalendarUtils.addDays(date, COUNT_DAYS)).getTime() ) {
                     //Заполняем ответ
 
-                    //Если организация с такой id не встречалась раньше, то создаем
-                    if (currentOrgId == null || currentOrgId != curOrgId)
+                    //Если организация с такой guid не встречалась раньше, то создаем
+                    if (curOrgGuid == null || curOrgGuid != currentOrgGuid)
                     {
                         discountComplexOrg = new DiscountComplexOrg();
-                        discountComplexOrg.setIdOrg(curOrgId);
+                        discountComplexOrg.setGuid(curOrgGuid);
                         responseDiscountComplex.getOrg().add(discountComplexOrg);
-                        currentOrgId = curOrgId;
+                        currentOrgGuid = curOrgGuid;
                         currentGroupName = null;
                     }
 
@@ -212,29 +238,29 @@ public class EzdController {
         return date;
     }
 
-    private Date getSpecialDate (Session persistenceSession, Date date, String groupName) throws Exception {
-        //Проверяем по учебному календарю
-        SpecialDate specialDate = DAOService.getInstance().getSpecialCalendarByDate(date);
-        if (specialDate != null && specialDate.getIsWeekend())
-        {
-            Long idOfOrg = specialDate.getIdOfOrg();
-            if (idOfOrg != null)
-            {
-                Org orgCalender = (Org) persistenceSession.load(Org.class, idOfOrg);
-                if (orgCalender.getClientGroups() == null)
-                {
-                    date = CalendarUtils.addOneDay(date);
-                }
-                else {
-                    if (DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, groupName)
-                            != null) {
-                        date = CalendarUtils.addOneDay(date);
-                    }
-                }
-            }
-        }
-        return date;
-    }
+    //private Date getSpecialDate (Session persistenceSession, Date date, String groupName) throws Exception {
+    //    //Проверяем по учебному календарю
+    //    SpecialDate specialDate = DAOService.getInstance().getSpecialCalendarByDate(date);
+    //    if (specialDate != null && specialDate.getIsWeekend())
+    //    {
+    //        Long idOfOrg = specialDate.getIdOfOrg();
+    //        if (idOfOrg != null)
+    //        {
+    //            Org orgCalender = (Org) persistenceSession.load(Org.class, idOfOrg);
+    //            if (orgCalender.getClientGroups() == null)
+    //            {
+    //                date = CalendarUtils.addOneDay(date);
+    //            }
+    //            else {
+    //                if (DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, groupName)
+    //                        != null) {
+    //                    date = CalendarUtils.addOneDay(date);
+    //                }
+    //            }
+    //        }
+    //    }
+    //    return date;
+    //}
 
     private boolean getStateforDate (Date date)
     {

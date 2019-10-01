@@ -73,8 +73,23 @@ public class OrgSettingDAOUtils {
         SQLQuery query = session.createSQLQuery("select os.idoforg, osi.settingvalue from cf_orgsettings_Items osi\n"
                 + "left join cf_orgsettings os on os.idoforgsetting=osi.idoforgsetting "
                 + "where osi.settingtype = :settingtype "
-                + "and os.idoforg in (:idOfOrgs) order by osi.version");
-        query.setParameterList("idOfOrgs", idOfOrgs);
+                + "and os.idoforg in (:idOfOrgs) "
+                + "order by osi.version");
+        if (idOfOrgs != null && !idOfOrgs.isEmpty()) {
+            query = session.createSQLQuery("select os.idoforg, osi.settingvalue from cf_orgsettings_Items osi\n"
+                    + "left join cf_orgsettings os on os.idoforgsetting=osi.idoforgsetting "
+                    + "where osi.settingtype = :settingtype "
+                    + "and os.idoforg in (:idOfOrgs) "
+                    + "order by osi.version");
+            query.setParameterList("idOfOrgs", idOfOrgs);
+        }
+        else
+        {
+            query = session.createSQLQuery("select os.idoforg, osi.settingvalue from cf_orgsettings_Items osi\n"
+                    + "left join cf_orgsettings os on os.idoforgsetting=osi.idoforgsetting "
+                    + "where osi.settingtype = :settingtype "
+                    + "order by osi.version");
+        }
         query.setParameter("settingtype", settingtype);
         List resultList = query.list();
         if (resultList.isEmpty())

@@ -8,7 +8,7 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class DiscountComplexOrg {
-   private Long idOrg;
+   private String guid;
    private List<DiscountComplexGroup> groups;
 
    public DiscountComplexOrg(){
@@ -23,11 +23,12 @@ public class DiscountComplexOrg {
       this.groups = groups;
    }
 
-   public Long getIdOrg() {
-      return idOrg;
+
+   public String getGuid() {
+      return guid;
    }
 
-   public void setIdOrg(Long idOrg) {
-      this.idOrg = idOrg;
+   public void setGuid(String guid) {
+      this.guid = guid;
    }
 }
