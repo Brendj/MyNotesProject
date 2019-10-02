@@ -74,8 +74,8 @@ public class PreorderRequestsReportService extends RecoverableService {
             return;
 
         updateStatusFile(new Date(), Status.RUNNING);
-        runGeneratePreorderRequests(new PreorderRequestsReportServiceParam(new Date()));
-
+        //runGeneratePreorderRequests(new PreorderRequestsReportServiceParam(new Date()));
+        runTask();
         updateStatusFile(new Date(), Status.FINISHED);
     }
 
