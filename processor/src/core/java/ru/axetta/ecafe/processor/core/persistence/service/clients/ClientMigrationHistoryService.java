@@ -79,6 +79,9 @@ public class ClientMigrationHistoryService {
 
         if (isOn(NODE_DISCOUNT_CHANGE_ORG)) {
             for (ClientMigration clientMigration : list) {
+                if (clientMigration.getOldOrg() == null) {
+                    continue;
+                }
                 Session session = null;
                 Transaction transaction = null;
 
