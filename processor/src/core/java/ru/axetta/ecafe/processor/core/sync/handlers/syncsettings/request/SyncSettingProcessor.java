@@ -42,14 +42,27 @@ public class SyncSettingProcessor extends AbstractProcessor<SyncSettingsSection>
             resSyncSettingsSection = new ResSyncSettingsSection();
 
             for (SyncSettingsSectionItem item : request.getItemList()){
-                ResSyncSettingsItem result = manager.saveFromSync(session, item, idOfOrg, syncData, maxVersionFromARM, nextVersion);
-                resSyncSettingsSection.getItemList().add(result);
+                SyncSettings currentSetting = findSettingByContentType(settingFromDB, item.getContentType());
+                if(currentSetting == null) {
+                    ResSyncSettingsItem result = manager
+                            .saveFromSync(session, item, idOfOrg, syncData, nextVersion);
+                    resSyncSettingsSection.getItemList().add(result);
+                }
             }
         } else {
             throw new Exception("Can't get SyncSettingManager from app context");
         }
 
 
+        return null;
+    }
+
+    private SyncSettings findSettingByContentType(List<SyncSettings> settingFromDB, Integer contentType) {
+        for(SyncSettings item : settingFromDB){
+            if(item.getContentType().getTypeCode().equals(contentType)){
+                return item;
+            }
+        }
         return null;
     }
 

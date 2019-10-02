@@ -28,9 +28,12 @@ public class SyncSettingsRequest implements SectionRequest {
             if (nodeElement.getNodeName().equals("SS")) {
                 SyncSettingsSectionItem setting = new SyncSettingsSectionItem();
                 setting.setContentType(XMLUtils.getIntegerAttributeValue(nodeElement, "ContentType"));
-                setting.setConcreteTime(
-                        Arrays.asList(StringUtils.split(XMLUtils.getAttributeValue(nodeElement, "ConcreteTime")))
-                );
+                String concreteTime = XMLUtils.getAttributeValue(nodeElement, "ConcreteTime");
+                if(concreteTime != null) {
+                    setting.setConcreteTime(Arrays.asList(
+                            StringUtils.split(concreteTime, ";"))
+                    );
+                }
                 setting.setEverySeconds(XMLUtils.getIntegerAttributeValue(nodeElement, "EverySeconds"));
                 setting.setLimitStartHour(XMLUtils.getIntegerAttributeValue(nodeElement, "LimitStartHour"));
                 setting.setLimitEndHour(XMLUtils.getIntegerAttributeValue(nodeElement, "LimitEndHour"));

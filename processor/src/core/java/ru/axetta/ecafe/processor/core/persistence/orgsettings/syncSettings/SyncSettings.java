@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
+import java.util.Date;
+import java.util.HashSet;
 import java.util.Set;
 
 public class SyncSettings {
@@ -24,7 +26,9 @@ public class SyncSettings {
     private Boolean sunday;
     private Long version;
     private Boolean deleteState;
-    private Set<ConcreteTime> concreteTime;
+    private Set<ConcreteTime> concreteTime = new HashSet<>();
+    private Date createdDate;
+    private Date lastUpdate;
 
     public Long getIdOfSyncSetting() {
         return idOfSyncSetting;
@@ -152,5 +156,21 @@ public class SyncSettings {
 
     public void setConcreteTime(Set<ConcreteTime> concreteTime) {
         this.concreteTime = concreteTime;
+    }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
     }
 }

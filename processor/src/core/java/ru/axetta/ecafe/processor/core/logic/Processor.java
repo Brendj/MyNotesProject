@@ -6471,8 +6471,8 @@ public class Processor implements SyncProcessor {
 
         try {
             OrgSettingsRequest orgSettingsRequest = request.getOrgSettingsRequest();
-            orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
             if (orgSettingsRequest != null) {
+                orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
                 orgSetting = processOrgSettings(orgSettingsRequest);
             }
         } catch (Exception e) {

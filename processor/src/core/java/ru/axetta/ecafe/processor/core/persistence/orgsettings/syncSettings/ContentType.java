@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings;
 
+import java.util.HashMap;
+import java.util.Map;
+
 public enum ContentType {
     BALANCES_AND_ENTEREVENTS(0, "Балансы и проходы"),
     MENU(1, "Меню"),
@@ -29,6 +32,14 @@ public enum ContentType {
     private Integer typeCode;
     private String description;
 
+    private static final Map<Integer, ContentType> intMap = new HashMap<>();
+
+    static {
+        for(ContentType type : ContentType.values()){
+            intMap.put(type.getTypeCode(), type);
+        }
+    }
+
     ContentType(Integer typeCode, String description){
         this.typeCode = typeCode;
         this.description = description;
@@ -41,5 +52,9 @@ public enum ContentType {
 
     public Integer getTypeCode() {
         return typeCode;
+    }
+
+    public static ContentType getContentTypeByCode(Integer code){
+        return intMap.get(code);
     }
 }

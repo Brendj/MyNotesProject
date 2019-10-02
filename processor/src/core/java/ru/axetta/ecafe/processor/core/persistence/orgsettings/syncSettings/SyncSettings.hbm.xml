@@ -20,6 +20,8 @@
         <property name="friday" column="friday" type="boolean" not-null="true"/>
         <property name="saturday" column="saturday" type="boolean" not-null="true"/>
         <property name="sunday" column="sunday" type="boolean" not-null="true"/>
+        <property name="createdDate" column="createdDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" />
 
         <property name="contentType" column="contentType" not-null="true">
             <type name="org.hibernate.type.EnumType">
