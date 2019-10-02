@@ -246,7 +246,7 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Card"/>
         </set>
 
-        <set name="EZD" lazy="false" table="cf_ezd_to_org">
+        <set name="EZD" lazy="true" table="cf_ezd_to_org">
             <key column="idoforg"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="idrequestsezd"/>
         </set>

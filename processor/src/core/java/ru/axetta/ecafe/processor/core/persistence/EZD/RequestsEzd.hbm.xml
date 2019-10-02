@@ -11,7 +11,7 @@
             <generator class="identity"/>
         </id>
 
-        <set name="Orgs" lazy="false" table="cf_ezd_to_org">
+        <set name="Orgs" lazy="true" table="cf_ezd_to_org">
             <key column="idrequestsezd"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"/>
         </set>
