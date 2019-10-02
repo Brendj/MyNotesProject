@@ -18,6 +18,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -180,7 +181,7 @@ public class DAOService {
         Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(ECafeSettings.class);
         if (idOfOrg == null && settingsIds == null) {
-            return new ArrayList<ECafeSettings>(0);
+            return Collections.emptyList();
         }
         if (idOfOrg != null) {
             criteria.add(Restrictions.eq("orgOwner", idOfOrg));

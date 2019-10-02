@@ -60,7 +60,7 @@ public class RnipDAOService {
     @Transactional
     public List<RnipMessage> getProcessedRnipMessages() {
         Query query = entityManager.createQuery("select rm from RnipMessage rm "
-                + "where rm.eventTime > :eventTime and rm.processed = true and rm.ackSent = false order by rm.eventTime");
+                + "where rm.eventTime > :eventTime and rm.processed = true and rm.ackSent = false and rm.responseMessageId is not null order by rm.eventTime");
         query.setParameter("eventTime", CalendarUtils.addDays(new Date(), -30));
         return query.getResultList();
     }
@@ -82,7 +82,7 @@ public class RnipDAOService {
     @Transactional
     public void saveAsProcessed(RnipMessage rnipMessage, String responseMessage, String responseMessageId, RnipEventType eventType) {
         boolean processed = RNIPLoadPaymentsServiceV21.noErrors(responseMessage) || RNIPLoadPaymentsServiceV21.noData(responseMessage)
-                || RNIPLoadPaymentsServiceV21.isCatalogMessage(eventType);
+                || RNIPLoadPaymentsServiceV21.isCatalogMessage(eventType) || RNIPLoadPaymentsServiceV21.emptyPacket(responseMessage);
         rnipMessage.setProcessed(processed);
         rnipMessage.setResponseMessage(responseMessage);
         rnipMessage.setResponseMessageId(responseMessageId);

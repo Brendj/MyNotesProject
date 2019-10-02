@@ -41,8 +41,8 @@ import javax.xml.bind.DatatypeConverter;
 import java.net.ConnectException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 @Component
 public class DTSZNDiscountsReviseService {
@@ -573,33 +573,32 @@ public class DTSZNDiscountsReviseService {
             logger.info(String.format("%d applications was find for update", applicationForFoodList.size()));
             Integer counter = 1;
             for (ApplicationForFood applicationForFood : applicationForFoodList) {
-                List<ClientDtisznDiscountInfo> clientInfoList = null;
+                ClientDtisznDiscountInfo info = null;
                 try {
                     if (null == transaction || !transaction.isActive()) {
                         transaction = session.beginTransaction();
                     }
-                    clientInfoList = DAOUtils.getDTISZNDiscountsInfoByClient(session, applicationForFood.getClient());
-                    if (clientInfoList.isEmpty()) {
+
+                    Long dtsznCode = (null == applicationForFood.getDtisznCode()) ? OTHER_DISCOUNT_CODE : applicationForFood.getDtisznCode();
+
+                    info = DAOUtils.getDTISZNDiscountInfoByClientAndCode(session, applicationForFood.getClient(), dtsznCode);
+                    if (null == info) {
+                        logger.info(String.format("Application with number = %s skipped for waiting discount", applicationForFood.getServiceNumber()));
                         continue;
                     }
-                    Boolean isDiscountOk = false;
+                    Boolean isDiscountOk;
                     Boolean isDateOk = true;
 
-                    for (ClientDtisznDiscountInfo info : clientInfoList) {
-                        if (applicationForFood.getDtisznCode().equals(info.getDtisznCode())) {
-                            if (applicationForFood.getLastUpdate().getTime() >= info.getLastReceivedDate().getTime()) {
-                                isDateOk = false;
-                                break;
-                            }
-                            isDiscountOk =
-                                    info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
-                                            .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd())
-                                            && !info.getArchived();
-                            break;
-                        }
+                    if (applicationForFood.getLastUpdate().getTime() >= info.getLastReceivedDate().getTime()) {
+                        isDateOk = false;
                     }
+                    isDiscountOk =
+                            info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
+                                    .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd())
+                                    && !info.getArchived();
 
                     if (!isDateOk) {
+                        logger.info(String.format("Application with number = %s skipped for waiting discount", applicationForFood.getServiceNumber()));
                         logger.info(String.format("Updating applications: %d/%d", counter++,
                                 applicationForFoodList.size()));
                         continue;
@@ -646,6 +645,8 @@ public class DTSZNDiscountsReviseService {
                                 applicationForFood.getStatus().getApplicationForFoodState(),
                                 applicationForFood.getStatus().getDeclineReason()));
                     }
+                    logger.info(String.format("Application with number updated to %s ClientDtisznDiscountInfo{status = %s, dateStart = %s, dateEnd = %s}",
+                            isDiscountOk ? "ok" : "denied", info.getStatus().toString(), info.getDateStart().toString(), info.getDateEnd().toString()));
                     service.sendStatusesAsync(statusList);
                     logger.info(
                             String.format("Updating applications: %d/%d", counter++, applicationForFoodList.size()));
@@ -653,7 +654,7 @@ public class DTSZNDiscountsReviseService {
                 } catch (Exception e) {
                     logger.error(String.format("Error in updateApplicationsForFoodTask: "
                                     + "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo={%s}",
-                            applicationForFood.getClient().getIdOfClient(), StringUtils.join(clientInfoList, ",")), e);
+                            applicationForFood.getClient().getIdOfClient(), info), e);
                 } finally {
                     if (null != transaction && transaction.isActive()) {
                         transaction.commit();
@@ -780,7 +781,14 @@ public class DTSZNDiscountsReviseService {
                 StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 
         if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
-            client.setCategoriesDiscounts(newDiscounts);
+            try {
+                ClientManager
+                        .renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode,
+                                DiscountChangeHistory.MODIFY_IN_REGISTRY);
+            } catch (Exception e) {
+                logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
+            }
+            /*client.setCategoriesDiscounts(newDiscounts);
             client.setDiscountMode(newDiscountMode);
 
             DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
@@ -795,7 +803,7 @@ public class DTSZNDiscountsReviseService {
             }
             long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
             client.setClientRegistryVersion(clientRegistryVersion);
-            session.update(client);
+            session.update(client);*/
         }
         updateApplicationForFood(session, client, infoList);
     }

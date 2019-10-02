@@ -21,7 +21,6 @@ import org.springframework.stereotype.Component;
 import javax.faces.event.ValueChangeEvent;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.UUID;
 
 /**
  * Created with IntelliJ IDEA.
@@ -86,6 +85,7 @@ public class SettingCreatePage extends BasicWorkspacePage implements OrgSelectPa
                 case 4: setting.setSettingValue("5;2;0;2;");break;
                 case 5: setting.setSettingValue("Резерв;2;");break;
                 case 6: setting.setSettingValue("1;1;");break;
+                case 7: setting.setSettingValue("0;0:00;"); break;
             }
             setting.setSettingsId(SettingsIds.fromInteger(settingsIds));
             parserBySettingValue = setting.getSplitSettingValue();

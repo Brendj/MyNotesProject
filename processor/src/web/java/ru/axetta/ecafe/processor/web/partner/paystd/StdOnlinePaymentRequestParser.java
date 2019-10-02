@@ -139,6 +139,26 @@ public class StdOnlinePaymentRequestParser extends OnlinePaymentRequestParser {
             vals.addLast("NameContragent");
             vals.addLast(response.getNazn());
         }
+        if (!StringUtils.isEmpty(response.getCorrAccount())) {
+            vals.addLast("corrAccount");
+            vals.addLast(response.getCorrAccount());
+        }
+        if (!StringUtils.isEmpty(response.getBic())) {
+            vals.addLast("bic");
+            vals.addLast(response.getBic().trim());
+        }
+        if (!StringUtils.isEmpty(response.getRasch())) {
+            vals.addLast("settlAccount");
+            vals.addLast(response.getRasch());
+        }
+        if (!StringUtils.isEmpty(response.getBank())) {
+            vals.addLast("bank");
+            vals.addLast(response.getBank());
+        }
+        if (!StringUtils.isEmpty(response.getKpp())) {
+            vals.addLast("kpp");
+            vals.addLast(response.getKpp());
+        }
 
         super.serializeResponseUrlEncoded(vals, httpResponse);
     }

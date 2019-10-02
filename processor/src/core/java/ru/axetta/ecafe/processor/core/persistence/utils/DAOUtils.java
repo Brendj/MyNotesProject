@@ -173,7 +173,7 @@ public class DAOUtils {
     @SuppressWarnings("unchecked")
     public static Client findClientByIacregid(Session persistenceSession, String iacregid) {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
-        criteria.add(Restrictions.eq("iacRegId", iacregid));
+        criteria.add(Restrictions.ilike("iacRegId", iacregid, MatchMode.ANYWHERE));
         List<Client> resultList = (List<Client>) criteria.list();
         return resultList.isEmpty() ? null : resultList.get(0);
     }
@@ -480,7 +480,7 @@ public class DAOUtils {
         return (Card) persistenceSession.get(Card.class, idOfCard);
     }
 
-    public static Card findCardByCardNo(Session persistenceSession, long cardNo) throws Exception {
+    public static Card findCardByCardNo(Session persistenceSession, long cardNo) {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
@@ -3636,6 +3636,14 @@ public class DAOUtils {
         return (Card) criteria.uniqueResult();
     }
 
+    public static Card findCardByCardNoAndIdOfFriendlyOrgNullSafe(Session session, Long cardNo, Long idOfOrg){
+        try {
+            return findCardByCardNoAndIdOfFriendlyOrg(session, cardNo, idOfOrg);
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public static Card findCardByCardNoAndIdOfFriendlyOrg(Session session, Long cardNo, Long idOfOrg){
         Integer state = CardState.ISSUED.getValue();
         Query query = session.createSQLQuery(" select cr.idofcard from cf_cards cr "
@@ -4009,6 +4017,16 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static ClientDtisznDiscountInfo getActualDTISZNDiscountsInfoInoeByClient(Session session, Long idOfClient, Long code) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
+        criteria.add(Restrictions.eq("archived", false));
+        criteria.add(Restrictions.eq("dtisznCode", code));
+        List list = criteria.list();
+        if (list.size() == 0 || list.size() > 1) return null;
+        return (ClientDtisznDiscountInfo)list.get(0);
+    }
+
     public static ApplicationForFood  updateApplicationForFoodByServiceNumberFullWithVersion(Session persistenceSession, String serviceNumber,
             Client client, Long dtisznCode, ApplicationForFoodStatus status, String mobile, String applicantName, String applicantSecondName,
             String applicantSurname, Long version, Long historyVersion) throws Exception {
@@ -4289,5 +4307,11 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.eq("archived", false));
         return criteria.list();
+    }
+
+    public static void removeUserOPFlag(Session session, Long idOfOrg) {
+        Query query = session.createSQLQuery("update cf_clients set userop = false where idoforg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.executeUpdate();
     }
 }

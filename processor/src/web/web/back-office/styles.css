@@ -111,6 +111,12 @@
     font-size: 10pt;
 }
 
+.important-command-link {
+    font-family: Tahoma, Arial, Sans-Serif;
+    font-size: 10pt;
+    color: red;
+}
+
 .error-output-text {
     font-family: Tahoma, Arial, Sans-Serif;
     font-size: 10pt;

@@ -15,7 +15,9 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.DetailedEnterEventReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
+import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 
 import org.hibernate.Criteria;
 import org.hibernate.Session;
@@ -60,38 +62,50 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
 
     public void onReportPeriodChanged(javax.faces.event.ActionEvent event) {
         htmlReport = null;
-        switch (periodTypeMenu.getPeriodType()){
+        switch (periodTypeMenu.getPeriodType()) {
             case ONE_DAY: {
                 setEndDate(startDate);
-            } break;
+            }
+            break;
             case ONE_WEEK: {
                 setEndDate(CalendarUtils.addDays(startDate, 6));
-            } break;
+            }
+            break;
             case TWO_WEEK: {
                 setEndDate(CalendarUtils.addDays(startDate, 13));
-            } break;
+            }
+            break;
             case ONE_MONTH: {
                 setEndDate(CalendarUtils.addDays(CalendarUtils.addMonth(startDate, 1), -1));
-            } break;
+            }
+            break;
         }
     }
 
     public void onEndDateSpecified(javax.faces.event.ActionEvent event) {
         htmlReport = null;
         Date end = CalendarUtils.truncateToDayOfMonth(endDate);
-        if(CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)){
+        if (CalendarUtils.addMonth(CalendarUtils.addOneDay(end), -1).equals(startDate)) {
             periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
         } else {
-            long diff=end.getTime()-startDate.getTime();
-            int noOfDays=(int)(diff/(24*60*60*1000));
-            switch (noOfDays){
-                case 0: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY); break;
-                case 6: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK); break;
-                case 13: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK); break;
-                default: periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY); break;
+            long diff = end.getTime() - startDate.getTime();
+            int noOfDays = (int) (diff / (24 * 60 * 60 * 1000));
+            switch (noOfDays) {
+                case 0:
+                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_DAY);
+                    break;
+                case 6:
+                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+                    break;
+                case 13:
+                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.TWO_WEEK);
+                    break;
+                default:
+                    periodTypeMenu.setPeriodType(PeriodTypeMenu.PeriodTypeEnum.FIXED_DAY);
+                    break;
             }
         }
-        if(startDate.after(endDate)){
+        if (startDate.after(endDate)) {
             printError("Дата выборки от меньше дата выборки до");
         }
     }
@@ -108,9 +122,6 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
             printError(String.format("Выберите организацию "));
             return null;
         }
-        builder.setIdOfOrg(idOfOrg);
-        builder.setAllFriendlyOrgs(allFriendlyOrgs);
-
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -120,10 +131,7 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
 
-                Properties properties = new Properties();
-                String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
-                properties.setProperty("groupName", groupNamesString);
-                builder.setReportProperties(properties);
+                builder.setReportProperties(buildProperties(persistenceSession));
 
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
@@ -163,8 +171,7 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
     public void generateXLS(ActionEvent event) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile();
-        if (templateFilename == null) {
-        } else {
+        if (templateFilename != null) {
             DetailedEnterEventReport.Builder builder = new DetailedEnterEventReport.Builder(templateFilename);
             Session persistenceSession = null;
             Transaction persistenceTransaction = null;
@@ -177,13 +184,7 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
                     printError(String.format("Выберите организацию "));
                 }
 
-                builder.setIdOfOrg(idOfOrg);
-                builder.setAllFriendlyOrgs(allFriendlyOrgs);
-
-                Properties properties = new Properties();
-                String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
-                properties.setProperty("groupName", groupNamesString);
-                builder.setReportProperties(properties);
+                builder.setReportProperties(buildProperties(persistenceSession));
 
                 report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                 persistenceTransaction.commit();
@@ -233,6 +234,24 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
         return templateFilename;
     }
 
+    private Properties buildProperties(Session persistenceSession) throws Exception {
+        Properties properties = new Properties();
+        properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, (null != idOfOrg) ? idOfOrg.toString() : "0");
+        properties.setProperty(DetailedEnterEventReport.P_ALL_FRIENDLY_ORGS,
+                (null != allFriendlyOrgs) ? allFriendlyOrgs.toString() : "0");
+        String idOfClients = "";
+        if (getClientList() != null && getClientList().size() > 0) {
+            for (ClientSelectListPage.Item item : getClientList()) {
+                idOfClients += item.getIdOfClient() + ",";
+            }
+            idOfClients = idOfClients.substring(0, idOfClients.length() - 1);
+        }
+        properties.setProperty(DetailedEnterEventReport.P_ID_OF_CLIENTS, idOfClients);
+        String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
+        properties.setProperty("groupName", groupNamesString);
+        return properties;
+    }
+
     public Boolean getAllFriendlyOrgs() {
         return allFriendlyOrgs;
     }
@@ -257,10 +276,12 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
 
         String groupNamesString = "";
 
-        if (!clientFilter.getClientGroupId().equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_ALL)) {
+        if (!clientFilter.getClientGroupId()
+                .equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_ALL)) {
 
 
-            if (clientFilter.getClientGroupId().equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_STUDY)) {
+            if (clientFilter.getClientGroupId()
+                    .equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_STUDY)) {
 
                 List<Long> groupIds = new ArrayList<Long>();
 
@@ -292,8 +313,8 @@ public class DetailedEnterEventReportPage extends OnlineReportPage {
                         i++;
                     }
                 }
-            } else if (clientFilter.getClientGroupId().equals(
-                    ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_PREDEFINED)) {
+            } else if (clientFilter.getClientGroupId()
+                    .equals(ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu.CLIENT_PREDEFINED)) {
                 int i = 0;
                 for (ClientGroup.Predefined predefined : ClientGroup.Predefined.values()) {
                     if (!predefined.getValue().equals(ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue())) {

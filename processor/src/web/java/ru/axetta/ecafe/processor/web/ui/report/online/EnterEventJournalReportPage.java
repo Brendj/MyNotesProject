@@ -16,7 +16,9 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.EnterEventJournalReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientFilter;
+import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.client.items.ClientGroupMenu;
 
 import org.hibernate.Criteria;
@@ -82,24 +84,13 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
         }
         builder.setIdOfOrg(idOfOrg);
         builder.setAllFriendlyOrgs(allFriendlyOrgs);
-
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
         try {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Properties properties = new Properties();
-            String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
-            properties.setProperty("groupName", groupNamesString);
-            properties.setProperty("eventFilter", selectedEventFilter.toString());
-            properties.setProperty("outputMigrants", outputMigrants.toString());
-            if (outputMigrants) {
-                properties.setProperty("sortedBySections", sortedBySections.toString());
-            } else {
-                properties.setProperty("sortedBySections", "false");
-            }
-            builder.setReportProperties(properties);
+            builder.setReportProperties(buildProperties(persistenceSession));
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -137,16 +128,13 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
     public void generateXLS(ActionEvent event) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String templateFilename = checkIsExistFile();
-        if (templateFilename == null) {
-
-        } else {
+        if (templateFilename != null) {
             EnterEventJournalReport.Builder builder = new EnterEventJournalReport.Builder(templateFilename);
             if (idOfOrg == null) {
                 printError("Выберите организацию ");
             } else {
                 builder.setIdOfOrg(idOfOrg);
                 builder.setAllFriendlyOrgs(allFriendlyOrgs);
-
                 Session persistenceSession = null;
                 Transaction persistenceTransaction = null;
                 BasicReportJob report = null;
@@ -154,19 +142,7 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
                     try {
                         persistenceSession = runtimeContext.createReportPersistenceSession();
                         persistenceTransaction = persistenceSession.beginTransaction();
-
-                        Properties properties = new Properties();
-                        String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
-                        properties.setProperty("groupName", groupNamesString);
-                        properties.setProperty("eventFilter", selectedEventFilter.toString());
-                        properties.setProperty("outputMigrants", outputMigrants.toString());
-                        if(outputMigrants){
-                            properties.setProperty("sortedBySections", sortedBySections.toString());
-                        } else {
-                            properties.setProperty("sortedBySections", "false");
-                        }
-
-                        builder.setReportProperties(properties);
+                        builder.setReportProperties(buildProperties(persistenceSession));
                         report = builder.build(persistenceSession, startDate, endDate, localCalendar);
                         persistenceTransaction.commit();
                         persistenceTransaction = null;
@@ -216,6 +192,28 @@ public class EnterEventJournalReportPage extends OnlineReportPage {
             return null;
         }
         return templateFilename;
+    }
+
+    private Properties buildProperties(Session persistenceSession) throws Exception {
+        Properties properties = new Properties();
+        String idOfClients = "";
+        if (getClientList() != null && getClientList().size() > 0) {
+            for (ClientSelectListPage.Item item : getClientList()) {
+                idOfClients += item.getIdOfClient() + ",";
+            }
+            idOfClients = idOfClients.substring(0, idOfClients.length() - 1);
+        }
+        properties.setProperty(EnterEventJournalReport.P_ID_CLIENT, idOfClients);
+        String groupNamesString = getGroupNamesString(persistenceSession, idOfOrg, allFriendlyOrgs);
+        properties.setProperty("groupName", groupNamesString);
+        properties.setProperty("eventFilter", selectedEventFilter.toString());
+        properties.setProperty("outputMigrants", outputMigrants.toString());
+        if (outputMigrants) {
+            properties.setProperty("sortedBySections", sortedBySections.toString());
+        } else {
+            properties.setProperty("sortedBySections", "false");
+        }
+        return properties;
     }
 
     public String getHtmlReport() {

@@ -562,7 +562,7 @@ public interface ClientRoomController {
             @WebParam(name = "surname") String surname, @WebParam(name = "secondName") String secondName,
             @WebParam(name = "birthDate") Date birthDate, @WebParam(name = "grade") String grade,
             @WebParam(name = "codeBenefit") String codeBenefit, @WebParam(name = "startDate") Date startDate,
-            @WebParam(name = "endDate") Date endDate);
+            @WebParam(name = "endDate") Date endDate, @WebParam(name = "lsnum") String lsnum);
 
     @WebMethod(operationName = "setMultiCardModeForClient")
     Result setMultiCardModeForClient(@WebParam(name = "contractId") String contractId, @WebParam(name = "value") String value);

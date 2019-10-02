@@ -97,6 +97,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean allowRegistryChangeEmployee;
     private Boolean helpdeskEnabled;
     private Boolean preordersEnabled;
+    private Boolean participantOP;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
@@ -279,6 +280,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.requestForVisitsToOtherOrg = org.getRequestForVisitsToOtherOrg();
         this.preordersEnabled = org.getPreordersEnabled();
         this.multiCardModeEnabled = org.multiCardModeIsEnabled();
+        this.participantOP = org.getParticipantOP();
     }
 
     public String getFilterOrgs() {
@@ -759,5 +761,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setDisableEditingClientsFromAISReestr(Boolean disableEditingClientsFromAISReestr) {
         this.disableEditingClientsFromAISReestr = disableEditingClientsFromAISReestr;
+    }
+
+    public Boolean getParticipantOP() {
+        return participantOP;
+    }
+
+    public void setParticipantOP(Boolean participantOP) {
+        this.participantOP = participantOP;
     }
 }

@@ -12,6 +12,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.persistence.EnterEvent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
@@ -44,6 +45,8 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
     public static final String[] TEMPLATE_FILE_NAMES = {"EnterEventJournalReport.jasper"};
     public static final boolean IS_TEMPLATE_REPORT = true;
     public static final int[] PARAM_HINTS = new int[]{-46, -47, -48};
+
+    public static final String P_ID_CLIENT = "idOfClients";
 
     private final static Logger logger = LoggerFactory.getLogger(EnterEventJournalReport.class);
 
@@ -115,6 +118,7 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
             String groupWhenSelectMigrants = outputMigrants ? " group by 1, 2, 3, 4, 5, 6, 7 " : "";
             String eventsCondition = "";
             String clientGroupCondition = "";
+
             String orgCondition = allFriendlyOrgs ? " and ee.idoforg in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg)" : " and ee.idoforg = :idOfOrg ";
 
             try {
@@ -132,6 +136,31 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                 clientGroupCondition = " and gr.groupname in (:groupList) ";
             }
 
+            List<String> stringClientsList;
+            try
+            {
+                String idOfClients = StringUtils.trimToEmpty(reportProperties.getProperty(P_ID_CLIENT));
+                stringClientsList = Arrays.asList(StringUtils.split(idOfClients, ','));
+            } catch (Exception e)
+            {
+                stringClientsList = new ArrayList<>();
+            }
+
+
+            String clientIdWhere = "";
+            if (!stringClientsList.isEmpty()) {
+                int i = 0;
+                String clientIdQuery = "";
+                for (String client : stringClientsList) {
+                    clientIdQuery = clientIdQuery + "'" + client + "'";
+                    if (i < stringClientsList.size() - 1) {
+                        clientIdQuery = clientIdQuery + ", ";
+                    }
+                    i++;
+                }
+                clientIdWhere = " AND c.idofclient in (" + clientIdQuery + ") ";
+            }
+
             Query query = session.createSQLQuery(
                            " select ee.evtdatetime, p.surname, p.firstname, p.secondname,"
                             + " case when gr.idoforg not in (select friendlyorg from cf_friendly_organization where currentorg = :idOfOrg) then 'Обучающиеся других ОО'"
@@ -144,9 +173,11 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
                             + " left join cf_visitors v on v.idOfVisitor = ee.idofvisitor "
                             + " left join cf_persons p on p.idofperson = c.idofperson or p.idofperson = v.idofperson "
                             + joinMigrants
-                            + " left join cf_clientgroups gr on gr.idoforg = c.idoforg and gr.idofclientgroup = c.idofclientgroup "
+                            + " left join cf_clientgroups gr on gr.idoforg = c.idoforg "
+                            + " and gr.idofclientgroup = c.idofclientgroup "
                             + " where ee.evtdatetime between :startTime and :endTime "
                             + orgCondition
+                            + clientIdWhere
                             + eventsCondition
                             + clientGroupCondition
                             + groupWhenSelectMigrants
@@ -223,8 +254,16 @@ public class EnterEventJournalReport extends BasicReportForAllOrgJob {
             }
         }
 
+        public Long getIdOfOrg() {
+            return idOfOrg;
+        }
+
         public void setIdOfOrg(Long idOfOrg) {
             this.idOfOrg = idOfOrg;
+        }
+
+        public Boolean getAllFriendlyOrgs() {
+            return allFriendlyOrgs;
         }
 
         public void setAllFriendlyOrgs(Boolean allFriendlyOrgs) {

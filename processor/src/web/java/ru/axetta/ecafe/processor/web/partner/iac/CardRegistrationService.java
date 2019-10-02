@@ -35,7 +35,7 @@ public class CardRegistrationService {
     public static final String COMMENT_ADDED_FROM_IAC = "{Добавлен из ИАЦ}";
 
     public Client registerNewClient(Session session, String firstName, String secondName, String surname, Date birthDate, String guid,
-            String extId, String organizationGuid, String group, String benefit) throws Exception {
+            String extId, String organizationGuid, String group, String benefit, Long contractId) throws Exception {
         ClientManager.ClientFieldConfig fieldConfig = new ClientManager.ClientFieldConfig();
         fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, guid);
         fieldConfig.setValue(ClientManager.FieldId.SURNAME, emptyIfNull(surname));
@@ -47,6 +47,7 @@ public class CardRegistrationService {
         fieldConfig.setValue(ClientManager.FieldId.GROUP, group);
         //fieldConfig.setValue(ClientManager.FieldId.BENEFIT, benefit);
         fieldConfig.setValue(ClientManager.FieldId.COMMENTS, COMMENT_ADDED_FROM_IAC);
+        fieldConfig.setValue(ClientManager.FieldId.CONTRACT_ID, contractId);
 
         Org org = DAOUtils.findOrgByGuid(session, organizationGuid);
         if (null == org) {
@@ -78,7 +79,7 @@ public class CardRegistrationService {
         if (null == cardId)
             throw new RequiredFieldsAreNotFilledException("Required fields are not filled: cardId = null");
 
-        Card card = DAOUtils.findCardByCardNoAndOrg(session, cardId, client.getOrg().getIdOfOrg());
+        Card card = DAOUtils.findCardByCardNo(session, cardId);
 
         if (null == card) {
             blockAllOtherClientCards(client);
@@ -96,8 +97,9 @@ public class CardRegistrationService {
                     blockAllOtherClientCards(client);
                     card.setState(CardState.ISSUED.getValue());
                 } else {
-                    throw new CardAlreadyUsedException(String.format("Card already used: cardId = %d, orgId = %d, clientId = %d",
-                            cardId, client.getOrg().getIdOfOrg(), client.getIdOfClient()));
+                    RuntimeContext.getInstance().getCardManager().updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+                            CardState.ISSUED.getValue(), card.getValidTime(), card.getLifeState(), card.getLockReason(),
+                            card.getIssueTime(), card.getExternalId());
                 }
             }
         }
@@ -142,7 +144,7 @@ public class CardRegistrationService {
             if (null != client)
                 externalInfo.contractId = client.getContractId();
         } else if (null != cardId) {
-            Card card = DAOUtils.findCardByCardNoAndOrg(session, cardId, org.getIdOfOrg());
+            Card card = DAOUtils.findCardByCardNo(session, cardId);
             externalInfo.contractId = card.getClient().getContractId();
         }
 

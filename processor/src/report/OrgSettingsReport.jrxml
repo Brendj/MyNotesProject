@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="MonitoringOfJasperReport" pageWidth="2915" pageHeight="30000" columnWidth="2875" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
 	<property name="ireport.zoom" value="1.210000000000003"/>
-	<property name="ireport.x" value="570"/>
+	<property name="ireport.x" value="17"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -64,6 +64,8 @@
 	<field name="requestForVisitsToOtherOrg" class="java.lang.Boolean"/>
 	<field name="isWorkInSummerTime" class="java.lang.Boolean"/>
 	<field name="needVerifyCardSign" class="java.lang.Boolean"/>
+	<field name="officialName" class="java.lang.String"/>
+	<field name="shortNameInfoService" class="java.lang.String"/>
 	<title>
 		<band height="79" splitType="Stretch">
 			<textField>
@@ -105,7 +107,7 @@
 				<text><![CDATA[ИД]]></text>
 			</staticText>
 			<staticText>
-				<reportElement uuid="c62d94a6-4eff-4921-913c-59bb47c58edf" stretchType="RelativeToBandHeight" x="113" y="25" width="264" height="110">
+				<reportElement uuid="c62d94a6-4eff-4921-913c-59bb47c58edf" stretchType="RelativeToBandHeight" x="113" y="25" width="59" height="110">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -117,7 +119,7 @@
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font size="11" isBold="true"/>
 				</textElement>
-				<text><![CDATA[Название]]></text>
+				<text><![CDATA[Название ПП]]></text>
 			</staticText>
 			<staticText>
 				<reportElement uuid="64d56469-fb0c-426d-b585-72a6bff211e7" stretchType="RelativeToBandHeight" x="377" y="25" width="75" height="110"/>
@@ -555,6 +557,36 @@
 				</textElement>
 				<text><![CDATA[Адрес]]></text>
 			</staticText>
+			<staticText>
+				<reportElement uuid="c62d94a6-4eff-4921-913c-59bb47c58edf" stretchType="RelativeToBandHeight" x="172" y="25" width="144" height="110">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Полное наименование]]></text>
+			</staticText>
+			<staticText>
+				<reportElement uuid="c62d94a6-4eff-4921-913c-59bb47c58edf" stretchType="RelativeToBandHeight" x="316" y="25" width="61" height="110">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font size="11" isBold="true"/>
+				</textElement>
+				<text><![CDATA[Наименование]]></text>
+			</staticText>
 		</band>
 	</columnHeader>
 	<detail>
@@ -586,7 +618,7 @@
 				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
 			</textField>
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
-				<reportElement uuid="4f32b8cc-fdcb-448f-96a4-95a8c38e3132" stretchType="RelativeToBandHeight" x="113" y="0" width="264" height="27">
+				<reportElement uuid="4f32b8cc-fdcb-448f-96a4-95a8c38e3132" stretchType="RelativeToBandHeight" x="113" y="0" width="59" height="27">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
@@ -950,6 +982,32 @@
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{settingName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="4f32b8cc-fdcb-448f-96a4-95a8c38e3132" stretchType="RelativeToBandHeight" x="172" y="0" width="144" height="27">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{officialName}]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="4f32b8cc-fdcb-448f-96a4-95a8c38e3132" stretchType="RelativeToBandHeight" x="316" y="0" width="61" height="27">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{shortNameInfoService}]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

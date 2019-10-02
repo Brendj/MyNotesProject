@@ -91,7 +91,7 @@ public class SubscriptionDeleteRequest implements IRequestOperation {
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public boolean postProcessResponse(Long mfrRequestId, Long subscriptionId, PaymentResponse paymentResponse) {
         BankSubscription bs = em.find(BankSubscription.class, subscriptionId);
-        if (MfrRequest.SUBSCRIPTION_DEACTIVATED.equalsIgnoreCase(paymentResponse.getStatus())) {
+        if (paymentResponse.getStatusCode() == HttpStatus.SC_OK) {
             bs.setActive(false);
             bs.setDeactivationDate(paymentResponse.getDateTime());
             bs.setStatus(MfrRequest.SUBSCRIPTION_DEACTIVATED);

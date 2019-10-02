@@ -14,7 +14,7 @@ public class OrgSetting {
     private Date createdDate;
     private Date lastUpdate;
     private OrgSettingGroup settingGroup;
-    private Set<OrgSettingItem> orgSettingItems;
+    private Set<OrgSettingItem> orgSettingItems = new HashSet<>();
     private Long version;
 
     public Long getIdOfOrgSetting() {
@@ -50,9 +50,6 @@ public class OrgSetting {
     }
 
     public Set<OrgSettingItem> getOrgSettingItems() {
-        if(orgSettingItems == null){
-            orgSettingItems = new HashSet<>();
-        }
         return orgSettingItems;
     }
 

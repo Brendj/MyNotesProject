@@ -541,6 +541,26 @@ public class ClientManager {
         }
     }
 
+    public static void renewDiscounts(Session session, Client client, String newDiscounts, String oldDiscounts,
+            Integer newDiscountMode, Integer oldDiscountMode, String historyComment) throws Exception {
+        client.setCategoriesDiscounts(newDiscounts);
+        client.setDiscountMode(newDiscountMode);
+
+        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
+                newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
+        discountChangeHistory.setComment(historyComment);
+        session.save(discountChangeHistory);
+        client.setLastDiscountsUpdate(new Date());
+        try {
+            client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
+        } catch (Exception e) {
+            logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
+        }
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+        client.setClientRegistryVersion(clientRegistryVersion);
+        session.update(client);
+    }
+
     public static Set<CategoryDiscount> getCategoriesSet(Session session, String categories) {
         if(StringUtils.isEmpty(categories)) {
             return new HashSet<CategoryDiscount>();
@@ -2052,6 +2072,24 @@ public class ClientManager {
             } catch (Exception e) {
                 logger.error(String.format("Unable to remove externalId for client with id = %d", client.getIdOfClient()));
             }
+        }
+    }
+
+    public static void checkUserOPFlag(Session session, Org oldOrg, Org newOrg, Long idOfClientGroup, Client client) {
+        if (null == client.getUserOP() || !client.getUserOP()) {
+            return;
+        }
+        if (!oldOrg.equals(newOrg)) {
+            if (!DAOUtils.isFriendlyOrganizations(session, oldOrg, newOrg)) {
+                client.setUserOP(false);
+            }
+        }
+
+        if (!ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue().equals(idOfClientGroup)
+                && !ClientGroup.Predefined.CLIENT_EMPLOYEE.getValue().equals(idOfClientGroup)
+                && !ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue().equals(idOfClientGroup)
+                && !ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue().equals(idOfClientGroup)) {
+            client.setUserOP(false);
         }
     }
 

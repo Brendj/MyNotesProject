@@ -38,5 +38,6 @@
         <property name="carbohydrates" column="Carbohydrates" type="double" update="false"/>
         <property name="protein" column="Protein" type="double" update="false"/>
         <property name="calories" column="Calories" type="double" update="false"/>
+        <property name="idOfGood" column="idofgood" type="long" />
     </class>
 </hibernate-mapping>
