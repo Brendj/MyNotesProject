@@ -37,10 +37,18 @@ public class EzdController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "test")
+    public Response test() {
+        return Response.status(HttpURLConnection.HTTP_OK).entity("good").build();
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "discountComplexList")
     public Response getComplexList() {
+        logger.info("Начало работы сервиса сбора данных для ЭЖД");
         ResponseDiscountComplex responseDiscountComplex = new ResponseDiscountComplex();
-
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -55,6 +63,8 @@ public class EzdController {
         {
             countDayz = 1;
         }
+        logger.info(String.format("Сбор на %s дней вперед", countDayz.toString()));
+
         //Вычисление результата запроса
         try {
 
@@ -66,22 +76,30 @@ public class EzdController {
 
             date = CalendarUtils.addOneDay(date);
             date = CalendarUtils.startOfDay(date);
+            logger.info("Старт начала сбора данных по учебному календарю");
             //Загружаем все данные учебного календаря
             List<RequestsEzdSpecialDateView> requestsEzdSpecialDateViews = DAOUtils.getAllDateFromsSpecialDatesForEZD(persistenceSession);
+            logger.info(String.format("Всего записей по учебному календарю - %s", String.valueOf(requestsEzdSpecialDateViews.size())));
 
+            logger.info("Старт начала сбора данных по производственному календарю");
             //Загружаем все данные производственного календаря
             List <ProductionCalendar> productionCalendars = DAOUtils.getAllDateFromProdactionCalendarForEZD(persistenceSession);
+            logger.info(String.format("Всего записей по производственному календарю - %s", String.valueOf(productionCalendars.size())));
 
+            logger.info("Старт начала сбора настроек, полученных с АРМ для организаций");
             //Настройка с АРМ для всех id Org
             Map<Long, Integer> allIdtoSetiings = OrgSettingDAOUtils
                     .getOrgSettingItemByOrgAndType(persistenceSession, null, SETTING_TYPE);
+            logger.info(String.format("Всего настроек с АРМ - %s", String.valueOf(allIdtoSetiings.size())));
 
+            logger.info("Старт сбора данных из вьюхи для отправки в ЭЖД");
             //Получаем все данные для отправки в ЭЖД
             List<RequestsEzdView> requestsEzdViews = DAOUtils
                     .getAllDateFromViewEZD(persistenceSession, null,
                             null, CalendarUtils.startOfDay(date));
+            logger.info(String.format("Вьюха вернула записей - %s", String.valueOf(requestsEzdViews.size())));
 
-
+            logger.info("Старт блока вычисления дат для каждой уникальной пары орг + группа");
             //Составление сводной информации для всех организаций и групп
             List<DataOfDates> dataOfDates = new ArrayList<>();
             String curguid = null;
@@ -140,6 +158,7 @@ public class EzdController {
                     dataOfDates.add(dataOfDates1);
                 }
             }
+            logger.info(String.format("Всего уникальных комбинаций - %s", String.valueOf(dataOfDates.size())));
 
             String currentOrgGuid = null;
             String currentGroupName = null;
@@ -151,6 +170,7 @@ public class EzdController {
             Integer clas;
             int counter = 0;
             boolean badComplex = false;
+            logger.info("Старт сбора ответа для ЭЖД");
             for (RequestsEzdView requestsEzdView : requestsEzdViews) {
 
                 String curOrgGuid = requestsEzdView.getOrgguid();
@@ -242,6 +262,7 @@ public class EzdController {
                     }
                 }
             }
+            logger.info("Ответ для ЭЖД успешно сформирован");
 
             persistenceSession.flush();
             persistenceTransaction.commit();
