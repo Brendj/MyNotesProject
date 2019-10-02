@@ -240,26 +240,21 @@ public class EzdController {
                     }
 
 
-                    boolean stateForDate = false;
+
                     String curDates = curDate.toString();
                     //Достаем дни
                     if (currentDates == null || !currentDates.equals(curDates))
                     {
                         discountComplexItem = new DiscountComplexItem();
-                        stateForDate = getStateforDate(curDate);
-                        discountComplexItem.setState(String.valueOf(stateForDate));
                         discountComplexItem.setDate(new SimpleDateFormat("dd.MM.yyyy").format(curDate));
                         discountComplexGroup.getDays().add(discountComplexItem);
                         currentDates = curDates;
                     }
 
-
-                    if (!stateForDate) {
-                        ComplexesItem complexesItem = new ComplexesItem();
-                        complexesItem.setComplexname(requestsEzdView.getComplexname());
-                        complexesItem.setIdofcomplex(requestsEzdView.getIdofcomplex().toString());
-                        discountComplexItem.getComplexeslist().add(complexesItem);
-                    }
+                    ComplexesItem complexesItem = new ComplexesItem();
+                    complexesItem.setComplexname(requestsEzdView.getComplexname());
+                    complexesItem.setIdofcomplex(requestsEzdView.getIdofcomplex().toString());
+                    discountComplexItem.getComplexeslist().add(complexesItem);
                 }
             }
             logger.info("Ответ для ЭЖД успешно сформирован");
@@ -299,25 +294,5 @@ public class EzdController {
             }
         }
         return Integer.valueOf(builder.toString());
-    }
-
-    private boolean getStateforDate (Date date)
-    {
-        if (DAOService.getInstance().getProductionCalendarByDate(date) != null)
-        {
-            return true;
-        }
-        else
-        {
-            SpecialDate specialDate = DAOService.getInstance().getSpecialCalendarByDate(date);
-            if (specialDate != null && specialDate.getIsWeekend())
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
-        }
     }
 }

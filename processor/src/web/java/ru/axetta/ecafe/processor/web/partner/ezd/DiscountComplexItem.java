@@ -9,7 +9,6 @@ import java.util.List;
 
 public class DiscountComplexItem {
    private String date;
-   private String state;
    private List<ComplexesItem> complexeslist;
 
    public DiscountComplexItem(){
@@ -22,14 +21,6 @@ public class DiscountComplexItem {
 
    public void setDate(String date) {
       this.date = date;
-   }
-
-   public String getState() {
-      return state;
-   }
-
-   public void setState(String state) {
-      this.state = state;
    }
 
    public List<ComplexesItem> getComplexeslist() {
