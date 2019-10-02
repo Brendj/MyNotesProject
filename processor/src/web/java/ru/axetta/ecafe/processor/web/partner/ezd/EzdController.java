@@ -104,81 +104,16 @@ public class EzdController {
             List<DataOfDates> dataOfDates = new ArrayList<>();
             String curguid = null;
             String curgroupName = null;
+            boolean badComplex;
             for (RequestsEzdView requestsEzdView : requestsEzdViews) {
                 String curOrgGuid = requestsEzdView.getOrgguid();
                 String groupName = requestsEzdView.getGroupname();
 
-                if (curguid == null || curgroupName == null || !curOrgGuid.equals(curguid)
-                        || !groupName.equals(curgroupName))
-                {
-                    curguid = curOrgGuid;
-                    curgroupName = groupName;
-                    DataOfDates dataOfDates1 = new DataOfDates();
-                    dataOfDates1.setGroupName(groupName);
-                    dataOfDates1.setGuid(curOrgGuid);
-                    //Находим даты
-                    Date curDate = date;
-                    //Сколько дней пропустить
-                    Integer countwait = allIdtoSetiings.get(requestsEzdView.getIdoforg());
-                    boolean goodProd;
-                    boolean goodSpec;
-                    int countGoodday = 0;
-
-                    do{
-                        goodProd = false;
-                        goodSpec = false;
-                        for (ProductionCalendar productionCalendar: productionCalendars)
-                        {
-                            if (productionCalendar.getDay().equals(curDate))
-                            {
-                                goodProd = true;
-                                break;
-                            }
-                        }
-                        if (!goodProd)
-                        {
-                            for (RequestsEzdSpecialDateView requestsEzdSpecialDateView: requestsEzdSpecialDateViews)
-                            {
-                                if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate()).equals(curDate))
-                                    goodSpec = true;
-                            }
-                        }
-                        if (!goodProd && !goodSpec)
-                        {
-                            if (countwait == null || countwait == 0)
-                            {
-                                dataOfDates1.getDates().add(curDate);
-                                countGoodday++;
-                            }
-                            else
-                                countwait--;
-                        }
-                        curDate = CalendarUtils.addOneDay(curDate);
-                    } while (countGoodday < countDayz);
-                    dataOfDates.add(dataOfDates1);
-                }
-            }
-            logger.info(String.format("Всего уникальных комбинаций - %s", String.valueOf(dataOfDates.size())));
-
-            String currentOrgGuid = null;
-            String currentGroupName = null;
-            String currentDates = null;
-            DiscountComplexOrg discountComplexOrg = null;
-            DiscountComplexGroup discountComplexGroup = null;
-            DiscountComplexItem discountComplexItem = null;
-            List<Date> datesForThis = new ArrayList<>();
-            Integer clas;
-            int counter = 0;
-            boolean badComplex = false;
-            logger.info("Старт сбора ответа для ЭЖД");
-            for (RequestsEzdView requestsEzdView : requestsEzdViews) {
-
-                String curOrgGuid = requestsEzdView.getOrgguid();
-                String groupName = requestsEzdView.getGroupname();
-
+                Integer clas;
+                badComplex = false;
                 //Проверка на то, что данный комплекс подходит для данной группы
                 String complexname = requestsEzdView.getComplexname();
-                if (currentGroupName == null || !currentGroupName.equals(requestsEzdView.getGroupname()))
+                if (curgroupName == null || !curgroupName.equals(requestsEzdView.getGroupname()))
                 {
                     try {
                         clas = extractDigits(groupName);
@@ -205,17 +140,80 @@ public class EzdController {
                     }
                 }
 
+                if (badComplex)
+                {
+
+                }
+                else {
+                    if (curguid == null || curgroupName == null || !curOrgGuid.equals(curguid) || !groupName
+                            .equals(curgroupName)) {
+                        curguid = curOrgGuid;
+                        curgroupName = groupName;
+                        DataOfDates dataOfDates1 = new DataOfDates();
+                        dataOfDates1.setGroupName(groupName);
+                        dataOfDates1.setGuid(curOrgGuid);
+                        //Находим даты
+                        Date curDate = date;
+                        //Сколько дней пропустить
+                        Integer countwait = allIdtoSetiings.get(requestsEzdView.getIdoforg());
+                        boolean goodProd;
+                        boolean goodSpec;
+                        int countGoodday = 0;
+
+                        do {
+                            goodProd = false;
+                            goodSpec = false;
+                            for (ProductionCalendar productionCalendar : productionCalendars) {
+                                if (productionCalendar.getDay().equals(curDate)) {
+                                    goodProd = true;
+                                    break;
+                                }
+                            }
+                            if (!goodProd) {
+                                for (RequestsEzdSpecialDateView requestsEzdSpecialDateView : requestsEzdSpecialDateViews) {
+                                    if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate()).equals(curDate))
+                                        goodSpec = true;
+                                }
+                            }
+                            if (!goodProd && !goodSpec) {
+                                if (countwait == null || countwait == 0) {
+                                    dataOfDates1.getDates().add(curDate);
+                                    countGoodday++;
+                                } else
+                                    countwait--;
+                            }
+                            curDate = CalendarUtils.addOneDay(curDate);
+                        } while (countGoodday < countDayz);
+                        dataOfDates.add(dataOfDates1);
+                    }
+                }
+            }
+            logger.info(String.format("Всего уникальных комбинаций - %s", String.valueOf(dataOfDates.size())));
+
+            String currentOrgGuid = null;
+            String currentGroupName = null;
+            String currentDates = null;
+            DiscountComplexOrg discountComplexOrg = null;
+            DiscountComplexGroup discountComplexGroup = null;
+            DiscountComplexItem discountComplexItem = null;
+            List<Date> datesForThis = new ArrayList<>();
+            int counter = 0;
+            logger.info("Старт сбора ответа для ЭЖД");
+            for (RequestsEzdView requestsEzdView : requestsEzdViews) {
+
+                String curOrgGuid = requestsEzdView.getOrgguid();
+                String groupName = requestsEzdView.getGroupname();
 
                 //Текущая комбинация орг+группа не совпадает с предыщей, то ...
                 if (curOrgGuid == null || !curOrgGuid.equals(currentOrgGuid) ||
-                        currentGroupName == null || !currentGroupName.equals(requestsEzdView.getGroupname())) {
+                        currentGroupName == null || !currentGroupName.equals(groupName)) {
                     datesForThis = dataOfDates.get(counter).getDates();
                     counter++;
                 }
 
                 Date curDate = CalendarUtils.startOfDay(requestsEzdView.getMenudate());
                 //Если для данной комбинации орг+группа есть такая дата и компелекс подходит для группы, то ..
-                if (datesForThis.contains(curDate) && !badComplex)
+                if (datesForThis.contains(curDate))
                 {
                     //Заполняем ответ
 
@@ -230,12 +228,12 @@ public class EzdController {
                     }
 
                     //Достаем группы
-                    if (currentGroupName == null || !currentGroupName.equals(requestsEzdView.getGroupname()))
+                    if (currentGroupName == null || !currentGroupName.equals(groupName))
                     {
                         discountComplexGroup = new DiscountComplexGroup();
-                        discountComplexGroup.setGroupName(requestsEzdView.getGroupname());
+                        discountComplexGroup.setGroupName(groupName);
                         discountComplexOrg.getGroups().add(discountComplexGroup);
-                        currentGroupName = requestsEzdView.getGroupname();
+                        currentGroupName = groupName;
                         currentDates = null;
                     }
 
