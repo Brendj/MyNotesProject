@@ -16,7 +16,6 @@ import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.ContragentPaymentReport;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.ui.BasicPage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 import ru.axetta.ecafe.processor.web.ui.ccaccount.CCAccountFilter;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
@@ -33,7 +32,6 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
 import javax.faces.event.ActionEvent;
 import javax.servlet.ServletOutputStream;
@@ -192,44 +190,6 @@ public class ContragentPaymentReportPage extends OnlineReportCustomPage implemen
 
     public void setContragentPaymentReceiverIds(String contragentPaymentReceiverIds) {
         this.contragentPaymentReceiverIds = contragentPaymentReceiverIds;
-    }
-
-    public void showContragentSelectPageOwn(Boolean isPaymentContragent) {
-        BasicPage currentTopMostPage = MainPage.getSessionInstance().getTopMostPage();
-        if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler
-                || currentTopMostPage instanceof ContragentListSelectPage) {
-            FacesContext facesContext = FacesContext.getCurrentInstance();
-            RuntimeContext runtimeContext = null;
-            Session persistenceSession = null;
-            Transaction persistenceTransaction = null;
-            String classType;
-            if(isPaymentContragent){
-                classType = "2";
-            } else {
-                classType = "1";
-            }
-            try {
-                runtimeContext = RuntimeContext.getInstance();
-                persistenceSession = runtimeContext.createPersistenceSession();
-                persistenceTransaction = persistenceSession.beginTransaction();
-                MainPage.getSessionInstance().getContragentListSelectPage().fill(persistenceSession, 0, classType);
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-                if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
-                    MainPage.getSessionInstance().getContragentListSelectPage().pushCompleteHandler(
-                            (ContragentListSelectPage.CompleteHandler) currentTopMostPage);
-                    MainPage.getSessionInstance().getModalPages().push(
-                            MainPage.getSessionInstance().getContragentListSelectPage());
-                }
-            } catch (Exception e) {
-                logger.error("Failed to fill contragent selection page", e);
-                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
-                        "Ошибка при подготовке страницы выбора контрагента: " + e.getMessage(), null));
-            } finally {
-                HibernateUtils.rollback(persistenceTransaction, logger);
-                HibernateUtils.close(persistenceSession, logger);
-            }
-        }
     }
 
     private List<ContragentListSelectPage.Item> retrieveContragents(Session session) throws HibernateException {

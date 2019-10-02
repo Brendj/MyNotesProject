@@ -218,6 +218,8 @@
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" /><br/>
             </h:panelGrid>
         </rich:panel>
+        <a4j:commandButton value="Отправка платежей в Атол" action="#{otherActionsPage.sendToAtol()}" id="sendToAtolButton"
+                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
     </h:panelGrid>
 
     <rich:panel rendered="#{otherActionsPage.isSpb()}">
