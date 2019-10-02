@@ -2,7 +2,7 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений ATOL
+-- Пакет обновлений 195
 
 --Таблица с реквизитами Компании
 create table cf_atol_company
@@ -69,3 +69,5 @@ CREATE TABLE cf_atol_packets
 CREATE INDEX cf_atol_packets_idofclientpaymentaddon
 ON cf_atol_packets
 USING btree (IdOfClientPaymentAddon);
+
+--! ФИНАЛИЗИРОВАН 02.10.2019, НЕ МЕНЯТЬ
