@@ -15,7 +15,8 @@ public enum OrganizationTypeModify {
     /*0*/ EMPTY(""),
     /*1*/ SCHOOL("Общеобразовательное ОУ"),
     /*2*/ KINDERGARTEN("Дошкольное ОУ"),
-    /*3*/ PROFESSIONAL("Профессиональное ОУ");
+    /*3*/ PROFESSIONAL("Профессиональное ОУ"),
+    /*4*/ ADDEDEDUCATION ("Доп.образование");
 
     private final String description;
 
