@@ -575,7 +575,7 @@
 
 <h:outputText value="Проходы:" />
 <rich:dataTable id="clientPassesTable" var="pass" value="#{mainPage.clientOperationListPage.clientPasses}"
-                rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer" rows="8" columns="8">
+                rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer" rows="8" columns="10">
 
     <f:facet name="header">
         <rich:columnGroup>
@@ -584,6 +584,12 @@
             </rich:column>
             <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
                 <h:outputText escape="true" value="Организация" styleClass="column-header" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                <h:outputText escape="true" value="ID OO" styleClass="column-header" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                <h:outputText escape="true" value="Адрес" styleClass="column-header" />
             </rich:column>
             <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
                 <h:outputText escape="true" value="Наименование входа" styleClass="column-header" />
@@ -611,6 +617,12 @@
     </rich:column>
     <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
         <h:outputText escape="true" value="#{pass.orgName}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+        <h:outputText escape="true" value="#{pass.idOfOrg}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+        <h:outputText escape="true" value="#{pass.shortAddress}" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
         <h:outputText escape="true" value="#{pass.enterName}" styleClass="output-text" />
