@@ -2096,21 +2096,20 @@ public class ClientManager {
     public static void deleteDiscount(Client client, Session session) throws Exception {
         Integer oldDiscountMode = client.getDiscountMode();
         String oldDiscounts = client.getCategoriesDiscounts();
-        //Set<CategoryDiscount> discounts = client.getCategories();
-        //for (CategoryDiscount discount : discounts) {
-        //    if (discount.getEligibleToDelete()) {
-        //        client.getCategories().remove(discount);
-        //        archiveDtisznDiscount(client, session, discount.getIdOfCategoryDiscount());
-        //    }
-        //}
-        Set<CategoryDiscount> set = client.getCategories();
-        for (Iterator<CategoryDiscount> i = set.iterator(); i.hasNext(); ) {
-            CategoryDiscount discount = i.next();
+        Set<CategoryDiscount> discountsAfterRemove = new HashSet<>();
+        Set<CategoryDiscount> discounts = client.getCategories();
+        for (CategoryDiscount discount : discounts) {
             if (discount.getEligibleToDelete()) {
-                client.getCategories().remove(discount);
                 archiveDtisznDiscount(client, session, discount.getIdOfCategoryDiscount());
+            } else {
+                discountsAfterRemove.add(discount);
             }
         }
+        if(!discountsAfterRemove.isEmpty()) {
+            client.getCategories().removeAll(discounts);
+            client.setCategories(discountsAfterRemove);
+        }
+
         String newDiscounts = "";
         for(CategoryDiscount discount : client.getCategories()){
             if(!newDiscounts.isEmpty()){
