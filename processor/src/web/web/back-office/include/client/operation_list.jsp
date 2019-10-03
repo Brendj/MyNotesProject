@@ -583,10 +583,10 @@
                 <h:outputText escape="true" value="№" styleClass="column-header" />
             </rich:column>
             <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
-                <h:outputText escape="true" value="Организация" styleClass="column-header" />
+                <h:outputText escape="true" value="ID OO" styleClass="column-header" />
             </rich:column>
             <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
-                <h:outputText escape="true" value="ID OO" styleClass="column-header" />
+                <h:outputText escape="true" value="Название ОО" styleClass="column-header" />
             </rich:column>
             <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
                 <h:outputText escape="true" value="Адрес" styleClass="column-header" />
@@ -616,10 +616,10 @@
         <h:outputText escape="true" value="#{row+1}" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
-        <h:outputText escape="true" value="#{pass.orgName}" styleClass="output-text" />
+        <h:outputText escape="true" value="#{pass.idOfOrg}" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
-        <h:outputText escape="true" value="#{pass.idOfOrg}" styleClass="output-text" />
+        <h:outputText escape="true" value="#{pass.orgName}" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
         <h:outputText escape="true" value="#{pass.shortAddress}" styleClass="output-text" />
