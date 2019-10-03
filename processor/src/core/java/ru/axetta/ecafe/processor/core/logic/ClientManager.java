@@ -2106,7 +2106,7 @@ public class ClientManager {
             }
         }
         if(!discountsAfterRemove.isEmpty()) {
-            client.getCategories().removeAll(discounts);
+            client.getCategories().clear();
             client.setCategories(discountsAfterRemove);
         }
 
