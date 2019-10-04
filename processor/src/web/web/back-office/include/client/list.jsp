@@ -142,7 +142,7 @@
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header" sortBy="#{item.idOfClient}">
             <f:facet name="header">
-                <h:outputText escape="true" value="Ид." />
+                <h:outputText escape="true" value="ИД" />
             </f:facet>
             <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.idOfClient}" converter="contractIdConverter"
@@ -160,17 +160,20 @@
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
             </a4j:commandLink>
         </rich:column>
+        <%-- доделать внутренности внешнего ид
+        --%>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Договор оформлен" />
+                <h:outputText escape="true" value="Внешний ИД" />
             </f:facet>
-            <h:outputText escape="true"
-                          value="#{item.contractPerson.surname} #{item.contractPerson.firstName} #{item.contractPerson.secondName}"
-                          styleClass="output-text" />
+            <h:outputText escape="true" value="#{item.externalId}" styleClass="output-text" />
         </rich:column>
+        <%-- доделать внутренности внешнего ид
+                --%>
+
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Обслуживается" />
+                <h:outputText escape="true" value="ФИО" />
             </f:facet>
             <h:outputText escape="true"
                           value="#{item.person.surname} #{item.person.firstName} #{item.person.secondName}"
@@ -185,49 +188,67 @@
         </rich:column>
         <rich:column headerClass="column-header" sortBy="#{item.clientGroupName}">
             <f:facet name="header">
-                <h:outputText escape="true" value="Промежуточная группа" />
+                <h:outputText escape="true" value="Подгруппа" />
             </f:facet>
             <h:outputText escape="true" value="#{item.middleGroup}"
                           styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+
+        <%--доделать внутренности ИД ОО--%>
+        <rich:column headerClass="column-header" sortBy="#{item.clientGroupName}">
             <f:facet name="header">
-               <h:outputText escape="true" value="Организация" />
+                <h:outputText escape="true" value="ИД ОО" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.org.shortName}"
+            <h:outputText escape="true" value="#{orgItem.idOfOrg}"
                           styleClass="output-text" />
         </rich:column>
+        <%--доделать внутренности ИД ОО--%>
+
+        <%--сделать ссылкой на карточку ОО--%>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Текущий баланс" />
+                <h:outputText escape="true" value="Название ОО" />
+            </f:facet>
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{mainPage.clientViewPage.orgShortName}" styleClass="command-link"
+                             action="#{mainPage.showOrgViewPage}">
+                <f:setPropertyActionListener value="#{mainPage.clientViewPage.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+            </a4j:commandLink>
+        </rich:column>
+        <%--сделать ссылкой на карточку ОО--%>
+
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Баланс" />
             </f:facet>
             <h:outputText escape="true" value="#{item.balance}" converter="copeckSumConverter"
                           styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Лимит овердрафта" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.limit}" converter="copeckSumConverter" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Лимит расходов" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.expenditureLimit}" converter="copeckSumConverter" styleClass="output-text" />
-        </rich:column>
+
+        <%--Добавить кнопку должно появиться окно со списком актуальных льгот--%>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Льгота" />
             </f:facet>
             <h:outputText escape="true" value="#{item.discountMode}" converter="clientDiscountModeConverter" styleClass="output-text" />
         </rich:column>
+        <%--Добавить кнопку должно появиться окно со списком актуальных льгот--%>
+
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Последние изменения" />
             </f:facet>
             <h:outputText escape="true" value="#{item.updateTime}" converter="timeConverter" styleClass="output-text" />
         </rich:column>
+
+        <%--Добавить внутренности Операции--%>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Операции" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.updateTime}" converter="timeConverter" styleClass="output-text" />
+        </rich:column>
+        <%--Добавить внутренности Операции--%>
+
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />
@@ -239,7 +260,7 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Исключить" />
+                <h:outputText escape="true" value="Удалить" />
             </f:facet>
             <!-- TODO -->
             <a4j:commandLink ajaxSingle="true" styleClass="command-link"

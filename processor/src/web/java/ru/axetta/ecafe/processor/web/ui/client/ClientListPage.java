@@ -109,6 +109,8 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         private final Integer discountMode;
         private final String discountAsString;
         private final String guid;
+        private final String regId;
+        private final String externalId;
 
         public void setExpenditureLimit(Long expenditureLimit) {
             this.expenditureLimit = expenditureLimit;
@@ -180,6 +182,12 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
                 this.discountAsString = Client.DISCOUNT_MODE_NAMES[0];
             } else {
                 this.discountAsString = Client.DISCOUNT_MODE_NAMES[discountMode];
+            }
+            this.regId = client.getIacRegId();
+            if(!regId.isEmpty()) {
+                this.externalId = regId;
+            } else {
+                this.externalId = guid;
             }
         }
 
@@ -273,6 +281,14 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
 
         public String getGuid() {
             return guid;
+        }
+
+        public String getRegId() {
+            return regId;
+        }
+
+        public String getExternalId() {
+            return externalId;
         }
     }
 
