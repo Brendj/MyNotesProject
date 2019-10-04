@@ -1988,6 +1988,44 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public void showContragentSelectPageOwn(Boolean isPaymentContragent) {
+        BasicPage currentTopMostPage = MainPage.getSessionInstance().getTopMostPage();
+        if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler
+                || currentTopMostPage instanceof ContragentListSelectPage) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            String classType;
+            if(isPaymentContragent){
+                classType = "2";
+            } else {
+                classType = "1";
+            }
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                MainPage.getSessionInstance().getContragentListSelectPage().fill(persistenceSession, 0, classType);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
+                    MainPage.getSessionInstance().getContragentListSelectPage().pushCompleteHandler(
+                            (ContragentListSelectPage.CompleteHandler) currentTopMostPage);
+                    MainPage.getSessionInstance().getModalPages().push(
+                            MainPage.getSessionInstance().getContragentListSelectPage());
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill contragent selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора контрагента: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
+    }
+
     public Object updateOrgSelectPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         RuntimeContext runtimeContext = null;

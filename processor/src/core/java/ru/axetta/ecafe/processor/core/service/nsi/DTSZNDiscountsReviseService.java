@@ -41,8 +41,8 @@ import javax.xml.bind.DatatypeConverter;
 import java.net.ConnectException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Calendar;
 import java.util.*;
+import java.util.Calendar;
 
 @Component
 public class DTSZNDiscountsReviseService {
@@ -902,6 +902,12 @@ public class DTSZNDiscountsReviseService {
         runTaskDB(null);
     }
 
+    private boolean isStudent(Client client) {
+        if (client == null) return false;
+        return client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                || client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+    }
+
     public void runTaskDB(String guid) throws Exception {
         ReviseDAOService.DiscountItemsWithTimestamp discountItemList;
 
@@ -938,7 +944,7 @@ public class DTSZNDiscountsReviseService {
                     transaction = session.beginTransaction();
                 }
                 Client client = DAOUtils.findClientByGuid(session, item.getRegistryGUID());
-                if (null == client) {
+                if (null == client || !isStudent(client)) {
                     //logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
                     if (0 == counter++ % maxRecords) {
                         transaction.commit();

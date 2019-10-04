@@ -781,6 +781,11 @@
                      rendered="#{mainPage.eligibleToServiceAdmin || mainPage.eligibleToServiceSupport}">
     <a4j:support event="onclick" action="#{mainPage.showServiceGroupPage}" reRender="workspaceForm" />
 
+    <%--@elvariable id="atolCompanyPage" type="ru.axetta.ecafe.processor.web.ui.service.atol.AtolCompanyPage"--%>
+    <rich:panelMenuItem id="atolCompanyMenuItem" binding="#{atolCompanyPage.mainMenuComponent}"
+                        label="Атрибуты компании" action="#{atolCompanyPage.show}" reRender="workspaceForm"
+                        rendered="#{mainPage.eligibleToServiceAdmin}" />
+
     <rich:panelMenuItem id="removeOrderMenuItem" binding="#{mainPage.orderRemovePage.mainMenuComponent}"
                         label="Удаление покупки" action="#{mainPage.showOrderRemovePage}" reRender="workspaceForm"
                         rendered="#{mainPage.eligibleToServiceAdmin}" />

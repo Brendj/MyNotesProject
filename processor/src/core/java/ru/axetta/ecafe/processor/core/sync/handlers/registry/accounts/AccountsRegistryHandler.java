@@ -77,7 +77,7 @@ public class AccountsRegistryHandler {
 
         CardReadOnlyRepository cardReadOnlyRepository = CardReadOnlyRepository.getInstance();
 
-        List<Card> allFreeByOrg = cardReadOnlyRepository.findAllFreeByOrg(idOfOrg);
+        List<Card> allFreeByOrg = cardReadOnlyRepository.findAllFreeByOrg(idOfOrgs);
         for (Card card : allFreeByOrg) {
             accountsRegistry.getFreeCardsItems().add(new CardsItem(card));
         }
