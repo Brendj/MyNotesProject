@@ -904,8 +904,13 @@ public class DTSZNDiscountsReviseService {
 
     private boolean isStudent(Client client) {
         if (client == null) return false;
-        return client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
-                || client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+        try {
+            return client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                    || client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+        } catch (Exception e) {
+            logger.error("Error in isStudent method: ", e);
+            return false;
+        }
     }
 
     public void runTaskDB(String guid) throws Exception {
