@@ -62,6 +62,7 @@ public class ReportRuleConstants {
             AdjustmentPaymentReport.class,
             AutoEnterEventByDaysReport.class,
             AutoEnterEventReport.class,
+            DetailedEnterEventReport.class,
             BalanceLeavingReport.class,
             BeneficiaryByAllOrgReport.class,
             BeneficiarySummaryReport.class,
