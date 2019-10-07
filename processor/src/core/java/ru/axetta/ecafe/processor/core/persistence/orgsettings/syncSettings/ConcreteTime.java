@@ -32,4 +32,9 @@ public class ConcreteTime {
     public void setConcreteTime(String concreteTime) {
         this.concreteTime = concreteTime;
     }
+
+    @Override
+    public int hashCode(){
+        return concreteTime.hashCode();
+    }
 }

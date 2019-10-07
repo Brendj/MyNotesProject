@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.ResSync
 import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.SyncSettingsSectionItem;
 import ru.axetta.ecafe.processor.core.utils.DataBaseSafeConverterUtils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -20,8 +21,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 @Service
 public class SyncSettingManager {
@@ -61,14 +61,15 @@ public class SyncSettingManager {
     }
 
     private void updateSyncSettings(SyncSettings currentSetting, List<String> concreteTime, Integer everySeconds,
-            Integer limitStartHour, Integer limitEndHour, Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday, Boolean saturday, Boolean sunday,
-            Boolean deleteState, Long nextVersion, Date lastUpdate, Session session) throws Exception {
-        if(currentSetting == null) {
+            Integer limitStartHour, Integer limitEndHour, Boolean monday, Boolean tuesday, Boolean wednesday,
+            Boolean thursday, Boolean friday, Boolean saturday, Boolean sunday, Boolean deleteState, Long nextVersion,
+            Date lastUpdate, Session session) throws Exception {
+        if (currentSetting == null) {
             throw new IllegalArgumentException("Org is NULL, nothing change");
         }
         validateParam(concreteTime, everySeconds, limitStartHour, limitEndHour);
 
-        if(lastUpdate == null){
+        if (lastUpdate == null) {
             lastUpdate = new Date();
         }
         currentSetting.setLastUpdate(lastUpdate);
@@ -84,12 +85,42 @@ public class SyncSettingManager {
         currentSetting.setSaturday(saturday);
         currentSetting.setSunday(sunday);
         currentSetting.setDeleteState(deleteState);
-        if(everySeconds == null){
-
-        } else {
-            currentSetting.getConcreteTime();
+        if (everySeconds == null && CollectionUtils.isNotEmpty(concreteTime)) {
+            //apply change from ARM
+            for(String value : concreteTime) {
+                ConcreteTime time = findByValue(currentSetting.getConcreteTime(), value);
+                if(time == null){
+                    time = new ConcreteTime();
+                    time.setSyncSettings(currentSetting);
+                    time.setConcreteTime(value);
+                    currentSetting.getConcreteTime().add(time);
+                }
+            }
+            // delete value from current settings, if not exist in ARM data
+            List<ConcreteTime> deleteCollection = new LinkedList<>();
+            for(ConcreteTime time : currentSetting.getConcreteTime()){
+                if(!concreteTime.contains(time.getConcreteTime())){
+                    session.delete(time);
+                    deleteCollection.add(time);
+                }
+            }
+            currentSetting.getConcreteTime().removeAll(deleteCollection);
+        } else if (CollectionUtils.isNotEmpty(currentSetting.getConcreteTime())) {
+            for (ConcreteTime time : currentSetting.getConcreteTime()) {
+                session.delete(time);
+            }
+            currentSetting.setConcreteTime(new HashSet<ConcreteTime>());
         }
+        session.persist(currentSetting);
+    }
 
+    private ConcreteTime findByValue(Set<ConcreteTime> concreteTime, String value) {
+        for(ConcreteTime item : concreteTime){
+            if(item.getConcreteTime().equals(value)){
+                return item;
+            }
+        }
+        return null;
     }
 
     private void validateParam(List<String> concreteTime, Integer everySeconds, Integer limitStartHour,
