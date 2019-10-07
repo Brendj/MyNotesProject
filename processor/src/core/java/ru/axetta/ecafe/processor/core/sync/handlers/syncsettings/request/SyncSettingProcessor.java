@@ -32,7 +32,6 @@ public class SyncSettingProcessor extends AbstractProcessor<SyncSettingsSection>
         SyncSettingManager manager = RuntimeContext.getAppContext().getBean(SyncSettingManager.class);
 
         if(manager != null) {
-            Long maxVersionFromARM = request.getMaxVersion();
             Date syncData = new Date();
             Long idOfOrg = request.getOwner();
             Long nextVersion = SyncSettingManager.getNextVersion(session);
@@ -43,11 +42,19 @@ public class SyncSettingProcessor extends AbstractProcessor<SyncSettingsSection>
 
             for (SyncSettingsSectionItem item : request.getItemList()){
                 SyncSettings currentSetting = findSettingByContentType(settingFromDB, item.getContentType());
+                ResSyncSettingsItem result = null;
                 if(currentSetting == null) {
-                    ResSyncSettingsItem result = manager
-                            .saveFromSync(session, item, idOfOrg, syncData, nextVersion);
-                    resSyncSettingsSection.getItemList().add(result);
+                    result = manager.saveFromSync(session, item, idOfOrg, syncData, nextVersion);
+
+                } else if(item.getVersion() >= currentSetting.getVersion()){
+                    result = manager.changeFromSync(session, currentSetting, item, syncData, nextVersion);
+                } else {
+                    result = new ResSyncSettingsItem();
+                    result.setContentTypeInt(item.getContentType());
+                    result.setVersion(currentSetting.getVersion());
+                    result.setResult(ProcessResultEnum.OK);
                 }
+                resSyncSettingsSection.getItemList().add(result);
             }
         } else {
             throw new Exception("Can't get SyncSettingManager from app context");

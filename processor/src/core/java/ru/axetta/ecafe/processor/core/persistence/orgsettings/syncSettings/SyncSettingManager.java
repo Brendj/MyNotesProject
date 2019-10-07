@@ -38,6 +38,75 @@ public class SyncSettingManager {
         return maxVersion == null ? 0 : maxVersion;
     }
 
+    public ResSyncSettingsItem changeFromSync(Session session, SyncSettings currentSetting, SyncSettingsSectionItem item, Date syncData, Long nextVersion) {
+        ResSyncSettingsItem result = new ResSyncSettingsItem();
+        result.setContentTypeInt(item.getContentType());
+        try {
+            updateSyncSettings(
+                    currentSetting, item.getConcreteTime(), item.getEverySeconds(), item.getLimitStartHour(),
+                    item.getLimitEndHour(), item.getMonday(), item.getTuesday(), item.getWednesday(), item.getThursday(),
+                    item.getFriday(), item.getSaturday(), item.getSunday(), item.getDeleteState(), nextVersion, syncData, session);
+
+            result.setResult(ProcessResultEnum.OK);
+        } catch (SyncProcessException e){
+            logger.error(String.format("Can't change in DB SyncSetting with ContentType %d for IdOfOrg %d",
+                    item.getContentType(), currentSetting.getOrg().getIdOfOrg()), e);
+            result.setResult(e.getExceptionRes());
+        } catch (Exception e){
+            logger.error(String.format("Can't change in DB SyncSetting with ContentType %d for IdOfOrg %d",
+                    item.getContentType(), currentSetting.getOrg().getIdOfOrg()), e);
+            result.setResult(ProcessResultEnum.INTERNAL_ERROR);
+        }
+        return result;
+    }
+
+    private void updateSyncSettings(SyncSettings currentSetting, List<String> concreteTime, Integer everySeconds,
+            Integer limitStartHour, Integer limitEndHour, Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday, Boolean saturday, Boolean sunday,
+            Boolean deleteState, Long nextVersion, Date lastUpdate, Session session) throws Exception {
+        if(currentSetting == null) {
+            throw new IllegalArgumentException("Org is NULL, nothing change");
+        }
+        validateParam(concreteTime, everySeconds, limitStartHour, limitEndHour);
+
+        if(lastUpdate == null){
+            lastUpdate = new Date();
+        }
+        currentSetting.setLastUpdate(lastUpdate);
+        currentSetting.setVersion(nextVersion);
+        currentSetting.setEverySecond(everySeconds);
+        currentSetting.setLimitStartHour(limitStartHour);
+        currentSetting.setLimitEndHour(limitEndHour);
+        currentSetting.setMonday(monday);
+        currentSetting.setTuesday(tuesday);
+        currentSetting.setWednesday(wednesday);
+        currentSetting.setThursday(thursday);
+        currentSetting.setFriday(friday);
+        currentSetting.setSaturday(saturday);
+        currentSetting.setSunday(sunday);
+        currentSetting.setDeleteState(deleteState);
+        if(everySeconds == null){
+
+        } else {
+            currentSetting.getConcreteTime();
+        }
+
+    }
+
+    private void validateParam(List<String> concreteTime, Integer everySeconds, Integer limitStartHour,
+            Integer limitEndHour) {
+        if(concreteTime != null && everySeconds != null) {
+            throw new AmbiguityConcreteTimeAndEverySecondsValues();
+        } else if(everySeconds != null && !everySeconds.equals(0)) {
+            throw new IncorrectEverySecondsException();
+        } else if((limitStartHour == null && limitEndHour != null) || (limitStartHour != null && limitEndHour == null)) {
+            throw new AmbiguityLimitHourException();
+        } else if(limitStartHour != null && limitEndHour != null) {
+            if((limitStartHour < 0 || limitStartHour > 24) || (limitEndHour < 0 || limitEndHour > 24)) {
+                throw new IncorrectLimitHourException();
+            }
+        }
+    }
+
     public ResSyncSettingsItem saveFromSync(Session session, SyncSettingsSectionItem item, Long idOfOrg, Date syncData, Long nextVersion){
         ResSyncSettingsItem result = new ResSyncSettingsItem();
         result.setContentTypeInt(item.getContentType());
@@ -67,17 +136,9 @@ public class SyncSettingManager {
             throw new IllegalArgumentException("Org is NULL");
         } else if(contentType == null) {
             throw new ContentTypeIsNullException();
-        } else if(concreteTime != null && everySeconds != null) {
-            throw new AmbiguityConcreteTimeAndEverySecondsValues();
-        } else if(everySeconds != null && !everySeconds.equals(0)) {
-            throw new IncorrectEverySecondsException();
-        } else if((limitStartHour == null && limitEndHour != null) || (limitStartHour != null && limitEndHour == null)) {
-            throw new AmbiguityLimitHourException();
-        } else if(limitStartHour != null && limitEndHour != null) {
-            if((limitStartHour < 0 || limitStartHour > 24) || (limitEndHour < 0 || limitEndHour > 24)) {
-                throw new IncorrectLimitHourException();
-            }
         }
+        validateParam(concreteTime, everySeconds, limitStartHour, limitEndHour);
+
         if(createDate == null){
             createDate = new Date();
         }
