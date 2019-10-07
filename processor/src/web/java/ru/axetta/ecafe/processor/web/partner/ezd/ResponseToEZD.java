@@ -7,11 +7,11 @@ package ru.axetta.ecafe.processor.web.partner.ezd;
 import java.util.LinkedList;
 import java.util.List;
 
-public class ResponseDiscountComplex extends Result{
+public class ResponseToEZD extends Result{
     private List<DiscountComplexOrg> org ;
 
 
-    public ResponseDiscountComplex(){
+    public ResponseToEZD(){
         this.org  = new LinkedList<DiscountComplexOrg>();
     }
 

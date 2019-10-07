@@ -379,6 +379,15 @@
         <url-pattern>/soap/specialcards</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>EZDControllerWS</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.internal.EZDController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EZDControllerWS</servlet-name>
+        <url-pattern>/soap/ezd</url-pattern>
+    </servlet-mapping>
+
 
     <servlet>
         <servlet-name>BarcodeServlet</servlet-name>

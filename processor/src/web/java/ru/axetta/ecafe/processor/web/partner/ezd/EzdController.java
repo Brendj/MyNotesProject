@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -48,7 +47,7 @@ public class EzdController {
     @Path(value = "discountComplexList")
     public Response getComplexList() {
         logger.info("Начало работы сервиса сбора данных для ЭЖД");
-        ResponseDiscountComplex responseDiscountComplex = new ResponseDiscountComplex();
+        ResponseToEZD responseToEZD = new ResponseToEZD();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -230,7 +229,7 @@ public class EzdController {
                         {
                             discountComplexOrg = new DiscountComplexOrg();
                             discountComplexOrg.setGuid(thisOrgGuid);
-                            responseDiscountComplex.getOrg().add(discountComplexOrg);
+                            responseToEZD.getOrg().add(discountComplexOrg);
                             orgGuidResponse = thisOrgGuid;
                             groupNameResponse = null;
                         }
@@ -266,19 +265,19 @@ public class EzdController {
 
             logger.info("Ответ для ЭЖД успешно сформирован");
 
-            responseDiscountComplex.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
-            responseDiscountComplex.setErrorMessage(ResponseCodes.RC_OK.toString());
-            return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscountComplex).build();
+            responseToEZD.setErrorCode(Long.toString(ResponseCodes.RC_OK.getCode()));
+            responseToEZD.setErrorMessage(ResponseCodes.RC_OK.toString());
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseToEZD).build();
         } catch (IllegalArgumentException e) {
             logger.error (String.format ("%s", e));
-            responseDiscountComplex.setErrorCode(Long.toString(ResponseCodes.RC_INTERNAL_ERROR.getCode()));
-            responseDiscountComplex.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
-            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseDiscountComplex).build();
+            responseToEZD.setErrorCode(Long.toString(ResponseCodes.RC_INTERNAL_ERROR.getCode()));
+            responseToEZD.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(responseToEZD).build();
         } catch (Exception e) {
             logger.error (String.format ("%s", e));
-            responseDiscountComplex.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
-            responseDiscountComplex.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
-            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(responseDiscountComplex).build();
+            responseToEZD.setErrorCode(Long.toString(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode()));
+            responseToEZD.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(responseToEZD).build();
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
