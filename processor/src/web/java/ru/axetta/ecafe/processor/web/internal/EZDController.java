@@ -73,64 +73,70 @@ public class EZDController extends HttpServlet {
             logger.info(String.format("Всего настроек с АРМ - %s", String.valueOf(allIdtoSetiings.size())));
 
 
-            //List<RequestsEzdSpecialDateView> dateNotWorksFromARM = new ArrayList<>();
-            //for (Map.Entry<Long, Integer> entry : allIdtoSetiings.entrySet()) {
-            //
-            //    for (ProductionCalendar productionCalendar : productionCalendars) {
-            //        if (productionCalendar.getDay().equals(curDateDates)) {
-            //            goodProd = true;
-            //            break;
-            //        }
-            //    }
-            //    System.out.println("ID =  " + entry.getKey() + " День недели = " + entry.getValue());
-            //}
+            //Берём текущую дату
+            Date date = new Date();
+            date = CalendarUtils.addOneDay(date);
+            date = CalendarUtils.startOfDay(date);
 
+            Date startDate = date;
+            List<RequestsEzdSpecialDateView> dateNotWorksFromARM = new ArrayList<>();
+            for (Map.Entry<Long, Integer> entry : allIdtoSetiings.entrySet()) {
+                Long idOrg = entry.getKey();
+                Integer countDays = entry.getValue();
+                for (RequestsEzdSpecialDateView requestsEzdSpecialDateView : requestsEzdSpecialDateViews) {
 
-            //Дата в запросе
-            Date curDateDates = new Date();
-            //Сколько дней пропустить
-            Integer countwait = allIdtoSetiings.get(thisIdOfOrg);
-            int countGoodday = 0;
-
-            do {
-                boolean goodProd = false;
-                boolean goodSpec = false;
-                for (ProductionCalendar productionCalendar : productionCalendars) {
-                    if (productionCalendar.getDay().equals(curDateDates)) {
-                        goodProd = true;
-                        break;
-                    }
                 }
-                if (!goodProd) {
-                    ///ПЕРЕДЕЛАТЬ ДЛЯ УСКОРЕНИЯ Т.К. ВЬЮХА БУДЕТ СОРТИРОВАНА!!!!!
-                    for (RequestsEzdSpecialDateView requestsEzdSpecialDateView : requestsEzdSpecialDateViews) {
-                        if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate())
-                                .equals(curDateDates) && requestsEzdSpecialDateView.getIdoforg()
-                                .equals(thisIdOfOrg) && requestsEzdSpecialDateView.getGroupname()
-                                .equals(thisGroupName)) {
-                            goodSpec = true;
+
+
+
+
+                Integer countGoodday = 0;
+                while (countGoodday < entry.getValue())
+                {
+
+                }
+
+
+
+
+                startDate = date;
+
+                do {
+                    boolean goodProd = false;
+                    boolean goodSpec = false;
+                    for (ProductionCalendar productionCalendar : productionCalendars) {
+                        if (productionCalendar.getDay().equals(startDate)) {
+                            goodProd = true;
+                            break;
                         }
                     }
-                }
-                if (goodProd || goodSpec)
-                {
-                    //baddate
+                    if (!goodProd) {
+                        ///ПЕРЕДЕЛАТЬ ДЛЯ УСКОРЕНИЯ Т.К. ВЬЮХА БУДЕТ СОРТИРОВАНА!!!!!
+                        for (RequestsEzdSpecialDateView requestsEzdSpecialDateView : requestsEzdSpecialDateViews) {
+                            if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate())
+                                    .equals(startDate) && requestsEzdSpecialDateView.getIdoforg()
+                                    .equals(entry.getKey())) {
+                                //Создаем доп список с запрещенными датами
+                                RequestsEzdSpecialDateView requestsEzdSpecialDateView1 = new RequestsEzdSpecialDateView();
+                                requestsEzdSpecialDateView1.setIdoforg(entry.getKey());
+                                requestsEzdSpecialDateView1.setGroupname(requestsEzdSpecialDateView.getGroupname());
+                                requestsEzdSpecialDateView1.setSpecDate(CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate()));
+                                dateNotWorksFromARM.add(requestsEzdSpecialDateView1);
+                                goodSpec = true;
+                            }
+                        }
+                    }
+                    if (!goodSpec) {
+                        countGoodday++;
+                    }
+                    startDate = CalendarUtils.addOneDay(startDate);
+                } while (countGoodday < entry.getValue());
 
-                }
-                else
-                {
-                    //gooddate
-                    if (countwait == null || countwait == 0)
-                    {
-                        //Если полученная дата > сегодняшней, то такой заказ возможен
-                        if (curDateDates.getTime() > curDateDates.getTime())
-                    }
-                    {
-                        countwait--;
-                    }
-                }
-                curDateDates = CalendarUtils.subOneDay(curDateDates);
-            } while ();
+
+                System.out.println("ID =  " + entry.getKey() + " День недели = " + entry.getValue());
+            }
+
+
 
 
             for (ResponseFromEzd responseFromEzd: orders)

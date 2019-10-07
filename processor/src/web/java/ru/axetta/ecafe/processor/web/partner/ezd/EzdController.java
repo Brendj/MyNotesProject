@@ -219,6 +219,7 @@ public class EzdController {
                                             .equals(thisIdOfOrg) && requestsEzdSpecialDateView.getGroupname()
                                             .equals(thisGroupName)) {
                                         goodSpec = true;
+                                        break;
                                     }
                                 }
                             }
