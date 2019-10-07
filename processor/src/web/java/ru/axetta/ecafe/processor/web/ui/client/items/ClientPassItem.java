@@ -25,10 +25,14 @@ public class ClientPassItem implements Comparable {
     private Date enterTime;
     private String enterName;
     private String direction;
+    private Long idOfOrg;
+    private String shortAddress;
     private List<ClientChekerPassItem> chekerItemList = new ArrayList<ClientChekerPassItem>();
 
     public ClientPassItem(Session session, EnterEvent event) {
         this.orgName = event.getOrg().getShortName();
+        this.idOfOrg = event.getOrg().getIdOfOrg();
+        this.shortAddress = event.getOrg().getShortAddress();
         this.enterTime = event.getEvtDateTime();
         this.enterName = event.getEnterName();
         this.direction = getDirection(event.getPassDirection());
@@ -92,6 +96,22 @@ public class ClientPassItem implements Comparable {
 
     public Integer getChekerItemListCount() {
         return chekerItemList.size() + 1;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
+    }
+
+    public String getShortAddress() {
+        return shortAddress;
+    }
+
+    public void setShortAddress(String shortAddress) {
+        this.shortAddress = shortAddress;
     }
 
     private String getDirection(int direction) {
