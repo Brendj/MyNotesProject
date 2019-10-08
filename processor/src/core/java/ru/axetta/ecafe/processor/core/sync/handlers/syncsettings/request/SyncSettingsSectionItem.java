@@ -4,14 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ConcreteTime;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettings;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 public class SyncSettingsSectionItem implements AbstractToElement {
     private Integer contentType;
@@ -28,6 +29,47 @@ public class SyncSettingsSectionItem implements AbstractToElement {
     private Boolean sunday;
     private Long version;
     private Boolean deleteState;
+
+    private static final Comparator<String> comparable = new Comparator<String>() {
+        @Override
+        public int compare(String o1, String o2) {
+            String[] oa1 = o1.split(":");
+            String[] oa2 = o2.split(":");
+            int res = oa1[0].compareTo(oa2[0]);
+
+            return res == 0 ? oa1[1].compareTo(oa2[1]) : res;
+        }
+    };
+
+    public SyncSettingsSectionItem(){
+
+    }
+
+    public SyncSettingsSectionItem(SyncSettings setting) {
+        this.contentType = setting.getContentType().getTypeCode();
+        this.concreteTime = buildConcreteTimeString(setting.getConcreteTime());
+        this.everySeconds = setting.getEverySecond();
+        this.limitStartHour = setting.getLimitStartHour();
+        this.limitEndHour = setting.getLimitEndHour();
+        this.monday = setting.getMonday();
+        this.tuesday = setting.getTuesday();
+        this.wednesday = setting.getWednesday();
+        this.thursday = setting.getThursday();
+        this.friday = setting.getFriday();
+        this.saturday = setting.getSaturday();
+        this.sunday = setting.getSunday();
+        this.version = setting.getVersion();
+        this.deleteState = setting.getDeleteState();
+    }
+
+    private List<String> buildConcreteTimeString(Set<ConcreteTime> concreteTime) {
+        List<String> result = new LinkedList<>();
+        for(ConcreteTime time : concreteTime){
+            result.add(time.getConcreteTime());
+        }
+        Collections.sort(result, comparable);
+        return result;
+    }
 
     @Override
     public Element toElement(Document document) throws Exception {

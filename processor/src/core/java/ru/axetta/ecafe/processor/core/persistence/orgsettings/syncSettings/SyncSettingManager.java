@@ -29,7 +29,7 @@ public class SyncSettingManager {
 
     public static Long getNextVersion(Session session){
         Long result = getMaxVersion(session);
-        return result + 1;
+        return result + 1L;
     }
 
     public static Long getMaxVersion(Session session) {
@@ -207,12 +207,21 @@ public class SyncSettingManager {
         session.persist(syncSettings);
     }
 
-    public List<SyncSettings> getSettingByIdOfOrgAndVersion(Session session, Long idOfOrg) {
+    public List<SyncSettings> getSettingByIdOfOrg(Session session, Long idOfOrg) {
         Criteria criteria = session.createCriteria(SyncSettings.class);
         criteria.createAlias("org", "o");
         criteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
         criteria.addOrder(Order.asc("contentType"));
 
         return criteria.list();
+    }
+
+    public List<SyncSettings> getSettingByIdOfOrgAndGreaterThenVersion(Session session, Long idOfOrg, Long maxVersionFromARM) {
+        Criteria criteria = session.createCriteria(SyncSettings.class);
+        criteria.createAlias("org", "o");
+        criteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.gt("version", maxVersionFromARM));
+        criteria.addOrder(Order.asc("contentType"));
+        return  criteria.list();
     }
 }
