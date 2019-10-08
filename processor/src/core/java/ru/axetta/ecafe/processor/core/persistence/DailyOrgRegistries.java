@@ -12,7 +12,7 @@ import java.util.Date;
  * Date: 21.01.15
  * Time: 15:34
  */
-
+@Deprecated
 public class DailyOrgRegistries {
 
     /**
