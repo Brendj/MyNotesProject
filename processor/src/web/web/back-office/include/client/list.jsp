@@ -160,17 +160,12 @@
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
             </a4j:commandLink>
         </rich:column>
-        <%-- доделать внутренности внешнего ид
-        --%>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Внешний ИД" />
             </f:facet>
             <h:outputText escape="true" value="#{item.externalId}" styleClass="output-text" />
         </rich:column>
-        <%-- доделать внутренности внешнего ид
-                --%>
-
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="ФИО" />
@@ -199,7 +194,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="ИД ОО" />
             </f:facet>
-            <h:outputText escape="true" value="#{orgItem.idOfOrg}"
+            <h:outputText escape="true" value="#{item.org}"
                           styleClass="output-text" />
         </rich:column>
         <%--доделать внутренности ИД ОО--%>
@@ -209,9 +204,10 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Название ОО" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{mainPage.clientViewPage.orgShortName}" styleClass="command-link"
-                             action="#{mainPage.showOrgViewPage}">
-                <f:setPropertyActionListener value="#{mainPage.clientViewPage.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+            <a4j:commandLink action="#{mainPage.showOrgViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
+                <h:outputText escape="true" value="#{item.org}"
+                              styleClass="output-text" />
+                <f:setPropertyActionListener value="#{item.org}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
         </rich:column>
         <%--сделать ссылкой на карточку ОО--%>

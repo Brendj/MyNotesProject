@@ -184,10 +184,10 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
                 this.discountAsString = Client.DISCOUNT_MODE_NAMES[discountMode];
             }
             this.regId = client.getIacRegId();
-            if(!regId.isEmpty()) {
-                this.externalId = regId;
+            if (client.getIacRegId() != null) {
+                this.externalId = client.getIacRegId();
             } else {
-                this.externalId = guid;
+                this.externalId = client.getClientGUID();
             }
         }
 
