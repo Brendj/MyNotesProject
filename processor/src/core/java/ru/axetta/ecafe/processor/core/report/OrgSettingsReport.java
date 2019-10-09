@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.FeedingSetting;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgSync;
+import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSettingsReportItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.collections.CollectionUtils;

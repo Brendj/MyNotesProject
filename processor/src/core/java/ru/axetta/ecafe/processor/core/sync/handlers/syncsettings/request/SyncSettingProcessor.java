@@ -41,6 +41,7 @@ public class SyncSettingProcessor extends AbstractProcessor<SyncSettingsSection>
             syncSettingsSection = new SyncSettingsSection();
             resSyncSettingsSection = new ResSyncSettingsSection();
 
+            //build resSyncSettingsSection
             for (SyncSettingsSectionItem item : request.getItemList()){
                 SyncSettings currentSetting = findSettingByContentType(settingFromDB, item.getContentType());
                 ResSyncSettingsItem result = null;
@@ -56,6 +57,9 @@ public class SyncSettingProcessor extends AbstractProcessor<SyncSettingsSection>
                 }
                 resSyncSettingsSection.getItemList().add(result);
             }
+            session.flush();
+
+            //build syncSettingsSection
             settingFromDB = manager.getSettingByIdOfOrgAndGreaterThenVersion(session, idOfOrg, maxVersionFromARM);
             for(SyncSettings setting : settingFromDB){
                 SyncSettingsSectionItem item = new SyncSettingsSectionItem(setting);
@@ -64,8 +68,6 @@ public class SyncSettingProcessor extends AbstractProcessor<SyncSettingsSection>
         } else {
             throw new Exception("Can't get SyncSettingManager from app context");
         }
-
-
         return null;
     }
 

@@ -966,9 +966,16 @@
     <rich:panelMenuItem id="preorderJournalReport" binding="#{preorderJournalReportPage.mainMenuComponent}"
                         label="Журнал операций ВП" action="#{preorderJournalReportPage.show}" reRender="workspaceForm" />
 
-    <%--@elvariable id="orgSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.OrgSettingsReportPage"--%>
-    <rich:panelMenuItem id="orgSettingsReport" binding="#{orgSettingsReportPage.mainMenuComponent}"
-                        label="Настройки ОО" action="#{orgSettingsReportPage.show}" reRender="workspaceForm" />
+    <rich:panelMenuGroup id="orgParameters" binding="#{mainPage.orgParametersGroup.mainMenuComponent}" label="Параметры ОО"
+                         rendered="#{mainPage.eligibleToServiceAdmin}">
+        <a4j:support event="onclick" action="#{mainPage.showOrgParametersGroupPage}" reRender="workspaceForm" />
+        <%--@elvariable id="orgSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSettingsReportPage"--%>
+        <rich:panelMenuItem id="orgSettingsReport" binding="#{orgSettingsReportPage.mainMenuComponent}"
+                            label="Настройки ОО" action="#{orgSettingsReportPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="orgSyncSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncSettingReportPage"--%>
+        <rich:panelMenuItem id="orgSettingsReport" binding="#{orgSyncSettingsReportPage.mainMenuComponent}"
+                            label="Расписание синхронизации" action="#{orgSyncSettingsReportPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"
