@@ -657,7 +657,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + " join cf_clients c on c.idofclient = o.idofclient "
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + " join cf_orgs og on og.idoforg = o.idoforg "
-                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and (od.menutype = 0 or od.menutype between 50 and 99) "
+                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                    + " and (od.menutype = 0 or od.menutype between 50 and 99) "
                     + "     and og.organizationtype = 0 and cg.idofclientgroup >= :clientGroup and cg.idofclientgroup < :clientEmployees ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<String>();
@@ -775,7 +776,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + " join cf_clients c on c.idofclient = o.idofclient "
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + " join cf_orgs og on og.idoforg = o.idoforg "
-                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and od.menutype = 0 "
+                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                    + " and od.menutype = 0 "
                     + "     and od.menuorigin in (0,1,10,11) and og.organizationtype = 0 and cg.idofclientgroup >= :clientGroup "
                     + "     and cg.idofclientgroup < :clientEmployees ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
@@ -877,7 +879,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + " join cf_clients c on c.idofclient = o.idofclient "
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + " join cf_orgs og on og.idoforg = o.idoforg "
-                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and od.menutype = 0 "
+                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                    + " and od.menutype = 0 "
                     + "     and od.menuorigin in (0,1,10,11) and og.organizationtype = 0 and cg.idofclientgroup >= :clientGroup "
                     + "     and cg.idofclientgroup < :clientEmployees ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
@@ -946,7 +949,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                             + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                             + " join cf_orgs og on og.idoforg = o.idoforg "
                             + " left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
-                            + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0 "
+                            + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                            + " and od.menutype < 150 and og.organizationtype = 0 "
                             + "     and c.idofclient in (:managerList) " + ") a "
                             + "group by a.idoforg, a.shortnameinfoservice, a.shortaddress, a.type, a.complexname, a.price";
 
@@ -972,7 +976,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + " join cf_orgs og on og.idoforg = o.idoforg "
                     + " left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
-                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and od.menutype = 0 "
+                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                    + " and od.menutype = 0 "
                     + "     and od.menuorigin in (0,1,10,11) and og.organizationtype = 0 and c.idofclient in (:managerList) "
                     + ") a " + "group by a.idoforg, a.shortnameinfoservice, a.shortaddress, a.complexname";
 
@@ -1014,7 +1019,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                             + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                             + " join cf_orgs og on og.idoforg = o.idoforg "
                             + " left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
-                            + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0 "
+                            + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                            + " and od.menutype < 150 and og.organizationtype = 0 "
                             + "     and cg.idofclientgroup >= :clientGroup and cg.idofclientgroup < :clientEmployees ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<String>();
@@ -1110,7 +1116,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + " join cf_clients c on c.idofclient = o.idofclient "
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + " join cf_orgs og on og.idoforg = o.idoforg "
-                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0 ";
+                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                    + " and od.menutype < 150 and og.organizationtype = 0 ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<>();
             List<String> classesNotConditionList = new ArrayList<>();
@@ -1196,7 +1203,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + " join cf_clients c on c.idofclient = o.idofclient "
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + " join cf_orgs og on og.idoforg = o.idoforg "
-                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0 ";
+                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                    + " and od.menutype < 150 and og.organizationtype = 0 ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<>();
             List<String> classesNotConditionList = new ArrayList<>();
@@ -1275,7 +1283,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + " join cf_clients c on c.idofclient = o.idofclient "
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + " join cf_orgs og on og.idoforg = o.idoforg "
-                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0 ";
+                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                    + " and od.menutype < 150 and og.organizationtype = 0 ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<>();
             List<String> classesNotConditionList = new ArrayList<>();
@@ -1360,7 +1369,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + " join cf_orgs og on og.idoforg = o.idoforg "
                     + " left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
-                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and od.menutype < 150 and og.organizationtype = 0 "
+                    + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                    + "and od.menutype < 150 and og.organizationtype = 0 "
                     + "     and cg.idofclientgroup >= :clientGroup and cg.idofclientgroup < :clientEmployees ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<>();
@@ -1987,7 +1997,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + "join cf_orgs og on o.idoforg = og.idoforg " + "join cf_clients c on c.idofclient = o.idofclient "
                     + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
-                    + "where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and od.menutype < 150 "
+                    + "where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                    + " and od.menutype < 150 "
                     + "     and og.organizationtype = 0 and cg.idofclientgroup between :clientGroup and :clientTechEmployees";
 
             sqlString += generateQueryConditions(Collections.EMPTY_LIST, showYoungerClasses, showMiddleClasses,
@@ -2037,7 +2048,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + "join cf_orgs og on o.idoforg = og.idoforg " + "join cf_clients c on c.idofclient = o.idofclient "
                     + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
-                    + "where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and od.menutype < 150 "
+                    + "where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                    + " and od.menutype < 150 "
                     + "     and og.organizationtype = 0 ";
 
             sqlString += generateQueryConditions(managerList, showYoungerClasses, showMiddleClasses, showOlderClasses,
@@ -2071,7 +2083,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + "join cf_orgs og on o.idoforg = og.idoforg " + "join cf_clients c on c.idofclient = o.idofclient "
                     + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
-                    + "where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and od.menutype < 150 "
+                    + "where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                    + " and od.menutype < 150 "
                     + "     and og.organizationtype = 0 and c.idofclient in (:managerList)";
 
             sqlString += generateQueryConditions(managerList, null, null, null, true, showFreeNutrition,
@@ -2215,7 +2228,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                         + " join cf_clients c on c.idofclient = o.idofclient "
                         + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                         + " left join cf_goods g on g.idofgood = od.idofgood join cf_orgs og on og.idoforg = o.idoforg "
-                        + " where o.idoforg = :idOfOrg and o.createddate between :startDate and :endDate and od.menutype < :complexItemMin and og.organizationtype = 0 "
+                        + " where o.idoforg = :idOfOrg and o.createddate between :startDate and :endDate and o.state = 0"
+                        + " and od.menutype < :complexItemMin and og.organizationtype = 0 "
                         + orgCondition + ") a group by a.idoforg";
                 Query query = session.createSQLQuery(sqlString);
                 query.setParameter("startDate", startDate.getTime());
