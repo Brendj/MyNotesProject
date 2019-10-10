@@ -2,7 +2,7 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.report;
+package ru.axetta.ecafe.processor.core.report.orgparameters;
 
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JasperFillManager;
@@ -13,7 +13,9 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.FeedingSetting;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgSync;
-import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSettingsReportItem;
+import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
+import ru.axetta.ecafe.processor.core.report.BasicReportForListOrgsJob;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -29,7 +31,7 @@ import org.slf4j.LoggerFactory;
 
 import java.util.*;
 
-public class OrgSettingsReport extends BasicReportForListOrgsJob{
+public class OrgSettingsReport extends BasicReportForListOrgsJob {
     private Logger logger = LoggerFactory.getLogger(OrgSettingsReport.class);
 
     public OrgSettingsReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
@@ -41,7 +43,7 @@ public class OrgSettingsReport extends BasicReportForListOrgsJob{
 
     }
 
-    public static class Builder extends BasicReportForContragentJob.Builder {
+    public static class Builder extends BasicReportJob.Builder {
 
         private static final Integer SERVICED  = 1;
         private static final Integer NOT_SERVISED = 2;

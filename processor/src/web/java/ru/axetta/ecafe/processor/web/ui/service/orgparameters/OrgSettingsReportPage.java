@@ -17,7 +17,7 @@ import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingManager;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ARMsSettingsType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
-import ru.axetta.ecafe.processor.core.report.OrgSettingsReport;
+import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSettingsReport;
 import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSettingsReportItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;

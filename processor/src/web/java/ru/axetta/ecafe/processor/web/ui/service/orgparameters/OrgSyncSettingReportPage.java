@@ -6,12 +6,15 @@ package ru.axetta.ecafe.processor.web.ui.service.orgparameters;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSyncSettingReport;
 import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSyncSettingReportItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
@@ -19,8 +22,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.faces.model.SelectItem;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Scope("session")
@@ -42,7 +44,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
                 selectItemList.add(new SelectItem(district, district));
             }
         } catch (Exception e){
-            logger.error("Cant build Districts items", e);
+            logger.error("Can't build Districts items", e);
         }
         return selectItemList;
     }
@@ -55,7 +57,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
             listOfOrgDistricts = buildListOfOrgDistricts(session);
             items.clear();
         } catch (Exception e){
-            logger.error("Exception when prepared the OrgSettingsPage: ", e);
+            logger.error("Exception when prepared the OrgSyncSettingsPage: ", e);
             throw e;
         } finally {
             HibernateUtils.close(session, logger);
@@ -63,19 +65,19 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     }
 
     public void buildHTML() {
-        /*Session persistenceSession = null;
+        Session persistenceSession = null;
         Transaction transaction = null;
         try {
             persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = persistenceSession.beginTransaction();
 
             List<String> idOfOrgListString = Arrays.asList(StringUtils.split(getGetStringIdOfOrgList(), ','));
-            List<Long> idOfOrgList = new ArrayList<Long>(idOfOrgListString.size());
+            List<Long> idOfOrgList = new ArrayList<>(idOfOrgListString.size());
             for (String item : idOfOrgListString) {
                 idOfOrgList.add(Long.parseLong(item));
             }
 
-            items = OrgSettingsReport.Builder.buildOrgSettingCollection(idOfOrgList, status, persistenceSession, selectedDistricts, allFriendlyOrgs);
+            items = OrgSyncSettingReport.getInstance().getBuilder().buildOrgSettingCollection(idOfOrgList, persistenceSession, selectedDistricts, allFriendlyOrgs);
             Collections.sort(items);
 
             transaction.commit();
@@ -86,7 +88,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         } finally {
             HibernateUtils.close(persistenceSession, logger);
             HibernateUtils.rollback(transaction, logger);
-        }*/
+        }
     }
 
     public void buildXLS(){
