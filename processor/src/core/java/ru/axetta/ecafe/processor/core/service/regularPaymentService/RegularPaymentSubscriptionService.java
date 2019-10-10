@@ -100,9 +100,9 @@ public class RegularPaymentSubscriptionService {
     private static Scheme scheme;
 
     public MfrRequest createRequestForSubscriptionReg(Long contractId, Long paymentAmount, Long thresholdAmount,
-            int period) {
+            int period, Date validityDate, String mobile) {
         return subscriptionRegRequest
-                .createRequestForSubscriptionReg(contractId, paymentAmount, thresholdAmount, period);
+                .createRequestForSubscriptionReg(contractId, paymentAmount, thresholdAmount, period, validityDate, mobile);
     }
 
     public void checkClientBalances() {
@@ -157,7 +157,7 @@ public class RegularPaymentSubscriptionService {
         for (Long id : subIds) {
             try {
                 BankSubscription bs = findBankSubscription(id);
-                if (bs.getValidToDate().before(today)) {
+                if (bs.getValidToDate() != null && bs.getValidToDate().before(today)) {
                     deactivateSubscription(id);
                     if (notifyAboutExpiredSubscription()) {
                         regularPaymentNotificationService.sendNotification(bs);
@@ -361,12 +361,11 @@ public class RegularPaymentSubscriptionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void updateBankSubscription(Long bsId, Long paymentAmount, Long thresholdAmount, int period) {
+    public void updateBankSubscription(Long bsId, Long paymentAmount, Long thresholdAmount, Date validityDate) {
         BankSubscription bs = em.find(BankSubscription.class, bsId);
         bs.setPaymentAmount(paymentAmount);
         bs.setThresholdAmount(thresholdAmount);
-        //bs.setMonthsCount(period);
-        //bs.setValidToDate(CalendarUtils.addMonth(new Date(), period)); //период подписки не трогаем
+        bs.setValidToDate(validityDate);
     }
 
     @Transactional(rollbackFor = Exception.class)

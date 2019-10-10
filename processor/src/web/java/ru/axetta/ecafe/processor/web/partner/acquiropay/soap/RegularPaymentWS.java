@@ -7,7 +7,9 @@ package ru.axetta.ecafe.processor.web.partner.acquiropay.soap;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.RegularPaymentStatus;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
@@ -15,11 +17,13 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.sms.PhoneNumberCanonicalizator;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.utils.HTTPData;
 import ru.axetta.ecafe.processor.web.partner.utils.HTTPDataHandler;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -59,14 +63,23 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
 
     private static final String RC_CLIENT_NOT_FOUND_DESC = "Client with %s = %s not found.";
     private static final String RC_INTERNAL_SERVER_ERROR_DESC = "Internal server error.";
-    private static final String RC_SUBSCRIPTION_NOT_FOUND_DESC = "Subscription with id = %s not found.";
+    private static final String RC_SUBSCRIPTION_NOT_FOUND_DESC = "Info by subscription with id = %s not found.";
     private static final String RC_SUBSCRIPTION_CLIENT_NOT_VALID = "Subscription client not valid.";
     private static final String RC_INVALID_PARAMETERS_DESC = "Request has invalid parameters.";
     private static final String RC_CLIENT_ALREADY_HAS_SUBSCRIPTION = "Client already has active subscription";
+    private static final String RC_PERIOD_VALIDITY_INCORRECT = "Period of validity is incorrect";
 
     private static final int CLIENT_ID_TYPE_CONTRACTID = 0;
     private static final int CLIENT_ID_TYPE_SAN = 1;
     private static final int CLIENT_ID_TYPE_MOBILE = 2;
+
+    private static final int RESULT_OK = 0;
+    private static final int RESULT_NOT_FOUND_REGULAR_PAYMENT = 1;
+    private static final int RESULT_NOT_FOUND_CLIENT_PAYMENT = 2;
+
+    private static final String RESULT_OK_DESC = "OK";
+    private static final String RESULT_NOT_FOUND_REGULAR_PAYMENT_DESC = "RegularPaymentID not found";
+    private static final String RESULT_NOT_FOUND_CLIENT_PAYMENT_DESC = "Client payment not found";
 
     @Resource
     private WebServiceContext context;
@@ -90,7 +103,9 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             @WebParam(name = "accountRegion") int accountRegion,
             @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
             @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
-            @WebParam(name = "subscriptionPeriodOfValidity") int period) {
+            @WebParam(name = "subscriptionPeriodOfValidity") int period,
+            @WebParam(name = "validityDate") Date validityDate,
+            @WebParam(name = "mobilePhone") String mobilePhone) {
         Session session = null;
         Transaction tr = null;
         RequestResult requestResult = new RequestResult();
@@ -105,7 +120,13 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
                         clientIDType == CLIENT_ID_TYPE_SAN ? "san" : "mobile phone number", clientID));
                 return requestResult;
             }
-            if (!(lowerLimitAmount > 0 && paymentAmount > 0 && period >= 1 && period <= 12)) {
+            if (period > 0 && validityDate != null) {
+                requestResult.setErrorCode(RC_BAD_REQUEST);
+                requestResult.setErrorDesc(RC_PERIOD_VALIDITY_INCORRECT);
+                return requestResult;
+            }
+            //if (!(lowerLimitAmount > 0 && paymentAmount > 0 && period >= 1 && period <= 12)) {
+            if (!(lowerLimitAmount > 0 && paymentAmount > 0)) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
                 requestResult.setErrorDesc(RC_INVALID_PARAMETERS_DESC);
                 return requestResult;
@@ -115,14 +136,16 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
                 requestResult.setErrorDesc(RC_CLIENT_ALREADY_HAS_SUBSCRIPTION);
                 return requestResult;
             }
+
             HTTPData data = new HTTPData();
             HTTPDataHandler handler = new HTTPDataHandler(data);
             Date date = new Date(System.currentTimeMillis());
             logRequest(handler);
             handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), date, handler.getData().getSsoId(),
                     c.getIdOfClient(), handler.getData().getOperationType());
+
             MfrRequest mfrRequest = rpService
-                    .createRequestForSubscriptionReg(contractId, paymentAmount, lowerLimitAmount, period);
+                    .createRequestForSubscriptionReg(contractId, paymentAmount, lowerLimitAmount, period, validityDate, mobilePhone);
             Map<String, String> params = rpService.getParamsForRegRequest(mfrRequest);
             requestResult.setParametersList(new ParametersList());
             requestResult.getParametersList().setList(new ArrayList<ParametersList.Parameter>());
@@ -148,7 +171,8 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
     @WebMethod
     public RequestResult regularPaymentEasyCheckCreateSubscription(@WebParam(name = "contractID") Long contractID,
             @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
-            @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency) {
+            @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
+            @WebParam(name = "validityDate") Date validityDate, @WebParam(name = "mobilePhone") String mobilePhone) {
         Session session = null;
         Transaction tr = null;
         RequestResult requestResult = new RequestResult();
@@ -158,7 +182,8 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             Long contractId = contractID;
             Client c = DAOUtils.findClientByContractId(session, contractId);
             int period = 12;
-            MfrRequest mfrRequest = rpService.createRequestForSubscriptionReg(contractId, paymentAmount, lowerLimitAmount, period);
+            MfrRequest mfrRequest = rpService.createRequestForSubscriptionReg(contractId, paymentAmount, lowerLimitAmount,
+                    period, validityDate, mobilePhone);
             Map<String, String> params = rpService.getParamsForRegRequest(mfrRequest);
             requestResult.setParametersList(new ParametersList());
             requestResult.getParametersList().setList(new ArrayList<ParametersList.Parameter>());
@@ -272,7 +297,8 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
             @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
             @WebParam(name = "subscriptionPeriodOfValidity") int period,
-            @WebParam(name = "contractId") Long contractId) {
+            @WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "validityDate") Date validityDate) {
         RequestResult requestResult = new RequestResult();
         try {
             BankSubscription bs = rpService.findBankSubscription(regularPaymentSubscriptionID);
@@ -284,13 +310,18 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             if (contractId != null && !checkSubscriptionContractId(bs, contractId, requestResult)) {
                 return requestResult;
             }
-
-            if (!(lowerLimitAmount > 0 && paymentAmount > 0 && period >= 1 && period <= 12)) {
+            if (period > 0 && validityDate != null) {
+                requestResult.setErrorCode(RC_BAD_REQUEST);
+                requestResult.setErrorDesc(RC_PERIOD_VALIDITY_INCORRECT);
+                return requestResult;
+            }
+            //if (!(lowerLimitAmount > 0 && paymentAmount > 0 && period >= 1 && period <= 12)) {
+            if (!(lowerLimitAmount > 0 && paymentAmount > 0)) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
                 requestResult.setErrorDesc(RC_INVALID_PARAMETERS_DESC);
                 return requestResult;
             }
-            rpService.updateBankSubscription(regularPaymentSubscriptionID, paymentAmount, lowerLimitAmount, period);
+            rpService.updateBankSubscription(regularPaymentSubscriptionID, paymentAmount, lowerLimitAmount, validityDate);
             requestResult.setErrorCode(0);
         } catch (Exception ex) {
             logger.error(ex.getMessage());
@@ -520,5 +551,112 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             paymentAmountList.getList().add(Long.valueOf(value));
         }
         return result;
+    }
+
+    @Override
+    public ResultStatusList regularPaymentResults(
+            @WebParam(name = "statusList") StatusList statusList) {
+        Session session = null;
+        Transaction transaction = null;
+        ResultStatusList result = new ResultStatusList();
+        List<StatusInfo> resultList = new ArrayList<>();
+        try {
+            session = runtimeContext.createPersistenceSession();
+            transaction = session.beginTransaction();
+            List<StatusInfo> list = statusList.getStatusList();
+            for (StatusInfo info : list) {
+
+                RegularPayment regularPayment = (RegularPayment)session.load(RegularPayment.class, info.getIdOfRegularPayment());
+                if (regularPayment == null) {
+                    StatusInfo resultInfo = new StatusInfo(info.getIdOfRegularPayment(), RESULT_NOT_FOUND_REGULAR_PAYMENT, RESULT_NOT_FOUND_REGULAR_PAYMENT_DESC);
+                    resultList.add(resultInfo);
+                    continue;
+                }
+                regularPayment.setStatusFields(info.getErrorCode(), info.getErrorDesc());
+                RegularPaymentStatus regularPaymentStatus = new RegularPaymentStatus(regularPayment, info.getErrorCode(), info.getErrorDesc(), info.getDate());
+                session.save(regularPaymentStatus);
+                StatusInfo resultInfo;
+                if (info.getErrorCode() == 0) {
+                    resultInfo = findAndModifyClientPayment(session, regularPayment.getBankSubscription(), regularPayment);
+                } else {
+                    resultInfo = new StatusInfo(info.getIdOfRegularPayment(), RESULT_OK, RESULT_OK_DESC);
+                }
+                session.update(regularPayment);
+                resultList.add(resultInfo);
+            }
+            transaction.commit();
+            transaction = null;
+
+            result.setErrorCode(RESULT_OK);
+            result.setErrorDesc(RESULT_OK_DESC);
+            result.setStatusList(resultList);
+        } catch (Exception e) {
+            result.setErrorCode(RC_INTERNAL_SERVER_ERROR);
+            result.setErrorDesc(RC_INTERNAL_SERVER_ERROR_DESC);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    private StatusInfo findAndModifyClientPayment(Session session, BankSubscription bankSubscription, RegularPayment regularPayment) {
+        StatusInfo resultInfo = new StatusInfo();
+        resultInfo.setIdOfRegularPayment(regularPayment.getIdOfPayment());
+        ClientPayment clientPayment = findPaymentBySumForToday(session, bankSubscription.getClient(), bankSubscription.getPaymentAmount());
+        if (clientPayment != null) {
+            Query query = session.createQuery("update ClientPayment set paymentMethod = :method where idOfClientPayment = :id");
+            query.setParameter("id", clientPayment.getIdOfClientPayment());
+            query.setParameter("method", ClientPayment.AUTO_PAYMENT_METHOD);
+            query.executeUpdate();
+            regularPayment.setClientPayment(clientPayment);
+            regularPayment.setSuccess(true);
+            resultInfo.setErrorCode(RESULT_OK);
+            resultInfo.setErrorDesc(RESULT_OK_DESC);
+        } else {
+            resultInfo.setErrorCode(RESULT_NOT_FOUND_CLIENT_PAYMENT);
+            resultInfo.setErrorDesc(RESULT_NOT_FOUND_CLIENT_PAYMENT_DESC);
+        }
+        return resultInfo;
+    }
+
+    private ClientPayment findPaymentBySumForToday(Session session, Client client, long sum) {
+        Query query = session.createQuery("select cp from ClientPayment cp "
+                + "where cp.transaction.client = :client and cp.createTime > :time and cp.paySum = :sum order by cp.createTime desc");
+        query.setMaxResults(1);
+        query.setParameter("client", client);
+        query.setParameter("time", CalendarUtils.startOfDay(new Date()));
+        query.setParameter("sum", sum);
+        List<ClientPayment> list = query.list();
+        if (list.size() > 0) return list.get(0);
+        return null;
+            return result;
+
+        } else {
+            result.setErrorCode(0);
+        }
+        return result;
+    }
+
+    private void findAndModifyClientPayment(Session session, BankSubscription bankSubscription) {
+        ClientPayment clientPayment = findPaymentBySumForToday(session, bankSubscription.getClient(), bankSubscription.getPaymentAmount());
+        if (clientPayment != null) {
+            Query query = session.createQuery("update ClientPayment set paymentMethod = :method where idOfClientPayment = :id");
+            query.setParameter("id", clientPayment.getIdOfClientPayment());
+            query.setParameter("method", ClientPayment.AUTO_PAYMENT_METHOD);
+            query.executeUpdate();
+        }
+    }
+
+    private ClientPayment findPaymentBySumForToday(Session session, Client client, long sum) {
+        Query query = session.createQuery("select cp from ClientPayment cp "
+                + "where cp.transaction.client = :client and cp.createTime > :time and cp.paySum = :sum order by cp.createTime desc");
+        query.setMaxResults(1);
+        query.setParameter("client", client);
+        query.setParameter("time", CalendarUtils.startOfDay(new Date()));
+        query.setParameter("sum", sum);
+        List<ClientPayment> list = query.list();
+        if (list.size() > 0) return list.get(0);
+        return null;
     }
 }

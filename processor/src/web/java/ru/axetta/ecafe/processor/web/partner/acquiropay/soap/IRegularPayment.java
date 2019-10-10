@@ -23,12 +23,15 @@ public interface IRegularPayment {
             @WebParam(name = "accountRegion") int accountRegion,
             @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
             @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
-            @WebParam(name = "subscriptionPeriodOfValidity") int period);
+            @WebParam(name = "subscriptionPeriodOfValidity") int period,
+            @WebParam(name = "validityDate") Date validityDate,
+            @WebParam(name = "mobilePhone") String mobilePhone);
 
     @WebMethod
     RequestResult regularPaymentEasyCheckCreateSubscription(@WebParam(name = "contractID") Long contractID,
             @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
-            @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency);
+            @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
+            @WebParam(name = "validityDate") Date validityDate, @WebParam(name = "mobilePhone") String mobilePhone);
 
     @WebMethod
     RequestResult regularPaymentReadSubscriptionList(@WebParam(name = "clientID") String clientID,
@@ -64,11 +67,15 @@ public interface IRegularPayment {
             @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
             @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
             @WebParam(name = "subscriptionPeriodOfValidity") int period,
-            @WebParam(name = "contractId") Long contractId);
+            @WebParam(name = "contractId") Long contractId, @WebParam(name = "validityDate") Date validityDate);
 
     @WebMethod
     RequestResult regularPaymentEasyCheckEditSubscription(
             @WebParam(name = "regularPaymentSubscriptionID") Long regularPaymentSubscriptionID,
             @WebParam(name = "contractId") Long contractId, @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
             @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency);
+
+    @WebMethod
+    ResultStatusList regularPaymentResults(
+            @WebParam(name = "statusList") StatusList statusList);
 }

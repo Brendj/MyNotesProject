@@ -43,6 +43,7 @@ public class BankSubscription {
     private Set<MfrRequest> mfrRequests = new HashSet<MfrRequest>();
     private Set<RegularPayment> regularPayments = new HashSet<RegularPayment>();
     private Boolean notificationSent;
+    private String mobile;
 
     public Long getIdOfSubscription() {
         return idOfSubscription;
@@ -251,5 +252,13 @@ public class BankSubscription {
 
     public void setNotificationSent(Boolean notificationSent) {
         this.notificationSent = notificationSent;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 }
