@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.RegularPaymentStatus" table="cf_regularpayment_status">
+    <class name="ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPaymentStatus" table="cf_regularpayment_status">
         <id name="idOfRegularPaymentStatus" column="idofregularpaymentstatus" type="long">
             <generator class="identity"/>
         </id>

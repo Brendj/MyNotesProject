@@ -9,10 +9,10 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 import ru.axetta.ecafe.processor.core.persistence.Option;
-import ru.axetta.ecafe.processor.core.persistence.RegularPaymentStatus;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
+import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPaymentStatus;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
@@ -618,34 +618,6 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             resultInfo.setErrorDesc(RESULT_NOT_FOUND_CLIENT_PAYMENT_DESC);
         }
         return resultInfo;
-    }
-
-    private ClientPayment findPaymentBySumForToday(Session session, Client client, long sum) {
-        Query query = session.createQuery("select cp from ClientPayment cp "
-                + "where cp.transaction.client = :client and cp.createTime > :time and cp.paySum = :sum order by cp.createTime desc");
-        query.setMaxResults(1);
-        query.setParameter("client", client);
-        query.setParameter("time", CalendarUtils.startOfDay(new Date()));
-        query.setParameter("sum", sum);
-        List<ClientPayment> list = query.list();
-        if (list.size() > 0) return list.get(0);
-        return null;
-            return result;
-
-        } else {
-            result.setErrorCode(0);
-        }
-        return result;
-    }
-
-    private void findAndModifyClientPayment(Session session, BankSubscription bankSubscription) {
-        ClientPayment clientPayment = findPaymentBySumForToday(session, bankSubscription.getClient(), bankSubscription.getPaymentAmount());
-        if (clientPayment != null) {
-            Query query = session.createQuery("update ClientPayment set paymentMethod = :method where idOfClientPayment = :id");
-            query.setParameter("id", clientPayment.getIdOfClientPayment());
-            query.setParameter("method", ClientPayment.AUTO_PAYMENT_METHOD);
-            query.executeUpdate();
-        }
     }
 
     private ClientPayment findPaymentBySumForToday(Session session, Client client, long sum) {

@@ -2,9 +2,7 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence;
-
-import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
+package ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription;
 
 import java.util.Date;
 
