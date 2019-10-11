@@ -2171,13 +2171,15 @@ public class ClientManager {
         Long applicationForFoodVersion = null;
 
         for (ApplicationForFood item : list) {
-            item.setArchived(true);
-            if (null == applicationForFoodVersion) {
-                applicationForFoodVersion = DAOUtils.nextVersionByApplicationForFood(session);
+            if (!item.getArchived()) {
+                item.setArchived(true);
+                if (null == applicationForFoodVersion) {
+                    applicationForFoodVersion = DAOUtils.nextVersionByApplicationForFood(session);
+                }
+                item.setVersion(applicationForFoodVersion);
+                item.setLastUpdate(new Date());
+                session.update(item);
             }
-            item.setVersion(applicationForFoodVersion);
-            item.setLastUpdate(new Date());
-            session.update(item);
         }
     }
     public static boolean atLeastOneDiscountEligibleToDelete (Client client) {
