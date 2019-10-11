@@ -81,7 +81,6 @@ public class Org implements Serializable {
     private Set<DiaryClass> diaryClasses = new HashSet<DiaryClass>();
     private Set<DiaryValue> diaryValues = new HashSet<DiaryValue>();
     private Set<OrgSetting> orgSettings = new HashSet<OrgSetting>();
-    private Set<RequestsEzd> EZD = new HashSet<RequestsEzd>();
     private String OGRN;
     private String INN;
     private Set<CategoryOrg> categoriesInternal = new HashSet<CategoryOrg>();
@@ -1195,13 +1194,5 @@ public class Org implements Serializable {
 
     public void setParticipantOP(Boolean participantOP) {
         this.participantOP = participantOP;
-    }
-
-    public Set<RequestsEzd> getEZD() {
-        return EZD;
-    }
-
-    public void setEZD(Set<RequestsEzd> EZD) {
-        this.EZD = EZD;
     }
 }

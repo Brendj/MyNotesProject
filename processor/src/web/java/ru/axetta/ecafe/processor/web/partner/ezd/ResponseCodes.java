@@ -10,7 +10,8 @@ import java.util.Map;
 public enum ResponseCodes {
     RC_OK(0L, "все хорошо"),
     RC_INTERNAL_ERROR(110L, "организация не найдена"),
-    RC_BAD_ARGUMENTS_ERROR(100L, "ошибка сервера/переданы некорректные параметры");
+    RC_BAD_ARGUMENTS_ERROR(100L, "ошибка сервера/переданы некорректные параметры"),
+    RC_WRONG_DATA(210L, "не верная дата");
 
 
     private final Long code;

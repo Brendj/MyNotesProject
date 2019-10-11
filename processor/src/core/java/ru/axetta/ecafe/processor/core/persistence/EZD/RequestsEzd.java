@@ -6,21 +6,22 @@ package ru.axetta.ecafe.processor.core.persistence.EZD;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
+import java.util.Date;
 import java.util.HashSet;
 import java.util.Set;
 
 public class RequestsEzd {
 
     private Long id;
-    private Set<Org> Orgs = new HashSet<Org>();
+    private Long idOfOrg;
     private String groupname;
-    private Long dateappointment;
+    private Date dateappointment;
     private Long idofcomplex;
     private String complexname;
     private Integer complexcount;
     private String username;
-    private Long createddate;
-    private Long lastupdate;
+    private Date createddate;
+    private Date lastupdate;
     private Integer versionrecord;
 
     public Long getId() {
@@ -31,14 +32,6 @@ public class RequestsEzd {
         this.id = id;
     }
 
-    public Set<Org> getOrgs() {
-        return Orgs;
-    }
-
-    public void setOrgs(Set<Org> orgs) {
-        Orgs = orgs;
-    }
-
     public String getGroupname() {
         return groupname;
     }
@@ -47,11 +40,11 @@ public class RequestsEzd {
         this.groupname = groupname;
     }
 
-    public Long getDateappointment() {
+    public Date getDateappointment() {
         return dateappointment;
     }
 
-    public void setDateappointment(Long dateappointment) {
+    public void setDateappointment(Date dateappointment) {
         this.dateappointment = dateappointment;
     }
 
@@ -87,19 +80,19 @@ public class RequestsEzd {
         this.username = username;
     }
 
-    public Long getCreateddate() {
+    public Date getCreateddate() {
         return createddate;
     }
 
-    public void setCreateddate(Long createddate) {
+    public void setCreateddate(Date createddate) {
         this.createddate = createddate;
     }
 
-    public Long getLastupdate() {
+    public Date getLastupdate() {
         return lastupdate;
     }
 
-    public void setLastupdate(Long lastupdate) {
+    public void setLastupdate(Date lastupdate) {
         this.lastupdate = lastupdate;
     }
 
@@ -127,5 +120,13 @@ public class RequestsEzd {
     public int hashCode() {
 
         return id.hashCode();
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 }
