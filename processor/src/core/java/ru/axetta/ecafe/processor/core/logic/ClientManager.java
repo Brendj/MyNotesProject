@@ -2180,4 +2180,13 @@ public class ClientManager {
             session.update(item);
         }
     }
+    public static boolean atLeastOneDiscountEligibleToDelete (Client client) {
+        Set<CategoryDiscount> discounts = client.getCategories();
+        for (CategoryDiscount discount : discounts) {
+            if (discount.getEligibleToDelete()) {
+                return true;
+            }
+        }
+        return false;
+    }
 }
