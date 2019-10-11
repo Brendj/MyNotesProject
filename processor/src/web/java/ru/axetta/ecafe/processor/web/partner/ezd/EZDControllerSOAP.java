@@ -138,13 +138,12 @@ public class EZDControllerSOAP extends HttpServlet {
                             boolean goodProd = false;
                             boolean goodSpec = false;
                             for (ProductionCalendar productionCalendar : productionCalendars) {
-                                if (productionCalendar.getDay().equals(startDate)) {
+                                if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(startDate)) {
                                     goodProd = true;
                                     break;
                                 }
                             }
                             if (!goodProd) {
-                                ///ПЕРЕДЕЛАТЬ ДЛЯ УСКОРЕНИЯ Т.К. ВЬЮХА БУДЕТ СОРТИРОВАНА!!!!!
                                 for (RequestsEzdSpecialDateView requestsEzdSpecialDateView : requestsEzdSpecialDateViews) {
                                     if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate())
                                             .equals(startDate) && requestsEzdSpecialDateView.getIdoforg().equals(idOrg)
@@ -155,7 +154,7 @@ public class EZDControllerSOAP extends HttpServlet {
                                     }
                                 }
                             }
-                            if (!goodSpec) {
+                            if (!goodSpec && !goodProd) {
                                 if (countBadday != 0) {
                                     RequestsEzdSpecialDateView requestsEzdSpecialDateView = new RequestsEzdSpecialDateView();
                                     requestsEzdSpecialDateView.setIdoforg(idOrg);

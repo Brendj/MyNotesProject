@@ -208,13 +208,12 @@ public class EzdController {
                             goodProd = false;
                             goodSpec = false;
                             for (ProductionCalendar productionCalendar : productionCalendars) {
-                                if (productionCalendar.getDay().equals(curDateDates)) {
+                                if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(curDateDates)) {
                                     goodProd = true;
                                     break;
                                 }
                             }
                             if (!goodProd) {
-                                ///ПЕРЕДЕЛАТЬ ДЛЯ УСКОРЕНИЯ Т.К. ВЬЮХА БУДЕТ СОРТИРОВАНА!!!!!
                                 for (Integer i = currentCountSpecDate; i < requestsEzdSpecialDateViews.size(); i++) {
                                     if (CalendarUtils.startOfDay(requestsEzdSpecialDateViews.get(i).getSpecDate())
                                             .equals(curDateDates) && requestsEzdSpecialDateViews.get(i).getIdoforg()
@@ -227,7 +226,7 @@ public class EzdController {
                                     currentCountSpecDate = requestsEzdSpecialDateViews.size();
                                 }
                             }
-                            if (!goodSpec) {
+                            if (!goodSpec && !goodProd) {
                                 if (countwait == null || countwait == 0) {
                                     datesForThis.add(curDateDates);
                                     countGoodday++;
@@ -396,13 +395,12 @@ public class EzdController {
                     boolean goodProd = false;
                     boolean goodSpec = false;
                     for (ProductionCalendar productionCalendar : productionCalendars) {
-                        if (productionCalendar.getDay().equals(startDate)) {
+                        if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(startDate)) {
                             goodProd = true;
                             break;
                         }
                     }
                     if (!goodProd) {
-                        ///ПЕРЕДЕЛАТЬ ДЛЯ УСКОРЕНИЯ Т.К. ВЬЮХА БУДЕТ СОРТИРОВАНА!!!!!
                         for (RequestsEzdSpecialDateView requestsEzdSpecialDateView : requestsEzdSpecialDateViews) {
                             if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate())
                                     .equals(startDate) && requestsEzdSpecialDateView.getIdoforg().equals(org.getIdOfOrg())
@@ -413,7 +411,7 @@ public class EzdController {
                             }
                         }
                     }
-                    if (!goodSpec) {
+                    if (!goodSpec && !goodProd) {
                         if (countBadday != 0) {
                             RequestsEzdSpecialDateView requestsEzdSpecialDateView = new RequestsEzdSpecialDateView();
                             requestsEzdSpecialDateView.setSpecDate(startDate);
