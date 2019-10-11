@@ -30,7 +30,7 @@
         </property>
 
         <set name="concreteTime" inverse="true" cascade="all" lazy="false">
-            <key column="idOfOrgSetting"/>
+            <key column="idOfSyncSetting"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ConcreteTime"/>
         </set>
     </class>

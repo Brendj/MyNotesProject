@@ -131,7 +131,7 @@ public class OrgSyncSettingReport extends BasicReportForListOrgsJob {
                 }
             }
             syncSettingCriteria.add(Restrictions.in("contentType", validContentType));
-            syncSettingCriteria.add(Restrictions.in("orgs.idOfOrg", idOfOrgList));
+            syncSettingCriteria.add(Restrictions.in("org.idOfOrg", idOfOrgList));
             List<SyncSettings> settings = syncSettingCriteria.list();
 
             for(Org org : orgs){

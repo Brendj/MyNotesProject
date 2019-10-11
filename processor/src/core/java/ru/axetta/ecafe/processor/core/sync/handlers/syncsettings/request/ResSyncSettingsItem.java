@@ -18,7 +18,9 @@ public class ResSyncSettingsItem implements AbstractToElement {
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("ReSS");
         element.setAttribute("ContentType", contentTypeInt.toString());
-        element.setAttribute("V", version.toString());
+        if(version != null) {
+            element.setAttribute("V", version.toString());
+        }
         element.setAttribute("Res", result.getCode().toString());
         element.setAttribute("Error", result.toString());
 

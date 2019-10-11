@@ -77,9 +77,13 @@ public class SyncSettingsSectionItem implements AbstractToElement {
 
         element.setAttribute("ContentType", contentType.toString());
         element.setAttribute("ConcreteTime", StringUtils.join(concreteTime, ";"));
-        element.setAttribute("EverySeconds", everySeconds.toString());
-        element.setAttribute("LimitStartHour", limitStartHour.toString());
-        element.setAttribute("LimitEndHour", limitEndHour.toString());
+        if(everySeconds != null) {
+            element.setAttribute("EverySeconds", everySeconds.toString());
+        }
+        if(limitStartHour != null && limitEndHour != null) {
+            element.setAttribute("LimitStartHour", limitStartHour.toString());
+            element.setAttribute("LimitEndHour", limitEndHour.toString());
+        }
         element.setAttribute("Monday", setBooleanAsBit(monday));
         element.setAttribute("Tuesday", setBooleanAsBit(tuesday));
         element.setAttribute("Wednesday", setBooleanAsBit(wednesday));

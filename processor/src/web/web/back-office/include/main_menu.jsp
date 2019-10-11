@@ -972,9 +972,9 @@
         <%--@elvariable id="orgSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSettingsReportPage"--%>
         <rich:panelMenuItem id="orgSettingsReport" binding="#{orgSettingsReportPage.mainMenuComponent}"
                             label="Настройки ОО" action="#{orgSettingsReportPage.show}" reRender="workspaceForm" />
-        <%--@elvariable id="orgSyncSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncSettingReportPage"--%>
-        <rich:panelMenuItem id="orgSettingsReport" binding="#{orgSyncSettingsReportPage.mainMenuComponent}"
-                            label="Расписание синхронизации" action="#{orgSyncSettingsReportPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="orgSyncSettingReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncSettingReportPage"--%>
+        <rich:panelMenuItem id="orgSyncSettingsReport" binding="#{orgSyncSettingReportPage.mainMenuComponent}"
+                            label="Расписание синхронизации" action="#{orgSyncSettingReportPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 

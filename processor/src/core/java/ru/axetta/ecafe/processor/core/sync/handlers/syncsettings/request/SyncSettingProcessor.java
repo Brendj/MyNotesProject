@@ -47,7 +47,7 @@ public class SyncSettingProcessor extends AbstractProcessor<SyncSettingsSection>
                 ResSyncSettingsItem result = null;
                 if(currentSetting == null) {
                     result = manager.saveFromSync(session, item, idOfOrg, syncData, nextVersion);
-                } else if(item.getVersion() >= currentSetting.getVersion()){
+                } else if(item.getVersion() != null && item.getVersion() >= currentSetting.getVersion()){
                     result = manager.changeFromSync(session, currentSetting, item, syncData, nextVersion);
                 } else {
                     result = new ResSyncSettingsItem();

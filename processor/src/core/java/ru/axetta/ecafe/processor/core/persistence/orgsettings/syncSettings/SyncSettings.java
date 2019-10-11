@@ -17,15 +17,15 @@ public class SyncSettings {
     private Integer everySecond;
     private Integer limitStartHour;
     private Integer limitEndHour;
-    private Boolean monday;
-    private Boolean tuesday;
-    private Boolean wednesday;
-    private Boolean thursday;
-    private Boolean friday;
-    private Boolean saturday;
-    private Boolean sunday;
+    private Boolean monday = false;
+    private Boolean tuesday = false;
+    private Boolean wednesday = false;
+    private Boolean thursday = false;
+    private Boolean friday = false;
+    private Boolean saturday = false;
+    private Boolean sunday = false;
     private Long version;
-    private Boolean deleteState;
+    private Boolean deleteState = false;
     private Set<ConcreteTime> concreteTime = new HashSet<>();
     private Date createdDate;
     private Date lastUpdate;
@@ -83,7 +83,7 @@ public class SyncSettings {
     }
 
     public void setMonday(Boolean monday) {
-        this.monday = monday;
+        this.monday = monday == null ? false : monday;
     }
 
     public Boolean getTuesday() {
@@ -91,7 +91,7 @@ public class SyncSettings {
     }
 
     public void setTuesday(Boolean tuesday) {
-        this.tuesday = tuesday;
+        this.tuesday = tuesday == null ? false : tuesday;
     }
 
     public Boolean getWednesday() {
@@ -99,7 +99,7 @@ public class SyncSettings {
     }
 
     public void setWednesday(Boolean wednesday) {
-        this.wednesday = wednesday;
+        this.wednesday = wednesday == null ? false : wednesday;
     }
 
     public Boolean getThursday() {
@@ -107,7 +107,7 @@ public class SyncSettings {
     }
 
     public void setThursday(Boolean thursday) {
-        this.thursday = thursday;
+        this.thursday = thursday == null ? false : thursday;
     }
 
     public Boolean getFriday() {
@@ -115,7 +115,7 @@ public class SyncSettings {
     }
 
     public void setFriday(Boolean friday) {
-        this.friday = friday;
+        this.friday = friday == null ? false : friday;
     }
 
     public Boolean getSaturday() {
@@ -123,7 +123,7 @@ public class SyncSettings {
     }
 
     public void setSaturday(Boolean saturday) {
-        this.saturday = saturday;
+        this.saturday = saturday == null ? false : saturday;
     }
 
     public Boolean getSunday() {
@@ -131,7 +131,7 @@ public class SyncSettings {
     }
 
     public void setSunday(Boolean sunday) {
-        this.sunday = sunday;
+        this.sunday = sunday == null ? false : sunday;
     }
 
     public Long getVersion() {
@@ -147,7 +147,7 @@ public class SyncSettings {
     }
 
     public void setDeleteState(Boolean deleteState) {
-        this.deleteState = deleteState;
+        this.deleteState = deleteState == null ? false : deleteState;
     }
 
     public Set<ConcreteTime> getConcreteTime() {

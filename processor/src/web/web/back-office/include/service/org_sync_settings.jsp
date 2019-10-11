@@ -9,18 +9,8 @@
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 
-<style>
-    .mainBuilding {
-        font-weight: bold;
-    }
-
-    .notServiced {
-        background-color: #CECECE;
-    }
-</style>
-
-<%--@elvariable id="orgSyncSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncSettingReportPage"--%>
-<h:panelGrid id="orgSettingsReportPanelGrid" binding="#{orgSyncSettingsReportPage.pageComponent}"
+<%--@elvariable id="orgSyncSettingReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncSettingReportPage"--%>
+<h:panelGrid id="orgSyncSettingsReportPanelGrid" binding="#{orgSyncSettingReportPage.pageComponent}"
              styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Организации" />
@@ -29,29 +19,29 @@
                                reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="#{orgSyncSettingsReportPage.getStringIdOfOrgList}"
+                <f:setPropertyActionListener value="#{orgSyncSettingReportPage.getStringIdOfOrgList}"
                                              target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
             </a4j:commandButton>
-            <h:outputText styleClass="output-text" escape="true" value=" {#{orgSyncSettingsReportPage.filter}}" />
+            <h:outputText styleClass="output-text" escape="true" value=" {#{orgSyncSettingReportPage.filter}}" />
         </h:panelGroup>
         <h:outputText styleClass="output-text" escape="true" value="Округ" />
         <h:selectOneMenu id="orgDistricts"
-                         value="#{orgSyncSettingsReportPage.selectedDistricts}"
+                         value="#{orgSyncSettingReportPage.selectedDistricts}"
                          styleClass="input-text" style="width: 250px;">
-            <f:selectItems value="#{orgSyncSettingsReportPage.listOfOrgDistricts}" />
+            <f:selectItems value="#{orgSyncSettingReportPage.listOfOrgDistricts}" />
             <a4j:support event="onchange" />
         </h:selectOneMenu>
         <h:outputText styleClass="output-text" escape="true" value="Построить по всем дружественным ОО" />
-        <h:selectBooleanCheckbox value="#{orgSyncSettingsReportPage.allFriendlyOrgs}" styleClass="checkboxes">
-            <a4j:support event="onchange" reRender="orgSettingsTable" />
+        <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.allFriendlyOrgs}" styleClass="checkboxes">
+            <a4j:support event="onchange" reRender="orgSyncSettingsTable" />
         </h:selectBooleanCheckbox>
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <a4j:commandButton value="Генерировать отчет" action="#{orgSyncSettingsReportPage.buildHTML}"
-                           reRender="orgSettingsTable" styleClass="command-button"
+        <a4j:commandButton value="Генерировать отчет" action="#{orgSyncSettingReportPage.buildHTML}"
+                           reRender="orgSyncSettingsTable" styleClass="command-button"
                            status="reportGenerateStatus" id="buildHTMLButton" />
 
-        <h:commandButton value="Выгрузить в Excel" action="#{orgSyncSettingsReportPage.buildXLS}"
+        <h:commandButton value="Выгрузить в Excel" action="#{orgSyncSettingReportPage.buildXLS}"
                          styleClass="command-button"  id="buildXLSButton" disabled="false">
             <a4j:support status="reportGenerateStatus" id="buildXLSButtonSupport"/>
         </h:commandButton>
@@ -61,7 +51,7 @@
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
         </f:facet>
     </a4j:status>
-    <rich:dataTable id="orgSettingsTable" value="#{orgSyncSettingsReportPage.items}" var="item" rows="25"
+    <rich:dataTable id="orgSyncSettingsTable" value="#{orgSyncSettingReportPage.items}" var="item" rows="25"
                     sortMode="single"
                     rowClasses="center-aligned-column" lang="rus"
                     footerClass="data-table-footer">
@@ -136,7 +126,7 @@
                           styleClass="output-text" />
         </rich:column>
         <f:facet name="footer">
-            <rich:datascroller for="orgSettingsTable" renderIfSinglePage="false"
+            <rich:datascroller for="orgSyncSettingsTable" renderIfSinglePage="false"
                                maxPages="15" fastControls="hide" stepControls="auto"
                                boundaryControls="hide">
                 <a4j:support event="onpagechange" />
@@ -150,8 +140,8 @@
         </f:facet>
     </rich:dataTable>
     <h:panelGrid styleClass="borderless-grid" columns="1">
-        <a4j:commandButton value="Применить изменения" action="#{orgSyncSettingsReportPage.applyChanges}"
-                           reRender="orgSettingsTable" styleClass="command-button"
+        <a4j:commandButton value="Применить изменения" action="#{orgSyncSettingReportPage.applyChanges}"
+                           reRender="orgSyncSettingsTable" styleClass="command-button"
                            status="reportGenerateStatus" id="applyChangesButton" />
     </h:panelGrid>
 

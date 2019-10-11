@@ -125,9 +125,9 @@ public class SyncSettingManager {
 
     private void validateParam(List<String> concreteTime, Integer everySeconds, Integer limitStartHour,
             Integer limitEndHour) {
-        if(concreteTime != null && everySeconds != null) {
+        if(CollectionUtils.isNotEmpty(concreteTime) && everySeconds != null) {
             throw new AmbiguityConcreteTimeAndEverySecondsValues();
-        } else if(everySeconds != null && !everySeconds.equals(0)) {
+        } else if(everySeconds != null && everySeconds.equals(0)) {
             throw new IncorrectEverySecondsException();
         } else if((limitStartHour == null && limitEndHour != null) || (limitStartHour != null && limitEndHour == null)) {
             throw new AmbiguityLimitHourException();

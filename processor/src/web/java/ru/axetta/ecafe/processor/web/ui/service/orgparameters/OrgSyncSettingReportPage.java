@@ -28,7 +28,9 @@ import java.util.*;
 @Scope("session")
 @DependsOn("runtimeContext")
 public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgListSelectPage.CompleteHandlerList {
+
     private static final Logger logger = LoggerFactory.getLogger(OrgSyncSettingReportPage.class);
+
     private Boolean allFriendlyOrgs = true;
     private List<SelectItem> listOfOrgDistricts;
     private String selectedDistricts = "";
@@ -190,5 +192,9 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
 
     public void setItems(List<OrgSyncSettingReportItem> items) {
         this.items = items;
+    }
+
+    public Object applyChanges() {
+        return null;
     }
 }
