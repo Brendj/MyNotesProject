@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.ezd;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
@@ -154,6 +155,7 @@ public class EzdController {
             boolean goodSpec;
             Date curDate;
             String curDatesString;
+            Integer currentCountSpecDate = 0;
             for (RequestsEzdView requestsEzdView : requestsEzdViews) {
                 thisOrgGuid = requestsEzdView.getOrgguid();
                 thisGroupName = requestsEzdView.getGroupname();
@@ -213,14 +215,16 @@ public class EzdController {
                             }
                             if (!goodProd) {
                                 ///ПЕРЕДЕЛАТЬ ДЛЯ УСКОРЕНИЯ Т.К. ВЬЮХА БУДЕТ СОРТИРОВАНА!!!!!
-                                for (RequestsEzdSpecialDateView requestsEzdSpecialDateView : requestsEzdSpecialDateViews) {
-                                    if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate())
-                                            .equals(curDateDates) && requestsEzdSpecialDateView.getIdoforg()
-                                            .equals(thisIdOfOrg) && requestsEzdSpecialDateView.getGroupname()
+                                for (Integer i = currentCountSpecDate; i < requestsEzdSpecialDateViews.size(); i++) {
+                                    if (CalendarUtils.startOfDay(requestsEzdSpecialDateViews.get(i).getSpecDate())
+                                            .equals(curDateDates) && requestsEzdSpecialDateViews.get(i).getIdoforg()
+                                            .equals(thisIdOfOrg) && requestsEzdSpecialDateViews.get(i).getGroupname()
                                             .equals(thisGroupName)) {
                                         goodSpec = true;
+                                        currentCountSpecDate = i;
                                         break;
                                     }
+                                    currentCountSpecDate = requestsEzdSpecialDateViews.size();
                                 }
                             }
                             if (!goodSpec) {
@@ -308,5 +312,160 @@ public class EzdController {
             }
         }
         return Integer.valueOf(builder.toString());
+    }
+
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "requestscomplex")
+    public Result requestscomplex(@QueryParam(value = "GuidOrg") String guidOrg,
+            @QueryParam(value = "GroupName") String groupName, @QueryParam(value = "Date") String dateR,
+            @QueryParam(value = "UserName") String userName, @QueryParam(value = "idOfComplex") Long idOfComplex,
+            @QueryParam(value = "complexName") String complexName, @QueryParam(value = "count") Integer count) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            Date date = new SimpleDateFormat("dd.MM.yyyy").parse(dateR);
+            date = CalendarUtils.startOfDay(date);
+
+            Org org = DAOUtils.findOrgByGuid(persistenceSession, guidOrg);
+
+            if (org == null || org.getState() == 0 || org.getType().equals(OrganizationType.SUPPLIER)) {
+                Result result = new Result();
+                result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
+                return result;
+            }
+            if (DAOUtils.getGroupNamesToOrgsByOrgAndGroupName(persistenceSession, org, groupName) == null) {
+                Result result = new Result();
+                result.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+                return result;
+            }
+
+            logger.info("Старт начала сбора данных по производственному календарю");
+            //Загружаем все данные производственного календаря
+            List<ProductionCalendar> productionCalendars = DAOUtils
+                    .getAllDateFromProdactionCalendarForEZD(persistenceSession);
+            if (productionCalendars == null) {
+                productionCalendars = new ArrayList<>();
+            }
+            logger.info(String.format("Всего записей по производственному календарю - %s",
+                    String.valueOf(productionCalendars.size())));
+
+            for (ProductionCalendar productionCalendar : productionCalendars) {
+                if (productionCalendar.getDay().equals(date)) {
+                    Result result = new Result();
+                    result.setErrorCode(ResponseCodes.RC_WRONG_DATA.getCode().toString());
+                    result.setErrorMessage(ResponseCodes.RC_WRONG_DATA.toString());
+                    return result;
+                }
+            }
+
+            logger.info("Старт начала сбора данных по учебному календарю");
+            //Загружаем все данные учебного календаря
+            List<RequestsEzdSpecialDateView> requestsEzdSpecialDateViews = DAOUtils
+                    .getDateFromsSpecialDatesForEZD(persistenceSession, groupName, org.getIdOfOrg());
+            if (requestsEzdSpecialDateViews == null) {
+                requestsEzdSpecialDateViews = new ArrayList<>();
+            }
+            logger.info(String.format("Всего записей по учебному календарю - %s",
+                    String.valueOf(requestsEzdSpecialDateViews.size())));
+
+
+            //Настройка с АРМ для Org
+            List<Long> idOrgs = new ArrayList<>();
+            idOrgs.add(org.getIdOfOrg());
+            Map<Long, Integer> allIdtoSetiings = OrgSettingDAOUtils
+                    .getOrgSettingItemByOrgAndType(persistenceSession, idOrgs, SETTING_TYPE);
+            if (allIdtoSetiings == null) {
+                allIdtoSetiings = new HashMap<>();
+            }
+
+            Integer countBadday = allIdtoSetiings.get(org.getIdOfOrg());
+            Date startDate = date;
+            //Собираем доп запрещенные даты для орг + группа на основе инфы с АРМ
+            List<RequestsEzdSpecialDateView> dateNotWorksFromARM = new ArrayList<>();
+            if (countBadday != null) {
+                do {
+                    boolean goodProd = false;
+                    boolean goodSpec = false;
+                    for (ProductionCalendar productionCalendar : productionCalendars) {
+                        if (productionCalendar.getDay().equals(startDate)) {
+                            goodProd = true;
+                            break;
+                        }
+                    }
+                    if (!goodProd) {
+                        ///ПЕРЕДЕЛАТЬ ДЛЯ УСКОРЕНИЯ Т.К. ВЬЮХА БУДЕТ СОРТИРОВАНА!!!!!
+                        for (RequestsEzdSpecialDateView requestsEzdSpecialDateView : requestsEzdSpecialDateViews) {
+                            if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate())
+                                    .equals(startDate) && requestsEzdSpecialDateView.getIdoforg().equals(org.getIdOfOrg())
+                                    && requestsEzdSpecialDateView.getGroupname()
+                                    .equals(groupName)) {
+                                goodSpec = true;
+                                break;
+                            }
+                        }
+                    }
+                    if (!goodSpec) {
+                        if (countBadday != 0) {
+                            RequestsEzdSpecialDateView requestsEzdSpecialDateView = new RequestsEzdSpecialDateView();
+                            requestsEzdSpecialDateView.setSpecDate(startDate);
+                            dateNotWorksFromARM.add(requestsEzdSpecialDateView);
+                            countBadday--;
+                        }
+                        startDate = CalendarUtils.addOneDay(startDate);
+                    }
+                } while (countBadday != 0);
+            }
+
+            //Добавляем дополнительные запрещенные даты, полученные от АРМ
+            requestsEzdSpecialDateViews.addAll(dateNotWorksFromARM);
+
+            Integer maxVersion = DAOUtils.getMaxVersionForEZD(persistenceSession);
+
+            maxVersion++;
+            if (!DAOUtils
+                    .findSameRequestFromEZD(persistenceSession, org.getIdOfOrg(), groupName, date,
+                            idOfComplex)) {
+                DAOUtils.updateRequestFromEZD(persistenceSession, org.getIdOfOrg(), groupName,
+                        date, idOfComplex, count, maxVersion);
+            } else {
+                RequestsEzd requestsEzd = new RequestsEzd();
+                requestsEzd.setIdOfOrg(org.getIdOfOrg());
+                requestsEzd.setGroupname(groupName);
+                requestsEzd.setDateappointment(date);
+                requestsEzd.setIdofcomplex(idOfComplex);
+                requestsEzd.setComplexname(complexName);
+                requestsEzd.setComplexcount(count);
+                requestsEzd.setUsername(userName);
+                requestsEzd.setCreateddate(new Date());
+                requestsEzd.setVersionrecord(maxVersion);
+                persistenceSession.save(requestsEzd);
+            }
+            Result result = new Result();
+            result.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_OK.toString());
+
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return result;
+        } catch (Exception e)
+        {
+            Result result = new Result();
+            result.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+            return result;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
     }
 }

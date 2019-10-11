@@ -11,19 +11,15 @@
             <generator class="identity"/>
         </id>
 
-        <set name="Orgs" lazy="true" table="cf_ezd_to_org">
-            <key column="idrequestsezd"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="idoforg"/>
-        </set>
-
+        <property name="idOfOrg" column="idoforg" type="long"/>
         <property name="groupname" column="groupname" type="string" length="32"/>
-        <property name="dateappointment" column="dateappointment" type="long"/>
+        <property name="dateappointment" column="dateappointment" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="idofcomplex" column="idofcomplex" type="long"/>
         <property name="complexname" column="complexname" type="string" length="32"/>
         <property name="complexcount" column="complexcount" type="integer"/>
         <property name="username" column="username" type="string" length="32"/>
-        <property name="createddate" column="createddate" type="long"/>
-        <property name="lastupdate" column="lastupdate" type="long"/>
+        <property name="createddate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="lastupdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="versionrecord" column="versionrecord" type="integer"/>
 
     </class>
