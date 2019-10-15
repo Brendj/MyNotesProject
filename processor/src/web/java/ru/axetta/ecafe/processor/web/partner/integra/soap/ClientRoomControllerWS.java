@@ -2531,6 +2531,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Date endDate = CalendarUtils.addOneDay(startDate);
 
         Criteria menuByDayCriteria = session.createCriteria(Menu.class);
+        menuByDayCriteria.createAlias("menuDetailsInternal", "detal", JoinType.LEFT_OUTER_JOIN);
         Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
         fromCal.setTime(startDate);
         toCal.setTime(endDate);
@@ -2541,7 +2542,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuByDayCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
         menuByDayCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
         menuByDayCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
-        menuByDayCriteria.add(Restrictions.not(Restrictions.like("menuDetailsInternal.groupName", "%сотрудн%")));
+        menuByDayCriteria.add(Restrictions.not(Restrictions.like("detal.groupName", "%сотрудн%")));
 
         return (List<Menu>) menuByDayCriteria.list();
     }
@@ -2581,6 +2582,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         startDate = CalendarUtils.addOneDay(startDate);
         }
         Criteria menuByDayCriteria = session.createCriteria(Menu.class);
+        menuByDayCriteria.createAlias("menuDetailsInternal", "detal", JoinType.LEFT_OUTER_JOIN);
         fromCal.setTime(startDate);
         toCal.setTime(endDate);
         truncateToDayOfMonth(fromCal);
@@ -2590,7 +2592,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuByDayCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
         menuByDayCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
         menuByDayCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
-        menuByDayCriteria.add(Restrictions.not(Restrictions.like("menuDetailsInternal.groupName", "%сотрудн%")));
+        menuByDayCriteria.add(Restrictions.not(Restrictions.like("detal.groupName", "%сотрудн%")));
 
         List menusRemaining = menuByDayCriteria.list();
         menus.addAll(menusRemaining);
@@ -2674,10 +2676,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             DAOService daoService = DAOService.getInstance();
 
             Criteria criteria = session.createCriteria(ComplexInfo.class);
+            criteria.createAlias("menuDetail", "detal", JoinType.LEFT_OUTER_JOIN);
             criteria.add(Restrictions.eq("org", org));
             criteria.add(Restrictions.gt("menuDate", startDate));
             criteria.add(Restrictions.lt("menuDate", endDate));
-            criteria.add(Restrictions.not(Restrictions.like("menuDetail.groupName", "%сотрудн%")));
+            criteria.add(Restrictions.not(Restrictions.like("detal.groupName", "%сотрудн%")));
 
             List<ComplexInfo> complexInfoList = criteria.list();
 
@@ -2805,6 +2808,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             startDate = CalendarUtils.addOneDay(startDate);
         }
         Criteria menuByDayCriteria = session.createCriteria(Menu.class);
+        menuByDayCriteria.createAlias("menuDetailsInternal", "detal", JoinType.LEFT_OUTER_JOIN);
         fromCal.setTime(startDate);
         toCal.setTime(endDate);
         truncateToDayOfMonth(fromCal);
@@ -2814,7 +2818,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuByDayCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
         menuByDayCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
         menuByDayCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
-        menuByDayCriteria.add(Restrictions.not(Restrictions.like("menuDetailsInternal.groupName", "%сотрудн%")));
+        menuByDayCriteria.add(Restrictions.not(Restrictions.like("detal.groupName", "%сотрудн%")));
 
         List menusRemaining = menuByDayCriteria.list();
         menus.addAll(menusRemaining);
@@ -2938,6 +2942,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
 
         Criteria menuCriteria = session.createCriteria(Menu.class);
+        menuCriteria.createAlias("menuDetailsInternal", "detal", JoinType.LEFT_OUTER_JOIN);
         Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
         fromCal.setTime(startDate);
         toCal.setTime(endDate);
@@ -2948,7 +2953,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
         menuCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
         menuCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
-        menuCriteria.add(Restrictions.not(Restrictions.like("menuDetailsInternal.groupName", "%сотрудн%")));
+        menuCriteria.add(Restrictions.not(Restrictions.like("detal.groupName", "%сотрудн%")));
 
         List menus = menuCriteria.list();
         MenuListExt menuListExt = objectFactory.createMenuListExt();
@@ -3016,6 +3021,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private void processMenuList(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
           Date endDate) throws DatatypeConfigurationException {
         Criteria menuCriteria = session.createCriteria(Menu.class);
+        menuCriteria.createAlias("menuDetailsInternal", "detal", JoinType.LEFT_OUTER_JOIN);
         Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
         fromCal.setTime(startDate);
         toCal.setTime(endDate);
@@ -3026,7 +3032,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
         menuCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
         menuCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
-        menuCriteria.add(Restrictions.not(Restrictions.like("menuDetailsInternal.groupName", "%сотрудн%")));
+        menuCriteria.add(Restrictions.not(Restrictions.like("detal.groupName", "%сотрудн%")));
         //menuCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
 
         List menus = menuCriteria.list();
