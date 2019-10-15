@@ -176,7 +176,7 @@
         <servlet-class>ru.axetta.ecafe.processor.web.partner.newispp.LastModifiedOrgsServlet</servlet-class>
     </servlet>
 
-    <servlet>
+    <!--<servlet>
         <servlet-name>PreorderServlet</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
         <init-param>
@@ -192,7 +192,7 @@
             <param-value>ru.axetta.ecafe.processor.web.partner.preorder.PreorderRequestInterceptor</param-value>
         </init-param>
     </servlet>
-    <!--<servlet-mapping>
+    <servlet-mapping>
         <servlet-name>PreorderServlet</servlet-name>
         <url-pattern>/preorder/*</url-pattern>
     </servlet-mapping>-->
@@ -466,6 +466,17 @@
 
         <url-pattern>/fps/api/*</url-pattern>
     </servlet-mapping>
+
+    <filter>
+        <filter-name>CleanupFilter</filter-name>
+        <filter-class>ru.axetta.ecafe.processor.web.partner.ResteasyCleanupFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>CleanupFilter</filter-name>
+        <url-pattern>/fps/api/*</url-pattern>
+        <url-pattern>/assessment/*</url-pattern>
+        <url-pattern>/smartwatch/*</url-pattern>
+    </filter-mapping>
 
     <security-constraint>
         <web-resource-collection>
