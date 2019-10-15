@@ -2514,10 +2514,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         menuList.add(menuItem);
                     }
                 }
-                if (menuList.get(0).getMenuDetails().isEmpty() || menuList.get(0).getMenuDetails().size() < 30) {
+                if (menuList.isEmpty())
+                {
                     processMenuByMaxIdOfMenu(session, startDate, endDate, objectFactory, org, data);
-                } else {
-                    processMenuList(org, data, objectFactory, session, startDate, endDate);
+                }
+                else {
+                    if (menuList.get(0).getMenuDetails().isEmpty() || menuList.get(0).getMenuDetails().size() < 30) {
+                        processMenuByMaxIdOfMenu(session, startDate, endDate, objectFactory, org, data);
+                    } else {
+                        processMenuList(org, data, objectFactory, session, startDate, endDate);
+                    }
                 }
             } else {
                 processMenuList(org, data, objectFactory, session, startDate, endDate);
@@ -2760,10 +2766,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         menuList.add(menuItem);
                     }
                 }
-                if (menuList.get(0).getMenuDetails().isEmpty() || menuList.get(0).getMenuDetails().size() < 30) {
-                    processMenuByMaxIdOfMenuWithProhibitions(client, data, objectFactory, session, startDate, endDate);
-                } else {
-                    processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+                if (menuList.isEmpty())
+                {
+                    processMenuByMaxIdOfMenuWithProhibitions(client, data, objectFactory, session, startDate,
+                            endDate);
+                }
+                else {
+                    if (menuList.get(0).getMenuDetails().isEmpty() || menuList.get(0).getMenuDetails().size() < 30) {
+                        processMenuByMaxIdOfMenuWithProhibitions(client, data, objectFactory, session, startDate,
+                                endDate);
+                    } else {
+                        processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+                    }
                 }
             } else {
                 processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
