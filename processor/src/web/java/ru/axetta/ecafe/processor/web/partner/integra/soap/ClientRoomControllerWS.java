@@ -2541,6 +2541,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuByDayCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
         menuByDayCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
         menuByDayCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
+        menuByDayCriteria.add(Restrictions.not(Restrictions.like("menuDetailsInternal.groupName", "%сотрудн%")));
 
         return (List<Menu>) menuByDayCriteria.list();
     }
@@ -2559,6 +2560,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuMaxIdCriteria.add(Restrictions.lt("m.menuDate", fromCal.getTime()));
         menuMaxIdCriteria.add(Restrictions.like("menuPath", "%уфет%"));
         menuMaxIdCriteria.setProjection(Projections.max("m.idOfMenu"));
+        menuMaxIdCriteria.add(Restrictions.not(Restrictions.like("groupName", "%сотрудн%")));
 
         Long menuMaxId = (Long) menuMaxIdCriteria.uniqueResult();
 
@@ -2588,6 +2590,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuByDayCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
         menuByDayCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
         menuByDayCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
+        menuByDayCriteria.add(Restrictions.not(Restrictions.like("menuDetailsInternal.groupName", "%сотрудн%")));
 
         List menusRemaining = menuByDayCriteria.list();
         menus.addAll(menusRemaining);
@@ -2674,6 +2677,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             criteria.add(Restrictions.eq("org", org));
             criteria.add(Restrictions.gt("menuDate", startDate));
             criteria.add(Restrictions.lt("menuDate", endDate));
+            criteria.add(Restrictions.not(Restrictions.like("menuDetail.groupName", "%сотрудн%")));
 
             List<ComplexInfo> complexInfoList = criteria.list();
 
@@ -2780,6 +2784,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuMaxIdCriteria.add(Restrictions.lt("m.menuDate", fromCal.getTime()));
         menuMaxIdCriteria.add(Restrictions.like("menuPath", "%уфет%"));
         menuMaxIdCriteria.setProjection(Projections.max("m.idOfMenu"));
+        menuMaxIdCriteria.add(Restrictions.not(Restrictions.like("groupName", "%сотрудн%")));
 
         Long menuMaxId = (Long) menuMaxIdCriteria.uniqueResult();
 
@@ -2809,6 +2814,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuByDayCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
         menuByDayCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
         menuByDayCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
+        menuByDayCriteria.add(Restrictions.not(Restrictions.like("menuDetailsInternal.groupName", "%сотрудн%")));
 
         List menusRemaining = menuByDayCriteria.list();
         menus.addAll(menusRemaining);
@@ -2942,6 +2948,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
         menuCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
         menuCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
+        menuCriteria.add(Restrictions.not(Restrictions.like("menuDetailsInternal.groupName", "%сотрудн%")));
 
         List menus = menuCriteria.list();
         MenuListExt menuListExt = objectFactory.createMenuListExt();
@@ -2958,6 +2965,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
             menuDetailCriteria.add(Restrictions.eq("availableNow", 1));
             menuDetailCriteria.add(Restrictions.eq("menu", menu));
+            menuDetailCriteria.add(Restrictions.not(Restrictions.like("groupName", "%сотрудн%")));
             //menuDetailCriteria.add(Restrictions.sqlRestriction("{alias}.menupath !~ '^\\[\\d*\\]'"));
             HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
             HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
@@ -3018,6 +3026,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
         menuCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
         menuCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
+        menuCriteria.add(Restrictions.not(Restrictions.like("menuDetailsInternal.groupName", "%сотрудн%")));
         //menuCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
 
         List menus = menuCriteria.list();
@@ -3035,6 +3044,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
             menuDetailCriteria.add(Restrictions.eq("menu", menu));
             menuDetailCriteria.add(Restrictions.eq("availableNow", 1));
+            menuDetailCriteria.add(Restrictions.not(Restrictions.like("groupName", "%сотрудн%")));
             HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
             HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
             List menuDetails = menuDetailCriteria.list();
