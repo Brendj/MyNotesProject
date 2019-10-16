@@ -12,6 +12,7 @@ public class RequestsEzdSpecialDateView {
     private Date specDate;
     private String groupname;
     private Long idoforg;
+    private Integer isweekend;
 
     public Date getSpecDate() {
         return specDate;
@@ -43,5 +44,13 @@ public class RequestsEzdSpecialDateView {
 
     public void setId(Long id) {
         this.id = id;
+    }
+
+    public Integer getIsweekend() {
+        return isweekend;
+    }
+
+    public void setIsweekend(Integer isweekend) {
+        this.isweekend = isweekend;
     }
 }

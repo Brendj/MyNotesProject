@@ -13,6 +13,7 @@
         <property name="specDate" column="date" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="groupname" column="groupname" type="string" length="32"/>
         <property name="idoforg" column="idoforg" type="long" />
+        <property name="isweekend" column="isweekend" type="integer" />
     </class>
 </hibernate-mapping>
 

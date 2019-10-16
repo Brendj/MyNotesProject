@@ -4477,11 +4477,11 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static List getDateFromsSpecialDatesForEZD(Session persistenceSession, String groupName, Long idofOrg) throws Exception {
+    public static List getDateFromsSpecialDatesForEZD(Session persistenceSession, String groupName, List<Long> idofOrg) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(RequestsEzdSpecialDateView.class);
         criteria.add(Restrictions.gt("specDate", new Date()));
         criteria.add(Restrictions.eq("groupname", groupName));
-        criteria.add(Restrictions.eq("idoforg", idofOrg));
+        criteria.add(Restrictions.in("idoforg", idofOrg));
         return criteria.list();
     }
 
