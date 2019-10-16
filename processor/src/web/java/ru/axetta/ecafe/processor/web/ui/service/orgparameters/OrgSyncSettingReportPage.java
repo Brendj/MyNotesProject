@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service.orgparameters;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSyncSettingReport;
 import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSyncSettingReportItem;
@@ -28,16 +29,17 @@ import java.util.*;
 @Scope("session")
 @DependsOn("runtimeContext")
 public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgListSelectPage.CompleteHandlerList {
-
     private static final Logger logger = LoggerFactory.getLogger(OrgSyncSettingReportPage.class);
 
     private Boolean allFriendlyOrgs = true;
     private List<SelectItem> listOfOrgDistricts;
+    private List<SelectItem> listOfContentType;
     private String selectedDistricts = "";
+    private Integer selectedContentType = OrgSyncSettingReport.ALL_TYPES;
     private List<OrgSyncSettingReportItem> items = new LinkedList<>();
 
     private List<SelectItem> buildListOfOrgDistricts(Session session) {
-        List<String> allDistricts = null;
+        List<String> allDistricts;
         List<SelectItem> selectItemList = new LinkedList<SelectItem>();
         selectItemList.add(new SelectItem("", "Все"));
         try{
@@ -57,6 +59,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             listOfOrgDistricts = buildListOfOrgDistricts(session);
+            listOfContentType = buildListOfContentType();
             items.clear();
         } catch (Exception e){
             logger.error("Exception when prepared the OrgSyncSettingsPage: ", e);
@@ -64,6 +67,20 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         } finally {
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private List<SelectItem> buildListOfContentType() {
+        List<SelectItem> selectItemList = new LinkedList<SelectItem>();
+        selectItemList.add(new SelectItem(OrgSyncSettingReport.ALL_TYPES, "Все"));
+        selectItemList.add(new SelectItem(ContentType.FULL_SYNC.getTypeCode(), ContentType.FULL_SYNC.toString()));
+        selectItemList.add(new SelectItem(ContentType.BALANCES_AND_ENTEREVENTS.getTypeCode(), ContentType.BALANCES_AND_ENTEREVENTS.toString()));
+        selectItemList.add(new SelectItem(ContentType.ORGSETTINGS.getTypeCode(), ContentType.ORGSETTINGS.toString()));
+        selectItemList.add(new SelectItem(ContentType.CLIENTS_DATA.getTypeCode(), ContentType.CLIENTS_DATA.toString()));
+        selectItemList.add(new SelectItem(ContentType.MENU.getTypeCode(), ContentType.MENU.toString()));
+        selectItemList.add(new SelectItem(ContentType.PHOTOS.getTypeCode(), ContentType.PHOTOS.toString()));
+        selectItemList.add(new SelectItem(ContentType.SUPPORT_SERVICE.getTypeCode(), ContentType.SUPPORT_SERVICE.toString()));
+        selectItemList.add(new SelectItem(ContentType.LIBRARY.getTypeCode(), ContentType.LIBRARY.toString()));
+        return selectItemList;
     }
 
     public void buildHTML() {
@@ -79,7 +96,8 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
                 idOfOrgList.add(Long.parseLong(item));
             }
 
-            items = OrgSyncSettingReport.getInstance().getBuilder().buildOrgSettingCollection(idOfOrgList, persistenceSession, selectedDistricts, allFriendlyOrgs);
+            items = OrgSyncSettingReport.getInstance().getBuilder().buildOrgSettingCollection(
+                    idOfOrgList, persistenceSession, selectedDistricts, allFriendlyOrgs, selectedContentType);
             Collections.sort(items);
 
             transaction.commit();
@@ -196,5 +214,53 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
 
     public Object applyChanges() {
         return null;
+    }
+
+    public List<SelectItem> getListOfContentType() {
+        return listOfContentType;
+    }
+
+    public void setListOfContentType(List<SelectItem> listOfContentType) {
+        this.listOfContentType = listOfContentType;
+    }
+
+    public Integer getSelectedContentType() {
+        return selectedContentType;
+    }
+
+    public void setSelectedContentType(Integer selectedContentType) {
+        this.selectedContentType = selectedContentType;
+    }
+
+    public boolean getShowColumnFull() {
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.FULL_SYNC.getTypeCode());
+    }
+
+    public boolean getShowColumnBalance() {
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.BALANCES_AND_ENTEREVENTS.getTypeCode());
+    }
+
+    public boolean getShowColumnOrgSettings() {
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.ORGSETTINGS.getTypeCode());
+    }
+
+    public boolean getShowColumnClientData() {
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.CLIENTS_DATA.getTypeCode());
+    }
+
+    public boolean getShowColumnMenu() {
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.MENU.getTypeCode());
+    }
+
+    public boolean getShowColumnPhoto() {
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.PHOTOS.getTypeCode());
+    }
+
+    public boolean getShowColumnSupport() {
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.SUPPORT_SERVICE.getTypeCode());
+    }
+
+    public boolean getShowColumnLib() {
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.LIBRARY.getTypeCode());
     }
 }

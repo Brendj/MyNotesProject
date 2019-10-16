@@ -40,6 +40,7 @@ public class OrgSyncSettingReport extends BasicReportForListOrgsJob {
             ContentType.SUPPORT_SERVICE,
             ContentType.LIBRARY
     );
+    public static final Integer ALL_TYPES = -1;
 
     @Override
     public BasicReportForAllOrgJob createInstance() {
@@ -97,7 +98,7 @@ public class OrgSyncSettingReport extends BasicReportForListOrgsJob {
         }
 
         public List<OrgSyncSettingReportItem> buildOrgSettingCollection(List<Long> idOfOrgList, Session persistenceSession,
-                String selectedDistricts, Boolean allFriendlyOrgs) throws Exception {
+                String selectedDistricts, Boolean allFriendlyOrgs, Integer selectedContentType) throws Exception {
             List<OrgSyncSettingReportItem> result = new ArrayList<>(idOfOrgList.size());
 
             Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
@@ -114,7 +115,7 @@ public class OrgSyncSettingReport extends BasicReportForListOrgsJob {
                 }
             }
 
-            if(!StringUtils.isEmpty(selectedDistricts)){
+            if(StringUtils.isNotEmpty(selectedDistricts)){
                 orgCriteria.add(Restrictions.like("district", selectedDistricts));
             }
             orgCriteria.addOrder(Order.asc("shortName"));
@@ -130,7 +131,11 @@ public class OrgSyncSettingReport extends BasicReportForListOrgsJob {
                     idOfOrgList.add(org.getIdOfOrg());
                 }
             }
-            syncSettingCriteria.add(Restrictions.in("contentType", validContentType));
+            if(selectedContentType.equals(ALL_TYPES)) {
+                syncSettingCriteria.add(Restrictions.in("contentType", validContentType));
+            } else {
+                syncSettingCriteria.add(Restrictions.eq("contentType", ContentType.getContentTypeByCode(selectedContentType)));
+            }
             syncSettingCriteria.add(Restrictions.in("org.idOfOrg", idOfOrgList));
             List<SyncSettings> settings = syncSettingCriteria.list();
 
