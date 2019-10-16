@@ -28,8 +28,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.*;
+import org.hibernate.criterion.Order;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -61,6 +61,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
     final public static String P_SHOW_COMPLEXES_BY_ORG_CARD = "showComplexesByOrgCard";
 
     final public static String P_SHOW_TOTAL = "showTotals";
+    private final static String SOTR = "Сотрудники";
 
     @Override
     public Logger getLogger() {
@@ -659,7 +660,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + " join cf_orgs og on og.idoforg = o.idoforg "
                     + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
                     + " and (od.menutype = 0 or od.menutype between 50 and 99) "
-                    + "     and og.organizationtype = 0 and cg.idofclientgroup >= :clientGroup and cg.idofclientgroup < :clientEmployees ";
+                    + "     and og.organizationtype = 0 and cg.idofclientgroup < :clientEmployees and cg.groupname <> :SOTR ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<String>();
             List<String> classesNotConditionList = new ArrayList<String>();
@@ -722,7 +723,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             query.setParameter("startDate", startDate.getTime());
             query.setParameter("endDate", endDate.getTime());
             query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            query.setParameter("clientGroup", ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue());
+            query.setParameter("SOTR", SOTR);
             query.setParameterList("idOfOrgList", itemHashMap.keySet());
             return query;
         }
@@ -764,22 +765,22 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 Date endDate, Boolean showComplexesByOrgCard, Boolean showYoungerClasses, Boolean showMiddleClasses,
                 Boolean showOlderClasses) {
             String sqlString = "select a.idoforg, a.group, count(distinct a.idofclient) as clientcount, "
-                    + " count(distinct a.idoforderdetail) as orderdetailcount " + " from ("
+                    + " sum(a.qty) as orderdetailcount " + " from ("
                     + " select distinct og.idoforg, og.shortnameinfoservice, og.shortaddress, " + "    case " + (
                     managerList.isEmpty() || !showComplexesByOrgCard ? ""
                             : " when c.idofclient in (:managerList) then 'Комплексы проданные по карте ОО' ")
                     + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 1 and 4 then 'Обучающиеся 1-4 классов' "
                     + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 5 and 9 then 'Обучающиеся 5-9 классов' "
                     + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 10 and 11 then 'Обучающиеся 10-11 классов' end as group, "
-                    + "    od.idoforderdetail, c.idofclient " + " from cf_orders o "
+                    + "    od.qty, c.idofclient " + " from cf_orders o "
                     + " join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + " join cf_clients c on c.idofclient = o.idofclient "
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + " join cf_orgs og on og.idoforg = o.idoforg "
                     + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
                     + " and od.menutype = 0 "
-                    + "     and od.menuorigin in (0,1,10,11) and og.organizationtype = 0 and cg.idofclientgroup >= :clientGroup "
-                    + "     and cg.idofclientgroup < :clientEmployees ";
+                    + "     and od.menuorigin in (0,1,10,11) and og.organizationtype = 0 "
+                    + "     and cg.idofclientgroup < :clientEmployees and cg.groupname <> :SOTR ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<String>();
             List<String> classesNotConditionList = new ArrayList<String>();
@@ -818,7 +819,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             query.setParameter("startDate", startDate.getTime());
             query.setParameter("endDate", endDate.getTime());
             query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            query.setParameter("clientGroup", ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue());
+            query.setParameter("SOTR", SOTR);
             query.setParameterList("idOfOrgList", itemHashMap.keySet());
             if (!managerList.isEmpty() && showComplexesByOrgCard) {
                 query.setParameterList("managerList", managerList);
@@ -865,7 +866,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 Date endDate, Boolean showComplexesByOrgCard, Boolean showYoungerClasses, Boolean showMiddleClasses,
                 Boolean showOlderClasses) {
             String sqlString = "select a.idoforg, a.group, a.complexname, count(distinct a.idofclient) as clientcount, "
-                    + " count(distinct a.idoforderdetail) as orderdetailcount " + " from ("
+                    + " sum(a.qty) as orderdetailcount " + " from ("
                     + " select distinct og.idoforg, og.shortnameinfoservice, og.shortaddress, " + "    case " + (
                     managerList.isEmpty() || !showComplexesByOrgCard ? ""
                             : " when c.idofclient in (:managerList) then 'Комплексы проданные по карте ОО' ")
@@ -874,15 +875,15 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 10 and 11 then 'Обучающиеся 10-11 классов' end as group, "
                     + "    case when od.menuorigin in (0,1) then 'Буфет горячее' "
                     + "         when od.menuorigin in (10,11) then 'Буфет покупная' else '' end as complexname, "
-                    + "    od.idoforderdetail, c.idofclient " + " from cf_orders o "
+                    + "    od.qty, c.idofclient " + " from cf_orders o "
                     + " join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + " join cf_clients c on c.idofclient = o.idofclient "
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + " join cf_orgs og on og.idoforg = o.idoforg "
                     + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
                     + " and od.menutype = 0 "
-                    + "     and od.menuorigin in (0,1,10,11) and og.organizationtype = 0 and cg.idofclientgroup >= :clientGroup "
-                    + "     and cg.idofclientgroup < :clientEmployees ";
+                    + "     and od.menuorigin in (0,1,10,11) and og.organizationtype = 0 "
+                    + "     and cg.idofclientgroup < :clientEmployees and cg.groupname <> :SOTR ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<String>();
             List<String> classesNotConditionList = new ArrayList<String>();
@@ -920,7 +921,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             query.setParameter("startDate", startDate.getTime());
             query.setParameter("endDate", endDate.getTime());
             query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            query.setParameter("clientGroup", ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue());
+            query.setParameter("SOTR", SOTR);
             query.setParameterList("idOfOrgList", itemHashMap.keySet());
             if (!managerList.isEmpty() && showComplexesByOrgCard) {
                 query.setParameterList("managerList", managerList);
@@ -932,7 +933,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 HashMap<Long, CoverageNutritionReportItem> itemHashMap, Date startDate, Date endDate,
                 List<Long> managerList) {
             String sqlString =
-                    "select a.idoforg, a.type, a.complexname, a.price,  count(distinct a.idoforderdetail) as orderdetailcount "
+                    "select a.idoforg, a.type, a.complexname, a.price,  sum(a.qty) as orderdetailcount "
                             + " from (" + " select distinct og.idoforg, og.shortnameinfoservice, og.shortaddress, "
                             + "    case when od.menutype = 0 and od.menuorigin in (0, 1, 10, 11) then 'Буфет' "
                             + "     when od.menutype between 50 and 99 and od.rprice > 0 then 'Платное питание' "
@@ -940,7 +941,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                             + "    case when od.menutype between 50 and 99 then od.menudetailname "
                             + "         when od.menutype = 0 and od.menuorigin in (0,1) then 'Горячее' "
                             + "         when od.menutype = 0 and od.menuorigin in (10,11) then 'Покупная' else '' end as complexname, "
-                            + "    od.idoforderdetail, c.idofclient,"
+                            + "    od.qty, c.idofclient,"
                             + "     case when od.menutype between 50 and 99 and od.rprice > 0 then od.rprice "
                             + "          when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then od.discount else 0 end as price "
                             + " from cf_orders o "
@@ -965,12 +966,12 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
         private Query prepareBuffetByOrgCardDataQuery(Session session,
                 HashMap<Long, CoverageNutritionReportItem> itemHashMap, Date startDate, Date endDate,
                 List<Long> managerList) {
-            String sqlString = "select a.idoforg, a.complexname, count(distinct a.idoforderdetail) as orderdetailcount "
+            String sqlString = "select a.idoforg, a.complexname, sum(a.qty) as orderdetailcount "
                     + " from (" + " select distinct og.idoforg, og.shortnameinfoservice, og.shortaddress, "
                     + "    case when od.menutype between 50 and 99 then od.menudetailname "
                     + "         when od.menutype = 0 and od.menuorigin in (0,1) then 'Буфет горячее' "
                     + "         when od.menutype = 0 and od.menuorigin in (10,11) then 'Буфет покупная' else '' end as complexname, "
-                    + "    od.idoforderdetail " + " from cf_orders o "
+                    + "    od.qty " + " from cf_orders o "
                     + " join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + " join cf_clients c on c.idofclient = o.idofclient "
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
@@ -995,7 +996,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 Boolean showYoungerClasses, Boolean showMiddleClasses, Boolean showOlderClasses) {
             String sqlString =
                     "select a.idoforg, a.group, a.type, a.complexname, a.price,  count(distinct a.idofclient) as clientcount, "
-                            + " count(distinct a.idoforderdetail) as orderdetailcount " + " from ("
+                            + " sum(a.qty) as orderdetailcount " + " from ("
                             + " select distinct og.idoforg, og.shortnameinfoservice, og.shortaddress, "
                             + "    st.studentsCountTotal, st.studentsCountYoung, st.studentsCountMiddle, st.studentsCountOld, st.benefitStudentsCountYoung, "
                             + "    st.benefitStudentsCountMiddle, st.benefitStudentsCountOld, st.benefitStudentsCountTotal, st.employeeCount, "
@@ -1010,7 +1011,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                             + "    case when od.menutype between 50 and 99 then od.menudetailname "
                             + "         when od.menutype = 0 and od.menuorigin in (0,1) then 'Горячее' "
                             + "         when od.menutype = 0 and od.menuorigin in (10,11) then 'Покупная' else '' end as complexname, "
-                            + "    od.idoforderdetail, c.idofclient,"
+                            + "    od.qty, c.idofclient,"
                             + "     case when od.menutype between 50 and 99 and od.rprice > 0 then od.rprice "
                             + "          when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then od.discount else 0 end as price "
                             + " from cf_orders o "
@@ -1021,7 +1022,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                             + " left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
                             + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
                             + " and od.menutype < 150 and og.organizationtype = 0 "
-                            + "     and cg.idofclientgroup >= :clientGroup and cg.idofclientgroup < :clientEmployees ";
+                            + "     and cg.idofclientgroup < :clientEmployees and cg.groupname <> :SOTR ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<String>();
             List<String> classesNotConditionList = new ArrayList<String>();
@@ -1089,7 +1090,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             query.setParameter("startDate", startDate.getTime());
             query.setParameter("endDate", endDate.getTime());
             query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            query.setParameter("clientGroup", ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue());
+            query.setParameter("SOTR", SOTR);
             query.setParameterList("idOfOrgList", itemHashMap.keySet());
             if (!managerList.isEmpty() && showComplexesByOrgCard) {
                 query.setParameterList("managerList", managerList);
@@ -1102,7 +1103,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 Boolean showPaidNutrition, Boolean showBuffet, Boolean showComplexesByOrgCard,
                 Boolean showYoungerClasses, Boolean showMiddleClasses, Boolean showOlderClasses) {
             String sqlString = "select a.idoforg, a.type, count(distinct a.idofclient) as clientcount, "
-                    + " count(distinct a.idoforderdetail) as orderdetailcount " + " from ("
+                    + " sum(a.qty) as orderdetailcount " + " from ("
                     + " select distinct og.idoforg, " + "    case " + (managerList.isEmpty() || !showComplexesByOrgCard
                     ? "" : " when c.idofclient in (:managerList) and od.menutype between 50 and 99 then 'complexCard' "
                     + " when c.idofclient in (:managerList) and od.menutype = 0 and od.menuorigin in (0, 1) then 'buffetHotCard' "
@@ -1111,7 +1112,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "         when od.menutype = 0 and od.menuorigin in (10, 11) then 'Буфет покупная' "
                     + "         when od.menutype between 50 and 99 and od.rprice > 0 then 'Платное питание' "
                     + "         when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then 'Бесплатное питание' end as type, "
-                    + "    od.idoforderdetail, c.idofclient " + " from cf_orders o "
+                    + "    od.qty, c.idofclient " + " from cf_orders o "
                     + " join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + " join cf_clients c on c.idofclient = o.idofclient "
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
@@ -1121,24 +1122,18 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<>();
             List<String> classesNotConditionList = new ArrayList<>();
-            if (showYoungerClasses) {
-                classesConditionList.add(String.format(conditionString, "", 1, 4));
-            } else {
+            if (!showYoungerClasses) {
                 classesNotConditionList.add(String.format(conditionString, "not", 1, 4));
             }
-            if (showMiddleClasses) {
-                classesConditionList.add(String.format(conditionString, "", 5, 9));
-            } else {
+            if (!showMiddleClasses) {
                 classesNotConditionList.add(String.format(conditionString, "not", 5, 9));
             }
-            if (showOlderClasses) {
-                classesConditionList.add(String.format(conditionString, "", 10, 11));
-            } else {
+            if (!showOlderClasses) {
                 classesNotConditionList.add(String.format(conditionString, "not", 10, 11));
             }
-            if (showComplexesByOrgCard && !managerList.isEmpty()) {
+            /*if (showComplexesByOrgCard && !managerList.isEmpty()) {
                 classesConditionList.add(String.format("c.idofclient in (%s)", StringUtils.join(managerList, ",")));
-            }
+            }*/
 
             if (!classesConditionList.isEmpty()) {
                 sqlString += " and (" + StringUtils.join(classesConditionList, " or ") + ") ";
@@ -1192,13 +1187,13 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 Boolean showComplexesByOrgCard, Boolean showYoungerClasses, Boolean showMiddleClasses,
                 Boolean showOlderClasses) {
             String sqlString = "select a.idoforg, a.type, count(distinct a.idofclient) as clientcount, "
-                    + " count(distinct a.idoforderdetail) as orderdetailcount " + " from ("
+                    + " sum(a.qty) as orderdetailcount " + " from ("
                     + " select distinct og.idoforg, " + "    case " + (managerList.isEmpty() || !showComplexesByOrgCard
                     ? ""
                     : " when c.idofclient in (:managerList) and od.menutype = 0 and od.menuorigin in (0, 1, 10, 11) then 'buffetCard' ")
                     + "         when od.menutype = 0 and od.menuorigin in (0, 1, 10, 11) then 'Буфет общее' "
                     + "         when od.menutype between 50 and 99 then 'Платное питание + Бесплатное' end as type, "
-                    + "    od.idoforderdetail, c.idofclient " + " from cf_orders o "
+                    + "    od.qty, c.idofclient " + " from cf_orders o "
                     + " join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + " join cf_clients c on c.idofclient = o.idofclient "
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
@@ -1208,24 +1203,18 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<>();
             List<String> classesNotConditionList = new ArrayList<>();
-            if (showYoungerClasses) {
-                classesConditionList.add(String.format(conditionString, "", 1, 4));
-            } else {
+            if (!showYoungerClasses) {
                 classesNotConditionList.add(String.format(conditionString, "not", 1, 4));
             }
-            if (showMiddleClasses) {
-                classesConditionList.add(String.format(conditionString, "", 5, 9));
-            } else {
+            if (!showMiddleClasses) {
                 classesNotConditionList.add(String.format(conditionString, "not", 5, 9));
             }
-            if (showOlderClasses) {
-                classesConditionList.add(String.format(conditionString, "", 10, 11));
-            } else {
+            if (!showOlderClasses) {
                 classesNotConditionList.add(String.format(conditionString, "not", 10, 11));
             }
-            if (showComplexesByOrgCard && !managerList.isEmpty()) {
+            /*if (showComplexesByOrgCard && !managerList.isEmpty()) {
                 classesConditionList.add(String.format("c.idofclient in (%s)", StringUtils.join(managerList, ",")));
-            }
+            }*/
 
             if (!classesConditionList.isEmpty()) {
                 sqlString += " and (" + StringUtils.join(classesConditionList, " or ") + ") ";
@@ -1288,19 +1277,13 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<>();
             List<String> classesNotConditionList = new ArrayList<>();
-            if (showYoungerClasses) {
-                classesConditionList.add(String.format(conditionString, "", 1, 4));
-            } else {
+            if (!showYoungerClasses) {
                 classesNotConditionList.add(String.format(conditionString, "not", 1, 4));
             }
-            if (showMiddleClasses) {
-                classesConditionList.add(String.format(conditionString, "", 5, 9));
-            } else {
+            if (!showMiddleClasses) {
                 classesNotConditionList.add(String.format(conditionString, "not", 5, 9));
             }
-            if (showOlderClasses) {
-                classesConditionList.add(String.format(conditionString, "", 10, 11));
-            } else {
+            if (!showOlderClasses) {
                 classesNotConditionList.add(String.format(conditionString, "not", 10, 11));
             }
 
@@ -1352,7 +1335,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 Boolean showPaidNutrition, Boolean showBuffet, Boolean showComplexesByOrgCard,
                 Boolean showYoungerClasses, Boolean showMiddleClasses, Boolean showOlderClasses) {
             String sqlString = "select a.idoforg, a.group, a.type, count(distinct a.idofclient) as clientcount, "
-                    + " count(distinct a.idoforderdetail) as orderdetailcount " + " from ("
+                    + " sum(a.qty) as orderdetailcount " + " from ("
                     + " select distinct og.idoforg, og.shortnameinfoservice, og.shortaddress, "
                     + "    st.studentsCountTotal, st.studentsCountYoung, st.studentsCountMiddle, st.studentsCountOld, st.benefitStudentsCountYoung, "
                     + "    st.benefitStudentsCountMiddle, st.benefitStudentsCountOld, st.benefitStudentsCountTotal, st.employeeCount, "
@@ -1363,7 +1346,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "         when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 10 and 11 then 'Обучающиеся 10-11 классов' end as group, "
                     + "    case when od.menutype = 0 and od.menuorigin in (0, 1, 10, 11) then 'Буфет' "
                     + "     when od.menutype between 50 and 99 then 'Платное питание + Бесплатное' end as type, "
-                    + "    od.idoforderdetail, c.idofclient" + " from cf_orders o "
+                    + "    od.qty, c.idofclient" + " from cf_orders o "
                     + " join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + " join cf_clients c on c.idofclient = o.idofclient "
                     + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
@@ -1371,7 +1354,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + " left join cf_kzn_clients_statistic st on st.idoforg = og.idoforg "
                     + " where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
                     + "and od.menutype < 150 and og.organizationtype = 0 "
-                    + "     and cg.idofclientgroup >= :clientGroup and cg.idofclientgroup < :clientEmployees ";
+                    + "     and cg.idofclientgroup < :clientEmployees and cg.groupname <> :SOTR ";
             String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
             List<String> classesConditionList = new ArrayList<>();
             List<String> classesNotConditionList = new ArrayList<>();
@@ -1439,7 +1422,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             query.setParameter("startDate", startDate.getTime());
             query.setParameter("endDate", endDate.getTime());
             query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            query.setParameter("clientGroup", ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue());
+            query.setParameter("SOTR", SOTR);
             query.setParameterList("idOfOrgList", itemHashMap.keySet());
             if (!managerList.isEmpty() && showComplexesByOrgCard) {
                 query.setParameterList("managerList", managerList);
@@ -1999,7 +1982,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + "where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
                     + " and od.menutype < 150 "
-                    + "     and og.organizationtype = 0 and cg.idofclientgroup between :clientGroup and :clientTechEmployees";
+                    + "     and og.organizationtype = 0 and cg.idofclientgroup <= :clientTechEmployees" + (showEmployee ? "" : " and cg.groupname <> 'Сотрудники'");
 
             sqlString += generateQueryConditions(Collections.EMPTY_LIST, showYoungerClasses, showMiddleClasses,
                     showOlderClasses, showEmployee, showFreeNutrition, showPaidNutrition, showBuffet, false);
@@ -2010,7 +1993,6 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             query.setParameter("clientAdministration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
             query.setParameter("clientTechEmployees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
-            query.setParameter("clientGroup", ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue());
 
             List list = query.list();
             for (Object o : list) {
@@ -2050,7 +2032,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + "where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
                     + " and od.menutype < 150 "
-                    + "     and og.organizationtype = 0 ";
+                    + "     and og.organizationtype = 0 " + (showEmployee ? "" : " and cg.groupname <> 'Сотрудники'");
 
             sqlString += generateQueryConditions(managerList, showYoungerClasses, showMiddleClasses, showOlderClasses,
                     showEmployee, showFreeNutrition, showPaidNutrition, showBuffet, showComplexesByOrgCard);
@@ -2172,7 +2154,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                         + " join cf_clients c on c.idofclient = o.idofclient "
                         + " join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                         + " left join cf_goods g on g.idofgood = od.idofgood join cf_orgs og on og.idoforg = o.idoforg "
-                        + " where o.idoforg = :idOfOrg and o.createddate between :startDate and :endDate and od.menutype < :complexItemMin and og.organizationtype = 0 "
+                        + " where o.idoforg = :idOfOrg and o.state = 0 and o.createddate between :startDate and :endDate and od.menutype < :complexItemMin and og.organizationtype = 0 "
                         + orgCondition + " order by 3) a " + "group by a.idoforg, a.type";
                 Query query = session.createSQLQuery(sqlString);
                 query.setParameter("startDate", startDate.getTime());
