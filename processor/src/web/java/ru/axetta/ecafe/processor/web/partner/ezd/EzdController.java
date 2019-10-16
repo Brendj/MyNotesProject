@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -214,12 +215,14 @@ public class EzdController {
                             for (ProductionCalendar productionCalendar : productionCalendars) {
                                 if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(curDateDates)) {
                                     goodProd = true;
+                                    boolean findDate = false;
                                     //Проверка не является ли эта дата рабочей субботой....
                                     for (RequestsEzdSpecialDateView requestsEzdSpecialDateView : requestsEzdSpecialDateViews) {
                                         if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate())
                                                 .equals(curDateDates) && requestsEzdSpecialDateView.getIdoforg()
                                                 .equals(thisIdOfOrg) && requestsEzdSpecialDateView.getGroupname()
                                                 .equals(thisGroupName)) {
+                                            findDate = true;
                                             if (requestsEzdSpecialDateView.getIsweekend() == 0) {
                                                 goodProd = false;
                                             } else {
@@ -227,6 +230,17 @@ public class EzdController {
                                             }
                                             break;
                                         }
+                                    }
+                                    if (!findDate) {
+                                        int day = CalendarUtils.getDayOfWeek(curDateDates);
+                                        if (day == Calendar.SATURDAY) {
+                                            boolean flag = DAOReadonlyService.getInstance().isSixWorkWeek(thisIdOfOrg, thisGroupName);
+                                            if (flag)
+                                            {
+                                                goodProd = false;
+                                            }
+                                        }
+
                                     }
                                     break;
                                 }
@@ -237,7 +251,8 @@ public class EzdController {
                                     if (CalendarUtils.startOfDay(requestsEzdSpecialDateViews.get(i).getSpecDate())
                                             .equals(curDateDates) && requestsEzdSpecialDateViews.get(i).getIdoforg()
                                             .equals(thisIdOfOrg) && requestsEzdSpecialDateViews.get(i).getGroupname()
-                                            .equals(thisGroupName) && requestsEzdSpecialDateViews.get(i).getIsweekend() == 1) {
+                                            .equals(thisGroupName)
+                                            && requestsEzdSpecialDateViews.get(i).getIsweekend() == 1) {
                                         goodSpec = true;
                                         currentCountSpecDate = i;
                                         break;
@@ -427,11 +442,13 @@ public class EzdController {
                             if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(startDate)) {
                                 goodProd = true;
                                 //Проверка не является ли эта дата рабочей субботой....
+                                boolean findDate = false;
                                 for (RequestsEzdSpecialDateView requestsEzdSpecialDateView : requestsEzdSpecialDateViews) {
                                     if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate())
                                             .equals(startDate) && requestsEzdSpecialDateView.getIdoforg()
                                             .equals(org.getIdOfOrg()) && requestsEzdSpecialDateView.getGroupname()
                                             .equals(groupName)) {
+                                        findDate = true;
                                         if (requestsEzdSpecialDateView.getIsweekend() == 0) {
                                             goodProd = false;
                                         } else {
@@ -439,6 +456,17 @@ public class EzdController {
                                         }
                                         break;
                                     }
+                                }
+                                if (!findDate) {
+                                    int day = CalendarUtils.getDayOfWeek(startDate);
+                                    if (day == Calendar.SATURDAY) {
+                                        boolean flag = DAOReadonlyService.getInstance().isSixWorkWeek(org.getIdOfOrg(), groupName);
+                                        if (flag)
+                                        {
+                                            goodProd = false;
+                                        }
+                                    }
+
                                 }
                                 break;
                             }
@@ -474,6 +502,12 @@ public class EzdController {
                     DAOUtils.updateRequestFromEZD(persistenceSession, org.getIdOfOrg(), groupName, date, idOfComplex,
                             count, maxVersion);
                 } else {
+                    if (date.getTime() < new Date().getTime()) {
+                        Result result = new Result();
+                        result.setErrorCode(ResponseCodes.RC_WRONG_DATA.getCode().toString());
+                        result.setErrorMessage(ResponseCodes.RC_WRONG_DATA.toString());
+                        return result;
+                    }
                     //Проверка по производственному календарю
                     boolean goodProd = false;
                     for (ProductionCalendar productionCalendar : productionCalendars) {
@@ -481,10 +515,9 @@ public class EzdController {
                             goodProd = true;
                             //Проверка не является ли эта дата рабочей субботой....
                             for (RequestsEzdSpecialDateView requestsEzdSpecialDateView : requestsEzdSpecialDateViews) {
-                                if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate())
-                                        .equals(date) && requestsEzdSpecialDateView.getIdoforg()
-                                        .equals(org.getIdOfOrg()) && requestsEzdSpecialDateView.getGroupname()
-                                        .equals(groupName)) {
+                                if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate()).equals(date)
+                                        && requestsEzdSpecialDateView.getIdoforg().equals(org.getIdOfOrg())
+                                        && requestsEzdSpecialDateView.getGroupname().equals(groupName)) {
                                     if (requestsEzdSpecialDateView.getIsweekend() == 0) {
                                         goodProd = false;
                                     }
@@ -494,8 +527,7 @@ public class EzdController {
                             break;
                         }
                     }
-                    if (goodProd)
-                    {
+                    if (goodProd) {
                         Result result = new Result();
                         result.setErrorCode(ResponseCodes.RC_WRONG_DATA.getCode().toString());
                         result.setErrorMessage(ResponseCodes.RC_WRONG_DATA.toString());
@@ -535,8 +567,7 @@ public class EzdController {
                     requestsEzd.setVersionrecord(maxVersion);
                     persistenceSession.save(requestsEzd);
                 }
-            }
-            Result result = new Result();
+            } Result result = new Result();
             result.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_OK.toString());
 
