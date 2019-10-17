@@ -125,9 +125,6 @@ public class EzdController {
 
             logger.info("Старт формирования ответа для ЭЖД");
 
-            //Хранится последняя группы при принадлежности группы к параллели
-            String groupNameComplex = null;
-
             //Хранится последние guid и орг при вычислении дат
             String curguidDATES = null;
             String curgroupNameDATES = null;
@@ -167,29 +164,28 @@ public class EzdController {
 
                 //Проверка на то, что данный комплекс подходит для данной группы
                 String complexname = requestsEzdView.getComplexname();
-                if (groupNameComplex == null || !groupNameComplex.equals(thisGroupName)) {
-                    groupNameComplex = thisGroupName;
-                    try {
-                        clas = extractDigits(thisGroupName);
-                    } catch (NumberFormatException e) //т.е. в названии группы нет чисел
-                    {
-                        clas = 0;
-                    }
-                    if (clas > 0 && clas < 5)//1-4
-                    {
-                        if (complexname.contains("5-11")) {
-                            badComplex = true;
-                        }
 
-                    } else {
-                        if (clas > 4 && clas < 12)//5-11
-                        {
-                            if (complexname.contains("1-4")) {
-                                badComplex = true;
-                            }
+                try {
+                    clas = extractDigits(thisGroupName);
+                } catch (NumberFormatException e) //т.е. в названии группы нет чисел
+                {
+                    clas = 0;
+                }
+                if (clas > 0 && clas < 5)//1-4
+                {
+                    if (complexname.contains("5-11")) {
+                        badComplex = true;
+                    }
+
+                } else {
+                    if (clas > 4 && clas < 12)//5-11
+                    {
+                        if (complexname.contains("1-4")) {
+                            badComplex = true;
                         }
                     }
                 }
+
 
                 //Если комплекс подходит, то ...
                 if (!badComplex) {
@@ -234,9 +230,9 @@ public class EzdController {
                                     if (!findDate) {
                                         int day = CalendarUtils.getDayOfWeek(curDateDates);
                                         if (day == Calendar.SATURDAY) {
-                                            boolean flag = DAOReadonlyService.getInstance().isSixWorkWeek(thisIdOfOrg, thisGroupName);
-                                            if (flag)
-                                            {
+                                            boolean flag = DAOReadonlyService.getInstance()
+                                                    .isSixWorkWeek(thisIdOfOrg, thisGroupName);
+                                            if (flag) {
                                                 goodProd = false;
                                             }
                                         }
@@ -460,9 +456,9 @@ public class EzdController {
                                 if (!findDate) {
                                     int day = CalendarUtils.getDayOfWeek(startDate);
                                     if (day == Calendar.SATURDAY) {
-                                        boolean flag = DAOReadonlyService.getInstance().isSixWorkWeek(org.getIdOfOrg(), groupName);
-                                        if (flag)
-                                        {
+                                        boolean flag = DAOReadonlyService.getInstance()
+                                                .isSixWorkWeek(org.getIdOfOrg(), groupName);
+                                        if (flag) {
                                             goodProd = false;
                                         }
                                     }
@@ -567,7 +563,8 @@ public class EzdController {
                     requestsEzd.setVersionrecord(maxVersion);
                     persistenceSession.save(requestsEzd);
                 }
-            } Result result = new Result();
+            }
+            Result result = new Result();
             result.setErrorCode(ResponseCodes.RC_OK.getCode().toString());
             result.setErrorMessage(ResponseCodes.RC_OK.toString());
 
