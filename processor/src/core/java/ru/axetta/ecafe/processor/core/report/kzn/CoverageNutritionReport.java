@@ -229,17 +229,17 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     startDate, endDate, showYoungerClasses, showMiddleClasses, showOlderClasses, showEmployee,
                     showFreeNutrition, showPaidNutrition, showBuffet);
             updateTemplateByComplexMap(reportBuilder, complexMap, columnTitleGroupBuilderList, false);
-            loadGroupsData(session, itemHashMap, managerList, startDate, endDate, showFreeNutrition, showPaidNutrition,
+            /*loadGroupsData(session, itemHashMap, managerList, startDate, endDate, showFreeNutrition, showPaidNutrition,
                     showBuffet, showComplexesByOrgCard, showYoungerClasses, showMiddleClasses, showOlderClasses,
-                    showEmployee);
+                    showEmployee);*/
 
             if (showComplexesByOrgCard && !managerList.isEmpty()) {
                 HashMap<String, HashMap<String, List<String>>> orgCardComplexMap = loadOrgCardComplexMap(session,
                         itemHashMap.keySet(), startDate, endDate, managerList, showFreeNutrition, showPaidNutrition,
                         showBuffet);
                 updateTemplateByComplexMap(reportBuilder, orgCardComplexMap, columnTitleGroupBuilderList, true);
-                loadComplexByOrgCardData(session, itemHashMap, startDate, endDate, managerList);
-                loadBuffetByOrgCardData(session, itemHashMap, startDate, endDate, managerList);
+                //loadComplexByOrgCardData(session, itemHashMap, startDate, endDate, managerList);
+                //loadBuffetByOrgCardData(session, itemHashMap, startDate, endDate, managerList);
             }
 
             if (showTotal) {
@@ -247,23 +247,381 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                         showYoungerClasses, showMiddleClasses, showOlderClasses, showEmployee, showFreeNutrition,
                         showPaidNutrition, showBuffet, showComplexesByOrgCard, managerList);
                 updateTemplateByTotal(reportBuilder, totalsTitlesList, columnTitleGroupBuilderList);
-                loadTotalsData(session, itemHashMap, managerList, startDate, endDate, showFreeNutrition,
+                /*loadTotalsData(session, itemHashMap, managerList, startDate, endDate, showFreeNutrition,
                         showPaidNutrition, showBuffet, showComplexesByOrgCard, showYoungerClasses, showMiddleClasses,
                         showOlderClasses);
                 loadTotalsPaidAndFreeAndBuffetAllDataTotal(session, itemHashMap, managerList, startDate, endDate,
                         showFreeNutrition, showPaidNutrition, showBuffet, showComplexesByOrgCard, showYoungerClasses,
                         showMiddleClasses, showOlderClasses);
                 loadTotalsUniqueClientsData(session, itemHashMap, startDate, endDate, showFreeNutrition,
-                        showPaidNutrition, showBuffet, showYoungerClasses, showMiddleClasses, showOlderClasses);
+                        showPaidNutrition, showBuffet, showYoungerClasses, showMiddleClasses, showOlderClasses);*/
             }
 
             if (showEmployee) {
                 updateTemplateByEmployees(reportBuilder, columnTitleGroupBuilderList);
-                loadEmployeesByOrgs(session, itemHashMap, startDate, endDate);
-                loadEmployeesTotalsByOrgs(session, itemHashMap, startDate, endDate);
+                //loadEmployeesByOrgs(session, itemHashMap, startDate, endDate);
+                //loadEmployeesTotalsByOrgs(session, itemHashMap, startDate, endDate);
             }
 
+            List<CNReportItem> totalItems = loadAllData(session, idOfOrgList, startDate, endDate);
+            logger.info(String.format("Получено %s записей", totalItems.size()));
+            fillReport(totalItems, itemHashMap, orgList, complexMap);
+
             return itemHashMap.values();
+        }
+
+        //Выбираем заказы по одной ОО из общего списка
+        private List<CNReportItem> getOrgReportItems(Long idOfOrg, List<CNReportItem> reportItems) {
+            List<CNReportItem> result = new ArrayList<>();
+            for (CNReportItem item : reportItems) {
+                if (item.getIdOfOrg().equals(idOfOrg)) result.add(item);
+            }
+            return result;
+        }
+
+        //Заполнение отчета
+        private void fillReport(List<CNReportItem> reportItems, HashMap<Long, CoverageNutritionReportItem> itemHashMap,
+                List<Long> orgList, HashMap<String, HashMap<String, List<String>>> complexMap) {
+            for (Long idOfOrg : orgList) {
+                List<CNReportItem> orgReportItems = getOrgReportItems(idOfOrg, reportItems);//инфа с заказами по одной ОО
+                HashMap<String, HashMap<String, HashMap<String, HashSet<Long>>>> clientCountMap = new HashMap<>(); //здесь будет количество клиентов по каждому комплексу
+                HashMap<String, HashMap<String, HashSet<Long>>> clientBuffetCountMap = new HashMap<>(); //здесь будет количество клиентов по буфету (с разделением на покупное и горячее)
+
+                HashMap<String, HashMap<String, HashMap<String, Integer>>> clientQtyMap = new HashMap<>(); //здесь будет количество проданных позиций по каждому комплексу
+                HashMap<String, HashMap<String, Integer>> clientBuffetQtyMap = new HashMap<>(); //здесь будет количество проданных позиций по буфету (с разделением на покупное и горячее)
+
+                HashMap<String, HashMap<String, HashSet<Long>>> clientBuffetCountTotalMap = new HashMap<>(); //здесь будет количество клиентов по буфету всего (Буфет общее)
+                HashMap<String, HashMap<String, Integer>> clientBuffetQtyTotalMap = new HashMap<>(); //здесь будет количество проданных позиций по буфету всего (Буфет общее)
+
+                HashMap<String, HashMap<String, HashSet<Long>>> clientCountPaidAndFreeMap = new HashMap<>(); //здесь будет количество клиентов по комплексам Платное + Бесплатное
+                HashMap<String, HashMap<String, Integer>> clientQtyPaidAndFreeMap = new HashMap<>(); //здесь будет количество проданных позиций по комплексам Платное + Бесплатное
+
+                HashMap<String, HashMap<String, HashSet<Long>>> clientCountTotalMap = new HashMap<>(); //здесь будет количество уникальных покупателей Всего
+
+                HashMap<String, HashSet<Long>> employeeCountMap = new HashMap<>(); //здесь будет количества по сотрудникам
+
+                for (CNReportItem item : orgReportItems) {
+                    tryFillEmployeeData(employeeCountMap, item);
+                    Map<String, List<String>> map1 = complexMap.get(item.getGroupNameForTemplate());
+                    if (map1 == null) continue;
+                    List<String> list = map1.get(item.getFoodType());
+                    if (item.isBuffet()) {
+                        putClientIntoBuffetCountMap(clientBuffetCountMap, clientBuffetCountTotalMap, clientCountTotalMap, item);
+                        putClientIntoBuffetQtyMap(clientBuffetQtyMap, clientBuffetQtyTotalMap, item);
+                        continue;
+                    }
+                    for (String complex : list) {
+                        if (complex.equals(item.getComplexNameForTemplate())) {
+                            putClientIntoComplexCountMap(clientCountMap, clientCountPaidAndFreeMap, clientCountTotalMap, item);
+                            putClientIntoComplexQtyMap(clientQtyMap, clientQtyPaidAndFreeMap, item);
+                        }
+                    }
+                }
+                CoverageNutritionReportItem item = itemHashMap.get(idOfOrg);
+                HashMap<String, DynamicProperty> dynamicPropertyList = item.getDynamicProperties();
+                //данные в отчет по количеству покупателей по комплексам
+                for (String group : clientCountMap.keySet()) {
+                    HashMap<String, HashMap<String, HashSet<Long>>> foodTypeMap = clientCountMap.get(group);
+                    for (String foodType : foodTypeMap.keySet()) {
+                        HashMap<String, HashSet<Long>> complexNameMap = foodTypeMap.get(foodType);
+                        for (String complexName : complexNameMap.keySet()) {
+                            dynamicPropertyList.put(String.format("%d",
+                                    (group + foodType + complexName + CoverageNutritionDynamicBean.CLIENTS_COUNT).hashCode()), new DynamicProperty(Long.valueOf(complexNameMap.get(complexName).size())));
+                        }
+                    }
+                }
+                //данные в отчет по количеству покупателей по буфету с разделением на горячее и покупное
+                for (String group : clientBuffetCountMap.keySet()) {
+                    HashMap<String, HashSet<Long>> foodTypeMap = clientBuffetCountMap.get(group);
+                    for (String foodType : foodTypeMap.keySet()) {
+                        HashSet<Long> clientsSet = foodTypeMap.get(foodType);
+                        String buffetType = foodType.contains(CoverageNutritionDynamicBean.BUFFET_HOT)
+                                ? CoverageNutritionDynamicBean.BUFFET_HOT : CoverageNutritionDynamicBean.BUFFET_PAID;
+                        dynamicPropertyList.put(String.format("%d",
+                                (group + foodType + String.format(CoverageNutritionDynamicBean.BUFFET_CLIENTS_COUNT, buffetType + " ", CoverageNutritionDynamicBean.findClassInString(group))).hashCode()),
+                                new DynamicProperty(Long.valueOf(clientsSet.size())));
+                    }
+                }
+                //данные в отчет по количеству проданных комплексов
+                for (String group : clientQtyMap.keySet()) {
+                    HashMap<String, HashMap<String, Integer>> foodTypeMap = clientQtyMap.get(group);
+                    for (String foodType : foodTypeMap.keySet()) {
+                        HashMap<String, Integer> complexNameMap = foodTypeMap.get(foodType);
+                        for (String complexName : complexNameMap.keySet()) {
+                            dynamicPropertyList.put(String.format("%d",
+                                    (group + foodType + complexName + CoverageNutritionDynamicBean.ORDERS_COUNT).hashCode()), new DynamicProperty(Long.valueOf(complexNameMap.get(complexName))));
+                        }
+                    }
+                }
+                //данные в отчет по количеству проданных позиций буфета с разделением на горячее и покупное
+                for (String group : clientBuffetQtyMap.keySet()) {
+                    HashMap<String, Integer> foodTypeMap = clientBuffetQtyMap.get(group);
+                    for (String foodType : foodTypeMap.keySet()) {
+                        //HashSet<Long> clientsSet = foodTypeMap.get(foodType);
+                        Integer qty = foodTypeMap.get(foodType);
+                        dynamicPropertyList.put(String.format("%d",
+                                (group + foodType + CoverageNutritionDynamicBean.BUFFET_ORDERS_COUNT).hashCode()),
+                                new DynamicProperty(Long.valueOf(qty)));
+                    }
+                }
+                //данные в отчет по количеству покупателей по Буфету общее
+                for (String group : clientBuffetCountTotalMap.keySet()) {
+                    HashMap<String, HashSet<Long>> foodTypeMap = clientBuffetCountTotalMap.get(group);
+                    for (String foodType : foodTypeMap.keySet()) {
+                        HashSet<Long> clientsSet = foodTypeMap.get(foodType);
+                        dynamicPropertyList.put(String.format("%d",
+                                (group + foodType + String.format(CoverageNutritionDynamicBean.BUFFET_CLIENTS_COUNT, "", CoverageNutritionDynamicBean.findClassInString(group))).hashCode()),
+                                new DynamicProperty(Long.valueOf(clientsSet.size())));
+                    }
+                }
+                //данные в отчет по количеству проданных позиций буфета общее
+                for (String group : clientBuffetQtyTotalMap.keySet()) {
+                    HashMap<String, Integer> foodTypeMap = clientBuffetQtyTotalMap.get(group);
+                    for (String foodType : foodTypeMap.keySet()) {
+                        Integer qty = foodTypeMap.get(foodType);
+                        dynamicPropertyList.put(String.format("%d",
+                                (group + foodType + CoverageNutritionDynamicBean.BUFFET_ORDERS_COUNT).hashCode()),
+                                new DynamicProperty(Long.valueOf(qty)));
+                    }
+                }
+                //данные в отчет по количеству покупателей по комплексам Платное + Бесплатное
+                for (String group : clientCountPaidAndFreeMap.keySet()) {
+                    HashMap<String, HashSet<Long>> foodTypeMap = clientCountPaidAndFreeMap.get(group);
+                    for (String foodType : foodTypeMap.keySet()) {
+                        HashSet<Long> clientsSet = foodTypeMap.get(foodType);
+                        dynamicPropertyList.put(String.format("%d",
+                                (group + foodType + CoverageNutritionDynamicBean.CLIENTS_COUNT).hashCode()),
+                                new DynamicProperty(Long.valueOf(clientsSet.size())));
+                    }
+                }
+                //данные в отчет по количеству комплексов Платное + Бесплатное
+                for (String group : clientQtyPaidAndFreeMap.keySet()) {
+                    HashMap<String, Integer> foodTypeMap = clientQtyPaidAndFreeMap.get(group);
+                    for (String foodType : foodTypeMap.keySet()) {
+                        Integer qty = foodTypeMap.get(foodType);
+                        dynamicPropertyList.put(String.format("%d",
+                                (group + foodType + CoverageNutritionDynamicBean.ORDERS_COUNT).hashCode()),
+                                new DynamicProperty(Long.valueOf(qty)));
+                    }
+                }
+                //данные в отчет по количеству уникальных покупателей всего
+                for (String group : clientCountTotalMap.keySet()) {
+                    HashMap<String, HashSet<Long>> foodTypeMap = clientCountTotalMap.get(group);
+                    for (String foodType : foodTypeMap.keySet()) {
+                        HashSet<Long> clientsSet = foodTypeMap.get(foodType);
+                        dynamicPropertyList.put(String.format("%d",
+                                (group + foodType + CoverageNutritionDynamicBean.CLIENTS_COUNT_TOTAL_SUBTITLE).hashCode()),
+                                new DynamicProperty(Long.valueOf(clientsSet.size())));
+                    }
+                }
+                //данные в отчет по количеству сотрудников с комплексами
+                for (String foodType : employeeCountMap.keySet()) {
+                    HashSet<Long> clientsSet = employeeCountMap.get(foodType);
+                    String key = "";
+                    if (foodType.equals(CoverageNutritionDynamicBean.EMPLOYEES_COMPLEXES)) key = CoverageNutritionDynamicBean.EMPLOYEES_COMPLEXES_SUBTITLE;
+                    if (foodType.equals(CoverageNutritionDynamicBean.MENU_TYPE_BUFFET)) key = CoverageNutritionDynamicBean.EMPLOYEES_BUIFFET_SUBTITLE;
+                    if (foodType.equals(CoverageNutritionDynamicBean.EMPLOYEES_COMPLEXES_AND_BUFFET)) key = CoverageNutritionDynamicBean.EMPLOYEES_COMPLEXES_AND_BUFFET_SUBTITLE;
+                    dynamicPropertyList.put(String.format("%d",
+                            (CoverageNutritionDynamicBean.EMPLOYEES_TITLE + foodType + key).hashCode()),
+                            new DynamicProperty(Long.valueOf(clientsSet.size())));
+                }
+                ///CoverageNutritionReportItem item = itemHashMap.get(idOfOrg);
+                ///HashMap<String, DynamicProperty> dynamicPropertyList = item.getDynamicProperties();
+                //dynamicPropertyList.put(String.format("%d",
+                //        (CoverageNutritionDynamicBean.ORG_CARD_COMPLEXES + foodType + complexName + priceFormat(price) + CoverageNutritionDynamicBean.ORG_CARD_ORDERS_COUNT).hashCode()),
+                //        new DynamicProperty(orderCount));
+                ///dynamicPropertyList.put(String.format("%d","Обучающиеся 1-4 классовБуфет покупнаякол-во проданной продукции".hashCode()), new DynamicProperty(120L));
+            }
+        }
+
+        private void tryFillEmployeeData(HashMap<String, HashSet<Long>> employeeCountMap, CNReportItem item) {
+            if (!item.getGroupNameForTemplate().equals(CoverageNutritionDynamicBean.EMPLOYEES_TITLE)) return;
+
+            if (item.isBuffet()) {
+                if (employeeCountMap.get(CoverageNutritionDynamicBean.MENU_TYPE_BUFFET) == null) {
+                    employeeCountMap.put(CoverageNutritionDynamicBean.MENU_TYPE_BUFFET, new HashSet<Long>());
+                }
+                employeeCountMap.get(CoverageNutritionDynamicBean.MENU_TYPE_BUFFET).add(item.getIdOfClient());
+            } else {
+                if (employeeCountMap.get(CoverageNutritionDynamicBean.EMPLOYEES_COMPLEXES) == null) {
+                    employeeCountMap.put(CoverageNutritionDynamicBean.EMPLOYEES_COMPLEXES, new HashSet<Long>());
+                }
+                employeeCountMap.get(CoverageNutritionDynamicBean.EMPLOYEES_COMPLEXES).add(item.getIdOfClient());
+            }
+            if (employeeCountMap.get(CoverageNutritionDynamicBean.EMPLOYEES_COMPLEXES_AND_BUFFET) == null) {
+                employeeCountMap.put(CoverageNutritionDynamicBean.EMPLOYEES_COMPLEXES_AND_BUFFET, new HashSet<Long>());
+            }
+            employeeCountMap.get(CoverageNutritionDynamicBean.EMPLOYEES_COMPLEXES_AND_BUFFET).add(item.getIdOfClient());
+        }
+
+        private void putClientIntoComplexCountMap(HashMap<String, HashMap<String, HashMap<String, HashSet<Long>>>> clientCountMap,
+                HashMap<String, HashMap<String, HashSet<Long>>> clientCountPaidAndFreeMap,
+                HashMap<String, HashMap<String, HashSet<Long>>> clientCountTotalMap, CNReportItem item) {
+            if (clientCountMap.get(item.getGroupNameForTemplate()) == null) {
+                clientCountMap.put(item.getGroupNameForTemplate(), new HashMap<String, HashMap<String, HashSet<Long>>>());
+            }
+            if (clientCountMap.get(item.getGroupNameForTemplate()).get(item.getFoodType()) == null) {
+                clientCountMap.get(item.getGroupNameForTemplate()).put(item.getFoodType(), new HashMap<String, HashSet<Long>>());
+            }
+            if (clientCountMap.get(item.getGroupNameForTemplate()).get(item.getFoodType()).get(item.getComplexNameForTemplate()) == null) {
+                clientCountMap.get(item.getGroupNameForTemplate()).get(item.getFoodType()).put(item.getComplexNameForTemplate(), new HashSet<Long>());
+            }
+            clientCountMap.get(item.getGroupNameForTemplate()).get(item.getFoodType()).get(item.getComplexNameForTemplate()).add(item.getIdOfClient());
+
+            if (clientCountPaidAndFreeMap.get(item.getGroupNameForTemplate()) == null) {
+                clientCountPaidAndFreeMap.put(item.getGroupNameForTemplate(), new HashMap<String, HashSet<Long>>());
+            }
+            if (clientCountPaidAndFreeMap.get(item.getGroupNameForTemplate()).get(CoverageNutritionDynamicBean.PAID_AND_FREE) == null) {
+                clientCountPaidAndFreeMap.get(item.getGroupNameForTemplate()).put(CoverageNutritionDynamicBean.PAID_AND_FREE, new HashSet<Long>());
+            }
+            clientCountPaidAndFreeMap.get(item.getGroupNameForTemplate()).get(CoverageNutritionDynamicBean.PAID_AND_FREE).add(item.getIdOfClient());
+
+            if (clientCountTotalMap.get(item.getGroupNameForTemplate()) == null) {
+                clientCountTotalMap.put(item.getGroupNameForTemplate(), new HashMap<String, HashSet<Long>>());
+            }
+            if (clientCountTotalMap.get(item.getGroupNameForTemplate()).get(CoverageNutritionDynamicBean.CLIENTS_COUNT_TOTAL) == null) {
+                clientCountTotalMap.get(item.getGroupNameForTemplate()).put(CoverageNutritionDynamicBean.CLIENTS_COUNT_TOTAL, new HashSet<Long>());
+            }
+            clientCountTotalMap.get(item.getGroupNameForTemplate()).get(CoverageNutritionDynamicBean.CLIENTS_COUNT_TOTAL).add(item.getIdOfClient());
+        }
+
+        private void putClientIntoBuffetCountMap(HashMap<String, HashMap<String, HashSet<Long>>> clientBuffetCountMap,
+                HashMap<String, HashMap<String, HashSet<Long>>> clientBuffetCountTotalMap,
+                HashMap<String, HashMap<String, HashSet<Long>>> clientCountTotalMap, CNReportItem item) {
+            if (clientBuffetCountMap.get(item.getGroupNameForTemplate()) == null) {
+                clientBuffetCountMap.put(item.getGroupNameForTemplate(), new HashMap<String, HashSet<Long>>());
+            }
+            if (clientBuffetCountMap.get(item.getGroupNameForTemplate()).get(item.getFoodType()) == null) {
+                clientBuffetCountMap.get(item.getGroupNameForTemplate()).put(item.getFoodType(), new HashSet<Long>());
+            }
+            clientBuffetCountMap.get(item.getGroupNameForTemplate()).get(item.getFoodType()).add(item.getIdOfClient());
+
+            if (clientBuffetCountTotalMap.get(item.getGroupNameForTemplate()) == null) {
+                clientBuffetCountTotalMap.put(item.getGroupNameForTemplate(), new HashMap<String, HashSet<Long>>());
+            }
+            if (clientBuffetCountTotalMap.get(item.getGroupNameForTemplate()).get(CoverageNutritionDynamicBean.BUFFET_ALL_FULL) == null) {
+                clientBuffetCountTotalMap.get(item.getGroupNameForTemplate()).put(CoverageNutritionDynamicBean.BUFFET_ALL_FULL, new HashSet<Long>());
+            }
+            clientBuffetCountTotalMap.get(item.getGroupNameForTemplate()).get(CoverageNutritionDynamicBean.BUFFET_ALL_FULL).add(item.getIdOfClient());
+
+            if (clientCountTotalMap.get(item.getGroupNameForTemplate()) == null) {
+                clientCountTotalMap.put(item.getGroupNameForTemplate(), new HashMap<String, HashSet<Long>>());
+            }
+            if (clientCountTotalMap.get(item.getGroupNameForTemplate()).get(CoverageNutritionDynamicBean.CLIENTS_COUNT_TOTAL) == null) {
+                clientCountTotalMap.get(item.getGroupNameForTemplate()).put(CoverageNutritionDynamicBean.CLIENTS_COUNT_TOTAL, new HashSet<Long>());
+            }
+            clientCountTotalMap.get(item.getGroupNameForTemplate()).get(CoverageNutritionDynamicBean.CLIENTS_COUNT_TOTAL).add(item.getIdOfClient());
+        }
+
+        private void putClientIntoComplexQtyMap(HashMap<String, HashMap<String, HashMap<String, Integer>>> clientQtyMap,
+                HashMap<String, HashMap<String, Integer>> clientQtyPaidAndFreeMap, CNReportItem item) {
+            if (clientQtyMap.get(item.getGroupNameForTemplate()) == null) {
+                clientQtyMap.put(item.getGroupNameForTemplate(), new HashMap<String, HashMap<String, Integer>>());
+            }
+            if (clientQtyMap.get(item.getGroupNameForTemplate()).get(item.getFoodType()) == null) {
+                clientQtyMap.get(item.getGroupNameForTemplate()).put(item.getFoodType(), new HashMap<String, Integer>());
+            }
+            if (clientQtyMap.get(item.getGroupNameForTemplate()).get(item.getFoodType()).get(item.getComplexNameForTemplate()) == null) {
+                clientQtyMap.get(item.getGroupNameForTemplate()).get(item.getFoodType()).put(item.getComplexNameForTemplate(), 0);
+            }
+            clientQtyMap.get(item.getGroupNameForTemplate()).get(item.getFoodType()).put(item.getComplexNameForTemplate(),
+                    clientQtyMap.get(item.getGroupNameForTemplate()).get(item.getFoodType()).get(item.getComplexNameForTemplate()) + item.getQty());
+
+            if (clientQtyPaidAndFreeMap.get(item.getGroupNameForTemplate()) == null) {
+                clientQtyPaidAndFreeMap.put(item.getGroupNameForTemplate(), new HashMap<String, Integer>());
+            }
+            if (clientQtyPaidAndFreeMap.get(item.getGroupNameForTemplate()).get(CoverageNutritionDynamicBean.PAID_AND_FREE) == null) {
+                clientQtyPaidAndFreeMap.get(item.getGroupNameForTemplate()).put(CoverageNutritionDynamicBean.PAID_AND_FREE, 0);
+            }
+            clientQtyPaidAndFreeMap.get(item.getGroupNameForTemplate()).put(CoverageNutritionDynamicBean.PAID_AND_FREE,
+                    clientQtyPaidAndFreeMap.get(item.getGroupNameForTemplate()).get(CoverageNutritionDynamicBean.PAID_AND_FREE) + item.getQty());
+
+        }
+
+        private void putClientIntoBuffetQtyMap(HashMap<String, HashMap<String, Integer>> clientBuffetQtyMap,
+                HashMap<String, HashMap<String, Integer>> clientBuffetQtyTotalMap, CNReportItem item) {
+            if (clientBuffetQtyMap.get(item.getGroupNameForTemplate()) == null) {
+                clientBuffetQtyMap.put(item.getGroupNameForTemplate(), new HashMap<String, Integer>());
+            }
+            if (clientBuffetQtyMap.get(item.getGroupNameForTemplate()).get(item.getFoodType()) == null) {
+                clientBuffetQtyMap.get(item.getGroupNameForTemplate()).put(item.getFoodType(), 0);
+            }
+            clientBuffetQtyMap.get(item.getGroupNameForTemplate()).put(item.getFoodType(),
+                    clientBuffetQtyMap.get(item.getGroupNameForTemplate()).get(item.getFoodType()) + item.getQty());
+
+            if (clientBuffetQtyTotalMap.get(item.getGroupNameForTemplate()) == null) {
+                clientBuffetQtyTotalMap.put(item.getGroupNameForTemplate(), new HashMap<String, Integer>());
+            }
+            if (clientBuffetQtyTotalMap.get(item.getGroupNameForTemplate()).get(CoverageNutritionDynamicBean.BUFFET_ALL_FULL) == null) {
+                clientBuffetQtyTotalMap.get(item.getGroupNameForTemplate()).put(CoverageNutritionDynamicBean.BUFFET_ALL_FULL, 0);
+            }
+            clientBuffetQtyTotalMap.get(item.getGroupNameForTemplate()).put(CoverageNutritionDynamicBean.BUFFET_ALL_FULL,
+                    clientBuffetQtyTotalMap.get(item.getGroupNameForTemplate()).get(CoverageNutritionDynamicBean.BUFFET_ALL_FULL) + item.getQty());
+        }
+
+
+
+        //Получаем все заказы с детализацией по всем выбранным ОО за период
+        private List<CNReportItem> loadAllData(Session session, Collection<Long> idOfOrgList, Date startDate,
+                Date endDate) {
+            String sqlString = "select distinct "
+                    + "c.idofclient, "//0
+                    + "c.idofclientgroup, "//1
+                    + "cg.groupname, "//2
+                    + "o.idoforg, "//3
+                    + "od.menutype, "//4
+                    + "od.menuorigin, "//5
+                    + "od.rprice, "//6
+                    + "od.discount, "//7
+                    + "od.qty, "//8
+                    + "od.menudetailname, "//9
+                    + "case when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 1 and 4 then 'Обучающиеся 1-4 классов' "
+                    + "    when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 5 and 9 then 'Обучающиеся 5-9 классов' "
+                    + "    when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 10 and 11 then 'Обучающиеся 10-11 классов' "
+                    + "    when cg.idofclientgroup in (:clientEmployees, :clientAdministration, :clientTechEmployees) or cg.groupname = 'Сотрудники' then 'Сотрудники' "
+                    + "else 'Обучающиеся другие группы' end as gr, "//10
+                    + "case when od.menutype = 0 and od.menuorigin in (0, 1, 2) then 'Буфет горячее' "
+                    + "    when od.menutype = 0 and od.menuorigin in (10, 11, 20) then 'Буфет покупная'"
+                    + "    when od.menutype between 50 and 99 and od.rprice > 0 then 'Платное питание' "
+                    + "    when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then 'Бесплатное питание' end as foodtype "//11
+                    + "from cf_orders o "
+                    + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
+                    + "join cf_orgs og on o.idoforg = og.idoforg join cf_clients c on c.idofclient = o.idofclient "
+                    + "join cf_persons p on c.idofperson = p.idofperson "
+                    + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
+                    + "where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
+                    + " and od.menutype < 150 "
+                    + "     and og.organizationtype = 0 ";
+
+            Query query = session.createSQLQuery(sqlString);
+            query.setParameterList("idOfOrgList", idOfOrgList);
+            query.setParameter("startDate", startDate.getTime());
+            query.setParameter("endDate", endDate.getTime());
+            query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            query.setParameter("clientAdministration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+            query.setParameter("clientTechEmployees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+
+            List<CNReportItem> reportItems = new ArrayList<>();
+            List list = query.list();
+            for (Object o : list) {
+                Object[] row = (Object[]) o;
+                Long idOfClient = (row[0] == null) ? 0 : ((BigInteger) row[0]).longValue();
+                Long idOfClientGroup = (row[1] == null) ? 0 : ((BigInteger) row[1]).longValue();
+                String groupName = (row[2] == null) ? "" : (String) row[2];
+                Long idOfOrg = ((BigInteger) row[3]).longValue();
+                Integer menuType = (Integer) row[4];
+                Integer menuOrigin = (Integer) row[5];
+                Long rprice = ((BigInteger) row[6]).longValue();
+                Long discount = ((BigInteger) row[7]).longValue();
+                Integer qty = (Integer) row[8];
+                String menuDetailName = (String) row[9];
+                String groupNameForTemplate = (String) row[10];
+                String foodType = (String) row[11];
+                CNReportItem item = new CNReportItem(idOfClient, idOfClientGroup, groupName, idOfOrg, menuType, menuOrigin, rprice, discount,
+                        qty, menuDetailName, groupNameForTemplate, foodType);
+                reportItems.add(item);
+            }
+            return reportItems;
         }
 
         private void loadStatistic(Session session, HashMap<Long, CoverageNutritionReportItem> itemHashMap) {
@@ -2263,19 +2621,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
         }
 
         private String priceFormat(Long price) {
-            if (price.equals(0L)) {
-                return "";
-            }
-
-            Integer rub = new Double(price.doubleValue() / 100.f).intValue();
-            Integer cop = new Long(price - rub * 100).intValue();
-
-            String moneyString = String.format(" - %d руб.", rub);
-
-            if (!cop.equals(0)) {
-                moneyString += String.format(" %02d коп.", cop);
-            }
-            return moneyString;
+            return CNReportItem.priceFormat(price);
         }
 
         public String getTemplateFilename() {
