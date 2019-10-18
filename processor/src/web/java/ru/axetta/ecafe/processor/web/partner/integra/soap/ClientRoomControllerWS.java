@@ -2588,8 +2588,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuMaxIdCriteria.add(Restrictions.lt("m.menuDate", fromCal.getTime()));
         menuMaxIdCriteria.add(Restrictions.like("menuPath", "%уфет%"));
         menuMaxIdCriteria.setProjection(Projections.max("m.idOfMenu"));
-        menuMaxIdCriteria.add(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)));
-
+        menuMaxIdCriteria.add(Restrictions
+                .or(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)),
+                        Restrictions.isNull("groupName")));
         Long menuMaxId = (Long) menuMaxIdCriteria.uniqueResult();
 
         List menus = new ArrayList();
@@ -2649,8 +2650,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
             menuDetailCriteria.add(Restrictions.eq("menu", menu));
             menuDetailCriteria.add(Restrictions.eq("availableNow", 1));
-            menuDetailCriteria
-                    .add(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)));
+            menuDetailCriteria.add(Restrictions
+                    .or(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)),
+                            Restrictions.isNull("groupName")));
             HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
             HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
             List menuDetails = menuDetailCriteria.list();
@@ -2831,7 +2833,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuMaxIdCriteria.add(Restrictions.lt("m.menuDate", fromCal.getTime()));
         menuMaxIdCriteria.add(Restrictions.like("menuPath", "%уфет%"));
         menuMaxIdCriteria.setProjection(Projections.max("m.idOfMenu"));
-        menuMaxIdCriteria.add(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)));
+        menuMaxIdCriteria.add(Restrictions
+                .or(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)),
+                        Restrictions.isNull("groupName")));
 
         Long menuMaxId = (Long) menuMaxIdCriteria.uniqueResult();
 
@@ -2916,8 +2920,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
             menuDetailCriteria.add(Restrictions.eq("menu", menu));
             menuDetailCriteria.add(Restrictions.eq("availableNow", 1));
-            menuDetailCriteria
-                    .add(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)));
+            menuDetailCriteria.add(Restrictions
+                    .or(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)),
+                            Restrictions.isNull("groupName")));
             //   menuDetailCriteria.add(Restrictions.sqlRestriction("{alias}.menupath !~ '^\\[\\d*\\]'"));
             HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
             HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
@@ -3024,8 +3029,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
             menuDetailCriteria.add(Restrictions.eq("availableNow", 1));
             menuDetailCriteria.add(Restrictions.eq("menu", menu));
-            menuDetailCriteria
-                    .add(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)));
+            menuDetailCriteria.add(Restrictions
+                    .or(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)),
+                            Restrictions.isNull("groupName")));
             //menuDetailCriteria.add(Restrictions.sqlRestriction("{alias}.menupath !~ '^\\[\\d*\\]'"));
             HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
             HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
@@ -3107,8 +3113,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
             menuDetailCriteria.add(Restrictions.eq("menu", menu));
             menuDetailCriteria.add(Restrictions.eq("availableNow", 1));
-            menuDetailCriteria
-                    .add(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)));
+            menuDetailCriteria.add(Restrictions
+                    .or(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)),
+                            Restrictions.isNull("groupName")));
             HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
             HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
             List menuDetails = menuDetailCriteria.list();
