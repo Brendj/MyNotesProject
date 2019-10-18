@@ -24,6 +24,7 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
     private SyncInfo photoSync;
     private SyncInfo helpRequestsSync;
     private SyncInfo libSync;
+    private List<SyncSettings> allSyncSettings = new LinkedList<>();
 
     private static final Comparator<String> comparable = new Comparator<String>() {
         @Override
@@ -68,6 +69,7 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
                     libSync = new SyncInfo(setting);
             }
         }
+        this.allSyncSettings = settings;
     }
 
     public String getOrgName() {
@@ -167,7 +169,6 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
         private String times;
         private String days = "";
         private String fullInf;
-
 
         SyncInfo(SyncSettings setting) {
             times = buildStringTimes(setting.getConcreteTime());

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service.orgparameters;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ConcreteTime;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSyncSettingReport;
@@ -31,12 +32,15 @@ import java.util.*;
 public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgListSelectPage.CompleteHandlerList {
     private static final Logger logger = LoggerFactory.getLogger(OrgSyncSettingReportPage.class);
 
-    private Boolean allFriendlyOrgs = true;
+    private Boolean allFriendlyOrgs = false;
     private List<SelectItem> listOfOrgDistricts;
     private List<SelectItem> listOfContentType;
+    private List<SelectItem> modalListOfContentType;
     private String selectedDistricts = "";
     private Integer selectedContentType = OrgSyncSettingReport.ALL_TYPES;
+    private Integer modalSelectedContentType = ContentType.FULL_SYNC.getTypeCode();
     private List<OrgSyncSettingReportItem> items = new LinkedList<>();
+    private OrgSyncSettingReportItem selectedItem = null;
 
     private List<SelectItem> buildListOfOrgDistricts(Session session) {
         List<String> allDistricts;
@@ -60,6 +64,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             listOfOrgDistricts = buildListOfOrgDistricts(session);
             listOfContentType = buildListOfContentType();
+            modalListOfContentType = buildModalListOfContentType();
             items.clear();
         } catch (Exception e){
             logger.error("Exception when prepared the OrgSyncSettingsPage: ", e);
@@ -67,6 +72,19 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         } finally {
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private List<SelectItem> buildModalListOfContentType() {
+        List<SelectItem> selectItemList = new LinkedList<SelectItem>();
+        selectItemList.add(new SelectItem(ContentType.FULL_SYNC.getTypeCode(), ContentType.FULL_SYNC.toString()));
+        selectItemList.add(new SelectItem(ContentType.BALANCES_AND_ENTEREVENTS.getTypeCode(), ContentType.BALANCES_AND_ENTEREVENTS.toString()));
+        selectItemList.add(new SelectItem(ContentType.ORGSETTINGS.getTypeCode(), ContentType.ORGSETTINGS.toString()));
+        selectItemList.add(new SelectItem(ContentType.CLIENTS_DATA.getTypeCode(), ContentType.CLIENTS_DATA.toString()));
+        selectItemList.add(new SelectItem(ContentType.MENU.getTypeCode(), ContentType.MENU.toString()));
+        selectItemList.add(new SelectItem(ContentType.PHOTOS.getTypeCode(), ContentType.PHOTOS.toString()));
+        selectItemList.add(new SelectItem(ContentType.SUPPORT_SERVICE.getTypeCode(), ContentType.SUPPORT_SERVICE.toString()));
+        selectItemList.add(new SelectItem(ContentType.LIBRARY.getTypeCode(), ContentType.LIBRARY.toString()));
+        return selectItemList;
     }
 
     private List<SelectItem> buildListOfContentType() {
@@ -262,5 +280,51 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
 
     public boolean getShowColumnLib() {
         return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.LIBRARY.getTypeCode());
+    }
+
+    public OrgSyncSettingReportItem getSelectedItem() {
+        return selectedItem;
+    }
+
+    public void setSelectedItem(OrgSyncSettingReportItem selectedItem) {
+        this.selectedItem = selectedItem;
+    }
+
+    public Object resetChanges() {
+        return null;
+    }
+
+    public List<SelectItem> getModalListOfContentType() {
+        return modalListOfContentType;
+    }
+
+    public void setModalListOfContentType(List<SelectItem> modalListOfContentType) {
+        this.modalListOfContentType = modalListOfContentType;
+    }
+
+    public Integer getModalSelectedContentType() {
+        return modalSelectedContentType;
+    }
+
+    public void setModalSelectedContentType(Integer modalSelectedContentType) {
+        this.modalSelectedContentType = modalSelectedContentType;
+    }
+
+    class EditedSetting{
+        private Integer everySecond;
+        private Integer limitStartHour;
+        private Integer limitEndHour;
+        private Boolean monday = false;
+        private Boolean tuesday = false;
+        private Boolean wednesday = false;
+        private Boolean thursday = false;
+        private Boolean friday = false;
+        private Boolean saturday = false;
+        private Boolean sunday = false;
+        private Long version;
+        private Boolean deleteState = false;
+        private Set<ConcreteTime> concreteTime = new HashSet<>();
+        private Date createdDate;
+        private Date lastUpdate;
     }
 }
