@@ -77,31 +77,40 @@
                                      value="#{orgSyncSettingReportPage.modalSelectedContentType}"
                                      styleClass="input-text" style="width: 175px;">
                         <f:selectItems value="#{orgSyncSettingReportPage.modalListOfContentType}"/>
+                        <a4j:support action="#{orgSyncSettingReportPage.buildEditedItem()}"/>
                     </h:selectOneMenu>
                 </h:panelGrid>
             </h:panelGroup>
             <h:panelGroup>
                 <h:panelGrid styleClass="borderless-grid" columns="2">
                     <h:outputText styleClass="output-text" value="Время сеанса 1"/>
+                    <h:inputText value="#{orgSyncSettingReportPage.editedSetting.concreteTime1}">
+                        <f:convertDateTime pattern="HH:mm" />
+                    </h:inputText>
                     <h:outputText styleClass="output-text" value="Время сеанса 2"/>
+                    <h:inputText value="#{orgSyncSettingReportPage.editedSetting.concreteTime2}">
+                        <f:convertDateTime pattern="HH:mm" />
+                    </h:inputText>
                     <h:outputText styleClass="output-text" value="Время сеанса 3"/>
+                    <h:inputText value="#{orgSyncSettingReportPage.editedSetting.concreteTime3}">
+                        <f:convertDateTime pattern="HH:mm" />
+                    </h:inputText>
                     <h:outputText styleClass="output-text" value="Запускать через каждые (сек.) "/>
+                    <h:inputText value="#{orgSyncSettingReportPage.editedSetting.everySecond}"/>
                     <h:outputText styleClass="output-text" value="Понедельник"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.monday}" styleClass="checkboxes"/>
                     <h:outputText styleClass="output-text" value="Вторник"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.tuesday}" styleClass="checkboxes"/>
                     <h:outputText styleClass="output-text" value="Среда"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.wednesday}" styleClass="checkboxes"/>
                     <h:outputText styleClass="output-text" value="Четверг"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.thursday}" styleClass="checkboxes"/>
                     <h:outputText styleClass="output-text" value="Пятница"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.friday}" styleClass="checkboxes"/>
                     <h:outputText styleClass="output-text" value="Суббота"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.saturday}" styleClass="checkboxes"/>
                     <h:outputText styleClass="output-text" value="Воскресенье"/>
-                    <h:outputText styleClass="output-text" value="#{orgSyncSettingReportPage.selectedItem.idOfOrg}"/>
-                    <h:outputText styleClass="output-text" value="Название :"/>
-                    <h:outputText styleClass="output-text" value="#{orgSyncSettingReportPage.selectedItem.orgName}"/>
-                    <h:outputText styleClass="output-text" value="Тип синхронизации"/>
-                    <h:selectOneMenu id="modalContentType"
-                                     value="#{orgSyncSettingReportPage.modalSelectedContentType}"
-                                     styleClass="input-text" style="width: 175px;">
-                        <f:selectItems value="#{orgSyncSettingReportPage.modalListOfContentType}"/>
-                    </h:selectOneMenu>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.sunday}" styleClass="checkboxes"/>
                 </h:panelGrid>
             </h:panelGroup>
         </h:panelGrid>
@@ -200,6 +209,7 @@
                 <h:outputText escape="true" value="Редактировать"/>
             </f:facet>
             <a4j:commandLink styleClass="command-link"
+                             action="#{orgSyncSettingReportPage.buildEditedItem()}"
                              oncomplete="Richfaces.showModalPanel('OrgSyncSettingEditPanel')"
                              reRender="OrgSyncSettingEditPanel">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;"/>

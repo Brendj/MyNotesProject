@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service.orgparameters;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ConcreteTime;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettings;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSyncSettingReport;
 import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSyncSettingReportItem;
@@ -41,6 +42,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     private Integer modalSelectedContentType = ContentType.FULL_SYNC.getTypeCode();
     private List<OrgSyncSettingReportItem> items = new LinkedList<>();
     private OrgSyncSettingReportItem selectedItem = null;
+    private EditedSetting editedSetting;
 
     private List<SelectItem> buildListOfOrgDistricts(Session session) {
         List<String> allDistricts;
@@ -188,6 +190,24 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         }*/
     }
 
+    public void buildEditedItem() {
+        SyncSettings currentSetting = findBySelectedModalType(selectedItem.getAllSyncSettings(), modalSelectedContentType);
+        if(currentSetting == null){
+            editedSetting = new EditedSetting();
+        } else {
+            editedSetting = new EditedSetting(currentSetting);
+        }
+    }
+
+    private SyncSettings findBySelectedModalType(List<SyncSettings> allSyncSettings, Integer modalSelectedContentType) {
+        for(SyncSettings setting : allSyncSettings){
+            if(setting.getContentType().getTypeCode().equals(modalSelectedContentType)){
+                return setting;
+            }
+        }
+        return null;
+    }
+
     @Override
     public String getPageFilename() {
         return "service/org_sync_settings";
@@ -310,7 +330,15 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         this.modalSelectedContentType = modalSelectedContentType;
     }
 
-    class EditedSetting{
+    public EditedSetting getEditedSetting() {
+        return editedSetting;
+    }
+
+    public void setEditedSetting(EditedSetting editedSetting) {
+        this.editedSetting = editedSetting;
+    }
+
+    class EditedSetting {
         private Integer everySecond;
         private Integer limitStartHour;
         private Integer limitEndHour;
@@ -321,10 +349,141 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         private Boolean friday = false;
         private Boolean saturday = false;
         private Boolean sunday = false;
-        private Long version;
-        private Boolean deleteState = false;
-        private Set<ConcreteTime> concreteTime = new HashSet<>();
-        private Date createdDate;
-        private Date lastUpdate;
+        private String concreteTime1;
+        private String concreteTime2;
+        private String concreteTime3;
+
+        public EditedSetting(){
+        }
+
+        public EditedSetting(SyncSettings syncSettings){
+            this.everySecond = syncSettings.getEverySecond();
+            this.limitStartHour = syncSettings.getLimitStartHour();
+            this.limitEndHour = syncSettings.getLimitEndHour();
+            this.monday = syncSettings.getMonday();
+            this.tuesday = syncSettings.getTuesday();
+            this.wednesday = syncSettings.getWednesday();
+            this.thursday = syncSettings.getThursday();
+            this.friday = syncSettings.getFriday();
+            this.saturday = syncSettings.getSaturday();
+            this.sunday = syncSettings.getSunday();
+            ConcreteTime[] times = (ConcreteTime[]) syncSettings.getConcreteTime().toArray();
+            if(times.length > 0){
+                if(times.length == 1){
+                    concreteTime1 = times[0].getConcreteTime();
+                } else if(times.length == 2){
+                    concreteTime1 = times[0].getConcreteTime();
+                    concreteTime2 = times[1].getConcreteTime();
+                } else if(times.length == 3){
+                    concreteTime1 = times[0].getConcreteTime();
+                    concreteTime2 = times[1].getConcreteTime();
+                    concreteTime3 = times[2].getConcreteTime();
+                }
+            }
+        }
+
+        public Integer getEverySecond() {
+            return everySecond;
+        }
+
+        public void setEverySecond(Integer everySecond) {
+            this.everySecond = everySecond;
+        }
+
+        public Integer getLimitStartHour() {
+            return limitStartHour;
+        }
+
+        public void setLimitStartHour(Integer limitStartHour) {
+            this.limitStartHour = limitStartHour;
+        }
+
+        public Integer getLimitEndHour() {
+            return limitEndHour;
+        }
+
+        public void setLimitEndHour(Integer limitEndHour) {
+            this.limitEndHour = limitEndHour;
+        }
+
+        public Boolean getMonday() {
+            return monday;
+        }
+
+        public void setMonday(Boolean monday) {
+            this.monday = monday;
+        }
+
+        public Boolean getTuesday() {
+            return tuesday;
+        }
+
+        public void setTuesday(Boolean tuesday) {
+            this.tuesday = tuesday;
+        }
+
+        public Boolean getWednesday() {
+            return wednesday;
+        }
+
+        public void setWednesday(Boolean wednesday) {
+            this.wednesday = wednesday;
+        }
+
+        public Boolean getThursday() {
+            return thursday;
+        }
+
+        public void setThursday(Boolean thursday) {
+            this.thursday = thursday;
+        }
+
+        public Boolean getFriday() {
+            return friday;
+        }
+
+        public void setFriday(Boolean friday) {
+            this.friday = friday;
+        }
+
+        public Boolean getSaturday() {
+            return saturday;
+        }
+
+        public void setSaturday(Boolean saturday) {
+            this.saturday = saturday;
+        }
+
+        public Boolean getSunday() {
+            return sunday;
+        }
+
+        public void setSunday(Boolean sunday) {
+            this.sunday = sunday;
+        }
+
+        public String getConcreteTime1() {
+            return concreteTime1;
+        }
+
+        public void setConcreteTime1(String concreteTime1) {
+            this.concreteTime1 = concreteTime1;
+        }
+
+        public String getConcreteTime2() {
+            return concreteTime2;
+        }
+
+        public void setConcreteTime2(String concreteTime2) {
+            this.concreteTime2 = concreteTime2;
+        }
+
+        public String getConcreteTime3() {
+            return concreteTime3;
+        }
+
+        public void setConcreteTime3(String concreteTime3) {
+            this.concreteTime3 = concreteTime3;
+        }
     }
 }

@@ -165,6 +165,14 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
         this.clientDataSync = clientDataSync;
     }
 
+    public List<SyncSettings> getAllSyncSettings() {
+        return allSyncSettings;
+    }
+
+    public void setAllSyncSettings(List<SyncSettings> allSyncSettings) {
+        this.allSyncSettings = allSyncSettings;
+    }
+
     public class SyncInfo {
         private String times;
         private String days = "";
