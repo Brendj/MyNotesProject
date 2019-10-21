@@ -23,6 +23,7 @@ public class CNReportItem {
     private String menuDetailName;
     private String groupNameForTemplate;
     private String foodType;
+    private String surname;
 
     public static final List<Integer> listMenuOriginBuffet = Arrays.asList(0, 1, 2, 10, 11, 20);
 
@@ -32,7 +33,7 @@ public class CNReportItem {
 
     public CNReportItem(Long idOfClient, Long idOfClientGroup, String groupName, Long idOfOrg, Integer menuType,
             Integer menuOrigin, Long rprice, Long discount, Integer qty, String menuDetailName, String groupNameForTemplate,
-            String foodType) {
+            String foodType, String surname) {
         this.idOfClient = idOfClient;
         this.idOfClientGroup = idOfClientGroup;
         this.groupName = groupName;
@@ -45,6 +46,7 @@ public class CNReportItem {
         this.menuDetailName = menuDetailName;
         this.groupNameForTemplate = groupNameForTemplate;
         this.foodType = foodType;
+        this.surname = surname;
     }
 
     public boolean isBuffet() {
@@ -186,5 +188,13 @@ public class CNReportItem {
 
     public void setFoodType(String foodType) {
         this.foodType = foodType;
+    }
+
+    public String getSurname() {
+        return surname;
+    }
+
+    public void setSurname(String surname) {
+        this.surname = surname;
     }
 }
