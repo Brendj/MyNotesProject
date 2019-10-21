@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.web.ui.service.orgparameters;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ConcreteTime;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettings;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -27,6 +26,8 @@ import org.springframework.stereotype.Component;
 import javax.faces.model.SelectItem;
 import java.util.*;
 
+import static ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType.*;
+
 @Component
 @Scope("session")
 @DependsOn("runtimeContext")
@@ -39,10 +40,13 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     private List<SelectItem> modalListOfContentType;
     private String selectedDistricts = "";
     private Integer selectedContentType = OrgSyncSettingReport.ALL_TYPES;
-    private Integer modalSelectedContentType = ContentType.FULL_SYNC.getTypeCode();
+    private Integer modalSelectedContentType = FULL_SYNC.getTypeCode();
     private List<OrgSyncSettingReportItem> items = new LinkedList<>();
     private OrgSyncSettingReportItem selectedItem = null;
-    private EditedSetting editedSetting;
+    private EditedSetting editedSetting = new EditedSetting();
+    private Boolean runEverySecond = false;
+    private Boolean showConcreteTime2 = false;
+    private Boolean showConcreteTime3 = false;
 
     private List<SelectItem> buildListOfOrgDistricts(Session session) {
         List<String> allDistricts;
@@ -78,28 +82,28 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
 
     private List<SelectItem> buildModalListOfContentType() {
         List<SelectItem> selectItemList = new LinkedList<SelectItem>();
-        selectItemList.add(new SelectItem(ContentType.FULL_SYNC.getTypeCode(), ContentType.FULL_SYNC.toString()));
-        selectItemList.add(new SelectItem(ContentType.BALANCES_AND_ENTEREVENTS.getTypeCode(), ContentType.BALANCES_AND_ENTEREVENTS.toString()));
-        selectItemList.add(new SelectItem(ContentType.ORGSETTINGS.getTypeCode(), ContentType.ORGSETTINGS.toString()));
-        selectItemList.add(new SelectItem(ContentType.CLIENTS_DATA.getTypeCode(), ContentType.CLIENTS_DATA.toString()));
-        selectItemList.add(new SelectItem(ContentType.MENU.getTypeCode(), ContentType.MENU.toString()));
-        selectItemList.add(new SelectItem(ContentType.PHOTOS.getTypeCode(), ContentType.PHOTOS.toString()));
-        selectItemList.add(new SelectItem(ContentType.SUPPORT_SERVICE.getTypeCode(), ContentType.SUPPORT_SERVICE.toString()));
-        selectItemList.add(new SelectItem(ContentType.LIBRARY.getTypeCode(), ContentType.LIBRARY.toString()));
+        selectItemList.add(new SelectItem(FULL_SYNC.getTypeCode(), FULL_SYNC.toString()));
+        selectItemList.add(new SelectItem(BALANCES_AND_ENTEREVENTS.getTypeCode(), BALANCES_AND_ENTEREVENTS.toString()));
+        selectItemList.add(new SelectItem(ORGSETTINGS.getTypeCode(), ORGSETTINGS.toString()));
+        selectItemList.add(new SelectItem(CLIENTS_DATA.getTypeCode(), CLIENTS_DATA.toString()));
+        selectItemList.add(new SelectItem(MENU.getTypeCode(), MENU.toString()));
+        selectItemList.add(new SelectItem(PHOTOS.getTypeCode(), PHOTOS.toString()));
+        selectItemList.add(new SelectItem(SUPPORT_SERVICE.getTypeCode(), SUPPORT_SERVICE.toString()));
+        selectItemList.add(new SelectItem(LIBRARY.getTypeCode(), LIBRARY.toString()));
         return selectItemList;
     }
 
     private List<SelectItem> buildListOfContentType() {
         List<SelectItem> selectItemList = new LinkedList<SelectItem>();
         selectItemList.add(new SelectItem(OrgSyncSettingReport.ALL_TYPES, "Все"));
-        selectItemList.add(new SelectItem(ContentType.FULL_SYNC.getTypeCode(), ContentType.FULL_SYNC.toString()));
-        selectItemList.add(new SelectItem(ContentType.BALANCES_AND_ENTEREVENTS.getTypeCode(), ContentType.BALANCES_AND_ENTEREVENTS.toString()));
-        selectItemList.add(new SelectItem(ContentType.ORGSETTINGS.getTypeCode(), ContentType.ORGSETTINGS.toString()));
-        selectItemList.add(new SelectItem(ContentType.CLIENTS_DATA.getTypeCode(), ContentType.CLIENTS_DATA.toString()));
-        selectItemList.add(new SelectItem(ContentType.MENU.getTypeCode(), ContentType.MENU.toString()));
-        selectItemList.add(new SelectItem(ContentType.PHOTOS.getTypeCode(), ContentType.PHOTOS.toString()));
-        selectItemList.add(new SelectItem(ContentType.SUPPORT_SERVICE.getTypeCode(), ContentType.SUPPORT_SERVICE.toString()));
-        selectItemList.add(new SelectItem(ContentType.LIBRARY.getTypeCode(), ContentType.LIBRARY.toString()));
+        selectItemList.add(new SelectItem(FULL_SYNC.getTypeCode(), FULL_SYNC.toString()));
+        selectItemList.add(new SelectItem(BALANCES_AND_ENTEREVENTS.getTypeCode(), BALANCES_AND_ENTEREVENTS.toString()));
+        selectItemList.add(new SelectItem(ORGSETTINGS.getTypeCode(), ORGSETTINGS.toString()));
+        selectItemList.add(new SelectItem(CLIENTS_DATA.getTypeCode(), CLIENTS_DATA.toString()));
+        selectItemList.add(new SelectItem(MENU.getTypeCode(), MENU.toString()));
+        selectItemList.add(new SelectItem(PHOTOS.getTypeCode(), PHOTOS.toString()));
+        selectItemList.add(new SelectItem(SUPPORT_SERVICE.getTypeCode(), SUPPORT_SERVICE.toString()));
+        selectItemList.add(new SelectItem(LIBRARY.getTypeCode(), LIBRARY.toString()));
         return selectItemList;
     }
 
@@ -191,21 +195,50 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     }
 
     public void buildEditedItem() {
-        SyncSettings currentSetting = findBySelectedModalType(selectedItem.getAllSyncSettings(), modalSelectedContentType);
+        SyncSettings currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
         if(currentSetting == null){
             editedSetting = new EditedSetting();
         } else {
             editedSetting = new EditedSetting(currentSetting);
         }
+        runEverySecond = modalSelectedContentType.equals(BALANCES_AND_ENTEREVENTS.getTypeCode())
+                || modalSelectedContentType.equals(SUPPORT_SERVICE.getTypeCode());
+
+        showConcreteTime2 = modalSelectedContentType.equals(ORGSETTINGS.getTypeCode())
+                || modalSelectedContentType.equals(CLIENTS_DATA.getTypeCode())
+                || modalSelectedContentType.equals(MENU.getTypeCode())
+                || modalSelectedContentType.equals(PHOTOS.getTypeCode())
+                || modalSelectedContentType.equals(LIBRARY.getTypeCode());
+
+        showConcreteTime3 = modalSelectedContentType.equals(CLIENTS_DATA.getTypeCode());
     }
 
-    private SyncSettings findBySelectedModalType(List<SyncSettings> allSyncSettings, Integer modalSelectedContentType) {
-        for(SyncSettings setting : allSyncSettings){
-            if(setting.getContentType().getTypeCode().equals(modalSelectedContentType)){
-                return setting;
-            }
+    private SyncSettings findBySelectedModalType(OrgSyncSettingReportItem item, Integer modalSelectedContentType) {
+        ContentType type = getContentTypeByCode(modalSelectedContentType);
+        switch (type){
+            case FULL_SYNC:
+                return getSyncSettingsOrNull(item.getFullSync());
+            case BALANCES_AND_ENTEREVENTS:
+                return getSyncSettingsOrNull(item.getAccIncSync());
+            case ORGSETTINGS:
+                return getSyncSettingsOrNull(item.getOrgSettingSync());
+            case CLIENTS_DATA:
+                return getSyncSettingsOrNull(item.getClientDataSync());
+            case MENU:
+                return getSyncSettingsOrNull(item.getMenuSync());
+            case PHOTOS:
+                return getSyncSettingsOrNull(item.getPhotoSync());
+            case SUPPORT_SERVICE:
+                return getSyncSettingsOrNull(item.getHelpRequestsSync());
+            case LIBRARY:
+                return getSyncSettingsOrNull(item.getLibSync());
+            default:
+                return null;
         }
-        return null;
+    }
+
+    private SyncSettings getSyncSettingsOrNull(OrgSyncSettingReportItem.SyncInfo info){
+        return info == null ? null : info.getSetting();
     }
 
     @Override
@@ -271,35 +304,36 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     }
 
     public boolean getShowColumnFull() {
-        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.FULL_SYNC.getTypeCode());
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(FULL_SYNC.getTypeCode());
     }
 
     public boolean getShowColumnBalance() {
-        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.BALANCES_AND_ENTEREVENTS.getTypeCode());
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(
+                BALANCES_AND_ENTEREVENTS.getTypeCode());
     }
 
     public boolean getShowColumnOrgSettings() {
-        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.ORGSETTINGS.getTypeCode());
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ORGSETTINGS.getTypeCode());
     }
 
     public boolean getShowColumnClientData() {
-        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.CLIENTS_DATA.getTypeCode());
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(CLIENTS_DATA.getTypeCode());
     }
 
     public boolean getShowColumnMenu() {
-        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.MENU.getTypeCode());
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(MENU.getTypeCode());
     }
 
     public boolean getShowColumnPhoto() {
-        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.PHOTOS.getTypeCode());
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(PHOTOS.getTypeCode());
     }
 
     public boolean getShowColumnSupport() {
-        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.SUPPORT_SERVICE.getTypeCode());
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(SUPPORT_SERVICE.getTypeCode());
     }
 
     public boolean getShowColumnLib() {
-        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(ContentType.LIBRARY.getTypeCode());
+        return selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) || selectedContentType.equals(LIBRARY.getTypeCode());
     }
 
     public OrgSyncSettingReportItem getSelectedItem() {
@@ -338,7 +372,65 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         this.editedSetting = editedSetting;
     }
 
-    class EditedSetting {
+    public Boolean getRunEverySecond() {
+        return runEverySecond;
+    }
+
+    public void setRunEverySecond(Boolean runEverySecond) {
+        this.runEverySecond = runEverySecond;
+    }
+
+    public void saveLocalChanges() {
+        SyncSettings currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
+        if(currentSetting != null) {
+            currentSetting.setMonday(editedSetting.getMonday());
+            currentSetting.setTuesday(editedSetting.getTuesday());
+            currentSetting.setWednesday(editedSetting.getWednesday());
+            currentSetting.setThursday(editedSetting.getThursday());
+            currentSetting.setFriday(editedSetting.getFriday());
+            currentSetting.setSaturday(editedSetting.getSaturday());
+            currentSetting.setSunday(editedSetting.getSunday());
+            currentSetting.setEverySecond(editedSetting.getEverySecond());
+            currentSetting.setConcreteTime(buildTime(editedSetting));
+        } else {
+            selectedItem.buildSyncInfo(editedSetting.getMonday(), editedSetting.getTuesday(),
+                    editedSetting.getWednesday(), editedSetting.getThursday(), editedSetting.getFriday(),
+                    editedSetting.getSaturday(), editedSetting.getSunday(),editedSetting.getEverySecond(),
+                    buildTime(editedSetting), modalSelectedContentType);
+        }
+    }
+
+    private String buildTime(EditedSetting editedSetting) {
+        List<String> as = new LinkedList<>();
+        if(StringUtils.isNotBlank(editedSetting.getConcreteTime1())){
+            as.add(editedSetting.getConcreteTime1());
+        }
+        if(StringUtils.isNotBlank(editedSetting.getConcreteTime2())){
+            as.add(editedSetting.getConcreteTime2());
+        }
+        if(StringUtils.isNotBlank(editedSetting.getConcreteTime3())){
+            as.add(editedSetting.getConcreteTime3());
+        }
+        return StringUtils.join(as, SyncSettings.SEPARATOR);
+    }
+
+    public Boolean getShowConcreteTime2() {
+        return showConcreteTime2;
+    }
+
+    public void setShowConcreteTime2(Boolean showConcreteTime2) {
+        this.showConcreteTime2 = showConcreteTime2;
+    }
+
+    public Boolean getShowConcreteTime3() {
+        return showConcreteTime3;
+    }
+
+    public void setShowConcreteTime3(Boolean showConcreteTime3) {
+        this.showConcreteTime3 = showConcreteTime3;
+    }
+
+    public static class EditedSetting {
         private Integer everySecond;
         private Integer limitStartHour;
         private Integer limitEndHour;
@@ -367,17 +459,19 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
             this.friday = syncSettings.getFriday();
             this.saturday = syncSettings.getSaturday();
             this.sunday = syncSettings.getSunday();
-            ConcreteTime[] times = (ConcreteTime[]) syncSettings.getConcreteTime().toArray();
-            if(times.length > 0){
-                if(times.length == 1){
-                    concreteTime1 = times[0].getConcreteTime();
-                } else if(times.length == 2){
-                    concreteTime1 = times[0].getConcreteTime();
-                    concreteTime2 = times[1].getConcreteTime();
-                } else if(times.length == 3){
-                    concreteTime1 = times[0].getConcreteTime();
-                    concreteTime2 = times[1].getConcreteTime();
-                    concreteTime3 = times[2].getConcreteTime();
+            String[] times = StringUtils.split(syncSettings.getConcreteTime(), SyncSettings.SEPARATOR);
+            if(times != null) {
+                if (times.length > 0) {
+                    if (times.length == 1) {
+                        concreteTime1 = times[0];
+                    } else if (times.length == 2) {
+                        concreteTime1 = times[0];
+                        concreteTime2 = times[1];
+                    } else if (times.length == 3) {
+                        concreteTime1 = times[0];
+                        concreteTime2 = times[1];
+                        concreteTime3 = times[2];
+                    }
                 }
             }
         }

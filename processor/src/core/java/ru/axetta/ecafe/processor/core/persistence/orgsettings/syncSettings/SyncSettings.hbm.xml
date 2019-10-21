@@ -22,16 +22,12 @@
         <property name="sunday" column="sunday" type="boolean" not-null="true"/>
         <property name="createdDate" column="createdDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" />
+        <property name="concreteTime" column="concreteTime" type="string"/>
 
         <property name="contentType" column="contentType" not-null="true">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType</param>
             </type>
         </property>
-
-        <set name="concreteTime" inverse="true" cascade="all" lazy="false">
-            <key column="idOfSyncSetting"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ConcreteTime"/>
-        </set>
     </class>
 </hibernate-mapping>

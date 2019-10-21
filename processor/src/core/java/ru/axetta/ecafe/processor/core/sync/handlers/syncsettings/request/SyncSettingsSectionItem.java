@@ -4,19 +4,17 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request;
 
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ConcreteTime;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettings;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
-import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.*;
+import java.util.Comparator;
 
 public class SyncSettingsSectionItem implements AbstractToElement {
     private Integer contentType;
-    private List<String> concreteTime = new LinkedList<>();
+    private String concreteTime;
     private Integer everySeconds;
     private Integer limitStartHour;
     private Integer limitEndHour;
@@ -47,7 +45,7 @@ public class SyncSettingsSectionItem implements AbstractToElement {
 
     public SyncSettingsSectionItem(SyncSettings setting) {
         this.contentType = setting.getContentType().getTypeCode();
-        this.concreteTime = buildConcreteTimeString(setting.getConcreteTime());
+        this.concreteTime = setting.getConcreteTime();
         this.everySeconds = setting.getEverySecond();
         this.limitStartHour = setting.getLimitStartHour();
         this.limitEndHour = setting.getLimitEndHour();
@@ -62,21 +60,12 @@ public class SyncSettingsSectionItem implements AbstractToElement {
         this.deleteState = setting.getDeleteState();
     }
 
-    private List<String> buildConcreteTimeString(Set<ConcreteTime> concreteTime) {
-        List<String> result = new LinkedList<>();
-        for(ConcreteTime time : concreteTime){
-            result.add(time.getConcreteTime());
-        }
-        Collections.sort(result, comparable);
-        return result;
-    }
-
     @Override
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("SS");
 
         element.setAttribute("ContentType", contentType.toString());
-        element.setAttribute("ConcreteTime", StringUtils.join(concreteTime, ";"));
+        element.setAttribute("ConcreteTime", concreteTime);
         if(everySeconds != null) {
             element.setAttribute("EverySeconds", everySeconds.toString());
         }
@@ -109,11 +98,11 @@ public class SyncSettingsSectionItem implements AbstractToElement {
         this.contentType = contentType;
     }
 
-    public List<String> getConcreteTime() {
+    public String getConcreteTime() {
         return concreteTime;
     }
 
-    public void setConcreteTime(List<String> concreteTime) {
+    public void setConcreteTime(String concreteTime) {
         this.concreteTime = concreteTime;
     }
 

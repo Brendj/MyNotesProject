@@ -7,10 +7,8 @@ package ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
-import java.util.Arrays;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -28,12 +26,7 @@ public class SyncSettingsRequest implements SectionRequest {
             if (nodeElement.getNodeName().equals("SS")) {
                 SyncSettingsSectionItem setting = new SyncSettingsSectionItem();
                 setting.setContentType(XMLUtils.getIntegerAttributeValue(nodeElement, "ContentType"));
-                String concreteTime = XMLUtils.getAttributeValue(nodeElement, "ConcreteTime");
-                if(concreteTime != null) {
-                    setting.setConcreteTime(Arrays.asList(
-                            StringUtils.split(concreteTime, ";"))
-                    );
-                }
+                setting.setConcreteTime(XMLUtils.getAttributeValue(nodeElement, "ConcreteTime"));
                 setting.setEverySeconds(XMLUtils.getIntegerAttributeValue(nodeElement, "EverySeconds"));
                 setting.setLimitStartHour(XMLUtils.getIntegerAttributeValue(nodeElement, "LimitStartHour"));
                 setting.setLimitEndHour(XMLUtils.getIntegerAttributeValue(nodeElement, "LimitEndHour"));

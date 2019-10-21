@@ -8,6 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="H" uri="http://richfaces.ajax4jsf.org/rich" %>
 
 <%--@elvariable id="orgSyncSettingReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncSettingReportPage"--%>
 <h:panelGrid id="orgSyncSettingsReportPanelGrid" binding="#{orgSyncSettingReportPage.pageComponent}"
@@ -54,10 +55,10 @@
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
         </f:facet>
     </a4j:status>
-    <rich:modalPanel id="OrgSyncSettingEditPanel" minWidth="830" minHeight="600" resizeable="false"
+    <rich:modalPanel id="OrgSyncSettingEditPanel" minWidth="735" minHeight="350" resizeable="false"
                      domElementAttachment="form">
         <f:facet name="header">
-            <h:outputText value="Редактирование расписания" styleClass="output-text"/>
+            <h:outputText value="Редактирование расписания"/>
         </f:facet>
         <f:facet name="controls">
             <h:panelGroup>
@@ -65,10 +66,10 @@
                                        event="onclick"/>
             </h:panelGroup>
         </f:facet>
-        <h:panelGrid columns="2" styleClass="borderless-grid">
+        <h:panelGrid columns="2" styleClass="borderless-grid" border="10" columnClasses="top">
             <h:panelGroup>
                 <h:panelGrid styleClass="borderless-grid" columns="2">
-                    <h:outputText  styleClass="output-text" value="ID :"/>
+                    <h:outputText styleClass="output-text" value="ID :"/>
                     <h:outputText styleClass="output-text" value="#{orgSyncSettingReportPage.selectedItem.idOfOrg}"/>
                     <h:outputText styleClass="output-text" value="Название :"/>
                     <h:outputText styleClass="output-text" value="#{orgSyncSettingReportPage.selectedItem.orgName}"/>
@@ -77,53 +78,72 @@
                                      value="#{orgSyncSettingReportPage.modalSelectedContentType}"
                                      styleClass="input-text" style="width: 175px;">
                         <f:selectItems value="#{orgSyncSettingReportPage.modalListOfContentType}"/>
-                        <a4j:support action="#{orgSyncSettingReportPage.buildEditedItem()}"/>
+                        <a4j:support event="onchange" action="#{orgSyncSettingReportPage.buildEditedItem()}"
+                                     reRender="OrgSyncSettingEditPanelGrid"/>
                     </h:selectOneMenu>
                 </h:panelGrid>
             </h:panelGroup>
-            <h:panelGroup>
+            <h:panelGroup id="OrgSyncSettingEditPanelGrid">
                 <h:panelGrid styleClass="borderless-grid" columns="2">
-                    <h:outputText styleClass="output-text" value="Время сеанса 1"/>
-                    <h:inputText value="#{orgSyncSettingReportPage.editedSetting.concreteTime1}">
-                        <f:convertDateTime pattern="HH:mm" />
-                    </h:inputText>
-                    <h:outputText styleClass="output-text" value="Время сеанса 2"/>
-                    <h:inputText value="#{orgSyncSettingReportPage.editedSetting.concreteTime2}">
-                        <f:convertDateTime pattern="HH:mm" />
-                    </h:inputText>
-                    <h:outputText styleClass="output-text" value="Время сеанса 3"/>
-                    <h:inputText value="#{orgSyncSettingReportPage.editedSetting.concreteTime3}">
-                        <f:convertDateTime pattern="HH:mm" />
-                    </h:inputText>
-                    <h:outputText styleClass="output-text" value="Запускать через каждые (сек.) "/>
-                    <h:inputText value="#{orgSyncSettingReportPage.editedSetting.everySecond}"/>
+                    <H:columnGroup rendered="#{!orgSyncSettingReportPage.runEverySecond}">
+                        <h:outputText styleClass="output-text" value="Время 1-го сеанса"/>
+                        <h:inputText value="#{orgSyncSettingReportPage.editedSetting.concreteTime1}">
+                            <f:convertDateTime pattern="HH:mm"/>
+                        </h:inputText>
+                        <H:columnGroup rendered="#{orgSyncSettingReportPage.showConcreteTime2}">
+                            <h:outputText styleClass="output-text" value="Время 2-го сеанса"/>
+                            <h:inputText value="#{orgSyncSettingReportPage.editedSetting.concreteTime2}">
+                                <f:convertDateTime pattern="HH:mm"/>
+                            </h:inputText>
+                        </H:columnGroup>
+                        <H:columnGroup rendered="#{orgSyncSettingReportPage.showConcreteTime3}">
+                            <h:outputText styleClass="output-text" value="Время 3-го сеанса"/>
+                            <h:inputText value="#{orgSyncSettingReportPage.editedSetting.concreteTime3}">
+                                <f:convertDateTime pattern="HH:mm"/>
+                            </h:inputText>
+                        </H:columnGroup>
+                    </H:columnGroup>
+                    <H:columnGroup rendered="#{orgSyncSettingReportPage.runEverySecond}">
+                        <h:outputText styleClass="output-text" value="Запускать через каждые (сек.) "/>
+                        <h:inputText value="#{orgSyncSettingReportPage.editedSetting.everySecond}"/>
+                    </H:columnGroup>
                     <h:outputText styleClass="output-text" value="Понедельник"/>
-                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.monday}" styleClass="checkboxes"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.monday}"
+                                             styleClass="checkboxes"/>
                     <h:outputText styleClass="output-text" value="Вторник"/>
-                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.tuesday}" styleClass="checkboxes"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.tuesday}"
+                                             styleClass="checkboxes"/>
                     <h:outputText styleClass="output-text" value="Среда"/>
-                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.wednesday}" styleClass="checkboxes"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.wednesday}"
+                                             styleClass="checkboxes"/>
                     <h:outputText styleClass="output-text" value="Четверг"/>
-                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.thursday}" styleClass="checkboxes"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.thursday}"
+                                             styleClass="checkboxes"/>
                     <h:outputText styleClass="output-text" value="Пятница"/>
-                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.friday}" styleClass="checkboxes"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.friday}"
+                                             styleClass="checkboxes"/>
                     <h:outputText styleClass="output-text" value="Суббота"/>
-                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.saturday}" styleClass="checkboxes"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.saturday}"
+                                             styleClass="checkboxes"/>
                     <h:outputText styleClass="output-text" value="Воскресенье"/>
-                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.sunday}" styleClass="checkboxes"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.sunday}"
+                                             styleClass="checkboxes"/>
+                    <h:panelGrid columns="2" styleClass="borderless-grid">
+                        <a4j:commandButton reRender="OrgSyncSettingEditPanelGrid"
+                                           action="#{orgSyncSettingReportPage.saveLocalChanges()}"
+                                           status="orgSyncReportStatus"
+                                           value="Сохранить"/>
+                    </h:panelGrid>
                 </h:panelGrid>
             </h:panelGroup>
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid" id="addNewElementToCatalogPanelGrid">
         </h:panelGrid>
-        <h:panelGrid columns="2" styleClass="borderless-grid">
+        <h:panelGrid columns="1" styleClass="borderless-grid">
             <a4j:commandButton oncomplete="Richfaces.hideModalPanel('OrgSyncSettingEditPanel')"
                                reRender="workspaceTogglePanel, OrgSyncSettingEditPanel" value="Закрыть"
                                action="#{orgSyncSettingReportPage.resetChanges()}"
                                status="orgSyncReportStatus"/>
-            <a4j:commandButton reRender="OrgSyncSettingEditListElementsTable"
-                               action="#{orgSyncSettingReportPage.applyChange()}" status="orgSyncReportStatus"
-                               value="Сохранить изменения"/>
         </h:panelGrid>
     </rich:modalPanel>
     <rich:dataTable id="orgSyncSettingsTable" value="#{orgSyncSettingReportPage.items}" var="item" rows="25"

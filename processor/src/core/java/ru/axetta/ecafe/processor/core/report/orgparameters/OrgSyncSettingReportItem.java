@@ -5,14 +5,17 @@
 package ru.axetta.ecafe.processor.core.report.orgparameters;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ConcreteTime;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettings;
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.*;
+import java.util.Comparator;
+import java.util.LinkedList;
+import java.util.List;
 
-public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReportItem>{
+public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReportItem> {
+
     private String orgName;
     private Long idOfOrg;
     private String shortAddress;
@@ -24,7 +27,6 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
     private SyncInfo photoSync;
     private SyncInfo helpRequestsSync;
     private SyncInfo libSync;
-    private List<SyncSettings> allSyncSettings = new LinkedList<>();
 
     private static final Comparator<String> comparable = new Comparator<String>() {
         @Override
@@ -42,8 +44,8 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
         this.idOfOrg = org.getIdOfOrg();
         this.shortAddress = org.getShortAddress();
 
-        for(SyncSettings setting : settings){
-            switch (setting.getContentType()){
+        for (SyncSettings setting : settings) {
+            switch (setting.getContentType()) {
                 case FULL_SYNC:
                     fullSync = new SyncInfo(setting);
                     break;
@@ -69,7 +71,6 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
                     libSync = new SyncInfo(setting);
             }
         }
-        this.allSyncSettings = settings;
     }
 
     public String getOrgName() {
@@ -165,60 +166,133 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
         this.clientDataSync = clientDataSync;
     }
 
-    public List<SyncSettings> getAllSyncSettings() {
-        return allSyncSettings;
+    public void buildSyncInfo(Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday,
+            Boolean saturday, Boolean sunday, Integer everySecond, String buildTime, Integer modalSelectedContentType) {
+        ContentType type = ContentType.getContentTypeByCode(modalSelectedContentType);
+        switch (type) {
+            case FULL_SYNC:
+                fullSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
+                        buildTime);
+                break;
+            case BALANCES_AND_ENTEREVENTS:
+                accIncSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
+                        buildTime);
+                break;
+            case ORGSETTINGS:
+                orgSettingSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday,
+                        everySecond, buildTime);
+                break;
+            case CLIENTS_DATA:
+                clientDataSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday,
+                        everySecond, buildTime);
+                break;
+            case MENU:
+                menuSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
+                        buildTime);
+                break;
+            case PHOTOS:
+                photoSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
+                        buildTime);
+                break;
+            case SUPPORT_SERVICE:
+                helpRequestsSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday,
+                        everySecond, buildTime);
+                break;
+            case LIBRARY:
+                libSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
+                        buildTime);
+        }
     }
 
-    public void setAllSyncSettings(List<SyncSettings> allSyncSettings) {
-        this.allSyncSettings = allSyncSettings;
-    }
 
-    public class SyncInfo {
+    public static class SyncInfo {
+
         private String times;
         private String days = "";
         private String fullInf;
+        private SyncSettings setting;
 
         SyncInfo(SyncSettings setting) {
-            times = buildStringTimes(setting.getConcreteTime());
+            times = setting.getConcreteTime();
 
             if (setting.getMonday() && setting.getTuesday() && setting.getWednesday() && setting.getThursday()
                     && setting.getFriday() && setting.getSaturday() && setting.getSunday()) {
                 days = "Все дни";
             } else {
                 List<String> daysList = new LinkedList<>();
-                if(setting.getMonday()){
+                if (setting.getMonday()) {
                     daysList.add("ПН");
                 }
-                if(setting.getTuesday()){
+                if (setting.getTuesday()) {
                     daysList.add("ВТ");
                 }
-                if(setting.getWednesday()){
+                if (setting.getWednesday()) {
                     daysList.add("СР");
                 }
-                if(setting.getThursday()){
+                if (setting.getThursday()) {
                     daysList.add("ЧТ");
                 }
-                if(setting.getFriday()){
+                if (setting.getFriday()) {
                     daysList.add("ПТ");
                 }
-                if(setting.getSaturday()){
+                if (setting.getSaturday()) {
                     daysList.add("СБ");
                 }
-                if(setting.getSunday()){
+                if (setting.getSunday()) {
                     daysList.add("ВС");
                 }
                 days = StringUtils.join(daysList, ";");
             }
-            fullInf = times + "\n" + days;
+            buildFullInfo(setting.getEverySecond());
+            this.setting = setting;
         }
 
-        private String buildStringTimes(Set<ConcreteTime> concreteTime) {
-            List<String> stringTimes = new LinkedList<>();
-            for (ConcreteTime time : concreteTime) {
-                stringTimes.add(time.getConcreteTime());
+        private void buildFullInfo(Integer everySecond) {
+            StringBuilder sb = new StringBuilder();
+            if(StringUtils.isNotBlank(times)) {
+                sb.append(times);
+                sb.append("\n");
+            } else if(everySecond != null) {
+                sb.append("Каждые ");
+                sb.append(everySecond);
+                sb.append(" сек.");
+                sb.append("\n");
             }
-            Collections.sort(stringTimes, comparable);
-            return StringUtils.join(stringTimes, "; ");
+            sb.append(days);
+            fullInf = sb.toString();
+        }
+
+        SyncInfo(Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday, Boolean saturday,
+                Boolean sunday, Integer everySecond, String buildTime) {
+            if (monday && tuesday && wednesday && thursday && friday && saturday && sunday) {
+                days = "Все дни";
+            } else {
+                List<String> daysList = new LinkedList<>();
+                if (monday) {
+                    daysList.add("ПН");
+                }
+                if (tuesday) {
+                    daysList.add("ВТ");
+                }
+                if (wednesday) {
+                    daysList.add("СР");
+                }
+                if (thursday) {
+                    daysList.add("ЧТ");
+                }
+                if (friday) {
+                    daysList.add("ПТ");
+                }
+                if (saturday) {
+                    daysList.add("СБ");
+                }
+                if (sunday) {
+                    daysList.add("ВС");
+                }
+                days = StringUtils.join(daysList, ";");
+            }
+            times = buildTime;
+            buildFullInfo(everySecond);
         }
 
         public String getTimes() {
@@ -243,6 +317,14 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
 
         public void setFullInf(String fullInf) {
             this.fullInf = fullInf;
+        }
+
+        public SyncSettings getSetting() {
+            return setting;
+        }
+
+        public void setSetting(SyncSettings setting) {
+            this.setting = setting;
         }
     }
 }

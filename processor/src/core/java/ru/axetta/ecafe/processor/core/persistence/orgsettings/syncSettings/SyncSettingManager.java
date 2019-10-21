@@ -11,7 +11,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.ResSync
 import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.SyncSettingsSectionItem;
 import ru.axetta.ecafe.processor.core.utils.DataBaseSafeConverterUtils;
 
-import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
@@ -21,7 +21,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Date;
+import java.util.List;
 
 @Service
 public class SyncSettingManager {
@@ -60,7 +61,7 @@ public class SyncSettingManager {
         return result;
     }
 
-    private void updateSyncSettings(SyncSettings currentSetting, List<String> concreteTime, Integer everySeconds,
+    private void updateSyncSettings(SyncSettings currentSetting, String concreteTime, Integer everySeconds,
             Integer limitStartHour, Integer limitEndHour, Boolean monday, Boolean tuesday, Boolean wednesday,
             Boolean thursday, Boolean friday, Boolean saturday, Boolean sunday, Boolean deleteState, Long nextVersion,
             Date lastUpdate, Session session) throws Exception {
@@ -85,47 +86,15 @@ public class SyncSettingManager {
         currentSetting.setSaturday(saturday);
         currentSetting.setSunday(sunday);
         currentSetting.setDeleteState(deleteState);
-        if (everySeconds == null && CollectionUtils.isNotEmpty(concreteTime)) {
-            //apply change from ARM
-            for(String value : concreteTime) {
-                ConcreteTime time = findByValue(currentSetting.getConcreteTime(), value);
-                if(time == null){
-                    time = new ConcreteTime();
-                    time.setSyncSettings(currentSetting);
-                    time.setConcreteTime(value);
-                    currentSetting.getConcreteTime().add(time);
-                }
-            }
-            // delete value from current settings, if not exist in ARM data
-            List<ConcreteTime> deleteCollection = new LinkedList<>();
-            for(ConcreteTime time : currentSetting.getConcreteTime()){
-                if(!concreteTime.contains(time.getConcreteTime())){
-                    session.delete(time);
-                    deleteCollection.add(time);
-                }
-            }
-            currentSetting.getConcreteTime().removeAll(deleteCollection);
-        } else if (CollectionUtils.isNotEmpty(currentSetting.getConcreteTime())) {
-            for (ConcreteTime time : currentSetting.getConcreteTime()) {
-                session.delete(time);
-            }
-            currentSetting.setConcreteTime(new HashSet<ConcreteTime>());
+        if (everySeconds == null ) {
+            currentSetting.setConcreteTime(concreteTime);
         }
         session.persist(currentSetting);
     }
 
-    private ConcreteTime findByValue(Set<ConcreteTime> concreteTime, String value) {
-        for(ConcreteTime item : concreteTime){
-            if(item.getConcreteTime().equals(value)){
-                return item;
-            }
-        }
-        return null;
-    }
-
-    private void validateParam(List<String> concreteTime, Integer everySeconds, Integer limitStartHour,
+    private void validateParam(String concreteTime, Integer everySeconds, Integer limitStartHour,
             Integer limitEndHour) {
-        if(CollectionUtils.isNotEmpty(concreteTime) && everySeconds != null) {
+        if(StringUtils.isNotEmpty(concreteTime) && everySeconds != null) {
             throw new AmbiguityConcreteTimeAndEverySecondsValues();
         } else if(everySeconds != null && everySeconds.equals(0)) {
             throw new IncorrectEverySecondsException();
@@ -156,10 +125,11 @@ public class SyncSettingManager {
                     item.getContentType(), idOfOrg), e);
             result.setResult(ProcessResultEnum.INTERNAL_ERROR);
         }
+        result.setResult(ProcessResultEnum.OK);
          return result;
     }
 
-    public void createSyncSettings(Integer contentType, List<String> concreteTime, Integer everySeconds,
+    public void createSyncSettings(Integer contentType, String concreteTime, Integer everySeconds,
             Integer limitStartHour, Integer limitEndHour, Boolean monday, Boolean tuesday, Boolean wednesday,
             Boolean thursday, Boolean friday, Boolean saturday, Boolean sunday, Boolean deleteState, Long nextVersion,
             Org org, Date createDate, Session session) throws Exception {
@@ -183,14 +153,7 @@ public class SyncSettingManager {
         syncSettings.setContentType(type);
         syncSettings.setCreatedDate(createDate);
         syncSettings.setLastUpdate(createDate);
-        if(concreteTime != null){
-            for(String val : concreteTime){
-                ConcreteTime concreteTimeObj = new ConcreteTime();
-                concreteTimeObj.setConcreteTime(val);
-                concreteTimeObj.setSyncSettings(syncSettings);
-                syncSettings.getConcreteTime().add(concreteTimeObj);
-            }
-        }
+        syncSettings.setConcreteTime(concreteTime);
         syncSettings.setEverySecond(everySeconds);
         syncSettings.setDeleteState(deleteState);
         syncSettings.setLimitStartHour(limitStartHour);

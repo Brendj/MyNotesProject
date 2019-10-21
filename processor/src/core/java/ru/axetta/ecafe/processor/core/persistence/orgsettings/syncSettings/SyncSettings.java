@@ -7,10 +7,10 @@ package ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 public class SyncSettings {
+    public static final String SEPARATOR = ";";
+
     private Long idOfSyncSetting;
     private Org org;
     private ContentType contentType;
@@ -26,7 +26,7 @@ public class SyncSettings {
     private Boolean sunday = false;
     private Long version;
     private Boolean deleteState = false;
-    private Set<ConcreteTime> concreteTime = new HashSet<>();
+    private String concreteTime;
     private Date createdDate;
     private Date lastUpdate;
 
@@ -131,7 +131,7 @@ public class SyncSettings {
     }
 
     public void setSunday(Boolean sunday) {
-        this.sunday = sunday == null ? false : sunday;
+         this.sunday = sunday == null ? false : sunday;
     }
 
     public Long getVersion() {
@@ -150,11 +150,11 @@ public class SyncSettings {
         this.deleteState = deleteState == null ? false : deleteState;
     }
 
-    public Set<ConcreteTime> getConcreteTime() {
+    public String getConcreteTime() {
         return concreteTime;
     }
 
-    public void setConcreteTime(Set<ConcreteTime> concreteTime) {
+    public void setConcreteTime(String concreteTime) {
         this.concreteTime = concreteTime;
     }
 
