@@ -193,6 +193,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.preordersEnabled}" styleClass="input-text" />
     <h:outputText escape="true" value="Участник ОП" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.participantOP}" styleClass="input-text" />
+    <h:outputText escape="true" value="Предварительные заявки по ЛП" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.preorderlp}" styleClass="input-text"/>
 </h:panelGrid>
 <br />
 <rich:separator />
