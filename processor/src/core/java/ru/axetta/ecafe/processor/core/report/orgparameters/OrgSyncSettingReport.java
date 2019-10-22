@@ -125,6 +125,7 @@ public class OrgSyncSettingReport extends BasicReportForListOrgsJob {
             }
 
             Criteria syncSettingCriteria  = persistenceSession.createCriteria(SyncSettings.class);
+            syncSettingCriteria.add(Restrictions.eq("deleteState", false));
             syncSettingCriteria.createAlias("org", "org");
             if(CollectionUtils.isEmpty(idOfOrgList)) {
                 for (Org org : orgs) {

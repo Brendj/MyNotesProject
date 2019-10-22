@@ -30,6 +30,25 @@ public class SyncSettings {
     private Date createdDate;
     private Date lastUpdate;
 
+    public SyncSettings(){
+        //for hibernate
+    }
+
+    public SyncSettings(Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday, Boolean saturday,
+            Boolean sunday, Integer everySecond, String buildTime, Integer limitStartHour, Integer limitEndHour){
+        this.monday = monday;
+        this.tuesday = tuesday;
+        this.wednesday = wednesday;
+        this.thursday = thursday;
+        this.friday = friday;
+        this.saturday = saturday;
+        this.sunday = sunday;
+        this.everySecond = everySecond;
+        this.concreteTime = buildTime;
+        this.limitStartHour = limitStartHour;
+        this.limitEndHour = limitEndHour;
+    }
+
     public Long getIdOfSyncSetting() {
         return idOfSyncSetting;
     }

@@ -25,6 +25,8 @@ import org.springframework.stereotype.Component;
 
 import javax.faces.model.SelectItem;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 import static ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType.*;
 
@@ -33,6 +35,7 @@ import static ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSetting
 @DependsOn("runtimeContext")
 public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgListSelectPage.CompleteHandlerList {
     private static final Logger logger = LoggerFactory.getLogger(OrgSyncSettingReportPage.class);
+    private static final Pattern TIME_PATTERN = Pattern.compile("([0-1][0-9]|2[0-3]):[0-5][0-9]");
 
     private Boolean allFriendlyOrgs = false;
     private List<SelectItem> listOfOrgDistricts;
@@ -47,6 +50,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     private Boolean runEverySecond = false;
     private Boolean showConcreteTime2 = false;
     private Boolean showConcreteTime3 = false;
+    private Boolean newSyncSetting = false;
 
     private List<SelectItem> buildListOfOrgDistricts(Session session) {
         List<String> allDistricts;
@@ -198,8 +202,10 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         SyncSettings currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
         if(currentSetting == null){
             editedSetting = new EditedSetting();
+            newSyncSetting = true;
         } else {
             editedSetting = new EditedSetting(currentSetting);
+            newSyncSetting = false;
         }
         runEverySecond = modalSelectedContentType.equals(BALANCES_AND_ENTEREVENTS.getTypeCode())
                 || modalSelectedContentType.equals(SUPPORT_SERVICE.getTypeCode());
@@ -239,6 +245,19 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
 
     private SyncSettings getSyncSettingsOrNull(OrgSyncSettingReportItem.SyncInfo info){
         return info == null ? null : info.getSetting();
+    }
+
+    public void applyChanges() {
+        try{
+            for(OrgSyncSettingReportItem item : items){
+                if(item.getIsChange()){
+                    // TODO: save settings in DB, but process only changed 
+                }
+            }
+        }catch (Exception e){
+            logger.error("Cant save SyncSetting to DB: ", e);
+            printError("Не удалось сохранить изменения в БД: " + e.getMessage());
+        }
     }
 
     @Override
@@ -281,10 +300,6 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
 
     public void setItems(List<OrgSyncSettingReportItem> items) {
         this.items = items;
-    }
-
-    public Object applyChanges() {
-        return null;
     }
 
     public List<SelectItem> getListOfContentType() {
@@ -381,22 +396,58 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     }
 
     public void saveLocalChanges() {
-        SyncSettings currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
-        if(currentSetting != null) {
-            currentSetting.setMonday(editedSetting.getMonday());
-            currentSetting.setTuesday(editedSetting.getTuesday());
-            currentSetting.setWednesday(editedSetting.getWednesday());
-            currentSetting.setThursday(editedSetting.getThursday());
-            currentSetting.setFriday(editedSetting.getFriday());
-            currentSetting.setSaturday(editedSetting.getSaturday());
-            currentSetting.setSunday(editedSetting.getSunday());
-            currentSetting.setEverySecond(editedSetting.getEverySecond());
-            currentSetting.setConcreteTime(buildTime(editedSetting));
+        try {
+            validateData();
+            SyncSettings currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
+            if (currentSetting != null) {
+                currentSetting.setMonday(editedSetting.getMonday());
+                currentSetting.setTuesday(editedSetting.getTuesday());
+                currentSetting.setWednesday(editedSetting.getWednesday());
+                currentSetting.setThursday(editedSetting.getThursday());
+                currentSetting.setFriday(editedSetting.getFriday());
+                currentSetting.setSaturday(editedSetting.getSaturday());
+                currentSetting.setSunday(editedSetting.getSunday());
+                currentSetting.setEverySecond(editedSetting.getEverySecond());
+                currentSetting.setConcreteTime(buildTime(editedSetting));
+                currentSetting.setLimitStartHour(editedSetting.getLimitStartHour());
+                currentSetting.setLimitEndHour(editedSetting.getLimitEndHour());
+                selectedItem.rebuildSyncInfo(modalSelectedContentType, currentSetting);
+            } else {
+                selectedItem.buildSyncInfo(editedSetting.getMonday(), editedSetting.getTuesday(),
+                        editedSetting.getWednesday(), editedSetting.getThursday(), editedSetting.getFriday(),
+                        editedSetting.getSaturday(), editedSetting.getSunday(), editedSetting.getEverySecond(),
+                        buildTime(editedSetting), modalSelectedContentType, editedSetting.getLimitStartHour(),
+                        editedSetting.getLimitEndHour());
+            }
+            selectedItem.setIsChange(true);
+        } catch (Exception e) {
+            logger.error("Exception when save local changes: ", e);
+            printError("Не удалось сохранить локальные изменения: " + e.getMessage());
+        }
+    }
+
+    private void validateData() throws Exception {
+        if(runEverySecond){
+            if(editedSetting.getLimitStartHour() > editedSetting.getLimitEndHour()){
+                throw new IllegalArgumentException("Значение начала таймаута не должно быть больше значению конца таймаута");
+            }
         } else {
-            selectedItem.buildSyncInfo(editedSetting.getMonday(), editedSetting.getTuesday(),
-                    editedSetting.getWednesday(), editedSetting.getThursday(), editedSetting.getFriday(),
-                    editedSetting.getSaturday(), editedSetting.getSunday(),editedSetting.getEverySecond(),
-                    buildTime(editedSetting), modalSelectedContentType);
+            Matcher m = TIME_PATTERN.matcher(editedSetting.getConcreteTime1());
+            if(!m.find()){
+                throw new IllegalArgumentException("Не верное значение времени 1-го сеанса");
+            }
+            if(showConcreteTime2 && StringUtils.isNotBlank(editedSetting.getConcreteTime2())){
+                m = TIME_PATTERN.matcher(editedSetting.getConcreteTime2());
+                if(!m.find()){
+                    throw new IllegalArgumentException("Не верное значение времени 2-го сеанса");
+                }
+            }
+            if(showConcreteTime3 && StringUtils.isNotBlank(editedSetting.getConcreteTime3())){
+                m = TIME_PATTERN.matcher(editedSetting.getConcreteTime3());
+                if(!m.find()){
+                    throw new IllegalArgumentException("Не верное значение времени 3-го сеанса");
+                }
+            }
         }
     }
 
@@ -428,6 +479,14 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
 
     public void setShowConcreteTime3(Boolean showConcreteTime3) {
         this.showConcreteTime3 = showConcreteTime3;
+    }
+
+    public Boolean getNewSyncSetting() {
+        return newSyncSetting;
+    }
+
+    public void setNewSyncSetting(Boolean newSyncSetting) {
+        this.newSyncSetting = newSyncSetting;
     }
 
     public static class EditedSetting {

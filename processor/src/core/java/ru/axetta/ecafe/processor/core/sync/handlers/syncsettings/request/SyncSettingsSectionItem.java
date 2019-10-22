@@ -10,8 +10,6 @@ import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.Comparator;
-
 public class SyncSettingsSectionItem implements AbstractToElement {
     private Integer contentType;
     private String concreteTime;
@@ -27,17 +25,6 @@ public class SyncSettingsSectionItem implements AbstractToElement {
     private Boolean sunday;
     private Long version;
     private Boolean deleteState;
-
-    private static final Comparator<String> comparable = new Comparator<String>() {
-        @Override
-        public int compare(String o1, String o2) {
-            String[] oa1 = o1.split(":");
-            String[] oa2 = o2.split(":");
-            int res = oa1[0].compareTo(oa2[0]);
-
-            return res == 0 ? oa1[1].compareTo(oa2[1]) : res;
-        }
-    };
 
     public SyncSettingsSectionItem(){
 

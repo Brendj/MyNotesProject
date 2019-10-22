@@ -10,12 +10,10 @@ import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncS
 
 import org.apache.commons.lang.StringUtils;
 
-import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
 public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReportItem> {
-
     private String orgName;
     private Long idOfOrg;
     private String shortAddress;
@@ -27,17 +25,7 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
     private SyncInfo photoSync;
     private SyncInfo helpRequestsSync;
     private SyncInfo libSync;
-
-    private static final Comparator<String> comparable = new Comparator<String>() {
-        @Override
-        public int compare(String o1, String o2) {
-            String[] oa1 = o1.split(":");
-            String[] oa2 = o2.split(":");
-            int res = oa1[0].compareTo(oa2[0]);
-
-            return res == 0 ? oa1[1].compareTo(oa2[1]) : res;
-        }
-    };
+    private Boolean isChange = false;
 
     public OrgSyncSettingReportItem(Org org, List<SyncSettings> settings) {
         this.orgName = org.getShortName();
@@ -167,53 +155,90 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
     }
 
     public void buildSyncInfo(Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday,
-            Boolean saturday, Boolean sunday, Integer everySecond, String buildTime, Integer modalSelectedContentType) {
+            Boolean saturday, Boolean sunday, Integer everySecond, String buildTime, Integer modalSelectedContentType,
+            Integer limitStartHour, Integer limitEndHour) {
         ContentType type = ContentType.getContentTypeByCode(modalSelectedContentType);
         switch (type) {
             case FULL_SYNC:
                 fullSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
-                        buildTime);
+                        buildTime, limitStartHour, limitEndHour);
                 break;
             case BALANCES_AND_ENTEREVENTS:
                 accIncSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
-                        buildTime);
+                        buildTime, limitStartHour, limitEndHour);
                 break;
             case ORGSETTINGS:
                 orgSettingSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday,
-                        everySecond, buildTime);
+                        everySecond, buildTime, limitStartHour, limitEndHour);
                 break;
             case CLIENTS_DATA:
                 clientDataSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday,
-                        everySecond, buildTime);
+                        everySecond, buildTime, limitStartHour, limitEndHour);
                 break;
             case MENU:
                 menuSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
-                        buildTime);
+                        buildTime, limitStartHour, limitEndHour);
                 break;
             case PHOTOS:
                 photoSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
-                        buildTime);
+                        buildTime, limitStartHour, limitEndHour);
                 break;
             case SUPPORT_SERVICE:
                 helpRequestsSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday,
-                        everySecond, buildTime);
+                        everySecond, buildTime, limitStartHour, limitEndHour);
                 break;
             case LIBRARY:
                 libSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
-                        buildTime);
+                        buildTime, limitStartHour, limitEndHour);
         }
+    }
+
+    public void rebuildSyncInfo(Integer modalSelectedContentType, SyncSettings setting) {
+        ContentType type = ContentType.getContentTypeByCode(modalSelectedContentType);
+        switch (type) {
+            case FULL_SYNC:
+                fullSync = new SyncInfo(setting);
+                break;
+            case BALANCES_AND_ENTEREVENTS:
+                accIncSync = new SyncInfo(setting);
+                break;
+            case ORGSETTINGS:
+                orgSettingSync = new SyncInfo(setting);
+                break;
+            case CLIENTS_DATA:
+                clientDataSync = new SyncInfo(setting);
+                break;
+            case MENU:
+                menuSync = new SyncInfo(setting);
+                break;
+            case PHOTOS:
+                photoSync = new SyncInfo(setting);
+                break;
+            case SUPPORT_SERVICE:
+                helpRequestsSync = new SyncInfo(setting);
+                break;
+            case LIBRARY:
+                libSync = new SyncInfo(setting);
+        }
+    }
+
+    public Boolean getIsChange() {
+        return isChange;
+    }
+
+    public void setIsChange(Boolean change) {
+        this.isChange = change;
     }
 
 
     public static class SyncInfo {
-
-        private String times;
-        private String days = "";
         private String fullInf;
         private SyncSettings setting;
+        private Integer state = 0;
 
         SyncInfo(SyncSettings setting) {
-            times = setting.getConcreteTime();
+            String times = setting.getConcreteTime();
+            String days;
 
             if (setting.getMonday() && setting.getTuesday() && setting.getWednesday() && setting.getThursday()
                     && setting.getFriday() && setting.getSaturday() && setting.getSunday()) {
@@ -243,11 +268,12 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
                 }
                 days = StringUtils.join(daysList, ";");
             }
-            buildFullInfo(setting.getEverySecond());
+            buildFullInfo(setting.getEverySecond(), setting.getLimitStartHour(), setting.getLimitEndHour(), days, times);
             this.setting = setting;
         }
 
-        private void buildFullInfo(Integer everySecond) {
+        private void buildFullInfo(Integer everySecond, Integer limitStartHour, Integer limitEndHour, String days,
+                String times) {
             StringBuilder sb = new StringBuilder();
             if(StringUtils.isNotBlank(times)) {
                 sb.append(times);
@@ -256,14 +282,24 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
                 sb.append("Каждые ");
                 sb.append(everySecond);
                 sb.append(" сек.");
+                if(limitStartHour != null && !(limitStartHour.equals(limitEndHour) && limitStartHour.equals(0))){
+                    sb.append(" с ");
+                    sb.append(limitStartHour);
+                    sb.append(":00 по ");
+                    sb.append(limitEndHour);
+                    sb.append(":00");
+                }
                 sb.append("\n");
             }
+
             sb.append(days);
             fullInf = sb.toString();
         }
 
         SyncInfo(Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday, Boolean saturday,
-                Boolean sunday, Integer everySecond, String buildTime) {
+                Boolean sunday, Integer everySecond, String buildTime, Integer limitStartHour, Integer limitEndHour ) {
+            String days;
+            String times;
             if (monday && tuesday && wednesday && thursday && friday && saturday && sunday) {
                 days = "Все дни";
             } else {
@@ -292,23 +328,9 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
                 days = StringUtils.join(daysList, ";");
             }
             times = buildTime;
-            buildFullInfo(everySecond);
-        }
-
-        public String getTimes() {
-            return times;
-        }
-
-        public void setTimes(String times) {
-            this.times = times;
-        }
-
-        public String getDays() {
-            return days;
-        }
-
-        public void setDays(String days) {
-            this.days = days;
+            buildFullInfo(everySecond, limitStartHour, limitEndHour, days, times);
+            setting = new SyncSettings(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
+                    buildTime, limitStartHour, limitEndHour);
         }
 
         public String getFullInf() {
