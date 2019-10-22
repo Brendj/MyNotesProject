@@ -36,6 +36,7 @@ public class EzdController {
 
     private Logger logger = LoggerFactory.getLogger(EzdController.class);
     private static final int SETTING_TYPE = 11001;
+    private static final long TIME_MAX = 39600000; //11:00
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
@@ -48,7 +49,7 @@ public class EzdController {
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "discountComplexList")
+    @Path(value = "discountcomplexlist")
     public Response getComplexList() {
         logger.info("Начало работы сервиса сбора данных для ЭЖД");
         ResponseToEZD responseToEZD = new ResponseToEZD();
@@ -76,7 +77,9 @@ public class EzdController {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             Date date = new Date();
-            date = CalendarUtils.addOneDay(date);
+            //Если время более 11:00, то на сегодня менять нельзя
+            if ((date.getTime() - CalendarUtils.startOfDay(date).getTime()) > TIME_MAX)
+                date = CalendarUtils.addOneDay(date);
             date = CalendarUtils.startOfDay(date);
 
 
@@ -363,8 +366,37 @@ public class EzdController {
             Date date = new SimpleDateFormat("dd.MM.yyyy").parse(dateR);
             date = CalendarUtils.startOfDay(date);
 
+            Date curDate = new Date();
+            //Если дата заявки сегодняшняя, но время больше 11:00...
+            if (CalendarUtils.startOfDay(curDate).getTime() == date.getTime() && (curDate.getTime() - date.getTime() > TIME_MAX))
+            {
+                Result result = new Result();
+                result.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+                return result;
+            }
+
+
+            //Если дата заявки меньше текущей...
+            if (date.getTime() < curDate.getTime())
+            {
+                Result result = new Result();
+                result.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+                return result;
+            }
+
+
+
             List<Org> orgs = DAOUtils.findOrgsByGuid(persistenceSession, guidOrg);
 
+            //Если организаций c таким guid не найдена, то ...
+            if (orgs.isEmpty()) {
+                Result result = new Result();
+                result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
+                result.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
+                return result;
+            }
 
             if (!orgs.isEmpty()) {
                 //Удаляем все организации, неподходящие по фильтру и у которых нет нужной группы
@@ -373,7 +405,7 @@ public class EzdController {
                     Org org = it.next();
                     if (org.getState() == 0 || org.getType().equals(OrganizationType.SUPPLIER)
                             || DAOUtils.getGroupNamesToOrgsByOrgAndGroupName(persistenceSession, org, groupName)
-                            == null) {
+                            == null || !org.getPreorderlp()) {
                         it.remove();
                     }
                 }
@@ -495,7 +527,7 @@ public class EzdController {
                 maxVersion++;
                 if (!DAOUtils
                         .findSameRequestFromEZD(persistenceSession, org.getIdOfOrg(), groupName, date, idOfComplex)) {
-                    DAOUtils.updateRequestFromEZD(persistenceSession, org.getIdOfOrg(), groupName, date, idOfComplex,
+                    DAOUtils.updateRequestFromEZD(persistenceSession, org.getIdOfOrg(), userName, groupName, date, idOfComplex,
                             count, maxVersion);
                 } else {
                     if (date.getTime() < new Date().getTime()) {

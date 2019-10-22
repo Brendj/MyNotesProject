@@ -4508,15 +4508,16 @@ public class DAOUtils {
     }
 
 
-    public static void updateRequestFromEZD(Session session, Long idofOrg, String groupName, Date data,
+    public static void updateRequestFromEZD(Session session, Long idofOrg, String userName, String groupName, Date data,
             Long idOfComplex, Integer complexcount, Integer versionrecord) {
         Query query = session.createSQLQuery(
-                "update cf_goods_requests_ezd set complexcount = :complexcount, lastupdate = :lastupdate, versionrecord = :versionrecord "
+                "update cf_goods_requests_ezd set complexcount = :complexcount, lastupdate = :lastupdate, versionrecord = :versionrecord, username = :username "
                         + "where idoforg = :idOfOrg and groupName = :groupName "
                         + "and dateappointment = :dateappointment and idOfComplex  = :idOfComplex");
         query.setParameter("complexcount", complexcount);
         query.setParameter("lastupdate", new Date().getTime());
         query.setParameter("idOfOrg", idofOrg);
+        query.setParameter("username", userName);
         query.setParameter("groupName", groupName);
         query.setParameter("dateappointment", data.getTime());
         query.setParameter("idOfComplex", idOfComplex);

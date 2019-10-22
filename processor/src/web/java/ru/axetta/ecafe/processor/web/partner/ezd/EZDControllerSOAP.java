@@ -237,7 +237,8 @@ public class EZDControllerSOAP extends HttpServlet {
                     if (!DAOUtils
                             .findSameRequestFromEZD(persistenceSession, org.getIdOfOrg(), currentGroupName, currentDate,
                                     responseFromEzd.getIdOfComplex())) {
-                        DAOUtils.updateRequestFromEZD(persistenceSession, org.getIdOfOrg(), currentGroupName,
+                        //Пока не рабочий вариант
+                        DAOUtils.updateRequestFromEZD(persistenceSession, org.getIdOfOrg(), null, currentGroupName,
                                 currentDate, responseFromEzd.getIdOfComplex(), responseFromEzd.getCount(), maxVersion);
                     } else {
                         RequestsEzd requestsEzd = new RequestsEzd();
