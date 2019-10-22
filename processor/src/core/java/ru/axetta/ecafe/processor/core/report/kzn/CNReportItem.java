@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report.kzn;
 
+import ru.axetta.ecafe.processor.core.utils.report.CoverageNutritionDynamicBean;
+
 import java.util.Arrays;
 import java.util.List;
 
@@ -26,6 +28,7 @@ public class CNReportItem {
     private String surname;
 
     public static final List<Integer> listMenuOriginBuffet = Arrays.asList(0, 1, 2, 10, 11, 20);
+    public static final List<Long> listSotrudnikov = Arrays.asList(1100000000L, 1100000010L, 1100000020L, 1100000110L);
 
     public Long getIdOfClient() {
         return idOfClient;
@@ -47,6 +50,10 @@ public class CNReportItem {
         this.groupNameForTemplate = groupNameForTemplate;
         this.foodType = foodType;
         this.surname = surname;
+    }
+
+    public boolean isSotrudnik() {
+        return ((listSotrudnikov.contains(idOfClientGroup) || groupName.equals(CoverageNutritionDynamicBean.EMPLOYEES_TITLE)) && !surname.startsWith("#"));
     }
 
     public boolean isBuffet() {

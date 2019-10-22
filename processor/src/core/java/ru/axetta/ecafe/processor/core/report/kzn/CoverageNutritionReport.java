@@ -602,7 +602,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
         }
 
         private void tryFillEmployeeData(HashMap<String, HashSet<Long>> employeeCountMap, CNReportItem item) {
-            if (!item.getGroupNameForTemplate().equals(CoverageNutritionDynamicBean.EMPLOYEES_TITLE)) return;
+            if (!item.isSotrudnik() || item.getSurname().startsWith("#")) return;
 
             if (item.isBuffet()) {
                 if (employeeCountMap.get(CoverageNutritionDynamicBean.MENU_TYPE_BUFFET) == null) {
@@ -631,6 +631,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 HashMap<String, Integer> totalBuffetZavProizvQtyMap,
                 HashMap<String, HashSet<Long>> totalComplexBuffetCountMap,
                 CNReportItem item) {
+            if (item.isSotrudnik()) return;
             if (totalCountMap.get(item.getFoodType()) == null) {
                 totalCountMap.put(item.getFoodType(), new HashSet<Long>());
             }
@@ -834,7 +835,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "case when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 1 and 4 then 'Обучающиеся 1-4 классов' "
                     + "    when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 5 and 9 then 'Обучающиеся 5-9 классов' "
                     + "    when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 10 and 11 then 'Обучающиеся 10-11 классов' "
-                    + "    when cg.idofclientgroup in (:clientEmployees, :clientAdministration, :clientTechEmployees) or cg.groupname = 'Сотрудники' then 'Сотрудники' "
+                    + "    when cg.idofclientgroup in (:clientEmployees, :clientAdministration, :clientTechEmployees, :clientEmployeesOtherOrg) or cg.groupname = 'Сотрудники' then 'Сотрудники' "
                     + "else 'Обучающиеся другие группы' end as gr, "//10
                     + "case when od.menutype = 0 and od.menuorigin in (0, 1, 2) then 'Буфет горячее' "
                     + "    when od.menutype = 0 and od.menuorigin in (10, 11, 20) then 'Буфет покупная'"
@@ -857,6 +858,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             query.setParameter("clientAdministration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
             query.setParameter("clientTechEmployees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+            query.setParameter("clientEmployeesOtherOrg", ClientGroup.Predefined.CLIENT_EMPLOYEE_OTHER_ORG.getValue());
 
             List<CNReportItem> reportItems = new ArrayList<>();
             List list = query.list();
@@ -1436,7 +1438,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "   case when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 1 and 4 then 'Обучающиеся 1-4 классов' "
                     + "        when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 5 and 9 then 'Обучающиеся 5-9 классов' "
                     + "        when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 10 and 11 then 'Обучающиеся 10-11 классов' "
-                    + "        when cg.idofclientgroup in (:clientEmployees, :clientAdministration, :clientTechEmployees) then 'Сотрудники' "
+                    + "        when cg.idofclientgroup in (:clientEmployees, :clientAdministration, :clientTechEmployees, :clientEmployeesOtherOrg) then 'Сотрудники' "
                     + "        else 'Обучающиеся другие группы' end as gr "
                     + "from cf_orders o "
                     + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
@@ -1455,6 +1457,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
             query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
             query.setParameter("clientAdministration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
             query.setParameter("clientTechEmployees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+            query.setParameter("clientEmployeesOtherOrg", ClientGroup.Predefined.CLIENT_EMPLOYEE_OTHER_ORG.getValue());
 
             List list = query.list();
             for (Object o : list) {
