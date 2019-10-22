@@ -98,9 +98,9 @@ public class ClientMigrationHistoryService {
                     Client client = DAOUtils.findClient(session, clientMigration.getClient().getIdOfClient());
                     if (ClientManager.atLeastOneDiscountEligibleToDelete(client)) {
                         ClientManager.deleteDiscount(client, session);
-                    } else {
-                        ClientManager.archiveApplicationForFoodWithoutDiscount(client, session);
                     }
+                    ClientManager.archiveApplicationForFoodWithoutDiscount(client, session);
+
                     transaction.commit();
                     transaction = null;
                     counter++;

@@ -2171,7 +2171,7 @@ public class ClientManager {
         Long applicationForFoodVersion = null;
 
         for (ApplicationForFood item : list) {
-            if (!item.getArchived()) {
+            if (!item.getArchived() && isEligibleToDelete(session, item)) {
                 item.setArchived(true);
                 if (null == applicationForFoodVersion) {
                     applicationForFoodVersion = DAOUtils.nextVersionByApplicationForFood(session);
@@ -2182,6 +2182,7 @@ public class ClientManager {
             }
         }
     }
+
     public static boolean atLeastOneDiscountEligibleToDelete (Client client) {
         Set<CategoryDiscount> discounts = client.getCategories();
         for (CategoryDiscount discount : discounts) {
@@ -2190,5 +2191,11 @@ public class ClientManager {
             }
         }
         return false;
+    }
+
+    public static boolean isEligibleToDelete(Session session, ApplicationForFood item) {
+        CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
+                .getCategoryDiscountDSZNByDSZNCode(session, item.getDtisznCode());
+        return categoryDiscountDSZN.getCategoryDiscount().getEligibleToDelete();
     }
 }
