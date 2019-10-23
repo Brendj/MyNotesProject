@@ -611,7 +611,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
         }
 
         private void tryFillEmployeeData(HashMap<String, HashSet<Long>> employeeCountMap, CNReportItem item) {
-            if (!item.isSotrudnik() || item.getSurname().startsWith("#")) return;
+            if (!item.isSotrudnik() || item.isZavProizv()) return;
 
             if (item.isBuffet()) {
                 if (employeeCountMap.get(CoverageNutritionDynamicBean.MENU_TYPE_BUFFET) == null) {
@@ -675,7 +675,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 }
                 totalPaidAndFreeQtyMap.put(CoverageNutritionDynamicBean.PAID_AND_FREE, totalPaidAndFreeQtyMap.get(CoverageNutritionDynamicBean.PAID_AND_FREE) + item.getQty());
 
-                if (item.getFoodType().equals(CoverageNutritionDynamicBean.PAID_NUTRITION) && item.getSurname().startsWith("#")) {
+                if (item.getFoodType().equals(CoverageNutritionDynamicBean.PAID_NUTRITION) && item.isZavProizv()) {
                     if (totalQtyPaidZavProizvMap.get(CoverageNutritionDynamicBean.PAID_NUTRITION) == null) {
                         totalQtyPaidZavProizvMap.put(CoverageNutritionDynamicBean.PAID_NUTRITION, 0);
                     }
@@ -687,7 +687,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 }
                 totalBuffetQtyMap.put(CoverageNutritionDynamicBean.BUFFET_ALL_FULL, totalBuffetQtyMap.get(CoverageNutritionDynamicBean.BUFFET_ALL_FULL) + item.getQty());
 
-                if (item.getSurname().startsWith("#")) {
+                if (item.isZavProizv()) {
                     //количество позиций буфета по карте зав производством
                     if (totalZavProizvQtyMap.get(item.getFoodType()) == null) {
                         totalZavProizvQtyMap.put(item.getFoodType(), 0);
@@ -703,7 +703,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
         }
 
         private void tryFillZavProizvData(HashMap<String, Integer> map, CNReportItem item) {
-            if (!item.getSurname().equals("#") || !item.isBuffet()) return;
+            if (!item.isZavProizv() || !item.isBuffet()) return;
 
             if (map.get(item.getFoodType()) == null) {
                 map.put(item.getFoodType(), 0);
@@ -797,7 +797,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
 
         private void putClientIntoComplexZavProizvQtyMap(HashMap<String, HashMap<String, HashMap<String, Integer>>> clientQtyMap,
                 CNReportItem item) {
-            if (!item.getSurname().startsWith("#")) return;
+            if (!item.isZavProizv()) return;
             if (clientQtyMap.get(CoverageNutritionDynamicBean.ORG_CARD_COMPLEXES) == null) {
                 clientQtyMap.put(CoverageNutritionDynamicBean.ORG_CARD_COMPLEXES, new HashMap<String, HashMap<String, Integer>>());
             }
@@ -864,7 +864,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + "join cf_orgs og on o.idoforg = og.idoforg join cf_clients c on c.idofclient = o.idofclient "
                     + "join cf_persons p on c.idofperson = p.idofperson "
-                    + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
+                    + "left join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + "where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
                     + " and od.menutype < 150 "
                     + "     and og.organizationtype = 0 ";

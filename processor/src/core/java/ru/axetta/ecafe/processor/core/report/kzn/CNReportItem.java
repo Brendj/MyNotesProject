@@ -52,6 +52,10 @@ public class CNReportItem {
         this.surname = surname;
     }
 
+    public boolean isZavProizv() {
+        return surname.startsWith("#");
+    }
+
     public boolean isSotrudnik() {
         return ((listSotrudnikov.contains(idOfClientGroup) || groupName.equals(CoverageNutritionDynamicBean.EMPLOYEES_TITLE)) && !surname.startsWith("#"));
     }
