@@ -315,12 +315,14 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 HashMap<String, Integer> totalZavProizvQtyMap = new HashMap<>(); //здесь будет количества позиций буфета по карте зав. производством
                 HashMap<String, Integer> totalBuffetZavProizvQtyMap = new HashMap<>(); //здесь будет количества позиций Буфет общее по карте зав. производством
                 HashMap<String, HashSet<Long>> totalComplexBuffetCountMap = new HashMap<>(); //здесь будет количества клиентов в Итого Комплексы + Буфет
+                HashMap<String, Integer> totalQtyPaidZavProizvMap = new HashMap<>(); //здесь будет количества позиций комплексов в Итого по платным комплексам по карте зав. произв
 
                 for (CNReportItem item : orgReportItems) {
                     tryFillEmployeeData(employeeCountMap, item);
                     tryFillZavProizvData(zavProizvCountMap, item);
                     tryFillTotalData(totalCountMap, totalPaidAndFreeCountMap, totalQtyMap, totalPaidAndFreeQtyMap,
-                            totalBuffetCountMap, totalBuffetQtyMap, totalZavProizvQtyMap, totalBuffetZavProizvQtyMap, totalComplexBuffetCountMap, item);
+                            totalBuffetCountMap, totalBuffetQtyMap, totalZavProizvQtyMap, totalBuffetZavProizvQtyMap,
+                            totalComplexBuffetCountMap, totalQtyPaidZavProizvMap, item);
                     Map<String, List<String>> map1 = complexMap.get(item.getGroupNameForTemplate());
                     if (map1 == null) continue;
                     List<String> list = map1.get(item.getFoodType());
@@ -521,6 +523,13 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                             (CoverageNutritionDynamicBean.TOTALS_TITLE + CoverageNutritionDynamicBean.PAID_AND_FREE + CoverageNutritionDynamicBean.TOTALS_SOLD_COMPLEXES).hashCode()),
                             new DynamicProperty(Long.valueOf(qty)));
                 }
+                //данные в отчет по количеству комплексов в Итого (Платное по карте зав. произв.)
+                for (String foodType : totalQtyPaidZavProizvMap.keySet()) {
+                    Integer qty = totalQtyPaidZavProizvMap.get(foodType);
+                    dynamicPropertyList.put(String.format("%d",
+                            (CoverageNutritionDynamicBean.TOTALS_TITLE + CoverageNutritionDynamicBean.PAID_NUTRITION + CoverageNutritionDynamicBean.TOTALS_SOLD_COMPLEXES_BY_ORG_CARD).hashCode()),
+                            new DynamicProperty(Long.valueOf(qty)));
+                }
                 //данные в отчет по количеству сотрудников в Итого (Платное + Бесплатное)
                 for (String foodType : totalBuffetCountMap.keySet()) {
                     HashSet<Long> clientsSet = totalBuffetCountMap.get(foodType);
@@ -630,6 +639,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                 HashMap<String, Integer> totalZavProizvQtyMap,
                 HashMap<String, Integer> totalBuffetZavProizvQtyMap,
                 HashMap<String, HashSet<Long>> totalComplexBuffetCountMap,
+                HashMap<String, Integer> totalQtyPaidZavProizvMap,
                 CNReportItem item) {
             if (item.isSotrudnik()) return;
             if (totalCountMap.get(item.getFoodType()) == null) {
@@ -664,6 +674,13 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     totalPaidAndFreeQtyMap.put(CoverageNutritionDynamicBean.PAID_AND_FREE, 0);
                 }
                 totalPaidAndFreeQtyMap.put(CoverageNutritionDynamicBean.PAID_AND_FREE, totalPaidAndFreeQtyMap.get(CoverageNutritionDynamicBean.PAID_AND_FREE) + item.getQty());
+
+                if (item.getFoodType().equals(CoverageNutritionDynamicBean.PAID_NUTRITION) && item.getSurname().startsWith("#")) {
+                    if (totalQtyPaidZavProizvMap.get(CoverageNutritionDynamicBean.PAID_NUTRITION) == null) {
+                        totalQtyPaidZavProizvMap.put(CoverageNutritionDynamicBean.PAID_NUTRITION, 0);
+                    }
+                    totalQtyPaidZavProizvMap.put(CoverageNutritionDynamicBean.PAID_NUTRITION, totalQtyPaidZavProizvMap.get(CoverageNutritionDynamicBean.PAID_NUTRITION) + item.getQty());
+                }
             } else {
                 if (totalBuffetQtyMap.get(CoverageNutritionDynamicBean.BUFFET_ALL_FULL) == null) {
                     totalBuffetQtyMap.put(CoverageNutritionDynamicBean.BUFFET_ALL_FULL, 0);
@@ -841,7 +858,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "    when od.menutype = 0 and od.menuorigin in (10, 11, 20) then 'Буфет покупная'"
                     + "    when od.menutype between 50 and 99 and od.rprice > 0 then 'Платное питание' "
                     + "    when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then 'Бесплатное питание' end as foodtype, "//11
-                    + "p.surname "//12
+                    + "p.surname, "//12
+                    + "o.idoforder "
                     + "from cf_orders o "
                     + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + "join cf_orgs og on o.idoforg = og.idoforg join cf_clients c on c.idofclient = o.idofclient "
