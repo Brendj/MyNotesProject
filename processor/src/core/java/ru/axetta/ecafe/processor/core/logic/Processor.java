@@ -873,8 +873,8 @@ public class Processor implements SyncProcessor {
 
         try {
             OrgSettingsRequest orgSettingsRequest = request.getOrgSettingsRequest();
-            orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
             if (orgSettingsRequest != null) {
+                orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
                 orgSettingSection = processOrgSettings(orgSettingsRequest);
             }
         } catch (Exception e) {
