@@ -243,11 +243,4 @@
                         cron="0 0 4 * * ?"/>
     </task:scheduled-tasks>
 
-    <!-- Ежедневное формирование реестров в формате XML производится каждый день ночью за предыдущий день-->
-    <task:scheduler id="xmlReportGeneratorSchedule"/>
-    <task:scheduled-tasks scheduler="xmlReportGeneratorSchedule">
-        <task:scheduled ref="xmlReportGeneratorService" method="generateXmlReport"
-                        cron="0 10 0 * * ?"/>
-    </task:scheduled-tasks>
-
 </beans>
