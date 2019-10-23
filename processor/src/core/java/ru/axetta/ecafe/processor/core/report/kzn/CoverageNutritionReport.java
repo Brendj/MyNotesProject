@@ -900,39 +900,31 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
 
         private String generateQueryConditions(List<Long> managerList, Boolean showYoungerClasses,
                 Boolean showMiddleClasses, Boolean showOlderClasses, Boolean showEmployee, Boolean showFreeNutrition,
-                Boolean showPaidNutrition, Boolean showBuffet, Boolean showComplexesByOrgCard) {
+                Boolean showPaidNutrition, Boolean showBuffet, Boolean showComplexesByOrgCard, boolean forTotals) {
             String resultString = "";
-            String conditionString = " cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) %s between %d and %d";
-            List<String> classesConditionList = new ArrayList<String>();
-            List<String> classesNotConditionList = new ArrayList<String>();
-            if (null != showYoungerClasses) {
-                if (!showYoungerClasses) {
+            if (!forTotals) {
+                String conditionString = " coalesce(cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer), 100) %s between %d and %d";
+                List<String> classesConditionList = new ArrayList<String>();
+                List<String> classesNotConditionList = new ArrayList<String>();
+                if (showYoungerClasses != null && !showYoungerClasses) {
                     classesNotConditionList.add(String.format(conditionString, "not", 1, 4));
                 }
-            }
-            if (null != showMiddleClasses) {
-                if (!showMiddleClasses) {
+                if (showMiddleClasses != null && !showMiddleClasses) {
                     classesNotConditionList.add(String.format(conditionString, "not", 5, 9));
                 }
-            }
-            if (null != showOlderClasses) {
-                if (!showOlderClasses) {
+                if (showOlderClasses != null && !showOlderClasses) {
                     classesNotConditionList.add(String.format(conditionString, "not", 10, 11));
                 }
-            }
-            if (!showComplexesByOrgCard && !managerList.isEmpty()) {
-                classesConditionList.add(String.format("c.idofclient not in (%s)", StringUtils.join(managerList, ",")));
-            }
+                if (showComplexesByOrgCard != null && !showComplexesByOrgCard && !managerList.isEmpty()) {
+                    classesConditionList.add(String.format("c.idofclient not in (%s)", StringUtils.join(managerList, ",")));
+                }
 
-            if (!classesConditionList.isEmpty()) {
-                resultString += " and (" + StringUtils.join(classesConditionList, " or ") + ") ";
-            }
-            if (!classesNotConditionList.isEmpty()) {
-                resultString += " and " + StringUtils.join(classesNotConditionList, " and ");
-            }
-
-            if (!showEmployee) {
-                resultString += " and cg.idofclientgroup not in (:clientEmployees, :clientAdministration, :clientTechEmployees)";
+                if (!classesConditionList.isEmpty()) {
+                    resultString += " and (" + StringUtils.join(classesConditionList, " or ") + ") ";
+                }
+                if (!classesNotConditionList.isEmpty()) {
+                    resultString += " and " + StringUtils.join(classesNotConditionList, " and ");
+                }
             }
 
             List<String> nutritionConditionList = new ArrayList<String>();
@@ -1446,10 +1438,10 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "join cf_clientgroups cg on cg.idofclientgroup = c.idofclientgroup and cg.idoforg = c.idoforg "
                     + "where o.idoforg in (:idOfOrgList) and o.createddate between :startDate and :endDate and o.state = 0 "
                     + " and od.menutype < 150 "
-                    + "     and og.organizationtype = 0 and cg.idofclientgroup <= :clientTechEmployees" + (showEmployee ? "" : " and cg.groupname <> 'Сотрудники'");
+                    + "     and og.organizationtype = 0 and cg.idofclientgroup <= :clientTechEmployees"; // + (showEmployee ? "" : " and cg.groupname <> 'Сотрудники'");
 
             sqlString += generateQueryConditions(Collections.EMPTY_LIST, showYoungerClasses, showMiddleClasses,
-                    showOlderClasses, showEmployee, showFreeNutrition, showPaidNutrition, showBuffet, false);
+                    showOlderClasses, showEmployee, showFreeNutrition, showPaidNutrition, showBuffet, false, false);
             Query query = session.createSQLQuery(sqlString);
             query.setParameterList("idOfOrgList", idOfOrgList);
             query.setParameter("startDate", startDate.getTime());
@@ -1500,16 +1492,11 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "     and og.organizationtype = 0 " + (showEmployee ? "" : " and cg.groupname <> 'Сотрудники'");
 
             sqlString += generateQueryConditions(managerList, showYoungerClasses, showMiddleClasses, showOlderClasses,
-                    showEmployee, showFreeNutrition, showPaidNutrition, showBuffet, showComplexesByOrgCard);
+                    showEmployee, showFreeNutrition, showPaidNutrition, showBuffet, showComplexesByOrgCard, true);
             Query query = session.createSQLQuery(sqlString);
             query.setParameterList("idOfOrgList", idOfOrgList);
             query.setParameter("startDate", startDate.getTime());
             query.setParameter("endDate", endDate.getTime());
-            if (!showEmployee) {
-                query.setParameter("clientEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-                query.setParameter("clientAdministration", ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
-                query.setParameter("clientTechEmployees", ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
-            }
 
             return query.list();
         }
@@ -1535,7 +1522,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "     and og.organizationtype = 0 and c.idofclient in (:managerList)";
 
             sqlString += generateQueryConditions(managerList, null, null, null, true, showFreeNutrition,
-                    showPaidNutrition, showBuffet, true);
+                    showPaidNutrition, showBuffet, true, false);
             Query query = session.createSQLQuery(sqlString);
             query.setParameterList("idOfOrgList", idOfOrgList);
             query.setParameter("startDate", startDate.getTime());
