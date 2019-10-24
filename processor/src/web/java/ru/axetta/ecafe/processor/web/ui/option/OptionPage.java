@@ -29,6 +29,8 @@ import javax.faces.model.SelectItem;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * Created by IntelliJ IDEA.
@@ -42,7 +44,9 @@ import java.util.*;
 public class OptionPage extends BasicWorkspacePage {
 
     private DateFormat biDataDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-    final Logger logger = LoggerFactory.getLogger(BasicWorkspacePage.class);
+    private final Logger logger = LoggerFactory.getLogger(BasicWorkspacePage.class);
+    private static final Pattern SYNC_EXPRESSION_PATTERN =
+            Pattern.compile("^(!*([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9];)+(!*([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9]);*$");
     private Boolean notifyBySMSAboutEnterEvent;
     private Boolean withOperator;
     private Boolean cleanMenu;
@@ -134,11 +138,64 @@ public class OptionPage extends BasicWorkspacePage {
     private String methodsInfoService;
     private String regularPaymentCertPath;
     private String regularPaymentCertPassword;
+    private String fullSyncExpressions;
+    private String orgSettingSyncExpressions;
+    private String clientDataSyncExpressions;
+    private String menuSyncExpressions;
+    private String photoSyncExpressions;
+    private String libSyncExpressions;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString(), RNIPVersion.RNIP_V21.toString()};
 
     private List<BankOptionItem> banks;
 
+    public String getFullSyncExpressions() {
+        return fullSyncExpressions;
+    }
+
+    public void setFullSyncExpressions(String fullSyncExpressions) {
+        this.fullSyncExpressions = fullSyncExpressions;
+    }
+
+    public String getOrgSettingSyncExpressions() {
+        return orgSettingSyncExpressions;
+    }
+
+    public void setOrgSettingSyncExpressions(String orgSettingSyncExpressions) {
+        this.orgSettingSyncExpressions = orgSettingSyncExpressions;
+    }
+
+    public String getClientDataSyncExpressions() {
+        return clientDataSyncExpressions;
+    }
+
+    public void setClientDataSyncExpressions(String clientDataSyncExpressions) {
+        this.clientDataSyncExpressions = clientDataSyncExpressions;
+    }
+
+    public String getMenuSyncExpressions() {
+        return menuSyncExpressions;
+    }
+
+    public void setMenuSyncExpressions(String menuSyncExpressions) {
+        this.menuSyncExpressions = menuSyncExpressions;
+    }
+
+    public String getPhotoSyncExpressions() {
+        return photoSyncExpressions;
+    }
+
+    public void setPhotoSyncExpressions(String photoSyncExpressions) {
+        this.photoSyncExpressions = photoSyncExpressions;
+    }
+
+    public String getLibSyncExpressions() {
+        return libSyncExpressions;
+    }
+
+    public void setLibSyncExpressions(String libSyncExpressions) {
+        this.libSyncExpressions = libSyncExpressions;
+    }
 
     public List<BankOptionItem> getBanks() {
         return banks;
@@ -924,6 +981,13 @@ public class OptionPage extends BasicWorkspacePage {
 
         readerForWebInterfaceString = runtimeContext.getOptionValueString(Option.OPTION_READER_FOR_WEB_STRING);
 
+       fullSyncExpressions = runtimeContext.getOptionValueString(Option.OPTION_FULL_SYNC_EXPRESSION);
+       orgSettingSyncExpressions = runtimeContext.getOptionValueString(Option.OPTION_ORG_SETTING_SYNC_EXPRESSION);
+       clientDataSyncExpressions = runtimeContext.getOptionValueString(Option.OPTION_CLIENT_DATA_SYNC_EXPRESSION);
+       menuSyncExpressions = runtimeContext.getOptionValueString(Option.OPTION_MENU_SYNC_EXPRESSION);
+       photoSyncExpressions = runtimeContext.getOptionValueString(Option.OPTION_PHOTO_SYNC_EXPRESSION);
+       libSyncExpressions = runtimeContext.getOptionValueString(Option.OPTION_LIB_SYNC_EXPRESSION);
+
         bankListPage.onShow();
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -969,8 +1033,44 @@ public class OptionPage extends BasicWorkspacePage {
         reviseLastDate = DAOService.getInstance().getReviseLastDate();
     }
 
+    private void validateSyncExpressions() throws Exception {
+        Matcher m;
+        if(StringUtils.isNotBlank(fullSyncExpressions)){
+            m = SYNC_EXPRESSION_PATTERN.matcher(fullSyncExpressions);
+            if(!m.find()){
+                throw new IllegalArgumentException("Выражение для полной синхранизации задано не верно");
+            }
+        } if(StringUtils.isNotBlank(orgSettingSyncExpressions)){
+            m = SYNC_EXPRESSION_PATTERN.matcher(orgSettingSyncExpressions);
+            if(!m.find()){
+                throw new IllegalArgumentException("Выражение для синхранизации настроек ОО задано не верно");
+            }
+        } if(StringUtils.isNotBlank(clientDataSyncExpressions)){
+            m = SYNC_EXPRESSION_PATTERN.matcher(clientDataSyncExpressions);
+            if(!m.find()){
+                throw new IllegalArgumentException("Выражение для синхранизации данных по клиентам задано не верно");
+            }
+        } if(StringUtils.isNotBlank(menuSyncExpressions)){
+            m = SYNC_EXPRESSION_PATTERN.matcher(menuSyncExpressions);
+            if(!m.find()){
+                throw new IllegalArgumentException("Выражение синхранизации меню задано не верно");
+            }
+        } if(StringUtils.isNotBlank(photoSyncExpressions)){
+            m = SYNC_EXPRESSION_PATTERN.matcher(photoSyncExpressions);
+            if(!m.find()){
+                throw new IllegalArgumentException("Выражение для синхранизации фотографий задано не верно");
+            }
+        } if(StringUtils.isNotBlank(libSyncExpressions)){
+            m = SYNC_EXPRESSION_PATTERN.matcher(libSyncExpressions);
+            if(!m.find()){
+                throw new IllegalArgumentException("Выражение для синхранизации библиотеки задано не верно");
+            }
+        }
+    }
+
     public Object save() {
         try {
+            validateSyncExpressions();
             runtimeContext.setOptionValue(Option.OPTION_WITH_OPERATOR, withOperator);
             runtimeContext.setOptionValue(Option.OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT, notifyBySMSAboutEnterEvent);
             runtimeContext.setOptionValue(Option.OPTION_CLEAN_MENU, cleanMenu);
@@ -1085,6 +1185,13 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_METHODS_INFOSERVICE, methodsInfoService);
             runtimeContext.setOptionValue(Option.OPTION_REGULAR_PAYMENT_CERT_PATH, regularPaymentCertPath);
             runtimeContext.setOptionValue(Option.OPTION_REGULAR_PAYMENT_CERT_PASSWORD, regularPaymentCertPassword);
+
+            runtimeContext.setOptionValue(Option.OPTION_FULL_SYNC_EXPRESSION, fullSyncExpressions);
+            runtimeContext.setOptionValue(Option.OPTION_ORG_SETTING_SYNC_EXPRESSION, orgSettingSyncExpressions);
+            runtimeContext.setOptionValue(Option.OPTION_CLIENT_DATA_SYNC_EXPRESSION, clientDataSyncExpressions);
+            runtimeContext.setOptionValue(Option.OPTION_MENU_SYNC_EXPRESSION, menuSyncExpressions);
+            runtimeContext.setOptionValue(Option.OPTION_PHOTO_SYNC_EXPRESSION, photoSyncExpressions);
+            runtimeContext.setOptionValue(Option.OPTION_LIB_SYNC_EXPRESSION, libSyncExpressions);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
