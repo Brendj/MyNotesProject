@@ -50,6 +50,8 @@ public class DirectiveElement implements AbstractToElement{
         if (feedingSettingLimit != null) {
             directiveItemList.add(new DirectiveItem("FeedingSettingLimit", feedingSettingLimit.toString()));
         }
+
+        directiveItemList.add(new DirectiveItem("DoRequestsEZDSync", (org.getPreorderlp())?"1":"0"));
     }
 
     public void processForFullSync(DirectivesRequest directivesRequest, Org org) throws Exception {

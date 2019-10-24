@@ -31,15 +31,24 @@ public class GoodRequestEZDSyncPOJO {
 
     public Element toElement(Document document, DateFormat timeFormat) throws Exception {
         Element element = document.createElement("GR");
-        element.setAttribute("IdOfOrg", idOfOrg.toString());
-        element.setAttribute("Guid", guid);
-        element.setAttribute("GroupName", groupName);
-        element.setAttribute("Date", timeFormat.format(date));
-        element.setAttribute("ComplexId", complexId.toString());
-        element.setAttribute("ComplexName", complexName);
-        element.setAttribute("Count", count.toString());
-        element.setAttribute("User", user);
-        element.setAttribute("V", version.toString());
+        if (idOfOrg != null)
+            element.setAttribute("IdOfOrg", idOfOrg.toString());
+        if (guid != null)
+            element.setAttribute("Guid", guid);
+        if (groupName != null)
+            element.setAttribute("GroupName", groupName);
+        if (date != null)
+            element.setAttribute("Date", timeFormat.format(date));
+        if (complexId != null)
+            element.setAttribute("ComplexId", complexId.toString());
+        if (complexName != null)
+            element.setAttribute("ComplexName", complexName);
+        if (count != null)
+            element.setAttribute("Count", count.toString());
+        if (user != null)
+            element.setAttribute("User", user);
+        if (version != null)
+            element.setAttribute("V", version.toString());
         return element;
     }
 
