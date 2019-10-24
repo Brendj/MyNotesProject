@@ -4501,6 +4501,12 @@ public class DAOUtils {
         return criteria.list().isEmpty();
     }
 
+    public static List getAllGoodRequestEZD(Session persistenceSession, Long version) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzd.class);
+        criteria.add(Restrictions.ge("versionrecord", version));
+        return criteria.list();
+    }
+
     public static Integer getMaxVersionForEZD(Session persistenceSession) throws Exception {
         Query query = persistenceSession.createQuery("SELECT MAX(re.versionrecord) FROM RequestsEzd AS re");
         Integer maxVer = (Integer) query.uniqueResult();

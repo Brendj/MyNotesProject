@@ -312,6 +312,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
         for (Org o : selectOrg) {
             o.setParticipantOP(participantOP);
+            o.setPreorderlp(preorderlp);
         }
 
         org.setCommodityAccounting(changeCommodityAccounting);
@@ -405,9 +406,8 @@ public class OrgEditPage extends BasicWorkspacePage
         }
 
         org.setRequestForVisitsToOtherOrg(requestForVisitsToOtherOrg);
-
         org.setPreorderlp(preorderlp);
-        
+
         session.update(org);
         fill(org);
 
