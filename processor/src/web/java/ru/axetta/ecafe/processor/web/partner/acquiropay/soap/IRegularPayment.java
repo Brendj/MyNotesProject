@@ -24,8 +24,7 @@ public interface IRegularPayment {
             @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
             @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
             @WebParam(name = "subscriptionPeriodOfValidity") int period,
-            @WebParam(name = "validityDate") Date validityDate,
-            @WebParam(name = "mobilePhone") String mobilePhone);
+            @WebParam(name = "validityDate") Date validityDate);
 
     @WebMethod
     RequestResult regularPaymentEasyCheckCreateSubscription(@WebParam(name = "contractID") Long contractID,

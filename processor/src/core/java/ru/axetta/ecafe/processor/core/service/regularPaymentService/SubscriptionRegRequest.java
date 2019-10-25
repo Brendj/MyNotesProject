@@ -76,7 +76,7 @@ public class SubscriptionRegRequest implements IRequestOperation {
         bs.setClient(client);
         bs.setSan(client.getSan());
         bs.setPaySystem(request.getPaySystem());
-        bs.setValidToDate(validityDate == null ? CalendarUtils.addMonth(new Date(), period) : validityDate);
+        bs.setValidToDate((validityDate == null && period > 0) ? CalendarUtils.addMonth(new Date(), period) : validityDate);
         bs.setMobile(mobile);
         em.persist(bs);
         request.setBankSubscription(bs);

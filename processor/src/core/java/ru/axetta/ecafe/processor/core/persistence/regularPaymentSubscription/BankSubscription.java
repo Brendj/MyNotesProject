@@ -73,6 +73,10 @@ public class BankSubscription {
         return monthsCount;
     }
 
+    public boolean showMonthsCount() {
+        return monthsCount > 0;
+    }
+
     public void setMonthsCount(int monthsCount) {
         this.monthsCount = monthsCount;
     }

@@ -369,11 +369,11 @@ public class RegularPaymentSubscriptionService {
     }
 
     @Transactional(rollbackFor = Exception.class)
-    public void updateBankSubscription(Long bsId, Long paymentAmount, Long thresholdAmount, Date validityDate) {
+    public void updateBankSubscription(Long bsId, Long paymentAmount, Long thresholdAmount, int period, Date validityDate) {
         BankSubscription bs = em.find(BankSubscription.class, bsId);
         bs.setPaymentAmount(paymentAmount);
         bs.setThresholdAmount(thresholdAmount);
-        bs.setValidToDate(validityDate);
+        bs.setValidToDate((validityDate == null && period > 0) ? CalendarUtils.addMonth(new Date(), period) : validityDate);
     }
 
     @Transactional(rollbackFor = Exception.class)

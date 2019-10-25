@@ -706,6 +706,12 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
+                <h:outputText escape="true" value="Кол-во месяцев" />
+            </f:facet>
+            <h:outputText escape="true" value="#{sub.monthsCount}" styleClass="output-text" rendered="#{sub.showMonthsCount()}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
                 <h:outputText escape="true" value="Дата отключения" />
             </f:facet>
             <h:outputText escape="true" value="#{sub.deactivationDate}" styleClass="output-text"

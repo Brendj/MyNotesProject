@@ -68,6 +68,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
     private static final String RC_INVALID_PARAMETERS_DESC = "Request has invalid parameters.";
     private static final String RC_CLIENT_ALREADY_HAS_SUBSCRIPTION = "Client already has active subscription";
     private static final String RC_PERIOD_VALIDITY_INCORRECT = "Period of validity is incorrect";
+    private static final String RC_INVALID_MOBILE_PHONE = "Mobile phone is incorrect";
 
     private static final int CLIENT_ID_TYPE_CONTRACTID = 0;
     private static final int CLIENT_ID_TYPE_SAN = 1;
@@ -104,8 +105,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             @WebParam(name = "lowerLimitAmount") long lowerLimitAmount,
             @WebParam(name = "paymentAmount") long paymentAmount, @WebParam(name = "currency") int currency,
             @WebParam(name = "subscriptionPeriodOfValidity") int period,
-            @WebParam(name = "validityDate") Date validityDate,
-            @WebParam(name = "mobilePhone") String mobilePhone) {
+            @WebParam(name = "validityDate") Date validityDate) {
         Session session = null;
         Transaction tr = null;
         RequestResult requestResult = new RequestResult();
@@ -116,11 +116,14 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             Client c = DAOUtils.findClientByContractId(session, contractId);
             if (c == null) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
-                requestResult.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC,
-                        clientIDType == CLIENT_ID_TYPE_SAN ? "san" : "mobile phone number", clientID));
+                requestResult.setErrorDesc(String.format(RC_CLIENT_NOT_FOUND_DESC, "contract ID", contractId));
                 return requestResult;
             }
-            if (period > 0 && validityDate != null) {
+            String mobilePhone = "";
+            if (clientIDType == CLIENT_ID_TYPE_MOBILE) {
+                mobilePhone = clientID;
+            }
+            if ((period > 0 && validityDate != null) || (validityDate != null && validityDate.before(new Date()))) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
                 requestResult.setErrorDesc(RC_PERIOD_VALIDITY_INCORRECT);
                 return requestResult;
@@ -134,6 +137,12 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             if (rpService.subscriptionExistsByClient(c.getIdOfClient())) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
                 requestResult.setErrorDesc(RC_CLIENT_ALREADY_HAS_SUBSCRIPTION);
+                return requestResult;
+            }
+            String mobilePhoneCanonical = Client.checkAndConvertMobile(mobilePhone);
+            if (!StringUtils.isEmpty(mobilePhone) && (mobilePhoneCanonical == null || !DAOUtils.guardianExistsByMobile(session, mobilePhoneCanonical, c))) {
+                requestResult.setErrorCode(RC_BAD_REQUEST);
+                requestResult.setErrorDesc(RC_INVALID_MOBILE_PHONE);
                 return requestResult;
             }
 
@@ -157,7 +166,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             tr.commit();
         } catch (Exception ex) {
             HibernateUtils.rollback(tr, logger);
-            logger.error(ex.getMessage());
+            logger.error("Error in regularPaymentCreateSubscription: ", ex);
             requestResult.setErrorCode(RC_INTERNAL_SERVER_ERROR);
             requestResult.setErrorDesc(RC_INTERNAL_SERVER_ERROR_DESC);
         } finally {
@@ -310,7 +319,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
             if (contractId != null && !checkSubscriptionContractId(bs, contractId, requestResult)) {
                 return requestResult;
             }
-            if (period > 0 && validityDate != null) {
+            if ((period > 0 && validityDate != null) || (validityDate != null && validityDate.before(new Date()))) {
                 requestResult.setErrorCode(RC_BAD_REQUEST);
                 requestResult.setErrorDesc(RC_PERIOD_VALIDITY_INCORRECT);
                 return requestResult;
@@ -321,7 +330,7 @@ public class RegularPaymentWS extends HttpServlet implements IRegularPayment {
                 requestResult.setErrorDesc(RC_INVALID_PARAMETERS_DESC);
                 return requestResult;
             }
-            rpService.updateBankSubscription(regularPaymentSubscriptionID, paymentAmount, lowerLimitAmount, validityDate);
+            rpService.updateBankSubscription(regularPaymentSubscriptionID, paymentAmount, lowerLimitAmount, period, validityDate);
             requestResult.setErrorCode(0);
         } catch (Exception ex) {
             logger.error(ex.getMessage());
