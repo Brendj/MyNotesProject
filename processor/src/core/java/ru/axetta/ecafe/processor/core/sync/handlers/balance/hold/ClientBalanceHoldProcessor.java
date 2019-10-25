@@ -54,7 +54,10 @@ public class ClientBalanceHoldProcessor extends AbstractProcessor<ClientBalanceH
     public ResClientBalanceHoldData processData() {
         ResClientBalanceHoldData result = new ResClientBalanceHoldData();
         List<ClientBalanceHoldItem> items = new ArrayList<ClientBalanceHoldItem>();
-        Long nextVersion = DAOUtils.nextVersionByClientBalanceHold(session);
+        Long nextVersion = 0L;
+        if (clientBalanceHoldData != null && clientBalanceHoldData.getItems() != null && clientBalanceHoldData.getItems().size() > 0) {
+            nextVersion = DAOUtils.nextVersionByClientBalanceHold(session);
+        }
         for (ClientBalanceHoldItem item : clientBalanceHoldData.getItems()) {
             if (!StringUtils.isEmpty(item.getErrorMessage())) {
                 ClientBalanceHoldItem resItem = new ClientBalanceHoldItem(item.getGuid(), 100, item.getErrorMessage(), null);
