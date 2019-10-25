@@ -5264,7 +5264,7 @@ public class Processor implements SyncProcessor {
                             clientFromEnterEvent == null ? null : clientFromEnterEvent.getIdOfClientGroup());
                     persistenceSession.save(enterEvent);
 
-                    if(RuntimeContext.RegistryType.isSpb() && ScudManager.isOn()){
+                    if(RuntimeContext.RegistryType.isSpb() && ScudManager.serviceIsWork){
                         DAOUtils.createEnterEventsSendInfo(enterEvent, persistenceSession);
                     }
                     if(GeoplanerManager.isOn() && enterEventOwnerHaveSmartWatch(persistenceSession, enterEvent)){
