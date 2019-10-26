@@ -245,7 +245,7 @@ public class AutoDistributionSyncSettingsService {
         int calculationMinutesForSyncVariable = 0;
         if(!allowedList.isEmpty()){
             for(TimePeriod allowedPeriod : allowedList){
-                calculationMinutesForSyncVariable = allowedPeriod.getStartTimeInMinutes() + calculationMinutesForSync;
+                calculationMinutesForSyncVariable = allowedPeriod.getStartTimeInMinutes() + calculationMinutesForSync % allowedPeriod.getEndTimeInMinutes();
                 for(int i = 0; i != NUMBER_OF_ATTEMPTS + 1; i++) {
                     if(i > NUMBER_OF_ATTEMPTS){
                         throw new IllegalArgumentException("Attempts to calculate the time ended");
