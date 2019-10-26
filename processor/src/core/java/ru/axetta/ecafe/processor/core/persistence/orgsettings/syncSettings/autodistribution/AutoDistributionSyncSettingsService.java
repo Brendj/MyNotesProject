@@ -10,6 +10,8 @@ import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.Conte
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettings;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
@@ -19,13 +21,14 @@ import java.util.*;
 @Component
 @DependsOn("runtimeContext")
 public class AutoDistributionSyncSettingsService {
+    private static final Logger logger = LoggerFactory.getLogger(AutoDistributionSyncSettingsService.class);
     private static final Integer FULL_SYNC_COEFFICIENT = 10;
     private static final Integer ORG_SETTING_SYNC_COEFFICIENT = 15;
     private static final Integer CLIENT_DATA_SYNC_COEFFICIENT = 20;
     private static final Integer MENU_SYNC_COEFFICIENT = 12;
     private static final Integer PHOTO_SYNC_COEFFICIENT = 33;
     private static final Integer LIB_SYNC_COEFFICIENT = 17;
-    private static final Integer NUMBER_OF_ATTEMPTS = 15;
+    private static final Integer NUMBER_OF_ATTEMPTS = 50;
     private static final Integer MAX_MINUTES_IN_DAY = 24 * 60;
     private static final Map<ContentType, Integer> SYNC_CONTENT_TYPE_MAP = buildMap();
     private static final String FULL_SYNC_DEFAULT_EXPRESSION = "!22:00-05:00;!07:00-16:00";
@@ -50,41 +53,57 @@ public class AutoDistributionSyncSettingsService {
 
     @PostConstruct
     private void buildTimePeriodLists(){
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        String fullSyncExpression = runtimeContext.getOptionValueString(Option.OPTION_FULL_SYNC_EXPRESSION);
-        if(StringUtils.isBlank(fullSyncExpression)){
-            fullSyncExpression = FULL_SYNC_DEFAULT_EXPRESSION;
+        try {
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            String fullSyncExpression = runtimeContext.getOptionValueString(Option.OPTION_FULL_SYNC_EXPRESSION);
+            if (StringUtils.isBlank(fullSyncExpression)) {
+                fullSyncExpression = FULL_SYNC_DEFAULT_EXPRESSION;
+            }
+            String orgSettingSyncExpression = runtimeContext.getOptionValueString(Option.OPTION_ORG_SETTING_SYNC_EXPRESSION);
+            if (StringUtils.isBlank(orgSettingSyncExpression)) {
+                orgSettingSyncExpression = ORG_SETTING_SYNC_DEFAULT_EXPRESSION;
+            }
+            String clientDataSyncExpression = runtimeContext.getOptionValueString(Option.OPTION_CLIENT_DATA_SYNC_EXPRESSION);
+            if (StringUtils.isBlank(clientDataSyncExpression)) {
+                clientDataSyncExpression = CLIENT_DATA_SYNC_DEFAULT_EXPRESSION;
+            }
+            String menuSyncExpression = runtimeContext.getOptionValueString(Option.OPTION_MENU_SYNC_EXPRESSION);
+            if (StringUtils.isBlank(menuSyncExpression)) {
+                menuSyncExpression = MENU_SYNC_DEFAULT_EXPRESSION;
+            }
+            String photoSyncExpression = runtimeContext.getOptionValueString(Option.OPTION_PHOTO_SYNC_EXPRESSION);
+            String libSyncExpression = runtimeContext.getOptionValueString(Option.OPTION_LIB_SYNC_EXPRESSION);
+
+            buildAllowedAndForbiddenList(fullSyncExpression, allowedFullSyncPeriods, forbiddenFullSyncPeriod);
+            buildAllowedAndForbiddenList(orgSettingSyncExpression, allowedOrgSettingSyncPeriods,
+                    forbiddenOrgSettingSyncPeriod);
+            buildAllowedAndForbiddenList(clientDataSyncExpression, allowedClientDataSyncPeriods,
+                    forbiddenClientDataSyncPeriod);
+            buildAllowedAndForbiddenList(menuSyncExpression, allowedMenuSyncPeriods, forbiddenMenuSyncPeriod);
+            buildAllowedAndForbiddenList(photoSyncExpression, allowedPhotoSyncPeriods, forbiddenPhotoSyncPeriod);
+            buildAllowedAndForbiddenList(libSyncExpression, allowedLibSyncPeriods, forbiddenLibSyncPeriod);
+
+            logger.info(String.format("Service created witch configs:\n"
+                            + "FullSync: %s \n"
+                            + "OrgSettingSync: %s \n"
+                            + "ClientDataSync: %s \n"
+                            + "MenuSync: %s \n"
+                            + "PhotoSync: %s \n"
+                            + "LibSync: %s \n",
+                    fullSyncExpression, orgSettingSyncExpression, clientDataSyncExpression,
+                    menuSyncExpression, photoSyncExpression, libSyncExpression));
+        } catch (Exception e){
+            logger.error("Can't build configuration for AutoDistribution: ", e);
         }
-        String orgSettingSyncExpression = runtimeContext.getOptionValueString(Option.OPTION_ORG_SETTING_SYNC_EXPRESSION);
-        if(StringUtils.isBlank(orgSettingSyncExpression)){
-            orgSettingSyncExpression = ORG_SETTING_SYNC_DEFAULT_EXPRESSION;
-        }
-        String clientDataSyncExpression = runtimeContext.getOptionValueString(Option.OPTION_CLIENT_DATA_SYNC_EXPRESSION);
-        if(StringUtils.isBlank(clientDataSyncExpression)){
-            clientDataSyncExpression = CLIENT_DATA_SYNC_DEFAULT_EXPRESSION;
-        }
-        String menuSyncExpression = runtimeContext.getOptionValueString(Option.OPTION_MENU_SYNC_EXPRESSION);
-        if(StringUtils.isBlank(menuSyncExpression)){
-            menuSyncExpression = MENU_SYNC_DEFAULT_EXPRESSION;
-        }
-        String photoSyncExpression = runtimeContext.getOptionValueString(Option.OPTION_PHOTO_SYNC_EXPRESSION);
-        if(StringUtils.isBlank(photoSyncExpression)){
-            photoSyncExpression = PHOTO_SYNC_DEFAULT_EXPRESSION;
-        }
-        String libSyncExpression = runtimeContext.getOptionValueString(Option.OPTION_LIB_SYNC_EXPRESSION);
-        if(StringUtils.isBlank(libSyncExpression)){
-            libSyncExpression = LIB_SYNC_DEFAULT_EXPRESSION;
-        }
-        buildAllowedAndForbiddenList(fullSyncExpression, allowedFullSyncPeriods, forbiddenFullSyncPeriod);
-        buildAllowedAndForbiddenList(orgSettingSyncExpression, allowedOrgSettingSyncPeriods, forbiddenOrgSettingSyncPeriod);
-        buildAllowedAndForbiddenList(clientDataSyncExpression, allowedClientDataSyncPeriods, forbiddenClientDataSyncPeriod);
-        buildAllowedAndForbiddenList(menuSyncExpression, allowedMenuSyncPeriods, forbiddenMenuSyncPeriod);
-        buildAllowedAndForbiddenList(photoSyncExpression, allowedPhotoSyncPeriods, forbiddenPhotoSyncPeriod);
-        buildAllowedAndForbiddenList(libSyncExpression, allowedLibSyncPeriods, forbiddenLibSyncPeriod);
     }
 
     private void buildAllowedAndForbiddenList(String expression, List<TimePeriod> allowedList,
             List<TimePeriod> forbiddenList) {
+        allowedList.clear();
+        forbiddenList.clear();
+        if(StringUtils.isBlank(expression)){
+            return;
+        }
         String[] periods = expression.split(";");
         for (String period : periods) {
             if (period.contains("!")) {
@@ -107,10 +126,103 @@ public class AutoDistributionSyncSettingsService {
         return Collections.unmodifiableMap(map);
     }
 
-    public SyncSettings distributionSyncSettingsService(SyncSettings setting){
+    public SyncSettings distributionSyncSettingsService(SyncSettings setting) throws Exception {
         if(!SYNC_CONTENT_TYPE_MAP.containsKey(setting.getContentType())){
+            logger.warn(String.format("Unsupported type of SyncSetting: %s", setting.getContentType()));
             return setting; // if wrong ContentType, then do nothing
         }
+
+        Long idOfOrg = setting.getOrg().getIdOfOrg();
+        Integer calculationMinutesForSync = calculateTime(idOfOrg, SYNC_CONTENT_TYPE_MAP.get(setting.getContentType()));
+        List<String> calculationPeriods = Collections.emptyList();
+        switch (setting.getContentType()){
+            case FULL_SYNC:
+                try {
+                    calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
+                            allowedFullSyncPeriods, forbiddenFullSyncPeriod);
+                } catch (Exception e) {
+                    logger.error("Can't calculate sync Time for full sync: ", e);
+                    logger.info("User expression dropped, try regenerate by default expression: "
+                            + FULL_SYNC_DEFAULT_EXPRESSION);
+                    buildAllowedAndForbiddenList(FULL_SYNC_DEFAULT_EXPRESSION,
+                            allowedFullSyncPeriods, forbiddenFullSyncPeriod);
+                    calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
+                            allowedFullSyncPeriods, forbiddenFullSyncPeriod);
+                }
+                break;
+            case ORGSETTINGS:
+                try {
+                    calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
+                            allowedOrgSettingSyncPeriods, forbiddenOrgSettingSyncPeriod);
+                } catch (Exception e) {
+                    logger.error("Can't calculate sync Time for OrgSetting sync: ", e);
+                    logger.info("User expression dropped, try regenerate by default expression: "
+                            + ORG_SETTING_SYNC_DEFAULT_EXPRESSION);
+                    buildAllowedAndForbiddenList(ORG_SETTING_SYNC_DEFAULT_EXPRESSION,
+                            allowedOrgSettingSyncPeriods, forbiddenOrgSettingSyncPeriod);
+                    calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
+                            allowedOrgSettingSyncPeriods, forbiddenOrgSettingSyncPeriod);
+                }
+                break;
+            case CLIENTS_DATA:
+                try {
+                    calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
+                        allowedClientDataSyncPeriods, forbiddenClientDataSyncPeriod);
+                } catch (Exception e) {
+                    logger.error("Can't calculate sync Time for ClientData sync: ", e);
+                    logger.info("User expression dropped, try regenerate by default expression: "
+                            + CLIENT_DATA_SYNC_DEFAULT_EXPRESSION);
+                    buildAllowedAndForbiddenList(CLIENT_DATA_SYNC_DEFAULT_EXPRESSION,
+                            allowedClientDataSyncPeriods, forbiddenClientDataSyncPeriod);
+                    calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
+                            allowedClientDataSyncPeriods, forbiddenClientDataSyncPeriod);
+                }
+                break;
+            case MENU:
+                try {
+                    calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
+                        allowedMenuSyncPeriods, forbiddenMenuSyncPeriod);
+                } catch (Exception e) {
+                    logger.error("Can't calculate sync Time for Menu sync: ", e);
+                    logger.info("User expression dropped, try regenerate by default expression: "
+                            + MENU_SYNC_DEFAULT_EXPRESSION);
+                    buildAllowedAndForbiddenList(MENU_SYNC_DEFAULT_EXPRESSION,
+                            allowedMenuSyncPeriods, forbiddenMenuSyncPeriod);
+                    calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
+                            allowedMenuSyncPeriods, forbiddenMenuSyncPeriod);
+                }
+                break;
+            case PHOTOS:
+                try {
+                calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
+                        allowedPhotoSyncPeriods, forbiddenPhotoSyncPeriod);
+                } catch (Exception e) {
+                    logger.error("Can't calculate sync Time for Photo sync: ", e);
+                    logger.info("User expression dropped, try regenerate by default expression: "
+                            + PHOTO_SYNC_DEFAULT_EXPRESSION);
+                    buildAllowedAndForbiddenList(PHOTO_SYNC_DEFAULT_EXPRESSION,
+                            allowedPhotoSyncPeriods, forbiddenPhotoSyncPeriod);
+                    calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
+                            allowedPhotoSyncPeriods, forbiddenPhotoSyncPeriod);
+                }
+                break;
+            case LIBRARY:
+                try {
+                    calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
+                        allowedLibSyncPeriods, forbiddenLibSyncPeriod);
+                } catch (Exception e) {
+                    logger.error("Can't calculate sync Time for Lib sync: ", e);
+                    logger.info("User expression dropped, try regenerate by default expression: "
+                            + LIB_SYNC_DEFAULT_EXPRESSION);
+                    buildAllowedAndForbiddenList(LIB_SYNC_DEFAULT_EXPRESSION,
+                            allowedLibSyncPeriods, forbiddenLibSyncPeriod);
+                    calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
+                            allowedLibSyncPeriods, forbiddenLibSyncPeriod);
+                }
+                break;
+        }
+        setting.setConcreteTime(StringUtils.join(calculationPeriods, ";"));
+
         setting.setMonday(true);
         setting.setTuesday(true);
         setting.setWednesday(true);
@@ -119,14 +231,74 @@ public class AutoDistributionSyncSettingsService {
         setting.setSaturday(true);
         setting.setSunday(true);
 
-        Long idOfOrg = setting.getOrg().getIdOfOrg();
-        Integer calculationMinutesForSync = calculateTime(idOfOrg, SYNC_CONTENT_TYPE_MAP.get(setting.getContentType()));
-        String s;
-        switch (setting.getContentType()){
-            case FULL_SYNC:
-            //todo
-        }
         return setting;
+    }
+
+    private List<String> calculatePeriodsForSyncSetting(final Integer calculationMinutesForSync,  List<TimePeriod> allowedList,
+            List<TimePeriod> forbiddenList) throws Exception {
+        if(allowedList.isEmpty() && forbiddenList.isEmpty()){
+            return Collections.emptyList();
+        }
+        List<String> result = new LinkedList<>();
+        int hour = 0;
+        int minutes = 0;
+        int calculationMinutesForSyncVariable = 0;
+        if(!allowedList.isEmpty()){
+            for(TimePeriod allowedPeriod : allowedList){
+                calculationMinutesForSyncVariable = allowedPeriod.getStartTimeInMinutes() + calculationMinutesForSync;
+                for(int i = 0; i != NUMBER_OF_ATTEMPTS + 1; i++) {
+                    if(i > NUMBER_OF_ATTEMPTS){
+                        throw new IllegalArgumentException("Attempts to calculate the time ended");
+                    }
+                    if (allowedPeriod.between(calculationMinutesForSyncVariable)) {
+                        hour = calculationMinutesForSyncVariable / 60;
+                        minutes = calculationMinutesForSyncVariable % 60;
+                        String r = hour + ":" + minutes;
+                        result.add(r);
+                        break;
+                    } else {
+                        if (calculationMinutesForSyncVariable > allowedPeriod.getEndTimeInMinutes()) {
+                            calculationMinutesForSyncVariable =
+                                    (calculationMinutesForSyncVariable % allowedPeriod.getEndTimeInMinutes()) + allowedPeriod.getStartTimeInMinutes();
+                        } else {
+                            calculationMinutesForSyncVariable =
+                                    calculationMinutesForSyncVariable + allowedPeriod.getStartTimeInMinutes();
+                        }
+                    }
+                }
+            }
+        } else {
+            calculationMinutesForSyncVariable = calculationMinutesForSync % MAX_MINUTES_IN_DAY;
+            for (int i = 0; i != NUMBER_OF_ATTEMPTS + 1; i++) {
+                if (i > NUMBER_OF_ATTEMPTS) {
+                    throw new IllegalArgumentException("Attempts to calculate the time ended");
+                }
+                for (TimePeriod forbiddenPeriod : forbiddenList) {
+                    if(forbiddenPeriod.between(calculationMinutesForSyncVariable)){
+                        calculationMinutesForSyncVariable =
+                                (calculationMinutesForSyncVariable + forbiddenPeriod.getEndTimeInMinutes()) % MAX_MINUTES_IN_DAY;
+                    }
+                }
+                if(!intersectionWithForbiddenPeriods(calculationMinutesForSyncVariable, forbiddenList)){
+                    hour = calculationMinutesForSyncVariable / 60;
+                    minutes = calculationMinutesForSyncVariable % 60;
+                    String r = hour + ":" + minutes;
+                    result.add(r);
+                    break;
+                }
+            }
+        }
+        return result;
+    }
+
+    private boolean intersectionWithForbiddenPeriods(int calculationMinutesForSyncVariable, List<TimePeriod> forbiddenList) {
+        boolean isIntersection = false;
+        for(TimePeriod period : forbiddenList){
+            if(period.between(calculationMinutesForSyncVariable)){
+                isIntersection = true;
+            }
+        }
+        return isIntersection;
     }
 
     private Integer calculateTime(Long idOfOrg, Integer coefficient) {

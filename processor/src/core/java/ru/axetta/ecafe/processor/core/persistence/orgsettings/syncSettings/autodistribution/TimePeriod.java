@@ -8,12 +8,8 @@ import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
 public class TimePeriod {
-    private Integer hourStart;
-    private Integer minutesStart;
-    private Integer startTimeInMenutes;
-    private Integer hourEnd;
-    private Integer minutesEnd;
-    private Integer endTimeInMenutes;
+    private Integer startTimeInMinutes;
+    private Integer endTimeInMinutes;
     private static final Pattern PERIOD_PATTERN = Pattern.compile("([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9]");
 
     public TimePeriod(String period){
@@ -27,21 +23,25 @@ public class TimePeriod {
         String endTime = sa[1];
         
         String[] splitStartTime = startTime.split(":");
-        hourStart = Integer.valueOf(splitStartTime[0]);
-        minutesStart = Integer.valueOf(splitStartTime[1]);
-        startTimeInMenutes = hourStart * 60 + minutesStart;
+        Integer hourStart = Integer.valueOf(splitStartTime[0]);
+        Integer minutesStart = Integer.valueOf(splitStartTime[1]);
+        startTimeInMinutes = hourStart * 60 + minutesStart;
 
         String[] splitEndTime = endTime.split(":");
-        hourEnd = Integer.valueOf(splitEndTime[0]);
-        minutesEnd = Integer.valueOf(splitEndTime[1]);
-        endTimeInMenutes = hourEnd * 60 + minutesEnd;
+        Integer hourEnd = Integer.valueOf(splitEndTime[0]);
+        Integer minutesEnd = Integer.valueOf(splitEndTime[1]);
+        endTimeInMinutes = hourEnd * 60 + minutesEnd;
     }
 
     public boolean between(Integer minutes){
-        return startTimeInMenutes <= minutes && minutes <= endTimeInMenutes;
+        return startTimeInMinutes <= minutes && minutes <= endTimeInMinutes;
     }
 
-    public Integer getDifferenceWithEndOfPeriod(Integer minutes){
-        return endTimeInMenutes - minutes;
+    public Integer getStartTimeInMinutes() {
+        return startTimeInMinutes;
+    }
+
+    public Integer getEndTimeInMinutes() {
+        return endTimeInMinutes;
     }
 }

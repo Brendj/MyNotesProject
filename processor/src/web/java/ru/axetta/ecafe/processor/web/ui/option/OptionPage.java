@@ -1039,33 +1039,64 @@ public class OptionPage extends BasicWorkspacePage {
             m = SYNC_EXPRESSION_PATTERN.matcher(fullSyncExpressions);
             if(!m.find()){
                 throw new IllegalArgumentException("Выражение для полной синхранизации задано не верно");
+            } else if(invalidExpressions(fullSyncExpressions)){
+                throw new IllegalArgumentException("Выражение для полной синхранизации задано не верно,"
+                        + " выражение должно состоять либо только из запрещенных промежутков, либо только из разрешенных");
             }
         } if(StringUtils.isNotBlank(orgSettingSyncExpressions)){
             m = SYNC_EXPRESSION_PATTERN.matcher(orgSettingSyncExpressions);
             if(!m.find()){
                 throw new IllegalArgumentException("Выражение для синхранизации настроек ОО задано не верно");
+            } else if(invalidExpressions(orgSettingSyncExpressions)){
+                throw new IllegalArgumentException("Выражение для синхранизации настроек ОО задано не верно,"
+                        + " выражение должно состоять либо только из запрещенных промежутков, либо только из разрешенных");
             }
         } if(StringUtils.isNotBlank(clientDataSyncExpressions)){
             m = SYNC_EXPRESSION_PATTERN.matcher(clientDataSyncExpressions);
             if(!m.find()){
                 throw new IllegalArgumentException("Выражение для синхранизации данных по клиентам задано не верно");
+            } else if(invalidExpressions(clientDataSyncExpressions)){
+                throw new IllegalArgumentException("Выражение для синхранизации данных по клиентам задано не верно,"
+                        + " выражение должно состоять либо только из запрещенных промежутков, либо только из разрешенных");
             }
         } if(StringUtils.isNotBlank(menuSyncExpressions)){
             m = SYNC_EXPRESSION_PATTERN.matcher(menuSyncExpressions);
             if(!m.find()){
                 throw new IllegalArgumentException("Выражение синхранизации меню задано не верно");
+            } else if(invalidExpressions(menuSyncExpressions)){
+                throw new IllegalArgumentException("Выражение синхранизации меню задано не верно,"
+                        + " выражение должно состоять либо только из запрещенных промежутков, либо только из разрешенных");
             }
         } if(StringUtils.isNotBlank(photoSyncExpressions)){
             m = SYNC_EXPRESSION_PATTERN.matcher(photoSyncExpressions);
             if(!m.find()){
                 throw new IllegalArgumentException("Выражение для синхранизации фотографий задано не верно");
+            } else if(invalidExpressions(photoSyncExpressions)){
+                throw new IllegalArgumentException("Выражение для синхранизации фотографий задано не верно,"
+                        + " выражение должно состоять либо только из запрещенных промежутков, либо только из разрешенных");
             }
         } if(StringUtils.isNotBlank(libSyncExpressions)){
             m = SYNC_EXPRESSION_PATTERN.matcher(libSyncExpressions);
             if(!m.find()){
                 throw new IllegalArgumentException("Выражение для синхранизации библиотеки задано не верно");
+            } else if(invalidExpressions(libSyncExpressions)){
+                throw new IllegalArgumentException("Выражение для синхранизации библиотеки задано не верно,"
+                        + " выражение должно состоять либо только из запрещенных промежутков, либо только из разрешенных");
             }
         }
+    }
+
+    private boolean invalidExpressions(String expressions) {
+        boolean haveAllowedExpression = false;
+        boolean haveForbiddenExpression = false;
+        for(String expression : expressions.split(";")){
+            if(expression.contains("!")){
+                haveForbiddenExpression = true;
+            } else {
+                haveAllowedExpression = true;
+            }
+        }
+        return haveAllowedExpression && haveForbiddenExpression;
     }
 
     public Object save() {
