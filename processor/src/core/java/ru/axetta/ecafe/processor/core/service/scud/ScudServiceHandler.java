@@ -25,15 +25,17 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
 
 public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
     private static final Logger logger = LoggerFactory.getLogger(ScudServiceHandler.class);
-    private final String fileName;
+    private String fileName;
     private final String LOG_PATH_PREFIX;
     private final String DEFAULT_LOG_PATH_PREFIX = "/home/jbosser/processor/SCUD_logs/";
+    private final String parsingAddress;
     private final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("_dd_MM_yyyy");
     private final String endPointAddress;
 
@@ -42,13 +44,18 @@ public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
                 .getConfigProperties().getProperty("ecafe.processor.scudmanager.logpath", DEFAULT_LOG_PATH_PREFIX);
     }
 
-    public ScudServiceHandler(String endPointAddress){
+    ScudServiceHandler(String endPointAddress){
         super();
         String endPointAddressFolder = parseAddress(endPointAddress);
         this.endPointAddress = endPointAddress;
+        this.parsingAddress = endPointAddressFolder;
         this.LOG_PATH_PREFIX = getLogPath() + endPointAddressFolder + "/";
+        this.fileName = generateLogFileName();
+    }
+
+    private String generateLogFileName(){
         String today = DATA_FORMAT.format(new Date());
-        this.fileName = LOG_PATH_PREFIX + endPointAddressFolder + today + ".log";
+        return LOG_PATH_PREFIX + parsingAddress + today + ".log";
     }
 
     private String parseAddress(String endPointAddress) {
@@ -69,10 +76,11 @@ public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
                 final SOAPPart soapPart = smc.getMessage().getSOAPPart();
                 final Document source_doc = soapPart.getEnvelope().getOwnerDocument();
                 String sss = toString(source_doc)
-                        .replaceAll(" xmlns:ns2=\"http://service.petersburgedu.ru/webservice/scud\" xmlns:ns3=\"http://service.petersburgedu.ru/webservice/scud/wsdl\"", "")
+                        .replaceAll(" xmlns:ns2=\"http://service.petersburgedu.ru/webservice/scud\" xmlns:ns3=\"http://service.petersburgedu.ru/webservice/scud/wsdl\"",
+                                "")
                         .replaceAll("ns3:", "")
                         .replaceAll("ns2:", "");
-                InputStream in = new ByteArrayInputStream(sss.getBytes("UTF-8"));
+                InputStream in = new ByteArrayInputStream(sss.getBytes(StandardCharsets.UTF_8));
                 Document signed_doc = newDocumentFromInputStream(in);
                 DOMSource domSource = new DOMSource(signed_doc);
                 soapPart.setContent(domSource);
@@ -138,6 +146,7 @@ public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
             message.append("\n");
 
             synchronized (this) {
+                fileName = generateLogFileName();
                 checkAndCreateFolder(LOG_PATH_PREFIX);
                 FileWriter fw = new FileWriter(fileName, true);
                 fw.write(message.toString());
@@ -145,7 +154,7 @@ public class ScudServiceHandler implements SOAPHandler<SOAPMessageContext> {
                 fw.close();
             }
         } catch (Exception e) {
-            logger.error("Exception in handler: " + e);
+            logger.error("Exception in handler: ", e);
         }
     }
 
