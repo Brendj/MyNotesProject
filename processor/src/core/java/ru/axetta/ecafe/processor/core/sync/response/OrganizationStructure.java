@@ -166,7 +166,7 @@ public class OrganizationStructure implements AbstractToElement {
             element.setAttribute("UseSpecialMenu", useSpecialMenu ? "1" : "0");
             element.setAttribute("ShortAddress", shortAddress);
             element.setAttribute("multiCardModeEnabled", multiCardModeEnabled ? "1" : "0");
-            element.setAttribute("preOrderLP", preorderlp ? "1" : "0");
+            element.setAttribute("receiveRequestsFromEZD", preorderlp ? "1" : "0");
             return element;
         }
 
