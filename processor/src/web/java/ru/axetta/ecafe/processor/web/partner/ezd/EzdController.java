@@ -583,6 +583,8 @@ public class EzdController {
                         }
                     }
 
+                    DAOUtils.updateOrgHaveNewLP(org, true);
+
                     RequestsEzd requestsEzd = new RequestsEzd();
                     requestsEzd.setIdOfOrg(org.getIdOfOrg());
                     requestsEzd.setGroupname(groupName);

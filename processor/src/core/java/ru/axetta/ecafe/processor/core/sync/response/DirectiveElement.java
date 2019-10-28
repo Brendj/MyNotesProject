@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.sync.request.DirectivesRequest;
 
@@ -21,6 +22,7 @@ import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -51,7 +53,7 @@ public class DirectiveElement implements AbstractToElement{
             directiveItemList.add(new DirectiveItem("FeedingSettingLimit", feedingSettingLimit.toString()));
         }
 
-        directiveItemList.add(new DirectiveItem("DoRequestsEZDSync", (org.getPreorderlp())?"1":"0"));
+        directiveItemList.add(new DirectiveItem("DoRequestsEZDSync", (org.getHaveNewLP())?"1":"0"));
     }
 
     public void processForFullSync(DirectivesRequest directivesRequest, Org org) throws Exception {

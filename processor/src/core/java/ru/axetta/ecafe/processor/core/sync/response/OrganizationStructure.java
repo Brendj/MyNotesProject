@@ -24,7 +24,8 @@ import java.util.Map;
  * Time: 16:08
  * To change this template use File | Settings | File Templates.
  */
-public class OrganizationStructure implements AbstractToElement{
+public class OrganizationStructure implements AbstractToElement {
+
     private Map<Long, OrganizationStructureItem> organizationItemMap = new HashMap<Long, OrganizationStructureItem>();
     private final long resultCode;
     private final String resultDescription;
@@ -52,9 +53,9 @@ public class OrganizationStructure implements AbstractToElement{
     public void addOrganizationStructureInfo(Session session, Org org, List<Org> orgList, boolean isAllOrgs) {
         List<Long> friendlyOrgsIds = new ArrayList<Long>();
         if (isAllOrgs) {
-             friendlyOrgsIds = DAOUtils.findFriendlyOrgIds(session, org.getIdOfOrg());
+            friendlyOrgsIds = DAOUtils.findFriendlyOrgIds(session, org.getIdOfOrg());
         }
-        for(Org o : orgList) {
+        for (Org o : orgList) {
             boolean isFriendly = true;
             if (isAllOrgs) {
                 isFriendly = friendlyOrgsIds.contains(o.getIdOfOrg());
@@ -64,7 +65,7 @@ public class OrganizationStructure implements AbstractToElement{
                     o.getOfficialPerson().getFullName(), o.getAddress(), o.getUsePaydableSubscriptionFeeding(),
                     getConfigurationId(o), getSupplierId(o), isFriendly, o.getDistrict(), o.getState(),
                     o.getVariableFeeding(), o.getNeedVerifyCardSign(), o.getPreordersEnabled(), o.getShortAddress(),
-                    o.getOrgStructureVersion(), o.multiCardModeIsEnabled());
+                    o.getOrgStructureVersion(), o.multiCardModeIsEnabled(), o.getPreorderlp());
             organizationItemMap.put(o.getIdOfOrg(), item);
         }
         if (!organizationItemMap.containsKey(org.getIdOfOrg())) {
@@ -74,14 +75,16 @@ public class OrganizationStructure implements AbstractToElement{
                     org.getShortNameInfoService(), org.getOfficialName(), org.getShortName(),
                     org.getOfficialPerson().getFullName(), org.getAddress(), org.getUsePaydableSubscriptionFeeding(),
                     getConfigurationId(org), getSupplierId(org), true, org.getDistrict(), org.getState(),
-                    org.getVariableFeeding(), org.getNeedVerifyCardSign(), org.getPreordersEnabled(), org.getShortAddress(),
-                    org.getOrgStructureVersion(), org.multiCardModeIsEnabled());
+                    org.getVariableFeeding(), org.getNeedVerifyCardSign(), org.getPreordersEnabled(),
+                    org.getShortAddress(), org.getOrgStructureVersion(), org.multiCardModeIsEnabled(),
+                    org.getPreorderlp());
             organizationItemMap.put(org.getIdOfOrg(), item);
         }
     }
 
     private Long getConfigurationId(Org o) {
-        return o.getConfigurationProvider() != null ? o.getConfigurationProvider().getIdOfConfigurationProvider() : null;
+        return o.getConfigurationProvider() != null ? o.getConfigurationProvider().getIdOfConfigurationProvider()
+                : null;
     }
 
     private Long getSupplierId(Org o) {
@@ -89,6 +92,7 @@ public class OrganizationStructure implements AbstractToElement{
     }
 
     private static class OrganizationStructureItem {
+
         private final Long idOfOrg;
         private final Integer organizationType;
         private final String shortNameInfoService;
@@ -108,10 +112,13 @@ public class OrganizationStructure implements AbstractToElement{
         private final Boolean useSpecialMenu;
         private final String shortAddress;
         private final Boolean multiCardModeEnabled;
+        private final Boolean preorderlp;
 
-        private OrganizationStructureItem(Long idOfOrg, Integer organizationType, String shortNameInfoService, String officialName, String shortName,
-                String chief, String address,Boolean useSubscriptionFeeding,Long configurationId,Long defaultSupplier, Boolean isFriendly, String nCounty,
-                Integer state, Boolean variableFeeding, Boolean needVerifyCardSign, Boolean useSpecialMenu, String shortAddress, Long version, Boolean multiCardModeEnabled) {
+        private OrganizationStructureItem(Long idOfOrg, Integer organizationType, String shortNameInfoService,
+                String officialName, String shortName, String chief, String address, Boolean useSubscriptionFeeding,
+                Long configurationId, Long defaultSupplier, Boolean isFriendly, String nCounty, Integer state,
+                Boolean variableFeeding, Boolean needVerifyCardSign, Boolean useSpecialMenu, String shortAddress,
+                Long version, Boolean multiCardModeEnabled, Boolean preorderlp) {
             this.idOfOrg = idOfOrg;
             this.organizationType = organizationType;
             this.shortNameInfoService = shortNameInfoService;
@@ -131,9 +138,10 @@ public class OrganizationStructure implements AbstractToElement{
             this.shortAddress = shortAddress;
             this.version = version;
             this.multiCardModeEnabled = multiCardModeEnabled;
+            this.preorderlp = preorderlp;
         }
 
-        public Element toElement(Document document) throws Exception{
+        public Element toElement(Document document) throws Exception {
             Element element = document.createElement("OU");
             element.setAttribute("OrgId", Long.toString(idOfOrg));
             element.setAttribute("OrgType", Integer.toString(organizationType));
@@ -148,7 +156,7 @@ public class OrganizationStructure implements AbstractToElement{
                 element.setAttribute("ConfId", Long.toString(configurationId));
             }
             if (defaultSupplier != null) {
-                element.setAttribute("SuplId",Long.toString(defaultSupplier));
+                element.setAttribute("SuplId", Long.toString(defaultSupplier));
             }
             element.setAttribute("Fr", isFriendly ? "1" : "0");
             element.setAttribute("NCounty", nCounty);
@@ -158,9 +166,13 @@ public class OrganizationStructure implements AbstractToElement{
             element.setAttribute("UseSpecialMenu", useSpecialMenu ? "1" : "0");
             element.setAttribute("ShortAddress", shortAddress);
             element.setAttribute("multiCardModeEnabled", multiCardModeEnabled ? "1" : "0");
+            element.setAttribute("preOrderLP", preorderlp ? "1" : "0");
             return element;
         }
 
+        public Boolean getPreorderlp() {
+            return preorderlp;
+        }
     }
 
 }

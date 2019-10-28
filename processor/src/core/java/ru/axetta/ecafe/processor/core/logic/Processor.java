@@ -893,7 +893,7 @@ public class Processor implements SyncProcessor {
             GoodRequestEZDRequest goodRequestEZDRequest = request.getGoodRequestEZDRequest();
             //Если такая секция существует в исходном запросе
             if (goodRequestEZDRequest != null) {
-                goodRequestEZDSection = processGoodRequestEZD(goodRequestEZDRequest);
+                goodRequestEZDSection = processGoodRequestEZD(goodRequestEZDRequest, request.getIdOfOrg());
             }
         } catch (Exception e) {
             String message = String.format("Error when process OrgSettingSetting: %s", e.getMessage());
@@ -6469,7 +6469,7 @@ public class Processor implements SyncProcessor {
             GoodRequestEZDRequest goodRequestEZDRequest = request.getGoodRequestEZDRequest();
             //Если такая секция существует в исходном запросе
             if (goodRequestEZDRequest != null) {
-                goodRequestEZDSection = processGoodRequestEZD(goodRequestEZDRequest);
+                goodRequestEZDSection = processGoodRequestEZD(goodRequestEZDRequest, request.getIdOfOrg());
             }
         } catch (Exception e) {
             String message = String.format("Error when process OrgSettingSetting: %s", e.getMessage());
@@ -6513,14 +6513,14 @@ public class Processor implements SyncProcessor {
         return orgSetting;
     }
 
-    private GoodRequestEZDSection processGoodRequestEZD(GoodRequestEZDRequest goodRequestEZDRequest) throws Exception{
+    private GoodRequestEZDSection processGoodRequestEZD(GoodRequestEZDRequest goodRequestEZDRequest, Long idOfOrg) throws Exception{
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         GoodRequestEZDSection goodRequestEZDSection = null;
         try{
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            AbstractProcessor processor = new GoodRequestEZDProcessor(persistenceSession, goodRequestEZDRequest);
+            AbstractProcessor processor = new GoodRequestEZDProcessor(persistenceSession, goodRequestEZDRequest, idOfOrg);
             goodRequestEZDSection = (GoodRequestEZDSection) processor.process();
             persistenceTransaction.commit();
             persistenceTransaction = null;

@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.SettingType;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingItemSyncPOJO;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
@@ -27,18 +28,17 @@ import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 public class GoodRequestEZDProcessor extends AbstractProcessor<OrgSettingSection> {
     private final GoodRequestEZDRequest goodRequestEZDRequest;
+    private final Long idOfOrg;
     private static final Logger logger = LoggerFactory.getLogger(GoodRequestEZDProcessor.class);
 
-    public GoodRequestEZDProcessor(Session session, GoodRequestEZDRequest goodRequestEZDRequest) {
+    public GoodRequestEZDProcessor(Session session, GoodRequestEZDRequest goodRequestEZDRequest, Long idOfOrg) {
         super(session);
         this.goodRequestEZDRequest = goodRequestEZDRequest;
+        this.idOfOrg = idOfOrg;
     }
 
     @Override
@@ -48,7 +48,14 @@ public class GoodRequestEZDProcessor extends AbstractProcessor<OrgSettingSection
         //Собираем данные для ответа
         GoodRequestEZDSection section = new GoodRequestEZDSection();
 
-        List<RequestsEzd> requestsEzds = DAOUtils.getAllGoodRequestEZD(session, maxVersionFromARM);
+        Org sourceOrg = (Org) session.load(Org.class, idOfOrg);
+        Set<Long> friendlyOrgsid = OrgUtils.getFriendlyOrgIds(sourceOrg);
+        friendlyOrgsid.add(sourceOrg.getIdOfOrg());
+
+        //Проставляем флаг, что последние заявки по ЛП отправлены
+        DAOUtils.updateOrgHaveNewLP(sourceOrg, false);
+
+        List<RequestsEzd> requestsEzds = DAOUtils.getAllGoodRequestEZD(session, friendlyOrgsid, maxVersionFromARM);
 
         for (RequestsEzd requestsEzd : requestsEzds) {
             GoodRequestEZDSyncPOJO goodRequestEZDSyncPOJO = new GoodRequestEZDSyncPOJO();
