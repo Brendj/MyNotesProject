@@ -10,29 +10,32 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
 import java.math.BigInteger;
 import java.util.*;
 
 @Component
-@Scope("singleton")
+@DependsOn("runtimeContext")
 public class ScudManager {
-    private final Integer LIMIT_RECORDS = getLimitRecords();
-    private final String DEFAULT_VALUE = "1";
+    public static final Boolean serviceIsWork = serviceIsWork();
+    private static final Integer LIMIT_RECORDS = getLimitRecords();
+    private static final String DEFAULT_VALUE = "1";
     private static final Logger logger = LoggerFactory.getLogger(ScudManager.class);
-    private final static boolean isOn = isOn();
+    private final static Boolean isOn = isOn();
     private ScudService service = RuntimeContext.getAppContext().getBean(ScudService.class);
-    private final String SCUD_ENDPOINT_ADDRESS = getScudEndPointAdressFromConfig();
+    private static final String SCUD_ENDPOINT_ADDRESS = getScudEndPointAddressFromConfig();
     private final static String SCUD_NODE = "ecafe.processor.scudmanager.node";
 
-    private String getScudEndPointAdressFromConfig() {
+    private static String getScudEndPointAddressFromConfig() {
         Properties properties = RuntimeContext.getInstance().getConfigProperties();
         return properties
                 .getProperty("ecafe.processor.scudmanager.mainendpointaddress", "http://10.146.136.36/service/webservice/scud");
@@ -41,8 +44,7 @@ public class ScudManager {
     public static boolean isOn() {
         try {
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
-            Boolean serviceIsOn = Boolean.parseBoolean(runtimeContext.getConfigProperties()
-                    .getProperty("ecafe.processor.scudmanager.sendtoexternal", "false"));
+            boolean serviceIsOn = serviceIsWork();
             String reqNode = runtimeContext.getConfigProperties().getProperty(SCUD_NODE, "").trim();
             String instance = runtimeContext.getNodeName().trim();
             return serviceIsOn && reqNode.equals(instance);
@@ -50,6 +52,12 @@ public class ScudManager {
             logger.error("Error when initialize ScudManager, manager is Off");
             return false;
         }
+    }
+
+    private static Boolean serviceIsWork(){
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        return Boolean.parseBoolean(runtimeContext.getConfigProperties()
+                .getProperty("ecafe.processor.scudmanager.sendtoexternal", "false"));
     }
 
     private static Integer getLimitRecords(){
@@ -99,7 +107,7 @@ public class ScudManager {
                 throw new Exception("No response packet from the main receiver ( " + SCUD_ENDPOINT_ADDRESS + " )");
             }
             sendToExternal = true;
-            Integer responseCode = response.isResult()? 1 : 0;
+            int responseCode = response.isResult()? 1 : 0;
             logger.info("Sending EnterEvent to SCUD completed, sent list with " + list.size() + " elements, ResultCode is: " + responseCode);
             updateEnterEventsSendInfo(session, list, response.isResult(), sendToExternal);
         } catch (Exception e){
@@ -112,13 +120,13 @@ public class ScudManager {
     private void updateEnterEventsSendInfo(Session session, List<EventDataItem> list, Boolean result,
             Boolean sendToExternal){
         try {
-            if(list == null || list.isEmpty()){
+            if(CollectionUtils.isEmpty(list)){
                 throw  new Exception("List of EnterEventsSendInfo is null or empty");
             }
-            for(EventDataItem element: list){
-                Long idofEnterEvent = element.getIdOfEnterEvent().longValue();
-                Long idofOrg = element.getIdOfOrg().longValue();
-                DAOUtils.updateEnterEventsSendInfo(session, idofEnterEvent, idofOrg, result, sendToExternal);
+            for(EventDataItem element : list){
+                Long idOfEnterEvent = element.getIdOfEnterEvent().longValue();
+                Long idOfOrg = element.getIdOfOrg().longValue();
+                DAOUtils.updateEnterEventsSendInfo(session, idOfEnterEvent, idOfOrg, result, sendToExternal);
             }
         } catch (Exception e){
             logger.error("Can't update EnterEventSendInfo records in DB: ", e);
@@ -146,7 +154,7 @@ public class ScudManager {
             for(Object[] row : result ){
                 String studentUid = null;
                 Long cardUid = null;
-                String ogrn = stringIsNullOrEmpty((String) row[0]) ? DEFAULT_VALUE :(String) row[0];
+                String ogrn = StringUtils.isBlank((String) row[0]) ? DEFAULT_VALUE : (String) row[0];
                 String turnstile = row[1] == null? DEFAULT_VALUE : String.valueOf(row[1]);
                 if(row[2] == null && row[3] == null){
                     continue;
@@ -172,12 +180,8 @@ public class ScudManager {
             }
             return dataItems;
         } catch (Exception e){
-            logger.error("Can't get records for sent to SCUD: ", e);
+            logger.error("Can't get records for send to SCUD: ", e);
             return null;
         }
-    }
-
-    private boolean stringIsNullOrEmpty(String s) {
-        return s == null || s.isEmpty();
     }
 }
