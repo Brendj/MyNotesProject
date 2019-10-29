@@ -35,7 +35,10 @@
                                     <h:outputText value="Введите код активации, полученный в СМС-сообщении" styleClass="output-text" />
                                     <h:inputText id="smscode-security" size="16" maxlength="64" styleClass="input-text" value="#{mainPage.smsCode}"/>
                                 </h:panelGrid>
-                                <a4j:commandButton id="enterSmsCodeButton" type="submit" value="Войти" action="#{mainPage.checkUserSmsCode}" reRender="smscode-security" />
+                                <h:panelGrid columns="2">
+                                    <a4j:commandButton type="submit" value="Отправить sms повторно" action="#{mainPage.sendSMSagain()}" disabled="#{mainPage.canSendAgain}"/>
+                                    <a4j:commandButton id="enterSmsCodeButton" type="submit" value="Войти" action="#{mainPage.checkUserSmsCode}" reRender="smscode-security" />
+                                </h:panelGrid>
                                 <a4j:commandLink id="eer-iiop" value="Назад" action="#{mainPage.logout}" styleClass="command-link" oncomplete="window.location.href='/processor/back-office/index.faces'"/>
                             </div>
                         </h:panelGrid>

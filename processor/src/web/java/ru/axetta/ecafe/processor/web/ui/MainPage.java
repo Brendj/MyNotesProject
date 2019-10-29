@@ -151,6 +151,7 @@ public class MainPage implements Serializable {
     private String userFilterOfSelectUserListSelectPage = "";
 
     private boolean eligibleToViewUsers;
+    private Boolean canSendAgain = false;
 
     private HtmlPanelMenu mainMenu;
     private BasicWorkspacePage currentWorkspacePage = new DefaultWorkspacePage();
@@ -9778,6 +9779,24 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object sendSMSagain() throws Exception {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+        String userName = context.getRemoteUser();
+        logger.info(String.format("Start of sending SMS code for the user %s", userName));
+        Boolean requstSMS = User.requestSmsCode(userName);
+        logger.info(String.format("End of sending SMS code for the user %s", userName));
+        if (requstSMS){
+            setCanSendAgain(true);
+            context.redirect(context.getRequestContextPath() + "/back-office/confirm-sms.faces");
+        }
+        else {
+            context.redirect(context.getRequestContextPath() + "/back-office/emp_server_not_answer.faces");
+        }
+        setCanSendAgain(true);
+        context.redirect(context.getRequestContextPath() + "/back-office/confirm-sms.faces");
+        return null;
+    }
+
     public Object doChangeUserPassword() throws Exception {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         String userName = context.getRemoteUser();
@@ -10517,5 +10536,13 @@ public class MainPage implements Serializable {
 
     public void setRemovedIdOfUserGroup(Long removedIdOfUserGroup) {
         this.removedIdOfUserGroup = removedIdOfUserGroup;
+    }
+
+    public Boolean getCanSendAgain() {
+        return canSendAgain;
+    }
+
+    public void setCanSendAgain(Boolean canSendAgain) {
+        this.canSendAgain = canSendAgain;
     }
 }
