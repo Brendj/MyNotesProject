@@ -16,6 +16,8 @@
         <property name="publickeyprovider" column="publickeyprovider" type="byte[]" not-null="true"/>
         <property name="signtypeprov" column="signtypeprov" type="integer" not-null="true"/>
         <property name="newtypeprovider" column="newtypeprovider" type="boolean" not-null="true"/>
+        <property name="deleted" column="deleted" type="boolean" not-null="true"/>
+
     </class>
 </hibernate-mapping>
 

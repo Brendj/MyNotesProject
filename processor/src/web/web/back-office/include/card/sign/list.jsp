@@ -55,8 +55,17 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактирование" />
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{cardSignEditPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="workspaceForm" action="#{cardSignEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{card}" target="#{cardSignGroupPage.currentCard}"/>
+            </a4j:commandLink>
+        </rich:column>
+        <rich:column styleClass="center-aligned-column">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Удаление" />
+            </f:facet>
+            <a4j:commandLink reRender="workspaceTogglePanel" action="#{cardSignListPage.delete}" styleClass="command-link">
+                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{card}" target="#{cardSignGroupPage.currentCard}"/>
             </a4j:commandLink>
         </rich:column>

@@ -13,8 +13,10 @@ import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -30,6 +32,9 @@ public class CardSignListPage extends BasicWorkspacePage {
     private static final Logger logger = LoggerFactory.getLogger(CardSignListPage.class);
     private List<CardSignItem> cards = new ArrayList<CardSignItem>();
 
+    @Autowired
+    CardSignGroupPage groupPage;
+
     @Override
     public void onShow() throws Exception {
         fill();
@@ -43,6 +48,7 @@ public class CardSignListPage extends BasicWorkspacePage {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
             Criteria criteria = session.createCriteria(CardSign.class);
+            criteria.add(Restrictions.eq("deleted", false));
             criteria.addOrder(Order.asc("idOfCardSign"));
             List<CardSign> list = criteria.list();
             for (CardSign cardSign : list) {
@@ -57,6 +63,31 @@ public class CardSignListPage extends BasicWorkspacePage {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    public Object delete() {
+
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            CardSign cardSign = (CardSign)session.load(CardSign.class, groupPage.getCurrentCard().getIdOfCardSign());
+            cardSign.setDeleted(true);
+            session.update(cardSign);
+            transaction.commit();
+            transaction = null;
+            logger.info(String.format("Удален поставщик карт %s", cardSign.getIdOfCardSign()));
+            printMessage("Запись удалена");
+            cards.remove(groupPage.getCurrentCard());
+        } catch (Exception e) {
+            logger.error("Error in cardSign edit page: ", e);
+            printError("При сохранении записи произошла ошибка с текстом: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return null;
     }
 
     @Override
