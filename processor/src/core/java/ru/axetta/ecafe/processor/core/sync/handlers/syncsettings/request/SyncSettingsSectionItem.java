@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request;
 
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettings;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSetting;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import org.w3c.dom.Document;
@@ -30,7 +30,7 @@ public class SyncSettingsSectionItem implements AbstractToElement {
 
     }
 
-    public SyncSettingsSectionItem(SyncSettings setting) {
+    public SyncSettingsSectionItem(SyncSetting setting) {
         this.contentType = setting.getContentType().getTypeCode();
         this.concreteTime = setting.getConcreteTime();
         this.everySeconds = setting.getEverySecond();

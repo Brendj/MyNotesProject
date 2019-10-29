@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.auto
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettings;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSetting;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -126,7 +126,7 @@ public class AutoDistributionSyncSettingsService {
         return Collections.unmodifiableMap(map);
     }
 
-    public SyncSettings distributionSyncSettingsService(SyncSettings setting) throws Exception {
+    public SyncSetting distributionSyncSettings(SyncSetting setting) throws Exception {
         if(!SYNC_CONTENT_TYPE_MAP.containsKey(setting.getContentType())){
             logger.warn(String.format("Unsupported type of SyncSetting: %s", setting.getContentType()));
             return setting; // if wrong ContentType, then do nothing
@@ -240,8 +240,7 @@ public class AutoDistributionSyncSettingsService {
             return Collections.emptyList();
         }
         List<String> result = new LinkedList<>();
-        int hour = 0;
-        int minutes = 0;
+
         int calculationMinutesForSyncVariable = 0;
         if(!allowedList.isEmpty()){
             for(TimePeriod allowedPeriod : allowedList){
@@ -251,10 +250,7 @@ public class AutoDistributionSyncSettingsService {
                         throw new IllegalArgumentException("Attempts to calculate the time ended");
                     }
                     if (allowedPeriod.between(calculationMinutesForSyncVariable)) {
-                        hour = calculationMinutesForSyncVariable / 60;
-                        minutes = calculationMinutesForSyncVariable % 60;
-                        String r = hour + ":" + minutes;
-                        result.add(r);
+                        result.add(buildSessionTime(calculationMinutesForSyncVariable));
                         break;
                     } else {
                         if (calculationMinutesForSyncVariable > allowedPeriod.getEndTimeInMinutes()) {
@@ -280,15 +276,21 @@ public class AutoDistributionSyncSettingsService {
                     }
                 }
                 if(!intersectionWithForbiddenPeriods(calculationMinutesForSyncVariable, forbiddenList)){
-                    hour = calculationMinutesForSyncVariable / 60;
-                    minutes = calculationMinutesForSyncVariable % 60;
-                    String r = hour + ":" + minutes;
-                    result.add(r);
+                    result.add(buildSessionTime(calculationMinutesForSyncVariable));
                     break;
                 }
             }
         }
         return result;
+    }
+
+    private String buildSessionTime(int calculationMinutesForSyncVariable) {
+        int hour;
+        int minutes;
+        hour = calculationMinutesForSyncVariable / 60;
+        minutes = calculationMinutesForSyncVariable % 60;
+
+        return String.format("%02d:%02d", hour, minutes);
     }
 
     private boolean intersectionWithForbiddenPeriods(int calculationMinutesForSyncVariable, List<TimePeriod> forbiddenList) {

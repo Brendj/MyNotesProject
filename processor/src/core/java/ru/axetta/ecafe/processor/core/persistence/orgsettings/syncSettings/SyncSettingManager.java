@@ -39,7 +39,7 @@ public class SyncSettingManager {
         return maxVersion == null ? 0 : maxVersion;
     }
 
-    public ResSyncSettingsItem changeFromSync(Session session, SyncSettings currentSetting, SyncSettingsSectionItem item, Date syncData, Long nextVersion) {
+    public ResSyncSettingsItem changeFromSync(Session session, SyncSetting currentSetting, SyncSettingsSectionItem item, Date syncData, Long nextVersion) {
         ResSyncSettingsItem result = new ResSyncSettingsItem();
         result.setContentTypeInt(item.getContentType());
         try {
@@ -61,7 +61,7 @@ public class SyncSettingManager {
         return result;
     }
 
-    private void updateSyncSettings(SyncSettings currentSetting, String concreteTime, Integer everySeconds,
+    private void updateSyncSettings(SyncSetting currentSetting, String concreteTime, Integer everySeconds,
             Integer limitStartHour, Integer limitEndHour, Boolean monday, Boolean tuesday, Boolean wednesday,
             Boolean thursday, Boolean friday, Boolean saturday, Boolean sunday, Boolean deleteState, Long nextVersion,
             Date lastUpdate, Session session) throws Exception {
@@ -148,30 +148,30 @@ public class SyncSettingManager {
             throw new ContentTypeNotExistException();
         }
 
-        SyncSettings syncSettings = new SyncSettings();
-        syncSettings.setOrg(org);
-        syncSettings.setContentType(type);
-        syncSettings.setCreatedDate(createDate);
-        syncSettings.setLastUpdate(createDate);
-        syncSettings.setConcreteTime(concreteTime);
-        syncSettings.setEverySecond(everySeconds);
-        syncSettings.setDeleteState(deleteState);
-        syncSettings.setLimitStartHour(limitStartHour);
-        syncSettings.setLimitEndHour(limitEndHour);
-        syncSettings.setMonday(monday);
-        syncSettings.setTuesday(tuesday);
-        syncSettings.setWednesday(wednesday);
-        syncSettings.setThursday(thursday);
-        syncSettings.setFriday(friday);
-        syncSettings.setSaturday(saturday);
-        syncSettings.setSunday(sunday);
-        syncSettings.setVersion(nextVersion);
+        SyncSetting syncSetting = new SyncSetting();
+        syncSetting.setOrg(org);
+        syncSetting.setContentType(type);
+        syncSetting.setCreatedDate(createDate);
+        syncSetting.setLastUpdate(createDate);
+        syncSetting.setConcreteTime(concreteTime);
+        syncSetting.setEverySecond(everySeconds);
+        syncSetting.setDeleteState(deleteState);
+        syncSetting.setLimitStartHour(limitStartHour);
+        syncSetting.setLimitEndHour(limitEndHour);
+        syncSetting.setMonday(monday);
+        syncSetting.setTuesday(tuesday);
+        syncSetting.setWednesday(wednesday);
+        syncSetting.setThursday(thursday);
+        syncSetting.setFriday(friday);
+        syncSetting.setSaturday(saturday);
+        syncSetting.setSunday(sunday);
+        syncSetting.setVersion(nextVersion);
 
-        session.persist(syncSettings);
+        session.persist(syncSetting);
     }
 
-    public List<SyncSettings> getSettingByIdOfOrg(Session session, Long idOfOrg) {
-        Criteria criteria = session.createCriteria(SyncSettings.class);
+    public List<SyncSetting> getSettingByIdOfOrg(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(SyncSetting.class);
         criteria.createAlias("org", "o");
         criteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
         criteria.addOrder(Order.asc("contentType"));
@@ -179,8 +179,8 @@ public class SyncSettingManager {
         return criteria.list();
     }
 
-    public List<SyncSettings> getSettingByIdOfOrgAndGreaterThenVersion(Session session, Long idOfOrg, Long maxVersionFromARM) {
-        Criteria criteria = session.createCriteria(SyncSettings.class);
+    public List<SyncSetting> getSettingByIdOfOrgAndGreaterThenVersion(Session session, Long idOfOrg, Long maxVersionFromARM) {
+        Criteria criteria = session.createCriteria(SyncSetting.class);
         criteria.createAlias("org", "o");
         criteria.add(Restrictions.eq("o.idOfOrg", idOfOrg));
         criteria.add(Restrictions.gt("version", maxVersionFromARM));

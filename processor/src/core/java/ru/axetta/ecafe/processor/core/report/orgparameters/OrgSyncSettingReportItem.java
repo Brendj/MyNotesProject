@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.core.report.orgparameters;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettings;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSetting;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -14,25 +14,31 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReportItem> {
+    private static final Integer NOT_CHANGED = 0;
+    private static final Integer CHANGED = 1;
     private String orgName;
     private Long idOfOrg;
     private String shortAddress;
-    private SyncInfo fullSync;
-    private SyncInfo accIncSync;
-    private SyncInfo orgSettingSync;
-    private SyncInfo clientDataSync;
-    private SyncInfo menuSync;
-    private SyncInfo photoSync;
-    private SyncInfo helpRequestsSync;
-    private SyncInfo libSync;
+    private SyncInfo fullSync = new SyncInfo();
+    private SyncInfo accIncSync = new SyncInfo();
+    private SyncInfo orgSettingSync = new SyncInfo();
+    private SyncInfo clientDataSync = new SyncInfo();
+    private SyncInfo menuSync = new SyncInfo();
+    private SyncInfo photoSync = new SyncInfo();
+    private SyncInfo helpRequestsSync = new SyncInfo();
+    private SyncInfo libSync = new SyncInfo();
     private Boolean isChange = false;
+    private Org org;
+    private List<SyncSetting> settings;
 
-    public OrgSyncSettingReportItem(Org org, List<SyncSettings> settings) {
+    public OrgSyncSettingReportItem(Org org, List<SyncSetting> settings) {
         this.orgName = org.getShortName();
         this.idOfOrg = org.getIdOfOrg();
         this.shortAddress = org.getShortAddress();
+        this.org = org;
+        this.settings = settings;
 
-        for (SyncSettings setting : settings) {
+        for (SyncSetting setting : settings) {
             switch (setting.getContentType()) {
                 case FULL_SYNC:
                     fullSync = new SyncInfo(setting);
@@ -161,65 +167,75 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
         switch (type) {
             case FULL_SYNC:
                 fullSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
-                        buildTime, limitStartHour, limitEndHour);
+                        buildTime, limitStartHour, limitEndHour, this.org);
                 break;
             case BALANCES_AND_ENTEREVENTS:
                 accIncSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
-                        buildTime, limitStartHour, limitEndHour);
+                        buildTime, limitStartHour, limitEndHour, this.org);
                 break;
             case ORGSETTINGS:
                 orgSettingSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday,
-                        everySecond, buildTime, limitStartHour, limitEndHour);
+                        everySecond, buildTime, limitStartHour, limitEndHour, this.org);
                 break;
             case CLIENTS_DATA:
                 clientDataSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday,
-                        everySecond, buildTime, limitStartHour, limitEndHour);
+                        everySecond, buildTime, limitStartHour, limitEndHour, this.org);
                 break;
             case MENU:
                 menuSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
-                        buildTime, limitStartHour, limitEndHour);
+                        buildTime, limitStartHour, limitEndHour, this.org);
                 break;
             case PHOTOS:
                 photoSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
-                        buildTime, limitStartHour, limitEndHour);
+                        buildTime, limitStartHour, limitEndHour, this.org);
                 break;
             case SUPPORT_SERVICE:
                 helpRequestsSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday,
-                        everySecond, buildTime, limitStartHour, limitEndHour);
+                        everySecond, buildTime, limitStartHour, limitEndHour, this.org);
                 break;
             case LIBRARY:
                 libSync = new SyncInfo(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
-                        buildTime, limitStartHour, limitEndHour);
+                        buildTime, limitStartHour, limitEndHour, this.org);
         }
+        isChange = true;
     }
 
-    public void rebuildSyncInfo(Integer modalSelectedContentType, SyncSettings setting) {
+    public void rebuildSyncInfo(Integer modalSelectedContentType, SyncSetting setting) {
         ContentType type = ContentType.getContentTypeByCode(modalSelectedContentType);
         switch (type) {
             case FULL_SYNC:
                 fullSync = new SyncInfo(setting);
+                fullSync.setState(CHANGED);
                 break;
             case BALANCES_AND_ENTEREVENTS:
                 accIncSync = new SyncInfo(setting);
+                accIncSync.setState(CHANGED);
                 break;
             case ORGSETTINGS:
                 orgSettingSync = new SyncInfo(setting);
+                orgSettingSync.setState(CHANGED);
                 break;
             case CLIENTS_DATA:
                 clientDataSync = new SyncInfo(setting);
+                clientDataSync.setState(CHANGED);
                 break;
             case MENU:
                 menuSync = new SyncInfo(setting);
+                menuSync.setState(CHANGED);
                 break;
             case PHOTOS:
                 photoSync = new SyncInfo(setting);
+                photoSync.setState(CHANGED);
                 break;
             case SUPPORT_SERVICE:
                 helpRequestsSync = new SyncInfo(setting);
+                helpRequestsSync.setState(CHANGED);
                 break;
             case LIBRARY:
                 libSync = new SyncInfo(setting);
+                libSync.setState(CHANGED);
         }
+        isChange = true;
     }
 
     public Boolean getIsChange() {
@@ -230,13 +246,72 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
         this.isChange = change;
     }
 
+    public Org getOrg() {
+        return org;
+    }
 
-    public static class SyncInfo {
-        private String fullInf;
-        private SyncSettings setting;
-        private Integer state = 0;
+    public void setOrg(Org org) {
+        this.org = org;
+    }
 
-        SyncInfo(SyncSettings setting) {
+    public List<SyncSetting> getSettings() {
+        return settings;
+    }
+
+    public void setSettings(List<SyncSetting> settings) {
+        this.settings = settings;
+    }
+
+    public void rebuildAllSyncInfo() {
+        for (SyncSetting setting : settings) {
+            switch (setting.getContentType()) {
+                case FULL_SYNC:
+                    fullSync = new SyncInfo(setting);
+                    fullSync.setState(CHANGED);
+                    break;
+                case BALANCES_AND_ENTEREVENTS:
+                    accIncSync = new SyncInfo(setting);
+                    accIncSync.setState(CHANGED);
+                    break;
+                case ORGSETTINGS:
+                    orgSettingSync = new SyncInfo(setting);
+                    orgSettingSync.setState(CHANGED);
+                    break;
+                case CLIENTS_DATA:
+                    clientDataSync = new SyncInfo(setting);
+                    clientDataSync.setState(CHANGED);
+                    break;
+                case MENU:
+                    menuSync = new SyncInfo(setting);
+                    menuSync.setState(CHANGED);
+                    break;
+                case PHOTOS:
+                    photoSync = new SyncInfo(setting);
+                    photoSync.setState(CHANGED);
+                    break;
+                case SUPPORT_SERVICE:
+                    helpRequestsSync = new SyncInfo(setting);
+                    helpRequestsSync.setState(CHANGED);
+                    break;
+                case LIBRARY:
+                    libSync = new SyncInfo(setting);
+                    libSync.setState(CHANGED);
+            }
+        }
+        isChange = true;
+    }
+
+    public class SyncInfo {
+        private String fullInf = "";
+        private SyncSetting setting;
+        private Integer state = NOT_CHANGED;
+
+        SyncInfo(){
+            setting = new SyncSetting();
+            setting.setOrg(org);
+        }
+
+        SyncInfo(SyncSetting setting) {
             String times = setting.getConcreteTime();
             String days;
 
@@ -272,32 +347,8 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
             this.setting = setting;
         }
 
-        private void buildFullInfo(Integer everySecond, Integer limitStartHour, Integer limitEndHour, String days,
-                String times) {
-            StringBuilder sb = new StringBuilder();
-            if(StringUtils.isNotBlank(times)) {
-                sb.append(times);
-                sb.append("\n");
-            } else if(everySecond != null) {
-                sb.append("Каждые ");
-                sb.append(everySecond);
-                sb.append(" сек.");
-                if(limitStartHour != null && !(limitStartHour.equals(limitEndHour) && limitStartHour.equals(0))){
-                    sb.append(" с ");
-                    sb.append(limitStartHour);
-                    sb.append(":00 по ");
-                    sb.append(limitEndHour);
-                    sb.append(":00");
-                }
-                sb.append("\n");
-            }
-
-            sb.append(days);
-            fullInf = sb.toString();
-        }
-
         SyncInfo(Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday, Boolean saturday,
-                Boolean sunday, Integer everySecond, String buildTime, Integer limitStartHour, Integer limitEndHour ) {
+                Boolean sunday, Integer everySecond, String buildTime, Integer limitStartHour, Integer limitEndHour, Org org ) {
             String days;
             String times;
             if (monday && tuesday && wednesday && thursday && friday && saturday && sunday) {
@@ -329,8 +380,34 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
             }
             times = buildTime;
             buildFullInfo(everySecond, limitStartHour, limitEndHour, days, times);
-            setting = new SyncSettings(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
+            setting = new SyncSetting(monday, tuesday, wednesday, thursday, friday, saturday, sunday, everySecond,
                     buildTime, limitStartHour, limitEndHour);
+            setting.setOrg(org);
+            state = CHANGED;
+        }
+
+        private void buildFullInfo(Integer everySecond, Integer limitStartHour, Integer limitEndHour, String days,
+                String times) {
+            StringBuilder sb = new StringBuilder();
+            if(StringUtils.isNotBlank(times)) {
+                sb.append(times);
+                sb.append("\n");
+            } else if(everySecond != null) {
+                sb.append("Каждые ");
+                sb.append(everySecond);
+                sb.append(" сек.");
+                if(limitStartHour != null && !(limitStartHour.equals(limitEndHour) && limitStartHour.equals(0))){
+                    sb.append(" с ");
+                    sb.append(limitStartHour);
+                    sb.append(":00 по ");
+                    sb.append(limitEndHour);
+                    sb.append(":00");
+                }
+                sb.append("\n");
+            }
+
+            sb.append(days);
+            fullInf = sb.toString();
         }
 
         public String getFullInf() {
@@ -341,12 +418,20 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
             this.fullInf = fullInf;
         }
 
-        public SyncSettings getSetting() {
+        public SyncSetting getSetting() {
             return setting;
         }
 
-        public void setSetting(SyncSettings setting) {
+        public void setSetting(SyncSetting setting) {
             this.setting = setting;
+        }
+
+        public Integer getState() {
+            return state;
+        }
+
+        public void setState(Integer state) {
+            this.state = state;
         }
     }
 }

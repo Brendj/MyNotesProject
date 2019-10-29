@@ -902,7 +902,7 @@ public class Processor implements SyncProcessor {
                 }
             }
         } catch (Exception e){
-            String message = String.format("Error when process SyncSettings: %s", e.getMessage());
+            String message = String.format("Error when process SyncSetting: %s", e.getMessage());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);

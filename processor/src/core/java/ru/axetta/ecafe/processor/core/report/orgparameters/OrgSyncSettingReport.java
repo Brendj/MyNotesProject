@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.core.report.orgparameters;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettings;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSetting;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportForListOrgsJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
@@ -124,7 +124,7 @@ public class OrgSyncSettingReport extends BasicReportForListOrgsJob {
                 return Collections.emptyList();
             }
 
-            Criteria syncSettingCriteria  = persistenceSession.createCriteria(SyncSettings.class);
+            Criteria syncSettingCriteria  = persistenceSession.createCriteria(SyncSetting.class);
             syncSettingCriteria.add(Restrictions.eq("deleteState", false));
             syncSettingCriteria.createAlias("org", "org");
             if(CollectionUtils.isEmpty(idOfOrgList)) {
@@ -138,19 +138,19 @@ public class OrgSyncSettingReport extends BasicReportForListOrgsJob {
                 syncSettingCriteria.add(Restrictions.eq("contentType", ContentType.getContentTypeByCode(selectedContentType)));
             }
             syncSettingCriteria.add(Restrictions.in("org.idOfOrg", idOfOrgList));
-            List<SyncSettings> settings = syncSettingCriteria.list();
+            List<SyncSetting> settings = syncSettingCriteria.list();
 
             for(Org org : orgs){
-                List<SyncSettings> settingsOfOrg = getListOfSettingsByOrg(settings, org);
+                List<SyncSetting> settingsOfOrg = getListOfSettingsByOrg(settings, org);
                 OrgSyncSettingReportItem item = new OrgSyncSettingReportItem(org, settingsOfOrg);
                 result.add(item);
             }
             return result;
         }
 
-        private List<SyncSettings> getListOfSettingsByOrg(List<SyncSettings> settings, Org org) {
-            List<SyncSettings> result = new LinkedList<>();
-            for(SyncSettings setting : settings){
+        private List<SyncSetting> getListOfSettingsByOrg(List<SyncSetting> settings, Org org) {
+            List<SyncSetting> result = new LinkedList<>();
+            for(SyncSetting setting : settings){
                 if(setting.getOrg().equals(org)){
                     result.add(setting);
                 }

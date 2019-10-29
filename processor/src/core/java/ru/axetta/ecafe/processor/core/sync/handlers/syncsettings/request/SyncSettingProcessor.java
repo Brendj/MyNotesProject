@@ -5,8 +5,8 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettingManager;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettings;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
 import org.hibernate.Session;
@@ -36,14 +36,14 @@ public class SyncSettingProcessor extends AbstractProcessor<SyncSettingsSection>
             Long maxVersionFromARM = request.getMaxVersion();
             Long idOfOrg = request.getOwner();
             Long nextVersion = SyncSettingManager.getNextVersion(session);
-            List<SyncSettings> settingFromDB = manager.getSettingByIdOfOrg(session, idOfOrg);
+            List<SyncSetting> settingFromDB = manager.getSettingByIdOfOrg(session, idOfOrg);
 
             syncSettingsSection = new SyncSettingsSection();
             resSyncSettingsSection = new ResSyncSettingsSection();
 
             //build resSyncSettingsSection
             for (SyncSettingsSectionItem item : request.getItemList()){
-                SyncSettings currentSetting = findSettingByContentType(settingFromDB, item.getContentType());
+                SyncSetting currentSetting = findSettingByContentType(settingFromDB, item.getContentType());
                 ResSyncSettingsItem result = null;
                 if(currentSetting == null) {
                     result = manager.saveFromSync(session, item, idOfOrg, syncData, nextVersion);
@@ -61,7 +61,7 @@ public class SyncSettingProcessor extends AbstractProcessor<SyncSettingsSection>
 
             //build syncSettingsSection
             settingFromDB = manager.getSettingByIdOfOrgAndGreaterThenVersion(session, idOfOrg, maxVersionFromARM);
-            for(SyncSettings setting : settingFromDB){
+            for(SyncSetting setting : settingFromDB){
                 SyncSettingsSectionItem item = new SyncSettingsSectionItem(setting);
                 syncSettingsSection.getItemList().add(item);
             }
@@ -71,8 +71,8 @@ public class SyncSettingProcessor extends AbstractProcessor<SyncSettingsSection>
         return null;
     }
 
-    private SyncSettings findSettingByContentType(List<SyncSettings> settingFromDB, Integer contentType) {
-        for(SyncSettings item : settingFromDB){
+    private SyncSetting findSettingByContentType(List<SyncSetting> settingFromDB, Integer contentType) {
+        for(SyncSetting item : settingFromDB){
             if(item.getContentType().getTypeCode().equals(contentType)){
                 return item;
             }

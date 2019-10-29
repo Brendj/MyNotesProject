@@ -8,7 +8,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import java.util.Date;
 
-public class SyncSettings {
+public class SyncSetting {
     public static final String SEPARATOR = ";";
 
     private Long idOfSyncSetting;
@@ -30,11 +30,11 @@ public class SyncSettings {
     private Date createdDate;
     private Date lastUpdate;
 
-    public SyncSettings(){
+    public SyncSetting(){
         //for hibernate
     }
 
-    public SyncSettings(Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday, Boolean saturday,
+    public SyncSetting(Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday, Boolean friday, Boolean saturday,
             Boolean sunday, Integer everySecond, String buildTime, Integer limitStartHour, Integer limitEndHour){
         this.monday = monday;
         this.tuesday = tuesday;

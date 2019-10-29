@@ -6,7 +6,8 @@ package ru.axetta.ecafe.processor.web.ui.service.orgparameters;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType;
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettings;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSetting;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.autodistribution.AutoDistributionSyncSettingsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSyncSettingReport;
 import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSyncSettingReportItem;
@@ -199,7 +200,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     }
 
     public void buildEditedItem() {
-        SyncSettings currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
+        SyncSetting currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
         if(currentSetting == null){
             editedSetting = new EditedSetting();
             newSyncSetting = true;
@@ -219,7 +220,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         showConcreteTime3 = modalSelectedContentType.equals(CLIENTS_DATA.getTypeCode());
     }
 
-    private SyncSettings findBySelectedModalType(OrgSyncSettingReportItem item, Integer modalSelectedContentType) {
+    private SyncSetting findBySelectedModalType(OrgSyncSettingReportItem item, Integer modalSelectedContentType) {
         ContentType type = getContentTypeByCode(modalSelectedContentType);
         switch (type){
             case FULL_SYNC:
@@ -243,20 +244,43 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         }
     }
 
-    private SyncSettings getSyncSettingsOrNull(OrgSyncSettingReportItem.SyncInfo info){
+    private SyncSetting getSyncSettingsOrNull(OrgSyncSettingReportItem.SyncInfo info){
         return info == null ? null : info.getSetting();
     }
 
     public void applyChanges() {
-        try{
+        try {
             for(OrgSyncSettingReportItem item : items){
                 if(item.getIsChange()){
                     // TODO: save settings in DB, but process only changed 
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error("Cant save SyncSetting to DB: ", e);
             printError("Не удалось сохранить изменения в БД: " + e.getMessage());
+        }
+    }
+
+    public void beginDistributionSyncSettings(){
+        try {
+            AutoDistributionSyncSettingsService service = RuntimeContext.getAppContext().getBean(AutoDistributionSyncSettingsService.class);
+            if(service == null) {
+                throw new Exception("Не удалось получить экземпляр сервиса автораспределения");
+            }
+            for (OrgSyncSettingReportItem item : items) {
+                try {
+                    for(SyncSetting setting : item.getSettings()){
+                        service.distributionSyncSettings(setting);
+                    }
+                    item.rebuildAllSyncInfo();
+                } catch (Exception e) {
+                    logger.error(String.format("Can't calculate new sessionTime for ID OO %d", item.getIdOfOrg()), e);
+                    printError("Не удалось расчитать новое время сеанса для настроек ID OO " + item.getIdOfOrg());
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Can't begin distribute SyncSetting: ", e);
+            printError("Не удалось запусть процедуру распределения: " + e.getMessage());
         }
     }
 
@@ -398,7 +422,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     public void saveLocalChanges() {
         try {
             validateData();
-            SyncSettings currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
+            SyncSetting currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
             if (currentSetting != null) {
                 currentSetting.setMonday(editedSetting.getMonday());
                 currentSetting.setTuesday(editedSetting.getTuesday());
@@ -462,7 +486,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         if(StringUtils.isNotBlank(editedSetting.getConcreteTime3())){
             as.add(editedSetting.getConcreteTime3());
         }
-        return StringUtils.join(as, SyncSettings.SEPARATOR);
+        return StringUtils.join(as, SyncSetting.SEPARATOR);
     }
 
     public Boolean getShowConcreteTime2() {
@@ -507,18 +531,18 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         public EditedSetting(){
         }
 
-        public EditedSetting(SyncSettings syncSettings){
-            this.everySecond = syncSettings.getEverySecond();
-            this.limitStartHour = syncSettings.getLimitStartHour();
-            this.limitEndHour = syncSettings.getLimitEndHour();
-            this.monday = syncSettings.getMonday();
-            this.tuesday = syncSettings.getTuesday();
-            this.wednesday = syncSettings.getWednesday();
-            this.thursday = syncSettings.getThursday();
-            this.friday = syncSettings.getFriday();
-            this.saturday = syncSettings.getSaturday();
-            this.sunday = syncSettings.getSunday();
-            String[] times = StringUtils.split(syncSettings.getConcreteTime(), SyncSettings.SEPARATOR);
+        public EditedSetting(SyncSetting syncSetting){
+            this.everySecond = syncSetting.getEverySecond();
+            this.limitStartHour = syncSetting.getLimitStartHour();
+            this.limitEndHour = syncSetting.getLimitEndHour();
+            this.monday = syncSetting.getMonday();
+            this.tuesday = syncSetting.getTuesday();
+            this.wednesday = syncSetting.getWednesday();
+            this.thursday = syncSetting.getThursday();
+            this.friday = syncSetting.getFriday();
+            this.saturday = syncSetting.getSaturday();
+            this.sunday = syncSetting.getSunday();
+            String[] times = StringUtils.split(syncSetting.getConcreteTime(), SyncSetting.SEPARATOR);
             if(times != null) {
                 if (times.length > 0) {
                     if (times.length == 1) {

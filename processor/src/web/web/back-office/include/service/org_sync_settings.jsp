@@ -39,7 +39,7 @@
         <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.allFriendlyOrgs}" styleClass="checkboxes" />
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <a4j:commandButton value="Генерировать отчет" action="#{orgSyncSettingReportPage.buildHTML}"
+        <a4j:commandButton value="Генерировать отчет" action="#{orgSyncSettingReportPage.buildHTML()}"
                            reRender="orgSyncSettingsTable" styleClass="command-button" status="orgSyncReportStatus"
                            id="buildHTMLButton" />
 
@@ -246,11 +246,10 @@
         <a4j:commandButton value="Применить изменения" action="#{orgSyncSettingReportPage.applyChanges()}"
                            reRender="orgSyncSettingsTable" styleClass="command-button" status="orgSyncReportStatus"
                            id="applyChangesButton" />
+        <a4j:commandButton action="#{orgSyncSettingReportPage.beginDistributionSyncSettings()}"
+                           value="Автоматически распределить время" reRender="orgSyncSettingsTable"
+                           styleClass="command-button" />
     </h:panelGrid>
-    <rich:progressBar>
-
-    </rich:progressBar>
-
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />
 </h:panelGrid>

@@ -18,7 +18,7 @@ public class SyncSettingsSection implements AbstractToElement {
 
     @Override
     public Element toElement(Document document) throws Exception {
-        Element element = document.createElement("SyncSettings");
+        Element element = document.createElement("SyncSetting");
         for(SyncSettingsSectionItem item : itemList){
             element.appendChild(item.toElement(document));
         }
