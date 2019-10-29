@@ -1174,22 +1174,6 @@ public class DAOUtils {
         }
     }
 
-    public static boolean updateOrgHaveNewLP(Org org, boolean value) throws Exception {
-        Transaction transaction = null;
-        Session session = RuntimeContext.getInstance().createPersistenceSession();
-        try {
-            transaction = session.beginTransaction();
-            org.setHaveNewLP(value);
-            session.update(org);
-            transaction.commit();
-            transaction = null;
-            return true;
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
-    }
-
     public static Long findMenuExchangeSourceOrg(Session persistenceSession, Long idOfOrg) {
         Criteria criteria = persistenceSession.createCriteria(MenuExchangeRule.class);
         criteria.add(Restrictions.eq("idOfDestOrg", idOfOrg));
@@ -4493,7 +4477,8 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static List getDateFromsSpecialDatesForEZD(Session persistenceSession, String groupName, List<Long> idofOrg) throws Exception {
+    public static List getDateFromsSpecialDatesForEZD(Session persistenceSession, String groupName, List<Long> idofOrg)
+            throws Exception {
         Criteria criteria = persistenceSession.createCriteria(RequestsEzdSpecialDateView.class);
         criteria.add(Restrictions.gt("specDate", new Date()));
         criteria.add(Restrictions.eq("groupname", groupName));
@@ -4517,11 +4502,13 @@ public class DAOUtils {
         return criteria.list().isEmpty();
     }
 
-    public static List getAllGoodRequestEZD(Session persistenceSession, Set<Long> friendlyOrgsid,  Long version) throws Exception {
+    public static List getAllGoodRequestEZD(Session persistenceSession, Set<Long> friendlyOrgsid, Long version)
+            throws Exception {
         Criteria criteria = persistenceSession.createCriteria(RequestsEzd.class);
-        criteria.add(Restrictions.ge("versionrecord", version));
+        criteria.add(Restrictions.ge("versionrecord", version.intValue()));
         criteria.add(Restrictions.in("idOfOrg", friendlyOrgsid));
         criteria.add(Restrictions.ge("dateappointment", new Date()));
+        criteria.add(Restrictions.le("dateappointment", CalendarUtils.addMonth(new Date(),1) ));
         return criteria.list();
     }
 

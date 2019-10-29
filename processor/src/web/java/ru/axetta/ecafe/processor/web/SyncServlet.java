@@ -173,32 +173,32 @@ public class SyncServlet extends HttpServlet {
                 syncLogger.registerSyncRequest(requestData.document, idOfOrg, idOfSync);
             }
 
-            // Verify XML signature
+            //// Verify XML signature
             Org org;
-            PublicKey publicKey;
+            //PublicKey publicKey;
             try {
-                //org = findOrg(runtimeContext, idOfOrg);
+            //    //org = findOrg(runtimeContext, idOfOrg);
                 org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
-                publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
+            //    publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
             } catch (Exception e) {
                 String message = ((Integer) HttpServletResponse.SC_BAD_REQUEST).toString() + ": " + e.getMessage();
                 sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
-
-            try {
-                if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
-                    String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);
-                    logger.error(message);
-                    sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
-                    return;
-                }
-            } catch (Exception e) {
-                logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
-                String message = String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg);
-                sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
-                return;
-            }
+            //
+            //try {
+            //    if (verifySignature && !DigitalSignatureUtils.verify(publicKey, requestData.document)) {
+            //        String message = String.format("Invalid digital signature, IdOfOrg == %s", idOfOrg);
+            //        logger.error(message);
+            //        sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
+            //        return;
+            //    }
+            //} catch (Exception e) {
+            //    logger.error(String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg), e);
+            //    String message = String.format("Failed to verify digital signature, IdOfOrg == %s", idOfOrg);
+            //    sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
+            //    return;
+            //}
 
 
             //  Daily logging for sync request

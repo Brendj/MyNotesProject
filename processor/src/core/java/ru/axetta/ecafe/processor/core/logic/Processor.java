@@ -1063,6 +1063,9 @@ public class Processor implements SyncProcessor {
 
         fullProcessingOrgSettings(request, syncHistory, responseSections);
 
+        //Секция заявок по ЭЖД
+        fullProcessingGoogRequestEZD(request, syncHistory, responseSections);
+
         fullProcessingCardRequests(request, syncHistory, responseSections);
 
         fullProcessingMenusCalendar(request, syncHistory, responseSections);
@@ -6342,6 +6345,23 @@ public class Processor implements SyncProcessor {
         } catch (Exception e) {
             String message = String.format("Error when process OrgSettingSetting: %s", e.getMessage());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingGoogRequestEZD(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {
+
+        try {
+            GoodRequestEZDRequest goodRequestEZDRequest = request.getGoodRequestEZDRequest();
+            //Если такая секция существует в исходном запросе
+            if (goodRequestEZDRequest != null) {
+                GoodRequestEZDSection goodRequestEZDSection = processGoodRequestEZD(goodRequestEZDRequest, request.getIdOfOrg());
+                addToResponseSections(goodRequestEZDSection, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process GoodRequestEZD: %s", e.getMessage());
+            processorUtils
+                    .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
     }

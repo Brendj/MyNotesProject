@@ -70,11 +70,7 @@ public class OrgSettingDAOUtils {
     }
 
     public static Map<Long, Integer> getOrgSettingItemByOrgAndType(Session session, List<Long> idOfOrgs, Integer settingtype) {
-        SQLQuery query = session.createSQLQuery("select os.idoforg, osi.settingvalue from cf_orgsettings_Items osi\n"
-                + "left join cf_orgsettings os on os.idoforgsetting=osi.idoforgsetting "
-                + "where osi.settingtype = :settingtype "
-                + "and os.idoforg in (:idOfOrgs) "
-                + "order by osi.version");
+        SQLQuery query;
         if (idOfOrgs != null && !idOfOrgs.isEmpty()) {
             query = session.createSQLQuery("select os.idoforg, osi.settingvalue from cf_orgsettings_Items osi\n"
                     + "left join cf_orgsettings os on os.idoforgsetting=osi.idoforgsetting "
@@ -98,7 +94,9 @@ public class OrgSettingDAOUtils {
         for (int i=0; i<resultList.size();i++)
         {
             Object o[] = (Object[]) resultList.get(i);
-            result.put(HibernateUtils.getDbLong(o[0]), HibernateUtils.getDbInt(o[1]));
+            try {
+                result.put(HibernateUtils.getDbLong(o[0]), Integer.valueOf(HibernateUtils.getDbString(o[1])));
+            } catch (Exception e) { } //В случае ошибки ничего не добавляем
         }
         return result;
     }

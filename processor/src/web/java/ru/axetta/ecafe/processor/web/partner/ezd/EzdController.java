@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -582,8 +583,7 @@ public class EzdController {
                             return result;
                         }
                     }
-
-                    DAOUtils.updateOrgHaveNewLP(org, true);
+                    DAOService.getInstance().applyHaveNewLPForOrg(org.getIdOfOrg(), true);
 
                     RequestsEzd requestsEzd = new RequestsEzd();
                     requestsEzd.setIdOfOrg(org.getIdOfOrg());

@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingItem;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.SettingType;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
@@ -53,7 +54,7 @@ public class GoodRequestEZDProcessor extends AbstractProcessor<OrgSettingSection
         friendlyOrgsid.add(sourceOrg.getIdOfOrg());
 
         //Проставляем флаг, что последние заявки по ЛП отправлены
-        DAOUtils.updateOrgHaveNewLP(sourceOrg, false);
+        DAOService.getInstance().applyHaveNewLPForOrg(sourceOrg.getIdOfOrg(), false);
 
         List<RequestsEzd> requestsEzds = DAOUtils.getAllGoodRequestEZD(session, friendlyOrgsid, maxVersionFromARM);
 

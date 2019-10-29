@@ -1597,6 +1597,13 @@ public class DAOService {
         query.executeUpdate();
     }
 
+    public void applyHaveNewLPForOrg(Long idOfOrg, boolean value) throws Exception {
+        Query query = entityManager.createQuery("update Org set haveNewLP=:valueB where idOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("valueB", value);
+        query.executeUpdate();
+    }
+
     public List<ComplexRole> findComplexRoles() {
         return entityManager.createQuery("from ComplexRole order by idOfRole", ComplexRole.class).getResultList();
     }
