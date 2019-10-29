@@ -25,6 +25,7 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPHandler;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.io.*;
+import java.nio.charset.StandardCharsets;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Set;
@@ -36,9 +37,10 @@ import java.util.Set;
 public class MealServiceHandler implements SOAPHandler<SOAPMessageContext> {
 
     private static final Logger logger = LoggerFactory.getLogger(MealServiceHandler.class);
-    private final String fileName;
+    private String fileName;
     private final String LOG_PATH_PREFIX;
     private final String DEFAULT_LOG_PATH_PREFIX = "/home/jbosser/processor/MEAL_logs/";
+    private final String parsingAddress;
     private final SimpleDateFormat DATA_FORMAT = new SimpleDateFormat("_dd_MM_yyyy");
     private final String endPointAddress;
 
@@ -46,11 +48,15 @@ public class MealServiceHandler implements SOAPHandler<SOAPMessageContext> {
         super();
         String endPointAddressFolder = parseAddress(endPointAddress);
         this.endPointAddress = endPointAddress;
+        this.parsingAddress = endPointAddressFolder;
         this.LOG_PATH_PREFIX = getLogPath() + endPointAddressFolder + "/";
-        String today = DATA_FORMAT.format(new Date());
-        this.fileName = LOG_PATH_PREFIX + endPointAddressFolder + today + ".log";
+        this.fileName = generateLogFileName();
     }
 
+    private String generateLogFileName(){
+        String today = DATA_FORMAT.format(new Date());
+        return LOG_PATH_PREFIX + parsingAddress + today + ".log";
+    }
 
     private String parseAddress(String endPointAddress) {
         return endPointAddress
@@ -71,14 +77,16 @@ public class MealServiceHandler implements SOAPHandler<SOAPMessageContext> {
         try {
             Boolean outboundProperty = (Boolean)
                     smc.get (MessageContext.MESSAGE_OUTBOUND_PROPERTY);
-            if (outboundProperty.booleanValue()) {
+            if (outboundProperty) {
                 final SOAPPart soapPart = smc.getMessage().getSOAPPart();
                 final Document source_doc = soapPart.getEnvelope().getOwnerDocument();
                 String sss = toString(source_doc)
-                        .replaceAll(" xmlns=\"http://service.petersburgedu.ru/webservice/meal\" xmlns:ns2=\"http://service.petersburgedu.ru/webservice/meal/wsdl\" xmlns:ns3=\"service.petersburgedu.ru/webservice/meal/wsdl\"", " xmlns=\"http://service.petersburgedu.ru/webservice/meal/wsdl\"")
+                        .replaceAll(
+                                " xmlns=\"http://service.petersburgedu.ru/webservice/meal\" xmlns:ns2=\"http://service.petersburgedu.ru/webservice/meal/wsdl\" xmlns:ns3=\"service.petersburgedu.ru/webservice/meal/wsdl\"",
+                                " xmlns=\"http://service.petersburgedu.ru/webservice/meal/wsdl\"")
                         .replaceAll("ns3:", "")
                         .replaceAll("ns2:", "");
-                InputStream in = new ByteArrayInputStream(sss.getBytes("UTF-8"));
+                InputStream in = new ByteArrayInputStream(sss.getBytes(StandardCharsets.UTF_8));
                 Document signed_doc = newDocumentFromInputStream(in);
                 DOMSource domSource = new DOMSource(signed_doc);
                 soapPart.setContent(domSource);
@@ -87,9 +95,7 @@ public class MealServiceHandler implements SOAPHandler<SOAPMessageContext> {
         } catch (Exception e) {
             logger.error("Error in filter chain", e);
         }
-        if (!MealManager.isOn()) {
-            logToFile(smc);
-        }
+        logToFile(smc);
         return true;
     }
 
@@ -152,6 +158,7 @@ public class MealServiceHandler implements SOAPHandler<SOAPMessageContext> {
             message.append("\n");
 
             synchronized (this) {
+                fileName = generateLogFileName();
                 checkAndCreateFolder(LOG_PATH_PREFIX);
                 FileWriter fw = new FileWriter(fileName, true);
                 fw.write(message.toString());
@@ -159,7 +166,7 @@ public class MealServiceHandler implements SOAPHandler<SOAPMessageContext> {
                 fw.close();
             }
         } catch (Exception e) {
-            logger.error("Exception in handler: " + e);
+            logger.error("Exception in handler: ", e);
         }
     }
 
@@ -171,7 +178,7 @@ public class MealServiceHandler implements SOAPHandler<SOAPMessageContext> {
                     throw new RuntimeException();
                 }
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             logger.error(String.format("Can't create directory %s :", pathToFolder), e);
             throw e;
         }

@@ -7,32 +7,31 @@ package ru.axetta.ecafe.processor.core.persistence;
 import java.io.Serializable;
 
 public class CompositeIdOfEnterEventSendInfo implements Serializable {
-    private long idOfEnterEvent;
-    private long idOfOrg;
+    private Long idOfEnterEvent;
+    private Long idOfOrg;
 
     protected CompositeIdOfEnterEventSendInfo() {
         // For Hibernate only
     }
 
-    public CompositeIdOfEnterEventSendInfo(long idOfEnterEvent, long idOfOrg) {
+    public CompositeIdOfEnterEventSendInfo(Long idOfEnterEvent, Long idOfOrg) {
         this.idOfEnterEvent = idOfEnterEvent;
         this.idOfOrg = idOfOrg;
     }
 
-    public long getIdOfEnterEvent() {
+    public Long getIdOfEnterEvent() {
         return idOfEnterEvent;
     }
 
-    public void setIdOfEnterEvent(long idOfEnterEvent) {
-        // For Hibernate only
+    public void setIdOfEnterEvent(Long idOfEnterEvent) {
         this.idOfEnterEvent = idOfEnterEvent;
     }
 
-    public long getIdOfOrg() {
+    public Long getIdOfOrg() {
         return idOfOrg;
     }
 
-    public void setIdOfOrg(long idOfOrg) {
+    public void setIdOfOrg(Long idOfOrg) {
         // For Hibernate only
         this.idOfOrg = idOfOrg;
     }
@@ -42,20 +41,13 @@ public class CompositeIdOfEnterEventSendInfo implements Serializable {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (o == null || this.getClass() != o.getClass()) {
             return false;
         }
 
         CompositeIdOfEnterEventSendInfo that = (CompositeIdOfEnterEventSendInfo) o;
 
-        if (idOfEnterEvent != that.idOfEnterEvent) {
-            return false;
-        }
-        if (idOfOrg != that.idOfOrg) {
-            return false;
-        }
-
-        return true;
+        return idOfEnterEvent.equals(that.idOfEnterEvent) && idOfOrg.equals(that.idOfOrg);
     }
 
     @Override
@@ -67,6 +59,6 @@ public class CompositeIdOfEnterEventSendInfo implements Serializable {
 
     @Override
     public String toString() {
-        return "CompositeIdOfEnterEvent{" + "idOfEnterEvent=" + idOfEnterEvent + ", idOfOrg=" + idOfOrg + '}';
+        return "CompositeIdOfEnterEventSendInfo{" + "idOfEnterEvent=" + idOfEnterEvent + ", idOfOrg=" + idOfOrg + '}';
     }
 }
