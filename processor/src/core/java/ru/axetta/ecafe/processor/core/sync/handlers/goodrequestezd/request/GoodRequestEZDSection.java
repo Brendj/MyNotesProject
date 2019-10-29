@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request;
 
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -37,6 +38,6 @@ public class GoodRequestEZDSection implements AbstractToElement {
 
     @Override
     public Element toElement(Document document) throws Exception {
-        return null;
+        return toElement(document, CalendarUtils.getDateTimeFormatLocal());
     }
 }
