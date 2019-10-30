@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
+import ru.axetta.ecafe.processor.core.emias.LiberateClientsList;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
@@ -1732,6 +1733,18 @@ public class DAOUtils {
         categoryDiscountDSZN.setVersion(nextVersion);
         categoryDiscountDSZN.setCategoryDiscount(null);
         session.save(categoryDiscountDSZN);
+    }
+
+    public static void saveEMIAS(Session session, LiberateClientsList liberateClientsList) {
+        EMIAS emias = new EMIAS();
+        emias.setGuid(liberateClientsList.getGuid());
+        emias.setIdEventEMIAS(liberateClientsList.getIdEventEMIAS());
+        emias.setTypeEventEMIAS(liberateClientsList.getTypeEventEMIAS());
+        emias.setDateLiberate(liberateClientsList.getDateLiberate());
+        emias.setStartDateLiberate(liberateClientsList.getStartDateLiberate());
+        emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
+        emias.setCreateDate(new Date());
+        session.save(emias);
     }
 
     @SuppressWarnings("unchecked")
