@@ -553,12 +553,16 @@ public class User {
             return true;
         }
         if (user.getSmsCodeEnterDate() == null) {
+            //Если не пробовали достучаться до ЕМП, то считаем, что получилось
+            setSuccessfullySendEMP(true);
             return true;
         }
 
         if (CalendarUtils.getDifferenceInDays(user.getSmsCodeEnterDate(), new Date(System.currentTimeMillis())) < days) {
             return false;
         } else {
+            //Если не пробовали достучаться до ЕМП, то считаем, что получилось
+            setSuccessfullySendEMP(true);
             return true;
         }
     }
