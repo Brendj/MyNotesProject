@@ -89,7 +89,7 @@ public class SyncSettingManager {
         if (everySeconds == null ) {
             currentSetting.setConcreteTime(concreteTime);
         }
-        session.persist(currentSetting);
+        session.merge(currentSetting);
     }
 
     private void validateParam(String concreteTime, Integer everySeconds, Integer limitStartHour,
@@ -186,5 +186,24 @@ public class SyncSettingManager {
         criteria.add(Restrictions.gt("version", maxVersionFromARM));
         criteria.addOrder(Order.asc("contentType"));
         return  criteria.list();
+    }
+
+    public void saveOrUpdateSettingFromReportPage(Session session, SyncSetting setting, Long nextVersion) throws Exception {
+        if(setting == null){
+            throw new IllegalArgumentException("Get instance of SyncSetting as NULL");
+        }
+        Date updateDate = new Date();
+        if(setting.getIdOfSyncSetting() == null){
+            createSyncSettings(setting.getContentType().getTypeCode(), setting.getConcreteTime(), setting.getEverySecond(),
+                    setting.getLimitStartHour(), setting.getLimitEndHour(), setting.getMonday(), setting.getTuesday(), setting.getWednesday(),
+                    setting.getThursday(), setting.getFriday(), setting.getSaturday(), setting.getSunday(),
+                    false, nextVersion, setting.getOrg(), updateDate, session);
+        } else {
+            session.merge(setting);
+            updateSyncSettings(setting, setting.getConcreteTime(), setting.getEverySecond(), setting.getLimitStartHour(),
+                    setting.getLimitEndHour(), setting.getMonday(), setting.getTuesday(), setting.getWednesday(),
+                    setting.getThursday(), setting.getFriday(), setting.getSaturday(), setting.getSunday(),
+                    false, nextVersion, updateDate, session);
+        }
     }
 }

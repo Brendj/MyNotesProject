@@ -14,29 +14,27 @@ import java.util.LinkedList;
 import java.util.List;
 
 public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReportItem> {
-    private static final Integer NOT_CHANGED = 0;
-    private static final Integer CHANGED = 1;
+    public static final Integer NOT_CHANGED = 0;
+    public static final Integer CHANGED = 1;
     private String orgName;
     private Long idOfOrg;
     private String shortAddress;
-    private SyncInfo fullSync = new SyncInfo();
-    private SyncInfo accIncSync = new SyncInfo();
-    private SyncInfo orgSettingSync = new SyncInfo();
-    private SyncInfo clientDataSync = new SyncInfo();
-    private SyncInfo menuSync = new SyncInfo();
-    private SyncInfo photoSync = new SyncInfo();
-    private SyncInfo helpRequestsSync = new SyncInfo();
-    private SyncInfo libSync = new SyncInfo();
+    private SyncInfo fullSync = new SyncInfo(ContentType.FULL_SYNC);
+    private SyncInfo accIncSync = new SyncInfo(ContentType.BALANCES_AND_ENTEREVENTS);
+    private SyncInfo orgSettingSync = new SyncInfo(ContentType.ORGSETTINGS);
+    private SyncInfo clientDataSync = new SyncInfo(ContentType.CLIENTS_DATA);
+    private SyncInfo menuSync = new SyncInfo(ContentType.MENU);
+    private SyncInfo photoSync = new SyncInfo(ContentType.PHOTOS);
+    private SyncInfo helpRequestsSync = new SyncInfo(ContentType.SUPPORT_SERVICE);
+    private SyncInfo libSync = new SyncInfo(ContentType.LIBRARY);
     private Boolean isChange = false;
     private Org org;
-    private List<SyncSetting> settings;
 
     public OrgSyncSettingReportItem(Org org, List<SyncSetting> settings) {
         this.orgName = org.getShortName();
         this.idOfOrg = org.getIdOfOrg();
         this.shortAddress = org.getShortAddress();
         this.org = org;
-        this.settings = settings;
 
         for (SyncSetting setting : settings) {
             switch (setting.getContentType()) {
@@ -65,6 +63,16 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
                     libSync = new SyncInfo(setting);
             }
         }
+        setOrgForAllSetting(org);
+    }
+
+    private void setOrgForAllSetting(Org org) {
+        getFullSync().getSetting().setOrg(org);
+        getOrgSettingSync().getSetting().setOrg(org);
+        getClientDataSync().getSetting().setOrg(org);
+        getMenuSync().getSetting().setOrg(org);
+        getPhotoSync().getSetting().setOrg(org);
+        getLibSync().getSetting().setOrg(org);
     }
 
     public String getOrgName() {
@@ -254,61 +262,14 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
         this.org = org;
     }
 
-    public List<SyncSetting> getSettings() {
-        return settings;
-    }
-
-    public void setSettings(List<SyncSetting> settings) {
-        this.settings = settings;
-    }
-
-    public void rebuildAllSyncInfo() {
-        for (SyncSetting setting : settings) {
-            switch (setting.getContentType()) {
-                case FULL_SYNC:
-                    fullSync = new SyncInfo(setting);
-                    fullSync.setState(CHANGED);
-                    break;
-                case BALANCES_AND_ENTEREVENTS:
-                    accIncSync = new SyncInfo(setting);
-                    accIncSync.setState(CHANGED);
-                    break;
-                case ORGSETTINGS:
-                    orgSettingSync = new SyncInfo(setting);
-                    orgSettingSync.setState(CHANGED);
-                    break;
-                case CLIENTS_DATA:
-                    clientDataSync = new SyncInfo(setting);
-                    clientDataSync.setState(CHANGED);
-                    break;
-                case MENU:
-                    menuSync = new SyncInfo(setting);
-                    menuSync.setState(CHANGED);
-                    break;
-                case PHOTOS:
-                    photoSync = new SyncInfo(setting);
-                    photoSync.setState(CHANGED);
-                    break;
-                case SUPPORT_SERVICE:
-                    helpRequestsSync = new SyncInfo(setting);
-                    helpRequestsSync.setState(CHANGED);
-                    break;
-                case LIBRARY:
-                    libSync = new SyncInfo(setting);
-                    libSync.setState(CHANGED);
-            }
-        }
-        isChange = true;
-    }
-
     public class SyncInfo {
         private String fullInf = "";
         private SyncSetting setting;
         private Integer state = NOT_CHANGED;
 
-        SyncInfo(){
+        SyncInfo(ContentType type){
             setting = new SyncSetting();
-            setting.setOrg(org);
+            setting.setContentType(type);
         }
 
         SyncInfo(SyncSetting setting) {

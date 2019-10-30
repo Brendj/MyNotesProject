@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.service.orgparameters;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSetting;
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettingManager;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.autodistribution.AutoDistributionSyncSettingsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSyncSettingReport;
@@ -201,7 +202,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
 
     public void buildEditedItem() {
         SyncSetting currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
-        if(currentSetting == null){
+        if(currentSetting == null || currentSetting.getIdOfSyncSetting() == null){
             editedSetting = new EditedSetting();
             newSyncSetting = true;
         } else {
@@ -224,40 +225,75 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         ContentType type = getContentTypeByCode(modalSelectedContentType);
         switch (type){
             case FULL_SYNC:
-                return getSyncSettingsOrNull(item.getFullSync());
+                return item.getFullSync().getSetting();
             case BALANCES_AND_ENTEREVENTS:
-                return getSyncSettingsOrNull(item.getAccIncSync());
+                return item.getAccIncSync().getSetting();
             case ORGSETTINGS:
-                return getSyncSettingsOrNull(item.getOrgSettingSync());
+                return item.getOrgSettingSync().getSetting();
             case CLIENTS_DATA:
-                return getSyncSettingsOrNull(item.getClientDataSync());
+                return item.getClientDataSync().getSetting();
             case MENU:
-                return getSyncSettingsOrNull(item.getMenuSync());
+                return item.getMenuSync().getSetting();
             case PHOTOS:
-                return getSyncSettingsOrNull(item.getPhotoSync());
+                return item.getPhotoSync().getSetting();
             case SUPPORT_SERVICE:
-                return getSyncSettingsOrNull(item.getHelpRequestsSync());
+                return item.getHelpRequestsSync().getSetting();
             case LIBRARY:
-                return getSyncSettingsOrNull(item.getLibSync());
+                return item.getLibSync().getSetting();
             default:
                 return null;
         }
     }
 
-    private SyncSetting getSyncSettingsOrNull(OrgSyncSettingReportItem.SyncInfo info){
-        return info == null ? null : info.getSetting();
-    }
-
     public void applyChanges() {
+        Session session = null;
+        Transaction transaction = null;
+        SyncSettingManager manager = null;
         try {
+            manager = RuntimeContext.getAppContext().getBean(SyncSettingManager.class);
+            if(manager == null){
+                throw new Exception("Can't get instance of SyncSettingManager");
+            }
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Long nextVersion = SyncSettingManager.getNextVersion(session);
             for(OrgSyncSettingReportItem item : items){
                 if(item.getIsChange()){
-                    // TODO: save settings in DB, but process only changed 
+                    if(item.getFullSync().getState().equals(OrgSyncSettingReportItem.CHANGED)){
+                        manager.saveOrUpdateSettingFromReportPage(session, item.getFullSync().getSetting(), nextVersion);
+                    }
+                    if(item.getOrgSettingSync().getState().equals(OrgSyncSettingReportItem.CHANGED)){
+                        manager.saveOrUpdateSettingFromReportPage(session, item.getOrgSettingSync().getSetting(), nextVersion);
+                    }
+                    if(item.getAccIncSync().getState().equals(OrgSyncSettingReportItem.CHANGED)){
+                        manager.saveOrUpdateSettingFromReportPage(session, item.getAccIncSync().getSetting(), nextVersion);
+                    }
+                    if(item.getClientDataSync().getState().equals(OrgSyncSettingReportItem.CHANGED)){
+                        manager.saveOrUpdateSettingFromReportPage(session, item.getClientDataSync().getSetting(), nextVersion);
+                    }
+                    if(item.getMenuSync().getState().equals(OrgSyncSettingReportItem.CHANGED)){
+                        manager.saveOrUpdateSettingFromReportPage(session, item.getMenuSync().getSetting(), nextVersion);
+                    }
+                    if(item.getPhotoSync().getState().equals(OrgSyncSettingReportItem.CHANGED)){
+                        manager.saveOrUpdateSettingFromReportPage(session, item.getPhotoSync().getSetting(), nextVersion);
+                    }
+                    if(item.getHelpRequestsSync().getState().equals(OrgSyncSettingReportItem.CHANGED)){
+                        manager.saveOrUpdateSettingFromReportPage(session, item.getHelpRequestsSync().getSetting(), nextVersion);
+                    }
+                    if(item.getLibSync().getState().equals(OrgSyncSettingReportItem.CHANGED)){
+                        manager.saveOrUpdateSettingFromReportPage(session, item.getLibSync().getSetting(), nextVersion);
+                    }
                 }
             }
+            transaction.commit();
+            transaction = null;
+            session.close();
         } catch (Exception e) {
             logger.error("Cant save SyncSetting to DB: ", e);
             printError("Не удалось сохранить изменения в БД: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
     }
 
@@ -269,10 +305,19 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
             }
             for (OrgSyncSettingReportItem item : items) {
                 try {
-                    for(SyncSetting setting : item.getSettings()){
-                        service.distributionSyncSettings(setting);
-                    }
-                    item.rebuildAllSyncInfo();
+                    SyncSetting fullSync = service.distributionSyncSettings(item.getFullSync().getSetting());
+                    SyncSetting orgSettingSync = service.distributionSyncSettings(item.getOrgSettingSync().getSetting());
+                    SyncSetting clientDataSync = service.distributionSyncSettings(item.getClientDataSync().getSetting());
+                    SyncSetting menuSync = service.distributionSyncSettings(item.getMenuSync().getSetting());
+                    SyncSetting photoSync = service.distributionSyncSettings(item.getPhotoSync().getSetting());
+                    SyncSetting libSync = service.distributionSyncSettings(item.getLibSync().getSetting());
+
+                    item.rebuildSyncInfo(fullSync.getContentType().getTypeCode(), fullSync);
+                    item.rebuildSyncInfo(orgSettingSync.getContentType().getTypeCode(), orgSettingSync);
+                    item.rebuildSyncInfo(clientDataSync.getContentType().getTypeCode(), clientDataSync);
+                    item.rebuildSyncInfo(menuSync.getContentType().getTypeCode(), menuSync);
+                    item.rebuildSyncInfo(photoSync.getContentType().getTypeCode(), photoSync);
+                    item.rebuildSyncInfo(libSync.getContentType().getTypeCode(), libSync);
                 } catch (Exception e) {
                     logger.error(String.format("Can't calculate new sessionTime for ID OO %d", item.getIdOfOrg()), e);
                     printError("Не удалось расчитать новое время сеанса для настроек ID OO " + item.getIdOfOrg());

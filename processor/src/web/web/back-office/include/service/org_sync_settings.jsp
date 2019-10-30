@@ -44,7 +44,7 @@
                            id="buildHTMLButton" />
 
         <h:commandButton value="Выгрузить в Excel" action="#{orgSyncSettingReportPage.buildXLS}"
-                         styleClass="command-button" id="buildXLSButton" disabled="false">
+                         styleClass="command-button" id="buildXLSButton" disabled="true">
             <a4j:support status="orgSyncReportStatus" id="buildXLSButtonSupport" />
         </h:commandButton>
     </h:panelGrid>
