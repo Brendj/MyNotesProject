@@ -595,6 +595,7 @@ public class EzdController {
                     requestsEzd.setUsername(userName);
                     requestsEzd.setCreateddate(new Date());
                     requestsEzd.setVersionrecord(maxVersion);
+                    requestsEzd.setGuid(UUID.randomUUID().toString());
                     persistenceSession.save(requestsEzd);
                 }
             }

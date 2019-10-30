@@ -4505,7 +4505,7 @@ public class DAOUtils {
     public static List getAllGoodRequestEZD(Session persistenceSession, Set<Long> friendlyOrgsid, Long version)
             throws Exception {
         Criteria criteria = persistenceSession.createCriteria(RequestsEzd.class);
-        criteria.add(Restrictions.ge("versionrecord", version.intValue()));
+        criteria.add(Restrictions.gt("versionrecord", version.intValue()));
         criteria.add(Restrictions.in("idOfOrg", friendlyOrgsid));
         criteria.add(Restrictions.ge("dateappointment", new Date()));
         criteria.add(Restrictions.le("dateappointment", CalendarUtils.addMonth(new Date(),1) ));

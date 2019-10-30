@@ -21,6 +21,7 @@
         <property name="createddate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="lastupdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="versionrecord" column="versionrecord" type="integer"/>
+        <property name="guid" column="Guid" type="string" length="32"/>
 
     </class>
 </hibernate-mapping>

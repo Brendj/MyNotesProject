@@ -63,9 +63,7 @@ public class GoodRequestEZDProcessor extends AbstractProcessor<OrgSettingSection
 
             goodRequestEZDSyncPOJO.setIdOfOrg(requestsEzd.getIdOfOrg().intValue());
 
-            Org org = (Org) session.load(Org.class, requestsEzd.getIdOfOrg());
-
-            goodRequestEZDSyncPOJO.setGuid(org.getGuid());
+            goodRequestEZDSyncPOJO.setGuid(requestsEzd.getGuid());
             goodRequestEZDSyncPOJO.setGroupName(requestsEzd.getGroupname());
             goodRequestEZDSyncPOJO.setDate(requestsEzd.getDateappointment());
             goodRequestEZDSyncPOJO.setComplexId(requestsEzd.getIdofcomplex().intValue());

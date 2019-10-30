@@ -23,6 +23,7 @@ public class RequestsEzd {
     private Date createddate;
     private Date lastupdate;
     private Integer versionrecord;
+    private String guid;
 
     public Long getId() {
         return id;
@@ -128,5 +129,13 @@ public class RequestsEzd {
 
     public void setIdOfOrg(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 }
