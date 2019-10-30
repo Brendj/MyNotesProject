@@ -15,7 +15,6 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
 import org.quartz.*;
 import org.quartz.impl.StdSchedulerFactory;
@@ -107,8 +106,10 @@ public class ApplicationForFoodProcessingService {
                     dayTriggerHash.put(clientOrg.getIdOfOrg(), new HashMap<Date, Date>());
                 }
 
+                //dayTriggerHash.get(clientOrg.getIdOfOrg()).put(statusCreatedDate,
+                //        getTriggerDateForOrg(session, clientOrg, statusCreatedDate, daysCount, application.getClient().getIdOfClientGroup()));
                 dayTriggerHash.get(clientOrg.getIdOfOrg()).put(statusCreatedDate,
-                        getTriggerDateForOrg(session, clientOrg, statusCreatedDate, daysCount, application.getClient().getIdOfClientGroup()));
+                        getTriggerDateByProductionCalendar(session, statusCreatedDate, daysCount));
                 Date triggerDate = dayTriggerHash.get(clientOrg.getIdOfOrg()).get(statusCreatedDate);
                 if (triggerDate.getTime() <= fireDate.getTime()) {
                     Long applicationVersion = DAOUtils.nextVersionByApplicationForFood(session);
@@ -141,36 +142,40 @@ public class ApplicationForFoodProcessingService {
         }
     }
 
-    private Date getTriggerDateForOrg(Session session, Org org, Date statusCreatedDate, Integer daysCount, Long idOfClientGroup) {
+    public Date getTriggerDateByProductionCalendar(Session session, Date statusCreatedDate, Integer daysCount) {
+        Integer _daysCounter = daysCount;
+        Date _startDate = CalendarUtils.truncateToDayOfMonth(statusCreatedDate);
+        Date specialDaysMonth = CalendarUtils.addMonth(_startDate, 1);
+
+        Criteria productionCalendarCriteria = session.createCriteria(ProductionCalendar.class);
+        productionCalendarCriteria.add(Restrictions.between("day", _startDate, specialDaysMonth));
+        List<ProductionCalendar> dates = productionCalendarCriteria.list();
+        do {
+            _startDate = CalendarUtils.addOneDay(_startDate);
+
+            Date endDateStart = CalendarUtils.startOfDay(_startDate);
+            Date endDateEnd = CalendarUtils.endOfDay(_startDate);
+            Boolean isWeekend = false;
+
+            for (ProductionCalendar pc : dates) {
+                if (CalendarUtils.betweenDate(pc.getDay(), endDateStart, endDateEnd)) {
+                    isWeekend = true;
+                    break;
+                }
+            }
+
+            if (!isWeekend) {
+                _daysCounter--;
+            }
+        } while(_daysCounter >= 0);
+        return _startDate;
+    }
+
+    /*private Date getTriggerDateForOrg(Session session, Org org, Date statusCreatedDate, Integer daysCount, Long idOfClientGroup) {
         Integer _daysCounter = daysCount;
 
         Date _startDate = CalendarUtils.truncateToDayOfMonth(statusCreatedDate);
         Date specialDaysMonth = CalendarUtils.addMonth(_startDate, 1);
-
-        //Boolean isSixWorkWeek = false; //SubscriberFeedingSettingSettingValue.SIX_WORK_WEEK
-        //ECafeSettings eCafeSettings = DAOUtils.getECafeSettingByIdOfOrgAndSettingId(session, org.getIdOfOrg(), SettingsIds.SubscriberFeeding);
-        //if (null == eCafeSettings) {
-        //    logger.warn(String.format("Unable to find ECafeSettings for idOfOrg=%d and SettingsId=%d", org.getIdOfOrg(),
-        //            SettingsIds.SubscriberFeeding.getId()));
-        //} else {
-        //    try {
-        //        isSixWorkWeek = ((SubscriberFeedingSettingSettingValue) eCafeSettings.getSplitSettingValue()).isSixWorkWeek();
-        //    } catch (Exception e) {
-        //        logger.warn(String.format("Unable to parse setting values for idOfOrg=%d, SettingsId=%d, SettingValue=%s", org.getIdOfOrg(),
-        //                SettingsIds.SubscriberFeeding.getId(), eCafeSettings.getSettingValue()));
-        //    }
-        //}
-        //
-        //if (!isSixWorkWeek) {
-        //    ClientGroup clientGroup = (ClientGroup) session.load(ClientGroup.class, new CompositeIdOfClientGroup(org.getIdOfOrg(), idOfClientGroup));
-        //    GroupNamesToOrgs groupNamesToOrgs = DAOUtils.getGroupNamesToOrgsByOrgAndGroupName(session, org, clientGroup.getGroupName());
-        //    if (null != groupNamesToOrgs) {
-        //        Boolean isSixDaysWorkWeek = groupNamesToOrgs.getIsSixDaysWorkWeek();
-        //        if (null != isSixDaysWorkWeek) {
-        //            isSixWorkWeek = isSixDaysWorkWeek;
-        //        }
-        //    }
-        //}
 
         Criteria specialDaysCriteria = session.createCriteria(SpecialDate.class);
         specialDaysCriteria.add(Restrictions.eq("idOfOrg", org.getIdOfOrg()));
@@ -215,7 +220,7 @@ public class ApplicationForFoodProcessingService {
         } while(_daysCounter >= 0);
 
         return _startDate;
-    }
+    }*/
 
     public void scheduleSync() throws Exception {
         String syncSchedule = RuntimeContext
