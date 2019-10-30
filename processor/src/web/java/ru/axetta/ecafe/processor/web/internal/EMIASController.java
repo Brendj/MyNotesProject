@@ -3,6 +3,7 @@
  */
 
 package ru.axetta.ecafe.processor.web.internal;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.emias.LiberateClientsList;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -12,6 +13,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
@@ -27,7 +29,8 @@ public class EMIASController extends HttpServlet {
     private final Logger logger = LoggerFactory.getLogger(EMIASController.class);
 
     @WebMethod(operationName = "getLiberateClientsList")
-    public  ResponseItem getLiberateClientsList(@WebParam(name = "LiberateClientsList") List<LiberateClientsList> liberateClientsLists) {
+    public ResponseItem getLiberateClientsList(
+            @WebParam(name = "LiberateClientsList") List<LiberateClientsList> liberateClientsLists) {
 
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -37,12 +40,22 @@ public class EMIASController extends HttpServlet {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            for (LiberateClientsList liberateClientsList: liberateClientsLists)
-            {
-                DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
+            for (LiberateClientsList liberateClientsList : liberateClientsLists) {
+                switch (liberateClientsList.getTypeEventEMIAS().intValue()) {
+                    case 1://создание освобождения (в том числе продление освобождения)
+                        DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
+                        break;
+                    case 2:
+                        DAOUtils.updateEMIAS(persistenceSession, liberateClientsList, true);
+                        break;
+                    case 3:
+                        DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
+                        break;
+                    case 4:
+                        DAOUtils.updateEMIAS(persistenceSession, liberateClientsList, false);
+                        break;
+                }
             }
-
-
             persistenceTransaction.commit();
             persistenceTransaction = null;
 

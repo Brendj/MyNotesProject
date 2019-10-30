@@ -25,6 +25,7 @@ public class EMIAS {
     private Date createDate;
     private Date updateDate;
     private Boolean accepted;
+    private Long deletedemiasid;
 
    public EMIAS(){}
 
@@ -107,5 +108,13 @@ public class EMIAS {
 
     public void setAccepted(Boolean accepted) {
         this.accepted = accepted;
+    }
+
+    public Long getDeletedemiasid() {
+        return deletedemiasid;
+    }
+
+    public void setDeletedemiasid(Long deletedemiasid) {
+        this.deletedemiasid = deletedemiasid;
     }
 }

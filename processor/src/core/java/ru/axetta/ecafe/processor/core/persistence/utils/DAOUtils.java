@@ -1747,6 +1747,51 @@ public class DAOUtils {
         session.save(emias);
     }
 
+    public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList, boolean sick) {
+        Criteria clientCardsCriteria = session.createCriteria(EMIAS.class);
+        clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
+        if (sick)
+            clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 1L));
+        else
+            clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 3L));
+        EMIAS emiasUpdated;
+        try {
+            emiasUpdated = (EMIAS)clientCardsCriteria.list().get(0);
+        }catch (Exception e)
+        {
+            emiasUpdated = null;
+        }
+
+        EMIAS emias = new EMIAS();
+        emias.setGuid(liberateClientsList.getGuid());
+        emias.setIdEventEMIAS(liberateClientsList.getIdEventEMIAS());
+        emias.setTypeEventEMIAS(liberateClientsList.getTypeEventEMIAS());
+        emias.setDateLiberate(liberateClientsList.getDateLiberate());
+        emias.setStartDateLiberate(liberateClientsList.getStartDateLiberate());
+        emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
+        emias.setCreateDate(new Date());
+        session.save(emias);
+        clientCardsCriteria = session.createCriteria(EMIAS.class);
+        clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
+        if (sick)
+            clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 2L));
+        else
+            clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 4L));
+        EMIAS emiasNEW;
+        try {
+            emiasNEW = (EMIAS)clientCardsCriteria.list().get(0);
+        }catch (Exception e)
+        {
+            emiasNEW = null;
+        }
+
+        assert emiasUpdated != null;
+        assert emiasNEW != null;
+        emiasUpdated.setDeletedemiasid(emiasNEW.getIdOfEMIAS());
+        emiasUpdated.setUpdateDate(new Date());
+        session.update(emiasUpdated);
+    }
+
     @SuppressWarnings("unchecked")
     public static List<Org> getOrgsByIdList(EntityManager entityManager, List<Long> idOfOrgList) {
         if (idOfOrgList.isEmpty()) return new LinkedList<Org>();
