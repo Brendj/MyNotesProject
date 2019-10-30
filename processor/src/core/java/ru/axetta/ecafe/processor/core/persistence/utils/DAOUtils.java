@@ -3758,7 +3758,7 @@ public class DAOUtils {
     public static ApplicationForFood updateApplicationForFoodWithSendToAISContingent(Session session, ApplicationForFood applicationForFood,
             ApplicationForFoodStatus status, Long version, Long historyVersion) throws Exception {
         applicationForFood.setSendToAISContingent(true);
-        return updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status, version, historyVersion);
+        return updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status, version, historyVersion, true);
     }
 
     public static ApplicationForFood updateApplicationForFoodWithVersion(Session session, ApplicationForFood applicationForFood,
@@ -3773,11 +3773,13 @@ public class DAOUtils {
     }
 
     public static ApplicationForFood updateApplicationForFoodWithVersionHistorySafe(Session session, ApplicationForFood applicationForFood,
-            ApplicationForFoodStatus status, Long version, Long historyVersion) throws Exception {
-        applicationForFood.setStatus(status);
-        applicationForFood.setVersion(version);
-        applicationForFood.setLastUpdate(new Date());
-        session.update(applicationForFood);
+            ApplicationForFoodStatus status, Long version, Long historyVersion, boolean updateParent) throws Exception {
+        if (updateParent) {
+            applicationForFood.setStatus(status);
+            applicationForFood.setVersion(version);
+            applicationForFood.setLastUpdate(new Date());
+            session.update(applicationForFood);
+        }
 
         addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood, status, historyVersion);
         return applicationForFood;
