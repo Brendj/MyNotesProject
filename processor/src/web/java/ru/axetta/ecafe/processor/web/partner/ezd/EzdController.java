@@ -520,8 +520,8 @@ public class EzdController {
                                 dateNotWorksFromARM.add(requestsEzdSpecialDateView);
                                 countBadday--;
                             }
-                            startDate = CalendarUtils.addOneDay(startDate);
                         }
+                        startDate = CalendarUtils.addOneDay(startDate);
                     } while (countBadday != 0);
                 }
 
