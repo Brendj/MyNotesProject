@@ -311,7 +311,7 @@ public class Manager implements AbstractToElement {
                 List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory, doSyncClass);
                 if (doSyncClass.getDoClass() == ECafeSettings.class) {
                     for (DistributedObject dob : distributedObjectsList) {
-                        if (!currentResultDOList.contains(dob)) currentResultDOList.add(dob);
+                        if (!currentResultDOList.contains(dob) && ((ECafeSettings) dob).isPreOrderFeeding()) currentResultDOList.add(dob);
                     }
                 }
                 LOGGER.debug("end processDistributedObjectsList");
@@ -347,7 +347,11 @@ public class Manager implements AbstractToElement {
                 List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory,
                         doSyncClass);
                 if (doSyncClass.getDoClass() == ECafeSettings.class) {
-                    currentResultDOSet.addAll(distributedObjectsList);
+                    for (DistributedObject dob : distributedObjectsList) {
+                        if (((ECafeSettings) dob).isPreOrderFeeding()) {
+                            currentResultDOSet.add(dob);
+                        }
+                    }
                 }
                 LOGGER.debug("end processDistributedObjectsList");
                 currentDOListMap.put(doSyncClass, distributedObjectsList);
