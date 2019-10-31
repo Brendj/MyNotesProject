@@ -45,8 +45,14 @@ public class EMIASController extends HttpServlet {
                 if (liberateClientsList.getGuid() == null || liberateClientsList.getIdEventEMIAS() == null
                         || liberateClientsList.getTypeEventEMIAS() == null
                         || liberateClientsList.getDateLiberate() == null) {
-                    orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND,
-                            ResponseItem.ERROR_ARGUMENT_NOT_FOUND_MESSAGE, liberateClientsList.getIdEventEMIAS()));
+                    if (liberateClientsList.getIdEventEMIAS() == null) {
+                        orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND, ResponseItem.ERROR_ARGUMENT_NOT_FOUND_MESSAGE));
+                    }
+                    else
+                    {
+                        orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND, ResponseItem.ERROR_ARGUMENT_NOT_FOUND_MESSAGE,
+                                liberateClientsList.getIdEventEMIAS() == null ? 0L : liberateClientsList.getIdEventEMIAS()));
+                    }
                     continue;
                 }
 
@@ -62,6 +68,7 @@ public class EMIASController extends HttpServlet {
                                 || liberateClientsList.getEndDateLiberate() == null) {
                             orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND,
                                     ResponseItem.ERROR_ARGUMENT_NOT_FOUND_MESSAGE, liberateClientsList.getIdEventEMIAS()));
+                            continue;
                         }
                         DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
                         break;
