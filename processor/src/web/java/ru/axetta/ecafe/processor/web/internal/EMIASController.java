@@ -81,9 +81,11 @@ public class EMIASController extends HttpServlet {
                     case 4:
                         DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
                         break;
-                    default:
+                    default: {
                         orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_EVENT_NOT_FOUND,
                                 ResponseItem.ERROR_EVENT_NOT_FOUND_MESSAGE, liberateClientsList.getIdEventEMIAS()));
+                        continue;
+                    }
                 }
                 orgSummaryResults.add(new OrgSummaryResult(ResponseItem.OK,
                         ResponseItem.OK_MESSAGE_2, liberateClientsList.getIdEventEMIAS()));
