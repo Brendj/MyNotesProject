@@ -1597,36 +1597,21 @@
   <component name="dataSourceStorageLocal">
     <data-source name="Moscow Stand VM" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>amoscow.public</schema-pattern>
-      <default-schemas>amoscow.public</default-schemas>
     </data-source>
     <data-source name="Kazan Stand VM" uuid="f29aa7e6-4670-495a-8741-1713d2cee403">
       <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>akazan.public</schema-pattern>
-      <default-schemas>akazan.public</default-schemas>
     </data-source>
     <data-source name="Local MoscowDB" uuid="cedfba61-0f44-4ced-9708-18045311d229">
       <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>moscow.public</schema-pattern>
-      <default-schemas>moscow.public</default-schemas>
     </data-source>
     <data-source name="Local Stand Data Source" uuid="225e21f8-d312-4780-aa94-b5ee2ffc7bbc">
       <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
     </data-source>
     <data-source name="SPB Data Base Source" uuid="c480fc0c-b222-491f-845b-ef25d1401d9a">
       <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>aspb.public</schema-pattern>
     </data-source>
     <data-source name="Moscow Last" uuid="0e6b978e-3b8a-493b-86b2-bb312f07eec8">
       <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>moscow_15_09_24.public</schema-pattern>
-      <default-schemas>moscow_15_09_24.public</default-schemas>
     </data-source>
   </component>
   <component name="ideadoc.IdeaDocConfigurationGUI">

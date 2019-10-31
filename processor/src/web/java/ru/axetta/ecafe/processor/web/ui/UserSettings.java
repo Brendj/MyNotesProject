@@ -111,6 +111,7 @@ public class UserSettings extends BasicWorkspacePage implements OrgListSelectPag
                 if(changePassword){
                     if(checkPasswordInfo(plainPassword, plainPasswordConfirmation)){
                         currUser.setPassword(plainPassword);
+                        currUser.setSmsCodeGenerateDate(null);
                     } else {
                         return false;
                     }

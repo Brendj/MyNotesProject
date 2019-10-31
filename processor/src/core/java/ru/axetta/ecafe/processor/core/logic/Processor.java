@@ -873,8 +873,8 @@ public class Processor implements SyncProcessor {
 
         try {
             OrgSettingsRequest orgSettingsRequest = request.getOrgSettingsRequest();
-            orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
             if (orgSettingsRequest != null) {
+                orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
                 orgSettingSection = processOrgSettings(orgSettingsRequest);
             }
         } catch (Exception e) {
@@ -5264,7 +5264,7 @@ public class Processor implements SyncProcessor {
                             clientFromEnterEvent == null ? null : clientFromEnterEvent.getIdOfClientGroup());
                     persistenceSession.save(enterEvent);
 
-                    if(RuntimeContext.RegistryType.isSpb() && ScudManager.isOn()){
+                    if(RuntimeContext.RegistryType.isSpb() && ScudManager.serviceIsWork){
                         DAOUtils.createEnterEventsSendInfo(enterEvent, persistenceSession);
                     }
                     if(GeoplanerManager.isOn() && enterEventOwnerHaveSmartWatch(persistenceSession, enterEvent)){
@@ -6427,8 +6427,8 @@ public class Processor implements SyncProcessor {
 
         try {
             OrgSettingsRequest orgSettingsRequest = request.getOrgSettingsRequest();
-            orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
             if (orgSettingsRequest != null) {
+                orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
                 orgSetting = processOrgSettings(orgSettingsRequest);
             }
         } catch (Exception e) {

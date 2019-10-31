@@ -179,7 +179,15 @@ public class RegularPaymentSubscriptionService {
     private PaymentResponse sendSubscriptionRequest(Long subscriptionId, IRequestOperation operation) {
         MfrRequest mfrRequest = operation.createRequest(subscriptionId);
         Map<String, String> params = operation.getRequestParams(mfrRequest);
-        PaymentResponse paymentResponse = sendRequest(mfrRequest.getRequestUrl(), params);
+        int attempt = 1;
+        boolean do_break = false;
+        PaymentResponse paymentResponse = null;
+        while (attempt < 4 && !do_break) {
+            logger.info(String.format("Attempt %s sending request to MFR", attempt));
+            paymentResponse = sendRequest(mfrRequest.getRequestUrl(), params);
+            do_break = (paymentResponse == null) ? false : (paymentResponse.getStatusCode() == HttpStatus.SC_OK);
+            attempt++;
+        }
         operation.processResponse(mfrRequest.getIdOfRequest(), paymentResponse);
         return paymentResponse;
     }

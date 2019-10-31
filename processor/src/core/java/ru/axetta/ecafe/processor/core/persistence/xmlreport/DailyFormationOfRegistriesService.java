@@ -26,7 +26,7 @@ import java.util.Set;
  * Date: 02.12.14
  * Time: 13:25
  */
-
+@Deprecated
 public class DailyFormationOfRegistriesService {
 
     // метод выбора контрагентов ТСП

@@ -33,6 +33,7 @@
                             <div align="center">
                                 <h:outputText value="Сервис отправки СМС не доступен. Попробуйте позже" styleClass="output-text" />
                             </div>
+                            <a4j:commandLink id="eer-iiop" value="Назад" action="#{mainPage.logout}" styleClass="command-link" oncomplete="window.location.href='/processor/back-office/index.faces'"/>
                         </h:panelGrid>
                     </rich:panel>
                     </a4j:form>
