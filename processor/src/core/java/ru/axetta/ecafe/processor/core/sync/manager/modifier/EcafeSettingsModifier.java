@@ -37,6 +37,7 @@ public class EcafeSettingsModifier extends CommonModifier {
             persistenceSession.update(currentDO);
             distributedObject.setGlobalVersion(currentMaxVersion);
             distributedObject.setTagName("M");
+            distributedObject.fill(currentDO);
         } else {
             //для остальных типов ECafeSettings стандартная логика + доп по OrgSetting
             super.modifyDO(persistenceSession, distributedObject, currentMaxVersion, currentDO, idOfOrg, conflictDocument);

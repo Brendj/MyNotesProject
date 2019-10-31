@@ -309,6 +309,11 @@ public class Manager implements AbstractToElement {
                 resultDOMap.put(doSyncClass, currentResultDOList);
                 LOGGER.debug("init processDistributedObjectsList");
                 List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory, doSyncClass);
+                if (doSyncClass.getDoClass() == ECafeSettings.class) {
+                    for (DistributedObject dob : distributedObjectsList) {
+                        if (!currentResultDOList.contains(dob)) currentResultDOList.add(dob);
+                    }
+                }
                 LOGGER.debug("end processDistributedObjectsList");
                 currentDOListMap.put(doSyncClass, distributedObjectsList);
                 LOGGER.debug("init addConfirms");
@@ -341,6 +346,9 @@ public class Manager implements AbstractToElement {
                 LOGGER.debug("init processDistributedObjectsList");
                 List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory,
                         doSyncClass);
+                if (doSyncClass.getDoClass() == ECafeSettings.class) {
+                    currentResultDOSet.addAll(distributedObjectsList);
+                }
                 LOGGER.debug("end processDistributedObjectsList");
                 currentDOListMap.put(doSyncClass, distributedObjectsList);
                 resultDOMap.put(doSyncClass,  new ArrayList<DistributedObject>(currentResultDOSet));
