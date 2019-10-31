@@ -15,6 +15,10 @@ public class CoverageNutritionDynamicBean implements DynamicBean {
 
     public static final Pattern classesPattern = Pattern.compile("(\\d{1,2}-\\d{1,2})");
 
+    public static final String TOTAL_STUDENTS = "TOTAL_STUDENTS";
+    public static final String TOTAL_ALL = "TOTAL_ALL";
+    public static final String TOTAL_EMPLOYEE = "TOTAL_EMPLOYEE";
+
     public static final String CLIENTS_COUNT = "кол-во покупателей";
     public static final String ORDERS_COUNT = "кол-во комплексов";
     public static final String PERCENTAGE_OF_UNIQUE_CLIENTS = "% уникальных покупателей";
@@ -25,6 +29,7 @@ public class CoverageNutritionDynamicBean implements DynamicBean {
     public static final String MENU_TYPE_BUFFET = "Буфет";
 
     public static final String BUFFET_CLIENTS_COUNT = "кол-во уникальных покупателей буфета %s%s классы";
+    public static final String BUFFET_CLIENTS_COUNT_WITHOUT_CLASSES = "кол-во уникальных покупателей буфета";
     public static final String BUFFET_ORDERS_COUNT = "кол-во проданной продукции";
     public static final String BUFFET_HOT = "горячее";
     public static final String BUFFET_PAID = "покупная";
@@ -44,8 +49,8 @@ public class CoverageNutritionDynamicBean implements DynamicBean {
 
     public static final String EMPLOYEES_TITLE = "Сотрудники";
     public static final String EMPLOYEES_COMPLEXES = "Комплексы";
-    public static final String EMPLOYEES_COMPLEXES_SUBTITLE = "количество по всем видам комлексов";
-    public static final String EMPLOYEES_BUIFFET_SUBTITLE = "количество по всем видам буфета";
+    public static final String EMPLOYEES_COMPLEXES_SUBTITLE = "количество уникальных покупателей по всем видам комлексов";
+    public static final String EMPLOYEES_BUIFFET_SUBTITLE = "количество уникальных покупателей по всем видам буфета";
     public static final String EMPLOYEES_COMPLEXES_AND_BUFFET = "Комплексы + буфет";
     public static final String EMPLOYEES_COMPLEXES_AND_BUFFET_SUBTITLE = "итого";
     public static final String EMPLOYEES_PERCCENTAGE_OF_ACTIVE = "% активных сотрудников";

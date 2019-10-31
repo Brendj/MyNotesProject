@@ -13,7 +13,7 @@ import java.util.Set;
  * Date: 09.12.14
  * Time: 13:38
  */
-
+@Deprecated
 public class DailyFormationRegistries {
 
     /**

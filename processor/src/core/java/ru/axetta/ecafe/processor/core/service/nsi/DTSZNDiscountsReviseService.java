@@ -41,8 +41,8 @@ import javax.xml.bind.DatatypeConverter;
 import java.net.ConnectException;
 import java.net.URL;
 import java.nio.charset.Charset;
-import java.util.Calendar;
 import java.util.*;
+import java.util.Calendar;
 
 @Component
 public class DTSZNDiscountsReviseService {
@@ -609,41 +609,37 @@ public class DTSZNDiscountsReviseService {
 
                     LinkedList<ETPMVScheduledStatus> statusList = new LinkedList<ETPMVScheduledStatus>();
                     //7705
+                    ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED, null);
                     applicationForFood = DAOUtils
                             .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
-                                    new ApplicationForFoodStatus(ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED,
-                                            null), applicationVersion, historyVersion);
+                                    status, applicationVersion, historyVersion, false);
                     statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
-                            applicationForFood.getStatus().getApplicationForFoodState(),
-                            applicationForFood.getStatus().getDeclineReason()));
+                            status.getApplicationForFoodState(), status.getDeclineReason()));
                     if (isDiscountOk) {
                         //1052
+                        status = new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null);
                         applicationForFood = DAOUtils
                                 .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
-                                        new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null),
-                                        applicationVersion, historyVersion);
+                                        status, applicationVersion, historyVersion, false);
                         statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
-                                applicationForFood.getStatus().getApplicationForFoodState(),
-                                applicationForFood.getStatus().getDeclineReason()));
+                                status.getApplicationForFoodState(), status.getDeclineReason()));
 
                         //1075
+                        status = new ApplicationForFoodStatus(ApplicationForFoodState.OK, null);
                         applicationForFood = DAOUtils
                                 .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
-                                        new ApplicationForFoodStatus(ApplicationForFoodState.OK, null),
-                                        applicationVersion, historyVersion);
+                                        status, applicationVersion, historyVersion, true);
                         statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
-                                applicationForFood.getStatus().getApplicationForFoodState(),
-                                applicationForFood.getStatus().getDeclineReason()));
+                                status.getApplicationForFoodState(), status.getDeclineReason()));
                     } else {
                         //1080.3
+                        status = new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
+                                ApplicationForFoodDeclineReason.INFORMATION_CONFLICT);
                         applicationForFood = DAOUtils
                                 .updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood,
-                                        new ApplicationForFoodStatus(ApplicationForFoodState.DENIED,
-                                                ApplicationForFoodDeclineReason.INFORMATION_CONFLICT),
-                                        applicationVersion, historyVersion);
+                                        status, applicationVersion, historyVersion, true);
                         statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
-                                applicationForFood.getStatus().getApplicationForFoodState(),
-                                applicationForFood.getStatus().getDeclineReason()));
+                                status.getApplicationForFoodState(), status.getDeclineReason()));
                     }
                     logger.info(String.format("Application with number updated to %s ClientDtisznDiscountInfo{status = %s, dateStart = %s, dateEnd = %s}",
                             isDiscountOk ? "ok" : "denied", info.getStatus().toString(), info.getDateStart().toString(), info.getDateEnd().toString()));
@@ -902,6 +898,17 @@ public class DTSZNDiscountsReviseService {
         runTaskDB(null);
     }
 
+    private boolean isStudent(Client client) {
+        if (client == null) return false;
+        try {
+            return client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                    || client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
+        } catch (Exception e) {
+            logger.error("Error in isStudent method: ", e);
+            return false;
+        }
+    }
+
     public void runTaskDB(String guid) throws Exception {
         ReviseDAOService.DiscountItemsWithTimestamp discountItemList;
 
@@ -938,7 +945,7 @@ public class DTSZNDiscountsReviseService {
                     transaction = session.beginTransaction();
                 }
                 Client client = DAOUtils.findClientByGuid(session, item.getRegistryGUID());
-                if (null == client) {
+                if (null == client || !isStudent(client)) {
                     //logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
                     if (0 == counter++ % maxRecords) {
                         transaction.commit();

@@ -39,7 +39,7 @@
         <h:outputText escape="true" value="Агент по приему платежей" styleClass="output-text required-field" />
         <h:panelGroup styleClass="borderless-div">
             <a4j:commandButton value="..."
-                               action="#{mainPage.contragentPaymentReportPage.showContragentSelectPageOwn(false)}"
+                               action="#{mainPage.showContragentSelectPageOwn(false)}"
                                reRender="modalContragentListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
@@ -52,7 +52,7 @@
         <h:outputText escape="true" value="Контрагент-получатель" styleClass="output-text required-field" />
         <h:panelGroup styleClass="borderless-div">
             <a4j:commandButton value="..."
-                               action="#{mainPage.contragentPaymentReportPage.showContragentSelectPageOwn(true)}"
+                               action="#{mainPage.showContragentSelectPageOwn(true)}"
                                reRender="modalContragentListSelectorPanel, orgPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">

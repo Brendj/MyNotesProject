@@ -56,10 +56,10 @@ public class CardReadOnlyRepository extends BaseJpaDao {
         return query.getResultList();
     }
 
-    public List<Card> findAllFreeByOrg(long idOfOrg){
+    public List<Card> findAllFreeByOrg(List<Long> idOfOrgs){
         Query query = entityManager
-                .createQuery("from Card c where c.org.idOfOrg=:idOfOrg and c.state = :freeState ", Card.class)
-                .setParameter("idOfOrg",idOfOrg).setParameter("freeState", CardState.FREE.getValue());
+                .createQuery("from Card c where c.org.idOfOrg in :idOfOrgs and c.state = :freeState ", Card.class)
+                .setParameter("idOfOrgs",idOfOrgs).setParameter("freeState", CardState.FREE.getValue());
         return query.getResultList();
     }
 

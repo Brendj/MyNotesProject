@@ -45,9 +45,19 @@ public class User {
     private static final String PASS_SPECIAL_SYMBOLS = "0123456789[]{},.<>;:|\\/?!`~@#$%^&*()-_=+";
     private static final int MIN_PASSWORD_LENGTH = 6;
 
+    private static boolean successfullySendEMP = false;
+
     protected static Logger logger;
     static {
         try {  logger = LoggerFactory.getLogger(User.class); } catch (Throwable ignored) {}
+    }
+
+    public static boolean isSuccessfullySendEMP() {
+        return successfullySendEMP;
+    }
+
+    public static void setSuccessfullySendEMP(boolean successfullySendEMP) {
+        User.successfullySendEMP = successfullySendEMP;
     }
 
     public String getLastSmsCode() {
@@ -537,27 +547,34 @@ public class User {
             needRegenerateCode = true;
         }
         if (needRegenerateCode) {
-            requestSmsCode(userName);
+            logger.info(String.format("Start of sending SMS code for the user %s", userName));
+            setSuccessfullySendEMP(requestSmsCode(userName));
+            logger.info(String.format("End of sending SMS code for the user %s", userName));
             return true;
         }
         if (user.getSmsCodeEnterDate() == null) {
+            //Если не пробовали достучаться до ЕМП, то считаем, что получилось
+            setSuccessfullySendEMP(true);
             return true;
         }
 
         if (CalendarUtils.getDifferenceInDays(user.getSmsCodeEnterDate(), new Date(System.currentTimeMillis())) < days) {
             return false;
         } else {
+            //Если не пробовали достучаться до ЕМП, то считаем, что получилось
+            setSuccessfullySendEMP(true);
             return true;
         }
     }
 
-    public static void requestSmsCode(String userName) throws Exception {
+    public static boolean requestSmsCode(String userName) throws Exception {
         User user = DAOService.getInstance().findUserByUserName(userName);
         if (user == null) {
+            logger.error(String.format("Cannot find user %s", userName));
             throw new Exception(String.format("Cannot find user %s", userName));
         }
         String code = ProcessorUtils.generateSmsCode();
-
+        logger.info(String.format("Code generated successfully for user %s", userName));
         /*Client fakeClient = createFakeClient(user.getPhone());
         RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                 .sendMessageAsync(fakeClient, EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED,
@@ -568,8 +585,11 @@ public class User {
             user.setSmsCodeEnterDate(null);
             user.setSmsCodeGenerateDate(new Date(System.currentTimeMillis()));
             DAOService.getInstance().setUserInfo(user);
+            logger.info(String.format("User %s data updated", userName));
+            return true;
         } else {
-            throw new Exception(String.format("Ошибка при отправке СМС-сообщения. Ответ сервиса: %s", errCode));
+            logger.error(String.format("Error sending SMS message. Service response:%s", errCode));
+            return false;
         }
     }
 
@@ -595,10 +615,11 @@ public class User {
                 .createUserEditRecord(SecurityJournalAuthenticate.EventType.GENERATE_SMS, request.getRemoteAddr(),
                         user.getUserName(), user, true, null, comment);
         DAOService.getInstance().writeAuthJournalRecord(record);
+        logger.info("Successfully created a record in the database about the user login");
         if (RuntimeContext.getInstance().getSmsUserCodeSender() != null) {
             return RuntimeContext.getInstance().getSmsUserCodeSender().sendCodeAndGetError(user, code);
         }
-        return "В системе не определен сервис отправки смс";
+        return "SMS sending service is not defined in the system";
     }
 
 

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -312,7 +313,7 @@ public class FinancialOpsManager {
                     idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
             registerSubBalance1ClientPayment(session, clientPayment);
         }
-
+        runtimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).savePayment(session, clientPayment);
         return clientPayment;
     }
 

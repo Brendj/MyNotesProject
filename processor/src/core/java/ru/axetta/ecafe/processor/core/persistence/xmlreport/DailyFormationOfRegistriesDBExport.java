@@ -24,7 +24,7 @@ import java.util.Set;
  * Date: 10.12.14
  * Time: 15:33
  */
-
+@Deprecated
 public class DailyFormationOfRegistriesDBExport {
 
     private static final Logger logger = LoggerFactory.getLogger(DailyFormationOfRegistriesDBExport.class);

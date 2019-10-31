@@ -27,7 +27,7 @@ import java.util.List;
  * Date: 08.12.14
  * Time: 15:01
  */
-
+@Deprecated
 public class XmlReportGenerator {
 
     public XmlReportGenerator() {

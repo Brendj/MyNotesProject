@@ -480,7 +480,7 @@ public class DAOUtils {
         return (Card) persistenceSession.get(Card.class, idOfCard);
     }
 
-    public static Card findCardByCardNo(Session persistenceSession, long cardNo) {
+    public static Card findCardByCardNo(Session persistenceSession, Long cardNo) {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
@@ -3482,10 +3482,7 @@ public class DAOUtils {
         try {
             if(!EnterEventSendInfo.VALID_ENTER_CODES.contains(enterEvent.getPassDirection()) &&
                     !EnterEventSendInfo.VALID_EXIT_CODES.contains(enterEvent.getPassDirection())){
-                logger.debug("EnterEvent record EVT Time: " + enterEvent.getEvtDateTime()
-                        + " ORG: " + enterEvent.getOrg().getIdOfOrg()
-                        + " have PassDirection: " + enterEvent.getPassDirection()
-                );
+                // save only specific enterEvents
                 return;
             }
             Card card = enterEvent.getIdOfCard() == null ? null : findCardByCardNo(session, enterEvent.getIdOfCard());
@@ -3506,7 +3503,11 @@ public class DAOUtils {
             enterEventSendInfo.setEnterEvent(enterEvent);
             session.save(enterEventSendInfo);
         } catch (Exception e){
-            logger.error("Save EnterEventSendInfo to database error: ", e);
+            Long idOfOrg = enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg();
+            Long idOfClient = enterEvent.getClient() == null ? null : enterEvent.getClient().getIdOfClient();
+            Long cardNo = enterEvent.getIdOfCard();
+            logger.error(String.format("Can't save EnterEventsSendInfo (IdOfOrg: %d IdOfClient: %d CardNo: %d) in DB: ",
+                    idOfOrg, idOfClient, cardNo), e);
         }
     }
 
@@ -3757,7 +3758,7 @@ public class DAOUtils {
     public static ApplicationForFood updateApplicationForFoodWithSendToAISContingent(Session session, ApplicationForFood applicationForFood,
             ApplicationForFoodStatus status, Long version, Long historyVersion) throws Exception {
         applicationForFood.setSendToAISContingent(true);
-        return updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status, version, historyVersion);
+        return updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status, version, historyVersion, true);
     }
 
     public static ApplicationForFood updateApplicationForFoodWithVersion(Session session, ApplicationForFood applicationForFood,
@@ -3772,11 +3773,13 @@ public class DAOUtils {
     }
 
     public static ApplicationForFood updateApplicationForFoodWithVersionHistorySafe(Session session, ApplicationForFood applicationForFood,
-            ApplicationForFoodStatus status, Long version, Long historyVersion) throws Exception {
-        applicationForFood.setStatus(status);
-        applicationForFood.setVersion(version);
-        applicationForFood.setLastUpdate(new Date());
-        session.update(applicationForFood);
+            ApplicationForFoodStatus status, Long version, Long historyVersion, boolean updateParent) throws Exception {
+        if (updateParent) {
+            applicationForFood.setStatus(status);
+            applicationForFood.setVersion(version);
+            applicationForFood.setLastUpdate(new Date());
+            session.update(applicationForFood);
+        }
 
         addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood, status, historyVersion);
         return applicationForFood;

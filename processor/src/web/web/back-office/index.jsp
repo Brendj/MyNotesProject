@@ -10,7 +10,14 @@
 <%
     try {
         if (StringUtils.isNotEmpty(request.getRemoteUser()) && User.needEnterSmsCode(request.getRemoteUser())) {
-            String mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces");
+            String mainPage;
+            if (User.isSuccessfullySendEMP()) {
+                mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces");
+            }
+            else
+            {
+                mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/emp_server_not_answer.faces");
+            }
             response.sendRedirect(mainPage);
             return;
         }

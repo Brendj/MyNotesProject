@@ -1523,6 +1523,29 @@ public class AutoReportGenerator {
             }
         }));
 
+        REPORT_DEFS.add(new ReportDef(DetailedEnterEventReport.class, DetailedEnterEventReport.AutoReportBuildJob.class, new JobDetailCreator() {
+            public JobDetail createJobDetail(AutoReportGenerator autoReportGenerator, String jobId, String jobName) throws Exception {
+                Class jobClass = BasicReportJob.AutoReportBuildJob.class;
+                // файл шаблона отчета по умолчанию: путь к шаблонам + имя класса + ".jasper"
+                String reportTemplate = autoReportGenerator.getReportsTemplateFilePath() + DetailedEnterEventReport.class.getSimpleName() + ".jasper";
+
+                BasicReportJob.AutoReportBuildJob.ExecuteEnvironment executeEnvironment = new BasicReportJob.AutoReportBuildJob.ExecuteEnvironment(
+                        jobId,
+                        jobName,
+                        new DetailedEnterEventReport(),
+                        autoReportGenerator.getExecutorService(), autoReportGenerator.getSessionFactory(),
+                        autoReportGenerator.getAutoReportProcessor(), autoReportGenerator.getReportPath(),
+                        reportTemplate, (Calendar) autoReportGenerator.getCalendar().clone(),
+                        (DateFormat) autoReportGenerator.getDateFormat().clone(),
+                        (DateFormat) autoReportGenerator.getTimeFormat().clone());
+
+                JobDetail jobDetail = new JobDetail(jobId, Scheduler.DEFAULT_GROUP, jobClass);
+                jobDetail.getJobDataMap()
+                        .put(DetailedEnterEventReport.AutoReportBuildJob.ENVIRONMENT_JOB_PARAM, executeEnvironment);
+                return jobDetail;
+            }
+        }));
+
     } // static
 
 
