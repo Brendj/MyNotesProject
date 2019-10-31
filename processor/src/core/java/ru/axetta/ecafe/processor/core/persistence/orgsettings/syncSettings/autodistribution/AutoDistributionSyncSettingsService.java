@@ -221,7 +221,7 @@ public class AutoDistributionSyncSettingsService {
                 }
                 break;
         }
-        setting.setConcreteTime(StringUtils.join(calculationPeriods, ";"));
+        setting.setConcreteTime(StringUtils.join(calculationPeriods, SyncSetting.SEPARATOR));
 
         setting.setMonday(true);
         setting.setTuesday(true);

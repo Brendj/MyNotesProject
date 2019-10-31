@@ -1074,6 +1074,9 @@ public class Processor implements SyncProcessor {
 
         fullProcessingMenusCalendar(request, syncHistory, responseSections);
 
+        //process SyncSetting
+        fullProcessingSyncSetting(request, syncHistory, responseSections);
+
         // время окончания обработки
         Date syncEndTime = new Date();
 
@@ -6359,6 +6362,30 @@ public class Processor implements SyncProcessor {
         } catch (Exception e) {
             String message = String.format("Error when process OrgSettingSetting: %s", e.getMessage());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingSyncSetting(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {
+        SyncSettingsSection syncSettingsSection = null;
+        ResSyncSettingsSection resSyncSettingsSection = null;
+        try {
+            SyncSettingsRequest syncSettingsRequest = request.findSection(SyncSettingsRequest.class);
+            if(syncSettingsRequest != null) {
+                syncSettingsRequest.setOwner(request.getIdOfOrg());
+                SyncSettingProcessor processor = processSyncSettingRequest(syncSettingsRequest);
+                if(processor != null) {
+                    resSyncSettingsSection = processor.getResSyncSettingsSection();
+                    syncSettingsSection = processor.getSyncSettingsSection();
+                    processor = null;
+                    addToResponseSections(resSyncSettingsSection, responseSections);
+                    addToResponseSections(syncSettingsSection, responseSections);
+                }
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process SyncSettingSetting: %s", e.getMessage());
+            processorUtils
+                    .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
     }

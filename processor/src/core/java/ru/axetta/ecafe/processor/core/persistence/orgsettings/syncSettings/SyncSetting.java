@@ -9,7 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import java.util.Date;
 
 public class SyncSetting {
-    public static final String SEPARATOR = ";";
+    public static final String SEPARATOR = "; ";
 
     private Long idOfSyncSetting;
     private Org org;

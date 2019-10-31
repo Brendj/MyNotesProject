@@ -354,9 +354,15 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
                 sb.append(times);
                 sb.append("\n");
             } else if(everySecond != null) {
+                int min = everySecond / 60;
+                int sec = everySecond % 60;
                 sb.append("Каждые ");
-                sb.append(everySecond);
-                sb.append(" сек.");
+                sb.append(min);
+                sb.append(" мин. ");
+                if(sec != 0) {
+                    sb.append(sec);
+                    sb.append(" сек.");
+                }
                 if(limitStartHour != null && !(limitStartHour.equals(limitEndHour) && limitStartHour.equals(0))){
                     sb.append(" с ");
                     sb.append(limitStartHour);
@@ -365,8 +371,9 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
                     sb.append(":00");
                 }
                 sb.append("\n");
+            } else {
+                sb.append("\n");
             }
-
             sb.append(days);
             fullInf = sb.toString();
         }

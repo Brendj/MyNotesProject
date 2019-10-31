@@ -25,8 +25,9 @@
         <property name="concreteTime" column="concreteTime" type="string"/>
 
         <property name="contentType" column="contentType" not-null="true">
-            <type name="org.hibernate.type.EnumType">
+            <type name="org.hibernate.type.EnumType" >
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType</param>
+                <param name="useNamed">true</param>
             </type>
         </property>
     </class>
