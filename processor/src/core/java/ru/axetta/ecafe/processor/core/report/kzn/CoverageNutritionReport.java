@@ -859,7 +859,8 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "    when od.menutype between 50 and 99 and od.rprice > 0 then 'Платное питание' "
                     + "    when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then 'Бесплатное питание' end as foodtype, "//11
                     + "p.surname, "//12
-                    + "o.idoforder "
+                    + "o.idoforder, "
+                    + "od.idoforderdetail "
                     + "from cf_orders o "
                     + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
                     + "join cf_orgs og on o.idoforg = og.idoforg join cf_clients c on c.idofclient = o.idofclient "
@@ -1448,7 +1449,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "   case when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 1 and 4 then 'Обучающиеся 1-4 классов' "
                     + "        when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 5 and 9 then 'Обучающиеся 5-9 классов' "
                     + "        when cast(substring(cg.groupname, '(\\d{1,3})-{0,1}\\D*') as integer) between 10 and 11 then 'Обучающиеся 10-11 классов' "
-                    + "        when cg.idofclientgroup in (:clientEmployees, :clientAdministration, :clientTechEmployees, :clientEmployeesOtherOrg) then 'Сотрудники' "
+                    + "        when cg.idofclientgroup in (:clientEmployees, :clientAdministration, :clientTechEmployees, :clientEmployeesOtherOrg) or cg.groupname = 'Сотрудники' then 'Сотрудники' "
                     + "        else 'Обучающиеся другие группы' end as gr "
                     + "from cf_orders o "
                     + "join cf_orderdetails od on od.idoforder = o.idoforder and od.idoforg = o.idoforg "
