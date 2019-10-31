@@ -13,6 +13,7 @@ public class LiberateClientsList {
     private Date dateLiberate;
     private Date startDateLiberate;
     private Date endDateLiberate;
+    private Long idEventCancelEMIAS;
 
     public String getGuid() {
         return guid;
@@ -60,5 +61,13 @@ public class LiberateClientsList {
 
     public void setEndDateLiberate(Date endDateLiberate) {
         this.endDateLiberate = endDateLiberate;
+    }
+
+    public Long getIdEventCancelEMIAS() {
+        return idEventCancelEMIAS;
+    }
+
+    public void setIdEventCancelEMIAS(Long idEventCancelEMIAS) {
+        this.idEventCancelEMIAS = idEventCancelEMIAS;
     }
 }

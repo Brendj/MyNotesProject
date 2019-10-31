@@ -14,7 +14,11 @@ import java.io.Serializable;
 public class ResponseItem implements Serializable {
 
     public static final int OK = 0;
+    public static final int ERROR_INTERNAL_EMIAS = 100;
     public static final int ERROR_ORG_NOT_FOUND = 110;
+    public static final int ERROR_CLIENT_NOT_FOUND_EMIAS = 110;
+    public static final int ERROR_ARGUMENT_NOT_FOUND = 150;
+    public static final int ERROR_EVENT_NOT_FOUND = 160;
     public static final int ERROR_DUPLICATE = 160;
     public static final int ERROR_INTERNAL = 170;
     public static final int ERROR_SIGN_VERIFY = 180;
@@ -30,9 +34,14 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_ORGANIZATION_NOT_FOUND = 440;
     public static final int ERROR_CLIENT_ALREADY_EXIST = 450;
     public static final String OK_MESSAGE = "Ok.";
+    public static final String OK_MESSAGE_2 = "Успешно";
     public static final String ERROR_ORG_NOT_FOUND_MESSAGE = "Организация не найдена";
+    public static final String ERROR_EVENT_NOT_FOUND_MESSAGE = "Некорректный тип события";
+    public static final String ERROR_ARGUMENT_NOT_FOUND_MESSAGE = "Не заполнены обязательные поля";
+    public static final String ERROR_CLIENT_NOT_FOUND_MESSAGE_EMIAS = "Клиент не найден";
     public static final String ERROR_DUPLICATE_CARD_MESSAGE = "Данная карта уже зарегистрирована.";
     public static final String ERROR_INTERNAL_MESSAGE = "Внутренняя ошибка приложения.";
+    public static final String ERROR_INTERNAL_MESSAGE_EMIAS = "Внутренняя ошибка";
     public static final String ERROR_SIGN_VERIFY_MESSAGE = "Не пройдена проверка цифровой подписи";
     public static final String ERROR_INVALID_TYPE_MESSAGE = "Неизвестный тип карты";
     public static final String ERROR_AUTHENTICATION_FAILED_MESSAGE = "Неверные учетные данные пользователя";

@@ -18,6 +18,7 @@ import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.servlet.http.HttpServlet;
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -29,10 +30,9 @@ public class EMIASController extends HttpServlet {
     private final Logger logger = LoggerFactory.getLogger(EMIASController.class);
 
     @WebMethod(operationName = "getLiberateClientsList")
-    public ResponseItem getLiberateClientsList(
+    public List<OrgSummaryResult> getLiberateClientsList(
             @WebParam(name = "LiberateClientsList") List<LiberateClientsList> liberateClientsLists) {
-
-
+        List<OrgSummaryResult> orgSummaryResults = new ArrayList<>();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -41,30 +41,59 @@ public class EMIASController extends HttpServlet {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             for (LiberateClientsList liberateClientsList : liberateClientsLists) {
+
+                if (liberateClientsList.getGuid() == null || liberateClientsList.getIdEventEMIAS() == null
+                        || liberateClientsList.getTypeEventEMIAS() == null
+                        || liberateClientsList.getDateLiberate() == null) {
+                    orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND,
+                            ResponseItem.ERROR_ARGUMENT_NOT_FOUND_MESSAGE, liberateClientsList.getIdEventEMIAS()));
+                    continue;
+                }
+
+                if (DAOUtils.findClientByGuid(persistenceSession, liberateClientsList.getGuid()) == null) {
+                    orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_CLIENT_NOT_FOUND_EMIAS,
+                            ResponseItem.ERROR_CLIENT_NOT_FOUND_MESSAGE_EMIAS, liberateClientsList.getIdEventEMIAS()));
+                    continue;
+                }
+
                 switch (liberateClientsList.getTypeEventEMIAS().intValue()) {
                     case 1://создание освобождения (в том числе продление освобождения)
+                        if (liberateClientsList.getStartDateLiberate() == null
+                                || liberateClientsList.getEndDateLiberate() == null) {
+                            orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND,
+                                    ResponseItem.ERROR_ARGUMENT_NOT_FOUND_MESSAGE, liberateClientsList.getIdEventEMIAS()));
+                        }
                         DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
                         break;
                     case 2:
-                        DAOUtils.updateEMIAS(persistenceSession, liberateClientsList, true);
+                        DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
                         break;
                     case 3:
                         DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
                         break;
                     case 4:
-                        DAOUtils.updateEMIAS(persistenceSession, liberateClientsList, false);
+                        DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
                         break;
+                    default:
+                        orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_EVENT_NOT_FOUND,
+                                ResponseItem.ERROR_EVENT_NOT_FOUND_MESSAGE, liberateClientsList.getIdEventEMIAS()));
                 }
+                orgSummaryResults.add(new OrgSummaryResult(ResponseItem.OK,
+                        ResponseItem.OK_MESSAGE_2, liberateClientsList.getIdEventEMIAS()));
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
 
         } catch (Exception e) {
             logger.error("Ошибка при сохранении данных для ЕМИАС", e);
+            orgSummaryResults.clear();
+            orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_INTERNAL_EMIAS,
+                    ResponseItem.ERROR_INTERNAL_MESSAGE_EMIAS));
+            return orgSummaryResults;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return new ResponseItem(ResponseItem.ERROR_INTERNAL, ResponseItem.ERROR_INTERNAL_MESSAGE);
+        return orgSummaryResults;
     }
 }

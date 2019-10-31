@@ -1747,13 +1747,13 @@ public class DAOUtils {
         session.save(emias);
     }
 
-    public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList, boolean sick) {
+    public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList) {
         Criteria clientCardsCriteria = session.createCriteria(EMIAS.class);
-        clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
-        if (sick)
-            clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 1L));
-        else
-            clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 3L));
+        clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventCancelEMIAS()));
+        //if (sick)
+        //    clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 1L));
+        //else
+        //    clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 3L));
         EMIAS emiasUpdated;
         try {
             emiasUpdated = (EMIAS)clientCardsCriteria.list().get(0);
@@ -1773,10 +1773,10 @@ public class DAOUtils {
         session.save(emias);
         clientCardsCriteria = session.createCriteria(EMIAS.class);
         clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
-        if (sick)
-            clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 2L));
-        else
-            clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 4L));
+        //if (sick)
+        //    clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 2L));
+        //else
+        //    clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 4L));
         EMIAS emiasNEW;
         try {
             emiasNEW = (EMIAS)clientCardsCriteria.list().get(0);
@@ -1785,11 +1785,11 @@ public class DAOUtils {
             emiasNEW = null;
         }
 
-        assert emiasUpdated != null;
-        assert emiasNEW != null;
-        emiasUpdated.setDeletedemiasid(emiasNEW.getIdOfEMIAS());
-        emiasUpdated.setUpdateDate(new Date());
-        session.update(emiasUpdated);
+        if (emiasUpdated != null && emiasNEW != null) {
+            emiasUpdated.setDeletedemiasid(emiasNEW.getIdOfEMIAS());
+            emiasUpdated.setUpdateDate(new Date());
+            session.update(emiasUpdated);
+        }
     }
 
     @SuppressWarnings("unchecked")
