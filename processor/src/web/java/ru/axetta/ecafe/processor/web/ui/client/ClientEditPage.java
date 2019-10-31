@@ -933,7 +933,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 }
             }
             runtimeContext.getProcessor().disableClientCardsIfChangeOrg(client, orgSet, org.getIdOfOrg());
-            archiveApplicationForFoodWithoutDiscount(client,persistenceSession);
+            archiveApplicationForFoodWithoutDiscount(client, persistenceSession);
         }
         ClientManager.checkUserOPFlag(persistenceSession, client.getOrg(), org, this.idOfClientGroup, client);
         client.setOrg(org);

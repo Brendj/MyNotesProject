@@ -2194,8 +2194,13 @@ public class ClientManager {
     }
 
     public static boolean isEligibleToDelete(Session session, ApplicationForFood item) {
-        CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils
-                .getCategoryDiscountDSZNByDSZNCode(session, item.getDtisznCode());
+        CategoryDiscountDSZN categoryDiscountDSZN;
+        if (item.getDtisznCode() == null) {
+            ///для льготы Иное
+            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, 0L);
+        } else {
+            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, item.getDtisznCode());
+        }
         return categoryDiscountDSZN.getCategoryDiscount().getEligibleToDelete();
     }
 }
