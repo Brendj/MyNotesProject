@@ -49,6 +49,7 @@ public class SyncSettingManager {
                     item.getFriday(), item.getSaturday(), item.getSunday(), item.getDeleteState(), nextVersion, syncData, session);
 
             result.setResult(ProcessResultEnum.OK);
+            result.setVersion(nextVersion);
         } catch (SyncProcessException e){
             logger.error(String.format("Can't change in DB SyncSetting with ContentType %d for IdOfOrg %d",
                     item.getContentType(), currentSetting.getOrg().getIdOfOrg()), e);
