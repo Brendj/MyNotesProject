@@ -28,6 +28,7 @@
             <type name="org.hibernate.type.EnumType" >
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType</param>
                 <param name="useNamed">true</param>
+                <param name="type">12</param>
             </type>
         </property>
     </class>
