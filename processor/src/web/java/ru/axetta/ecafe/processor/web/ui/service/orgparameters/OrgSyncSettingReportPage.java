@@ -4,12 +4,18 @@
 
 package ru.axetta.ecafe.processor.web.ui.service.orgparameters;
 
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSettingManager;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.autodistribution.AutoDistributionSyncSettingsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSyncSettingReport;
 import ru.axetta.ecafe.processor.core.report.orgparameters.OrgSyncSettingReportItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -25,7 +31,10 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -142,27 +151,24 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     }
 
     public void buildXLS(){
-        /*RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
         try {
             startDate = new Date();
 
-            OrgSettingsReport.Builder builder = new OrgSettingsReport.Builder();
-
-            builder.getReportProperties().setProperty(OrgSettingsReport.Builder.LIST_OF_ORG_IDS_PARAM, getGetStringIdOfOrgList());
-            builder.getReportProperties().setProperty(OrgSettingsReport.Builder.SELECTED_STATUS_PARAM, status.toString());
-            builder.getReportProperties().setProperty(OrgSettingsReport.Builder.SELECTED_DISTRICT_PARAM, selectedDistricts);
-            builder.getReportProperties().setProperty(OrgSettingsReport.Builder.SHOW_REQUISITE, showRequisite.toString());
-            builder.getReportProperties().setProperty(OrgSettingsReport.Builder.SHOW_FEEDING_SETTINGS, showFeedingSettings.toString());
-            builder.getReportProperties().setProperty(OrgSettingsReport.Builder.SHOW_CARD_SETTINGS, showCardSettings.toString());
-            builder.getReportProperties().setProperty(OrgSettingsReport.Builder.SHOW_OTHER_SETTINGS, showOtherSetting.toString());
-            builder.getReportProperties().setProperty(OrgSettingsReport.Builder.ALL_FRIENDLY_ORGS, allFriendlyOrgs.toString());
+            OrgSyncSettingReport.Builder builder = new OrgSyncSettingReport.Builder();
+            builder.getReportProperties().setProperty(OrgSyncSettingReport.Builder.LIST_OF_ORG_IDS_PARAM, getGetStringIdOfOrgList());
+            builder.getReportProperties().setProperty(OrgSyncSettingReport.Builder.SELECTED_DISTRICT_PARAM, selectedDistricts);
+            builder.getReportProperties().setProperty(OrgSyncSettingReport.Builder.ALL_FRIENDLY_ORGS, allFriendlyOrgs.toString());
+            builder.getReportProperties().setProperty(OrgSyncSettingReport.Builder.SELECTED_CONTENT_TYPE, selectedContentType.toString());
 
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+
             report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (Exception e) {
@@ -181,7 +187,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
 
                 facesContext.responseComplete();
                 response.setContentType("application/xls");
-                response.setHeader("Content-disposition", "inline;filename=org_settings_report.xls");
+                response.setHeader("Content-disposition", "inline;filename=sync_settings_report.xls");
                 JRXlsExporter xlsExport = new JRXlsExporter();
                 xlsExport.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
                 xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
@@ -197,7 +203,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
                 printError("Ошибка при построении отчета: " + e.getMessage());
                 logger.error("Failed build report ", e);
             }
-        }*/
+        }
     }
 
     public void buildEditedItem() {
@@ -577,6 +583,13 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         }
 
         public EditedSetting(SyncSetting syncSetting){
+            boolean setConcreteTime2 = syncSetting.getContentType().equals(ORGSETTINGS)
+                || syncSetting.getContentType().equals(CLIENTS_DATA)
+                || syncSetting.getContentType().equals(MENU)
+                || syncSetting.getContentType().equals(PHOTOS)
+                || syncSetting.getContentType().equals(LIBRARY);
+
+            boolean setConcreteTime3 = syncSetting.getContentType().equals(CLIENTS_DATA);
             this.everySecond = syncSetting.getEverySecond();
             this.limitStartHour = syncSetting.getLimitStartHour();
             this.limitEndHour = syncSetting.getLimitEndHour();
@@ -590,14 +603,11 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
             String[] times = StringUtils.split(syncSetting.getConcreteTime(), SyncSetting.SEPARATOR);
             if(times != null) {
                 if (times.length > 0) {
-                    if (times.length == 1) {
+                    if (times.length >= 1) {
                         concreteTime1 = times[0];
-                    } else if (times.length == 2) {
-                        concreteTime1 = times[0];
+                    } if (times.length >= 2 && setConcreteTime2) {
                         concreteTime2 = times[1];
-                    } else if (times.length == 3) {
-                        concreteTime1 = times[0];
-                        concreteTime2 = times[1];
+                    } if (times.length >= 3 && setConcreteTime3) {
                         concreteTime3 = times[2];
                     }
                 }

@@ -401,5 +401,10 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
         public void setState(Integer state) {
             this.state = state;
         }
+
+        @Override
+        public String toString(){
+            return fullInf;
+        }
     }
 }

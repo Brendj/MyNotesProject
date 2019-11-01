@@ -117,6 +117,8 @@ public class SyncSettingManager {
                     item.getContentType(), item.getConcreteTime(), item.getEverySeconds(), item.getLimitStartHour(),
                     item.getLimitEndHour(), item.getMonday(), item.getTuesday(), item.getWednesday(), item.getThursday(),
                     item.getFriday(), item.getSaturday(), item.getSunday(), item.getDeleteState(), nextVersion, org, syncData, session);
+            result.setResult(ProcessResultEnum.OK);
+            result.setVersion(nextVersion);
         } catch (SyncProcessException e){
             logger.error(String.format("Can't save in DB SyncSetting with ContentType %d for IdOfOrg %d",
                     item.getContentType(), idOfOrg), e);
@@ -126,8 +128,7 @@ public class SyncSettingManager {
                     item.getContentType(), idOfOrg), e);
             result.setResult(ProcessResultEnum.INTERNAL_ERROR);
         }
-        result.setResult(ProcessResultEnum.OK);
-         return result;
+        return result;
     }
 
     public void createSyncSettings(Integer contentType, String concreteTime, Integer everySeconds,
