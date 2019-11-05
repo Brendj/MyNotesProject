@@ -107,7 +107,7 @@ public class CardWritableRepository extends WritableJpaDao {
                 throw new IllegalStateException("Ошибка регистрации");
             case VERIFY_SUCCESS:
                 Criteria criteria = ((Session) entityManager.getDelegate()).createCriteria(CardSign.class);
-                criteria.add(Restrictions.eq("deleted", false));
+                criteria.add(Restrictions.or(Restrictions.eq("deleted", false), Restrictions.isNull("deleted")));
                 List<CardSign> list = criteria.list();
                 //CardSign cardSign = entityManager.find(CardSign.class, cardSignCertNum);
                 if (list == null || list.isEmpty()) throw new IllegalStateException("Ошибка регистрации");

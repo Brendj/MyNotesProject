@@ -2618,7 +2618,7 @@ public class DAOService {
     public List findCardsignByManufactureCodeForNewTypeProvider (Integer manufactureCode)
     {
         Query query = entityManager.createQuery("select cs from CardSign cs where cs.manufacturerCode = :manufactureCode "
-                + "and cs.newtypeprovider = true and cs.deleted = false");
+                + "and cs.newtypeprovider = true and (cs.deleted = false or cs.deleted is null)");
         query.setParameter("manufactureCode", manufactureCode);
         try {
             return query.getResultList();

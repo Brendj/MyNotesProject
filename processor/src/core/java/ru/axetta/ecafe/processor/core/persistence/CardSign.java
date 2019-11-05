@@ -107,6 +107,9 @@ public class CardSign {
     }
 
     public Boolean getDeleted() {
+        //Если null, то запись НЕ удалена
+        if (deleted = null)
+            return false;
         return deleted;
     }
 

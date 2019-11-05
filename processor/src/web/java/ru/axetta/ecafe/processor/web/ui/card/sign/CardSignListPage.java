@@ -48,7 +48,7 @@ public class CardSignListPage extends BasicWorkspacePage {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
             Criteria criteria = session.createCriteria(CardSign.class);
-            criteria.add(Restrictions.eq("deleted", false));
+            criteria.add(Restrictions.or(Restrictions.eq("deleted", false), Restrictions.isNull("deleted")));
             criteria.addOrder(Order.asc("idOfCardSign"));
             List<CardSign> list = criteria.list();
             for (CardSign cardSign : list) {
