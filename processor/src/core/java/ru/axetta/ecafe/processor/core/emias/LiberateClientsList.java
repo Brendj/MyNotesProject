@@ -4,9 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.emias;
 
+import javax.xml.bind.annotation.XmlType;
 import java.util.Date;
 
+@XmlType(name = "LiberateClientsList", propOrder = {
+        "guid", "idEventEMIAS", "typeEventEMIAS", "dateLiberate", "startDateLiberate", "endDateLiberate",
+        "idEventCancelEMIAS"})
 public class LiberateClientsList {
+
     private String guid;
     private Long idEventEMIAS;
     private Long typeEventEMIAS;
