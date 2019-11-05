@@ -82,51 +82,61 @@
             <h:panelGroup id="OrgSyncSettingEditPanelGrid">
                 <h:outputText styleClass="output-text" value="Новая запись" style="color: green" rendered="#{orgSyncSettingReportPage.newSyncSetting}"/>
                 <h:panelGrid styleClass="borderless-grid" columns="2">
+                    <h:outputText styleClass="output-text" escape="true" value="Активировать расписание" rendered="#{orgSyncSettingReportPage.showSettingEnable}"/>
+                    <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.settingEnable}" styleClass="checkboxes" rendered="#{orgSyncSettingReportPage.showSettingEnable}">
+                            <a4j:support reRender="OrgSyncSettingEditPanelGrid" event="onchange"/>
+                    </h:selectBooleanCheckbox>
                     <h:outputText styleClass="output-text" value="Время 1-го сеанса"
                                   rendered="#{!orgSyncSettingReportPage.runEverySecond}" />
                     <h:inputText value="#{orgSyncSettingReportPage.editedSetting.concreteTime1}" maxlength="5"
-                                 rendered="#{!orgSyncSettingReportPage.runEverySecond}"/>
+                                 rendered="#{!orgSyncSettingReportPage.runEverySecond}"
+                                 disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:outputText styleClass="output-text" value="Время 2-го сеанса"
                                   rendered="#{!orgSyncSettingReportPage.runEverySecond && orgSyncSettingReportPage.showConcreteTime2}"/>
                     <h:inputText value="#{orgSyncSettingReportPage.editedSetting.concreteTime2}" maxlength="5"
-                                 rendered="#{!orgSyncSettingReportPage.runEverySecond && orgSyncSettingReportPage.showConcreteTime2}"/>
+                                 rendered="#{!orgSyncSettingReportPage.runEverySecond && orgSyncSettingReportPage.showConcreteTime2}"
+                                 disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:outputText styleClass="output-text" value="Время 3-го сеанса"
                                   rendered="#{!orgSyncSettingReportPage.runEverySecond && orgSyncSettingReportPage.showConcreteTime3}"/>
                     <h:inputText value="#{orgSyncSettingReportPage.editedSetting.concreteTime3}" maxlength="5"
-                                 rendered="#{!orgSyncSettingReportPage.runEverySecond && orgSyncSettingReportPage.showConcreteTime3}"/>
+                                 rendered="#{!orgSyncSettingReportPage.runEverySecond && orgSyncSettingReportPage.showConcreteTime3}"
+                                 disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:outputText styleClass="output-text" value="Запускать через каждые (сек.) "
                                   rendered="#{orgSyncSettingReportPage.runEverySecond}"/>
                     <h:inputText value="#{orgSyncSettingReportPage.editedSetting.everySecond}"
-                                 rendered="#{orgSyncSettingReportPage.runEverySecond}"/>
+                                 rendered="#{orgSyncSettingReportPage.runEverySecond}"
+                                 disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:outputText styleClass="output-text" value="Начала таймаута"
                                   rendered="#{orgSyncSettingReportPage.runEverySecond}"/>
                     <rich:inputNumberSpinner value="#{orgSyncSettingReportPage.editedSetting.limitStartHour}"
-                                 rendered="#{orgSyncSettingReportPage.runEverySecond}" minValue="0" maxValue="23"/>
+                                 rendered="#{orgSyncSettingReportPage.runEverySecond}" minValue="0" maxValue="23"
+                                             disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:outputText styleClass="output-text" value="Конец таймаута"
                                   rendered="#{orgSyncSettingReportPage.runEverySecond}"/>
                     <rich:inputNumberSpinner value="#{orgSyncSettingReportPage.editedSetting.limitEndHour}"
-                                 rendered="#{orgSyncSettingReportPage.runEverySecond}" minValue="0" maxValue="23"/>
+                                 rendered="#{orgSyncSettingReportPage.runEverySecond}" minValue="0" maxValue="23"
+                                             disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:outputText styleClass="output-text" value="Понедельник" />
                     <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.monday}"
-                                             styleClass="checkboxes" />
+                                             styleClass="checkboxes" disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:outputText styleClass="output-text" value="Вторник" />
                     <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.tuesday}"
-                                             styleClass="checkboxes" />
+                                             styleClass="checkboxes" disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:outputText styleClass="output-text" value="Среда" />
                     <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.wednesday}"
-                                             styleClass="checkboxes" />
+                                             styleClass="checkboxes" disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:outputText styleClass="output-text" value="Четверг" />
                     <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.thursday}"
-                                             styleClass="checkboxes" />
+                                             styleClass="checkboxes" disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:outputText styleClass="output-text" value="Пятница" />
                     <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.friday}"
-                                             styleClass="checkboxes" />
+                                             styleClass="checkboxes" disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:outputText styleClass="output-text" value="Суббота" />
                     <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.saturday}"
-                                             styleClass="checkboxes" />
+                                             styleClass="checkboxes" disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:outputText styleClass="output-text" value="Воскресенье" />
                     <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.sunday}"
-                                             styleClass="checkboxes" />
+                                             styleClass="checkboxes" disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:panelGrid columns="2" styleClass="borderless-grid">
                         <a4j:commandButton reRender="OrgSyncSettingEditPanelGrid"
                                            action="#{orgSyncSettingReportPage.saveLocalChanges()}"

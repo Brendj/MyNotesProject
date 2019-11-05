@@ -62,6 +62,8 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     private Boolean showConcreteTime2 = false;
     private Boolean showConcreteTime3 = false;
     private Boolean newSyncSetting = false;
+    private Boolean showSettingEnable = false;
+    private Boolean settingEnable = true;
 
     private List<SelectItem> buildListOfOrgDistricts(Session session) {
         List<String> allDistricts;
@@ -207,6 +209,8 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     }
 
     public void buildEditedItem() {
+        settingEnable = true;
+        showSettingEnable = false;
         SyncSetting currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
         if(currentSetting == null || currentSetting.getIdOfSyncSetting() == null){
             editedSetting = new EditedSetting();
@@ -225,6 +229,10 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
                 || modalSelectedContentType.equals(LIBRARY.getTypeCode());
 
         showConcreteTime3 = modalSelectedContentType.equals(CLIENTS_DATA.getTypeCode());
+        showSettingEnable = modalSelectedContentType.equals(PHOTOS.getTypeCode())
+                || modalSelectedContentType.equals(LIBRARY.getTypeCode());
+        settingEnable = (modalSelectedContentType.equals(PHOTOS.getTypeCode()) && StringUtils.isNotBlank(selectedItem.getPhotoSync().getFullInf())
+                || modalSelectedContentType.equals(LIBRARY.getTypeCode()) && StringUtils.isNotBlank(selectedItem.getLibSync().getFullInf())) || !showSettingEnable;
     }
 
     private SyncSetting findBySelectedModalType(OrgSyncSettingReportItem item, Integer modalSelectedContentType) {
@@ -471,6 +479,9 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     }
 
     public void saveLocalChanges() {
+        if(!settingEnable){
+            selectedItem.setIsChange(false);
+        }
         try {
             validateData();
             SyncSetting currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
@@ -562,6 +573,22 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
 
     public void setNewSyncSetting(Boolean newSyncSetting) {
         this.newSyncSetting = newSyncSetting;
+    }
+
+    public Boolean getShowSettingEnable() {
+        return showSettingEnable;
+    }
+
+    public void setShowSettingEnable(Boolean showSettingEnable) {
+        this.showSettingEnable = showSettingEnable;
+    }
+
+    public Boolean getSettingEnable() {
+        return settingEnable;
+    }
+
+    public void setSettingEnable(Boolean settingEnable) {
+        this.settingEnable = settingEnable;
     }
 
     public static class EditedSetting {
