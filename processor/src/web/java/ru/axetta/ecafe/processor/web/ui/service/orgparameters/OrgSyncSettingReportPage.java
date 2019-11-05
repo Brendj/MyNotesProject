@@ -113,14 +113,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     private List<SelectItem> buildListOfContentType() {
         List<SelectItem> selectItemList = new LinkedList<SelectItem>();
         selectItemList.add(new SelectItem(OrgSyncSettingReport.ALL_TYPES, "Все"));
-        selectItemList.add(new SelectItem(FULL_SYNC.getTypeCode(), FULL_SYNC.toString()));
-        selectItemList.add(new SelectItem(BALANCES_AND_ENTEREVENTS.getTypeCode(), BALANCES_AND_ENTEREVENTS.toString()));
-        selectItemList.add(new SelectItem(ORGSETTINGS.getTypeCode(), ORGSETTINGS.toString()));
-        selectItemList.add(new SelectItem(CLIENTS_DATA.getTypeCode(), CLIENTS_DATA.toString()));
-        selectItemList.add(new SelectItem(MENU.getTypeCode(), MENU.toString()));
-        selectItemList.add(new SelectItem(PHOTOS.getTypeCode(), PHOTOS.toString()));
-        selectItemList.add(new SelectItem(SUPPORT_SERVICE.getTypeCode(), SUPPORT_SERVICE.toString()));
-        selectItemList.add(new SelectItem(LIBRARY.getTypeCode(), LIBRARY.toString()));
+        selectItemList.addAll( buildModalListOfContentType());
         return selectItemList;
     }
 
@@ -309,6 +302,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+        buildHTML();
     }
 
     public void beginDistributionSyncSettings(){
@@ -479,33 +473,39 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     }
 
     public void saveLocalChanges() {
-        if(!settingEnable){
-            selectedItem.setIsChange(false);
-        }
         try {
             validateData();
             SyncSetting currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
             if (currentSetting != null) {
-                currentSetting.setMonday(editedSetting.getMonday());
-                currentSetting.setTuesday(editedSetting.getTuesday());
-                currentSetting.setWednesday(editedSetting.getWednesday());
-                currentSetting.setThursday(editedSetting.getThursday());
-                currentSetting.setFriday(editedSetting.getFriday());
-                currentSetting.setSaturday(editedSetting.getSaturday());
-                currentSetting.setSunday(editedSetting.getSunday());
-                currentSetting.setEverySecond(editedSetting.getEverySecond());
-                currentSetting.setConcreteTime(buildTime(editedSetting));
-                currentSetting.setLimitStartHour(editedSetting.getLimitStartHour());
-                currentSetting.setLimitEndHour(editedSetting.getLimitEndHour());
+                if(settingEnable) {
+                    currentSetting.setMonday(editedSetting.getMonday());
+                    currentSetting.setTuesday(editedSetting.getTuesday());
+                    currentSetting.setWednesday(editedSetting.getWednesday());
+                    currentSetting.setThursday(editedSetting.getThursday());
+                    currentSetting.setFriday(editedSetting.getFriday());
+                    currentSetting.setSaturday(editedSetting.getSaturday());
+                    currentSetting.setSunday(editedSetting.getSunday());
+                    currentSetting.setEverySecond(editedSetting.getEverySecond());
+                    currentSetting.setConcreteTime(buildTime(editedSetting));
+                    currentSetting.setLimitStartHour(editedSetting.getLimitStartHour());
+                    currentSetting.setLimitEndHour(editedSetting.getLimitEndHour());
+                } else {
+                    currentSetting.setDeleteState(true);
+                }
+                selectedItem.setIsChange(true);
                 selectedItem.rebuildSyncInfo(modalSelectedContentType, currentSetting);
             } else {
-                selectedItem.buildSyncInfo(editedSetting.getMonday(), editedSetting.getTuesday(),
-                        editedSetting.getWednesday(), editedSetting.getThursday(), editedSetting.getFriday(),
-                        editedSetting.getSaturday(), editedSetting.getSunday(), editedSetting.getEverySecond(),
-                        buildTime(editedSetting), modalSelectedContentType, editedSetting.getLimitStartHour(),
-                        editedSetting.getLimitEndHour());
+                if(!settingEnable){
+                    selectedItem.setIsChange(false);
+                } else {
+                    selectedItem.buildSyncInfo(editedSetting.getMonday(), editedSetting.getTuesday(),
+                            editedSetting.getWednesday(), editedSetting.getThursday(), editedSetting.getFriday(),
+                            editedSetting.getSaturday(), editedSetting.getSunday(), editedSetting.getEverySecond(),
+                            buildTime(editedSetting), modalSelectedContentType, editedSetting.getLimitStartHour(),
+                            editedSetting.getLimitEndHour());
+                    selectedItem.setIsChange(true);
+                }
             }
-            selectedItem.setIsChange(true);
         } catch (Exception e) {
             logger.error("Exception when save local changes: ", e);
             printError("Не удалось сохранить локальные изменения: " + e.getMessage());
@@ -513,6 +513,9 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     }
 
     private void validateData() throws Exception {
+        if(!settingEnable){
+            return;
+        }
         if(runEverySecond){
             if(editedSetting.getLimitStartHour() > editedSetting.getLimitEndHour()){
                 throw new IllegalArgumentException("Значение начала таймаута не должно быть больше значению конца таймаута");

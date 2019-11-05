@@ -199,13 +199,13 @@ public class SyncSettingManager {
             createSyncSettings(setting.getContentType().getTypeCode(), setting.getConcreteTime(), setting.getEverySecond(),
                     setting.getLimitStartHour(), setting.getLimitEndHour(), setting.getMonday(), setting.getTuesday(), setting.getWednesday(),
                     setting.getThursday(), setting.getFriday(), setting.getSaturday(), setting.getSunday(),
-                    false, nextVersion, setting.getOrg(), updateDate, session);
+                    setting.getDeleteState(), nextVersion, setting.getOrg(), updateDate, session);
         } else {
             session.merge(setting);
             updateSyncSettings(setting, setting.getConcreteTime(), setting.getEverySecond(), setting.getLimitStartHour(),
                     setting.getLimitEndHour(), setting.getMonday(), setting.getTuesday(), setting.getWednesday(),
                     setting.getThursday(), setting.getFriday(), setting.getSaturday(), setting.getSunday(),
-                    false, nextVersion, updateDate, session);
+                    setting.getDeleteState(), nextVersion, updateDate, session);
         }
     }
 }
