@@ -9936,7 +9936,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             Integer period = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_PERIOD_OF_EXTENSION_CARDS);
-            Date newValidDate = CalendarUtils.addYear(card.getValidTime(), period);
+            Date newValidDate = CalendarUtils.addYear(new Date(), period);
 
             CardManager cardManager = RuntimeContext.getInstance().getCardManager();
             cardManager.updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
