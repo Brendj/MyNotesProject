@@ -9930,7 +9930,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Card card = (Card) criteria.uniqueResult();
             if (card == null) {
                 throw new CardNotFoundException(
-                        "У клиента с л/с " + contractId + " нет активной карты с UID " + cardNo);
+                        "У клиента с л/с " + contractId + " нет карты с UID " + cardNo);
             } else if(!(card.getState().equals(CardState.ISSUED.getValue()) || card.getState().equals(CardState.TEMPISSUED.getValue()))){
                 throw new CardWrongStateException("Card must have state ISSUED or TEMPISSUED");
             }
@@ -9950,19 +9950,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (ClientNotFoundException e) {
-            logger.error("Error in extendValidDateOfСard", e);
+            logger.error("Error in extendValidDateOfCard", e);
             result.resultCode = RC_CLIENT_NOT_FOUND;
             result.description = RC_CLIENT_NOT_FOUND_DESC;
         } catch (CardNotFoundException e) {
-            logger.error("Error in extendValidDateOfСard", e);
+            logger.error("Error in extendValidDateOfCard", e);
             result.resultCode = RC_CARD_NOT_FOUND;
             result.description = RC_CARD_NOT_FOUND_DESC;
         } catch (CardWrongStateException e){
-            logger.error("Error in extendValidDateOfСard", e);
+            logger.error("Error in extendValidDateOfCard", e);
             result.resultCode = RC_WRONG_STATE_OF_CARD;
             result.description = RC_WRONG_STATE_OF_CARD_DESC;
         } catch (Exception e) {
-            logger.error("Error in extendValidDateOfСard", e);
+            logger.error("Error in extendValidDateOfCard", e);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
