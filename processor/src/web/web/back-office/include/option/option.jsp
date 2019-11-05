@@ -397,6 +397,14 @@
                 </h:panelGrid>
             </rich:panel>
 
+            <rich:panel>
+                <f:facet name="header"><h:outputText styleClass="column-header" value="Редактирование срока действия карт" /></f:facet>
+                <h:panelGrid styleClass="borderless-grid" columns="2">
+                    <h:outputText escape="true" value="Срок продления карты (кол-во лет)"
+                                  styleClass="output-text" />
+                    <h:inputText value="#{optionPage.periodOfExtensionCards}" styleClass="input-text" size="2" converter="javax.faces.Integer"/>
+                </h:panelGrid>
+            </rich:panel>
         </h:panelGrid>
     </rich:tab>
 
