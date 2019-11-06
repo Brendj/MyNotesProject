@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -19,7 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.*;
 
@@ -232,8 +236,16 @@ public class CardManagerProcessor implements CardManager {
     @Override
     public void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg) throws Exception {
+        updateCard(idOfClient, idOfCard, cardType, state, validTime, lifeState, lockReason, issueTime, externalId, cardOperatorUser,
+                idOfOrg, "");
+    }
+
+    @Override
+    public void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
+            String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg, String informationAboutCard) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
+        String additionalInfoAboutCard = StringUtils.isBlank(informationAboutCard) ? "" : " (" + informationAboutCard + ")";
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -273,7 +285,8 @@ public class CardManagerProcessor implements CardManager {
                 if (state == CardState.BLOCKED.getValue()) {
                     historyCard.setInformationAboutCard("Блокировка карты №: " + updatedCard.getCardNo());
                 } else {
-                    historyCard.setInformationAboutCard("Редактирование данных карты №: " + updatedCard.getCardNo());
+                    historyCard.setInformationAboutCard("Редактирование данных карты №: " + updatedCard.getCardNo()
+                           + additionalInfoAboutCard);
                 }
                 historyCard.setNewOwner(newCardOwner);
                 historyCard.setFormerOwner(updatedCard.getClient());
