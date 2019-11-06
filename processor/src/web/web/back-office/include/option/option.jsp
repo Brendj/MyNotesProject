@@ -402,7 +402,9 @@
                 <h:panelGrid styleClass="borderless-grid" columns="2">
                     <h:outputText escape="true" value="Срок продления карты (кол-во лет)"
                                   styleClass="output-text" />
-                    <h:inputText value="#{optionPage.periodOfExtensionCards}" styleClass="input-text" size="2" converter="javax.faces.Integer"/>
+                    <h:inputText id="periodOfExtensionCards" label="Срок продления карты" value="#{optionPage.periodOfExtensionCards}" styleClass="input-text" size="2" converter="javax.faces.Integer">
+                        <f:validateLongRange minimum="0" maximum="99"/>
+                    </h:inputText>
                 </h:panelGrid>
             </rich:panel>
         </h:panelGrid>
