@@ -91,7 +91,7 @@ public class CardSignCreatePage extends CardSignDataBasicPage {
             session.save(cardSign);
             transaction.commit();
             transaction = null;
-            logger.info(String.format("Создад поставщик карт %s", cardSign.getIdOfCardSign()));
+            logger.info(String.format("Создан поставщик карт %s", cardSign.getIdOfCardSign()));
             printMessage("Запись сохранена");
         } catch (Exception e) {
             logger.error("Error in cardSign create page: ", e);
