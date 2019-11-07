@@ -26,6 +26,7 @@ public class EMIAS {
     private Date updateDate;
     private Boolean accepted;
     private Long deletedemiasid;
+    private Long version;
 
    public EMIAS(){}
 
@@ -116,5 +117,13 @@ public class EMIAS {
 
     public void setDeletedemiasid(Long deletedemiasid) {
         this.deletedemiasid = deletedemiasid;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

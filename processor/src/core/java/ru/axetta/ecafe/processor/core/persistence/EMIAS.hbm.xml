@@ -22,6 +22,7 @@
         <property name="updateDate" column="updateDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="accepted" column="accepted" type="boolean"/>
         <property name="deletedemiasid" column="deletedemiasid" type="long"/>
+        <property name="version" column="version" type="long"/>
     </class>
 </hibernate-mapping>
 

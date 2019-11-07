@@ -1736,6 +1736,20 @@ public class DAOUtils {
     }
 
     public static void saveEMIAS(Session session, LiberateClientsList liberateClientsList) {
+        Long version = 0L;
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.setProjection(Projections.max("version"));
+            Object result = criteria.uniqueResult();
+            if (result != null) {
+                Long currentMaxVersion = (Long) result;
+                version = currentMaxVersion + 1;
+            }
+        } catch (Exception ex) {
+            logger.error("Failed get max emias version, ", ex);
+            version = 0L;
+        }
+
         EMIAS emias = new EMIAS();
         emias.setGuid(liberateClientsList.getGuid());
         emias.setIdEventEMIAS(liberateClientsList.getIdEventEMIAS());
@@ -1744,6 +1758,7 @@ public class DAOUtils {
         emias.setStartDateLiberate(liberateClientsList.getStartDateLiberate());
         emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
         emias.setCreateDate(new Date());
+        emias.setVersion(version);
         session.save(emias);
     }
 
