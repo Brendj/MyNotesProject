@@ -8,7 +8,11 @@ public class ResponseToEZDResult extends Result {
     private String guidOrg; //Guid организации
     private String groupName; //Наименование группы обучающихся
     private String date; //Дата на которую созданы заявки
+    private String userName; //ФИО пользователя
     private Long idOfComplex; //Идентификатор рациона
+    private String complexName; //Наименование рациона
+    private Integer count; //Количество рационов
+
 
     public String getGuidOrg() {
         return guidOrg;
@@ -34,11 +38,35 @@ public class ResponseToEZDResult extends Result {
         this.date = date;
     }
 
+    public String getUserName() {
+        return userName;
+    }
+
+    public void setUserName(String userName) {
+        this.userName = userName;
+    }
+
     public Long getIdOfComplex() {
         return idOfComplex;
     }
 
     public void setIdOfComplex(Long idOfComplex) {
         this.idOfComplex = idOfComplex;
+    }
+
+    public String getComplexName() {
+        return complexName;
+    }
+
+    public void setComplexName(String complexName) {
+        this.complexName = complexName;
+    }
+
+    public Integer getCount() {
+        return count;
+    }
+
+    public void setCount(Integer count) {
+        this.count = count;
     }
 }
