@@ -686,9 +686,10 @@ public class DTSZNDiscountsReviseService {
             Boolean isOk = false;
 
             for (ClientDtisznDiscountInfo info : infoList) {
-                if (application.getDtisznCode().equals(info.getDtisznCode()) && info.getStatus()
-                        .equals(ClientDTISZNDiscountStatus.CONFIRMED) && CalendarUtils
-                        .betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd()) && !info.getArchived()) {
+                if (((application.getDtisznCode() == null && info.getDtisznCode().equals(0L)) || application.getDtisznCode().equals(info.getDtisznCode()))
+                        && info.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)
+                        && CalendarUtils.betweenOrEqualDate(fireTime, info.getDateStart(), info.getDateEnd())
+                        && !info.getArchived()) {
                     isOk = true;
                     break;
                 }
@@ -705,7 +706,7 @@ public class DTSZNDiscountsReviseService {
         } catch (Exception e) {
             logger.error(String.format("Error in updateApplicationForFood: "
                             + "unable to update application for food for client with id=%d, idOfClientDTISZNDiscountInfo={%s}",
-                    client.getIdOfClient(), StringUtils.join(infoList, ",")));
+                    client.getIdOfClient(), StringUtils.join(infoList, ",")), e);
         }
     }
 
@@ -782,24 +783,8 @@ public class DTSZNDiscountsReviseService {
                         .renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode,
                                 DiscountChangeHistory.MODIFY_IN_REGISTRY);
             } catch (Exception e) {
-                logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
+                logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()), e);
             }
-            /*client.setCategoriesDiscounts(newDiscounts);
-            client.setDiscountMode(newDiscountMode);
-
-            DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
-                    newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
-            discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
-            session.save(discountChangeHistory);
-            client.setLastDiscountsUpdate(new Date());
-            try {
-                client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
-            } catch (Exception e) {
-                logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
-            }
-            long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
-            client.setClientRegistryVersion(clientRegistryVersion);
-            session.update(client);*/
         }
         updateApplicationForFood(session, client, infoList);
     }
@@ -1070,27 +1055,75 @@ public class DTSZNDiscountsReviseService {
         Transaction transaction = null;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
 
             Date fireTime = new Date();
             Long nextVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
-            Query query = session.createSQLQuery(
-                    "update cf_client_dtiszn_discount_info set archived = 1, version = :version, "
-                            + " lastupdate = :lastUpdate where dateend <= :now and status = :confirmed and archived = 0");
-            query.setParameter("version", nextVersion);
-            query.setParameter("lastUpdate", fireTime.getTime());
-            query.setParameter("now", CalendarUtils.addDays(fireTime, -1).getTime());
-            query.setParameter("confirmed", ClientDTISZNDiscountStatus.CONFIRMED.getValue());
-            int rows = query.executeUpdate();
-            if (0 != rows) {
-                logger.info(String.format("%d discounts marked as archived", rows));
-            }
+            Query query = session.createQuery("select i from ClientDtisznDiscountInfo i where i.dateEnd <= :now "
+                    + "and i.status = :confirmed and i.archived = false");
 
-            transaction.commit();
-            transaction = null;
-        } catch (Exception e) {
-            logger.error("Error in update archived flag", e);
-            throw e;
+            query.setParameter("now", CalendarUtils.addDays(fireTime, -1));
+            query.setParameter("confirmed", ClientDTISZNDiscountStatus.CONFIRMED);
+            List<ClientDtisznDiscountInfo> list = query.list();
+
+            for (ClientDtisznDiscountInfo info : list) {
+                try {
+                    transaction = session.beginTransaction();
+                    info.setArchived(true);
+                    info.setVersion(nextVersion);
+                    info.setLastUpdate(fireTime);
+                    session.update(info);
+
+                    if (!info.getDtisznCode().equals(0L)) {
+                        transaction.commit();
+                        transaction = null;
+                        continue; //если не Иное - пропускаем обновление льгот клиента
+                    }
+                    Client client = info.getClient();
+                    List<ClientDtisznDiscountInfo> infoList = new ArrayList<>();
+                    infoList.add(info);
+                    updateApplicationForFood(session, client, infoList);
+                    if (StringUtils.isEmpty(client.getCategoriesDiscounts())) {
+                        transaction.commit();
+                        transaction = null;
+                        continue;
+                    }
+
+                    CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, info.getDtisznCode());
+                    String isppCode = Long.toString(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount()); //код льготы ИСПП для льготы из Инфо
+                    List<String> discounts = new ArrayList(Arrays.asList(client.getCategoriesDiscounts().split(",")));
+                    String oldDiscounts = client.getCategoriesDiscounts();
+                    Integer oldDiscountMode = client.getDiscountMode();
+
+                    for (Iterator<String> iterator = discounts.iterator(); iterator.hasNext(); ) {
+                        String s = iterator.next();
+                        if (s.equals(isppCode)) {
+                            iterator.remove();
+                        }
+                    }
+                    String newDiscounts = StringUtils.join(discounts, ",");
+                    Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+
+                    if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
+                        try {
+                            ClientManager.renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode,
+                                    oldDiscountMode, DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                        } catch (Exception e) {
+                            transaction.rollback();
+                            transaction = null;
+                            logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
+                        }
+                    }
+
+                    if (transaction != null) {
+                        transaction.commit();
+                        transaction = null;
+                    }
+                } catch (Exception e) {
+                    transaction.rollback();
+                    transaction = null;
+                    logger.error("Error in update archived flag", e);
+                }
+            }
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
