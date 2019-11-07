@@ -4,6 +4,17 @@
 
 package ru.axetta.ecafe.processor.web.partner.ezd;
 
+import javax.xml.bind.annotation.XmlType;
+
+@XmlType(name = "ResponseFromEzd", propOrder = {
+        "guidOrg",
+        "groupName",
+        "userName",
+        "date",
+        "idOfComplex",
+        "complexName",
+        "count"
+})
 public class ResponseFromEzd {
     private String guidOrg; //Guid организации
     private String groupName; //Наименование группы обучающихся
