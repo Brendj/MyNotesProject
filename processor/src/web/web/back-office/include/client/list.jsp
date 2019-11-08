@@ -188,30 +188,22 @@
             <h:outputText escape="true" value="#{item.middleGroup}"
                           styleClass="output-text" />
         </rich:column>
-
-        <%--доделать внутренности ИД ОО--%>
         <rich:column headerClass="column-header" sortBy="#{item.clientGroupName}">
             <f:facet name="header">
                 <h:outputText escape="true" value="ИД ОО" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.org}"
-                          styleClass="output-text" />
+            <h:outputText escape="true" value="#{item.org.idOfOrg}" styleClass="output-text" />
         </rich:column>
-        <%--доделать внутренности ИД ОО--%>
-
-        <%--сделать ссылкой на карточку ОО--%>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Название ОО" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showOrgViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
-                <h:outputText escape="true" value="#{item.org}"
-                              styleClass="output-text" />
-                <f:setPropertyActionListener value="#{item.org}" target="#{mainPage.selectedIdOfOrg}" />
+            <a4j:commandLink action="#{mainPage.showOrgViewPage}" styleClass="command-link"
+                             reRender="mainMenu, workspaceForm">
+                <h:outputText escape="true" value="#{item.org.shortName}" styleClass="output-text" />
+                <f:setPropertyActionListener value="#{item.org.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
         </rich:column>
-        <%--сделать ссылкой на карточку ОО--%>
-
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Баланс" />
@@ -219,32 +211,35 @@
             <h:outputText escape="true" value="#{item.balance}" converter="copeckSumConverter"
                           styleClass="output-text" />
         </rich:column>
-
-        <%--Добавить кнопку должно появиться окно со списком актуальных льгот--%>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Льгота" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.discountMode}" converter="clientDiscountModeConverter" styleClass="output-text" />
+            <h:outputText escape="true" value="#{item.categoriesDiscounts}" styleClass="output-text" />
         </rich:column>
-        <%--Добавить кнопку должно появиться окно со списком актуальных льгот--%>
-
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата создания" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.contractTime}" converter="dateTimeConverter"
+                          styleClass="output-text" />
+        </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Последние изменения" />
             </f:facet>
             <h:outputText escape="true" value="#{item.updateTime}" converter="timeConverter" styleClass="output-text" />
         </rich:column>
-
-        <%--Добавить внутренности Операции--%>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Операции" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.updateTime}" converter="timeConverter" styleClass="output-text" />
+            <a4j:commandLink action="#{mainPage.showClientOperationListPage}" styleClass="command-link"
+                             reRender="mainMenu, workspaceForm">
+                <h:outputText escape="true" value="Операции" styleClass="output-text" />
+                <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+            </a4j:commandLink>
         </rich:column>
-        <%--Добавить внутренности Операции--%>
-
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Редактировать" />

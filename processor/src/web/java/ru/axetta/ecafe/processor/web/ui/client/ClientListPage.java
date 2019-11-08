@@ -111,6 +111,9 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         private final String guid;
         private final String regId;
         private final String externalId;
+        private final ClientCreatedFromType createdFrom;
+        private final String categoriesDiscounts;
+
 
         public void setExpenditureLimit(Long expenditureLimit) {
             this.expenditureLimit = expenditureLimit;
@@ -189,6 +192,8 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             } else {
                 this.externalId = client.getClientGUID();
             }
+            this.createdFrom = client.getCreatedFrom();
+            this.categoriesDiscounts = client.getCategoriesDiscounts();
         }
 
         public Long getIdOfClient() {
@@ -289,6 +294,14 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
 
         public String getExternalId() {
             return externalId;
+        }
+
+        public ClientCreatedFromType getCreatedFrom() {
+            return createdFrom;
+        }
+
+        public String getCategoriesDiscounts() {
+            return categoriesDiscounts;
         }
     }
 
