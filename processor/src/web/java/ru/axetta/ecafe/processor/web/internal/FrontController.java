@@ -2147,17 +2147,24 @@ public class FrontController extends HttpServlet {
                 return result;
             }
 
-            ClientGuardian clientGuardian = ClientManager.createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree,
-                    false, clientId, ClientCreatedFromType.ARM, null);
-
-            clientGuardian.setIsLegalRepresent(legality);
-            persistenceSession.merge(clientGuardian);
-
             Client child = (Client) persistenceSession.load(Client.class, clientId);
             if (null == child) {
                 result.code = ResponseItem.ERROR_CLIENT_NOT_FOUND;
                 result.message = ResponseItem.ERROR_CLIENT_NOT_FOUND_MESSAGE;
                 return result;
+            }
+
+            ClientGuardian existingRef = DAOUtils.findClientGuardian(persistenceSession, clientId, guardianId);
+            if (existingRef == null) {
+                ClientGuardian clientGuardian = ClientManager
+                        .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
+                                clientId, ClientCreatedFromType.ARM, null);
+
+                clientGuardian.setIsLegalRepresent(legality);
+                persistenceSession.merge(clientGuardian);
+            } else {
+                logger.warn(String.format("In registerGuardianMigrantRequest: ClientGuardian Reference already exist between Guardian ID: %d and Client^ %d",
+                        guardianId, clientId));
             }
 
             if (!DAOUtils.isFriendlyOrganizations(persistenceSession, guardian.getOrg(), child.getOrg())) {
