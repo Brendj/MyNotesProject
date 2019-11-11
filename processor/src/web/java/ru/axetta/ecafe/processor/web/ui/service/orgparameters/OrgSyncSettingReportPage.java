@@ -118,6 +118,8 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     }
 
     public void buildHTML() {
+        resetParams();
+
         Session persistenceSession = null;
         Transaction transaction = null;
         try {
@@ -295,6 +297,8 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
             transaction.commit();
             transaction = null;
             session.close();
+
+            printMessage("Изменения сохранены");
         } catch (Exception e) {
             logger.error("Cant save SyncSetting to DB: ", e);
             printError("Не удалось сохранить изменения в БД: " + e.getMessage());
@@ -436,8 +440,24 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         this.selectedItem = selectedItem;
     }
 
-    public Object resetChanges() {
-        return null;
+    public void resetChanges() {
+        resetParams();
+
+        if(!items.isEmpty()) {
+            items.clear();
+            buildHTML();
+        }
+    }
+
+    private void resetParams() {
+        selectedItem = null;
+        editedSetting = new EditedSetting();
+        runEverySecond = false;
+        showConcreteTime2 = false;
+        showConcreteTime3 = false;
+        newSyncSetting = false;
+        showSettingEnable = false;
+        settingEnable = true;
     }
 
     public List<SelectItem> getModalListOfContentType() {

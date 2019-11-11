@@ -252,7 +252,10 @@
             </rich:datascroller>
         </f:facet>
     </rich:dataTable>
-    <h:panelGrid styleClass="borderless-grid" columns="1">
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <a4j:commandButton value="Восстановить" action="#{orgSyncSettingReportPage.resetChanges()}"
+                           reRender="orgSyncSettingsTable" styleClass="command-button" status="orgSyncReportStatus"
+                           id="resetChangesButton" />
         <a4j:commandButton value="Применить изменения" action="#{orgSyncSettingReportPage.applyChanges()}"
                            reRender="orgSyncSettingsTable" styleClass="command-button" status="orgSyncReportStatus"
                            id="applyChangesButton" />
