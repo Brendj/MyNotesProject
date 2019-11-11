@@ -600,4 +600,7 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "blockActiveCardByCardNoAndContractId")
     Result blockActiveCardByCardNoAndContractId(@WebParam(name = "contractId") Long contractId, @WebParam(name = "cardNo") Long cardNo);
+
+    @WebMethod(operationName = "extendValidDateOfСard")
+    Result extendValidDateOfCard(@WebParam(name = "contractId") Long contractId, @WebParam(name = "UID") Long cardNo);
 }

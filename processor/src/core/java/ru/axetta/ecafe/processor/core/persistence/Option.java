@@ -150,7 +150,8 @@ public class Option {
             OPTION_METHODS_INFOSERVICE = 100098,
             OPTION_IMPORT_RNIP_PAYMENTS_URL_V20 = 100099,
             OPTION_REGULAR_PAYMENT_CERT_PATH = 100100,
-            OPTION_REGULAR_PAYMENT_CERT_PASSWORD = 100101;
+            OPTION_REGULAR_PAYMENT_CERT_PASSWORD = 100101,
+            OPTION_PERIOD_OF_EXTENSION_CARDS = 101101;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -278,8 +279,8 @@ public class Option {
             OPTION_METHODS_INFOSERVICE, "",
             OPTION_IMPORT_RNIP_PAYMENTS_URL_V20, "http://test.rnip.mos.ru/frontend-service/MainService",
             OPTION_REGULAR_PAYMENT_CERT_PATH, "",
-            OPTION_REGULAR_PAYMENT_CERT_PASSWORD, "12345678"
-
+            OPTION_REGULAR_PAYMENT_CERT_PASSWORD, "12345678",
+            OPTION_PERIOD_OF_EXTENSION_CARDS, "12"
 };
 
     private Long idOfOption;
