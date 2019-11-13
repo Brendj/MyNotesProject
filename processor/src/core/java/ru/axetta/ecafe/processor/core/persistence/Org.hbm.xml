@@ -245,6 +245,7 @@
             <key column="IdOfOrg"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.Card"/>
         </set>
+
         <property name="registryUrl" column="registryUrl" type="string" length="256"/>
 
         <property name="interdistrictCouncil" column="interdistrictCouncil" type="string" length="256"/>
@@ -261,6 +262,8 @@
         <property name="preordersEnabled" column="preordersEnabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
         <property name="multiCardModeEnabled" column="multiCardModeEnabled" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <property name="participantOP" column="participantOP" type="boolean"/>
+        <property name="preorderlp" column="preorderlp" type="boolean"/>
+        <property name="haveNewLP" column="haveNewLP" type="boolean"/>
     </class>
 </hibernate-mapping>
 

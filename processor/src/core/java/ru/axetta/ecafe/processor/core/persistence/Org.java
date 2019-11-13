@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
@@ -151,6 +152,8 @@ public class Org implements Serializable {
     private Boolean preordersEnabled;
     private Boolean multiCardModeEnabled;
     private Boolean participantOP;
+    private Boolean preorderlp;
+    private Boolean haveNewLP;
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -1193,5 +1196,21 @@ public class Org implements Serializable {
 
     public void setParticipantOP(Boolean participantOP) {
         this.participantOP = participantOP;
+    }
+
+    public Boolean getPreorderlp() {
+        return preorderlp;
+    }
+
+    public void setPreorderlp(Boolean preorderlp) {
+        this.preorderlp = preorderlp;
+    }
+
+    public Boolean getHaveNewLP() {
+        return haveNewLP;
+    }
+
+    public void setHaveNewLP(Boolean haveNewLP) {
+        this.haveNewLP = haveNewLP;
     }
 }

@@ -1597,6 +1597,13 @@ public class DAOService {
         query.executeUpdate();
     }
 
+    public void applyHaveNewLPForOrg(Long idOfOrg, boolean value) throws Exception {
+        Query query = entityManager.createQuery("update Org set haveNewLP=:valueB where idOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("valueB", value);
+        query.executeUpdate();
+    }
+
     public List<ComplexRole> findComplexRoles() {
         return entityManager.createQuery("from ComplexRole order by idOfRole", ComplexRole.class).getResultList();
     }
@@ -2559,6 +2566,16 @@ public class DAOService {
         query.setParameter("day", date);
         try {
             return (ProductionCalendar) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
+    public SpecialDate getSpecialCalendarByDate(Date date) {
+        Query query = entityManager.createQuery("select sd from SpecialDate sd where sd.date = :day");
+        query.setParameter("day", date);
+        try {
+            return (SpecialDate) query.getSingleResult();
         } catch (NoResultException e) {
             return null;
         }

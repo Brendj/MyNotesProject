@@ -131,6 +131,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean preordersEnabled;
     private Boolean multiCardModeEnabled;
     private Boolean participantOP;
+    private Boolean preorderlp;
 
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
@@ -311,6 +312,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
         for (Org o : selectOrg) {
             o.setParticipantOP(participantOP);
+            o.setPreorderlp(preorderlp);
         }
 
         org.setCommodityAccounting(changeCommodityAccounting);
@@ -404,7 +406,8 @@ public class OrgEditPage extends BasicWorkspacePage
         }
 
         org.setRequestForVisitsToOtherOrg(requestForVisitsToOtherOrg);
-        
+        org.setPreorderlp(preorderlp);
+
         session.update(org);
         fill(org);
 
@@ -553,6 +556,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.preordersEnabled = org.getPreordersEnabled();
         this.multiCardModeEnabled = org.multiCardModeIsEnabled();
         this.participantOP = org.getParticipantOP();
+        this.preorderlp = org.getPreorderlp();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1163,6 +1167,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setMultiCardModeEnabled(Boolean multiCardModeEnabled) {
         this.multiCardModeEnabled = multiCardModeEnabled;
+    }
+
+    public Boolean getPreorderlp() {
+        return preorderlp;
+    }
+
+    public void setPreorderlp(Boolean preorderlp) {
+        this.preorderlp = preorderlp;
     }
 
     public static class ContragentItem {
