@@ -13,7 +13,9 @@ import ru.axetta.ecafe.processor.core.persistence.service.card.CardSignVerifyTyp
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.response.registry.cards.CardsOperationsRegistryItem;
 
+import org.hibernate.Criteria;
 import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
 import org.springframework.stereotype.Repository;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,8 +106,11 @@ public class CardWritableRepository extends WritableJpaDao {
             case VERIFY_FAIL:
                 throw new IllegalStateException("Ошибка регистрации");
             case VERIFY_SUCCESS:
-                CardSign cardSign = entityManager.find(CardSign.class, cardSignCertNum);
-                if (cardSign == null) throw new IllegalStateException("Ошибка регистрации");
+                Criteria criteria = ((Session) entityManager.getDelegate()).createCriteria(CardSign.class);
+                criteria.add(Restrictions.or(Restrictions.eq("deleted", false), Restrictions.isNull("deleted")));
+                List<CardSign> list = criteria.list();
+                //CardSign cardSign = entityManager.find(CardSign.class, cardSignCertNum);
+                if (list == null || list.isEmpty()) throw new IllegalStateException("Ошибка регистрации");
                 return;
             default: throw new IllegalStateException("Неизвестное значение параметра cardSignVerifyRes");
         }

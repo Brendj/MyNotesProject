@@ -55,8 +55,14 @@ public class CardSignEditPage extends CardSignDataBasicPage {
     }
 
     public Object save(boolean newProvider) {
+        logger.info(String.format("Старт изменения поставщика карт %s", groupPage.getCurrentCard().getIdOfCardSign()));
         if (signData == null || manufacturerCode == null || manufacturerCode == 0 || StringUtils.isEmpty(manufacturerName)) {
             printError("Все поля на форме обязательны для заполнения. Файл с данными ключа также должен быть загружен");
+            return null;
+        }
+        if (getManufacturerCode() < 1 || getManufacturerCode() > 256)
+        {
+            printError("Код поставщика карты должен быть не более 256");
             return null;
         }
         //Только для нового типа поставщика
@@ -90,6 +96,7 @@ public class CardSignEditPage extends CardSignDataBasicPage {
             session.update(cardSign);
             transaction.commit();
             transaction = null;
+            logger.info(String.format("Изменен поставщик карт %s", cardSign.getIdOfCardSign()));
             printMessage("Запись сохранена");
         } catch (Exception e) {
             logger.error("Error in cardSign edit page: ", e);

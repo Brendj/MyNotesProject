@@ -435,7 +435,7 @@ public class DAOReadonlyService {
 
     public byte[] getCardSignData(Integer idOfCardSign, Integer signType) {
         try {
-            Query query = entityManager.createQuery("select cs.signData from CardSign cs " + "where cs.idOfCardSign = :idOfCardSign and cs.signType = :signType");
+            Query query = entityManager.createQuery("select cs.signData from CardSign cs " + "where cs.idOfCardSign = :idOfCardSign and cs.signType = :signType  and (cs.deleted = false or cs.deleted is null)");
             query.setParameter("idOfCardSign", idOfCardSign);
             query.setParameter("signType", signType);
             return (byte[]) query.getSingleResult();
@@ -446,7 +446,7 @@ public class DAOReadonlyService {
 
     public CardSign getSignInform(Integer manufacturerCode) {
         try {
-            Query query = entityManager.createQuery("From CardSign cs " + "where cs.manufacturerCode = :manufacturerCode");
+            Query query = entityManager.createQuery("From CardSign cs " + "where cs.manufacturerCode = :manufacturerCode and (cs.deleted = false or cs.deleted is null)");
             query.setParameter("manufacturerCode", manufacturerCode);
             List<CardSign> allSign = query.getResultList();
             for (CardSign cardSign : allSign)
