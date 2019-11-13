@@ -17,6 +17,7 @@ public class CardSign {
     private byte[] publickeyprovider;
     private Integer signtypeprov;
     private Boolean newtypeprovider;
+    private Boolean deleted;
 
     public static final String CARDSIGN_SCRIPT_TYPE = "Scrypt";
     public static final String CARDSIGN_ECDSA_TYPE = "ECDSA";
@@ -103,5 +104,16 @@ public class CardSign {
 
     public void setNewtypeprovider(Boolean newtypeprovider) {
         this.newtypeprovider = newtypeprovider;
+    }
+
+    public Boolean getDeleted() {
+        //Если null, то запись НЕ удалена
+        if (deleted == null)
+            return false;
+        return deleted;
+    }
+
+    public void setDeleted(Boolean deleted) {
+        this.deleted = deleted;
     }
 }

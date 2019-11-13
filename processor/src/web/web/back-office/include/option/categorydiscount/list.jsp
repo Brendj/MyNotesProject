@@ -69,58 +69,90 @@
         <rich:column headerClass="center-aligned-column" style="text-align:left">
             <f:facet name="header">
                 <h:panelGroup>
-                    <h:outputText styleClass="output-text" escape="true" value="Запрет изменения в АРМ" />
+                    <h:outputText styleClass="output-text" escape="true" value="Ставка дисконтирования" />
                 </h:panelGroup>
             </f:facet>
-            <h:selectBooleanCheckbox value="#{item.blockedToChange}" styleClass="output-text" disabled="true"/>
+            <h:outputText styleClass="output-text" value="#{item.discountRate}" />
         </rich:column>
-        <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditCategory}"
-                     style="text-align:center">
+        <rich:column headerClass="center-aligned-column" style="text-align:left">
             <f:facet name="header">
-                <h:outputText escape="true" value="Редактировать" />
+                <h:panelGroup>
+                    <h:outputText styleClass="output-text" escape="true" value="Тип категории" />
+                </h:panelGroup>
             </f:facet>
-            <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{categoryDiscountEditPage.show}" styleClass="command-link" rendered="#{item.idOfCategoryDiscount>=0}">
-                <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{item.idOfCategoryDiscount}" target="#{categoryDiscountEditPage.idOfCategoryDiscount}" />
-            </a4j:commandLink>
+            <h:outputText styleClass="output-text" value="#{item.categoryType.description}" />
         </rich:column>
-        <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditCategory}"
-                     style="text-align:center">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Удалить" />
-            </f:facet>
-            <a4j:commandLink ajaxSingle="true" styleClass="command-link"
-                             oncomplete="#{rich:component('confirmDeletePanel')}.show();">
-                <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{categoryDiscountListPage}"
-                                             target="#{confirmDeletePage.listener}" />
-                <f:setPropertyActionListener value="#{item.idOfCategoryDiscount }"
-                                             target="#{confirmDeletePage.entityId}" />
-            </a4j:commandLink>
-        </rich:column>
-        <f:facet name="footer">
-            <rich:datascroller for="categoryTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
-                               stepControls="auto">
-                <f:facet name="first">
-                    <h:graphicImage value="/images/16x16/first.png" />
-                </f:facet>
-                <f:facet name="previous">
-                    <h:graphicImage value="/images/16x16/left-arrow.png" />
-                </f:facet>
-                <f:facet name="next">
-                    <h:graphicImage value="/images/16x16/right-arrow.png" />
-                </f:facet>
-                <f:facet name="last">
-                    <h:graphicImage value="/images/16x16/last.png" />
-                </f:facet>
-            </rich:datascroller>
-        </f:facet>
-    </rich:dataTable>
+        <rich:column headerClass="center-aligned-column" style="text-align:left">
+             <f:facet name="header">
+                 <h:panelGroup>
+                     <h:outputText styleClass="output-text" escape="true" value="Используется в правилах" />
+                 </h:panelGroup>
+             </f:facet>
+             <h:outputText styleClass="output-text" value="#{item.filter}" />
+         </rich:column>
+         <rich:column headerClass="center-aligned-column" style="text-align:left">
+             <f:facet name="header">
+                 <h:panelGroup>
+                     <h:outputText styleClass="output-text" escape="true" value="Запрет изменения в АРМ" />
+                 </h:panelGroup>
+             </f:facet>
+             <h:selectBooleanCheckbox value="#{item.blockedToChange}" styleClass="output-text" disabled="true"/>
+         </rich:column>
+         <rich:column headerClass="center-aligned-column" style="text-align:left">
+             <f:facet name="header">
+                 <h:panelGroup>
+                     <h:outputText styleClass="output-text" escape="true" value="Удалять при переводе" />
+                 </h:panelGroup>
+             </f:facet>
+             <h:selectBooleanCheckbox value="#{item.eligibleToDelete}" styleClass="output-text" disabled="true"/>
+         </rich:column>
+         <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditCategory}"
+                      style="text-align:center">
+             <f:facet name="header">
+                 <h:outputText escape="true" value="Редактировать" />
+             </f:facet>
+             <a4j:commandLink reRender="mainMenu, workspaceForm" action="#{categoryDiscountEditPage.show}" styleClass="command-link" rendered="#{item.idOfCategoryDiscount>=0}">
+                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
+                 <f:setPropertyActionListener value="#{item.idOfCategoryDiscount}" target="#{categoryDiscountEditPage.idOfCategoryDiscount}" />
+             </a4j:commandLink>
+         </rich:column>
+         <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditCategory}"
+                      style="text-align:center">
+             <f:facet name="header">
+                 <h:outputText escape="true" value="Удалить" />
+             </f:facet>
+             <a4j:commandLink ajaxSingle="true" styleClass="command-link"
+                              oncomplete="#{rich:component('confirmDeletePanel')}.show();">
+                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                 <f:setPropertyActionListener value="#{categoryDiscountListPage}"
+                                              target="#{confirmDeletePage.listener}" />
+                 <f:setPropertyActionListener value="#{item.idOfCategoryDiscount }"
+                                              target="#{confirmDeletePage.entityId}" />
+             </a4j:commandLink>
+         </rich:column>
+         <f:facet name="footer">
+             <rich:datascroller for="categoryTable" renderIfSinglePage="false" maxPages="10" fastControls="hide"
+                                stepControls="auto">
+                 <f:facet name="first">
+                     <h:graphicImage value="/images/16x16/first.png" />
+                 </f:facet>
+                 <f:facet name="previous">
+                     <h:graphicImage value="/images/16x16/left-arrow.png" />
+                 </f:facet>
+                 <f:facet name="next">
+                     <h:graphicImage value="/images/16x16/right-arrow.png" />
+                 </f:facet>
+                 <f:facet name="last">
+                     <h:graphicImage value="/images/16x16/last.png" />
+                 </f:facet>
+             </rich:datascroller>
+         </f:facet>
+     </rich:dataTable>
 
-    <h:panelGrid styleClass="borderless-grid">
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                       warnClass="warn-messages" />
-    </h:panelGrid>
+     <h:panelGrid styleClass="borderless-grid">
+         <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                        warnClass="warn-messages" />
+     </h:panelGrid>
 
-    <!--h:commandButton value="Выгрузить в CSV" action="{mainPage.showCategoryCSVList}" styleClass="command-button" /-->
-</h:panelGrid>
+     <!--h:commandButton value="Выгрузить в CSV" action="{mainPage.showCategoryCSVList}" styleClass="command-button" /-->
+ </h:panelGrid>

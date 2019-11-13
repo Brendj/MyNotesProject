@@ -134,6 +134,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String methodsInfoService;
     private String regularPaymentCertPath;
     private String regularPaymentCertPassword;
+    private Integer periodOfExtensionCards;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString(), RNIPVersion.RNIP_V21.toString()};
 
@@ -924,6 +925,8 @@ public class OptionPage extends BasicWorkspacePage {
 
         readerForWebInterfaceString = runtimeContext.getOptionValueString(Option.OPTION_READER_FOR_WEB_STRING);
 
+        periodOfExtensionCards = runtimeContext.getOptionValueInt(Option.OPTION_PERIOD_OF_EXTENSION_CARDS);
+
         bankListPage.onShow();
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -1086,6 +1089,8 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_REGULAR_PAYMENT_CERT_PATH, regularPaymentCertPath);
             runtimeContext.setOptionValue(Option.OPTION_REGULAR_PAYMENT_CERT_PASSWORD, regularPaymentCertPassword);
 
+            runtimeContext.setOptionValue(Option.OPTION_PERIOD_OF_EXTENSION_CARDS, periodOfExtensionCards);
+
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
         } catch (Exception e) {
@@ -1221,5 +1226,13 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setRegularPaymentCertPassword(String regularPaymentCertPassword) {
         this.regularPaymentCertPassword = regularPaymentCertPassword;
+    }
+
+    public Integer getPeriodOfExtensionCards() {
+        return periodOfExtensionCards;
+    }
+
+    public void setPeriodOfExtensionCards(Integer periodOfExtensionCards) {
+        this.periodOfExtensionCards = periodOfExtensionCards;
     }
 }

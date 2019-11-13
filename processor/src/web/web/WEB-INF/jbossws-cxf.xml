@@ -164,4 +164,12 @@ the signature crypto configuration.  See SignaturePropRefId. -->
             implementor='ru.axetta.ecafe.processor.web.internal.CardSignature'>
     </jaxws:endpoint>
 
+
+    <jaxws:endpoint
+            id="EZDController"
+            address='http://localhost:8080/processor/soap/ezd'
+            implementor='ru.axetta.ecafe.processor.web.partner.ezd.EZDControllerSOAP'>
+    </jaxws:endpoint>
+
+
 </beans>

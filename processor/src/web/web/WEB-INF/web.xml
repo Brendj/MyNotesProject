@@ -379,6 +379,15 @@
         <url-pattern>/soap/specialcards</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>EZDControllerWS</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.ezd.EZDControllerSOAP</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EZDControllerWS</servlet-name>
+        <url-pattern>/soap/ezd</url-pattern>
+    </servlet-mapping>
+
 
     <servlet>
         <servlet-name>BarcodeServlet</servlet-name>
@@ -450,21 +459,37 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>FpsApiServlet</servlet-name>
-        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
-        <init-param>
-            <param-name>resteasy.resources</param-name>
-            <param-value>ru.axetta.ecafe.processor.web.partner.fpsapi.FpsapiController</param-value>
-        </init-param>
-        <init-param>
-            <param-name>resteasy.servlet.mapping.prefix</param-name>
-            <param-value>/fps/api</param-value>
-        </init-param>
+    <servlet-name>FpsApiServlet</servlet-name>
+    <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+    <init-param>
+        <param-name>resteasy.resources</param-name>
+        <param-value>ru.axetta.ecafe.processor.web.partner.fpsapi.FpsapiController</param-value>
+    </init-param>
+    <init-param>
+        <param-name>resteasy.servlet.mapping.prefix</param-name>
+        <param-value>/fps/api</param-value>
+    </init-param>
     </servlet>
     <servlet-mapping>
         <servlet-name>FpsApiServlet</servlet-name>
-
         <url-pattern>/fps/api/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>EzdServlet</servlet-name>
+        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+        <init-param>
+            <param-name>resteasy.resources</param-name>
+            <param-value>ru.axetta.ecafe.processor.web.partner.ezd.EzdController</param-value>
+        </init-param>
+        <init-param>
+            <param-name>resteasy.servlet.mapping.prefix</param-name>
+            <param-value>/ezd</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EzdServlet</servlet-name>
+        <url-pattern>/ezd/*</url-pattern>
     </servlet-mapping>
 
     <filter>
