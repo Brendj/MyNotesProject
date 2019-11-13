@@ -42,6 +42,7 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
     private Integer organizationType;
     private Integer discountRate = 100;
     private boolean blockedToChange = false;
+    private Boolean eligibleToDelete = false;
     private final CategoryDiscountEnumTypeMenu categoryDiscountEnumTypeMenu = new CategoryDiscountEnumTypeMenu();
     private String filter = "-";
     private List<Long> idOfRuleList = new ArrayList<Long>();
@@ -146,6 +147,14 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         this.blockedToChange = blockedToChange;
     }
 
+    public Boolean getEligibleToDelete() {
+        return eligibleToDelete;
+    }
+
+    public void setEligibleToDelete(Boolean eligibleToDelete) {
+        this.eligibleToDelete = eligibleToDelete;
+    }
+
     public SelectItem[] getOrganizationItems() {
         OrganizationType[] organizationTypes = OrganizationType.values();
         SelectItem[] items = new SelectItem[3];
@@ -168,6 +177,7 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         categoryDiscount.setOrgType(organizationType);
         categoryDiscount.setLastUpdate(new Date());
         categoryDiscount.setBlockedToChange(blockedToChange);
+        categoryDiscount.setEligibleToDelete(eligibleToDelete);
         entityManager.persist(categoryDiscount);
         printMessage("Данные обновлены.");
         return null;
@@ -209,6 +219,7 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
             discountRate = 100;
         }
         this.blockedToChange = categoryDiscount.getBlockedToChange();
+        this.eligibleToDelete = categoryDiscount.getEligibleToDelete();
     }
 
     /*@Override
