@@ -4,16 +4,12 @@
 
 package ru.axetta.ecafe.processor.web.partner.ezd;
 
-import com.sun.org.apache.xpath.internal.operations.Or;
-
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -356,7 +352,54 @@ public class EzdController {
             @QueryParam(value = "GroupName") String groupName, @QueryParam(value = "Date") String dateR,
             @QueryParam(value = "UserName") String userName, @QueryParam(value = "idOfComplex") Long idOfComplex,
             @QueryParam(value = "complexName") String complexName, @QueryParam(value = "count") Integer count) {
-        return GeneralRequestMetod.requestsComplexForOne(guidOrg, groupName,dateR, userName, idOfComplex,
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            logger.info("Старт начала сбора данных по производственному календарю");
+            //Загружаем все данные производственного календаря
+            List<ProductionCalendar> productionCalendars = DAOUtils.getAllDateFromProdactionCalendarForEZD(persistenceSession);
+            if (productionCalendars == null) {
+                productionCalendars = new ArrayList<>();
+            }
+            logger.info(String.format("Всего записей по производственному календарю - %s", String.valueOf(productionCalendars.size())));
+
+            List<Org> orgs = DAOUtils.findOrgsByGuid(persistenceSession, guidOrg);
+            List<Long> idOrgs = new ArrayList<>();
+            for (Org org : orgs) {
+                idOrgs.add(org.getIdOfOrg());
+            }
+
+            List<String> groupNames = new ArrayList<>();
+            groupNames.add(groupName);
+            logger.info("Старт начала сбора данных по учебному календарю");
+            //Загружаем все данные учебного календаря
+            List<RequestsEzdSpecialDateView> requestsEzdSpecialDateViews = DAOUtils
+                    .getDateFromsSpecialDatesForEZD(persistenceSession, groupNames, idOrgs);
+            if (requestsEzdSpecialDateViews == null) {
+                requestsEzdSpecialDateViews = new ArrayList<>();
+            }
+            logger.info(String.format("Всего записей по учебному календарю - %s", String.valueOf(requestsEzdSpecialDateViews.size())));
+
+            //Настройка с АРМ для Org
+            Map<Long, Integer> allIdtoSetiings = OrgSettingDAOUtils
+                    .getOrgSettingItemByOrgAndType(persistenceSession, idOrgs, SETTING_TYPE);
+            if (allIdtoSetiings == null) {
+                allIdtoSetiings = new HashMap<>();
+            }
+        return GeneralRequestMetod.requestsComplexForOne(persistenceSession, productionCalendars, requestsEzdSpecialDateViews,
+                allIdtoSetiings, guidOrg, groupName,dateR, userName, idOfComplex,
                 complexName,  count);
+        } catch (Exception e) {
+            Result result = new Result();
+            result.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode().toString());
+            result.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+            return result;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
     }
 }
