@@ -645,7 +645,7 @@ public class PreorderDAOService {
     @Transactional
     public void relevancePreordersToOrgs(PreorderRequestsReportServiceParam params) {
         logger.info("Start relevancePreordersToOrgs process");
-        long nextVersion = nextVersionByPreorderComplex();
+        long nextVersion;
         Query query = em.createQuery("select pc, c.org.idOfOrg from PreorderComplex pc join pc.client c "
                 + "where pc.preorderDate > :date and pc.deletedState = false "
                 + params.getJPACondition()
@@ -657,6 +657,7 @@ public class PreorderDAOService {
             PreorderComplex preorderComplex = (PreorderComplex) row[0];
             Long idOfOrg = (Long) row[1];
             if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
+            nextVersion = nextVersionByPreorderComplex();
             if (preorderComplex.getIdOfOrgOnCreate() != null && !preorderComplex.getIdOfOrgOnCreate().equals(idOfOrg)) {
                 testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGE_ORG, true);
                 continue;
@@ -743,7 +744,7 @@ public class PreorderDAOService {
     @Transactional
     public void relevancePreordersToOrgFlag(PreorderRequestsReportServiceParam params) {
         logger.info("Start relevancePreordersToOrgFlag process");
-        long nextVersion = nextVersionByPreorderComplex();
+        long nextVersion;
         Query query = em.createQuery("select pc from PreorderComplex pc join pc.client.org o "
                 + "where pc.preorderDate > :date and pc.deletedState = false and o.preordersEnabled = false "
                 + params.getJPACondition()
@@ -752,6 +753,7 @@ public class PreorderDAOService {
         List<PreorderComplex> list = query.getResultList();
         for (PreorderComplex preorderComplex : list) {
             if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
+            nextVersion = nextVersionByPreorderComplex();
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF, true);
         }
 
