@@ -38,6 +38,10 @@ public enum CategoryDiscountEnumType {
         return value;
     }
 
+    public String getDescription() {
+        return description;
+    }
+
     @Override
     public String toString() {
         return String.format("(%d) - %s",value,description);

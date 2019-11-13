@@ -27,6 +27,7 @@ public class DiscountChangeHistory {
     public static final String MODIFY_IN_SERVICE = "Изменено в Сервисе.";
     public static final String MODIFY_IN_REGISTRY = "Изменено в Реестрах.";
     public static final String MODIFY_BY_US = "Положительное решение УС";
+    public static final String MODIFY_BY_TRANSITION = "Удалено при переводе";
 
     private Long idOfDiscountChange;
     private Date registrationDate;
