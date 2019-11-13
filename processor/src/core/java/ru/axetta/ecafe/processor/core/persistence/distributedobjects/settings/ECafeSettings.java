@@ -99,6 +99,10 @@ public class ECafeSettings extends DistributedObject {
         }
     }
 
+    public boolean isPreOrderFeeding() {
+        return settingsId != null && settingsId.equals(SettingsIds.PreOrderFeeding);
+    }
+
     @Override
     public void createProjections(Criteria criteria) {
         ProjectionList projectionList = Projections.projectionList();
