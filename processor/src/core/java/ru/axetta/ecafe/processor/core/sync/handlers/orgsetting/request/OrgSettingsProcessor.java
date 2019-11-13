@@ -70,17 +70,23 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
                         isChanged = true;
                     } else if (settingItem.getVersion() <= itemSyncPOJO.getVersion()
                             && !settingItem.getSettingValue().equals(itemSyncPOJO.getValue())) {
-                        settingItem.setLastUpdate(syncData);
-                        settingItem.setSettingValue(itemSyncPOJO.getValue());
+                        if (!setting.isPreOrderFeeding()) {
+                            //Не принимаем изменения от арма для типа PreOrderFeeding
+                            settingItem.setLastUpdate(syncData);
+                            settingItem.setSettingValue(itemSyncPOJO.getValue());
+                        }
                         settingItem.setVersion(nextVersionOfOrgSettingItem);
                         isChanged = true;
                     }
                 }
             }
             if(isChanged) {
-                setting.setLastUpdate(syncData);
                 setting.setVersion(nextVersionOfOrgSetting);
-                updateECafeSettingByOrgSetting(setting);
+                if (!setting.isPreOrderFeeding()) {
+                    //Не принимаем изменения от арма для типа PreOrderFeeding (issue_314)
+                    setting.setLastUpdate(syncData);
+                    updateECafeSettingByOrgSetting(setting);
+                }
                 session.persist(setting);
             }
         }
