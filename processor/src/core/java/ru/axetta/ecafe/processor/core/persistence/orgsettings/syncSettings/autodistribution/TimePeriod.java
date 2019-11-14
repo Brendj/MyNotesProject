@@ -10,6 +10,7 @@ import java.util.regex.Pattern;
 public class TimePeriod {
     private Integer startTimeInMinutes;
     private Integer endTimeInMinutes;
+    private boolean betweenTwoDay;
     private static final Pattern PERIOD_PATTERN = Pattern.compile("([0-1][0-9]|2[0-3]):[0-5][0-9]-([0-1][0-9]|2[0-3]):[0-5][0-9]");
 
     public TimePeriod(String period){
@@ -31,10 +32,16 @@ public class TimePeriod {
         Integer hourEnd = Integer.valueOf(splitEndTime[0]);
         Integer minutesEnd = Integer.valueOf(splitEndTime[1]);
         endTimeInMinutes = hourEnd * 60 + minutesEnd;
+
+        betweenTwoDay = startTimeInMinutes > endTimeInMinutes;
     }
 
     public boolean between(Integer minutes){
-        return startTimeInMinutes <= minutes && minutes <= endTimeInMinutes;
+        if(!betweenTwoDay) {
+            return startTimeInMinutes <= minutes && minutes <= endTimeInMinutes;
+        } else {
+            return startTimeInMinutes <= minutes || minutes <= endTimeInMinutes;
+        }
     }
 
     public Integer getStartTimeInMinutes() {

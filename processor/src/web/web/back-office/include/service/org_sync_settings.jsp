@@ -256,12 +256,12 @@
         <a4j:commandButton value="Восстановить" action="#{orgSyncSettingReportPage.resetChanges()}"
                            reRender="orgSyncSettingsTable" styleClass="command-button" status="orgSyncReportStatus"
                            id="resetChangesButton" />
-        <a4j:commandButton value="Применить изменения" action="#{orgSyncSettingReportPage.applyChanges()}"
-                           reRender="orgSyncSettingsTable" styleClass="command-button" status="orgSyncReportStatus"
-                           id="applyChangesButton" />
         <a4j:commandButton action="#{orgSyncSettingReportPage.beginDistributionSyncSettings()}"
                            value="Автоматически распределить время" reRender="orgSyncSettingsTable"
                            styleClass="command-button" />
+        <a4j:commandButton value="Применить изменения" action="#{orgSyncSettingReportPage.applyChanges()}"
+                           reRender="orgSyncSettingsTable" styleClass="command-button" status="orgSyncReportStatus"
+                           id="applyChangesButton" />
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages" />

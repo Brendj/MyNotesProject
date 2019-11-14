@@ -317,19 +317,48 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
             }
             for (OrgSyncSettingReportItem item : items) {
                 try {
-                    SyncSetting fullSync = service.distributionSyncSettings(item.getFullSync().getSetting());
-                    SyncSetting orgSettingSync = service.distributionSyncSettings(item.getOrgSettingSync().getSetting());
-                    SyncSetting clientDataSync = service.distributionSyncSettings(item.getClientDataSync().getSetting());
-                    SyncSetting menuSync = service.distributionSyncSettings(item.getMenuSync().getSetting());
-                    SyncSetting photoSync = service.distributionSyncSettings(item.getPhotoSync().getSetting());
-                    SyncSetting libSync = service.distributionSyncSettings(item.getLibSync().getSetting());
+                    if(selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES)){
+                        SyncSetting fullSync = service.distributionSyncSettings(item.getFullSync().getSetting());
+                        SyncSetting orgSettingSync = service.distributionSyncSettings(item.getOrgSettingSync().getSetting());
+                        SyncSetting clientDataSync = service.distributionSyncSettings(item.getClientDataSync().getSetting());
+                        SyncSetting menuSync = service.distributionSyncSettings(item.getMenuSync().getSetting());
+                        SyncSetting photoSync = service.distributionSyncSettings(item.getPhotoSync().getSetting());
+                        SyncSetting libSync = service.distributionSyncSettings(item.getLibSync().getSetting());
 
-                    item.rebuildSyncInfo(fullSync.getContentType().getTypeCode(), fullSync);
-                    item.rebuildSyncInfo(orgSettingSync.getContentType().getTypeCode(), orgSettingSync);
-                    item.rebuildSyncInfo(clientDataSync.getContentType().getTypeCode(), clientDataSync);
-                    item.rebuildSyncInfo(menuSync.getContentType().getTypeCode(), menuSync);
-                    item.rebuildSyncInfo(photoSync.getContentType().getTypeCode(), photoSync);
-                    item.rebuildSyncInfo(libSync.getContentType().getTypeCode(), libSync);
+                        item.rebuildSyncInfo(fullSync.getContentType().getTypeCode(), fullSync);
+                        item.rebuildSyncInfo(orgSettingSync.getContentType().getTypeCode(), orgSettingSync);
+                        item.rebuildSyncInfo(clientDataSync.getContentType().getTypeCode(), clientDataSync);
+                        item.rebuildSyncInfo(menuSync.getContentType().getTypeCode(), menuSync);
+                        item.rebuildSyncInfo(photoSync.getContentType().getTypeCode(), photoSync);
+                        item.rebuildSyncInfo(libSync.getContentType().getTypeCode(), libSync);
+                    } else {
+                        ContentType type = ContentType.getContentTypeByCode(selectedContentType);
+                        SyncSetting currentSetting;
+                        switch (type) {
+                            case FULL_SYNC:
+                                currentSetting = service.distributionSyncSettings(item.getFullSync().getSetting());
+                                break;
+                            case ORGSETTINGS:
+                                currentSetting = service.distributionSyncSettings(item.getOrgSettingSync().getSetting());
+                                break;
+                            case CLIENTS_DATA:
+                                currentSetting = service.distributionSyncSettings(item.getClientDataSync().getSetting());
+                                break;
+                            case MENU:
+                                currentSetting = service.distributionSyncSettings(item.getMenuSync().getSetting());
+                                break;
+                            case PHOTOS:
+                                currentSetting = service.distributionSyncSettings(item.getPhotoSync().getSetting());
+                                break;
+                            case LIBRARY:
+                                currentSetting = service.distributionSyncSettings(item.getLibSync().getSetting());
+                                break;
+                            default:
+                                throw new IllegalArgumentException("Not supported type of SyncSetting");
+                        }
+                        assert currentSetting != null;
+                        item.rebuildSyncInfo(currentSetting.getContentType().getTypeCode(), currentSetting);
+                    }
                 } catch (Exception e) {
                     logger.error(String.format("Can't calculate new sessionTime for ID OO %d", item.getIdOfOrg()), e);
                     printError("Не удалось расчитать новое время сеанса для настроек ID OO " + item.getIdOfOrg());
