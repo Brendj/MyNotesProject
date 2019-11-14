@@ -920,13 +920,20 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
         Boolean isReplaceOrg = !(client.getOrg().getIdOfOrg().equals(org.getIdOfOrg()));
+        Boolean isFriendlyReplaceOrg = false;
         if (isReplaceOrg) {
             clientMigration = new ClientMigration(client.getOrg());
 
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             Set<Org> orgSet = client.getOrg().getFriendlyOrg();
+            for (Org o : orgSet) {
+                if(o.getIdOfOrg().equals(org.getIdOfOrg())){
+                    isFriendlyReplaceOrg = true;
+                    break;
+                }
+            }
             runtimeContext.getProcessor().disableClientCardsIfChangeOrg(client, orgSet, org.getIdOfOrg());
-
+            archiveApplicationForFoodWithoutDiscount(client, persistenceSession);
         }
         ClientManager.checkUserOPFlag(persistenceSession, client.getOrg(), org, this.idOfClientGroup, client);
         client.setOrg(org);
@@ -991,6 +998,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             categoryCriteria.addOrder(Order.asc("idOfCategoryDiscount"));
             for (Object object : categoryCriteria.list()) {
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;
+                if(isReplaceOrg && !isFriendlyReplaceOrg && categoryDiscount.getEligibleToDelete()){
+                    archiveDtisznDiscount(client, persistenceSession, categoryDiscount.getIdOfCategoryDiscount());
+                    continue;
+                }
                 clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
                 clientCategories.append(",");
                 categoryDiscountSet.add(categoryDiscount);
@@ -1159,9 +1170,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private void saveDiscountChange(Client client, Session persistenceSession, String newCategoriesDiscounts) {
         DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, null, discountMode, client.getDiscountMode(),
                 newCategoriesDiscounts, client.getCategoriesDiscounts());
-        discountChangeHistory.setComment(
-                DiscountChangeHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
-                        .getExternalContext().getRemoteUser() + ".");
+        discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_BY_TRANSITION);
         persistenceSession.save(discountChangeHistory);
 
     }

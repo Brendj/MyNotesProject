@@ -3785,6 +3785,10 @@ public class Processor implements SyncProcessor {
                 //Проверяем, если у клиента меняется организация, то блокируем ему карты в старой организации
                 Client client = DAOUtils.findClient(persistenceSession, clientParamItem.getIdOfClient());
                 disableClientCardsIfChangeOrg(client, orgSet, idOfOrg);
+                Boolean isRemoveDiscount = removeClientDiscountIfChangeOrg(client,persistenceSession,orgSet,idOfOrg);
+                if (!isRemoveDiscount) {
+                    archiveApplicationForFoodIfChangeOrg(client, persistenceSession, orgSet, idOfOrg);
+                }
 
                 /*ClientGroup clientGroup = orgMap.get(2L).get(clientParamItem.getGroupName());
                 *//* если группы нет то создаем *//*
@@ -6443,6 +6447,42 @@ public class Processor implements SyncProcessor {
         return clientDiscountDTSZN;
     }
 
+    public boolean removeClientDiscountIfChangeOrg(Client client, Session session, Set<Org> oldOrgs, long newIdOfOrg)
+            throws Exception {
+        if (client == null) {
+            return false;
+        }
+        //Если новая организация не совпадает ни со старой, ни с дружественными старой, то удаляем льготы
+        if (isReplaceOrg(client, oldOrgs, newIdOfOrg)) {
+            ClientManager.deleteDiscount(client, session);
+            return true;
+        }
+        return false;
+    }
+
+    public void archiveApplicationForFoodIfChangeOrg(Client client, Session session, Set<Org> oldOrgs, long newIdOforg)
+            throws Exception {
+        if (client == null) {
+            return;
+        }
+
+        if(isReplaceOrg(client, oldOrgs, newIdOforg)) {
+            ClientManager.archiveApplicationForFoodWithoutDiscount(client, session);
+        }
+
+    }
+
+    private boolean isReplaceOrg (Client client, Set<Org> oldOrgs, long newIdOfOrg) {
+        Boolean replaceOrg = !client.getOrg().getIdOfOrg()
+                .equals(newIdOfOrg); //сравниваем старую организацию клиента с новой
+        for (Org o : oldOrgs) {
+            if (o.getIdOfOrg().equals(newIdOfOrg)) {                             //и с дружественными организациями
+                replaceOrg = false;
+                return replaceOrg;
+            }
+        }
+        return replaceOrg;
+    }
     private SyncResponse buildOrgSettingsSectionsResponse(SyncRequest request, Date syncStartTime, int syncResult) {
         SyncHistory syncHistory = null;
         Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации

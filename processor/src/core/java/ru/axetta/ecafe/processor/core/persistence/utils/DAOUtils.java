@@ -4234,6 +4234,11 @@ public class DAOUtils {
         return (OrgSetting) criteria.uniqueResult();
     }
 
+    public static List<CategoryDiscount> getCategoryDiscountList(Session session) {
+        Query q = session.createQuery("from CategoryDiscount order by idOfCategoryDiscount");
+        return (List<CategoryDiscount>)q.list();
+    }
+
     public static List<Long> findFriendlyOrgsIds(Session session, List<Long> orgIdList) {
         Query query = session
                 .createSQLQuery("select friendlyorg from cf_friendly_organization where currentorg in (:idOfOrgList)")
@@ -4282,6 +4287,28 @@ public class DAOUtils {
         Criteria criteria = persistenceSession.createCriteria(EnterEvent.class);
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.between("evtDateTime", startDate, endDate));
+        return criteria.list();
+    }
+
+    public static List<Integer> getDsznCodeListByCategoryDiscountCode(Session session, Long idOfCategoryDiscount) {
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        criteria.add(Restrictions.eq("categoryDiscount.idOfCategoryDiscount", idOfCategoryDiscount));
+        criteria.setProjection(Projections.property("code"));
+        return criteria.list();
+    }
+
+    public static ApplicationForFood getApplicationForFoodByClientAndCode(Session session, Client client, Long code) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.eq("dtisznCode", code));
+        criteria.add(Restrictions.eq("archived", false));
+        return (ApplicationForFood) criteria.uniqueResult();
+    }
+
+    public static List<ApplicationForFood> getApplicationForFoodByClient(Session session, Client client) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.eq("archived", false));
         return criteria.list();
     }
 
