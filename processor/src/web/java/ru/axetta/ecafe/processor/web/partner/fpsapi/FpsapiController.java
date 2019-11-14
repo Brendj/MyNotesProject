@@ -421,7 +421,7 @@ public class FpsapiController {
 
                 transactionItem.setTransactiontag("");
 
-                responseTransactions.getTransaction().add(transactionItem);
+                responseTransactions.getTransactions().add(transactionItem);
             }
             persistenceSession.flush();
             persistenceTransaction.commit();

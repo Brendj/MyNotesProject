@@ -1597,6 +1597,13 @@ public class DAOService {
         query.executeUpdate();
     }
 
+    public void applyHaveNewLPForOrg(Long idOfOrg, boolean value) throws Exception {
+        Query query = entityManager.createQuery("update Org set haveNewLP=:valueB where idOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("valueB", value);
+        query.executeUpdate();
+    }
+
     public List<ComplexRole> findComplexRoles() {
         return entityManager.createQuery("from ComplexRole order by idOfRole", ComplexRole.class).getResultList();
     }
@@ -2564,6 +2571,16 @@ public class DAOService {
         }
     }
 
+    public SpecialDate getSpecialCalendarByDate(Date date) {
+        Query query = entityManager.createQuery("select sd from SpecialDate sd where sd.date = :day");
+        query.setParameter("day", date);
+        try {
+            return (SpecialDate) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
     private String getStrForDate(String str) {
         return (str.length() == 1) ? "0" + str : str;
     }
@@ -2618,7 +2635,7 @@ public class DAOService {
     public List findCardsignByManufactureCodeForNewTypeProvider (Integer manufactureCode)
     {
         Query query = entityManager.createQuery("select cs from CardSign cs where cs.manufacturerCode = :manufactureCode "
-                + "and cs.newtypeprovider = true");
+                + "and cs.newtypeprovider = true and (cs.deleted = false or cs.deleted is null)");
         query.setParameter("manufactureCode", manufactureCode);
         try {
             return query.getResultList();
