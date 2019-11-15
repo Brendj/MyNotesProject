@@ -13,6 +13,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.ResCate
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZN;
+import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSection;
+import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSectionForARMAnswer;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.ResHelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
@@ -1203,6 +1205,8 @@ public class SyncResponse {
     private RequestFeedingData requestFeedingData;
     private ClientDiscountDTSZN clientDiscountDTSZN;
     private OrgSettingSection orgSetting;
+    private EmiasSection emias;
+    private EmiasSectionForARMAnswer emiasSectionForARMAnswer;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1224,7 +1228,7 @@ public class SyncResponse {
             ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections,
             ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData,
             ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
-            ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting) {
+            ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1281,6 +1285,8 @@ public class SyncResponse {
         this.clientBalanceHoldFeeding = clientBalanceHoldFeeding;
         this.resClientBalanceHoldData = resClientBalanceHoldData;
         this.orgSetting = orgSetting;
+        this.emias = emias;
+        this.emiasSectionForARMAnswer = emiasSectionForARMAnswer;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1567,6 +1573,13 @@ public class SyncResponse {
 
         if(orgSetting != null){
             envelopeElement.appendChild(orgSetting.toElement(document));
+        }
+
+        if (emiasSectionForARMAnswer != null) {
+            envelopeElement.appendChild(emiasSectionForARMAnswer.toElement(document));
+        }
+        if(emias != null){
+            envelopeElement.appendChild(emias.toElement(document));
         }
     }
 
