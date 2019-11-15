@@ -93,7 +93,7 @@ public class CardsUidUpdateService {
                 Client toClient = (Client)session.load(Client.class, idOfClientBalanceTo);
                 Long idOfClientBalanceFrom = ((BigInteger)row[1]).longValue();
                 Client fromClient = (Client)session.load(Client.class, idOfClientBalanceFrom);
-                if (fromClient.getBalance() > 0) {
+                if (fromClient.getBalance() > 0 && toClient.getBalance().equals(0L)) {
                     logger.info(String.format("Перевод баланса клиента ид=%s клиенту ид=%s, сумма %s",
                             idOfClientBalanceFrom, idOfClientBalanceTo, fromClient.getBalance()));
                     RuntimeContext.getFinancialOpsManager()
