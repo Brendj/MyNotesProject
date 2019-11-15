@@ -138,7 +138,7 @@
                     <h:selectBooleanCheckbox value="#{orgSyncSettingReportPage.editedSetting.sunday}"
                                              styleClass="checkboxes" disabled="#{!orgSyncSettingReportPage.settingEnable}"/>
                     <h:panelGrid columns="2" styleClass="borderless-grid">
-                        <a4j:commandButton reRender="OrgSyncSettingEditPanelGrid"
+                        <a4j:commandButton reRender="OrgSyncSettingEditPanelGrid, orgSyncSettingsTable"
                                            action="#{orgSyncSettingReportPage.saveLocalChanges()}"
                                            status="orgSyncReportStatus" value="Сохранить" />
                     </h:panelGrid>
@@ -150,7 +150,7 @@
         <h:panelGrid columns="1" styleClass="borderless-grid">
             <a4j:commandButton oncomplete="Richfaces.hideModalPanel('OrgSyncSettingEditPanel')"
                                reRender="workspaceTogglePanel, OrgSyncSettingEditPanel" value="Закрыть"
-                               action="#{orgSyncSettingReportPage.resetChanges()}" status="orgSyncReportStatus" />
+                               status="orgSyncReportStatus" />
         </h:panelGrid>
     </rich:modalPanel>
     <rich:dataTable id="orgSyncSettingsTable" value="#{orgSyncSettingReportPage.items}" var="item" rows="25"
