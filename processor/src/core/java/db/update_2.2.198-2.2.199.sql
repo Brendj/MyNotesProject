@@ -8,19 +8,22 @@
 
 -- Таблица для хранения заявок от ЭЖД
 CREATE TABLE cf_goods_requests_ezd (
-  idrequestsezd   bigserial,		-- первичный ключ
-  idoforg         int8,       -- идентификатор организации
-  groupName 		varchar,	-- наименование группы обучающихся
-  dateappointment int8,		-- дата предварительной заявки
-  idOfComplex   	int8,		-- идентификатор комплекса
-  complexName     varchar, 	-- наименование комплекса
-  complexcount	int4, 		-- количество комплексов
-  userName 		varchar, 	-- ФИО пользователя, который подал предварительную заявку
-  createddate 	int8,		-- дата создания записи
-  lastupdate 		int8, 		-- дата изменения записи
-  versionrecord	int4,		-- версия записи
-  guid 			varchar 	-- guid заявки
+  idrequestsezd   bigserial,
+  idoforg         int8,
+  groupName 		varchar,
+  dateappointment int8,
+  idOfComplex   	int8,
+  complexName     varchar,
+  complexcount	int4,
+  userName 		varchar,
+  createddate 	int8,
+  lastupdate 		int8,
+  versionrecord	int4,
+  guid 			varchar
 );
+
+ALTER TABLE cf_orgs ADD preorderlp bool NULL DEFAULT true;
+COMMENT ON COLUMN cf_orgs.preorderlp IS 'Предварительные заявки по ЛП';
 
 -- Представление для удобства отображения данных для отправки в ЭЖД
 CREATE view cf_ezd_request
@@ -61,16 +64,15 @@ create view cf_ezd_request_special_date
                     sda.date > cast((round(date_part('epoch',now())) * 1000) as bigint) order by sda.idoforg, cgto.groupname, sda.date
              ) as res) as resulted;
 
-ALTER TABLE public.cf_orgs ADD preorderlp bool NULL DEFAULT true;
-COMMENT ON COLUMN public.cf_orgs.preorderlp IS 'Предварительные заявки по ЛП';
-
-ALTER TABLE public.cf_orgs ADD havenewlp bool NULL DEFAULT false;
-COMMENT ON COLUMN public.cf_orgs.havenewlp IS 'Имеются заявки, не отправленные в АРМ';
-
-ALTER TABLE public.cf_goods_requests_ezd ADD guid varchar NULL;
-
+ALTER TABLE cf_orgs ADD havenewlp bool NULL DEFAULT false;
+COMMENT ON COLUMN cf_orgs.havenewlp IS 'Имеются заявки, не отправленные в АРМ';
 
 --277
 
-ALTER TABLE public.cf_card_signs ADD deleted bool NULL DEFAULT false;
-COMMENT ON COLUMN public.cf_card_signs.deleted IS 'Метка, что запись удалена';
+ALTER TABLE cf_card_signs ADD deleted bool NULL DEFAULT false;
+COMMENT ON COLUMN cf_card_signs.deleted IS 'Метка, что запись удалена';
+
+ALTER TABLE cf_categorydiscounts
+  ADD COLUMN eligibletodelete integer not null default 0;
+
+--! ФИНАЛИЗИРОВАН 30.10.2019, НЕ МЕНЯТЬ
