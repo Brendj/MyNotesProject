@@ -29,7 +29,6 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
     private SyncInfo libSync = new SyncInfo(ContentType.LIBRARY);
     private Boolean isChange = false;
     private Org org;
-    private Integer numOfPhotoEnabled;
 
     public OrgSyncSettingReportItem(Org org, List<SyncSetting> settings) {
         this.orgName = org.getShortName();
@@ -261,14 +260,6 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
 
     public void setOrg(Org org) {
         this.org = org;
-    }
-
-    public Integer getNumOfPhotoEnabled() {
-        return numOfPhotoEnabled;
-    }
-
-    public void setNumOfPhotoEnabled(Integer numOfPhotoEnabled) {
-        this.numOfPhotoEnabled = numOfPhotoEnabled;
     }
 
     public class SyncInfo {

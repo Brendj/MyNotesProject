@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.ContentType;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.syncSettings.SyncSetting;
+import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -132,6 +133,7 @@ public class AutoDistributionSyncSettingsService {
             return setting; // if wrong ContentType, then do nothing
         }
 
+        boolean isChanges = false;
         Long idOfOrg = setting.getOrg().getIdOfOrg();
         Integer calculationMinutesForSync = calculateTime(idOfOrg, SYNC_CONTENT_TYPE_MAP.get(setting.getContentType()));
         List<String> calculationPeriods = Collections.emptyList();
@@ -140,96 +142,110 @@ public class AutoDistributionSyncSettingsService {
                 try {
                     calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
                             allowedFullSyncPeriods, forbiddenFullSyncPeriod);
+                    isChanges = !CollectionUtils.isEmpty(calculationPeriods);
                 } catch (Exception e) {
                     logger.error("Can't calculate sync Time for full sync: ", e);
-                    logger.info("User expression dropped, try regenerate by default expression: "
+                    logger.info("FULL_SYNC User expression dropped, try regenerate by default expression: "
                             + FULL_SYNC_DEFAULT_EXPRESSION);
                     buildAllowedAndForbiddenList(FULL_SYNC_DEFAULT_EXPRESSION,
                             allowedFullSyncPeriods, forbiddenFullSyncPeriod);
                     calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
                             allowedFullSyncPeriods, forbiddenFullSyncPeriod);
+                    isChanges = !CollectionUtils.isEmpty(calculationPeriods);
                 }
                 break;
             case ORGSETTINGS:
                 try {
                     calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
                             allowedOrgSettingSyncPeriods, forbiddenOrgSettingSyncPeriod);
+                    isChanges = !CollectionUtils.isEmpty(calculationPeriods);
                 } catch (Exception e) {
                     logger.error("Can't calculate sync Time for OrgSetting sync: ", e);
-                    logger.info("User expression dropped, try regenerate by default expression: "
+                    logger.info("ORGSETTINGS User expression dropped, try regenerate by default expression: "
                             + ORG_SETTING_SYNC_DEFAULT_EXPRESSION);
                     buildAllowedAndForbiddenList(ORG_SETTING_SYNC_DEFAULT_EXPRESSION,
                             allowedOrgSettingSyncPeriods, forbiddenOrgSettingSyncPeriod);
                     calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
                             allowedOrgSettingSyncPeriods, forbiddenOrgSettingSyncPeriod);
+                    isChanges = !CollectionUtils.isEmpty(calculationPeriods);
                 }
                 break;
             case CLIENTS_DATA:
                 try {
                     calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
                         allowedClientDataSyncPeriods, forbiddenClientDataSyncPeriod);
+                    isChanges = !CollectionUtils.isEmpty(calculationPeriods);
                 } catch (Exception e) {
                     logger.error("Can't calculate sync Time for ClientData sync: ", e);
-                    logger.info("User expression dropped, try regenerate by default expression: "
+                    logger.info("CLIENTS_DATA User expression dropped, try regenerate by default expression: "
                             + CLIENT_DATA_SYNC_DEFAULT_EXPRESSION);
                     buildAllowedAndForbiddenList(CLIENT_DATA_SYNC_DEFAULT_EXPRESSION,
                             allowedClientDataSyncPeriods, forbiddenClientDataSyncPeriod);
                     calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
                             allowedClientDataSyncPeriods, forbiddenClientDataSyncPeriod);
+                    isChanges = !CollectionUtils.isEmpty(calculationPeriods);
                 }
                 break;
             case MENU:
                 try {
                     calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
                         allowedMenuSyncPeriods, forbiddenMenuSyncPeriod);
+                    isChanges = !CollectionUtils.isEmpty(calculationPeriods);
                 } catch (Exception e) {
                     logger.error("Can't calculate sync Time for Menu sync: ", e);
-                    logger.info("User expression dropped, try regenerate by default expression: "
+                    logger.info("MENU User expression dropped, try regenerate by default expression: "
                             + MENU_SYNC_DEFAULT_EXPRESSION);
                     buildAllowedAndForbiddenList(MENU_SYNC_DEFAULT_EXPRESSION,
                             allowedMenuSyncPeriods, forbiddenMenuSyncPeriod);
                     calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
                             allowedMenuSyncPeriods, forbiddenMenuSyncPeriod);
+                    isChanges = !CollectionUtils.isEmpty(calculationPeriods);
                 }
                 break;
             case PHOTOS:
                 try {
                 calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
                         allowedPhotoSyncPeriods, forbiddenPhotoSyncPeriod);
+                    isChanges = !CollectionUtils.isEmpty(calculationPeriods);
                 } catch (Exception e) {
                     logger.error("Can't calculate sync Time for Photo sync: ", e);
-                    logger.info("User expression dropped, try regenerate by default expression: "
+                    logger.info("PHOTOS User expression dropped, try regenerate by default expression: "
                             + PHOTO_SYNC_DEFAULT_EXPRESSION);
                     buildAllowedAndForbiddenList(PHOTO_SYNC_DEFAULT_EXPRESSION,
                             allowedPhotoSyncPeriods, forbiddenPhotoSyncPeriod);
                     calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
                             allowedPhotoSyncPeriods, forbiddenPhotoSyncPeriod);
+                    isChanges = !CollectionUtils.isEmpty(calculationPeriods);
                 }
                 break;
             case LIBRARY:
                 try {
                     calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
                         allowedLibSyncPeriods, forbiddenLibSyncPeriod);
+                    isChanges = !CollectionUtils.isEmpty(calculationPeriods);
                 } catch (Exception e) {
                     logger.error("Can't calculate sync Time for Lib sync: ", e);
-                    logger.info("User expression dropped, try regenerate by default expression: "
+                    logger.info("LIBRARY User expression dropped, try regenerate by default expression: "
                             + LIB_SYNC_DEFAULT_EXPRESSION);
                     buildAllowedAndForbiddenList(LIB_SYNC_DEFAULT_EXPRESSION,
                             allowedLibSyncPeriods, forbiddenLibSyncPeriod);
                     calculationPeriods = calculatePeriodsForSyncSetting(calculationMinutesForSync,
                             allowedLibSyncPeriods, forbiddenLibSyncPeriod);
+                    isChanges = !CollectionUtils.isEmpty(calculationPeriods);
                 }
                 break;
         }
-        setting.setConcreteTime(StringUtils.join(calculationPeriods, SyncSetting.SEPARATOR));
 
-        setting.setMonday(true);
-        setting.setTuesday(true);
-        setting.setWednesday(true);
-        setting.setThursday(true);
-        setting.setFriday(true);
-        setting.setSaturday(true);
-        setting.setSunday(true);
+        if(isChanges) {
+            setting.setConcreteTime(StringUtils.join(calculationPeriods, SyncSetting.SEPARATOR));
+            setting.setMonday(true);
+            setting.setTuesday(true);
+            setting.setWednesday(true);
+            setting.setThursday(true);
+            setting.setFriday(true);
+            setting.setSaturday(true);
+            setting.setSunday(true);
+        }
 
         return setting;
     }
