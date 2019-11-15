@@ -6,11 +6,12 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
@@ -121,7 +122,7 @@ public class ClientBalanceTransferPage extends BasicWorkspacePage implements Cli
         updateClientInfo((Session)em.getDelegate());
     }
     
-    private void updateClientInfo(Session session) {
+    public void updateClientInfo(Session session) {
         fromClientName=null;
         fromClientBalance=null;
         toClientName=null;
@@ -156,13 +157,22 @@ public class ClientBalanceTransferPage extends BasicWorkspacePage implements Cli
         } else if (fromClientBalance < sum) {
             printError("Недостаточно средств на лицевом счете плательщика");
         } else {
+            Session session = null;
+            Transaction transaction = null;
             try {
-                RuntimeContext.getFinancialOpsManager().createAccountTransfer(fromClient, toClient, sum, reason,
+                session = RuntimeContext.getInstance().createPersistenceSession();
+                transaction = session.beginTransaction();
+                RuntimeContext.getFinancialOpsManager().createAccountTransfer(session, fromClient, toClient, sum, reason,
                         MainPage.getSessionInstance().getCurrentUser());
                 printMessage("Перевод успешно проведен");
-                RuntimeContext.getAppContext().getBean(ClientBalanceTransferPage.class).updateClientInfo();
+                RuntimeContext.getAppContext().getBean(ClientBalanceTransferPage.class).updateClientInfo(session);
+                transaction.commit();
+                transaction = null;
             } catch (Exception e) {
                 logAndPrintMessage("Ошибка при выполнении перевода", e);
+            } finally {
+                HibernateUtils.rollback(transaction, getLogger());
+                HibernateUtils.close(session, getLogger());
             }
         }
 
