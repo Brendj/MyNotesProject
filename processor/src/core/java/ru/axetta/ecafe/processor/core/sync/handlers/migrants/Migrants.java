@@ -95,6 +95,7 @@ public class Migrants implements SectionRequest{
                     String[] incomeIdsForOrg = incomeCurrentActive.split(";");
                     for (String idForOrg : incomeIdsForOrg) {
                         String[] orgAndId = idForOrg.split(":");
+                        if (orgAndId.length != 2) continue;
                         Long idOfOrg = Long.parseLong(orgAndId[0]);
                         for (String id : orgAndId[1].split(",")) {
                             try {
