@@ -10583,4 +10583,34 @@ public class MainPage implements Serializable {
     public void setCanSendAgain(Boolean canSendAgain) {
         this.canSendAgain = canSendAgain;
     }
+
+    public Object showClientOperationListPageWithOrgView() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            selectedClientGroupPage.fill(persistenceSession, selectedIdOfClient);
+            clientOperationListPage.fill(persistenceSession, selectedIdOfClient);
+            clientViewPage.fill(persistenceSession, selectedIdOfClient);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            selectedClientGroupPage.showAndExpandMenuGroup();
+            currentWorkspacePage = clientOperationListPage;
+        } catch (Exception e) {
+            logger.error("Failed to show client operation list page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы просмотра списка операций по клиенту: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
 }

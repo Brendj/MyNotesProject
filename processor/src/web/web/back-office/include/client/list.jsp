@@ -47,7 +47,6 @@
             <h:outputText escape="true" value="Поиск по GUID" styleClass="output-text" />
             <h:inputText value="#{mainPage.clientListPage.clientFilter.filterClientGUID}" size="40"
                          styleClass="input-text" />
-
             <h:outputText escape="true" value="Группа" styleClass="output-text" />
             <h:selectOneMenu value="#{mainPage.clientListPage.clientFilter.clientGroupId}" styleClass="input-text"
                              style="width: 145px;">
@@ -138,7 +137,7 @@
     </a4j:status>
 
     <rich:dataTable id="clientListTable" value="#{mainPage.clientListPage.items}" var="item" rows="20"
-                    columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,  center-aligned-column"
+                    columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,  center-aligned-column, center-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header" sortBy="#{item.idOfClient}">
             <f:facet name="header">
@@ -234,7 +233,7 @@
             <f:facet name="header">
                 <h:outputText escape="true" value="Операции" />
             </f:facet>
-            <a4j:commandLink action="#{mainPage.showClientOperationListPage}" styleClass="command-link"
+            <a4j:commandLink action="#{mainPage.showClientOperationListPageWithOrgView}" styleClass="command-link"
                              reRender="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="Операции" styleClass="output-text" />
                 <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
