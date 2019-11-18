@@ -40,7 +40,7 @@
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{orgSyncSettingReportPage.buildHTML()}"
-                           reRender="orgSyncSettingsTable" styleClass="command-button" status="orgSyncReportStatus"
+                           reRender="orgSyncSettingsTable, autoDistributionSyncSettingsButton" styleClass="command-button" status="orgSyncReportStatus"
                            id="buildHTMLButton" />
 
         <h:commandButton value="Выгрузить в Excel" action="#{orgSyncSettingReportPage.buildXLS}"
@@ -256,9 +256,10 @@
         <a4j:commandButton value="Восстановить" action="#{orgSyncSettingReportPage.resetChanges()}"
                            reRender="orgSyncSettingsTable" styleClass="command-button" status="orgSyncReportStatus"
                            id="resetChangesButton" />
-        <a4j:commandButton action="#{orgSyncSettingReportPage.beginDistributionSyncSettings()}"
+        <a4j:commandButton action="#{orgSyncSettingReportPage.beginDistributionSyncSettings()}" disabled="#{orgSyncSettingReportPage.disableDistribution()}"
                            value="Автоматически распределить время" reRender="orgSyncSettingsTable"
-                           styleClass="command-button" />
+                           styleClass="command-button"
+                           id="autoDistributionSyncSettingsButton"/>
         <a4j:commandButton value="Применить изменения" action="#{orgSyncSettingReportPage.applyChanges()}"
                            reRender="orgSyncSettingsTable" styleClass="command-button" status="orgSyncReportStatus"
                            id="applyChangesButton" />

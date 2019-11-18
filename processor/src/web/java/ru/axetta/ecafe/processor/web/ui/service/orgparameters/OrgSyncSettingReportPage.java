@@ -643,6 +643,11 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
         this.settingEnable = settingEnable;
     }
 
+    public boolean disableDistribution() {
+        return selectedContentType.equals(BALANCES_AND_ENTEREVENTS.getTypeCode())
+                ||  selectedContentType.equals(SUPPORT_SERVICE.getTypeCode());
+    }
+
     public static class EditedSetting {
         private Integer everySecond;
         private Integer limitStartHour;
