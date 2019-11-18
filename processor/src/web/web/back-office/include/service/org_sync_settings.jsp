@@ -209,7 +209,8 @@
             </f:facet>
             <h:outputText escape="true" value="#{item.menuSync.fullInf}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" headerClass="column-header" rendered="#{orgSyncSettingReportPage.showColumnPhoto}">
+        <rich:column sortable="true" headerClass="column-header" rendered="#{orgSyncSettingReportPage.showColumnPhoto}"
+                     style="#{item.photoSync.setting.deleteState ? 'background-color: #C4C4C4' : ''}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Фотографии" />
             </f:facet>
@@ -222,7 +223,8 @@
             </f:facet>
             <h:outputText escape="true" value="#{item.helpRequestsSync.fullInf}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" headerClass="column-header" rendered="#{orgSyncSettingReportPage.showColumnLib}">
+        <rich:column sortable="true" headerClass="column-header" rendered="#{orgSyncSettingReportPage.showColumnLib}"
+                     style="#{item.libSync.setting.deleteState ? 'background-color: #C4C4C4' : ''}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Библиотека" />
             </f:facet>
