@@ -39,6 +39,7 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_EVENT_NOT_FOUND_MESSAGE = "Некорректный тип события";
     public static final String ERROR_ARGUMENT_NOT_FOUND_MESSAGE = "Не заполнены обязательные поля";
     public static final String ERROR_CLIENT_NOT_FOUND_MESSAGE_EMIAS = "Клиент не найден";
+    public static final String ERROR_ID_EVENT_EMIAS = "Некорректные данные";
     public static final String ERROR_DUPLICATE_CARD_MESSAGE = "Данная карта уже зарегистрирована.";
     public static final String ERROR_INTERNAL_MESSAGE = "Внутренняя ошибка приложения.";
     public static final String ERROR_INTERNAL_MESSAGE_EMIAS = "Внутренняя ошибка";

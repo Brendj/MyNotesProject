@@ -10,11 +10,13 @@ import org.w3c.dom.Element;
 public class EMIASSyncFromAnswerARMPOJO {
     private Long idEventEMIAS;
     private String errormessage;
+    private Long version;
 
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("Record");
         element.setAttribute("idEventEMIAS",idEventEMIAS.toString());
         element.setAttribute("errormessage", errormessage == null ? "" : errormessage);
+        element.setAttribute("Version", Long.toString(version));
         return element;
     }
 
@@ -33,5 +35,13 @@ public class EMIASSyncFromAnswerARMPOJO {
 
     public void setErrormessage(String errormessage) {
         this.errormessage = errormessage;
+    }
+
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
     }
 }

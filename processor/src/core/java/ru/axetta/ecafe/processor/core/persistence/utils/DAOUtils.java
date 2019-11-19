@@ -4377,8 +4377,13 @@ public class DAOUtils {
     }
 
     public static List<EMIAS> getEmiasbyidEventEMIAS(Long idEventEMIAS, Session session){
-        Criteria criteria = session.createCriteria(EMIAS.class);
-        criteria.add(Restrictions.eq("idEventEMIAS", idEventEMIAS));
-        return criteria.list();
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.add(Restrictions.eq("idEventEMIAS", idEventEMIAS));
+            return criteria.list();
+        } catch (Exception e)
+        {
+            return new ArrayList<EMIAS>();
+        }
     }
 }

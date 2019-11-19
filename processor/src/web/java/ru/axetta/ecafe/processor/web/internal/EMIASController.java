@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.emias.LiberateClientsList;
+import ru.axetta.ecafe.processor.core.persistence.EMIAS;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
@@ -59,6 +60,14 @@ public class EMIASController extends HttpServlet {
                 if (DAOUtils.findClientByGuid(persistenceSession, liberateClientsList.getGuid()) == null) {
                     orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_CLIENT_NOT_FOUND_EMIAS,
                             ResponseItem.ERROR_CLIENT_NOT_FOUND_MESSAGE_EMIAS, liberateClientsList.getIdEventEMIAS()));
+                    continue;
+                }
+
+                List<EMIAS> emias = DAOUtils.getEmiasbyidEventEMIAS(liberateClientsList.getIdEventEMIAS(), persistenceSession);
+
+                if (liberateClientsList.getIdEventEMIAS() < 0L || !emias.isEmpty()) {
+                    orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND,
+                            ResponseItem.ERROR_ID_EVENT_EMIAS, liberateClientsList.getIdEventEMIAS()));
                     continue;
                 }
 

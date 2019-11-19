@@ -2648,7 +2648,6 @@ public class Processor implements SyncProcessor {
             if (emiasRequest != null) {
                 FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest);
                 emiasSection = new EmiasSection();
-                emiasSection.setMaxVersion(fullEmiasAnswerForARM.getMaxVersion());
                 emiasSection.setItems(fullEmiasAnswerForARM.getItems());
                 emiasSectionForARMAnswer = new EmiasSectionForARMAnswer();
                 emiasSectionForARMAnswer.setMaxVersion(fullEmiasAnswerForARM.getMaxVersionArm());

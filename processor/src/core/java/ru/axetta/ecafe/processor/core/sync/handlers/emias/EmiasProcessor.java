@@ -37,8 +37,9 @@ public class EmiasProcessor extends AbstractProcessor<OrgSettingSection> {
             try {
                 emiasSyncFromAnswerARMPOJO.setIdEventEMIAS(pojo.getIdEventEMIAS());
                 List<EMIAS> emias = DAOUtils.getEmiasbyidEventEMIAS(pojo.getIdEventEMIAS(), session);
-
+                Long version = 0L;
                 for (EMIAS oneEmias : emias) {
+                    version = 0L;
                     boolean isChanged = true;
                     if (oneEmias.getAccepted() != null && pojo.getAccepted() != null) {
                         if (oneEmias.getAccepted().equals(pojo.getAccepted())) {
@@ -46,11 +47,15 @@ public class EmiasProcessor extends AbstractProcessor<OrgSettingSection> {
                         }
                     }
                     if (isChanged) {
+                        version = DAOUtils.getMaxVersionOfEmias(session) + 1;
                         oneEmias.setAccepted(pojo.getAccepted());
                         oneEmias.setUpdateDate(new Date());
+                        oneEmias.setVersion(version);
                         session.persist(oneEmias);
                     }
                 }
+                if (!version.equals(0L))
+                    emiasSyncFromAnswerARMPOJO.setVersion(version);
                 emiasSyncFromAnswerARMPOJO.setErrormessage("");
             } catch (Exception e)
             {
@@ -61,10 +66,9 @@ public class EmiasProcessor extends AbstractProcessor<OrgSettingSection> {
 
 
         //Build section for response
-        Long maxVersionFromDB = DAOUtils.getMaxVersionOfEmias(session);
         List<EMIAS> EMIASFromDB = DAOUtils.getEmiasForMaxVersion(maxVersionFromARM, session);
 
-        fullEmiasAnswerForARM.setMaxVersion(maxVersionFromDB);
+        //fullEmiasAnswerForARM.setMaxVersion(maxVersionFromDB);
         for (EMIAS emias : EMIASFromDB) {
 
             EMIASSyncPOJO emiasSyncPOJO = new EMIASSyncPOJO();
