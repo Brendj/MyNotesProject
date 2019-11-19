@@ -4505,4 +4505,14 @@ public class DAOUtils {
         criteria.add(Restrictions.gt("version", maxVersion));
         return criteria.list();
     }
+ 	public static List<EMIAS> getEmiasbyidEventEMIAS(Long idEventEMIAS, Session session){
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.add(Restrictions.eq("idEventEMIAS", idEventEMIAS));
+            return criteria.list();
+        } catch (Exception e)
+        {
+            return new ArrayList<EMIAS>();
+        }
+    }
 }

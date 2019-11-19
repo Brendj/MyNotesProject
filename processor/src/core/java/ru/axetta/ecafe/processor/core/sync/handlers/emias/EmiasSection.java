@@ -16,12 +16,10 @@ import java.util.List;
 public class EmiasSection implements AbstractToElement {
 
     private List<EMIASSyncPOJO> items;
-    private Long maxVersion;
 
     @Override
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("EMIAS");
-        element.setAttribute("V", maxVersion.toString());
         for (EMIASSyncPOJO item : getItems()) {
             element.appendChild(item.toElement(document));
         }
@@ -37,13 +35,5 @@ public class EmiasSection implements AbstractToElement {
 
     public void setItems(List<EMIASSyncPOJO> items) {
         this.items = items;
-    }
-
-    public Long getMaxVersion() {
-        return maxVersion;
-    }
-
-    public void setMaxVersion(Long maxVersion) {
-        this.maxVersion = maxVersion;
     }
 }

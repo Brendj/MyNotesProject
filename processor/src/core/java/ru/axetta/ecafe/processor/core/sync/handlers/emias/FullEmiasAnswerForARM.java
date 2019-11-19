@@ -17,7 +17,6 @@ public class FullEmiasAnswerForARM implements AbstractToElement {
     private List<EMIASSyncFromAnswerARMPOJO> itemsArm;
     private Long maxVersionArm;
     private List<EMIASSyncPOJO> items;
-    private Long maxVersion;
 
     @Override
     public Element toElement(Document document) throws Exception {
@@ -50,13 +49,5 @@ public class FullEmiasAnswerForARM implements AbstractToElement {
 
     public void setItems(List<EMIASSyncPOJO> items) {
         this.items = items;
-    }
-
-    public Long getMaxVersion() {
-        return maxVersion;
-    }
-
-    public void setMaxVersion(Long maxVersion) {
-        this.maxVersion = maxVersion;
     }
 }
