@@ -72,4 +72,7 @@ COMMENT ON COLUMN cf_orgs.havenewlp IS 'Имеются заявки, не отп
 ALTER TABLE cf_card_signs ADD deleted bool NULL DEFAULT false;
 COMMENT ON COLUMN cf_card_signs.deleted IS 'Метка, что запись удалена';
 
+ALTER TABLE cf_categorydiscounts
+  ADD COLUMN eligibletodelete integer not null default 0;
+
 --! ФИНАЛИЗИРОВАН 30.10.2019, НЕ МЕНЯТЬ

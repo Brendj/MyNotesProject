@@ -920,7 +920,7 @@ public class Processor implements SyncProcessor {
                 goodRequestEZDSection = processGoodRequestEZD(goodRequestEZDRequest, request.getIdOfOrg());
             }
         } catch (Exception e) {
-            String message = String.format("Error when process OrgSettingSetting: %s", e.getMessage());
+            String message = String.format("Error when process GoodRequestEZD: %s", e.getMessage());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
@@ -6628,7 +6628,7 @@ public class Processor implements SyncProcessor {
                 goodRequestEZDSection = processGoodRequestEZD(goodRequestEZDRequest, request.getIdOfOrg());
             }
         } catch (Exception e) {
-            String message = String.format("Error when process OrgSettingSetting: %s", e.getMessage());
+            String message = String.format("Error when process GoodRequestEZD: %s", e.getMessage());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
