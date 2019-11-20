@@ -65,6 +65,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     private Boolean showSettingEnable = false;
     private Boolean settingEnable = true;
 
+
     private List<SelectItem> buildListOfOrgDistricts(Session session) {
         List<String> allDistricts;
         List<SelectItem> selectItemList = new LinkedList<SelectItem>();
@@ -425,6 +426,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     }
 
     public void setSelectedContentType(Integer selectedContentType) {
+        modalSelectedContentType = selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES) ? FULL_SYNC.getTypeCode() : selectedContentType;
         this.selectedContentType = selectedContentType;
     }
 
@@ -646,6 +648,10 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
     public boolean disableDistribution() {
         return selectedContentType.equals(BALANCES_AND_ENTEREVENTS.getTypeCode())
                 ||  selectedContentType.equals(SUPPORT_SERVICE.getTypeCode());
+    }
+
+    public boolean modalContentTypeEnable() {
+        return !selectedContentType.equals(OrgSyncSettingReport.ALL_TYPES);
     }
 
     public static class EditedSetting {

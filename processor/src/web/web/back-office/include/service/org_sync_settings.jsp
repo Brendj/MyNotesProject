@@ -72,7 +72,7 @@
                     <h:outputText styleClass="output-text" value="#{orgSyncSettingReportPage.selectedItem.orgName}" />
                     <h:outputText styleClass="output-text" value="Тип синхронизации" />
                     <h:selectOneMenu id="modalContentType" value="#{orgSyncSettingReportPage.modalSelectedContentType}"
-                                     styleClass="input-text" style="width: 175px;">
+                                     styleClass="input-text" style="width: 175px;" disabled="#{orgSyncSettingReportPage.modalContentTypeEnable()}">
                         <f:selectItems value="#{orgSyncSettingReportPage.modalListOfContentType}" />
                         <a4j:support event="onchange" action="#{orgSyncSettingReportPage.buildEditedItem()}"
                                      reRender="OrgSyncSettingEditPanelGrid" />
