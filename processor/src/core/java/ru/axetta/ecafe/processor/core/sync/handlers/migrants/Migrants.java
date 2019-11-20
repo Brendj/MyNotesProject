@@ -42,7 +42,7 @@ public class Migrants implements SectionRequest{
         this.outcomeMigrationRequestsItems = new ArrayList<OutcomeMigrationRequestsItem>();
 
         currentActiveOutcome = new ArrayList<Long>();
-        String outcomeCurrentActive = XMLUtils.getStringAttributeValue(outcomeMigrationRequestsNode, "CurrentActive", 30000);
+        String outcomeCurrentActive = XMLUtils.getStringAttributeValue(outcomeMigrationRequestsNode, "CurrentActive", 100000);
         if(outcomeCurrentActive != null) {
             if(outcomeCurrentActive.length() > 0) {
                 String[] outcomeIds = outcomeCurrentActive.split(",");
