@@ -15,10 +15,15 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
 import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.xml.ws.WebServiceContext;
+import javax.xml.ws.handler.MessageContext;
+import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -28,12 +33,30 @@ import java.util.List;
 @WebService(targetNamespace = "http://ru.axetta.ecafe")
 public class EMIASController extends HttpServlet {
 
+    public static final String USED_KEY_FOR_EZD = "ecafe.processor.emias.usedkey";
+    public static final String USED_IP_FOR_EZD = "ecafe.processor.emias.usedip";
+    public static final String IP_FOR_EZD = "ecafe.processor.emias.ip";
+    public static final String KEY_FOR_EZD = "ecafe.processor.emias.key";
     private final Logger logger = LoggerFactory.getLogger(EMIASController.class);
+
+    @Resource
+    private WebServiceContext context;
 
     @WebMethod(operationName = "getLiberateClientsList")
     public List<OrgSummaryResult> getLiberateClientsList(
-            @WebParam(name = "LiberateClientsList") List<LiberateClientsList> liberateClientsLists) {
+            @WebParam(name = "LiberateClientsList") List<LiberateClientsList> liberateClientsLists,
+            @WebParam(name = "token", header = true) String key) {
+
         List<OrgSummaryResult> orgSummaryResults = new ArrayList<>();
+
+        //Контроль безопасности
+        if (!validateAccess(key))
+        {
+            orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_WRONG_KEY_EMIAS,
+                    ResponseItem.ERROR_WRONG_KEY_MESSAGE_EMIAS));
+            return orgSummaryResults;
+        }
+
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -113,5 +136,63 @@ public class EMIASController extends HttpServlet {
             HibernateUtils.close(persistenceSession, logger);
         }
         return orgSummaryResults;
+    }
+
+    private boolean validateAccess(String key)
+    {
+        //Узнаем, нужно ли использовать проверку по ip
+        String useip = RuntimeContext.getInstance().getConfigProperties().getProperty(USED_IP_FOR_EZD, "");
+        Boolean useips;
+        try{
+            useips = Boolean.parseBoolean(useip);
+        } catch (Exception e)
+        {
+            useips = false;
+        }
+        if (useips)
+        {
+            boolean goodIp = false;
+            //Проверяем само значение ключа
+            String IpsInternal = RuntimeContext.getInstance().getConfigProperties().getProperty(IP_FOR_EZD, "");
+            //Список разрешенных ip
+            String[] addressList = IpsInternal.split(";");
+
+            //Получаем ip, откуда запрос
+            MessageContext jaxwsContext = context.getMessageContext();
+            HttpServletRequest httpServletRequest = ((HttpServletRequest) jaxwsContext.get(SOAPMessageContext.SERVLET_REQUEST));
+            String ip = httpServletRequest.getRemoteAddr();
+            for (String ip1 : addressList)
+            {
+                if (ip1.equals(ip))
+                {
+                    goodIp = true;
+                    break;
+                }
+            }
+            if (!goodIp)
+            {
+                return false;
+            }
+        }
+
+        //Узнаем, нужно ли использовать ключ для доступа
+        String useKey = RuntimeContext.getInstance().getConfigProperties().getProperty(USED_KEY_FOR_EZD, "");
+        Boolean usedKey;
+        try{
+            usedKey = Boolean.parseBoolean(useKey);
+        } catch (Exception e)
+        {
+            usedKey = false;
+        }
+        if (usedKey)
+        {
+            //Проверяем само значение ключа
+            String keyInternal = RuntimeContext.getInstance().getConfigProperties().getProperty(KEY_FOR_EZD, "");
+            if (!keyInternal.equals(key))
+            {
+                return false;
+            }
+        }
+        return true;
     }
 }

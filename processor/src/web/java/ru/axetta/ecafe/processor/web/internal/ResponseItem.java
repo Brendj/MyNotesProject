@@ -15,6 +15,7 @@ public class ResponseItem implements Serializable {
 
     public static final int OK = 0;
     public static final int ERROR_INTERNAL_EMIAS = 100;
+    public static final int ERROR_WRONG_KEY_EMIAS = 120;//????????
     public static final int ERROR_ORG_NOT_FOUND = 110;
     public static final int ERROR_CLIENT_NOT_FOUND_EMIAS = 110;
     public static final int ERROR_ARGUMENT_NOT_FOUND = 150;
@@ -35,6 +36,7 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_CLIENT_ALREADY_EXIST = 450;
     public static final String OK_MESSAGE = "Ok.";
     public static final String OK_MESSAGE_2 = "Успешно";
+    public static final String ERROR_WRONG_KEY_MESSAGE_EMIAS = "Доступ запрещен";
     public static final String ERROR_ORG_NOT_FOUND_MESSAGE = "Организация не найдена";
     public static final String ERROR_EVENT_NOT_FOUND_MESSAGE = "Некорректный тип события";
     public static final String ERROR_ARGUMENT_NOT_FOUND_MESSAGE = "Не заполнены обязательные поля";
