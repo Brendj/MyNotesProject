@@ -347,10 +347,10 @@ public class SummaryCalculationService {
         Map menuMap = new TreeMap<Long, String>();
         if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
             String query_menu =
-                    "select distinct c.idofclient, od.qty, od.rprice, od.menudetailname, o.idoforder from cf_clients c inner join cf_orders o on c.idofclient = o.idofclient "
+                    "select distinct c.idofclient, od.qty, od.rprice, od.menudetailname, o.idoforder "
+                            + "from cf_clients c inner join cf_orders o on c.idofclient = o.idofclient "
                     + "inner join cf_orderdetails od on o.idoforder = od.idoforder and o.idoforg = od.idoforg "
-                    + "inner join cf_clientsnotificationsettings n on c.idofclient = n.idofclient "
-                    + "where (n.notifytype = :notifyType or exists (select * from cf_client_guardian cg "
+                    + "where (exists(select * from cf_clientsnotificationsettings n where c.idofclient = n.idofclient and n.notifytype = :notifyType) or exists (select * from cf_client_guardian cg "
                     + "inner join cf_client_guardian_notificationsettings nn on cg.idofclientguardian = nn.idofclientguardian and nn.notifytype = :notifyType where cg.idofchildren = c.idofclient)) "
                     + "AND o.createddate BETWEEN :startTime AND :endTime  and c.idofclientgroup not between :group_employees and :group_displaced";
             Query mquery = entityManager.createNativeQuery(query_menu);
@@ -386,7 +386,7 @@ public class SummaryCalculationService {
                 + (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue()) ? "" :
                  ", coalesce(query6.countw1, 0) as countw1, coalesce(query7.countw2, 0) as countw2, coalesce(query8.countw3, 0) as countw3, coalesce(query9.countw4, 0) as countw4, "
                 + "coalesce(query10.countw5, 0) as countw5, coalesce(query11.countw6, 0) as countw6, coalesce(query12.countw7, 0) as countw7 ")
-                + "FROM cf_clientsnotificationsettings n INNER JOIN cf_clients c ON c.idofclient = n.idofclient INNER JOIN cf_persons p ON c.idofperson = p.idofperson "
+                + "FROM cf_clients c INNER JOIN cf_persons p ON c.idofperson = p.idofperson "
                 + "left outer JOIN "
                 + "(SELECT c.idofclient, sum(t1.transactionsum) AS sum1 FROM cf_clients c "
                 + "LEFT JOIN cf_transactions t1 ON t1.idofclient = c.idofclient AND t1.transactionDate BETWEEN :startTime AND :curTime "
@@ -446,7 +446,7 @@ public class SummaryCalculationService {
                         + "LEFT JOIN cf_orders o ON o.idofclient = c.idofclient AND o.createddate BETWEEN :startTime AND :endTime AND o.ordertype IN (:orderTypes) "
                         + "AND o.state = :orderState and extract(dow from TO_TIMESTAMP(o.createddate / 1000)) = 7 "
                         + "GROUP BY c.idofclient) AS query12 ON c.idofclient = query12.idofclient " )
-                + "WHERE (n.notifytype = :notifyType or exists (select * from cf_client_guardian cg "
+                + "WHERE (exists(select * from cf_clientsnotificationsettings n where c.idofclient = n.idofclient and n.notifytype = :notifyType) or exists (select * from cf_client_guardian cg "
                 + "inner join cf_client_guardian_notificationsettings nn on cg.idofclientguardian = nn.idofclientguardian and nn.notifytype = :notifyType where cg.idofchildren = c.idofclient)) "
                 + "and c.idofclientgroup not between :group_employees and :group_displaced";
         Query bquery = entityManager.createNativeQuery(query_balance);
