@@ -19,7 +19,6 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Example;
 import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Restrictions;
@@ -389,14 +388,22 @@ public class ClientFilter {
         }
         if (!this.person.isEmpty()) {
             Person examplePerson = this.person.buildPerson();
-            Criteria personCriteria = criteria.createCriteria("person");
-            personCriteria
-                    .add(Example.create(examplePerson).excludeZeroes().enableLike(MatchMode.ANYWHERE).ignoreCase());
+            if (StringUtils.isNotEmpty(examplePerson.getSurname())) {
+                criteria.add(Restrictions.ilike("p.surname", examplePerson.getSurname(), MatchMode.ANYWHERE));
+            }
+            if (StringUtils.isNotEmpty(examplePerson.getFirstName())) {
+                criteria.add(Restrictions.ilike("p.firstName", examplePerson.getFirstName(), MatchMode.ANYWHERE));
+            }
+            if (StringUtils.isNotEmpty(examplePerson.getSecondName())) {
+                criteria.add(Restrictions.ilike("p.secondName", examplePerson.getSecondName(), MatchMode.ANYWHERE));
+            }
+            if (StringUtils.isNotEmpty(examplePerson.getIdDocument())) {
+                criteria.add(Restrictions.ilike("p.idDocument", examplePerson.getIdDocument(), MatchMode.ANYWHERE));
+            }
         }
         if (!this.contractPerson.isEmpty()) {
             Person examplePerson = this.person.buildPerson();
-            criteria.createCriteria("person")
-            .add(Restrictions.ilike("surname", examplePerson.getSurname(), MatchMode.START));
+            criteria.add(Restrictions.ilike("p.surname", examplePerson.getSurname(), MatchMode.START));
         }
         if (StringUtils.isNotEmpty(this.filterClientId)) {
             criteria.add(Restrictions.eq("idOfClient", Long.parseLong(this.filterClientId.replaceAll("\\s", ""))));
