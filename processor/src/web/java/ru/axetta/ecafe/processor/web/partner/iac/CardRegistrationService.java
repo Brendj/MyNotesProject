@@ -13,10 +13,8 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -83,15 +81,13 @@ public class CardRegistrationService {
 
         if (null == card) {
             String strCardId = cardId.toString();
-            //boolean doRegister = false;
             if (strCardId.length() == 13 && !strCardId.startsWith("1")) {
-                //doRegister = true;
                 if (null == validDate) validDate = CalendarUtils.addYear(new Date(), 12);
             } else {
                 if (client.getCards() != null && client.getCards().size() > 0 && null == validDate)
                     validDate = CalendarUtils.addDays(new Date(), 10);
             }
-            blockAllOtherClientCards(client);
+            blockAllOtherClientCards(session, client);
             if (null == validDate)
                 validDate = CalendarUtils.addYear(new Date(), 5);
             RuntimeContext.getInstance().getCardManager().createCard(session, session.getTransaction(), client.getIdOfClient(),
@@ -103,7 +99,7 @@ public class CardRegistrationService {
                         cardId, client.getOrg().getIdOfOrg(), client.getIdOfClient()));
             } else {
                 if (card.getClient().getIdOfClient().equals(client.getIdOfClient())) {
-                    blockAllOtherClientCards(client);
+                    blockAllOtherClientCards(session, client);
                     card.setState(CardState.ISSUED.getValue());
                 } else {
                     RuntimeContext.getInstance().getCardManager().updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
@@ -114,28 +110,28 @@ public class CardRegistrationService {
         }
     }
 
-    private void blockAllOtherClientCards(Client client) throws Exception {
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
+    private void blockAllOtherClientCards(Session session, Client client) throws Exception {
+        //Session session = null;
+        //Transaction transaction = null;
+        //try {
+        //    session = RuntimeContext.getInstance().createPersistenceSession();
+        //    transaction = session.beginTransaction();
             List<Card> cardList = DAOUtils.getAllCardByClient(session, client);
             CardManager cardManager = RuntimeContext.getInstance().getCardManager();
 
             for (Card card : cardList) {
                 if (card.getState() != CardState.BLOCKED.getValue() && card.getState() != CardState.TEMPBLOCKED.getValue())
-                    cardManager.updateCard(card.getClient().getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+                    cardManager.updateCard(session, card.getClient().getIdOfClient(), card.getIdOfCard(), card.getCardType(),
                             CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(), card.getLockReason(),
-                            card.getIssueTime(), card.getExternalId());
+                            card.getIssueTime(), card.getExternalId(), null, null, "");
             }
 
-            transaction.commit();
-            transaction = null;
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
+        //    transaction.commit();
+        //    transaction = null;
+        //} finally {
+        //    HibernateUtils.rollback(transaction, logger);
+        //    HibernateUtils.close(session, logger);
+        //}
     }
 
     public ExternalInfo loadExternalInfo(Session session, String organizationGuid, String clientGuid, Long cardId ) {
