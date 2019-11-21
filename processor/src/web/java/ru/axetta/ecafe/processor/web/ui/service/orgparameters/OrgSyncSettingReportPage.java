@@ -528,21 +528,19 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
             validateData();
             SyncSetting currentSetting = findBySelectedModalType(selectedItem, modalSelectedContentType);
             if (currentSetting != null) {
-                if(settingEnable) {
-                    currentSetting.setMonday(editedSetting.getMonday());
-                    currentSetting.setTuesday(editedSetting.getTuesday());
-                    currentSetting.setWednesday(editedSetting.getWednesday());
-                    currentSetting.setThursday(editedSetting.getThursday());
-                    currentSetting.setFriday(editedSetting.getFriday());
-                    currentSetting.setSaturday(editedSetting.getSaturday());
-                    currentSetting.setSunday(editedSetting.getSunday());
-                    currentSetting.setEverySecond(editedSetting.getEverySecond());
-                    currentSetting.setConcreteTime(buildTime(editedSetting));
-                    currentSetting.setLimitStartHour(editedSetting.getLimitStartHour());
-                    currentSetting.setLimitEndHour(editedSetting.getLimitEndHour());
-                } else {
-                    currentSetting.setDeleteState(true);
-                }
+                currentSetting.setMonday(editedSetting.getMonday());
+                currentSetting.setTuesday(editedSetting.getTuesday());
+                currentSetting.setWednesday(editedSetting.getWednesday());
+                currentSetting.setThursday(editedSetting.getThursday());
+                currentSetting.setFriday(editedSetting.getFriday());
+                currentSetting.setSaturday(editedSetting.getSaturday());
+                currentSetting.setSunday(editedSetting.getSunday());
+                currentSetting.setEverySecond(editedSetting.getEverySecond());
+                currentSetting.setConcreteTime(buildTime(editedSetting));
+                currentSetting.setLimitStartHour(editedSetting.getLimitStartHour());
+                currentSetting.setLimitEndHour(editedSetting.getLimitEndHour());
+                currentSetting.setDeleteState(!settingEnable);
+
                 selectedItem.setIsChange(true);
                 selectedItem.rebuildSyncInfo(modalSelectedContentType, currentSetting);
             } else {
