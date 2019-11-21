@@ -82,6 +82,15 @@ public class CardRegistrationService {
         Card card = DAOUtils.findCardByCardNo(session, cardId);
 
         if (null == card) {
+            String strCardId = cardId.toString();
+            //boolean doRegister = false;
+            if (strCardId.length() == 13 && !strCardId.startsWith("1")) {
+                //doRegister = true;
+                if (null == validDate) validDate = CalendarUtils.addYear(new Date(), 12);
+            } else {
+                if (client.getCards() != null && client.getCards().size() > 0 && null == validDate)
+                    validDate = CalendarUtils.addDays(new Date(), 10);
+            }
             blockAllOtherClientCards(client);
             if (null == validDate)
                 validDate = CalendarUtils.addYear(new Date(), 5);
