@@ -87,7 +87,9 @@ public class SmartWatchRestController {
 
     @POST
     @Path(value = "getTokenByMobile")
-    public Response sendLinkingTokenByMobile(@FormParam(value="mobilePhone") String mobilePhone)throws Exception{
+    public Response sendLinkingTokenByMobile(@FormParam(value="mobilePhone") String mobilePhone)throws Exception {
+        logger.info(String.format("getTokenByMobile: Try create new LinkingToken for guardianPhone: %s", mobilePhone));
+
         Result result = new Result();
         Session session = null;
         Transaction transaction = null;
@@ -114,22 +116,26 @@ public class SmartWatchRestController {
                     .sendMessageAsync(client, EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED,
                             new String[]{"linkingToken", token}, new Date());
 
-            token = "";
-
             transaction.commit();
             transaction = null;
 
             result.resultCode = ResponseCodes.RC_OK.getCode();
             result.description = "Код активации отправлен по SMS" +
                     (client.hasEmail()? " и по Email" : "");
+
+            logger.info(String.format("getTokenByMobile: Processing completed successfully, token %s send by async method for guardianPhone: %s",
+                    token, mobilePhone)
+            );
+
+            token = "";
             return Response.status(HttpURLConnection.HTTP_OK)
                     .entity(result)
                     .build();
         } catch (IllegalArgumentException e){
-            logger.error("Can't generate or send token :", e);
+            logger.error(String.format("getTokenByMobile: Can't generate or send token for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't generate or send token :", e);
+            logger.error(String.format("getTokenByMobile: Can't generate or send token for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
@@ -140,7 +146,7 @@ public class SmartWatchRestController {
     @GET
     @Path(value = "getListInfoOfChildrens")
     public Response getListOfChildrenByPhoneAndToken(@QueryParam(value="mobilePhone") String mobilePhone,
-            @QueryParam(value="token") String token)throws Exception{
+            @QueryParam(value="token") String token)throws Exception {
         JsonListInfo result = new JsonListInfo();
         Session session = null;
         Transaction transaction = null;
@@ -165,10 +171,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get List Of Children's", e);
+            logger.error(String.format("getListInfoOfChildrens: Can't get List Of Children's for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get List Of Children's", e);
+            logger.error(String.format("getListInfoOfChildrens: Can't get List Of Children's for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
@@ -182,7 +188,8 @@ public class SmartWatchRestController {
             @FormParam(value="contractId") Long contractId, @FormParam(value="model") String model, @FormParam(value="color") String color,
             @FormParam(value="trackerUid") Long trackerUid, @FormParam(value="trackerID") Long trackerId,
             @FormParam(value="trackerActivateUserId") Long trackerActivateUserId, @FormParam(value="status") String status,
-            @FormParam(value="trackerActivateTime") Long trackerActivateTime, @FormParam(value="simIccid") String simIccid) throws Exception{
+            @FormParam(value="trackerActivateTime") Long trackerActivateTime, @FormParam(value="simIccid") String simIccid) throws Exception {
+        logger.info(String.format("Try registry SmartWatch for Phone: %s", mobilePhone));
         Result result = new Result();
         Session session = null;
         Transaction transaction = null;
@@ -243,12 +250,13 @@ public class SmartWatchRestController {
             transaction.commit();
             transaction = null;
 
+            logger.info(String.format("registrySmartWatch: Processing completed successfully for guardianPhone: %s", mobilePhone));
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't registry SmartWatch ", e);
+            logger.error(String.format("registrySmartWatch: Can't registry SmartWatch for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't registry SmartWatch ", e);
+            logger.error(String.format("registrySmartWatch: Can't registry SmartWatch for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
@@ -260,6 +268,8 @@ public class SmartWatchRestController {
     @Path(value = "blockSmartWatch")
     public Response blockSmartWatch(@FormParam(value="mobilePhone") String mobilePhone, @FormParam(value="token") String token,
             @FormParam(value="trackerUid") Long trackerUid, @FormParam(value="trackerID") Long trackerId)throws Exception{
+        logger.info(String.format("Try block SmartWatch for guardianPhone: %s", mobilePhone));
+
         Result result = new Result();
         Session session = null;
         Transaction transaction = null;
@@ -294,10 +304,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't block SmartWatch", e);
+            logger.error(String.format("blockSmartWatch: Can't block SmartWatch for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't block SmartWatch", e);
+            logger.error(String.format("blockSmartWatch: Can't block SmartWatch for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
@@ -353,10 +363,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get EnterEvents ", e);
+            logger.error(String.format("getEnterEvents: Can't get EnterEvents for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get EnterEvents ", e);
+            logger.error(String.format("getEnterEvents: Can't get EnterEvents for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -403,10 +413,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get Purchases ", e);
+            logger.error(String.format("getPurchasesOld: Can't get Purchases for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get Purchases  ", e);
+            logger.error(String.format("getPurchasesOld: Can't get Purchases for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -452,10 +462,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get Transactions ", e);
+            logger.error(String.format("getPurchases: Can't get Transactions for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get Transactions ", e);
+            logger.error(String.format("getPurchases: Can't get Transactions for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -485,10 +495,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get PurchaseDetail ", e);
+            logger.error(String.format("getPurchaseDetail: Can't get PurchaseDetail for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get PurchaseDetail ", e);
+            logger.error(String.format("getPurchaseDetail: Can't get PurchaseDetail for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -534,10 +544,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get PurchasedComplexes ", e);
+            logger.error(String.format("getPurchasedComplexes: Can't get PurchasedComplexes for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get PurchasedComplexes ", e);
+            logger.error(String.format("getPurchasedComplexes: Can't get PurchasedComplexes for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -567,10 +577,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get Balance ", e);
+            logger.error(String.format("getBalance: Can't get Balance for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get Balance ", e);
+            logger.error(String.format("getBalance: Can't get Balance for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -617,10 +627,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get BalanceOperations ", e);
+            logger.error(String.format("getBalanceOperations: Can't get BalanceOperations for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get BalanceOperations ", e);
+            logger.error(String.format("getBalanceOperations: Can't get BalanceOperations for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -740,10 +750,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get Locations ", e);
+            logger.error(String.format("getLocations: Can't get Locations for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get Locations ", e);
+            logger.error(String.format("getLocations: Can't get Locations for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
