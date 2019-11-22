@@ -2724,7 +2724,7 @@ public class Processor implements SyncProcessor {
         try {
             EmiasRequest emiasRequest = request.getEmiasRequest();
             if (emiasRequest != null) {
-                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest);
+                FullEmiasAnswerForARM fullEmiasAnswerForARM = processEmias(emiasRequest, request.getIdOfOrg());
                 emiasSection = new EmiasSection();
                 emiasSection.setMaxVersion(fullEmiasAnswerForARM.getMaxVersion());
                 emiasSection.setItems(fullEmiasAnswerForARM.getItems());
@@ -6748,14 +6748,14 @@ public class Processor implements SyncProcessor {
         return goodRequestEZDSection;
     }
 
-	private FullEmiasAnswerForARM processEmias(EmiasRequest emiasRequest) throws Exception{
+    private FullEmiasAnswerForARM processEmias(EmiasRequest emiasRequest, Long idOfOrg) throws Exception{
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         FullEmiasAnswerForARM fullEmiasAnswerForARM = null;
         try{
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            AbstractProcessor processor = new EmiasProcessor(persistenceSession, emiasRequest);
+            AbstractProcessor processor = new EmiasProcessor(persistenceSession, emiasRequest, idOfOrg);
             fullEmiasAnswerForARM = (FullEmiasAnswerForARM) processor.process();
             persistenceTransaction.commit();
             persistenceTransaction = null;

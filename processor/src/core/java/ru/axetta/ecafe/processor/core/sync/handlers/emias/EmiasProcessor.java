@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.emias;
 
 import ru.axetta.ecafe.processor.core.persistence.EMIAS;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
@@ -19,11 +21,13 @@ import java.util.*;
 public class EmiasProcessor extends AbstractProcessor<OrgSettingSection> {
 
     private final EmiasRequest emiasRequest;
+    private Long idOfOrg;
     private static final Logger logger = LoggerFactory.getLogger(EmiasProcessor.class);
 
-    public EmiasProcessor(Session session, EmiasRequest emiasRequest) {
+    public EmiasProcessor(Session session, EmiasRequest emiasRequest, Long idOfOrg) {
         super(session);
         this.emiasRequest = emiasRequest;
+        this.idOfOrg = idOfOrg;
     }
 
     @Override
@@ -37,8 +41,9 @@ public class EmiasProcessor extends AbstractProcessor<OrgSettingSection> {
             try {
                 emiasSyncFromAnswerARMPOJO.setIdEventEMIAS(pojo.getIdEventEMIAS());
                 List<EMIAS> emias = DAOUtils.getEmiasbyidEventEMIAS(pojo.getIdEventEMIAS(), session);
-
+                Long version = 0L;
                 for (EMIAS oneEmias : emias) {
+                    version = 0L;
                     boolean isChanged = true;
                     if (oneEmias.getAccepted() != null && pojo.getAccepted() != null) {
                         if (oneEmias.getAccepted().equals(pojo.getAccepted())) {
@@ -46,11 +51,15 @@ public class EmiasProcessor extends AbstractProcessor<OrgSettingSection> {
                         }
                     }
                     if (isChanged) {
+                        version = DAOUtils.getMaxVersionOfEmias(session) + 1;
                         oneEmias.setAccepted(pojo.getAccepted());
                         oneEmias.setUpdateDate(new Date());
+                        oneEmias.setVersion(version);
                         session.persist(oneEmias);
                     }
                 }
+                if (!version.equals(0L))
+                    emiasSyncFromAnswerARMPOJO.setVersion(version);
                 emiasSyncFromAnswerARMPOJO.setErrormessage("");
             } catch (Exception e)
             {
@@ -61,10 +70,18 @@ public class EmiasProcessor extends AbstractProcessor<OrgSettingSection> {
 
 
         //Build section for response
-        Long maxVersionFromDB = DAOUtils.getMaxVersionOfEmias(session);
-        List<EMIAS> EMIASFromDB = DAOUtils.getEmiasForMaxVersion(maxVersionFromARM, session);
 
-        fullEmiasAnswerForARM.setMaxVersion(maxVersionFromDB);
+        //Собираем данные по всем дружественным корпусам
+        List<Long> friendlyOrg = new ArrayList<>();
+        friendlyOrg.add(idOfOrg);
+        Org org = (Org) session.load(Org.class, idOfOrg);
+        for (Org friendlyOrgs : org.getFriendlyOrg()) {
+            friendlyOrg.add(friendlyOrgs.getIdOfOrg());
+        }
+
+        List<EMIAS> EMIASFromDB = DAOReadonlyService.getInstance().getEmiasForMaxVersionAndIdOrg(maxVersionFromARM, friendlyOrg);
+
+        //fullEmiasAnswerForARM.setMaxVersion(maxVersionFromDB);
         for (EMIAS emias : EMIASFromDB) {
 
             EMIASSyncPOJO emiasSyncPOJO = new EMIASSyncPOJO();
@@ -82,5 +99,13 @@ public class EmiasProcessor extends AbstractProcessor<OrgSettingSection> {
             fullEmiasAnswerForARM.getItems().add(emiasSyncPOJO);
         }
         return fullEmiasAnswerForARM;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 }
