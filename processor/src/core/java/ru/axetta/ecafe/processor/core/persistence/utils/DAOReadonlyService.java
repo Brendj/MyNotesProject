@@ -629,7 +629,7 @@ public class DAOReadonlyService {
             while(emiasIterator.hasNext()) {
                 EMIAS emias1 = emiasIterator.next();//получаем следующий элемент
                 Client cl = DAOUtils.findClientByGuid(entityManager, emias1.getGuid());
-                if (orgs.indexOf(cl.getOrg().getIdOfOrg()) != -1) {
+                if (orgs.indexOf(cl.getOrg().getIdOfOrg()) == -1) {
                     //Удаляем "чужих" клиентов
                     emiasIterator.remove();
                 }
