@@ -32,7 +32,7 @@ public class EMIASSyncPOJO {
         element.setAttribute("guid", guid);
         element.setAttribute("idEventEMIAS",idEventEMIAS.toString());
         element.setAttribute("typeEventEMIAS",typeEventEMIAS.toString());
-        element.setAttribute("dateLiberate", CalendarUtils.dateShortToStringFullYear(dateLiberate));
+        element.setAttribute("dateLiberate", CalendarUtils.dateTimeToString(dateLiberate));
         element.setAttribute("startDateLiberate",CalendarUtils.dateShortToStringFullYear(startDateLiberate));
         element.setAttribute("endDateLiberate",CalendarUtils.dateShortToStringFullYear(endDateLiberate));
         element.setAttribute("accepted", accepted == null ? "false" : accepted.toString());
