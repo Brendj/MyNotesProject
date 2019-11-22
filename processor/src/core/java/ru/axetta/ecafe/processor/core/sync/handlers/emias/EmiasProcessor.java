@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.emias;
 
 import ru.axetta.ecafe.processor.core.persistence.EMIAS;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
@@ -19,11 +21,13 @@ import java.util.*;
 public class EmiasProcessor extends AbstractProcessor<OrgSettingSection> {
 
     private final EmiasRequest emiasRequest;
+    private Long idOfOrg;
     private static final Logger logger = LoggerFactory.getLogger(EmiasProcessor.class);
 
-    public EmiasProcessor(Session session, EmiasRequest emiasRequest) {
+    public EmiasProcessor(Session session, EmiasRequest emiasRequest, Long idOfOrg) {
         super(session);
         this.emiasRequest = emiasRequest;
+        this.idOfOrg = idOfOrg;
     }
 
     @Override
@@ -66,7 +70,16 @@ public class EmiasProcessor extends AbstractProcessor<OrgSettingSection> {
 
 
         //Build section for response
-        List<EMIAS> EMIASFromDB = DAOUtils.getEmiasForMaxVersion(maxVersionFromARM, session);
+
+        //Собираем данные по всем дружественным корпусам
+        List<Long> friendlyOrg = new ArrayList<>();
+        friendlyOrg.add(idOfOrg);
+        Org org = (Org) session.load(Org.class, idOfOrg);
+        for (Org friendlyOrgs : org.getFriendlyOrg()) {
+            friendlyOrg.add(friendlyOrgs.getIdOfOrg());
+        }
+
+        List<EMIAS> EMIASFromDB = DAOReadonlyService.getInstance().getEmiasForMaxVersionAndIdOrg(maxVersionFromARM, friendlyOrg);
 
         //fullEmiasAnswerForARM.setMaxVersion(maxVersionFromDB);
         for (EMIAS emias : EMIASFromDB) {
@@ -86,5 +99,13 @@ public class EmiasProcessor extends AbstractProcessor<OrgSettingSection> {
             fullEmiasAnswerForARM.getItems().add(emiasSyncPOJO);
         }
         return fullEmiasAnswerForARM;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 }

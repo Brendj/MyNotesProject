@@ -618,4 +618,27 @@ public class DAOReadonlyService {
         }
         return resultMap;
     }
+    public List<EMIAS> getEmiasForMaxVersionAndIdOrg(Long maxVersion, List<Long> orgs){
+        try {
+            Query query = entityManager.createQuery(
+                    "select ce from EMIAS ce where ce.version > :vers");
+            query.setParameter("vers", maxVersion);
+            List<EMIAS> emias = query.getResultList();
+            //Фильтрация по орг
+            Iterator<EMIAS> emiasIterator = emias.iterator();
+            while(emiasIterator.hasNext()) {
+                EMIAS emias1 = emiasIterator.next();//получаем следующий элемент
+                Client cl = DAOUtils.findClientByGuid(entityManager, emias1.getGuid());
+                if (orgs.indexOf(cl.getOrg().getIdOfOrg()) != -1) {
+                    //Удаляем "чужих" клиентов
+                    emiasIterator.remove();
+                }
+            }
+            return emias;
+        }
+        catch (Exception e)
+        {
+            return new ArrayList<>();
+        }
+    }
 }

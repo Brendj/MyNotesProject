@@ -28,7 +28,7 @@ public class EmiasRequest implements SectionRequest {
             if (nodeElement.getNodeName().equals("Record")) {
                 EMIASSyncFromARMPOJO emiasSyncFromARMPOJO = new EMIASSyncFromARMPOJO();
                 emiasSyncFromARMPOJO.setIdEventEMIAS(XMLUtils.getLongAttributeValue(nodeElement, "idEventEMIAS"));
-                emiasSyncFromARMPOJO.setAccepted(XMLUtils.getBooleanAttributeValue(nodeElement, "accepted"));
+                emiasSyncFromARMPOJO.setAccepted(Boolean.valueOf(XMLUtils.getAttributeValue(nodeElement, "accepted")));
                 items.add(emiasSyncFromARMPOJO);
             }
             nodeElement = nodeElement.getNextSibling();
