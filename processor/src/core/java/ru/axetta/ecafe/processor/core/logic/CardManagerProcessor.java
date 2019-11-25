@@ -249,7 +249,7 @@ public class CardManagerProcessor implements CardManager {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            updateCard(persistenceSession, idOfClient, idOfCard, cardType, state, validTime, lifeState,
+            updateCardInSession(persistenceSession, idOfClient, idOfCard, cardType, state, validTime, lifeState,
             lockReason, issueTime, externalId, cardOperatorUser, idOfOrg, informationAboutCard);
 
             persistenceTransaction.commit();
@@ -260,7 +260,7 @@ public class CardManagerProcessor implements CardManager {
         }
     }
 
-    public void updateCard(Session persistenceSession, Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
+    public void updateCardInSession(Session persistenceSession, Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg, String informationAboutCard) throws Exception {
         String additionalInfoAboutCard = StringUtils.isBlank(informationAboutCard) ? "" : " (" + informationAboutCard + ")";
         Client newCardOwner = getClientReference(persistenceSession, idOfClient);

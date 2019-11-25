@@ -121,7 +121,7 @@ public class CardRegistrationService {
 
             for (Card card : cardList) {
                 if (card.getState() != CardState.BLOCKED.getValue() && card.getState() != CardState.TEMPBLOCKED.getValue())
-                    cardManager.updateCard(session, card.getClient().getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+                    cardManager.updateCardInSession(session, card.getClient().getIdOfClient(), card.getIdOfCard(), card.getCardType(),
                             CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(), card.getLockReason(),
                             card.getIssueTime(), card.getExternalId(), null, null, "");
             }
