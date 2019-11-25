@@ -135,7 +135,7 @@
         <h:panelGrid styleClass="borderless-grid" id="synSettingExpressionsGrid" columns="2" bgcolor="#FFF3C2">
             <h:outputText escape="true" value="Выражение для полной синхронизации" styleClass="output-text" />
             <h:inputText value="#{optionPage.fullSyncExpressions}" styleClass="input-text"  />
-            <h:outputText escape="true" value="Выражение для синхронизации настроект ОО" styleClass="output-text" />
+            <h:outputText escape="true" value="Выражение для синхронизации настроек ОО" styleClass="output-text" />
             <h:inputText value="#{optionPage.orgSettingSyncExpressions}" styleClass="input-text"  />
             <h:outputText escape="true" value="Выражение для синхронизации данных по клиентам ОО" styleClass="output-text" />
             <h:inputText value="#{optionPage.clientDataSyncExpressions}" styleClass="input-text"  />
