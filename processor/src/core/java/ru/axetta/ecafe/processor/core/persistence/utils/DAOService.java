@@ -18,13 +18,12 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -2593,10 +2592,12 @@ public class DAOService {
         this.preorderDAOOperationsImpl = preorderDAOOperationsImpl;
     }
 
-    public String generateLinkingTokenForSmartWatch(Session session, String phone) throws Exception{
+    public String generateLinkingTokenForSmartWatch(Session session, String phone) throws Exception {
         org.hibernate.Query query = session.createQuery("delete from LinkingTokenForSmartWatch where phoneNumber like :phoneNumber");
         query.setParameter("phoneNumber", phone);
         query.executeUpdate();
+
+        Date createDate = new Date();
         SecureRandom secureRandom = new SecureRandom();
         String randomToken;
         int nSize = 9;
@@ -2616,6 +2617,7 @@ public class DAOService {
         LinkingTokenForSmartWatch token = new LinkingTokenForSmartWatch();
         token.setPhoneNumber(phone);
         token.setToken(randomToken);
+        token.setCreateDate(createDate);
         session.save(token);
         return token.getToken();
     }
