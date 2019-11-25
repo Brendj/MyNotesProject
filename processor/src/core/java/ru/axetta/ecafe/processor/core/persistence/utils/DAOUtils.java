@@ -1736,19 +1736,7 @@ public class DAOUtils {
     }
 
     public static void saveEMIAS(Session session, LiberateClientsList liberateClientsList) {
-        Long version = 0L;
-        try {
-            Criteria criteria = session.createCriteria(EMIAS.class);
-            criteria.setProjection(Projections.max("version"));
-            Object result = criteria.uniqueResult();
-            if (result != null) {
-                Long currentMaxVersion = (Long) result;
-                version = currentMaxVersion + 1;
-            }
-        } catch (Exception ex) {
-            logger.error("Failed get max emias version, ", ex);
-            version = 0L;
-        }
+        Long version = getMaxVersionEMIAS(session);
 
         EMIAS emias = new EMIAS();
         emias.setGuid(liberateClientsList.getGuid());
@@ -1763,12 +1751,10 @@ public class DAOUtils {
     }
 
     public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList) {
+        Long version = getMaxVersionEMIAS(session);
+
         Criteria clientCardsCriteria = session.createCriteria(EMIAS.class);
         clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventCancelEMIAS()));
-        //if (sick)
-        //    clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 1L));
-        //else
-        //    clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 3L));
         EMIAS emiasUpdated;
         try {
             emiasUpdated = (EMIAS)clientCardsCriteria.list().get(0);
@@ -1785,13 +1771,10 @@ public class DAOUtils {
         emias.setStartDateLiberate(liberateClientsList.getStartDateLiberate());
         emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
         emias.setCreateDate(new Date());
+        emias.setVersion(version);
         session.save(emias);
         clientCardsCriteria = session.createCriteria(EMIAS.class);
         clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
-        //if (sick)
-        //    clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 2L));
-        //else
-        //    clientCardsCriteria.add(Restrictions.eq("typeEventEMIAS", 4L));
         EMIAS emiasNEW;
         try {
             emiasNEW = (EMIAS)clientCardsCriteria.list().get(0);
@@ -1801,10 +1784,28 @@ public class DAOUtils {
         }
 
         if (emiasUpdated != null && emiasNEW != null) {
-            emiasUpdated.setDeletedemiasid(emiasNEW.getIdOfEMIAS());
+            emiasUpdated.setDeletedemiasid(emiasNEW.getIdEventEMIAS());
             emiasUpdated.setUpdateDate(new Date());
             session.update(emiasUpdated);
         }
+    }
+
+    public static Long getMaxVersionEMIAS (Session session)
+    {
+        Long version = 0L;
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.setProjection(Projections.max("version"));
+            Object result = criteria.uniqueResult();
+            if (result != null) {
+                Long currentMaxVersion = (Long) result;
+                version = currentMaxVersion + 1;
+            }
+        } catch (Exception ex) {
+            logger.error("Failed get max emias version, ", ex);
+            version = 0L;
+        }
+        return version;
     }
 
     @SuppressWarnings("unchecked")
