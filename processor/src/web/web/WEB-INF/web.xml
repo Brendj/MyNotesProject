@@ -388,6 +388,14 @@
         <url-pattern>/soap/ezd</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>EMIASControllewWS</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.internal.EMIASController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EMIASControllewWS</servlet-name>
+        <url-pattern>/soap/emias</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>BarcodeServlet</servlet-name>
