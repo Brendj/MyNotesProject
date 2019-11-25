@@ -245,7 +245,6 @@ public class CardManagerProcessor implements CardManager {
             String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg, String informationAboutCard) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -253,7 +252,6 @@ public class CardManagerProcessor implements CardManager {
             updateCardInSession(persistenceSession, idOfClient, idOfCard, cardType, state, validTime, lifeState,
             lockReason, issueTime, externalId, cardOperatorUser, idOfOrg, informationAboutCard);
 
-            persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -324,8 +322,10 @@ public class CardManagerProcessor implements CardManager {
         updatedCard.setExternalId(externalId);
         updatedCard.setUpdateTime(new Date());
         persistenceSession.update(updatedCard);
-    }
 
+        persistenceSession.flush();
+
+    }
 
     @Override
     public void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime) throws Exception {
