@@ -35,6 +35,7 @@
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>
+        <property name="extraId" column="extraId" type="long" not-null="true" insert="false" update="false"/>
     </class>
 </hibernate-mapping>
 
