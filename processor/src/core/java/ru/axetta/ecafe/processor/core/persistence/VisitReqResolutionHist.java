@@ -35,6 +35,7 @@ public class VisitReqResolutionHist implements Serializable {
     private Integer syncState;
     private Migrant migrant;
     private VisitReqResolutionHistInitiatorEnum initiator;
+    private Long extraId;
 
     public VisitReqResolutionHist() {
     }
@@ -144,7 +145,8 @@ public class VisitReqResolutionHist implements Serializable {
 
     @Override
     public int hashCode() {
-        return compositeIdOfVisitReqResolutionHist.hashCode();
+        return extraId.hashCode();
+        //return compositeIdOfVisitReqResolutionHist.hashCode();
     }
 
     @Override
@@ -153,5 +155,13 @@ public class VisitReqResolutionHist implements Serializable {
             return this.hashCode() == o.hashCode();
         }
         return false;
+    }
+
+    public Long getExtraId() {
+        return extraId;
+    }
+
+    public void setExtraId(Long extraId) {
+        this.extraId = extraId;
     }
 }

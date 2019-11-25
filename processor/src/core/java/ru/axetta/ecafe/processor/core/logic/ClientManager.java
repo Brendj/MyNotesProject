@@ -2075,6 +2075,20 @@ public class ClientManager {
         }
     }
 
+    public static void createClientGroupMigrationHistory(Session session, Client client, Org org, Long idOfClientGroup,
+            String clientGroupName, String comment) {
+        ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(org, client);
+        if (client.getClientGroup() != null) {
+            clientGroupMigrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+            clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
+        }
+        clientGroupMigrationHistory.setNewGroupId(idOfClientGroup);
+        clientGroupMigrationHistory.setNewGroupName(clientGroupName);
+        clientGroupMigrationHistory.setComment(comment);
+
+        session.save(clientGroupMigrationHistory);
+    }
+
     public static void checkUserOPFlag(Session session, Org oldOrg, Org newOrg, Long idOfClientGroup, Client client) {
         if (null == client.getUserOP() || !client.getUserOP()) {
             return;

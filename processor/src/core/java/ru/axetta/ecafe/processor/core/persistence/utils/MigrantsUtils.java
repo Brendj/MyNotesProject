@@ -135,9 +135,19 @@ public class MigrantsUtils {
     }
 
     public static List<Client> getActiveMigrantsForOrg(Session session, Long idOfOrg) throws Exception {
-        Set<Client> clients = new HashSet<Client>();
-        List<Migrant> migrants = getCurrentMigrantsForOrg(session, idOfOrg);
-        for(Migrant migrant : migrants){
+        //Set<Client> clients = new HashSet<Client>();
+        //List<Migrant> migrants = getCurrentMigrantsForOrg(session, idOfOrg);
+        /*Query query = session.createQuery("select distinct v.migrant.clientMigrate from VisitReqResolutionHist v join fetch v.migrant m join fetch m.clientMigrate "
+                + "where m.orgVisit.idOfOrg = :idOfOrg and "
+                + "m.visitStartDate <= :date and m.visitEndDate >= :date and v.resolution = 1 order by v.resolutionDateTime desc");*/
+        Query query = session.createQuery("select distinct m.clientMigrate from Migrant m join m.visitReqResolutionHists v "
+                + "where m.orgVisit.idOfOrg = :idOfOrg and "
+                + "m.visitStartDate <= :date and m.visitEndDate >= :date and v.resolution = 1");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("date", new Date());
+        List<Client> list = query.list();
+        return list == null ? new ArrayList<Client>() : list;
+        /*for(Migrant migrant : migrants){
             Query query = session.createQuery("from VisitReqResolutionHist where migrant=:migrant order by resolutionDateTime desc");
             query.setParameter("migrant", migrant);
             query.setMaxResults(1);
@@ -146,11 +156,18 @@ public class MigrantsUtils {
                 clients.add(migrant.getClientMigrate());
             }
         }
-        return new ArrayList<Client>(clients);
+        return new ArrayList<Client>(clients);*/
     }
 
     public static List<Long> getActiveMigrantsIdsForOrg(Session session, Long idOfOrg) throws Exception {
-        Set<Long> clientsIds = new HashSet<Long>();
+        Query query = session.createQuery("select distinct m.clientMigrate.idOfClient from Migrant m join m.visitReqResolutionHists v "
+                + "where m.orgVisit.idOfOrg = :idOfOrg and "
+                + "m.visitStartDate <= :date and m.visitEndDate >= :date and v.resolution = 1");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("date", new Date());
+        List<Long> list = query.list();
+        return list == null ? new ArrayList<Long>() : list;
+        /*Set<Long> clientsIds = new HashSet<Long>();
         List<Migrant> migrants = getCurrentMigrantsForOrg(session, idOfOrg);
         for(Migrant migrant : migrants){
             Query query = session.createQuery("from VisitReqResolutionHist where migrant=:migrant order by resolutionDateTime desc");
@@ -161,7 +178,7 @@ public class MigrantsUtils {
                 clientsIds.add(migrant.getClientMigrate().getIdOfClient());
             }
         }
-        return new ArrayList<Long>(clientsIds);
+        return new ArrayList<Long>(clientsIds);*/
     }
 
     public static VisitReqResolutionHist getLastResolutionForMigrant(Session session, Migrant migrant){

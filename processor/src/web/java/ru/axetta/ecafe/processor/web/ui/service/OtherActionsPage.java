@@ -60,6 +60,7 @@ public class OtherActionsPage extends OnlineReportPage {
     private Date summaryFinOperatorDate;
     private String orgsForSpbCardsUidUpdate;
     private String guidForDiscountsUpdate;
+    private String updateSpbClientDoubles;
 
     private static void close(Closeable resource) {
         if (resource != null) {
@@ -643,6 +644,17 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
+    public void runProcessClientDoubles() throws Exception {
+        try {
+            Long idOfOrg = Long.parseLong(updateSpbClientDoubles);
+            RuntimeContext.getAppContext().getBean(CardsUidUpdateService.class).processClientDoubles(idOfOrg);
+            printMessage("Обработка дублей клиентов завершена");
+        } catch (Exception e) {
+            getLogger().error("Error update card uids: ", e);
+            printError("Во время обработки дублей клиентов произошла ошибка с текстом " + e.getMessage());
+        }
+    }
+
     public void runEventNotificationServiceForDaily(){
         SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
         Date today = new Date(System.currentTimeMillis());
@@ -678,5 +690,13 @@ public class OtherActionsPage extends OnlineReportPage {
             getLogger().error("Error run update ESZ migrants: ", e);
             printError("Во время обработки произошла ошибка с текстом " + e.getMessage());
         }
+    }
+
+    public String getUpdateSpbClientDoubles() {
+        return updateSpbClientDoubles;
+    }
+
+    public void setUpdateSpbClientDoubles(String updateSpbClientDoubles) {
+        this.updateSpbClientDoubles = updateSpbClientDoubles;
     }
 }
