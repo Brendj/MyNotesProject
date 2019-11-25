@@ -10,6 +10,7 @@
 <script language="javascript">
     function disableButtons(value) {
         document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:generateGuardiansByOrgs").disabled=value;
+        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:updateSpbClientDoubles").disabled=value;
     }
 </script>
 
@@ -220,6 +221,14 @@
         </rich:panel>
         <a4j:commandButton value="Отправка платежей в Атол" action="#{otherActionsPage.sendToAtol()}" id="sendToAtolButton"
                            styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+        <rich:panel rendered="#{otherActionsPage.isSpb()}">
+            <a4j:commandButton value="Обработка дублей клиентов" action="#{otherActionsPage.runProcessClientDoubles}" id="updateSpbClientDoubles"
+                               title="Обработка дублей клиентов"
+                               styleClass="command-button" onclick="disableButtons(true);" oncomplete="disableButtons(false)" /><br/>
+            <h:outputText value="Ид. организаций:"/>
+            <h:inputText value="#{otherActionsPage.updateSpbClientDoubles}" size="50"/>
+        </rich:panel>
+
     </h:panelGrid>
 
     <rich:panel rendered="#{otherActionsPage.isSpb()}">
