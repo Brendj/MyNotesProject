@@ -7,3 +7,19 @@
 -- 338: Добавление поля времени создания токена для облегчения мониторинга
 ALTER TABLE cf_linking_tokens_for_smartwatch
   ADD COLUMN createDate BIGINT;
+
+-- 318: Таблица для взаимодействия с сервисом ЕМИАС
+CREATE TABLE cf_emias (
+  id   				bigserial,	-- первичный ключ
+  guid         		varchar,    -- Гуид клиента в КИС ГУСОЭВ
+  idEventEMIAS 		int8, 		-- Ид события в ГИС «ЕМИАС»
+  typeEventEMIAS 		int8, 		-- Тип события в ГИС «ЕМИАС»
+  dateLiberate		int8, 		-- Дата возникновения события
+  startDateLiberate	int8, 		-- Дата начала освобождения
+  endDateLiberate		int8, 		-- Дата окончания освобождения
+  createDate			int8, 		-- Дата создания записи в ИС «ПП»
+  updateDate			int8, 		-- Дата обновления записи в ИС «ПП»
+  accepted			bool, 		-- Отметка о принятии к сведению информации
+  deletedemiasid		int8,		-- Ссылка на idEventEMIAS, который данная запись отменяет
+  version				int8		-- Версия записи
+);
