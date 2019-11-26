@@ -22,7 +22,7 @@ CREATE TABLE public.cf_syncsettings
     sunday boolean NOT NULL DEFAULT false,
     version bigint NOT NULL DEFAULT 0,
     deletestate boolean NOT NULL DEFAULT false,
-    createddate bigint NOT NULL DEFAULT (date_part('epoch'::text, now()) * (1000)::double precision),
+    createddate bigint NOT NULL DEFAULT (date_part(cast('epoch' as text), now()) * cast(1000 as double precision)),
     lastupdate bigint,
     concretetime varchar(256),
 
@@ -36,3 +36,5 @@ CREATE UNIQUE INDEX cf_syncsettings_idoforg_contenttype
     WHERE deletestate IS FALSE;
 
 alter table cf_visitreqresolutionhist add column extraId bigserial not null;
+
+--! ФИНАЛИЗИРОВАН 26.11.2019, НЕ МЕНЯТЬ
