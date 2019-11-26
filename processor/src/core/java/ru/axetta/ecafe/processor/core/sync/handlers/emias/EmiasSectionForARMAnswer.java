@@ -11,6 +11,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.LinkedList;
 import java.util.List;
 
@@ -33,6 +35,11 @@ public class EmiasSectionForARMAnswer implements AbstractToElement {
         if (items == null) {
             items = new LinkedList<>();
         }
+        Collections.sort(items, new Comparator<EMIASSyncFromAnswerARMPOJO>() {
+            public int compare(EMIASSyncFromAnswerARMPOJO o1, EMIASSyncFromAnswerARMPOJO o2) {
+                return o1.getIdEventEMIAS().compareTo(o2.getIdEventEMIAS());
+            }
+        });
         return items;
     }
 

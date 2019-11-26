@@ -22,6 +22,8 @@ public class EMIASSyncFromAnswerARMPOJO {
 
 
     public Long getIdEventEMIAS() {
+        if (idEventEMIAS == null)
+            return 0L;
         return idEventEMIAS;
     }
 
