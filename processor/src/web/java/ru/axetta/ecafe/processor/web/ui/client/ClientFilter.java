@@ -318,6 +318,7 @@ public class ClientFilter {
         mobileNumber = null;
         clientCardOwnCondition = ClientCardOwnMenu.NO_CONDITION;
         clientBalanceCondition = ClientBalanceFilter.NO_CONDITION;
+        clientGroupId = null;
     }
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws HibernateException {
