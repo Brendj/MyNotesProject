@@ -35,11 +35,13 @@ public class EmiasSectionForARMAnswer implements AbstractToElement {
         if (items == null) {
             items = new LinkedList<>();
         }
-        Collections.sort(items, new Comparator<EMIASSyncFromAnswerARMPOJO>() {
-            public int compare(EMIASSyncFromAnswerARMPOJO o1, EMIASSyncFromAnswerARMPOJO o2) {
-                return o1.getIdEventEMIAS().compareTo(o2.getIdEventEMIAS());
-            }
-        });
+        else {
+            Collections.sort(items, new Comparator<EMIASSyncFromAnswerARMPOJO>() {
+                public int compare(EMIASSyncFromAnswerARMPOJO o1, EMIASSyncFromAnswerARMPOJO o2) {
+                    return o1.getIdEventEMIAS().compareTo(o2.getIdEventEMIAS());
+                }
+            });
+        }
         return items;
     }
 
