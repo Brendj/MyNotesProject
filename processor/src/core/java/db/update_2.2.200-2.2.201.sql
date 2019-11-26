@@ -5,7 +5,7 @@
 -- Пакет обновлений 201
 
 -- 203: Сущность настройкии расписания синхранизации для ОО
-CREATE TABLE public.cf_syncsettings
+CREATE TABLE cf_syncsettings
 (
     idofsyncsetting bigserial primary key,
     idoforg bigint NOT NULL references cf_orgs(idoforg),
