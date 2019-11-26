@@ -34,3 +34,5 @@ CREATE TABLE public.cf_syncsettings
 CREATE UNIQUE INDEX cf_syncsettings_idoforg_contenttype
     ON cf_syncsettings (idoforg, contenttype)
     WHERE deletestate IS FALSE;
+
+alter table cf_visitreqresolutionhist add column extraId bigserial not null;
