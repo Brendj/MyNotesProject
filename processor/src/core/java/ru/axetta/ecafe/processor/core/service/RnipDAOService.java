@@ -53,7 +53,8 @@ public class RnipDAOService {
     public List<RnipMessage> getRnipMessages() {
         Query query = entityManager.createQuery("select rm from RnipMessage rm join fetch rm.contragent where rm.eventTime > :eventTime "
                 + "and rm.processed = false order by rm.eventTime");
-        query.setParameter("eventTime", CalendarUtils.addDays(new Date(), -30)); //
+        query.setParameter("eventTime", CalendarUtils.addDays(new Date(), -30));
+        query.setMaxResults(RuntimeContext.getAppContext().getBean(RNIPGetPaymentsServiceV21.class).getRemainingCapacity());
         return query.getResultList();
     }
 

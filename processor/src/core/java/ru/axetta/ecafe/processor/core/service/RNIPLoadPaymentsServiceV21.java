@@ -30,6 +30,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.annotation.Resource;
 import javax.xml.ws.BindingProvider;
 import javax.xml.ws.handler.Handler;
 import java.math.BigDecimal;
@@ -53,6 +54,9 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
     private static SMEVMessageExchangePortType port21;
     private static BindingProvider bindingProvider21;
     private static final Object sync = new Object();
+
+    @Resource
+    RNIPGetPaymentsServiceV21 getPaymentsService;
 
     public static final int PAGING_VALUE = 2147483647;
     public static final String SUCCESS_CODE = "0 -";
@@ -519,16 +523,16 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         if (!isOn()) {
             return;
         }
-        loggerGetResponse.info("Start processing rnip GetResponses");
+        loggerGetResponse.info("Start processing rnip GetResponses in thread pool");
         List<RnipMessage> messages = RnipDAOService.getInstance().getRnipMessages();
         for (RnipMessage rnipMessage : messages) {
             try {
-                processRnipMessage(rnipMessage);
+                RuntimeContext.getAppContext().getBean(RNIPGetPaymentsServiceV21.class).processRnipMessage(rnipMessage);
             } catch (Exception e) {
                 loggerGetResponse.error("Error in processing rnip message async", e);
             }
         }
-        loggerGetResponse.info("End processing rnip GetResponses");
+        loggerGetResponse.info("End processing rnip GetResponses in thread pool");
     }
 
     public void runSendAck() {
@@ -578,7 +582,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         }
     }
 
-    private void processRnipMessage(RnipMessage rnipMessage) throws Exception {
+    public void processRnipMessage(RnipMessage rnipMessage) throws Exception {
         InitRNIP21Service(rnipMessage.getContragent());
 
         generated.ru.gov.smev.artefacts.x.services.message_exchange.types._1.ObjectFactory requestObjectFactory =
