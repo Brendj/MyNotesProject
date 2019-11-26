@@ -1753,15 +1753,15 @@ public class DAOUtils {
     public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList) {
         Long version = getMaxVersionEMIAS(session);
 
-        Criteria clientCardsCriteria = session.createCriteria(EMIAS.class);
-        clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventCancelEMIAS()));
-        EMIAS emiasUpdated;
-        try {
-            emiasUpdated = (EMIAS)clientCardsCriteria.list().get(0);
-        }catch (Exception e)
-        {
-            emiasUpdated = null;
-        }
+        //Criteria clientCardsCriteria = session.createCriteria(EMIAS.class);
+        //clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventCancelEMIAS()));
+        //EMIAS emiasUpdated;
+        //try {
+        //    emiasUpdated = (EMIAS)clientCardsCriteria.list().get(0);
+        //}catch (Exception e)
+        //{
+        //    emiasUpdated = null;
+        //}
 
         EMIAS emias = new EMIAS();
         emias.setGuid(liberateClientsList.getGuid());
@@ -1771,23 +1771,25 @@ public class DAOUtils {
         emias.setStartDateLiberate(liberateClientsList.getStartDateLiberate());
         emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
         emias.setCreateDate(new Date());
+        emias.setDeletedemiasid(liberateClientsList.getIdEventCancelEMIAS());
         emias.setVersion(version);
         session.save(emias);
-        clientCardsCriteria = session.createCriteria(EMIAS.class);
-        clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
-        EMIAS emiasNEW;
-        try {
-            emiasNEW = (EMIAS)clientCardsCriteria.list().get(0);
-        }catch (Exception e)
-        {
-            emiasNEW = null;
-        }
 
-        if (emiasUpdated != null && emiasNEW != null) {
-            emiasUpdated.setDeletedemiasid(emiasNEW.getIdEventEMIAS());
-            emiasUpdated.setUpdateDate(new Date());
-            session.update(emiasUpdated);
-        }
+        //clientCardsCriteria = session.createCriteria(EMIAS.class);
+        //clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
+        //EMIAS emiasNEW;
+        //try {
+        //    emiasNEW = (EMIAS)clientCardsCriteria.list().get(0);
+        //}catch (Exception e)
+        //{
+        //    emiasNEW = null;
+        //}
+        //
+        //if (emiasUpdated != null && emiasNEW != null) {
+        //    emiasUpdated.setDeletedemiasid(emiasNEW.getIdEventEMIAS());
+        //    emiasUpdated.setUpdateDate(new Date());
+        //    session.update(emiasUpdated);
+        //}
     }
 
     public static Long getMaxVersionEMIAS (Session session)
