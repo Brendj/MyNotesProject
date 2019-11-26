@@ -1120,7 +1120,7 @@ public class RNIPLoadPaymentsService {
 
     protected Date getStartDateByLastUpdateDate(Date updateDate) {
         Date lastUpdateDate = new Date(updateDate.getTime());
-        lastUpdateDate = CalendarUtils.addMinute(lastUpdateDate, -1);
+        lastUpdateDate = CalendarUtils.addSeconds(lastUpdateDate, -20);
         return lastUpdateDate;
     }
 

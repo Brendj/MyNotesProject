@@ -47,6 +47,23 @@ public class RnipMessage {
         this.succeeded = false;
     }
 
+    @Override
+    public int hashCode() {
+        return idOfRnipMessage.hashCode();
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof RnipMessage)) {
+            return false;
+        }
+        final RnipMessage that = (RnipMessage) o;
+        return idOfRnipMessage.equals(that.getIdOfRnipMessage());
+    }
+
     public Long getIdOfRnipMessage() {
         return idOfRnipMessage;
     }
