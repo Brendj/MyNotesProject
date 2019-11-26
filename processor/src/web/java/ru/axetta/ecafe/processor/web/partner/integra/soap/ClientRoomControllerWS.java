@@ -22,9 +22,9 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -47,6 +47,7 @@ import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryStatus;
 import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryType;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardNotFoundException;
+import ru.axetta.ecafe.processor.core.persistence.service.card.CardWrongStateException;
 import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.*;
 import ru.axetta.ecafe.processor.core.service.*;
@@ -106,8 +107,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -168,6 +169,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_ERROR_CREATE_VARIABLE_FEEDING = 590L;
     private static final Long RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING = 600L;
     private static final Long RC_CARD_NOT_FOUND = 610L;
+    private static final Long RC_WRONG_STATE_OF_CARD = 615L;
     //private static final Long RC_START_WEEK_POSITION_NOT_FOUND = 620L;
     private static final Long RC_START_WEEK_POSITION_NOT_CORRECT = 630L;
     private static final Long RC_NOT_INFORMED_SPECIAL_MENU = 640L;
@@ -212,6 +214,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_ERROR_CREATE_VARIABLE_FEEDING_DESC = "В рамках данного вида питания можно выбрать только один вариант комплекса каждого вида рациона (завтрак, обед)";
     private static final String RC_ERROR_NOT_ALL_DAYS_FILLED_VARIABLE_FEEDING_DESC = "В рамках данного вида питания должен быть выбран один вариант комплекса каждого вида рациона (завтрак, обед) на каждый день циклограммы в пределах недели";
     private static final String RC_CARD_NOT_FOUND_DESC = "Карта не найдена";
+    private static final String RC_WRONG_STATE_OF_CARD_DESC = "Запись не подлежит изменениям";
     //private static final String RC_START_WEEK_POSITION_NOT_FOUND_DESC = "Для циклограммы вариативного питания не указан номер стартовой недели";
     private static final String RC_START_WEEK_POSITION_NOT_CORRECT_DESC = "Номер стартовой недели некорректен";
     private static final String RC_NOT_INFORMED_SPECIAL_MENU_DESC = "Представитель не проинформирован об условиях предоставления услуги";
@@ -9862,7 +9865,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
             if (client == null) {
-                throw new ClientNotFoundException("Не найдет клиент с л/с " + contractId);
+                throw new ClientNotFoundException("Не найден клиент с л/с " + contractId);
             }
 
             Criteria criteria = persistenceSession.createCriteria(Card.class);
@@ -9896,6 +9899,70 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_CARD_NOT_FOUND_DESC;
         } catch (Exception e) {
             logger.error("Error in blockActiveCardByCardNoAndContractId", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return result;
+    }
+
+    @Override
+    public Result extendValidDateOfCard(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "UID") Long cardNo){
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        Result result = new Result();
+        try{
+            persistenceSession = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(persistenceSession, contractId);
+            if (client == null) {
+                throw new ClientNotFoundException("Не найден клиент с л/с " + contractId);
+            }
+
+            Criteria criteria = persistenceSession.createCriteria(Card.class);
+            criteria.add(Restrictions.eq("cardNo", cardNo));
+            criteria.add(Restrictions.eq("client", client));
+
+            Card card = (Card) criteria.uniqueResult();
+            if (card == null) {
+                throw new CardNotFoundException(
+                        "У клиента с л/с " + contractId + " нет карты с UID " + cardNo);
+            } else if(!(card.getState().equals(CardState.ISSUED.getValue()) || card.getState().equals(CardState.TEMPISSUED.getValue()))){
+                throw new CardWrongStateException("Card must have state ISSUED or TEMPISSUED");
+            }
+
+            Integer period = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_PERIOD_OF_EXTENSION_CARDS);
+            Date newValidDate = CalendarUtils.addYear(new Date(), period);
+
+            CardManager cardManager = RuntimeContext.getInstance().getCardManager();
+            cardManager.updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+                    card.getState(), newValidDate, card.getLifeState(), CardLockReason.EMPTY.getDescription(),
+                    card.getIssueTime(), card.getExternalId(), null, card.getOrg().getIdOfOrg(),
+                    "Дата окончания изменена внешней системой");
+
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (ClientNotFoundException e) {
+            logger.error("Error in extendValidDateOfCard", e);
+            result.resultCode = RC_CLIENT_NOT_FOUND;
+            result.description = RC_CLIENT_NOT_FOUND_DESC;
+        } catch (CardNotFoundException e) {
+            logger.error("Error in extendValidDateOfCard", e);
+            result.resultCode = RC_CARD_NOT_FOUND;
+            result.description = RC_CARD_NOT_FOUND_DESC;
+        } catch (CardWrongStateException e){
+            logger.error("Error in extendValidDateOfCard", e);
+            result.resultCode = RC_WRONG_STATE_OF_CARD;
+            result.description = RC_WRONG_STATE_OF_CARD_DESC;
+        } catch (Exception e) {
+            logger.error("Error in extendValidDateOfCard", e);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {

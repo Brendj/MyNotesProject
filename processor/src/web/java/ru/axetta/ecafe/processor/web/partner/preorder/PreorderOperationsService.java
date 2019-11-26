@@ -47,7 +47,7 @@ public class PreorderOperationsService {
 
     public void runRelevancePreordersToMenu(PreorderRequestsReportServiceParam params) {
         logger.info("Start relevancePreordersToMenu process");
-        long nextVersion = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).nextVersionByPreorderComplex();
+        long nextVersion;
         List<PreorderComplex> list = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreorderComplexListForRelevanceToMenu(params);
         int counter = 0;
         List<ModifyMenu> modifyMenuList = new ArrayList<>();
@@ -56,6 +56,7 @@ public class PreorderOperationsService {
                 logger.info(String.format("Start processing record %s from %s", ++counter, list.size()));
                 if (preorderComplex.getIdOfGoodsRequestPosition() != null)
                     continue;
+                nextVersion = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).nextVersionByPreorderComplex();
                 List<ModifyMenu> mmList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                         .relevancePreordersToMenu(preorderComplex, nextVersion);
                 if (mmList != null) {
@@ -65,6 +66,7 @@ public class PreorderOperationsService {
                 logger.error("Error in runRelevancePreordersToMenu: ", e);
             }
         }
+        nextVersion = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).nextVersionByPreorderComplex();
         RuntimeContext.getAppContext().getBean(PreorderDAOService.class).changeLocalIdOfMenu(modifyMenuList, nextVersion);
         logger.info("End relevancePreordersToMenu process");
     }

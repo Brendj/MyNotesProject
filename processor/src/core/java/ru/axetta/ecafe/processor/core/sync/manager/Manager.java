@@ -10,7 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistory;
 import ru.axetta.ecafe.processor.core.persistence.SyncHistoryException;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConfirm;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConflict;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -29,6 +28,8 @@ import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.sync.doGroups.DOGroupsFactory;
 import ru.axetta.ecafe.processor.core.sync.doGroups.DOSyncClass;
 import ru.axetta.ecafe.processor.core.sync.doGroups.IDOGroup;
+import ru.axetta.ecafe.processor.core.sync.manager.modifier.DistributedObjectModifier;
+import ru.axetta.ecafe.processor.core.sync.manager.modifier.ModifierTypeFactory;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -44,7 +45,6 @@ import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.TransformerException;
 import java.util.*;
 
 /**
@@ -309,6 +309,11 @@ public class Manager implements AbstractToElement {
                 resultDOMap.put(doSyncClass, currentResultDOList);
                 LOGGER.debug("init processDistributedObjectsList");
                 List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory, doSyncClass);
+                if (doSyncClass.getDoClass() == ECafeSettings.class) {
+                    for (DistributedObject dob : distributedObjectsList) {
+                        if (!currentResultDOList.contains(dob) && ((ECafeSettings) dob).isPreOrderFeeding()) currentResultDOList.add(dob);
+                    }
+                }
                 LOGGER.debug("end processDistributedObjectsList");
                 currentDOListMap.put(doSyncClass, distributedObjectsList);
                 LOGGER.debug("init addConfirms");
@@ -341,6 +346,13 @@ public class Manager implements AbstractToElement {
                 LOGGER.debug("init processDistributedObjectsList");
                 List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory,
                         doSyncClass);
+                if (doSyncClass.getDoClass() == ECafeSettings.class) {
+                    for (DistributedObject dob : distributedObjectsList) {
+                        if (((ECafeSettings) dob).isPreOrderFeeding()) {
+                            currentResultDOSet.add(dob);
+                        }
+                    }
+                }
                 LOGGER.debug("end processDistributedObjectsList");
                 currentDOListMap.put(doSyncClass, distributedObjectsList);
                 resultDOMap.put(doSyncClass,  new ArrayList<DistributedObject>(currentResultDOSet));
@@ -882,7 +894,9 @@ public class Manager implements AbstractToElement {
         }
         // Изменение существующего в БД экземпляра РО.
         if (distributedObject.getTagName().equals("M")) {
-            Long currentVersion = currentDO.getGlobalVersion();
+            DistributedObjectModifier modifier = ModifierTypeFactory.createModifier(distributedObject);
+            modifier.modifyDO(persistenceSession, distributedObject, currentMaxVersion, currentDO, idOfOrg, conflictDocument);
+            /*Long currentVersion = currentDO.getGlobalVersion();
             Long objectVersion = distributedObject.getGlobalVersion();
             currentDO.fill(distributedObject);
             currentDO.setDeletedState(distributedObject.getDeletedState());
@@ -902,12 +916,12 @@ public class Manager implements AbstractToElement {
             distributedObject.setTagName("M");
             if(distributedObject instanceof ECafeSettings) {
                 updateOrgSettingByECafeSetting(persistenceSession, (ECafeSettings) distributedObject);
-            }
+            }*/
         }
         return distributedObject;
     }
 
-    private void updateOrgSettingByECafeSetting(Session persistenceSession, ECafeSettings eCafeSettings) throws Exception {
+    /*private void updateOrgSettingByECafeSetting(Session persistenceSession, ECafeSettings eCafeSettings) throws Exception {
         Date now = new Date();
         Long lastVersionOfOrgSetting = OrgSettingDAOUtils.getLastVersionOfOrgSettings(persistenceSession);
         Long lastVersionOfOrgSettingItem = OrgSettingDAOUtils.getLastVersionOfOrgSettingsItem(persistenceSession);
@@ -955,7 +969,7 @@ public class Manager implements AbstractToElement {
             map.put(item.getSettingType(), item);
         }
         return map;
-    }
+    }*/
 
     private void createOrgSettingByECafeSetting(Session persistenceSession, ECafeSettings eCafeSettings) throws Exception {
         Date now = new Date();
@@ -980,7 +994,7 @@ public class Manager implements AbstractToElement {
         persistenceSession.persist(setting);
     }
 
-    private DOConflict createConflict(DistributedObject distributedObject, DistributedObject currentDO)
+    /*private DOConflict createConflict(DistributedObject distributedObject, DistributedObject currentDO)
             throws Exception {
         DOConflict conflict = new DOConflict();
         conflict.setValueInc(createStringElement(conflictDocument, distributedObject));
@@ -998,6 +1012,6 @@ public class Manager implements AbstractToElement {
         Element element = document.createElement("O");
         element = distributedObject.toElement(element);
         return XMLUtils.nodeToString(element);
-    }
+    }*/
 
 }

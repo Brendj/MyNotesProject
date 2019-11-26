@@ -9,6 +9,9 @@ import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
@@ -3627,6 +3630,12 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("guid", guid));
         return (Org) criteria.uniqueResult();
     }
+    
+     public static List<Org> findOrgsByGuid(Session session, String guid) {
+        Criteria criteria = session.createCriteria(Org.class);
+        criteria.add(Restrictions.eq("guid", guid));
+        return criteria.list();
+    }
 
     public static Card findCardByCardNoAndOrg(Session persistenceSession, long cardNo, long idOfOrg) {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
@@ -4234,6 +4243,11 @@ public class DAOUtils {
         return (OrgSetting) criteria.uniqueResult();
     }
 
+    public static List<CategoryDiscount> getCategoryDiscountList(Session session) {
+        Query q = session.createQuery("from CategoryDiscount order by idOfCategoryDiscount");
+        return (List<CategoryDiscount>)q.list();
+    }
+
     public static List<Long> findFriendlyOrgsIds(Session session, List<Long> orgIdList) {
         Query query = session
                 .createSQLQuery("select friendlyorg from cf_friendly_organization where currentorg in (:idOfOrgList)")
@@ -4285,9 +4299,113 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<Integer> getDsznCodeListByCategoryDiscountCode(Session session, Long idOfCategoryDiscount) {
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        criteria.add(Restrictions.eq("categoryDiscount.idOfCategoryDiscount", idOfCategoryDiscount));
+        criteria.setProjection(Projections.property("code"));
+        return criteria.list();
+    }
+
+    public static ApplicationForFood getApplicationForFoodByClientAndCode(Session session, Client client, Long code) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.eq("dtisznCode", code));
+        criteria.add(Restrictions.eq("archived", false));
+        return (ApplicationForFood) criteria.uniqueResult();
+    }
+
+    public static List<ApplicationForFood> getApplicationForFoodByClient(Session session, Client client) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.eq("archived", false));
+        return criteria.list();
+    }
+
     public static void removeUserOPFlag(Session session, Long idOfOrg) {
         Query query = session.createSQLQuery("update cf_clients set userop = false where idoforg = :idOfOrg");
         query.setParameter("idOfOrg", idOfOrg);
+        query.executeUpdate();
+    }
+
+    public static List getAllDateFromViewEZD(Session persistenceSession, List<Org> orgs, String groupname,
+            Date startDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzdView.class);
+        if (orgs != null && !orgs.isEmpty()) {
+            List<Long> ids = new ArrayList<>();
+            for (Org org : orgs) {
+                ids.add(org.getIdOfOrg());
+            }
+            criteria.add(Restrictions.in("idoforg", ids));
+        }
+        if (groupname != null) {
+            criteria.add(Restrictions.eq("groupname", groupname));
+        }
+        criteria.add(Restrictions.gt("menudate", startDate));
+        return criteria.list();
+    }
+
+    public static List getAllDateFromsSpecialDatesForEZD(Session persistenceSession) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzdSpecialDateView.class);
+        criteria.add(Restrictions.gt("specDate", new Date()));
+        return criteria.list();
+    }
+
+    public static List getDateFromsSpecialDatesForEZD(Session persistenceSession, List<String> groupName, List<Long> idofOrg)
+            throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzdSpecialDateView.class);
+        criteria.add(Restrictions.gt("specDate", new Date()));
+        criteria.add(Restrictions.in("groupname", groupName));
+        criteria.add(Restrictions.in("idoforg", idofOrg));
+        return criteria.list();
+    }
+
+    public static List getAllDateFromProdactionCalendarForEZD(Session persistenceSession) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
+        criteria.add(Restrictions.gt("day", new Date()));
+        return criteria.list();
+    }
+
+    public static boolean findSameRequestFromEZD(Session persistenceSession, Long idofOrg, String groupName, Date data,
+            Long idOfComplex) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzd.class);
+        criteria.add(Restrictions.eq("idOfOrg", idofOrg));
+        criteria.add(Restrictions.eq("groupname", groupName));
+        criteria.add(Restrictions.eq("dateappointment", data));
+        criteria.add(Restrictions.eq("idofcomplex", idOfComplex));
+        return criteria.list().isEmpty();
+    }
+
+    public static List getAllGoodRequestEZD(Session persistenceSession, Set<Long> friendlyOrgsid, Long version)
+            throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzd.class);
+        criteria.add(Restrictions.gt("versionrecord", version.intValue()));
+        criteria.add(Restrictions.in("idOfOrg", friendlyOrgsid));
+        criteria.add(Restrictions.ge("dateappointment", new Date()));
+        criteria.add(Restrictions.le("dateappointment", CalendarUtils.addMonth(new Date(),1) ));
+        return criteria.list();
+    }
+
+    public static Integer getMaxVersionForEZD(Session persistenceSession) throws Exception {
+        Query query = persistenceSession.createQuery("SELECT MAX(re.versionrecord) FROM RequestsEzd AS re");
+        Integer maxVer = (Integer) query.uniqueResult();
+        return maxVer == null ? 0 : maxVer;
+    }
+
+
+    public static void updateRequestFromEZD(Session session, Long idofOrg, String userName, String groupName, Date data,
+            Long idOfComplex, Integer complexcount, Integer versionrecord) {
+        Query query = session.createSQLQuery(
+                "update cf_goods_requests_ezd set complexcount = :complexcount, lastupdate = :lastupdate, versionrecord = :versionrecord, username = :username "
+                        + "where idoforg = :idOfOrg and groupName = :groupName "
+                        + "and dateappointment = :dateappointment and idOfComplex  = :idOfComplex");
+        query.setParameter("complexcount", complexcount);
+        query.setParameter("lastupdate", new Date().getTime());
+        query.setParameter("idOfOrg", idofOrg);
+        query.setParameter("username", userName);
+        query.setParameter("groupName", groupName);
+        query.setParameter("dateappointment", data.getTime());
+        query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("versionrecord", versionrecord);
         query.executeUpdate();
     }
 }

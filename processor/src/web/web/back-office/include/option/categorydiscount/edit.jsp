@@ -35,6 +35,8 @@
     </h:selectOneMenu>
     <h:outputText escape="true" value="Запрет изменения в АРМ" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{categoryDiscountEditPage.blockedToChange}" styleClass="output-text"/>
+    <h:outputText escape="true" value="Удалять при переводе" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{categoryDiscountEditPage.eligibleToDelete}" styleClass="output-text"/>
     <h:outputText escape="true" value="Используется в правилах" styleClass="output-text" />
     <h:panelGroup>
         <h:outputText styleClass="output-text" id="ruleListFilter" escape="true" value=" {#{categoryDiscountEditPage.filter}}" />

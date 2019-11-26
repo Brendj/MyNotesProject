@@ -17,6 +17,10 @@ public class OrgSetting {
     private Set<OrgSettingItem> orgSettingItems = new HashSet<>();
     private Long version;
 
+    public boolean isPreOrderFeeding() {
+        return settingGroup.equals(OrgSettingGroup.PreOrderFeeding);
+    }
+
     public Long getIdOfOrgSetting() {
         return idOfOrgSetting;
     }
