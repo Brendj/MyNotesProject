@@ -1084,7 +1084,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             if ((this.idOfClientGroup != null && client.getIdOfClientGroup() == null) ||
                     (this.idOfClientGroup == null && client.getIdOfClientGroup() != null) ||
                     (client.getIdOfClientGroup() != null && !client.getIdOfClientGroup().equals(this.idOfClientGroup))) {
-                ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(org, client);
+                ClientManager.createClientGroupMigrationHistory(persistenceSession, client, org, this.idOfClientGroup,
+                        this.clientGroupName, ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
+                                .getExternalContext().getRemoteUser());
+                /*ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(org, client);
                 if (client.getClientGroup() != null) {
                     clientGroupMigrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
                     clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
@@ -1095,7 +1098,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                         ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
                                 .getExternalContext().getRemoteUser());
 
-                persistenceSession.save(clientGroupMigrationHistory);
+                persistenceSession.save(clientGroupMigrationHistory);*/
 
             }
             client.setIdOfClientGroup(this.idOfClientGroup);

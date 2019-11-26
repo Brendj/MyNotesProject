@@ -328,8 +328,14 @@ public class CalendarUtils {
         return safeDateShortFormat.format(date);
     }
     public static String dateShortToStringFullYear(Date date) {
-        SimpleDateFormat safeDateShortFormatFullYear = dateShortFormatFullYear.get();
-        return safeDateShortFormatFullYear.format(date);
+        try {
+            SimpleDateFormat safeDateShortFormatFullYear = dateShortFormatFullYear.get();
+            return safeDateShortFormatFullYear.format(date);
+        }
+        catch (Exception e)
+        {
+            return "";
+        }
     }
     public static String dateMMMMYYYYToString(Date date) {
         SimpleDateFormat safeMMMMYYYY = MMMMYYYY.get();

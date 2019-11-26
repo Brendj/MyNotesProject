@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
+import ru.axetta.ecafe.processor.core.emias.LiberateClientsList;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
@@ -121,8 +122,8 @@ public class DAOUtils {
 
     public static List findClientsBySan (Session persistenceSession, String san) {
         org.hibernate.Query query = persistenceSession.createSQLQuery("select CF_Clients.IdOfClient "
-                                                                    + "from CF_Clients "
-                                                                    + "where CF_Clients.san like :san");
+                + "from CF_Clients "
+                + "where CF_Clients.san like :san");
         query.setParameter("san", san);
         List clientList = query.list();
         return clientList;
@@ -411,8 +412,8 @@ public class DAOUtils {
     }
 
     /*
-    * Обновляет орг. Ставит признак mainbuilding = 0
-    * */
+     * Обновляет орг. Ставит признак mainbuilding = 0
+     * */
     public static int orgMainBuildingUnset(Session session, long idOfOrg)  {
         Query q = session.createSQLQuery("update cf_orgs set MainBuilding = 0 where idOfOrg = :idOfOrg").setParameter("idOfOrg",idOfOrg);
         return q.executeUpdate();
@@ -1208,8 +1209,8 @@ public class DAOUtils {
         try {
             String[] values = generateLowBalanceNotificationParams(session, client, transactionDate);
             RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                .sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_LOW_BALANCE,
-                        values, transactionDate);
+                    .sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_LOW_BALANCE,
+                            values, transactionDate);
             List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
 
             if (!(guardians == null || guardians.isEmpty())) {
@@ -1218,8 +1219,8 @@ public class DAOUtils {
                             client.getIdOfClient(),
                             ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_LOW_BALANCE.getValue())) {
                         RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                            .sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_LOW_BALANCE,
-                                    values, transactionDate);
+                                .sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_LOW_BALANCE,
+                                        values, transactionDate);
                     }
                 }
             }
@@ -1399,25 +1400,25 @@ public class DAOUtils {
             Long lastTransactionId, Integer count, Date startDate, Date endDate) {
         try
         {
-        Criteria criteria = persistenceSession.createCriteria(AccountTransaction.class);
-        criteria.add(Restrictions.eq("client", client));
-        //Типы транзакций, который НЕ должны учитываться
-        criteria.add(Restrictions.not(
-                Restrictions.eq("sourceType", AccountTransaction.INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE)));
-        criteria.add(Restrictions.not(
-                Restrictions.eq("sourceType", AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE)));
-        criteria.add(Restrictions.not(
-                Restrictions.eq("sourceType", AccountTransaction.CLIENT_BALANCE_HOLD)));
-        //Определяем начальную точку отсчёта
-        if (lastTransactionId != null)
-            criteria.add(Restrictions.le("idOfTransaction", lastTransactionId));   // <=
-        //Сортировка по убыванию
-        criteria.addOrder(org.hibernate.criterion.Order.desc("idOfTransaction"));
-        if (count != null)
-            criteria.setMaxResults(count);
-        if (startDate != null && endDate != null)
-            criteria.add(Restrictions.between("transactionTime", startDate, endDate));
-        return criteria.list();
+            Criteria criteria = persistenceSession.createCriteria(AccountTransaction.class);
+            criteria.add(Restrictions.eq("client", client));
+            //Типы транзакций, который НЕ должны учитываться
+            criteria.add(Restrictions.not(
+                    Restrictions.eq("sourceType", AccountTransaction.INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE)));
+            criteria.add(Restrictions.not(
+                    Restrictions.eq("sourceType", AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE)));
+            criteria.add(Restrictions.not(
+                    Restrictions.eq("sourceType", AccountTransaction.CLIENT_BALANCE_HOLD)));
+            //Определяем начальную точку отсчёта
+            if (lastTransactionId != null)
+                criteria.add(Restrictions.le("idOfTransaction", lastTransactionId));   // <=
+            //Сортировка по убыванию
+            criteria.addOrder(org.hibernate.criterion.Order.desc("idOfTransaction"));
+            if (count != null)
+                criteria.setMaxResults(count);
+            if (startDate != null && endDate != null)
+                criteria.add(Restrictions.between("transactionTime", startDate, endDate));
+            return criteria.list();
         } catch (Exception e)
         {
             return null;
@@ -1619,7 +1620,7 @@ public class DAOUtils {
      * @param entityManager менеджер сущностей
      * @return null если таблица пуста, List<CategoryOrg>
      */
-     public static List<CategoryOrg> findCategoryOrg(EntityManager entityManager) {
+    public static List<CategoryOrg> findCategoryOrg(EntityManager entityManager) {
         javax.persistence.Query q = entityManager.createQuery("from CategoryOrg order by idOfCategoryOrg asc");
         return (List<CategoryOrg>)q.getResultList();
     }
@@ -1701,14 +1702,14 @@ public class DAOUtils {
         CategoryDiscount categoryDiscount = (CategoryDiscount) session.load(CategoryDiscount.class, id);
         Criteria clientCriteria = session.createCriteria(Client.class);
         Criterion exp1 = Restrictions.or(
-            Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + "", MatchMode.EXACT),
-            Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + ",",
-                MatchMode.START));
+                Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + "", MatchMode.EXACT),
+                Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + ",",
+                        MatchMode.START));
         Criterion exp2 = Restrictions.or(
-            Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount(),
-                MatchMode.END),
-            Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount() + ",",
-                MatchMode.ANYWHERE));
+                Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount(),
+                        MatchMode.END),
+                Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount() + ",",
+                        MatchMode.ANYWHERE));
         Criterion expression = Restrictions.or(exp1, exp2);
         clientCriteria.add(expression);
         List<Client> clients = clientCriteria.list();
@@ -1735,6 +1736,79 @@ public class DAOUtils {
         categoryDiscountDSZN.setVersion(nextVersion);
         categoryDiscountDSZN.setCategoryDiscount(null);
         session.save(categoryDiscountDSZN);
+    }
+
+    public static void saveEMIAS(Session session, LiberateClientsList liberateClientsList) {
+        Long version = getMaxVersionEMIAS(session);
+
+        EMIAS emias = new EMIAS();
+        emias.setGuid(liberateClientsList.getGuid());
+        emias.setIdEventEMIAS(liberateClientsList.getIdEventEMIAS());
+        emias.setTypeEventEMIAS(liberateClientsList.getTypeEventEMIAS());
+        emias.setDateLiberate(liberateClientsList.getDateLiberate());
+        emias.setStartDateLiberate(liberateClientsList.getStartDateLiberate());
+        emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
+        emias.setCreateDate(new Date());
+        emias.setVersion(version);
+        session.save(emias);
+    }
+
+    public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList) {
+        Long version = getMaxVersionEMIAS(session);
+
+        Criteria clientCardsCriteria = session.createCriteria(EMIAS.class);
+        clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventCancelEMIAS()));
+        EMIAS emiasUpdated;
+        try {
+            emiasUpdated = (EMIAS)clientCardsCriteria.list().get(0);
+        }catch (Exception e)
+        {
+            emiasUpdated = null;
+        }
+
+        EMIAS emias = new EMIAS();
+        emias.setGuid(liberateClientsList.getGuid());
+        emias.setIdEventEMIAS(liberateClientsList.getIdEventEMIAS());
+        emias.setTypeEventEMIAS(liberateClientsList.getTypeEventEMIAS());
+        emias.setDateLiberate(liberateClientsList.getDateLiberate());
+        emias.setStartDateLiberate(liberateClientsList.getStartDateLiberate());
+        emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
+        emias.setCreateDate(new Date());
+        emias.setVersion(version);
+        session.save(emias);
+        clientCardsCriteria = session.createCriteria(EMIAS.class);
+        clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
+        EMIAS emiasNEW;
+        try {
+            emiasNEW = (EMIAS)clientCardsCriteria.list().get(0);
+        }catch (Exception e)
+        {
+            emiasNEW = null;
+        }
+
+        if (emiasUpdated != null && emiasNEW != null) {
+            emiasUpdated.setDeletedemiasid(emiasNEW.getIdEventEMIAS());
+            emiasUpdated.setUpdateDate(new Date());
+            session.update(emiasUpdated);
+        }
+    }
+
+    public static Long getMaxVersionEMIAS (Session session)
+    {
+        Long version = 0L;
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.setProjection(Projections.max("version"));
+            Object result = criteria.uniqueResult();
+            if (result != null) {
+                Long currentMaxVersion = (Long) result;
+                version = currentMaxVersion + 1;
+            }
+        } catch (Exception ex) {
+            logger.error("Failed get max emias version, ", ex);
+            version = 0L;
+        }
+        return version;
     }
 
     @SuppressWarnings("unchecked")
@@ -1836,7 +1910,7 @@ public class DAOUtils {
             Long res = l.isEmpty() || l.get(0) == null ? ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue()
                     : (Long) l.get(0);
             idOfClientGroup = res + 1;
-            }
+        }
         CompositeIdOfClientGroup compositeIdOfClientGroup = new CompositeIdOfClientGroup(idOfOrg,idOfClientGroup);
         ClientGroup clientGroup = new ClientGroup(compositeIdOfClientGroup, clientGroupName);
         persistenceSession.save(clientGroup);
@@ -2031,7 +2105,7 @@ public class DAOUtils {
         q.setParameter("client", client);
         return (List<AccountTransfer>)q.list();
     }
-    
+
     @SuppressWarnings("unchecked")
     public static List<AccountRefund> getAccountRefundsForClient(Session session, Client client, Date startTime,
             Date endTime) {
@@ -2095,10 +2169,10 @@ public class DAOUtils {
     public static void updateClientVersionAndRemoteAddressByOrg(Session persistenceSession, Long idOfOrg, String clientVersion,
             String remoteAddress, String sqlServerVersion, Double databaseSize) {
         Query query = persistenceSession.createQuery(
-                 "update OrgSync "
-                 + " set remoteAddress=:remoteAddress, clientVersion=:clientVersion, sqlServerVersion = :sqlServerVersion "
-                         + (databaseSize == null ? "" : ", databaseSize = :databaseSize ")
-                 + " where idOfOrg=:idOfOrg ");
+                "update OrgSync "
+                        + " set remoteAddress=:remoteAddress, clientVersion=:clientVersion, sqlServerVersion = :sqlServerVersion "
+                        + (databaseSize == null ? "" : ", databaseSize = :databaseSize ")
+                        + " where idOfOrg=:idOfOrg ");
         query.setParameter("remoteAddress", remoteAddress);
         query.setParameter("clientVersion", clientVersion);
         query.setParameter("sqlServerVersion", sqlServerVersion);
@@ -2313,8 +2387,8 @@ public class DAOUtils {
     }
 
     /*
-    * Находит детей представителя или ребенка, у которого указан телефонный номер
-    * */
+     * Находит детей представителя или ребенка, у которого указан телефонный номер
+     * */
     public static List<Long> extractIDFromGuardByGuardMobile(Session persistenceSession, String guardMobile) {
         //String query = "select client.idOfClient from Client client where (client.phone=:guardMobile or client.mobile=:guardMobile) "
         //        + "and not exists (select idOfClientGuardian from ClientGuardian where idOfChildren = Client.idOfClient)";
@@ -2386,7 +2460,7 @@ public class DAOUtils {
         return (List<Object[]>)q.getResultList();
     }
 
-		public static int extractCardTypeByCartNo(Session session, Long cardNo) {
+    public static int extractCardTypeByCartNo(Session session, Long cardNo) {
         Query query = session.createQuery("select visitorType from CardTemp where cardNo=:cardNo");
         query.setParameter("cardNo", cardNo);
         return (Integer) query.uniqueResult();
@@ -2470,7 +2544,7 @@ public class DAOUtils {
         }
         return productCriteria.list();
     }
-    
+
     public static List<String> getDiscountRuleSubcategories(Session session) {
         org.hibernate.Query q = session.createSQLQuery(
                 "select distinct subcategory from cf_discountrules where subcategory<>''");
@@ -3011,10 +3085,10 @@ public class DAOUtils {
         }
 
         Query query = session.createQuery(" FROM GroupNamesToOrgs WHERE idOfMainOrg = :idOfMainOrg "
-                                          + " AND LOWER(REPLACE(groupName, ' ', '')) LIKE REPLACE(:groupName, ' ', '')");
+                + " AND LOWER(REPLACE(groupName, ' ', '')) LIKE REPLACE(:groupName, ' ', '')");
         query.setParameter("idOfMainOrg", idOfMainOrg);
         query.setParameter("groupName", groupName.toLowerCase());
-        
+
         List<GroupNamesToOrgs> list = (List<GroupNamesToOrgs>) query.list();
         GroupNamesToOrgs groupNamesToOrgs = null;
 
@@ -3406,7 +3480,7 @@ public class DAOUtils {
             throw new IllegalArgumentException("Not correct OGRN");
         }
         Query query = session.createSQLQuery("select idoforg from cf_orgs "
-                                        + " where ogrn like :OGRN ");
+                + " where ogrn like :OGRN ");
         query.setParameter("OGRN", ogrn);
         query.setMaxResults(1);
         BigInteger idoforg = (BigInteger) query.uniqueResult();
@@ -3416,7 +3490,7 @@ public class DAOUtils {
         return idoforg.longValue();
     }
 
-	public static Long getAllPreordersPriceByClient(Session session, Long idOfClient, Date startDate, Date endDate,
+    public static Long getAllPreordersPriceByClient(Session session, Long idOfClient, Date startDate, Date endDate,
             Long idOfPreorderComplex, Long idOfPreorderMenudetail) {
         String complexCondition = "", menudetailCondition = "";
         if (null != idOfPreorderComplex) {
@@ -3426,20 +3500,20 @@ public class DAOUtils {
             menudetailCondition = " AND pmd.idofpreordermenudetail <> :idOfPreorderMenudetail ";
         }
         Query query = session.createSQLQuery(
-             "SELECT sum(a.totalprice) AS totalprice "
-              + "FROM ( "
-              + "   SELECT sum(pc.complexprice * pc.amount) AS totalprice "
-              + "   FROM cf_preorder_complex pc "
-              + "   WHERE pc.amount > 0 AND coalesce(pc.deletedstate=0,false) AND pc.idofclient = :idOfClient AND "
-              + "       pc.preorderdate BETWEEN :startDate AND :endDate "
-              + complexCondition
-              + "   UNION ALL "
-              + "   SELECT sum(pmd.menudetailprice * pmd.amount) AS totalprice "
-              + "   FROM cf_preorder_menudetail pmd "
-              + "   WHERE pmd.amount > 0 AND coalesce(pmd.deletedstate=0,false) AND pmd.idofclient = :idOfClient AND "
-              + "       pmd.preorderdate BETWEEN :startDate AND :endDate "
-              + menudetailCondition
-              + ") a");
+                "SELECT sum(a.totalprice) AS totalprice "
+                        + "FROM ( "
+                        + "   SELECT sum(pc.complexprice * pc.amount) AS totalprice "
+                        + "   FROM cf_preorder_complex pc "
+                        + "   WHERE pc.amount > 0 AND coalesce(pc.deletedstate=0,false) AND pc.idofclient = :idOfClient AND "
+                        + "       pc.preorderdate BETWEEN :startDate AND :endDate "
+                        + complexCondition
+                        + "   UNION ALL "
+                        + "   SELECT sum(pmd.menudetailprice * pmd.amount) AS totalprice "
+                        + "   FROM cf_preorder_menudetail pmd "
+                        + "   WHERE pmd.amount > 0 AND coalesce(pmd.deletedstate=0,false) AND pmd.idofclient = :idOfClient AND "
+                        + "       pmd.preorderdate BETWEEN :startDate AND :endDate "
+                        + menudetailCondition
+                        + ") a");
 
         query.setParameter("idOfClient", idOfClient);
         query.setParameter("startDate", startDate.getTime());
@@ -3494,7 +3568,7 @@ public class DAOUtils {
                     new CompositeIdOfEnterEventSendInfo(
                             enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(),
                             enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()
-                            )
+                    )
             );
             enterEventSendInfo.setClient(enterEvent.getClient());
             enterEventSendInfo.setCard(card);
@@ -3517,7 +3591,7 @@ public class DAOUtils {
     public static String findClientGUIDByCardNo(Session session, Long cardNo) {
         try {
             Query query = session.createSQLQuery(
-                            " select c.clientguid from cf_clients c "
+                    " select c.clientguid from cf_clients c "
                             + " join cf_cards crd on crd.idofclient = c.idofclient "
                             + " where crd.cardno = :cardNo ");
             query.setParameter("cardNo", cardNo);
@@ -3532,7 +3606,7 @@ public class DAOUtils {
     public static Long findCardNoByClientGUID(Session session, String GUID) {
         try {
             Query query = session.createSQLQuery(
-                            " select crd.cardno from cf_cards crd "
+                    " select crd.cardno from cf_cards crd "
                             + " join cf_clients c on c.idofclient = crd.idofcard "
                             + " where c.clientguid like :guid and crd.state = 0 "
                             + " order by crd.createddate desc ");
@@ -3552,10 +3626,10 @@ public class DAOUtils {
     public static void updateEnterEventsSendInfo(Session session, Long idofEnterEvent, Long idofOrg,
             Boolean responseCode, Boolean sendToExternal) throws Exception {
         Query query = session.createSQLQuery(
-                        " UPDATE cf_EnterEvents_Send_Info "
-                         + " SET sendToExternal = :sendToExternal, responseCode = :responseCode "
-                         + " WHERE idoforg = :idofOrg and idofenterevent = :idofEnterEvent "
-                )
+                " UPDATE cf_EnterEvents_Send_Info "
+                        + " SET sendToExternal = :sendToExternal, responseCode = :responseCode "
+                        + " WHERE idoforg = :idofOrg and idofenterevent = :idofEnterEvent "
+        )
                 .setParameter("sendToExternal", sendToExternal? 1:0)
                 .setParameter("responseCode", responseCode? 1:0)
                 .setParameter("idofOrg", idofOrg)
@@ -3630,8 +3704,8 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("guid", guid));
         return (Org) criteria.uniqueResult();
     }
-    
-     public static List<Org> findOrgsByGuid(Session session, String guid) {
+
+    public static List<Org> findOrgsByGuid(Session session, String guid) {
         Criteria criteria = session.createCriteria(Org.class);
         criteria.add(Restrictions.eq("guid", guid));
         return criteria.list();
@@ -4407,5 +4481,16 @@ public class DAOUtils {
         query.setParameter("idOfComplex", idOfComplex);
         query.setParameter("versionrecord", versionrecord);
         query.executeUpdate();
+    }
+
+    public static List<EMIAS> getEmiasbyidEventEMIAS(Long idEventEMIAS, Session session){
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.add(Restrictions.eq("idEventEMIAS", idEventEMIAS));
+            return criteria.list();
+        } catch (Exception e)
+        {
+            return new ArrayList<EMIAS>();
+        }
     }
 }
