@@ -14,9 +14,9 @@ public class EMIASSyncFromAnswerARMPOJO {
 
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("Record");
-        element.setAttribute("idEventEMIAS",idEventEMIAS.toString());
+        element.setAttribute("idEventEMIAS", idEventEMIAS == null ? "" : idEventEMIAS.toString());
         element.setAttribute("errormessage", errormessage == null ? "" : errormessage);
-        element.setAttribute("Version", Long.toString(version));
+        element.setAttribute("Version", version == null ? "0" : Long.toString(version));
         return element;
     }
 
