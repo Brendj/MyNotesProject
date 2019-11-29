@@ -657,8 +657,8 @@ public class PreorderDAOService {
             PreorderComplex preorderComplex = (PreorderComplex) row[0];
             Long idOfOrg = (Long) row[1];
             if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
-            nextVersion = nextVersionByPreorderComplex();
             if (preorderComplex.getIdOfOrgOnCreate() != null && !preorderComplex.getIdOfOrgOnCreate().equals(idOfOrg)) {
+                nextVersion = nextVersionByPreorderComplex();
                 testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGE_ORG, true);
                 continue;
             }
