@@ -62,6 +62,10 @@ public class EventNotificationService {
     public static String NOTIFICATION_NOENTER_MUSEUM = "noEnterMuseum";
     public static String NOTIFICATION_ENTER_CULTURE = "enterCulture";
     public static String NOTIFICATION_EXIT_CULTURE = "exitCulture";
+    public static String NOTIFICATION_START_SICK = "startSick";
+    public static String NOTIFICATION_CANCEL_START_SICK = "CstartSick";
+    public static String NOTIFICATION_END_SICK = "endSick";
+    public static String NOTIFICATION_CANCEL_END_SICK = "CendSick";
     public static String NOTIFICATION_CLIENT_NEWPASSWORD = "clientNewPassword";
     public static String NOTIFICATION_EXPIRED_REGULAR_PAYMENT = "regularPaymentExpired";
     public static String TYPE_SMS = "sms", TYPE_EMAIL_TEXT = "email.text", TYPE_EMAIL_SUBJECT = "email.subject";

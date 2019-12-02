@@ -6,9 +6,11 @@ package ru.axetta.ecafe.processor.web.internal;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.emias.LiberateClientsList;
-import ru.axetta.ecafe.processor.core.persistence.EMIAS;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -80,7 +82,8 @@ public class EMIASController extends HttpServlet {
                     continue;
                 }
 
-                if (DAOUtils.findClientByGuid(persistenceSession, liberateClientsList.getGuid()) == null) {
+                Client cl = DAOUtils.findClientByGuid(persistenceSession, liberateClientsList.getGuid());
+                if (cl == null) {
                     orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_CLIENT_NOT_FOUND_EMIAS,
                             ResponseItem.ERROR_CLIENT_NOT_FOUND_MESSAGE_EMIAS, liberateClientsList.getIdEventEMIAS()));
                     continue;
@@ -93,7 +96,7 @@ public class EMIASController extends HttpServlet {
                             ResponseItem.ERROR_ID_EVENT_EMIAS, liberateClientsList.getIdEventEMIAS()));
                     continue;
                 }
-
+                Integer eventsStatus = -1;
                 switch (liberateClientsList.getTypeEventEMIAS().intValue()) {
                     case 1://создание освобождения (в том числе продление освобождения)
                         if (liberateClientsList.getStartDateLiberate() == null
@@ -103,15 +106,19 @@ public class EMIASController extends HttpServlet {
                             continue;
                         }
                         DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
+                        eventsStatus = 2;
                         break;
                     case 2:
                         DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
+                        eventsStatus = 3;
                         break;
                     case 3:
                         DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
+                        eventsStatus = 4;
                         break;
                     case 4:
                         DAOUtils.updateEMIAS(persistenceSession, liberateClientsList);
+                        eventsStatus = 5;
                         break;
                     default: {
                         orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_EVENT_NOT_FOUND,
@@ -119,6 +126,18 @@ public class EMIASController extends HttpServlet {
                         continue;
                     }
                 }
+                if (eventsStatus != -1) {
+                    ExternalEventVersionHandler handler = new ExternalEventVersionHandler(persistenceSession);
+                    ExternalEvent event = new ExternalEvent(cl, ExternalEventType.SPECIAL, liberateClientsList.getDateLiberate(),
+                            ExternalEventStatus.fromInteger(eventsStatus), handler);
+                    persistenceSession.save(event);
+                    ExternalEventNotificationService notificationService = RuntimeContext.getAppContext()
+                            .getBean(ExternalEventNotificationService.class);
+                    notificationService.setSTART_DATE(liberateClientsList.getStartDateLiberate());
+                    notificationService.setEND_DATE(liberateClientsList.getEndDateLiberate());
+                    notificationService.sendNotification(cl, event);
+                }
+
                 orgSummaryResults.add(new OrgSummaryResult(ResponseItem.OK,
                         ResponseItem.OK_MESSAGE_2, liberateClientsList.getIdEventEMIAS()));
             }

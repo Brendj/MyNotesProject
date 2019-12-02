@@ -18,6 +18,7 @@ import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -43,6 +44,8 @@ public class ExternalEventNotificationService {
     public static String ADDRESS = "address";
     public static String SHORTNAMEINFOSERVICE = "shortnameinfoservice";
     private String cultureShortName;
+    private Date START_DATE;
+    private Date END_DATE;
 
     public void sendNotification(Client client, ExternalEvent event) throws Exception {
         String type = null;
@@ -59,6 +62,18 @@ public class ExternalEventNotificationService {
             } else if (event.getEvtStatus().equals(ExternalEventStatus.TICKET_BACK)) {
                 type = EventNotificationService.NOTIFICATION_EXIT_CULTURE;
             }
+        }
+        if (event.getEvtType().equals(ExternalEventType.SPECIAL)) {
+            if (event.getEvtStatus().equals(ExternalEventStatus.START_SICK)) {
+                type = EventNotificationService.NOTIFICATION_START_SICK;
+            } else if (event.getEvtStatus().equals(ExternalEventStatus.CANCEL_START_SICK)) {
+                type = EventNotificationService.NOTIFICATION_CANCEL_START_SICK;
+            } else if (event.getEvtStatus().equals(ExternalEventStatus.END_SICK)) {
+                type = EventNotificationService.NOTIFICATION_END_SICK;
+            } else if (event.getEvtStatus().equals(ExternalEventStatus.CANCEL_END_SICK)) {
+                type = EventNotificationService.NOTIFICATION_CANCEL_END_SICK;
+            }
+
         }
         if (type == null) return;
         Session persistenceSession = null;
@@ -83,6 +98,8 @@ public class ExternalEventNotificationService {
                         notificationService
                                 .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                     }
+                    notificationService
+                            .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                 }
             }
             //отправка клиенту
@@ -134,6 +151,20 @@ public class ExternalEventNotificationService {
                     ACCOUNT, client.getContractId().toString()
             };
         }
+        if (event.getEvtType().equals(ExternalEventType.SPECIAL)) {
+            SimpleDateFormat dateFormat = null;
+            dateFormat = new SimpleDateFormat("dd.MM.YYYY");
+            String empDate = dateFormat.format(getSTART_DATE());
+            String empTimeH = dateFormat.format(getEND_DATE());
+
+            return new String[] {
+                    SURNAME, client.getPerson().getSurname(),
+                    EMP_DATE, empDate,
+                    EMP_TIME, empTime,
+                    EMP_TIME_H, empTimeH,
+                    NAME, client.getPerson().getFirstName()
+            };
+        }
         return null;
     }
 
@@ -143,5 +174,21 @@ public class ExternalEventNotificationService {
 
     public void setCultureShortName(String cultureShortName) {
         this.cultureShortName = cultureShortName;
+    }
+
+    public Date getSTART_DATE() {
+        return START_DATE;
+    }
+
+    public void setSTART_DATE(Date START_DATE) {
+        this.START_DATE = START_DATE;
+    }
+
+    public Date getEND_DATE() {
+        return END_DATE;
+    }
+
+    public void setEND_DATE(Date END_DATE) {
+        this.END_DATE = END_DATE;
     }
 }

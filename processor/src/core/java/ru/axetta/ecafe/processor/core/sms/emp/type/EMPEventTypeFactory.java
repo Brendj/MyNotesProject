@@ -36,6 +36,7 @@ public class EMPEventTypeFactory {
     public static final int LEAVE_WITH_CHECKER        = 901240017;
     public static final int INFO_MAILING_EVENT        = 901240056;
     public static final int CLIENT_NEWPASSWORD_EVENT  = 901240057;
+    public static final int STOP_PREFERENTIAL_MEALS   = 901240018;
 
 
     //Параметр modifired введен для определения: точно ли произошедшее событие соответствует коду события по умолчанию
