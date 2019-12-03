@@ -4323,8 +4323,9 @@ public class DAOUtils {
     }
 
     public static List<CategoryDiscount> getCategoryDiscountListByCategoryName(Session session, String categoryName) {
-        Query q = session.createQuery("from CategoryDiscount where lower(categoryName) like lower('%" +
-                categoryName + "%') order by idOfCategoryDiscount");
+        Query q = session.createQuery("from CategoryDiscount where lower(categoryName) like lower(:categoryName) "
+                + "order by idOfCategoryDiscount");
+        q.setParameter("categoryName", categoryName);
         return (List<CategoryDiscount>)q.list();
     }
 
