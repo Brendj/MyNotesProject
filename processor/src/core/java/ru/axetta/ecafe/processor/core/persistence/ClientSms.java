@@ -56,6 +56,10 @@ public class ClientSms {
     public static final int TYPE_CLIENT_NEWPASSWORD_NOTIFICATION = 16;
     public static final int TYPE_ENTER_CULTURE_NOTIFICATION = 17;
     public static final int TYPE_EXIT_CULTURE_NOTIFICATION = 18;
+    public static final int TYPE_NOTIFICATION_START_SICK = 19;
+    public static final int TYPE_NOTIFICATION_CANCEL_START_SICK = 20;
+    public static final int TYPE_NOTIFICATION_END_SICK = 21;
+    public static final int TYPE_NOTIFICATION_CANCEL_END_SICK = 22;
     public static final int TYPE_EXPIRED_REGULAR_PAYMENT_SUBSCRIPTION_NOTIFICATION = 17;
 
     public static final int SENT_TO_SERVICE = 0;

@@ -194,7 +194,14 @@ public class EventNotificationService {
             "[surname] [name] (л/с: [account]): посещение музея [event_place_code]",
             NOTIFICATION_NOENTER_MUSEUM + "." + TYPE_SMS,
             "[surname] [name] (л/с: [account]): возврат билета в музей [event_place_code]",
-
+            NOTIFICATION_START_SICK + "." + TYPE_SMS,
+            "[surname] [name] (л/с: [account]): Рекомендация об освобождении",
+            NOTIFICATION_CANCEL_START_SICK + "." + TYPE_SMS,
+            "[surname] [name] (л/с: [account]): Аннулирование рекомендаций об освобождении",
+            NOTIFICATION_END_SICK + "." + TYPE_SMS,
+            "[surname] [name] (л/с: [account]): Рекомендация о возможности посещать ОО",
+            NOTIFICATION_CANCEL_END_SICK + "." + TYPE_SMS,
+            "[surname] [name] (л/с: [account]): Аннулирование рекомендаций о возможности посещать ОО",
             NOTIFICATION_ENTER_CULTURE + "." + TYPE_SMS,
             "<html>\n" + "<body>\n" + "<b>Здравствуйте!<br/><br/>\n"
                     + "[empDate] в [empTimeH]</b> [surname] [name] зашел в здание культуры по адресу: [address]([shortnameinfoservice]).\n"
@@ -525,6 +532,14 @@ public class EventNotificationService {
                 clientSMSType = ClientSms.TYPE_EXIT_CULTURE_NOTIFICATION;
             } else if (type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
                 clientSMSType = ClientSms.TYPE_NOENTER_MUSEUM_NOTIFICATION;
+            } else if (type.equals(NOTIFICATION_START_SICK)) {
+                clientSMSType = ClientSms.TYPE_NOTIFICATION_START_SICK;
+            } else if (type.equals(NOTIFICATION_CANCEL_START_SICK)) {
+                clientSMSType = ClientSms.TYPE_NOTIFICATION_CANCEL_START_SICK;
+            } else if (type.equals(NOTIFICATION_END_SICK)) {
+                clientSMSType = ClientSms.TYPE_NOTIFICATION_END_SICK;
+            } else if (type.equals(NOTIFICATION_CANCEL_END_SICK)) {
+                clientSMSType = ClientSms.TYPE_NOTIFICATION_CANCEL_END_SICK;
             } else {
                 throw new Exception("No client SMS type defined for notification " + type);
             }
@@ -963,6 +978,34 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, destClient, 1);
                 }
             }
+            else if (type.equals(NOTIFICATION_START_SICK)) {
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SPECIAL_TYPE_EVENT, dataClient, destClient, 2);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SPECIAL_TYPE_EVENT, destClient, 2);
+                }
+            }
+            else if (type.equals(NOTIFICATION_CANCEL_START_SICK)) {
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SPECIAL_TYPE_EVENT, dataClient, destClient, 3);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SPECIAL_TYPE_EVENT, destClient, 3);
+                }
+            }
+            else if (type.equals(NOTIFICATION_END_SICK)) {
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SPECIAL_TYPE_EVENT, dataClient, destClient, 4);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SPECIAL_TYPE_EVENT, destClient, 4);
+                }
+            }
+            else if (type.equals(NOTIFICATION_CANCEL_END_SICK)) {
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SPECIAL_TYPE_EVENT, dataClient, destClient, 5);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.SPECIAL_TYPE_EVENT, destClient, 5);
+                }
+            }
             if (type.equals(NOTIFICATION_ENTER_MUSEUM) || type.equals(NOTIFICATION_NOENTER_MUSEUM)) {
                 String eventPlaceCode = findValueInParams(new String[]{ExternalEventNotificationService.PLACE_CODE}, values);
                 empType.getParameters().put(ExternalEventNotificationService.PLACE_CODE, eventPlaceCode);
@@ -979,6 +1022,20 @@ public class EventNotificationService {
                 empType.getParameters().put(ExternalEventNotificationService.EMP_DATE, eventDate);
                 String eventTime = findValueInParams(new String[]{ExternalEventNotificationService.EMP_TIME_H}, values);
                 empType.getParameters().put(ExternalEventNotificationService.EMP_TIME_H, eventTime);
+                putGenderParams(empType, values);
+            }
+            if (type.equals(NOTIFICATION_START_SICK) || type.equals(NOTIFICATION_CANCEL_START_SICK))
+            {
+                String eventDate = findValueInParams(new String[]{ExternalEventNotificationService.EMP_DATE}, values);
+                empType.getParameters().put(ExternalEventNotificationService.EMP_DATE, eventDate);
+                String eventTime = findValueInParams(new String[]{ExternalEventNotificationService.EMP_TIME_H}, values);
+                empType.getParameters().put(ExternalEventNotificationService.EMP_TIME_H, eventTime);
+                putGenderParams(empType, values);
+            }
+            if (type.equals(NOTIFICATION_END_SICK) || type.equals(NOTIFICATION_CANCEL_END_SICK))
+            {
+                String eventDate = findValueInParams(new String[]{ExternalEventNotificationService.EMP_TIME}, values);
+                empType.getParameters().put(ExternalEventNotificationService.EMP_TIME, eventDate);
                 putGenderParams(empType, values);
             }
 

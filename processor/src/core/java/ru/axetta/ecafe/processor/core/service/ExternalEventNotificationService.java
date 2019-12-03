@@ -5,12 +5,17 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.client.items.ClientDiscountItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -18,7 +23,9 @@ import org.springframework.stereotype.Component;
 
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
+import java.util.Collections;
 import java.util.Date;
+import java.util.LinkedList;
 import java.util.List;
 
 /**
@@ -93,17 +100,38 @@ public class ExternalEventNotificationService {
                     //Если произошел проход в здание культуры или в здание музея...
                     if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
                             client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_MUSEUM.getValue())
-                            || ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
-                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_EVENTS.getValue())) {
+                            && event.getEvtType().equals(ExternalEventType.MUSEUM)) {
                         notificationService
                                 .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                     }
-                    notificationService
-                            .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
+                    if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
+                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue())
+                            && event.getEvtType().equals(ExternalEventType.CULTURE)) {
+                        notificationService
+                                .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
+                    }
+                    if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
+                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue())
+                            && event.getEvtType().equals(ExternalEventType.SPECIAL)) {
+                        notificationService
+                                .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
+                    }
+                    //notificationService
+                    //        .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                 }
             }
-            //отправка клиенту
-            notificationService.sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
+            if (event.getEvtType().equals(ExternalEventType.SPECIAL)) {
+                //Только для НЕ предопределенной группы
+                ClientGroup.Predefined predefined = ClientGroup.Predefined.parse(client.getClientGroup().getGroupName());
+                if (predefined == null) {
+                    //Если есть социальная льгота
+                    if (!ClientHaveDiscount(persistenceSession, client))
+                        notificationService.sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
+                }
+            } else {
+                //отправка клиенту
+                notificationService.sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
+            }
 
             transaction.commit();
             transaction = null;
@@ -114,6 +142,36 @@ public class ExternalEventNotificationService {
             HibernateUtils.close(persistenceSession, logger);
         }
     }
+
+    public boolean ClientHaveDiscount (Session session, Client client) {
+        List<ClientDiscountItem> result = new LinkedList<ClientDiscountItem>();
+
+        List<Long> categoriesDiscountsIds = new LinkedList<Long>();
+        for(String cd : client.getCategoriesDiscounts().split(",")) {
+            if(StringUtils.isNotEmpty(cd)) {
+                categoriesDiscountsIds.add(Long.valueOf(cd));
+            }
+        }
+
+        List<CategoryDiscount> clientDiscountsList = Collections.emptyList();
+        if(!categoriesDiscountsIds.isEmpty()) {
+            Criteria clientDiscountsCriteria = session.createCriteria(CategoryDiscount.class);
+            clientDiscountsCriteria.add(Restrictions.in("idOfCategoryDiscount", categoriesDiscountsIds));
+            clientDiscountsList = clientDiscountsCriteria.list();
+        }
+        boolean discount = false;
+        for (CategoryDiscount categoryDiscount : clientDiscountsList)
+        {
+            if (categoryDiscount.getCategoryType().getDescription().equals("Льгота"))
+            {
+                discount = true;
+                break;
+            }
+        }
+
+        return discount;
+    }
+
     private String[] generateNotificationParams(Client client, ExternalEvent event) {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(event.getEvtDateTime());
@@ -162,7 +220,8 @@ public class ExternalEventNotificationService {
                     EMP_DATE, empDate,
                     EMP_TIME, empTime,
                     EMP_TIME_H, empTimeH,
-                    NAME, client.getPerson().getFirstName()
+                    NAME, client.getPerson().getFirstName(),
+                    ACCOUNT, client.getContractId().toString()
             };
         }
         return null;
