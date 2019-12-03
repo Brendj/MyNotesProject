@@ -857,7 +857,7 @@ public class CoverageNutritionReport extends BasicReportForAllOrgJob {
                     + "case when od.menutype = 0 and od.menuorigin in (0, 1, 2) then 'Буфет горячее' "
                     + "    when od.menutype = 0 and od.menuorigin in (10, 11, 20) then 'Буфет покупная'"
                     + "    when od.menutype between 50 and 99 and od.rprice > 0 then 'Платное питание' "
-                    + "    when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then 'Бесплатное питание' end as foodtype, "//11
+                    + "    when od.menutype between 50 and 99 and od.rprice = 0 and od.discount > 0 then 'Бесплатное питание' else 'Неизвестно' end as foodtype, "//11
                     + "p.surname, "//12
                     + "o.idoforder, "
                     + "od.idoforderdetail "
