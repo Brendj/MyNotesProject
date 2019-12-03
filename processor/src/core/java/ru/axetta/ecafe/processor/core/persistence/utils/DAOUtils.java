@@ -4323,10 +4323,10 @@ public class DAOUtils {
     }
 
     public static List<CategoryDiscount> getCategoryDiscountListByCategoryName(Session session, String categoryName) {
-        Query q = session.createQuery("from CategoryDiscount where lower(categoryName) like lower(:categoryName) "
-                + "order by idOfCategoryDiscount");
-        q.setParameter("categoryName", categoryName);
-        return (List<CategoryDiscount>)q.list();
+        Criteria criteria = session.createCriteria(CategoryDiscount.class);
+        criteria.add(Restrictions.like("categoryName", categoryName, MatchMode.ANYWHERE).ignoreCase());
+        criteria.addOrder(org.hibernate.criterion.Order.asc("idOfCategoryDiscount"));
+        return (List<CategoryDiscount>) criteria.list();
     }
 
     public static List<Long> findFriendlyOrgsIds(Session session, List<Long> orgIdList) {
