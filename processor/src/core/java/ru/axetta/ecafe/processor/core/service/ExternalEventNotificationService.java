@@ -93,7 +93,13 @@ public class ExternalEventNotificationService {
             final EventNotificationService notificationService = RuntimeContext.getAppContext().getBean(
                     EventNotificationService.class);
             List<Client> guardians = ClientManager.findGuardiansByClient(persistenceSession, client.getIdOfClient(), null);
-
+            Integer clas;
+            try {
+                clas = extractDigits(client.getClientGroup().getGroupName());
+            } catch (NumberFormatException e) //т.е. в названии группы нет чисел
+            {
+                clas = 0;
+            }
             //отправка представителям
             if (!(guardians == null || guardians.isEmpty())) {
                 for (Client destGuardian : guardians) {
@@ -113,23 +119,38 @@ public class ExternalEventNotificationService {
                     if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
                             client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue())
                             && event.getEvtType().equals(ExternalEventType.SPECIAL)) {
-                        notificationService
-                                .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
+                        if (clas > 0 && clas < 5)//1-4
+                        {
+                            //Если учащийся с 1-4 класс
+                            notificationService
+                                    .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
+                        } else {
+                            //Если есть социальная льгота
+                            if (!ClientHaveDiscount(persistenceSession, client))
+                                notificationService
+                                        .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
+                        }
                     }
-                    //notificationService
-                    //        .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                 }
             }
-            if (event.getEvtType().equals(ExternalEventType.SPECIAL)) {
-                //Только для НЕ предопределенной группы
-                ClientGroup.Predefined predefined = ClientGroup.Predefined.parse(client.getClientGroup().getGroupName());
-                if (predefined == null) {
-                    //Если есть социальная льгота
-                    if (!ClientHaveDiscount(persistenceSession, client))
-                        notificationService.sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
+            //отправка клиенту
+            if (event.getEvtType().equals(ExternalEventType.SPECIAL)) { //Если тип = Служебные сообщения, то ....
+                if (clas > 0 && clas < 5)//1-4
+                {
+                    //Если учащийся с 1-4 класс
+                    notificationService.sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
+                } else {
+                    //Только для НЕ предопределенной группы
+                    ClientGroup.Predefined predefined = ClientGroup.Predefined.parse(client.getClientGroup().getGroupName());
+                    if (predefined == null) {
+                        //Если есть социальная льгота
+                        if (!ClientHaveDiscount(persistenceSession, client))
+                            notificationService.sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
+                    }
                 }
+
             } else {
-                //отправка клиенту
+                //для всех других типов отправляем без условий
                 notificationService.sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
             }
 
@@ -141,6 +162,19 @@ public class ExternalEventNotificationService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    public Integer extractDigits(String src) {
+        StringBuilder builder = new StringBuilder();
+        for (int i = 0; i < src.length(); i++) {
+            char c = src.charAt(i);
+            if (Character.isDigit(c)) {
+                builder.append(c);
+            } else {
+                return Integer.valueOf(builder.toString());
+            }
+        }
+        return Integer.valueOf(builder.toString());
     }
 
     public boolean ClientHaveDiscount (Session session, Client client) {
