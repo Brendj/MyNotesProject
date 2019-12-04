@@ -127,6 +127,7 @@ public class EMIASController extends HttpServlet {
                     }
                 }
                 if (eventsStatus != -1) {
+                    logger.info("Старт сервиса по отправке уведомлений в ЕМП для ЕМИАС");
                     ExternalEventVersionHandler handler = new ExternalEventVersionHandler(persistenceSession);
                     ExternalEvent event = new ExternalEvent(cl, ExternalEventType.SPECIAL, liberateClientsList.getDateLiberate(),
                             ExternalEventStatus.fromInteger(eventsStatus), handler);

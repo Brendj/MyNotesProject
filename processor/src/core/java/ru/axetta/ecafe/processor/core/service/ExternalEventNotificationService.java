@@ -73,12 +73,16 @@ public class ExternalEventNotificationService {
         if (event.getEvtType().equals(ExternalEventType.SPECIAL)) {
             if (event.getEvtStatus().equals(ExternalEventStatus.START_SICK)) {
                 type = EventNotificationService.NOTIFICATION_START_SICK;
+                logger.info("Тип сообщения - рекомендация об освобождении");
             } else if (event.getEvtStatus().equals(ExternalEventStatus.CANCEL_START_SICK)) {
                 type = EventNotificationService.NOTIFICATION_CANCEL_START_SICK;
+                logger.info("Тип сообщения - отмена рекомендации об освобождении");
             } else if (event.getEvtStatus().equals(ExternalEventStatus.END_SICK)) {
                 type = EventNotificationService.NOTIFICATION_END_SICK;
+                logger.info("Тип сообщения - рекомендация о посещении ОО");
             } else if (event.getEvtStatus().equals(ExternalEventStatus.CANCEL_END_SICK)) {
                 type = EventNotificationService.NOTIFICATION_CANCEL_END_SICK;
+                logger.info("Тип сообщения - отмена рекомендации о посещении ОО");
             }
 
         }
@@ -119,33 +123,58 @@ public class ExternalEventNotificationService {
                     if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
                             client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue())
                             && event.getEvtType().equals(ExternalEventType.SPECIAL)) {
+                        logger.info("Отправка кведомления представителю л/с" + destGuardian.getContractId());
                         if (clas > 0 && clas < 5)//1-4
                         {
                             //Если учащийся с 1-4 класс
+                            logger.info("Учащийся в 1-4 классе");
                             notificationService
                                     .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
+                            logger.info("Отправка уведомления прошла успешно");
                         } else {
+                            logger.info("Учащийся не в 1-4 классе");
                             //Если есть социальная льгота
-                            if (!ClientHaveDiscount(persistenceSession, client))
-                                notificationService
-                                        .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
+                            if (!ClientHaveDiscount(persistenceSession, client)) {
+                                logger.info("У учашегося есть льгота");
+                                notificationService.sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
+                                logger.info("Отправка уведомления прошла успешно");
+                            }
+                            else
+                            {
+                                logger.info("У учашегося нет льготы");
+                            }
                         }
                     }
                 }
             }
             //отправка клиенту
             if (event.getEvtType().equals(ExternalEventType.SPECIAL)) { //Если тип = Служебные сообщения, то ....
+                logger.info("Отправка уведомления клиенту");
                 if (clas > 0 && clas < 5)//1-4
                 {
                     //Если учащийся с 1-4 класс
+                    logger.info("Учащийся в 1-4 классе");
                     notificationService.sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
+                    logger.info("Отправка уведомления прошла успешно");
                 } else {
+                    logger.info("Учащийся не в 1-4 классе");
                     //Только для НЕ предопределенной группы
                     ClientGroup.Predefined predefined = ClientGroup.Predefined.parse(client.getClientGroup().getGroupName());
                     if (predefined == null) {
+                        logger.info("Учашийся в непредопределенной группе");
                         //Если есть социальная льгота
-                        if (!ClientHaveDiscount(persistenceSession, client))
+                        if (!ClientHaveDiscount(persistenceSession, client)) {
+                            logger.info("У учашегося есть льгота");
                             notificationService.sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
+                            logger.info("Отправка уведомления прошла успешно");
+                        }
+                        else
+                        {
+                            logger.info("У учашегося нет льготы");
+                        }
+                    } else
+                    {
+                        logger.info("Учашийся в предопределенной группе");
                     }
                 }
 
@@ -202,7 +231,6 @@ public class ExternalEventNotificationService {
                 break;
             }
         }
-
         return discount;
     }
 
