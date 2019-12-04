@@ -246,12 +246,6 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
-                            <h:outputText value="Очередь внедрения" />
-                        </f:facet>
-                        <h:outputText value="#{org.introductionQueue}" escape="false" />
-                    </rich:column>
-                    <rich:column>
-                        <f:facet name="header">
                             <h:outputText value="Статус" />
                         </f:facet>
                         <h:outputText value="#{org.stringState}" escape="false" />

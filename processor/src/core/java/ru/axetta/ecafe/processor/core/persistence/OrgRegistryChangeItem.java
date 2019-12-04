@@ -43,8 +43,6 @@ public class OrgRegistryChangeItem {
     protected String guid;
     protected String guidFrom;
     protected Long additionalId;
-    protected String introductionQueue;
-    protected String introductionQueueFrom;
     protected String director;
     protected String directorFrom;
 
@@ -77,8 +75,8 @@ public class OrgRegistryChangeItem {
             String inn, String innFrom,
 
             String guid, String guidFrom, Long additionalId,
-            OrgRegistryChange orgRegistryChange, String shortNameSupplierFrom, Integer state, String introductionQueue,
-            String introductionQueueFrom, String director, String directorFrom) {
+            OrgRegistryChange orgRegistryChange, String shortNameSupplierFrom, Integer state,
+            String director, String directorFrom) {
         this.idOfOrg = idOfOrg;
         this.state = state;
 
@@ -115,8 +113,6 @@ public class OrgRegistryChangeItem {
 
         this.orgRegistryChange = orgRegistryChange;
         this.shortNameSupplierFrom = shortNameSupplierFrom;
-        this.introductionQueue = introductionQueue;
-        this.introductionQueueFrom = introductionQueueFrom;
         this.director = director;
         this.directorFrom = directorFrom;
     }
@@ -367,22 +363,6 @@ public class OrgRegistryChangeItem {
 
     public void setState(Integer state) {
         this.state = state;
-    }
-
-    public String getIntroductionQueue() {
-        return introductionQueue;
-    }
-
-    public void setIntroductionQueue(String introductionQueue) {
-        this.introductionQueue = introductionQueue;
-    }
-
-    public String getIntroductionQueueFrom() {
-        return introductionQueueFrom;
-    }
-
-    public void setIntroductionQueueFrom(String introductionQueueFrom) {
-        this.introductionQueueFrom = introductionQueueFrom;
     }
 
     public String getDirector() {

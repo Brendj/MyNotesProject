@@ -552,8 +552,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         protected String guid;
         protected String guidFrom;
         protected Long additionalId;
-        protected String introductionQueue;
-        protected String introductionQueueFrom;
         protected String director;
         protected String directorFrom;
 
@@ -633,8 +631,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.guid = registryChangeItem.getGuid();
             this.guidFrom = registryChangeItem.getGuidFrom();
             this.additionalId = registryChangeItem.getAdditionalId();
-            this.introductionQueue = registryChangeItem.getIntroductionQueue();
-            this.introductionQueueFrom = registryChangeItem.getIntroductionQueueFrom();
             this.director = registryChangeItem.getDirector();
             this.directorFrom = registryChangeItem.getDirectorFrom();
 
@@ -1001,14 +997,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.state = state;
         }
 
-        public String getIntroductionQueue() {
-            return getResultString(introductionQueue, introductionQueueFrom);
-        }
-
-        public void setIntroductionQueue(String introductionQueue) {
-            this.introductionQueue = introductionQueue;
-        }
-
         public String getDirector() {
             return getResultString(director, directorFrom);
         }
@@ -1029,12 +1017,5 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.directorFrom = directorFrom;
         }
 
-        public String getIntroductionQueueFrom() {
-            return introductionQueueFrom;
-        }
-
-        public void setIntroductionQueueFrom(String introductionQueueFrom) {
-            this.introductionQueueFrom = introductionQueueFrom;
-        }
     }
 }
