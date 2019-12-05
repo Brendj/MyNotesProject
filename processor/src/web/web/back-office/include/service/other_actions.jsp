@@ -55,17 +55,17 @@
                               styleClass="output-text"/><br/>
 
                 <h:outputText styleClass="output-text" escape="true" value="л/с склиента"/>
-                <h:inputText value="#{otherActionsPage.orgsForGenerateGuardians}" size="50"/>
+                <h:inputText value="#{otherActionsPage.contractId}" size="50"/>
                 <h:outputText escape="true" value="Начальная дата выборки" styleClass="output-text"/>
-                <rich:calendar value="#{otherActionsPage.startDate}" datePattern="dd.MM.yyyy"
+                <rich:calendar value="#{otherActionsPage.startDateEMP}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false">
                 </rich:calendar>
                 <h:outputText escape="true" value="Конечная дата выборки" styleClass="output-text"/>
-                <rich:calendar value="#{otherActionsPage.startDate}" datePattern="dd.MM.yyyy"
+                <rich:calendar value="#{otherActionsPage.endDateEMP}" datePattern="dd.MM.yyyy"
                                converter="dateConverter" inputClass="input-text" showWeeksBar="false">
                 </rich:calendar>
                 <a4j:commandButton value="Отправить события ЕМИАС в ЕМП"
-                                   action="#{otherActionsPage.preorderRequestsManualGenerate()}"
+                                   action="#{otherActionsPage.runSendEMPEventEMIAS()}"
                                    id="sendEMIASTestEMP"
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel"/><br/>
             </h:panelGrid>
