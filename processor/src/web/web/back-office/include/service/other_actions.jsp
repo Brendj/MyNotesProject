@@ -49,6 +49,27 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Отправить пробное событие на ЕМП" action="#{otherActionsPage.runSendEMPEvent}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+        <rich:panel>
+            <h:panelGrid columns="2">
+                <h:outputText escape="true" value="Отправить все события ЕМИАС по клиенту на тестовый сервис ЕМП"
+                              styleClass="output-text"/><br/>
+
+                <h:outputText styleClass="output-text" escape="true" value="л/с склиента"/>
+                <h:inputText value="#{otherActionsPage.orgsForGenerateGuardians}" size="50"/>
+                <h:outputText escape="true" value="Начальная дата выборки" styleClass="output-text"/>
+                <rich:calendar value="#{otherActionsPage.startDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                </rich:calendar>
+                <h:outputText escape="true" value="Конечная дата выборки" styleClass="output-text"/>
+                <rich:calendar value="#{otherActionsPage.startDate}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                </rich:calendar>
+                <a4j:commandButton value="Отправить события ЕМИАС в ЕМП"
+                                   action="#{otherActionsPage.preorderRequestsManualGenerate()}"
+                                   id="sendEMIASTestEMP"
+                                   styleClass="command-button" reRender="mainMenu, workspaceTogglePanel"/><br/>
+            </h:panelGrid>
+        </rich:panel>
     <a4j:commandButton value="Обновить статистику ЕМП" action="#{otherActionsPage.runRecalculateEMPStatistics}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Исправить записи из Реестров" action="#{otherActionsPage.repairNSI}"

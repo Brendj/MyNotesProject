@@ -1049,6 +1049,10 @@ public class EventNotificationService {
                 putGenderParams(empType, values);
             }
 
+            String isTest = findValueInParams(new String[]{ExternalEventNotificationService.TEST}, values);
+            if (!isTest.equals(""))
+                empType.getParameters().put(ExternalEventNotificationService.TEST, isTest);
+
             //  Устанавливаем дату
             String empDateStr = findValueInParams(new String [] {"empTime"}, values);
             if(empDateStr != null && !StringUtils.isBlank(empDateStr)) {

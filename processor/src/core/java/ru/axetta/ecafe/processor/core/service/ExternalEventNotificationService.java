@@ -49,6 +49,7 @@ public class ExternalEventNotificationService {
     public static String ACCOUNT = "account";
     public static String BALANCE = "balance";
     public static String ADDRESS = "address";
+    public static String TEST = "TEST";
     public static String SHORTNAMEINFOSERVICE = "shortnameinfoservice";
     private String cultureShortName;
     private Date START_DATE;
@@ -134,7 +135,7 @@ public class ExternalEventNotificationService {
                         } else {
                             logger.info("Учащийся не в 1-4 классе");
                             //Если есть социальная льгота
-                            if (!ClientHaveDiscount(persistenceSession, client)) {
+                            if (ClientHaveDiscount(persistenceSession, client)) {
                                 logger.info("У учашегося есть льгота");
                                 notificationService.sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                                 logger.info("Отправка уведомления прошла успешно");
@@ -272,8 +273,7 @@ public class ExternalEventNotificationService {
             };
         }
         if (event.getEvtType().equals(ExternalEventType.SPECIAL)) {
-            SimpleDateFormat dateFormat = null;
-            dateFormat = new SimpleDateFormat("dd.MM.YYYY");
+            SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY");
             String empDate = dateFormat.format(getSTART_DATE());
             String empTimeH = dateFormat.format(getEND_DATE());
 

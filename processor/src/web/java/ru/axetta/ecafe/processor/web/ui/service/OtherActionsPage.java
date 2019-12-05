@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
+import ru.axetta.ecafe.processor.core.persistence.EMIAS;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -42,6 +43,7 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -61,6 +63,9 @@ public class OtherActionsPage extends OnlineReportPage {
     private String orgsForSpbCardsUidUpdate;
     private String guidForDiscountsUpdate;
     private String updateSpbClientDoubles;
+    private Date startDateEMP;
+    private Date endDateEMP;
+    private Long contractId;
 
     private static void close(Closeable resource) {
         if (resource != null) {
@@ -155,6 +160,49 @@ public class OtherActionsPage extends OnlineReportPage {
         RuntimeContext.getAppContext().getBean(EventNotificationService.class).
                 sendSMS(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, new Date()); //DEF
         printMessage("Пробное  событие успешно отправлено на ЕМП");
+    }
+
+    public void runSendEMPEventEMIAS() throws Exception {
+        Client client = DAOService.getInstance().getClientByContractId(getContractId());
+        List<EMIAS> emias = DAOService.getInstance().findEMIASbyClientandBeetwenDates(client, getStartDateEMP(), getEndDateEMP());
+        DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
+        SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY");
+        for (EMIAS emias1 : emias)
+        {
+            String empTime = df.format(emias1.getDateLiberate());
+            String empDate = dateFormat.format(emias1.getStartDateLiberate());
+            String empTimeH = dateFormat.format(emias1.getEndDateLiberate());
+            String[] values = new String[]{
+                    "surname", client.getPerson().getSurname(),
+                    "empDate", empDate,
+                    "empTime", empTime,
+                    "empTimeH", empTimeH,
+                    "name", client.getPerson().getFirstName(),
+                    "account", client.getContractId().toString(),
+                    "TEST","true"
+            };
+            values = EventNotificationService.attachGenderToValues(client.getGender(), values);
+            String type = "1";
+            switch (emias1.getTypeEventEMIAS().intValue())
+            {
+                case 1:
+                    type =  EventNotificationService.NOTIFICATION_START_SICK;
+                    break;
+                case 2:
+                    type = EventNotificationService.NOTIFICATION_CANCEL_START_SICK;
+                    break;
+                case 3:
+                    type = EventNotificationService.NOTIFICATION_END_SICK;
+                    break;
+                case 4:
+                    type = EventNotificationService.NOTIFICATION_CANCEL_END_SICK;
+                    break;
+            }
+
+            RuntimeContext.getAppContext().getBean(EventNotificationService.class).
+                    sendSMS(client, null, type, values, new Date()); //DEF
+        }
+        printMessage("События клиента отправлены (" + emias.size() +")");
     }
 
     public void runRecalculateEMPStatistics() throws Exception {
@@ -698,5 +746,29 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void setUpdateSpbClientDoubles(String updateSpbClientDoubles) {
         this.updateSpbClientDoubles = updateSpbClientDoubles;
+    }
+
+    public Date getStartDateEMP() {
+        return startDateEMP;
+    }
+
+    public void setStartDateEMP(Date startDateEMP) {
+        this.startDateEMP = startDateEMP;
+    }
+
+    public Date getEndDateEMP() {
+        return endDateEMP;
+    }
+
+    public void setEndDateEMP(Date endDateEMP) {
+        this.endDateEMP = endDateEMP;
+    }
+
+    public Long getContractId() {
+        return contractId;
+    }
+
+    public void setContractId(Long contractId) {
+        this.contractId = contractId;
     }
 }

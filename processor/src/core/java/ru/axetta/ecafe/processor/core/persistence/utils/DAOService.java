@@ -2645,4 +2645,17 @@ public class DAOService {
             return null;
         }
     }
+    public List findEMIASbyClientandBeetwenDates (Client client, Date startDate, Date endDate)
+    {
+        Query query = entityManager.createQuery("select em from EMIAS em where em.guid = :guid "
+                + "and em.dateLiberate between :begDate and :endDate ");
+        query.setParameter("guid", client.getClientGUID());
+        query.setParameter("begDate", startDate.getTime());
+        query.setParameter("endDate", endDate.getTime());
+        try {
+            return query.getResultList();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
 }
