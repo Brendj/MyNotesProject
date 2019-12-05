@@ -308,13 +308,14 @@ public class EMPSmsServiceImpl extends ISmsService {
             }
             List<EventMessageParameterType> params = paramsObj.getParameter();
             for (String k : eventType.getParameters().keySet()) {
-                String v = eventType.getParameters().get(k);
-
-                EventMessageParameterType nameParam = new EventMessageParameterType();
-                nameParam.setName(k);
-                //nameParam.setValue(URLEncoder.encode(new String(v.getBytes(), ENCODING), ENCODING));
-                nameParam.setValue(new String(v.getBytes(ENCODING), ENCODING));
-                params.add(nameParam);
+                if (!k.equals("TEST")) {
+                    String v = eventType.getParameters().get(k);
+                    EventMessageParameterType nameParam = new EventMessageParameterType();
+                    nameParam.setName(k);
+                    //nameParam.setValue(URLEncoder.encode(new String(v.getBytes(), ENCODING), ENCODING));
+                    nameParam.setValue(new String(v.getBytes(ENCODING), ENCODING));
+                    params.add(nameParam);
+                }
             }
             event.setMessage(messageParams);
             //  filters
