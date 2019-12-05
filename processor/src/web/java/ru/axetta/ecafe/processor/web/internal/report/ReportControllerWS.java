@@ -223,9 +223,9 @@ public class ReportControllerWS extends HttpServlet implements ReportController 
         try {
             OrgService orgService = OrgService.getInstance();
             MailingListReportsTypes type = MailingListReportsTypes.getByCode(mailingListType.intValue());
-            Org mainBulding = orgService.getMainBulding(idOfOrg);
-            if (mainBulding != null) {
-                result.setMailingList(orgService.getMailingList(mainBulding, type));
+            Org org = orgService.findOrg(idOfOrg);
+            if (org != null) {
+                result.setMailingList(orgService.getMailingList(org, type));
                 result.setCode(RC_OK);
                 result.setResult(RC_OK_DESC);
             } else {
