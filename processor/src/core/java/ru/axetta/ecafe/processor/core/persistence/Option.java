@@ -17,6 +17,9 @@ import ru.axetta.ecafe.processor.core.service.SMSSubscriptionFeeService;
  */
 public class Option {
 
+    public static final String NSI2="НСИ-2";
+    public static final String NSI3="НСИ-3";
+
     public final static int OPTION_WITH_OPERATOR=2,
             OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT=3,
             OPTION_CLEAN_MENU=4,
@@ -157,7 +160,8 @@ public class Option {
             OPTION_MENU_SYNC_EXPRESSION = 100203,
             OPTION_PHOTO_SYNC_EXPRESSION = 100204,
             OPTION_LIB_SYNC_EXPRESSION = 100205,
-            OPTION_PERIOD_OF_EXTENSION_CARDS = 101101;
+            OPTION_PERIOD_OF_EXTENSION_CARDS = 101101,
+            OPTION_NSI_VERSION = 100206;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -292,7 +296,8 @@ public class Option {
             OPTION_MENU_SYNC_EXPRESSION, "04:00-13:00;13:00-22:00",
             OPTION_PHOTO_SYNC_EXPRESSION, "04:00-07:00",
             OPTION_LIB_SYNC_EXPRESSION, "16:00-22:00",
-            OPTION_PERIOD_OF_EXTENSION_CARDS, "12"
+            OPTION_PERIOD_OF_EXTENSION_CARDS, "12",
+            OPTION_NSI_VERSION, NSI2
 };
 
     private Long idOfOption;

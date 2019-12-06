@@ -10,7 +10,6 @@ import generated.nsiws2.com.rstyle.nsi.beans.Item;
 import generated.nsiws2.com.rstyle.nsi.beans.SearchPredicate;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.partner.symmetric.OrgSymmetricDAOService;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange;
@@ -363,9 +362,17 @@ public class OrgMskNSIService extends MskNSIService {
         return result;
     }
 
+    private OrgMskNSIService getNSIService() {
+        switch (RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION)) {
+            case Option.NSI2 : return RuntimeContext.getAppContext().getBean(OrgSymmetricDAOService.class);
+            case Option.NSI3 : return RuntimeContext.getAppContext().getBean(OrgNSI3DAOService.class);
+        }
+        return null;
+    }
+
     //Получения списка изменений из реестров с учетом имени, и ограничения на кол-во оргзаписей в ответе
     public List<ImportRegisterOrgsService.OrgInfo> getOrgs(String orgName, String region) throws Exception {
-        return RuntimeContext.getAppContext().getBean(OrgSymmetricDAOService.class).getOrgs(orgName, region);
+        return getNSIService().getOrgs(orgName, region);
         /*List<ImportRegisterOrgsService.OrgInfo> orgs = new ArrayList<ImportRegisterOrgsService.OrgInfo>();
         int importIteration = 1;
         while (true) {
