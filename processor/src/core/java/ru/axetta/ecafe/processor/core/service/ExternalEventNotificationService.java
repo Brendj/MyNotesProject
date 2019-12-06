@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.items.ClientDiscountItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.collections.CollectionUtils;
@@ -87,7 +88,9 @@ public class ExternalEventNotificationService {
             }
 
         }
-        if (type == null) return;
+        if (type == null) {
+            return;
+        }
         Session persistenceSession = null;
         Transaction transaction = null;
         try {
@@ -95,9 +98,10 @@ public class ExternalEventNotificationService {
             transaction = persistenceSession.beginTransaction();
             String[] values = generateNotificationParams(client, event);
             values = EventNotificationService.attachGenderToValues(client.getGender(), values);
-            final EventNotificationService notificationService = RuntimeContext.getAppContext().getBean(
-                    EventNotificationService.class);
-            List<Client> guardians = ClientManager.findGuardiansByClient(persistenceSession, client.getIdOfClient(), null);
+            final EventNotificationService notificationService = RuntimeContext.getAppContext()
+                    .getBean(EventNotificationService.class);
+            List<Client> guardians = ClientManager
+                    .findGuardiansByClient(persistenceSession, client.getIdOfClient(), null);
             Integer clas;
             try {
                 clas = extractDigits(client.getClientGroup().getGroupName());
@@ -110,20 +114,23 @@ public class ExternalEventNotificationService {
                 for (Client destGuardian : guardians) {
                     //Если произошел проход в здание культуры или в здание музея...
                     if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
-                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_MUSEUM.getValue())
-                            && event.getEvtType().equals(ExternalEventType.MUSEUM)) {
+                            client.getIdOfClient(),
+                            ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_MUSEUM.getValue()) && event
+                            .getEvtType().equals(ExternalEventType.MUSEUM)) {
                         notificationService
                                 .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                     }
                     if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
-                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue())
-                            && event.getEvtType().equals(ExternalEventType.CULTURE)) {
+                            client.getIdOfClient(),
+                            ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_CULTURE.getValue()) && event
+                            .getEvtType().equals(ExternalEventType.CULTURE)) {
                         notificationService
                                 .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
                     }
                     if (ClientManager.allowedGuardianshipNotification(persistenceSession, destGuardian.getIdOfClient(),
-                            client.getIdOfClient(), ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue())
-                            && event.getEvtType().equals(ExternalEventType.SPECIAL)) {
+                            client.getIdOfClient(),
+                            ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL.getValue()) && event
+                            .getEvtType().equals(ExternalEventType.SPECIAL)) {
                         logger.info("Отправка кведомления представителю л/с" + destGuardian.getContractId());
                         if (clas > 0 && clas < 5)//1-4
                         {
@@ -137,11 +144,10 @@ public class ExternalEventNotificationService {
                             //Если есть социальная льгота
                             if (ClientHaveDiscount(persistenceSession, client)) {
                                 logger.info("У учашегося есть льгота");
-                                notificationService.sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
+                                notificationService.sendNotificationAsync(destGuardian, client, type, values,
+                                        event.getEvtDateTime());
                                 logger.info("Отправка уведомления прошла успешно");
-                            }
-                            else
-                            {
+                            } else {
                                 logger.info("У учашегося нет льготы");
                             }
                         }
@@ -160,21 +166,20 @@ public class ExternalEventNotificationService {
                 } else {
                     logger.info("Учащийся не в 1-4 классе");
                     //Только для НЕ предопределенной группы
-                    ClientGroup.Predefined predefined = ClientGroup.Predefined.parse(client.getClientGroup().getGroupName());
+                    ClientGroup.Predefined predefined = ClientGroup.Predefined
+                            .parse(client.getClientGroup().getGroupName());
                     if (predefined == null) {
                         logger.info("Учашийся в непредопределенной группе");
                         //Если есть социальная льгота
-                        if (!ClientHaveDiscount(persistenceSession, client)) {
+                        if (ClientHaveDiscount(persistenceSession, client)) {
                             logger.info("У учашегося есть льгота");
-                            notificationService.sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
+                            notificationService
+                                    .sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
                             logger.info("Отправка уведомления прошла успешно");
-                        }
-                        else
-                        {
+                        } else {
                             logger.info("У учашегося нет льготы");
                         }
-                    } else
-                    {
+                    } else {
                         logger.info("Учашийся в предопределенной группе");
                     }
                 }
@@ -207,27 +212,23 @@ public class ExternalEventNotificationService {
         return Integer.valueOf(builder.toString());
     }
 
-    public boolean ClientHaveDiscount (Session session, Client client) {
-        List<ClientDiscountItem> result = new LinkedList<ClientDiscountItem>();
-
+    public boolean ClientHaveDiscount(Session session, Client client) {
         List<Long> categoriesDiscountsIds = new LinkedList<Long>();
-        for(String cd : client.getCategoriesDiscounts().split(",")) {
-            if(StringUtils.isNotEmpty(cd)) {
+        for (String cd : client.getCategoriesDiscounts().split(",")) {
+            if (StringUtils.isNotEmpty(cd)) {
                 categoriesDiscountsIds.add(Long.valueOf(cd));
             }
         }
 
         List<CategoryDiscount> clientDiscountsList = Collections.emptyList();
-        if(!categoriesDiscountsIds.isEmpty()) {
+        if (!categoriesDiscountsIds.isEmpty()) {
             Criteria clientDiscountsCriteria = session.createCriteria(CategoryDiscount.class);
             clientDiscountsCriteria.add(Restrictions.in("idOfCategoryDiscount", categoriesDiscountsIds));
             clientDiscountsList = clientDiscountsCriteria.list();
         }
         boolean discount = false;
-        for (CategoryDiscount categoryDiscount : clientDiscountsList)
-        {
-            if (categoryDiscount.getCategoryType().getDescription().equals("Льгота"))
-            {
+        for (CategoryDiscount categoryDiscount : clientDiscountsList) {
+            if (categoryDiscount.getCategoryType().getDescription().equals("Льгота")) {
                 discount = true;
                 break;
             }
@@ -239,14 +240,10 @@ public class ExternalEventNotificationService {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(event.getEvtDateTime());
         if (event.getEvtType().equals(ExternalEventType.MUSEUM)) {
-            return new String[] {
-                    EMP_TIME, empTime,
-                    PLACE_NAME, event.getOrgName(),
-                    PLACE_CODE, event.getOrgCode(),
-                    SURNAME, client.getPerson().getSurname(),
-                    NAME, client.getPerson().getFirstName(),
-                    ACCOUNT, client.getContractId().toString()
-            };
+            return new String[]{
+                    EMP_TIME, empTime, PLACE_NAME, event.getOrgName(), PLACE_CODE, event.getOrgCode(), SURNAME,
+                    client.getPerson().getSurname(), NAME, client.getPerson().getFirstName(), ACCOUNT,
+                    client.getContractId().toString()};
         }
         if (event.getEvtType().equals(ExternalEventType.CULTURE)) {
             SimpleDateFormat dateFormat = null;
@@ -255,36 +252,31 @@ public class ExternalEventNotificationService {
             dateFormat = new SimpleDateFormat("HH:mm");
             String empTimeH = dateFormat.format(event.getEvtDateTime());
             String shortName = null;
-            if (cultureShortName == null)
+            if (cultureShortName == null) {
                 shortName = event.getOrgName();
-            else
+            } else {
                 shortName = cultureShortName;
-            return new String[] {
-                    SURNAME, client.getPerson().getSurname(),
-                    PLACE_NAME, event.getOrgName(),
-                    EMP_DATE, empDate,
-                    BALANCE, String.valueOf(client.getBalance()),
-                    EMP_TIME, empTime,
-                    EMP_TIME_H, empTimeH,
-                    ADDRESS, event.getAddress(),
-                    SHORTNAMEINFOSERVICE, shortName,
-                    NAME, client.getPerson().getFirstName(),
-                    ACCOUNT, client.getContractId().toString()
-            };
+            }
+            return new String[]{
+                    SURNAME, client.getPerson().getSurname(), PLACE_NAME, event.getOrgName(), EMP_DATE, empDate,
+                    BALANCE, String.valueOf(client.getBalance()), EMP_TIME, empTime, EMP_TIME_H, empTimeH, ADDRESS,
+                    event.getAddress(), SHORTNAMEINFOSERVICE, shortName, NAME, client.getPerson().getFirstName(),
+                    ACCOUNT, client.getContractId().toString()};
         }
         if (event.getEvtType().equals(ExternalEventType.SPECIAL)) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY");
             String empDate = dateFormat.format(getSTART_DATE());
             String empTimeH = dateFormat.format(getEND_DATE());
-
-            return new String[] {
-                    SURNAME, client.getPerson().getSurname(),
-                    EMP_DATE, empDate,
-                    EMP_TIME, empTime,
-                    EMP_TIME_H, empTimeH,
-                    NAME, client.getPerson().getFirstName(),
-                    ACCOUNT, client.getContractId().toString()
-            };
+            if (event.getForTest()) {
+                return new String[]{
+                        SURNAME, client.getPerson().getSurname(), EMP_DATE, empDate, EMP_TIME, empTime, EMP_TIME_H,
+                        empTimeH, NAME, client.getPerson().getFirstName(), ACCOUNT, client.getContractId().toString(),
+                        "TEST", "true"};
+            } else {
+                return new String[]{
+                        SURNAME, client.getPerson().getSurname(), EMP_DATE, empDate, EMP_TIME, empTime, EMP_TIME_H,
+                        empTimeH, NAME, client.getPerson().getFirstName(), ACCOUNT, client.getContractId().toString()};
+            }
         }
         return null;
     }

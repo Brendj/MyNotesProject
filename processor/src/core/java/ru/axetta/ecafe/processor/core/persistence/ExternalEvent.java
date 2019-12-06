@@ -23,6 +23,7 @@ public class ExternalEvent {
     private Long version;
     private Long cardNo;
     private Integer cardType;
+    private Boolean forTest;
 
     public ExternalEvent() {
         //default constructor
@@ -186,5 +187,13 @@ public class ExternalEvent {
 
     public void setOrgShortName(String orgShortName) {
         this.orgShortName = orgShortName;
+    }
+
+    public Boolean getForTest() {
+        return forTest;
+    }
+
+    public void setForTest(Boolean forTest) {
+        this.forTest = forTest;
     }
 }

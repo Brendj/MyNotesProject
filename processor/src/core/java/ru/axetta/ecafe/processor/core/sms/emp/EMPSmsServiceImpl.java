@@ -238,7 +238,7 @@ public class EMPSmsServiceImpl extends ISmsService {
             updateStats(OUTCOME_STATS_ID, 1);
             return eventParam.getId();
         }
-        return null;
+        return UUID.randomUUID().toString();
     }
 
     protected SubscriptionPortType createEventController(boolean forTest) {
@@ -251,14 +251,14 @@ public class EMPSmsServiceImpl extends ISmsService {
             if (forTest) {
                 String testURL = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sms.service.url.test", "");
                 service = new SubscriptionService(new URL(testURL),
-                        new QName("urn://emp.altarix.ru/subscriptions", "SubscriptionService"));
+                        new QName("http://tempuri.org/", "EmpSubscriptionService"));
+                controller = service.getServicePortTest();
             }
             else {
                 service = new SubscriptionService(new URL(config.getServiceUrl()),
                         new QName("urn://emp.altarix.ru/subscriptions", "SubscriptionService"));
+                controller = service.getServicePort();
             }
-
-            controller = service.getServicePort();
 
             org.apache.cxf.endpoint.Client client = ClientProxy.getClient(controller);
             HTTPConduit conduit = (HTTPConduit) client.getConduit();
