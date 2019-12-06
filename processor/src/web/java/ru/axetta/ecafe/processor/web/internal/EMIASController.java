@@ -132,6 +132,7 @@ public class EMIASController extends HttpServlet {
                     ExternalEvent event = new ExternalEvent(cl, ExternalEventType.SPECIAL, liberateClientsList.getDateLiberate(),
                             ExternalEventStatus.fromInteger(eventsStatus), handler);
                     persistenceSession.save(event);
+                    event.setForTest(false);
                     ExternalEventNotificationService notificationService = RuntimeContext.getAppContext()
                             .getBean(ExternalEventNotificationService.class);
                     notificationService.setSTART_DATE(liberateClientsList.getStartDateLiberate());

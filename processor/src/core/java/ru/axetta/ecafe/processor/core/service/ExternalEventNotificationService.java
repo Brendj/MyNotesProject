@@ -267,7 +267,7 @@ public class ExternalEventNotificationService {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY");
             String empDate = dateFormat.format(getSTART_DATE());
             String empTimeH = dateFormat.format(getEND_DATE());
-            if (event.getForTest()) {
+            if (event.getForTest() != null && event.getForTest()) {
                 return new String[]{
                         SURNAME, client.getPerson().getSurname(), EMP_DATE, empDate, EMP_TIME, empTime, EMP_TIME_H,
                         empTimeH, NAME, client.getPerson().getFirstName(), ACCOUNT, client.getContractId().toString(),
