@@ -211,6 +211,7 @@ public class EMPSmsServiceImpl extends ISmsService {
                     empProcessor.log(synchDate + "[Тестовый контур] Не удалось доставить событие " + event.getType() + " для клиента [" + client
                             .getIdOfClient() + "] " + client.getMobile());
                 }
+                subscriptionService = null;
             }
         }
         if (event.getParameters().get("TEST") == null) {
