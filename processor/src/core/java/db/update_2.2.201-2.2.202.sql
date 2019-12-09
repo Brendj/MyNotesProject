@@ -8,3 +8,5 @@
 INSERT INTO cf_clientgroups (idoforg, idofclientgroup, groupname)
 SELECT org.idoforg, 1100000120, 'Вне ОУ'
 FROM cf_orgs org;
+
+alter table cf_orgs add column ekisId bigint;
