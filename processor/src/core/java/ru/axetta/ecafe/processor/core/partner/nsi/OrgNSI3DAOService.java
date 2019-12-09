@@ -42,7 +42,7 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
                 + "addr.address as FullAddress, "     //1
                 + "org.full_name as FullName, "                            //2
                 + "org.short_name as ShortName, "                     //3
-                + "org.inn as Inn, "                                  //4
+                + "cast(org.inn as varchar) as Inn, "                                  //4
                 + "org.ogrn as Ogrn, "                                //5
                 + "org.director as Person, "                         //6
                 + "'' as ExternalUid, "                     //7
@@ -50,15 +50,15 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
                 + "org.eo_id as EkisIds, "                          //9
                 + "'' as EkisType, "              //10
                 + "'' as EkisType2015, "         //11
-                + "addr.unom as UNOM, "                               //12
-                + "addr.unad as UNAD, "                               //13
+                + "cast(addr.unom as varchar) as UNOM, "                               //12
+                + "cast(addr.unad as varchar) as UNAD, "                               //13
                 + "'' as pp_status, "                                  //14
                 + "addr.unique_address_id as ekis_address_id, "                            //15
                 + "a.title "                                  //16
                 + "FROM "
                 + "cf_kf_organization_registry org "
                 + "INNER JOIN cf_kf_eo_address addr ON addr.global_object_id = org.global_id "
-                + "INNER JOIN cf_kf_ct_admin_district a ON a.global_id = org.eo_district_id "
+                + "INNER JOIN cf_kf_ct_admin_district a ON org.eo_district_id = a.system_object_id "
                 + "WHERE org.arhiv = false and a.is_deleted = 0 "
                 + (StringUtils.isEmpty(orgName) ? "" : " and org.short_name like '%" + orgName + "%'")
                 + (StringUtils.isEmpty(region) ? "" : " and a.title like '%" + region + "%'"));
