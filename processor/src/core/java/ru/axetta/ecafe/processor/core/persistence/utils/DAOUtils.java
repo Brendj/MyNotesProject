@@ -10,11 +10,11 @@ import ru.axetta.ecafe.processor.core.emias.LiberateClientsList;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -4320,6 +4320,13 @@ public class DAOUtils {
     public static List<CategoryDiscount> getCategoryDiscountList(Session session) {
         Query q = session.createQuery("from CategoryDiscount order by idOfCategoryDiscount");
         return (List<CategoryDiscount>)q.list();
+    }
+
+    public static List<CategoryDiscount> getCategoryDiscountListByCategoryName(Session session, String categoryName) {
+        Criteria criteria = session.createCriteria(CategoryDiscount.class);
+        criteria.add(Restrictions.like("categoryName", categoryName, MatchMode.ANYWHERE).ignoreCase());
+        criteria.addOrder(org.hibernate.criterion.Order.asc("idOfCategoryDiscount"));
+        return (List<CategoryDiscount>) criteria.list();
     }
 
     public static List<Long> findFriendlyOrgsIds(Session session, List<Long> orgIdList) {
