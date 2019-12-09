@@ -291,7 +291,7 @@ public class CardManagerProcessor implements CardManager {
             historyCard.setFormerOwner(updatedCard.getClient());
             historyCard.setUser(cardOperatorUser);
             persistenceSession.save(historyCard);
-        } else if (cardOperatorUser != null) {
+        } else if (cardOperatorUser != null || !StringUtils.isEmpty(informationAboutCard)) {
             HistoryCard historyCard = new HistoryCard();
             historyCard.setCard(updatedCard);
             historyCard.setUpDatetime(new Date());
