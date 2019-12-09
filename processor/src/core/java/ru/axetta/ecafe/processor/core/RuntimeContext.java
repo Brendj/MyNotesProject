@@ -155,6 +155,14 @@ public class RuntimeContext implements ApplicationContextAware {
         this.methodsInfoService = methodsInfoService;
     }
 
+    public String getExtendCardServiceApiKey() {
+        return extendCardServiceApiKey;
+    }
+
+    public void setExtendCardServiceApiKey(String extendCardServiceApiKey) {
+        this.extendCardServiceApiKey = extendCardServiceApiKey;
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -206,6 +214,7 @@ public class RuntimeContext implements ApplicationContextAware {
     public static final String SCUD_LOGIN = SCUD + ".login";
     public static final String SCUD_PASSWORD = SCUD + ".password";
     private static final String OKU_API_KEY = PROCESSOR_PARAM_BASE + ".oku.api.key";
+    private static final String EXTEND_CARD_SERVICE_API_KEY = PROCESSOR_PARAM_BASE + ".extendCardService.api.key";
 
     public final static int NODE_ROLE_MAIN = 1, NODE_ROLE_PROCESSOR = 2;
     // Logger
@@ -264,6 +273,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private String geoplanerApiKey;
 
     private String okuApiKey;
+    private String extendCardServiceApiKey;
 
     private RBKMoneyConfig partnerRbkMoneyConfig;
     ////////////////////////////////////////////
@@ -665,6 +675,7 @@ public class RuntimeContext implements ApplicationContextAware {
             this.geoplanerApiKey = properties.getProperty(PROCESSOR_PARAM_BASE + ".geoplaner.apikey");
 
             this.okuApiKey = properties.getProperty(OKU_API_KEY);
+            this.extendCardServiceApiKey = properties.getProperty(EXTEND_CARD_SERVICE_API_KEY);
 
             ruleProcessor = createRuleHandler(properties, sessionFactory, postman, postman);
             this.autoReportProcessor = ruleProcessor;

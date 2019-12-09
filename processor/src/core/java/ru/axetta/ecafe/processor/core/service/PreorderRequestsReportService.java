@@ -201,7 +201,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                             if (transaction.isActive()) transaction.commit();
                             transaction = null;
                         }
-                        if (guids.size() > 0) {
+                        /*if (guids.size() > 0) {
                             logger.info(String.format("Sending requests to orgID=%s, count=%s", idOfOrg, guids.size()));
                             Calendar calendarEnd = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
                             final Date lastCreateOrUpdateDate = calendarEnd.getTime();
@@ -209,7 +209,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                             final Date endGenerateTime = calendarEnd.getTime();
                             RuntimeContext.getAppContext().getBean(GoodRequestsChangeAsyncNotificationService.class)
                                     .notifyOrg(orgItem, fireTime, endGenerateTime, lastCreateOrUpdateDate, dateWork);
-                        }
+                        }*/
                     }
 
                 }
