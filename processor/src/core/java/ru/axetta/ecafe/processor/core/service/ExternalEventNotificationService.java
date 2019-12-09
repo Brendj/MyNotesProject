@@ -266,16 +266,25 @@ public class ExternalEventNotificationService {
         if (event.getEvtType().equals(ExternalEventType.SPECIAL)) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY");
             String empDate = dateFormat.format(getSTART_DATE());
-            String empTimeH = dateFormat.format(getEND_DATE());
             if (event.getForTest() != null && event.getForTest()) {
                 return new String[]{
-                        SURNAME, client.getPerson().getSurname(), EMP_DATE, empDate, EMP_TIME, empTime, EMP_TIME_H,
-                        empTimeH, NAME, client.getPerson().getFirstName(), ACCOUNT, client.getContractId().toString(),
-                        "TEST", "true"};
+                        SURNAME, client.getPerson().getSurname(),
+                        NAME, client.getPerson().getFirstName(),
+                        PLACE_NAME, event.getOrgName(),
+                        ACCOUNT, client.getContractId().toString(),
+                        EMP_DATE, empDate,
+                        PLACE_CODE, event.getOrgCode(),
+                        "TEST", "true"
+                };
             } else {
                 return new String[]{
-                        SURNAME, client.getPerson().getSurname(), EMP_DATE, empDate, EMP_TIME, empTime, EMP_TIME_H,
-                        empTimeH, NAME, client.getPerson().getFirstName(), ACCOUNT, client.getContractId().toString()};
+                        SURNAME, client.getPerson().getSurname(),
+                        NAME, client.getPerson().getFirstName(),
+                        PLACE_NAME, event.getOrgName(),
+                        ACCOUNT, client.getContractId().toString(),
+                        EMP_DATE, empDate,
+                        PLACE_CODE, event.getOrgCode()
+                        };
             }
         }
         return null;

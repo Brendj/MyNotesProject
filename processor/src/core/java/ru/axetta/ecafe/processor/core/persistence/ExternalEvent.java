@@ -56,10 +56,12 @@ public class ExternalEvent {
         buildEnterName(evtStatus);
     }
 
-    public ExternalEvent(Client client, ExternalEventType evtType,
+    public ExternalEvent(Client client, String orgCode, String orgName, ExternalEventType evtType,
             Date evtDateTime, ExternalEventStatus evtStatus,
             ISetExternalEventVersion handlerVersion) throws IllegalArgumentException {
         this.client = client;
+        this.orgCode = orgCode;
+        this.orgName = orgName;
         this.evtType = evtType;
         this.evtDateTime = evtDateTime;
         this.evtStatus = evtStatus;
