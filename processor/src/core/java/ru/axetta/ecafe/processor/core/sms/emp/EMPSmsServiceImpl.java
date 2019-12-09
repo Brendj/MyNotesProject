@@ -10,10 +10,12 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
 import ru.axetta.ecafe.processor.core.sms.DeliveryResponse;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.SendResponse;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
+import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventTypeFactory;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPInfoMailingEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPMessageLogger;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
@@ -330,14 +332,33 @@ public class EMPSmsServiceImpl extends ISmsService {
                 messageParams.setParameters(paramsObj);
             }
             List<EventMessageParameterType> params = paramsObj.getParameter();
-            for (String k : eventType.getParameters().keySet()) {
-                if (!k.equals("TEST")) {
-                    String v = eventType.getParameters().get(k);
-                    EventMessageParameterType nameParam = new EventMessageParameterType();
-                    nameParam.setName(k);
-                    //nameParam.setValue(URLEncoder.encode(new String(v.getBytes(), ENCODING), ENCODING));
-                    nameParam.setValue(new String(v.getBytes(ENCODING), ENCODING));
-                    params.add(nameParam);
+            if (eventType.getType() == EMPEventTypeFactory.SPECIAL_TYPE_EVENT)
+            {
+                for (String k : eventType.getParameters().keySet()) {
+                    if (k.equals(ExternalEventNotificationService.SURNAME) ||
+                            k.equals(ExternalEventNotificationService.NAME) ||
+                            k.equals("OrgName") ||
+                            k.equals(ExternalEventNotificationService.ACCOUNT) ||
+                            k.equals(EventNotificationService.CLIENT_GENDER_KEY) ||
+                            k.equals(ExternalEventNotificationService.EMP_DATE) ||
+                            k.equals("OrgNum")) {
+                        String v = eventType.getParameters().get(k);
+                        EventMessageParameterType nameParam = new EventMessageParameterType();
+                        nameParam.setName(k);
+                        nameParam.setValue(new String(v.getBytes(ENCODING), ENCODING));
+                        params.add(nameParam);
+                    }
+                }
+            }
+            else {
+                for (String k : eventType.getParameters().keySet()) {
+                    if (!k.equals("TEST")) {
+                        String v = eventType.getParameters().get(k);
+                        EventMessageParameterType nameParam = new EventMessageParameterType();
+                        nameParam.setName(k);
+                        nameParam.setValue(new String(v.getBytes(ENCODING), ENCODING));
+                        params.add(nameParam);
+                    }
                 }
             }
             event.setMessage(messageParams);

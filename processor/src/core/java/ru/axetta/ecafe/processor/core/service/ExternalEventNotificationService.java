@@ -135,20 +135,13 @@ public class ExternalEventNotificationService {
                         if (clas > 0 && clas < 5)//1-4
                         {
                             //Если учащийся с 1-4 класс
-                            logger.info("Учащийся в 1-4 классе");
                             notificationService
                                     .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
-                            logger.info("Отправка уведомления прошла успешно");
                         } else {
-                            logger.info("Учащийся не в 1-4 классе");
                             //Если есть социальная льгота
                             if (ClientHaveDiscount(persistenceSession, client)) {
-                                logger.info("У учашегося есть льгота");
                                 notificationService.sendNotificationAsync(destGuardian, client, type, values,
                                         event.getEvtDateTime());
-                                logger.info("Отправка уведомления прошла успешно");
-                            } else {
-                                logger.info("У учашегося нет льготы");
                             }
                         }
                     }
@@ -156,31 +149,20 @@ public class ExternalEventNotificationService {
             }
             //отправка клиенту
             if (event.getEvtType().equals(ExternalEventType.SPECIAL)) { //Если тип = Служебные сообщения, то ....
-                logger.info("Отправка уведомления клиенту");
                 if (clas > 0 && clas < 5)//1-4
                 {
                     //Если учащийся с 1-4 класс
-                    logger.info("Учащийся в 1-4 классе");
                     notificationService.sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
-                    logger.info("Отправка уведомления прошла успешно");
                 } else {
-                    logger.info("Учащийся не в 1-4 классе");
                     //Только для НЕ предопределенной группы
                     ClientGroup.Predefined predefined = ClientGroup.Predefined
                             .parse(client.getClientGroup().getGroupName());
                     if (predefined == null) {
-                        logger.info("Учашийся в непредопределенной группе");
                         //Если есть социальная льгота
                         if (ClientHaveDiscount(persistenceSession, client)) {
-                            logger.info("У учашегося есть льгота");
                             notificationService
                                     .sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
-                            logger.info("Отправка уведомления прошла успешно");
-                        } else {
-                            logger.info("У учашегося нет льготы");
                         }
-                    } else {
-                        logger.info("Учашийся в предопределенной группе");
                     }
                 }
 
@@ -266,6 +248,7 @@ public class ExternalEventNotificationService {
         if (event.getEvtType().equals(ExternalEventType.SPECIAL)) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY");
             String empDate = dateFormat.format(getSTART_DATE());
+            String empTimeH = dateFormat.format(getEND_DATE());
             if (event.getForTest() != null && event.getForTest()) {
                 return new String[]{
                         SURNAME, client.getPerson().getSurname(),
@@ -274,6 +257,8 @@ public class ExternalEventNotificationService {
                         ACCOUNT, client.getContractId().toString(),
                         EMP_DATE, empDate,
                         PLACE_CODE, event.getOrgCode(),
+                        EMP_TIME, empTime,
+                        EMP_TIME_H, empTimeH,
                         "TEST", "true"
                 };
             } else {
