@@ -4500,4 +4500,16 @@ public class DAOUtils {
             return new ArrayList<EMIAS>();
         }
     }
+	
+	public static Long getMaxVersionOfEmias(Session session) {
+        Query query = session.createQuery("SELECT MAX(em.version) FROM EMIAS AS em");
+        Long maxVer = (Long) query.uniqueResult();
+        return maxVer == null ? 0 : maxVer;
+    }
+
+    public static List<EMIAS> getEmiasForMaxVersion(Long maxVersion, Session session){
+        Criteria criteria = session.createCriteria(EMIAS.class);
+        criteria.add(Restrictions.gt("version", maxVersion));
+        return criteria.list();
+    }
 }

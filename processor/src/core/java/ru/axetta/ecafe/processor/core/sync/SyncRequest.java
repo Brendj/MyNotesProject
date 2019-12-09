@@ -27,6 +27,9 @@ import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZNBu
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountsDTSZNRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.GroupsOrganizationRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestBuilder;
@@ -2719,8 +2722,9 @@ public class SyncRequest {
             builders.add(new RequestFeedingBuilder(idOfOrg));
             builders.add(new ClientDiscountDTSZNBuilder(idOfOrg));
             builders.add(new OrgSettingsBuilder(idOfOrg));
-            builders.add(new GoodRequestEZDBuilder());
+			builders.add(new GoodRequestEZDBuilder());
             builders.add(new SyncSettingsRequestBuilder(idOfOrg));
+			builders.add(new EmiasBuilder());
             return builders;
         }
 
@@ -3008,6 +3012,10 @@ public class SyncRequest {
 
     public GoodRequestEZDRequest getGoodRequestEZDRequest(){
         return this.<GoodRequestEZDRequest>findSection(GoodRequestEZDRequest.class);
+    }
+	
+	public EmiasRequest getEmiasRequest(){
+        return this.<EmiasRequest>findSection(EmiasRequest.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {
