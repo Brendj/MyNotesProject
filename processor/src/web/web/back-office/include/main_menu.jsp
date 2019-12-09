@@ -1104,6 +1104,10 @@
                             binding="#{mainPage.electronicReconciliationStatisticsPage.mainMenuComponent}"
                             label="Статистика электронной сверки"
                             action="#{mainPage.showElectronicReconciliationStatisticsPage}" reRender="workspaceForm" />
+        <rich:panelMenuItem id="taloonApprovalPreorderVerificationMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
+                            binding="#{mainPage.taloonApprovalPreorderVerificationPage.mainMenuComponent}"
+                            label="Электронная сверка (предзаказ)" action="#{mainPage.showTaloonApprovalPreorderVerificationPage}"
+                            reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuGroup id="budgetReportGroupMenu" binding="#{mainPage.budgetFoodGroupMenu.mainMenuComponent}"

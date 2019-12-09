@@ -462,6 +462,7 @@ public class MainPage implements Serializable {
     private final AdjustmentPaymentReportPage adjustmentPaymentReportPage = new AdjustmentPaymentReportPage();
     private final SalesReportGroupPage salesReportGroupPage = new SalesReportGroupPage();
     private final TaloonApprovalVerificationPage taloonApprovalVerificationPage = new TaloonApprovalVerificationPage();
+    private final TaloonApprovalPreorderVerificationPage taloonApprovalPreorderVerificationPage = new TaloonApprovalPreorderVerificationPage();
     private final ElectronicReconciliationStatisticsPage electronicReconciliationStatisticsPage = new ElectronicReconciliationStatisticsPage();
     private final BasicWorkspacePage electronicReconciliationReportGroupMenu = new BasicWorkspacePage();
     private final CardOperatorListPage cardOperatorListPage = new CardOperatorListPage();
@@ -6748,6 +6749,20 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showTaloonApprovalPreorderVerificationPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = taloonApprovalPreorderVerificationPage;
+            currentWorkspacePage.show();
+        } catch (Exception e) {
+            logger.error("Failed to set taloon approval preorder verification page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы сверки реестров талонов (предзаказ): " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public Object showElectronicReconciliationStatisticsPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -9945,6 +9960,10 @@ public class MainPage implements Serializable {
 
     public TaloonApprovalVerificationPage getTaloonApprovalVerificationPage() {
         return taloonApprovalVerificationPage;
+    }
+
+    public TaloonApprovalPreorderVerificationPage getTaloonApprovalPreorderVerificationPage() {
+        return taloonApprovalPreorderVerificationPage;
     }
 
     public ElectronicReconciliationStatisticsPage getElectronicReconciliationStatisticsPage() {
