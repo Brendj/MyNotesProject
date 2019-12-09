@@ -23,6 +23,7 @@ public class ExternalEvent {
     private Long version;
     private Long cardNo;
     private Integer cardType;
+    private Boolean forTest;
 
     public ExternalEvent() {
         //default constructor
@@ -42,7 +43,7 @@ public class ExternalEvent {
         this.version = handlerVersion.getVersion();
         buildEnterName(evtStatus);
     }
-    public ExternalEvent(Client cl, String orgCode, String CultureName, String CultureShortName, String CultureAddress, ExternalEventType evtType,
+    public ExternalEvent(Client cl, String orgCode, String CultureName, String CultureAddress, ExternalEventType evtType,
             Date evtDateTime, ExternalEventStatus evtStatus, ISetExternalEventVersion handlerVersion) throws IllegalArgumentException {
         this.orgCode = orgCode;
         this.orgName = CultureName;
@@ -52,6 +53,17 @@ public class ExternalEvent {
         this.evtStatus = evtStatus;
         this.version = handlerVersion.getVersion();
         this.address = CultureAddress;
+        buildEnterName(evtStatus);
+    }
+
+    public ExternalEvent(Client client, ExternalEventType evtType,
+            Date evtDateTime, ExternalEventStatus evtStatus,
+            ISetExternalEventVersion handlerVersion) throws IllegalArgumentException {
+        this.client = client;
+        this.evtType = evtType;
+        this.evtDateTime = evtDateTime;
+        this.evtStatus = evtStatus;
+        this.version = handlerVersion.getVersion();
         buildEnterName(evtStatus);
     }
 
@@ -175,5 +187,13 @@ public class ExternalEvent {
 
     public void setOrgShortName(String orgShortName) {
         this.orgShortName = orgShortName;
+    }
+
+    public Boolean getForTest() {
+        return forTest;
+    }
+
+    public void setForTest(Boolean forTest) {
+        this.forTest = forTest;
     }
 }

@@ -2645,4 +2645,32 @@ public class DAOService {
             return null;
         }
     }
+    public List findEMIASbyClientandBeetwenDates (Client client, Date startDate, Date endDate)
+    {
+        Query query = entityManager.createQuery("select em from EMIAS em where em.guid = :guid "
+                + "and em.dateLiberate between :begDate and :endDate ");
+        query.setParameter("guid", client.getClientGUID());
+        query.setParameter("begDate", startDate);
+        query.setParameter("endDate", endDate);
+        try {
+            return query.getResultList();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+    public ExternalEvent getExternalEvent (Client client, ExternalEventType evtType,
+            Date evtDateTime, ExternalEventStatus evtStatus)
+    {
+        Query query = entityManager.createQuery("select ee from ExternalEvent ee where ee.client = :client "
+                + "and ee.evtType = :evtType and ee.evtDateTime = :evtDateTime and ee.evtStatus = :evtStatus ");
+        query.setParameter("client", client);
+        query.setParameter("evtType", evtType);
+        query.setParameter("evtDateTime", evtDateTime);
+        query.setParameter("evtStatus", evtStatus);
+        try {
+            return (ExternalEvent)query.getResultList().get(0);
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
 }

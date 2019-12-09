@@ -47,6 +47,7 @@ import java.util.*;
 @Component
 @Scope("singleton")
 public class EMPSmsServiceImpl extends ISmsService {
+
     @Resource
     EMPProcessor empProcessor;
     //  system
@@ -54,6 +55,7 @@ public class EMPSmsServiceImpl extends ISmsService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(EMPSmsServiceImpl.class);
     //  services instances
     protected SubscriptionPortType subscriptionService;
+    protected SubscriptionPortType subscriptionServiceTESTemp;
 
     private static CircularFifoBuffer buffer = new CircularFifoBuffer(100);
 
@@ -82,15 +84,19 @@ public class EMPSmsServiceImpl extends ISmsService {
 
         EMPEventType empEvent = (EMPEventType) textObject;
         try {
-            String messageId = RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class).sendEvent(client, empEvent);
-            if(messageId == null || StringUtils.isBlank(messageId)) {
-                throw new Exception(String.format("Failed tot send EMP event for client [%s] - EMP system failed to send", client.getIdOfClient()));
+            String messageId = RuntimeContext.getAppContext().getBean(EMPSmsServiceImpl.class)
+                    .sendEvent(client, empEvent);
+            if (messageId == null || StringUtils.isBlank(messageId)) {
+                throw new Exception(
+                        String.format("Failed tot send EMP event for client [%s] - EMP system failed to send",
+                                client.getIdOfClient()));
             }
             return new SendResponse(1, null, messageId);// messageId ???
-        } catch(EMPException empe) {
-            if(empe.getMessageId() != null && !StringUtils.isBlank(empe.getMessageId())) {
-                return new SendResponse(empe.getCode() < SendResponse.MIN_SUCCESS_STATUS ? empe.getCode() : -empe.getCode(),
-                                        String.format("E: [%s] %s", "" + empe.getCode(), empe.getError()), empe.getMessageId());
+        } catch (EMPException empe) {
+            if (empe.getMessageId() != null && !StringUtils.isBlank(empe.getMessageId())) {
+                return new SendResponse(
+                        empe.getCode() < SendResponse.MIN_SUCCESS_STATUS ? empe.getCode() : -empe.getCode(),
+                        String.format("E: [%s] %s", "" + empe.getCode(), empe.getError()), empe.getMessageId());
             }
         } catch (Exception e) {
             throw e;
@@ -160,13 +166,13 @@ public class EMPSmsServiceImpl extends ISmsService {
 
     public void updateStats(int type, int inc) {
         String instance = RuntimeContext.getInstance().getNodeName();
-        if(stats == null) {
+        if (stats == null) {
             stats = DAOService.getInstance().getAllPreviousStatsForExternalSystem("emp_event", instance);
         }
 
         stats.setValue(type, stats.getValue(type) + inc);
 
-        if(System.currentTimeMillis() >= stats.getCreateDate().getTime() + empProcessor.getConfigStatsLifetime()) {
+        if (System.currentTimeMillis() >= stats.getCreateDate().getTime() + empProcessor.getConfigStatsLifetime()) {
             stats.setCreateDate(new Date(System.currentTimeMillis()));
             stats = DAOService.getInstance().saveStatsForExtermalSystem(stats);
         }
@@ -182,8 +188,10 @@ public class EMPSmsServiceImpl extends ISmsService {
             updateStats(INCOME_STATS_ID, 10000);       //  TEST ONLY!!!!!!
             return null;                //  TEST ONLY!!!!!!
         }*/
-        if(!ignoreMobileTest(event) && (event.getMsisdn() == null || StringUtils.isBlank("" + event.getMsisdn()))) {
-            throw new EMPException(String.format("Failed to send EMP event for client [%s] - msisdn (mobile) is required", client.getIdOfClient()));
+        if (!ignoreMobileTest(event) && (event.getMsisdn() == null || StringUtils.isBlank("" + event.getMsisdn()))) {
+            throw new EMPException(
+                    String.format("Failed to send EMP event for client [%s] - msisdn (mobile) is required",
+                            client.getIdOfClient()));
         }
         /*if (StringUtils.isBlank(client.getSsoid())/* || NumberUtils.toLong(client.getSsoid()) < 0L/) {
             //return null;
@@ -196,55 +204,96 @@ public class EMPSmsServiceImpl extends ISmsService {
         //  Вспомогательные значения
         String date = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss").format(new Date(System.currentTimeMillis()));
         String synchDate = "[Отправка события " + date + "]: ";
-        empProcessor.log(synchDate + "Событие " + event.getType() + " для клиента [" +
-                client.getIdOfClient() + "] " + client.getMobile());
+        empProcessor.log(synchDate + "Событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] "
+                + client.getMobile());
 
-        //  Отправка запроса
-        SubscriptionPortType subscription = createEventController();
-        if (subscription == null) {
-            throw new EMPException("Failed to create connection with EMP web service");
+
+        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sms.service.test", "false")
+                .equals("true")) {
+            //  Отправка запроса на тестовый контур
+            SubscriptionPortType subscription = createEventController(true);
+            if (subscription != null) {
+                SendSubscriptionStreamEventsRequestType eventParam = buildEventParam(event);
+                SendSubscriptionStreamEventsResponseType response = subscription
+                        .sendSubscriptionStreamEvents(eventParam);
+                if (response.getErrorCode() != 0) {
+                    empProcessor.log(synchDate + "[Тестовый контур] Не удалось доставить событие " + event.getType()
+                            + " для клиента [" + client.getIdOfClient() + "] " + client.getMobile());
+                }
+            }
         }
-        SendSubscriptionStreamEventsRequestType eventParam = buildEventParam(event);
-        empProcessor.logRequest(eventParam);
-        Date timeBefore = new Date();
-        SendSubscriptionStreamEventsResponseType response = subscription.sendSubscriptionStreamEvents(eventParam);
-        Date timeAfter = new Date();
-        addResponseTime(timeAfter.getTime() - timeBefore.getTime());
-        if (response.getErrorCode() != 0) {
-            empProcessor.log(synchDate + "Не удалось доставить событие " + event.getType() + " для клиента [" + client
-                    .getIdOfClient() + "] " + client.getMobile());
-            updateStats(FAILED_STATS_ID, 1);
-            throw new EMPException(response.getErrorCode(),
-                    String.format("Failed to execute event notification: Error [%s] %s", response.getErrorCode(),
-                            response.getErrorMessage())).setMessageId(eventParam.getId());
+        if (event.getParameters().get("TEST") == null) {
+            //  Отправка запроса
+            SubscriptionPortType subscription = createEventController(false);
+            if (subscription == null) {
+                throw new EMPException("Failed to create connection with EMP web service");
+            }
+            SendSubscriptionStreamEventsRequestType eventParam = buildEventParam(event);
+            empProcessor.logRequest(eventParam);
+            Date timeBefore = new Date();
+            SendSubscriptionStreamEventsResponseType response = subscription.sendSubscriptionStreamEvents(eventParam);
+            Date timeAfter = new Date();
+            addResponseTime(timeAfter.getTime() - timeBefore.getTime());
+            if (response.getErrorCode() != 0) {
+                empProcessor
+                        .log(synchDate + "Не удалось доставить событие " + event.getType() + " для клиента [" + client
+                                .getIdOfClient() + "] " + client.getMobile());
+                updateStats(FAILED_STATS_ID, 1);
+                throw new EMPException(response.getErrorCode(),
+                        String.format("Failed to execute event notification: Error [%s] %s", response.getErrorCode(),
+                                response.getErrorMessage())).setMessageId(eventParam.getId());
+            }
+            empProcessor.log(synchDate + "Событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] "
+                    + client.getMobile() + " доставлено");
+            updateStats(OUTCOME_STATS_ID, 1);
+            return eventParam.getId();
         }
-        empProcessor.log(synchDate + "Событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] " + client
-                .getMobile() + " доставлено");
-        updateStats(OUTCOME_STATS_ID, 1);
-        return eventParam.getId();
+        return UUID.randomUUID().toString();
     }
 
-    protected SubscriptionPortType createEventController() {
-        if (subscriptionService != null) {
-            return subscriptionService;
+    protected SubscriptionPortType createEventController(boolean forTest) {
+        if (forTest) {
+            if (subscriptionServiceTESTemp != null) {
+                return subscriptionServiceTESTemp;
+            }
+        } else {
+            if (subscriptionService != null) {
+                return subscriptionService;
+            }
         }
         SubscriptionPortType controller = null;
         try {
-            SubscriptionService service = new SubscriptionService(new URL(config.getServiceUrl()),
-                    new QName("urn://emp.altarix.ru/subscriptions", "SubscriptionService"));
-            controller = service.getServicePort();
+            SubscriptionService service;
+            if (forTest) {
+                String testURL = RuntimeContext.getInstance().getConfigProperties()
+                        .getProperty("ecafe.processor.sms.service.url.test", "");
+                service = new SubscriptionService(new URL(testURL),
+                        new QName("http://tempuri.org/", "EmpSubscriptionService"));
+                controller = service.getServicePortTest();
+            } else {
+                service = new SubscriptionService(new URL(config.getServiceUrl()),
+                        new QName("urn://emp.altarix.ru/subscriptions", "SubscriptionService"));
+                controller = service.getServicePort();
+            }
 
             org.apache.cxf.endpoint.Client client = ClientProxy.getClient(controller);
             HTTPConduit conduit = (HTTPConduit) client.getConduit();
             HTTPClientPolicy policy = conduit.getClient();
             policy.setReceiveTimeout(30 * 60 * 1000);
             policy.setConnectionTimeout(30 * 60 * 1000);
-            subscriptionService = controller;
-            final EMPMessageLogger loggingHandler = new RuntimeContext().getAppContext().getBean(EMPMessageLogger.class);
+            final EMPMessageLogger loggingHandler = new RuntimeContext().getAppContext()
+                    .getBean(EMPMessageLogger.class);
             final List<Handler> handlerChain = new ArrayList<Handler>();
             handlerChain.add(loggingHandler);
-            ((BindingProvider) subscriptionService).getBinding().setHandlerChain(handlerChain);
-            return subscriptionService;
+            if (forTest) {
+                subscriptionServiceTESTemp = controller;
+                ((BindingProvider) subscriptionServiceTESTemp).getBinding().setHandlerChain(handlerChain);
+                return subscriptionServiceTESTemp;
+            } else {
+                subscriptionService = controller;
+                ((BindingProvider) subscriptionService).getBinding().setHandlerChain(handlerChain);
+                return subscriptionService;
+            }
         } catch (java.lang.Exception e) {
             logger.error("Failed to create WS controller", e);
             return null;
@@ -282,13 +331,14 @@ public class EMPSmsServiceImpl extends ISmsService {
             }
             List<EventMessageParameterType> params = paramsObj.getParameter();
             for (String k : eventType.getParameters().keySet()) {
-                String v = eventType.getParameters().get(k);
-
-                EventMessageParameterType nameParam = new EventMessageParameterType();
-                nameParam.setName(k);
-                //nameParam.setValue(URLEncoder.encode(new String(v.getBytes(), ENCODING), ENCODING));
-                nameParam.setValue(new String(v.getBytes(ENCODING), ENCODING));
-                params.add(nameParam);
+                if (!k.equals("TEST")) {
+                    String v = eventType.getParameters().get(k);
+                    EventMessageParameterType nameParam = new EventMessageParameterType();
+                    nameParam.setName(k);
+                    //nameParam.setValue(URLEncoder.encode(new String(v.getBytes(), ENCODING), ENCODING));
+                    nameParam.setValue(new String(v.getBytes(ENCODING), ENCODING));
+                    params.add(nameParam);
+                }
             }
             event.setMessage(messageParams);
             //  filters
