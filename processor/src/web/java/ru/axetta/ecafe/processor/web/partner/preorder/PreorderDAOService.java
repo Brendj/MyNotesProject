@@ -792,7 +792,7 @@ public class PreorderDAOService {
         try {
             logger.info("Start of generating regular preorders");
             if (params.isEmpty()) {
-                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).generatePreordersBySchedule();
+                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).generatePreordersBySchedule(params);
             }
             logger.info("Successful end of generating regular preorders");
         } catch (Exception e) {
@@ -808,7 +808,7 @@ public class PreorderDAOService {
         try {
             logger.info("Start additional tasks for regulars");
             if (params.isEmpty()) {
-                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).additionalTasksForRegulars();
+                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).additionalTasksForRegulars(params);
             }
             logger.info("Successful end additional tasks for regulars");
         } catch (Exception e) {
@@ -1112,8 +1112,9 @@ public class PreorderDAOService {
     }
 
     @Transactional
-    public List<RegularPreorder> getRegularPreorders() {
-        Query query = em.createQuery("select r from RegularPreorder r where r.deletedState = false and r.endDate > :date");
+    public List<RegularPreorder> getRegularPreorders(PreorderRequestsReportServiceParam params) {
+        Query query = em.createQuery("select r from RegularPreorder r join fetch r.client c "
+                + "where r.deletedState = false and r.endDate > :date" + params.getRegularPreorderJPACondition());
         query.setParameter("date", new Date());
         return query.getResultList();
     }
@@ -1127,8 +1128,9 @@ public class PreorderDAOService {
     }
 
     @Transactional
-    public List<RegularPreorder> getExpiredRegularPreorders() {
-        Query query = em.createQuery("select r from RegularPreorder r where r.deletedState = false and r.endDate < :date");
+    public List<RegularPreorder> getExpiredRegularPreorders(PreorderRequestsReportServiceParam params) {
+        Query query = em.createQuery("select r from RegularPreorder r join fetch r.client c "
+                + "where r.deletedState = false and r.endDate < :date" + params.getRegularPreorderJPACondition());
         query.setParameter("date", new Date());
         return query.getResultList();
     }

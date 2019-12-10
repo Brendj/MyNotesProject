@@ -58,6 +58,12 @@ public class PreorderRequestsReportServiceParam {
         return result;
     }
 
+    public String getRegularPreorderJPACondition() {
+        String result = "";
+        if (modBy != null && serversAmount != null) result += String.format(" and mod(c.org.idOfOrg, %s) = %s", serversAmount, modBy);
+        return result;
+    }
+
     public List<Long> getIdOfOrgList() {
         return idOfOrgList;
     }
