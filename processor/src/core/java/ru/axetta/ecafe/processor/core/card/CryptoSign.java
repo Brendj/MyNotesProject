@@ -87,8 +87,10 @@ public class CryptoSign {
                 //card.getMemSize() == 2 - Если тип карты не поддерживает данный более 128 байт
                 //cardSign.getSignType() == 1 - ECDSA
                 //cardSign.getSignType() == 2 - Scrypt
-                if (!((card.getMemSize() == 1 && cardSign.getSignType() == 1) || (card.getMemSize() == 2 && cardSign.getSignType() == 0)))
+                if (!((card.getMemSize() == 1 && cardSign.getSignType() == 1) || (card.getMemSize() == 2 && cardSign.getSignType() == 0))) {
                     sucsess = false;
+                    responseCardSign.setMessage("Тип подписи для карты задан некорректно");
+                }
                 if (sucsess) {//Подписываем карту только если пройдены проверки
                     //Подготавливаем данные для подписи
                     byte[] fiz = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(card.getUid()).array();
