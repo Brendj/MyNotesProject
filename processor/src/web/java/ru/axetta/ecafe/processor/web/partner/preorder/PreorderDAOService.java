@@ -1121,7 +1121,7 @@ public class PreorderDAOService {
 
     @Transactional
     public List getAllActualPreorders(PreorderRequestsReportServiceParam params) {
-        Query query = em.createQuery("select pc, pc.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup from PreorderComplex pc "
+        Query query = em.createQuery("select pc, pc.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup from PreorderComplex pc join fetch pc.client c "
                 + "where pc.deletedState = false and pc.preorderDate > :date" + params.getJPACondition());
         query.setParameter("date", new Date());
         return query.getResultList();
