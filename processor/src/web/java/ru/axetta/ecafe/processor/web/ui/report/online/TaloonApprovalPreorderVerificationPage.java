@@ -121,7 +121,8 @@ public class TaloonApprovalPreorderVerificationPage extends BasicWorkspacePage i
         for (TaloonApprovalPreorderVerificationItem item : items) {
             for (TaloonApprovalPreorderVerificationItem.TaloonApprovalPreorderVerificationItemDetail detail : item.getDetails()) {
                 if (detail.equals(currentTaloonApprovalPreorderVerificationItemDetail)) {
-                    if (currentState.equals(TaloonApprovalPreorderVerificationItem.MAKE_CANCEL) && !detail.needFillShippedQty()) {
+                    if (currentState.equals(TaloonApprovalPreorderVerificationItem.MAKE_CANCEL) //&& !detail.needFillShippedQty()
+                    ) {
                         detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
                     }
                     if (currentState.equals(TaloonApprovalPreorderVerificationItem.MAKE_CONFIRM)) {
@@ -146,9 +147,11 @@ public class TaloonApprovalPreorderVerificationPage extends BasicWorkspacePage i
             if (item.equals(currentTaloonApprovalPreorderVerificationItem)) {
                 for (TaloonApprovalPreorderVerificationItem.TaloonApprovalPreorderVerificationItemDetail detail : item.getDetails()) {
                     if (detail.getPpState() != null) {
-                        if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.allowedSetFirstFlag())
+                        if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED // && detail.allowedSetFirstFlag()
+                        )
                                 ||
-                                ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED || state == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED) && detail.allowedClearFirstFlag())) {
+                                ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED || state == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED)) //&& detail.allowedClearFirstFlag())
+                        ) {
                             detail.setPpState(state);
                         }
                     }

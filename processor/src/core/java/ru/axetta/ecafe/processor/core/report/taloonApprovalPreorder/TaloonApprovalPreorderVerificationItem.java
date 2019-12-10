@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2016. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
 package ru.axetta.ecafe.processor.core.report.taloonApprovalPreorder;
@@ -30,6 +30,9 @@ public class TaloonApprovalPreorderVerificationItem {
     private Date taloonDate;
     private final List<TaloonApprovalPreorderVerificationItemDetail> details = new ArrayList<>();
 
+    public TaloonApprovalPreorderVerificationItem() {
+    }
+
     public Date getTaloonDate() {
         return taloonDate;
     }
@@ -43,48 +46,60 @@ public class TaloonApprovalPreorderVerificationItem {
     }
 
     public static class TaloonApprovalPreorderVerificationItemDetail {
-        private String taloonName;
+        private Long idOfOrg;
         private Long idOfOrgCreated;
-        private Integer soldedQty;
-        private Integer requestedQty;
-        private Integer shippedQty;
+        private Date taloonDate;
+        private String complexName;
+        private String goodsName;
+        private String goodsGuid;
         private Long price;
-        private Long summa;
+        private Integer requestedQty;
+        private Long requestedSum;
+        private Integer soldQty;
+        private Long soldSum;
+        private Integer shippedQty;
+        private Long shippedSum;
+        private Integer reservedQty;
+        private Long reservedSum;
+        private Integer blockedQty;
+        private Long blockedSum;
+        private Integer differedQty;
+        private Long differedSum;
         private TaloonISPPStatesEnum isppState;
         private TaloonPPStatesEnum ppState;
-        private Long idOfOrg;
-        private Date taloonDate;
-        private boolean summaryDay;
-        private String goodsGuid;
         private String remarks;
+        private boolean summaryDay;
 
         public TaloonApprovalPreorderVerificationItemDetail() {}
 
-        public TaloonApprovalPreorderVerificationItemDetail(String taloonName, Long idOfOrgCreated, Integer soldedQty, Integer requestedQty,
-                Integer shippedQty, Long price, Long summa, TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,
-                Long idOfOrg, Date taloonDate, boolean summaryDay, String goodsGuid, String remarks) {
-            this.setTaloonName(taloonName);
-            this.setIdOfOrgCreated(idOfOrgCreated);
-            this.setRequestedQty(requestedQty);
-            this.setSoldedQty(soldedQty);
-            this.setShippedQty(shippedQty);
-            this.setPrice(price);
-            setSumma(summa);
-            this.setIsppState(isppState);
-            this.setPpState(ppState);
-            this.setIdOfOrg(idOfOrg);
-            this.setTaloonDate(taloonDate);
-            this.setSummaryDay(summaryDay);
-            this.setGoodsGuid(goodsGuid);
-            this.setRemarks(remarks);
-        }
-
-        public String getTaloonName() {
-            return taloonName;
-        }
-
-        public void setTaloonName(String taloonName) {
-            this.taloonName = taloonName;
+        public TaloonApprovalPreorderVerificationItemDetail(Long idOfOrg, Long idOfOrgCreated, Date taloonDate,
+                String complexName, String goodsName, String goodsGuid, Long price, Integer requestedQty,
+                Long requestedSum, Integer soldQty, Long soldSum, Integer shippedQty, Long shippedSum,
+                Integer reservedQty, Long reservedSum, Integer blockedQty, Long blockedSum, Integer differedQty, Long differedSum,
+                TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState, String remarks, boolean summaryDay) {
+            this.idOfOrg = idOfOrg;
+            this.idOfOrgCreated = idOfOrgCreated;
+            this.taloonDate = taloonDate;
+            this.complexName = complexName;
+            this.goodsName = goodsName;
+            this.goodsGuid = goodsGuid;
+            this.price = price;
+            this.requestedQty = requestedQty;
+            this.requestedSum = requestedSum;
+            this.soldQty = soldQty;
+            this.soldSum = soldSum;
+            this.shippedQty = shippedQty;
+            this.shippedSum = shippedSum;
+            this.reservedQty = reservedQty;
+            this.reservedSum = reservedSum;
+            this.blockedQty = blockedQty;
+            this.blockedSum = blockedSum;
+            this.blockedQty = differedQty;
+            this.blockedSum = differedSum;
+            this.isppState = isppState;
+            this.ppState = ppState;
+            this.remarks = remarks;
+            this.summaryDay = summaryDay;
         }
 
         public Long getIdOfOrgCreated() {
@@ -93,14 +108,6 @@ public class TaloonApprovalPreorderVerificationItem {
 
         public void setIdOfOrgCreated(Long idOfOrgCreated) {
             this.idOfOrgCreated = idOfOrgCreated;
-        }
-
-        public Integer getSoldedQty() {
-            return soldedQty;
-        }
-
-        public void setSoldedQty(Integer soldedQty) {
-            this.soldedQty = soldedQty;
         }
 
         public Integer getRequestedQty() {
@@ -143,37 +150,142 @@ public class TaloonApprovalPreorderVerificationItem {
             this.ppState = ppState;
         }
 
-        public Long getSumma() {
-            return summa;
+        public Long getIdOfOrg() {
+            return idOfOrg;
         }
 
-        public void setSumma(Long summa) {
-            this.summa = summa;
+        public void setIdOfOrg(Long idOfOrg) {
+            this.idOfOrg = idOfOrg;
         }
 
-        public boolean isIsppStateConfirmed() {
-            return (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED);
+        public Date getTaloonDate() {
+            return taloonDate;
         }
 
-        public boolean isPpStateConfirmed() {
-            return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
+        public void setTaloonDate(Date taloonDate) {
+            this.taloonDate = taloonDate;
         }
 
-        public boolean isPpStateCanceled() {
-            return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
+        public boolean isSummaryDay() {
+            return summaryDay;
         }
 
-        public boolean isPpStateNotSelected() {
-            return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
+        public void setSummaryDay(boolean summaryDay) {
+            this.summaryDay = summaryDay;
         }
 
-        public boolean isPpStateNull() {
-            return (ppState == null && taloonDate != null);
+        public String getGoodsGuid() {
+            return goodsGuid;
         }
 
-        public Boolean needFillShippedQty() {
-            return (shippedQty == null || shippedQty == 0);
+        public void setGoodsGuid(String goodsGuid) {
+            this.goodsGuid = goodsGuid;
         }
+
+        public String getRemarks() {
+            return remarks;
+        }
+
+        public void setRemarks(String remarks) {
+            this.remarks = remarks;
+        }
+
+        public String getComplexName() {
+            return complexName;
+        }
+
+        public void setComplexName(String complexName) {
+            this.complexName = complexName;
+        }
+
+        public String getGoodsName() {
+            return goodsName;
+        }
+
+        public void setGoodsName(String goodsName) {
+            this.goodsName = goodsName;
+        }
+
+        public Integer getSoldQty() {
+            return soldQty;
+        }
+
+        public void setSoldQty(Integer soldQty) {
+            this.soldQty = soldQty;
+        }
+
+        public Integer getReservedQty() {
+            return reservedQty;
+        }
+
+        public void setReservedQty(Integer reservedQty) {
+            this.reservedQty = reservedQty;
+        }
+
+        public Integer getBlockedQty() {
+            return blockedQty;
+        }
+
+        public void setBlockedQty(Integer blockedQty) {
+            this.blockedQty = blockedQty;
+        }
+
+        public Long getRequestedSum() {
+            return requestedSum;
+        }
+
+        public void setRequestedSum(Long requestedSum) {
+            this.requestedSum = requestedSum;
+        }
+
+        public Long getSoldSum() {
+            return soldSum;
+        }
+
+        public void setSoldSum(Long soldSum) {
+            this.soldSum = soldSum;
+        }
+
+        public Long getShippedSum() {
+            return shippedSum;
+        }
+
+        public void setShippedSum(Long shippedSum) {
+            this.shippedSum = shippedSum;
+        }
+
+        public Long getReservedSum() {
+            return reservedSum;
+        }
+
+        public void setReservedSum(Long reservedSum) {
+            this.reservedSum = reservedSum;
+        }
+
+        public Long getBlockedSum() {
+            return blockedSum;
+        }
+
+        public void setBlockedSum(Long blockedSum) {
+            this.blockedSum = blockedSum;
+        }
+
+        public Integer getDifferedQty() {
+            return differedQty;
+        }
+
+        public void setDifferedQty(Integer differedQty) {
+            this.differedQty = differedQty;
+        }
+
+        public Long getDifferedSum() {
+            return differedSum;
+        }
+
+        public void setDifferedSum(Long differedSum) {
+            this.differedSum = differedSum;
+        }
+
 
         public int getPeriod() {
             Date currentDate = new Date();
@@ -301,44 +413,28 @@ public class TaloonApprovalPreorderVerificationItem {
             return taloonDate == null;
         }
 
-        public Long getIdOfOrg() {
-            return idOfOrg;
+        public boolean isIsppStateConfirmed() {
+            return (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED);
         }
 
-        public void setIdOfOrg(Long idOfOrg) {
-            this.idOfOrg = idOfOrg;
+        public boolean isPpStateConfirmed() {
+            return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
         }
 
-        public Date getTaloonDate() {
-            return taloonDate;
+        public boolean isPpStateCanceled() {
+            return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
         }
 
-        public void setTaloonDate(Date taloonDate) {
-            this.taloonDate = taloonDate;
+        public boolean isPpStateNotSelected() {
+            return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
         }
 
-        public boolean isSummaryDay() {
-            return summaryDay;
+        public boolean isPpStateNull() {
+            return (ppState == null && taloonDate != null);
         }
 
-        public void setSummaryDay(boolean summaryDay) {
-            this.summaryDay = summaryDay;
-        }
-
-        public String getGoodsGuid() {
-            return goodsGuid;
-        }
-
-        public void setGoodsGuid(String goodsGuid) {
-            this.goodsGuid = goodsGuid;
-        }
-
-        public String getRemarks() {
-            return remarks;
-        }
-
-        public void setRemarks(String remarks) {
-            this.remarks = remarks;
+        public Boolean needFillShippedQty() {
+            return (shippedQty == null || shippedQty == 0);
         }
 
         public Boolean getRemarksEmpty() {

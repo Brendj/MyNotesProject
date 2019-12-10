@@ -345,6 +345,28 @@ public class DAOReadonlyService {
         }
     }
 
+    public TaloonApprovalPreorder findTaloonApprovalPreorder(Long idOfOrg, Date taloonDate, String complexName,
+            String goodsName, String goodsGuid, Long price) {
+        try {
+            Query query = entityManager.createQuery("SELECT taloon from TaloonApprovalPreorder taloon "
+                    + "where taloon.idOfOrg = :idOfOrg "
+                    + "and taloon.taloonDate = :taloonDate "
+                    + "and taloon.taloonName = :complexName "
+                    + "and taloon.goodsName = :goodsName "
+                    + "and taloon.price = :price "
+                    + "and taloon.goodsGuid = :goodsGuid");
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setParameter("taloonDate", taloonDate);
+            query.setParameter("complexName", complexName);
+            query.setParameter("goodsName", goodsName);
+            query.setParameter("price", price);
+            query.setParameter("goodsGuid", goodsGuid);
+            return (TaloonApprovalPreorder)query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public ComplexSchedule findComplexSchedule(String guid) {
         try {
             Query query = entityManager.createQuery("SELECT schedule from ComplexSchedule schedule "

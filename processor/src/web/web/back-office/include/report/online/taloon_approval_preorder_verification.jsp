@@ -1,5 +1,6 @@
 <%--
-  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+  ~ Copyright (c) 2019. Axe
+  tta LLC. All Rights Reserved.
   --%>
 
 <%--
@@ -215,31 +216,33 @@
             <rich:column headerClass="column-header">
 <%--            Изменить статус записи--%>
                 <a4j:commandLink reRender="taloonApprovalPreorderVerificationTable" rendered="#{detail.ppStateNotSelected}"
-                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.switchPpState()}" style="color:lightgray;"
-                                 onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.switchPpState()}" style="color:lightgray;">
+<%--                                 onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
                     <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentTaloonApprovalPreorderVerificationItemDetail}" />
                     <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentState}" />
                     <h:graphicImage value="/images/taloons/applied-gray.png" />
                 </a4j:commandLink>
-                <a4j:commandLink oncomplete="if (#{detail.needFillShippedQty()}) { alert('Заполните комментарий'); }"
-                                 reRender="taloonApprovalPreorderVerificationTable" rendered="#{detail.ppStateNotSelected}"
-                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.switchPpState()}"
-                                 onclick="if (#{!detail.allowedSetSecondFlag()}) { alert('Операция запрещена'); return false; }"
-                                 style="color:lightgray;" >
+
+                <a4j:commandLink reRender="taloonApprovalPreorderVerificationTable" rendered="#{detail.ppStateNotSelected}"
+                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.switchPpState()}" style="color:lightgray;">
+<%--                        oncomplete="if (#{detail.needFillShippedQty()}) { alert('Заполните отгрузку ПП'); }"--%>
+<%--                                 onclick="if (#{!detail.allowedSetSecondFlag()}) { alert('Операция запрещена'); return false; }"--%>
                     <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentTaloonApprovalPreorderVerificationItemDetail}" />
                     <f:setPropertyActionListener value="#{detail.ppStateToTurnOnSecond}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentState}" />
                     <h:graphicImage value="/images/taloons/canceled-gray.png" />
                 </a4j:commandLink>
+
                 <a4j:commandLink reRender="taloonApprovalPreorderVerificationTable" rendered="#{detail.ppStateCanceled}"
-                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.resetPpState()}"
-                                 onclick="if (#{!detail.allowedClearSecondFlag()}) { alert('Операция запрещена'); return false; }">
+                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.resetPpState()}">
+<%--                                 onclick="if (#{!detail.allowedClearSecondFlag()}) { alert('Операция запрещена'); return false; }">--%>
                     <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentTaloonApprovalPreorderVerificationItemDetail}" />
                     <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentState}" />
                     <h:graphicImage value="/images/taloons/canceled.png" />
                 </a4j:commandLink>
+
                 <a4j:commandLink reRender="taloonApprovalPreorderVerificationTable" rendered="#{detail.ppStateConfirmed}"
-                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.resetPpState()}"
-                                 onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.resetPpState()}">
+<%--                                 onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
                     <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentTaloonApprovalPreorderVerificationItemDetail}" />
                     <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentState}" />
                     <h:graphicImage value="/images/taloons/applied.png" />
@@ -247,15 +250,15 @@
 
 <%--            Подтвердить для всего дня--%>
                 <a4j:commandLink reRender="taloonApprovalPreorderVerificationTable" rendered="#{detail.ppStateNull}"
-                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.confirmPpStateAllDay()}" style="color:lightgray;"
-                                 onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.confirmPpStateAllDay()}" >
+<%--                                 onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
                     <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentTaloonApprovalPreorderVerificationItem}" />
                     <h:graphicImage value="/images/taloons/applied-big.png" />
                 </a4j:commandLink>
-<%--            Отменить выбор для всего дня--%>
+<%--            Отменить выбор для всего дня-- ppStateNull--%>
                 <a4j:commandLink reRender="taloonApprovalPreorderVerificationTable" rendered="#{detail.ppStateNull}"
-                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.deselectPpStateAllDay()}" style="color:lightgray;"
-                                 onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.deselectPpStateAllDay()}" style="color:lightgray;">
+<%--                                 onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
                     <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentTaloonApprovalPreorderVerificationItem}" />
                     <h:graphicImage value="/images/taloons/applied-big-gray.png" />
                 </a4j:commandLink>
