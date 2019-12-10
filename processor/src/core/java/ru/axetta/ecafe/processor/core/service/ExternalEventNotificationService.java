@@ -222,10 +222,17 @@ public class ExternalEventNotificationService {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(event.getEvtDateTime());
         if (event.getEvtType().equals(ExternalEventType.MUSEUM)) {
-            return new String[]{
-                    EMP_TIME, empTime, PLACE_NAME, event.getOrgName(), PLACE_CODE, event.getOrgCode(), SURNAME,
-                    client.getPerson().getSurname(), NAME, client.getPerson().getFirstName(), ACCOUNT,
-                    client.getContractId().toString()};
+            if (event.getForTest() != null && event.getForTest()) {
+                return new String[]{
+                        EMP_TIME, empTime, PLACE_NAME, event.getOrgName(), PLACE_CODE, event.getOrgCode(), SURNAME,
+                        client.getPerson().getSurname(), NAME, client.getPerson().getFirstName(), ACCOUNT,
+                        client.getContractId().toString(), "TEST", "true"};
+            } else {
+                return new String[]{
+                        EMP_TIME, empTime, PLACE_NAME, event.getOrgName(), PLACE_CODE, event.getOrgCode(), SURNAME,
+                        client.getPerson().getSurname(), NAME, client.getPerson().getFirstName(), ACCOUNT,
+                        client.getContractId().toString()};
+            }
         }
         if (event.getEvtType().equals(ExternalEventType.CULTURE)) {
             SimpleDateFormat dateFormat = null;
@@ -239,11 +246,21 @@ public class ExternalEventNotificationService {
             } else {
                 shortName = cultureShortName;
             }
-            return new String[]{
-                    SURNAME, client.getPerson().getSurname(), PLACE_NAME, event.getOrgName(), EMP_DATE, empDate,
-                    BALANCE, String.valueOf(client.getBalance()), EMP_TIME, empTime, EMP_TIME_H, empTimeH, ADDRESS,
-                    event.getAddress(), SHORTNAMEINFOSERVICE, shortName, NAME, client.getPerson().getFirstName(),
-                    ACCOUNT, client.getContractId().toString()};
+            if (event.getForTest() != null && event.getForTest()) {
+                return new String[]{
+                        SURNAME, client.getPerson().getSurname(), PLACE_NAME, event.getOrgName(), EMP_DATE, empDate,
+                        BALANCE, String.valueOf(client.getBalance()), EMP_TIME, empTime, EMP_TIME_H, empTimeH, ADDRESS,
+                        event.getAddress(), SHORTNAMEINFOSERVICE, shortName, NAME, client.getPerson().getFirstName(),
+                        ACCOUNT, client.getContractId().toString(),  "TEST", "true"};
+            } else {
+                return new String[]{
+                        SURNAME, client.getPerson().getSurname(), PLACE_NAME, event.getOrgName(), EMP_DATE, empDate,
+                        BALANCE, String.valueOf(client.getBalance()), EMP_TIME, empTime, EMP_TIME_H, empTimeH, ADDRESS,
+                        event.getAddress(), SHORTNAMEINFOSERVICE, shortName, NAME, client.getPerson().getFirstName(),
+                        ACCOUNT, client.getContractId().toString()
+                };
+            }
+
         }
         if (event.getEvtType().equals(ExternalEventType.SPECIAL)) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY");
