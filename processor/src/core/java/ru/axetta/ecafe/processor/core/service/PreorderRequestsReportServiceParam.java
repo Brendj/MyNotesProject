@@ -47,6 +47,7 @@ public class PreorderRequestsReportServiceParam {
         if (!idOfClientList.isEmpty()) {
             return String.format(" and %s.idOfOrg in (select distinct c.org.idOfOrg from Client c where c.idOfClient in (%s)) ", alias, StringUtils.join(idOfClientList, ','));
         }
+        if (modBy != null && serversAmount != null) return String.format(" and mod(%s.idOfOrg, %s) = %s", alias, serversAmount, modBy);
         return "";
     }
 
