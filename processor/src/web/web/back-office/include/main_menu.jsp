@@ -1104,9 +1104,9 @@
                             binding="#{mainPage.electronicReconciliationStatisticsPage.mainMenuComponent}"
                             label="Статистика электронной сверки"
                             action="#{mainPage.showElectronicReconciliationStatisticsPage}" reRender="workspaceForm" />
-        <rich:panelMenuItem id="taloonApprovalPreorderVerificationMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
-                            binding="#{mainPage.taloonApprovalPreorderVerificationPage.mainMenuComponent}"
-                            label="Электронная сверка (предзаказ)" action="#{mainPage.showTaloonApprovalPreorderVerificationPage}"
+        <rich:panelMenuItem id="taloonPreorderVerificationMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
+                            binding="#{mainPage.taloonPreorderVerificationPage.mainMenuComponent}"
+                            label="Электронная сверка (предзаказ)" action="#{mainPage.showTaloonPreorderVerificationPage}"
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
 

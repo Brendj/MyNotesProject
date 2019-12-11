@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.TaloonApprovalPreorder" table="CF_Taloon_Approval_Preorder">
+    <class name="ru.axetta.ecafe.processor.core.persistence.TaloonPreorder" table="CF_Taloon_Preorder">
 
         <id name="idOfTaloonApproval" column="idOfTaloonApproval" type="long">
             <generator class="hilo">

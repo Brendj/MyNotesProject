@@ -2,7 +2,7 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.report.taloonApprovalPreorder;
+package ru.axetta.ecafe.processor.core.report.taloonPreorder;
 
 import ru.axetta.ecafe.processor.core.persistence.TaloonISPPStatesEnum;
 import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
@@ -19,7 +19,7 @@ import java.util.List;
 /**
  * Created by o.petrova on 09.12.2019.
  */
-public class TaloonApprovalPreorderVerificationItem {
+public class TaloonPreorderVerificationItem {
 
     public static final String MAKE_CONFIRM = "Согласие";
     public static final String MAKE_CANCEL = "Отказ";
@@ -28,9 +28,9 @@ public class TaloonApprovalPreorderVerificationItem {
     public static final String DAY_FORMAT = "dd.MM.yyyy";
 
     private Date taloonDate;
-    private final List<TaloonApprovalPreorderVerificationItemDetail> details = new ArrayList<>();
+    private final List<TaloonPreorderVerificationItemDetail> details = new ArrayList<>();
 
-    public TaloonApprovalPreorderVerificationItem() {
+    public TaloonPreorderVerificationItem() {
     }
 
     public Date getTaloonDate() {
@@ -41,14 +41,15 @@ public class TaloonApprovalPreorderVerificationItem {
         this.taloonDate = taloonDate;
     }
 
-    public List<TaloonApprovalPreorderVerificationItemDetail> getDetails() {
+    public List<TaloonPreorderVerificationItemDetail> getDetails() {
         return details;
     }
 
-    public static class TaloonApprovalPreorderVerificationItemDetail {
+    public static class TaloonPreorderVerificationItemDetail {
         private Long idOfOrg;
         private Long idOfOrgCreated;
         private Date taloonDate;
+        private Long complexId;
         private String complexName;
         private String goodsName;
         private String goodsGuid;
@@ -70,9 +71,9 @@ public class TaloonApprovalPreorderVerificationItem {
         private String remarks;
         private boolean summaryDay;
 
-        public TaloonApprovalPreorderVerificationItemDetail() {}
+        public TaloonPreorderVerificationItemDetail() {}
 
-        public TaloonApprovalPreorderVerificationItemDetail(Long idOfOrg, Long idOfOrgCreated, Date taloonDate,
+        public TaloonPreorderVerificationItemDetail(Long idOfOrg, Long idOfOrgCreated, Date taloonDate, Long complexId,
                 String complexName, String goodsName, String goodsGuid, Long price, Integer requestedQty,
                 Long requestedSum, Integer soldQty, Long soldSum, Integer shippedQty, Long shippedSum,
                 Integer reservedQty, Long reservedSum, Integer blockedQty, Long blockedSum, Integer differedQty, Long differedSum,
@@ -80,6 +81,7 @@ public class TaloonApprovalPreorderVerificationItem {
             this.idOfOrg = idOfOrg;
             this.idOfOrgCreated = idOfOrgCreated;
             this.taloonDate = taloonDate;
+            this.complexId = complexId;
             this.complexName = complexName;
             this.goodsName = goodsName;
             this.goodsGuid = goodsGuid;
@@ -286,6 +288,14 @@ public class TaloonApprovalPreorderVerificationItem {
             this.differedSum = differedSum;
         }
 
+        public Long getComplexId() {
+            return complexId;
+        }
+
+        public void setComplexId(Long complexId) {
+            this.complexId = complexId;
+        }
+
 
         public int getPeriod() {
             Date currentDate = new Date();
@@ -440,6 +450,21 @@ public class TaloonApprovalPreorderVerificationItem {
         public Boolean getRemarksEmpty() {
             return StringUtils.isEmpty(remarks);
         }
-    }
 
+        public void addAndGet(TaloonPreorderVerificationItemDetail arg) {
+            this.setRequestedQty(this.getRequestedQty() + arg.getRequestedQty());
+            this.setRequestedSum(this.getRequestedSum() + arg.getRequestedSum());
+            this.setSoldQty(this.getSoldQty() + arg.getSoldQty());
+            this.setSoldSum(this.getSoldSum() + arg.getSoldSum());
+            this.setShippedQty(this.getShippedQty() + arg.getShippedQty());
+            this.setShippedSum(this.getShippedSum() + arg.getShippedSum());
+            this.setReservedQty(this.getReservedQty() + arg.getReservedQty());
+            this.setReservedSum(this.getReservedSum() + arg.getReservedSum());
+            this.setBlockedQty(this.getBlockedQty() + arg.getBlockedQty());
+            this.setBlockedSum(this.getBlockedSum() + arg.getBlockedSum());
+            this.setDifferedQty(this.getDifferedQty() + arg.getDifferedQty());
+            this.setDifferedSum(this.getDifferedSum() + arg.getDifferedSum());
+        }
+
+    }
 }

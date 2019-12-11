@@ -24,20 +24,20 @@
     }
 </script>
 
-<h:panelGrid id="taloonApprovalPreorderVerificationPanelGrid" binding="#{mainPage.taloonApprovalPreorderVerificationPage.pageComponent}"
+<h:panelGrid id="taloonPreorderVerificationPanelGrid" binding="#{mainPage.taloonPreorderVerificationPage.pageComponent}"
              styleClass="borderless-grid">
-    <rich:modalPanel id="taloonApprovalPreorderMessagePanel" autosized="true" minWidth="400">
+    <rich:modalPanel id="taloonPreorderMessagePanel" autosized="true" minWidth="400">
         <f:facet name="header">
             <h:outputText value="История изменений записи" />
         </f:facet>
-        <h:inputTextarea value="#{mainPage.taloonApprovalPreorderVerificationPage.remarksToShow}" cols="80" rows="10" id="ta_remarks_toshow" readonly="true" />
+        <h:inputTextarea value="#{mainPage.taloonPreorderVerificationPage.remarksToShow}" cols="80" rows="10" id="ta_remarks_toshow" readonly="true" />
         <rich:spacer height="20px" />
-        <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('taloonApprovalPreorderMessagePanel')" style="width: 180px;" ajaxSingle="true" />
+        <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('taloonPreorderMessagePanel')" style="width: 180px;" ajaxSingle="true" />
     </rich:modalPanel>
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <h:panelGroup styleClass="borderless-div">
-            <h:inputText value="#{mainPage.taloonApprovalPreorderVerificationPage.filter}" readonly="true" styleClass="input-text long-field"
+            <h:inputText value="#{mainPage.taloonPreorderVerificationPage.filter}" readonly="true" styleClass="input-text long-field"
                          style="margin-right: 2px;" />
             <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}" reRender="modalOrgSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
@@ -45,14 +45,14 @@
         </h:panelGroup>
 
         <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
-        <rich:calendar value="#{mainPage.taloonApprovalPreorderVerificationPage.startDate}" datePattern="dd.MM.yyyy"
+        <rich:calendar value="#{mainPage.taloonPreorderVerificationPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDateCalendar"
                          actionListener="#{mainPage.totalSalesPage.onReportPeriodChanged}" />
         </rich:calendar>
 
         <h:outputText escape="true" value="Конечная дата" styleClass="output-text" />
-        <rich:calendar id="endDateCalendar" value="#{mainPage.taloonApprovalPreorderVerificationPage.endDate}" datePattern="dd.MM.yyyy"
+        <rich:calendar id="endDateCalendar" value="#{mainPage.taloonPreorderVerificationPage.endDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false">
             <a4j:support event="onchanged" reRender="endDatePeriodSelect"
                          actionListener="#{mainPage.totalSalesPage.onEndDateSpecified}" />
@@ -60,8 +60,8 @@
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="1">
-        <a4j:commandButton value="Обновить" action="#{mainPage.taloonApprovalPreorderVerificationPage.reload}"
-                           reRender="taloonApprovalPreorderVerificationPanelGrid" styleClass="command-button"
+        <a4j:commandButton value="Обновить" action="#{mainPage.taloonPreorderVerificationPage.reload}"
+                           reRender="taloonPreorderVerificationPanelGrid" styleClass="command-button"
                            status="reportGenerateStatus" id="reloadButton" />
     </h:panelGrid>
     <a4j:status id="reportGenerateStatus">
@@ -70,7 +70,7 @@
         </f:facet>
     </a4j:status>
 
-    <rich:dataTable id="taloonApprovalPreorderVerificationTable" value="#{mainPage.taloonApprovalPreorderVerificationPage.items}" var="item" rows="25"
+    <rich:dataTable id="taloonPreorderVerificationTable" value="#{mainPage.taloonPreorderVerificationPage.items}" var="item" rows="25"
                     footerClass="data-table-footer">
         <f:facet name="header">
             <rich:columnGroup>
@@ -215,51 +215,51 @@
 <%--        Статус ПП--%>
             <rich:column headerClass="column-header">
 <%--            Изменить статус записи--%>
-                <a4j:commandLink reRender="taloonApprovalPreorderVerificationTable" rendered="#{detail.ppStateNotSelected}"
-                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.switchPpState()}" style="color:lightgray;">
+                <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateNotSelected}"
+                                 action="#{mainPage.taloonPreorderVerificationPage.switchPpState()}" style="color:lightgray;">
 <%--                                 onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
-                    <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentTaloonApprovalPreorderVerificationItemDetail}" />
-                    <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentState}" />
+                    <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItemDetail}" />
+                    <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonPreorderVerificationPage.currentState}" />
                     <h:graphicImage value="/images/taloons/applied-gray.png" />
                 </a4j:commandLink>
 
-                <a4j:commandLink reRender="taloonApprovalPreorderVerificationTable" rendered="#{detail.ppStateNotSelected}"
-                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.switchPpState()}" style="color:lightgray;">
+                <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateNotSelected}"
+                                 action="#{mainPage.taloonPreorderVerificationPage.switchPpState()}" style="color:lightgray;">
 <%--                        oncomplete="if (#{detail.needFillShippedQty()}) { alert('Заполните отгрузку ПП'); }"--%>
 <%--                                 onclick="if (#{!detail.allowedSetSecondFlag()}) { alert('Операция запрещена'); return false; }"--%>
-                    <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentTaloonApprovalPreorderVerificationItemDetail}" />
-                    <f:setPropertyActionListener value="#{detail.ppStateToTurnOnSecond}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentState}" />
+                    <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItemDetail}" />
+                    <f:setPropertyActionListener value="#{detail.ppStateToTurnOnSecond}" target="#{mainPage.taloonPreorderVerificationPage.currentState}" />
                     <h:graphicImage value="/images/taloons/canceled-gray.png" />
                 </a4j:commandLink>
 
-                <a4j:commandLink reRender="taloonApprovalPreorderVerificationTable" rendered="#{detail.ppStateCanceled}"
-                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.resetPpState()}">
+                <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateCanceled}"
+                                 action="#{mainPage.taloonPreorderVerificationPage.resetPpState()}">
 <%--                                 onclick="if (#{!detail.allowedClearSecondFlag()}) { alert('Операция запрещена'); return false; }">--%>
-                    <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentTaloonApprovalPreorderVerificationItemDetail}" />
-                    <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentState}" />
+                    <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItemDetail}" />
+                    <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonPreorderVerificationPage.currentState}" />
                     <h:graphicImage value="/images/taloons/canceled.png" />
                 </a4j:commandLink>
 
-                <a4j:commandLink reRender="taloonApprovalPreorderVerificationTable" rendered="#{detail.ppStateConfirmed}"
-                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.resetPpState()}">
+                <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateConfirmed}"
+                                 action="#{mainPage.taloonPreorderVerificationPage.resetPpState()}">
 <%--                                 onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
-                    <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentTaloonApprovalPreorderVerificationItemDetail}" />
-                    <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentState}" />
+                    <f:setPropertyActionListener value="#{detail}" target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItemDetail}" />
+                    <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}" target="#{mainPage.taloonPreorderVerificationPage.currentState}" />
                     <h:graphicImage value="/images/taloons/applied.png" />
                 </a4j:commandLink>
 
 <%--            Подтвердить для всего дня--%>
-                <a4j:commandLink reRender="taloonApprovalPreorderVerificationTable" rendered="#{detail.ppStateNull}"
-                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.confirmPpStateAllDay()}" >
+                <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateNull}"
+                                 action="#{mainPage.taloonPreorderVerificationPage.confirmPpStateAllDay()}" >
 <%--                                 onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
-                    <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentTaloonApprovalPreorderVerificationItem}" />
+                    <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItem}" />
                     <h:graphicImage value="/images/taloons/applied-big.png" />
                 </a4j:commandLink>
 <%--            Отменить выбор для всего дня-- ppStateNull--%>
-                <a4j:commandLink reRender="taloonApprovalPreorderVerificationTable" rendered="#{detail.ppStateNull}"
-                                 action="#{mainPage.taloonApprovalPreorderVerificationPage.deselectPpStateAllDay()}" style="color:lightgray;">
+                <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateNull}"
+                                 action="#{mainPage.taloonPreorderVerificationPage.deselectPpStateAllDay()}" style="color:lightgray;">
 <%--                                 onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
-                    <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonApprovalPreorderVerificationPage.currentTaloonApprovalPreorderVerificationItem}" />
+                    <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItem}" />
                     <h:graphicImage value="/images/taloons/applied-big-gray.png" />
                 </a4j:commandLink>
             </rich:column>
@@ -275,15 +275,15 @@
             </rich:column>
 <%--        История изменений--%>
             <rich:column>
-                <a4j:commandButton value="..." reRender="taloonApprovalPreorderVerificationTable,ta_remarks_toshow" rendered="#{!detail.remarksEmpty}" ajaxSingle="true"
-                                   title="#{detail.remarks}" oncomplete="Richfaces.showModalPanel('taloonApprovalPreorderMessagePanel');">
-                    <f:setPropertyActionListener value="#{detail.remarks}" target="#{mainPage.taloonApprovalPreorderVerificationPage.remarksToShow}" />
+                <a4j:commandButton value="..." reRender="taloonPreorderVerificationTable,ta_remarks_toshow" rendered="#{!detail.remarksEmpty}" ajaxSingle="true"
+                                   title="#{detail.remarks}" oncomplete="Richfaces.showModalPanel('taloonPreorderMessagePanel');">
+                    <f:setPropertyActionListener value="#{detail.remarks}" target="#{mainPage.taloonPreorderVerificationPage.remarksToShow}" />
                 </a4j:commandButton>
             </rich:column>
         </rich:subTable>
 
         <f:facet name="footer">
-            <rich:datascroller for="taloonApprovalPreorderVerificationTable" renderIfSinglePage="false"
+            <rich:datascroller for="taloonPreorderVerificationTable" renderIfSinglePage="false"
                                maxPages="5" fastControls="hide" stepControls="auto"
                                boundaryControls="hide">
                 <a4j:support event="onpagechange" />
@@ -298,8 +298,8 @@
     </rich:dataTable>
 
     <h:panelGrid styleClass="borderless-grid" columns="1">
-        <a4j:commandButton value="Подтвердить" action="#{mainPage.taloonApprovalPreorderVerificationPage.apply}"
-                           reRender="taloonApprovalPreorderVerificationTable" styleClass="command-button"
+        <a4j:commandButton value="Подтвердить" action="#{mainPage.taloonPreorderVerificationPage.apply}"
+                           reRender="taloonPreorderVerificationTable" styleClass="command-button"
                            status="reportGenerateStatus" id="applyButton" />
     </h:panelGrid>
 

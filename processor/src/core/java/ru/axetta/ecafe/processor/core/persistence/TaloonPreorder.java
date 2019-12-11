@@ -13,11 +13,12 @@ import java.util.Date;
  * Time: 14:01
  * To change this template use File | Settings | File Templates.
  */
-public class TaloonApprovalPreorder {
+public class TaloonPreorder {
 
-    private Long idOfTaloonApproval;
+    private Long idOfTaloon;
     private Long idOfOrg;
     private Date taloonDate;
+    private Long complexId;
     private String complexName;
     private String goodsName;
     private String goodsGuid;
@@ -38,16 +39,17 @@ public class TaloonApprovalPreorder {
     private Boolean deletedState;
     private String remarks;
 
-    public TaloonApprovalPreorder() {
+    public TaloonPreorder() {
         //for Hibernate only
     }
 
-    public TaloonApprovalPreorder(Long idOfOrg, Date taloonDate, String complexName,
+    public TaloonPreorder(Long idOfOrg, Date taloonDate, Long complexId, String complexName,
             String goodsName, String goodsGuid, Long idOfOrgCreated, Integer soldQty, Integer requestedQty,
             Integer shippedQty, Integer reservedQty, Integer blockedQty, Long price, TaloonCreatedTypeEnum createdType,
             TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState) {
         this.idOfOrg = idOfOrg;
         this.taloonDate = taloonDate;
+        this.complexId = complexId;
         this.complexName = complexName;
         this.goodsName = goodsName;
         this.goodsGuid = goodsGuid;
@@ -111,12 +113,12 @@ public class TaloonApprovalPreorder {
         this.createdType = createdType;
     }
 
-    public Long getIdOfTaloonApproval() {
-        return idOfTaloonApproval;
+    public Long getIdOfTaloon() {
+        return idOfTaloon;
     }
 
-    public void setIdOfTaloonApproval(Long idOfTaloonApproval) {
-        this.idOfTaloonApproval = idOfTaloonApproval;
+    public void setIdOfTaloon(Long idOfTaloon) {
+        this.idOfTaloon = idOfTaloon;
     }
 
     public Long getIdOfOrg() {
@@ -239,21 +241,29 @@ public class TaloonApprovalPreorder {
         this.remarks = remarks;
     }
 
+    public Long getComplexId() {
+        return complexId;
+    }
+
+    public void setComplexId(Long complexId) {
+        this.complexId = complexId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (!(o instanceof TaloonApprovalPreorder)) {
+        if (!(o instanceof TaloonPreorder)) {
             return false;
         }
-        final TaloonApprovalPreorder taloonApprovalPreorder = (TaloonApprovalPreorder) o;
-        return idOfTaloonApproval.equals(taloonApprovalPreorder.getIdOfTaloonApproval());
+        final TaloonPreorder taloonPreorder = (TaloonPreorder) o;
+        return idOfTaloon.equals(taloonPreorder.getIdOfTaloon());
     }
 
     @Override
     public String toString() {
-        return "TaloonApproval{" + "idOfTaloonApproval=" + idOfTaloonApproval + ", idOfOrg=" + idOfOrg + ", complexName=" + complexName
+        return "TaloonPreorder{" + "idOfTaloon=" + idOfTaloon + ", idOfOrg=" + idOfOrg + ", complexId=" + complexId + ", complexName=" + complexName
                 + ", taloonDate=" + taloonDate + ", goodsGuid=" + goodsGuid + ", org=" + org + ", soldQty=" + soldQty
                 + ", requestedQty=" + requestedQty + ", shippedQty=" + shippedQty + ", reservedQty=" + reservedQty
                 + ", blockedQty=" + blockedQty + ", ispp_state=" + isppState + ", pp_state=" + ppState

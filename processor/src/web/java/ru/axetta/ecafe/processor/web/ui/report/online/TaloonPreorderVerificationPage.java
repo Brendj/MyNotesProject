@@ -7,8 +7,8 @@ package ru.axetta.ecafe.processor.web.ui.report.online;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
-import ru.axetta.ecafe.processor.core.report.taloonApprovalPreorder.TaloonApprovalPreorderVerification;
-import ru.axetta.ecafe.processor.core.report.taloonApprovalPreorder.TaloonApprovalPreorderVerificationItem;
+import ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerification;
+import ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -31,29 +31,29 @@ import java.util.List;
  */
 @Component
 @Scope("session")
-public class TaloonApprovalPreorderVerificationPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler {
+public class TaloonPreorderVerificationPage extends BasicWorkspacePage implements OrgSelectPage.CompleteHandler {
 
     private Long idOfOrg;
     private String filter = "Не выбрано";
-    private List<TaloonApprovalPreorderVerificationItem> items;
+    private List<TaloonPreorderVerificationItem> items;
     private Date startDate;
     private Date endDate;
-    private TaloonApprovalPreorderVerification builder;
-    private TaloonApprovalPreorderVerificationItem.TaloonApprovalPreorderVerificationItemDetail currentTaloonApprovalPreorderVerificationItemDetail;
-    private TaloonApprovalPreorderVerificationItem currentTaloonApprovalPreorderVerificationItem;
+    private TaloonPreorderVerification builder;
+    private TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail currentTaloonPreorderVerificationItemDetail;
+    private TaloonPreorderVerificationItem currentTaloonPreorderVerificationItem;
     private String currentState;
     private String remarksToShow;
 
-    private static final Logger logger = LoggerFactory.getLogger(TaloonApprovalPreorderVerificationPage.class);
+    private static final Logger logger = LoggerFactory.getLogger(TaloonPreorderVerificationPage.class);
 
     @Override
     public String getPageFilename() {
-        return "report/online/taloon_approval_preorder_verification";
+        return "report/online/taloon_preorder_verification";
     }
 
-    public TaloonApprovalPreorderVerificationPage() {
+    public TaloonPreorderVerificationPage() {
         super();
-        builder = new TaloonApprovalPreorderVerification();
+        builder = new TaloonPreorderVerification();
     }
 
     public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
@@ -107,9 +107,9 @@ public class TaloonApprovalPreorderVerificationPage extends BasicWorkspacePage i
     }
 
     public void resetPpState() {
-        for (TaloonApprovalPreorderVerificationItem item : items) {
-            for (TaloonApprovalPreorderVerificationItem.TaloonApprovalPreorderVerificationItemDetail detail : item.getDetails()) {
-                if (detail.equals(currentTaloonApprovalPreorderVerificationItemDetail)) {
+        for (TaloonPreorderVerificationItem item : items) {
+            for (TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail detail : item.getDetails()) {
+                if (detail.equals(currentTaloonPreorderVerificationItemDetail)) {
                     detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
                     break;
                 }
@@ -118,14 +118,16 @@ public class TaloonApprovalPreorderVerificationPage extends BasicWorkspacePage i
     }
 
     public void switchPpState() {
-        for (TaloonApprovalPreorderVerificationItem item : items) {
-            for (TaloonApprovalPreorderVerificationItem.TaloonApprovalPreorderVerificationItemDetail detail : item.getDetails()) {
-                if (detail.equals(currentTaloonApprovalPreorderVerificationItemDetail)) {
-                    if (currentState.equals(TaloonApprovalPreorderVerificationItem.MAKE_CANCEL) //&& !detail.needFillShippedQty()
+        for (TaloonPreorderVerificationItem item : items) {
+            for (TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail detail : item.getDetails()) {
+                if (detail.equals(currentTaloonPreorderVerificationItemDetail)) {
+                    if (currentState.equals(
+                            ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CANCEL) //&& !detail.needFillShippedQty()
                     ) {
                         detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
                     }
-                    if (currentState.equals(TaloonApprovalPreorderVerificationItem.MAKE_CONFIRM)) {
+                    if (currentState.equals(
+                            ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CONFIRM)) {
                         detail.performConfirm();
                     }
                     break;
@@ -143,9 +145,9 @@ public class TaloonApprovalPreorderVerificationPage extends BasicWorkspacePage i
     }
 
     public void changePpStateAllDay(TaloonPPStatesEnum state) {
-        for (TaloonApprovalPreorderVerificationItem item : items) {
-            if (item.equals(currentTaloonApprovalPreorderVerificationItem)) {
-                for (TaloonApprovalPreorderVerificationItem.TaloonApprovalPreorderVerificationItemDetail detail : item.getDetails()) {
+        for (TaloonPreorderVerificationItem item : items) {
+            if (item.equals(currentTaloonPreorderVerificationItem)) {
+                for (TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail detail : item.getDetails()) {
                     if (detail.getPpState() != null) {
                         if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED // && detail.allowedSetFirstFlag()
                         )
@@ -173,11 +175,11 @@ public class TaloonApprovalPreorderVerificationPage extends BasicWorkspacePage i
         this.idOfOrg = idOfOrg;
     }
 
-    public List<TaloonApprovalPreorderVerificationItem> getItems() {
+    public List<TaloonPreorderVerificationItem> getItems() {
         return items;
     }
 
-    public void setItems(List<TaloonApprovalPreorderVerificationItem> items) {
+    public void setItems(List<TaloonPreorderVerificationItem> items) {
         this.items = items;
     }
 
@@ -198,13 +200,13 @@ public class TaloonApprovalPreorderVerificationPage extends BasicWorkspacePage i
     }
 
 
-    public TaloonApprovalPreorderVerificationItem.TaloonApprovalPreorderVerificationItemDetail getCurrentTaloonApprovalPreorderVerificationItemDetail() {
-        return currentTaloonApprovalPreorderVerificationItemDetail;
+    public TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail getCurrentTaloonPreorderVerificationItemDetail() {
+        return currentTaloonPreorderVerificationItemDetail;
     }
 
-    public void setCurrentTaloonApprovalPreorderVerificationItemDetail(
-            TaloonApprovalPreorderVerificationItem.TaloonApprovalPreorderVerificationItemDetail currentTaloonApprovalPreorderVerificationItemDetail) {
-        this.currentTaloonApprovalPreorderVerificationItemDetail = currentTaloonApprovalPreorderVerificationItemDetail;
+    public void setCurrentTaloonPreorderVerificationItemDetail(
+            TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail currentTaloonPreorderVerificationItemDetail) {
+        this.currentTaloonPreorderVerificationItemDetail = currentTaloonPreorderVerificationItemDetail;
     }
 
     public String getCurrentState() {
@@ -215,13 +217,13 @@ public class TaloonApprovalPreorderVerificationPage extends BasicWorkspacePage i
         this.currentState = currentState;
     }
 
-    public TaloonApprovalPreorderVerificationItem getCurrentTaloonApprovalPreorderVerificationItem() {
-        return currentTaloonApprovalPreorderVerificationItem;
+    public TaloonPreorderVerificationItem getCurrentTaloonPreorderVerificationItem() {
+        return currentTaloonPreorderVerificationItem;
     }
 
-    public void setCurrentTaloonApprovalPreorderVerificationItem(
-            TaloonApprovalPreorderVerificationItem currentTaloonApprovalPreorderVerificationItem) {
-        this.currentTaloonApprovalPreorderVerificationItem = currentTaloonApprovalPreorderVerificationItem;
+    public void setCurrentTaloonPreorderVerificationItem(
+            TaloonPreorderVerificationItem currentTaloonPreorderVerificationItem) {
+        this.currentTaloonPreorderVerificationItem = currentTaloonPreorderVerificationItem;
     }
 
     public String getRemarksToShow() {

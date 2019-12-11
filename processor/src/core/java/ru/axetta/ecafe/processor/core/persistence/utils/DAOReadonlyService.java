@@ -345,23 +345,20 @@ public class DAOReadonlyService {
         }
     }
 
-    public TaloonApprovalPreorder findTaloonApprovalPreorder(Long idOfOrg, Date taloonDate, String complexName,
-            String goodsName, String goodsGuid, Long price) {
+    public TaloonPreorder findTaloonPreorder(Long idOfOrg, Date taloonDate, Long complexId, String goodsGuid, Long price) {
         try {
-            Query query = entityManager.createQuery("SELECT taloon from TaloonApprovalPreorder taloon "
+            Query query = entityManager.createQuery("SELECT taloon from TaloonPreorder taloon "
                     + "where taloon.idOfOrg = :idOfOrg "
                     + "and taloon.taloonDate = :taloonDate "
-                    + "and taloon.taloonName = :complexName "
-                    + "and taloon.goodsName = :goodsName "
+                    + "and taloon.complexId = :complexId "
                     + "and taloon.price = :price "
                     + "and taloon.goodsGuid = :goodsGuid");
             query.setParameter("idOfOrg", idOfOrg);
             query.setParameter("taloonDate", taloonDate);
-            query.setParameter("complexName", complexName);
-            query.setParameter("goodsName", goodsName);
+            query.setParameter("complexId", complexId);
             query.setParameter("price", price);
             query.setParameter("goodsGuid", goodsGuid);
-            return (TaloonApprovalPreorder)query.getSingleResult();
+            return (TaloonPreorder)query.getSingleResult();
         } catch (Exception e) {
             return null;
         }

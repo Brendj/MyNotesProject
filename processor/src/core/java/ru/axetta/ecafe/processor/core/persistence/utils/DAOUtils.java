@@ -2661,6 +2661,16 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByTaloonPreorder(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery("select t.version from cf_taloon_preorder as t order by t.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
     public static long nextVersionByComplexSchedule(Session session){
         long version = 0L;
         Query query = session.createSQLQuery("select s.version from cf_complex_schedules as s order by s.version desc limit 1 for update");
