@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -2226,6 +2226,13 @@ public class DAOUtils {
     public static void falseFullSyncByOrg(Session session, Long idOfOrg) {
         Query query = session.createQuery("update Org set fullSyncParam=0 where id=:idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
+        query.executeUpdate();
+    }
+
+    public static void savePreorderDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
+        Query query = session.createQuery("update Org set preorderSyncParam = :value where id = :idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
         query.executeUpdate();
     }
 
