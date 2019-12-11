@@ -540,6 +540,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
                 currentSetting.setLimitStartHour(editedSetting.getLimitStartHour());
                 currentSetting.setLimitEndHour(editedSetting.getLimitEndHour());
                 currentSetting.setDeleteState(!settingEnable);
+                currentSetting.setOrg(selectedItem.getOrg());
 
                 selectedItem.setIsChange(true);
                 selectedItem.rebuildSyncInfo(modalSelectedContentType, currentSetting);
