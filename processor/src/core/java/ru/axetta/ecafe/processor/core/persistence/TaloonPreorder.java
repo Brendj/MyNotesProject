@@ -15,7 +15,7 @@ import java.util.Date;
  */
 public class TaloonPreorder {
 
-    private Long idOfTaloon;
+    private Long idOfTaloonPreorder;
     private Long idOfOrg;
     private Date taloonDate;
     private Long complexId;
@@ -113,12 +113,12 @@ public class TaloonPreorder {
         this.createdType = createdType;
     }
 
-    public Long getIdOfTaloon() {
-        return idOfTaloon;
+    public Long getIdOfTaloonPreorder() {
+        return idOfTaloonPreorder;
     }
 
-    public void setIdOfTaloon(Long idOfTaloon) {
-        this.idOfTaloon = idOfTaloon;
+    public void setIdOfTaloonPreorder(Long idOfTaloonPreorder) {
+        this.idOfTaloonPreorder = idOfTaloonPreorder;
     }
 
     public Long getIdOfOrg() {
@@ -258,12 +258,12 @@ public class TaloonPreorder {
             return false;
         }
         final TaloonPreorder taloonPreorder = (TaloonPreorder) o;
-        return idOfTaloon.equals(taloonPreorder.getIdOfTaloon());
+        return idOfTaloonPreorder.equals(taloonPreorder.getIdOfTaloonPreorder());
     }
 
     @Override
     public String toString() {
-        return "TaloonPreorder{" + "idOfTaloon=" + idOfTaloon + ", idOfOrg=" + idOfOrg + ", complexId=" + complexId + ", complexName=" + complexName
+        return "TaloonPreorder{" + "idOfTaloon=" + idOfTaloonPreorder + ", idOfOrg=" + idOfOrg + ", complexId=" + complexId + ", complexName=" + complexName
                 + ", taloonDate=" + taloonDate + ", goodsGuid=" + goodsGuid + ", org=" + org + ", soldQty=" + soldQty
                 + ", requestedQty=" + requestedQty + ", shippedQty=" + shippedQty + ", reservedQty=" + reservedQty
                 + ", blockedQty=" + blockedQty + ", ispp_state=" + isppState + ", pp_state=" + ppState
