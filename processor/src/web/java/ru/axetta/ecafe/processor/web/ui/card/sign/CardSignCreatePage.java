@@ -77,6 +77,7 @@ public class CardSignCreatePage extends CardSignDataBasicPage {
             cardSign.setManufacturerCode(getManufacturerCode());
             cardSign.setManufacturerName(getManufacturerName());
 
+            //type = 1 только у поставщиков нового типа
             if (type == 1) {
                 cardSign.setSignData(publicKey.getEncoded());
                 cardSign.setPublickeyprovider(signData);

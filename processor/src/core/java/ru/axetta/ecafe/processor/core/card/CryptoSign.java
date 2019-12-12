@@ -64,8 +64,6 @@ public class CryptoSign {
     public static List<ResponseCardSign> createSignforCard(List<RequestCardForSign> cards, CardSign cardSign)
             throws Exception {
         List<ResponseCardSign> responseCardSigns = new ArrayList<ResponseCardSign>();
-        //Достаем приватный ключ для подписи
-        PrivateKey pk = loadPrivKey(cardSign.getPrivatekeycard());
         boolean sucsess;
         for (RequestCardForSign card : cards) {
             sucsess = true;
@@ -108,10 +106,13 @@ public class CryptoSign {
 
                     //Если тип карты поддерживает данный более 128 байт
                     if (card.getMemSize() == 1) {
+                        //Достаем приватный ключ для подписи
+                        PrivateKey pk = loadPrivKey(cardSign.getPrivatekeycard(), true);
                         //Подписывание
                         sign = CryptoSign.sign(card_data, pk);
                     } else {
                         if (card.getMemSize() == 2) {
+                            PrivateKey pk = loadPrivKey(cardSign.getPrivatekeycard(), false);
                             sign = SCrypt.generate(pk.getEncoded(), card_data, //данные карты используем как "соль"
                                     16384, 8, 1, 20);
                         } else {
@@ -217,7 +218,7 @@ public class CryptoSign {
 
     private static boolean verifySCRIPT(byte[] dateCards, byte[] sign, CardSign cardSign) throws Exception {
 
-        byte[] varsign = SCrypt.generate(loadPrivKey(cardSign.getPublickeyprovider()).getEncoded(), dateCards,
+        byte[] varsign = SCrypt.generate(loadPrivKey(cardSign.getPublickeyprovider(), true).getEncoded(), dateCards,
                 //данные карты используем как "соль"
                 16384, 8, 1, 20);
         return Arrays.equals(varsign, sign);
@@ -226,9 +227,8 @@ public class CryptoSign {
     public static PublicKey loadPubKey(byte[] data) throws Exception {
         List<String> arrayKey = Arrays.asList(StringUtils.split(new String(data), '\n'));
         String rezult = "";
-        for (int i=1; i<arrayKey.size()-1;i++)
-        {
-            rezult+=arrayKey.get(i) + "\n";
+        for (int i = 1; i < arrayKey.size() - 1; i++) {
+            rezult += arrayKey.get(i) + "\n";
         }
         rezult = rezult.substring(0, rezult.length() - 1);
         byte[] newFormatData = DatatypeConverter.parseBase64Binary(rezult);
@@ -237,8 +237,17 @@ public class CryptoSign {
         return key_f.generatePublic(ks);
     }
 
-    public static PrivateKey loadPrivKey(byte[] data) throws Exception {
-        KeySpec ks = new PKCS8EncodedKeySpec(data);
+    public static PrivateKey loadPrivKey(byte[] data, boolean usedFullKey) throws Exception {
+        KeySpec ks;
+        if (usedFullKey || data.length < 65) {
+            ks = new PKCS8EncodedKeySpec(data);
+        }
+        else
+        {
+            byte[] privKeyCard = new byte[64];
+            System.arraycopy(data, 0, privKeyCard, 0, 64);
+            ks = new PKCS8EncodedKeySpec(privKeyCard);
+        }
         KeyFactory key_f = KeyFactory.getInstance(KEY_FACTOR);
         PrivateKey res = key_f.generatePrivate(ks);
         return res;
