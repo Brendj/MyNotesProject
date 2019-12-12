@@ -29,7 +29,7 @@ CREATE TABLE cf_taloon_preorder
     pp_state integer NOT NULL DEFAULT 0,
     idoftaloonpreorder bigint NOT NULL,
     remarks text,
-    CONSTRAINT cf_taloon_preoredr_pk PRIMARY KEY (idoftaloonpreorder)
+    CONSTRAINT cf_taloon_preorder_pk PRIMARY KEY (idoftaloonpreorder)
 )
     WITH (
         OIDS=FALSE

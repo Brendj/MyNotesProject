@@ -96,8 +96,8 @@ public class TaloonPreorderVerificationItem {
             this.reservedSum = reservedSum;
             this.blockedQty = blockedQty;
             this.blockedSum = blockedSum;
-            this.blockedQty = differedQty;
-            this.blockedSum = differedSum;
+            this.differedQty = differedQty;
+            this.differedSum = differedSum;
             this.isppState = isppState;
             this.ppState = ppState;
             this.remarks = remarks;
@@ -451,7 +451,7 @@ public class TaloonPreorderVerificationItem {
             return StringUtils.isEmpty(remarks);
         }
 
-        public void addAndGet(TaloonPreorderVerificationItemDetail arg) {
+        public void addQtyAndGet(TaloonPreorderVerificationItemDetail arg) {
             this.setRequestedQty(this.getRequestedQty() + arg.getRequestedQty());
             this.setRequestedSum(this.getRequestedSum() + arg.getRequestedSum());
             this.setSoldQty(this.getSoldQty() + arg.getSoldQty());

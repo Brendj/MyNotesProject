@@ -249,6 +249,7 @@ public class TaloonPreorder {
         this.complexId = complexId;
     }
 
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -263,7 +264,7 @@ public class TaloonPreorder {
 
     @Override
     public String toString() {
-        return "TaloonPreorder{" + "idOfTaloon=" + idOfTaloonPreorder + ", idOfOrg=" + idOfOrg + ", complexId=" + complexId + ", complexName=" + complexName
+        return "TaloonPreorder{" + "idOfTaloonPreorder=" + idOfTaloonPreorder + ", idOfOrg=" + idOfOrg + ", complexId=" + complexId + ", complexName=" + complexName
                 + ", taloonDate=" + taloonDate + ", goodsGuid=" + goodsGuid + ", org=" + org + ", soldQty=" + soldQty
                 + ", requestedQty=" + requestedQty + ", shippedQty=" + shippedQty + ", reservedQty=" + reservedQty
                 + ", blockedQty=" + blockedQty + ", ispp_state=" + isppState + ", pp_state=" + ppState

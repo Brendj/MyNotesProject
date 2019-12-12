@@ -50,7 +50,7 @@ public class TaloonPreorderVerification {
 
             TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail detailSum =
                     new TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail(
-                            null, null, d, null, "Всего", null,
+                            null, null, d, null, null, "Всего",
                             null, null, 0, 0L, 0, 0L,
                             0, 0L, 0, 0L, 0, 0L,
                             0, 0L, null, null, null, true);
@@ -93,7 +93,7 @@ public class TaloonPreorderVerification {
                                 taloon.getRemarks(),
                                 false);
 
-                detailSum.addAndGet(detail);
+                detailSum.addQtyAndGet(detail);
                 item.getDetails().add(detail);
 
                 if (!summaryMap.containsKey(detail.getComplexId() + detail.getGoodsGuid())) {
@@ -109,7 +109,7 @@ public class TaloonPreorderVerification {
                                             null, null, null,
                                             true));
                 } else {
-                    summaryMap.get(taloon.getComplexId() + taloon.getGoodsGuid()).addAndGet(detail);
+                    summaryMap.get(taloon.getComplexId() + taloon.getGoodsGuid()).addQtyAndGet(detail);
                 }
             }
             item.getDetails().add(detailSum);

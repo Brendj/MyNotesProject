@@ -16,6 +16,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
 <%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
+<%@ taglib prefix="ui" uri="http://richfaces.org/a4j" %>
 <script language="javascript">
     function disableButtons(value) {
         document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:generateButton").disabled=value;
@@ -26,14 +27,16 @@
 
 <h:panelGrid id="taloonPreorderVerificationPanelGrid" binding="#{mainPage.taloonPreorderVerificationPage.pageComponent}"
              styleClass="borderless-grid">
+
     <rich:modalPanel id="taloonPreorderMessagePanel" autosized="true" minWidth="400">
         <f:facet name="header">
             <h:outputText value="История изменений записи" />
         </f:facet>
-        <h:inputTextarea value="#{mainPage.taloonPreorderVerificationPage.remarksToShow}" cols="80" rows="10" id="ta_remarks_toshow" readonly="true" />
+        <h:inputTextarea value="#{mainPage.taloonPreorderVerificationPage.remarksToShow}" cols="80" rows="10" id="tp_remarks_toshow" readonly="true" />
         <rich:spacer height="20px" />
         <a4j:commandButton value="Закрыть" onclick="Richfaces.hideModalPanel('taloonPreorderMessagePanel')" style="width: 180px;" ajaxSingle="true" />
     </rich:modalPanel>
+<%--    Панель фильтров--%>
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <h:panelGroup styleClass="borderless-div">
@@ -43,7 +46,6 @@
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" />
         </h:panelGroup>
-
         <h:outputText escape="true" value="Начальная дата" styleClass="output-text" />
         <rich:calendar value="#{mainPage.taloonPreorderVerificationPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false">
@@ -58,12 +60,12 @@
                          actionListener="#{mainPage.totalSalesPage.onEndDateSpecified}" />
         </rich:calendar>
     </h:panelGrid>
-
     <h:panelGrid styleClass="borderless-grid" columns="1">
         <a4j:commandButton value="Обновить" action="#{mainPage.taloonPreorderVerificationPage.reload}"
                            reRender="taloonPreorderVerificationPanelGrid" styleClass="command-button"
                            status="reportGenerateStatus" id="reloadButton" />
     </h:panelGrid>
+
     <a4j:status id="reportGenerateStatus">
         <f:facet name="start">
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
@@ -77,7 +79,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Дата" />
                 </rich:column>
-                <rich:column headerClass="column-header">
+                <rich:column headerClass="column-header" colspan="2">
                     <h:outputText escape="true" value="Рацион" />
                 </rich:column>
                 <rich:column headerClass="column-header">
@@ -115,23 +117,33 @@
                 </rich:column>
             </rich:columnGroup>
         </f:facet>
-        <rich:subTable value="#{item.details}" var="detail" rowKeyVar="rowKey"
-                       columnClasses="left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,
+
+        <rich:subTable value="#{item.details}" var="detail" rowKeyVar="rowKey" id="detailTab"
+                       columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,
                        center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,
                        center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
+
 <%--        Дата--%>
-            <rich:column headerClass="column-header" rowspan="#{item.details.size()}" rendered="#{rowKey eq 0}">
+            <rich:column headerClass="column-header" rowspan="#{item.details.size()}" rendered="#{rowKey eq 0}" >
                 <h:outputText escape="true" value="#{item.taloonDate}" styleClass="output-text" converter="dateConverter" />
             </rich:column>
-<%--        Рацион--%>
+
+<%--        Комплекс--%>
+            <rich:column headerClass="column-header">
+                <h:outputText value="#{detail.complexName}" />
+            </rich:column>
+
+<%--        Товары--%>
             <rich:column headerClass="column-header">
                 <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                <h:outputText escape="true" value="#{detail.taloonName}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{detail.goodsName}" styleClass="output-text" />
                 <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
             </rich:column>
+
+
 <%--        Цена, руб--%>
             <rich:column headerClass="column-header">
-                <h:outputText escape="true" value="#{detail.price}" styleClass="output-text" converter="copeckSumConverter" rendered="#{!detail.summaryDay}" />
+                <h:outputText escape="true" value="#{detail.price}" styleClass="output-text" converter="copeckSumConverter" />
             </rich:column>
 <%--        Заказ ИСПП шт--%>
             <rich:column headerClass="column-header">
@@ -142,43 +154,43 @@
 <%--        Заказ ИСПП руб--%>
             <rich:column headerClass="column-header">
                 <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                <h:outputText escape="true" value="#{detail.summa}" styleClass="output-text" converter="copeckSumConverter" />
+                <h:outputText escape="true" value="#{detail.requestedSum}" styleClass="output-text" converter="copeckSumConverter" />
                 <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
             </rich:column>
 <%--        Оплата ИСПП шт--%>
             <rich:column headerClass="column-header">
                 <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                <h:outputText escape="true" value="#{detail.soldedQty}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{detail.soldQty}" styleClass="output-text" />
                 <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
             </rich:column>
 <%--        Оплата ИСПП руб--%>
             <rich:column headerClass="column-header">
                 <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                <h:outputText escape="true" value="#{detail.summa}" styleClass="output-text" converter="copeckSumConverter" />
+                <h:outputText escape="true" value="#{detail.soldSum}" styleClass="output-text" converter="copeckSumConverter" />
                 <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
             </rich:column>
 <%--        Блокировано шт--%>
             <rich:column headerClass="column-header">
                 <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                <h:outputText escape="true" value="#{detail.soldedQty}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{detail.blockedQty}" styleClass="output-text" />
                 <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
             </rich:column>
 <%--        Блокировано руб--%>
             <rich:column headerClass="column-header">
                 <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                <h:outputText escape="true" value="#{detail.summa}" styleClass="output-text" converter="copeckSumConverter" />
+                <h:outputText escape="true" value="#{detail.blockedSum}" styleClass="output-text" converter="copeckSumConverter" />
                 <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
             </rich:column>
 <%--        Сторнировано шт--%>
             <rich:column headerClass="column-header">
                 <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                <h:outputText escape="true" value="#{detail.soldedQty}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{detail.reservedQty}" styleClass="output-text" />
                 <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
             </rich:column>
 <%--        Сторнировано руб--%>
             <rich:column headerClass="column-header">
                 <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                <h:outputText escape="true" value="#{detail.summa}" styleClass="output-text" converter="copeckSumConverter" />
+                <h:outputText escape="true" value="#{detail.reservedSum}" styleClass="output-text" converter="copeckSumConverter" />
                 <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
             </rich:column>
 <%--        Отгрузка шт--%>
@@ -193,19 +205,19 @@
 <%--        Отгрузка руб--%>
             <rich:column headerClass="column-header">
                 <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                <h:outputText escape="true" value="#{detail.summa}" styleClass="output-text" converter="copeckSumConverter" />
+                <h:outputText escape="true" value="#{detail.shippedSum}" styleClass="output-text" converter="copeckSumConverter" />
                 <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
             </rich:column>
 <%--        Разница шт--%>
             <rich:column headerClass="column-header">
                 <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                <h:outputText escape="true" value="#{detail.soldedQty}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{detail.differedQty}" styleClass="output-text" />
                 <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
             </rich:column>
 <%--        Разница руб--%>
             <rich:column headerClass="column-header">
                 <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                <h:outputText escape="true" value="#{detail.summa}" styleClass="output-text" converter="copeckSumConverter" />
+                <h:outputText escape="true" value="#{detail.differedSum}" styleClass="output-text" converter="copeckSumConverter" />
                 <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
             </rich:column>
 <%--        Статус ОО--%>
@@ -266,20 +278,16 @@
 
 <%--        Комментарий--%>
             <rich:column headerClass="column-header">
-                <h:inputText value="#{detail.shippedQty}" styleClass="output-text" rendered="#{detail.enableEditShippedQty()}">
-                    <a4j:support event="onchange" />
-                </h:inputText>
-                <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                <h:outputText escape="true" value="#{detail.shippedQty}" styleClass="output-text" rendered="#{!detail.enableEditShippedQty()}" />
-                <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                <h:inputText value="" styleClass="output-text" rendered="#{!detail.summaryDay}" />
             </rich:column>
 <%--        История изменений--%>
             <rich:column>
-                <a4j:commandButton value="..." reRender="taloonPreorderVerificationTable,ta_remarks_toshow" rendered="#{!detail.remarksEmpty}" ajaxSingle="true"
+                <a4j:commandButton value="..." reRender="taloonPreorderVerificationTable,tp_remarks_toshow" rendered="#{!detail.remarksEmpty}" ajaxSingle="true"
                                    title="#{detail.remarks}" oncomplete="Richfaces.showModalPanel('taloonPreorderMessagePanel');">
                     <f:setPropertyActionListener value="#{detail.remarks}" target="#{mainPage.taloonPreorderVerificationPage.remarksToShow}" />
                 </a4j:commandButton>
             </rich:column>
+
         </rich:subTable>
 
         <f:facet name="footer">
