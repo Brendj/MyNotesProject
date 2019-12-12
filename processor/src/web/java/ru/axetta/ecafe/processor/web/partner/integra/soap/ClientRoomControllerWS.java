@@ -3743,6 +3743,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             ClientGuardian cg = (ClientGuardian) row[1];
                             ClientWithAddInfo addInfo = new ClientWithAddInfo();
                             addInfo.setInformedSpecialMenu(cg.getInformedSpecialMenu() ? 1 : null);
+                            addInfo.setPreorderAllowed(cg.getAllowedPreorder() ? 1 : null);
                             addInfo.setClientCreatedFrom(cg.isDisabled() ? null : cg.getCreatedFrom());
                             addInfo.setDisabled(cg.isDisabled());
                             result.put((Client) row[0], addInfo);
@@ -8741,6 +8742,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     ClientSummaryBase base = processSummaryBase(entry.getKey());
                     base.setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
                     base.setInformedSpecialMenu(entry.getValue().getInformedSpecialMenu());
+                    base.setPreorderAllowed(entry.getValue().getPreorderAllowed());
                     base.setIsInside(DAOReadExternalsService.getInstance()
                             .isClientInside(session, entry.getKey().getIdOfClient()));
                     if (base != null) {
