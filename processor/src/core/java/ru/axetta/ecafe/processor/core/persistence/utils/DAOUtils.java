@@ -10,11 +10,11 @@ import ru.axetta.ecafe.processor.core.emias.LiberateClientsList;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -1756,15 +1756,15 @@ public class DAOUtils {
     public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList) {
         Long version = getMaxVersionEMIAS(session);
 
-        Criteria clientCardsCriteria = session.createCriteria(EMIAS.class);
-        clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventCancelEMIAS()));
-        EMIAS emiasUpdated;
-        try {
-            emiasUpdated = (EMIAS)clientCardsCriteria.list().get(0);
-        }catch (Exception e)
-        {
-            emiasUpdated = null;
-        }
+        //Criteria clientCardsCriteria = session.createCriteria(EMIAS.class);
+        //clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventCancelEMIAS()));
+        //EMIAS emiasUpdated;
+        //try {
+        //    emiasUpdated = (EMIAS)clientCardsCriteria.list().get(0);
+        //}catch (Exception e)
+        //{
+        //    emiasUpdated = null;
+        //}
 
         EMIAS emias = new EMIAS();
         emias.setGuid(liberateClientsList.getGuid());
@@ -1774,23 +1774,25 @@ public class DAOUtils {
         emias.setStartDateLiberate(liberateClientsList.getStartDateLiberate());
         emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
         emias.setCreateDate(new Date());
+        emias.setDeletedemiasid(liberateClientsList.getIdEventCancelEMIAS());
         emias.setVersion(version);
         session.save(emias);
-        clientCardsCriteria = session.createCriteria(EMIAS.class);
-        clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
-        EMIAS emiasNEW;
-        try {
-            emiasNEW = (EMIAS)clientCardsCriteria.list().get(0);
-        }catch (Exception e)
-        {
-            emiasNEW = null;
-        }
 
-        if (emiasUpdated != null && emiasNEW != null) {
-            emiasUpdated.setDeletedemiasid(emiasNEW.getIdEventEMIAS());
-            emiasUpdated.setUpdateDate(new Date());
-            session.update(emiasUpdated);
-        }
+        //clientCardsCriteria = session.createCriteria(EMIAS.class);
+        //clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
+        //EMIAS emiasNEW;
+        //try {
+        //    emiasNEW = (EMIAS)clientCardsCriteria.list().get(0);
+        //}catch (Exception e)
+        //{
+        //    emiasNEW = null;
+        //}
+        //
+        //if (emiasUpdated != null && emiasNEW != null) {
+        //    emiasUpdated.setDeletedemiasid(emiasNEW.getIdEventEMIAS());
+        //    emiasUpdated.setUpdateDate(new Date());
+        //    session.update(emiasUpdated);
+        //}
     }
 
     public static Long getMaxVersionEMIAS (Session session)
@@ -4322,6 +4324,13 @@ public class DAOUtils {
         return (List<CategoryDiscount>)q.list();
     }
 
+    public static List<CategoryDiscount> getCategoryDiscountListByCategoryName(Session session, String categoryName) {
+        Criteria criteria = session.createCriteria(CategoryDiscount.class);
+        criteria.add(Restrictions.like("categoryName", categoryName, MatchMode.ANYWHERE).ignoreCase());
+        criteria.addOrder(org.hibernate.criterion.Order.asc("idOfCategoryDiscount"));
+        return (List<CategoryDiscount>) criteria.list();
+    }
+
     public static List<Long> findFriendlyOrgsIds(Session session, List<Long> orgIdList) {
         Query query = session
                 .createSQLQuery("select friendlyorg from cf_friendly_organization where currentorg in (:idOfOrgList)")
@@ -4492,5 +4501,17 @@ public class DAOUtils {
         {
             return new ArrayList<EMIAS>();
         }
+    }
+	
+	public static Long getMaxVersionOfEmias(Session session) {
+        Query query = session.createQuery("SELECT MAX(em.version) FROM EMIAS AS em");
+        Long maxVer = (Long) query.uniqueResult();
+        return maxVer == null ? 0 : maxVer;
+    }
+
+    public static List<EMIAS> getEmiasForMaxVersion(Long maxVersion, Session session){
+        Criteria criteria = session.createCriteria(EMIAS.class);
+        criteria.add(Restrictions.gt("version", maxVersion));
+        return criteria.list();
     }
 }

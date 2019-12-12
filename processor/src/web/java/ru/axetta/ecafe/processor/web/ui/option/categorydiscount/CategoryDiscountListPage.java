@@ -120,10 +120,25 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
         if(categoryNameFilter.isEmpty()){
             return null;
         }
-        List<CategoryDiscount> list = service.getCategoryDiscountListByCategoryName(categoryNameFilter);
-        items = new LinkedList<CategoryDiscountItem>();
-        for(CategoryDiscount categoryDiscount : list) {
-            items.add(new CategoryDiscountItem(categoryDiscount));
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            List<CategoryDiscount> list = DAOUtils.getCategoryDiscountListByCategoryName(persistenceSession, categoryNameFilter);
+
+            items = new LinkedList<CategoryDiscountItem>();
+            for(CategoryDiscount categoryDiscount : list) {
+                items.add(new CategoryDiscountItem(categoryDiscount));
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logAndPrintMessage("Ошибка при фильтрации льгот ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, getLogger());
+            HibernateUtils.close(persistenceSession, getLogger());
         }
         return null;
     }
