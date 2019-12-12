@@ -88,6 +88,8 @@ public class OtherActionsPage extends OnlineReportPage {
         summaryDate = new Date();
         summaryFinOperatorDate = new Date();
         startDate = CalendarUtils.addDays(new Date(), 2);
+        endDateEMP = new Date();
+        startDateEMP = CalendarUtils.addDays(endDateEMP, -7);
     }
 
     public void rubBIExport() throws Exception {
