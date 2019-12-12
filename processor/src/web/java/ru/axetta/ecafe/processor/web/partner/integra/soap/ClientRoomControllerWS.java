@@ -17,14 +17,15 @@ import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
+import ru.axetta.ecafe.processor.core.logic.NotInformedSpecialMenuException;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.Order;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -107,8 +108,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -224,6 +225,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_NOT_ENOUGH_BALANCE_DESC = "Недостаточно средств на балансе лицевого счета";
     private static final String RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED_DESC = "Заявление не найдено или имеет статус, в котором удаление запрещено";
     private static final String RC_NOT_EDITED_DAY_DESC = "День недоступен для редактирования предзаказа";
+    private static final String RC_INVALID_MOBILE = "Неверный формат мобильного телефона";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -4299,7 +4301,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         mobilePhone = Client.checkAndConvertMobile(mobilePhone);
         if (mobilePhone == null) {
             r.resultCode = RC_INVALID_DATA;
-            r.description = "Неверный формат телефона";
+            r.description = RC_INVALID_MOBILE;
             return r;
         }
         if (!DAOService.getInstance().setClientMobilePhone(contractId, mobilePhone, dateConfirm)) {
@@ -5373,7 +5375,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             mobilePhone = Client.checkAndConvertMobile(mobilePhone);
             if (mobilePhone == null) {
                 result.resultCode = RC_INVALID_DATA;
-                result.description = "Неверный формат телефона";
+                result.description = RC_INVALID_MOBILE;
                 return result;
             }
 
@@ -5923,7 +5925,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             mobilePhone = Client.checkAndConvertMobile(mobilePhone);
             if (mobilePhone == null) {
                 r.resultCode = RC_INVALID_DATA;
-                r.description = "Неверный формат телефона";
+                r.description = RC_INVALID_MOBILE;
                 return r;
             }
             if (!daoService.setClientMobilePhone(contractId, mobilePhone, null)) {
@@ -8199,7 +8201,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
         }
         if (StringUtils.isEmpty(mobilePhone)) {
-            return new Result(RC_INVALID_DATA, "Неверный формат мобильного телефона");
+            return new Result(RC_INVALID_DATA, RC_INVALID_MOBILE);
         }
 
         Result result = new Result();
@@ -9016,6 +9018,67 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public Result setPreorderAllowed(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "guardianMobile") String guardianMobile,
+            @WebParam(name = "childMobile") String childMobile) {
+        authenticateRequest(contractId);
+        Result result = new Result();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+            String mobile = Client.checkAndConvertMobile(childMobile);
+            if (mobile == null) {
+                result.resultCode = RC_INVALID_DATA;
+                result.description = RC_INVALID_MOBILE;
+                return result;
+            }
+
+            List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
+            Long version = getClientGuardiansResultVersion(session);
+            boolean guardianWithMobileFound = false;
+            for (Client guardian : guardians) {
+                if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile()
+                        .equals(Client.checkAndConvertMobile(guardianMobile))) {
+                    guardianWithMobileFound = true;
+                    ClientManager
+                            .setPreorderAllowed(session, client, guardian.getIdOfClient(), mobile, version);
+                }
+            }
+
+            if (!guardianWithMobileFound) {
+                result.resultCode = RC_CLIENT_GUARDIAN_NOT_FOUND;
+                result.description = RC_CLIENT_GUARDIAN_NOT_FOUND_DESC;
+                return result;
+            }
+
+            transaction.commit();
+            transaction = null;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (NotInformedSpecialMenuException ne) {
+            result.resultCode = RC_NOT_INFORMED_SPECIAL_MENU;
+            result.description = RC_NOT_INFORMED_SPECIAL_MENU_DESC;
+        } catch (Exception e) {
+            logger.error("Error in setInformedSpecialMenu", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
     public Result setInformedSpecialMenu(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "guardianMobile") String guardianMobile) {
         authenticateRequest(contractId);
@@ -9669,7 +9732,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
         }
         if (StringUtils.isEmpty(mobilePhone)) {
-            return new Result(RC_INVALID_DATA, "Неверный формат мобильного телефона");
+            return new Result(RC_INVALID_DATA, RC_INVALID_MOBILE);
         }
         if (null == guardianSecondName) {
             guardianSecondName = "";

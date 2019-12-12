@@ -543,6 +543,10 @@ public interface ClientRoomController {
     @WebMethod(operationName = "setInformedSpecialMenu")
     Result setInformedSpecialMenu(@WebParam(name="contractId") Long contractId, @WebParam(name="guardianMobile") String guardianMobile);
 
+    @WebMethod(operationName = "setPreorderAllowed")
+    Result setPreorderAllowed(@WebParam(name="contractId") Long contractId, @WebParam(name="guardianMobile") String guardianMobile,
+            @WebParam(name="childMobile") String childMobile);
+
     @WebMethod(operationName = "setSpecialMenu")
     Result setSpecialMenu(@WebParam(name = "contractId") Long contractId, @WebParam(name = "value") Boolean value);
 

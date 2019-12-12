@@ -1767,6 +1767,24 @@ public class ClientManager {
         session.update(cg);
     }
 
+    /* Установить флаг на самостоятельное использование предзаказа + установка телефона + очистка флагов уведомлений*/
+    public static void setPreorderAllowed(Session session, Client child, Long idOfGuardian, String childMobile, Long newVersion) throws Exception {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfChildren", child.getIdOfClient()));
+        criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
+        ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
+        if (!cg.getInformedSpecialMenu()) throw new NotInformedSpecialMenuException();
+        cg.setAllowedPreorder(true);
+        cg.setVersion(newVersion);
+        cg.setLastUpdate(new Date());
+        session.update(cg);
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+        child.setMobile(childMobile);
+        child.setClientRegistryVersion(clientRegistryVersion);
+        child.getNotificationSettings().clear();
+        session.update(child);
+    }
+
     public static void attachNotifications(ClientGuardian clientGuardian, List<NotificationSettingItem> notificationItems) {
         if (notificationItems == null) return;
         Set<ClientGuardianNotificationSetting> dbSettings = clientGuardian.getNotificationSettings();
