@@ -107,13 +107,13 @@ public class CryptoSign {
                     //Если тип карты поддерживает данный более 128 байт
                     if (card.getMemSize() == 1) {
                         //Достаем приватный ключ для подписи
-                        PrivateKey pk = loadPrivKey(cardSign.getPrivatekeycard(), true);
+                        PrivateKey pk = loadPrivKey(cardSign.getPrivatekeycard());
                         //Подписывание
                         sign = CryptoSign.sign(card_data, pk);
                     } else {
                         if (card.getMemSize() == 2) {
-                            PrivateKey pk = loadPrivKey(cardSign.getPrivatekeycard(), false);
-                            sign = SCrypt.generate(pk.getEncoded(), card_data, //данные карты используем как "соль"
+                            byte[] pk = loadPrivKeySCRIPT(cardSign.getPrivatekeycard());
+                            sign = SCrypt.generate(pk, card_data, //данные карты используем как "соль"
                                     16384, 8, 1, 20);
                         } else {
                             sign = new byte[]{0};
@@ -218,7 +218,7 @@ public class CryptoSign {
 
     private static boolean verifySCRIPT(byte[] dateCards, byte[] sign, CardSign cardSign) throws Exception {
 
-        byte[] varsign = SCrypt.generate(loadPrivKey(cardSign.getPublickeyprovider(), true).getEncoded(), dateCards,
+        byte[] varsign = SCrypt.generate(loadPrivKeySCRIPT(cardSign.getPublickeyprovider()), dateCards,
                 //данные карты используем как "соль"
                 16384, 8, 1, 20);
         return Arrays.equals(varsign, sign);
@@ -237,19 +237,23 @@ public class CryptoSign {
         return key_f.generatePublic(ks);
     }
 
-    public static PrivateKey loadPrivKey(byte[] data, boolean usedFullKey) throws Exception {
+    public static PrivateKey loadPrivKey(byte[] data) throws Exception {
+        KeySpec ks = new PKCS8EncodedKeySpec(data);
+        KeyFactory key_f = KeyFactory.getInstance(KEY_FACTOR);
+        PrivateKey res = key_f.generatePrivate(ks);
+        return res;
+    }
+
+    public static byte[] loadPrivKeySCRIPT(byte[] data) throws Exception {
         KeySpec ks;
-        if (usedFullKey || data.length < 65) {
-            ks = new PKCS8EncodedKeySpec(data);
+        if  (data.length < 65) {
+           return data;
         }
         else
         {
             byte[] privKeyCard = new byte[64];
             System.arraycopy(data, 0, privKeyCard, 0, 64);
-            ks = new PKCS8EncodedKeySpec(privKeyCard);
+            return privKeyCard;
         }
-        KeyFactory key_f = KeyFactory.getInstance(KEY_FACTOR);
-        PrivateKey res = key_f.generatePrivate(ks);
-        return res;
     }
 }
