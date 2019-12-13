@@ -76,8 +76,21 @@
                     footerClass="data-table-footer">
         <f:facet name="header">
             <rich:columnGroup>
+
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Det" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Com" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Nc" />
+                </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Дата" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Nd" />
                 </rich:column>
                 <rich:column headerClass="column-header" colspan="2">
                     <h:outputText escape="true" value="Рацион" />
@@ -118,20 +131,40 @@
             </rich:columnGroup>
         </f:facet>
 
-        <rich:subTable value="#{item.details}" var="detail" rowKeyVar="rowKey" id="detailTab"
-                       columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,
-                       center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,
-                       center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
+        <rich:subTable value="#{item.complexes}" var="complex" rowKeyVar="rowComplexKey">
 
-<%--        Дата--%>
-            <rich:column headerClass="column-header" rowspan="#{item.details.size()}" rendered="#{rowKey eq 0}" >
-                <h:outputText escape="true" value="#{item.taloonDate}" styleClass="output-text" converter="dateConverter" />
-            </rich:column>
+                    <rich:subTable value="#{complex.details}" var="detail" rowKeyVar="rowDetailKey"
+                                   columnClasses="left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column,
+                                   center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,
+                                   center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,
+                                   center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column">
 
-<%--        Комплекс--%>
-            <rich:column headerClass="column-header">
-                <h:outputText value="#{detail.complexName}" />
-            </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText value="#{complex.details.size()}" />
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText value="#{item.complexes.size()}" />
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText value="#{rowComplexKey}" />
+                        </rich:column>
+
+                        <%--       Дата--%>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
+                            <h:outputText escape="true" value="#{item.taloonDate}" styleClass="output-text" converter="dateConverter" rendered="#{!complex.taloonDateEmpty()}"/>
+                            <h:outputText escape="true" value="Итого" styleClass="output-text" rendered="#{complex.taloonDateEmpty()}" />
+                            <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                        </rich:column>
+
+                        <rich:column headerClass="column-header">
+                            <h:outputText value="#{rowDetailKey}" />
+                        </rich:column>
+
+                        <%--        Комплекс--%>
+                        <rich:column headerClass="column-header">
+                            <h:outputText value="#{detail.complexName}" />
+                        </rich:column>
 
 <%--        Товары--%>
             <rich:column headerClass="column-header">
@@ -287,7 +320,7 @@
                     <f:setPropertyActionListener value="#{detail.remarks}" target="#{mainPage.taloonPreorderVerificationPage.remarksToShow}" />
                 </a4j:commandButton>
             </rich:column>
-
+                    </rich:subTable>
         </rich:subTable>
 
         <f:facet name="footer">

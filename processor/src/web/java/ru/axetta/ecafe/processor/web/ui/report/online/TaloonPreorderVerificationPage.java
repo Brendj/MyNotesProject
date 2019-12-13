@@ -8,6 +8,8 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
 import ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerification;
+import ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationComplex;
+import ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationDetail;
 import ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -39,7 +41,8 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
     private Date startDate;
     private Date endDate;
     private TaloonPreorderVerification builder;
-    private TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail currentTaloonPreorderVerificationItemDetail;
+    private TaloonPreorderVerificationDetail currentTaloonPreorderVerificationDetail;
+    private TaloonPreorderVerificationComplex currentTaloonPreorderVerificationComplex;
     private TaloonPreorderVerificationItem currentTaloonPreorderVerificationItem;
     private String currentState;
     private String remarksToShow;
@@ -108,10 +111,12 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
 
     public void resetPpState() {
         for (TaloonPreorderVerificationItem item : items) {
-            for (TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail detail : item.getDetails()) {
-                if (detail.equals(currentTaloonPreorderVerificationItemDetail)) {
-                    detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
-                    break;
+            for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
+                for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
+                    if (detail.equals(currentTaloonPreorderVerificationDetail)) {
+                        detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
+                        break;
+                    }
                 }
             }
         }
@@ -119,18 +124,18 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
 
     public void switchPpState() {
         for (TaloonPreorderVerificationItem item : items) {
-            for (TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail detail : item.getDetails()) {
-                if (detail.equals(currentTaloonPreorderVerificationItemDetail)) {
-                    if (currentState.equals(
-                            ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CANCEL) //&& !detail.needFillShippedQty()
-                    ) {
-                        detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
+            for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
+                for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
+                    if (detail.equals(currentTaloonPreorderVerificationDetail)) {
+                        if (currentState.equals(ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CANCEL) //&& !detail.needFillShippedQty()
+                        ) {
+                            detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
+                        }
+                        if (currentState.equals(ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CONFIRM)) {
+                            detail.performConfirm();
+                        }
+                        break;
                     }
-                    if (currentState.equals(
-                            ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CONFIRM)) {
-                        detail.performConfirm();
-                    }
-                    break;
                 }
             }
         }
@@ -147,18 +152,18 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
     public void changePpStateAllDay(TaloonPPStatesEnum state) {
         for (TaloonPreorderVerificationItem item : items) {
             if (item.equals(currentTaloonPreorderVerificationItem)) {
-                for (TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail detail : item.getDetails()) {
-                    if (detail.getPpState() != null) {
-                        if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED // && detail.allowedSetFirstFlag()
-                        )
-                                ||
-                                ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED || state == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED)) //&& detail.allowedClearFirstFlag())
-                        ) {
-                            detail.setPpState(state);
+                for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
+                    for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
+                        if (detail.getPpState() != null) {
+                            if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED // && detail.allowedSetFirstFlag()
+                            ) || ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED || state == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED)) //&& detail.allowedClearFirstFlag())
+                            ) {
+                                detail.setPpState(state);
+                            }
                         }
                     }
+                    break;
                 }
-                break;
             }
         }
     }
@@ -200,13 +205,13 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
     }
 
 
-    public TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail getCurrentTaloonPreorderVerificationItemDetail() {
-        return currentTaloonPreorderVerificationItemDetail;
+    public TaloonPreorderVerificationDetail getCurrentTaloonPreorderVerificationItemDetail() {
+        return currentTaloonPreorderVerificationDetail;
     }
 
     public void setCurrentTaloonPreorderVerificationItemDetail(
-            TaloonPreorderVerificationItem.TaloonPreorderVerificationItemDetail currentTaloonPreorderVerificationItemDetail) {
-        this.currentTaloonPreorderVerificationItemDetail = currentTaloonPreorderVerificationItemDetail;
+            TaloonPreorderVerificationDetail currentTaloonPreorderVerificationDetail) {
+        this.currentTaloonPreorderVerificationDetail = currentTaloonPreorderVerificationDetail;
     }
 
     public String getCurrentState() {
@@ -215,6 +220,24 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
 
     public void setCurrentState(String currentState) {
         this.currentState = currentState;
+    }
+
+    public TaloonPreorderVerificationDetail getCurrentTaloonPreorderVerificationDetail() {
+        return currentTaloonPreorderVerificationDetail;
+    }
+
+    public void setCurrentTaloonPreorderVerificationDetail(
+            TaloonPreorderVerificationDetail currentTaloonPreorderVerificationDetail) {
+        this.currentTaloonPreorderVerificationDetail = currentTaloonPreorderVerificationDetail;
+    }
+
+    public TaloonPreorderVerificationComplex getCurrentTaloonPreorderVerificationComplex() {
+        return currentTaloonPreorderVerificationComplex;
+    }
+
+    public void setCurrentTaloonPreorderVerificationComplex(
+            TaloonPreorderVerificationComplex currentTaloonPreorderVerificationComplex) {
+        this.currentTaloonPreorderVerificationComplex = currentTaloonPreorderVerificationComplex;
     }
 
     public TaloonPreorderVerificationItem getCurrentTaloonPreorderVerificationItem() {
