@@ -1530,7 +1530,7 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        clientGuardian.getInformedSpecialMenu(), clientGuardian.getIsLegalRepresent()));
+                        clientGuardian.getInformedSpecialMenu(), clientGuardian.getIsLegalRepresent(), clientGuardian.getAllowedPreorder()));
             }
         }
         return guardianItems;
@@ -1549,7 +1549,7 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
                 wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
                         notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        clientWard.getInformedSpecialMenu(), clientWard.getIsLegalRepresent()));
+                        clientWard.getInformedSpecialMenu(), clientWard.getIsLegalRepresent(), clientWard.getAllowedPreorder()));
             }
         }
         return wardItems;
