@@ -8724,7 +8724,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public ClientSummaryBaseListResult getSummaryByChildMobileMin(String childMobile) {
+    public ClientSummaryBaseListResult getSummaryByStaffMobileMin(String staffMobile) {
         authenticateRequest(null);
         Session session = null;
         Transaction transaction = null;
@@ -8732,11 +8732,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
             transaction = session.beginTransaction();
 
-            Query query = session.createQuery("select c from Client c where c.mobile = :mobile and c.idOfClientGroup < :clientGroup");
-            query.setParameter("mobile", Client.checkAndConvertMobile(childMobile));
-            query.setParameter("clientGroup", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            List<Long> staffGroups = new ArrayList<>();
+            staffGroups.add(ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
+            staffGroups.add(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
+            staffGroups.add(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            staffGroups.add(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
+
+            Query query = session.createQuery("select c from Client c where c.mobile = :mobile and c.idOfClientGroup in :clientGroups");
+            query.setParameter("mobile", Client.checkAndConvertMobile(staffMobile));
+            query.setParameterList("clientGroups", staffGroups);
             List<Client> clients = query.list();
-            ClientSummaryBaseListResult result = processClientSummaryByMobileResult(session, clients);
+            ClientSummaryBaseListResult result = processClientSummaryByMobileResult(session, clients, "staff");
 
             transaction.commit();
             transaction = null;
@@ -8752,7 +8758,37 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         }
     }
 
-    private ClientSummaryBaseListResult processClientSummaryByMobileResult(Session session, List<Client> clients) throws Exception {
+    @Override
+    public ClientSummaryBaseListResult getSummaryByChildMobileMin(String childMobile) {
+        authenticateRequest(null);
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Query query = session.createQuery("select c from Client c where c.mobile = :mobile and c.idOfClientGroup < :clientGroup");
+            query.setParameter("mobile", Client.checkAndConvertMobile(childMobile));
+            query.setParameter("clientGroup", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            List<Client> clients = query.list();
+            ClientSummaryBaseListResult result = processClientSummaryByMobileResult(session, clients, "child");
+
+            transaction.commit();
+            transaction = null;
+            return result;
+        } catch (Exception e) {
+            ClientSummaryBaseListResult result = new ClientSummaryBaseListResult();
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+            return result;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    private ClientSummaryBaseListResult processClientSummaryByMobileResult(Session session, List<Client> clients,
+            String mode) throws Exception {
         ClientSummaryBaseListResult result = new ClientSummaryBaseListResult();
         if (clients.size() == 0) {
             result.resultCode = RC_CLIENT_NOT_FOUND;
@@ -8770,30 +8806,32 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.description = RC_PREORDERS_NOT_ENABLED_DESC;
             return result;
         }
-        List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, child.getIdOfClient());
-        boolean informed = false;
-        for (ClientGuardianItem item : guardians) {
-            if (item.getInformedSpecialMenu()) {
-                informed = true;
-                break;
+        if (mode.equals("child")) {
+            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, child.getIdOfClient());
+            boolean informed = false;
+            for (ClientGuardianItem item : guardians) {
+                if (item.getInformedSpecialMenu()) {
+                    informed = true;
+                    break;
+                }
             }
-        }
-        if (!informed) {
-            result.resultCode = RC_NOT_INFORMED_SPECIAL_MENU;
-            result.description = RC_NOT_INFORMED_SPECIAL_MENU_DESC;
-            return result;
-        }
-        boolean allowed = false;
-        for (ClientGuardianItem item : guardians) {
-            if (item.getAllowedPreorder()) {
-                allowed = true;
-                break;
+            if (!informed) {
+                result.resultCode = RC_NOT_INFORMED_SPECIAL_MENU;
+                result.description = RC_NOT_INFORMED_SPECIAL_MENU_DESC;
+                return result;
             }
-        }
-        if (!allowed) {
-            result.resultCode = RC_NOT_ALLOWED_PREORDERS;
-            result.description = RC_NOT_ALLOWED_PREORDERS_DESC;
-            return result;
+            boolean allowed = false;
+            for (ClientGuardianItem item : guardians) {
+                if (item.getAllowedPreorder()) {
+                    allowed = true;
+                    break;
+                }
+            }
+            if (!allowed) {
+                result.resultCode = RC_NOT_ALLOWED_PREORDERS;
+                result.description = RC_NOT_ALLOWED_PREORDERS_DESC;
+                return result;
+            }
         }
         ClientSummaryBase summaryBase = new ClientSummaryBase();
         summaryBase.setContractId(child.getContractId());
@@ -8803,7 +8841,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         summaryBase.setBalance(child.getBalance());
         summaryBase.setOfficialName(child.getOrg().getOfficialName());
         summaryBase.setGrade(child.getClientGroup().getGroupName());
-        summaryBase.setPreorderAllowed(1); //т.к. если флаг выключен, то выше уже кидаем ошибку
+        if (mode.equals("child")) summaryBase.setPreorderAllowed(1); //т.к. если флаг выключен, то выше уже кидаем ошибку
         summaryBase.setAddress(child.getOrg().getShortAddress());
 
         List<ClientSummaryBase> list = new ArrayList<>();
@@ -9115,7 +9153,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public Result setPreorderAllowed(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "guardianMobile") String guardianMobile,
-            @WebParam(name = "childMobile") String childMobile) {
+            @WebParam(name = "staffMobile") String childMobile) {
         authenticateRequest(contractId);
         Result result = new Result();
         Session session = null;

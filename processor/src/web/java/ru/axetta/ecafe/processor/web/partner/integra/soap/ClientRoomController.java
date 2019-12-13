@@ -530,6 +530,8 @@ public interface ClientRoomController {
 
     @WebMethod ClientSummaryBaseListResult getSummaryByChildMobileMin(@WebParam(name = "childMobile") String guardMobile);
 
+    @WebMethod ClientSummaryBaseListResult getSummaryByStaffMobileMin(@WebParam(name = "staffMobile") String guardMobile);
+
     @WebMethod TransactionInfoListResult getOrderTransactions();
 
     @WebMethod(operationName = "getGuardiansFromDate")
