@@ -55,4 +55,20 @@ public class TaloonPreorderVerificationItem {
         return taloonDate == null;
     }
 
+    public int getDetailsSize() {
+        int size = 0;
+        for (TaloonPreorderVerificationComplex complex : complexes) {
+            size += complex.getDetails().size();
+        }
+        return size;
+    }
+
+    public int getRowInItem(int complexId, int rowId) {
+        int complexesSize = 0;
+        for (int i = 0; i < complexId; i++) {
+            complexesSize += this.complexes.get(i).getDetails().size();
+        }
+        return complexesSize + rowId;
+    }
+
 }
