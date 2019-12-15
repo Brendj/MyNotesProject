@@ -127,7 +127,7 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
             for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
                 for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                     if (detail.equals(currentTaloonPreorderVerificationDetail)) {
-                        if (currentState.equals(ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CANCEL) //&& !detail.needFillShippedQty()
+                        if (currentState.equals(ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CANCEL) && !detail.needFillShippedQty()
                         ) {
                             detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
                         }
@@ -155,9 +155,8 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
                 for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
                     for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                         if (detail.getPpState() != null) {
-                            if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED // && detail.allowedSetFirstFlag()
-                            ) || ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED || state == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED)) //&& detail.allowedClearFirstFlag())
-                            ) {
+                            if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.allowedSetFirstFlag()
+                            ) || ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED || state == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED)) && detail.allowedClearFirstFlag()) {
                                 detail.setPpState(state);
                             }
                         }

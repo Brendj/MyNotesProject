@@ -44,15 +44,19 @@ public class TaloonPreorderVerificationDetail {
     private TaloonISPPStatesEnum isppState;
     private TaloonPPStatesEnum ppState;
     private String remarks;
+    private String comments;
     private boolean summaryDay;
 
-    public TaloonPreorderVerificationDetail() {}
+    private TaloonPreorderVerificationComplex complex;
+
+    public TaloonPreorderVerificationDetail() {
+    }
 
     public TaloonPreorderVerificationDetail(Long idOfOrg, Long idOfOrgCreated, Date taloonDate, Long complexId,
-            String complexName, String goodsName, String goodsGuid, Long price, Integer requestedQty,
-            Long requestedSum, Integer soldQty, Long soldSum, Integer shippedQty, Long shippedSum,
-            Integer reservedQty, Long reservedSum, Integer blockedQty, Long blockedSum, Integer differedQty, Long differedSum,
-            TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState, String remarks, boolean summaryDay) {
+            String complexName, String goodsName, String goodsGuid, Long price, Integer requestedQty, Long requestedSum,
+            Integer soldQty, Long soldSum, Integer shippedQty, Long shippedSum, Integer reservedQty, Long reservedSum,
+            Integer blockedQty, Long blockedSum, Integer differedQty, Long differedSum, TaloonISPPStatesEnum isppState,
+            TaloonPPStatesEnum ppState, String remarks, String comments, boolean summaryDay) {
         this.idOfOrg = idOfOrg;
         this.idOfOrgCreated = idOfOrgCreated;
         this.taloonDate = taloonDate;
@@ -76,6 +80,7 @@ public class TaloonPreorderVerificationDetail {
         this.isppState = isppState;
         this.ppState = ppState;
         this.remarks = remarks;
+        this.comments = comments;
         this.summaryDay = summaryDay;
     }
 
@@ -271,6 +276,22 @@ public class TaloonPreorderVerificationDetail {
         this.complexId = complexId;
     }
 
+    public TaloonPreorderVerificationComplex getComplex() {
+        return complex;
+    }
+
+    public void setComplex(TaloonPreorderVerificationComplex complex) {
+        this.complex = complex;
+    }
+
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
+
 
     public int getPeriod() {
         Date currentDate = new Date();
@@ -293,7 +314,8 @@ public class TaloonPreorderVerificationDetail {
     public Boolean allowedSetFirstFlag() {
         int period = getPeriod();
         if (period == 1) {
-            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED) {
+            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED
+                    && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED) {
                 return false;
             } else {
                 return true;
@@ -342,7 +364,8 @@ public class TaloonPreorderVerificationDetail {
     public Boolean allowedClearSecondFlag() {
         int period = getPeriod();
         if (period == 1) {
-            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
+            if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED
+                    && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
                 return true;
             } else {
                 return false;
@@ -359,13 +382,18 @@ public class TaloonPreorderVerificationDetail {
     }
 
     public Boolean enableEditShippedQty() {
-        if (summaryDay) return false;
+        if (summaryDay) {
+            return false;
+        }
         Date currentDate = new Date();
         Date firstMonthDate = CalendarUtils.getFirstDayOfNextMonth(taloonDate);
         Date redDate = CalendarUtils.addDays(firstMonthDate, 5);
-        if (currentDate.after(redDate)) return false;
+        if (currentDate.after(redDate)) {
+            return false;
+        }
 
-        if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED || ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
+        if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED
+                || ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
             return true;
         } else {
             return false;
@@ -373,7 +401,9 @@ public class TaloonPreorderVerificationDetail {
     }
 
     public void performConfirm() {
-        if (this.ppState == null) return;
+        if (this.ppState == null) {
+            return;
+        }
         this.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
     }
 
@@ -439,5 +469,18 @@ public class TaloonPreorderVerificationDetail {
         this.setBlockedSum(this.getBlockedSum() + arg.getBlockedSum());
         this.setDifferedQty(this.getDifferedQty() + arg.getDifferedQty());
         this.setDifferedSum(this.getDifferedSum() + arg.getDifferedSum());
+    }
+
+    public void confirmPpState() {
+        changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
+    }
+
+    public void deselectPpState() {
+        changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
+    }
+
+    private void changePpState(TaloonPPStatesEnum ppState) {
+        this.ppState = ppState;
+        this.getComplex().getItem().setPpState();
     }
 }

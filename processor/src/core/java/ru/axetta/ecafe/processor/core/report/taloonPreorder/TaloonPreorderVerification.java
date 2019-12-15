@@ -50,10 +50,9 @@ public class TaloonPreorderVerification {
             item.setTaloonDate(date);
             complexMap = new HashMap<>();
             TaloonPreorderVerificationDetail detailSum = new TaloonPreorderVerificationDetail(null, null, date, null,
-                    null, "Всего", null, null, 0, 0L, 0, 0L, 0, 0L, 0, 0L, 0, 0L, 0, 0L, null, null, null, true);
+                    null, "Всего", null, null, 0, 0L, 0, 0L, 0, 0L, 0, 0L, 0, 0L, 0, 0L, null, null, null, null, true);
 
             for (TaloonPreorder taloon : list) {
-                TaloonPreorderVerificationComplex complex;
                 if (!date.equals(taloon.getTaloonDate())) {
                     continue;
                 }
@@ -74,10 +73,10 @@ public class TaloonPreorderVerification {
                                 : (taloon.getShippedQty() - taloon.getSoldQty()),
                         (taloon.getPrice() == null || taloon.getShippedQty() == null || taloon.getSoldQty() == null) ? 0
                                 : taloon.getPrice() * (taloon.getShippedQty() - taloon.getSoldQty()),
-                        taloon.getIsppState(), taloon.getPpState(), taloon.getRemarks(), false);
+                        taloon.getIsppState(), taloon.getPpState(), taloon.getRemarks(), taloon.getComments(), false);
 
+                addComplexToMap(item, complexMap, date, detail, taloon.getComplexId(), taloon.getComplexName());
                 detailSum.addQtyAndGet(detail);
-                addComplexToMap(complexMap, date, detail, taloon.getComplexId(), taloon.getComplexName());
 
                 if (!summaryMap.containsKey(detail.getComplexId() + detail.getGoodsGuid())) {
                     summaryMap.put(taloon.getComplexId() + taloon.getGoodsGuid(),
@@ -87,7 +86,7 @@ public class TaloonPreorderVerification {
                                     detail.getSoldQty(), detail.getSoldSum(), detail.getShippedQty(),
                                     detail.getShippedSum(), detail.getReservedQty(), detail.getReservedSum(),
                                     detail.getBlockedQty(), detail.getBlockedSum(), detail.getDifferedQty(),
-                                    detail.getDifferedSum(), null, null, null, true));
+                                    detail.getDifferedSum(), null, null, null, null, true));
                 } else {
                     summaryMap.get(taloon.getComplexId() + taloon.getGoodsGuid()).addQtyAndGet(detail);
                 }
@@ -96,9 +95,12 @@ public class TaloonPreorderVerification {
             // Всего
             TaloonPreorderVerificationComplex complex = new TaloonPreorderVerificationComplex();
             complex.setTaloonDate(date);
+            complex.setItem(item);
+            complex.setComplexName("Всего");
+            detailSum.setComplex(complex);
             complex.getDetails().add(detailSum);
             item.getComplexes().add(complex);
-
+            item.setPpState();
         }
         // Итого
         TaloonPreorderVerificationItem item = new TaloonPreorderVerificationItem();
@@ -107,9 +109,10 @@ public class TaloonPreorderVerification {
         Iterator<Map.Entry<String, TaloonPreorderVerificationDetail>> iter = summaryMap.entrySet().iterator();
         while (iter.hasNext()) {
             Map.Entry<String, TaloonPreorderVerificationDetail> e = iter.next();
-            addComplexToMap(complexMap, null, e.getValue(), e.getValue().getComplexId(), e.getValue().getComplexName());
+            addComplexToMap(item, complexMap, null, e.getValue(), e.getValue().getComplexId(), e.getValue().getComplexName());
         }
         addItemToList(items, complexMap, item);
+
         return items;
     }
 
@@ -123,13 +126,15 @@ public class TaloonPreorderVerification {
         items.add(item);
     }
 
-    private void addComplexToMap(Map<Long, TaloonPreorderVerificationComplex> complexMap, Date date,
+    private void addComplexToMap(TaloonPreorderVerificationItem item, Map<Long, TaloonPreorderVerificationComplex> complexMap, Date date,
             TaloonPreorderVerificationDetail detail, Long complexId, String complexName) {
         if (!complexMap.containsKey(complexId)) {
             TaloonPreorderVerificationComplex complex = new TaloonPreorderVerificationComplex();
             complex.setTaloonDate(date);
             complex.setComplexId(complexId);
             complex.setComplexName(complexName);
+            complex.setItem(item);
+            detail.setComplex(complex);
             complexMap.put(complexId, complex);
         }
         complexMap.get(complexId).getDetails().add(detail);
@@ -158,6 +163,7 @@ public class TaloonPreorderVerification {
                                     .format("Изменено в АРМ отчетности, пользователь=%s, %2$td.%2$tm.%2$tY %2$tT",
                                             DAOReadonlyService.getInstance().getUserFromSession().getUserName(),
                                             new Date())));
+                            taloon.setComments(detail.getComments());
                             taloon.setShippedQty(detail.getShippedQty());
                             taloon.setPpState(detail.getPpState());
                             Long nextVersion = DAOUtils.nextVersionByTaloonPreorder(session);

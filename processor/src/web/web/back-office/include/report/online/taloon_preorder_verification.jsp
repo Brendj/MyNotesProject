@@ -250,8 +250,8 @@
                     <%--            Изменить статус записи--%>
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateNotSelected}"
                                      action="#{mainPage.taloonPreorderVerificationPage.switchPpState()}"
+                                     onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }"
                                      style="color:lightgray;">
-                        <%--                                 onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
                         <f:setPropertyActionListener value="#{detail}"
                                                      target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItemDetail}"/>
                         <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}"
@@ -261,9 +261,9 @@
 
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateNotSelected}"
                                      action="#{mainPage.taloonPreorderVerificationPage.switchPpState()}"
-                                     style="color:lightgray;">
-                        <%--                        oncomplete="if (#{detail.needFillShippedQty()}) { alert('Заполните отгрузку ПП'); }"--%>
-                        <%--                                 onclick="if (#{!detail.allowedSetSecondFlag()}) { alert('Операция запрещена'); return false; }"--%>
+                                     oncomplete="if (#{detail.needFillShippedQty()}) { alert('Заполните отгрузку ПП'); }"
+                                     onclick="if (#{!detail.allowedSetSecondFlag()}) { alert('Операция запрещена'); return false; }"
+                    style="color:lightgray;">
                         <f:setPropertyActionListener value="#{detail}"
                                                      target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItemDetail}"/>
                         <f:setPropertyActionListener value="#{detail.ppStateToTurnOnSecond}"
@@ -272,8 +272,8 @@
                     </a4j:commandLink>
 
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateCanceled}"
-                                     action="#{mainPage.taloonPreorderVerificationPage.resetPpState()}">
-                        <%--                                 onclick="if (#{!detail.allowedClearSecondFlag()}) { alert('Операция запрещена'); return false; }">--%>
+                                     action="#{mainPage.taloonPreorderVerificationPage.resetPpState()}"
+                                     onclick="if (#{!detail.allowedClearSecondFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{detail}"
                                                      target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItemDetail}"/>
                         <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}"
@@ -282,8 +282,8 @@
                     </a4j:commandLink>
 
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateConfirmed}"
-                                     action="#{mainPage.taloonPreorderVerificationPage.resetPpState()}">
-                        <%--                                 onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
+                                     action="#{mainPage.taloonPreorderVerificationPage.resetPpState()}"
+                                     onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{detail}"
                                                      target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItemDetail}"/>
                         <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}"
@@ -292,27 +292,28 @@
                     </a4j:commandLink>
 
                     <%--            Подтвердить для всего дня--%>
-                    <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateNull}"
-                                     action="#{mainPage.taloonPreorderVerificationPage.confirmPpStateAllDay()}">
-                        <%--                                 onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
-                        <f:setPropertyActionListener value="#{item}"
-                                                     target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItem}"/>
-                        <h:graphicImage value="/images/taloons/applied-big.png"/>
+<%--                    action="#{mainPage.taloonPreorderVerificationPage.confirmPpStateAllDay()}"--%>
+                    <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{item.isPpStateNotSelected() and detail.summaryDay}"
+                                     action="#{item.confirmPpState()}"
+                                     onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                        <f:setPropertyActionListener value="#{item}" target="#{item.getPpState()}"/>
+<%--                        <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItem}"/>--%>
+                        <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
                     </a4j:commandLink>
                     <%--            Отменить выбор для всего дня-- ppStateNull--%>
-                    <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateNull}"
-                                     action="#{mainPage.taloonPreorderVerificationPage.deselectPpStateAllDay()}"
-                                     style="color:lightgray;">
-                        <%--                                 onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
+<%--                    action="#{mainPage.taloonPreorderVerificationPage.deselectPpStateAllDay()}"--%>
+                    <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{item.isPpStateConfirmed() and detail.summaryDay}"
+                                     action="#{item.deselectPpState()}" style="color:lightgray;"
+                                     onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{item}"
-                                                     target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItem}"/>
-                        <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
+                                                     target="#{item.getPpState()}"/>
+                        <h:graphicImage value="/images/taloons/applied-big.png"/>
                     </a4j:commandLink>
                 </rich:column>
 
                 <%--        Комментарий--%>
                 <rich:column headerClass="column-header">
-                    <h:inputText value="" styleClass="output-text" rendered="#{!detail.summaryDay}"/>
+                    <h:inputText value="#{detail.comments}" styleClass="output-text" rendered="#{!detail.summaryDay}"/>
                 </rich:column>
                 <%--        История изменений--%>
                 <rich:column>
@@ -324,6 +325,7 @@
                                                      target="#{mainPage.taloonPreorderVerificationPage.remarksToShow}"/>
                     </a4j:commandButton>
                 </rich:column>
+
             </rich:subTable>
         </rich:subTable>
 

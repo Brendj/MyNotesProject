@@ -38,6 +38,7 @@ public class TaloonPreorder {
     private Long version;
     private Boolean deletedState;
     private String remarks;
+    private String comments;
 
     public TaloonPreorder() {
         //for Hibernate only
@@ -46,7 +47,7 @@ public class TaloonPreorder {
     public TaloonPreorder(Long idOfOrg, Date taloonDate, Long complexId, String complexName,
             String goodsName, String goodsGuid, Long idOfOrgCreated, Integer soldQty, Integer requestedQty,
             Integer shippedQty, Integer reservedQty, Integer blockedQty, Long price, TaloonCreatedTypeEnum createdType,
-            TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState) {
+            TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState, String remarks, String comments) {
         this.idOfOrg = idOfOrg;
         this.taloonDate = taloonDate;
         this.complexId = complexId;
@@ -63,6 +64,8 @@ public class TaloonPreorder {
         this.createdType = createdType;
         this.isppState = isppState;
         this.ppState = ppState;
+        this.remarks = remarks;
+        this.comments = comments;
     }
 
     public String getGoodsName() {
@@ -249,6 +252,13 @@ public class TaloonPreorder {
         this.complexId = complexId;
     }
 
+    public String getComments() {
+        return comments;
+    }
+
+    public void setComments(String comments) {
+        this.comments = comments;
+    }
 
     @Override
     public boolean equals(Object o) {
