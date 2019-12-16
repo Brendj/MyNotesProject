@@ -28,7 +28,7 @@ CREATE TABLE cf_taloon_preorder
     ispp_state integer NOT NULL DEFAULT 0,
     pp_state integer NOT NULL DEFAULT 0,
     idoftaloonpreorder bigint NOT NULL,
-    remarks character varying(512),
+    remarks text,
     comments character varying(128),
     CONSTRAINT cf_taloon_preorder_pk PRIMARY KEY (idoftaloonpreorder)
 )

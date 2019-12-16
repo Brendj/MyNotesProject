@@ -1090,26 +1090,6 @@
                             label="Отчет по предзаказам" action="#{preordersReportPage.show}"
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
-
-    <rich:panelMenuGroup id="electronicReconciliationStatisticsReportGroupMenu"
-                         binding="#{mainPage.electronicReconciliationReportGroupMenu.mainMenuComponent}"
-                         label="Электронная сверка" rendered="#{mainPage.eligibleToViewElectronicReconciliationReport}">
-        <a4j:support event="onclick" action="#{mainPage.showElectronicReconciliationReportGroupMenu}"
-                     reRender="workspaceForm" />
-        <rich:panelMenuItem id="taloonApprovalVerificationMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
-                            binding="#{mainPage.taloonApprovalVerificationPage.mainMenuComponent}"
-                            label="Электронная сверка" action="#{mainPage.showTaloonApprovalVerificationPage}"
-                            reRender="workspaceForm" />
-        <rich:panelMenuItem id="electronicReconciliationStatisticsMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
-                            binding="#{mainPage.electronicReconciliationStatisticsPage.mainMenuComponent}"
-                            label="Статистика электронной сверки"
-                            action="#{mainPage.showElectronicReconciliationStatisticsPage}" reRender="workspaceForm" />
-        <rich:panelMenuItem id="taloonPreorderVerificationMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
-                            binding="#{mainPage.taloonPreorderVerificationPage.mainMenuComponent}"
-                            label="Электронная сверка (предзаказ)" action="#{mainPage.showTaloonPreorderVerificationPage}"
-                            reRender="workspaceForm" />
-    </rich:panelMenuGroup>
-
     <rich:panelMenuGroup id="budgetReportGroupMenu" binding="#{mainPage.budgetFoodGroupMenu.mainMenuComponent}"
                          label="Льготное питание" rendered="#{mainPage.eligibleToViewMealsReports}">
         <a4j:support event="onclick" action="#{mainPage.showBudgetFoodGroupMenu}" reRender="workspaceForm" />
@@ -1155,6 +1135,14 @@
         <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
                             label="Справки расходования средств" action="#{referReportPage.show}"
                             reRender="workspaceForm" />
+        <rich:panelMenuItem id="taloonApprovalVerificationMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
+                            binding="#{mainPage.taloonApprovalVerificationPage.mainMenuComponent}"
+                            label="Электронная сверка" action="#{mainPage.showTaloonApprovalVerificationPage}"
+                            reRender="workspaceForm" />
+        <rich:panelMenuItem id="electronicReconciliationStatisticsMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
+                            binding="#{mainPage.electronicReconciliationStatisticsPage.mainMenuComponent}"
+                            label="Статистика электронной сверки"
+                            action="#{mainPage.showElectronicReconciliationStatisticsPage}" reRender="workspaceForm" />
 
 
         <%--@elvariable id="totalBenefFeedReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalBenefFeedReportPage"--%>
@@ -1493,6 +1481,11 @@
                             label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"
                             reRender="workspaceForm" rendered="#{mainPage.eligibleToViewEnterEventReport}" />
     </rich:panelMenuGroup>
+
+    <rich:panelMenuItem id="taloonPreorderVerificationMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
+                        binding="#{mainPage.taloonPreorderVerificationPage.mainMenuComponent}"
+                        label="Электронная сверка" action="#{mainPage.showTaloonPreorderVerificationPage}"
+                        reRender="workspaceForm" />
 
     <%--@elvariable id="helpdeskGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.HelpdeskGroupPage"--%>
     <rich:panelMenuGroup id="helpdeskGroupPageMenu" binding="#{helpdeskGroupPage.mainMenuComponent}" label="Служба помощи"

@@ -50,7 +50,7 @@
                 <param name="type">4</param> <!-- http://docs.oracle.com/javase/6/docs/api/constant-values.html#java.sql.Types.INTEGER -->
             </type>
         </property>
-        <property name="remarks" column="Remarks" type="string" length="512"/>
+        <property name="remarks" column="Remarks" type="string" length="1024"/>
         <property name="comments" column="comments" type="string" length="128"/>
 
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
