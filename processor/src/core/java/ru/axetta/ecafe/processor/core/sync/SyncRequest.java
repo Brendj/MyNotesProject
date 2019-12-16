@@ -46,6 +46,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersF
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ReestrTaloonPreorder;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ReestrTaloonPreorderBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingBuilder;
@@ -2693,6 +2695,7 @@ public class SyncRequest {
             builders.add(new ClientGroupManagerBuilder());
             builders.add(new AccountsRegistryRequestBuilder());
             builders.add(new ReestrTaloonApprovalBuilder(idOfOrg));
+            builders.add(new ReestrTaloonPreorderBuilder(idOfOrg));
             builders.add(new ZeroTransactionsBuilder(idOfOrg));
             builders.add(new SpecialDatesBuilder(idOfOrg));
             builders.add(new MigrantsBuilder(idOfOrg));
@@ -2944,6 +2947,10 @@ public class SyncRequest {
 
     public ReestrTaloonApproval getReestrTaloonApproval() {
         return this.<ReestrTaloonApproval>findSection(ReestrTaloonApproval.class);
+    }
+
+    public ReestrTaloonPreorder getReestrTaloonPreorder() {
+        return this.<ReestrTaloonPreorder>findSection(ReestrTaloonPreorder.class);
     }
 
     public InteractiveReport getInteractiveReport() {

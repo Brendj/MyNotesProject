@@ -2849,6 +2849,16 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<TaloonPreorder> getTaloonPreorderForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        //Org org = (Org)session.load(Org.class, idOfOrg);
+        List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
+        Criteria criteria = session.createCriteria(TaloonPreorder.class);
+        criteria.add(Restrictions.in("org", orgs));
+        criteria.add(Restrictions.gt("version", version));
+        //criteria.add(Restrictions.eq("deletedState", false));
+        return criteria.list();
+    }
+
     public static List<ComplexSchedule> getComplexSchedulesForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
         List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
         Criteria criteria = session.createCriteria(ComplexSchedule.class);

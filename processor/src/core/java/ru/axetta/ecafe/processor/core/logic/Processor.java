@@ -80,6 +80,10 @@ import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.Reest
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ResReestrTaloonApproval;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ReestrTaloonPreorder;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ReestrTaloonPreorderData;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ReestrTaloonPreorderProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ResReestrTaloonPreorder;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.accounts.AccountsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.cards.CardsOperationsRegistryHandler;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistryHandler;
@@ -213,6 +217,11 @@ public class Processor implements SyncProcessor {
                     response = buildOrgSettingsSectionsResponse(request, syncStartTime, syncResult);
                     break;
                 }
+                case TYPE_REESTR_TALOONS_PREORDER: {
+                    //обработка синхронизации ручного реестра талонов (платное питание)
+                    response = buildReestrTaloonsPreorderSyncResponse(request);
+                    break;
+                }
             }
 
         } catch (Exception e) {
@@ -323,6 +332,8 @@ public class Processor implements SyncProcessor {
         AccountsRegistry accountsRegistry = null;
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        ResReestrTaloonPreorder resReestrTaloonPreorder = null;
+        ReestrTaloonPreorderData reestrTaloonPreorderData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
         InteractiveReportData interactiveReportData = null;
         InteractiveReport interactiveReport = null;
@@ -737,6 +748,18 @@ public class Processor implements SyncProcessor {
         timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processReestrTaloonApproval", timeForDelta);
 
         try {
+            if (request.getReestrTaloonPreorder() != null) {
+                resReestrTaloonPreorder = processReestrTaloonPreorder(request.getReestrTaloonPreorder());
+                reestrTaloonPreorderData = processReestrTaloonPreorderData(request.getReestrTaloonPreorder());
+            }
+        } catch (Exception e) {
+            String message = String.format("processReestrTaloonPreorder: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processReestrTaloonPreorder", timeForDelta);
+
+        try {
             if (request.getZeroTransactions() != null) {
                 zeroTransactionData = processZeroTransactionsData(request.getZeroTransactions());
                 resZeroTransactions = processZeroTransactions(request.getZeroTransactions());
@@ -938,7 +961,7 @@ public class Processor implements SyncProcessor {
                 tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry,
                 manager, orgOwnerData, questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian,
                 clientGuardianData, accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
-                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding,
                 cardRequestsData, resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection,goodRequestEZDSection,
@@ -1050,6 +1073,9 @@ public class Processor implements SyncProcessor {
 
         // обработка реестра TallonApproval
         fullProcessingReestTaloonApproval(request, syncHistory, responseSections);
+
+        // обработка реестра TaloonPreorder
+        fullProcessingReestrTaloonPreorder(request, syncHistory, responseSections);
 
         // обработка нулевых транзакций
         fullProcessingZeroTransactions(request, syncHistory, responseSections);
@@ -1286,6 +1312,26 @@ public class Processor implements SyncProcessor {
             }
         } catch (Exception e) {
             String message = String.format("processReestrTaloonApproval: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingReestrTaloonPreorder(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            ReestrTaloonPreorder reestrTaloonPreorderRequest = request.getReestrTaloonPreorder();
+            if (reestrTaloonPreorderRequest != null) {
+                ResReestrTaloonPreorder resReestrTaloonPreorder = processReestrTaloonPreorder(
+                        reestrTaloonPreorderRequest);
+                addToResponseSections(resReestrTaloonPreorder, responseSections);
+
+                ReestrTaloonPreorderData reestrTaloonPreorderData = processReestrTaloonPreorderData(
+                        reestrTaloonPreorderRequest);
+                addToResponseSections(reestrTaloonPreorderData, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("processReestrTaloonPreorder: %s", e.getMessage());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
@@ -1970,6 +2016,8 @@ public class Processor implements SyncProcessor {
         AccountsRegistry accountsRegistry = null;
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        ResReestrTaloonPreorder resReestrTaloonPreorder = null;
+        ReestrTaloonPreorderData reestrTaloonPreorderData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
         InteractiveReportData interactiveReportData = null;
         ZeroTransactionData zeroTransactionData = null;
@@ -2033,7 +2081,7 @@ public class Processor implements SyncProcessor {
                 tempCardOperationData, resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry,
                 manager, orgOwnerData, questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian,
                 clientGuardianData, accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
-                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding, cardRequestsData,
                 resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
@@ -2072,6 +2120,8 @@ public class Processor implements SyncProcessor {
         AccountsRegistry accountsRegistry = null;
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        ResReestrTaloonPreorder resReestrTaloonPreorder = null;
+        ReestrTaloonPreorderData reestrTaloonPreorderData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
         InteractiveReportData interactiveReportData = null;
         ZeroTransactionData zeroTransactionData = null;
@@ -2117,9 +2167,96 @@ public class Processor implements SyncProcessor {
                 resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry, manager, orgOwnerData,
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
-                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                  specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
+                clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
+                resSyncSettingsSection, syncSettingsSection);
+    }
+
+    private SyncResponse buildReestrTaloonsPreorderSyncResponse(SyncRequest request) throws Exception {
+        SyncHistory syncHistory = null;
+        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        ResAccountOperationsRegistry resAccountOperationsRegistry = null;
+        ResPaymentRegistry resPaymentRegistry = null;
+        SyncResponse.AccRegistry accRegistry = null;
+        SyncResponse.AccIncRegistry accIncRegistry = null;
+        SyncResponse.ClientRegistry clientRegistry = null;
+        SyncResponse.ResOrgStructure resOrgStructure = null;
+        SyncResponse.ResMenuExchangeData resMenuExchange = null;
+        SyncResponse.ResDiary resDiary = null;
+        SyncResponse.ResEnterEvents resEnterEvents = null;
+        ResTempCardsOperations resTempCardsOperations = null;
+        TempCardOperationData tempCardOperationData = null;
+        ComplexRoles complexRoles = null;
+        ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
+        Manager manager = null;
+        OrgOwnerData orgOwnerData = null;
+        QuestionaryData questionaryData = null;
+        GoodsBasicBasketData goodsBasicBasketData = null;
+        DirectiveElement directiveElement = null;
+        List<Long> errorClientIds = new ArrayList<Long>();
+        ResultClientGuardian resultClientGuardian = null;
+        ClientGuardianData clientGuardianData = null;
+        AccRegistryUpdate accRegistryUpdate = null;
+        ProhibitionsMenu prohibitionsMenu = null;
+        OrganizationStructure organizationStructure = null;
+        ResCardsOperationsRegistry resCardsOperationsRegistry = null;
+        AccountsRegistry accountsRegistry = null;
+        ResReestrTaloonApproval resReestrTaloonApproval = null;
+        ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        ResReestrTaloonPreorder resReestrTaloonPreorder = null;
+        ReestrTaloonPreorderData reestrTaloonPreorderData = null;
+        OrganizationComplexesStructure organizationComplexesStructure = null;
+        InteractiveReportData interactiveReportData = null;
+        ZeroTransactionData zeroTransactionData = null;
+        ResZeroTransactions resZeroTransactions = null;
+        SpecialDatesData specialDatesData = null;
+        ResSpecialDates resSpecialDates = null;
+        MigrantsData migrantsData = null;
+        ResMigrants resMigrants = null;
+        ResHelpRequest resHelpRequest = null;
+        HelpRequestData helpRequestData = null;
+        PreOrdersFeeding preOrdersFeeding = null;
+        CardRequestsData cardRequestsData = null;
+        ResMenusCalendar resMenusCalendar = null;
+        MenusCalendarData menusCalendarData = null;
+        ClientBalanceHoldFeeding clientBalanceHoldFeeding = null;
+        ResClientBalanceHoldData resClientBalanceHoldData = null;
+        OrgSettingSection orgSettingSection = null;
+        SyncSettingsSection syncSettingsSection = null;
+        ResSyncSettingsSection resSyncSettingsSection = null;
+        GoodRequestEZDSection goodRequestEZDSection = null;
+
+        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
+
+        boolean bError = false;
+
+        try {
+            if (request.getReestrTaloonPreorder() != null) {
+                resReestrTaloonPreorder = processReestrTaloonPreorder(request.getReestrTaloonPreorder());
+                reestrTaloonPreorderData = processReestrTaloonPreorderData(request.getReestrTaloonPreorder());
+            }
+        } catch (Exception e) {
+            String message = String.format("processReestrTaloonPreorder: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        Date syncEndTime = new Date();
+
+        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
+                request.getOrg().getType(), "", idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure,
+                resMenuExchange, resDiary, "", resEnterEvents, resTempCardsOperations, tempCardOperationData,
+                resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry, manager, orgOwnerData,
+                questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
+                accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
+                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection);
@@ -2157,6 +2294,8 @@ public class Processor implements SyncProcessor {
         AccountsRegistry accountsRegistry = null;
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        ResReestrTaloonPreorder resReestrTaloonPreorder = null;
+        ReestrTaloonPreorderData reestrTaloonPreorderData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
         InteractiveReportData interactiveReportData = null;
         ZeroTransactionData zeroTransactionData = null;
@@ -2202,7 +2341,7 @@ public class Processor implements SyncProcessor {
                 resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry, manager, orgOwnerData,
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
-                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
@@ -2242,6 +2381,8 @@ public class Processor implements SyncProcessor {
         AccountsRegistry accountsRegistry = null;
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        ResReestrTaloonPreorder resReestrTaloonPreorder = null;
+        ReestrTaloonPreorderData reestrTaloonPreorderData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
         InteractiveReportData interactiveReportData = null;
         ZeroTransactionData zeroTransactionData = null;
@@ -2322,7 +2463,7 @@ public class Processor implements SyncProcessor {
                 resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry, manager, orgOwnerData,
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
-                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
@@ -2382,6 +2523,8 @@ public class Processor implements SyncProcessor {
         AccountsRegistry accountsRegistry = null;
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        ResReestrTaloonPreorder resReestrTaloonPreorder = null;
+        ReestrTaloonPreorderData reestrTaloonPreorderData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
         InteractiveReportData interactiveReportData = null;
         ZeroTransactionData zeroTransactionData = null;
@@ -2484,7 +2627,7 @@ public class Processor implements SyncProcessor {
                 resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry, manager, orgOwnerData,
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
-                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
@@ -2528,6 +2671,8 @@ public class Processor implements SyncProcessor {
         AccountsRegistry accountsRegistry = null;
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        ResReestrTaloonPreorder resReestrTaloonPreorder = null;
+        ReestrTaloonPreorderData reestrTaloonPreorderData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
         InteractiveReportData interactiveReportData = null;
         ZeroTransactionData zeroTransactionData = null;
@@ -2627,7 +2772,7 @@ public class Processor implements SyncProcessor {
                 resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry, manager, orgOwnerData,
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
-                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
@@ -2668,6 +2813,8 @@ public class Processor implements SyncProcessor {
         AccountsRegistry accountsRegistry = null;
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        ResReestrTaloonPreorder resReestrTaloonPreorder = null;
+        ReestrTaloonPreorderData reestrTaloonPreorderData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
         InteractiveReportData interactiveReportData = null;
         ZeroTransactionData zeroTransactionData = null;
@@ -2810,7 +2957,7 @@ public class Processor implements SyncProcessor {
                 resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry, manager, orgOwnerData,
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
-                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
@@ -2966,6 +3113,45 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return reestrTaloonApprovalData;
+    }
+
+    private ResReestrTaloonPreorder processReestrTaloonPreorder(ReestrTaloonPreorder reestrTaloonPreorder)
+            throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResReestrTaloonPreorder resReestrTaloonPreorder = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new ReestrTaloonPreorderProcessor(persistenceSession, reestrTaloonPreorder);
+            resReestrTaloonPreorder = (ResReestrTaloonPreorder) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return resReestrTaloonPreorder;
+    }
+
+    private ReestrTaloonPreorderData processReestrTaloonPreorderData(ReestrTaloonPreorder reestrTaloonPreorder)
+            throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ReestrTaloonPreorderData reestrTaloonPreorderData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            ReestrTaloonPreorderProcessor processor = new ReestrTaloonPreorderProcessor(persistenceSession,
+                    reestrTaloonPreorder);
+            reestrTaloonPreorderData = processor.processData();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return reestrTaloonPreorderData;
     }
 
     private ZeroTransactionData processZeroTransactionsData(ZeroTransactions zeroTransactions) throws Exception {
@@ -6143,6 +6329,8 @@ public class Processor implements SyncProcessor {
         AccountsRegistry accountsRegistry = null;
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        ResReestrTaloonPreorder resReestrTaloonPreorder = null;
+        ReestrTaloonPreorderData reestrTaloonPreorderData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
         InteractiveReportData interactiveReportData = null;
         ZeroTransactionData zeroTransactionData = null;
@@ -6187,7 +6375,7 @@ public class Processor implements SyncProcessor {
                 resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry, manager, orgOwnerData,
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
-                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
@@ -6566,6 +6754,8 @@ public class Processor implements SyncProcessor {
         AccountsRegistry accountsRegistry = null;
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        ResReestrTaloonPreorder resReestrTaloonPreorder = null;
+        ReestrTaloonPreorderData reestrTaloonPreorderData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
         InteractiveReportData interactiveReportData = null;
         ZeroTransactionData zeroTransactionData = null;
@@ -6643,7 +6833,7 @@ public class Processor implements SyncProcessor {
                 resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry, manager, orgOwnerData,
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
-                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,

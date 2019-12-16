@@ -156,8 +156,9 @@ public class TaloonPreorderVerification {
                     TaloonPreorder taloon = DAOReadonlyService.getInstance()
                             .findTaloonPreorder(idOfOrg, taloonDate, complexId, goodsGuid, price);
                     if (taloon != null) {
-                        if (itemChangedNullSafe(taloon.getShippedQty(), detail.getShippedQty()) || !taloon.getPpState()
-                                .equals(detail.getPpState())) {
+                        if (itemChangedNullSafe(taloon.getShippedQty(), detail.getShippedQty()) ||
+                                !taloon.getPpState().equals(detail.getPpState()) ||
+                                itemChangedNullSafe(taloon.getComments(), detail.getComments())) {
                             String rem = (taloon.getRemarks() == null ? "-" : taloon.getRemarks());
                             taloon.setRemarks(rem.concat("\n").concat(String
                                     .format("Изменено в АРМ отчетности, пользователь=%s, %2$td.%2$tm.%2$tY %2$tT",
@@ -180,6 +181,12 @@ public class TaloonPreorderVerification {
     private boolean itemChangedNullSafe(Integer fromDB, Integer fromApp) {
         Integer fromDB1 = (fromDB == null ? 0 : fromDB);
         Integer fromApp1 = (fromApp == null ? 0 : fromApp);
+        return !fromDB1.equals(fromApp1);
+    }
+
+    private boolean itemChangedNullSafe(String fromDB, String fromApp) {
+        String fromDB1 = (fromDB == null ? "" : fromDB);
+        String fromApp1 = (fromApp == null ? "" : fromApp);
         return !fromDB1.equals(fromApp1);
     }
 }

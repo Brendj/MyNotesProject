@@ -47,7 +47,7 @@ public class TaloonPreorder {
     public TaloonPreorder(Long idOfOrg, Date taloonDate, Long complexId, String complexName,
             String goodsName, String goodsGuid, Long idOfOrgCreated, Integer soldQty, Integer requestedQty,
             Integer shippedQty, Integer reservedQty, Integer blockedQty, Long price, TaloonCreatedTypeEnum createdType,
-            TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState, String remarks, String comments) {
+            TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState, String comments) {
         this.idOfOrg = idOfOrg;
         this.taloonDate = taloonDate;
         this.complexId = complexId;
@@ -64,7 +64,6 @@ public class TaloonPreorder {
         this.createdType = createdType;
         this.isppState = isppState;
         this.ppState = ppState;
-        this.remarks = remarks;
         this.comments = comments;
     }
 

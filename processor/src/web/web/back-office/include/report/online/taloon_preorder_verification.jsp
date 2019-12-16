@@ -313,8 +313,11 @@
 
                 <%--        Комментарий--%>
                 <rich:column headerClass="column-header">
-                    <h:inputText value="#{detail.comments}" styleClass="output-text" rendered="#{!detail.summaryDay}"/>
+                    <h:inputText value="#{detail.comments}" styleClass="output-text" rendered="#{!detail.summaryDay}">
+                    <a4j:support event="onchange"/>
+                    </h:inputText>
                 </rich:column>
+
                 <%--        История изменений--%>
                 <rich:column>
                     <a4j:commandButton value="..." reRender="taloonPreorderVerificationTable,tp_remarks_toshow"

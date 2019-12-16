@@ -416,6 +416,47 @@ public class DAOReadonlyService {
         }
     }
 
+    public Integer findTaloonPreorderSoldQty(Long idOfOrg, Date taloonDate, String complexName, String goodsGuid, Long price) {
+        Date dateEnd = CalendarUtils.addOneDay(taloonDate);
+        try {
+            String goodsJoin = "";
+            String goodsParam = "";
+            if(StringUtils.isNotEmpty(goodsGuid)) {
+                goodsJoin = "inner join cf_goods g on g.idofgood = od.idofgood ";
+                goodsParam = "and g.guid =:goodsGuid ";
+            } else {
+                goodsParam = "and od.idofgood is null ";
+            }
+            Query query = entityManager.createNativeQuery("SELECT sum(od.qty) from cf_orderDetails od "
+                    + "inner join cf_orders o on od.idOfOrg = o.idOfOrg and od.idOfOrder = o.idOfOrder " + goodsJoin
+                    + "where od.socDiscount > 0 and od.rprice = 0 and od.idOfOrg= :idOfOrg "
+                    + "and od.menuDetailName = :complexName "
+                    + "and od.MenuType >= :complexMin "
+                    + "and od.MenuType <= :complexMax "
+                    + "and od.discount =:price "
+                    + "and o.createdDate >= :taloonDate "
+                    + "and o.createdDate < :dateEnd "
+                    + "and o.state = :state "
+                    + goodsParam);
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setParameter("complexName", complexName);
+            query.setParameter("price", price);
+            query.setParameter("complexMin", OrderDetail.TYPE_COMPLEX_MIN);
+            query.setParameter("complexMax", OrderDetail.TYPE_COMPLEX_MAX);
+            query.setParameter("taloonDate", taloonDate.getTime());
+            query.setParameter("dateEnd", dateEnd.getTime());
+            query.setParameter("state", Order.STATE_COMMITED);
+            if(StringUtils.isNotEmpty(goodsGuid)) {
+                query.setParameter("goodsGuid", goodsGuid);
+            }
+            Object result = query.getSingleResult();
+            return result != null ? ((BigInteger) result).intValue() : 0;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
     public List getInfoMessageDetails(Long idOfInfoMessage) {
         //Query query = entityManager.createQuery("select d from InfoMessageDetail d where d.compositeIdOfInfoMessageDetail.idOfInfoMessage = :idOfInfoMessage");
         Session session = entityManager.unwrap(Session.class);
