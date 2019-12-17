@@ -96,40 +96,42 @@ public class ResTaloonPreorderItem {
         this.comments = taloon.getComments();
     }
 
-    public Element toElement(Document document, String elementName) throws Exception {
+    public Element toElement(Document document, String elementName, boolean isFullRecord) throws Exception {
         Element element = document.createElement(elementName);
         XMLUtils.setAttributeIfNotNull(element,"Guid",this.guid == null ? "" : this.guid);
-        XMLUtils.setAttributeIfNotNull(element, "OrgId", orgId);
-        XMLUtils.setAttributeIfNotNull(element, "OrgIdCreated", orgIdCreated);
-        if (date != null) {
-            XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.dateShortToStringFullYear(date));
-        }
         XMLUtils.setAttributeIfNotNull(element, "V", version);
         XMLUtils.setAttributeIfNotNull(element, "D", deletedState);
-        XMLUtils.setAttributeIfNotNull(element, "Res", resultCode);
-        XMLUtils.setAttributeIfNotNull(element, "ComplexId", complexId);
-        XMLUtils.setAttributeIfNotNull(element, "ComplexName", complexName);
-        XMLUtils.setAttributeIfNotNull(element, "SoldedQtyISPP", soldQty);
-        XMLUtils.setAttributeIfNotNull(element, "OrdersCount", ordersCount);
-        XMLUtils.setAttributeIfNotNull(element, "RequestedQtyISPP", requestedQty);
-        XMLUtils.setAttributeIfNotNull(element, "ShippedQtyPP", shippedQty);
-        XMLUtils.setAttributeIfNotNull(element, "StornoInPlan", reservedQty);
-        XMLUtils.setAttributeIfNotNull(element, "BlockInPlan", blockedQty);
-        XMLUtils.setAttributeIfNotNull(element, "Price", price);
-        //XMLUtils.setAttributeIfNotNull(element, "TaloonNumber", taloonNumber);
-        if (createdType != null) {
-            XMLUtils.setAttributeIfNotNull(element, "CreatedType", createdType.ordinal());
-        }
-        XMLUtils.setAttributeIfNotNull(element,"GoodsName",this.goodsName);
-        XMLUtils.setAttributeIfNotNull(element,"GoodsGuid",this.goodsGuid == null ? "" : this.goodsGuid);
-        if(isppState != null) XMLUtils.setAttributeIfNotNull(element, "ISPP_State", isppState.ordinal());
-        if(ppState != null) XMLUtils.setAttributeIfNotNull(element, "PP_State", ppState.ordinal());
-        if (resultCode != null && resultCode != 0) {
-            XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
-        }
         XMLUtils.setAttributeIfNotNull(element,"Comments",this.comments);
-        // для поддежки старых версий
-        XMLUtils.setAttributeIfNotNull(element, "Qty", soldQty);
+        if (!isFullRecord) {
+            XMLUtils.setAttributeIfNotNull(element, "Res", resultCode);
+            XMLUtils.setAttributeIfNotNull(element, "OrdersInPP", ordersCount);
+            if (resultCode != null && resultCode != 0) {
+                XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
+            }
+        } else {
+            XMLUtils.setAttributeIfNotNull(element, "OrgId", orgId);
+            XMLUtils.setAttributeIfNotNull(element, "OrgIdCreated", orgIdCreated);
+            if (date != null) {
+                XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.dateShortToStringFullYear(date));
+            }
+            XMLUtils.setAttributeIfNotNull(element, "ComplexId", complexId);
+            XMLUtils.setAttributeIfNotNull(element, "ComplexName", complexName);
+            XMLUtils.setAttributeIfNotNull(element, "SoldedQtyISPP", soldQty);
+            XMLUtils.setAttributeIfNotNull(element, "RequestedQtyISPP", requestedQty);
+            XMLUtils.setAttributeIfNotNull(element, "ShippedQtyPP", shippedQty);
+            XMLUtils.setAttributeIfNotNull(element, "StornoInPlan", reservedQty);
+            XMLUtils.setAttributeIfNotNull(element, "BlockInPlan", blockedQty);
+            XMLUtils.setAttributeIfNotNull(element, "Price", price);
+            if (createdType != null) {
+                XMLUtils.setAttributeIfNotNull(element, "CreatedType", createdType.ordinal());
+            }
+            XMLUtils.setAttributeIfNotNull(element,"GoodsName",this.goodsName);
+            XMLUtils.setAttributeIfNotNull(element,"GoodsGuid",this.goodsGuid == null ? "" : this.goodsGuid);
+            if(isppState != null) XMLUtils.setAttributeIfNotNull(element, "ISPP_State", isppState.ordinal());
+            if(ppState != null) XMLUtils.setAttributeIfNotNull(element, "PP_State", ppState.ordinal());
+            // для поддежки старых версий
+            XMLUtils.setAttributeIfNotNull(element, "Qty", soldQty);
+        }
         return element;
     }
 

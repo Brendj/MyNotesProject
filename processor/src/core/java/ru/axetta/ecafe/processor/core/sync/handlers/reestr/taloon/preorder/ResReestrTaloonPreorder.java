@@ -28,7 +28,7 @@ public class ResReestrTaloonPreorder implements AbstractToElement {
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("ResReestrTaloonPreorders");
         for (ResTaloonPreorderItem item : this.getItems()) {
-            element.appendChild(item.toElement(document, "RTPR"));
+            element.appendChild(item.toElement(document, "RTPR", false));
         }
         return element;
     }
