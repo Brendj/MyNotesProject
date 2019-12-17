@@ -26,6 +26,7 @@ public class ProcessGroupsOrganizationData implements AbstractToElement {
         Element element = document.createElement("GroupsOrganization");
 
         Map<String, List<ProcessGroupsOrganizationDataItem>> middleGroupsByGroup = new HashMap<String, List<ProcessGroupsOrganizationDataItem>>();
+        List<ProcessGroupsOrganizationDataItem> allItems = new ArrayList<>();
 
         for (ProcessGroupsOrganizationDataItem item : items) {
             if (item.getMiddleGroup() != null || item.getParentGroupName() != null) {
@@ -39,11 +40,28 @@ public class ProcessGroupsOrganizationData implements AbstractToElement {
                     }
                 }
             } else {
-                element.appendChild(item.toElement(document));
+                allItems.add(item);
             }
         }
 
         Set<String> groupNamesSet = middleGroupsByGroup.keySet();
+
+        //Убираем из списка групп те, у которых есть подгруппы т.к. они вместе с подгруппами запищутся далее отдельно
+        for (ProcessGroupsOrganizationDataItem processGroupsOrganizationDataItem: allItems)
+        {
+            boolean haveMainGroup = false;
+            for (String mainGroup: groupNamesSet)
+            {
+                if (processGroupsOrganizationDataItem.getName().equals(mainGroup))
+                {
+                    haveMainGroup = true;
+                    break;
+                }
+            }
+            if (!haveMainGroup)
+                element.appendChild(processGroupsOrganizationDataItem.toElement(document));
+        }
+
 
         for (String groupName : groupNamesSet) {
             List<ProcessGroupsOrganizationDataItem> middleGroups = middleGroupsByGroup.get(groupName);
