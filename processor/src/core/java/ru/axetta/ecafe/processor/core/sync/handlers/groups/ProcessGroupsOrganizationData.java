@@ -27,6 +27,7 @@ public class ProcessGroupsOrganizationData implements AbstractToElement {
 
         Map<String, List<ProcessGroupsOrganizationDataItem>> middleGroupsByGroup = new HashMap<String, List<ProcessGroupsOrganizationDataItem>>();
         List<ProcessGroupsOrganizationDataItem> allItems = new ArrayList<>();
+        Map<String, Boolean> is6DaysForMainGroup = new HashMap<String, Boolean>();
 
         for (ProcessGroupsOrganizationDataItem item : items) {
             if (item.getMiddleGroup() != null || item.getParentGroupName() != null) {
@@ -37,6 +38,7 @@ public class ProcessGroupsOrganizationData implements AbstractToElement {
                         List<ProcessGroupsOrganizationDataItem> array = new ArrayList<ProcessGroupsOrganizationDataItem>();
                         array.add(item);
                         middleGroupsByGroup.put(item.getParentGroupName(), array);
+                        is6DaysForMainGroup.put(item.getParentGroupName(), item.getIsSixDaysWorkWeek());
                     }
                 }
             } else {
@@ -47,32 +49,31 @@ public class ProcessGroupsOrganizationData implements AbstractToElement {
         Set<String> groupNamesSet = middleGroupsByGroup.keySet();
 
         //Убираем из списка групп те, у которых есть подгруппы т.к. они вместе с подгруппами запищутся далее отдельно
-        for (ProcessGroupsOrganizationDataItem processGroupsOrganizationDataItem: allItems)
-        {
+        for (ProcessGroupsOrganizationDataItem processGroupsOrganizationDataItem : allItems) {
             boolean haveMainGroup = false;
-            for (String mainGroup: groupNamesSet)
-            {
-                if (processGroupsOrganizationDataItem.getName().equals(mainGroup))
-                {
+            for (String mainGroup : groupNamesSet) {
+                if (processGroupsOrganizationDataItem.getName().equals(mainGroup)) {
                     haveMainGroup = true;
                     break;
                 }
             }
-            if (!haveMainGroup)
+            if (!haveMainGroup) {
                 element.appendChild(processGroupsOrganizationDataItem.toElement(document));
+            }
         }
 
 
         for (String groupName : groupNamesSet) {
             List<ProcessGroupsOrganizationDataItem> middleGroups = middleGroupsByGroup.get(groupName);
-            element.appendChild(middleGroupsToElement(groupName, middleGroups, document));
+            Boolean is6DaysValue = is6DaysForMainGroup.get(groupName);
+            element.appendChild(middleGroupsToElement(groupName, middleGroups, is6DaysValue, document));
         }
 
         return element;
     }
 
     private Node middleGroupsToElement(String groupName, List<ProcessGroupsOrganizationDataItem> middleGroups,
-            Document document) {
+            Boolean is6DaysValue, Document document) {
         Long maxVersion = 0L;
 
         for (ProcessGroupsOrganizationDataItem groupsOrganizationDataItem : middleGroups) {
@@ -83,13 +84,15 @@ public class ProcessGroupsOrganizationData implements AbstractToElement {
 
         Element element = document.createElement("CG");
         XMLUtils.setAttributeIfNotNull(element, "Name", groupName);
+        XMLUtils.setAttributeIfNotNull(element, "Is6DaysWorkWeek", is6DaysValue);
         XMLUtils.setAttributeIfNotNull(element, "V", maxVersion);
 
         for (ProcessGroupsOrganizationDataItem groupsOrganizationData : middleGroups) {
             Element elementCmg = document.createElement("CMG");
             XMLUtils.setAttributeIfNotNull(elementCmg, "Name", groupsOrganizationData.getName());
             XMLUtils.setAttributeIfNotNull(elementCmg, "BindingToOrg", groupsOrganizationData.getBindingToOrg());
-            XMLUtils.setAttributeIfNotNull(elementCmg, "Is6DaysWorkWeek", groupsOrganizationData.getIsSixDaysWorkWeek());
+            XMLUtils.setAttributeIfNotNull(elementCmg, "Is6DaysWorkWeek",
+                    groupsOrganizationData.getIsSixDaysWorkWeek());
             element.appendChild(elementCmg);
         }
 
