@@ -91,6 +91,11 @@ public class CryptoSign {
                     sucsess = false;
                     responseCardSign.setMessage("Тип подписи для карты задан некорректно");
                 }
+                //Маленькие карты и тип Тройка-Москвенок
+                if (card.getMemSize() == 2 && (card.getTypeId() == 12 && card.getTypeId() == 13 && card.getTypeId() == 14)) {
+                    sucsess = false;
+                    responseCardSign.setMessage("Неверный тип носителя");
+                }
                 if (sucsess) {//Подписываем карту только если пройдены проверки
                     //Подготавливаем данные для подписи
                     byte[] fiz = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(card.getUid()).array();
