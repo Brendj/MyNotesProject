@@ -42,6 +42,7 @@ public class ProcessGroupsOrganizationData implements AbstractToElement {
                     }
                 }
             } else {
+                is6DaysForMainGroup.put(item.getName(), item.getIsSixDaysWorkWeek());
                 allItems.add(item);
             }
         }
