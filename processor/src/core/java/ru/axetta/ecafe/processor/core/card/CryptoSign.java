@@ -83,6 +83,19 @@ public class CryptoSign {
                     responseCardSign.setMessage("Неверный тип носителя");
                     sucsess = false;
                 }
+                //card.getMemSize() == 1 - Если тип карты поддерживает данный более 128 байт
+                //card.getMemSize() == 2 - Если тип карты не поддерживает данный более 128 байт
+                //cardSign.getSignType() == 1 - ECDSA
+                //cardSign.getSignType() == 2 - Scrypt
+                if (!((card.getMemSize() == 1 && cardSign.getSignType() == 1) || (card.getMemSize() == 2 && cardSign.getSignType() == 0))) {
+                    sucsess = false;
+                    responseCardSign.setMessage("Тип подписи для карты задан некорректно");
+                }
+                //Маленькие карты и тип Тройка-Москвенок
+                if (card.getMemSize() == 2 && (card.getTypeId() == 12 || card.getTypeId() == 13 || card.getTypeId() == 14)) {
+                    sucsess = false;
+                    responseCardSign.setMessage("Неверный тип носителя");
+                }
                 if (sucsess) {//Подписываем карту только если пройдены проверки
                     //Подготавливаем данные для подписи
                     byte[] fiz = ByteBuffer.allocate(Long.SIZE / Byte.SIZE).putLong(card.getUid()).array();
