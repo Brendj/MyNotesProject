@@ -88,6 +88,8 @@ public class OtherActionsPage extends OnlineReportPage {
         summaryDate = new Date();
         summaryFinOperatorDate = new Date();
         startDate = CalendarUtils.addDays(new Date(), 2);
+        endDateEMP = new Date();
+        startDateEMP = CalendarUtils.addDays(endDateEMP, -7);
     }
 
     public void rubBIExport() throws Exception {
@@ -204,7 +206,8 @@ public class OtherActionsPage extends OnlineReportPage {
                 }
 
                 ExternalEvent event = DAOService.getInstance()
-                        .getExternalEvent(client, ExternalEventType.SPECIAL, emias1.getDateLiberate(),
+                        .getExternalEvent(client, client.getOrg().getShortNameInfoService(), client.getOrg().getOfficialName(),
+                                ExternalEventType.SPECIAL, emias1.getDateLiberate(),
                                 ExternalEventStatus.fromInteger(eventsStatus));
                 event.setForTest(true);
                 ExternalEventNotificationService notificationService = RuntimeContext.getAppContext()

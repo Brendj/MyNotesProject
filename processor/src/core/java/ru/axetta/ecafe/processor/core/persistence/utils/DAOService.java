@@ -2658,15 +2658,18 @@ public class DAOService {
             return null;
         }
     }
-    public ExternalEvent getExternalEvent (Client client, ExternalEventType evtType,
+    public ExternalEvent getExternalEvent (Client client, String orgCode, String orgName, ExternalEventType evtType,
             Date evtDateTime, ExternalEventStatus evtStatus)
     {
         Query query = entityManager.createQuery("select ee from ExternalEvent ee where ee.client = :client "
-                + "and ee.evtType = :evtType and ee.evtDateTime = :evtDateTime and ee.evtStatus = :evtStatus ");
+                + "and ee.evtType = :evtType and ee.evtDateTime = :evtDateTime and ee.evtStatus = :evtStatus "
+                + "and ee.orgCode = :orgCode and ee.orgName = :orgName");
         query.setParameter("client", client);
         query.setParameter("evtType", evtType);
         query.setParameter("evtDateTime", evtDateTime);
         query.setParameter("evtStatus", evtStatus);
+        query.setParameter("orgCode", orgCode);
+        query.setParameter("orgName", orgName);
         try {
             return (ExternalEvent)query.getResultList().get(0);
         } catch (NoResultException e) {

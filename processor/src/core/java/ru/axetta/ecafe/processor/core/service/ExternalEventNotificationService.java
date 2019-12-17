@@ -135,20 +135,13 @@ public class ExternalEventNotificationService {
                         if (clas > 0 && clas < 5)//1-4
                         {
                             //Если учащийся с 1-4 класс
-                            logger.info("Учащийся в 1-4 классе");
                             notificationService
                                     .sendNotificationAsync(destGuardian, client, type, values, event.getEvtDateTime());
-                            logger.info("Отправка уведомления прошла успешно");
                         } else {
-                            logger.info("Учащийся не в 1-4 классе");
                             //Если есть социальная льгота
                             if (ClientHaveDiscount(persistenceSession, client)) {
-                                logger.info("У учашегося есть льгота");
                                 notificationService.sendNotificationAsync(destGuardian, client, type, values,
                                         event.getEvtDateTime());
-                                logger.info("Отправка уведомления прошла успешно");
-                            } else {
-                                logger.info("У учашегося нет льготы");
                             }
                         }
                     }
@@ -156,31 +149,20 @@ public class ExternalEventNotificationService {
             }
             //отправка клиенту
             if (event.getEvtType().equals(ExternalEventType.SPECIAL)) { //Если тип = Служебные сообщения, то ....
-                logger.info("Отправка уведомления клиенту");
                 if (clas > 0 && clas < 5)//1-4
                 {
                     //Если учащийся с 1-4 класс
-                    logger.info("Учащийся в 1-4 классе");
                     notificationService.sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
-                    logger.info("Отправка уведомления прошла успешно");
                 } else {
-                    logger.info("Учащийся не в 1-4 классе");
                     //Только для НЕ предопределенной группы
                     ClientGroup.Predefined predefined = ClientGroup.Predefined
                             .parse(client.getClientGroup().getGroupName());
                     if (predefined == null) {
-                        logger.info("Учашийся в непредопределенной группе");
                         //Если есть социальная льгота
                         if (ClientHaveDiscount(persistenceSession, client)) {
-                            logger.info("У учашегося есть льгота");
                             notificationService
                                     .sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
-                            logger.info("Отправка уведомления прошла успешно");
-                        } else {
-                            logger.info("У учашегося нет льготы");
                         }
-                    } else {
-                        logger.info("Учашийся в предопределенной группе");
                     }
                 }
 
@@ -240,10 +222,17 @@ public class ExternalEventNotificationService {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(event.getEvtDateTime());
         if (event.getEvtType().equals(ExternalEventType.MUSEUM)) {
-            return new String[]{
-                    EMP_TIME, empTime, PLACE_NAME, event.getOrgName(), PLACE_CODE, event.getOrgCode(), SURNAME,
-                    client.getPerson().getSurname(), NAME, client.getPerson().getFirstName(), ACCOUNT,
-                    client.getContractId().toString()};
+            if (event.getForTest() != null && event.getForTest()) {
+                return new String[]{
+                        EMP_TIME, empTime, PLACE_NAME, event.getOrgName(), PLACE_CODE, event.getOrgCode(), SURNAME,
+                        client.getPerson().getSurname(), NAME, client.getPerson().getFirstName(), ACCOUNT,
+                        client.getContractId().toString(), "TEST", "true"};
+            } else {
+                return new String[]{
+                        EMP_TIME, empTime, PLACE_NAME, event.getOrgName(), PLACE_CODE, event.getOrgCode(), SURNAME,
+                        client.getPerson().getSurname(), NAME, client.getPerson().getFirstName(), ACCOUNT,
+                        client.getContractId().toString()};
+            }
         }
         if (event.getEvtType().equals(ExternalEventType.CULTURE)) {
             SimpleDateFormat dateFormat = null;
@@ -257,11 +246,21 @@ public class ExternalEventNotificationService {
             } else {
                 shortName = cultureShortName;
             }
-            return new String[]{
-                    SURNAME, client.getPerson().getSurname(), PLACE_NAME, event.getOrgName(), EMP_DATE, empDate,
-                    BALANCE, String.valueOf(client.getBalance()), EMP_TIME, empTime, EMP_TIME_H, empTimeH, ADDRESS,
-                    event.getAddress(), SHORTNAMEINFOSERVICE, shortName, NAME, client.getPerson().getFirstName(),
-                    ACCOUNT, client.getContractId().toString()};
+            if (event.getForTest() != null && event.getForTest()) {
+                return new String[]{
+                        SURNAME, client.getPerson().getSurname(), PLACE_NAME, event.getOrgName(), EMP_DATE, empDate,
+                        BALANCE, String.valueOf(client.getBalance()), EMP_TIME, empTime, EMP_TIME_H, empTimeH, ADDRESS,
+                        event.getAddress(), SHORTNAMEINFOSERVICE, shortName, NAME, client.getPerson().getFirstName(),
+                        ACCOUNT, client.getContractId().toString(),  "TEST", "true"};
+            } else {
+                return new String[]{
+                        SURNAME, client.getPerson().getSurname(), PLACE_NAME, event.getOrgName(), EMP_DATE, empDate,
+                        BALANCE, String.valueOf(client.getBalance()), EMP_TIME, empTime, EMP_TIME_H, empTimeH, ADDRESS,
+                        event.getAddress(), SHORTNAMEINFOSERVICE, shortName, NAME, client.getPerson().getFirstName(),
+                        ACCOUNT, client.getContractId().toString()
+                };
+            }
+
         }
         if (event.getEvtType().equals(ExternalEventType.SPECIAL)) {
             SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.YYYY");
@@ -269,13 +268,25 @@ public class ExternalEventNotificationService {
             String empTimeH = dateFormat.format(getEND_DATE());
             if (event.getForTest() != null && event.getForTest()) {
                 return new String[]{
-                        SURNAME, client.getPerson().getSurname(), EMP_DATE, empDate, EMP_TIME, empTime, EMP_TIME_H,
-                        empTimeH, NAME, client.getPerson().getFirstName(), ACCOUNT, client.getContractId().toString(),
-                        "TEST", "true"};
+                        SURNAME, client.getPerson().getSurname(),
+                        NAME, client.getPerson().getFirstName(),
+                        PLACE_NAME, event.getOrgName(),
+                        ACCOUNT, client.getContractId().toString(),
+                        EMP_DATE, empDate,
+                        PLACE_CODE, event.getOrgCode(),
+                        EMP_TIME, empTime,
+                        EMP_TIME_H, empTimeH,
+                        "TEST", "true"
+                };
             } else {
                 return new String[]{
-                        SURNAME, client.getPerson().getSurname(), EMP_DATE, empDate, EMP_TIME, empTime, EMP_TIME_H,
-                        empTimeH, NAME, client.getPerson().getFirstName(), ACCOUNT, client.getContractId().toString()};
+                        SURNAME, client.getPerson().getSurname(),
+                        NAME, client.getPerson().getFirstName(),
+                        PLACE_NAME, event.getOrgName(),
+                        ACCOUNT, client.getContractId().toString(),
+                        EMP_DATE, empDate,
+                        PLACE_CODE, event.getOrgCode()
+                        };
             }
         }
         return null;
