@@ -1530,11 +1530,39 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        clientGuardian.getInformedSpecialMenu(), clientGuardian.getIsLegalRepresent(), clientGuardian.getAllowedPreorder()));
+                        getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getIsLegalRepresent()));
             }
         }
         return guardianItems;
     }
+
+    public static boolean getInformedSpecialMenu(Session session, Long idOfClient, Long idOfGuardian) {
+        Criteria criteria = session.createCriteria(PreorderFlag.class);
+        criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
+        criteria.add(Restrictions.eq("informedSpecialMenu", true));
+        criteria.add(Restrictions.eq("guardianInformedSpecialMenu.idOfClient", idOfGuardian));
+
+        List<PreorderFlag> list = criteria.list(); //getPreorderFlagByClient(session, idOfClient, idOfGuardian);
+        if (list.size() == 0) return false;
+        return list.get(0).getInformedSpecialMenu();
+    }
+
+    public static boolean getAllowedPreorderByClient(Session session, Long idOfClient) {
+        Criteria criteria = session.createCriteria(PreorderFlag.class);
+        criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
+        criteria.add(Restrictions.eq("allowedPreorder", true));
+
+        List<PreorderFlag> list = criteria.list(); //getPreorderFlagByClient(session, idOfClient, null);
+        if (list.size() == 0) return false;
+        return list.get(0).getAllowedPreorder();
+    }
+
+    /*private static List<PreorderFlag> getPreorderFlagByClient(Session session, Long idOfClient, Long idOfGuardian) {
+        Criteria criteria = session.createCriteria(PreorderFlag.class);
+        criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
+        if (idOfGuardian != null) criteria.add(Restrictions.eq("guardianInformedSpecialMenu.idOfClient", idOfGuardian));
+        return criteria.list();
+    }*/
 
     public static List<ClientGuardianItem> loadWardsByClient(Session session, Long idOfClient) throws Exception {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
@@ -1549,7 +1577,7 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
                 wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
                         notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        clientWard.getInformedSpecialMenu(), clientWard.getIsLegalRepresent(), clientWard.getAllowedPreorder()));
+                        getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getIsLegalRepresent()));
             }
         }
         return wardItems;
@@ -1756,28 +1784,42 @@ public class ClientManager {
     }
 
     /* Установить флаг информирования об условиях предоставления услуг по предзаказам */
-    public static void setInformSpecialMenu(Session session, Long idOfClient, Long idOfGuardian, Long newVersion) {
-        Criteria criteria = session.createCriteria(ClientGuardian.class);
+    public static void setInformSpecialMenu(Session session, Client client, Client guardian, Long newVersion) {
+        /*Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfClient));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
         ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
         cg.setInformedSpecialMenu(true);
         cg.setVersion(newVersion);
         cg.setLastUpdate(new Date());
-        session.update(cg);
+        session.update(cg);*/
+
+        Criteria criteria = session.createCriteria(PreorderFlag.class);
+        criteria.add(Restrictions.eq("client", client));
+        if (guardian != null) criteria.add(Restrictions.eq("guardianInformedSpecialMenu", guardian));
+        List<PreorderFlag> preorderFlagList = criteria.list();
+        PreorderFlag preorderFlag;
+        if (preorderFlagList.size() == 0) {
+            preorderFlag = new PreorderFlag(client);
+        } else {
+            preorderFlag = preorderFlagList.get(0);
+        }
+        preorderFlag.setInformedSpecialMenu(true);
+        preorderFlag.setGuardianAllowedPreorder(guardian);
+        preorderFlag.setLastUpdate(new Date());
+        session.saveOrUpdate(preorderFlag);
     }
 
     /* Установить флаг на самостоятельное использование предзаказа + установка телефона + очистка флагов уведомлений*/
-    public static void setPreorderAllowed(Session session, Client child, Long idOfGuardian, String childMobile, Long newVersion) throws Exception {
-        Criteria criteria = session.createCriteria(ClientGuardian.class);
-        criteria.add(Restrictions.eq("idOfChildren", child.getIdOfClient()));
-        criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
-        ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
-        if (!cg.getInformedSpecialMenu()) throw new NotInformedSpecialMenuException();
-        cg.setAllowedPreorder(true);
-        cg.setVersion(newVersion);
-        cg.setLastUpdate(new Date());
-        session.update(cg);
+    public static void setPreorderAllowed(Session session, Client child, Client guardian, String childMobile, Long newVersion) throws Exception {
+        Criteria criteria = session.createCriteria(PreorderFlag.class);
+        criteria.add(Restrictions.eq("client", child));
+        PreorderFlag preorderFlag = (PreorderFlag) criteria.uniqueResult();
+        if (preorderFlag == null || !preorderFlag.getInformedSpecialMenu()) throw new NotInformedSpecialMenuException();
+        preorderFlag.setAllowedPreorder(true);
+        preorderFlag.setGuardianAllowedPreorder(guardian);
+        preorderFlag.setLastUpdate(new Date());
+        session.update(preorderFlag);
         long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
         child.setMobile(childMobile);
         child.setClientRegistryVersion(clientRegistryVersion);

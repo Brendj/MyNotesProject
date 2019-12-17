@@ -409,6 +409,10 @@
     <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.specialMenu}" disabled="true" readonly="true"
                              styleClass="output-text" />
 
+    <h:outputText escape="true" value="Согласие на предзаказ получено" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.informedSpecialMenu}" disabled="true" readonly="true"
+                             styleClass="output-text" />
+
     <h:outputText escape="true" value="Режим выдачи нескольких активных карт" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.multiCardMode}" styleClass="output-text"
                              disabled="true"  readonly="true"/>

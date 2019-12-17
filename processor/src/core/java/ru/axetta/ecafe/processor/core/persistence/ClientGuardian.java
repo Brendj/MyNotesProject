@@ -30,7 +30,6 @@ public class ClientGuardian {
     private CardRequest cardRequest;
     private Boolean informedSpecialMenu;
     private Boolean isLegalRepresent;
-    private Boolean allowedPreorder;
 
     protected ClientGuardian() {}
 
@@ -199,11 +198,4 @@ public class ClientGuardian {
         return isLegalRepresent == null ? false : isLegalRepresent;
     }
 
-    public Boolean getAllowedPreorder() {
-        return allowedPreorder;
-    }
-
-    public void setAllowedPreorder(Boolean allowedPreorder) {
-        this.allowedPreorder = allowedPreorder;
-    }
 }

@@ -182,6 +182,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_NOT_ENOUGH_BALANCE = 680L;
     private static final Long RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED = 690L;
     private static final Long RC_NOT_EDITED_DAY = 700L;
+    private static final Long RC_WRONG_GROUP = 710L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -230,6 +231,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED_DESC = "Заявление не найдено или имеет статус, в котором удаление запрещено";
     private static final String RC_NOT_EDITED_DAY_DESC = "День недоступен для редактирования предзаказа";
     private static final String RC_INVALID_MOBILE = "Неверный формат мобильного телефона";
+    private static final String RC_INVALID_INPUT_DATA = "Неверные входные данные";
+    private static final String RC_WRONG_GROUP_DESC = "Неверная группа клиента";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -3744,13 +3747,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         if (result.get(row[0]) == null || (result.get(row[0]) != null && result.get(row[0])
                                 .isDisabled())) {
                             //если по клиенту инфы еще нет то добавляем, или инфа уже есть, но связка выключена, то обновляем инфу
+                            Client child = (Client) row[0];
                             ClientGuardian cg = (ClientGuardian) row[1];
                             ClientWithAddInfo addInfo = new ClientWithAddInfo();
-                            addInfo.setInformedSpecialMenu(cg.getInformedSpecialMenu() ? 1 : null);
-                            addInfo.setPreorderAllowed(cg.getAllowedPreorder() ? 1 : null);
+                            addInfo.setInformedSpecialMenu(ClientManager.getInformedSpecialMenu(session, child.getIdOfClient(), cg.getIdOfGuardian()) ? 1 : null);
+                            addInfo.setPreorderAllowed(ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient()) ? 1 : 0);
                             addInfo.setClientCreatedFrom(cg.isDisabled() ? null : cg.getCreatedFrom());
                             addInfo.setDisabled(cg.isDisabled());
-                            result.put((Client) row[0], addInfo);
+                            result.put(child, addInfo);
                         }
                     }
                 } else {
@@ -8820,13 +8824,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.description = RC_NOT_INFORMED_SPECIAL_MENU_DESC;
                 return result;
             }
-            boolean allowed = false;
-            for (ClientGuardianItem item : guardians) {
-                if (item.getAllowedPreorder()) {
-                    allowed = true;
-                    break;
-                }
-            }
+            boolean allowed = ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient());
             if (!allowed) {
                 result.resultCode = RC_NOT_ALLOWED_PREORDERS;
                 result.description = RC_NOT_ALLOWED_PREORDERS_DESC;
@@ -9175,6 +9173,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
 
+            if ((client.isStudent() && (StringUtils.isEmpty(guardianMobile) || StringUtils.isEmpty(childMobile)))
+                    || (!client.isStudent() && (!StringUtils.isEmpty(guardianMobile) || !StringUtils.isEmpty(childMobile)))) {
+                //если для ученика не указаны телефоны представителя и самого ученика или наоборот, для сотрудника они указаны, то это ошибка
+                result.resultCode = RC_INVALID_DATA;
+                result.description = RC_INVALID_INPUT_DATA;
+                return result;
+            }
+
             List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
             Long version = getClientGuardiansResultVersion(session);
             boolean guardianWithMobileFound = false;
@@ -9183,7 +9189,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         .equals(Client.checkAndConvertMobile(guardianMobile))) {
                     guardianWithMobileFound = true;
                     ClientManager
-                            .setPreorderAllowed(session, client, guardian.getIdOfClient(), mobile, version);
+                            .setPreorderAllowed(session, client, guardian, mobile, version);
                 }
             }
 
@@ -9201,7 +9207,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.resultCode = RC_NOT_INFORMED_SPECIAL_MENU;
             result.description = RC_NOT_INFORMED_SPECIAL_MENU_DESC;
         } catch (Exception e) {
-            logger.error("Error in setInformedSpecialMenu", e);
+            logger.error("Error in setPreorderAllowed", e);
             result.resultCode = RC_INTERNAL_ERROR;
             result.description = RC_INTERNAL_ERROR_DESC;
         } finally {
@@ -9229,21 +9235,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
 
-            List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
             Long version = getClientGuardiansResultVersion(session);
-            boolean guardianWithMobileFound = false;
-            for (Client guardian : guardians) {
-                if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile()
-                        .equals(Client.checkAndConvertMobile(guardianMobile))) {
-                    guardianWithMobileFound = true;
-                    ClientManager
-                            .setInformSpecialMenu(session, client.getIdOfClient(), guardian.getIdOfClient(), version);
+            if (client.isStudent()) {
+                List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
+                boolean guardianWithMobileFound = false;
+                for (Client guardian : guardians) {
+                    if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile().equals(Client.checkAndConvertMobile(guardianMobile))) {
+                        guardianWithMobileFound = true;
+                        ClientManager.setInformSpecialMenu(session, client, guardian, version);
+                    }
                 }
-            }
-
-            if (!guardianWithMobileFound) {
-                result.resultCode = RC_CLIENT_GUARDIAN_NOT_FOUND;
-                result.description = RC_CLIENT_GUARDIAN_NOT_FOUND_DESC;
+                if (!guardianWithMobileFound) {
+                    result.resultCode = RC_CLIENT_GUARDIAN_NOT_FOUND;
+                    result.description = RC_CLIENT_GUARDIAN_NOT_FOUND_DESC;
+                    return result;
+                }
+            } else if (client.isSotrudnikMsk() && StringUtils.isEmpty(guardianMobile)) {
+                ClientManager.setInformSpecialMenu(session, client, null, version);
+            } else {
+                result.resultCode = RC_WRONG_GROUP;
+                result.description = RC_WRONG_GROUP_DESC;
                 return result;
             }
 

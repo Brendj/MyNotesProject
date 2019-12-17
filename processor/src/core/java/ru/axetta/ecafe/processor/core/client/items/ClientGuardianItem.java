@@ -28,7 +28,6 @@ public class ClientGuardianItem {
     private String createdWhereGuardianDesc;
     private Boolean informedSpecialMenu;
     private Boolean isLegalRepresentative;
-    private Boolean allowedPreorder;
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
@@ -44,7 +43,7 @@ public class ClientGuardianItem {
     public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation,
             List notificationSettings, ClientCreatedFromType createdWhereClientGuardian,
             ClientCreatedFromType createdWhereGuardian, String createdWhereGuardianDesc,
-            Boolean informedSpecialMenu, Boolean isLegalRepresentative, Boolean allowedPreorder) {
+            Boolean informedSpecialMenu, Boolean isLegalRepresentative) {
         this.idOfClient = client.getIdOfClient();
         this.contractId = client.getContractId();
         this.personName = client.getPerson().getSurnameAndFirstLetters();
@@ -58,7 +57,6 @@ public class ClientGuardianItem {
         this.createdWhereGuardianDesc = createdWhereGuardianDesc;
         this.informedSpecialMenu = informedSpecialMenu;
         this.isLegalRepresentative = isLegalRepresentative;
-        this.allowedPreorder = allowedPreorder;
     }
 
     public String getCreatedWhereClientGuardianStr() {
@@ -181,11 +179,4 @@ public class ClientGuardianItem {
         isLegalRepresentative = legalRepresentative;
     }
 
-    public Boolean getAllowedPreorder() {
-        return allowedPreorder;
-    }
-
-    public void setAllowedPreorder(Boolean allowedPreorder) {
-        this.allowedPreorder = allowedPreorder;
-    }
 }

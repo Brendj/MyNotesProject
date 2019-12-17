@@ -242,6 +242,17 @@ public class Client {
         return idOfClientGroup != null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
     }
 
+    public boolean isStudent() {
+        return idOfClientGroup != null && idOfClientGroup < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue();
+    }
+
+    public boolean isSotrudnikMsk() {
+        return idOfClientGroup != null && (idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue())
+            || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue())
+            || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue())
+            || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_OTHERS.getValue()));
+    }
+
     public static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
         MessageDigest hash = MessageDigest.getInstance("SHA1");
         ByteArrayInputStream arrayInputStream = new ByteArrayInputStream(plainPassword.getBytes());
