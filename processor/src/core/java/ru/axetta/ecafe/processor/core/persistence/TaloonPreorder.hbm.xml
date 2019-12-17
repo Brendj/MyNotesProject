@@ -52,6 +52,7 @@
         </property>
         <property name="remarks" column="Remarks" type="string" length="1024"/>
         <property name="comments" column="comments" type="string" length="128"/>
+        <property name="guid" type="string" column="guid" />
 
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
                      insert="false" update="false"/>

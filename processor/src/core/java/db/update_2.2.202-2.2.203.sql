@@ -7,6 +7,7 @@
 -- 358: Создание таблицы cf_taloon_preorder
 CREATE TABLE cf_taloon_preorder
 (
+    guid character varying(36) NOT NULL,
     idoforg bigint NOT NULL,
     taloondate bigint NOT NULL,
     complexid bigint NOT NULL,
@@ -45,3 +46,8 @@ CREATE INDEX cf_taloons_preorder_version_idx
     ON cf_taloon_preorder
         USING btree
         (version);
+
+CREATE INDEX cf_taloons_preorder_guid_idx
+    ON cf_taloon_preorder
+        USING btree
+        (guid COLLATE pg_catalog."default");

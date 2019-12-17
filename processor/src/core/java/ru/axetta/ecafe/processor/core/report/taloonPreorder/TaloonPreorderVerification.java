@@ -49,14 +49,14 @@ public class TaloonPreorderVerification {
             TaloonPreorderVerificationItem item = new TaloonPreorderVerificationItem();
             item.setTaloonDate(date);
             complexMap = new HashMap<>();
-            TaloonPreorderVerificationDetail detailSum = new TaloonPreorderVerificationDetail(null, null, date, null,
+            TaloonPreorderVerificationDetail detailSum = new TaloonPreorderVerificationDetail(null, null, null, date, null,
                     null, "Всего", null, null, 0, 0L, 0, 0L, 0, 0L, 0, 0L, 0, 0L, 0, 0L, null, null, null, null, true);
 
             for (TaloonPreorder taloon : list) {
                 if (!date.equals(taloon.getTaloonDate())) {
                     continue;
                 }
-                TaloonPreorderVerificationDetail detail = new TaloonPreorderVerificationDetail(taloon.getIdOfOrg(),
+                TaloonPreorderVerificationDetail detail = new TaloonPreorderVerificationDetail(taloon.getGuid(), taloon.getIdOfOrg(),
                         taloon.getIdOfOrgCreated(), date, taloon.getComplexId(), taloon.getComplexName(),
                         taloon.getGoodsName(), taloon.getGoodsGuid(), taloon.getPrice(), taloon.getRequestedQty(),
                         (taloon.getPrice() == null || taloon.getRequestedQty() == null) ? 0
@@ -80,7 +80,7 @@ public class TaloonPreorderVerification {
 
                 if (!summaryMap.containsKey(detail.getComplexId() + detail.getGoodsGuid())) {
                     summaryMap.put(taloon.getComplexId() + taloon.getGoodsGuid(),
-                            new TaloonPreorderVerificationDetail(null, null, null, detail.getComplexId(),
+                            new TaloonPreorderVerificationDetail(null, null, null, null, detail.getComplexId(),
                                     detail.getComplexName(), detail.getGoodsName(), detail.getGoodsGuid(),
                                     detail.getPrice(), detail.getRequestedQty(), detail.getRequestedSum(),
                                     detail.getSoldQty(), detail.getSoldSum(), detail.getShippedQty(),
@@ -149,12 +149,15 @@ public class TaloonPreorderVerification {
                     if (detail.isSummaryDay()) {
                         continue;
                     }
+                    String guid = detail.getGuid();
                     Long complexId = detail.getComplexId();
                     String goodsGuid = detail.getGoodsGuid();
                     Long idOfOrg = detail.getIdOfOrg();
                     Long price = detail.getPrice();
+                    //TaloonPreorder taloon = DAOReadonlyService.getInstance()
+                    //        .findTaloonPreorder(idOfOrg, taloonDate, complexId, goodsGuid, price);
                     TaloonPreorder taloon = DAOReadonlyService.getInstance()
-                            .findTaloonPreorder(idOfOrg, taloonDate, complexId, goodsGuid, price);
+                            .findTaloonPreorder(guid);
                     if (taloon != null) {
                         if (itemChangedNullSafe(taloon.getShippedQty(), detail.getShippedQty()) ||
                                 !taloon.getPpState().equals(detail.getPpState()) ||

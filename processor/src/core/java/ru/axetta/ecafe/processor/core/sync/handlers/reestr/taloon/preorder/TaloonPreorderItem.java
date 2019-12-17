@@ -29,6 +29,7 @@ public class TaloonPreorderItem {
     public static final Integer ERROR_CODE_ALL_OK = 0;
     public static final Integer ERROR_CODE_NOT_VALID_ATTRIBUTE = 100;
 
+    private String guid;
     private Long orgId;
     private Long orgIdCreated;
     private Date date;
@@ -54,6 +55,7 @@ public class TaloonPreorderItem {
     private String comments;
 
     public static TaloonPreorderItem build(Node itemNode, Long orgOwner) {
+        String guid = null;
         Long orgId = null;
         Long orgIdCreated = null;
         Date date = null;
@@ -75,6 +77,11 @@ public class TaloonPreorderItem {
         Long version = null;
         StringBuilder errorMessage = new StringBuilder();
         String comments = null;
+
+        guid = XMLUtils.getAttributeValue(itemNode, "Guid");
+        if (StringUtils.isEmpty(guid)) {
+            errorMessage.append( "Attribute Guid not found");
+        }
 
         // Четыре обязательных поля (orgId, date, complexId, goodsGuid)- первичный ключ
         String strOrgId = XMLUtils.getAttributeValue(itemNode, "OrgId");
@@ -236,7 +243,7 @@ public class TaloonPreorderItem {
             }
         }
 
-        return new TaloonPreorderItem(orgId, orgIdCreated, date, complexId, complexName, goodsName,goodsGuid, soldQty, requestedQty, shippedQty,
+        return new TaloonPreorderItem(guid, orgId, orgIdCreated, date, complexId, complexName, goodsName,goodsGuid, soldQty, requestedQty, shippedQty,
                 reservedQty, blockedQty, price,
                 TaloonCreatedTypeEnum.fromInteger(createdType), TaloonISPPStatesEnum.fromInteger(isppState), TaloonPPStatesEnum.fromInteger(ppState),
                 taloonNumber, orgOwner, deletedState, version, errorMessage.toString(), comments);
@@ -262,10 +269,11 @@ public class TaloonPreorderItem {
     }
 
 
-    private TaloonPreorderItem(Long orgId, Long orgIdCreated, Date date, Long complexId, String complexName, String goodsName, String goodsGuid, Integer soldQty,
+    private TaloonPreorderItem(String guid, Long orgId, Long orgIdCreated, Date date, Long complexId, String complexName, String goodsName, String goodsGuid, Integer soldQty,
             Integer requestedQty, Integer shippedQty, Integer reservedQty, Integer blockedQty,
             Long price, TaloonCreatedTypeEnum createdType, TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,
             Long taloonNumber, Long orgOwnerId, Boolean deletedState, Long version, String errorMessage, String comments) {
+        this.setGuid(guid);
         this.setOrgId(orgId);
         this.setOrgIdCreated(orgIdCreated);
         this.setDate(date);
@@ -477,5 +485,13 @@ public class TaloonPreorderItem {
 
     public void setBlockedQty(Integer blockedQty) {
         this.blockedQty = blockedQty;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 }

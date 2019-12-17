@@ -1157,6 +1157,11 @@
         <rich:panelMenuItem id="registerStampPaidReportMenuItem" binding="#{registerStampPaidPage.mainMenuComponent}"
                             label="Реестр талонов" action="#{registerStampPaidPage.show}" reRender="workspaceForm" />
 
+        <rich:panelMenuItem id="taloonPreorderVerificationMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
+                            binding="#{mainPage.taloonPreorderVerificationPage.mainMenuComponent}"
+                            label="Электронная сверка" action="#{mainPage.showTaloonPreorderVerificationPage}"
+                            reRender="workspaceForm" />
+
         <rich:panelMenuGroup id="feedingSettingsGroupMenu" label="Настройки платного питания" rendered="#{mainPage.eligibleToViewOrEditFeedingSettings}">
             <rich:panelMenuItem id="feedingSettingsListMenuItem" binding="#{mainPage.feedingSettingsListPage.mainMenuComponent}"
                             label="Список" action="#{mainPage.showFeedingSettingListPage}" reRender="workspaceForm" />
@@ -1481,11 +1486,6 @@
                             label="Отчет по турникетам" action="#{mainPage.showEnterEventReportPage}"
                             reRender="workspaceForm" rendered="#{mainPage.eligibleToViewEnterEventReport}" />
     </rich:panelMenuGroup>
-
-    <rich:panelMenuItem id="taloonPreorderVerificationMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
-                        binding="#{mainPage.taloonPreorderVerificationPage.mainMenuComponent}"
-                        label="Электронная сверка" action="#{mainPage.showTaloonPreorderVerificationPage}"
-                        reRender="workspaceForm" />
 
     <%--@elvariable id="helpdeskGroupPage" type="ru.axetta.ecafe.processor.web.ui.report.online.HelpdeskGroupPage"--%>
     <rich:panelMenuGroup id="helpdeskGroupPageMenu" binding="#{helpdeskGroupPage.mainMenuComponent}" label="Служба помощи"

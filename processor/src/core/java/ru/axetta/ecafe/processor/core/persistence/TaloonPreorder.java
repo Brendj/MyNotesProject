@@ -15,6 +15,7 @@ import java.util.Date;
  */
 public class TaloonPreorder {
 
+    private String guid;
     private Long idOfTaloonPreorder;
     private Long idOfOrg;
     private Date taloonDate;
@@ -44,10 +45,11 @@ public class TaloonPreorder {
         //for Hibernate only
     }
 
-    public TaloonPreorder(Long idOfOrg, Date taloonDate, Long complexId, String complexName,
+    public TaloonPreorder(String guid, Long idOfOrg, Date taloonDate, Long complexId, String complexName,
             String goodsName, String goodsGuid, Long idOfOrgCreated, Integer soldQty, Integer requestedQty,
             Integer shippedQty, Integer reservedQty, Integer blockedQty, Long price, TaloonCreatedTypeEnum createdType,
             TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState, String comments) {
+        this.guid = guid;
         this.idOfOrg = idOfOrg;
         this.taloonDate = taloonDate;
         this.complexId = complexId;
@@ -65,6 +67,14 @@ public class TaloonPreorder {
         this.isppState = isppState;
         this.ppState = ppState;
         this.comments = comments;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 
     public String getGoodsName() {
@@ -259,6 +269,8 @@ public class TaloonPreorder {
         this.comments = comments;
     }
 
+
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -277,7 +289,8 @@ public class TaloonPreorder {
                 + ", taloonDate=" + taloonDate + ", goodsGuid=" + goodsGuid + ", org=" + org + ", soldQty=" + soldQty
                 + ", requestedQty=" + requestedQty + ", shippedQty=" + shippedQty + ", reservedQty=" + reservedQty
                 + ", blockedQty=" + blockedQty + ", ispp_state=" + isppState + ", pp_state=" + ppState
-                + ", price=" + price + ", createdType=" + createdType + ", orgOwner=" + orgOwner + ", taloonNumber=" + taloonNumber + '}';
+                + ", price=" + price + ", createdType=" + createdType + ", orgOwner=" + orgOwner +
+                ", taloonNumber=" + taloonNumber + ", guid=" + guid + '}';
     }
 
 }

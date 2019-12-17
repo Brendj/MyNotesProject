@@ -49,6 +49,8 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
 
                 errorFound = !item.getResCode().equals(TaloonPreorderItem.ERROR_CODE_ALL_OK);
                 if (!errorFound) {
+                    String guid = item.getGuid();
+                    if (guid == null) guid = "";
                     Long idOfOrg = item.getOrgId();
                     Long idOfOrgCreated = item.getOrgIdCreated();
                     Date date = item.getDate();
@@ -57,7 +59,8 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
                     String goodsGuid = item.getGoodsGuid();
                     Long price = item.getPrice();
                     if (goodsGuid == null) goodsGuid = "";
-                    TaloonPreorder taloon = DAOReadonlyService.getInstance().findTaloonPreorder(idOfOrg, date, complexId, goodsGuid, price);
+                    //TaloonPreorder taloon = DAOReadonlyService.getInstance().findTaloonPreorder(idOfOrg, date, complexId, goodsGuid, price);
+                    TaloonPreorder taloon = DAOReadonlyService.getInstance().findTaloonPreorder(guid);
                     Integer ordersCount = DAOReadonlyService.getInstance().findTaloonPreorderSoldQty(idOfOrg, date, complexName, goodsGuid, price);
                     Integer soldQty = item.getSoldQty();
                     if(ordersCount == null || ordersCount == 0 || soldQty.equals(ordersCount)) {
@@ -86,7 +89,7 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
                     } else {
 
                         if (taloon == null) {
-                            taloon = new TaloonPreorder(idOfOrg, date, complexId, complexName, goodsName, goodsGuid, idOfOrgCreated,
+                            taloon = new TaloonPreorder(guid, idOfOrg, date, complexId, complexName, goodsName, goodsGuid, idOfOrgCreated,
                                     soldQty, requestedQty, shippedQty, reservedQty, blockedQty, price, createdType,
                                     isppState, ppState, comments);
                             taloon.setRemarks(String.format("Создано в ОО \"%s\" (ид.=%s), %3$td.%3$tm.%3$tY %3$tT",
@@ -118,6 +121,7 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
                 }
                 if (errorFound) {
                     resItem = new ResTaloonPreorderItem();
+                    resItem.setGuid(item.getGuid());
                     resItem.setOrgId(item.getOrgId());
                     resItem.setDate(item.getDate());
                     resItem.setComplexId(item.getComplexId());

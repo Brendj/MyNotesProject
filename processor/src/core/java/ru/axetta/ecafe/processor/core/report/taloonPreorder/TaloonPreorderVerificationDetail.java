@@ -21,6 +21,7 @@ public class TaloonPreorderVerificationDetail {
     public static final String MAKE_CLEAR = "Очистить";
     public static final String DAY_FORMAT = "dd.MM.yyyy";
 
+    private String guid;
     private Long idOfOrg;
     private Long idOfOrgCreated;
     private Date taloonDate;
@@ -52,11 +53,12 @@ public class TaloonPreorderVerificationDetail {
     public TaloonPreorderVerificationDetail() {
     }
 
-    public TaloonPreorderVerificationDetail(Long idOfOrg, Long idOfOrgCreated, Date taloonDate, Long complexId,
+    public TaloonPreorderVerificationDetail(String guid, Long idOfOrg, Long idOfOrgCreated, Date taloonDate, Long complexId,
             String complexName, String goodsName, String goodsGuid, Long price, Integer requestedQty, Long requestedSum,
             Integer soldQty, Long soldSum, Integer shippedQty, Long shippedSum, Integer reservedQty, Long reservedSum,
             Integer blockedQty, Long blockedSum, Integer differedQty, Long differedSum, TaloonISPPStatesEnum isppState,
             TaloonPPStatesEnum ppState, String remarks, String comments, boolean summaryDay) {
+        this.guid = guid;
         this.idOfOrg = idOfOrg;
         this.idOfOrgCreated = idOfOrgCreated;
         this.taloonDate = taloonDate;
@@ -292,6 +294,13 @@ public class TaloonPreorderVerificationDetail {
         this.comments = comments;
     }
 
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
+    }
 
     public int getPeriod() {
         Date currentDate = new Date();

@@ -25,6 +25,7 @@ import java.util.Date;
  */
 public class ResTaloonPreorderItem {
 
+    private String guid;
     private Long orgId;
     private Long orgIdCreated;
     private Date date;
@@ -54,6 +55,7 @@ public class ResTaloonPreorderItem {
     }
 
     public ResTaloonPreorderItem(TaloonPreorder taloon) {
+        this.guid = taloon.getGuid();
         this.orgId = taloon.getIdOfOrg();
         this.orgIdCreated = taloon.getIdOfOrgCreated();
         this.date = taloon.getTaloonDate();
@@ -78,6 +80,7 @@ public class ResTaloonPreorderItem {
     }
 
     public ResTaloonPreorderItem(TaloonPreorder taloon, Integer ordersCount, Integer resCode) {
+        this.guid = taloon.getGuid();
         this.orgId = taloon.getIdOfOrg();
         this.orgIdCreated = taloon.getIdOfOrgCreated();
         this.date = taloon.getTaloonDate();
@@ -95,6 +98,7 @@ public class ResTaloonPreorderItem {
 
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
+        XMLUtils.setAttributeIfNotNull(element,"Guid",this.guid == null ? "" : this.guid);
         XMLUtils.setAttributeIfNotNull(element, "OrgId", orgId);
         XMLUtils.setAttributeIfNotNull(element, "OrgIdCreated", orgIdCreated);
         if (date != null) {
@@ -311,5 +315,13 @@ public class ResTaloonPreorderItem {
 
     public void setComments(String comments) {
         this.comments = comments;
+    }
+
+    public String getGuid() {
+        return guid;
+    }
+
+    public void setGuid(String guid) {
+        this.guid = guid;
     }
 }

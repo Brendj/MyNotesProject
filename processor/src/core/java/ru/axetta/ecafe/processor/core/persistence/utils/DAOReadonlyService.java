@@ -364,6 +364,17 @@ public class DAOReadonlyService {
         }
     }
 
+    public TaloonPreorder findTaloonPreorder(String guid) {
+        try {
+            Query query = entityManager.createQuery("SELECT taloon from TaloonPreorder taloon "
+                    + "where taloon.guid = :guid");
+            query.setParameter("guid", guid);
+            return (TaloonPreorder)query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     public ComplexSchedule findComplexSchedule(String guid) {
         try {
             Query query = entityManager.createQuery("SELECT schedule from ComplexSchedule schedule "
