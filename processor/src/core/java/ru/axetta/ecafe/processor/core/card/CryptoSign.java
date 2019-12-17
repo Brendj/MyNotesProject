@@ -92,7 +92,7 @@ public class CryptoSign {
                     responseCardSign.setMessage("Тип подписи для карты задан некорректно");
                 }
                 //Маленькие карты и тип Тройка-Москвенок
-                if (card.getMemSize() == 2 && (card.getTypeId() == 12 && card.getTypeId() == 13 && card.getTypeId() == 14)) {
+                if (card.getMemSize() == 2 && (card.getTypeId() == 12 || card.getTypeId() == 13 || card.getTypeId() == 14)) {
                     sucsess = false;
                     responseCardSign.setMessage("Неверный тип носителя");
                 }
