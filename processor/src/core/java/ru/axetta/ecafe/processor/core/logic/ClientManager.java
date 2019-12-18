@@ -1536,6 +1536,22 @@ public class ClientManager {
         return guardianItems;
     }
 
+    public static final boolean getInformedSpecialMenuWithoutSession(Long idOfClient, Long idOfGuardian) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            boolean result = getInformedSpecialMenu(session, idOfClient, idOfGuardian);
+            transaction.commit();
+            transaction = null;
+            return result;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
     public static boolean getInformedSpecialMenu(Session session, Long idOfClient, Long idOfGuardian) {
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
@@ -1547,10 +1563,11 @@ public class ClientManager {
         return list.get(0).getInformedSpecialMenu();
     }
 
-    public static boolean getAllowedPreorderByClient(Session session, Long idOfClient) {
+    public static boolean getAllowedPreorderByClient(Session session, Long idOfClient, Long idOfGuardian) {
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
         criteria.add(Restrictions.eq("allowedPreorder", true));
+        if (idOfGuardian != null) criteria.add(Restrictions.eq("guardianAllowedPreorder.idOfClient", idOfGuardian));
 
         List<PreorderFlag> list = criteria.list(); //getPreorderFlagByClient(session, idOfClient, null);
         if (list.size() == 0) return false;
@@ -1805,7 +1822,7 @@ public class ClientManager {
             preorderFlag = preorderFlagList.get(0);
         }
         preorderFlag.setInformedSpecialMenu(true);
-        preorderFlag.setGuardianAllowedPreorder(guardian);
+        preorderFlag.setGuardianInformedSpecialMenu(guardian);
         preorderFlag.setLastUpdate(new Date());
         session.saveOrUpdate(preorderFlag);
     }
@@ -1814,6 +1831,7 @@ public class ClientManager {
     public static void setPreorderAllowed(Session session, Client child, Client guardian, String childMobile, Long newVersion) throws Exception {
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client", child));
+        criteria.add(Restrictions.eq("guardianInformedSpecialMenu", guardian));
         PreorderFlag preorderFlag = (PreorderFlag) criteria.uniqueResult();
         if (preorderFlag == null || !preorderFlag.getInformedSpecialMenu()) throw new NotInformedSpecialMenuException();
         preorderFlag.setAllowedPreorder(true);

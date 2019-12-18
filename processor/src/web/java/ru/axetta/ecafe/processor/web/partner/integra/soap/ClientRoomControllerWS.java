@@ -3751,7 +3751,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             ClientGuardian cg = (ClientGuardian) row[1];
                             ClientWithAddInfo addInfo = new ClientWithAddInfo();
                             addInfo.setInformedSpecialMenu(ClientManager.getInformedSpecialMenu(session, child.getIdOfClient(), cg.getIdOfGuardian()) ? 1 : null);
-                            addInfo.setPreorderAllowed(ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient()) ? 1 : 0);
+                            addInfo.setPreorderAllowed(ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient(), cg.getIdOfGuardian()) ? 1 : null);
                             addInfo.setClientCreatedFrom(cg.isDisabled() ? null : cg.getCreatedFrom());
                             addInfo.setDisabled(cg.isDisabled());
                             result.put(child, addInfo);
@@ -8824,7 +8824,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.description = RC_NOT_INFORMED_SPECIAL_MENU_DESC;
                 return result;
             }
-            boolean allowed = ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient());
+            boolean allowed = ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient(), null);
             if (!allowed) {
                 result.resultCode = RC_NOT_ALLOWED_PREORDERS;
                 result.description = RC_NOT_ALLOWED_PREORDERS_DESC;
@@ -9079,6 +9079,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             item.setDate(toXmlDateTime(CalendarUtils.parseDate(entry.getKey())));
             item.setEditForbidden((entry.getValue())[0]);
             item.setPreorderExists((entry.getValue())[1]);
+            item.setAddress(preorderDAOService.getAddress((entry.getValue())[2]));
             calendar.getItems().add(item);
         }
         result.setCalendar(calendar);
@@ -9117,7 +9118,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         boolean informed = false;
         for (ClientGuardian cg : cgr.getClientGuardian()) {
-            if (cg.getInformedSpecialMenu()) {
+            if (ClientManager.getInformedSpecialMenuWithoutSession(client.getIdOfClient(), cg.getIdOfGuardian())) {
                 informed = true;
                 break;
             }
