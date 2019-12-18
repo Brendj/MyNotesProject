@@ -1221,4 +1221,8 @@ public class Org implements Serializable {
     public void setEkisId(Long ekisId) {
         this.ekisId = ekisId;
     }
+
+    public Boolean getMainBuilding() {
+        return mainBuilding;
+    }
 }
