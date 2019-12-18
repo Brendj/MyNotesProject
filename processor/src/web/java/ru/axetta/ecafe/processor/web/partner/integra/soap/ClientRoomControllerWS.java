@@ -9274,6 +9274,38 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
+    //todo НЕ ДОДЕЛАНО
+    @Override
+    public ClientGroupResult getClientsGroupForPreorder(@WebParam(name="mobile") String mobile) {
+        authenticateRequest(null);
+        String mobilePhone = Client.checkAndConvertMobile(mobile);
+        if (mobilePhone == null) {
+            return new ClientGroupResult(RC_INVALID_DATA, RC_INVALID_MOBILE);
+        }
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
+            transaction = session.beginTransaction();
+
+
+            Query query = session.createQuery("select c from Client c where c.mobile = :mobile");
+            query.setParameter("mobile", mobilePhone);
+            List<Client> clients = query.list();
+            ClientGroupResult result = new ClientGroupResult(); //getClientGroupResult(mobilePhone);
+            //ClientSummaryBaseListResult result = processClientSummaryByMobileResult(session, clients, "child");
+
+            transaction.commit();
+            transaction = null;
+            return result;
+        } catch (Exception e) {
+            return new ClientGroupResult(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
     @Override
     public Result setSpecialMenu(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "value") Boolean value) {
