@@ -42,7 +42,7 @@ public class Migrants implements SectionRequest{
         this.outcomeMigrationRequestsItems = new ArrayList<OutcomeMigrationRequestsItem>();
 
         currentActiveOutcome = new ArrayList<Long>();
-        String outcomeCurrentActive = XMLUtils.getStringAttributeValue(outcomeMigrationRequestsNode, "CurrentActive", 30000);
+        String outcomeCurrentActive = XMLUtils.getStringAttributeValue(outcomeMigrationRequestsNode, "CurrentActive", 100000);
         if(outcomeCurrentActive != null) {
             if(outcomeCurrentActive.length() > 0) {
                 String[] outcomeIds = outcomeCurrentActive.split(",");
@@ -89,12 +89,13 @@ public class Migrants implements SectionRequest{
         currentActiveIncome = new ArrayList<CompositeIdOfMigrant>();
         if(incomeMigrationRequestsNode != null) {
             String incomeCurrentActive = XMLUtils
-                    .getStringAttributeValue(incomeMigrationRequestsNode, "CurrentActive", 30000);
+                    .getStringAttributeValue(incomeMigrationRequestsNode, "CurrentActive", 100000);
             if (incomeCurrentActive != null) {
                 if (incomeCurrentActive.length() > 0) {
                     String[] incomeIdsForOrg = incomeCurrentActive.split(";");
                     for (String idForOrg : incomeIdsForOrg) {
                         String[] orgAndId = idForOrg.split(":");
+                        if (orgAndId.length != 2) continue;
                         Long idOfOrg = Long.parseLong(orgAndId[0]);
                         for (String id : orgAndId[1].split(",")) {
                             try {

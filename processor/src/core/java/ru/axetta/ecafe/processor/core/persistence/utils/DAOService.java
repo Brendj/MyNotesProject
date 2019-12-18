@@ -18,13 +18,12 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -2593,10 +2592,12 @@ public class DAOService {
         this.preorderDAOOperationsImpl = preorderDAOOperationsImpl;
     }
 
-    public String generateLinkingTokenForSmartWatch(Session session, String phone) throws Exception{
+    public String generateLinkingTokenForSmartWatch(Session session, String phone) throws Exception {
         org.hibernate.Query query = session.createQuery("delete from LinkingTokenForSmartWatch where phoneNumber like :phoneNumber");
         query.setParameter("phoneNumber", phone);
         query.executeUpdate();
+
+        Date createDate = new Date();
         SecureRandom secureRandom = new SecureRandom();
         String randomToken;
         int nSize = 9;
@@ -2616,6 +2617,7 @@ public class DAOService {
         LinkingTokenForSmartWatch token = new LinkingTokenForSmartWatch();
         token.setPhoneNumber(phone);
         token.setToken(randomToken);
+        token.setCreateDate(createDate);
         session.save(token);
         return token.getToken();
     }
@@ -2639,6 +2641,37 @@ public class DAOService {
         query.setParameter("manufactureCode", manufactureCode);
         try {
             return query.getResultList();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+    public List findEMIASbyClientandBeetwenDates (Client client, Date startDate, Date endDate)
+    {
+        Query query = entityManager.createQuery("select em from EMIAS em where em.guid = :guid "
+                + "and em.dateLiberate between :begDate and :endDate ");
+        query.setParameter("guid", client.getClientGUID());
+        query.setParameter("begDate", startDate);
+        query.setParameter("endDate", endDate);
+        try {
+            return query.getResultList();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+    public ExternalEvent getExternalEvent (Client client, String orgCode, String orgName, ExternalEventType evtType,
+            Date evtDateTime, ExternalEventStatus evtStatus)
+    {
+        Query query = entityManager.createQuery("select ee from ExternalEvent ee where ee.client = :client "
+                + "and ee.evtType = :evtType and ee.evtDateTime = :evtDateTime and ee.evtStatus = :evtStatus "
+                + "and ee.orgCode = :orgCode and ee.orgName = :orgName");
+        query.setParameter("client", client);
+        query.setParameter("evtType", evtType);
+        query.setParameter("evtDateTime", evtDateTime);
+        query.setParameter("evtStatus", evtStatus);
+        query.setParameter("orgCode", orgCode);
+        query.setParameter("orgName", orgName);
+        try {
+            return (ExternalEvent)query.getResultList().get(0);
         } catch (NoResultException e) {
             return null;
         }

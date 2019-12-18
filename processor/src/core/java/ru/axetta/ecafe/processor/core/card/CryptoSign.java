@@ -64,8 +64,6 @@ public class CryptoSign {
     public static List<ResponseCardSign> createSignforCard(List<RequestCardForSign> cards, CardSign cardSign)
             throws Exception {
         List<ResponseCardSign> responseCardSigns = new ArrayList<ResponseCardSign>();
-        //Достаем приватный ключ для подписи
-        PrivateKey pk = loadPrivKey(cardSign.getPrivatekeycard());
         boolean sucsess;
         for (RequestCardForSign card : cards) {
             sucsess = true;
@@ -82,6 +80,19 @@ public class CryptoSign {
                         && card.getTypeId() != 15) {
                     responseCardSign.setMessage("Неверный тип носителя");
                     sucsess = false;
+                }
+                //card.getMemSize() == 1 - Если тип карты поддерживает данный более 128 байт
+                //card.getMemSize() == 2 - Если тип карты не поддерживает данный более 128 байт
+                //cardSign.getSignType() == 1 - ECDSA
+                //cardSign.getSignType() == 2 - Scrypt
+                if (!((card.getMemSize() == 1 && cardSign.getSignType() == 1) || (card.getMemSize() == 2 && cardSign.getSignType() == 0))) {
+                    sucsess = false;
+                    responseCardSign.setMessage("Тип подписи для карты задан некорректно");
+                }
+                //Маленькие карты и тип Тройка-Москвенок
+                if (card.getMemSize() == 2 && (card.getTypeId() == 12 || card.getTypeId() == 13 || card.getTypeId() == 14)) {
+                    sucsess = false;
+                    responseCardSign.setMessage("Неверный тип носителя");
                 }
                 if (sucsess) {//Подписываем карту только если пройдены проверки
                     //Подготавливаем данные для подписи
@@ -108,11 +119,14 @@ public class CryptoSign {
 
                     //Если тип карты поддерживает данный более 128 байт
                     if (card.getMemSize() == 1) {
+                        //Достаем приватный ключ для подписи
+                        PrivateKey pk = loadPrivKey(cardSign.getPrivatekeycard());
                         //Подписывание
                         sign = CryptoSign.sign(card_data, pk);
                     } else {
                         if (card.getMemSize() == 2) {
-                            sign = SCrypt.generate(pk.getEncoded(), card_data, //данные карты используем как "соль"
+                            byte[] pk = loadPrivKeySCRIPT(cardSign.getPrivatekeycard());
+                            sign = SCrypt.generate(pk, card_data, //данные карты используем как "соль"
                                     16384, 8, 1, 20);
                         } else {
                             sign = new byte[]{0};
@@ -217,7 +231,7 @@ public class CryptoSign {
 
     private static boolean verifySCRIPT(byte[] dateCards, byte[] sign, CardSign cardSign) throws Exception {
 
-        byte[] varsign = SCrypt.generate(loadPrivKey(cardSign.getPublickeyprovider()).getEncoded(), dateCards,
+        byte[] varsign = SCrypt.generate(loadPrivKeySCRIPT(cardSign.getPublickeyprovider()), dateCards,
                 //данные карты используем как "соль"
                 16384, 8, 1, 20);
         return Arrays.equals(varsign, sign);
@@ -226,9 +240,8 @@ public class CryptoSign {
     public static PublicKey loadPubKey(byte[] data) throws Exception {
         List<String> arrayKey = Arrays.asList(StringUtils.split(new String(data), '\n'));
         String rezult = "";
-        for (int i=1; i<arrayKey.size()-1;i++)
-        {
-            rezult+=arrayKey.get(i) + "\n";
+        for (int i = 1; i < arrayKey.size() - 1; i++) {
+            rezult += arrayKey.get(i) + "\n";
         }
         rezult = rezult.substring(0, rezult.length() - 1);
         byte[] newFormatData = DatatypeConverter.parseBase64Binary(rezult);
@@ -242,5 +255,18 @@ public class CryptoSign {
         KeyFactory key_f = KeyFactory.getInstance(KEY_FACTOR);
         PrivateKey res = key_f.generatePrivate(ks);
         return res;
+    }
+
+    public static byte[] loadPrivKeySCRIPT(byte[] data) throws Exception {
+        KeySpec ks;
+        if  (data.length < 65) {
+           return data;
+        }
+        else
+        {
+            byte[] privKeyCard = new byte[64];
+            System.arraycopy(data, 0, privKeyCard, 0, 64);
+            return privKeyCard;
+        }
     }
 }

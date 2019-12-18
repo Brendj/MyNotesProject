@@ -80,6 +80,7 @@ public class OrgSettingsProcessor extends AbstractProcessor<OrgSettingSection> {
                     }
                 }
             }
+
             if(isChanged) {
                 setting.setVersion(nextVersionOfOrgSetting);
                 if (!setting.isPreOrderFeeding()) {

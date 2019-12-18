@@ -17,6 +17,7 @@ public class CompositeIdOfVisitReqResolutionHist implements Serializable {
     private Long idOfRecord; // Идентификатор резолюции по запросу на посещение
     private Long idOfRequest; // Идентификатор запроса на посещение
     private Long idOfOrgResol; // Идентификатор организации, в которой была вынесена резолюция
+    private static final int BASE_FOR_HASH = 10000000;
 
     public CompositeIdOfVisitReqResolutionHist() {
     }
@@ -77,9 +78,12 @@ public class CompositeIdOfVisitReqResolutionHist implements Serializable {
 
     @Override
     public int hashCode() {
-        int result = idOfRecord.hashCode();
-        result = 31 * result + idOfRequest.hashCode();
-        result = 31 * result + idOfOrgResol.hashCode();
+        return new Long((getBaseForHash(idOfRecord) + getBaseForHash(idOfRequest) + getBaseForHash(idOfOrgResol))).hashCode();
+    }
+
+    private long getBaseForHash(long value) {
+        long result = value > 0L ? value : -value;
+        while (result < BASE_FOR_HASH) result = result << 3;
         return result;
     }
 }

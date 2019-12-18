@@ -433,9 +433,15 @@ public class DAOReadonlyService {
         return result != null && ((BigInteger) result).longValue() > 0 ? true : false;
     }
 
-    public byte[] getCardSignData(Integer idOfCardSign, Integer signType) {
+    public byte[] getCardSignVerifyData(Integer idOfCardSign, Integer signType) {
         try {
-            Query query = entityManager.createQuery("select cs.signData from CardSign cs " + "where cs.idOfCardSign = :idOfCardSign and cs.signType = :signType  and (cs.deleted = false or cs.deleted is null)");
+            Query query;
+            if (signType == 0)
+                query = entityManager.createQuery("select cs.privatekeycard from CardSign cs " +
+                        "where cs.idOfCardSign = :idOfCardSign and cs.signType = :signType  and (cs.deleted = false or cs.deleted is null)");
+            else
+                query = entityManager.createQuery("select cs.signData from CardSign cs " +
+                        "where cs.idOfCardSign = :idOfCardSign and cs.signType = :signType  and (cs.deleted = false or cs.deleted is null)");
             query.setParameter("idOfCardSign", idOfCardSign);
             query.setParameter("signType", signType);
             return (byte[]) query.getSingleResult();
@@ -617,5 +623,28 @@ public class DAOReadonlyService {
             resultMap.put(year, monthMap);
         }
         return resultMap;
+    }
+    public List<EMIAS> getEmiasForMaxVersionAndIdOrg(Long maxVersion, List<Long> orgs){
+        try {
+            Query query = entityManager.createQuery(
+                    "select ce from EMIAS ce where ce.version > :vers");
+            query.setParameter("vers", maxVersion);
+            List<EMIAS> emias = query.getResultList();
+            //Фильтрация по орг
+            Iterator<EMIAS> emiasIterator = emias.iterator();
+            while(emiasIterator.hasNext()) {
+                EMIAS emias1 = emiasIterator.next();//получаем следующий элемент
+                Client cl = DAOUtils.findClientByGuid(entityManager, emias1.getGuid());
+                if (orgs.indexOf(cl.getOrg().getIdOfOrg()) == -1) {
+                    //Удаляем "чужих" клиентов
+                    emiasIterator.remove();
+                }
+            }
+            return emias;
+        }
+        catch (Exception e)
+        {
+            return new ArrayList<>();
+        }
     }
 }

@@ -8690,7 +8690,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 CultureName = CultureName.substring(0, 255);
             }
             ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
-            ExternalEvent event = new ExternalEvent(cl, orgCode, CultureName, CultureShortName, CultureAddress,
+            ExternalEvent event = new ExternalEvent(cl, orgCode, CultureName, CultureAddress,
                     ExternalEventType.CULTURE, accessTime, ExternalEventStatus.fromInteger(eventsStatus), handler);
             session.save(event);
             transaction.commit();

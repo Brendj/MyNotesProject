@@ -4,17 +4,20 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import java.util.Date;
+
 public class LinkingTokenForSmartWatch {
-    private Long idofLinkingTokensForSmartWatch;
+    private Long idOfLinkingTokensForSmartWatch;
     private String phoneNumber;
     private String token;
+    private Date createDate;
 
-    public Long getIdofLinkingTokensForSmartWatch() {
-        return idofLinkingTokensForSmartWatch;
+    public Long getIdOfLinkingTokensForSmartWatch() {
+        return idOfLinkingTokensForSmartWatch;
     }
 
-    public void setIdofLinkingTokensForSmartWatch(Long idofLinkingTokensForSmartWatch) {
-        this.idofLinkingTokensForSmartWatch = idofLinkingTokensForSmartWatch;
+    public void setIdOfLinkingTokensForSmartWatch(Long idOfLinkingTokensForSmartWatch) {
+        this.idOfLinkingTokensForSmartWatch = idOfLinkingTokensForSmartWatch;
     }
 
     public String getPhoneNumber() {
@@ -31,5 +34,13 @@ public class LinkingTokenForSmartWatch {
 
     public void setToken(String token) {
         this.token = token;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
     }
 }

@@ -52,6 +52,15 @@
         <property name="keepAliveSeconds" value="120"/>
     </bean>
 
+    <!-- RNIP get payments executor -->
+    <bean id="rnipPaymentsExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="2"/>
+        <property name="maxPoolSize" value="5"/>
+        <property name="queueCapacity" value="100"/>
+        <property name="allowCoreThreadTimeOut" value="true"/>
+        <property name="keepAliveSeconds" value="120"/>
+    </bean>
+
     <!--    <jee:jndi-lookup id="dataSource" jndi-name="java:jboss/PostgresDS"/>-->
 
 

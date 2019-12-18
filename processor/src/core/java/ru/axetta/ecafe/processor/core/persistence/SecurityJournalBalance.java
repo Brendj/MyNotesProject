@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
 
 import org.apache.catalina.util.ParameterMap;
+import org.hibernate.Session;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
@@ -271,13 +272,19 @@ public class SecurityJournalBalance {
         if (writeBalancesInfoEnabled()) DAOService.getInstance().saveSecurityJournalBalance(journal);
     }
 
-    public static void saveSecurityJournalBalanceWithTransaction(SecurityJournalBalance journal, boolean success,
+    public static void saveSecurityJournalBalanceWithTransaction(Session session, SecurityJournalBalance journal, boolean success,
             String message, AccountTransaction accountTransaction) {
         journal.setIsSuccess(success);
         journal.setMessage(message);
         journal.setAccountTransaction(accountTransaction);
         journal.setEventDate(accountTransaction.getTransactionTime());
-        if (writeBalancesInfoEnabled()) DAOService.getInstance().saveSecurityJournalBalance(journal);
+        if (writeBalancesInfoEnabled()) {
+            if (session == null) {
+                DAOService.getInstance().saveSecurityJournalBalance(journal);
+            } else {
+                session.save(journal);
+            }
+        }
     }
 
     public static void saveSecurityJournalBalance(SecurityJournalBalance journal, boolean success, String message) {

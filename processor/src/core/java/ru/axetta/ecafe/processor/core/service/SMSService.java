@@ -30,6 +30,7 @@ import org.springframework.transaction.support.DefaultTransactionDefinition;
 import javax.annotation.Resource;
 import javax.persistence.PersistenceContext;
 import java.util.Date;
+import java.util.Map;
 
 @Component
 @Scope("singleton")
@@ -55,13 +56,16 @@ public class SMSService {
     public void logQueue() {
         try {
             QueueState queueState = getQueueState();
-            logger.info(String.format("Размеры очереди smsSendingTaskExecutor: выполняется потоков - %s, "+
-                    "доступно в очереди - %s, размер очереди - %s", queueState.getActiveCount(), queueState.getSize(), queueState.getQueue()));
-            ThreadPoolTaskExecutor ex = (ThreadPoolTaskExecutor)RuntimeContext.getAppContext().getBean("executorWithPoolSizeRange");
+            logger.info(String.format("Размеры очереди smsSendingTaskExecutor: выполняется потоков - %s, "
+                            + "доступно в очереди - %s, размер очереди - %s", queueState.getActiveCount(), queueState.getSize(),
+                    queueState.getQueue()));
+            ThreadPoolTaskExecutor ex = (ThreadPoolTaskExecutor) RuntimeContext.getAppContext()
+                    .getBean("executorWithPoolSizeRange");
             if (ex != null) {
-                logger.info(String.format("Размеры очереди asyncThreadPoolTaskExecutor: выполняется потоков - %s, "+
-                        "доступно в очереди - %s, размер очереди - %s, выполнено задач - %s", ex.getActiveCount(),
-                        ex.getThreadPoolExecutor().getQueue().remainingCapacity(), ex.getThreadPoolExecutor().getQueue().size(),
+                logger.info(String.format("Размеры очереди asyncThreadPoolTaskExecutor: выполняется потоков - %s, "
+                                + "доступно в очереди - %s, размер очереди - %s, выполнено задач - %s", ex.getActiveCount(),
+                        ex.getThreadPoolExecutor().getQueue().remainingCapacity(),
+                        ex.getThreadPoolExecutor().getQueue().size(),
                         ex.getThreadPoolExecutor().getCompletedTaskCount()));
             }
         } catch (Exception e) {
@@ -69,19 +73,22 @@ public class SMSService {
         }
     }
 
-    public boolean sendSMSAsync(Client client, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) {
-        RunnableSendSmsThreadWrapper wrapper = new RunnableSendSmsThreadWrapper
-                (transactionManager, em, client, messageType, messageTargetId, textObject, values, eventTime);
+    public boolean sendSMSAsync(Client client, int messageType, Long messageTargetId, Object textObject,
+            String[] values, Date eventTime) {
+        RunnableSendSmsThreadWrapper wrapper = new RunnableSendSmsThreadWrapper(transactionManager, em, client,
+                messageType, messageTargetId, textObject, values, eventTime);
         taskExecutor.execute(wrapper);
         return true;
     }
 
-    public boolean sendSMS(Client client, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) throws Exception {
+    public boolean sendSMS(Client client, int messageType, Long messageTargetId, Object textObject, String[] values,
+            Date eventTime) throws Exception {
         SendSmsThreadWrapper wrapper = new SendSmsThreadWrapper(transactionManager, em);
         return wrapper.sendSMS(client, messageType, messageTargetId, textObject, values, eventTime);
     }
 
     public static final class RunnableSendSmsThreadWrapper extends SendSmsThreadWrapper implements Runnable {
+
         protected Client client;
         protected int messageType;
         protected Long messageTargetId;
@@ -93,8 +100,10 @@ public class SMSService {
         public RunnableSendSmsThreadWrapper() {
         }
 
-        public RunnableSendSmsThreadWrapper(org.springframework.transaction.PlatformTransactionManager transactionManager, javax.persistence.EntityManager em,
-                                            Client client, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) {
+        public RunnableSendSmsThreadWrapper(
+                org.springframework.transaction.PlatformTransactionManager transactionManager,
+                javax.persistence.EntityManager em, Client client, int messageType, Long messageTargetId,
+                Object textObject, String[] values, Date eventTime) {
             super(transactionManager, em);
 
             this.client = client;
@@ -109,7 +118,8 @@ public class SMSService {
         @Override
         public void run() {
             try {
-                result = sendSMS(this.client, this.messageType, this.messageTargetId, this.textObject, this.values, this.eventTime);
+                result = sendSMS(this.client, this.messageType, this.messageTargetId, this.textObject, this.values,
+                        this.eventTime);
             } catch (Exception e) {
                 logger.error("Failed to send SMS", e);
                 result = false;
@@ -118,26 +128,30 @@ public class SMSService {
     }
 
     public static class SendSmsThreadWrapper {
+
         protected org.springframework.transaction.PlatformTransactionManager transactionManager;
         protected javax.persistence.EntityManager em;
 
         public SendSmsThreadWrapper() {
         }
 
-        public SendSmsThreadWrapper(org.springframework.transaction.PlatformTransactionManager transactionManager, javax.persistence.EntityManager em) {
+        public SendSmsThreadWrapper(org.springframework.transaction.PlatformTransactionManager transactionManager,
+                javax.persistence.EntityManager em) {
             this.transactionManager = transactionManager;
             this.em = em;
         }
 
         private boolean ignoreMobileTest(int messageType) {
-            return (messageType == ClientSms.TYPE_INFO_MAILING_NOTIFICATION) || EventNotificationService.isIgnoreEmptyMobile();
+            return (messageType == ClientSms.TYPE_INFO_MAILING_NOTIFICATION) || EventNotificationService
+                    .isIgnoreEmptyMobile();
         }
 
-        public boolean sendSMS(Client client, int messageType, Long messageTargetId, Object textObject, String[] values, Date eventTime) throws Exception {
-            if(transactionManager == null) {
+        public boolean sendSMS(Client client, int messageType, Long messageTargetId, Object textObject, String[] values,
+                Date eventTime) throws Exception {
+            if (transactionManager == null) {
                 throw new IllegalStateException("Transaction manager is null");
             }
-            if(em == null) {
+            if (em == null) {
                 throw new IllegalStateException("Entity manager is null");
             }
             DefaultTransactionDefinition def = new DefaultTransactionDefinition();
@@ -148,32 +162,41 @@ public class SMSService {
 
             try {
                 if (client == null) {
-                    throw new Exception ("Client doesn't exist");
+                    throw new Exception("Client doesn't exist");
                 }
 
-                if (!smsService.ignoreNotifyFlags()){
-                    if(!client.isNotifyViaSMS() && messageType!=ClientSms.TYPE_LINKING_TOKEN) return false;
+                if (!smsService.ignoreNotifyFlags()) {
+                    if (!client.isNotifyViaSMS() && messageType != ClientSms.TYPE_LINKING_TOKEN) {
+                        return false;
+                    }
                 }
                 phoneNumber = client.getMobile();
-                if (!StringUtils.isNotEmpty(phoneNumber) && !ignoreMobileTest(messageType)) return false;
+                if (!StringUtils.isNotEmpty(phoneNumber) && !ignoreMobileTest(messageType)) {
+                    return false;
+                }
                 phoneNumber = PhoneNumberCanonicalizator.canonicalize(phoneNumber);
-                if (StringUtils.length(phoneNumber) != 11 && !ignoreMobileTest(messageType)) return false;
+                if (StringUtils.length(phoneNumber) != 11 && !ignoreMobileTest(messageType)) {
+                    return false;
+                }
                 transactionManager.commit(status);
                 status = null;
-            }
-            finally {
-                if (status!=null) transactionManager.rollback(status);
+            } finally {
+                if (status != null) {
+                    transactionManager.rollback(status);
+                }
             }
 
             SendResponse sendResponse = null;
 
-            logger.info("sending SMS: " + getLoggingInfo(values, textObject));
+            logger.info("sending SMS: " + getLoggingInfo(values, textObject, messageType));
             String textMessage = null;
-            if(smsService instanceof SMPPClient){
+            if (smsService instanceof SMPPClient) {
                 try {
                     sendResponse = smsService.sendTextMessage(sender, phoneNumber, textObject);
-                    logger.info(String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s, RC: %s, error: %s",
-                            sendResponse.getMessageId(), sender, phoneNumber, textObject.toString(), sendResponse.getStatusCode(), sendResponse.getError()));
+                    logger.info(String.format(
+                            "sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, text: %s, RC: %s, error: %s",
+                            sendResponse.getMessageId(), sender, phoneNumber, textObject.toString(),
+                            sendResponse.getStatusCode(), sendResponse.getError()));
                     textMessage = textObject.toString();
                 } catch (Exception e) {
                     logger.warn("Failed to send SMS, sender: {}, phoneNumber: {}, text: {}, exception: {}",
@@ -182,15 +205,15 @@ public class SMSService {
             } else {
                 for (int i = 0; i < 3; i++) {
                     try {
-                        if(smsService instanceof EMPSmsServiceImpl) {
+                        if (smsService instanceof EMPSmsServiceImpl) {
                             //logger.info(String.format("Test sending sms: %s", ((EMPAbstractEventType)textObject).toFullString()));
                             sendResponse = ((EMPSmsServiceImpl) smsService).sendTextMessage(sender, client, textObject);
                             boolean isSuccess = sendResponse.isSuccess();
-                            if(sendResponse != null && !isSuccess) {
+                            if (sendResponse != null && !isSuccess) {
                                 String msg = ((EMPEventType) textObject).buildText();
                                 msg = String.format("E:[%s] %s", sendResponse.getStatusCode(), msg);
-                                regisgterClientSMSFailedCharge(client, sendResponse.getMessageId(),
-                                        phoneNumber, messageTargetId, messageType, msg);
+                                regisgterClientSMSFailedCharge(client, sendResponse.getMessageId(), phoneNumber,
+                                        messageTargetId, messageType, msg);
                                 return false;
                             }
                             //textObject = ((EMPEventType) textObject).buildText();
@@ -199,8 +222,10 @@ public class SMSService {
                             sendResponse = smsService.sendTextMessage(sender, phoneNumber, textObject);
                             textMessage = textObject.toString();
                         }
-                        logger.info(String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, RC: %s, error: %s",
-                                sendResponse.getMessageId(), sender, phoneNumber, sendResponse.getStatusCode(), sendResponse.getError()));
+                        logger.info(
+                                String.format("sent SMS, idOfSms: %s, sender: %s, phoneNumber: %s, RC: %s, error: %s",
+                                        sendResponse.getMessageId(), sender, phoneNumber, sendResponse.getStatusCode(),
+                                        sendResponse.getError()));
                         if (sendResponse.isSuccess()) {
                             break;
                         }
@@ -221,33 +246,51 @@ public class SMSService {
 
             //  Добавление в список не отправленных sms
             //if(sendResponse != null && !sendResponse.isSuccess()) {
-            boolean failureTestingMode = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_SMS_FAILURE_TESTING_MODE);
+            boolean failureTestingMode = RuntimeContext.getInstance()
+                    .getOptionValueBool(Option.OPTION_SMS_FAILURE_TESTING_MODE);
             result = result && !failureTestingMode;
-            if(!result) {
+            if (!result) {
                 String serviceName = RuntimeContext.getInstance().getConfigProperties().
                         getProperty(RuntimeContext.SMS_SERVICE_PARAM_BASE + ".type", "atompark");
-                SMSResendingService.getInstance().addResending(sendResponse.getMessageId(), client,
-                        phoneNumber, serviceName, messageTargetId, messageType, textObject, values, eventTime);
+                SMSResendingService.getInstance()
+                        .addResending(sendResponse.getMessageId(), client, phoneNumber, serviceName, messageTargetId,
+                                messageType, textObject, values, eventTime);
             }
 
             return result;
         }
 
-        private String getLoggingInfo(String[] values, Object textObject) {
+        private String getLoggingInfo(String[] values, Object textObject, int messageType) {
             String result = "";
             try {
                 result += "phone=" + ((EMPEventType) textObject).getMsisdn();
                 result += ";typeId=" + ((EMPEventType) textObject).getType();
-                for (int i = 0; i < values.length - 1; i += 2) {
-                    result += ";"+ values[i] + "=" + values[i + 1];
+                if (messageType >= ClientSms.TYPE_NOTIFICATION_START_SICK
+                        && messageType <= ClientSms.TYPE_NOTIFICATION_CANCEL_END_SICK) {
+                    //Только для специальных уведомлений
+                    for (Map.Entry<String, String> entry : ((EMPEventType) textObject).getParameters().entrySet()) {
+                        System.out.println("ID =  " + entry.getKey() + " День недели = " + entry.getValue());
+                        if (entry.getKey().equals(ExternalEventNotificationService.SURNAME) || entry.getKey()
+                                .equals(ExternalEventNotificationService.NAME) || entry.getKey().equals("OrgName")
+                                || entry.getKey().equals(ExternalEventNotificationService.ACCOUNT) || entry.getKey()
+                                .equals(EventNotificationService.CLIENT_GENDER_KEY) || entry.getKey()
+                                .equals(ExternalEventNotificationService.EMP_DATE) || entry.getKey().equals("OrgNum")) {
+                            result += ";" + entry.getKey() + "=" + entry.getValue();
+                        }
+                    }
+                } else {
+                    for (int i = 0; i < values.length - 1; i += 2) {
+                        result += ";" + values[i] + "=" + values[i + 1];
+                    }
                 }
-            } catch (Exception ignore) {}
+            } catch (Exception ignore) {
+            }
             return result;
         }
 
-        protected boolean regisgterClientSMSFailedCharge(Client client, String messageId,
-                                                         String phoneNumber, Long messageTargetId, int messageType, String text) throws Exception {
-            if(text == null || StringUtils.isBlank(text)) {
+        protected boolean regisgterClientSMSFailedCharge(Client client, String messageId, String phoneNumber,
+                Long messageTargetId, int messageType, String text) throws Exception {
+            if (text == null || StringUtils.isBlank(text)) {
                 return false;
             }
             ClientSms clientSms = RuntimeContext.getFinancialOpsManager()
@@ -257,12 +300,13 @@ public class SMSService {
             return true;
         }
 
-        protected boolean registerClientSMSCharge(boolean success, Client client, String messageId, String phoneNumber, Long messageTargetId,
-                int messageType, String text, Date eventTime, Long idOfSourceOrg) throws Exception {
+        protected boolean registerClientSMSCharge(boolean success, Client client, String messageId, String phoneNumber,
+                Long messageTargetId, int messageType, String text, Date eventTime, Long idOfSourceOrg)
+                throws Exception {
             ClientSms clientSms = null;
             boolean result = false;
             if (success) {
-                boolean delivered =  RuntimeContext.getInstance().getSmsService() instanceof EMPSmsServiceImpl;
+                boolean delivered = RuntimeContext.getInstance().getSmsService() instanceof EMPSmsServiceImpl;
                 clientSms = RuntimeContext.getFinancialOpsManager()
                         .createClientSmsCharge(client, messageId, phoneNumber, messageTargetId, messageType, text,
                                 new Date(), eventTime, delivered, idOfSourceOrg);
@@ -288,13 +332,14 @@ public class SMSService {
     }
 
     public QueueState getQueueState() {
-        int activeCount = ((ThreadPoolTaskExecutor)taskExecutor).getActiveCount();
-        int size = ((ThreadPoolTaskExecutor)taskExecutor).getThreadPoolExecutor().getQueue().remainingCapacity();
-        int queue = ((ThreadPoolTaskExecutor)taskExecutor).getThreadPoolExecutor().getQueue().size();
+        int activeCount = ((ThreadPoolTaskExecutor) taskExecutor).getActiveCount();
+        int size = ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().getQueue().remainingCapacity();
+        int queue = ((ThreadPoolTaskExecutor) taskExecutor).getThreadPoolExecutor().getQueue().size();
         return new QueueState(activeCount, size, queue);
     }
 
     public class QueueState {
+
         private int activeCount;
         private int size;
         private int queue;

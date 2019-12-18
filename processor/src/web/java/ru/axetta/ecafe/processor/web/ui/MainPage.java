@@ -307,6 +307,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage nsiGroupEmployeePage = new BasicWorkspacePage();
     private final BasicWorkspacePage spbGroupContingentPage = new BasicWorkspacePage();
     private final BasicWorkspacePage spbGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage orgParametersGroup = new BasicWorkspacePage();
     private final SalesReportPage salesReportPage = new SalesReportPage();
     private final SyncReportPage syncReportPage = new SyncReportPage();
     private final StatusSyncReportPage statusSyncReportPage = new StatusSyncReportPage();
@@ -527,6 +528,10 @@ public class MainPage implements Serializable {
 
     public BasicWorkspacePage getReportGroupPage() {
         return reportGroupPage;
+    }
+
+    public BasicWorkspacePage getOrgParametersGroup() {
+        return orgParametersGroup;
     }
 
     public Object showAllOrgsDiscountReportPage() {
@@ -6406,6 +6411,12 @@ public class MainPage implements Serializable {
 
     public Object showBenefitGroupPage() {
         currentWorkspacePage = benefitPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showOrgParametersGroupPage(){
+        currentWorkspacePage = orgParametersGroup;
         updateSelectedMainMenu();
         return null;
     }

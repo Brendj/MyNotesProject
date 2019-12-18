@@ -132,6 +132,33 @@
             <h:outputText escape="true" value="Обработано до: " styleClass="output-text" />
             <h:inputText value="#{optionPage.reviseLastDate}" styleClass="input-text" readonly="true" />
         </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid" id="synSettingExpressionsGrid" columns="2" bgcolor="#FFF3C2">
+            <h:outputText escape="true" value="Выражение для полной синхронизации" styleClass="output-text" />
+            <h:inputText value="#{optionPage.fullSyncExpressions}" styleClass="input-text"  />
+            <h:outputText escape="true" value="Выражение для синхронизации настроек ОО" styleClass="output-text" />
+            <h:inputText value="#{optionPage.orgSettingSyncExpressions}" styleClass="input-text"  />
+            <h:outputText escape="true" value="Выражение для синхронизации данных по клиентам ОО" styleClass="output-text" />
+            <h:inputText value="#{optionPage.clientDataSyncExpressions}" styleClass="input-text"  />
+            <h:outputText escape="true" value="Выражение для синхронизации меню" styleClass="output-text" />
+            <h:inputText value="#{optionPage.menuSyncExpressions}" styleClass="input-text"  />
+            <h:outputText escape="true" value="Выражение для синхронизации фотографий" styleClass="output-text" />
+            <h:inputText value="#{optionPage.photoSyncExpressions}" styleClass="input-text"  />
+            <h:outputText escape="true" value="Выражение для синхронизации библиотеки" styleClass="output-text" />
+            <h:inputText value="#{optionPage.libSyncExpressions}" styleClass="input-text"  />
+            <rich:toolTip styleClass="tooltip" layout="block">
+                <span style="white-space: nowrap">
+                    Выражение для автораспределения расписания представляет собой перечисление временных промежутков, когда необходимо и когда запрещено проводить синхронизацию АРМ с сервером Процессинга.
+                    <ul>
+                        <li>Промежутки задаются в формате HH:mm-HH:mm, разделителем является точка с запятой (;).</li>
+                        <li>Если задать несколько промежутков, то сервис астораспределения сгенерирует время для каждого. Из-за чего количество промежутков == количество сеансов.</li>
+                        <li>Время, в которое запрещено проводить синхронизацию, помечается восклицательным знаком в начале (!).</li>
+                        <li>Выражение должно состоять только из разрешенных промежутков, либо только из запрещенных.</li>
+                        <li>Если выражение не задано, то используется выражение по умолчанию.</li>
+                        <li>Сервис астораспределения имеет ограниченное количество попыток сгенерировать время для сеанса. По истечению количества попыток сервис генерирует время используя выражение по умолчанию.</li>
+                    </ul>
+                </span>
+            </rich:toolTip>
+        </h:panelGrid>
     </rich:tab>
     <rich:tab label="Платежные системы">
         <h:outputText escape="true" value="Выводить в личный кабинет" styleClass="output-text" />

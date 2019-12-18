@@ -90,6 +90,7 @@ public class TempCardOperationProcessor extends AbstractProcessor<ResTempCardsOp
     }
 
     private void addResTempCardOperation(TempCardOperation tempCardOperation, int code, String message) {
+        if (tempCardOperation == null || tempCardOperation.getIdOfOperation() == null) return;
         ResTempCardOperation resTempCardOperation = new ResTempCardOperation(tempCardOperation.getIdOfOperation(),code,message);
         resTempCardOperationList.add(resTempCardOperation);
     }

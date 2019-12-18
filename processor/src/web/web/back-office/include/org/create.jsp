@@ -17,6 +17,8 @@
 <h:panelGrid id="orgCreateGrid_basic" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.guid}" styleClass="input-text" />
+    <h:outputText escape="true" value="ЕКИС Id" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.ekisId}" styleClass="input-text" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.officialName}" maxlength="256" styleClass="input-text" size="150" />
     <h:outputText escape="true" value="Краткое наименование" styleClass="output-text required-field" />
