@@ -347,15 +347,13 @@ public class EventNotificationService {
         Boolean sms = null;
         if (smsService.ignoreNotifyFlags() || destClient.isNotifyViaSMS()) {
             if (isSMSNotificationEnabledForType(type)) {
-                logger.info("Старт отправки сообщения");
                 if(sendAsync != null) {
                     sms = sendSMS(destClient, dataClient, type, values, sendAsync, passDirection, guardian, eventTime);
                 } else {
                     sms = sendSMS(destClient, dataClient, type, values, passDirection, guardian, eventTime);
                 }
-                logger.info("Сообщение успешно отправлено");
             }
-        }
+        } else
         {
             logger.info("У клиента с л/с " + destClient.getContractId() + " отключен уведомление по SMS");
         }
@@ -506,7 +504,6 @@ public class EventNotificationService {
         if (text.length() > 68) {
             text = text.substring(0, 67) + "..";
         }
-        logger.info("Подготовка текста сообщения");
         boolean result = false;
         try {
             int clientSMSType;
@@ -552,16 +549,13 @@ public class EventNotificationService {
             }
 
             Object textObject = getTextObject(text, type, destClient, dataClient, direction, guardian, values);
-            logger.info("Текст сообщения: " + textObject);
             if(textObject != null) {
-                logger.info("Старт непосредственно отправки сообщения");
                 if (sendAsync) {
                     smsService.sendSMSAsync(destClient, clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
                     result = true;
                 } else {
                     result = smsService.sendSMS(destClient, clientSMSType, getTargetIdFromValues(values), textObject, values, eventTime);
                 }
-                logger.info("Сообщение успешно отправлено");
             }
         } catch (Exception e) {
             String message = String.format("Failed to send SMS notification to client with contract_id = %s.", destClient.getContractId());
