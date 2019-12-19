@@ -9274,7 +9274,29 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    //todo НЕ ДОДЕЛАНО
+    private ClientGroupResult getClientGroupResult(List<Client> clients) {
+        Map<Integer, Integer> map = new HashMap<>();
+        for (Client client : clients) {
+            int type = 0;
+            if (client.isStudent()) type = ClientGroupResult.STUDENT;
+            if (client.isParentGroup()) type = ClientGroupResult.PARENT;
+            if (client.isSotrudnikMsk()) type = ClientGroupResult.EMPLOYEE;
+            if (type == 0) continue;
+            Integer count = map.get(type);
+            if (count == null) count = 0;
+            map.put(type, count + 1);
+        }
+        if (map.size() == 0) return new ClientGroupResult(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+
+        for (Integer value : map.keySet()) {
+            if (map.get(value) > 1) return new ClientGroupResult(RC_SEVERAL_CLIENTS_WERE_FOUND, RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
+        }
+
+        ClientGroupResult result = new ClientGroupResult();
+
+        return result;
+    }
+
     @Override
     public ClientGroupResult getClientsGroupForPreorder(@WebParam(name="mobile") String mobile) {
         authenticateRequest(null);
@@ -9292,7 +9314,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Query query = session.createQuery("select c from Client c where c.mobile = :mobile");
             query.setParameter("mobile", mobilePhone);
             List<Client> clients = query.list();
-            ClientGroupResult result = new ClientGroupResult(); //getClientGroupResult(mobilePhone);
+            ClientGroupResult result = getClientGroupResult(clients);
             //ClientSummaryBaseListResult result = processClientSummaryByMobileResult(session, clients, "child");
 
             transaction.commit();
