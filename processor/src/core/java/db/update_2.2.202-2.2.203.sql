@@ -10,8 +10,8 @@ CREATE TABLE cf_taloon_preorder
     guid character varying(36) NOT NULL,
     idoforg bigint NOT NULL,
     taloondate bigint NOT NULL,
-    complexid bigint NOT NULL,
-    complexname character varying(128) NOT NULL,
+    complexid bigint NOT NULL, -- NOT NULL ?
+    complexname character varying(128), -- NOT NULL ?
     goodsname character varying(512),
     goodsguid character varying(36),
     idoforgcreated bigint,
@@ -51,3 +51,7 @@ CREATE INDEX cf_taloons_preorder_guid_idx
     ON cf_taloon_preorder
         USING btree
         (guid COLLATE pg_catalog."default");
+
+-- 358: Добавление id комплекса в cf_goods_requests_positions
+ALTER TABLE cf_goods_requests_positions
+    ADD complexId bigint;
