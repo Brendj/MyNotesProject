@@ -15,7 +15,7 @@
     <h:outputText escape="true" value="Идентификатор" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.idOfOrg}" styleClass="input-text" />
     <h:outputText escape="true" value="GUID" styleClass="output-text" />
-    <h:inputText readonly="true" value="#{mainPage.orgViewPage.guid}" styleClass="input-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.guid}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="ЕКИС Id" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.ekisId}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />

@@ -9276,11 +9276,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private ClientGroupResult getClientGroupResult(List<Client> clients) {
         Map<Integer, Integer> map = new HashMap<>();
+        boolean isStudent = false;
+        boolean isParent = false;
+        boolean isEmployee = false;
         for (Client client : clients) {
             int type = 0;
-            if (client.isStudent()) type = ClientGroupResult.STUDENT;
-            if (client.isParentGroup()) type = ClientGroupResult.PARENT;
-            if (client.isSotrudnikMsk()) type = ClientGroupResult.EMPLOYEE;
+            if (client.isStudent()) {
+                type = ClientGroupResult.STUDENT;
+                isStudent = true;
+            }
+            if (client.isParentGroup()) {
+                type = ClientGroupResult.PARENT;
+                isParent = true;
+            }
+            if (client.isSotrudnikMsk()) {
+                type = ClientGroupResult.EMPLOYEE;
+                isEmployee = true;
+            }
             if (type == 0) continue;
             Integer count = map.get(type);
             if (count == null) count = 0;
@@ -9292,7 +9304,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (map.get(value) > 1) return new ClientGroupResult(RC_SEVERAL_CLIENTS_WERE_FOUND, RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
         }
 
-        ClientGroupResult result = new ClientGroupResult();
+        Integer value;
+        if ((isStudent && isParent && isEmployee) || (isParent && isEmployee))
+            value = ClientGroupResult.PARENT_EMPLOYEE;
+        else if (isEmployee && isStudent)
+            value = ClientGroupResult.EMPLOYEE;
+        else if ((isParent && isStudent) || isParent)
+            value = ClientGroupResult.PARENT;
+        else if (isStudent)
+            value = ClientGroupResult.STUDENT;
+        else value = null;
+        if (value == null) return new ClientGroupResult(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+
+        ClientGroupResult result = new ClientGroupResult(RC_OK, RC_OK_DESC);
+        result.setValue(value);
 
         return result;
     }
