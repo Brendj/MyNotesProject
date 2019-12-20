@@ -9167,37 +9167,39 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.description = RC_CLIENT_NOT_FOUND_DESC;
                 return result;
             }
-            String mobile = Client.checkAndConvertMobile(childMobile);
-            if (mobile == null) {
-                result.resultCode = RC_INVALID_DATA;
-                result.description = RC_INVALID_MOBILE;
-                return result;
-            }
 
             if ((client.isStudent() && (StringUtils.isEmpty(guardianMobile) || StringUtils.isEmpty(childMobile)))
-                    || (!client.isStudent() && (!StringUtils.isEmpty(guardianMobile) || !StringUtils.isEmpty(childMobile)))) {
+                    || (client.isSotrudnikMsk() && (!StringUtils.isEmpty(guardianMobile) || !StringUtils.isEmpty(childMobile)))) {
                 //если для ученика не указаны телефоны представителя и самого ученика или наоборот, для сотрудника они указаны, то это ошибка
                 result.resultCode = RC_INVALID_DATA;
                 result.description = RC_INVALID_INPUT_DATA;
                 return result;
             }
 
-            List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
-            Long version = getClientGuardiansResultVersion(session);
-            boolean guardianWithMobileFound = false;
-            for (Client guardian : guardians) {
-                if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile()
-                        .equals(Client.checkAndConvertMobile(guardianMobile))) {
-                    guardianWithMobileFound = true;
-                    ClientManager
-                            .setPreorderAllowed(session, client, guardian, mobile, version);
-                }
-            }
+            if (client.isSotrudnikMsk()) {
+                ClientManager.setPreorderAllowedForClient(session, client);
+            } else {
 
-            if (!guardianWithMobileFound) {
-                result.resultCode = RC_CLIENT_GUARDIAN_NOT_FOUND;
-                result.description = RC_CLIENT_GUARDIAN_NOT_FOUND_DESC;
-                return result;
+                String mobile = Client.checkAndConvertMobile(childMobile);
+                if (mobile == null) {
+                    result.resultCode = RC_INVALID_DATA;
+                    result.description = RC_INVALID_MOBILE;
+                    return result;
+                }
+                List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
+                boolean guardianWithMobileFound = false;
+                for (Client guardian : guardians) {
+                    if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile().equals(Client.checkAndConvertMobile(guardianMobile))) {
+                        guardianWithMobileFound = true;
+                        ClientManager.setPreorderAllowed(session, client, guardian, mobile);
+                    }
+                }
+
+                if (!guardianWithMobileFound) {
+                    result.resultCode = RC_CLIENT_GUARDIAN_NOT_FOUND;
+                    result.description = RC_CLIENT_GUARDIAN_NOT_FOUND_DESC;
+                    return result;
+                }
             }
 
             transaction.commit();
@@ -9307,7 +9309,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Integer value;
         if ((isStudent && isParent && isEmployee) || (isParent && isEmployee))
             value = ClientGroupResult.PARENT_EMPLOYEE;
-        else if (isEmployee && isStudent)
+        else if ((isEmployee && isStudent) || isEmployee)
             value = ClientGroupResult.EMPLOYEE;
         else if ((isParent && isStudent) || isParent)
             value = ClientGroupResult.PARENT;
