@@ -59,9 +59,6 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     @Override
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
             String currentLastGuid, Integer currentLimit) throws Exception {
-        if (complexId == 0L) {
-            DAOUtils.getComplexIdForGoodRequestPosition(idOfOrg, good.getGlobalId());
-        }
         if (informationContent == null || informationContent.isDefault()) {
             return super.process(session, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
         }
@@ -135,6 +132,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         }
         if (g != null) {
             setGood(g);
+            setComplexId(DAOUtils.getComplexIdForGoodRequestPosition(session, idOfOrg, g.getGlobalId()));
         }
         if (p != null) {
             setProduct(p);
@@ -160,7 +158,6 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         if (longTotalCount != null) {
             setTotalCount(longTotalCount);
         }
-        setComplexId(0L);
         Long longDailySampleCount = XMLUtils.getLongAttributeValue(node, "DailySampleCount"); // суточная проба
         if (longDailySampleCount != null) {
             setDailySampleCount(longDailySampleCount);
@@ -173,6 +170,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         if (longNetWeight != null) {
             setNetWeight(longNetWeight);
         }
+        setComplexId(0L);
         guidOfGR = XMLUtils.getStringAttributeValue(node, "GuidOfGoodsRequest", 36);
         guidOfG = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         guidOfP = XMLUtils.getStringAttributeValue(node, "GuidOfBaseProduct", 36);

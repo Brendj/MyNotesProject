@@ -4521,28 +4521,22 @@ public class DAOUtils {
         }
     }
 
-    /// переделать запрос!
-    public static Long getComplexIdForGoodRequestPosition(Long idOfOrg, Long idOfGood) {
-        try {
-            javax.persistence.Query query = entityManager.createNativeQuery("SELECT DISTINCT ci.idOfComplex "
-                    + "FROM cf_preorder_complex pc "
-                    + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
-                    + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid "
-                    + "INNER JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
-                    + "INNER JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
-                    + "INNER JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-                    + "INNER JOIN cf_goods gc ON gc.idofgood = ci.idofgood "
-                    + "INNER JOIN cf_goods gmd ON gmd.idofgood = md.idofgood "
-                    + "WHERE ci.idOfOrg = :idOfOrg "
-                    + "AND gc.idOfGood = :idOfGood "
-                    + "AND (pc.deletedState = 0 OR pc.deletedState IS NULL) AND (pmd.deletedState = 0 OR pmd.deletedState IS NULL)");
-            query.setParameter("idOfOrg", idOfOrg);
-            query.setParameter("idOfGood", idOfGood);
-            Object result = query.getSingleResult();
-            return result != null ? ((Long) result) : 0L;
-        } catch (Exception e) {
-            logger.error(e.getMessage(), e);
-            return null;
-        }
+    public static Long getComplexIdForGoodRequestPosition(Session persistenceSession, Long idOfOrg, Long idOfGood) {
+        Query q = persistenceSession.createSQLQuery("SELECT DISTINCT ci.idOfComplex FROM cf_preorder_complex pc "
+                + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
+                + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid "
+                + "INNER JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
+                + "INNER JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
+                + "INNER JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
+                + "INNER JOIN cf_goods gc ON gc.idofgood = ci.idofgood "
+                + "INNER JOIN cf_goods gmd ON gmd.idofgood = md.idofgood "
+                + "WHERE ci.idOfOrg = :idOfOrg "
+                + "AND gc.idOfGood = :idOfGood "
+                + "AND (pc.deletedState = 0 OR pc.deletedState IS NULL) AND (pmd.deletedState = 0 OR pmd.deletedState IS NULL)");
+                q.setParameter("idOfOrg", idOfOrg);
+        q.setParameter("idOfOrg", idOfOrg);
+        q.setParameter("idOfGood", idOfGood);
+        Object result = q.uniqueResult();
+        return (result == null) ? 0L : (Long)result;
     }
 }
