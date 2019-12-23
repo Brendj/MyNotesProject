@@ -568,6 +568,20 @@ public class DAOReadonlyService {
         return "";
     }
 
+    public Client getClientByCardPrintedNo(Long cardPrintedNo) throws Exception {
+        Query query = entityManager.createQuery("select c from Card card join fetch card.client c join fetch c.person p "
+                + "where card.cardPrintedNo = :cardPrintedNo and card.state = :state");
+        query.setParameter("cardPrintedNo", cardPrintedNo);
+        query.setParameter("state", Card.ACTIVE_STATE);
+        List<Client> list = query.getResultList();
+        if (list.size() == 0) {
+            throw new Exception("Карта не найдена");
+        } else if (list.size() > 1) {
+            throw new Exception("Найдено более одной карты");
+        }
+        return list.get(0);
+    }
+
     public List<SpecialDate> getSpecialDates(Date startDate, Date endDate, Long idOfOrg) {
         try {
             Query query = entityManager.createQuery(

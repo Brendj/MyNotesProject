@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.web.partner.spb;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomController;
 
@@ -35,19 +37,36 @@ public class ExtendCardServiceServlet extends HttpServlet {
     private static ClientRoomController controller = null;
     private static final String PARAM_CODE = "code";
     private static final String PARAM_DESCRIPTION = "description";
+    private static final String PARAM_OPERATION = "operation";
+    private static final String PARAM_CARDPRINTEDNO = "cardprintedno";
+
+    private static final String OPERATION_EXTENDCARD = "extendcard";
+    private static final String OPERATION_GETCONTRACTID = "getcontractid";
 
     @Override
     public void doPost(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ServletException, IOException {
         try {
             authorizeRequest(httpRequest);
             Map<String, String> map = parseParams(httpRequest);
-            String cardno = map.get(PARAM_UID);
-            String contractId = map.get(PARAM_CONTRACTID);
-            logger.info(String.format("Incoming request to extend card valid date: uid=%s, contractId=%s", cardno, contractId));
-            ClientRoomController controller = createController();
-            Result result = controller.extendValidDateOfCard(Long.parseLong(contractId), Long.parseLong(cardno));
+            String operation = map.get(PARAM_OPERATION);
+            if (operation.equals(OPERATION_EXTENDCARD)) {
+                String cardno = map.get(PARAM_UID);
+                String contractId = map.get(PARAM_CONTRACTID);
 
-            serializeResponse(result.resultCode.toString(), result.description, httpResponse);
+                logger.info(String.format("Incoming request to extend card valid date: uid=%s, contractId=%s", cardno,
+                        contractId));
+
+                ClientRoomController controller = createController();
+                Result result = controller.extendValidDateOfCard(Long.parseLong(contractId), Long.parseLong(cardno));
+                serializeResponse(result.resultCode.toString(), result.description, httpResponse);
+            }
+
+            if (operation.equals(OPERATION_GETCONTRACTID)) {
+                String cardprintedno = map.get(PARAM_CARDPRINTEDNO);
+                Long value = Long.parseLong(cardprintedno);
+                Client client = DAOReadonlyService.getInstance().getClientByCardPrintedNo(value);
+                String response =
+            }
         } catch (Exception e) {
             logger.error("Error in SpbCardService", e);
             httpResponse.sendError(HttpServletResponse.SC_BAD_REQUEST);
