@@ -37,11 +37,13 @@ public class ExtendCardServiceServlet extends HttpServlet {
     private static ClientRoomController controller = null;
     private static final String PARAM_CODE = "code";
     private static final String PARAM_DESCRIPTION = "description";
+    private static final String PARAM_FIO = "fio";
+
     private static final String PARAM_OPERATION = "operation";
     private static final String PARAM_CARDPRINTEDNO = "cardprintedno";
 
     private static final String OPERATION_EXTENDCARD = "extendcard";
-    private static final String OPERATION_GETCONTRACTID = "getcontractid";
+    private static final String OPERATION_GETCLIENTINFO = "getclientinfo";
 
     @Override
     public void doPost(HttpServletRequest httpRequest, HttpServletResponse httpResponse) throws ServletException, IOException {
@@ -58,14 +60,37 @@ public class ExtendCardServiceServlet extends HttpServlet {
 
                 ClientRoomController controller = createController();
                 Result result = controller.extendValidDateOfCard(Long.parseLong(contractId), Long.parseLong(cardno));
-                serializeResponse(result.resultCode.toString(), result.description, httpResponse);
+                String responseString = String.format("%s=%s&%s=%s", PARAM_CODE, result.resultCode.toString(), PARAM_DESCRIPTION, result.description);
+                serializeResponse(responseString, httpResponse);
             }
 
-            if (operation.equals(OPERATION_GETCONTRACTID)) {
+            if (operation.equals(OPERATION_GETCLIENTINFO)) {
                 String cardprintedno = map.get(PARAM_CARDPRINTEDNO);
                 Long value = Long.parseLong(cardprintedno);
-                Client client = DAOReadonlyService.getInstance().getClientByCardPrintedNo(value);
-                String response =
+                Result result = new Result(0L, "OK");
+                Client client = null;
+                try {
+                    client = DAOReadonlyService.getInstance().getClientByCardPrintedNo(value);
+                } catch (Exception e) {
+                    if (e.getMessage().equals(DAOReadonlyService.CARD_NOT_FOUND) || e.getMessage().equals(DAOReadonlyService.SEVERAL_CARDS_FOUND)) {
+                        result.resultCode = 100L;
+                        result.description = e.getMessage();
+                        String responseString = String.format("%s=%s&%s=%s", PARAM_CODE, result.resultCode.toString(), PARAM_DESCRIPTION, result.description);
+                        serializeResponse(responseString, httpResponse);
+                        return;
+                    } else {
+                        throw e;
+                    }
+                }
+                StringBuilder sb = new StringBuilder();
+                sb.append(PARAM_CODE + "=" + result.resultCode.toString());
+                sb.append("&");
+                sb.append(PARAM_DESCRIPTION + "=" + result.description);
+                sb.append("&");
+                sb.append(PARAM_CONTRACTID + "=" + client.getContractId().toString());
+                sb.append("&");
+                sb.append(PARAM_FIO + "=" + client.getPerson().getFullName());
+                serializeResponse(sb.toString(), httpResponse);
             }
         } catch (Exception e) {
             logger.error("Error in SpbCardService", e);
@@ -73,12 +98,11 @@ public class ExtendCardServiceServlet extends HttpServlet {
         }
     }
 
-    protected void serializeResponse(String code, String description, HttpServletResponse httpResponse) throws IOException {
-        String s = String.format("%s=%s&%s=%s", PARAM_CODE, code, PARAM_DESCRIPTION, description);
+    protected void serializeResponse(String responseString, HttpServletResponse httpResponse) throws IOException {
         ByteArrayOutputStream byteStream = new ByteArrayOutputStream();
         PrintStream printStream = new PrintStream(byteStream, true, "UTF-8");
         try {
-            printStream.print(s);
+            printStream.print(responseString);
         } catch (Exception e) {
             logger.error("Failed to serialize response", e);
             httpResponse.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
