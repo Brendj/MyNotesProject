@@ -4,17 +4,25 @@
 
 package ru.axetta.ecafe.processor.core.emias;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
 import javax.xml.bind.annotation.XmlType;
 import java.util.Date;
 
+@XmlAccessorType(XmlAccessType.FIELD)
 @XmlType(name = "LiberateClientsList", propOrder = {
         "guid", "idEventEMIAS", "typeEventEMIAS", "dateLiberate", "startDateLiberate", "endDateLiberate",
         "idEventCancelEMIAS"})
 public class LiberateClientsList {
 
+    @XmlElement(required = true)
     private String guid;
+    @XmlElement(required = true)
     private Long idEventEMIAS;
+    @XmlElement(required = true)
     private Long typeEventEMIAS;
+    @XmlElement(required = true)
     private Date dateLiberate;
     private Date startDateLiberate;
     private Date endDateLiberate;
