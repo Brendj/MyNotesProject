@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 
+import org.apache.cxf.message.Message;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -28,6 +29,7 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 /**
  * Created by a.voinov on 28.10.2019.
@@ -46,14 +48,12 @@ public class EMIASController extends HttpServlet {
 
     @WebMethod(operationName = "getLiberateClientsList")
     public List<OrgSummaryResult> getLiberateClientsList(
-            @WebParam(name = "LiberateClientsList") List<LiberateClientsList> liberateClientsLists,
-            @WebParam(name = "token", header = true) String key) {
+            @WebParam(name = "LiberateClientsList") List<LiberateClientsList> liberateClientsLists) {
 
         List<OrgSummaryResult> orgSummaryResults = new ArrayList<>();
 
         //Контроль безопасности
-        if (!validateAccess(key))
-        {
+        if (!validateAccess()) {
             orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_WRONG_KEY_EMIAS,
                     ResponseItem.ERROR_WRONG_KEY_MESSAGE_EMIAS));
             return orgSummaryResults;
@@ -72,12 +72,13 @@ public class EMIASController extends HttpServlet {
                         || liberateClientsList.getTypeEventEMIAS() == null
                         || liberateClientsList.getDateLiberate() == null) {
                     if (liberateClientsList.getIdEventEMIAS() == null) {
-                        orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND, ResponseItem.ERROR_ARGUMENT_NOT_FOUND_MESSAGE));
-                    }
-                    else
-                    {
-                        orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND, ResponseItem.ERROR_ARGUMENT_NOT_FOUND_MESSAGE,
-                                liberateClientsList.getIdEventEMIAS() == null ? 0L : liberateClientsList.getIdEventEMIAS()));
+                        orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND,
+                                ResponseItem.ERROR_ARGUMENT_NOT_FOUND_MESSAGE));
+                    } else {
+                        orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND,
+                                ResponseItem.ERROR_ARGUMENT_NOT_FOUND_MESSAGE,
+                                liberateClientsList.getIdEventEMIAS() == null ? 0L
+                                        : liberateClientsList.getIdEventEMIAS()));
                     }
                     continue;
                 }
@@ -89,7 +90,8 @@ public class EMIASController extends HttpServlet {
                     continue;
                 }
 
-                List<EMIAS> emias = DAOUtils.getEmiasbyidEventEMIAS(liberateClientsList.getIdEventEMIAS(), persistenceSession);
+                List<EMIAS> emias = DAOUtils
+                        .getEmiasbyidEventEMIAS(liberateClientsList.getIdEventEMIAS(), persistenceSession);
 
                 if (liberateClientsList.getIdEventEMIAS() < 0L || !emias.isEmpty()) {
                     orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND,
@@ -102,7 +104,8 @@ public class EMIASController extends HttpServlet {
                         if (liberateClientsList.getStartDateLiberate() == null
                                 || liberateClientsList.getEndDateLiberate() == null) {
                             orgSummaryResults.add(new OrgSummaryResult(ResponseItem.ERROR_ARGUMENT_NOT_FOUND,
-                                    ResponseItem.ERROR_ARGUMENT_NOT_FOUND_MESSAGE, liberateClientsList.getIdEventEMIAS()));
+                                    ResponseItem.ERROR_ARGUMENT_NOT_FOUND_MESSAGE,
+                                    liberateClientsList.getIdEventEMIAS()));
                             continue;
                         }
                         DAOUtils.saveEMIAS(persistenceSession, liberateClientsList);
@@ -129,8 +132,9 @@ public class EMIASController extends HttpServlet {
                 if (eventsStatus != -1) {
                     logger.info("Старт сервиса по отправке уведомлений в ЕМП для ЕМИАС");
                     ExternalEventVersionHandler handler = new ExternalEventVersionHandler(persistenceSession);
-                    ExternalEvent event = new ExternalEvent(cl, ExternalEventType.SPECIAL, liberateClientsList.getDateLiberate(),
-                            ExternalEventStatus.fromInteger(eventsStatus), handler);
+                    ExternalEvent event = new ExternalEvent(cl, ExternalEventType.SPECIAL,
+                            liberateClientsList.getDateLiberate(), ExternalEventStatus.fromInteger(eventsStatus),
+                            handler);
                     persistenceSession.save(event);
                     event.setForTest(false);
                     ExternalEventNotificationService notificationService = RuntimeContext.getAppContext()
@@ -140,8 +144,8 @@ public class EMIASController extends HttpServlet {
                     notificationService.sendNotification(cl, event);
                 }
 
-                orgSummaryResults.add(new OrgSummaryResult(ResponseItem.OK,
-                        ResponseItem.OK_MESSAGE_2, liberateClientsList.getIdEventEMIAS()));
+                orgSummaryResults.add(new OrgSummaryResult(ResponseItem.OK, ResponseItem.OK_MESSAGE_2,
+                        liberateClientsList.getIdEventEMIAS()));
             }
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -159,19 +163,16 @@ public class EMIASController extends HttpServlet {
         return orgSummaryResults;
     }
 
-    private boolean validateAccess(String key)
-    {
+    private boolean validateAccess() {
         //Узнаем, нужно ли использовать проверку по ip
         String useip = RuntimeContext.getInstance().getConfigProperties().getProperty(USED_IP_FOR_EZD, "");
         Boolean useips;
-        try{
+        try {
             useips = Boolean.parseBoolean(useip);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             useips = false;
         }
-        if (useips)
-        {
+        if (useips) {
             boolean goodIp = false;
             //Проверяем само значение ключа
             String IpsInternal = RuntimeContext.getInstance().getConfigProperties().getProperty(IP_FOR_EZD, "");
@@ -180,18 +181,16 @@ public class EMIASController extends HttpServlet {
 
             //Получаем ip, откуда запрос
             MessageContext jaxwsContext = context.getMessageContext();
-            HttpServletRequest httpServletRequest = ((HttpServletRequest) jaxwsContext.get(SOAPMessageContext.SERVLET_REQUEST));
+            HttpServletRequest httpServletRequest = ((HttpServletRequest) jaxwsContext
+                    .get(SOAPMessageContext.SERVLET_REQUEST));
             String ip = httpServletRequest.getRemoteAddr();
-            for (String ip1 : addressList)
-            {
-                if (ip1.equals(ip))
-                {
+            for (String ip1 : addressList) {
+                if (ip1.equals(ip)) {
                     goodIp = true;
                     break;
                 }
             }
-            if (!goodIp)
-            {
+            if (!goodIp) {
                 return false;
             }
         }
@@ -199,18 +198,23 @@ public class EMIASController extends HttpServlet {
         //Узнаем, нужно ли использовать ключ для доступа
         String useKey = RuntimeContext.getInstance().getConfigProperties().getProperty(USED_KEY_FOR_EZD, "");
         Boolean usedKey;
-        try{
+        try {
             usedKey = Boolean.parseBoolean(useKey);
-        } catch (Exception e)
-        {
+        } catch (Exception e) {
             usedKey = false;
         }
-        if (usedKey)
-        {
+        if (usedKey) {
             //Проверяем само значение ключа
             String keyInternal = RuntimeContext.getInstance().getConfigProperties().getProperty(KEY_FOR_EZD, "");
-            if (!keyInternal.equals(key))
-            {
+            Map<String, List> headers = (Map<String, List>) context.getMessageContext().get(Message.PROTOCOL_HEADERS);
+            List<String> keyInput = headers.get("token");
+            try {
+                if (keyInput.get(0).equals(keyInternal)) {
+                    return true;
+                } else {
+                    return false;
+                }
+            } catch (Exception e) {
                 return false;
             }
         }
