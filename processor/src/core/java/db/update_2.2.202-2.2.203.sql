@@ -5,4 +5,6 @@
 -- Пакет обновлений 203
 
 -- В рамках задачи 363 удаление архивных записей
-DELETE FROM cf_syncsettings WHERE deletestate = TRUE
+DELETE FROM cf_syncsettings WHERE deletestate = TRUE;
+
+--! ФИНАЛИЗИРОВАН 23.12.2019, НЕ МЕНЯТЬ
