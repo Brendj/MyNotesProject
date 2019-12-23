@@ -400,6 +400,15 @@ public class DAOUtils {
         return null;
     }
 
+    public static Person findPersonByFIO(Session session, String firstname, String surname, String secondname) {
+        Query query = session.createQuery("from Person p where p.firstname = :firstname and p.surname = :surname "
+                + "and p.secondname = :secondname");
+        query.setParameter("firstname", firstname);
+        query.setParameter("surname", surname);
+        query.setParameter("secondname", secondname);
+        return (Person)query.uniqueResult();
+    }
+
     public static boolean isNotPlannedOrgExists(Session session, String shortName, long additionalIdBuilding) {
         Query q = session.createSQLQuery("select 1 from cf_not_planned_orgs where shortName=:shortName and additionalIdBuilding=:additionalIdBuilding");
         q.setParameter("shortName", shortName);

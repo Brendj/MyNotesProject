@@ -10,9 +10,11 @@
 
 <%--@elvariable id="orgListLoaderPage" type="ru.axetta.ecafe.processor.web.ui.service.OrgListLoaderPage"--%>
 <h:panelGrid id="orgListLoaderGrid" binding="#{orgListLoaderPage.pageComponent}" styleClass="borderless-grid">
-
-    <h:panelGrid columns="2">
+    <h:panelGrid columns="1">
         <h:outputText value="Файл для загрузки"/>
+        <h:commandLink action="#{orgListLoaderPage.downloadSample}" id="downloadSample" value="Скачать образец" styleClass="command-link" />
+    </h:panelGrid>
+    <h:panelGrid columns="2">
         <rich:fileUpload id="orgFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
                          addButtonClassDisabled="upload-command-button-diasbled" cleanButtonClass="upload-command-button"
                          cleanButtonClassDisabled="upload-command-button-diasbled" stopButtonClass="upload-command-button"
@@ -24,7 +26,9 @@
                          clearControlLabel="Очистить" clearAllControlLabel="Очистить все" doneLabel="Готово"
                          cancelEntryControlLabel="Отменить" transferErrorLabel="Ошибка передачи"
                          uploadControlLabel="Загрузка файла" progressLabel="Загрузка" listHeight="70px"
-                         fileUploadListener="#{orgListLoaderPage.fileUploadListener}">
+                         fileUploadListener="#{orgListLoaderPage.uploadFile}">
+<%--                         fileUploadListener="#{orgListLoaderPage.fileUploadListener}">--%>
+
             <f:facet name="label">
                 <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]" />
             </f:facet>
