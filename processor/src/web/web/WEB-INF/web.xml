@@ -230,7 +230,7 @@
 
     <servlet-mapping>
         <servlet-name>SpbCardServiceServlet</servlet-name>
-        <url-pattern>/extendcard</url-pattern>
+        <url-pattern>/cardservice</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
