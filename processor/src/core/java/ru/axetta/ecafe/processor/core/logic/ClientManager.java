@@ -1530,7 +1530,8 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getIsLegalRepresent()));
+                        getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getIsLegalRepresent(),
+                        getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient())));
             }
         }
         return guardianItems;
@@ -1595,7 +1596,8 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
                 wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
                         notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getIsLegalRepresent()));
+                        getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getIsLegalRepresent(),
+                        getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient)));
             }
         }
         return wardItems;

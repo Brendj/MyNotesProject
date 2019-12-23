@@ -176,6 +176,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_NOT_INFORMED_SPECIAL_MENU = 640L;
     private static final Long RC_NOT_ALLOWED_PREORDERS = 641L;
     private static final Long RC_PREORDERS_NOT_ENABLED = 642L;
+    private static final Long RC_PREORDERS_NOT_STAFF = 643L;
     private static final Long RC_ORGANIZATION_NOT_FOUND = 650L;
     private static final Long RC_REQUIRED_FIELDS_ARE_NOT_FILLED = 660L;
     private static final Long RC_NOT_FOUND_MENUDETAIL = 670L;
@@ -224,6 +225,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_NOT_INFORMED_SPECIAL_MENU_DESC = "Представитель не проинформирован об условиях предоставления услуги";
     private static final String RC_NOT_ALLOWED_PREORDERS_DESC = "Клиенту  не установлен флаг разрешения самостоятельного заказа";
     private static final String RC_PREORDERS_NOT_ENABLED_DESC = "В ОО клиента не включен функционал «Предзаказ»";
+    private static final String RC_PREORDERS_NOT_STAFF_DESC = "Клиент не принадлежит группе сотрудников";
     private static final String RC_ORGANIZATION_NOT_FOUND_DESC = "Организация не найдена";
     private static final String RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC = "Не заполнены обязательные параметры";
     private static final String RC_NOT_FOUND_MENUDETAIL_DESC = "На данный момент блюдо в меню не найдено";
@@ -8737,14 +8739,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             transaction = session.beginTransaction();
 
             List<Long> staffGroups = new ArrayList<>();
-            staffGroups.add(ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue());
-            staffGroups.add(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue());
-            staffGroups.add(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
-            staffGroups.add(ClientGroup.Predefined.CLIENT_OTHERS.getValue());
 
-            Query query = session.createQuery("select c from Client c where c.mobile = :mobile and c.idOfClientGroup in :clientGroups");
+            Query query = session.createQuery("select c from Client c where c.mobile = :mobile");
             query.setParameter("mobile", Client.checkAndConvertMobile(staffMobile));
-            query.setParameterList("clientGroups", staffGroups);
             List<Client> clients = query.list();
             ClientSummaryBaseListResult result = processClientSummaryByMobileResult(session, clients, "staff");
 
@@ -8830,6 +8827,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 result.description = RC_NOT_ALLOWED_PREORDERS_DESC;
                 return result;
             }
+        } else if (mode.equals("staff") && !child.isSotrudnikMsk()) {
+            result.resultCode = RC_PREORDERS_NOT_STAFF;
+            result.description = RC_PREORDERS_NOT_STAFF_DESC;
+            return result;
         }
         ClientSummaryBase summaryBase = new ClientSummaryBase();
         summaryBase.setContractId(child.getContractId());
