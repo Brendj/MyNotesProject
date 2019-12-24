@@ -9116,7 +9116,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         if (client.isSotrudnikMsk()) {
             informed = ClientManager.getInformedSpecialMenuWithoutSession(client.getIdOfClient(), null);
-        } else {
+        } else if (client.isStudent() && !client.getMobile().equals(guardianMobile)) {
             ClientGuardianResult cgr = getClientGuardianOrError(client, guardianMobile);
             if (!cgr.resultCode.equals(RC_OK)) {
                 result.resultCode = cgr.resultCode;
@@ -9131,10 +9131,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
         }
-        if (client.isStudent() && client.getMobile().equals(guardianMobile) && !ClientManager.getAllowedPreorderByClientWithoutSession(client.getIdOfClient(), null)) {
-            result.resultCode = RC_NOT_ALLOWED_PREORDERS;
-            result.description = RC_NOT_ALLOWED_PREORDERS_DESC;
-            return result;
+        if (client.isStudent() && client.getMobile().equals(guardianMobile)) {
+            if (!ClientManager.getAllowedPreorderByClientWithoutSession(client.getIdOfClient(), null)) {
+                result.resultCode = RC_NOT_ALLOWED_PREORDERS;
+                result.description = RC_NOT_ALLOWED_PREORDERS_DESC;
+                return result;
+            } else {
+                informed = true;
+            }
         }
         if (!informed) {
             result.resultCode = RC_NOT_INFORMED_SPECIAL_MENU;
