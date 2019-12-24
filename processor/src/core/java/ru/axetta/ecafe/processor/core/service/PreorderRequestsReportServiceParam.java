@@ -17,11 +17,15 @@ public class PreorderRequestsReportServiceParam {
     private final List<Long> idOfOrgList;
     private final List<Long> idOfClientList;
     private final Date date;
+    private Integer modBy;
+    private Integer serversAmount;
 
     public PreorderRequestsReportServiceParam(Date date) {
         idOfOrgList = new ArrayList<>();
         idOfClientList = new ArrayList<>();
         this.date = date;
+        modBy = null;
+        serversAmount = null;
     }
 
     public boolean isEmpty() {
@@ -32,6 +36,7 @@ public class PreorderRequestsReportServiceParam {
         String result = "";
         if (!idOfOrgList.isEmpty()) result = String.format(" and pc.idOfOrgOnCreate in (%s) ", StringUtils.join(idOfOrgList, ','));
         if (!idOfClientList.isEmpty()) result += String.format(" and pc.client.idOfClient in (%s) ", StringUtils.join(idOfClientList, ','));
+        if (modBy != null && serversAmount != null) result += String.format(" and mod(pc.idOfOrgOnCreate, %s) = %s", serversAmount, modBy);
         return result;
     }
 
@@ -42,6 +47,7 @@ public class PreorderRequestsReportServiceParam {
         if (!idOfClientList.isEmpty()) {
             return String.format(" and %s.idOfOrg in (select distinct c.org.idOfOrg from Client c where c.idOfClient in (%s)) ", alias, StringUtils.join(idOfClientList, ','));
         }
+        if (modBy != null && serversAmount != null) return String.format(" and mod(%s.idOfOrg, %s) = %s", alias, serversAmount, modBy);
         return "";
     }
 
@@ -49,6 +55,13 @@ public class PreorderRequestsReportServiceParam {
         String result = "";
         if (!idOfOrgList.isEmpty()) result = String.format(" and pc.idOfOrgOnCreate in (%s) ", StringUtils.join(idOfOrgList, ','));
         if (!idOfClientList.isEmpty()) result += String.format(" and pc.idOfClient in (%s) ", StringUtils.join(idOfClientList, ','));
+        if (modBy != null && serversAmount != null) result += String.format(" and mod(pc.idOfOrgOnCreate, %s) = %s", serversAmount, modBy);
+        return result;
+    }
+
+    public String getRegularPreorderJPACondition() {
+        String result = "";
+        if (modBy != null && serversAmount != null) result += String.format(" and mod(c.org.idOfOrg, %s) = %s", serversAmount, modBy);
         return result;
     }
 
@@ -62,5 +75,21 @@ public class PreorderRequestsReportServiceParam {
 
     public Date getDate() {
         return date;
+    }
+
+    public Integer getModBy() {
+        return modBy;
+    }
+
+    public Integer getServersAmount() {
+        return serversAmount;
+    }
+
+    public void setModBy(Integer modBy) {
+        this.modBy = modBy;
+    }
+
+    public void setServersAmount(Integer serversAmount) {
+        this.serversAmount = serversAmount;
     }
 }

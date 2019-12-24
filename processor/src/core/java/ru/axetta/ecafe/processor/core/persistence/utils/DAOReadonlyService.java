@@ -49,6 +49,9 @@ import java.util.*;
 public class DAOReadonlyService {
     private final static Logger logger = LoggerFactory.getLogger(DAOReadonlyService.class);
 
+    public static final String CARD_NOT_FOUND = "Карта не найдена";
+    public static final String SEVERAL_CARDS_FOUND = "Найдено более одной карты";
+
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
 
@@ -566,6 +569,20 @@ public class DAOReadonlyService {
             } catch (Exception ignore) { }
         }
         return "";
+    }
+
+    public Client getClientByCardPrintedNo(Long cardPrintedNo) throws Exception {
+        Query query = entityManager.createQuery("select card from Card card join fetch card.client c join fetch c.person p "
+                + "where card.cardPrintedNo = :cardPrintedNo and card.state = :state and card.client is not null");
+        query.setParameter("cardPrintedNo", cardPrintedNo);
+        query.setParameter("state", Card.ACTIVE_STATE);
+        List<Card> list = query.getResultList();
+        if (list.size() == 0) {
+            throw new Exception(CARD_NOT_FOUND);
+        } else if (list.size() > 1) {
+            throw new Exception(SEVERAL_CARDS_FOUND);
+        }
+        return list.get(0).getClient();
     }
 
     public List<SpecialDate> getSpecialDates(Date startDate, Date endDate, Long idOfOrg) {

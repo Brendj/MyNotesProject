@@ -83,11 +83,13 @@ public class PreorderRequestsReportService extends RecoverableService {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String instance = runtimeContext.getNodeName();
         String reqInstance = runtimeContext.getConfigProperties().getProperty(PreorderRequestsReportService.NODE_PROPERTY, "1");
-        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim().equals(
-                reqInstance.trim())) {
-            return false;
+        String[] nodes = reqInstance.split(",");
+        for (String node : nodes) {
+            if (!StringUtils.isBlank(instance) && !StringUtils.isBlank(reqInstance) && instance.trim().equals(node.trim())) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     private void deletePreorderForNotEnoughMoney(Session session, PreorderItem item) {
@@ -378,7 +380,19 @@ public class PreorderRequestsReportService extends RecoverableService {
     }
 
     public void runTask() throws Exception {
-        runTask(new PreorderRequestsReportServiceParam(new Date()));
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getConfigProperties().getProperty(PreorderRequestsReportService.NODE_PROPERTY, "1");
+        String[] nodes = reqInstance.split(",");
+        PreorderRequestsReportServiceParam params = new PreorderRequestsReportServiceParam(new Date());
+        for (int i = 0; i < nodes.length; i++) {
+            if (instance.equals(nodes[i])) {
+                params.setModBy(i);
+                params.setServersAmount(nodes.length);
+                break;
+            }
+        }
+        runTask(params);
     }
 
     public void runTask(PreorderRequestsReportServiceParam params) throws Exception {

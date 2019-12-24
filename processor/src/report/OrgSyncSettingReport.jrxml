@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="SyncSettingsJasperReport" pageWidth="2915" pageHeight="30000" columnWidth="2875" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" isIgnorePagination="true" uuid="55e746e4-7cb7-4b01-87f6-06f7e0f25f33">
 	<property name="ireport.zoom" value="1.4641000000000044"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="2922"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -310,6 +310,7 @@
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="1966" y="0" width="303" height="27" backcolor="#CCCCCC">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<printWhenExpression><![CDATA[$F{photoSync}.equals(false)]]></printWhenExpression>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
@@ -336,6 +337,7 @@
 			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
 				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" x="2572" y="0" width="303" height="27" backcolor="#CCCCCC">
 					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<printWhenExpression><![CDATA[$F{libSync}.equals(false)]]></printWhenExpression>
 				</reportElement>
 				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
 					<topPen lineWidth="0.5"/>
@@ -345,6 +347,34 @@
 				</box>
 				<textElement textAlignment="Center" verticalAlignment="Middle"/>
 				<textFieldExpression><![CDATA[$F{libSync}.toString()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" mode="Opaque" x="2572" y="0" width="303" height="27" backcolor="#CCCCCC">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<printWhenExpression><![CDATA[$F{libSync}.equals(true)]]></printWhenExpression>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{libSync}.toString()]]></textFieldExpression>
+			</textField>
+			<textField isStretchWithOverflow="true" isBlankWhenNull="true">
+				<reportElement uuid="3c650ca8-07f8-46c9-9b90-455956f7ff2e" stretchType="RelativeToBandHeight" mode="Opaque" x="1966" y="0" width="303" height="27" backcolor="#CCCCCC">
+					<property name="net.sf.jasperreports.export.xls.auto.fit.row" value="true"/>
+					<printWhenExpression><![CDATA[$F{photoSync}.equals(true)]]></printWhenExpression>
+				</reportElement>
+				<box topPadding="1" leftPadding="1" bottomPadding="1" rightPadding="1">
+					<topPen lineWidth="0.5"/>
+					<leftPen lineWidth="0.5"/>
+					<bottomPen lineWidth="0.5"/>
+					<rightPen lineWidth="0.5"/>
+				</box>
+				<textElement textAlignment="Center" verticalAlignment="Middle"/>
+				<textFieldExpression><![CDATA[$F{photoSync}.toString()]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>
