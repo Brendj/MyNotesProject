@@ -177,6 +177,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_NOT_ALLOWED_PREORDERS = 641L;
     private static final Long RC_PREORDERS_NOT_ENABLED = 642L;
     private static final Long RC_PREORDERS_NOT_STAFF = 643L;
+    private static final Long RC_PREORDERS_NOT_UNIQUE_CLIENT = 644L;
     private static final Long RC_ORGANIZATION_NOT_FOUND = 650L;
     private static final Long RC_REQUIRED_FIELDS_ARE_NOT_FILLED = 660L;
     private static final Long RC_NOT_FOUND_MENUDETAIL = 670L;
@@ -226,6 +227,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_NOT_ALLOWED_PREORDERS_DESC = "Клиенту  не установлен флаг разрешения самостоятельного заказа";
     private static final String RC_PREORDERS_NOT_ENABLED_DESC = "В ОО клиента не включен функционал «Предзаказ»";
     private static final String RC_PREORDERS_NOT_STAFF_DESC = "Клиент не принадлежит группе сотрудников";
+    private static final String RC_PREORDERS_NOT_UNIQUE_CLIENT_DESC = "Клиент из группы учащихся имеет не уникальный номер";
     private static final String RC_ORGANIZATION_NOT_FOUND_DESC = "Организация не найдена";
     private static final String RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC = "Не заполнены обязательные параметры";
     private static final String RC_NOT_FOUND_MENUDETAIL_DESC = "На данный момент блюдо в меню не найдено";
@@ -9277,7 +9279,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    private ClientGroupResult getClientGroupResult(List<Client> clients) {
+    private ClientGroupResult getClientGroupResult(Session session, List<Client> clients) {
         Map<Integer, Integer> map = new HashMap<>();
         boolean isStudent = false;
         boolean isParent = false;
@@ -9307,17 +9309,28 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             if (map.get(value) > 1) return new ClientGroupResult(RC_SEVERAL_CLIENTS_WERE_FOUND, RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
         }
 
+        if ((isStudent && isParent && isEmployee) || (isEmployee && isStudent) || (isParent && isStudent)) {
+            return new ClientGroupResult(RC_PREORDERS_NOT_UNIQUE_CLIENT, RC_PREORDERS_NOT_UNIQUE_CLIENT_DESC);
+        }
         Integer value;
-        if ((isStudent && isParent && isEmployee) || (isParent && isEmployee))
+        if (isParent && isEmployee)
             value = ClientGroupResult.PARENT_EMPLOYEE;
-        else if ((isEmployee && isStudent) || isEmployee)
+        else if (isEmployee && !isStudent && !isParent)
             value = ClientGroupResult.EMPLOYEE;
-        else if ((isParent && isStudent) || isParent)
+        else if (isParent && !isStudent && !isEmployee)
             value = ClientGroupResult.PARENT;
-        else if (isStudent)
+        else if (isStudent && !isEmployee && !isParent)
             value = ClientGroupResult.STUDENT;
         else value = null;
         if (value == null) return new ClientGroupResult(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+
+        if (value.equals(ClientGroupResult.EMPLOYEE)) {
+            Criteria criteria = session.createCriteria(ClientGuardian.class);
+            criteria.add(Restrictions.eq("idOfGuardian", clients.get(0).getIdOfClient()));
+            criteria.add(Restrictions.ne("deletedState", true));
+            criteria.add(Restrictions.ne("disabled", true));
+            if (criteria.list().size() > 0) value = ClientGroupResult.PARENT_EMPLOYEE;
+        }
 
         ClientGroupResult result = new ClientGroupResult(RC_OK, RC_OK_DESC);
         result.setValue(value);
@@ -9342,7 +9355,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Query query = session.createQuery("select c from Client c where c.mobile = :mobile");
             query.setParameter("mobile", mobilePhone);
             List<Client> clients = query.list();
-            ClientGroupResult result = getClientGroupResult(clients);
+            ClientGroupResult result = getClientGroupResult(session, clients);
             //ClientSummaryBaseListResult result = processClientSummaryByMobileResult(session, clients, "child");
 
             transaction.commit();
