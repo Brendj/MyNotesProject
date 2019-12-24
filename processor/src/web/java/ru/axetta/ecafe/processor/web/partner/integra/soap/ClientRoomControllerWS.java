@@ -9112,18 +9112,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return result;
         }
 
-        ClientGuardianResult cgr = getClientGuardianOrError(client, guardianMobile);
-        if (!cgr.resultCode.equals(RC_OK)) {
-            result.resultCode = cgr.resultCode;
-            result.description = cgr.description;
-            return result;
-        }
-
         boolean informed = false;
-        for (ClientGuardian cg : cgr.getClientGuardian()) {
-            if (ClientManager.getInformedSpecialMenuWithoutSession(client.getIdOfClient(), cg.getIdOfGuardian())) {
-                informed = true;
-                break;
+
+        if (client.isSotrudnikMsk()) {
+            informed = ClientManager.getInformedSpecialMenuWithoutSession(client.getIdOfClient(), null);
+        } else {
+            ClientGuardianResult cgr = getClientGuardianOrError(client, guardianMobile);
+            if (!cgr.resultCode.equals(RC_OK)) {
+                result.resultCode = cgr.resultCode;
+                result.description = cgr.description;
+                return result;
+            }
+
+            for (ClientGuardian cg : cgr.getClientGuardian()) {
+                if (ClientManager.getInformedSpecialMenuWithoutSession(client.getIdOfClient(), cg.getIdOfGuardian())) {
+                    informed = true;
+                    break;
+                }
             }
         }
         if (!informed) {
