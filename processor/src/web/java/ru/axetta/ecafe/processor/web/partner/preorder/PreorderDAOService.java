@@ -1422,9 +1422,9 @@ public class PreorderDAOService {
             }
         }
 
-        query = emReport.createQuery("select sum(p.amount), p.preorderDate from PreorderMenuDetail p "
+        query = emReport.createQuery("select sum(p.amount), p.preorderDate, coalesce(p.preorderComplex.idOfOrgOnCreate, p.client.org.idOfOrg) from PreorderMenuDetail p "
                 + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate and p.preorderComplex.deletedState = false "
-                + "group by p.preorderDate");
+                + "group by p.preorderDate, coalesce(p.preorderComplex.idOfOrgOnCreate, p.client.org.idOfOrg)");
         query.setParameter("idOfClient", idOfClient);
         query.setParameter("startDate", CalendarUtils.startOfDay(startDate));
         query.setParameter("endDate", CalendarUtils.endOfDay(endDate));
@@ -1434,10 +1434,14 @@ public class PreorderDAOService {
                 Object[] row = (Object[]) obj;
                 Date date2 = (Date)row[1];
                 Long amount = (Long)row[0];
+                Long idOfOrg = (Long)row[2];;
                 if (map.containsKey(date2)) {
-                    amount = amount + (Long)map.get(date2);
+                    amount = amount + ((Long[])map.get(date2))[0];
                 }
-                map.put(date2, amount);
+                Long[] arr = new Long[2];
+                arr[0] = amount;
+                arr[1] = idOfOrg;
+                map.put(date2, arr);
             }
         }
         return map;
