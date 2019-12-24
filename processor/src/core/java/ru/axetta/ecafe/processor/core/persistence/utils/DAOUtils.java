@@ -400,13 +400,17 @@ public class DAOUtils {
         return null;
     }
 
-    public static Person findPersonByFIO(Session session, String firstname, String surname, String secondname) {
-        Query query = session.createQuery("from Person p where p.firstname = :firstname and p.surname = :surname "
-                + "and p.secondname = :secondname");
-        query.setParameter("firstname", firstname);
+    public static Person findPersonByFIO(Session session, String firstName, String surname, String secondName) {
+        Query query = session.createQuery("from Person p where p.firstName = :firstName and p.surname = :surname "
+                + "and p.secondName = :secondName");
+        query.setParameter("firstName", firstName);
         query.setParameter("surname", surname);
-        query.setParameter("secondname", secondname);
-        return (Person)query.uniqueResult();
+        query.setParameter("secondName", secondName);
+        List res = query.list();
+        if(res != null && res.size() > 0) {
+            return (Person) res.get(0);
+        }
+        return (Person) res;
     }
 
     public static boolean isNotPlannedOrgExists(Session session, String shortName, long additionalIdBuilding) {

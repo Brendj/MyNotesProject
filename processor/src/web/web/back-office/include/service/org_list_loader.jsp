@@ -27,7 +27,6 @@
                          cancelEntryControlLabel="Отменить" transferErrorLabel="Ошибка передачи"
                          uploadControlLabel="Загрузка файла" progressLabel="Загрузка" listHeight="70px"
                          fileUploadListener="#{orgListLoaderPage.uploadFile}">
-<%--                         fileUploadListener="#{orgListLoaderPage.fileUploadListener}">--%>
 
             <f:facet name="label">
                 <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]" />
