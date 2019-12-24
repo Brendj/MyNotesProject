@@ -57,44 +57,25 @@
 
         </h:panelGrid>
 
-        <h:panelGrid columns="2" styleClass="borderless-grid" columnClasses="column-width-500,column-width-500">
-
+        <h:panelGrid columns="1" styleClass="borderless-grid" columnClasses="column-width-500">
             <h:outputText escape="true" value="Обслуживается:" styleClass="output-text" style="text-decoration: underline;" />
-
-            <h:outputText escape="true" value="Договор:" styleClass="output-text" style="text-decoration: underline;" />
-
         </h:panelGrid>
-        <h:panelGrid columns="4" styleClass="borderless-grid" columnClasses="column-width-250,column-width-250,column-width-250,column-width-250">
+        <h:panelGrid columns="2" styleClass="borderless-grid" columnClasses="column-width-250,column-width-250">
 
             <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
             <h:inputText value="#{mainPage.clientListPage.clientFilter.person.surname}" maxlength="128"
                          styleClass="input-text" />
 
-            <h:outputText escape="true" value="Фамилия" styleClass="output-text"/>
-            <h:inputText value="#{mainPage.clientListPage.clientFilter.contractPerson.surname}"
-                         maxlength="128" styleClass="input-text" />
-
             <h:outputText escape="true" value="Имя" styleClass="output-text" />
             <h:inputText value="#{mainPage.clientListPage.clientFilter.person.firstName}" maxlength="64"
                          styleClass="input-text" />
-            <h:outputText escape="true" value="Имя" styleClass="output-text"/>
-            <h:inputText value="#{mainPage.clientListPage.clientFilter.contractPerson.firstName}"
-                         maxlength="64" styleClass="input-text" />
 
             <h:outputText escape="true" value="Отчество" styleClass="output-text" />
             <h:inputText value="#{mainPage.clientListPage.clientFilter.person.secondName}"
                          maxlength="128" styleClass="input-text" />
 
-            <h:outputText escape="true" value="Отчество" styleClass="output-text"/>
-            <h:inputText value="#{mainPage.clientListPage.clientFilter.contractPerson.secondName}"
-                         maxlength="128" styleClass="input-text" />
-
             <h:outputText escape="true" value="Номер документа" styleClass="output-text" />
             <h:inputText value="#{mainPage.clientListPage.clientFilter.person.idDocument}"
-                         maxlength="128" styleClass="input-text" />
-
-            <h:outputText escape="true" value="Номер документа" styleClass="output-text"/>
-            <h:inputText value="#{mainPage.clientListPage.clientFilter.contractPerson.idDocument}"
                          maxlength="128" styleClass="input-text" />
 
         </h:panelGrid>
