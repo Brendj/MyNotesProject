@@ -1565,6 +1565,22 @@ public class ClientManager {
         return list.get(0).getInformedSpecialMenu();
     }
 
+    public static final boolean getAllowedPreorderByClientWithoutSession(Long idOfClient, Long idOfGuardian) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+            transaction = session.beginTransaction();
+            boolean result = getAllowedPreorderByClient(session, idOfClient, idOfGuardian);
+            transaction.commit();
+            transaction = null;
+            return result;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
     public static boolean getAllowedPreorderByClient(Session session, Long idOfClient, Long idOfGuardian) {
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client.idOfClient", idOfClient));

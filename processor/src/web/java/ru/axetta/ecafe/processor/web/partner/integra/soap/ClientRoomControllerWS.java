@@ -9131,6 +9131,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
         }
+        if (client.isStudent() && client.getMobile().equals(guardianMobile) && !ClientManager.getAllowedPreorderByClientWithoutSession(client.getIdOfClient(), null)) {
+            result.resultCode = RC_NOT_ALLOWED_PREORDERS;
+            result.description = RC_NOT_ALLOWED_PREORDERS_DESC;
+            return result;
+        }
         if (!informed) {
             result.resultCode = RC_NOT_INFORMED_SPECIAL_MENU;
             result.description = RC_NOT_INFORMED_SPECIAL_MENU_DESC;
