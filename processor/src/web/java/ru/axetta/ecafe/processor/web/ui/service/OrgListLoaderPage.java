@@ -52,8 +52,8 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
     private static final long MAX_LINE_NUMBER = 80000;
     private List<OrgEntry> lineResults = Collections.emptyList();
     private int successLineNumber = 0;
+    public static final String UTF8_BOM = "\uFEFF";
     //public static final long DEFAULT_SUPPLIER_ID = 28L;
-    //public static final String UTF8_BOM = "\uFEFF";
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -97,6 +97,10 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
         try (BufferedReader br = Files.newBufferedReader(path, StandardCharsets.UTF_8)) {
             String str;
             while ((str = br.readLine()) != null) {
+                if (firstLine) {
+                    str = str.replace(UTF8_BOM, "");
+                    firstLine = false;
+                }
                 if (lineNum == MAX_LINE_NUMBER) {
                     break;
                 }

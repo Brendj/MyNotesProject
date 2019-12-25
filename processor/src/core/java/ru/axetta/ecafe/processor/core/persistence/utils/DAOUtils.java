@@ -417,11 +417,7 @@ public class DAOUtils {
         Query query = session.createQuery("from Contragent c where c.idOfContragent = :idOfContragent "
                 + "and c.classId = 2"); // ТСП
         query.setParameter("idOfContragent", idOfContragent);
-        List res = query.list();
-        if(res != null && res.size() > 0) {
-            return (Contragent) res.get(0);
-        }
-        return (Contragent) res;
+        return (Contragent) query.uniqueResult();
     }
 
     public static boolean isNotPlannedOrgExists(Session session, String shortName, long additionalIdBuilding) {
