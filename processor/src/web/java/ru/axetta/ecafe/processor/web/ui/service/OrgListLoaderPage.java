@@ -53,8 +53,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
     private List<OrgEntry> lineResults = Collections.emptyList();
     private int successLineNumber = 0;
     //public static final long DEFAULT_SUPPLIER_ID = 28L;
-
-    public static final String UTF8_BOM = "\uFEFF";
+    //public static final String UTF8_BOM = "\uFEFF";
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -66,7 +65,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
             {"district", "Район"},
             {"GUID", "GUID"},
             {"supplierId", "ID поставщика"},
-            {"orgType", "Тип организации(0-3)"},
+            {"orgType", "Тип организации(0-4)"},
             {"position", "Должность руководителя"},
             {"surname", "Фамилия"},
             {"firstName", "Имя"},
@@ -157,7 +156,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
     private OrgEntry createOrg(Session session, int lineNum, Map<String, String> columns)
             throws Exception {
         if (columns == null || columns.size() < 1 || lineNum == 0) {
-            return new OrgEntry(lineNum, 1, "Not enough data", null);
+            return new OrgEntry(lineNum, 1, "Недостаточно данных", null);
         }
 
         String shortName = columns.get("shortName");
@@ -178,13 +177,13 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                     + " строка = " + lineNum, null);
         }
 
-        Contragent currentSupplier = DAOUtils.findContragent(session, supplierID);
+        Contragent currentSupplier = DAOUtils.findContragentIsSupplier(session, supplierID);
         if (currentSupplier == null) {
             logger.warn("Failed to find supplier id = " + supplierID);
             return new OrgEntry(lineNum, 1, "Не найден поставщик с id = " + supplierID, null);
         }
 
-        if (strOrgType == null || !strOrgType.matches("[0-3]") ) {
+        if (strOrgType == null || !strOrgType.matches("[0-4]") ) {
             logger.warn("Failed to get orgType = " + strOrgType);
             return new OrgEntry(lineNum, 1, "Не найден тип организации " + strOrgType, null);
         } else {
@@ -223,7 +222,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                 Set<Client> clients = currentOrg.getClients();
                 if ((clients != null && clients.size() > 0) || currentOrg.getStatus()
                         .equals(OrganizationStatus.ACTIVE)) {
-                    return new OrgEntry(lineNum, 0, "Org is already registered", currentOrg.getIdOfOrg());
+                    return new OrgEntry(lineNum, 0, "Организация уже зарегистрирована", currentOrg.getIdOfOrg());
                 }
                 if (address != null && !address.equals("")) {
                     currentOrg.setAddress(address);
@@ -243,7 +242,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                     currentOrg.setOfficialPerson(officialPerson);
                 }
                 session.update(currentOrg);
-                return new OrgEntry(lineNum, 0, "Org has been modified", currentOrg.getIdOfOrg());
+                return new OrgEntry(lineNum, 0, "Данные организации были обновлены", currentOrg.getIdOfOrg());
             }
 
             long version = DAOUtils.nextVersionByOrgStucture(session);
@@ -278,7 +277,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
             org.setPhotoRegistryDirective(PhotoRegistryDirective.DISALLOWED);
             session.save(org);
 
-            return new OrgEntry(lineNum, 0, "Ok", org.getIdOfOrg());
+            return new OrgEntry(lineNum, 0, "ОК", org.getIdOfOrg());
         } catch (Exception e) {
             logger.warn("Failed to create org", e);
             return new OrgEntry(lineNum, 1, e.getMessage(), null);
@@ -306,7 +305,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
 
     public void downloadSample() {
         String result = "\"Наименование\";\"Официальное наименование\";\"Адрес\";\"Район\";\"GUID\";\"ID поставщика\";"
-                + "\"Тип организации(0-3)\";\"Должность руководителя\";\"Фамилия\";\"Имя\";\"Отчество\";";
+                + "\"Тип организации(0-4)\";\"Должность руководителя\";\"Фамилия\";\"Имя\";\"Отчество\";";
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
