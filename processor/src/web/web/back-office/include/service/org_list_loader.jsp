@@ -74,7 +74,7 @@
         </rich:column>
 
         <rich:column styleClass="center-aligned-column">
-            <a4j:commandLink value="#{item.idOfOrg}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.idOfOrg}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
                 <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
             </a4j:commandLink>
         </rich:column>
