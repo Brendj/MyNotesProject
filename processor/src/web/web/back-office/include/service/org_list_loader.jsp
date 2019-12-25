@@ -43,33 +43,40 @@
     <rich:dataTable id="orgListLoaderResultTable" value="#{orgListLoaderPage.lineResults}" var="item" rows="20"
                     columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column"
                     footerClass="data-table-footer">
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Номер строки файла" />
-            </f:facet>
+
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column headerClass="column-header">
+                    <h:outputText value="Номер строки файла" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText value="Код результата" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText value="Сообщение" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText value="Идентификатор ОУ в БД (IdOfOrg)" />
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:column styleClass="center-aligned-column">
             <h:outputText escape="true" value="#{item.lineNo}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Код результата" />
-            </f:facet>
+
+        <rich:column styleClass="center-aligned-column">
             <h:outputText escape="true" value="#{item.resultCode}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Сообщение" />
-            </f:facet>
+
+        <rich:column styleClass="center-aligned-column">
             <h:outputText escape="true" value="#{item.message}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Идентификатор ОУ в БД (IdOfOrg)" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
-            <%--<a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
 
-                <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
-            </a4j:commandLink>--%>
+        <rich:column styleClass="center-aligned-column">
+            <a4j:commandLink value="#{item.idOfOrg}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+                <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+            </a4j:commandLink>
         </rich:column>
 
         <f:facet name="footer">

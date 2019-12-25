@@ -410,7 +410,7 @@ public class DAOUtils {
         if(res != null && res.size() > 0) {
             return (Person) res.get(0);
         }
-        return (Person) res;
+        return null;
     }
 
     public static Contragent findContragentIsSupplier(Session session, long idOfContragent) {

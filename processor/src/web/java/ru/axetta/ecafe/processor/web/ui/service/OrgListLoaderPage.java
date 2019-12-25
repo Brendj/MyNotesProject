@@ -59,17 +59,10 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
     private EntityManager entityManager;
 
     protected static final String[][] COLUMN_NAMES = new String[][]{
-            {"shortName", "Наименование"},
-            {"officialName", "Официальное наименование"},
-            {"address", "Адрес"},
-            {"district", "Район"},
-            {"GUID", "GUID"},
-            {"supplierId", "ID поставщика"},
-            {"orgType", "Тип организации(0-4)"},
-            {"position", "Должность руководителя"},
-            {"surname", "Фамилия"},
-            {"firstName", "Имя"},
-            {"secondName", "Отчество"}};
+            {"shortName", "Наименование"}, {"officialName", "Официальное наименование"}, {"address", "Адрес"},
+            {"district", "Район"}, {"GUID", "GUID"}, {"supplierId", "ID поставщика"},
+            {"orgType", "Тип организации(0-4)"}, {"position", "Должность руководителя"}, {"surname", "Фамилия"},
+            {"firstName", "Имя"}, {"secondName", "Отчество"}};
 
     public int getSuccessLineNumber() {
         return successLineNumber;
@@ -157,8 +150,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
         return createOrg(session, lineNum, columns);
     }
 
-    private OrgEntry createOrg(Session session, int lineNum, Map<String, String> columns)
-            throws Exception {
+    private OrgEntry createOrg(Session session, int lineNum, Map<String, String> columns) throws Exception {
         if (columns == null || columns.size() < 1 || lineNum == 0) {
             return new OrgEntry(lineNum, 1, "Недостаточно данных", null);
         }
@@ -177,8 +169,8 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
             supplierID = NumberUtils.createLong(strSupplierID);
         } else {
             logger.warn("Failed to get supplier = " + strSupplierID + " row = " + lineNum);
-            return new OrgEntry(lineNum, 1, "Ошибка преобразования id поставщика = " + strSupplierID
-                    + " строка = " + lineNum, null);
+            return new OrgEntry(lineNum, 1,
+                    "Ошибка преобразования id поставщика = " + strSupplierID + " строка = " + lineNum, null);
         }
 
         Contragent currentSupplier = DAOUtils.findContragentIsSupplier(session, supplierID);
@@ -187,7 +179,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
             return new OrgEntry(lineNum, 1, "Не найден поставщик с id = " + supplierID, null);
         }
 
-        if (strOrgType == null || !strOrgType.matches("[0-4]") ) {
+        if (strOrgType == null || !strOrgType.matches("[0-4]")) {
             logger.warn("Failed to get orgType = " + strOrgType);
             return new OrgEntry(lineNum, 1, "Не найден тип организации " + strOrgType, null);
         } else {
@@ -200,13 +192,16 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
         String secondname = columns.get("secondName");
 
         Person officialPerson;
+        Person currentPerson;
         if (firstname != null && surname != null && secondname != null) {
-            Person currentPerson = DAOUtils.findPersonByFIO(session, firstname, surname, secondname);
+            currentPerson = DAOUtils.findPersonByFIO(session, firstname, surname, secondname);
             if (currentPerson != null) {
                 officialPerson = currentPerson;
             } else {
                 officialPerson = new Person(firstname, surname, secondname);
             }
+        } else if (firstname != null && surname != null && secondname == null) {
+            officialPerson = new Person(firstname, surname, "");
         } else {
             officialPerson = new Person("", "", "");
         }
@@ -255,8 +250,8 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
             }
 
             Org org = new Org(shortName, "", officialName, address, "", officialPerson, position, "", contractTime,
-                    OrganizationType.fromInteger(orgType), 0, 0L, "", 0L, 0L, currentSupplier, "", "", "", "", "", "", 0L, 0L, 0L,
-                    "", 0L, "/", version, false);
+                    OrganizationType.fromInteger(orgType), 0, 0L, "", 0L, 0L, currentSupplier, "", "", "", "", "", "",
+                    0L, 0L, 0L, "", 0L, "/", version, false);
             org.setStatus(OrganizationStatus.PLANNED);
             org.setSecurityLevel(OrganizationSecurityLevel.STANDARD);
             org.setPhotoRegistryDirective(PhotoRegistryDirective.DISALLOWED);
