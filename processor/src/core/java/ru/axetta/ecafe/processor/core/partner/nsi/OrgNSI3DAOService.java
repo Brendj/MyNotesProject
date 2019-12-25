@@ -39,7 +39,7 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
         entityManager.setFlushMode(FlushModeType.COMMIT);
         Query query = entityManager.createNativeQuery("select distinct "
                 + "'' as building_guid, "                                                                  //0
-                + "addr.address as FullAddress, "     //1
+                + "concat_ws(' / ', addr.area, addr.district, addr.address_asur) as FullAddress, "     //1
                 + "org.full_name as FullName, "                            //2
                 + "org.short_name as ShortName, "                     //3
                 + "cast(org.inn as varchar) as Inn, "                                  //4
