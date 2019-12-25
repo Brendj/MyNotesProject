@@ -13,9 +13,11 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -271,6 +273,13 @@ public class CardManagerProcessor implements CardManager {
             throw new Exception("УИД карты передан в пользование другой ОО");
         }
 
+        boolean clientHadCards = newCardOwner.getCards().size() > 0; //есть ли или были ли ранее у клиента хоть какие-то карты
+        if (!clientHadCards) {
+            Criteria criteria = persistenceSession.createCriteria(HistoryCard.class);
+            criteria.add(Restrictions.or(Restrictions.eq("formerOwner", newCardOwner), Restrictions.eq("newOwner", newCardOwner)));
+            clientHadCards = criteria.list().size() > 0;
+        }
+
         if (state == Card.ACTIVE_STATE) {
             Set<Card> clientCards = new HashSet<Card>(newCardOwner.getCards());
             clientCards.remove(updatedCard);
@@ -316,11 +325,11 @@ public class CardManagerProcessor implements CardManager {
         updatedCard.setUpdateTime(new Date());
         updatedCard.setState(state);
         updatedCard.setLockReason(lockReason);
-        updatedCard.setValidTime(validTime);
-        updatedCard.setIssueTime(issueTime);
+        Date validTo = clientHadCards ? CalendarUtils.addDays(new Date(), 10) : CalendarUtils.addYear(new Date(), 12);
+        updatedCard.setValidTime(validTo);
+        updatedCard.setIssueTime(new Date());
         updatedCard.setLifeState(lifeState);
         updatedCard.setExternalId(externalId);
-        updatedCard.setUpdateTime(new Date());
         persistenceSession.update(updatedCard);
 
         persistenceSession.flush();
