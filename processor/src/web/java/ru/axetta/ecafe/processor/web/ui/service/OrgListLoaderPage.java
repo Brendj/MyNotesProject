@@ -261,6 +261,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
             org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
             org.setDistrict(district);
             org.setGuid(guid);
+            org.setPreorderlp(false); // Предварительные заявки по ЛП - для синхронизации
             session.save(org);
 
             OrgSync orgSync = new OrgSync();
