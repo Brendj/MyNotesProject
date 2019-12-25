@@ -71,6 +71,28 @@ public class TaloonPreorderVerificationItem {
         }
     }
 
+    public boolean allowedSetFirstFlag() {
+        for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
+            for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
+                if (!detail.allowedSetFirstFlag()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
+    public boolean allowedClearFirstFlag() {
+        for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
+            for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
+                if (!detail.allowedClearFirstFlag()) {
+                    return false;
+                }
+            }
+        }
+        return true;
+    }
+
     //public void changePpStateAllDay(TaloonPPStatesEnum state) {
     //    for (TaloonPreorderVerificationItem item : items) {
     //        if (item.equals(currentTaloonPreorderVerificationItem)) {

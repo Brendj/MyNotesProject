@@ -295,7 +295,7 @@
 <%--                    action="#{mainPage.taloonPreorderVerificationPage.confirmPpStateAllDay()}"--%>
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{item.isPpStateNotSelected() and detail.summaryDay}"
                                      action="#{item.confirmPpState()}"
-                                     onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                                     onclick="if (#{!item.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{item}" target="#{item.getPpState()}"/>
 <%--                        <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItem}"/>--%>
                         <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
@@ -304,7 +304,7 @@
 <%--                    action="#{mainPage.taloonPreorderVerificationPage.deselectPpStateAllDay()}"--%>
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{item.isPpStateConfirmed() and detail.summaryDay}"
                                      action="#{item.deselectPpState()}" style="color:lightgray;"
-                                     onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                                     onclick="if (#{!item.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{item}"
                                                      target="#{item.getPpState()}"/>
                         <h:graphicImage value="/images/taloons/applied-big.png"/>
