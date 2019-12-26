@@ -9169,7 +9169,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public Result setPreorderAllowed(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "guardianMobile") String guardianMobile,
-            @WebParam(name = "staffMobile") String childMobile) {
+            @WebParam(name = "staffMobile") String childMobile, @WebParam(name = "value") Boolean value) {
         authenticateRequest(contractId);
         Result result = new Result();
         Session session = null;
@@ -9194,7 +9194,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             if (client.isSotrudnikMsk()) {
-                ClientManager.setPreorderAllowedForClient(session, client);
+                ClientManager.setPreorderAllowedForClient(session, client, value);
             } else {
 
                 String mobile = Client.checkAndConvertMobile(childMobile);
@@ -9208,7 +9208,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 for (Client guardian : guardians) {
                     if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile().equals(Client.checkAndConvertMobile(guardianMobile))) {
                         guardianWithMobileFound = true;
-                        ClientManager.setPreorderAllowed(session, client, guardian, mobile);
+                        ClientManager.setPreorderAllowed(session, client, guardian, mobile, value);
                     }
                 }
 
