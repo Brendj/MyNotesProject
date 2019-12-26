@@ -1573,11 +1573,19 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "signType") Integer signType) throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         try {
-            byte[] signVerifyData = DAOReadonlyService.getInstance().getCardSignVerifyData(cardSignCertNum, signType);
+
+            CardSign cardSign = DAOReadonlyService.getInstance().getCardSignbyId(cardSignCertNum);
+            if (cardSign == null) {
+                throw new FrontControllerException("Ключ не найден по входным данным");
+            }
+            byte[] signVerifyData = DAOReadonlyService.getInstance().getCardSignVerifyData(cardSignCertNum, signType, cardSign.getNewtypeprovider());
             //Здесь сформируется конечный вариант
             if (signVerifyData == null) {
                 throw new FrontControllerException("Ключ не найден по входным данным");
             }
+            //Для старого типа поставщиков
+            if (!cardSign.getNewtypeprovider())
+                return Base64.encodeBytes(signVerifyData);
             //Если тип подписи Scrips и длина ключа более 64 байт...
             if (signType == 0 && signVerifyData.length > 64) {
                 byte[] privKeyCard = new byte[64];
