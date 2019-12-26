@@ -326,7 +326,7 @@ public class CardManagerProcessor implements CardManager {
         updatedCard.setState(state);
         updatedCard.setLockReason(lockReason);
         Date validTo = clientHadCards ? CalendarUtils.addDays(new Date(), 10) : CalendarUtils.addYear(new Date(), 12);
-        updatedCard.setValidTime(validTo);
+        if (oldClient != newClient) updatedCard.setValidTime(validTo); //дату действия меняем, если карту выдаем другому клиенту
         updatedCard.setIssueTime(new Date());
         updatedCard.setLifeState(lifeState);
         updatedCard.setExternalId(externalId);
