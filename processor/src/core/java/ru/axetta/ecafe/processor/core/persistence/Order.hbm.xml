@@ -66,6 +66,7 @@
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.OrderDetail"/>
         </set>
         <property name="isFromFriendlyOrg" column="IsFromFriendlyOrg" type="boolean" not-null="true"/>
+        <property name="sendnotificationtoclient" column="sendnotificationtoclient" type="boolean" not-null="true"/>
     </class>
 </hibernate-mapping>
 

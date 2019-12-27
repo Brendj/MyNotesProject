@@ -46,6 +46,7 @@ public class Order{
     private Long idOfPayForClient;
     private Boolean isFromFriendlyOrg;
     private Long idOrgPayment;
+    private Boolean sendnotificationtoclient;
 
     public OrderTypeEnumType getOrderType() {
         return orderType;
@@ -322,5 +323,13 @@ public class Order{
 
     public void setIdOrgPayment(Long idOrgPayment) {
         this.idOrgPayment = idOrgPayment;
+    }
+
+    public Boolean getSendnotificationtoclient() {
+        return sendnotificationtoclient;
+    }
+
+    public void setSendnotificationtoclient(Boolean sendnotificationtoclient) {
+        this.sendnotificationtoclient = sendnotificationtoclient;
     }
 }

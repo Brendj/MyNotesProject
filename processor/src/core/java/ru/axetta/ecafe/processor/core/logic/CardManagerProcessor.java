@@ -559,7 +559,7 @@ public class CardManagerProcessor implements CardManager {
         }
         AccountTransaction accountTransaction = null;
         accountTransaction = ClientAccountManager.processAccountTransaction(persistenceSession, client, null, -price, cardPrintedNo.toString(),
-                AccountTransaction.CUSTOMERS_CARD_REVEALING_TRANSACTION_SOURCE_TYPE, null, issueTime);
+                AccountTransaction.CUSTOMERS_CARD_REVEALING_TRANSACTION_SOURCE_TYPE, null, issueTime, null);
         createCard(persistenceSession, idOfClient, cardNo, cardType, state, validTime, lifeState,
                 lockReason, issueTime, cardPrintedNo, user, accountTransaction);
         persistenceSession.save(accountTransaction);

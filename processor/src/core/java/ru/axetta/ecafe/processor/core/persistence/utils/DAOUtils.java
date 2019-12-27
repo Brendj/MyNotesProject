@@ -1192,7 +1192,7 @@ public class DAOUtils {
         return !query.list().isEmpty();
     }
 
-    public static void changeClientBalance(Session session, Client client, long sum, Date transactionDate) {
+    public static void changeClientBalance(Session session, Client client, long sum, Date transactionDate, Long orderId) {
         Query q = session.createQuery("UPDATE Client SET balance = balance + :charge WHERE idOfClient = :id")
                 .setParameter("charge", sum)
                 .setParameter("id", client.getIdOfClient());
