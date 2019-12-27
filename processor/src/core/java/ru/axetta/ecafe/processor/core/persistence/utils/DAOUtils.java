@@ -1200,8 +1200,20 @@ public class DAOUtils {
         client.addBalanceNotForSave(sum);
         RuntimeContext.getAppContext().getBean(ProcessorUtils.class).saveLastProcessSectionCustomDateTransactionFree(
                 session, client.getOrg().getIdOfOrg(), SectionType.LAST_TRANSACTION, transactionDate);
-        if ((client.getBalanceToNotify() != null) && (client.getBalance() < client.getBalanceToNotify())) {
+        boolean flagOrder;
+        Order order = (Order) session.load(Order.class, orderId);
+        if (orderId != null) {
+            flagOrder = order.getSendnotificationtoclient();
+        }
+        else
+        {
+            flagOrder = false;
+        }
+
+        if ((client.getBalanceToNotify() != null) && (client.getBalance() < client.getBalanceToNotify()) && !flagOrder) {
             sendNotificationLowBalance(session, client, transactionDate);
+            order.setSendnotificationtoclient(true);
+            session.update(order);
         }
     }
 

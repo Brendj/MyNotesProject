@@ -326,6 +326,8 @@ public class Order{
     }
 
     public Boolean getSendnotificationtoclient() {
+        if (sendnotificationtoclient == null)
+            return false;
         return sendnotificationtoclient;
     }
 
