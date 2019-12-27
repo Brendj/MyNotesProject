@@ -433,13 +433,6 @@ public class DAOReadonlyService {
         return result != null && ((BigInteger) result).longValue() > 0 ? true : false;
     }
 
-    public CardSign getCardSignbyId (Integer idOfCardSign)
-    {
-        Session hiberSession = (Session) entityManager.getDelegate();
-        return  (CardSign)hiberSession.load(CardSign.class, idOfCardSign);
-    }
-
-
     public byte[] getCardSignVerifyData(Integer idOfCardSign, Integer signType, boolean isNewType) {
         try {
             Query query;
