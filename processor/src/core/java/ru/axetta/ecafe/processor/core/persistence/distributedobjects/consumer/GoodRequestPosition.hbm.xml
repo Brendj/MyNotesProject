@@ -46,7 +46,7 @@
         <property name="lastTotalCount" column="LastTotalCount" type="long"/>
         <property name="lastDailySampleCount" column="LastDailySampleCount" type="long"/>
         <property name="lastTempClientsCount" column="LastTempClientsCount" type="long"/>
-        <property name="complexId" column="complexId" type="long"/>
+        <property name="complexId" column="complexId" type="int"/>
 
         <many-to-one name="goodRequest" fetch="select" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest">
             <column name="IdOfGoodsRequest" not-null="false" />

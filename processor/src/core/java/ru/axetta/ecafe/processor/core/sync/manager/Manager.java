@@ -131,9 +131,8 @@ public class Manager implements AbstractToElement {
         //Node confirmNode = XMLUtils.findFirstChildElement(roNode, "Confirm");
         // Обработка секции <Confirm>
         List<Node> confirmNodes = XMLUtils.findNodesWithNameEqualsTo(roNode, "Confirm");
-        for (Node confirmNode: confirmNodes){
-            if (confirmNode != null)
-            {
+        for (Node confirmNode : confirmNodes) {
+            if (confirmNode != null) {
                 buildConfirmNode(confirmNode);
             }
         }
@@ -165,8 +164,9 @@ public class Manager implements AbstractToElement {
         currentLimits.put(doSyncClass.getDoClass().getSimpleName(), XMLUtils.getIntegerValueZeroSafe(doNode, "Limit"));
         currentLastGuids.put(doSyncClass.getDoClass().getSimpleName(), XMLUtils.getAttributeValue(doNode, "LastGuid"));
         if (XMLUtils.getIntegerAttributeValue(doNode, "Contents") != null) {
-            currentInformationContents.put(doSyncClass.getDoClass().getSimpleName(),DistributedObject.InformationContents.getByCode(
-                    XMLUtils.getIntegerAttributeValue(doNode, "Contents").intValue()));
+            currentInformationContents.put(doSyncClass.getDoClass().getSimpleName(),
+                    DistributedObject.InformationContents
+                            .getByCode(XMLUtils.getIntegerAttributeValue(doNode, "Contents").intValue()));
         }
         incomeDOMap.put(doSyncClass, new ArrayList<DistributedObject>());
         doNode = doNode.getFirstChild();
@@ -308,10 +308,13 @@ public class Manager implements AbstractToElement {
                 LOGGER.debug("end findResponseResult");
                 resultDOMap.put(doSyncClass, currentResultDOList);
                 LOGGER.debug("init processDistributedObjectsList");
-                List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory, doSyncClass);
+                List<DistributedObject> distributedObjectsList = processDistributedObjectsList(sessionFactory,
+                        doSyncClass);
                 if (doSyncClass.getDoClass() == ECafeSettings.class) {
                     for (DistributedObject dob : distributedObjectsList) {
-                        if (!currentResultDOList.contains(dob) && ((ECafeSettings) dob).isPreOrderFeeding()) currentResultDOList.add(dob);
+                        if (!currentResultDOList.contains(dob) && ((ECafeSettings) dob).isPreOrderFeeding()) {
+                            currentResultDOList.add(dob);
+                        }
                     }
                 }
                 LOGGER.debug("end processDistributedObjectsList");
@@ -332,12 +335,19 @@ public class Manager implements AbstractToElement {
                 }
             } else {
                 LOGGER.debug("init findConfirmedDO");
-                Set<DistributedObject> currentResultDOSet = new HashSet<DistributedObject>(findConfirmedDO(sessionFactory, doClass, classSimpleName));
+                Set<DistributedObject> currentResultDOSet = new HashSet<DistributedObject>(
+                        findConfirmedDO(sessionFactory, doClass, classSimpleName));
                 LOGGER.debug("end findConfirmedDO");
                 final int newLimit = currentLimit - currentResultDOSet.size();
                 if (newLimit > 0) {
                     List<DistributedObject> newResultDOList = findResponseResult(sessionFactory, doClass, newLimit);
-                    currentResultDOSet.addAll(newResultDOList);
+                    if (doSyncClass.getDoClass().getName().contains("GoodRequestPosition")) {
+                        Set<DistributedObject> newCurrentResultDOSet = new HashSet<>(newResultDOList);
+                        newCurrentResultDOSet.addAll(currentResultDOSet);
+                        currentResultDOSet = newCurrentResultDOSet;
+                    } else {
+                        currentResultDOSet.addAll(newResultDOList);
+                    }
                     LOGGER.debug("end findResponseResult");
                     LOGGER.debug("init addConfirms");
                     addConfirms(sessionFactory, classSimpleName, new ArrayList<DistributedObject>(currentResultDOSet));
@@ -398,12 +408,12 @@ public class Manager implements AbstractToElement {
             Long currentMaxVersion = currentMaxVersions.get(classSimpleName);
             final String currentLastGuid = currentLastGuids.get(classSimpleName);
             DistributedObject.InformationContents informationContent = currentInformationContents.get(classSimpleName);
-            if (informationContent != null){
+            if (informationContent != null) {
                 refDistributedObject.setNewInformationContent(informationContent);
             }
-            List<DistributedObject> currentDOList = refDistributedObject.process(persistenceSession, idOfOrg, currentMaxVersion,
-                    currentLastGuid, currentLimit);
-            if(!CollectionUtils.isEmpty(currentDOList)){
+            List<DistributedObject> currentDOList = refDistributedObject
+                    .process(persistenceSession, idOfOrg, currentMaxVersion, currentLastGuid, currentLimit);
+            if (!CollectionUtils.isEmpty(currentDOList)) {
                 currentResultDOList.addAll(currentDOList);
             }
         } catch (Exception e) {
@@ -419,7 +429,7 @@ public class Manager implements AbstractToElement {
         if (doClass.getSimpleName().equals("GoodRequestPosition")) {
             List<DistributedObject> currentResultDOListResult = new ArrayList<DistributedObject>();
             try {
-                currentResultDOListResult = currentResultDOListFind(currentResultDOList);
+                currentResultDOListResult = currentResultDOListFind(sessionFactory, currentResultDOList);
             } catch (Exception e) {
                 e.printStackTrace();
             }
@@ -429,12 +439,33 @@ public class Manager implements AbstractToElement {
         return currentResultDOList;
     }
 
-    private List<DistributedObject> currentResultDOListFind (List<DistributedObject> currentResultDOList) throws Exception {
+    private List<DistributedObject> currentResultDOListFind(SessionFactory sessionFactory,
+            List<DistributedObject> currentResultDOList) throws Exception {
         List<DistributedObject> currentResultDOListResult = new ArrayList<DistributedObject>();
+        Session session = null;
 
-        for (DistributedObject distributedObject: currentResultDOList) {
+        for (DistributedObject distributedObject : currentResultDOList) {
             GoodRequestPosition goodRequestPosition = (GoodRequestPosition) distributedObject;
-            if (goodRequestPosition.getGuidOfGR() != null) {
+            if (goodRequestPosition.getGuidOfGR() != null && goodRequestPosition.getComplexId() == null) {
+                try {
+                    session = sessionFactory.openSession();
+                    Integer currentComplexID = DAOUtils.getComplexIdForGoodRequestPosition(session, idOfOrg,
+                            goodRequestPosition.getGuidOfG());
+                    if (currentComplexID == null) {
+                        currentComplexID = 0;
+                    }
+                    goodRequestPosition.setComplexId(currentComplexID);
+                    final String sql = "update GoodRequestPosition set complexid = :currentComplexID "
+                            + "where guid = :guid";
+                    Query query = session.createQuery(sql);
+                    query.setParameter("guid", goodRequestPosition.getGuid());
+                    query.setParameter("currentComplexID", currentComplexID);
+                    query.executeUpdate();
+                } catch (Exception e) {
+                    LOGGER.error("Error findResponseResult: " + e.getMessage(), e);
+                } finally {
+                    HibernateUtils.close(session, LOGGER);
+                }
                 currentResultDOListResult.add(goodRequestPosition);
             }
         }
@@ -571,8 +602,9 @@ public class Manager implements AbstractToElement {
                 }
                 duration = System.currentTimeMillis() - duration;
                 LOGGER.debug("addConfirms: end find exist UUID duration: " + duration);
-                final boolean b = (dbGUIDs!=null && currentGUIDs==null) || (dbGUIDs==null && currentGUIDs!=null) ||
-                        (dbGUIDs!=null && currentGUIDs!=null && dbGUIDs.size() != currentGUIDs.size());
+                final boolean b =
+                        (dbGUIDs != null && currentGUIDs == null) || (dbGUIDs == null && currentGUIDs != null) || (
+                                dbGUIDs != null && currentGUIDs != null && dbGUIDs.size() != currentGUIDs.size());
                 LOGGER.debug("addConfirms: current and DB count not equals:" + b);
                 if (b) {
                     LOGGER.debug("addConfirms: persist not exists confirm: " + duration);
@@ -660,7 +692,7 @@ public class Manager implements AbstractToElement {
         }
     }
 
-    private Long updateDOVersion(SessionFactory sessionFactory, String doClass){
+    private Long updateDOVersion(SessionFactory sessionFactory, String doClass) {
         Long version = null;
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -707,15 +739,18 @@ public class Manager implements AbstractToElement {
             return distributedObject;
         }
         if (distributedObject instanceof LibraryDistributedObject) {
-            distributedObject = makePreprocessAndProcessDOLibrary(sessionFactory, (LibraryDistributedObject) distributedObject, (LibraryDistributedObject) currentDO, currentMaxVersion);
+            distributedObject = makePreprocessAndProcessDOLibrary(sessionFactory,
+                    (LibraryDistributedObject) distributedObject, (LibraryDistributedObject) currentDO,
+                    currentMaxVersion);
         } else {
-            distributedObject = makePreprocessAndProcessDO(sessionFactory, distributedObject, currentDO, currentMaxVersion);
+            distributedObject = makePreprocessAndProcessDO(sessionFactory, distributedObject, currentDO,
+                    currentMaxVersion);
         }
         return distributedObject;
     }
 
-    private DistributedObject makePreprocessAndProcessDO(SessionFactory sessionFactory, DistributedObject distributedObject,
-            DistributedObject currentDO, Long currentMaxVersion) {
+    private DistributedObject makePreprocessAndProcessDO(SessionFactory sessionFactory,
+            DistributedObject distributedObject, DistributedObject currentDO, Long currentMaxVersion) {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         String errorMessage = null;
@@ -807,14 +842,13 @@ public class Manager implements AbstractToElement {
                     list.add(distributedObject.mergedDistributedObject);
                     DOSyncClass syncClass = new DOSyncClass(distributedObject.mergedDistributedObject.getClass(), 0);
                     resultDOMap.put(syncClass, list);
-                }
-                catch (Exception e2) {
-                    distributedObject.mergedDistributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
+                } catch (Exception e2) {
+                    distributedObject.mergedDistributedObject
+                            .setDistributedObjectException(new DistributedObjectException("Internal Error"));
                     LOGGER.error(distributedObject.mergedDistributedObject.toString(), e);
                 }
             }
-        }
-        catch (Exception e) {
+        } catch (Exception e) {
             distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
             LOGGER.error(distributedObject.toString(), e);
         } finally {
@@ -886,7 +920,7 @@ public class Manager implements AbstractToElement {
                     ((Good) distributedObject).setDailySale(Boolean.FALSE);
                 }
             }
-            if(distributedObject instanceof ECafeSettings){
+            if (distributedObject instanceof ECafeSettings) {
                 createOrgSettingByECafeSetting(persistenceSession, (ECafeSettings) distributedObject);
             }
             persistenceSession.persist(distributedObject);
@@ -895,7 +929,8 @@ public class Manager implements AbstractToElement {
         // Изменение существующего в БД экземпляра РО.
         if (distributedObject.getTagName().equals("M")) {
             DistributedObjectModifier modifier = ModifierTypeFactory.createModifier(distributedObject);
-            modifier.modifyDO(persistenceSession, distributedObject, currentMaxVersion, currentDO, idOfOrg, conflictDocument);
+            modifier.modifyDO(persistenceSession, distributedObject, currentMaxVersion, currentDO, idOfOrg,
+                    conflictDocument);
             /*Long currentVersion = currentDO.getGlobalVersion();
             Long objectVersion = distributedObject.getGlobalVersion();
             currentDO.fill(distributedObject);
@@ -971,24 +1006,29 @@ public class Manager implements AbstractToElement {
         return map;
     }*/
 
-    private void createOrgSettingByECafeSetting(Session persistenceSession, ECafeSettings eCafeSettings) throws Exception {
+    private void createOrgSettingByECafeSetting(Session persistenceSession, ECafeSettings eCafeSettings)
+            throws Exception {
         Date now = new Date();
         OrgSetting setting = new OrgSetting();
         Long lastVersionOfOrgSetting = OrgSettingDAOUtils.getLastVersionOfOrgSettings(persistenceSession);
         Long lastVersionOfOrgSettingItem = OrgSettingDAOUtils.getLastVersionOfOrgSettingsItem(persistenceSession);
 
         Long nextVersionOfOrgSetting = (lastVersionOfOrgSetting == null ? 0L : lastVersionOfOrgSetting) + 1L;
-        Long nextVersionOfOrgSettingItem = (lastVersionOfOrgSettingItem == null ? 0L : lastVersionOfOrgSettingItem) + 1L;
+        Long nextVersionOfOrgSettingItem =
+                (lastVersionOfOrgSettingItem == null ? 0L : lastVersionOfOrgSettingItem) + 1L;
 
         setting.setCreatedDate(now);
         setting.setLastUpdate(now);
         setting.setIdOfOrg(eCafeSettings.getOrgOwner());
-        setting.setSettingGroup(OrgSettingGroup.getGroupById(eCafeSettings.getSettingsId().getId() + OrgSettingGroup.OFFSET_IN_RELATION_TO_ECAFESETTING));
+        setting.setSettingGroup(OrgSettingGroup.getGroupById(
+                eCafeSettings.getSettingsId().getId() + OrgSettingGroup.OFFSET_IN_RELATION_TO_ECAFESETTING));
         setting.setVersion(nextVersionOfOrgSetting);
 
-        SettingValueParser valueParser = new SettingValueParser(eCafeSettings.getSettingValue(), eCafeSettings.getSettingsId());
+        SettingValueParser valueParser = new SettingValueParser(eCafeSettings.getSettingValue(),
+                eCafeSettings.getSettingsId());
 
-        Set<OrgSettingItem> items = valueParser.getParserBySettingValue().buildSetOfOrgSettingItem(setting, nextVersionOfOrgSettingItem);
+        Set<OrgSettingItem> items = valueParser.getParserBySettingValue()
+                .buildSetOfOrgSettingItem(setting, nextVersionOfOrgSettingItem);
         setting.setOrgSettingItems(items);
 
         persistenceSession.persist(setting);

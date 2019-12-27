@@ -53,8 +53,8 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     private Good good;
     private String guidOfG;
     private Boolean notified;
-    private Long complexId;
     private InformationContents informationContent = InformationContents.ONLY_CURRENT_ORG;
+    private Integer complexId;
 
     @Override
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
@@ -121,6 +121,8 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         GoodRequest gr = DAOUtils.findDistributedObjectByRefGUID(GoodRequest.class, session, guidOfGR);
+        Integer currentComplexID = DAOUtils.getComplexIdForGoodRequestPosition(session, idOfOrg, guidOfG);
+        complexId = (currentComplexID == null) ?  0 : currentComplexID;
         if (gr == null) {
             throw new DistributedObjectException("NOT_FOUND_VALUE GOOD_REQUEST");
         }
@@ -132,7 +134,6 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         }
         if (g != null) {
             setGood(g);
-            setComplexId(DAOUtils.getComplexIdForGoodRequestPosition(session, idOfOrg, g.getGlobalId()));
         }
         if (p != null) {
             setProduct(p);
@@ -158,6 +159,10 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         if (longTotalCount != null) {
             setTotalCount(longTotalCount);
         }
+        Integer intComplexId = XMLUtils.getIntegerAttributeValue(node, "ComplexId");
+        if (intComplexId != null) {
+            setComplexId(intComplexId);
+        }
         Long longDailySampleCount = XMLUtils.getLongAttributeValue(node, "DailySampleCount"); // суточная проба
         if (longDailySampleCount != null) {
             setDailySampleCount(longDailySampleCount);
@@ -170,7 +175,6 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         if (longNetWeight != null) {
             setNetWeight(longNetWeight);
         }
-        setComplexId(0L);
         guidOfGR = XMLUtils.getStringAttributeValue(node, "GuidOfGoodsRequest", 36);
         guidOfG = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         guidOfP = XMLUtils.getStringAttributeValue(node, "GuidOfBaseProduct", 36);
@@ -183,7 +187,6 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         final Long lastTotalCount = getTotalCount();
         final Long lastDailySampleCount = getDailySampleCount();
         final Long lastTempClientsCount = getTempClientsCount();
-        Long complexId = getComplexId();
         setOrgOwner(distributedObject.getOrgOwner());
         setGoodRequest(((GoodRequestPosition) distributedObject).getGoodRequest());
         setGood(((GoodRequestPosition) distributedObject).getGood());
@@ -346,11 +349,11 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         this.lastTempClientsCount = lastTempClientsCount;
     }
 
-    public Long getComplexId() {
+    public Integer getComplexId() {
         return complexId;
     }
 
-    public void setComplexId(Long complexId) {
+    public void setComplexId(Integer complexId) {
         this.complexId = complexId;
     }
 }

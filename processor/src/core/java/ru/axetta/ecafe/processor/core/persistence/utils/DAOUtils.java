@@ -4521,7 +4521,7 @@ public class DAOUtils {
         }
     }
 
-    public static Long getComplexIdForGoodRequestPosition(Session persistenceSession, Long idOfOrg, Long idOfGood) {
+    public static Integer getComplexIdForGoodRequestPosition(Session persistenceSession, Long idOfOrg, String guidOfGood) {
         Query q = persistenceSession.createSQLQuery("SELECT DISTINCT ci.idOfComplex FROM cf_preorder_complex pc "
                 + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
                 + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid "
@@ -4531,12 +4531,11 @@ public class DAOUtils {
                 + "INNER JOIN cf_goods gc ON gc.idofgood = ci.idofgood "
                 + "INNER JOIN cf_goods gmd ON gmd.idofgood = md.idofgood "
                 + "WHERE ci.idOfOrg = :idOfOrg "
-                + "AND gc.idOfGood = :idOfGood "
+                + "AND gc.guid = :guidOfGood "
                 + "AND (pc.deletedState = 0 OR pc.deletedState IS NULL) AND (pmd.deletedState = 0 OR pmd.deletedState IS NULL)");
                 q.setParameter("idOfOrg", idOfOrg);
         q.setParameter("idOfOrg", idOfOrg);
-        q.setParameter("idOfGood", idOfGood);
-        Object result = q.uniqueResult();
-        return (result == null) ? 0L : (Long)result;
+        q.setParameter("guidOfGood", guidOfGood);
+        return (Integer) q.uniqueResult();
     }
 }

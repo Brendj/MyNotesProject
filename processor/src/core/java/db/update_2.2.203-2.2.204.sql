@@ -54,4 +54,4 @@ CREATE INDEX cf_taloons_preorder_guid_idx
 
 -- 358: Добавление id комплекса в cf_goods_requests_positions
 ALTER TABLE cf_goods_requests_positions
-    ADD complexId bigint;
+    ADD complexId integer;
