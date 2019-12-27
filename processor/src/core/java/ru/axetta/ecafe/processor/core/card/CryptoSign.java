@@ -112,15 +112,9 @@ public class CryptoSign {
                         sign = CryptoSign.sign(card_data, pk);
                     } else {
                         if (card.getMemSize() == 2) {
-                            if (cardSign.getNewtypeprovider()) {
-                                byte[] pk = loadPrivKeySCRIPT(cardSign.getPrivatekeycard());
-                                sign = SCrypt.generate(pk, card_data, //данные карты используем как "соль"
-                                        16384, 8, 1, 20);
-                            } else {
-                                PrivateKey pk = loadPrivKey(cardSign.getPrivatekeycard());
-                                sign = SCrypt.generate(pk.getEncoded(), card_data, //данные карты используем как "соль"
-                                        16384, 8, 1, 20);
-                            }
+                            byte[] pk = loadPrivKeySCRIPT(cardSign.getPrivatekeycard());
+                            sign = SCrypt.generate(pk, card_data, //данные карты используем как "соль"
+                                    16384, 8, 1, 20);
                         } else {
                             sign = new byte[]{0};
                             responseCardSign.setMessage("Тип карты задан некорректно");
@@ -223,16 +217,10 @@ public class CryptoSign {
     }
 
     private static boolean verifySCRIPT(byte[] dateCards, byte[] sign, CardSign cardSign) throws Exception {
-        byte[] varsign;
-        if (cardSign.getNewtypeprovider()) {
-            varsign = SCrypt.generate(loadPrivKeySCRIPT(cardSign.getPublickeyprovider()), dateCards,
-                    //данные карты используем как "соль"
-                    16384, 8, 1, 20);
-        } else {
-            varsign = SCrypt.generate(loadPrivKey(cardSign.getPublickeyprovider()).getEncoded(), dateCards,
-                    //данные карты используем как "соль"
-                    16384, 8, 1, 20);
-        }
+
+        byte[] varsign = SCrypt.generate(loadPrivKeySCRIPT(cardSign.getPublickeyprovider()), dateCards,
+                //данные карты используем как "соль"
+                16384, 8, 1, 20);
         return Arrays.equals(varsign, sign);
     }
 
@@ -258,9 +246,11 @@ public class CryptoSign {
 
     public static byte[] loadPrivKeySCRIPT(byte[] data) throws Exception {
         KeySpec ks;
-        if (data.length < 65) {
-            return data;
-        } else {
+        if  (data.length < 65) {
+           return data;
+        }
+        else
+        {
             byte[] privKeyCard = new byte[64];
             System.arraycopy(data, 0, privKeyCard, 0, 64);
             return privKeyCard;

@@ -99,8 +99,6 @@ public class CardSign {
     }
 
     public Boolean getNewtypeprovider() {
-        if (newtypeprovider == null)
-            return false;
         return newtypeprovider;
     }
 
