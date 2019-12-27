@@ -121,7 +121,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         GoodRequest gr = DAOUtils.findDistributedObjectByRefGUID(GoodRequest.class, session, guidOfGR);
-        Integer currentComplexID = DAOUtils.getComplexIdForGoodRequestPosition(session, idOfOrg, guidOfG);
+        Integer currentComplexID = DAOUtils.getComplexIdForGoodRequestPosition(session, guid);
         complexId = (currentComplexID == null) ?  0 : currentComplexID;
         if (gr == null) {
             throw new DistributedObjectException("NOT_FOUND_VALUE GOOD_REQUEST");

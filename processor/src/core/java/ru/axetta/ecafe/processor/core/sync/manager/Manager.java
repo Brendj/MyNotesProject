@@ -446,11 +446,12 @@ public class Manager implements AbstractToElement {
 
         for (DistributedObject distributedObject : currentResultDOList) {
             GoodRequestPosition goodRequestPosition = (GoodRequestPosition) distributedObject;
-            if (goodRequestPosition.getGuidOfGR() != null && goodRequestPosition.getComplexId() == null) {
+            if (goodRequestPosition.getGuidOfGR() != null && (goodRequestPosition.getComplexId() == null ||
+                    goodRequestPosition.getComplexId() == 0)) {
                 try {
                     session = sessionFactory.openSession();
-                    Integer currentComplexID = DAOUtils.getComplexIdForGoodRequestPosition(session, idOfOrg,
-                            goodRequestPosition.getGuidOfG());
+                    Integer currentComplexID = DAOUtils.getComplexIdForGoodRequestPosition(session,
+                            goodRequestPosition.getGuid());
                     if (currentComplexID == null) {
                         currentComplexID = 0;
                     }

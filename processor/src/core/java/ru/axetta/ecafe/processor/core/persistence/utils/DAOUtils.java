@@ -4521,21 +4521,12 @@ public class DAOUtils {
         }
     }
 
-    public static Integer getComplexIdForGoodRequestPosition(Session persistenceSession, Long idOfOrg, String guidOfGood) {
-        Query q = persistenceSession.createSQLQuery("SELECT DISTINCT ci.idOfComplex FROM cf_preorder_complex pc "
-                + "INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
-                + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid "
-                + "INNER JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex "
-                + "INNER JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
-                + "INNER JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
-                + "INNER JOIN cf_goods gc ON gc.idofgood = ci.idofgood "
-                + "INNER JOIN cf_goods gmd ON gmd.idofgood = md.idofgood "
-                + "WHERE ci.idOfOrg = :idOfOrg "
-                + "AND gc.guid = :guidOfGood "
-                + "AND (pc.deletedState = 0 OR pc.deletedState IS NULL) AND (pmd.deletedState = 0 OR pmd.deletedState IS NULL)");
-                q.setParameter("idOfOrg", idOfOrg);
-        q.setParameter("idOfOrg", idOfOrg);
-        q.setParameter("guidOfGood", guidOfGood);
+    public static Integer getComplexIdForGoodRequestPosition(Session persistenceSession, String guidOfPosition) {
+        Query q = persistenceSession.createSQLQuery("select pc.armcomplexid from cf_goods_requests_positions p "
+                + "inner join cf_preorder_menudetail pm on p.idofgoodsrequestposition = pm.idofgoodsrequestposition "
+                + "inner join cf_preorder_complex pc on pc.idofpreordercomplex = pm.idofpreordercomplex "
+                + "where p.guid = :guidOfPosition");
+        q.setParameter("guidOfPosition", guidOfPosition);
         return (Integer) q.uniqueResult();
     }
 }
