@@ -78,7 +78,7 @@
         <h:panelGrid id="cardSignCreateGrid_OLD" styleClass="borderless-grid" columns="2">
             <h:outputText escape="true" value="Тип ключа" styleClass="output-text" />
             <h:selectOneMenu value="#{cardSignCreatePage.signTypeCard}" styleClass="input-text">
-                <f:selectItems value="#{cardSignCreatePage.getTypes(1)}" />
+                <f:selectItems value="#{cardSignCreatePage.getTypes(2)}" />
             </h:selectOneMenu>
             <h:outputText escape="true" value="Данные ключа" styleClass="output-text" />
             <h:outputText value="#{cardSignCreatePage.signDataSize}" styleClass="output-text" />

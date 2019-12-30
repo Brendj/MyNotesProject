@@ -507,10 +507,10 @@ public class DAOReadonlyService {
         return result != null && ((BigInteger) result).longValue() > 0 ? true : false;
     }
 
-    public byte[] getCardSignVerifyData(Integer idOfCardSign, Integer signType) {
+    public byte[] getCardSignVerifyData(Integer idOfCardSign, Integer signType, boolean isNewType) {
         try {
             Query query;
-            if (signType == 0)
+            if (signType == 0 && isNewType)
                 query = entityManager.createQuery("select cs.privatekeycard from CardSign cs " +
                         "where cs.idOfCardSign = :idOfCardSign and cs.signType = :signType  and (cs.deleted = false or cs.deleted is null)");
             else
