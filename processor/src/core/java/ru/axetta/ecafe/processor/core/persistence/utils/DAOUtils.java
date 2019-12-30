@@ -400,6 +400,26 @@ public class DAOUtils {
         return null;
     }
 
+    public static Person findPersonByFIO(Session session, String firstName, String surname, String secondName) {
+        Query query = session.createQuery("from Person p where p.firstName = :firstName and p.surname = :surname "
+                + "and p.secondName = :secondName");
+        query.setParameter("firstName", firstName);
+        query.setParameter("surname", surname);
+        query.setParameter("secondName", secondName);
+        List res = query.list();
+        if(res != null && res.size() > 0) {
+            return (Person) res.get(0);
+        }
+        return null;
+    }
+
+    public static Contragent findContragentIsSupplier(Session session, long idOfContragent) {
+        Query query = session.createQuery("from Contragent c where c.idOfContragent = :idOfContragent "
+                + "and c.classId = 2"); // ТСП
+        query.setParameter("idOfContragent", idOfContragent);
+        return (Contragent) query.uniqueResult();
+    }
+
     public static boolean isNotPlannedOrgExists(Session session, String shortName, long additionalIdBuilding) {
         Query q = session.createSQLQuery("select 1 from cf_not_planned_orgs where shortName=:shortName and additionalIdBuilding=:additionalIdBuilding");
         q.setParameter("shortName", shortName);
