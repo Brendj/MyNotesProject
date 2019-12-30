@@ -300,6 +300,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Long idOfClientGroup;
     private Long externalId;
     private String clientGUID;
+    private String clientIacRegId;
     private Integer discountMode;
     private List<SelectItem> selectItemList = new ArrayList<SelectItem>();
     private String san;
@@ -673,6 +674,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.clientGUID = clientGUID;
     }
 
+    public String getClientIacRegId() {
+        return clientIacRegId;
+    }
+
+    public void setClientIacRegId(String clientIacRegId) {
+        this.clientIacRegId =  clientIacRegId;
+    }
+
     public Boolean getSpecialMenu() {
         return specialMenu;
     }
@@ -981,6 +990,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         } else {
             client.setClientGUID(this.clientGUID);
         }
+        if (this.clientIacRegId == null || this.clientIacRegId.isEmpty()) {
+            client.setIacRegId(null);
+        } else {
+            client.setIacRegId(this.clientIacRegId);
+        }
         if (this.changePassword) {
             client.setPassword(this.plainPassword);
         }
@@ -1235,6 +1249,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         this.externalId = client.getExternalId();
         this.clientGUID = client.getClientGUID();
+        this.clientIacRegId = client.getIacRegId();
         this.discountMode = client.getDiscountMode();
         /* filter fill*/
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();

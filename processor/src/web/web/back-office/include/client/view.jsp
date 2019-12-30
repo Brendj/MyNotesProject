@@ -162,6 +162,8 @@
     <h:inputText value="#{mainPage.clientViewPage.clientGUID}" maxlength="64" styleClass="input-text long-field" readonly="true"/>
     <h:outputText escape="true" value="Идентификатор SSOID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.clientSSOID}" maxlength="64" styleClass="input-text long-field" readonly="true"/>
+    <h:outputText escape="true" value="Идентификатор REGID" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.clientIacRegId}" maxlength="40" styleClass="input-text long-field" readonly="true"/>
     <h:outputText escape="true" value="Пол" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.clientViewPage.gender}" styleClass="input-text" readonly="true">
         <f:selectItems value="#{mainPage.clientViewPage.clientGenderMenu.items}" />
