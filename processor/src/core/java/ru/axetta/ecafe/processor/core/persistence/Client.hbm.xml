@@ -52,6 +52,9 @@
         <property name="canConfirmGroupPayment" column="CanConfirmGroupPayment"
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
+        <property name="confirmVisualRecognition" column="ConfirmVisualRecognition"
+                  type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
         <!--property name="image" column="Image" type="blob"/-->
         <property name="remarks" column="Remarks" type="string" length="1024"/>
         <property name="updateTime" column="LastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
