@@ -60,7 +60,7 @@
         <h:inputText value="#{cardSignEditPage.idOfCardSign}" styleClass="input-text" readonly="true" />
         <h:outputText escape="true" value="Тип ключа" styleClass="output-text" />
         <h:selectOneMenu value="#{cardSignEditPage.signTypeCard}" styleClass="input-text">
-            <f:selectItems value="#{cardSignEditPage.getTypes(1)}" />
+            <f:selectItems value="#{cardSignEditPage.getTypes(2)}" />
         </h:selectOneMenu>
         <h:outputText escape="true" value="Данные ключа" styleClass="output-text" />
         <h:outputText value="#{cardSignEditPage.signDataSize}" styleClass="output-text" />
