@@ -2676,4 +2676,9 @@ public class DAOService {
             return null;
         }
     }
+
+    public void saveNotificationOrder(NotificationOrders object) {
+        entityManager.persist(object);
+        entityManager.flush();
+    }
 }

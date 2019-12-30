@@ -1288,24 +1288,14 @@ public class DAOUtils {
                 && !flagOrder) {
             sendNotificationLowBalance(session, client, transactionDate);
             if (orderId != null) {
-                //Удаляем из таблицы все записи старше 3 дней
-                //Date endDate = DateUtils.addDays(new Date(), -3);
-                //q = session.createQuery("DELETE FROM NotificationOrders WHERE createddate<=:createddate");
-                //q.setParameter("createddate", endDate);
-                //q.executeUpdate();
+                //Сохраняем информацию об отправленном сообщении
                 NotificationOrders notificationOrders = new NotificationOrders();
                 notificationOrders.setIdOfClient(client.getIdOfClient());
                 notificationOrders.setIdOfOrder(orderId);
                 notificationOrders.setCreateddate(new Date());
-                session.save(notificationOrders);
-                session.getTransaction().commit();
+                DAOService.getInstance().saveNotificationOrder(notificationOrders);
             }
         }
-    }
-
-    private void saveNewNotificationOrder ()
-    {
-
     }
 
     private static void sendNotificationLowBalance(Session session, Client client, Date transactionDate) {
