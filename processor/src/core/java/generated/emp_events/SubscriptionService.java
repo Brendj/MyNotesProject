@@ -1,13 +1,13 @@
 
 package generated.emp_events;
 
-import java.net.MalformedURLException;
-import java.net.URL;
 import javax.xml.namespace.QName;
 import javax.xml.ws.Service;
 import javax.xml.ws.WebEndpoint;
 import javax.xml.ws.WebServiceClient;
 import javax.xml.ws.WebServiceFeature;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 
 /**
@@ -49,6 +49,11 @@ public class SubscriptionService
     @WebEndpoint(name = "ServicePort")
     public SubscriptionPortType getServicePort() {
         return (SubscriptionPortType)super.getPort(new QName("urn://emp.altarix.ru/subscriptions", "ServicePort"), SubscriptionPortType.class);
+    }
+
+    @WebEndpoint(name = "ServicePort")
+    public SubscriptionPortType getServicePortTest() {
+        return (SubscriptionPortType)super.getPort(new QName("http://tempuri.org/", "BasicHttpBinding_SubscriptionService"), SubscriptionPortType.class);
     }
 
     /**

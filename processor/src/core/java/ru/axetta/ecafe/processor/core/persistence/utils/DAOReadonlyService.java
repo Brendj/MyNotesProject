@@ -49,6 +49,9 @@ import java.util.*;
 public class DAOReadonlyService {
     private final static Logger logger = LoggerFactory.getLogger(DAOReadonlyService.class);
 
+    public static final String CARD_NOT_FOUND = "Карта не найдена";
+    public static final String SEVERAL_CARDS_FOUND = "Найдено более одной карты";
+
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
 
@@ -504,9 +507,15 @@ public class DAOReadonlyService {
         return result != null && ((BigInteger) result).longValue() > 0 ? true : false;
     }
 
-    public byte[] getCardSignData(Integer idOfCardSign, Integer signType) {
+    public byte[] getCardSignVerifyData(Integer idOfCardSign, Integer signType) {
         try {
-            Query query = entityManager.createQuery("select cs.signData from CardSign cs " + "where cs.idOfCardSign = :idOfCardSign and cs.signType = :signType  and (cs.deleted = false or cs.deleted is null)");
+            Query query;
+            if (signType == 0)
+                query = entityManager.createQuery("select cs.privatekeycard from CardSign cs " +
+                        "where cs.idOfCardSign = :idOfCardSign and cs.signType = :signType  and (cs.deleted = false or cs.deleted is null)");
+            else
+                query = entityManager.createQuery("select cs.signData from CardSign cs " +
+                        "where cs.idOfCardSign = :idOfCardSign and cs.signType = :signType  and (cs.deleted = false or cs.deleted is null)");
             query.setParameter("idOfCardSign", idOfCardSign);
             query.setParameter("signType", signType);
             return (byte[]) query.getSingleResult();
@@ -633,6 +642,20 @@ public class DAOReadonlyService {
         return "";
     }
 
+    public Client getClientByCardPrintedNo(Long cardPrintedNo) throws Exception {
+        Query query = entityManager.createQuery("select card from Card card join fetch card.client c join fetch c.person p "
+                + "where card.cardPrintedNo = :cardPrintedNo and card.state = :state and card.client is not null");
+        query.setParameter("cardPrintedNo", cardPrintedNo);
+        query.setParameter("state", Card.ACTIVE_STATE);
+        List<Card> list = query.getResultList();
+        if (list.size() == 0) {
+            throw new Exception(CARD_NOT_FOUND);
+        } else if (list.size() > 1) {
+            throw new Exception(SEVERAL_CARDS_FOUND);
+        }
+        return list.get(0).getClient();
+    }
+
     public List<SpecialDate> getSpecialDates(Date startDate, Date endDate, Long idOfOrg) {
         try {
             Query query = entityManager.createQuery(
@@ -688,5 +711,28 @@ public class DAOReadonlyService {
             resultMap.put(year, monthMap);
         }
         return resultMap;
+    }
+    public List<EMIAS> getEmiasForMaxVersionAndIdOrg(Long maxVersion, List<Long> orgs){
+        try {
+            Query query = entityManager.createQuery(
+                    "select ce from EMIAS ce where ce.version > :vers");
+            query.setParameter("vers", maxVersion);
+            List<EMIAS> emias = query.getResultList();
+            //Фильтрация по орг
+            Iterator<EMIAS> emiasIterator = emias.iterator();
+            while(emiasIterator.hasNext()) {
+                EMIAS emias1 = emiasIterator.next();//получаем следующий элемент
+                Client cl = DAOUtils.findClientByGuid(entityManager, emias1.getGuid());
+                if (orgs.indexOf(cl.getOrg().getIdOfOrg()) == -1) {
+                    //Удаляем "чужих" клиентов
+                    emiasIterator.remove();
+                }
+            }
+            return emias;
+        }
+        catch (Exception e)
+        {
+            return new ArrayList<>();
+        }
     }
 }

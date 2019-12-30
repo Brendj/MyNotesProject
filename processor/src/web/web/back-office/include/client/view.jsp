@@ -114,7 +114,7 @@
                              styleClass="output-text" />
     <h:outputText escape="true" value="Правила оповещения" styleClass="output-text" rendered="#{mainPage.clientViewPage.oldFlagsShow}" />
     <rich:dataTable id="clientNotificationSetting" value="#{mainPage.clientViewPage.clientNotificationSettingPage.items}" var="it"
-                    rows="9"
+                    rows="11"
                     columnClasses="left-aligned-column, center-aligned-column"
                     footerClass="data-table-footer"
                     rendered="#{mainPage.clientViewPage.oldFlagsShow}">
@@ -162,6 +162,8 @@
     <h:inputText value="#{mainPage.clientViewPage.clientGUID}" maxlength="64" styleClass="input-text long-field" readonly="true"/>
     <h:outputText escape="true" value="Идентификатор SSOID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.clientSSOID}" maxlength="64" styleClass="input-text long-field" readonly="true"/>
+    <h:outputText escape="true" value="Идентификатор REGID" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.clientIacRegId}" maxlength="40" styleClass="input-text long-field" readonly="true"/>
     <h:outputText escape="true" value="Пол" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.clientViewPage.gender}" styleClass="input-text" readonly="true">
         <f:selectItems value="#{mainPage.clientViewPage.clientGenderMenu.items}" />
@@ -277,7 +279,7 @@
                 <h:outputText escape="true" value="Правила оповещения" />
             </f:facet>
             <rich:dataTable id="clientNotificationSetting" value="#{clientGuardian.notificationItems}" var="it"
-                            rows="9" columnClasses="left-aligned-column, center-aligned-column" styleClass="borderless-grid-all-client">
+                            rows="11" columnClasses="left-aligned-column, center-aligned-column" styleClass="borderless-grid-all-client">
                 <rich:column styleClass="borderless-grid-all-client">
                     <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text" />
                 </rich:column>
@@ -339,7 +341,7 @@
                 <h:outputText escape="true" value="Правила оповещения" />
             </f:facet>
             <rich:dataTable id="clientNotificationSetting" value="#{clientWard.notificationItems}" var="it"
-                            rows="8" columnClasses="left-aligned-column, center-aligned-column"  styleClass="borderless-grid-all-client">
+                            rows="11" columnClasses="left-aligned-column, center-aligned-column"  styleClass="borderless-grid-all-client">
                 <rich:column styleClass="borderless-grid-all-client">
                     <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text" />
                 </rich:column>

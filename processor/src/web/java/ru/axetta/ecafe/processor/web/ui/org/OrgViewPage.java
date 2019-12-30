@@ -4,7 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.org;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.ConfigurationProvider;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.Person;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -57,6 +60,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String mailingListReports1;
     private String mailingListReports2;
     private String guid;
+    private Long ekisId;
     private List<CategoryOrg> categoryOrg;
     private String configurationProviderName;
     private List<Long> idOfOrgList;
@@ -189,6 +193,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.INN=org.getINN();
         this.OGRN=org.getOGRN();
         this.guid = org.getGuid();
+        this.ekisId = org.getEkisId();
         this.commodityAccountingParam = org.getCommodityAccounting();
         this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
         this.usePlanOrders = org.getUsePlanOrders();
@@ -779,5 +784,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setPreorderlp(Boolean preorderlp) {
         this.preorderlp = preorderlp;
+    }
+
+    public Long getEkisId() {
+        return ekisId;
+    }
+
+    public void setEkisId(Long ekisId) {
+        this.ekisId = ekisId;
     }
 }

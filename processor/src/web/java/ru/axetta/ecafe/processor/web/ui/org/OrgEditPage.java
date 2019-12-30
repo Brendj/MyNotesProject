@@ -69,6 +69,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private String mailingListReports1;
     private String mailingListReports2;
     private String guid;
+    private Long ekisId;
     private ConfigurationProvider configurationProvider;
     private List<Long> idOfOrgList = new ArrayList<Long>();
     private String city;
@@ -233,6 +234,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setMailingListReports1(mailingListReports1);
         org.setMailingListReports2(mailingListReports2);
         org.setGuid(guid);
+        org.setEkisId(ekisId.equals(0L) ? null : ekisId);
         org.setCategoriesInternal(new HashSet<CategoryOrg>());
         if (this.idOfCategoryOrgList.isEmpty()) org.setCategoriesInternal(null);
         else {
@@ -452,6 +454,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.mailingListReports1 = org.getMailingListReports1();
         this.mailingListReports2 = org.getMailingListReports2();
         this.guid = org.getGuid();
+        this.ekisId = org.getEkisId();
         this.fullSyncParam = org.getFullSyncParam();
         this.usePlanOrders = org.getUsePlanOrders();
         this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
@@ -1175,6 +1178,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setPreorderlp(Boolean preorderlp) {
         this.preorderlp = preorderlp;
+    }
+
+    public Long getEkisId() {
+        return ekisId;
+    }
+
+    public void setEkisId(Long ekisId) {
+        this.ekisId = ekisId;
     }
 
     public static class ContragentItem {

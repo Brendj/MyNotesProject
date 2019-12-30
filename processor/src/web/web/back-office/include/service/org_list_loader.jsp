@@ -10,9 +10,11 @@
 
 <%--@elvariable id="orgListLoaderPage" type="ru.axetta.ecafe.processor.web.ui.service.OrgListLoaderPage"--%>
 <h:panelGrid id="orgListLoaderGrid" binding="#{orgListLoaderPage.pageComponent}" styleClass="borderless-grid">
-
-    <h:panelGrid columns="2">
+    <h:panelGrid columns="1">
         <h:outputText value="Файл для загрузки"/>
+        <h:commandLink action="#{orgListLoaderPage.downloadSample}" id="downloadSample" value="Скачать образец" styleClass="command-link" />
+    </h:panelGrid>
+    <h:panelGrid columns="2">
         <rich:fileUpload id="orgFileUploadElement" styleClass="upload" addButtonClass="upload-command-button"
                          addButtonClassDisabled="upload-command-button-diasbled" cleanButtonClass="upload-command-button"
                          cleanButtonClassDisabled="upload-command-button-diasbled" stopButtonClass="upload-command-button"
@@ -24,7 +26,8 @@
                          clearControlLabel="Очистить" clearAllControlLabel="Очистить все" doneLabel="Готово"
                          cancelEntryControlLabel="Отменить" transferErrorLabel="Ошибка передачи"
                          uploadControlLabel="Загрузка файла" progressLabel="Загрузка" listHeight="70px"
-                         fileUploadListener="#{orgListLoaderPage.fileUploadListener}">
+                         fileUploadListener="#{orgListLoaderPage.uploadFile}">
+
             <f:facet name="label">
                 <h:outputText escape="true" value="{_KB}KB/{KB}KB [{mm}:{ss}]" />
             </f:facet>
@@ -40,33 +43,40 @@
     <rich:dataTable id="orgListLoaderResultTable" value="#{orgListLoaderPage.lineResults}" var="item" rows="20"
                     columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column"
                     footerClass="data-table-footer">
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Номер строки файла" />
-            </f:facet>
+
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column headerClass="column-header">
+                    <h:outputText value="Номер строки файла" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText value="Код результата" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText value="Сообщение" />
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText value="Идентификатор ОУ в БД (IdOfOrg)" />
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+
+        <rich:column styleClass="center-aligned-column">
             <h:outputText escape="true" value="#{item.lineNo}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Код результата" />
-            </f:facet>
+
+        <rich:column styleClass="center-aligned-column">
             <h:outputText escape="true" value="#{item.resultCode}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Сообщение" />
-            </f:facet>
+
+        <rich:column styleClass="center-aligned-column">
             <h:outputText escape="true" value="#{item.message}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Идентификатор ОУ в БД (IdOfOrg)" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
-            <%--<a4j:commandLink action="#{mainPage.showCardViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
 
-                <f:setPropertyActionListener value="#{item.idOfCard}" target="#{mainPage.selectedIdOfCard}" />
-            </a4j:commandLink>--%>
+        <rich:column styleClass="center-aligned-column">
+            <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.idOfOrg}" action="#{mainPage.showOrgViewPage}" styleClass="command-link">
+                <f:setPropertyActionListener value="#{item.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+            </a4j:commandLink>
         </rich:column>
 
         <f:facet name="footer">

@@ -49,7 +49,9 @@ import ru.axetta.ecafe.processor.core.persistence.questionary.QuestionaryType;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardNotFoundException;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardWrongStateException;
 import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
-import ru.axetta.ecafe.processor.core.persistence.utils.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.service.finoperator.FinManager;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
@@ -8690,7 +8692,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 CultureName = CultureName.substring(0, 255);
             }
             ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
-            ExternalEvent event = new ExternalEvent(cl, orgCode, CultureName, CultureShortName, CultureAddress,
+            ExternalEvent event = new ExternalEvent(cl, orgCode, CultureName, CultureAddress,
                     ExternalEventType.CULTURE, accessTime, ExternalEventStatus.fromInteger(eventsStatus), handler);
             session.save(event);
             transaction.commit();

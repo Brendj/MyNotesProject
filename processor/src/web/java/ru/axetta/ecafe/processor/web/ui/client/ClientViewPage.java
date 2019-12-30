@@ -193,6 +193,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Long externalId;
     private String clientGUID;
     private String clientSSOID;
+    private String clientIacRegId;
     private List<BankSubscription> bankSubscriptions;
     private Integer gender;
     private Date birthDate;
@@ -520,6 +521,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.expenditureLimit = client.getExpenditureLimit();
         this.clientGUID = client.getClientGUID();
         this.clientSSOID = client.getSsoid();
+        this.clientIacRegId = client.getIacRegId();
         this.externalId = client.getExternalId();
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
         this.gender = client.getGender();
@@ -724,6 +726,14 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     public void setUserOP(Boolean userOP) {
         this.userOP = userOP;
+    }
+
+    public String getClientIacRegId() {
+        return clientIacRegId;
+    }
+
+    public void setClientIacRegId(String clientIacRegId) {
+        this.clientIacRegId = clientIacRegId;
     }
 
     public boolean isEligibleToViewUserOP() {

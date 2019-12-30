@@ -25,6 +25,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientsPhotos;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ListComplexSchedules;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZNBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountsDTSZNRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.GroupsOrganizationRequest;
@@ -2722,8 +2724,9 @@ public class SyncRequest {
             builders.add(new RequestFeedingBuilder(idOfOrg));
             builders.add(new ClientDiscountDTSZNBuilder(idOfOrg));
             builders.add(new OrgSettingsBuilder(idOfOrg));
-            builders.add(new GoodRequestEZDBuilder());
+			builders.add(new GoodRequestEZDBuilder());
             builders.add(new SyncSettingsRequestBuilder(idOfOrg));
+			builders.add(new EmiasBuilder());
             return builders;
         }
 
@@ -3015,6 +3018,10 @@ public class SyncRequest {
 
     public GoodRequestEZDRequest getGoodRequestEZDRequest(){
         return this.<GoodRequestEZDRequest>findSection(GoodRequestEZDRequest.class);
+    }
+	
+	public EmiasRequest getEmiasRequest(){
+        return this.<EmiasRequest>findSection(EmiasRequest.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

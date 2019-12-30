@@ -400,6 +400,26 @@ public class DAOUtils {
         return null;
     }
 
+    public static Person findPersonByFIO(Session session, String firstName, String surname, String secondName) {
+        Query query = session.createQuery("from Person p where p.firstName = :firstName and p.surname = :surname "
+                + "and p.secondName = :secondName");
+        query.setParameter("firstName", firstName);
+        query.setParameter("surname", surname);
+        query.setParameter("secondName", secondName);
+        List res = query.list();
+        if(res != null && res.size() > 0) {
+            return (Person) res.get(0);
+        }
+        return null;
+    }
+
+    public static Contragent findContragentIsSupplier(Session session, long idOfContragent) {
+        Query query = session.createQuery("from Contragent c where c.idOfContragent = :idOfContragent "
+                + "and c.classId = 2"); // ТСП
+        query.setParameter("idOfContragent", idOfContragent);
+        return (Contragent) query.uniqueResult();
+    }
+
     public static boolean isNotPlannedOrgExists(Session session, String shortName, long additionalIdBuilding) {
         Query q = session.createSQLQuery("select 1 from cf_not_planned_orgs where shortName=:shortName and additionalIdBuilding=:additionalIdBuilding");
         q.setParameter("shortName", shortName);
@@ -1756,15 +1776,15 @@ public class DAOUtils {
     public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList) {
         Long version = getMaxVersionEMIAS(session);
 
-        Criteria clientCardsCriteria = session.createCriteria(EMIAS.class);
-        clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventCancelEMIAS()));
-        EMIAS emiasUpdated;
-        try {
-            emiasUpdated = (EMIAS)clientCardsCriteria.list().get(0);
-        }catch (Exception e)
-        {
-            emiasUpdated = null;
-        }
+        //Criteria clientCardsCriteria = session.createCriteria(EMIAS.class);
+        //clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventCancelEMIAS()));
+        //EMIAS emiasUpdated;
+        //try {
+        //    emiasUpdated = (EMIAS)clientCardsCriteria.list().get(0);
+        //}catch (Exception e)
+        //{
+        //    emiasUpdated = null;
+        //}
 
         EMIAS emias = new EMIAS();
         emias.setGuid(liberateClientsList.getGuid());
@@ -1774,23 +1794,25 @@ public class DAOUtils {
         emias.setStartDateLiberate(liberateClientsList.getStartDateLiberate());
         emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
         emias.setCreateDate(new Date());
+        emias.setDeletedemiasid(liberateClientsList.getIdEventCancelEMIAS());
         emias.setVersion(version);
         session.save(emias);
-        clientCardsCriteria = session.createCriteria(EMIAS.class);
-        clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
-        EMIAS emiasNEW;
-        try {
-            emiasNEW = (EMIAS)clientCardsCriteria.list().get(0);
-        }catch (Exception e)
-        {
-            emiasNEW = null;
-        }
 
-        if (emiasUpdated != null && emiasNEW != null) {
-            emiasUpdated.setDeletedemiasid(emiasNEW.getIdEventEMIAS());
-            emiasUpdated.setUpdateDate(new Date());
-            session.update(emiasUpdated);
-        }
+        //clientCardsCriteria = session.createCriteria(EMIAS.class);
+        //clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
+        //EMIAS emiasNEW;
+        //try {
+        //    emiasNEW = (EMIAS)clientCardsCriteria.list().get(0);
+        //}catch (Exception e)
+        //{
+        //    emiasNEW = null;
+        //}
+        //
+        //if (emiasUpdated != null && emiasNEW != null) {
+        //    emiasUpdated.setDeletedemiasid(emiasNEW.getIdEventEMIAS());
+        //    emiasUpdated.setUpdateDate(new Date());
+        //    session.update(emiasUpdated);
+        //}
     }
 
     public static Long getMaxVersionEMIAS (Session session)
@@ -4519,6 +4541,18 @@ public class DAOUtils {
         {
             return new ArrayList<EMIAS>();
         }
+    }
+
+	public static Long getMaxVersionOfEmias(Session session) {
+        Query query = session.createQuery("SELECT MAX(em.version) FROM EMIAS AS em");
+        Long maxVer = (Long) query.uniqueResult();
+        return maxVer == null ? 0 : maxVer;
+    }
+
+    public static List<EMIAS> getEmiasForMaxVersion(Long maxVersion, Session session){
+        Criteria criteria = session.createCriteria(EMIAS.class);
+        criteria.add(Restrictions.gt("version", maxVersion));
+        return criteria.list();
     }
 
     public static Integer getComplexIdForGoodRequestPosition(Session persistenceSession, String guidOfPosition) {
