@@ -1253,8 +1253,7 @@ public class DAOUtils {
         return !query.list().isEmpty();
     }
 
-    public static void changeClientBalance(Session session, Client client, long sum, Date transactionDate, Long orderId,
-            Long idClient) {
+    public static void changeClientBalance(Session session, Client client, long sum, Date transactionDate, Long orderId) {
         Query q = session.createQuery("UPDATE Client SET balance = balance + :charge WHERE idOfClient = :id")
                 .setParameter("charge", sum).setParameter("id", client.getIdOfClient());
         q.executeUpdate();
@@ -1266,7 +1265,7 @@ public class DAOUtils {
         if (orderId != null) {
             Criteria criteria = session.createCriteria(NotificationOrders.class);
             criteria.add(Restrictions.eq("idOfOrder", orderId));
-            criteria.add(Restrictions.eq("idOfClient", idClient));
+            criteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
             NotificationOrders notificationOrder = null;
             try {
                 List notificationOrders = criteria.list();
@@ -1290,18 +1289,23 @@ public class DAOUtils {
             sendNotificationLowBalance(session, client, transactionDate);
             if (orderId != null) {
                 //Удаляем из таблицы все записи старше 3 дней
-                Date endDate = DateUtils.addDays(new Date(), -3);
-                q = session.createQuery("DELETE FROM NotificationOrders WHERE createddate<=:createddate");
-                q.setParameter("createddate", endDate);
-                q.executeUpdate();
+                //Date endDate = DateUtils.addDays(new Date(), -3);
+                //q = session.createQuery("DELETE FROM NotificationOrders WHERE createddate<=:createddate");
+                //q.setParameter("createddate", endDate);
+                //q.executeUpdate();
                 NotificationOrders notificationOrders = new NotificationOrders();
-                notificationOrders.setIdOfClient(idClient);
+                notificationOrders.setIdOfClient(client.getIdOfClient());
                 notificationOrders.setIdOfOrder(orderId);
                 notificationOrders.setCreateddate(new Date());
                 session.save(notificationOrders);
                 session.getTransaction().commit();
             }
         }
+    }
+
+    private void saveNewNotificationOrder ()
+    {
+
     }
 
     private static void sendNotificationLowBalance(Session session, Client client, Date transactionDate) {
