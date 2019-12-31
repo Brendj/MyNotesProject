@@ -967,6 +967,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setNotifyViaSMS(this.notifyViaSMS);
         client.setNotifyViaPUSH(this.notifyViaPUSH);
         client.setDontShowToExternal(this.dontShowToExternal);
+        client.setConfirmVisualRecognition(this.confirmVisualRecognition);
         client.setUseLastEEModeForPlan(this.useLastEEModeForPlan);
         client.setRemarks(this.remarks);
         client.setUpdateTime(new Date());
