@@ -13,9 +13,9 @@ import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.ResCate
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZN;
-import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSectionForARMAnswer;
+import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.ResHelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
@@ -377,6 +377,7 @@ public class SyncResponse {
             private final boolean notifyViaPUSH;
             private final String remarks;
             private final boolean canConfirmGroupPayment;
+            private final boolean confirmVisualRecognition;
             private final int discountMode;
             private final String guid;
             private boolean tempClient;
@@ -422,6 +423,7 @@ public class SyncResponse {
                 this.notifyViaPUSH=client.isNotifyViaPUSH();
                 this.remarks = client.getRemarks();
                 this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
+                this.confirmVisualRecognition = client.getConfirmVisualRecognition();
                 this.discountMode = client.getDiscountMode();
                 this.guid = client.getClientGUID();
                 this.clientType = clientType;
@@ -513,6 +515,10 @@ public class SyncResponse {
                 return canConfirmGroupPayment;
             }
 
+            public boolean isConfirmVisualRecognition() {
+                return confirmVisualRecognition;
+            }
+
             public boolean isTempClient() {
                 return tempClient;
             }
@@ -576,6 +582,7 @@ public class SyncResponse {
                 element.setAttribute("NotifyViaSMS", this.notifyViaSMS?"1":"0");
                 element.setAttribute("NotifyViaPUSH", this.notifyViaPUSH?"1":"0");
                 element.setAttribute("CanConfirmGroupPayment", this.canConfirmGroupPayment?"1":"0");
+                element.setAttribute("IsInOutByVideo", this.confirmVisualRecognition?"1":"0");
                 element.setAttribute("Remarks", this.remarks);
                 if (null != this.email) {
                     element.setAttribute("Email", this.email);
