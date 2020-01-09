@@ -264,6 +264,7 @@
         <property name="participantOP" column="participantOP" type="boolean"/>
         <property name="preorderlp" column="preorderlp" type="boolean"/>
         <property name="haveNewLP" column="haveNewLP" type="boolean"/>
+        <property name="ekisId" column="ekisId" type="long"/>
     </class>
 </hibernate-mapping>
 
