@@ -892,6 +892,7 @@ public class EMPProcessor {
             client = (Client) resultList.get(0);
         } catch (Exception e) {
             logger.warn("Failed to get Client from persistence for {contractId :" + clientMobileString + "\"} : ", e);
+            return new HashMap<>();
         }
 
         StoragePortType storage = createStorageController();
