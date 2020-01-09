@@ -73,6 +73,9 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
             item.setAddress((String)row[1]);
             item.setCity("Москва");
             item.setGuid((String)row[8]);
+            if (row[9] != null) {
+                item.setEkisId(Long.parseLong((String)row[9]));
+            }
             if (row[12] != null) {
                 item.setUnom(Long.parseLong((String)row[12]));
             } else {

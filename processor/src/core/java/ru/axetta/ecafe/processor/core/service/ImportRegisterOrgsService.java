@@ -466,7 +466,8 @@ public class ImportRegisterOrgsService {
                         oi.getAdditionalId() == null ? -1L : oi.getAdditionalId(),
                         orgRegistryChange, oi.getShortNameSupplierFrom(),
                         oi.getOrgState(), oi.getIntroductionQueue(), oi.getIntroductionQueueFrom(),
-                        oi.getDirector(), oi.getDirectorFrom()
+                        oi.getDirector(), oi.getDirectorFrom(),
+                        oi.getEkisId(), oi.getEkisIdFrom()
                 );
     }
 
@@ -534,6 +535,8 @@ public class ImportRegisterOrgsService {
         private String introductionQueueFrom;
         private String director;
         private String directorFrom;
+        private Long ekisId;
+        private Long ekisIdFrom;
 
         private List<OrgInfo> orgInfos = new LinkedList<OrgInfo>();
         private Boolean mainBuilding;
@@ -857,6 +860,22 @@ public class ImportRegisterOrgsService {
 
         public void setDirectorFrom(String directorFrom) {
             this.directorFrom = directorFrom;
+        }
+
+        public Long getEkisId() {
+            return ekisId;
+        }
+
+        public void setEkisId(Long ekisId) {
+            this.ekisId = ekisId;
+        }
+
+        public Long getEkisIdFrom() {
+            return ekisIdFrom;
+        }
+
+        public void setEkisIdFrom(Long ekisIdFrom) {
+            this.ekisIdFrom = ekisIdFrom;
         }
     }
 }

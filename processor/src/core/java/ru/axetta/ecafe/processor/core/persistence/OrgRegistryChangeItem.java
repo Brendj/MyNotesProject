@@ -47,6 +47,8 @@ public class OrgRegistryChangeItem {
     protected String introductionQueueFrom;
     protected String director;
     protected String directorFrom;
+    protected Long ekisId;
+    protected Long ekisIdFrom;
 
     private OrgRegistryChange orgRegistryChange;
 
@@ -78,7 +80,7 @@ public class OrgRegistryChangeItem {
 
             String guid, String guidFrom, Long additionalId,
             OrgRegistryChange orgRegistryChange, String shortNameSupplierFrom, Integer state, String introductionQueue,
-            String introductionQueueFrom, String director, String directorFrom) {
+            String introductionQueueFrom, String director, String directorFrom, Long ekisId, Long ekisIdFrom) {
         this.idOfOrg = idOfOrg;
         this.state = state;
 
@@ -119,6 +121,8 @@ public class OrgRegistryChangeItem {
         this.introductionQueueFrom = introductionQueueFrom;
         this.director = director;
         this.directorFrom = directorFrom;
+        this.ekisId = ekisId;
+        this.ekisIdFrom = ekisIdFrom;
     }
 
     public Long getAdditionalId() {
@@ -399,5 +403,21 @@ public class OrgRegistryChangeItem {
 
     public void setDirectorFrom(String directorFrom) {
         this.directorFrom = directorFrom;
+    }
+
+    public Long getEkisId() {
+        return ekisId;
+    }
+
+    public void setEkisId(Long ekisId) {
+        this.ekisId = ekisId;
+    }
+
+    public Long getEkisIdFrom() {
+        return ekisIdFrom;
+    }
+
+    public void setEkisIdFrom(Long ekisIdFrom) {
+        this.ekisIdFrom = ekisIdFrom;
     }
 }
