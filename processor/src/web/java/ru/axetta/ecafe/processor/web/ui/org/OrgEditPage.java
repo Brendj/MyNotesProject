@@ -70,6 +70,7 @@ public class OrgEditPage extends BasicWorkspacePage
     private String mailingListReports2;
     private String guid;
     private Long ekisId;
+    private String egissoId;
     private ConfigurationProvider configurationProvider;
     private List<Long> idOfOrgList = new ArrayList<Long>();
     private String city;
@@ -235,6 +236,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setMailingListReports2(mailingListReports2);
         org.setGuid(guid);
         org.setEkisId(ekisId.equals(0L) ? null : ekisId);
+        org.setEgissoId(egissoId);
         org.setCategoriesInternal(new HashSet<CategoryOrg>());
         if (this.idOfCategoryOrgList.isEmpty()) org.setCategoriesInternal(null);
         else {
@@ -455,6 +457,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.mailingListReports2 = org.getMailingListReports2();
         this.guid = org.getGuid();
         this.ekisId = org.getEkisId();
+        this.egissoId = org.getEgissoId();
         this.fullSyncParam = org.getFullSyncParam();
         this.usePlanOrders = org.getUsePlanOrders();
         this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
@@ -1186,6 +1189,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setEkisId(Long ekisId) {
         this.ekisId = ekisId;
+    }
+
+    public String getEgissoId() {
+        return egissoId;
+    }
+
+    public void setEgissoId(String egissoId) {
+        this.egissoId = egissoId;
     }
 
     public static class ContragentItem {

@@ -265,6 +265,7 @@
         <property name="preorderlp" column="preorderlp" type="boolean"/>
         <property name="haveNewLP" column="haveNewLP" type="boolean"/>
         <property name="ekisId" column="ekisId" type="long"/>
+        <property name="egissoId" column="egissoId" type="string" length="128"/>
     </class>
 </hibernate-mapping>
 
