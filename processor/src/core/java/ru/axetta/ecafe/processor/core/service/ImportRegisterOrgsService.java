@@ -46,6 +46,7 @@ public class ImportRegisterOrgsService {
     public static final int MOVE_OPERATION = 4;
 
     public static final String VALUE_GUID = "Guid";
+    public static final String VALUE_EKIS_ID = "ЕКИС Id";
     public static final String VALUE_UNIQUE_ADDRESS_ID = "№ здания";
     public static final String VALUE_ADDRESS = "Адрес корпуса";
     public static final String VALUE_SHORT_NAME = "Краткое наименование";
@@ -280,6 +281,8 @@ public class ImportRegisterOrgsService {
                         org.setINN(orgRegistryChangeItem.getInn());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_GUID)))
                         org.setGuid(orgRegistryChange.getGuid());
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_EKIS_ID)))
+                        org.setEkisId(orgRegistryChange.getEkisId());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_UNIQUE_ADDRESS_ID))) {
                         org.setUniqueAddressId(orgRegistryChangeItem.getUniqueAddressId());
                         org.setAdditionalIdBuilding(org.getUniqueAddressId()); // ??
@@ -438,7 +441,8 @@ public class ImportRegisterOrgsService {
                         solveString(oi.getInn()), oi.getInnFrom(),
 
                         solveString(oi.getGuid()), oi.getGuidFrom(),
-                        oi.getAdditionalId() == null ? -1L : oi.getAdditionalId()
+                        oi.getAdditionalId() == null ? -1L : oi.getAdditionalId(),
+                        oi.getEkisId(), oi.getEkisIdFrom()
                 );
     }
 

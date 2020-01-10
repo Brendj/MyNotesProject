@@ -52,6 +52,8 @@
         <property name="uniqueAddressIdFrom" column="uniqueaddressidfrom" type="long"/>
         <property name="inn" column="inn" type="string" length="32"/>
         <property name="innFrom" column="innfrom" type="string" length="32"/>
+        <property name="ekisId" column="ekisId" type="long"/>
+        <property name="ekisIdFrom" column="ekisIdFrom" type="long"/>
 
         <property name="guid" column="guid" type="string" length="255"/>
         <property name="guidFrom" column="guidfrom" type="string" length="255"/>

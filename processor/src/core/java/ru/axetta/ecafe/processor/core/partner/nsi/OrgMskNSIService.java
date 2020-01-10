@@ -289,6 +289,7 @@ public class OrgMskNSIService extends MskNSIService {
         info.setInnFrom(existingOrg.getINN());
         info.setIntroductionQueueFrom(existingOrg.getIntroductionQueue());
         info.setDirectorFrom(existingOrg.getOfficialPerson().getFullName());
+        info.setEkisIdFrom(existingOrg.getEkisId());
 
         info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
     }
@@ -362,9 +363,9 @@ public class OrgMskNSIService extends MskNSIService {
         return result;
     }
 
-    private OrgMskNSIService getNSIService() {
+    public OrgMskNSIService getNSIService() {
         switch (RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION)) {
-            case Option.NSI2 : return RuntimeContext.getAppContext().getBean(OrgSymmetricDAOService.class);
+            case Option.NSI2 : return RuntimeContext.getAppContext().getBean("OrgSymmetricDAOService", OrgSymmetricDAOService.class);
             case Option.NSI3 : return RuntimeContext.getAppContext().getBean(OrgNSI3DAOService.class);
         }
         return null;

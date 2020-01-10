@@ -50,6 +50,8 @@
         <property name="guid" column="guid" type="string" length="255" not-null="true"/>
         <property name="guidFrom" column="guidfrom" type="string" length="255"/>
         <property name="additionalId" column="additionalid" type="long"/>
+        <property name="ekisId" column="ekisId" type="long"/>
+        <property name="ekisIdFrom" column="ekisIdFrom" type="long"/>
 
         <set name="orgs" lazy="false" cascade="all" order-by="operationType, address">
             <key column="mainRegistry"/>

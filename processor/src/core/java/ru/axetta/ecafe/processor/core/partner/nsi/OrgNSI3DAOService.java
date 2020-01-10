@@ -50,16 +50,15 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
                 + "org.eo_id as EkisIds, "                          //9
                 + "'' as EkisType, "              //10
                 + "'' as EkisType2015, "         //11
-                + "cast(addr.unom as varchar) as UNOM, "                               //12
-                + "cast(addr.unad as varchar) as UNAD, "                               //13
+                + "addr.unom as UNOM, "                               //12
+                + "addr.unad as UNAD, "                               //13
                 + "'' as pp_status, "                                  //14
                 + "addr.unique_address_id as ekis_address_id, "                            //15
-                + "a.title "                                  //16
+                + "addr.area "                                  //16
                 + "FROM "
                 + "cf_kf_organization_registry org "
                 + "INNER JOIN cf_kf_eo_address addr ON addr.global_object_id = org.global_id "
-                + "INNER JOIN cf_kf_ct_admin_district a ON org.eo_district_id = a.system_object_id "
-                + "WHERE org.arhiv = false and a.is_deleted = 0 "
+                + "WHERE org.arhiv = false "
                 + (StringUtils.isEmpty(orgName) ? "" : " and org.short_name like '%" + orgName + "%'")
                 + (StringUtils.isEmpty(region) ? "" : " and a.title like '%" + region + "%'"));
         List list = query.getResultList();
@@ -74,15 +73,15 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
             item.setCity("Москва");
             item.setGuid((String)row[8]);
             if (row[9] != null) {
-                item.setEkisId(Long.parseLong((String)row[9]));
+                item.setEkisId(((BigInteger) row[9]).longValue());
             }
             if (row[12] != null) {
-                item.setUnom(Long.parseLong((String)row[12]));
+                item.setUnom(((BigInteger) row[12]).longValue());
             } else {
                 item.setUnom(null);
             }
             if (row[13] != null) {
-                item.setUnad(Long.parseLong((String)row[13]));
+                item.setUnad(((BigInteger) row[13]).longValue());
             } else {
                 item.setUnad(null);
             }
@@ -92,7 +91,7 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
 
             ImportRegisterOrgsService.OrgInfo info;
 
-            Org fOrg = DAOService.getInstance().findOrgByRegistryData(item.getUniqueAddressId(), item.getGuid(),
+            Org fOrg = DAOService.getInstance().findOrgByRegistryDataByMainField(item.getUniqueAddressId(), "ekisId", item.getEkisId(),
                     item.getInn(), item.getUnom(), item.getUnad(), true);
 
             if (fOrg != null) {
@@ -118,6 +117,18 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
             }
         }
         return result;
+    }
+
+    @Override
+    protected ImportRegisterOrgsService.OrgInfo getInfoWithAddToResult(List<ImportRegisterOrgsService.OrgInfo> result, Object[] row) {
+        for (ImportRegisterOrgsService.OrgInfo info : result) {
+            if (row[9] != null && (((BigInteger) row[9]).longValue() == (info.getEkisId()))) {
+                return info;
+            }
+        }
+        ImportRegisterOrgsService.OrgInfo info = new ImportRegisterOrgsService.OrgInfo();
+        result.add(info);
+        return info;
     }
 
 }

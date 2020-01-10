@@ -51,6 +51,9 @@ public class OrgRegistryChange {
     protected String guidFrom;
     protected Long additionalId;
 
+    protected Long ekisId;
+    protected Long ekisIdFrom;
+
     private Set<OrgRegistryChangeItem> orgs;
 
     protected Boolean applied = false;
@@ -78,7 +81,8 @@ public class OrgRegistryChange {
                              String inn, String innFrom,
 
                              String guid, String guidFrom,
-                             Long additionalId
+                             Long additionalId,
+                             Long ekisId, Long ekisIdFrom
             ) {
         this.idOfOrg = idOfOrg;
 
@@ -112,6 +116,9 @@ public class OrgRegistryChange {
         this.guid = guid;
         this.guidFrom = guidFrom;
         this.additionalId = additionalId;
+
+        this.ekisId = ekisId;
+        this.ekisIdFrom = ekisIdFrom;
 
     }
 
@@ -354,5 +361,21 @@ public class OrgRegistryChange {
         }
         OrgRegistryChange other = (OrgRegistryChange) obj;
         return this.idOfOrgRegistryChange.equals(other.getIdOfOrgRegistryChange());
+    }
+
+    public Long getEkisId() {
+        return ekisId;
+    }
+
+    public void setEkisId(Long ekisId) {
+        this.ekisId = ekisId;
+    }
+
+    public Long getEkisIdFrom() {
+        return ekisIdFrom;
+    }
+
+    public void setEkisIdFrom(Long ekisIdFrom) {
+        this.ekisIdFrom = ekisIdFrom;
     }
 }
