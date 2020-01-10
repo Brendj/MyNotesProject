@@ -582,7 +582,8 @@ public class SyncResponse {
                 element.setAttribute("NotifyViaSMS", this.notifyViaSMS?"1":"0");
                 element.setAttribute("NotifyViaPUSH", this.notifyViaPUSH?"1":"0");
                 element.setAttribute("CanConfirmGroupPayment", this.canConfirmGroupPayment?"1":"0");
-                element.setAttribute("IsInOutByVideo", this.confirmVisualRecognition?"1":"0");
+                // отправляем как IsOnOutByVideo для обратной совместимости с АРМ
+                element.setAttribute("IsOnOutByVideo", this.confirmVisualRecognition?"1":"0");
                 element.setAttribute("Remarks", this.remarks);
                 if (null != this.email) {
                     element.setAttribute("Email", this.email);
