@@ -56,6 +56,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         orgModifyChangeItems.clear();
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_GUID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_EKIS_ID, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_EGISSO_ID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_UNIQUE_ADDRESS_ID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_INN, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_UNOM, "", ""));
@@ -471,6 +472,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
                 item.setOldValue(orgForEdit.getEkisIdFromNullSafe());
                 item.setNewValue(orgForEdit.getEkisIdReestrNullSafe());
             }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_EGISSO_ID)) {
+                item.setOldValue(orgForEdit.getEgissoIdFrom());
+                item.setNewValue(orgForEdit.getEgissoIdReestr());
+            }
             if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_UNIQUE_ADDRESS_ID)) {
                 item.setOldValue(orgForEdit.getUniqueAddressIdFromNullSafe());
                 item.setNewValue(orgForEdit.getUniqueAddressIdReestrNullSafe());
@@ -558,6 +563,8 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         protected String guidFrom;
         protected Long ekisId;
         protected Long ekisIdFrom;
+        protected String egissoId;
+        protected String egissoIdFrom;
         protected Long additionalId;
         protected String introductionQueue;
         protected String introductionQueueFrom;
@@ -593,6 +600,8 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.guidFrom = registryChange.getGuidFrom();
             this.ekisId = registryChange.getEkisId();
             this.ekisIdFrom = registryChange.getEkisIdFrom();
+            this.egissoId = registryChange.getEgissoId();
+            this.egissoIdFrom = registryChange.getEgissoIdFrom();
             this.uniqueAddressId = registryChange.getUniqueAddressId();
             this.uniqueAddressIdFrom = registryChange.getUniqueAddressIdFrom();
             this.inn = registryChange.getInn();
@@ -643,6 +652,8 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.guidFrom = registryChangeItem.getGuidFrom();
             this.ekisId = registryChangeItem.getEkisId();
             this.ekisIdFrom = registryChangeItem.getEkisIdFrom();
+            this.egissoId = registryChangeItem.getEgissoId();
+            this.egissoIdFrom = registryChangeItem.getEgissoIdFrom();
             this.additionalId = registryChangeItem.getAdditionalId();
             this.introductionQueue = registryChangeItem.getIntroductionQueue();
             this.introductionQueueFrom = registryChangeItem.getIntroductionQueueFrom();
@@ -1054,6 +1065,14 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public String getEkisIdFromNullSafe() {
             return ekisIdFrom == null ? "" : ekisIdFrom.toString();
+        }
+
+        public String getEgissoIdFrom() {
+            return egissoIdFrom;
+        }
+
+        public String getEgissoIdReestr() {
+            return egissoId;
         }
 
     }

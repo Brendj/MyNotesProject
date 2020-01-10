@@ -53,6 +53,8 @@ public class OrgRegistryChange {
 
     protected Long ekisId;
     protected Long ekisIdFrom;
+    protected String egissoId;
+    protected String egissoIdFrom;
 
     private Set<OrgRegistryChangeItem> orgs;
 
@@ -82,7 +84,8 @@ public class OrgRegistryChange {
 
                              String guid, String guidFrom,
                              Long additionalId,
-                             Long ekisId, Long ekisIdFrom
+                             Long ekisId, Long ekisIdFrom,
+                             String egissoId, String egissoIdFrom
             ) {
         this.idOfOrg = idOfOrg;
 
@@ -119,7 +122,8 @@ public class OrgRegistryChange {
 
         this.ekisId = ekisId;
         this.ekisIdFrom = ekisIdFrom;
-
+        this.egissoId = egissoId;
+        this.egissoIdFrom = egissoIdFrom;
     }
 
     public Long getAdditionalId() {
@@ -377,5 +381,21 @@ public class OrgRegistryChange {
 
     public void setEkisIdFrom(Long ekisIdFrom) {
         this.ekisIdFrom = ekisIdFrom;
+    }
+
+    public String getEgissoId() {
+        return egissoId;
+    }
+
+    public void setEgissoId(String egissoId) {
+        this.egissoId = egissoId;
+    }
+
+    public String getEgissoIdFrom() {
+        return egissoIdFrom;
+    }
+
+    public void setEgissoIdFrom(String egissoIdFrom) {
+        this.egissoIdFrom = egissoIdFrom;
     }
 }

@@ -52,6 +52,8 @@
         <property name="additionalId" column="additionalid" type="long"/>
         <property name="ekisId" column="ekisId" type="long"/>
         <property name="ekisIdFrom" column="ekisIdFrom" type="long"/>
+        <property name="egissoId" column="egissoId" type="string" length="128"/>
+        <property name="egissoIdFrom" column="egissoIdFrom" type="string" length="128"/>
 
         <set name="orgs" lazy="false" cascade="all" order-by="operationType, address">
             <key column="mainRegistry"/>

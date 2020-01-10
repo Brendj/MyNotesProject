@@ -290,6 +290,7 @@ public class OrgMskNSIService extends MskNSIService {
         info.setIntroductionQueueFrom(existingOrg.getIntroductionQueue());
         info.setDirectorFrom(existingOrg.getOfficialPerson().getFullName());
         info.setEkisIdFrom(existingOrg.getEkisId());
+        info.setEgissoIdFrom(existingOrg.getEgissoId());
 
         info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
     }

@@ -49,6 +49,8 @@ public class OrgRegistryChangeItem {
     protected String directorFrom;
     protected Long ekisId;
     protected Long ekisIdFrom;
+    protected String egissoId;
+    protected String egissoIdFrom;
 
     private OrgRegistryChange orgRegistryChange;
 
@@ -80,7 +82,8 @@ public class OrgRegistryChangeItem {
 
             String guid, String guidFrom, Long additionalId,
             OrgRegistryChange orgRegistryChange, String shortNameSupplierFrom, Integer state, String introductionQueue,
-            String introductionQueueFrom, String director, String directorFrom, Long ekisId, Long ekisIdFrom) {
+            String introductionQueueFrom, String director, String directorFrom, Long ekisId, Long ekisIdFrom,
+            String egissoId, String egissoIdFrom) {
         this.idOfOrg = idOfOrg;
         this.state = state;
 
@@ -123,6 +126,8 @@ public class OrgRegistryChangeItem {
         this.directorFrom = directorFrom;
         this.ekisId = ekisId;
         this.ekisIdFrom = ekisIdFrom;
+        this.egissoId = egissoId;
+        this.egissoIdFrom = egissoIdFrom;
     }
 
     public Long getAdditionalId() {
@@ -419,5 +424,21 @@ public class OrgRegistryChangeItem {
 
     public void setEkisIdFrom(Long ekisIdFrom) {
         this.ekisIdFrom = ekisIdFrom;
+    }
+
+    public String getEgissoId() {
+        return egissoId;
+    }
+
+    public void setEgissoId(String egissoId) {
+        this.egissoId = egissoId;
+    }
+
+    public String getEgissoIdFrom() {
+        return egissoIdFrom;
+    }
+
+    public void setEgissoIdFrom(String egissoIdFrom) {
+        this.egissoIdFrom = egissoIdFrom;
     }
 }

@@ -47,6 +47,7 @@ public class ImportRegisterOrgsService {
 
     public static final String VALUE_GUID = "Guid";
     public static final String VALUE_EKIS_ID = "ЕКИС Id";
+    public static final String VALUE_EGISSO_ID = "ЕГИССО Id";
     public static final String VALUE_UNIQUE_ADDRESS_ID = "№ здания";
     public static final String VALUE_ADDRESS = "Адрес корпуса";
     public static final String VALUE_SHORT_NAME = "Краткое наименование";
@@ -378,7 +379,7 @@ public class ImportRegisterOrgsService {
                 if (safeCompare(orgInfo.address, orgInfo.addressFrom) && safeCompare(orgInfo.shortName, orgInfo.shortNameFrom) &&
                         safeCompare(orgInfo.officialName, orgInfo.officialNameFrom) && safeCompare(orgInfo.unom, orgInfo.unomFrom) &&
                         safeCompare(orgInfo.unad, orgInfo.unadFrom) && safeCompare(orgInfo.inn, orgInfo.innFrom) &&
-                        safeCompare(orgInfo.director, orgInfo.directorFrom)) {
+                        safeCompare(orgInfo.director, orgInfo.directorFrom) && safeCompare(orgInfo.egissoId, orgInfo.egissoIdFrom)) {
                 } else {
                     if(orgRegistryChange.getOrgs() == null){
                         orgRegistryChange.setOrgs(new HashSet<OrgRegistryChangeItem>());
@@ -442,7 +443,8 @@ public class ImportRegisterOrgsService {
 
                         solveString(oi.getGuid()), oi.getGuidFrom(),
                         oi.getAdditionalId() == null ? -1L : oi.getAdditionalId(),
-                        oi.getEkisId(), oi.getEkisIdFrom()
+                        oi.getEkisId(), oi.getEkisIdFrom(),
+                        oi.getEgissoId(), oi.getEgissoIdFrom()
                 );
     }
 
@@ -471,7 +473,8 @@ public class ImportRegisterOrgsService {
                         orgRegistryChange, oi.getShortNameSupplierFrom(),
                         oi.getOrgState(), oi.getIntroductionQueue(), oi.getIntroductionQueueFrom(),
                         oi.getDirector(), oi.getDirectorFrom(),
-                        oi.getEkisId(), oi.getEkisIdFrom()
+                        oi.getEkisId(), oi.getEkisIdFrom(),
+                        oi.getEgissoId(), oi.getEgissoIdFrom()
                 );
     }
 
@@ -541,6 +544,8 @@ public class ImportRegisterOrgsService {
         private String directorFrom;
         private Long ekisId;
         private Long ekisIdFrom;
+        private String egissoId;
+        private String egissoIdFrom;
 
         private List<OrgInfo> orgInfos = new LinkedList<OrgInfo>();
         private Boolean mainBuilding;
@@ -880,6 +885,22 @@ public class ImportRegisterOrgsService {
 
         public void setEkisIdFrom(Long ekisIdFrom) {
             this.ekisIdFrom = ekisIdFrom;
+        }
+
+        public String getEgissoId() {
+            return egissoId;
+        }
+
+        public void setEgissoId(String egissoId) {
+            this.egissoId = egissoId;
+        }
+
+        public String getEgissoIdFrom() {
+            return egissoIdFrom;
+        }
+
+        public void setEgissoIdFrom(String egissoIdFrom) {
+            this.egissoIdFrom = egissoIdFrom;
         }
     }
 }

@@ -58,7 +58,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String mailingListReports2;
     private String guid;
     private Long ekisId;
-    private String egossoId;
+    private String egissoId;
     private List<CategoryOrg> categoryOrg;
     private String configurationProviderName;
     private List<Long> idOfOrgList;
@@ -192,7 +192,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.OGRN=org.getOGRN();
         this.guid = org.getGuid();
         this.ekisId = org.getEkisId();
-        this.egossoId = org.getEgissoId();
+        this.egissoId = org.getEgissoId();
         this.commodityAccountingParam = org.getCommodityAccounting();
         this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
         this.usePlanOrders = org.getUsePlanOrders();
@@ -793,11 +793,11 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.ekisId = ekisId;
     }
 
-    public String getEgossoId() {
-        return egossoId;
+    public String getEgissoId() {
+        return egissoId;
     }
 
-    public void setEgossoId(String egossoId) {
-        this.egossoId = egossoId;
+    public void setEgissoId(String egissoId) {
+        this.egissoId = egissoId;
     }
 }

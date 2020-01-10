@@ -54,7 +54,8 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
                 + "addr.unad as UNAD, "                               //13
                 + "'' as pp_status, "                                  //14
                 + "addr.unique_address_id as ekis_address_id, "                            //15
-                + "addr.area "                                  //16
+                + "addr.area, "                                  //16
+                + "org.egisso_id "                               //17
                 + "FROM "
                 + "cf_kf_organization_registry org "
                 + "INNER JOIN cf_kf_eo_address addr ON addr.global_object_id = org.global_id "
@@ -88,6 +89,7 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
             item.setUniqueAddressId(((BigInteger)row[15]).longValue());
             item.setIntroductionQueue((String)row[14]);
             item.setDirector((String)row[6]);
+            item.setEgissoId((String)row[17]);
 
             ImportRegisterOrgsService.OrgInfo info;
 
