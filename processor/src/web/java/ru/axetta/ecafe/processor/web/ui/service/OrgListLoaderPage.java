@@ -60,7 +60,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
 
     protected static final String[][] COLUMN_NAMES = new String[][]{
             {"shortName", "Наименование"}, {"officialName", "Официальное наименование"}, {"address", "Адрес"},
-            {"district", "Район"}, {"GUID", "GUID"}, {"supplierId", "ID поставщика"},
+            {"district", "Район"}, {"OGRN", "ОГРН"}, {"GUID", "GUID"}, {"supplierId", "ID поставщика"},
             {"orgType", "Тип организации(0-4)"}, {"position", "Должность руководителя"}, {"surname", "Фамилия"},
             {"firstName", "Имя"}, {"secondName", "Отчество"}};
 
@@ -160,6 +160,7 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
         String address = columns.get("address");
         String district = columns.get("district");
         String guid = columns.get("GUID");
+        String ogrn = columns.get("OGRN");
         String strSupplierID = columns.get("supplierId");
         long supplierID = 0L;
         String strOrgType = columns.get("orgType");
@@ -232,6 +233,9 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
                 if (district != null) {
                     currentOrg.setDistrict(district);
                 }
+                if (ogrn != null && ogrn.length() > 12 && ogrn.length() < 33) { // ОГРН состоит из 13 цифр; размерность поля в БД = 32
+                    currentOrg.setOGRN(ogrn);
+                }
                 if (guid != null) {
                     currentOrg.setGuid(guid);
                 }
@@ -258,6 +262,9 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
             org.setState(1); // Обслуживается
             org.setUpdateTime(new java.util.Date(java.lang.System.currentTimeMillis()));
             org.setDistrict(district);
+            if (ogrn.length() > 12 && ogrn.length() < 33) { // ОГРН состоит из 13 цифр; размерность поля в БД = 32
+                org.setOGRN(ogrn);
+            }
             org.setGuid(guid);
             org.setPreorderlp(false); // Предварительные заявки по ЛП - для синхронизации
             session.save(org);
@@ -303,8 +310,9 @@ public class OrgListLoaderPage extends BasicWorkspacePage {
     }
 
     public void downloadSample() {
-        String result = "\"Наименование\";\"Официальное наименование\";\"Адрес\";\"Район\";\"GUID\";\"ID поставщика\";"
-                + "\"Тип организации(0-4)\";\"Должность руководителя\";\"Фамилия\";\"Имя\";\"Отчество\";";
+        String result = "\"Наименование\";\"Официальное наименование\";\"Адрес\";\"Район\";\"ОГРН\";\"GUID\";"
+                + "\"ID поставщика\";" + "\"Тип организации(0-4)\";\"Должность руководителя\";\"Фамилия\";\"Имя\";"
+                + "\"Отчество\";";
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
             HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
