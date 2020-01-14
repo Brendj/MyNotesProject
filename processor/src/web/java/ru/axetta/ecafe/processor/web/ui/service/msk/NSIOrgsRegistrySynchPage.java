@@ -62,6 +62,8 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_UNOM, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_UNAD, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_ADDRESS, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_SHORT_ADDRESS, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_MUNICIPAL_DISTRICT, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_OFFICIAL_NAME, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_SHORT_NAME, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_DIRECTOR, "", ""));
@@ -496,6 +498,14 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
                 item.setOldValue(orgForEdit.getAddressFrom());
                 item.setNewValue(orgForEdit.getAddressReestr());
             }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_SHORT_ADDRESS)) {
+                item.setOldValue(orgForEdit.getShortAddressFrom());
+                item.setNewValue(orgForEdit.getShortAddressReestr());
+            }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_MUNICIPAL_DISTRICT)) {
+                item.setOldValue(orgForEdit.getMunicipalDistrictFrom());
+                item.setNewValue(orgForEdit.getMunicipalDistrictReestr());
+            }
             if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_OFFICIAL_NAME)) {
                 item.setOldValue(orgForEdit.getOfficialNameFrom());
                 item.setNewValue(orgForEdit.getOfficialNameReestr());
@@ -570,6 +580,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         protected String introductionQueueFrom;
         protected String director;
         protected String directorFrom;
+        protected String shortAddress;
+        protected String shortAddressFrom;
+        protected String municipalDistrict;
+        protected String municipalDistrictFrom;
 
         private boolean selected = false;
 
@@ -607,6 +621,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.inn = registryChange.getInn();
             this.innFrom = registryChange.getInnFrom();
             this.additionalId = registryChange.getAdditionalId();
+            this.shortAddress = registryChange.getShortAddress();
+            this.shortAddressFrom = registryChange.getShortAddressFrom();
+            this.municipalDistrict = registryChange.getMunicipalDistrict();
+            this.municipalDistrictFrom = registryChange.getMunicipalDistrictFrom();
 
             this.selected = registryChange.getApplied() ? true: false;
             boolean doAdd;
@@ -659,6 +677,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.introductionQueueFrom = registryChangeItem.getIntroductionQueueFrom();
             this.director = registryChangeItem.getDirector();
             this.directorFrom = registryChangeItem.getDirectorFrom();
+            this.shortAddress = registryChangeItem.getShortAddress();
+            this.shortAddressFrom = registryChangeItem.getShortAddressFrom();
+            this.municipalDistrict = registryChangeItem.getMunicipalDistrict();
+            this.municipalDistrictFrom = registryChangeItem.getMunicipalDistrictFrom();
 
             this.selected = registryChangeItem.getOperationType().equals(OrgRegistryChange.CREATE_OPERATION) ? false : true;
         }
@@ -849,6 +871,22 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public String getAddressFrom() {
             return addressFrom;
+        }
+
+        public String getShortAddressFrom() {
+            return shortAddressFrom;
+        }
+
+        public String getShortAddressReestr() {
+            return shortAddress;
+        }
+
+        public String getMunicipalDistrictFrom() {
+            return municipalDistrictFrom;
+        }
+
+        public String getMunicipalDistrictReestr() {
+            return municipalDistrict;
         }
 
         public String getCity() {

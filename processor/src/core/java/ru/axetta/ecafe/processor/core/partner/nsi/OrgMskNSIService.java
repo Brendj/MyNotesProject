@@ -291,6 +291,8 @@ public class OrgMskNSIService extends MskNSIService {
         info.setDirectorFrom(existingOrg.getOfficialPerson().getFullName());
         info.setEkisIdFrom(existingOrg.getEkisId());
         info.setEgissoIdFrom(existingOrg.getEgissoId());
+        info.setShortAddressFrom(existingOrg.getShortAddress());
+        info.setMunicipalDistrictFrom(existingOrg.getMunicipalDistrict());
 
         info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
     }

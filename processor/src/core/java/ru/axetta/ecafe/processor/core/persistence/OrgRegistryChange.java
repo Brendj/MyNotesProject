@@ -55,6 +55,10 @@ public class OrgRegistryChange {
     protected Long ekisIdFrom;
     protected String egissoId;
     protected String egissoIdFrom;
+    protected String municipalDistrict;
+    protected String municipalDistrictFrom;
+    protected String shortAddress;
+    protected String shortAddressFrom;
 
     private Set<OrgRegistryChangeItem> orgs;
 
@@ -85,7 +89,9 @@ public class OrgRegistryChange {
                              String guid, String guidFrom,
                              Long additionalId,
                              Long ekisId, Long ekisIdFrom,
-                             String egissoId, String egissoIdFrom
+                             String egissoId, String egissoIdFrom,
+                             String shortAddress, String shortAddressFrom,
+                             String municipalDistrict, String municipalDistrictFrom
             ) {
         this.idOfOrg = idOfOrg;
 
@@ -124,6 +130,10 @@ public class OrgRegistryChange {
         this.ekisIdFrom = ekisIdFrom;
         this.egissoId = egissoId;
         this.egissoIdFrom = egissoIdFrom;
+        this.shortAddress = shortAddress;
+        this.shortAddressFrom = shortAddressFrom;
+        this.municipalDistrict = municipalDistrict;
+        this.municipalDistrictFrom = municipalDistrictFrom;
     }
 
     public Long getAdditionalId() {
@@ -397,5 +407,37 @@ public class OrgRegistryChange {
 
     public void setEgissoIdFrom(String egissoIdFrom) {
         this.egissoIdFrom = egissoIdFrom;
+    }
+
+    public String getMunicipalDistrict() {
+        return municipalDistrict;
+    }
+
+    public void setMunicipalDistrict(String municipalDistrict) {
+        this.municipalDistrict = municipalDistrict;
+    }
+
+    public String getMunicipalDistrictFrom() {
+        return municipalDistrictFrom;
+    }
+
+    public void setMunicipalDistrictFrom(String municipalDistrictFrom) {
+        this.municipalDistrictFrom = municipalDistrictFrom;
+    }
+
+    public String getShortAddress() {
+        return shortAddress;
+    }
+
+    public void setShortAddress(String shortAddress) {
+        this.shortAddress = shortAddress;
+    }
+
+    public String getShortAddressFrom() {
+        return shortAddressFrom;
+    }
+
+    public void setShortAddressFrom(String shortAddressFrom) {
+        this.shortAddressFrom = shortAddressFrom;
     }
 }

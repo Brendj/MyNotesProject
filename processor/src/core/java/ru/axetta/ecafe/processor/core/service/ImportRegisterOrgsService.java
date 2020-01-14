@@ -50,6 +50,8 @@ public class ImportRegisterOrgsService {
     public static final String VALUE_EGISSO_ID = "ЕГИССО Id";
     public static final String VALUE_UNIQUE_ADDRESS_ID = "№ здания";
     public static final String VALUE_ADDRESS = "Адрес корпуса";
+    public static final String VALUE_SHORT_ADDRESS = "Короткий адрес";
+    public static final String VALUE_MUNICIPAL_DISTRICT = "Муниципальный округ";
     public static final String VALUE_SHORT_NAME = "Краткое наименование";
     public static final String VALUE_OFFICIAL_NAME = "Полное наименование";
     public static final String VALUE_UNOM = "УНОМ";
@@ -375,11 +377,12 @@ public class ImportRegisterOrgsService {
             }
             addChange = false;
             for (OrgInfo orgInfo : oi.getOrgInfos()) {
-                //если полное совпадение по сверяемым полям, то запись не включаем в таблицу сверки
                 if (safeCompare(orgInfo.address, orgInfo.addressFrom) && safeCompare(orgInfo.shortName, orgInfo.shortNameFrom) &&
                         safeCompare(orgInfo.officialName, orgInfo.officialNameFrom) && safeCompare(orgInfo.unom, orgInfo.unomFrom) &&
                         safeCompare(orgInfo.unad, orgInfo.unadFrom) && safeCompare(orgInfo.inn, orgInfo.innFrom) &&
-                        safeCompare(orgInfo.director, orgInfo.directorFrom) && safeCompare(orgInfo.egissoId, orgInfo.egissoIdFrom)) {
+                        safeCompare(orgInfo.director, orgInfo.directorFrom) && safeCompare(orgInfo.egissoId, orgInfo.egissoIdFrom) &&
+                        safeCompare(orgInfo.shortAddress, orgInfo.shortAddressFrom) && safeCompare(orgInfo.municipalDistrict, orgInfo.municipalDistrictFrom)) {
+                    //если полное совпадение по сверяемым полям, то запись не включаем в таблицу сверки
                 } else {
                     if(orgRegistryChange.getOrgs() == null){
                         orgRegistryChange.setOrgs(new HashSet<OrgRegistryChangeItem>());
@@ -444,7 +447,9 @@ public class ImportRegisterOrgsService {
                         solveString(oi.getGuid()), oi.getGuidFrom(),
                         oi.getAdditionalId() == null ? -1L : oi.getAdditionalId(),
                         oi.getEkisId(), oi.getEkisIdFrom(),
-                        oi.getEgissoId(), oi.getEgissoIdFrom()
+                        solveString(oi.getEgissoId()), solveString(oi.getEgissoIdFrom()),
+                        solveString(oi.getShortAddress()), solveString(oi.getShortAddressFrom()),
+                        solveString(oi.getMunicipalDistrict()), solveString(oi.getMunicipalDistrictFrom())
                 );
     }
 
@@ -474,7 +479,9 @@ public class ImportRegisterOrgsService {
                         oi.getOrgState(), oi.getIntroductionQueue(), oi.getIntroductionQueueFrom(),
                         oi.getDirector(), oi.getDirectorFrom(),
                         oi.getEkisId(), oi.getEkisIdFrom(),
-                        oi.getEgissoId(), oi.getEgissoIdFrom()
+                        solveString(oi.getEgissoId()), solveString(oi.getEgissoIdFrom()),
+                        solveString(oi.getShortAddress()), solveString(oi.getShortAddressFrom()),
+                        solveString(oi.getMunicipalDistrict()), solveString(oi.getMunicipalDistrictFrom())
                 );
     }
 
@@ -546,6 +553,10 @@ public class ImportRegisterOrgsService {
         private Long ekisIdFrom;
         private String egissoId;
         private String egissoIdFrom;
+        private String shortAddress;
+        private String shortAddressFrom;
+        private String municipalDistrict;
+        private String municipalDistrictFrom;
 
         private List<OrgInfo> orgInfos = new LinkedList<OrgInfo>();
         private Boolean mainBuilding;
@@ -901,6 +912,38 @@ public class ImportRegisterOrgsService {
 
         public void setEgissoIdFrom(String egissoIdFrom) {
             this.egissoIdFrom = egissoIdFrom;
+        }
+
+        public String getShortAddress() {
+            return shortAddress;
+        }
+
+        public void setShortAddress(String shortAddress) {
+            this.shortAddress = shortAddress;
+        }
+
+        public String getShortAddressFrom() {
+            return shortAddressFrom;
+        }
+
+        public void setShortAddressFrom(String shortAddressFrom) {
+            this.shortAddressFrom = shortAddressFrom;
+        }
+
+        public String getMunicipalDistrict() {
+            return municipalDistrict;
+        }
+
+        public void setMunicipalDistrict(String municipalDistrict) {
+            this.municipalDistrict = municipalDistrict;
+        }
+
+        public String getMunicipalDistrictFrom() {
+            return municipalDistrictFrom;
+        }
+
+        public void setMunicipalDistrictFrom(String municipalDistrictFrom) {
+            this.municipalDistrictFrom = municipalDistrictFrom;
         }
     }
 }

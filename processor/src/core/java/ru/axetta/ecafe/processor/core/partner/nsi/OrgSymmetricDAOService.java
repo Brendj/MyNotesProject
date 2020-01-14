@@ -158,6 +158,8 @@ public class OrgSymmetricDAOService extends OrgMskNSIService {
         info.setDirector(item.getDirector());
         info.setEkisId(item.getEkisId());
         info.setEgissoId(item.getEgissoId());
+        info.setShortAddress(item.getShortAddress());
+        info.setMunicipalDistrict(item.getMunicipalDistrict());
         info.setRegion(region);
         if (info.getOrgInfos().size() == 0) {
             info.setOrgInfos(new ArrayList<ImportRegisterOrgsService.OrgInfo>());
