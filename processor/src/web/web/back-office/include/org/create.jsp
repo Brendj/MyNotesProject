@@ -89,8 +89,10 @@
 <h:panelGrid id="orgCreateGrid_placement" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Город" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.city}" maxlength="128" styleClass="input-text long-field" />
-    <h:outputText escape="true" value="Район" styleClass="output-text" />
+    <h:outputText escape="true" value="Округ" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.district}" maxlength="128" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="Район" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.municipalDistrict}" maxlength="128" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Локация" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.location}" maxlength="128" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Широта" styleClass="output-text" />

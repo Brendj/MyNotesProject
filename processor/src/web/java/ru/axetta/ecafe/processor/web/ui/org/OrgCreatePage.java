@@ -63,6 +63,7 @@ public class OrgCreatePage extends BasicWorkspacePage
     private String tag;
     private String city;
     private String district;
+    private String municipalDistrict;
     private String location;
     private String latitude;
     private String longitude;
@@ -315,6 +316,14 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setEgissoId(String egissoId) {
         this.egissoId = egissoId;
+    }
+
+    public String getMunicipalDistrict() {
+        return municipalDistrict;
+    }
+
+    public void setMunicipalDistrict(String municipalDistrict) {
+        this.municipalDistrict = municipalDistrict;
     }
 
     public static class ContragentItem {
@@ -629,6 +638,7 @@ public class OrgCreatePage extends BasicWorkspacePage
                 this.introductionQueue, this.additionalIdBuilding, this.statusDetailing, version, changesDSZN);
         org.setCity(city);
         org.setDistrict(district);
+        org.setMunicipalDistrict(municipalDistrict);
         org.setLocation(location);
         org.setLongitude(longitude);
         org.setLatitude(latitude);

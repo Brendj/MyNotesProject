@@ -51,7 +51,7 @@ public class ImportRegisterOrgsService {
     public static final String VALUE_UNIQUE_ADDRESS_ID = "№ здания";
     public static final String VALUE_ADDRESS = "Адрес корпуса";
     public static final String VALUE_SHORT_ADDRESS = "Короткий адрес";
-    public static final String VALUE_MUNICIPAL_DISTRICT = "Муниципальный округ";
+    public static final String VALUE_MUNICIPAL_DISTRICT = "Район";
     public static final String VALUE_SHORT_NAME = "Краткое наименование";
     public static final String VALUE_OFFICIAL_NAME = "Полное наименование";
     public static final String VALUE_UNOM = "УНОМ";
@@ -294,6 +294,10 @@ public class ImportRegisterOrgsService {
                         org.setAddress(orgRegistryChangeItem.getAddress());
                         org.setCity(orgRegistryChange.getCity());
                     }
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_SHORT_ADDRESS)))
+                        org.setShortAddress(orgRegistryChange.getShortAddress());
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_MUNICIPAL_DISTRICT)))
+                        org.setMunicipalDistrict(orgRegistryChange.getMunicipalDistrict());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_OFFICIAL_NAME)))
                         org.setOfficialName(orgRegistryChange.getOfficialName());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_SHORT_NAME)))
