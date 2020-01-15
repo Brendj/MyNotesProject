@@ -220,8 +220,8 @@ public class SmartWatchRestController {
             } else {
                 if((card.getClient() == null || card.getState().equals(CardState.BLOCKED.getValue()))
                         && card.getCardType().equals(CARD_TYPE_SMARTWATCH)) {
-                    cardManager.updateCard(child.getIdOfClient(), card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), card.getValidTime(),
-                            card.getLifeState(), "", card.getIssueTime(), card.getExternalId(), null,
+                    cardManager.updateCard(child.getIdOfClient(), card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), validTime,
+                            card.getLifeState(), "", issueTime, card.getExternalId(), null,
                             child.getOrg().getIdOfOrg());
                 } else {
                     throw new Exception("Card CardNo: " + card.getCardNo()
