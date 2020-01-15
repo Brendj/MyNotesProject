@@ -42,7 +42,7 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
-            for (Long ekisId : orgGuids.getOrgEkisIds()) {
+            for (String ekisId : orgGuids.getOrgEkisIds()) {
                 //Проверка на существование ЕКИС Ид ОО в выгрузке
                 Query query = session.createSQLQuery("select ekisId from cf_registry_file where ekisId = :ekisId limit 1");
                 query.setParameter("ekisId", ekisId);
@@ -54,7 +54,7 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
                 }
                 if (!guidOK) {
                     String badGuidString = "";
-                    List<Org> orgs = DAOService.getInstance().findOrgsByEkisId(ekisId);
+                    List<Org> orgs = DAOService.getInstance().findOrgsByEkisId(Long.parseLong(ekisId));
                     for (Org o : orgs) {
                         badGuidString += String.format("ЕКИС Ид: %s, Ид. организации: %s, Название организации: %s;\n", ekisId, o.getIdOfOrg(), o.getShortNameInfoService());
                     }

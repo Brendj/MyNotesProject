@@ -1191,7 +1191,7 @@ public class ImportRegisterClientsService {
 
         Set<String> orgGuids;
         String guidInfo;
-        private Set<Long> orgEkisIds;
+        private Set<String> orgEkisIds;
         private String ekisInfo;
 
         public OrgRegistryGUIDInfo(Org org) {
@@ -1214,7 +1214,7 @@ public class ImportRegisterClientsService {
                 if (o.getEkisId() == null) continue;
                 if (ekisInfo.length() > 0) ekisInfo += ", ";
                 ekisInfo += o.getOrgNumberInName() + ": " + o.getEkisId().toString();
-                orgEkisIds.add(o.getEkisId());
+                orgEkisIds.add(o.getEkisId().toString());
             }
         }
 
@@ -1226,7 +1226,7 @@ public class ImportRegisterClientsService {
             return guidInfo;
         }
 
-        public Set<Long> getOrgEkisIds() {
+        public Set<String> getOrgEkisIds() {
             return orgEkisIds;
         }
 
