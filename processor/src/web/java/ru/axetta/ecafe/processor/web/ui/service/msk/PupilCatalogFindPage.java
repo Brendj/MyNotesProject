@@ -225,7 +225,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             pupilInfos = new LinkedList<Item>();
             int nItemsNotFound = 0;
             List<ImportRegisterClientsService.ExpandedPupilInfo> pis = nsiService
-                    .getPupilsByOrgGUID(orgGuids==null?null:orgGuids.getOrgGuids(), familyName, firstName, secondName);
+                    .getPupilsByOrgGUID(orgGuids, familyName, firstName, secondName);
             if(showOnlyClientGoups) {
                 pis = clearClientsByClass(pis);
             }
@@ -487,7 +487,7 @@ public class PupilCatalogFindPage extends BasicWorkspacePage implements OrgSelec
             HttpServletResponse response = (HttpServletResponse) externalContext.getResponse();
 
 
-            response.setCharacterEncoding("winwdows-1251");
+            response.setCharacterEncoding("windows-1251");
             response.setHeader("Content-Type", "text/csv");
             response.setHeader("Content-Disposition", "attachment;filename=\"synch.csv\"");
             final ServletOutputStream responseOutputStream = response.getOutputStream();

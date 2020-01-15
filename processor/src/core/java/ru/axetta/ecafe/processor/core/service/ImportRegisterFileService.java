@@ -97,7 +97,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
             inputStreamReader = new InputStreamReader(fileInputStream, "windows-1251");
             bufferedReader = new BufferedReader(inputStreamReader);
 
-            ClientMskNSIService service = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getNSIService();
+            ClientMskNSIService service = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).getNSIService();
             service.fillTable(bufferedReader);
 
         } finally {
