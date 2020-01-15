@@ -1191,11 +1191,15 @@ public class ImportRegisterClientsService {
 
         Set<String> orgGuids;
         String guidInfo;
+        private Set<Long> orgEkisIds;
+        private String ekisInfo;
 
         public OrgRegistryGUIDInfo(Org org) {
             Set<Org> orgs = DAOService.getInstance().getFriendlyOrgs(org.getIdOfOrg());
             orgGuids = new HashSet<String>();
             guidInfo = "";
+            orgEkisIds = new HashSet<>();
+            ekisInfo = "";
             for (Org o : orgs) {
                 if (StringUtils.isEmpty(o.getGuid())) {
                     continue;
@@ -1206,6 +1210,12 @@ public class ImportRegisterClientsService {
                 guidInfo += o.getOrgNumberInName() + ": " + o.getGuid();
                 orgGuids.add(o.getGuid());
             }
+            for (Org o : orgs) {
+                if (o.getEkisId() == null) continue;
+                if (ekisInfo.length() > 0) ekisInfo += ", ";
+                ekisInfo += o.getOrgNumberInName() + ": " + o.getEkisId().toString();
+                orgEkisIds.add(o.getEkisId());
+            }
         }
 
         public Set<String> getOrgGuids() {
@@ -1214,6 +1224,14 @@ public class ImportRegisterClientsService {
 
         public String getGuidInfo() {
             return guidInfo;
+        }
+
+        public Set<Long> getOrgEkisIds() {
+            return orgEkisIds;
+        }
+
+        public String getEkisInfo() {
+            return ekisInfo;
         }
     }
 
@@ -1630,7 +1648,7 @@ public class ImportRegisterClientsService {
         String synchDate = "[Синхронизация с Реестрами от " + date + " для " + org.getIdOfOrg() + "]: ";
         OrgRegistryGUIDInfo orgGuids = new OrgRegistryGUIDInfo(org);
         log(synchDate + "Производится синхронизация для " + org.getOfficialName() + " GUID [" + orgGuids.getGuidInfo()
-                + "]", logBuffer);
+                + "] + EKIS Id [" + orgGuids.getEkisInfo() + "]", logBuffer);
 
         SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
                 SecurityJournalProcess.EventType.NSI_CLIENTS, new Date());
@@ -1641,7 +1659,7 @@ public class ImportRegisterClientsService {
             //DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 1);
             //Проверка на устаревшие гуиды организаций
             ClientMskNSIService service = getNSIService();
-            List<String> list = service.getBadGuids(orgGuids.orgGuids);
+            List<String> list = service.getBadGuids(orgGuids);
             if (list != null && !list.isEmpty()) {
                 String badGuids = "Найдены следующие неактуальные GUIDы организаций:\n";
                 for (String g : list) {

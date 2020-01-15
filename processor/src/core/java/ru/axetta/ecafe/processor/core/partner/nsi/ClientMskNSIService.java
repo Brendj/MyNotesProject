@@ -47,7 +47,7 @@ public class ClientMskNSIService extends MskNSIService {
         return group;
     }
 
-    public List<String> getBadGuids(Set<String> orgGuids) throws Exception {
+    public List<String> getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
         List<String> result = new ArrayList<String>();
         SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
         searchPredicateInfo.setCatalogName("Реестр образовательных учреждений");
@@ -60,7 +60,7 @@ public class ClientMskNSIService extends MskNSIService {
         searchPredicateInfo.addSearchPredicate(searchByStatus);
 
         Boolean guidOK;
-        for (String guid : orgGuids) {
+        for (String guid : orgGuids.getOrgGuids()) {
             guidOK = false;
             if (searchPredicateInfo.getSearchPredicates().size() > 1) {
                 searchPredicateInfo.getSearchPredicates().remove(1);
@@ -101,13 +101,13 @@ public class ClientMskNSIService extends MskNSIService {
         return result;
     }
 
-    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(Set<String> orgGuids,
+    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(Set orgGuids,
             String familyName, String firstName, String secondName) throws Exception {
         List<ImportRegisterClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
         int importIteration = 1;
         while (true) {
             List<ImportRegisterClientsService.ExpandedPupilInfo> iterationPupils = null;
-            iterationPupils = getClientsForOrgs(orgGuids, familyName, firstName, secondName, importIteration);
+            iterationPupils = getClientsForOrgs((Set<String>)orgGuids, familyName, firstName, secondName, importIteration);
             if (iterationPupils == null) continue;
             if (iterationPupils.size() > 0) {
                 pupils.addAll(iterationPupils);

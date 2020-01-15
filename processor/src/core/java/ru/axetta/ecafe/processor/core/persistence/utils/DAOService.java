@@ -932,6 +932,12 @@ public class DAOService {
         return findOrgByRegistryDataByMainField(uniqueAddressId, "guid", guid, inn, unom, unad, skipThirdPart);
     }
 
+    public List<Org> findOrgsByEkisId(Long ekisId) {
+        Query q = entityManager.createQuery("select org from Org org where org.ekisId = :ekisId");
+        q.setParameter("ekisId", ekisId);
+        return q.getResultList();
+    }
+
     public List<Org> findOrgsByGuidAddressINNOrNumber(String guid, String address, String inn, String number) {
         String queryStr;
         if (StringUtils.isEmpty(address)) {

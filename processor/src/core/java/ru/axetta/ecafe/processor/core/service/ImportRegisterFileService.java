@@ -48,7 +48,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
     protected final String INITIAL_INSERT_STATEMENT = "insert into cf_registry_file(guidofclient, "
             + "  guidoforg, firstname, secondname, surname, birthdate, gender, benefit, parallel, "
             + "  letter, clazz, currentclassorgroup, status, rep_firstname, rep_secondname, rep_surname, rep_phone, "
-            + "  rep_who, agegrouptype) values ";
+            + "  rep_who, agegrouptype, ekisId) values ";
     protected static final String REGEXP = ",(?=(?:[^\"]*\"[^\"]*\")*[^\"]*$)";
 
     protected Integer LINE_SIZE = 19;
@@ -209,7 +209,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
     protected String buildOneInsertValue(String[] arr) {
         //0-Фамилия, 1-Имя, 2-Отчество, 3-Дата рождения, 4-Пол, 5-Льгота, 6-Параллель, 7-Буква, 8-Класс, 9-Текущий класс или группа
         //10-GUID, 11-GUID школы, 12-Статус записи, 13-Фамилия представителя, 14-Имя представителя, 15-Отчество представителя
-        //16-Телефон представителя, 17-Представитель - кем приходится, 18-Тип возрастной группы
+        //16-Телефон представителя, 17-Представитель - кем приходится, 18-Тип возрастной группы, 19-ЕКИС ид здания
 
         StringBuilder sb = new StringBuilder();
         sb.append(getQuotedStr(arr[10])).append(", "); //guidofclient
@@ -230,7 +230,8 @@ public class ImportRegisterFileService extends ClientMskNSIService {
         sb.append(getQuotedStr(arr[13])).append(", ");  //rep_surname
         sb.append(getQuotedStr(arr[16])).append(", ");  //rep_phone
         sb.append(getQuotedStr(arr[17])).append(", ");  //rep_who
-        sb.append(getQuotedStr(arr[18]));               //agegrouptype
+        sb.append(getQuotedStr(arr[18])).append(", ");  //agegrouptype
+        sb.append(getQuotedStr(arr[19]));               //ekisId
         return sb.toString();
     }
 
@@ -253,7 +254,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
     }*/
 
     @Override
-    public List<String> getBadGuids(Set<String> orgGuids) throws Exception {
+    public List<String> getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
         List<String> result = new ArrayList<String>();
         Boolean guidOK;
         ImportRegisterClientsService service = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class);
@@ -262,7 +263,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
-            for (String guid : orgGuids) {
+            for (String guid : orgGuids.getOrgGuids()) {
                 //Проверка на существование гуида ОО в выгрузке
                 Query query = session.createSQLQuery("select guidoforg from cf_registry_file where guidoforg = :guid limit 1");
                 query.setParameter("guid", guid);
@@ -292,7 +293,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
     }
 
     @Override
-    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(Set<String> orgGuids,
+    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(Set orgGuids,
             String familyName, String firstName, String secondName) throws Exception {
         List<ImportRegisterClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
         Session session = null;
@@ -407,7 +408,8 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                 + "  currentclassorgroup,"
                 + "  status, "
                 + "  agegrouptype, "
-                + "  concat_ws('|', rep_firstname,  rep_secondname, rep_surname, rep_phone, rep_who, '', '', '') "  //последние 3 поля - законный представитель, ссоид, гуид
+                + "  concat_ws('|', rep_firstname,  rep_secondname, rep_surname, rep_phone, rep_who, '', '', ''), "  //последние 3 поля - законный представитель, ссоид, гуид
+                + "  null as ekisId "
                 + "from cf_registry_file r where r.guidoforg in :guids";
     }
 }

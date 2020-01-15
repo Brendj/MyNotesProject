@@ -27,14 +27,18 @@ alter table cf_orgregistrychange
 alter table cf_orgs add column egissoId character varying(128),
   add column municipal_district character varying(256);
 
+alter table cf_registry_file add column ekisId character varying(32);
+
+COMMENT ON COLUMN cf_registry_file.ekisId IS 'Ид ЕКИС';
+
 COMMENT ON COLUMN cf_orgs.egissoId IS 'Ид ЕГИССО';
-COMMENT ON COLUMN cf_orgs.municipal_district IS 'Муниципальный округ';
+COMMENT ON COLUMN cf_orgs.municipal_district IS 'Муниципальный округ (район)';
 
 COMMENT ON COLUMN cf_orgregistrychange.ekisId IS 'Ид ЕКИС';
 COMMENT ON COLUMN cf_orgregistrychange.ekisIdFrom IS 'Ид ЕКИС в ИСПП';
 COMMENT ON COLUMN cf_orgregistrychange.egissoId IS 'Ид ЕГИССО';
 COMMENT ON COLUMN cf_orgregistrychange.egissoIdFrom IS 'Ид ЕКИС в ИСПП';
-COMMENT ON COLUMN cf_orgregistrychange.municipal_district IS 'Муниципальный округ';
+COMMENT ON COLUMN cf_orgregistrychange.municipal_district IS 'Муниципальный округ (район)';
 COMMENT ON COLUMN cf_orgregistrychange.municipal_districtFrom IS 'Ид ЕКИС в ИСПП';
 COMMENT ON COLUMN cf_orgregistrychange.short_address IS 'Короткий адрес';
 COMMENT ON COLUMN cf_orgregistrychange.short_addressFrom IS 'Ид ЕКИС в ИСПП';
@@ -43,7 +47,7 @@ COMMENT ON COLUMN cf_orgregistrychange_item.ekisId IS 'Ид ЕКИС';
 COMMENT ON COLUMN cf_orgregistrychange_item.ekisIdFrom IS 'Ид ЕКИС в ИСПП';
 COMMENT ON COLUMN cf_orgregistrychange_item.egissoId IS 'Ид ЕГИССО';
 COMMENT ON COLUMN cf_orgregistrychange_item.egissoIdFrom IS 'Ид ЕКИС в ИСПП';
-COMMENT ON COLUMN cf_orgregistrychange_item.municipal_district IS 'Муниципальный округ';
+COMMENT ON COLUMN cf_orgregistrychange_item.municipal_district IS 'Муниципальный округ (район)';
 COMMENT ON COLUMN cf_orgregistrychange_item.municipal_districtFrom IS 'Ид ЕКИС в ИСПП';
 COMMENT ON COLUMN cf_orgregistrychange_item.short_address IS 'Короткий адрес';
 COMMENT ON COLUMN cf_orgregistrychange_item.short_addressFrom IS 'Ид ЕКИС в ИСПП';
