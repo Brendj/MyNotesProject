@@ -28,7 +28,6 @@ import java.io.InputStreamReader;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created by baloun on 03.10.2017.
@@ -98,7 +97,8 @@ public class ImportRegisterFileService extends ClientMskNSIService {
             inputStreamReader = new InputStreamReader(fileInputStream, "windows-1251");
             bufferedReader = new BufferedReader(inputStreamReader);
 
-            fillTable(bufferedReader);
+            ClientMskNSIService service = RuntimeContext.getAppContext().getBean(ImportRegisterClientsService.class).getNSIService();
+            service.fillTable(bufferedReader);
 
         } finally {
             IOUtils.closeQuietly(bufferedReader);
@@ -292,8 +292,12 @@ public class ImportRegisterFileService extends ClientMskNSIService {
         }
     }
 
+    protected void fillOrgGuids(Query query, ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) {
+        query.setParameterList("guids", orgGuids.getOrgGuids());
+    }
+
     @Override
-    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(Set orgGuids,
+    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids,
             String familyName, String firstName, String secondName) throws Exception {
         List<ImportRegisterClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
         Session session = null;
@@ -306,7 +310,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                     (!StringUtils.isBlank(secondName) ? " and r.secondname like :secondname" : "");
             String str_query = getQueryString() + fioCondition;
             Query query = session.createSQLQuery(str_query);
-            query.setParameterList("guids", orgGuids);
+            fillOrgGuids(query, orgGuids);
             if (!StringUtils.isBlank(familyName)) query.setParameter("surname", familyName);
             if (!StringUtils.isBlank(firstName)) query.setParameter("firstname", firstName);
             if (!StringUtils.isBlank(secondName)) query.setParameter("secondname", secondName);

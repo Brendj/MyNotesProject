@@ -26,6 +26,13 @@ import java.util.List;
 @Scope("singleton")
 public class ImportRegisterNSI3Service extends ImportRegisterFileService {
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterNSI3Service.class);
+    protected String DROP_INDEX = "drop index if exists cf_registry_file_ekisid_idx";
+    protected String CREATE_INDEX = "create index cf_registry_file_ekisid_idx on cf_registry_file using btree (ekisId)";
+
+    @Override
+    protected void fillOrgGuids(Query query, ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) {
+        query.setParameterList("guids", orgGuids.getOrgEkisIds());
+    }
 
     public List<String> getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
         List<String> result = new ArrayList<String>();
@@ -81,5 +88,13 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
                 + "  concat_ws('|', rep_firstname,  rep_secondname, rep_surname, rep_phone, rep_who, '', '', ''), "  //последние 3 поля - законный представитель, ссоид, гуид
                 + "  ekisId "
                 + "from cf_registry_file r where r.ekisId in :guids";
+    }
+
+    protected String getDropIndexStatement() {
+        return DROP_INDEX;
+    }
+
+    protected String getCreateIndexStatement() {
+        return CREATE_INDEX;
     }
 }

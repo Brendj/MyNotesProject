@@ -1622,13 +1622,21 @@ public class ImportRegisterClientsService {
         }
     }
 
-    private ClientMskNSIService getNSIService() {
+    public ClientMskNSIService getNSIService() {
+        switch (RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION)) {
+            case Option.NSI3 :
+                //Не смотрим на настройку из MODE_PROPERTY. Pабота с файлом НСИ-3 по екис ид
+                return RuntimeContext.getAppContext().getBean("ImportRegisterNSI3Service", ImportRegisterNSI3Service.class);
+        }
         String mode = RuntimeContext.getInstance().getPropertiesValue(ImportRegisterFileService.MODE_PROPERTY, null);
         if (mode.equals(ImportRegisterFileService.MODE_SYMMETRIC)) {
+            //забор клиентов из таблиц симметрика
             return RuntimeContext.getAppContext().getBean("ImportRegisterSymmetricService", ImportRegisterSymmetricService.class);
         } else if (mode.equals(ImportRegisterFileService.MODE_FILE)) {
+            //клиенты из файла НСИ-2
             return RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class);
         } else {
+            //запросы в апи НСИ-1
             return RuntimeContext.getAppContext().getBean("ClientMskNSIService", ClientMskNSIService.class);
         }
     }
@@ -1661,7 +1669,7 @@ public class ImportRegisterClientsService {
             ClientMskNSIService service = getNSIService();
             List<String> list = service.getBadGuids(orgGuids);
             if (list != null && !list.isEmpty()) {
-                String badGuids = "Найдены следующие неактуальные GUIDы организаций:\n";
+                String badGuids = "Найдены следующие неактуальные идентификаторы организаций в НСИ:\n";
                 for (String g : list) {
                     badGuids += g;
                 }
@@ -1670,7 +1678,7 @@ public class ImportRegisterClientsService {
             }
 
             //  Итеративно загружаем клиентов, используя ограничения
-            List<ExpandedPupilInfo> pupils = service.getPupilsByOrgGUID(orgGuids.orgGuids, null, null, null);
+            List<ExpandedPupilInfo> pupils = service.getPupilsByOrgGUID(orgGuids, null, null, null);
             log(synchDate + "Получено " + pupils.size() + " записей", logBuffer);
             //  !!!!!!!!!!
             //  !!!!!!!!!!

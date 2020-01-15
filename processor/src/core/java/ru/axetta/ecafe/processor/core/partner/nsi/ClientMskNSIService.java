@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
 import java.util.*;
 
 /**
@@ -45,6 +46,10 @@ public class ClientMskNSIService extends MskNSIService {
             group = group.replaceAll("[ -]", "");
         }
         return group;
+    }
+
+    public void fillTable(BufferedReader bufferedReader) throws Exception {
+        //stub
     }
 
     public List<String> getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
@@ -101,13 +106,13 @@ public class ClientMskNSIService extends MskNSIService {
         return result;
     }
 
-    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(Set orgGuids,
+    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids,
             String familyName, String firstName, String secondName) throws Exception {
         List<ImportRegisterClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
         int importIteration = 1;
         while (true) {
             List<ImportRegisterClientsService.ExpandedPupilInfo> iterationPupils = null;
-            iterationPupils = getClientsForOrgs((Set<String>)orgGuids, familyName, firstName, secondName, importIteration);
+            iterationPupils = getClientsForOrgs(orgGuids.getOrgGuids(), familyName, firstName, secondName, importIteration);
             if (iterationPupils == null) continue;
             if (iterationPupils.size() > 0) {
                 pupils.addAll(iterationPupils);
