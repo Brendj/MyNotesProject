@@ -150,6 +150,10 @@ public class Org implements Serializable {
     private Boolean requestForVisitsToOtherOrg;
     private Boolean preordersEnabled;
     private Boolean multiCardModeEnabled;
+    private Boolean participantOP;
+    private Boolean preorderlp;
+    private Boolean haveNewLP;
+    private Long ekisId;
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -1184,5 +1188,41 @@ public class Org implements Serializable {
 
     public void setOrgSettings(Set<OrgSetting> orgSettings) {
         this.orgSettings = orgSettings;
+    }
+
+    public Boolean getParticipantOP() {
+        return participantOP;
+    }
+
+    public void setParticipantOP(Boolean participantOP) {
+        this.participantOP = participantOP;
+    }
+
+    public Boolean getPreorderlp() {
+        return preorderlp;
+    }
+
+    public void setPreorderlp(Boolean preorderlp) {
+        this.preorderlp = preorderlp;
+    }
+
+    public Boolean getHaveNewLP() {
+        return haveNewLP;
+    }
+
+    public void setHaveNewLP(Boolean haveNewLP) {
+        this.haveNewLP = haveNewLP;
+    }
+
+    public Long getEkisId() {
+        return ekisId;
+    }
+
+    public void setEkisId(Long ekisId) {
+        this.ekisId = ekisId;
+    }
+
+    public Boolean getMainBuilding() {
+        return mainBuilding;
     }
 }

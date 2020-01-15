@@ -74,8 +74,8 @@ public class PreorderRequestsReportService extends RecoverableService {
             return;
 
         updateStatusFile(new Date(), Status.RUNNING);
-        runGeneratePreorderRequests(new PreorderRequestsReportServiceParam(new Date()));
-
+        //runGeneratePreorderRequests(new PreorderRequestsReportServiceParam(new Date()));
+        runTask();
         updateStatusFile(new Date(), Status.FINISHED);
     }
 
@@ -83,11 +83,13 @@ public class PreorderRequestsReportService extends RecoverableService {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String instance = runtimeContext.getNodeName();
         String reqInstance = runtimeContext.getConfigProperties().getProperty(PreorderRequestsReportService.NODE_PROPERTY, "1");
-        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim().equals(
-                reqInstance.trim())) {
-            return false;
+        String[] nodes = reqInstance.split(",");
+        for (String node : nodes) {
+            if (!StringUtils.isBlank(instance) && !StringUtils.isBlank(reqInstance) && instance.trim().equals(node.trim())) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     private void deletePreorderForNotEnoughMoney(Session session, PreorderItem item) {
@@ -201,7 +203,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                             if (transaction.isActive()) transaction.commit();
                             transaction = null;
                         }
-                        if (guids.size() > 0) {
+                        /*if (guids.size() > 0) {
                             logger.info(String.format("Sending requests to orgID=%s, count=%s", idOfOrg, guids.size()));
                             Calendar calendarEnd = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
                             final Date lastCreateOrUpdateDate = calendarEnd.getTime();
@@ -209,7 +211,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                             final Date endGenerateTime = calendarEnd.getTime();
                             RuntimeContext.getAppContext().getBean(GoodRequestsChangeAsyncNotificationService.class)
                                     .notifyOrg(orgItem, fireTime, endGenerateTime, lastCreateOrUpdateDate, dateWork);
-                        }
+                        }*/
                     }
 
                 }
@@ -378,7 +380,19 @@ public class PreorderRequestsReportService extends RecoverableService {
     }
 
     public void runTask() throws Exception {
-        runTask(new PreorderRequestsReportServiceParam(new Date()));
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getConfigProperties().getProperty(PreorderRequestsReportService.NODE_PROPERTY, "1");
+        String[] nodes = reqInstance.split(",");
+        PreorderRequestsReportServiceParam params = new PreorderRequestsReportServiceParam(new Date());
+        for (int i = 0; i < nodes.length; i++) {
+            if (instance.equals(nodes[i])) {
+                params.setModBy(i);
+                params.setServersAmount(nodes.length);
+                break;
+            }
+        }
+        runTask(params);
     }
 
     public void runTask(PreorderRequestsReportServiceParam params) throws Exception {
@@ -411,7 +425,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "pc.createddate, "                                                                           //1
                             + "pc.idofpreordercomplex, "                                                                   //2
                             + "pmd.idofpreordermenudetail, "                                                               //3
-                            + "   CASE WHEN (pc.amount = 0) THEN md.idofgood ELSE ci.idofgood END AS idofgood, "           //4
+                            + "   CASE WHEN (pc.amount = 0) THEN (case when md.idofgood is null then pmd.idofgood else md.idofgood end) ELSE ci.idofgood END AS idofgood, "           //4
                             + "   CASE WHEN (pc.amount = 0) THEN pmd.amount ELSE pc.amount END AS amount,"                 //5
                             + "   pc.preorderdate, "                                                                       //6
                             + "pc.complexprice, "                                                                          //7
@@ -424,9 +438,9 @@ public class PreorderRequestsReportService extends RecoverableService {
                             + "pc.usedsum, "                                                                                //14
                             + "case when (pc.amount = 0) then pmd.idofgoodsrequestposition else pc.idofgoodsrequestposition end " //15
                             + "FROM cf_preorder_complex pc INNER JOIN cf_clients c ON c.idofclient = pc.idofclient "
-                            + "INNER JOIN cf_complexinfo ci ON c.idoforg = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid "
+                            + "INNER JOIN cf_complexinfo ci ON pc.idoforgoncreate = ci.idoforg AND ci.menudate = pc.preorderdate AND ci.idofcomplex = pc.armcomplexid "
                             + "LEFT JOIN cf_preorder_menudetail pmd ON pc.idofpreordercomplex = pmd.idofpreordercomplex AND pc.amount = 0 and pmd.deletedstate = 0 "
-                            + "LEFT JOIN cf_menu m ON c.idoforg = m.idoforg AND pmd.preorderdate = m.menudate "
+                            + "LEFT JOIN cf_menu m ON pc.idoforgoncreate = m.idoforg AND pmd.preorderdate = m.menudate "
                             + "LEFT JOIN cf_menudetails md ON m.idofmenu = md.idofmenu AND pmd.armidofmenu = md.localidofmenu "
                             + "WHERE pc.preorderdate >= :date " + (dateTo != null ? " and pc.preorderdate <= :dateTo " : "")
                             + "   AND (pc.amount <> 0 OR pmd.amount <> 0) and pc.deletedstate = 0 "

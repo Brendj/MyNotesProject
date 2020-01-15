@@ -71,7 +71,7 @@ public class ECafeSettings extends DistributedObject {
         ArrayList<DistributedObject> result = new ArrayList<DistributedObject>();
         for (DistributedObject distributedObject : listSettings) {
             ECafeSettings settings = (ECafeSettings) distributedObject;
-            if (settings.orgOwner == orgId) {
+            if (settings.orgOwner.equals(orgId)) {
                 result.add(settings);
             }
         }
@@ -90,14 +90,17 @@ public class ECafeSettings extends DistributedObject {
                 map.put(settings.getSettingsId(), settings.getGlobalVersion());
             }
         }
-        Iterator<DistributedObject> settingsIterator = listSettings.iterator();
-        while (settingsIterator.hasNext()) {
-            ECafeSettings settings = (ECafeSettings) settingsIterator.next();
+        for (DistributedObject listSetting : listSettings) {
+            ECafeSettings settings = (ECafeSettings) listSetting;
             Long maxVer = map.get(settings.getSettingsId());
             if (settings.getGlobalVersion() < maxVer) {
                 DAOService.getInstance().removeSetting(settings);
             }
         }
+    }
+
+    public boolean isPreOrderFeeding() {
+        return settingsId != null && settingsId.equals(SettingsIds.PreOrderFeeding);
     }
 
     @Override
@@ -112,7 +115,6 @@ public class ECafeSettings extends DistributedObject {
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
-        //if(getTagName().equals("C")){
         Criteria criteria = session.createCriteria(ECafeSettings.class);
         criteria.add(Restrictions.eq("settingsId", settingsId));
         criteria.add(Restrictions.eq("orgOwner", orgOwner));
@@ -126,7 +128,6 @@ public class ECafeSettings extends DistributedObject {
             distributedObjectException.setData(settings.getGuid());
             throw distributedObjectException;
         }
-        //}
     }
 
     @Override
@@ -179,29 +180,6 @@ public class ECafeSettings extends DistributedObject {
     public void setNewInformationContent(InformationContents informationContent) {
         this.informationContent = informationContent;
     }
-
-
-    // Настройки, заданные на клиенте, имеют приоритет над серверными.
-    // Поэтому активную настройку, созданную на сервере, мы блокируем и прикрываем активной клиентской.
-    // Не может быть у орг-ии двух активных настроек!
-    //@Override
-    //public void beforePersist(Session session, Long idOfOrg, String ignoreUuid) {
-    //    final String updateString = "delete ECafeSettings where orgOwner=:idoforg and settingsId=:settingsId and guid!=:guid";
-    //    final Query updateQ = session.createQuery(updateString);
-    //    updateQ.setParameter("idoforg",idOfOrg);
-    //    updateQ.setParameter("settingsId",settingsId);
-    //    updateQ.setParameter("guid",ignoreUuid);
-    //    updateQ.executeUpdate();
-    //}
-    //
-    //@Override
-    //public void beforePersist(Session session, Long idOfOrg) {
-    //    final String updateString = "delete ECafeSettings where orgOwner=:idoforg and settingsId=:settingsId";
-    //    final Query updateQ = session.createQuery(updateString);
-    //    updateQ.setParameter("idoforg",idOfOrg);
-    //    updateQ.setParameter("settingsId",settingsId);
-    //    updateQ.executeUpdate();
-    //}
 
     public SettingsIds getSettingsId() {
         return settingsId;

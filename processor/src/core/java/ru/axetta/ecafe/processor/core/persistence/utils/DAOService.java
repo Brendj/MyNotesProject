@@ -22,8 +22,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -180,7 +180,7 @@ public class DAOService {
         Session session = entityManager.unwrap(Session.class);
         Criteria criteria = session.createCriteria(ECafeSettings.class);
         if (idOfOrg == null && settingsIds == null) {
-            return new ArrayList<ECafeSettings>(0);
+            return Collections.emptyList();
         }
         if (idOfOrg != null) {
             criteria.add(Restrictions.eq("orgOwner", idOfOrg));
@@ -1596,6 +1596,13 @@ public class DAOService {
         query.executeUpdate();
     }
 
+    public void applyHaveNewLPForOrg(Long idOfOrg, boolean value) throws Exception {
+        Query query = entityManager.createQuery("update Org set haveNewLP=:valueB where idOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("valueB", value);
+        query.executeUpdate();
+    }
+
     public List<ComplexRole> findComplexRoles() {
         return entityManager.createQuery("from ComplexRole order by idOfRole", ComplexRole.class).getResultList();
     }
@@ -2424,21 +2431,48 @@ public class DAOService {
         }
     }*/
 
+    private String getOnlineOptionValue(int option) throws Exception {
+        String str_query = "select optiontext from cf_options where idofoption = :idofoption";
+        Query q = entityManager.createNativeQuery(str_query);
+        q.setParameter("idofoption", option);
+        List list = q.getResultList();
+        if (list.size() == 0) throw new Exception(String.format("Option id=%s not found", option));
+        return (String)list.get(0);
+    }
+
+    @Transactional
+    public String getReviseLastDate() {
+        try {
+            return getOnlineOptionValue(Option.OPTION_REVISE_LAST_DATE);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    @Transactional
+    public void setOnlineOptionValue(String value, int option) {
+        String str_query = "select optiontext from cf_options where idofoption = :idofoption";
+        Query q = entityManager.createNativeQuery(str_query);
+        q.setParameter("idofoption", option);
+        List list = q.getResultList();
+        if (list.size() == 0) {
+            str_query = "insert into cf_options (idofoption, optiontext) values(:idofoption, :value)";
+        } else {
+            str_query = "update cf_options set optiontext = :value where idofoption = :idofoption";
+        }
+        q = entityManager.createNativeQuery(str_query);
+        q.setParameter("value", value);
+        q.setParameter("idofoption", option);
+        q.executeUpdate();
+    }
+
     @Transactional
     public Boolean isSverkaEnabled() {
         try {
-            String str_query = "select optiontext from cf_options where idofoption = :idofoption";
-            Query q = entityManager
-                    .createNativeQuery(str_query);
-            q.setParameter("idofoption", Option.OPTION_SVERKA_ENABLED);
-            List list = q.getResultList();
-            if (list.size() == 0) {
-                return true;
-            } else {
-                return ((String)list.get(0)).equals("1");
-            }
+            String option = getOnlineOptionValue(Option.OPTION_SVERKA_ENABLED);
+            return option.equals("1");
         } catch (Exception e) {
-            logger.error("Can't get sverka permission value");
+            logger.error("Can't get sverka permission value", e);
             return true;
         }
     }
@@ -2446,21 +2480,7 @@ public class DAOService {
     @Transactional
     public void setSverkaEnabled(Boolean value) {
         String val_str = value ? "1" : "0";
-        String str_query = "select optiontext from cf_options where idofoption = :idofoption";
-        Query q = entityManager
-                .createNativeQuery(str_query);
-        q.setParameter("idofoption", Option.OPTION_SVERKA_ENABLED);
-        List list = q.getResultList();
-        if (list.size() == 0) {
-            str_query = "insert into cf_options (idofoption, optiontext) values(:idofoption, :value)";
-        } else {
-            str_query = "update cf_options set optiontext = :value where idofoption = :idofoption";
-        }
-
-        q = entityManager.createNativeQuery(str_query);
-        q.setParameter("value", val_str);
-        q.setParameter("idofoption", Option.OPTION_SVERKA_ENABLED);
-        q.executeUpdate();
+        setOnlineOptionValue(val_str, Option.OPTION_SVERKA_ENABLED);
     }
 
     public void saveTradeAccountConfigChangeDirective(Long idOfOrg) {
@@ -2550,6 +2570,16 @@ public class DAOService {
         }
     }
 
+    public SpecialDate getSpecialCalendarByDate(Date date) {
+        Query query = entityManager.createQuery("select sd from SpecialDate sd where sd.date = :day");
+        query.setParameter("day", date);
+        try {
+            return (SpecialDate) query.getSingleResult();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+
     private String getStrForDate(String str) {
         return (str.length() == 1) ? "0" + str : str;
     }
@@ -2562,10 +2592,12 @@ public class DAOService {
         this.preorderDAOOperationsImpl = preorderDAOOperationsImpl;
     }
 
-    public String generateLinkingTokenForSmartWatch(Session session, String phone) throws Exception{
+    public String generateLinkingTokenForSmartWatch(Session session, String phone) throws Exception {
         org.hibernate.Query query = session.createQuery("delete from LinkingTokenForSmartWatch where phoneNumber like :phoneNumber");
         query.setParameter("phoneNumber", phone);
         query.executeUpdate();
+
+        Date createDate = new Date();
         SecureRandom secureRandom = new SecureRandom();
         String randomToken;
         int nSize = 9;
@@ -2585,6 +2617,7 @@ public class DAOService {
         LinkingTokenForSmartWatch token = new LinkingTokenForSmartWatch();
         token.setPhoneNumber(phone);
         token.setToken(randomToken);
+        token.setCreateDate(createDate);
         session.save(token);
         return token.getToken();
     }
@@ -2604,10 +2637,41 @@ public class DAOService {
     public List findCardsignByManufactureCodeForNewTypeProvider (Integer manufactureCode)
     {
         Query query = entityManager.createQuery("select cs from CardSign cs where cs.manufacturerCode = :manufactureCode "
-                + "and cs.newtypeprovider = true");
+                + "and cs.newtypeprovider = true and (cs.deleted = false or cs.deleted is null)");
         query.setParameter("manufactureCode", manufactureCode);
         try {
             return query.getResultList();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+    public List findEMIASbyClientandBeetwenDates (Client client, Date startDate, Date endDate)
+    {
+        Query query = entityManager.createQuery("select em from EMIAS em where em.guid = :guid "
+                + "and em.dateLiberate between :begDate and :endDate ");
+        query.setParameter("guid", client.getClientGUID());
+        query.setParameter("begDate", startDate);
+        query.setParameter("endDate", endDate);
+        try {
+            return query.getResultList();
+        } catch (NoResultException e) {
+            return null;
+        }
+    }
+    public ExternalEvent getExternalEvent (Client client, String orgCode, String orgName, ExternalEventType evtType,
+            Date evtDateTime, ExternalEventStatus evtStatus)
+    {
+        Query query = entityManager.createQuery("select ee from ExternalEvent ee where ee.client = :client "
+                + "and ee.evtType = :evtType and ee.evtDateTime = :evtDateTime and ee.evtStatus = :evtStatus "
+                + "and ee.orgCode = :orgCode and ee.orgName = :orgName");
+        query.setParameter("client", client);
+        query.setParameter("evtType", evtType);
+        query.setParameter("evtDateTime", evtDateTime);
+        query.setParameter("evtStatus", evtStatus);
+        query.setParameter("orgCode", orgCode);
+        query.setParameter("orgName", orgName);
+        try {
+            return (ExternalEvent)query.getResultList().get(0);
         } catch (NoResultException e) {
             return null;
         }

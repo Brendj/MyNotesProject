@@ -10,6 +10,7 @@
 <script language="javascript">
     function disableButtons(value) {
         document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:generateGuardiansByOrgs").disabled=value;
+        document.getElementById("workspaceSubView:workspaceForm:workspacePageSubView:updateSpbClientDoubles").disabled=value;
     }
 </script>
 
@@ -48,6 +49,27 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Отправить пробное событие на ЕМП" action="#{otherActionsPage.runSendEMPEvent}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+        <rich:panel>
+            <h:panelGrid columns="2">
+                <h:outputText escape="true" value="Отправить все события ЕМИАС по клиенту на тестовый сервис ЕМП"
+                              styleClass="output-text"/><br/>
+
+                <h:outputText styleClass="output-text" escape="true" value="л/с склиента"/>
+                <h:inputText value="#{otherActionsPage.contractId}" size="50"/>
+                <h:outputText escape="true" value="Начальная дата выборки" styleClass="output-text"/>
+                <rich:calendar value="#{otherActionsPage.startDateEMP}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                </rich:calendar>
+                <h:outputText escape="true" value="Конечная дата выборки" styleClass="output-text"/>
+                <rich:calendar value="#{otherActionsPage.endDateEMP}" datePattern="dd.MM.yyyy"
+                               converter="dateConverter" inputClass="input-text" showWeeksBar="false">
+                </rich:calendar>
+                <a4j:commandButton value="Отправить события ЕМИАС в ЕМП"
+                                   action="#{otherActionsPage.runSendEMPEventEMIAS()}"
+                                   id="sendEMIASTestEMP"
+                                   styleClass="command-button" reRender="mainMenu, workspaceTogglePanel"/><br/>
+            </h:panelGrid>
+        </rich:panel>
     <a4j:commandButton value="Обновить статистику ЕМП" action="#{otherActionsPage.runRecalculateEMPStatistics}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Исправить записи из Реестров" action="#{otherActionsPage.repairNSI}"
@@ -218,6 +240,16 @@
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" /><br/>
             </h:panelGrid>
         </rich:panel>
+        <a4j:commandButton value="Отправка платежей в Атол" action="#{otherActionsPage.sendToAtol()}" id="sendToAtolButton"
+                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+        <rich:panel rendered="#{otherActionsPage.isSpb()}">
+            <a4j:commandButton value="Обработка дублей клиентов" action="#{otherActionsPage.runProcessClientDoubles}" id="updateSpbClientDoubles"
+                               title="Обработка дублей клиентов"
+                               styleClass="command-button" onclick="disableButtons(true);" oncomplete="disableButtons(false)" /><br/>
+            <h:outputText value="Ид. организаций:"/>
+            <h:inputText value="#{otherActionsPage.updateSpbClientDoubles}" size="50"/>
+        </rich:panel>
+
     </h:panelGrid>
 
     <rich:panel rendered="#{otherActionsPage.isSpb()}">

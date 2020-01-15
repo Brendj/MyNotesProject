@@ -53,7 +53,7 @@ import static ru.axetta.ecafe.processor.web.partner.integra.soap.ClientRoomContr
 public class PreorderDAOService {
     private static final Logger logger = LoggerFactory.getLogger(PreorderDAOService.class);
     private final String NEW_LINE_DELIMITER = ";";
-
+    public static final long BASE_ID_MENU_VALUE_FOR_MODIFY = 7700000;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
@@ -645,7 +645,7 @@ public class PreorderDAOService {
     @Transactional
     public void relevancePreordersToOrgs(PreorderRequestsReportServiceParam params) {
         logger.info("Start relevancePreordersToOrgs process");
-        long nextVersion = nextVersionByPreorderComplex();
+        long nextVersion;
         Query query = em.createQuery("select pc, c.org.idOfOrg from PreorderComplex pc join pc.client c "
                 + "where pc.preorderDate > :date and pc.deletedState = false "
                 + params.getJPACondition()
@@ -658,6 +658,7 @@ public class PreorderDAOService {
             Long idOfOrg = (Long) row[1];
             if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
             if (preorderComplex.getIdOfOrgOnCreate() != null && !preorderComplex.getIdOfOrgOnCreate().equals(idOfOrg)) {
+                nextVersion = nextVersionByPreorderComplex();
                 testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGE_ORG, true);
                 continue;
             }
@@ -666,56 +667,84 @@ public class PreorderDAOService {
     }
 
     @Transactional
-    public void relevancePreordersToMenu(PreorderRequestsReportServiceParam params) {
-        logger.info("Start relevancePreordersToMenu process");
-        long nextVersion = nextVersionByPreorderComplex();
-        Query query = em.createQuery("select pc from PreorderComplex pc "
+    public List<PreorderComplex> getPreorderComplexListForRelevanceToMenu(PreorderRequestsReportServiceParam params) {
+        Query query = em.createQuery("select pc from PreorderComplex pc join fetch pc.preorderMenuDetails join fetch pc.client c join fetch c.org "
                 + "where pc.preorderDate > :date and pc.deletedState = false "
                 + params.getJPACondition()
                 + "order by pc.preorderDate");
         query.setParameter("date", new Date());
-        List<PreorderComplex> list = query.getResultList();
-        for (PreorderComplex preorderComplex : list) {
-            if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
-            ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
-            if (complexInfo == null) {
-                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
-                continue;
+        return query.getResultList();
+    }
+
+    @Transactional
+    public List<ModifyMenu> relevancePreordersToMenu(PreorderComplex preorderComplex, long nextVersion) {
+        List<ModifyMenu> modifyMenuList = new ArrayList<>();
+
+        ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
+        if (complexInfo == null) {
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
+            return null;
+        }
+        if (preorderComplex.getAmount() > 0) {
+            if (!preorderComplex.getComplexPrice().equals(complexInfo.getCurrentPrice())) {
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false);
+                return null;
             }
-            if (preorderComplex.getAmount() > 0) {
-                if (!preorderComplex.getComplexPrice().equals(complexInfo.getCurrentPrice())) {
-                    testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false);
-                    continue;
-                }
-            } else {
-                for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
-                    if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) continue;
-                    if (!preorderMenuDetail.getDeletedState() && preorderMenuDetail.getAmount() > 0) {
-                        MenuDetail menuDetail = getMenuDetail(preorderComplex.getClient(), preorderMenuDetail.getItemCode(),
-                                preorderMenuDetail.getPreorderDate(), null, complexInfo.getIdOfComplexInfo());
-                        if (menuDetail == null) {
-                            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
+        } else {
+            for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
+                if (preorderMenuDetail.getIdOfGoodsRequestPosition() != null) continue;
+                if (!preorderMenuDetail.getDeletedState() && preorderMenuDetail.getAmount() > 0) {
+                    MenuDetail menuDetail = getMenuDetail(preorderComplex.getClient(), preorderMenuDetail.getItemCode(),
+                            preorderMenuDetail.getPreorderDate(), null, complexInfo.getIdOfComplexInfo());
+                    if (menuDetail == null) {
+                        testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
+                        break;
+                    } else {
+                        if (!preorderMenuDetail.getMenuDetailPrice().equals(menuDetail.getPrice())) {
+                            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false);
                             break;
-                        } else {
-                            if (!preorderMenuDetail.getMenuDetailPrice().equals(menuDetail.getPrice())) {
-                                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false);
-                                break;
-                            } else if (!preorderMenuDetail.getArmIdOfMenu().equals(menuDetail.getLocalIdOfMenu())) {
-                                preorderMenuDetail.modifyArmIdOfMenu(nextVersion, menuDetail.getLocalIdOfMenu());
-                                em.merge(preorderMenuDetail);
-                            }
+                        } else if (!preorderMenuDetail.getArmIdOfMenu().equals(menuDetail.getLocalIdOfMenu())) {
+                            logger.info(String.format("Change localIdOfMenu %s to %s at preorder %s adding to process list",
+                                    preorderMenuDetail.getArmIdOfMenu(), menuDetail.getLocalIdOfMenu(), preorderComplex));
+                            ModifyMenu modifyMenu = new ModifyMenu(menuDetail.getLocalIdOfMenu(),
+                                    preorderMenuDetail.getIdOfPreorderMenuDetail(), preorderComplex.getIdOfPreorderComplex());
+                            modifyMenuList.add(modifyMenu);
                         }
                     }
                 }
             }
         }
-        logger.info("End relevancePreordersToMenu process");
+        return modifyMenuList;
+    }
+
+    @Transactional
+    public void changeLocalIdOfMenu(List<ModifyMenu> modifyMenuList, Long nextVersion) {
+        logger.info("Start change localIdOfMenu");
+        doChangeLocalIdOfMenu(modifyMenuList, BASE_ID_MENU_VALUE_FOR_MODIFY, nextVersion, false);
+        doChangeLocalIdOfMenu(modifyMenuList, 0, nextVersion, true);
+        logger.info("End change localIdOfMenu");
+    }
+
+    private void doChangeLocalIdOfMenu(List<ModifyMenu> modifyMenuList, long offset, Long nextVersion, boolean updatePreorderComplex) {
+        for (ModifyMenu modifyMenu : modifyMenuList) {
+            Query query = em.createQuery("update PreorderMenuDetail set armIdOfMenu= :armIdOfMenu where idOfPreorderMenuDetail = :idOfPreorderMenuDetail");
+            query.setParameter("armIdOfMenu", offset + modifyMenu.getNewIdOfMenu());
+            query.setParameter("idOfPreorderMenuDetail", modifyMenu.getIdOfPreorderMenuDetail());
+            query.executeUpdate();
+            if (updatePreorderComplex) {
+                Query query2 = em.createQuery("update PreorderComplex set version = :version, lastUpdate = :lastUpdate where idOfPreorderComplex = :idOfPreorderComplex");
+                query2.setParameter("version", nextVersion);
+                query2.setParameter("lastUpdate", new Date());
+                query2.setParameter("idOfPreorderComplex", modifyMenu.getIdOfPreorderComplex());
+                query2.executeUpdate();
+            }
+        }
     }
 
     @Transactional
     public void relevancePreordersToOrgFlag(PreorderRequestsReportServiceParam params) {
         logger.info("Start relevancePreordersToOrgFlag process");
-        long nextVersion = nextVersionByPreorderComplex();
+        long nextVersion;
         Query query = em.createQuery("select pc from PreorderComplex pc join pc.client.org o "
                 + "where pc.preorderDate > :date and pc.deletedState = false and o.preordersEnabled = false "
                 + params.getJPACondition()
@@ -724,6 +753,7 @@ public class PreorderDAOService {
         List<PreorderComplex> list = query.getResultList();
         for (PreorderComplex preorderComplex : list) {
             if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
+            nextVersion = nextVersionByPreorderComplex();
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF, true);
         }
 
@@ -762,7 +792,7 @@ public class PreorderDAOService {
         try {
             logger.info("Start of generating regular preorders");
             if (params.isEmpty()) {
-                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).generatePreordersBySchedule();
+                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).generatePreordersBySchedule(params);
             }
             logger.info("Successful end of generating regular preorders");
         } catch (Exception e) {
@@ -778,7 +808,7 @@ public class PreorderDAOService {
         try {
             logger.info("Start additional tasks for regulars");
             if (params.isEmpty()) {
-                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).additionalTasksForRegulars();
+                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).additionalTasksForRegulars(params);
             }
             logger.info("Successful end additional tasks for regulars");
         } catch (Exception e) {
@@ -791,7 +821,7 @@ public class PreorderDAOService {
         Date dateFrom = getStartDateForGeneratePreordersInternal(regularPreorder.getClient());
         long nextVersion = DAOUtils.nextVersionByPreorderComplex(session);
         org.hibernate.Query delQuery = session.createQuery("update PreorderComplex set deletedState = true, lastUpdate = :lastUpdate, amount = 0, state = :state, version = :version "
-                + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom");
+                + "where regularPreorder = :regularPreorder and preorderDate > :dateFrom and idOfGoodsRequestPosition is null");
         delQuery.setParameter("lastUpdate", new Date());
         delQuery.setParameter("regularPreorder", regularPreorder);
         delQuery.setParameter("dateFrom", dateFrom);
@@ -800,7 +830,8 @@ public class PreorderDAOService {
         delQuery.executeUpdate();
 
         delQuery = session.createQuery("update PreorderMenuDetail set deletedState = true, amount = 0, state = :state "
-                + "where preorderComplex.idOfPreorderComplex in (select idOfPreorderComplex from PreorderComplex where regularPreorder = :regularPreorder) and preorderDate > :dateFrom");
+                + "where preorderComplex.idOfPreorderComplex in (select idOfPreorderComplex from PreorderComplex "
+                + "where regularPreorder = :regularPreorder) and preorderDate > :dateFrom and idOfGoodsRequestPosition is null");
         delQuery.setParameter("regularPreorder", regularPreorder);
         delQuery.setParameter("dateFrom", dateFrom);
         delQuery.setParameter("state", state);
@@ -1081,23 +1112,25 @@ public class PreorderDAOService {
     }
 
     @Transactional
-    public List<RegularPreorder> getRegularPreorders() {
-        Query query = em.createQuery("select r from RegularPreorder r where r.deletedState = false and r.endDate > :date");
+    public List<RegularPreorder> getRegularPreorders(PreorderRequestsReportServiceParam params) {
+        Query query = em.createQuery("select r from RegularPreorder r join fetch r.client c "
+                + "where r.deletedState = false and r.endDate > :date" + params.getRegularPreorderJPACondition());
         query.setParameter("date", new Date());
         return query.getResultList();
     }
 
     @Transactional
     public List getAllActualPreorders(PreorderRequestsReportServiceParam params) {
-        Query query = em.createQuery("select pc, pc.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup from PreorderComplex pc "
+        Query query = em.createQuery("select pc, pc.client.clientGroup.compositeIdOfClientGroup.idOfClientGroup from PreorderComplex pc join fetch pc.client c "
                 + "where pc.deletedState = false and pc.preorderDate > :date" + params.getJPACondition());
         query.setParameter("date", new Date());
         return query.getResultList();
     }
 
     @Transactional
-    public List<RegularPreorder> getExpiredRegularPreorders() {
-        Query query = em.createQuery("select r from RegularPreorder r where r.deletedState = false and r.endDate < :date");
+    public List<RegularPreorder> getExpiredRegularPreorders(PreorderRequestsReportServiceParam params) {
+        Query query = em.createQuery("select r from RegularPreorder r join fetch r.client c "
+                + "where r.deletedState = false and r.endDate < :date" + params.getRegularPreorderJPACondition());
         query.setParameter("date", new Date());
         return query.getResultList();
     }
@@ -1285,6 +1318,7 @@ public class PreorderDAOService {
         preorderMenuDetail.setMenuDetailOutput(md.getMenuDetailOutput());
         preorderMenuDetail.setProtein(md.getProtein());
         preorderMenuDetail.setShortName(md.getShortName());
+        preorderMenuDetail.setIdOfGood(md.getIdOfGood());
         return preorderMenuDetail;
     }
 
@@ -1298,7 +1332,7 @@ public class PreorderDAOService {
         try {
             return (ComplexInfo)query.getSingleResult();
         } catch (Exception e) {
-            logger.error(String.format("Cant find complexInfo idOfComplex=%s, date=%s, idOfClient=%s", idOfComplex, date.getTime(), client.getIdOfClient()));
+            logger.error(String.format("Cant find complexInfo idOfComplex=%s, date=%s, idOfClient=%s", idOfComplex, date.getTime(), client.getIdOfClient()), e);
             return null;
         }
     }
@@ -1357,6 +1391,7 @@ public class PreorderDAOService {
         return sum; // client.getBalance() - sum;
     }
 
+    @Transactional(propagation = Propagation.REQUIRED)
     public long nextVersionByPreorderComplex() {
         Session session = (Session)em.getDelegate();
         return DAOUtils.nextVersionByPreorderComplex(session);

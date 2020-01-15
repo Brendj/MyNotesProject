@@ -18,10 +18,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created by nuc on 02.04.2019.
@@ -32,10 +29,15 @@ public class PreorderOperationsService {
     private static final Logger logger = LoggerFactory.getLogger(PreorderOperationsService.class);
 
     public void relevancePreorders(PreorderRequestsReportServiceParam params) {
+        logger.info("Start process relevance preorders");
         try {
-            logger.info("Start process relevance preorders");
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgs(params);
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu(params);
+        } catch (Exception e) {
+            logger.error("Error in relevancePreordersToOrgs: ", e);
+        }
+        //RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToMenu(params);
+        try {
+            runRelevancePreordersToMenu(params);
             RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgFlag(params);
             logger.info("Successful end process relevance preorders");
         } catch(Exception e) {
@@ -43,8 +45,34 @@ public class PreorderOperationsService {
         }
     }
 
-    public void generatePreordersBySchedule() {
-        List<RegularPreorder> list = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getRegularPreorders();
+    public void runRelevancePreordersToMenu(PreorderRequestsReportServiceParam params) {
+        logger.info("Start relevancePreordersToMenu process");
+        long nextVersion;
+        List<PreorderComplex> list = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreorderComplexListForRelevanceToMenu(params);
+        int counter = 0;
+        List<ModifyMenu> modifyMenuList = new ArrayList<>();
+        for (PreorderComplex preorderComplex : list) {
+            try {
+                logger.info(String.format("Start processing record %s from %s", ++counter, list.size()));
+                if (preorderComplex.getIdOfGoodsRequestPosition() != null)
+                    continue;
+                nextVersion = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).nextVersionByPreorderComplex();
+                List<ModifyMenu> mmList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .relevancePreordersToMenu(preorderComplex, nextVersion);
+                if (mmList != null) {
+                    modifyMenuList.addAll(mmList);
+                }
+            } catch (Exception e) {
+                logger.error("Error in runRelevancePreordersToMenu: ", e);
+            }
+        }
+        nextVersion = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).nextVersionByPreorderComplex();
+        RuntimeContext.getAppContext().getBean(PreorderDAOService.class).changeLocalIdOfMenu(modifyMenuList, nextVersion);
+        logger.info("End relevancePreordersToMenu process");
+    }
+
+    public void generatePreordersBySchedule(PreorderRequestsReportServiceParam params) {
+        List<RegularPreorder> list = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getRegularPreorders(params);
         for (RegularPreorder regularPreorder : list) {
             if (regularPreorder.getIdOfComplex() != null) {
                 try {
@@ -79,8 +107,8 @@ public class PreorderOperationsService {
         }
     }
 
-    public void additionalTasksForRegulars() {
-        List<RegularPreorder> list = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getExpiredRegularPreorders();
+    public void additionalTasksForRegulars(PreorderRequestsReportServiceParam params) {
+        List<RegularPreorder> list = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getExpiredRegularPreorders(params);
         for (RegularPreorder regularPreorder : list) {
             try {
                 RuntimeContext.getAppContext().getBean(PreorderDAOService.class).deleteExpiredRegularPreorder(regularPreorder);

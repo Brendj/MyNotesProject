@@ -27,6 +27,7 @@ import org.hibernate.type.LongType;
 import org.hibernate.type.StringType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Controller;
 
 import javax.ws.rs.*;
@@ -41,6 +42,7 @@ import static java.lang.Math.abs;
 @Path(value = "")
 @Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Controller
+@DependsOn("runtimeContext")
 public class SmartWatchRestController {
     private Logger logger = LoggerFactory.getLogger(SmartWatchRestController.class);
     private Map<Integer, String> cardState;
@@ -85,7 +87,9 @@ public class SmartWatchRestController {
 
     @POST
     @Path(value = "getTokenByMobile")
-    public Response sendLinkingTokenByMobile(@FormParam(value="mobilePhone") String mobilePhone)throws Exception{
+    public Response sendLinkingTokenByMobile(@FormParam(value="mobilePhone") String mobilePhone)throws Exception {
+        logger.info(String.format("getTokenByMobile: Try create new LinkingToken for guardianPhone: %s", mobilePhone));
+
         Result result = new Result();
         Session session = null;
         Transaction transaction = null;
@@ -97,23 +101,20 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkAndConvertPhone(mobilePhone);
-            Client client = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
-            if(client == null){
+            List<Client> clients = DAOService.getInstance().getClientsListByMobilePhone(mobilePhone);
+            if(clients.isEmpty()){
                 throw new IllegalArgumentException("No clients found for this mobilePhone number: " + mobilePhone);
             }
-            if(!isGuardian(session, client)){
-                throw new IllegalArgumentException("Client with contractID: " + client.getContractId()
-                        + ", found by mobilePhone number: " + mobilePhone
+            if(!isGuardian(session, clients)){
+                throw new IllegalArgumentException("Client found by mobilePhone number: " + mobilePhone
                         + ", is not a guardian");
             }
 
             String token = DAOService.getInstance().generateLinkingTokenForSmartWatch(session, mobilePhone);
-
+            Client client = clients.get(0);
             RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                     .sendMessageAsync(client, EventNotificationService.MESSAGE_LINKING_TOKEN_GENERATED,
                             new String[]{"linkingToken", token}, new Date());
-
-            token = "";
 
             transaction.commit();
             transaction = null;
@@ -121,14 +122,20 @@ public class SmartWatchRestController {
             result.resultCode = ResponseCodes.RC_OK.getCode();
             result.description = "Код активации отправлен по SMS" +
                     (client.hasEmail()? " и по Email" : "");
+
+            logger.info(String.format("getTokenByMobile: Processing completed successfully, token %s send by async method for guardianPhone: %s",
+                    token, mobilePhone)
+            );
+
+            token = "";
             return Response.status(HttpURLConnection.HTTP_OK)
                     .entity(result)
                     .build();
         } catch (IllegalArgumentException e){
-            logger.error("Can't generate or send token :", e);
+            logger.error(String.format("getTokenByMobile: Can't generate or send token for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't generate or send token :", e);
+            logger.error(String.format("getTokenByMobile: Can't generate or send token for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
@@ -139,7 +146,7 @@ public class SmartWatchRestController {
     @GET
     @Path(value = "getListInfoOfChildrens")
     public Response getListOfChildrenByPhoneAndToken(@QueryParam(value="mobilePhone") String mobilePhone,
-            @QueryParam(value="token") String token)throws Exception{
+            @QueryParam(value="token") String token)throws Exception {
         JsonListInfo result = new JsonListInfo();
         Session session = null;
         Transaction transaction = null;
@@ -154,9 +161,9 @@ public class SmartWatchRestController {
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
             token = "";
 
-            Client parent = findParentByMobile(mobilePhone);
+            List<Client> parents = findParentsByMobile(mobilePhone);
 
-            List<JsonChildrenDataInfoItem> items = buildChildrenDataInfoItems(session, parent);
+            List<JsonChildrenDataInfoItem> items = buildChildrenDataInfoItems(session, parents);
             result.setItems(items);
 
             transaction.commit();
@@ -164,10 +171,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get List Of Children's", e);
+            logger.error(String.format("getListInfoOfChildrens: Can't get List Of Children's for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get List Of Children's", e);
+            logger.error(String.format("getListInfoOfChildrens: Can't get List Of Children's for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
@@ -181,7 +188,8 @@ public class SmartWatchRestController {
             @FormParam(value="contractId") Long contractId, @FormParam(value="model") String model, @FormParam(value="color") String color,
             @FormParam(value="trackerUid") Long trackerUid, @FormParam(value="trackerID") Long trackerId,
             @FormParam(value="trackerActivateUserId") Long trackerActivateUserId, @FormParam(value="status") String status,
-            @FormParam(value="trackerActivateTime") Long trackerActivateTime, @FormParam(value="simIccid") String simIccid) throws Exception{
+            @FormParam(value="trackerActivateTime") Long trackerActivateTime, @FormParam(value="simIccid") String simIccid) throws Exception {
+        logger.info(String.format("Try registry SmartWatch for Phone: %s", mobilePhone));
         Result result = new Result();
         Session session = null;
         Transaction transaction = null;
@@ -191,19 +199,7 @@ public class SmartWatchRestController {
 
             mobilePhone = inputParamsIsValidOrTrowException(session, trackerId, trackerUid, mobilePhone, token);
 
-            if(contractId == null){
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if(child == null){
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if(!isRelatives(session, parent, child)){
-                throw new IllegalArgumentException("Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId()
-                        + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             if(childHasAnActiveSmartWatch(session, child)){
                 throw new IllegalArgumentException("The client witch contractID: " + child.getContractId()
@@ -254,12 +250,13 @@ public class SmartWatchRestController {
             transaction.commit();
             transaction = null;
 
+            logger.info(String.format("registrySmartWatch: Processing completed successfully for guardianPhone: %s", mobilePhone));
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't registry SmartWatch ", e);
+            logger.error(String.format("registrySmartWatch: Can't registry SmartWatch for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't registry SmartWatch ", e);
+            logger.error(String.format("registrySmartWatch: Can't registry SmartWatch for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
@@ -271,6 +268,8 @@ public class SmartWatchRestController {
     @Path(value = "blockSmartWatch")
     public Response blockSmartWatch(@FormParam(value="mobilePhone") String mobilePhone, @FormParam(value="token") String token,
             @FormParam(value="trackerUid") Long trackerUid, @FormParam(value="trackerID") Long trackerId)throws Exception{
+        logger.info(String.format("Try block SmartWatch for guardianPhone: %s", mobilePhone));
+
         Result result = new Result();
         Session session = null;
         Transaction transaction = null;
@@ -305,15 +304,31 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't block SmartWatch", e);
+            logger.error(String.format("blockSmartWatch: Can't block SmartWatch for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't block SmartWatch", e);
+            logger.error(String.format("blockSmartWatch: Can't block SmartWatch for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private Client findClientWithCheckOnParent(Session session, String mobilePhone, Long contractId) throws Exception {
+        if(contractId == null){
+            throw new IllegalArgumentException("ContractID is null");
+        }
+        List<Client> parents = findParentsByMobile(mobilePhone);
+
+        Client child = DAOUtils.findClientByContractId(session, contractId);
+        if(child == null){
+            throw new IllegalArgumentException("No clients found by contractID: " + contractId);
+        }
+        if(!isRelatives(session, parents, child)){
+            throw new IllegalArgumentException(String.format("Not found parent for child with contractId=%s", contractId));
+        }
+        return child;
     }
 
     @GET
@@ -330,21 +345,7 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
-            token = "";
-
-            if(contractId == null){
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if(child == null){
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if(!isRelatives(session, parent, child)){
-                throw new IllegalArgumentException("Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             if(startDateTime == null){
                 logger.warn("Start date is Null, set as now");
@@ -362,10 +363,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get EnterEvents ", e);
+            logger.error(String.format("getEnterEvents: Can't get EnterEvents for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get EnterEvents ", e);
+            logger.error(String.format("getEnterEvents: Can't get EnterEvents for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -388,22 +389,7 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
-            token = "";
-
-            if (contractId == null) {
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if (child == null) {
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if (!isRelatives(session, parent, child)) {
-                throw new IllegalArgumentException(
-                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             Date startDate;
             Date endDate = null;
@@ -427,10 +413,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get Purchases ", e);
+            logger.error(String.format("getPurchasesOld: Can't get Purchases for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get Purchases  ", e);
+            logger.error(String.format("getPurchasesOld: Can't get Purchases for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -452,22 +438,7 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
-            token = "";
-
-            if (contractId == null) {
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if (child == null) {
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if (!isRelatives(session, parent, child)) {
-                throw new IllegalArgumentException(
-                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             Date startDate;
             Date endDate = null;
@@ -491,10 +462,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get Transactions ", e);
+            logger.error(String.format("getPurchases: Can't get Transactions for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get Transactions ", e);
+            logger.error(String.format("getPurchases: Can't get Transactions for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -524,10 +495,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get PurchaseDetail ", e);
+            logger.error(String.format("getPurchaseDetail: Can't get PurchaseDetail for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get PurchaseDetail ", e);
+            logger.error(String.format("getPurchaseDetail: Can't get PurchaseDetail for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -549,22 +520,7 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
-            token = "";
-
-            if (contractId == null) {
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if (child == null) {
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if (!isRelatives(session, parent, child)) {
-                throw new IllegalArgumentException(
-                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             Date startDate;
             Date endDate = null;
@@ -588,10 +544,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get PurchasedComplexes ", e);
+            logger.error(String.format("getPurchasedComplexes: Can't get PurchasedComplexes for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get PurchasedComplexes ", e);
+            logger.error(String.format("getPurchasedComplexes: Can't get PurchasedComplexes for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -611,22 +567,7 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
-            token = "";
-
-            if (contractId == null) {
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if (child == null) {
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if (!isRelatives(session, parent, child)) {
-                throw new IllegalArgumentException(
-                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             JsonBalanceInfo info = buildBalanceInfo(session, child);
             result.setBalanceInfo(info);
@@ -636,10 +577,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get Balance ", e);
+            logger.error(String.format("getBalance: Can't get Balance for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get Balance ", e);
+            logger.error(String.format("getBalance: Can't get Balance for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -660,22 +601,7 @@ public class SmartWatchRestController {
             transaction = session.beginTransaction();
 
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
-            token = "";
-
-            if (contractId == null) {
-                throw new IllegalArgumentException("ContractID is null");
-            }
-
-            Client parent = findParentByMobile(mobilePhone);
-
-            Client child = DAOUtils.findClientByContractId(session, contractId);
-            if (child == null) {
-                throw new IllegalArgumentException("No clients found by contractID: " + contractId);
-            }
-            if (!isRelatives(session, parent, child)) {
-                throw new IllegalArgumentException(
-                        "Parent (contractID: " + parent.getContractId() + ") and Child (contractID: " + child.getContractId() + ") is not relatives");
-            }
+            Client child = findClientWithCheckOnParent(session, mobilePhone, contractId);
 
             Date startDate;
             Date endDate;
@@ -701,10 +627,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get BalanceOperations ", e);
+            logger.error(String.format("getBalanceOperations: Can't get BalanceOperations for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get BalanceOperations ", e);
+            logger.error(String.format("getBalanceOperations: Can't get BalanceOperations for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -811,9 +737,9 @@ public class SmartWatchRestController {
             mobilePhone = checkMobilePhone(session, mobilePhone, token);
             token = "";
 
-            Client parent = findParentByMobile(mobilePhone);
+            List<Client> parents = findParentsByMobile(mobilePhone);
 
-            List<Client> children = findChildrenByGuardian(session, parent);
+            List<Client> children = findChildrenByGuardians(session, parents);
 
             for(Client child : children) {
                 JsonLocationsInfo locations = buildLocations(session, child);
@@ -824,10 +750,10 @@ public class SmartWatchRestController {
 
             return resultOK(result);
         } catch (IllegalArgumentException e){
-            logger.error("Can't get Locations ", e);
+            logger.error(String.format("getLocations: Can't get Locations for guardianPhone %s", mobilePhone), e);
             return resultBadArgs(result, e);
         } catch (Exception e){
-            logger.error("Can't get Locations ", e);
+            logger.error(String.format("getLocations: Can't get Locations for guardianPhone %s", mobilePhone), e);
             return resultException(result, e);
         } finally{
             HibernateUtils.rollback(transaction, logger);
@@ -835,8 +761,8 @@ public class SmartWatchRestController {
         }
     }
 
-    private List<Client> findChildrenByGuardian(Session session, Client parent) {
-        List<ClientGuardian> listOfClientGuardianByIdOfGuardian = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, parent.getIdOfClient());
+    private List<Client> findChildrenByGuardians(Session session, List<Client> parents) {
+        List<ClientGuardian> listOfClientGuardianByIdOfGuardian = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, parents);
         if(CollectionUtils.isEmpty(listOfClientGuardianByIdOfGuardian)){
             return Collections.emptyList();
         }
@@ -1168,8 +1094,15 @@ public class SmartWatchRestController {
     }
 
     private boolean isRelatives(Session session, Client parent, Client child) throws Exception {
-        ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, child.getIdOfClient(), parent.getIdOfClient());
-        return clientGuardian != null;
+        return DAOUtils.findClientGuardian(session, child.getIdOfClient(), parent.getIdOfClient()) != null;
+    }
+
+    private boolean isRelatives(Session session, List<Client> parents, Client child) throws Exception {
+        for (Client parent : parents) {
+            boolean guardianFound = isRelatives(session, parent, child);
+            if (guardianFound) return true;
+        }
+        return false;
     }
 
     private boolean childHasAnActiveSmartWatch(Session session, Client child) throws Exception {
@@ -1188,14 +1121,16 @@ public class SmartWatchRestController {
         return false;
     }
 
-    private List<JsonChildrenDataInfoItem> buildChildrenDataInfoItems(Session session, Client guardian) throws Exception{
+    private List<JsonChildrenDataInfoItem> buildChildrenDataInfoItems(Session session, List<Client> guardians) throws Exception{
         List<JsonChildrenDataInfoItem> resultList = new LinkedList<JsonChildrenDataInfoItem>();
+        Set<Client> uniqueChildren = new HashSet<>();
         try{
-            List<ClientGuardian> childes = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, guardian.getIdOfClient());
+            List<ClientGuardian> childes = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, guardians);
             for(ClientGuardian el : childes){
-                JsonChildrenDataInfoItem item = new JsonChildrenDataInfoItem();
-
                 Client child = (Client) session.get(Client.class, el.getIdOfChildren());
+                if (uniqueChildren.contains(child)) continue;
+                uniqueChildren.add(child);
+                JsonChildrenDataInfoItem item = new JsonChildrenDataInfoItem();
 
                 item.setContractID(child.getContractId());
                 if(child.getPerson() != null) {
@@ -1268,11 +1203,11 @@ public class SmartWatchRestController {
         return mobilePhone;
     }
 
-    private boolean isGuardian(Session session, Client client) throws Exception {
+    private boolean isGuardian(Session session, List<Client> clients) throws Exception {
         try {
-            List<ClientGuardian> dataFromDB = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, client.getIdOfClient());
+            List<ClientGuardian> dataFromDB = DAOUtils.findListOfClientGuardianByIdOfGuardian(session, clients);
             if (dataFromDB == null || dataFromDB.isEmpty()) {
-                logger.warn("No data about Guardians by Clients with contractID: " + client.getContractId());
+                logger.warn("No data about Guardians by Clients with contractID: ");
                 return false;
             }
             return true;
@@ -1338,13 +1273,13 @@ public class SmartWatchRestController {
         return mobilePhone;
     }
 
-    private Client findParentByMobile(String mobilePhone) throws Exception {
-        Client parent = DAOService.getInstance().getClientByMobilePhone(mobilePhone);
-        if(parent == null){
+    private List<Client> findParentsByMobile(String mobilePhone) throws Exception {
+        List<Client> parents = DAOService.getInstance().getClientsListByMobilePhone(mobilePhone);
+        if(parents.isEmpty()){
             throw new Exception("No clients found for this mobilePhone number: " + mobilePhone
                     + ", but passed the TokenValidator");
         }
-        return parent;
+        return parents;
     }
 
     private JsonPurchaseDetailItem fillPurchaseDetailItem(Order order) {

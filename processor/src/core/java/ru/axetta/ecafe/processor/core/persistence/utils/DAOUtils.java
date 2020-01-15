@@ -6,11 +6,15 @@ package ru.axetta.ecafe.processor.core.persistence.utils;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
+import ru.axetta.ecafe.processor.core.emias.LiberateClientsList;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -118,8 +122,8 @@ public class DAOUtils {
 
     public static List findClientsBySan (Session persistenceSession, String san) {
         org.hibernate.Query query = persistenceSession.createSQLQuery("select CF_Clients.IdOfClient "
-                                                                    + "from CF_Clients "
-                                                                    + "where CF_Clients.san like :san");
+                + "from CF_Clients "
+                + "where CF_Clients.san like :san");
         query.setParameter("san", san);
         List clientList = query.list();
         return clientList;
@@ -173,7 +177,7 @@ public class DAOUtils {
     @SuppressWarnings("unchecked")
     public static Client findClientByIacregid(Session persistenceSession, String iacregid) {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
-        criteria.add(Restrictions.eq("iacRegId", iacregid));
+        criteria.add(Restrictions.ilike("iacRegId", iacregid, MatchMode.ANYWHERE));
         List<Client> resultList = (List<Client>) criteria.list();
         return resultList.isEmpty() ? null : resultList.get(0);
     }
@@ -396,6 +400,26 @@ public class DAOUtils {
         return null;
     }
 
+    public static Person findPersonByFIO(Session session, String firstName, String surname, String secondName) {
+        Query query = session.createQuery("from Person p where p.firstName = :firstName and p.surname = :surname "
+                + "and p.secondName = :secondName");
+        query.setParameter("firstName", firstName);
+        query.setParameter("surname", surname);
+        query.setParameter("secondName", secondName);
+        List res = query.list();
+        if(res != null && res.size() > 0) {
+            return (Person) res.get(0);
+        }
+        return null;
+    }
+
+    public static Contragent findContragentIsSupplier(Session session, long idOfContragent) {
+        Query query = session.createQuery("from Contragent c where c.idOfContragent = :idOfContragent "
+                + "and c.classId = 2"); // ТСП
+        query.setParameter("idOfContragent", idOfContragent);
+        return (Contragent) query.uniqueResult();
+    }
+
     public static boolean isNotPlannedOrgExists(Session session, String shortName, long additionalIdBuilding) {
         Query q = session.createSQLQuery("select 1 from cf_not_planned_orgs where shortName=:shortName and additionalIdBuilding=:additionalIdBuilding");
         q.setParameter("shortName", shortName);
@@ -408,8 +432,8 @@ public class DAOUtils {
     }
 
     /*
-    * Обновляет орг. Ставит признак mainbuilding = 0
-    * */
+     * Обновляет орг. Ставит признак mainbuilding = 0
+     * */
     public static int orgMainBuildingUnset(Session session, long idOfOrg)  {
         Query q = session.createSQLQuery("update cf_orgs set MainBuilding = 0 where idOfOrg = :idOfOrg").setParameter("idOfOrg",idOfOrg);
         return q.executeUpdate();
@@ -480,7 +504,7 @@ public class DAOUtils {
         return (Card) persistenceSession.get(Card.class, idOfCard);
     }
 
-    public static Card findCardByCardNo(Session persistenceSession, long cardNo) throws Exception {
+    public static Card findCardByCardNo(Session persistenceSession, Long cardNo) {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
@@ -1205,8 +1229,8 @@ public class DAOUtils {
         try {
             String[] values = generateLowBalanceNotificationParams(session, client, transactionDate);
             RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                .sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_LOW_BALANCE,
-                        values, transactionDate);
+                    .sendNotificationAsync(client, null, EventNotificationService.NOTIFICATION_LOW_BALANCE,
+                            values, transactionDate);
             List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
 
             if (!(guardians == null || guardians.isEmpty())) {
@@ -1215,8 +1239,8 @@ public class DAOUtils {
                             client.getIdOfClient(),
                             ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_LOW_BALANCE.getValue())) {
                         RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                            .sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_LOW_BALANCE,
-                                    values, transactionDate);
+                                .sendNotificationAsync(destGuardian, client, EventNotificationService.NOTIFICATION_LOW_BALANCE,
+                                        values, transactionDate);
                     }
                 }
             }
@@ -1396,25 +1420,25 @@ public class DAOUtils {
             Long lastTransactionId, Integer count, Date startDate, Date endDate) {
         try
         {
-        Criteria criteria = persistenceSession.createCriteria(AccountTransaction.class);
-        criteria.add(Restrictions.eq("client", client));
-        //Типы транзакций, который НЕ должны учитываться
-        criteria.add(Restrictions.not(
-                Restrictions.eq("sourceType", AccountTransaction.INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE)));
-        criteria.add(Restrictions.not(
-                Restrictions.eq("sourceType", AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE)));
-        criteria.add(Restrictions.not(
-                Restrictions.eq("sourceType", AccountTransaction.CLIENT_BALANCE_HOLD)));
-        //Определяем начальную точку отсчёта
-        if (lastTransactionId != null)
-            criteria.add(Restrictions.le("idOfTransaction", lastTransactionId));   // <=
-        //Сортировка по убыванию
-        criteria.addOrder(org.hibernate.criterion.Order.desc("idOfTransaction"));
-        if (count != null)
-            criteria.setMaxResults(count);
-        if (startDate != null && endDate != null)
-            criteria.add(Restrictions.between("transactionTime", startDate, endDate));
-        return criteria.list();
+            Criteria criteria = persistenceSession.createCriteria(AccountTransaction.class);
+            criteria.add(Restrictions.eq("client", client));
+            //Типы транзакций, который НЕ должны учитываться
+            criteria.add(Restrictions.not(
+                    Restrictions.eq("sourceType", AccountTransaction.INTERNAL_ORDER_TRANSACTION_SOURCE_TYPE)));
+            criteria.add(Restrictions.not(
+                    Restrictions.eq("sourceType", AccountTransaction.SUBSCRIPTION_FEE_TRANSACTION_SOURCE_TYPE)));
+            criteria.add(Restrictions.not(
+                    Restrictions.eq("sourceType", AccountTransaction.CLIENT_BALANCE_HOLD)));
+            //Определяем начальную точку отсчёта
+            if (lastTransactionId != null)
+                criteria.add(Restrictions.le("idOfTransaction", lastTransactionId));   // <=
+            //Сортировка по убыванию
+            criteria.addOrder(org.hibernate.criterion.Order.desc("idOfTransaction"));
+            if (count != null)
+                criteria.setMaxResults(count);
+            if (startDate != null && endDate != null)
+                criteria.add(Restrictions.between("transactionTime", startDate, endDate));
+            return criteria.list();
         } catch (Exception e)
         {
             return null;
@@ -1616,7 +1640,7 @@ public class DAOUtils {
      * @param entityManager менеджер сущностей
      * @return null если таблица пуста, List<CategoryOrg>
      */
-     public static List<CategoryOrg> findCategoryOrg(EntityManager entityManager) {
+    public static List<CategoryOrg> findCategoryOrg(EntityManager entityManager) {
         javax.persistence.Query q = entityManager.createQuery("from CategoryOrg order by idOfCategoryOrg asc");
         return (List<CategoryOrg>)q.getResultList();
     }
@@ -1698,14 +1722,14 @@ public class DAOUtils {
         CategoryDiscount categoryDiscount = (CategoryDiscount) session.load(CategoryDiscount.class, id);
         Criteria clientCriteria = session.createCriteria(Client.class);
         Criterion exp1 = Restrictions.or(
-            Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + "", MatchMode.EXACT),
-            Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + ",",
-                MatchMode.START));
+                Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + "", MatchMode.EXACT),
+                Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + ",",
+                        MatchMode.START));
         Criterion exp2 = Restrictions.or(
-            Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount(),
-                MatchMode.END),
-            Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount() + ",",
-                MatchMode.ANYWHERE));
+                Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount(),
+                        MatchMode.END),
+                Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount() + ",",
+                        MatchMode.ANYWHERE));
         Criterion expression = Restrictions.or(exp1, exp2);
         clientCriteria.add(expression);
         List<Client> clients = clientCriteria.list();
@@ -1732,6 +1756,81 @@ public class DAOUtils {
         categoryDiscountDSZN.setVersion(nextVersion);
         categoryDiscountDSZN.setCategoryDiscount(null);
         session.save(categoryDiscountDSZN);
+    }
+
+    public static void saveEMIAS(Session session, LiberateClientsList liberateClientsList) {
+        Long version = getMaxVersionEMIAS(session);
+
+        EMIAS emias = new EMIAS();
+        emias.setGuid(liberateClientsList.getGuid());
+        emias.setIdEventEMIAS(liberateClientsList.getIdEventEMIAS());
+        emias.setTypeEventEMIAS(liberateClientsList.getTypeEventEMIAS());
+        emias.setDateLiberate(liberateClientsList.getDateLiberate());
+        emias.setStartDateLiberate(liberateClientsList.getStartDateLiberate());
+        emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
+        emias.setCreateDate(new Date());
+        emias.setVersion(version);
+        session.save(emias);
+    }
+
+    public static void updateEMIAS(Session session, LiberateClientsList liberateClientsList) {
+        Long version = getMaxVersionEMIAS(session);
+
+        //Criteria clientCardsCriteria = session.createCriteria(EMIAS.class);
+        //clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventCancelEMIAS()));
+        //EMIAS emiasUpdated;
+        //try {
+        //    emiasUpdated = (EMIAS)clientCardsCriteria.list().get(0);
+        //}catch (Exception e)
+        //{
+        //    emiasUpdated = null;
+        //}
+
+        EMIAS emias = new EMIAS();
+        emias.setGuid(liberateClientsList.getGuid());
+        emias.setIdEventEMIAS(liberateClientsList.getIdEventEMIAS());
+        emias.setTypeEventEMIAS(liberateClientsList.getTypeEventEMIAS());
+        emias.setDateLiberate(liberateClientsList.getDateLiberate());
+        emias.setStartDateLiberate(liberateClientsList.getStartDateLiberate());
+        emias.setEndDateLiberate(liberateClientsList.getEndDateLiberate());
+        emias.setCreateDate(new Date());
+        emias.setDeletedemiasid(liberateClientsList.getIdEventCancelEMIAS());
+        emias.setVersion(version);
+        session.save(emias);
+
+        //clientCardsCriteria = session.createCriteria(EMIAS.class);
+        //clientCardsCriteria.add(Restrictions.eq("idEventEMIAS", liberateClientsList.getIdEventEMIAS()));
+        //EMIAS emiasNEW;
+        //try {
+        //    emiasNEW = (EMIAS)clientCardsCriteria.list().get(0);
+        //}catch (Exception e)
+        //{
+        //    emiasNEW = null;
+        //}
+        //
+        //if (emiasUpdated != null && emiasNEW != null) {
+        //    emiasUpdated.setDeletedemiasid(emiasNEW.getIdEventEMIAS());
+        //    emiasUpdated.setUpdateDate(new Date());
+        //    session.update(emiasUpdated);
+        //}
+    }
+
+    public static Long getMaxVersionEMIAS (Session session)
+    {
+        Long version = 0L;
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.setProjection(Projections.max("version"));
+            Object result = criteria.uniqueResult();
+            if (result != null) {
+                Long currentMaxVersion = (Long) result;
+                version = currentMaxVersion + 1;
+            }
+        } catch (Exception ex) {
+            logger.error("Failed get max emias version, ", ex);
+            version = 0L;
+        }
+        return version;
     }
 
     @SuppressWarnings("unchecked")
@@ -1833,7 +1932,7 @@ public class DAOUtils {
             Long res = l.isEmpty() || l.get(0) == null ? ClientGroup.Predefined.CLIENT_STUDENTS_CLASS_BEGIN.getValue()
                     : (Long) l.get(0);
             idOfClientGroup = res + 1;
-            }
+        }
         CompositeIdOfClientGroup compositeIdOfClientGroup = new CompositeIdOfClientGroup(idOfOrg,idOfClientGroup);
         ClientGroup clientGroup = new ClientGroup(compositeIdOfClientGroup, clientGroupName);
         persistenceSession.save(clientGroup);
@@ -2028,7 +2127,7 @@ public class DAOUtils {
         q.setParameter("client", client);
         return (List<AccountTransfer>)q.list();
     }
-    
+
     @SuppressWarnings("unchecked")
     public static List<AccountRefund> getAccountRefundsForClient(Session session, Client client, Date startTime,
             Date endTime) {
@@ -2092,10 +2191,10 @@ public class DAOUtils {
     public static void updateClientVersionAndRemoteAddressByOrg(Session persistenceSession, Long idOfOrg, String clientVersion,
             String remoteAddress, String sqlServerVersion, Double databaseSize) {
         Query query = persistenceSession.createQuery(
-                 "update OrgSync "
-                 + " set remoteAddress=:remoteAddress, clientVersion=:clientVersion, sqlServerVersion = :sqlServerVersion "
-                         + (databaseSize == null ? "" : ", databaseSize = :databaseSize ")
-                 + " where idOfOrg=:idOfOrg ");
+                "update OrgSync "
+                        + " set remoteAddress=:remoteAddress, clientVersion=:clientVersion, sqlServerVersion = :sqlServerVersion "
+                        + (databaseSize == null ? "" : ", databaseSize = :databaseSize ")
+                        + " where idOfOrg=:idOfOrg ");
         query.setParameter("remoteAddress", remoteAddress);
         query.setParameter("clientVersion", clientVersion);
         query.setParameter("sqlServerVersion", sqlServerVersion);
@@ -2310,8 +2409,8 @@ public class DAOUtils {
     }
 
     /*
-    * Находит детей представителя или ребенка, у которого указан телефонный номер
-    * */
+     * Находит детей представителя или ребенка, у которого указан телефонный номер
+     * */
     public static List<Long> extractIDFromGuardByGuardMobile(Session persistenceSession, String guardMobile) {
         //String query = "select client.idOfClient from Client client where (client.phone=:guardMobile or client.mobile=:guardMobile) "
         //        + "and not exists (select idOfClientGuardian from ClientGuardian where idOfChildren = Client.idOfClient)";
@@ -2383,7 +2482,7 @@ public class DAOUtils {
         return (List<Object[]>)q.getResultList();
     }
 
-		public static int extractCardTypeByCartNo(Session session, Long cardNo) {
+    public static int extractCardTypeByCartNo(Session session, Long cardNo) {
         Query query = session.createQuery("select visitorType from CardTemp where cardNo=:cardNo");
         query.setParameter("cardNo", cardNo);
         return (Integer) query.uniqueResult();
@@ -2467,7 +2566,7 @@ public class DAOUtils {
         }
         return productCriteria.list();
     }
-    
+
     public static List<String> getDiscountRuleSubcategories(Session session) {
         org.hibernate.Query q = session.createSQLQuery(
                 "select distinct subcategory from cf_discountrules where subcategory<>''");
@@ -3008,10 +3107,10 @@ public class DAOUtils {
         }
 
         Query query = session.createQuery(" FROM GroupNamesToOrgs WHERE idOfMainOrg = :idOfMainOrg "
-                                          + " AND LOWER(REPLACE(groupName, ' ', '')) LIKE REPLACE(:groupName, ' ', '')");
+                + " AND LOWER(REPLACE(groupName, ' ', '')) LIKE REPLACE(:groupName, ' ', '')");
         query.setParameter("idOfMainOrg", idOfMainOrg);
         query.setParameter("groupName", groupName.toLowerCase());
-        
+
         List<GroupNamesToOrgs> list = (List<GroupNamesToOrgs>) query.list();
         GroupNamesToOrgs groupNamesToOrgs = null;
 
@@ -3403,7 +3502,7 @@ public class DAOUtils {
             throw new IllegalArgumentException("Not correct OGRN");
         }
         Query query = session.createSQLQuery("select idoforg from cf_orgs "
-                                        + " where ogrn like :OGRN ");
+                + " where ogrn like :OGRN ");
         query.setParameter("OGRN", ogrn);
         query.setMaxResults(1);
         BigInteger idoforg = (BigInteger) query.uniqueResult();
@@ -3413,7 +3512,7 @@ public class DAOUtils {
         return idoforg.longValue();
     }
 
-	public static Long getAllPreordersPriceByClient(Session session, Long idOfClient, Date startDate, Date endDate,
+    public static Long getAllPreordersPriceByClient(Session session, Long idOfClient, Date startDate, Date endDate,
             Long idOfPreorderComplex, Long idOfPreorderMenudetail) {
         String complexCondition = "", menudetailCondition = "";
         if (null != idOfPreorderComplex) {
@@ -3423,20 +3522,20 @@ public class DAOUtils {
             menudetailCondition = " AND pmd.idofpreordermenudetail <> :idOfPreorderMenudetail ";
         }
         Query query = session.createSQLQuery(
-             "SELECT sum(a.totalprice) AS totalprice "
-              + "FROM ( "
-              + "   SELECT sum(pc.complexprice * pc.amount) AS totalprice "
-              + "   FROM cf_preorder_complex pc "
-              + "   WHERE pc.amount > 0 AND coalesce(pc.deletedstate=0,false) AND pc.idofclient = :idOfClient AND "
-              + "       pc.preorderdate BETWEEN :startDate AND :endDate "
-              + complexCondition
-              + "   UNION ALL "
-              + "   SELECT sum(pmd.menudetailprice * pmd.amount) AS totalprice "
-              + "   FROM cf_preorder_menudetail pmd "
-              + "   WHERE pmd.amount > 0 AND coalesce(pmd.deletedstate=0,false) AND pmd.idofclient = :idOfClient AND "
-              + "       pmd.preorderdate BETWEEN :startDate AND :endDate "
-              + menudetailCondition
-              + ") a");
+                "SELECT sum(a.totalprice) AS totalprice "
+                        + "FROM ( "
+                        + "   SELECT sum(pc.complexprice * pc.amount) AS totalprice "
+                        + "   FROM cf_preorder_complex pc "
+                        + "   WHERE pc.amount > 0 AND coalesce(pc.deletedstate=0,false) AND pc.idofclient = :idOfClient AND "
+                        + "       pc.preorderdate BETWEEN :startDate AND :endDate "
+                        + complexCondition
+                        + "   UNION ALL "
+                        + "   SELECT sum(pmd.menudetailprice * pmd.amount) AS totalprice "
+                        + "   FROM cf_preorder_menudetail pmd "
+                        + "   WHERE pmd.amount > 0 AND coalesce(pmd.deletedstate=0,false) AND pmd.idofclient = :idOfClient AND "
+                        + "       pmd.preorderdate BETWEEN :startDate AND :endDate "
+                        + menudetailCondition
+                        + ") a");
 
         query.setParameter("idOfClient", idOfClient);
         query.setParameter("startDate", startDate.getTime());
@@ -3482,10 +3581,7 @@ public class DAOUtils {
         try {
             if(!EnterEventSendInfo.VALID_ENTER_CODES.contains(enterEvent.getPassDirection()) &&
                     !EnterEventSendInfo.VALID_EXIT_CODES.contains(enterEvent.getPassDirection())){
-                logger.debug("EnterEvent record EVT Time: " + enterEvent.getEvtDateTime()
-                        + " ORG: " + enterEvent.getOrg().getIdOfOrg()
-                        + " have PassDirection: " + enterEvent.getPassDirection()
-                );
+                // save only specific enterEvents
                 return;
             }
             Card card = enterEvent.getIdOfCard() == null ? null : findCardByCardNo(session, enterEvent.getIdOfCard());
@@ -3494,7 +3590,7 @@ public class DAOUtils {
                     new CompositeIdOfEnterEventSendInfo(
                             enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(),
                             enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()
-                            )
+                    )
             );
             enterEventSendInfo.setClient(enterEvent.getClient());
             enterEventSendInfo.setCard(card);
@@ -3506,14 +3602,18 @@ public class DAOUtils {
             enterEventSendInfo.setEnterEvent(enterEvent);
             session.save(enterEventSendInfo);
         } catch (Exception e){
-            logger.error("Save EnterEventSendInfo to database error: ", e);
+            Long idOfOrg = enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg();
+            Long idOfClient = enterEvent.getClient() == null ? null : enterEvent.getClient().getIdOfClient();
+            Long cardNo = enterEvent.getIdOfCard();
+            logger.error(String.format("Can't save EnterEventsSendInfo (IdOfOrg: %d IdOfClient: %d CardNo: %d) in DB: ",
+                    idOfOrg, idOfClient, cardNo), e);
         }
     }
 
     public static String findClientGUIDByCardNo(Session session, Long cardNo) {
         try {
             Query query = session.createSQLQuery(
-                            " select c.clientguid from cf_clients c "
+                    " select c.clientguid from cf_clients c "
                             + " join cf_cards crd on crd.idofclient = c.idofclient "
                             + " where crd.cardno = :cardNo ");
             query.setParameter("cardNo", cardNo);
@@ -3528,7 +3628,7 @@ public class DAOUtils {
     public static Long findCardNoByClientGUID(Session session, String GUID) {
         try {
             Query query = session.createSQLQuery(
-                            " select crd.cardno from cf_cards crd "
+                    " select crd.cardno from cf_cards crd "
                             + " join cf_clients c on c.idofclient = crd.idofcard "
                             + " where c.clientguid like :guid and crd.state = 0 "
                             + " order by crd.createddate desc ");
@@ -3548,10 +3648,10 @@ public class DAOUtils {
     public static void updateEnterEventsSendInfo(Session session, Long idofEnterEvent, Long idofOrg,
             Boolean responseCode, Boolean sendToExternal) throws Exception {
         Query query = session.createSQLQuery(
-                        " UPDATE cf_EnterEvents_Send_Info "
-                         + " SET sendToExternal = :sendToExternal, responseCode = :responseCode "
-                         + " WHERE idoforg = :idofOrg and idofenterevent = :idofEnterEvent "
-                )
+                " UPDATE cf_EnterEvents_Send_Info "
+                        + " SET sendToExternal = :sendToExternal, responseCode = :responseCode "
+                        + " WHERE idoforg = :idofOrg and idofenterevent = :idofEnterEvent "
+        )
                 .setParameter("sendToExternal", sendToExternal? 1:0)
                 .setParameter("responseCode", responseCode? 1:0)
                 .setParameter("idofOrg", idofOrg)
@@ -3568,9 +3668,13 @@ public class DAOUtils {
         return (LinkingTokenForSmartWatch) criteria.uniqueResult();
     }
 
-    public static List<ClientGuardian> findListOfClientGuardianByIdOfGuardian(Session session, Long idOfClient) {
+    public static List<ClientGuardian> findListOfClientGuardianByIdOfGuardian(Session session, List<Client> clients) {
+        List<Long> list = new ArrayList<>();
+        for (Client client : clients) {
+            list.add(client.getIdOfClient());
+        }
         Criteria criteria = session.createCriteria(ClientGuardian.class);
-        criteria.add(Restrictions.eq("idOfGuardian", idOfClient));
+        criteria.add(Restrictions.in("idOfGuardian", list));
         criteria.add(Restrictions.eq("deletedState", false));
         criteria.add(Restrictions.eq("disabled", false));
         return criteria.list();
@@ -3623,6 +3727,12 @@ public class DAOUtils {
         return (Org) criteria.uniqueResult();
     }
 
+    public static List<Org> findOrgsByGuid(Session session, String guid) {
+        Criteria criteria = session.createCriteria(Org.class);
+        criteria.add(Restrictions.eq("guid", guid));
+        return criteria.list();
+    }
+
     public static Card findCardByCardNoAndOrg(Session persistenceSession, long cardNo, long idOfOrg) {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
@@ -3630,6 +3740,14 @@ public class DAOUtils {
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
         criteria.setMaxResults(1);
         return (Card) criteria.uniqueResult();
+    }
+
+    public static Card findCardByCardNoAndIdOfFriendlyOrgNullSafe(Session session, Long cardNo, Long idOfOrg){
+        try {
+            return findCardByCardNoAndIdOfFriendlyOrg(session, cardNo, idOfOrg);
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static Card findCardByCardNoAndIdOfFriendlyOrg(Session session, Long cardNo, Long idOfOrg){
@@ -3745,7 +3863,7 @@ public class DAOUtils {
     public static ApplicationForFood updateApplicationForFoodWithSendToAISContingent(Session session, ApplicationForFood applicationForFood,
             ApplicationForFoodStatus status, Long version, Long historyVersion) throws Exception {
         applicationForFood.setSendToAISContingent(true);
-        return updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status, version, historyVersion);
+        return updateApplicationForFoodWithVersionHistorySafe(session, applicationForFood, status, version, historyVersion, true);
     }
 
     public static ApplicationForFood updateApplicationForFoodWithVersion(Session session, ApplicationForFood applicationForFood,
@@ -3760,11 +3878,13 @@ public class DAOUtils {
     }
 
     public static ApplicationForFood updateApplicationForFoodWithVersionHistorySafe(Session session, ApplicationForFood applicationForFood,
-            ApplicationForFoodStatus status, Long version, Long historyVersion) throws Exception {
-        applicationForFood.setStatus(status);
-        applicationForFood.setVersion(version);
-        applicationForFood.setLastUpdate(new Date());
-        session.update(applicationForFood);
+            ApplicationForFoodStatus status, Long version, Long historyVersion, boolean updateParent) throws Exception {
+        if (updateParent) {
+            applicationForFood.setStatus(status);
+            applicationForFood.setVersion(version);
+            applicationForFood.setLastUpdate(new Date());
+            session.update(applicationForFood);
+        }
 
         addApplicationForFoodHistoryWithVersionIfNotExist(session, applicationForFood, status, historyVersion);
         return applicationForFood;
@@ -3864,14 +3984,19 @@ public class DAOUtils {
     }
 
     public static List<ApplicationForFood> getApplicationForFoodListByOrgs(Session session, List<Long> idOfOrgs,
-            ApplicationForFoodStatus status, Long benefit, List<Long> idOfClientList, String number) {
+            ApplicationForFoodStatus status, Long benefit, List<Long> idOfClientList, String number, Date startDate, Date endDate, Boolean showPeriod) {
         String condition = "where 1=1 ";
         condition += (idOfOrgs.size() == 0 ? "" : "and a.client.org.idOfOrg in :idOfOrgs");
         condition += status == null ? "" : " and a.status = :status";
         condition += benefit == null ? "" : (benefit.equals(0L) ? " and a.dtisznCode is null" : " and a.dtisznCode = :code");
         condition += (idOfClientList.size() == 0) ? "" : " and a.client.idOfClient in :idOfClientList";
         condition += (StringUtils.isEmpty(number)) ? "" : " and a.serviceNumber like :number";
+        condition += showPeriod ? " and a.createdDate between :startDate and :endDate" : "";
         Query query = session.createQuery("select a from ApplicationForFood a " + condition + " order by a.createdDate, a.serviceNumber");
+        if (showPeriod) {
+            query.setParameter("startDate", startDate);
+            query.setParameter("endDate", endDate);
+        }
         if (idOfOrgs.size() > 0) query.setParameterList("idOfOrgs", idOfOrgs);
         if (status != null) query.setParameter("status", status);
         if (benefit != null && benefit > 0L) query.setParameter("code", benefit);
@@ -3998,6 +4123,16 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("deleted", false));
         criteria.addOrder(org.hibernate.criterion.Order.asc("code"));
         return criteria.list();
+    }
+
+    public static ClientDtisznDiscountInfo getActualDTISZNDiscountsInfoInoeByClient(Session session, Long idOfClient, Long code) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
+        criteria.add(Restrictions.eq("archived", false));
+        criteria.add(Restrictions.eq("dtisznCode", code));
+        List list = criteria.list();
+        if (list.size() == 0 || list.size() > 1) return null;
+        return (ClientDtisznDiscountInfo)list.get(0);
     }
 
     public static ApplicationForFood  updateApplicationForFoodByServiceNumberFullWithVersion(Session persistenceSession, String serviceNumber,
@@ -4204,6 +4339,18 @@ public class DAOUtils {
         return (OrgSetting) criteria.uniqueResult();
     }
 
+    public static List<CategoryDiscount> getCategoryDiscountList(Session session) {
+        Query q = session.createQuery("from CategoryDiscount order by idOfCategoryDiscount");
+        return (List<CategoryDiscount>)q.list();
+    }
+
+    public static List<CategoryDiscount> getCategoryDiscountListByCategoryName(Session session, String categoryName) {
+        Criteria criteria = session.createCriteria(CategoryDiscount.class);
+        criteria.add(Restrictions.like("categoryName", categoryName, MatchMode.ANYWHERE).ignoreCase());
+        criteria.addOrder(org.hibernate.criterion.Order.asc("idOfCategoryDiscount"));
+        return (List<CategoryDiscount>) criteria.list();
+    }
+
     public static List<Long> findFriendlyOrgsIds(Session session, List<Long> orgIdList) {
         Query query = session
                 .createSQLQuery("select friendlyorg from cf_friendly_organization where currentorg in (:idOfOrgList)")
@@ -4252,6 +4399,139 @@ public class DAOUtils {
         Criteria criteria = persistenceSession.createCriteria(EnterEvent.class);
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.between("evtDateTime", startDate, endDate));
+        return criteria.list();
+    }
+
+    public static List<Integer> getDsznCodeListByCategoryDiscountCode(Session session, Long idOfCategoryDiscount) {
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        criteria.add(Restrictions.eq("categoryDiscount.idOfCategoryDiscount", idOfCategoryDiscount));
+        criteria.setProjection(Projections.property("code"));
+        return criteria.list();
+    }
+
+    public static ApplicationForFood getApplicationForFoodByClientAndCode(Session session, Client client, Long code) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.eq("dtisznCode", code));
+        criteria.add(Restrictions.eq("archived", false));
+        return (ApplicationForFood) criteria.uniqueResult();
+    }
+
+    public static List<ApplicationForFood> getApplicationForFoodByClient(Session session, Client client) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.eq("archived", false));
+        return criteria.list();
+    }
+
+    public static void removeUserOPFlag(Session session, Long idOfOrg) {
+        Query query = session.createSQLQuery("update cf_clients set userop = false where idoforg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        query.executeUpdate();
+    }
+
+    public static List getAllDateFromViewEZD(Session persistenceSession, List<Org> orgs, String groupname,
+            Date startDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzdView.class);
+        if (orgs != null && !orgs.isEmpty()) {
+            List<Long> ids = new ArrayList<>();
+            for (Org org : orgs) {
+                ids.add(org.getIdOfOrg());
+            }
+            criteria.add(Restrictions.in("idoforg", ids));
+        }
+        if (groupname != null) {
+            criteria.add(Restrictions.eq("groupname", groupname));
+        }
+        criteria.add(Restrictions.gt("menudate", startDate));
+        return criteria.list();
+    }
+
+    public static List getAllDateFromsSpecialDatesForEZD(Session persistenceSession) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzdSpecialDateView.class);
+        criteria.add(Restrictions.gt("specDate", new Date()));
+        return criteria.list();
+    }
+
+    public static List getDateFromsSpecialDatesForEZD(Session persistenceSession, List<String> groupName, List<Long> idofOrg)
+            throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzdSpecialDateView.class);
+        criteria.add(Restrictions.gt("specDate", new Date()));
+        criteria.add(Restrictions.in("groupname", groupName));
+        criteria.add(Restrictions.in("idoforg", idofOrg));
+        return criteria.list();
+    }
+
+    public static List getAllDateFromProdactionCalendarForEZD(Session persistenceSession) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
+        criteria.add(Restrictions.gt("day", new Date()));
+        return criteria.list();
+    }
+
+    public static boolean findSameRequestFromEZD(Session persistenceSession, Long idofOrg, String groupName, Date data,
+            Long idOfComplex) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzd.class);
+        criteria.add(Restrictions.eq("idOfOrg", idofOrg));
+        criteria.add(Restrictions.eq("groupname", groupName));
+        criteria.add(Restrictions.eq("dateappointment", data));
+        criteria.add(Restrictions.eq("idofcomplex", idOfComplex));
+        return criteria.list().isEmpty();
+    }
+
+    public static List getAllGoodRequestEZD(Session persistenceSession, Set<Long> friendlyOrgsid, Long version)
+            throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzd.class);
+        criteria.add(Restrictions.gt("versionrecord", version.intValue()));
+        criteria.add(Restrictions.in("idOfOrg", friendlyOrgsid));
+        criteria.add(Restrictions.ge("dateappointment", new Date()));
+        criteria.add(Restrictions.le("dateappointment", CalendarUtils.addMonth(new Date(),1) ));
+        return criteria.list();
+    }
+
+    public static Integer getMaxVersionForEZD(Session persistenceSession) throws Exception {
+        Query query = persistenceSession.createQuery("SELECT MAX(re.versionrecord) FROM RequestsEzd AS re");
+        Integer maxVer = (Integer) query.uniqueResult();
+        return maxVer == null ? 0 : maxVer;
+    }
+
+
+    public static void updateRequestFromEZD(Session session, Long idofOrg, String userName, String groupName, Date data,
+            Long idOfComplex, Integer complexcount, Integer versionrecord) {
+        Query query = session.createSQLQuery(
+                "update cf_goods_requests_ezd set complexcount = :complexcount, lastupdate = :lastupdate, versionrecord = :versionrecord, username = :username "
+                        + "where idoforg = :idOfOrg and groupName = :groupName "
+                        + "and dateappointment = :dateappointment and idOfComplex  = :idOfComplex");
+        query.setParameter("complexcount", complexcount);
+        query.setParameter("lastupdate", new Date().getTime());
+        query.setParameter("idOfOrg", idofOrg);
+        query.setParameter("username", userName);
+        query.setParameter("groupName", groupName);
+        query.setParameter("dateappointment", data.getTime());
+        query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("versionrecord", versionrecord);
+        query.executeUpdate();
+    }
+
+    public static List<EMIAS> getEmiasbyidEventEMIAS(Long idEventEMIAS, Session session){
+        try {
+            Criteria criteria = session.createCriteria(EMIAS.class);
+            criteria.add(Restrictions.eq("idEventEMIAS", idEventEMIAS));
+            return criteria.list();
+        } catch (Exception e)
+        {
+            return new ArrayList<EMIAS>();
+        }
+    }
+	
+	public static Long getMaxVersionOfEmias(Session session) {
+        Query query = session.createQuery("SELECT MAX(em.version) FROM EMIAS AS em");
+        Long maxVer = (Long) query.uniqueResult();
+        return maxVer == null ? 0 : maxVer;
+    }
+
+    public static List<EMIAS> getEmiasForMaxVersion(Long maxVersion, Session session){
+        Criteria criteria = session.createCriteria(EMIAS.class);
+        criteria.add(Restrictions.gt("version", maxVersion));
         return criteria.list();
     }
 }

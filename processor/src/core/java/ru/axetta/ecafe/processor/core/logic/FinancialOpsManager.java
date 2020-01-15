@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.logic;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -312,7 +313,7 @@ public class FinancialOpsManager {
                     idOfPayment, contragent, getContragentReceiverForPayments(session, client), addPaymentMethod, addIdOfPayment);
             registerSubBalance1ClientPayment(session, clientPayment);
         }
-
+        runtimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).savePayment(session, clientPayment);
         return clientPayment;
     }
 
@@ -409,13 +410,13 @@ public class FinancialOpsManager {
     }
 
     //TODO: добавить изменение текущих позиций
-    @Transactional
-    public void createAccountTransfer(Client benefactor, Client beneficiary, Long sum, String reason, User createdBy) throws Exception {
+    //@Transactional
+    public void createAccountTransfer(Session session, Client benefactor, Client beneficiary, Long sum, String reason, User createdBy) throws Exception {
         SecurityJournalBalance journalFrom = SecurityJournalBalance.getSecurityJournalBalanceFromOperations(
                 null, benefactor, SJBalanceTypeEnum.SJBALANCE_TYPE_ORDER, SJBalanceSourceEnum.SJBALANCE_SOURCE_BALANCE_TRANSFER);
         SecurityJournalBalance journalTo = SecurityJournalBalance.getSecurityJournalBalanceFromOperations(
                 null, beneficiary, SJBalanceTypeEnum.SJBALANCE_TYPE_PAYMENT, SJBalanceSourceEnum.SJBALANCE_SOURCE_BALANCE_TRANSFER);
-        Session session = (Session)em.getDelegate();
+        //Session session = (Session)em.getDelegate();
         String mess = null;
         if (sum<=0) {
             mess = "Сумма перевода должна быть больше нуля";
@@ -448,8 +449,8 @@ public class FinancialOpsManager {
         session.update(accountTransactionOnBenefactor);
         session.update(accountTransactionOnBeneficiary);
 
-        SecurityJournalBalance.saveSecurityJournalBalanceWithTransaction(journalFrom, true, "OK", accountTransactionOnBenefactor);
-        SecurityJournalBalance.saveSecurityJournalBalanceWithTransaction(journalTo, true, "OK", accountTransactionOnBeneficiary);
+        SecurityJournalBalance.saveSecurityJournalBalanceWithTransaction(session, journalFrom, true, "OK", accountTransactionOnBenefactor);
+        SecurityJournalBalance.saveSecurityJournalBalanceWithTransaction(session, journalTo, true, "OK", accountTransactionOnBeneficiary);
     }
 
     @Transactional
@@ -494,7 +495,7 @@ public class FinancialOpsManager {
         session.flush();
         accountTransaction.updateSource(accountRefund.getIdOfAccountRefund() + "");
         session.update(accountTransaction);
-        SecurityJournalBalance.saveSecurityJournalBalanceWithTransaction(journal, true, "OK", accountTransaction);
+        SecurityJournalBalance.saveSecurityJournalBalanceWithTransaction(null, journal, true, "OK", accountTransaction);
     }
 
     @Transactional

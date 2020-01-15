@@ -17,6 +17,8 @@
 <h:panelGrid id="orgCreateGrid_basic" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.guid}" styleClass="input-text" />
+    <h:outputText escape="true" value="ЕКИС Id" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.ekisId}" styleClass="input-text" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.officialName}" maxlength="256" styleClass="input-text" size="150" />
     <h:outputText escape="true" value="Краткое наименование" styleClass="output-text required-field" />
@@ -165,6 +167,8 @@
     <h:inputText value="#{mainPage.orgCreatePage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />
     <h:outputText escape="true" value="Включить предзаказы" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.preordersEnabled}" styleClass="input-text" />
+    <h:outputText escape="true" value="Предварительные заявки по ЛП" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgCreatePage.preorderlp}" styleClass="input-text"/>
 </h:panelGrid>
 <br />
 <rich:separator />

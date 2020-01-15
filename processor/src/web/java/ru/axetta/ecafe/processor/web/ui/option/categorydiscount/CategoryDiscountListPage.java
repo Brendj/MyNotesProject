@@ -6,7 +6,8 @@ package ru.axetta.ecafe.processor.web.ui.option.categorydiscount;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
+import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -79,10 +80,25 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
     }
 
     private void reload() {
-        List<CategoryDiscount> list = service.getCategoryDiscountList();
-        items = new ArrayList<CategoryDiscountItem>();
-        for(CategoryDiscount categoryDiscount : list) {
-            items.add(new CategoryDiscountItem(categoryDiscount));
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            List<CategoryDiscount> list = DAOUtils.getCategoryDiscountList(persistenceSession);
+
+            items = new ArrayList<CategoryDiscountItem>();
+            for (CategoryDiscount categoryDiscount : list) {
+                items.add(new CategoryDiscountItem(categoryDiscount));
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logAndPrintMessage("Ошибка при обновлении льгот ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, getLogger());
+            HibernateUtils.close(persistenceSession, getLogger());
         }
     }
 
@@ -104,10 +120,25 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
         if(categoryNameFilter.isEmpty()){
             return null;
         }
-        List<CategoryDiscount> list = service.getCategoryDiscountListByCategoryName(categoryNameFilter);
-        items = new LinkedList<CategoryDiscountItem>();
-        for(CategoryDiscount categoryDiscount : list) {
-            items.add(new CategoryDiscountItem(categoryDiscount));
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            List<CategoryDiscount> list = DAOUtils.getCategoryDiscountListByCategoryName(persistenceSession, categoryNameFilter);
+
+            items = new LinkedList<CategoryDiscountItem>();
+            for(CategoryDiscount categoryDiscount : list) {
+                items.add(new CategoryDiscountItem(categoryDiscount));
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logAndPrintMessage("Ошибка при фильтрации льгот ", e);
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, getLogger());
+            HibernateUtils.close(persistenceSession, getLogger());
         }
         return null;
     }
@@ -123,32 +154,49 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
         private String organizationTypeString;
         private String categoriesDSZN;
         private boolean blockedToChange;
+        private Boolean eligibleToDelete;
+        private String discountRate;
+        private CategoryDiscountEnumType categoryType;
+        private String filter = "-";
+        private String discountRules;
+        private List<Long> idOfRuleList = new ArrayList<Long>();
+        private Set<DiscountRule> discountRuleSet;
+        public static final String DISCOUNT_START = "Платное питание[";
+        public static final String DISCOUNT_END = "%]";
 
         public CategoryDiscountItem(CategoryDiscount categoryDiscount) {
             this.idOfCategoryDiscount = categoryDiscount.getIdOfCategoryDiscount();
             this.categoryName = categoryDiscount.getCategoryName();
             this.description = categoryDiscount.getDescription();
             this.organizationTypeString = categoryDiscount.getOrganizationTypeString();
-            if(categoryDiscount.getCategoriesDiscountDSZN() != null
-                    && categoryDiscount.getCategoriesDiscountDSZN().size() > 0) {
-                Map<Integer, String> map = new TreeMap<Integer, String>();
-                for (CategoryDiscountDSZN discountDSZN : categoryDiscount.getCategoriesDiscountDSZN()) {
-                    if(!discountDSZN.getDeleted()) {
-                        map.put(discountDSZN.getCode(), discountDSZN.getDescription());
-                    }
-                }
-                StringBuilder sb = new StringBuilder();
-                for (Integer code : map.keySet()) {
-                    sb.append(code);
-                    sb.append(" - ");
-                    sb.append(map.get(code));
-                    sb.append("; ");
-                }
-                this.categoriesDSZN = sb.length() > 2 ? sb.substring(0, sb.length() - 2) : sb.toString();
-            } else {
-                this.categoriesDSZN = "";
-            }
             this.blockedToChange = categoryDiscount.getBlockedToChange();
+            this.eligibleToDelete = categoryDiscount.getEligibleToDelete();
+            this.categoryType = categoryDiscount.getCategoryType();
+            this.discountRules = categoryDiscount.getDiscountRules();
+            this.discountRuleSet = categoryDiscount.getDiscountsRules();
+
+            if(description.indexOf(DISCOUNT_START) == 0) {
+                String discount = description.substring(
+                        description.indexOf(DISCOUNT_START) + DISCOUNT_START.length(),
+                        description.indexOf(DISCOUNT_END));
+                this.setDiscountRate(discount+"%");
+                description = "";
+            } else {
+                this.setDiscountRate("100%");
+            }
+            if(categoryDiscount.getDiscountsRules().isEmpty()){
+                this.setFilter("-");
+            } else {
+                StringBuilder sb=new StringBuilder();
+                sb.append("{");
+                for (DiscountRule discountRule: categoryDiscount.getDiscountsRules()){
+                    this.idOfRuleList.add(discountRule.getIdOfRule());
+                    sb.append(discountRule.getDescription());
+                    sb.append(";");
+                }
+                sb.append("} ");
+                this.setFilter(sb.substring(0, sb.length()-1));
+            }
         }
 
         public long getIdOfCategoryDiscount() {
@@ -198,6 +246,53 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
         public void setBlockedToChange(boolean blockedToChange) {
             this.blockedToChange = blockedToChange;
         }
-    }
 
+        public Boolean getEligibleToDelete() {
+            return eligibleToDelete;
+        }
+
+        public void setEligibleToDelete(Boolean eligibleToDelete) {
+            this.eligibleToDelete = eligibleToDelete;
+        }
+
+        public String getDiscountRate() {
+            return discountRate;
+        }
+
+        public void setDiscountRate(String discountRate) {
+            this.discountRate = discountRate;
+        }
+
+        public CategoryDiscountEnumType getCategoryType() {
+            return categoryType;
+        }
+
+        public void setCategoryType(CategoryDiscountEnumType categoryType) {
+            this.categoryType = categoryType;
+        }
+
+        public void setFilter(String filter) {
+            this.filter = filter;
+        }
+
+        public String getFilter() {
+            return filter;
+        }
+
+        public Set<DiscountRule> getDiscountRuleSet() {
+            return discountRuleSet;
+        }
+
+        public void setDiscountRuleSet(Set<DiscountRule> discountRuleSet) {
+            this.discountRuleSet = discountRuleSet;
+        }
+
+        public String getDiscountRules() {
+            return discountRules;
+        }
+
+        public void setDiscountRules(String discountRules) {
+            this.discountRules = discountRules;
+        }
+    }
 }

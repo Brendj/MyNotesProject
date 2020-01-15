@@ -53,6 +53,8 @@ public class Option {
             OPTION_MAX_NUM_DAYS_NOTIFICATION_GOOD_REQUEST_CHANGE =1015, //максимальное количество дней для выборки(7-31)
             OPTION_ARRAY_OF_FILTER_TEXT =1016, //Список выражений по фильтраций комплексов АП, выражения разделяются через ';
             OPTION_VALID_REGISTRY_DATE = 1017,
+            OPTION_REVISE_LAST_DATE = 1018,
+            OPTION_REVISE_LIMIT = 1019,
 
             OPTION_NSI_LAST_SYNC_TIME=10001,
             OPTION_STOP_LIST_LAST_UPDATE=10010,
@@ -146,7 +148,16 @@ public class Option {
             OPTION_REVISE_DELTA = 100096,
             OPTION_LOG_INFOSERVICE = 100097,
             OPTION_METHODS_INFOSERVICE = 100098,
-            OPTION_IMPORT_RNIP_PAYMENTS_URL_V20 = 100099;
+            OPTION_IMPORT_RNIP_PAYMENTS_URL_V20 = 100099,
+            OPTION_REGULAR_PAYMENT_CERT_PATH = 100100,
+            OPTION_REGULAR_PAYMENT_CERT_PASSWORD = 100101,
+            OPTION_FULL_SYNC_EXPRESSION = 100200,
+            OPTION_ORG_SETTING_SYNC_EXPRESSION = 100201,
+            OPTION_CLIENT_DATA_SYNC_EXPRESSION = 100202,
+            OPTION_MENU_SYNC_EXPRESSION = 100203,
+            OPTION_PHOTO_SYNC_EXPRESSION = 100204,
+            OPTION_LIB_SYNC_EXPRESSION = 100205,
+            OPTION_PERIOD_OF_EXTENSION_CARDS = 101101;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -183,6 +194,8 @@ public class Option {
             OPTION_MAX_NUM_DAYS_NOTIFICATION_GOOD_REQUEST_CHANGE, "7", // по умолчанию неделя максимально до 31 дня
             OPTION_ARRAY_OF_FILTER_TEXT, "сотрудник;",
             OPTION_VALID_REGISTRY_DATE, "0",
+            OPTION_REVISE_LAST_DATE, "",
+            OPTION_REVISE_LIMIT, "10000",
             OPTION_NSI_LAST_SYNC_TIME, null,
             OPTION_STOP_LIST_LAST_UPDATE, null,
             OPTION_MSR_STOPLIST_ON, "0",
@@ -270,8 +283,16 @@ public class Option {
             OPTION_REVISE_DELTA, "24",
             OPTION_LOG_INFOSERVICE, "0",
             OPTION_METHODS_INFOSERVICE, "",
-            OPTION_IMPORT_RNIP_PAYMENTS_URL_V20, "http://test.rnip.mos.ru/frontend-service/MainService"
-
+            OPTION_IMPORT_RNIP_PAYMENTS_URL_V20, "http://test.rnip.mos.ru/frontend-service/MainService",
+            OPTION_REGULAR_PAYMENT_CERT_PATH, "",
+            OPTION_REGULAR_PAYMENT_CERT_PASSWORD, "12345678",
+            OPTION_FULL_SYNC_EXPRESSION, "!22:00-05:00;!07:00-16:00",
+            OPTION_ORG_SETTING_SYNC_EXPRESSION, "04:00-11:00;11:00-18:00",
+            OPTION_CLIENT_DATA_SYNC_EXPRESSION, "04:00-09:00;09:00-14:00",
+            OPTION_MENU_SYNC_EXPRESSION, "04:00-13:00;13:00-22:00",
+            OPTION_PHOTO_SYNC_EXPRESSION, "04:00-07:00",
+            OPTION_LIB_SYNC_EXPRESSION, "16:00-22:00",
+            OPTION_PERIOD_OF_EXTENSION_CARDS, "12"
 };
 
     private Long idOfOption;

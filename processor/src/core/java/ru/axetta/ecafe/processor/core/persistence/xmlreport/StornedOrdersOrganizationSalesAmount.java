@@ -12,7 +12,7 @@ import java.util.Date;
  * Date: 19.01.15
  * Time: 17:59
  */
-
+@Deprecated
 public class StornedOrdersOrganizationSalesAmount {
 
     public Long idOfOrg;

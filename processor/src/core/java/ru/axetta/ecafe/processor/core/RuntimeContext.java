@@ -155,6 +155,14 @@ public class RuntimeContext implements ApplicationContextAware {
         this.methodsInfoService = methodsInfoService;
     }
 
+    public String getExtendCardServiceApiKey() {
+        return extendCardServiceApiKey;
+    }
+
+    public void setExtendCardServiceApiKey(String extendCardServiceApiKey) {
+        this.extendCardServiceApiKey = extendCardServiceApiKey;
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -167,6 +175,10 @@ public class RuntimeContext implements ApplicationContextAware {
         public AlreadyInitializedException() {
             super("Runtime context has been initialized already.");
         }
+    }
+
+    public String getOkuApiKey() {
+        return okuApiKey;
     }
 
     private static ApplicationContext applicationContext;
@@ -201,6 +213,8 @@ public class RuntimeContext implements ApplicationContextAware {
     public static final String SCUD = PROCESSOR_PARAM_BASE + ".scud";
     public static final String SCUD_LOGIN = SCUD + ".login";
     public static final String SCUD_PASSWORD = SCUD + ".password";
+    private static final String OKU_API_KEY = PROCESSOR_PARAM_BASE + ".oku.api.key";
+    private static final String EXTEND_CARD_SERVICE_API_KEY = PROCESSOR_PARAM_BASE + ".extendCardService.api.key";
 
     public final static int NODE_ROLE_MAIN = 1, NODE_ROLE_PROCESSOR = 2;
     // Logger
@@ -257,6 +271,9 @@ public class RuntimeContext implements ApplicationContextAware {
     private String scudPassword;
 
     private String geoplanerApiKey;
+
+    private String okuApiKey;
+    private String extendCardServiceApiKey;
 
     private RBKMoneyConfig partnerRbkMoneyConfig;
     ////////////////////////////////////////////
@@ -657,6 +674,9 @@ public class RuntimeContext implements ApplicationContextAware {
 
             this.geoplanerApiKey = properties.getProperty(PROCESSOR_PARAM_BASE + ".geoplaner.apikey");
 
+            this.okuApiKey = properties.getProperty(OKU_API_KEY);
+            this.extendCardServiceApiKey = properties.getProperty(EXTEND_CARD_SERVICE_API_KEY);
+
             ruleProcessor = createRuleHandler(properties, sessionFactory, postman, postman);
             this.autoReportProcessor = ruleProcessor;
             this.eventProcessor = ruleProcessor;
@@ -1006,7 +1026,7 @@ public class RuntimeContext implements ApplicationContextAware {
             String description) {
         Date currentTime = new Date();
         CategoryDiscount categoryDiscount = new CategoryDiscount(idOfCategoryDiscount, categoryName, discountRules,
-                description, currentTime, currentTime, false);
+                description, currentTime, currentTime, false,false);
         categoryDiscount.setCategoryType(CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
         entityManager.persist(categoryDiscount);
         logger.info("Category with name \"" + categoryName + "\" created");
@@ -1284,6 +1304,10 @@ public class RuntimeContext implements ApplicationContextAware {
         IAuthorizeUserBySms service = null;
         if (properties.getProperty("ecafe.processor.userCode.service", "").equals("EMP")) {
             service = applicationContext.getBean(EMPAuthorizeUserBySmsService.class);
+        }
+        else
+        {
+            service = applicationContext.getBean(EMPSendSmsToUserService.class);
         }
         return service;
     }

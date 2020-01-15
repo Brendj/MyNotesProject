@@ -15,10 +15,14 @@ public enum OrganizationType {
     /*0*/ SCHOOL(0,"Общеобразовательное ОУ"),
     /*1*/ KINDERGARTEN(1,"Дошкольное ОУ"),
     /*2*/ SUPPLIER(2,"Поставщик питания"),
-    /*3*/ PROFESSIONAL(3,"Профессиональное ОУ");
+    /*3*/ PROFESSIONAL(3,"Профессиональное ОУ"),
+    /*4*/ ADDEDEDUCATION (4, "Доп.образование");
 
     private final Integer code;
     private final String description;
+
+    public final static String[] ORGANIZATION_CODE_TYPES = {
+            "school", "kindergarten", "supplier", "professional"};
 
     static Map<Integer,OrganizationType> map = new HashMap<Integer,OrganizationType>();
     static {
@@ -67,5 +71,18 @@ public enum OrganizationType {
         } else {
             return fromInteger(code).toString();
         }
+    }
+
+    public static String getCodeTypeByCode(Integer code) {
+        if(SCHOOL.code.equals(code)){
+            return ORGANIZATION_CODE_TYPES[0];
+        } else if(KINDERGARTEN.code.equals(code)){
+            return ORGANIZATION_CODE_TYPES[1];
+        } else if(SUPPLIER.code.equals(code)){
+            return ORGANIZATION_CODE_TYPES[2];
+        } else if(PROFESSIONAL.code.equals(code)){
+            return ORGANIZATION_CODE_TYPES[3];
+        }
+        return ORGANIZATION_CODE_TYPES[0];
     }
 }

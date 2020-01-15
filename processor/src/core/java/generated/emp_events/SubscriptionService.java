@@ -51,6 +51,11 @@ public class SubscriptionService
         return (SubscriptionPortType)super.getPort(new QName("urn://emp.altarix.ru/subscriptions", "ServicePort"), SubscriptionPortType.class);
     }
 
+    @WebEndpoint(name = "ServicePort")
+    public SubscriptionPortType getServicePortTest() {
+        return (SubscriptionPortType)super.getPort(new QName("http://tempuri.org/", "BasicHttpBinding_SubscriptionService"), SubscriptionPortType.class);
+    }
+
     /**
      * 
      * @param features

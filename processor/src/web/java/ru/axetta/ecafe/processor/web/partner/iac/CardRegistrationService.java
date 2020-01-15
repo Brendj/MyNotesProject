@@ -13,10 +13,8 @@ import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Session;
-import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -35,7 +33,7 @@ public class CardRegistrationService {
     public static final String COMMENT_ADDED_FROM_IAC = "{Добавлен из ИАЦ}";
 
     public Client registerNewClient(Session session, String firstName, String secondName, String surname, Date birthDate, String guid,
-            String extId, String organizationGuid, String group, String benefit) throws Exception {
+            String extId, String organizationGuid, String group, String benefit, Long contractId) throws Exception {
         ClientManager.ClientFieldConfig fieldConfig = new ClientManager.ClientFieldConfig();
         fieldConfig.setValue(ClientManager.FieldId.CLIENT_GUID, guid);
         fieldConfig.setValue(ClientManager.FieldId.SURNAME, emptyIfNull(surname));
@@ -43,10 +41,11 @@ public class CardRegistrationService {
         fieldConfig.setValue(ClientManager.FieldId.SECONDNAME, emptyIfNull(secondName));
         SimpleDateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy");
         fieldConfig.setValue(ClientManager.FieldId.BIRTH_DATE, dateFormat.format(birthDate));
-        fieldConfig.setValue(ClientManager.FieldId.IAC_REG_ID, extId);
+        fieldConfig.setValue(ClientManager.FieldId.IAC_REG_ID, convertRegId(extId));
         fieldConfig.setValue(ClientManager.FieldId.GROUP, group);
         //fieldConfig.setValue(ClientManager.FieldId.BENEFIT, benefit);
         fieldConfig.setValue(ClientManager.FieldId.COMMENTS, COMMENT_ADDED_FROM_IAC);
+        fieldConfig.setValue(ClientManager.FieldId.CONTRACT_ID, contractId);
 
         Org org = DAOUtils.findOrgByGuid(session, organizationGuid);
         if (null == org) {
@@ -58,17 +57,39 @@ public class CardRegistrationService {
         return (Client) session.load(Client.class, idOfClient);
     }
 
+    private String convertRegId(String regId) {
+        if (regId == null) return null;
+        regId = regId.trim();
+        int len = regId.length();
+        int st = 0;
+        char[] val = regId.toCharArray();
+        while ((st < len) && (val[st] == '{')) {
+            st++;
+        }
+        while ((st < len) && (val[len - 1] == '}')) {
+            len--;
+        }
+        return ((st > 0) || (len < regId.length())) ? regId.substring(st, len) : regId;
+    }
+
     public void registerCard(Session session, Long cardId, Date validDate, Client client) throws Exception {
 
         if (null == cardId)
             throw new RequiredFieldsAreNotFilledException("Required fields are not filled: cardId = null");
 
-        Card card = DAOUtils.findCardByCardNoAndOrg(session, cardId, client.getOrg().getIdOfOrg());
+        Card card = DAOUtils.findCardByCardNo(session, cardId);
 
         if (null == card) {
-            blockAllOtherClientCards(client);
+            String strCardId = cardId.toString();
+            if (strCardId.length() == 13 && !strCardId.startsWith("1")) {
+                if (null == validDate) validDate = CalendarUtils.addYear(new Date(), 12);
+            } else {
+                if (client.getCards() != null && client.getCards().size() > 0 && null == validDate)
+                    validDate = CalendarUtils.addDays(new Date(), 10);
+            }
+            blockAllOtherClientCards(session, client);
             if (null == validDate)
-                validDate = CalendarUtils.addYear(new Date(), 5);
+                validDate = CalendarUtils.addYear(new Date(), 12);
             RuntimeContext.getInstance().getCardManager().createCard(session, session.getTransaction(), client.getIdOfClient(),
                     cardId, Arrays.asList(Card.TYPE_NAMES).indexOf("Mifare"), CardState.ISSUED.getValue(), validDate,
                     Card.ISSUED_LIFE_STATE, null, new Date(), cardId);
@@ -78,38 +99,39 @@ public class CardRegistrationService {
                         cardId, client.getOrg().getIdOfOrg(), client.getIdOfClient()));
             } else {
                 if (card.getClient().getIdOfClient().equals(client.getIdOfClient())) {
-                    blockAllOtherClientCards(client);
+                    blockAllOtherClientCards(session, client);
                     card.setState(CardState.ISSUED.getValue());
                 } else {
-                    throw new CardAlreadyUsedException(String.format("Card already used: cardId = %d, orgId = %d, clientId = %d",
-                            cardId, client.getOrg().getIdOfOrg(), client.getIdOfClient()));
+                    RuntimeContext.getInstance().getCardManager().updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+                            CardState.ISSUED.getValue(), card.getValidTime(), card.getLifeState(), card.getLockReason(),
+                            card.getIssueTime(), card.getExternalId());
                 }
             }
         }
     }
 
-    private void blockAllOtherClientCards(Client client) throws Exception {
-        Session session = null;
-        Transaction transaction = null;
-        try {
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
+    private void blockAllOtherClientCards(Session session, Client client) throws Exception {
+        //Session session = null;
+        //Transaction transaction = null;
+        //try {
+        //    session = RuntimeContext.getInstance().createPersistenceSession();
+        //    transaction = session.beginTransaction();
             List<Card> cardList = DAOUtils.getAllCardByClient(session, client);
             CardManager cardManager = RuntimeContext.getInstance().getCardManager();
 
             for (Card card : cardList) {
                 if (card.getState() != CardState.BLOCKED.getValue() && card.getState() != CardState.TEMPBLOCKED.getValue())
-                    cardManager.updateCard(card.getClient().getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+                    cardManager.updateCardInSession(session, card.getClient().getIdOfClient(), card.getIdOfCard(), card.getCardType(),
                             CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(), card.getLockReason(),
-                            card.getIssueTime(), card.getExternalId());
+                            card.getIssueTime(), card.getExternalId(), null, null, "");
             }
 
-            transaction.commit();
-            transaction = null;
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
+        //    transaction.commit();
+        //    transaction = null;
+        //} finally {
+        //    HibernateUtils.rollback(transaction, logger);
+        //    HibernateUtils.close(session, logger);
+        //}
     }
 
     public ExternalInfo loadExternalInfo(Session session, String organizationGuid, String clientGuid, Long cardId ) {
@@ -127,7 +149,7 @@ public class CardRegistrationService {
             if (null != client)
                 externalInfo.contractId = client.getContractId();
         } else if (null != cardId) {
-            Card card = DAOUtils.findCardByCardNoAndOrg(session, cardId, org.getIdOfOrg());
+            Card card = DAOUtils.findCardByCardNo(session, cardId);
             externalInfo.contractId = card.getClient().getContractId();
         }
 

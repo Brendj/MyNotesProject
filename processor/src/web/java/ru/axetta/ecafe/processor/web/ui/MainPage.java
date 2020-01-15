@@ -151,6 +151,7 @@ public class MainPage implements Serializable {
     private String userFilterOfSelectUserListSelectPage = "";
 
     private boolean eligibleToViewUsers;
+    private Boolean canSendAgain = false;
 
     private HtmlPanelMenu mainMenu;
     private BasicWorkspacePage currentWorkspacePage = new DefaultWorkspacePage();
@@ -306,6 +307,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage nsiGroupEmployeePage = new BasicWorkspacePage();
     private final BasicWorkspacePage spbGroupContingentPage = new BasicWorkspacePage();
     private final BasicWorkspacePage spbGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage orgParametersGroup = new BasicWorkspacePage();
     private final BasicWorkspacePage webTechnologistGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage webTechnologistCatalogGroupPage = new BasicWorkspacePage();
     private final SalesReportPage salesReportPage = new SalesReportPage();
@@ -528,6 +530,10 @@ public class MainPage implements Serializable {
 
     public BasicWorkspacePage getReportGroupPage() {
         return reportGroupPage;
+    }
+
+    public BasicWorkspacePage getOrgParametersGroup() {
+        return orgParametersGroup;
     }
 
     public BasicWorkspacePage getWebTechnologistGroupPage() {
@@ -1996,6 +2002,44 @@ public class MainPage implements Serializable {
             }
         }
         return null;
+    }
+
+    public void showContragentSelectPageOwn(Boolean isPaymentContragent) {
+        BasicPage currentTopMostPage = MainPage.getSessionInstance().getTopMostPage();
+        if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler
+                || currentTopMostPage instanceof ContragentListSelectPage) {
+            FacesContext facesContext = FacesContext.getCurrentInstance();
+            RuntimeContext runtimeContext = null;
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            String classType;
+            if(isPaymentContragent){
+                classType = "2";
+            } else {
+                classType = "1";
+            }
+            try {
+                runtimeContext = RuntimeContext.getInstance();
+                persistenceSession = runtimeContext.createPersistenceSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+                MainPage.getSessionInstance().getContragentListSelectPage().fill(persistenceSession, 0, classType);
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                if (currentTopMostPage instanceof ContragentListSelectPage.CompleteHandler) {
+                    MainPage.getSessionInstance().getContragentListSelectPage().pushCompleteHandler(
+                            (ContragentListSelectPage.CompleteHandler) currentTopMostPage);
+                    MainPage.getSessionInstance().getModalPages().push(
+                            MainPage.getSessionInstance().getContragentListSelectPage());
+                }
+            } catch (Exception e) {
+                logger.error("Failed to fill contragent selection page", e);
+                facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                        "Ошибка при подготовке страницы выбора контрагента: " + e.getMessage(), null));
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
+        }
     }
 
     public Object updateOrgSelectPage() {
@@ -6381,6 +6425,12 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showOrgParametersGroupPage(){
+        currentWorkspacePage = orgParametersGroup;
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public Object showWebTechnologistGroupPage(){
         currentWorkspacePage = webTechnologistGroupPage;
         updateSelectedMainMenu();
@@ -9800,6 +9850,24 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object sendSMSagain() throws Exception {
+        ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
+        String userName = context.getRemoteUser();
+        logger.info(String.format("Start of sending SMS code for the user %s", userName));
+        Boolean requstSMS = User.requestSmsCode(userName);
+        logger.info(String.format("End of sending SMS code for the user %s", userName));
+        if (requstSMS){
+            setCanSendAgain(true);
+            context.redirect(context.getRequestContextPath() + "/back-office/confirm-sms.faces");
+        }
+        else {
+            context.redirect(context.getRequestContextPath() + "/back-office/emp_server_not_answer.faces");
+        }
+        setCanSendAgain(true);
+        context.redirect(context.getRequestContextPath() + "/back-office/confirm-sms.faces");
+        return null;
+    }
+
     public Object doChangeUserPassword() throws Exception {
         ExternalContext context = FacesContext.getCurrentInstance().getExternalContext();
         String userName = context.getRemoteUser();
@@ -10539,5 +10607,43 @@ public class MainPage implements Serializable {
 
     public void setRemovedIdOfUserGroup(Long removedIdOfUserGroup) {
         this.removedIdOfUserGroup = removedIdOfUserGroup;
+    }
+
+    public Boolean getCanSendAgain() {
+        return canSendAgain;
+    }
+
+    public void setCanSendAgain(Boolean canSendAgain) {
+        this.canSendAgain = canSendAgain;
+    }
+
+    public Object showClientOperationListPageWithOrgView() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            selectedClientGroupPage.fill(persistenceSession, selectedIdOfClient);
+            clientOperationListPage.fill(persistenceSession, selectedIdOfClient);
+            clientViewPage.fill(persistenceSession, selectedIdOfClient);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            selectedClientGroupPage.showAndExpandMenuGroup();
+            currentWorkspacePage = clientOperationListPage;
+        } catch (Exception e) {
+            logger.error("Failed to show client operation list page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы просмотра списка операций по клиенту: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        updateSelectedMainMenu();
+        return null;
     }
 }

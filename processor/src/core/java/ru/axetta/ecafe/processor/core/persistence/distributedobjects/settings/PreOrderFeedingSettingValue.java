@@ -4,12 +4,16 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.PreOrderFeedingType;
+
 import java.text.ParseException;
 
 public class PreOrderFeedingSettingValue extends AbstractParserBySettingValue{
 
     private int daysCount;  // кол-во дней, на которые должны создаваться заявки
     private int forbiddenDaysCount; // кол-во дней, на которые нельзя редактировать заявки
+
+    private static final int DEFAULT_CAPACITY = 2;
 
     public PreOrderFeedingSettingValue(String[] values) throws ParseException {
         super(values);
@@ -29,6 +33,21 @@ public class PreOrderFeedingSettingValue extends AbstractParserBySettingValue{
     @Override
     public boolean check() {
         return true;
+    }
+
+    @Override
+    protected int getECafeSettingArrayCapacity() {
+        return DEFAULT_CAPACITY;
+    }
+
+    @Override
+    protected Integer getOrgSettingTypeByIndex(Integer index) {
+        return PreOrderFeedingType.getGlobalIdByECafeSettingValueIndex(index);
+    }
+
+    @Override
+    protected Integer getIndexByOrgSettingType(Integer type) {
+        return PreOrderFeedingType.getECafeSettingValueIndexByGlobalId(type);
     }
 
     public int getDaysCount() {

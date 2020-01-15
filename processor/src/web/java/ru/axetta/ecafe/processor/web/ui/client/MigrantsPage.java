@@ -179,7 +179,7 @@ public class MigrantsPage extends OnlineReportPage implements OrgSelectPage.Comp
         }
         if (!StringUtils.isEmpty(guid)) {
             strQuery += isFirstStatement ? "" : " AND ";
-            strQuery += " cc.clientGUID LIKE " + guid;
+            strQuery += " cc.clientGUID LIKE '" + guid + "'";
 
             isFirstStatement = false;
         }

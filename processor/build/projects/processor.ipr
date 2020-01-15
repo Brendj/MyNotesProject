@@ -1597,36 +1597,21 @@
   <component name="dataSourceStorageLocal">
     <data-source name="Moscow Stand VM" uuid="6265f447-0cbf-4544-a95e-c2187c51501f">
       <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>amoscow.public</schema-pattern>
-      <default-schemas>amoscow.public</default-schemas>
     </data-source>
     <data-source name="Kazan Stand VM" uuid="f29aa7e6-4670-495a-8741-1713d2cee403">
       <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>akazan.public</schema-pattern>
-      <default-schemas>akazan.public</default-schemas>
     </data-source>
     <data-source name="Local MoscowDB" uuid="cedfba61-0f44-4ced-9708-18045311d229">
       <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>moscow.public</schema-pattern>
-      <default-schemas>moscow.public</default-schemas>
     </data-source>
     <data-source name="Local Stand Data Source" uuid="225e21f8-d312-4780-aa94-b5ee2ffc7bbc">
       <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
     </data-source>
     <data-source name="SPB Data Base Source" uuid="c480fc0c-b222-491f-845b-ef25d1401d9a">
       <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>aspb.public</schema-pattern>
     </data-source>
     <data-source name="Moscow Last" uuid="0e6b978e-3b8a-493b-86b2-bb312f07eec8">
       <user-name>postgres</user-name>
-      <user-password>dfdadfc5dfd9dfdedfcddfd8dfcfdfd9</user-password>
-      <schema-pattern>moscow_15_09_24.public</schema-pattern>
-      <default-schemas>moscow_15_09_24.public</default-schemas>
     </data-source>
   </component>
   <component name="ideadoc.IdeaDocConfigurationGUI">
@@ -1690,14 +1675,6 @@
     <property name="useTabs" value="false" />
   </component>
   <component name="libraryTable">
-    <library name="apache">
-      <CLASSES>
-        <root url="file://$PROJECT_DIR$/../lib/apache" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES />
-      <jarDirectory url="file://$PROJECT_DIR$/../lib/apache" recursive="false" />
-    </library>
     <library name="axetta_charset">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/smpp/axetta_charset.1.jar!/" />
@@ -1722,6 +1699,14 @@
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/barcode/javase.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/barcode/core.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
+    </library>
+    <library name="bcpkix-jdk15on-1.50">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/bcpkix-jdk15on-1.50.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/bcprov-jdk15on-1.50.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />
@@ -1780,19 +1765,6 @@
         <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-digester-2.1.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES>
-        <root url="jar://$USER_HOME$/.ideaLibSources/commons-lang-2.4-sources.jar!/" />
-        <root url="jar://$USER_HOME$/.ideaLibSources/commons-io-1.4-sources.jar!/" />
-        <root url="jar://$USER_HOME$/.ideaLibSources/commons-httpclient-3.1-sources.jar!/" />
-        <root url="jar://$USER_HOME$/.ideaLibSources/commons-collections-3.2.1-sources.jar!/" />
-        <root url="jar://$USER_HOME$/.ideaLibSources/commons-beanutils-1.8.0-sources.jar!/" />
-      </SOURCES>
-    </library>
-    <library name="commons-logging-1.1.1">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../lib/apache/commons/commons-logging-1.1.1.jar!/" />
-      </CLASSES>
-      <JAVADOC />
       <SOURCES />
     </library>
     <library name="cryptopro">
@@ -1836,13 +1808,6 @@
       <JAVADOC />
       <SOURCES />
     </library>
-    <library name="h2-1.3.161">
-      <CLASSES>
-        <root url="jar://$PROJECT_DIR$/../lib/h2-1.3.161.jar!/" />
-      </CLASSES>
-      <JAVADOC />
-      <SOURCES />
-    </library>
     <library name="hibernate-4.0.1">
       <CLASSES>
         <root url="jar://$PROJECT_DIR$/../lib/hibernate/hibernate-commons-annotations-4.0.1.Final.jar!/" />
@@ -1856,12 +1821,15 @@
         <root url="jar://$PROJECT_DIR$/../lib/hibernate/hibernate-envers-4.0.1.Final.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES>
-        <root url="jar://$USER_HOME$/.ideaLibSources/hibernate-core-4.0.1.Final-sources.jar!/" />
-        <root url="jar://$USER_HOME$/.ideaLibSources/hibernate-jpa-2.0-api-1.0.1.Final-sources.jar!/" />
-        <root url="jar://$USER_HOME$/.ideaLibSources/hibernate-entitymanager-4.0.1.Final-sources.jar!/" />
-        <root url="jar://$USER_HOME$/.ideaLibSources/jboss-logging-3.1.0.GA-sources.jar!/" />
-      </SOURCES>
+      <SOURCES />
+    </library>
+    <library name="httpclient-4.1.2">
+      <CLASSES>
+        <root url="jar://$PROJECT_DIR$/../lib/apache/httpclient-4.1.2.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/apache/httpcore-4.1.4.jar!/" />
+      </CLASSES>
+      <JAVADOC />
+      <SOURCES />
     </library>
     <library name="infinispan-core-5.1.2.FINAL">
       <CLASSES>
@@ -1891,9 +1859,7 @@
         <root url="jar://$PROJECT_DIR$/../lib/jasper/dynamicreports-core-2.4.0.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES>
-        <root url="jar://D:/lib/ireport/src/jasperreports-4.7.1-sources.jar!/" />
-      </SOURCES>
+      <SOURCES />
     </library>
     <library name="javamelody-monitoring">
       <CLASSES>
@@ -1933,9 +1899,7 @@
         <root url="jar://$PROJECT_DIR$/../lib/jbossJ2EE/jbossweb-7.0.10.Final.jar!/" />
       </CLASSES>
       <JAVADOC />
-      <SOURCES>
-        <root url="jar://$USER_HOME$/.ideaLibSources/jboss-servlet-api_3.0_spec-1.0.0.Final-sources.jar!/" />
-      </SOURCES>
+      <SOURCES />
     </library>
     <library name="jfreechart-1.5.0">
       <CLASSES>

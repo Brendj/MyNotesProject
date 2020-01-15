@@ -52,6 +52,15 @@
         <property name="keepAliveSeconds" value="120"/>
     </bean>
 
+    <!-- RNIP get payments executor -->
+    <bean id="rnipPaymentsExecutor" class="org.springframework.scheduling.concurrent.ThreadPoolTaskExecutor">
+        <property name="corePoolSize" value="2"/>
+        <property name="maxPoolSize" value="5"/>
+        <property name="queueCapacity" value="100"/>
+        <property name="allowCoreThreadTimeOut" value="true"/>
+        <property name="keepAliveSeconds" value="120"/>
+    </bean>
+
     <!--    <jee:jndi-lookup id="dataSource" jndi-name="java:jboss/PostgresDS"/>-->
 
 
@@ -175,7 +184,7 @@
     <task:scheduler id="regularPaymentSchedule"/>
     <task:scheduled-tasks scheduler="regularPaymentSchedule">
         <task:scheduled ref="regularPaymentSubscriptionService" method="checkClientBalances"
-                        cron="0 0 17 * * ?"/>
+                        cron="0 0 11,17 * * ?"/>
     </task:scheduled-tasks>
 
     <task:scheduler id="regularPaymentExpireNotificationSchedule"/>
@@ -241,13 +250,6 @@
     <task:scheduled-tasks scheduler="orderStateChangeSchedule">
         <task:scheduled ref="orderStateChangeService" method="notifyOrderStateChange"
                         cron="0 0 4 * * ?"/>
-    </task:scheduled-tasks>
-
-    <!-- Ежедневное формирование реестров в формате XML производится каждый день ночью за предыдущий день-->
-    <task:scheduler id="xmlReportGeneratorSchedule"/>
-    <task:scheduled-tasks scheduler="xmlReportGeneratorSchedule">
-        <task:scheduled ref="xmlReportGeneratorService" method="generateXmlReport"
-                        cron="0 10 0 * * ?"/>
     </task:scheduled-tasks>
 
 </beans>

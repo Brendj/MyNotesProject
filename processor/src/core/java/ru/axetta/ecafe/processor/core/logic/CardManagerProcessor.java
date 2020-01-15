@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
@@ -19,7 +20,10 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 import static ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils.*;
 
@@ -232,72 +236,22 @@ public class CardManagerProcessor implements CardManager {
     @Override
     public void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
             String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg) throws Exception {
+        updateCard(idOfClient, idOfCard, cardType, state, validTime, lifeState, lockReason, issueTime, externalId, cardOperatorUser,
+                idOfOrg, "");
+    }
+
+    @Override
+    public void updateCard(Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
+            String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg, String informationAboutCard) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
-            Client newCardOwner = getClientReference(persistenceSession, idOfClient);
-            Card updatedCard = getCardReference(persistenceSession, idOfCard);
+            updateCardInSession(persistenceSession, idOfClient, idOfCard, cardType, state, validTime, lifeState,
+            lockReason, issueTime, externalId, cardOperatorUser, idOfOrg, informationAboutCard);
 
-            if (CardTransitionState.GIVEN_AWAY.getCode().equals(updatedCard.getTransitionState()) &&
-                    state != updatedCard.getState()) {
-                throw new Exception("УИД карты передан в пользование другой ОО");
-            }
-
-            if (state == Card.ACTIVE_STATE) {
-                Set<Card> clientCards = new HashSet<Card>(newCardOwner.getCards());
-                clientCards.remove(updatedCard);
-                lockActiveCards(persistenceSession, clientCards);
-            }
-
-            final long oldClient = (updatedCard.getClient() != null) ? updatedCard.getClient().getIdOfClient() : -1;
-            final long newClient = newCardOwner.getIdOfClient();
-
-            //История карты при обновлении информации
-            if (oldClient != newClient) {
-                HistoryCard historyCard = new HistoryCard();
-                historyCard.setCard(updatedCard);
-                historyCard.setUpDatetime(new Date());
-                historyCard
-                        .setInformationAboutCard("Передача карты №: " + updatedCard.getCardNo() + " другому владельцу");
-                historyCard.setNewOwner(newCardOwner);
-                historyCard.setFormerOwner(updatedCard.getClient());
-                historyCard.setUser(cardOperatorUser);
-                persistenceSession.save(historyCard);
-            } else if (cardOperatorUser != null) {
-                HistoryCard historyCard = new HistoryCard();
-                historyCard.setCard(updatedCard);
-                historyCard.setUpDatetime(new Date());
-                if (state == CardState.BLOCKED.getValue()) {
-                    historyCard.setInformationAboutCard("Блокировка карты №: " + updatedCard.getCardNo());
-                } else {
-                    historyCard.setInformationAboutCard("Редактирование данных карты №: " + updatedCard.getCardNo());
-                }
-                historyCard.setNewOwner(newCardOwner);
-                historyCard.setFormerOwner(updatedCard.getClient());
-                historyCard.setUser(cardOperatorUser);
-                persistenceSession.save(historyCard);
-            }
-            if(idOfOrg != null){
-                Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
-                if(org != null) updatedCard.setOrg(org);
-            }
-
-            updatedCard.setClient(newCardOwner);
-            updatedCard.setCardType(cardType);
-            updatedCard.setUpdateTime(new Date());
-            updatedCard.setState(state);
-            updatedCard.setLockReason(lockReason);
-            updatedCard.setValidTime(validTime);
-            updatedCard.setIssueTime(issueTime);
-            updatedCard.setLifeState(lifeState);
-            updatedCard.setExternalId(externalId);
-            updatedCard.setUpdateTime(new Date());
-            persistenceSession.update(updatedCard);
-
-            persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -306,6 +260,72 @@ public class CardManagerProcessor implements CardManager {
         }
     }
 
+    public void updateCardInSession(Session persistenceSession, Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
+            String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg, String informationAboutCard) throws Exception {
+        String additionalInfoAboutCard = StringUtils.isBlank(informationAboutCard) ? "" : " (" + informationAboutCard + ")";
+        Client newCardOwner = getClientReference(persistenceSession, idOfClient);
+        Card updatedCard = getCardReference(persistenceSession, idOfCard);
+
+        if (CardTransitionState.GIVEN_AWAY.getCode().equals(updatedCard.getTransitionState()) &&
+                state != updatedCard.getState()) {
+            throw new Exception("УИД карты передан в пользование другой ОО");
+        }
+
+        if (state == Card.ACTIVE_STATE) {
+            Set<Card> clientCards = new HashSet<Card>(newCardOwner.getCards());
+            clientCards.remove(updatedCard);
+            lockActiveCards(persistenceSession, clientCards);
+        }
+
+        final long oldClient = (updatedCard.getClient() != null) ? updatedCard.getClient().getIdOfClient() : -1;
+        final long newClient = newCardOwner.getIdOfClient();
+
+        //История карты при обновлении информации
+        if (oldClient != newClient) {
+            HistoryCard historyCard = new HistoryCard();
+            historyCard.setCard(updatedCard);
+            historyCard.setUpDatetime(new Date());
+            historyCard
+                    .setInformationAboutCard("Передача карты №: " + updatedCard.getCardNo() + " другому владельцу");
+            historyCard.setNewOwner(newCardOwner);
+            historyCard.setFormerOwner(updatedCard.getClient());
+            historyCard.setUser(cardOperatorUser);
+            persistenceSession.save(historyCard);
+        } else if (cardOperatorUser != null || !StringUtils.isEmpty(informationAboutCard)) {
+            HistoryCard historyCard = new HistoryCard();
+            historyCard.setCard(updatedCard);
+            historyCard.setUpDatetime(new Date());
+            if (state == CardState.BLOCKED.getValue()) {
+                historyCard.setInformationAboutCard("Блокировка карты №: " + updatedCard.getCardNo());
+            } else {
+                historyCard.setInformationAboutCard("Редактирование данных карты №: " + updatedCard.getCardNo()
+                        + additionalInfoAboutCard);
+            }
+            historyCard.setNewOwner(newCardOwner);
+            historyCard.setFormerOwner(updatedCard.getClient());
+            historyCard.setUser(cardOperatorUser);
+            persistenceSession.save(historyCard);
+        }
+        if(idOfOrg != null){
+            Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
+            if(org != null) updatedCard.setOrg(org);
+        }
+
+        updatedCard.setClient(newCardOwner);
+        updatedCard.setCardType(cardType);
+        updatedCard.setUpdateTime(new Date());
+        updatedCard.setState(state);
+        updatedCard.setLockReason(lockReason);
+        updatedCard.setValidTime(validTime);
+        updatedCard.setIssueTime(issueTime);
+        updatedCard.setLifeState(lifeState);
+        updatedCard.setExternalId(externalId);
+        updatedCard.setUpdateTime(new Date());
+        persistenceSession.update(updatedCard);
+
+        persistenceSession.flush();
+
+    }
 
     @Override
     public void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime) throws Exception {

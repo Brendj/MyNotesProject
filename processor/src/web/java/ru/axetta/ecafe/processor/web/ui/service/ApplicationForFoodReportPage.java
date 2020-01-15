@@ -12,12 +12,17 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.ApplicationForFoodHistoryReportItem;
 import ru.axetta.ecafe.processor.core.report.ApplicationForFoodReportItem;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
+import ru.axetta.ecafe.processor.web.ui.report.online.PeriodTypeMenu;
 
+import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -26,7 +31,9 @@ import org.springframework.stereotype.Component;
 import javax.faces.model.SelectItem;
 import javax.persistence.NoResultException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 @Component
 @Scope("session")
@@ -35,6 +42,8 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     Logger logger = LoggerFactory.getLogger(ApplicationForFoodReportPage.class);
     private List<ApplicationForFoodReportItem> items = new ArrayList<ApplicationForFoodReportItem>();
     private ApplicationForFoodReportItem currentItem;
+    private List<ApplicationForFoodReportItem> deletedItems = new ArrayList<>();
+    private List<ApplicationForFoodReportItem> changeDatesItems = new ArrayList<>();
 
     private List<SelectItem> statuses = readAllItems();
     private String status;
@@ -42,6 +51,13 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     private Integer benefit;
     private String number = "";
     private final static Integer ALL_BENEFITS = -1;
+    private Boolean showPeriod = false;
+    private static final String ARCHIEVE_COMMENT = "ЗЛП заархивировано";
+    private Boolean needAction = false;
+    private Date benefitStartDate;
+    private Date benefitEndDate;
+    private Boolean noErrorsOnValidate;
+    private String errorMessage;
 
     private static List<SelectItem> readAllItems() {
         ApplicationForFoodState[] states = ApplicationForFoodState.values();
@@ -83,11 +99,14 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     }
 
     public ApplicationForFoodReportPage() {
-
+        periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_MONTH);
     }
 
     public void reload() {
+        needAction = false;
         items.clear();
+        deletedItems.clear();
+        changeDatesItems.clear();
         Session session = null;
         Transaction transaction = null;
         try {
@@ -110,9 +129,15 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 }
             }
             List<ApplicationForFood> list = DAOUtils.getApplicationForFoodListByOrgs(session, idOfOrgList, statusCondition,
-                    benefitCondition, idOfClientList, number);
+                    benefitCondition, idOfClientList, number, CalendarUtils.startOfDay(startDate), CalendarUtils.endOfDay(endDate), showPeriod);
             for (ApplicationForFood applicationForFood : list) {
                 ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(applicationForFood);
+                ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, applicationForFood.getClient().getIdOfClient(),
+                        Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE));
+                if (info != null) {
+                    item.setStartDate(info.getDateStart());
+                    item.setEndDate(info.getDateEnd());
+                }
                 items.add(item);
             }
             transaction.commit();
@@ -127,15 +152,74 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
 
     public void makeResume() {
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.RESUME, null));
+        needAction = true;
     }
 
     public void makeOK() {
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING, null));
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.OK, null));
+        needAction = true;
     }
 
     public void makeDenied() {
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.NO_DOCS));
+        needAction = true;
+    }
+
+    public void makeArchieved() {
+        for (ApplicationForFoodReportItem item : items) {
+            if (item.getApplicationForFood().getIdOfApplicationForFood().equals(currentItem.getApplicationForFood().getIdOfApplicationForFood())) {
+                deletedItems.add(item);
+                item.setArchieved(true);
+                break;
+            }
+        }
+        needAction = true;
+    }
+
+    public void changeDates() {
+        for (ApplicationForFoodReportItem item : items) {
+            if (item.getApplicationForFood().getIdOfApplicationForFood().equals(currentItem.getApplicationForFood().getIdOfApplicationForFood())) {
+                if (!validateDates()) return;
+                item.setStartDate(benefitStartDate);
+                item.setEndDate(benefitEndDate);
+                changeDatesItems.add(item);
+                break;
+            }
+        }
+        needAction = true;
+    }
+
+    private Date convertDate(Date date) {
+        return CalendarUtils.startOfDay(date);
+    }
+
+    public boolean validateDates() {
+        if (benefitStartDate == null || benefitEndDate == null) return false;
+        if (benefitStartDate.after(benefitEndDate)) {
+            errorMessage = "Начальная дата не может быть больше конечной";
+            return false;
+        }
+        if (convertDate(benefitEndDate).before(convertDate(new Date()))) {
+            errorMessage = "Конечная дата не может быть меньше текущей даты";
+            return false;
+        }
+        for (ApplicationForFoodReportItem item : items) {
+            if (item.getApplicationForFood().getIdOfApplicationForFood().equals(currentItem.getApplicationForFood().getIdOfApplicationForFood())) {
+                if (item.getStartDate() == null) continue;
+                if (!convertDate(item.getStartDate()).equals(convertDate(benefitStartDate))) {
+                    if (convertDate(benefitStartDate).before(convertDate(new Date()))) {
+                        errorMessage = "Начальная дата не может быть меньше текущей даты";
+                        return false;
+                    }
+                }
+            }
+        }
+        return true;
+    }
+
+    public Boolean needAction() {
+        return needAction;
     }
 
     private void setStatus(ApplicationForFoodStatus status) {
@@ -177,6 +261,58 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                     }
                 }
             }
+            CategoryDiscountDSZN discountInoe = getDiscountInoe(session);
+            String isppCodeInoe = Long.toString(discountInoe.getCategoryDiscount().getIdOfCategoryDiscount());
+            Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+            for (ApplicationForFoodReportItem item : deletedItems) {
+                wereChanges = true;
+                ApplicationForFood applicationForFood = (ApplicationForFood)session.load(ApplicationForFood.class, item.getApplicationForFood().getIdOfApplicationForFood());
+                applicationForFood.setArchived(true);
+                applicationForFood.setVersion(nextVersion);
+                applicationForFood.setLastUpdate(new Date());
+                session.update(applicationForFood);
+
+                Client client = DAOUtils.findClient(session, applicationForFood.getClient().getIdOfClient());
+                if (applicationForFoodInoeExists(session, client, applicationForFood.getCreatedDate())) continue;
+                Set<CategoryDiscount> discounts = client.getCategories();
+                if (discounts.contains(discountInoe.getCategoryDiscount())) {
+                    String oldDiscounts = client.getCategoriesDiscounts();
+                    String newDiscounts = "";
+                    for (String str : oldDiscounts.split(",")) {
+                        if (!str.equals(isppCodeInoe))
+                            newDiscounts += str + ",";
+                    }
+                    if (!StringUtils.isEmpty(newDiscounts))
+                        newDiscounts = newDiscounts.substring(0, newDiscounts.length()-1);
+                    Integer oldDiscountMode = client.getDiscountMode();
+                    Integer newDiscountMode =
+                            StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+                    ClientManager
+                            .renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode, ARCHIEVE_COMMENT);
+                }
+                Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+                criteria.add(Restrictions.eq("client", client));
+                criteria.add(Restrictions.eq("archived", false));
+                criteria.add(Restrictions.eq("dtisznCode", new Long(discountInoe.getCode())));
+                List<ClientDtisznDiscountInfo> list = criteria.list();
+                for (ClientDtisznDiscountInfo info : list) {
+                    info.setLastUpdate(new Date());
+                    info.setArchived(true);
+                    info.setVersion(clientDTISZNDiscountVersion);
+                    session.update(info);
+                }
+            }
+
+            for (ApplicationForFoodReportItem item : changeDatesItems) {
+                wereChanges = true;
+                ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, item.getApplicationForFood().getClient().getIdOfClient(),
+                        Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE));
+                info.setDateStart(item.getStartDate());
+                info.setDateEnd(item.getEndDate());
+                info.setLastUpdate(new Date());
+                info.setVersion(clientDTISZNDiscountVersion);
+                session.update(info);
+            }
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
@@ -188,6 +324,22 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
         }
         reload();
         printMessage(wereChanges ? "Операция выполнена" : "Нет измененных записей");
+    }
+
+    private boolean applicationForFoodInoeExists(Session session, Client client, Date date) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.gt("createdDate", date));
+        ApplicationForFoodStatus status = new ApplicationForFoodStatus(ApplicationForFoodState.OK, null);
+        criteria.add(Restrictions.eq("status", status));
+        return criteria.list().size() > 0;
+    }
+
+    private CategoryDiscountDSZN getDiscountInoe(Session session) {
+        Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
+        criteria.add(Restrictions.isNull("ETPCode"));
+        criteria.add(Restrictions.eq("deleted", false));
+        return (CategoryDiscountDSZN)criteria.uniqueResult();
     }
 
     public String getStatusString(ApplicationForFoodStatus status) {
@@ -223,7 +375,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     }
 
     public ApplicationForFoodReportItem getCurrentItem() {
-        return currentItem;
+        return currentItem == null ? new ApplicationForFoodReportItem() : currentItem;
     }
 
     public void setCurrentItem(ApplicationForFoodReportItem currentItem) {
@@ -292,5 +444,45 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
 
     public void setNumber(String number) {
         this.number = number;
+    }
+
+    public Boolean getShowPeriod() {
+        return showPeriod;
+    }
+
+    public void setShowPeriod(Boolean showPeriod) {
+        this.showPeriod = showPeriod;
+    }
+
+    public Date getBenefitStartDate() {
+        return benefitStartDate;
+    }
+
+    public void setBenefitStartDate(Date benefitStartDate) {
+        this.benefitStartDate = benefitStartDate;
+    }
+
+    public Date getBenefitEndDate() {
+        return benefitEndDate;
+    }
+
+    public void setBenefitEndDate(Date benefitEndDate) {
+        this.benefitEndDate = benefitEndDate;
+    }
+
+    public Boolean getNoErrorsOnValidate() {
+        return noErrorsOnValidate;
+    }
+
+    public void setNoErrorsOnValidate(Boolean noErrorsOnValidate) {
+        this.noErrorsOnValidate = noErrorsOnValidate;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }

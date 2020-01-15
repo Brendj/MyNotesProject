@@ -25,6 +25,9 @@ public class CategoryDiscount {
     private CategoryDiscountEnumType categoryType;
     private Integer orgType;
     private Boolean blockedToChange;
+    private Boolean eligibleToDelete;
+    private String discountRate;
+
     private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
     private Set<Client> clientsInternal = new HashSet<Client>();
     private Set<CategoryDiscountDSZN> categoriesDiscountDSZN = new HashSet<CategoryDiscountDSZN>();
@@ -84,11 +87,27 @@ public class CategoryDiscount {
         this.blockedToChange = blockedToChange;
     }
 
+    public Boolean getEligibleToDelete() {
+        return eligibleToDelete;
+    }
+
+    public void setEligibleToDelete(Boolean eligibleToDelete) {
+        this.eligibleToDelete = eligibleToDelete;
+    }
+
+    public String getDiscountRate() {
+        return discountRate;
+    }
+
+    public void setDiscountRate(String discountRate) {
+        this.discountRate = discountRate;
+    }
+
     public CategoryDiscount() {
     }
 
     public CategoryDiscount(long idOfCategoryDiscount, String categoryName, String discountRules,String description, Date createdDate,
-            Date lastUpdate, Boolean blockedToChange) {
+            Date lastUpdate, Boolean blockedToChange, Boolean eligibleToDelete) {
         this.idOfCategoryDiscount = idOfCategoryDiscount;
         this.categoryName = categoryName;
         this.description = description;
@@ -96,6 +115,7 @@ public class CategoryDiscount {
         this.lastUpdate = lastUpdate;
         this.discountRules = discountRules;
         this.blockedToChange = blockedToChange;
+        this.eligibleToDelete = eligibleToDelete;
     }
 
     public long getIdOfCategoryDiscount() {
@@ -145,8 +165,7 @@ public class CategoryDiscount {
     public void setCategoriesDiscountDSZN(Set<CategoryDiscountDSZN> categoriesDiscountDSZN) {
         this.categoriesDiscountDSZN = categoriesDiscountDSZN;
     }
-
-    /*
+/*
     private Set<DiscountRule> getDiscountRulesInternal() {
         return discountRules;
     }

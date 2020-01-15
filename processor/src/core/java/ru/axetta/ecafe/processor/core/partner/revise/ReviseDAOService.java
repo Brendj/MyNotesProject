@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.partner.revise;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.service.nsi.ReviseLogger;
 
 import org.slf4j.Logger;
@@ -28,26 +29,27 @@ public class ReviseDAOService {
     @PersistenceContext(unitName = "revisePU")
     private EntityManager entityManager;
 
-    public List<DiscountItem> getDiscountsUpdatedSinceDate(Date updated) {
+    public DiscountItemsWithTimestamp getDiscountsUpdatedSinceDate(Date updated) {
         String sqlString = "select registry_guid, dszn_code, title, sd, sd_dszn, fd, fd_dszn, is_benefit_confirm, updated_at, is_del "
-                + " from benefits_for_ispp where updated_at >= :updatedDate and registry_guid is not null order by updated_at asc";
+                + " from benefits_for_ispp where updated_at > :updatedDate and registry_guid is not null order by updated_at asc limit :lim";
         Query query = entityManager.createNativeQuery(sqlString);
         query.setParameter("updatedDate", updated);
+        query.setParameter("lim", RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_REVISE_LIMIT));
         try {
             reviseLogger.logRequestDB(query, sqlString);
         } catch (Exception e) {
             logger.warn("Unable to log revise request");
         }
-        List<DiscountItem> discountItemList = parseDiscounts(query.getResultList());
+        DiscountItemsWithTimestamp discountItemList = parseDiscounts(query.getResultList());
         try {
-            reviseLogger.logResponseDB(discountItemList);
+            reviseLogger.logResponseDB(discountItemList.getItems());
         } catch (Exception e) {
             logger.warn("Unable to log revise response");
         }
         return discountItemList;
     }
 
-    public List<DiscountItem> getDiscountsByGUID(String guid) {
+    public DiscountItemsWithTimestamp getDiscountsByGUID(String guid) {
         String sqlString = "select registry_guid, dszn_code, title, sd, sd_dszn, fd, fd_dszn, is_benefit_confirm, updated_at, is_del "
                 + " from benefits_for_ispp where registry_guid = :guid order by updated_at asc";
         Query query = entityManager.createNativeQuery(sqlString);
@@ -57,17 +59,18 @@ public class ReviseDAOService {
         } catch (Exception e) {
             logger.warn("Unable to log revise request");
         }
-        List<DiscountItem> discountItemList = parseDiscounts(query.getResultList());
+        DiscountItemsWithTimestamp discountItemList = parseDiscounts(query.getResultList());
         try {
-            reviseLogger.logResponseDB(discountItemList);
+            reviseLogger.logResponseDB(discountItemList.getItems());
         } catch (Exception e) {
             logger.warn("Unable to log revise response");
         }
         return discountItemList;
     }
 
-    private List<DiscountItem> parseDiscounts(List list) {
+    private DiscountItemsWithTimestamp parseDiscounts(List list) {
         List<DiscountItem> discountItemList = new ArrayList<DiscountItem>();
+        Date updatedAt = null;
         for (Object o : list) {
             Object[] row = (Object[]) o;
             String registryGUID = (String) row[0];
@@ -85,12 +88,39 @@ public class ReviseDAOService {
             Date fd = (Date) row[5];
             Date fdDszn = (Date) row[6];
             Boolean isBenefitConfirmed = (Boolean) row[7];
-            Date updatedAt = (Date) row[8];
+            updatedAt = (Date) row[8];
             Boolean isDeleted = (Boolean) row[9];
             discountItemList.add(new DiscountItem(registryGUID, dsznCode, title, sd, sdDszn, fd, fdDszn, isBenefitConfirmed,
                     updatedAt, isDeleted));
+
         }
-        return discountItemList;
+        return new DiscountItemsWithTimestamp(discountItemList, updatedAt);
+    }
+
+    public static class DiscountItemsWithTimestamp {
+        private Date date;
+        private List<DiscountItem> items;
+
+        public DiscountItemsWithTimestamp(List<DiscountItem> items, Date date) {
+            this.items = items;
+            this.date = date;
+        }
+
+        public Date getDate() {
+            return date;
+        }
+
+        public void setDate(Date date) {
+            this.date = date;
+        }
+
+        public List<DiscountItem> getItems() {
+            return items;
+        }
+
+        public void setItems(List<DiscountItem> items) {
+            this.items = items;
+        }
     }
 
     public static class DiscountItem {

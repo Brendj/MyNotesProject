@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.request.feeding;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
+import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Document;
@@ -16,9 +16,10 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class RequestFeedingItem {
+
     public static final Integer ERROR_CODE_ALL_OK = 0;
     public static final Integer ERROR_CODE_NOT_VALID_ATTRIBUTE = 100;
-    public static final Integer ERROR_CODE_INTERNAL_ERROR=110;
+    public static final Integer ERROR_CODE_INTERNAL_ERROR = 110;
 
     private Long applicationForFeedingNumber;
     private String servNumber;
@@ -40,11 +41,14 @@ public class RequestFeedingItem {
     private Integer resCode;
     private Long version;
     private Date statusCreatedDate;
+    private Date otherDiscountStartDate;
+    private Date otherDiscountEndDate;
 
-    public RequestFeedingItem(Long applicationForFeedingNumber, String servNumber, Integer status, Integer declineReason,
-            Date applicationCreatedDate, Long idOfClient, String applicantSurname, String applicantName,
-            String applicantSecondName, String applicantPhone, ApplicationForFoodCreatorType creatorType, Long dtisznCode,
-            String idOfDocOrder, Date docOrderDate, Boolean isArchive, String errorMessage) {
+    public RequestFeedingItem(Long applicationForFeedingNumber, String servNumber, Integer status,
+            Integer declineReason, Date applicationCreatedDate, Long idOfClient, String applicantSurname,
+            String applicantName, String applicantSecondName, String applicantPhone,
+            ApplicationForFoodCreatorType creatorType, Long dtisznCode, String idOfDocOrder, Date docOrderDate,
+            Boolean isArchive, Date otherDiscountStartDate, Date otherDiscountEndDate, String errorMessage) {
         this.applicationForFeedingNumber = applicationForFeedingNumber;
         this.servNumber = servNumber;
         this.status = status;
@@ -60,6 +64,8 @@ public class RequestFeedingItem {
         this.idOfDocOrder = idOfDocOrder;
         this.docOrderDate = docOrderDate;
         this.isArchive = isArchive;
+        this.otherDiscountStartDate = otherDiscountStartDate;
+        this.otherDiscountEndDate = otherDiscountEndDate;
         if (errorMessage.isEmpty()) {
             this.setResCode(ERROR_CODE_ALL_OK);
         } else {
@@ -72,8 +78,9 @@ public class RequestFeedingItem {
         this.applicationForFeedingNumber = applicationForFood.getIdOfApplicationForFood();
         ApplicationForFoodStatus status = applicationForFood.getStatus();
         this.status = status.getApplicationForFoodState().getCode();
-        if (null != status.getDeclineReason())
+        if (null != status.getDeclineReason()) {
             this.declineReason = status.getDeclineReason().getCode();
+        }
         this.applicationCreatedDate = applicationForFood.getCreatedDate();
         this.idOfClient = applicationForFood.getClient().getIdOfClient();
         this.applicantSurname = applicationForFood.getApplicantSurname();
@@ -89,6 +96,16 @@ public class RequestFeedingItem {
         this.docOrderDate = applicationForFood.getDocOrderDate();
         this.hasSocialDiscount = (null != applicationForFood.getDtisznCode());
         this.statusCreatedDate = statusCreatedDate;
+    }
+
+    public RequestFeedingItem(ApplicationForFood applicationForFood, Date statusCreatedDate, ClientDtisznDiscountInfo discountInfo) {
+        this(applicationForFood, statusCreatedDate);
+        // Только иное
+        if (!DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE.equals(discountInfo.getDtisznCode())) {
+            return;
+        }
+        this.otherDiscountStartDate = discountInfo.getDateStart();
+        this.otherDiscountEndDate = discountInfo.getDateEnd();
     }
 
     public static RequestFeedingItem build(Node itemNode, Long idOfOrg) throws Exception {
@@ -107,29 +124,29 @@ public class RequestFeedingItem {
         ApplicationForFoodCreatorType creatorType;
         String idOfDocOrder;
         Date docOrderDate;
+        Date otherDiscountStartDate;
+        Date otherDiscountEndDate;
 
         StringBuilder errorMessage = new StringBuilder();
 
         applicationForFeedingNumber = XMLUtils.getLongAttributeValue(itemNode, "Number");
 
         state = XMLUtils.getIntegerAttributeValue(itemNode, "State");
-        if (!ApplicationForFoodState.TRY_TO_REGISTER.getCode().equals(state) &&
-                !ApplicationForFoodState.REGISTERED.getCode().equals(state) &&
-                !ApplicationForFoodState.PAUSED.getCode().equals(state) &&
-                !ApplicationForFoodState.RESUME.getCode().equals(state) &&
-                !ApplicationForFoodState.OK.getCode().equals(state) &&
-                !ApplicationForFoodState.DENIED.getCode().equals(state) &&
-                !ApplicationForFoodState.INFORMATION_REQUEST_SENDED.getCode().equals(state) &&
-                !ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED.getCode().equals(state)) {
+        if (!ApplicationForFoodState.TRY_TO_REGISTER.getCode().equals(state) && !ApplicationForFoodState.REGISTERED
+                .getCode().equals(state) && !ApplicationForFoodState.PAUSED.getCode().equals(state)
+                && !ApplicationForFoodState.RESUME.getCode().equals(state) && !ApplicationForFoodState.OK.getCode()
+                .equals(state) && !ApplicationForFoodState.DENIED.getCode().equals(state)
+                && !ApplicationForFoodState.INFORMATION_REQUEST_SENDED.getCode().equals(state)
+                && !ApplicationForFoodState.INFORMATION_REQUEST_RECEIVED.getCode().equals(state)) {
             errorMessage.append("Attribute State is incorrect ");
         }
 
         declineReason = XMLUtils.getIntegerAttributeValue(itemNode, "DeclineReason");
-        if (null == declineReason && ApplicationForFoodState.DENIED.getCode().equals(state) ||
-                ApplicationForFoodState.DENIED.getCode().equals(state) &&
-                        !ApplicationForFoodDeclineReason.NO_DOCS.getCode().equals(declineReason) &&
-                        !ApplicationForFoodDeclineReason.NO_APPROVAL.getCode().equals(declineReason) &&
-                        !ApplicationForFoodDeclineReason.INFORMATION_CONFLICT.getCode().equals(declineReason)) {
+        if (null == declineReason && ApplicationForFoodState.DENIED.getCode().equals(state)
+                || ApplicationForFoodState.DENIED.getCode().equals(state) && !ApplicationForFoodDeclineReason.NO_DOCS
+                .getCode().equals(declineReason) && !ApplicationForFoodDeclineReason.NO_APPROVAL.getCode()
+                .equals(declineReason) && !ApplicationForFoodDeclineReason.INFORMATION_CONFLICT.getCode()
+                .equals(declineReason)) {
             errorMessage.append("Attribute DeclineReason is incorrect ");
         }
 
@@ -174,7 +191,8 @@ public class RequestFeedingItem {
 
         serviceNumber = XMLUtils.getStringAttributeValue(itemNode, "ServNumber", 128);
 
-        creatorType = ApplicationForFoodCreatorType.fromCode(XMLUtils.getIntegerAttributeValue(itemNode, "CreatorType"));
+        creatorType = ApplicationForFoodCreatorType
+                .fromCode(XMLUtils.getIntegerAttributeValue(itemNode, "CreatorType"));
         if (null == creatorType) {
             errorMessage.append("Attribute CreatorType not found ");
         }
@@ -183,35 +201,49 @@ public class RequestFeedingItem {
 
         docOrderDate = XMLUtils.getDateTimeAttributeValue(itemNode, "DocOrderDate");
 
-        return new RequestFeedingItem(applicationForFeedingNumber, serviceNumber, state, declineReason, regDate, idOfClient,
-                applicantSurname, applicantName, applicantSecondName, applicantPhone, creatorType, dtisznDiscount,
-                idOfDocOrder, docOrderDate, archived, errorMessage.toString());
+        otherDiscountStartDate = XMLUtils.getDateAttributeValue(itemNode, "FDate");
+        otherDiscountEndDate = XMLUtils.getDateAttributeValue(itemNode, "LDate");
+
+        return new RequestFeedingItem(applicationForFeedingNumber, serviceNumber, state, declineReason, regDate,
+                idOfClient, applicantSurname, applicantName, applicantSecondName, applicantPhone, creatorType,
+                dtisznDiscount, idOfDocOrder, docOrderDate, archived, otherDiscountStartDate, otherDiscountEndDate,
+                errorMessage.toString());
     }
 
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-        if (null != applicationForFeedingNumber)
+        SimpleDateFormat simpleDateWithoutTimestampFormat = new SimpleDateFormat("dd.MM.yyyy");
+        if (null != applicationForFeedingNumber) {
             XMLUtils.setAttributeIfNotNull(element, "Number", applicationForFeedingNumber);
-        if (null != version)
+        }
+        if (null != version) {
             XMLUtils.setAttributeIfNotNull(element, "V", version);
-        if (null != status)
+        }
+        if (null != status) {
             XMLUtils.setAttributeIfNotNull(element, "State", status);
-        if (null != declineReason)
+        }
+        if (null != declineReason) {
             XMLUtils.setAttributeIfNotNull(element, "DeclineReason", declineReason);
+        }
         if (null != applicationCreatedDate) {
             XMLUtils.setAttributeIfNotNull(element, "RegDate", simpleDateFormat.format(applicationCreatedDate));
         }
-        if (null != idOfClient)
+        if (null != idOfClient) {
             XMLUtils.setAttributeIfNotNull(element, "ClientId", idOfClient);
-        if (null != applicantSurname)
+        }
+        if (null != applicantSurname) {
             XMLUtils.setAttributeIfNotNull(element, "ApplicantSurname", applicantSurname);
-        if (null != applicantName)
+        }
+        if (null != applicantName) {
             XMLUtils.setAttributeIfNotNull(element, "ApplicantName", applicantName);
-        if (null != applicantSecondName)
+        }
+        if (null != applicantSecondName) {
             XMLUtils.setAttributeIfNotNull(element, "ApplicantSecName", applicantSecondName);
-        if (null != applicantPhone)
+        }
+        if (null != applicantPhone) {
             XMLUtils.setAttributeIfNotNull(element, "ApplicantPhone", applicantPhone);
+        }
         if (null != dtisznCode) {
             XMLUtils.setAttributeIfNotNull(element, "DiscountDtszn", dtisznCode);
         }
@@ -235,6 +267,12 @@ public class RequestFeedingItem {
         }
         if (null != statusCreatedDate) {
             XMLUtils.setAttributeIfNotNull(element, "StatusDate", simpleDateFormat.format(statusCreatedDate));
+        }
+        if (null != otherDiscountStartDate) {
+            XMLUtils.setAttributeIfNotNull(element, "FDate", simpleDateWithoutTimestampFormat.format(otherDiscountStartDate));
+        }
+        if (null != otherDiscountEndDate) {
+            XMLUtils.setAttributeIfNotNull(element, "LDate", simpleDateWithoutTimestampFormat.format(otherDiscountEndDate));
         }
         return element;
     }
@@ -397,5 +435,21 @@ public class RequestFeedingItem {
 
     public void setStatusCreatedDate(Date statusCreatedDate) {
         this.statusCreatedDate = statusCreatedDate;
+    }
+
+    public Date getOtherDiscountStartDate() {
+        return otherDiscountStartDate;
+    }
+
+    public void setOtherDiscountStartDate(Date otherDiscountStartDate) {
+        this.otherDiscountStartDate = otherDiscountStartDate;
+    }
+
+    public Date getOtherDiscountEndDate() {
+        return otherDiscountEndDate;
+    }
+
+    public void setOtherDiscountEndDate(Date otherDiscountEndDate) {
+        this.otherDiscountEndDate = otherDiscountEndDate;
     }
 }

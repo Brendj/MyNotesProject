@@ -159,9 +159,23 @@ the signature crypto configuration.  See SignaturePropRefId. -->
     </jaxws:endpoint>
 
     <jaxws:endpoint
+            id="EMIASController"
+            address='http://localhost:8080/processor/soap/emias'
+            implementor='ru.axetta.ecafe.processor.web.internal.EMIASController'>
+    </jaxws:endpoint>
+
+    <jaxws:endpoint
             id="CardSignature"
             address='http://localhost:8080/processor/soap/signcards'
             implementor='ru.axetta.ecafe.processor.web.internal.CardSignature'>
     </jaxws:endpoint>
+
+
+    <jaxws:endpoint
+            id="EZDController"
+            address='http://localhost:8080/processor/soap/ezd'
+            implementor='ru.axetta.ecafe.processor.web.partner.ezd.EZDControllerSOAP'>
+    </jaxws:endpoint>
+
 
 </beans>

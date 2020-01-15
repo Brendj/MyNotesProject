@@ -12,8 +12,12 @@ import ru.axetta.ecafe.processor.web.partner.OnlinePaymentRequestParser;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.ByteArrayOutputStream;
+import java.io.IOException;
 import java.math.BigDecimal;
 import java.net.URLDecoder;
+import java.nio.ByteBuffer;
+import java.nio.charset.Charset;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -55,7 +59,6 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
     @Override
     public void serializeResponse(OnlinePaymentProcessor.PayResponse response, HttpServletResponse httpResponse)
             throws Exception {
-        String rsp = "";
         StringBuilder stringBuilder = new StringBuilder("<?xml version=\"1.0\" encoding=\"windows-1251\"?><response>");
 
         if(action.equals(ACTION_PAYMENT)){
@@ -63,7 +66,6 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
             stringBuilder.append(String.format("<REG_DATE>%s</REG_DATE>", date));
         }
         SBMSKPaymentsCodes result = SBMSKPaymentsCodes.getFromPaymentProcessResultCode(response.getResultCode());
-        addSBMSKInfoToResponse(response);
         int resultCode = result.getCode();
         stringBuilder.append(String.format("<CODE>%d</CODE>",resultCode));
         stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",result.toString()));
@@ -78,10 +80,20 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
                 stringBuilder.append(String.format(Locale.US, "<BALANCE>%.2f</BALANCE>", balance));
             }
         }
+        if (action.equals(ACTION_PAYMENT) && response.getIdOfClientPayment() != null) {
+            stringBuilder.append(String.format("<EXT_ID>%s</EXT_ID>", response.getIdOfClientPayment()));
+        }
 
         stringBuilder.append("</response>");
-        rsp = new String(stringBuilder.toString().getBytes("UTF-8"), "windows-1251");
-        printToStream(rsp, httpResponse);
+        printToStream(stringBuilder.toString(), httpResponse);
+    }
+
+    protected void printToStream(String s, HttpServletResponse httpResponse) throws IOException {
+        ByteArrayOutputStream outputStream = new ByteArrayOutputStream();
+        ByteBuffer byteBuffer = Charset.forName("windows-1251").encode(s);
+        byte[] tmp = byteBuffer.array();
+        outputStream.write(tmp, 0, byteBuffer.limit());
+        outputStream.writeTo(httpResponse.getOutputStream());
     }
 
     private void addSBMSKInfoToResponse(OnlinePaymentProcessor.PayResponse response) {
@@ -100,17 +112,14 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
 
     public void serializeResponseIfException(HttpServletResponse httpResponse, SBMSKPaymentsCodes error)
     throws Exception {
-        String rsp = "";
         StringBuilder stringBuilder = new StringBuilder("<?xml version=\"1.0\" encoding=\"windows-1251\"?><response>");
 
-        String message = new String(error.toString().getBytes("UTF-8"), "windows-1251"); // output windows-1251 as UTF-8
         int resultCode = error.getCode();
         stringBuilder.append(String.format("<CODE>%d</CODE>",resultCode));
-        stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",message));
+        stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",error.toString()));
 
         stringBuilder.append("</response>");
-        rsp = stringBuilder.toString();
-        printToStream(rsp, httpResponse);
+        printToStream(stringBuilder.toString(), httpResponse);
     }
 
     @Override

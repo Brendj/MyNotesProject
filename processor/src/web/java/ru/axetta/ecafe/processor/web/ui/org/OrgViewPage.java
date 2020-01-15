@@ -57,6 +57,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String mailingListReports1;
     private String mailingListReports2;
     private String guid;
+    private Long ekisId;
     private List<CategoryOrg> categoryOrg;
     private String configurationProviderName;
     private List<Long> idOfOrgList;
@@ -97,6 +98,8 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean allowRegistryChangeEmployee;
     private Boolean helpdeskEnabled;
     private Boolean preordersEnabled;
+    private Boolean participantOP;
+    private Boolean preorderlp;
 
     private String interdistrictCouncil; //В каком межрайонном совете состоит ОО
     private String interdistrictCouncilChief ; //Председателем какого межрайонного совета является руководитель ОО
@@ -187,6 +190,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.INN=org.getINN();
         this.OGRN=org.getOGRN();
         this.guid = org.getGuid();
+        this.ekisId = org.getEkisId();
         this.commodityAccountingParam = org.getCommodityAccounting();
         this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
         this.usePlanOrders = org.getUsePlanOrders();
@@ -279,6 +283,8 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.requestForVisitsToOtherOrg = org.getRequestForVisitsToOtherOrg();
         this.preordersEnabled = org.getPreordersEnabled();
         this.multiCardModeEnabled = org.multiCardModeIsEnabled();
+        this.participantOP = org.getParticipantOP();
+        this.preorderlp = org.getPreorderlp();
     }
 
     public String getFilterOrgs() {
@@ -759,5 +765,29 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setDisableEditingClientsFromAISReestr(Boolean disableEditingClientsFromAISReestr) {
         this.disableEditingClientsFromAISReestr = disableEditingClientsFromAISReestr;
+    }
+
+    public Boolean getParticipantOP() {
+        return participantOP;
+    }
+
+    public void setParticipantOP(Boolean participantOP) {
+        this.participantOP = participantOP;
+    }
+
+    public Boolean getPreorderlp() {
+        return preorderlp;
+    }
+
+    public void setPreorderlp(Boolean preorderlp) {
+        this.preorderlp = preorderlp;
+    }
+
+    public Long getEkisId() {
+        return ekisId;
+    }
+
+    public void setEkisId(Long ekisId) {
+        this.ekisId = ekisId;
     }
 }

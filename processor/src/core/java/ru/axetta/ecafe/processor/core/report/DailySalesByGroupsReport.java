@@ -492,7 +492,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
             Query menuOriginQuery = session
                     .createSQLQuery(String.format("SELECT DISTINCT od.%s FROM CF_ORDERS o,CF_ORDERDETAILS od " +
-                            " WHERE (o.idOfOrg=:idOfOrg AND od.idOfOrg=:idOfOrg) AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType=:typeDish) and o.state=0 and od.state=0 AND "
+                            " WHERE (o.idOfOrg in (:idOfOrg) AND od.idOfOrg in (:idOfOrg)) AND (o.IdOfOrder=od.IdOfOrder) AND (od.MenuType=:typeDish) and o.state=0 and od.state=0 AND "
                             +
                             "(o.CreatedDate>=:startTime AND o.CreatedDate<=:endTime) ", groupByField));
 
@@ -501,10 +501,21 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
             menuOriginQuery.setParameter("endTime", endTime.getTime());
 
             menuOriginList = new ArrayList();
-            for(OrgShortItem orgItem : orgShortItemList) {
-                menuOriginQuery.setParameter("idOfOrg", orgItem.getIdOfOrg());
-                menuOriginList.addAll(menuOriginQuery.list());
+            List<Long> idOrgs = new ArrayList<>();
+            //Если только по главному корпусу
+            if (orgShortItemList.size() == 1)
+            {
+                idOrgs.add(orgShortItemList.get(0).getIdOfOrg());
+                menuOriginQuery.setParameterList("idOfOrg", idOrgs);
             }
+            //Если по всем корпусам
+            else {
+                for (OrgShortItem orgItem : orgShortItemList) {
+                    idOrgs.add(orgItem.getIdOfOrg());
+                }
+                menuOriginQuery.setParameterList("idOfOrg", idOrgs);
+            }
+            menuOriginList.addAll(menuOriginQuery.list());
 
             Object val;
 

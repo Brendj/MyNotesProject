@@ -158,6 +158,7 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 }
                 user.setPassword(plainPassword);
                 user.setPasswordDate(new Date(System.currentTimeMillis()));
+                user.setSmsCodeGenerateDate(null);
             }
             Boolean successChangeGrants = getChangeGrantsMode(session, user);
             if(user.getPerson() != null) {
@@ -177,6 +178,9 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 //Если пользователь был заблокирован и новое значение флага блокировки = false, то меняем дату последней активности пользователя
                 user.setLastEntryTime(new Date());
             }
+            //Если мы разблокируем пользователя, то нужно отправить sms
+            if (user.isBlocked() && !blocked)
+                user.setSmsCodeGenerateDate(null);
             user.setBlocked(blocked);
             user.setBlockedUntilDate(blockedUntilDate);
             User.DefaultRole role = null;

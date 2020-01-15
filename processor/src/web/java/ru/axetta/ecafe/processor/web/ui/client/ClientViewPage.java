@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.Ban
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
+import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.MigrantItem;
 
@@ -192,6 +193,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Long externalId;
     private String clientGUID;
     private String clientSSOID;
+    private String clientIacRegId;
     private List<BankSubscription> bankSubscriptions;
     private Integer gender;
     private Date birthDate;
@@ -211,6 +213,8 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Boolean visitsSections;
     private String parallel;
     private Boolean canConfirmGroupPayment;
+    private Boolean userOP;
+    private Long idOfClientGroup;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -517,6 +521,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.expenditureLimit = client.getExpenditureLimit();
         this.clientGUID = client.getClientGUID();
         this.clientSSOID = client.getSsoid();
+        this.clientIacRegId = client.getIacRegId();
         this.externalId = client.getExternalId();
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
         this.gender = client.getGender();
@@ -546,6 +551,7 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         ClientGroup group = client.getClientGroup();
         this.clientGroupName = group==null?"":group.getGroupName();
+        this.idOfClientGroup = group == null ? null : group.getCompositeIdOfClientGroup().getIdOfClientGroup();
 
         this.middleGroup = client.getMiddleGroup();
 
@@ -576,6 +582,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.passportSeries = client.getPassportSeries();
         this.cardRequest = DAOUtils.getCardRequestString(session, client);
         this.parallel = client.getParallel();
+        this.userOP = client.getUserOP();
 
         balanceHold = RuntimeContext.getAppContext().getBean(ClientBalanceHoldService.class).getBalanceHoldListAsString(session, client.getIdOfClient());
 
@@ -711,5 +718,28 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     public boolean isLastConfirmMobileEmpty() {
         return getLastConfirmMobile() == null;
+    }
+
+    public Boolean getUserOP() {
+        return userOP;
+    }
+
+    public void setUserOP(Boolean userOP) {
+        this.userOP = userOP;
+    }
+
+    public String getClientIacRegId() {
+        return clientIacRegId;
+    }
+
+    public void setClientIacRegId(String clientIacRegId) {
+        this.clientIacRegId = clientIacRegId;
+    }
+
+    public boolean isEligibleToViewUserOP() {
+        if (null == this.idOfClientGroup) {
+            return false;
+        }
+        return OkuDAOService.getClientGroupList().contains(this.idOfClientGroup);
     }
 }

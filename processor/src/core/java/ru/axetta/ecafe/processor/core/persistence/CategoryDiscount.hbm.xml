@@ -55,5 +55,9 @@
         <property name="blockedToChange" column="blockedToChange" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
 
+        <property name="eligibleToDelete" column="eligibleToDelete" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+
+
     </class>
 </hibernate-mapping>

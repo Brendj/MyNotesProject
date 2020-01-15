@@ -1,5 +1,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.CardBalanceReportPrinterType;
+
 import java.text.ParseException;
 
 /**
@@ -9,7 +11,7 @@ import java.text.ParseException;
  * Time: 16:44
  * To change this template use File | Settings | File Templates.
  */
-public class CardBalanceReportPrinterSettingValue  extends AbstractParserBySettingValue{
+public class CardBalanceReportPrinterSettingValue extends AbstractParserBySettingValue{
 
     private String a; //a: Microsoft XPS Document Writer - название принтера
     private String b; //b: 42 - общая ширина ленты принтера (возможные значения 42,48, по умолчанию 42)
@@ -18,6 +20,8 @@ public class CardBalanceReportPrinterSettingValue  extends AbstractParserBySetti
     private String e;//e: 6 - ширина колонки номер карты (возможные значения 8,10,12,14, по умолчанию 12)
     private String f;//f: 12 - ширина колонки баланс (возможные значения 7,8,9,10,11,12, по умолчанию 12)
     private String g;//g: текстовое поле выводимое на принтере
+
+    private static final int DEFAULT_CAPACITY = 7;
 
     public CardBalanceReportPrinterSettingValue(String[] values) throws ParseException {
         super(values);
@@ -53,6 +57,21 @@ public class CardBalanceReportPrinterSettingValue  extends AbstractParserBySetti
         int d1 = getValuesByD();
         int d2 = Integer.parseInt(d);
         return d1==d2;
+    }
+
+    @Override
+    protected int getECafeSettingArrayCapacity() {
+        return DEFAULT_CAPACITY;
+    }
+
+    @Override
+    protected Integer getOrgSettingTypeByIndex(Integer index) {
+        return CardBalanceReportPrinterType.getGlobalIdByECafeSettingValueIndex(index);
+    }
+
+    @Override
+    protected Integer getIndexByOrgSettingType(Integer type) {
+        return CardBalanceReportPrinterType.getECafeSettingValueIndexByGlobalId(type);
     }
 
     public String getA() {

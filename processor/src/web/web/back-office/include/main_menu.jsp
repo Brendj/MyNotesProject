@@ -781,6 +781,11 @@
                      rendered="#{mainPage.eligibleToServiceAdmin || mainPage.eligibleToServiceSupport}">
     <a4j:support event="onclick" action="#{mainPage.showServiceGroupPage}" reRender="workspaceForm" />
 
+    <%--@elvariable id="atolCompanyPage" type="ru.axetta.ecafe.processor.web.ui.service.atol.AtolCompanyPage"--%>
+    <rich:panelMenuItem id="atolCompanyMenuItem" binding="#{atolCompanyPage.mainMenuComponent}"
+                        label="Атрибуты компании" action="#{atolCompanyPage.show}" reRender="workspaceForm"
+                        rendered="#{mainPage.eligibleToServiceAdmin}" />
+
     <rich:panelMenuItem id="removeOrderMenuItem" binding="#{mainPage.orderRemovePage.mainMenuComponent}"
                         label="Удаление покупки" action="#{mainPage.showOrderRemovePage}" reRender="workspaceForm"
                         rendered="#{mainPage.eligibleToServiceAdmin}" />
@@ -960,6 +965,17 @@
     <%--@elvariable id="preorderJournalReportPage" type="ru.axetta.ecafe.processor.web.ui.service.PreorderJournalReportPage"--%>
     <rich:panelMenuItem id="preorderJournalReport" binding="#{preorderJournalReportPage.mainMenuComponent}"
                         label="Журнал операций ВП" action="#{preorderJournalReportPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuGroup id="orgParameters" binding="#{mainPage.orgParametersGroup.mainMenuComponent}" label="Параметры ОО"
+                         rendered="#{mainPage.eligibleToServiceAdmin}">
+        <a4j:support event="onclick" action="#{mainPage.showOrgParametersGroupPage}" reRender="workspaceForm" />
+        <%--@elvariable id="orgSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSettingsReportPage"--%>
+        <rich:panelMenuItem id="orgSettingsReport" binding="#{orgSettingsReportPage.mainMenuComponent}"
+                            label="Настройки ОО" action="#{orgSettingsReportPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="orgSyncSettingReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncSettingReportPage"--%>
+        <rich:panelMenuItem id="orgSyncSettingsReport" binding="#{orgSyncSettingReportPage.mainMenuComponent}"
+                            label="Расписание синхронизации" action="#{orgSyncSettingReportPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
 
     <%--@elvariable id="orgSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.OrgSettingsReportPage"--%>
     <rich:panelMenuItem id="orgSettingsReport" binding="#{orgSettingsReportPage.mainMenuComponent}"

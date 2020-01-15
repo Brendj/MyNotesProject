@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.PreOrderAutoPayType;
+
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
@@ -13,6 +15,8 @@ public class PreOrderAutopaySettingValue extends AbstractParserBySettingValue{
     private boolean isActivePreorder;  // активность для предзаказов
     private Date processingTime_Preorder; // время срабатывания автооплаты
     private static SimpleDateFormat dateOnlyFormat = new SimpleDateFormat("HH:mm");
+
+    private static final int DEFAULT_CAPACITY = 2;
 
     public PreOrderAutopaySettingValue(String[] values) throws ParseException {
         super(values);
@@ -34,6 +38,20 @@ public class PreOrderAutopaySettingValue extends AbstractParserBySettingValue{
         return true;
     }
 
+    @Override
+    protected int getECafeSettingArrayCapacity() {
+        return DEFAULT_CAPACITY;
+    }
+
+    @Override
+    protected Integer getOrgSettingTypeByIndex(Integer index) {
+        return PreOrderAutoPayType.getGlobalIdByECafeSettingValueIndex(index);
+    }
+
+    @Override
+    protected Integer getIndexByOrgSettingType(Integer type) {
+        return PreOrderAutoPayType.getECafeSettingValueIndexByGlobalId(type);
+    }
 
     public boolean getIsActivePreorder() {
         return isActivePreorder;

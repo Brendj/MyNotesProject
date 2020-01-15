@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
 import ru.axetta.ecafe.processor.core.service.ClientGuardSanRebuildService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
+import ru.axetta.ecafe.processor.web.partner.oku.OkuDAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
@@ -299,6 +300,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Long idOfClientGroup;
     private Long externalId;
     private String clientGUID;
+    private String clientIacRegId;
     private Integer discountMode;
     private List<SelectItem> selectItemList = new ArrayList<SelectItem>();
     private String san;
@@ -323,6 +325,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean inOrgEnabledMultiCardMode;
     private String parallel;
     private Boolean canConfirmGroupPayment;
+    private Boolean userOP;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
 
@@ -671,6 +674,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.clientGUID = clientGUID;
     }
 
+    public String getClientIacRegId() {
+        return clientIacRegId;
+    }
+
+    public void setClientIacRegId(String clientIacRegId) {
+        this.clientIacRegId =  clientIacRegId;
+    }
+
     public Boolean getSpecialMenu() {
         return specialMenu;
     }
@@ -918,14 +929,22 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         Org org = (Org) persistenceSession.load(Org.class, this.org.getIdOfOrg());
         Boolean isReplaceOrg = !(client.getOrg().getIdOfOrg().equals(org.getIdOfOrg()));
+        Boolean isFriendlyReplaceOrg = false;
         if (isReplaceOrg) {
             clientMigration = new ClientMigration(client.getOrg());
 
             RuntimeContext runtimeContext = RuntimeContext.getInstance();
             Set<Org> orgSet = client.getOrg().getFriendlyOrg();
+            for (Org o : orgSet) {
+                if(o.getIdOfOrg().equals(org.getIdOfOrg())){
+                    isFriendlyReplaceOrg = true;
+                    break;
+                }
+            }
             runtimeContext.getProcessor().disableClientCardsIfChangeOrg(client, orgSet, org.getIdOfOrg());
-
+            archiveApplicationForFoodWithoutDiscount(client, persistenceSession);
         }
+        ClientManager.checkUserOPFlag(persistenceSession, client.getOrg(), org, this.idOfClientGroup, client);
         client.setOrg(org);
         client.setPerson(person);
         client.setContractPerson(contractPerson);
@@ -971,6 +990,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         } else {
             client.setClientGUID(this.clientGUID);
         }
+        if (this.clientIacRegId == null || this.clientIacRegId.isEmpty()) {
+            client.setIacRegId(null);
+        } else {
+            client.setIacRegId(this.clientIacRegId);
+        }
         if (this.changePassword) {
             client.setPassword(this.plainPassword);
         }
@@ -988,6 +1012,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             categoryCriteria.addOrder(Order.asc("idOfCategoryDiscount"));
             for (Object object : categoryCriteria.list()) {
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;
+                if(isReplaceOrg && !isFriendlyReplaceOrg && categoryDiscount.getEligibleToDelete()){
+                    archiveDtisznDiscount(client, persistenceSession, categoryDiscount.getIdOfCategoryDiscount());
+                    continue;
+                }
                 clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
                 clientCategories.append(",");
                 categoryDiscountSet.add(categoryDiscount);
@@ -1070,7 +1098,10 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             if ((this.idOfClientGroup != null && client.getIdOfClientGroup() == null) ||
                     (this.idOfClientGroup == null && client.getIdOfClientGroup() != null) ||
                     (client.getIdOfClientGroup() != null && !client.getIdOfClientGroup().equals(this.idOfClientGroup))) {
-                ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(org, client);
+                ClientManager.createClientGroupMigrationHistory(persistenceSession, client, org, this.idOfClientGroup,
+                        this.clientGroupName, ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
+                                .getExternalContext().getRemoteUser());
+                /*ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(org, client);
                 if (client.getClientGroup() != null) {
                     clientGroupMigrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
                     clientGroupMigrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
@@ -1081,7 +1112,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                         ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
                                 .getExternalContext().getRemoteUser());
 
-                persistenceSession.save(clientGroupMigrationHistory);
+                persistenceSession.save(clientGroupMigrationHistory);*/
 
             }
             client.setIdOfClientGroup(this.idOfClientGroup);
@@ -1156,9 +1187,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private void saveDiscountChange(Client client, Session persistenceSession, String newCategoriesDiscounts) {
         DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, null, discountMode, client.getDiscountMode(),
                 newCategoriesDiscounts, client.getCategoriesDiscounts());
-        discountChangeHistory.setComment(
-                DiscountChangeHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance()
-                        .getExternalContext().getRemoteUser() + ".");
+        discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_BY_TRANSITION);
         persistenceSession.save(discountChangeHistory);
 
     }
@@ -1220,6 +1249,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         this.externalId = client.getExternalId();
         this.clientGUID = client.getClientGUID();
+        this.clientIacRegId = client.getIacRegId();
         this.discountMode = client.getDiscountMode();
         /* filter fill*/
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
@@ -1242,6 +1272,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.parallel = StringUtils.defaultString(client.getParallel());
         this.clientDiscountItems = ClientViewPage.buildClientDiscountItem(session, client);
         this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
+        this.userOP = client.getUserOP();
     }
 
     public String getIdOfCategoryListString() {
@@ -1288,6 +1319,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         return getLastConfirmMobile() == null;
     }
 
+    public Boolean getUserOP() {
+        return userOP;
+    }
+
+    public void setUserOP(Boolean userOP) {
+        this.userOP = userOP;
+    }
+
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws HibernateException {
         //To change body of implemented methods use File | Settings | File Templates.
         if (null != categoryMap) {
@@ -1323,5 +1362,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             result[i+1] = new SelectItem(i, ClientGuardianRelationType.fromInteger(i).toString());
         }
         return result;
+    }
+
+    public boolean isEligibleToViewUserOP() {
+        if (null == this.idOfClientGroup) {
+            return false;
+        }
+        return OkuDAOService.getClientGroupList().contains(this.idOfClientGroup);
     }
 }

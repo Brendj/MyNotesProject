@@ -17,11 +17,11 @@ public class ResponseTransactions extends Result{
         this.transactions = new LinkedList<TransactionItem>();
     }
 
-    public List<TransactionItem> getTransaction() {
+    public List<TransactionItem> getTransactions() {
         return transactions;
     }
 
-    public void setTransaction(List<TransactionItem> transactions) {
+    public void setTransactions(List<TransactionItem> transactions) {
         this.transactions = transactions;
     }
 }

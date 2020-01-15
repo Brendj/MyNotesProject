@@ -31,6 +31,62 @@ public class PaymentResponse {
 
         public static class Item {
 
+            public String getInn() {
+                return inn;
+            }
+
+            public void setInn(String inn) {
+                this.inn = inn;
+            }
+
+            public String getNazn() {
+                return nazn;
+            }
+
+            public void setNazn(String nazn) {
+                this.nazn = nazn;
+            }
+
+            public String getBic() {
+                return bic;
+            }
+
+            public void setBic(String bic) {
+                this.bic = bic;
+            }
+
+            public String getRasch() {
+                return rasch;
+            }
+
+            public void setRasch(String rasch) {
+                this.rasch = rasch;
+            }
+
+            public String getBank() {
+                return bank;
+            }
+
+            public void setBank(String bank) {
+                this.bank = bank;
+            }
+
+            public String getCorrAccount() {
+                return corrAccount;
+            }
+
+            public void setCorrAccount(String corrAccount) {
+                this.corrAccount = corrAccount;
+            }
+
+            public String getKpp() {
+                return kpp;
+            }
+
+            public void setKpp(String kpp) {
+                this.kpp = kpp;
+            }
+
             public static class ClientInfo {
 
                 public static class PersonInfo {
@@ -130,6 +186,13 @@ public class PaymentResponse {
             private final CardInfo card;
             private final HashMap<String, String> addInfo;
             private Long idOfClientPayment;
+            private String inn;
+            private String nazn;
+            private String bic;
+            private String rasch;
+            private String bank;
+            private String corrAccount;
+            private String kpp;
 
             public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long tspContragentId, Long idOfCard, Long balance,
                     Long subBalance1, int result, String error, HashMap<String, String> addInfo) {
@@ -148,7 +211,8 @@ public class PaymentResponse {
             }
 
             public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long tspContragentId, Long idOfCard, Long balance,
-                    int result, String error, Client client, Long subBalance1, HashMap<String, String> addInfo) {
+                    int result, String error, Client client, Long subBalance1, HashMap<String, String> addInfo, String inn, String nazn, String bic, String rasch,
+                    String bank, String corrAccount, String kpp) {
                 this.payment = payment;
                 this.idOfClient = idOfClient;
                 this.contractId = contractId;
@@ -161,6 +225,13 @@ public class PaymentResponse {
                 this.client = new ClientInfo(client);
                 this.card = null;
                 this.addInfo = addInfo;
+                this.inn = inn;
+                this.nazn = nazn;
+                this.bic = bic;
+                this.rasch = rasch;
+                this.bank = bank;
+                this.corrAccount = corrAccount;
+                this.kpp = kpp;
             }
 
             public Item(PaymentRequest.PaymentRegistry.Payment payment, Long idOfClient, Long contractId, Long tspContragentId, Long idOfCard, Long balance,

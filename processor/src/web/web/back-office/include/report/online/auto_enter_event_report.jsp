@@ -19,30 +19,21 @@
 <h:panelGrid id="autoEnterEventReportPanel" binding="#{mainPage.autoEnterEventReportPage.pageComponent}"
              styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
-        <rich:calendar value="#{mainPage.autoEnterEventReportPage.startDate}" datePattern="dd.MM.yyyy"
-                       converter="dateConverter" inputClass="input-text"
-                       showWeeksBar="false">
-            <a4j:support event="onchanged" reRender="endDateCalendar,autoEnterEventReportPanel"
-                         actionListener="#{mainPage.autoEnterEventReportPage.onReportPeriodChanged}" />
-        </rich:calendar>
 
-        <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
-        <h:selectOneMenu id="endDatePeriodSelect"
-                         value="#{mainPage.autoEnterEventReportPage.periodTypeMenu.periodType}"
-                         styleClass="input-text" style="width: 250px;">
-            <f:converter converterId="periodTypeConverter" />
-            <f:selectItems value="#{mainPage.autoEnterEventReportPage.periodTypeMenu.items}" />
-            <a4j:support event="onchange" reRender="endDateCalendar,autoEnterEventReportPanel"
-                         actionListener="#{mainPage.autoEnterEventReportPage.onReportPeriodChanged}" />
+        <h:outputText styleClass="output-text" escape="true" value="Месяц" />
+        <h:selectOneMenu id="month"
+                         value="#{mainPage.autoEnterEventReportPage.monthYearTypeMenu.mounthType}"
+                         styleClass="input-text" style="width: 100px;">
+            <f:converter converterId="mouthTypeConverter" />
+            <f:selectItems value="#{mainPage.autoEnterEventReportPage.monthYearTypeMenu.itemsMonth}" />
         </h:selectOneMenu>
-        <h:outputText escape="true" value="Дата выборки до" styleClass="output-text" />
-        <rich:calendar id="endDateCalendar" value="#{mainPage.autoEnterEventReportPage.endDate}"
-                       datePattern="dd.MM.yyyy" converter="dateConverter"
-                       inputClass="input-text" showWeeksBar="false">
-            <a4j:support event="onchanged" reRender="endDatePeriodSelect,autoEnterEventReportPanel"
-                         actionListener="#{mainPage.autoEnterEventReportPage.onEndDateSpecified}" />
-        </rich:calendar>
+
+        <h:outputText styleClass="output-text" escape="true" value="Год" />
+        <h:selectOneMenu id="year"
+                         value="#{mainPage.autoEnterEventReportPage.monthYearTypeMenu.selectedYear}"
+                         styleClass="input-text" style="width: 100px;">
+            <f:selectItems value="#{mainPage.autoEnterEventReportPage.monthYearTypeMenu.itemsYears}" />
+        </h:selectOneMenu>
 
         <h:outputText styleClass="output-text" escape="true" value="Организация" />
         <h:panelGroup styleClass="borderless-div">
@@ -57,12 +48,12 @@
 
     </h:panelGrid>
 
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <h:outputText escape="false" value="Построить по всем дружественным организациям" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{mainPage.autoEnterEventReportPage.allFriendlyOrgs}"
-                                 styleClass="output-text">
-        </h:selectBooleanCheckbox>
-    </h:panelGrid>
+    <%--<h:panelGrid styleClass="borderless-grid" columns="2">--%>
+        <%--<h:outputText escape="false" value="Построить по всем дружественным организациям" styleClass="output-text" />--%>
+        <%--<h:selectBooleanCheckbox value="#{mainPage.autoEnterEventReportPage.allFriendlyOrgs}"--%>
+                                 <%--styleClass="output-text">--%>
+        <%--</h:selectBooleanCheckbox>--%>
+    <%--</h:panelGrid>--%>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <h:outputText escape="true" value="Группа" styleClass="output-text" />
@@ -73,6 +64,23 @@
         </h:selectOneMenu>
     </h:panelGrid>
 
+    <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:outputText styleClass="output-text" escape="true" value="Клиент" />
+        <h:panelGroup id="clientFilter">
+            <a4j:commandButton value="..."
+                               action="#{mainPage.showClientSelectListPage(mainPage.autoEnterEventReportPage.getClientList())}"
+                               reRender="modalClientListSelectorPanel,selectedClientList"
+                               oncomplete="if (#{facesContext.maximumSeverity == null})
+                                        #{rich:component('modalClientListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="1" target="#{mainPage.clientSelectListPage.clientFilter}" />
+                <f:setPropertyActionListener value="#{mainPage.autoEnterEventReportPage.getStringClientList}"
+                                             target="#{mainPage.clientSelectListPage.clientFilter}" />
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" escape="true" id="selectedClientList"
+                          value=" {#{mainPage.autoEnterEventReportPage.filterClient}}" />
+        </h:panelGroup>
+    </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Генерировать отчет" action="#{mainPage.autoEnterEventReportPage.buildReportHTML}"

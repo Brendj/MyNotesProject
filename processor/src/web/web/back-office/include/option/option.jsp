@@ -119,15 +119,45 @@
                            showWeeksBar="false">
             </rich:calendar>
         </h:panelGrid>
-        <h:panelGrid styleClass="borderless-grid" columns="2">
+        <h:panelGrid styleClass="borderless-grid" columns="2" bgcolor="#CCCCCC">
             <h:outputText escape="true" value="Сверка 2.0 источник данных:" styleClass="output-text" />
             <h:selectOneRadio value="#{optionPage.reviseSourceType}" styleClass="input-text">
                 <f:selectItem itemValue="1" itemLabel="НСИ" />
                 <f:selectItem itemValue="2" itemLabel="мастер база" />
             </h:selectOneRadio>
-            <h:outputText escape="true" value="Сверка 2.0 дельта (в часах)"
-                          styleClass="output-text" />
+            <h:outputText escape="true" value="Сверка 2.0 дельта (в часах)" styleClass="output-text" />
             <h:inputText value="#{optionPage.reviseDelta}" styleClass="input-text" size="5" />
+            <h:outputText escape="true" value="Лимит записей в запросе к мастер базе" styleClass="output-text" />
+            <h:inputText value="#{optionPage.reviseLimit}" styleClass="input-text" size="6" />
+            <h:outputText escape="true" value="Обработано до: " styleClass="output-text" />
+            <h:inputText value="#{optionPage.reviseLastDate}" styleClass="input-text" readonly="true" />
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid" id="synSettingExpressionsGrid" columns="2" bgcolor="#FFF3C2">
+            <h:outputText escape="true" value="Выражение для полной синхронизации" styleClass="output-text" />
+            <h:inputText value="#{optionPage.fullSyncExpressions}" styleClass="input-text"  />
+            <h:outputText escape="true" value="Выражение для синхронизации настроек ОО" styleClass="output-text" />
+            <h:inputText value="#{optionPage.orgSettingSyncExpressions}" styleClass="input-text"  />
+            <h:outputText escape="true" value="Выражение для синхронизации данных по клиентам ОО" styleClass="output-text" />
+            <h:inputText value="#{optionPage.clientDataSyncExpressions}" styleClass="input-text"  />
+            <h:outputText escape="true" value="Выражение для синхронизации меню" styleClass="output-text" />
+            <h:inputText value="#{optionPage.menuSyncExpressions}" styleClass="input-text"  />
+            <h:outputText escape="true" value="Выражение для синхронизации фотографий" styleClass="output-text" />
+            <h:inputText value="#{optionPage.photoSyncExpressions}" styleClass="input-text"  />
+            <h:outputText escape="true" value="Выражение для синхронизации библиотеки" styleClass="output-text" />
+            <h:inputText value="#{optionPage.libSyncExpressions}" styleClass="input-text"  />
+            <rich:toolTip styleClass="tooltip" layout="block">
+                <span style="white-space: nowrap">
+                    Выражение для автораспределения расписания представляет собой перечисление временных промежутков, когда необходимо и когда запрещено проводить синхронизацию АРМ с сервером Процессинга.
+                    <ul>
+                        <li>Промежутки задаются в формате HH:mm-HH:mm, разделителем является точка с запятой (;).</li>
+                        <li>Если задать несколько промежутков, то сервис астораспределения сгенерирует время для каждого. Из-за чего количество промежутков == количество сеансов.</li>
+                        <li>Время, в которое запрещено проводить синхронизацию, помечается восклицательным знаком в начале (!).</li>
+                        <li>Выражение должно состоять только из разрешенных промежутков, либо только из запрещенных.</li>
+                        <li>Если выражение не задано, то используется выражение по умолчанию.</li>
+                        <li>Сервис астораспределения имеет ограниченное количество попыток сгенерировать время для сеанса. По истечению количества попыток сервис генерирует время используя выражение по умолчанию.</li>
+                    </ul>
+                </span>
+            </rich:toolTip>
         </h:panelGrid>
     </rich:tab>
     <rich:tab label="Платежные системы">
@@ -394,6 +424,16 @@
                 </h:panelGrid>
             </rich:panel>
 
+            <rich:panel>
+                <f:facet name="header"><h:outputText styleClass="column-header" value="Редактирование срока действия карт" /></f:facet>
+                <h:panelGrid styleClass="borderless-grid" columns="2">
+                    <h:outputText escape="true" value="Срок продления карты (кол-во лет)"
+                                  styleClass="output-text" />
+                    <h:inputText id="periodOfExtensionCards" label="Срок продления карты" value="#{optionPage.periodOfExtensionCards}" styleClass="input-text" size="2" converter="javax.faces.Integer">
+                        <f:validateLongRange minimum="0" maximum="99"/>
+                    </h:inputText>
+                </h:panelGrid>
+            </rich:panel>
         </h:panelGrid>
     </rich:tab>
 
@@ -409,6 +449,16 @@
                     <h:inputText value="#{optionPage.RNIPPaymentsAlias}" styleClass="input-text" size="40" />
                     <h:outputText escape="true" value="Пароль" styleClass="output-text" />
                     <h:inputText value="#{optionPage.RNIPPaymentsPassword}" styleClass="input-text" size="40" />
+                </h:panelGrid>
+            </rich:panel>
+            <rich:panel>
+                <f:facet name="header"><h:outputText styleClass="column-header"
+                                                     value="Взаимодействие с МТС банк" /></f:facet>
+                <h:panelGrid styleClass="borderless-grid" columns="2">
+                    <h:outputText escape="true" value="Путь к файлу сертификата" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.regularPaymentCertPath}" styleClass="input-text" size="40" />
+                    <h:outputText escape="true" value="Пароль" styleClass="output-text" />
+                    <h:inputText value="#{optionPage.regularPaymentCertPassword}" styleClass="input-text" size="40" />
                 </h:panelGrid>
             </rich:panel>
         </h:panelGrid>

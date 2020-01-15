@@ -10,10 +10,10 @@ import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSett
 import ru.axetta.ecafe.processor.core.persistence.ClientNotificationSetting;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.service.ApplicationForFoodProcessingService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.service.SummaryCalculationService;
-import ru.axetta.ecafe.processor.core.service.regularPaymentService.RegularPaymentSubscriptionService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -121,9 +121,15 @@ public class DebugInfoPage extends BasicWorkspacePage {
     }
 
     public void runTest2() throws Exception {
-        RegularPaymentSubscriptionService notificationService = RuntimeContext.getInstance()
+        ApplicationForFoodProcessingService service = RuntimeContext.getAppContext().getBean(ApplicationForFoodProcessingService.class);
+        Session session = RuntimeContext.getInstance().createPersistenceSession();
+        Transaction transaction = session.beginTransaction();
+        logger.info(CalendarUtils.dateTimeToString(service.getTriggerDateByProductionCalendar(session, new Date(), 3)));
+        transaction.rollback();
+        session.close();
+        /*RegularPaymentSubscriptionService notificationService = RuntimeContext.getInstance()
                 .getRegularPaymentSubscriptionService();
-        //notificationService.notifyClientsAboutExpiredSubscriptions();
+        notificationService.checkClientBalances();*/
         /*for (Long w = 1499868946299L; w < 1499868946399L; w++) {
             DAOService.getInstance().registerSyncRequest(5, w.toString());
             Thread.sleep(500);

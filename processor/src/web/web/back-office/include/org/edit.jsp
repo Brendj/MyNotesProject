@@ -19,6 +19,8 @@
     <h:inputText readonly="true" value="#{mainPage.orgEditPage.idOfOrg}" styleClass="input-text" />
     <h:outputText escape="true" value="GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.guid}" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="ЕКИС Id" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.ekisId}" styleClass="input-text" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.officialName}" maxlength="256" styleClass="input-text" size="150" />
     <h:outputText escape="true" value="Краткое наименование" styleClass="output-text" />
@@ -191,6 +193,10 @@
     <h:inputText value="#{mainPage.orgEditPage.cardLimit}" converter="copeckSumConverter" styleClass="input-text" />
     <h:outputText escape="true" value="Включить предзаказы" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.preordersEnabled}" styleClass="input-text" />
+    <h:outputText escape="true" value="Участник ОП" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.participantOP}" styleClass="input-text" />
+    <h:outputText escape="true" value="Предварительные заявки по ЛП" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgEditPage.preorderlp}" styleClass="input-text"/>
 </h:panelGrid>
 <br />
 <rich:separator />

@@ -4,9 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings;
 
+import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.ReplacingMissingBeneficiariesType;
+
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.Date;
 
 /**
  * Created with IntelliJ IDEA.
@@ -19,6 +19,8 @@ public class ReplacingMissingBeneficiariesSettingSettingValue extends AbstractPa
 
     private String value; // (Резерв\Все)
     private int orgParam;//   int (1 \ 2)  1 только свой корпус 2 все корпуса
+
+    private static final int DEFAULT_CAPACITY = 2;
 
     public ReplacingMissingBeneficiariesSettingSettingValue(String[] values) throws ParseException {
         super(values);
@@ -38,6 +40,21 @@ public class ReplacingMissingBeneficiariesSettingSettingValue extends AbstractPa
     @Override
     public boolean check() {
         return true;
+    }
+
+    @Override
+    protected int getECafeSettingArrayCapacity() {
+        return DEFAULT_CAPACITY;
+    }
+
+    @Override
+    protected Integer getOrgSettingTypeByIndex(Integer index) {
+        return ReplacingMissingBeneficiariesType.getGlobalIdByECafeSettingValueIndex(index);
+    }
+
+    @Override
+    protected Integer getIndexByOrgSettingType(Integer type) {
+        return ReplacingMissingBeneficiariesType.getECafeSettingValueIndexByGlobalId(type);
     }
 
     public String getValue() {

@@ -36,6 +36,7 @@ public class EMPEventTypeFactory {
     public static final int LEAVE_WITH_CHECKER        = 901240017;
     public static final int INFO_MAILING_EVENT        = 901240056;
     public static final int CLIENT_NEWPASSWORD_EVENT  = 901240057;
+    public static final int SPECIAL_TYPE_EVENT        = 901240018;
 
 
     //Параметр modifired введен для определения: точно ли произошедшее событие соответствует коду события по умолчанию
@@ -126,6 +127,26 @@ public class EMPEventTypeFactory {
                 break;
             case LEAVE_WITH_CHECKER:
                 event = new EMPLeaveWithCheckerEventType();
+                break;
+            case SPECIAL_TYPE_EVENT:
+                switch (modifired)
+                {
+                    case 2:
+                        event = new EMPSpecialEventType(1);
+                        break;
+                    case 3:
+                        event = new EMPSpecialEventType(2);
+                        break;
+                    case 4:
+                        event = new EMPSpecialEventType(3);
+                        break;
+                    case 5:
+                        event = new EMPSpecialEventType(4);
+                        break;
+                    default:
+                        event = new EMPSpecialEventType(1);
+                        break;
+                }
                 break;
             default:
                 throw new IllegalArgumentException("Unknown type");

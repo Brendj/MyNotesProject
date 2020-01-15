@@ -328,8 +328,14 @@ public class CalendarUtils {
         return safeDateShortFormat.format(date);
     }
     public static String dateShortToStringFullYear(Date date) {
-        SimpleDateFormat safeDateShortFormatFullYear = dateShortFormatFullYear.get();
-        return safeDateShortFormatFullYear.format(date);
+        try {
+            SimpleDateFormat safeDateShortFormatFullYear = dateShortFormatFullYear.get();
+            return safeDateShortFormatFullYear.format(date);
+        }
+        catch (Exception e)
+        {
+            return "";
+        }
     }
     public static String dateMMMMYYYYToString(Date date) {
         SimpleDateFormat safeMMMMYYYY = MMMMYYYY.get();
@@ -482,6 +488,16 @@ public class CalendarUtils {
         c.add(Calendar.DAY_OF_YEAR, 6);
         res[1] = c.getTime();
         return res;
+    }
+
+    public static Integer getCurrentYear() {
+        GregorianCalendar gc = new GregorianCalendar();
+        return gc.get(Calendar.YEAR);
+    }
+
+    public static Integer getCurrentMonth() {
+        GregorianCalendar gc = new GregorianCalendar();
+        return gc.get(Calendar.MONTH);
     }
 
     public static DateFormat getDateFormatLocal() {

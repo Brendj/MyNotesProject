@@ -13,6 +13,9 @@ import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.ResCate
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZN;
+import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDSection;
+import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSection;
+import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSectionForARMAnswer;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.ResHelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
@@ -31,6 +34,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedi
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.ResSpecialDates;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesData;
+import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.ResSyncSettingsSection;
+import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.SyncSettingsSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.temp.cards.operations.ResTempCardsOperations;
 import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ResZeroTransactions;
 import ru.axetta.ecafe.processor.core.sync.handlers.zero.transactions.ZeroTransactionData;
@@ -66,6 +71,14 @@ public class SyncResponse {
 
     public void setCardRequestsData(CardRequestsData cardRequestsData) {
         this.cardRequestsData = cardRequestsData;
+    }
+
+    public GoodRequestEZDSection getGoodRequestEZDSection() {
+        return goodRequestEZDSection;
+    }
+
+    public void setGoodRequestEZDSection(GoodRequestEZDSection goodRequestEZDSection) {
+        this.goodRequestEZDSection = goodRequestEZDSection;
     }
 
     public static class AccRegistry implements AbstractToElement{
@@ -1203,6 +1216,11 @@ public class SyncResponse {
     private RequestFeedingData requestFeedingData;
     private ClientDiscountDTSZN clientDiscountDTSZN;
     private OrgSettingSection orgSetting;
+	private GoodRequestEZDSection goodRequestEZDSection;
+    private ResSyncSettingsSection resSyncSettingsSection;
+    private SyncSettingsSection syncSettingsSection;
+    private EmiasSection emias;
+    private EmiasSectionForARMAnswer emiasSectionForARMAnswer;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1224,7 +1242,8 @@ public class SyncResponse {
             ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections,
             ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData,
             ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
-            ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting) {
+            ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, GoodRequestEZDSection goodRequestEZDSection,
+            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1281,6 +1300,11 @@ public class SyncResponse {
         this.clientBalanceHoldFeeding = clientBalanceHoldFeeding;
         this.resClientBalanceHoldData = resClientBalanceHoldData;
         this.orgSetting = orgSetting;
+        this.goodRequestEZDSection = goodRequestEZDSection;
+        this.resSyncSettingsSection = resSyncSettingsSection;
+        this.syncSettingsSection = syncSettingsSection;
+		this.emias = emias;
+        this.emiasSectionForARMAnswer = emiasSectionForARMAnswer;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1336,6 +1360,7 @@ public class SyncResponse {
         envelopeElement.setAttribute("Type",syncType.toString());
         envelopeElement.setAttribute("OrganizationType", String.valueOf(organizationType.ordinal()));
         envelopeElement.setAttribute("ReportService", (String) RuntimeContext.getInstance().getConfigProperties().get("ecafe.processor.report.service"));
+        envelopeElement.setAttribute("NodeName", RuntimeContext.getInstance().getNodeName());
         String timeService = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.time.service", "");
         if (!StringUtils.isEmpty(timeService)) {
             envelopeElement.setAttribute("TimeService", timeService);
@@ -1566,6 +1591,26 @@ public class SyncResponse {
 
         if(orgSetting != null){
             envelopeElement.appendChild(orgSetting.toElement(document));
+        }
+		
+        if(goodRequestEZDSection != null){
+            envelopeElement.appendChild(goodRequestEZDSection.toElement(document, timeFormat));
+        }
+
+        if(resSyncSettingsSection != null){
+            envelopeElement.appendChild(resSyncSettingsSection.toElement(document));
+        }
+		
+        if(syncSettingsSection != null){
+            envelopeElement.appendChild(syncSettingsSection.toElement(document));
+        }
+		
+		if (emiasSectionForARMAnswer != null) {
+            envelopeElement.appendChild(emiasSectionForARMAnswer.toElement(document));
+        }
+		
+        if(emias != null){
+            envelopeElement.appendChild(emias.toElement(document));
         }
     }
 

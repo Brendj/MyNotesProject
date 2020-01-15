@@ -36,9 +36,21 @@ public class CardSignCreatePage extends CardSignDataBasicPage {
         return "card/sign/create";
     }
 
+    @Override
+    public void onShow() throws Exception {
+        this.setSignData(null);
+        this.setSignData(null);
+    }
+
     public void createCardSign(Long type) throws Exception {
+        logger.info("Старт создания поставщика карт");
         if (signData == null || manufacturerCode == null || manufacturerCode == 0 || StringUtils.isEmpty(manufacturerName)) {
             printError("Все поля на форме обязательны для заполнения. Файл с данными ключа также должен быть загружен");
+            return;
+        }
+        if (getManufacturerCode() < 1 || getManufacturerCode() > 256)
+        {
+            printError("Код поставщика карты должен быть не более 256");
             return;
         }
         //Только для нового типа поставщика
@@ -65,6 +77,7 @@ public class CardSignCreatePage extends CardSignDataBasicPage {
             cardSign.setManufacturerCode(getManufacturerCode());
             cardSign.setManufacturerName(getManufacturerName());
 
+            //type = 1 только у поставщиков нового типа
             if (type == 1) {
                 cardSign.setSignData(publicKey.getEncoded());
                 cardSign.setPublickeyprovider(signData);
@@ -79,6 +92,7 @@ public class CardSignCreatePage extends CardSignDataBasicPage {
             session.save(cardSign);
             transaction.commit();
             transaction = null;
+            logger.info(String.format("Создан поставщик карт %s", cardSign.getIdOfCardSign()));
             printMessage("Запись сохранена");
         } catch (Exception e) {
             logger.error("Error in cardSign create page: ", e);

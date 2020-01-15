@@ -113,6 +113,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>SpbCardServiceServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.spb.ExtendCardServiceServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>ImageServlet</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.ImageServlet</servlet-class>
     </servlet>
@@ -176,7 +181,7 @@
         <servlet-class>ru.axetta.ecafe.processor.web.partner.newispp.LastModifiedOrgsServlet</servlet-class>
     </servlet>
 
-    <servlet>
+    <!--<servlet>
         <servlet-name>PreorderServlet</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
         <init-param>
@@ -192,7 +197,7 @@
             <param-value>ru.axetta.ecafe.processor.web.partner.preorder.PreorderRequestInterceptor</param-value>
         </init-param>
     </servlet>
-    <!--<servlet-mapping>
+    <servlet-mapping>
         <servlet-name>PreorderServlet</servlet-name>
         <url-pattern>/preorder/*</url-pattern>
     </servlet-mapping>-->
@@ -221,6 +226,11 @@
     <servlet-mapping>
         <servlet-name>CommonTaskServlet</servlet-name>
         <url-pattern>/commontask</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SpbCardServiceServlet</servlet-name>
+        <url-pattern>/cardservice</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
@@ -379,6 +389,23 @@
         <url-pattern>/soap/specialcards</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <servlet-name>EZDControllerWS</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.ezd.EZDControllerSOAP</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EZDControllerWS</servlet-name>
+        <url-pattern>/soap/ezd</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>EMIASControllewWS</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.internal.EMIASController</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EMIASControllewWS</servlet-name>
+        <url-pattern>/soap/emias</url-pattern>
+    </servlet-mapping>
 
     <servlet>
         <servlet-name>BarcodeServlet</servlet-name>
@@ -429,22 +456,70 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>FpsApiServlet</servlet-name>
+        <servlet-name>OkuServlet</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
         <init-param>
             <param-name>resteasy.resources</param-name>
-            <param-value>ru.axetta.ecafe.processor.web.partner.fpsapi.FpsapiController</param-value>
+            <param-value>ru.axetta.ecafe.processor.web.partner.oku.OkuRestController</param-value>
         </init-param>
         <init-param>
             <param-name>resteasy.servlet.mapping.prefix</param-name>
-            <param-value>/fps/api</param-value>
+            <param-value>/assessment</param-value>
+        </init-param>
+        <init-param>
+            <param-name>resteasy.providers</param-name>
+            <param-value>ru.axetta.ecafe.processor.web.partner.oku.OkuRequestInterceptor</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>
-        <servlet-name>FpsApiServlet</servlet-name>
+        <servlet-name>OkuServlet</servlet-name>
+        <url-pattern>/assessment/*</url-pattern>
+    </servlet-mapping>
 
+    <servlet>
+    <servlet-name>FpsApiServlet</servlet-name>
+    <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+    <init-param>
+        <param-name>resteasy.resources</param-name>
+        <param-value>ru.axetta.ecafe.processor.web.partner.fpsapi.FpsapiController</param-value>
+    </init-param>
+    <init-param>
+        <param-name>resteasy.servlet.mapping.prefix</param-name>
+        <param-value>/fps/api</param-value>
+    </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>FpsApiServlet</servlet-name>
         <url-pattern>/fps/api/*</url-pattern>
     </servlet-mapping>
+
+    <servlet>
+        <servlet-name>EzdServlet</servlet-name>
+        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+        <init-param>
+            <param-name>resteasy.resources</param-name>
+            <param-value>ru.axetta.ecafe.processor.web.partner.ezd.EzdController</param-value>
+        </init-param>
+        <init-param>
+            <param-name>resteasy.servlet.mapping.prefix</param-name>
+            <param-value>/ezd</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>EzdServlet</servlet-name>
+        <url-pattern>/ezd/*</url-pattern>
+    </servlet-mapping>
+
+    <filter>
+        <filter-name>CleanupFilter</filter-name>
+        <filter-class>ru.axetta.ecafe.processor.web.partner.ResteasyCleanupFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>CleanupFilter</filter-name>
+        <url-pattern>/fps/api/*</url-pattern>
+        <url-pattern>/assessment/*</url-pattern>
+        <url-pattern>/smartwatch/*</url-pattern>
+    </filter-mapping>
 
     <security-constraint>
         <web-resource-collection>

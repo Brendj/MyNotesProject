@@ -161,11 +161,25 @@ public class ETPMVDaoService {
     }
 
     @Transactional
+    public List<ApplicationForFoodHistory> getNotSendedApplicationForFoodHistory(Date startDate, Date endDate) {
+        Query query = entityManager.createQuery("select h from ApplicationForFoodHistory h join fetch h.applicationForFood "
+                + "where h.sendDate is null and h.createdDate between :startDate and :endDate "
+                + "order by h.applicationForFood.idOfApplicationForFood, h.createdDate");
+        query.setParameter("startDate", startDate);
+        query.setParameter("endDate", endDate);
+        query.setMaxResults(1000);
+        return query.getResultList();
+    }
+
+    @Transactional
     public List<ApplicationForFood> getDataForAISContingent() {
         Query query = entityManager.createQuery("select a from ApplicationForFood a join fetch a.client c where a.sendToAISContingent = false "
-                + " and ((a.dtisznCode <> null and a.status = :statusDtiszn) or (a.dtisznCode = null and a.status = :statusInoe))");
+                + " and ((a.dtisznCode <> null and a.status = :statusDtiszn) or (a.dtisznCode = null and a.status = :statusInoe)) "
+                + " and (c.clientGroup.compositeIdOfClientGroup.idOfClientGroup < :group_employees or c.clientGroup.compositeIdOfClientGroup.idOfClientGroup = :group_displaced)");
         query.setParameter("statusDtiszn", new ApplicationForFoodStatus(ApplicationForFoodState.REGISTERED, null));
         query.setParameter("statusInoe", new ApplicationForFoodStatus(ApplicationForFoodState.OK, null));
+        query.setParameter("group_employees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+        query.setParameter("group_displaced", ClientGroup.Predefined.CLIENT_DISPLACED.getValue());
         return query.getResultList();
     }
 

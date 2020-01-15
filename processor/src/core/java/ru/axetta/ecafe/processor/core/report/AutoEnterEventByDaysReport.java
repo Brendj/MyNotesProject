@@ -39,20 +39,23 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob {
+
     /*
-    * Параметры отчета для добавления в правила и шаблоны
-    *
-    * При создании любого отчета необходимо добавить параметры:
-    * REPORT_NAME - название отчета на русском
-    * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
-    * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
-    * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
-    * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
-    *
-    * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
-    */
+     * Параметры отчета для добавления в правила и шаблоны
+     *
+     * При создании любого отчета необходимо добавить параметры:
+     * REPORT_NAME - название отчета на русском
+     * TEMPLATE_FILE_NAMES - названия всех jasper-файлов, созданных для отчета
+     * IS_TEMPLATE_REPORT - добавлять ли отчет в шаблоны отчетов
+     * PARAM_HINTS - параметры отчета (смотри ReportRuleConstants.PARAM_HINTS)
+     * заполняется, если отчет добавлен в шаблоны (класс AutoReportGenerator)
+     *
+     * Затем КАЖДЫЙ класс отчета добавляется в массив ReportRuleConstants.ALL_REPORT_CLASSES
+     */
     public static final String REPORT_NAME = "Сводный отчет по посещению";
     public static final String[] TEMPLATE_FILE_NAMES = {"AutoEnterEventByDaysReport.jasper"};
+    public static final String TEMPLATE_FILE_NAMES_FOR_CLIENT = "AutoEnterEventByDaysReportClient.jasper";
+    public static final String P_ID_CLIENT = "idOfClients";
     public static final boolean IS_TEMPLATE_REPORT = true;
     public static final int[] PARAM_HINTS = new int[]{28, 29, -3, 22, 23, 24};
 
@@ -63,17 +66,29 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
         public static class ReportItem {
 
             private static String[] data = new String[31];
+            private static String[] dataweek = new String[4];
             private static SimpleDateFormat ft = new SimpleDateFormat("hh:mm");
-            static {for (int day = 0; day < 31; day++) data[day] = "";}
+
+            static {
+                for (int day = 0; day < 31; day++) {
+                    data[day] = "";
+                }
+                for (int week = 0; week < 4; week++) {
+                    dataweek[week] = "";
+                }
+            }
 
             private String fio = null;
             private List<String> timeList = new ArrayList<String>(Arrays.asList(data));
+            private List <String> timeinWeekList = new ArrayList<String>(Arrays.asList(dataweek));
             //private Map<Integer, Date> dayMaxMin = new HashMap<Integer, Date>();
             private MultiValueMap dayMaxMin = new MultiValueMap();
-            private Map<Integer, Date> dayEntry = new HashMap<Integer, Date>();
-            private Map<Integer, Date> dayExit = new HashMap<Integer, Date>();
+            //Массив входов для одного дня
+            private Map<Integer, List<Date>> dayEntry = new HashMap<Integer, List<Date>>();
+            //Массив выходов для одного дня
+            private Map<Integer, List<Date>> dayExit = new HashMap<Integer, List<Date>>();
             private String groupName = "";
-            private String presenceOfDay="";
+            private String presenceOfDay = "";
 
             public String getFio() {
                 return fio;
@@ -83,8 +98,8 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                 this.fio = fio;
             }
 
-            public void addEventTime(int type, Long day, Long dateTime){
-                if(type==0){
+            public void addEventTime(int type, Long day, Long dateTime) {
+                if (type == 0) {
                     addEntryTime(day, dateTime);
                 } else {
                     addExitTime(day, dateTime);
@@ -92,54 +107,137 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             }
 
             private void addEntryTime(Long day, Long dateTime) {
-                int dayOfMonth = CalendarUtils.getDayOfMonth(new Date(day))-1;
-                Date date = dayEntry.get(dayOfMonth);
-                if(date==null || date.getTime()>dateTime){
-                    dayEntry.put(dayOfMonth, new Date(dateTime));
-                }
+                int dayOfMonth = CalendarUtils.getDayOfMonth(new Date(day)) - 1;
+                List<Date> date = dayEntry.get(dayOfMonth);
+                if (date == null)
+                    date = new ArrayList<>();
+                date.add(new Date(dateTime));
+                dayEntry.put(dayOfMonth, date);
+
             }
 
             private void addExitTime(Long day, Long dateTime) {
-                int dayOfMonth = CalendarUtils.getDayOfMonth(new Date(day))-1;
-                Date date = dayExit.get(dayOfMonth);
-                if(date==null || date.getTime()<dateTime){
-                    dayExit.put(dayOfMonth, new Date(dateTime));
-                }
+                int dayOfMonth = CalendarUtils.getDayOfMonth(new Date(day)) - 1;
+                List<Date> date = dayExit.get(dayOfMonth);
+                if (date == null)
+                    date = new ArrayList<>();
+                date.add(new Date(dateTime));
+                dayExit.put(dayOfMonth, date);
             }
 
             public void buildTimeList() {
                 long timeInOrg = 0;
                 long countDays = 0;
+                ArrayList<Long> timeinWeekLong = new ArrayList<>();
                 for (int day = 0; day < 31; day++) {
-                    Date dateEntry = dayEntry.get(day);
-                    Date dateExit = dayExit.get(day);
-                    if(dateEntry!=null || dateExit!=null){
+                    List<Date> dateEntry = dayEntry.get(day);
+                    List<Date> dateExit = dayExit.get(day);
+                    if (dateEntry != null || dateExit != null) {
                         // Если есть и вход и выход
-                        if(dateEntry!=null && dateExit!=null){
-                            final long duration = dateEntry.getTime() - dateExit.getTime();
-                            String s = String.format("%s-%s", CalendarUtils.timeToString(dateEntry),
-                                    CalendarUtils.timeToString(dateExit));
+                        if (dateEntry != null && dateExit != null) {
+                            //Суммарное время пребывания в организации
+                            final long duration = getDuration(dateEntry, dateExit);
+                            //final long duration = dateEntry.getTime() - dateExit.getTime();
+                            String s = String.format("%s-%s", CalendarUtils.timeToString(getMaxMinDate(dateEntry, false)),
+                                    CalendarUtils.timeToString(getMaxMinDate(dateExit, true)));
                             timeList.add(day, s);
-                            timeInOrg +=Math.abs(duration/60000);
+                            //timeInOrg += Math.abs(duration / 60000);
+                            timeInOrg += duration;
                             countDays++;
                         } else {
                             // Если только вход
-                            if(dateEntry!=null){
-                                timeList.add(day, CalendarUtils.timeToString(dateEntry));
+                            if (dateEntry != null) {
+                                timeList.add(day, "ВХ " + CalendarUtils.timeToString(getMaxMinDate(dateEntry, false)));
                             }
                             // Если только выход
-                            if(dateExit!=null){
-                                timeList.add(day, CalendarUtils.timeToString(dateExit));
+                            if (dateExit != null) {
+                                timeList.add(day, "ВЫХ " + CalendarUtils.timeToString(getMaxMinDate(dateExit, true)));
+                            }
+                        }
+                    }
+                    if (day == 6)
+                        timeinWeekLong.add(timeInOrg);
+                    if (day == 13)
+                        timeinWeekLong.add(timeInOrg - timeinWeekLong.get(0));
+                    if (day == 20)
+                        timeinWeekLong.add(timeInOrg - (timeinWeekLong.get(1) + timeinWeekLong.get(0)));
+                    if (day == 27)
+                        timeinWeekLong.add(timeInOrg - (timeinWeekLong.get(2) + timeinWeekLong.get(1) + timeinWeekLong.get(0)));
+                }
+                if (countDays > 0) {
+                    presenceOfDay = getStringTime (timeInOrg);
+                }
+                for (int i = 0; i < 4; i++)
+                    timeinWeekList.add(i, getStringTime(timeinWeekLong.get(i)));
+            }
+
+            private String getStringTime (Long time)
+            {
+                long result = time/1000;
+                long min = result / 60;
+                long sec = result % 60;
+                if (min < 60)
+                    return String.format("%02d:%02d", min, sec);
+                else
+                {
+                    long hour = min/60;
+                    min = min%60;
+                    return String.format("%02d:%02d:%02d", hour, min, sec);
+                }
+            }
+
+            //Функция для получения максимально/минимальной даты из списка
+            private Date getMaxMinDate(List<Date> dates, boolean maximum) {
+                Date date = null;
+                for (Date date1 : dates) {
+                    if (date == null) {
+                        date = new Date(date1.getTime());
+                    } else {
+                        if (maximum) {
+                            if (date.getTime() < date1.getTime()) {
+                                date.setTime(date1.getTime());
+                            }
+                        } else {
+                            if (date.getTime() > date1.getTime()) {
+                                date.setTime(date1.getTime());
                             }
                         }
                     }
                 }
-                if(countDays>0){
-                    long result = timeInOrg / countDays;
-                    long h = result / 60;
-                    long m = result % 60;
-                    presenceOfDay = String.format("%02d:%02d", h,m);
+                return date;
+            }
+
+            private Long getDuration(List<Date> dateEntry, List<Date> dateExit)
+            {
+                Long durations = 0L;
+                try {
+                    List<Date> dateTotal = new ArrayList<>();
+                    dateTotal.addAll(dateEntry);
+                    dateTotal.addAll(dateExit);
+                    Collections.sort(dateTotal);
+
+                    Long start = null;
+                    Long end;
+                    boolean wasEnd = false;
+                    for (Date date : dateTotal) {
+                        if (dateEntry.indexOf(date) != -1) {
+                            start = date.getTime();
+                            wasEnd = false;
+                        } else {
+                            if (start != null) {
+                                end = date.getTime();
+                                if (!wasEnd) {
+                                    durations += (end - start);
+                                }
+                                wasEnd = true;
+                            }
+                        }
+                    }
+                } catch (Exception e)
+                {
+                    durations = 0L;
                 }
+                return durations;
             }
 
             public List<String> getTimeList() {
@@ -165,6 +263,14 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             public void setPresenceOfDay(String presenceOfDay) {
                 this.presenceOfDay = presenceOfDay;
             }
+
+            public List<String> getTimeinWeekList() {
+                return timeinWeekList;
+            }
+
+            public void setTimeinWeekList(List<String> timeinWeekList) {
+                this.timeinWeekList = timeinWeekList;
+            }
         }
 
         public Builder(String templateFilename) {
@@ -176,29 +282,49 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             Map<String, Object> parameterMap = new HashMap<String, Object>();
             List<String> daysOfMonth = new ArrayList<String>(31); // 1 Вс	2 Пн	3 Вт	4 Ср ...
             Org orgLoad = (Org) session.load(Org.class, org.getIdOfOrg());
-            StringBuilder sb = new StringBuilder();
-            for(Org org : orgLoad.getFriendlyOrg()) {
-                sb.append(org.getShortAddress()).append(", ");
+
+            Boolean isAllFriendlyOrgs;
+            if (reportProperties.getProperty("isAllFriendlyOrgs") != null) {
+                isAllFriendlyOrgs = Boolean.valueOf(reportProperties.getProperty("isAllFriendlyOrgs"));
+            } else {
+                isAllFriendlyOrgs = true;
             }
+            //Если строим отчет по всем корпусам, то добавляем их названия
+            if (isAllFriendlyOrgs)
+            {
+                StringBuilder sb = new StringBuilder();
+                //sb.append(", ");
+                for (Org org : orgLoad.getFriendlyOrg()) {
+                    sb.append(org.getShortAddress()).append(", ");
+                }
+                parameterMap.put("allAdress", "В отчете представлена фиксация событий посещения любого здания ОО");
+                parameterMap.put("shortAddress", sb.substring(0, sb.length() - 2));
+            }
+            else {
+                parameterMap.put("allAdress", "В отчете представлена фиксация событий посещения главного здания ОО");
+                parameterMap.put("shortAddress", orgLoad.getShortAddress());
+            }
+
             parameterMap.put("shortNameInfoService", orgLoad.getShortNameInfoService());
-            parameterMap.put("shortAddress", sb.length() == 0 ? orgLoad.getShortAddress() : sb.substring(0, sb.length() - 2));
             calendar.setTime(startTime);
             Date firtstDayOfMonth = CalendarUtils.getFirstDayOfMonth(startTime);
             for (int day = 1; day <= 31; day++) {
-                daysOfMonth.add((day - 1), String.format("%d %s", day, CalendarUtils.dayInWeekToString(CalendarUtils.addDays(firtstDayOfMonth, day - 1))));
+                daysOfMonth.add((day - 1), String.format("%d %s", day,
+                        CalendarUtils.dayInWeekToString(CalendarUtils.addDays(firtstDayOfMonth, day - 1))));
             }
             parameterMap.put("days", daysOfMonth);
             parameterMap.put("monthName", calendar.getDisplayName(Calendar.MONTH, Calendar.LONG, new Locale("ru")));
-            JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap,
-                    createDataSource(session, org, startTime, endTime));
+            JasperPrint jasperPrint = JasperFillManager
+                    .fillReport(templateFilename, parameterMap, createDataSource(session, org, startTime, endTime));
             Date generateEndTime = new Date();
             return new AutoEnterEventByDaysReport(generateTime, generateEndTime.getTime() - generateTime.getTime(),
                     jasperPrint, startTime, endTime, org.getIdOfOrg());
         }
 
-        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime) throws Exception {
+        private JRDataSource createDataSource(Session session, OrgShortItem org, Date startTime, Date endTime)
+                throws Exception {
             Map<Long, ReportItem> map = new HashMap<Long, ReportItem>();
-            String typeConditionsValue = (String)getReportProperties().get("enterEventType");
+            String typeConditionsValue = (String) getReportProperties().get("enterEventType");
 
             //DetachedCriteria orgCriteria = DetachedCriteria.forClass(Org.class);
             //orgCriteria.add(Restrictions.eq("idOfOrg", org.getIdOfOrg()));
@@ -207,10 +333,10 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             //по все корпусам фильтр
             Boolean isAllFriendlyOrgs;
 
-            if (reportProperties.getProperty("isAllFriendlyOrgs") == null) {
-                isAllFriendlyOrgs = true;
-            } else {
+            if (reportProperties.getProperty("isAllFriendlyOrgs") != null) {
                 isAllFriendlyOrgs = Boolean.valueOf(reportProperties.getProperty("isAllFriendlyOrgs"));
+            } else {
+                isAllFriendlyOrgs = true;
             }
 
             Set<Long> ids = new HashSet<Long>();
@@ -229,6 +355,22 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                 ids.add(org.getIdOfOrg());
             }
 
+            //Фильтр по клиенту
+            List<String> stringClientsList;
+            List<Long> clientsList = new ArrayList<>();
+            try
+            {
+                String idOfClients = StringUtils.trimToEmpty(reportProperties.getProperty(P_ID_CLIENT));
+                stringClientsList = Arrays.asList(StringUtils.split(idOfClients, ','));
+                for (String clientId: stringClientsList)
+                    clientsList.add(Long.valueOf(clientId));
+            } catch (Exception e)
+            {
+                stringClientsList = new ArrayList<>();
+                clientsList = new ArrayList<>();
+            }
+
+
             //группа фильтр
             String groupName;
             if (reportProperties.getProperty("groupName") == null) {
@@ -241,41 +383,59 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
 
             if (groupName != null) {
                 String[] groups = StringUtils.split(groupName, ",");
-                for (String str: groups) {
+                for (String str : groups) {
                     groupList.add(str);
                 }
             }
+            List<Client> clientList;
+            if (clientsList.isEmpty()) {
+                Criteria clientCriteria = session.createCriteria(Client.class);
+                clientCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
+                //clientCriteria.add(Property.forName("org.idOfOrg").in(orgCriteria));
+                clientCriteria.add(Restrictions.in("org.idOfOrg", ids));
 
-            Criteria clientCriteria = session.createCriteria(Client.class);
-            clientCriteria.createAlias("clientGroup", "cg", JoinType.LEFT_OUTER_JOIN);
-            //clientCriteria.add(Property.forName("org.idOfOrg").in(orgCriteria));
-            clientCriteria.add(Restrictions.in("org.idOfOrg", ids));
-            clientCriteria.add(Restrictions.ne("idOfClientGroup", 1100000060L)); // Исключаем из списка Выбывших
-            if (!groupList.isEmpty()) {
-                clientCriteria.add(Restrictions.in("cg.groupName", groupList));
-            }
-            if (typeConditionsValue != null) {
-                // значения могут перечисляться через запятую, однако данный параметр может принимать только 1 из "все", "учащиеся", "все_без_учащихся"
-                String typeConditionsValues[] = typeConditionsValue.split(RuleProcessor.DELIMETER);
-                if (typeConditionsValues.length > 1)
-                    throw new Exception(String.format("%s: Параметр enterEventType не может принимать несколько значений.", AutoEnterEventByDaysReport.class.getSimpleName()));
-                if ((typeConditionsValues[0].trim().equals(RuleCondition.ENTEREVENT_TYPE_TEXT[RuleCondition.ENTEREVENT_TYPE_STUDS]))){
-                    clientCriteria.add(Restrictions.lt("idOfClientGroup", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES));
+                if (!clientsList.isEmpty()) {
+                    clientCriteria.add(Restrictions.in("idOfClient", clientsList));
                 }
-                else if ((typeConditionsValues[0].trim().equals(RuleCondition.ENTEREVENT_TYPE_TEXT[RuleCondition.ENTEREVENT_TYPE_WITHOUTSTUDS]))){
-                    clientCriteria.add(Restrictions.ge("idOfClientGroup", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES));
+                //clientCriteria.add(Restrictions.ne("idOfClientGroup", 1100000060L)); // Исключаем из списка Выбывших
+                if (!groupList.isEmpty()) {
+                    clientCriteria.add(Restrictions.in("cg.groupName", groupList));
                 }
+                if (typeConditionsValue != null) {
+                    // значения могут перечисляться через запятую, однако данный параметр может принимать только 1 из "все", "учащиеся", "все_без_учащихся"
+                    String typeConditionsValues[] = typeConditionsValue.split(RuleProcessor.DELIMETER);
+                    if (typeConditionsValues.length > 1) {
+                        throw new Exception(String.format("%s: Параметр enterEventType не может принимать несколько значений.",
+                                AutoEnterEventByDaysReport.class.getSimpleName()));
+                    }
+                    if ((typeConditionsValues[0].trim().equals(RuleCondition.ENTEREVENT_TYPE_TEXT[RuleCondition.ENTEREVENT_TYPE_STUDS]))) {
+                        clientCriteria.add(Restrictions.lt("idOfClientGroup", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES));
+                    } else if ((typeConditionsValues[0].trim().equals(RuleCondition.ENTEREVENT_TYPE_TEXT[RuleCondition.ENTEREVENT_TYPE_WITHOUTSTUDS]))) {
+                        clientCriteria.add(Restrictions.ge("idOfClientGroup", ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES));
+                    }
+                }
+                clientList = clientCriteria.list();
             }
-            List<Client> clientList = clientCriteria.list();
-
-            for (Client client: clientList){
+            else
+            {
+                Criteria clientCriteria = session.createCriteria(Client.class);
+                clientCriteria.add(Restrictions.in("idOfClient", clientsList));
+                clientList = clientCriteria.list();
+            }
+            for (Client client : clientList) {
                 ReportItem reportItem = new ReportItem();
-                reportItem.setGroupName(client.getClientGroup().getGroupName());
-                reportItem.setFio(client.getPerson().getFullName());
+                if (client.getClientGroup() != null && client.getClientGroup().getGroupName() != null)
+                    reportItem.setGroupName(client.getClientGroup().getGroupName());
+                else
+                    reportItem.setGroupName("Не найдена");
+                if (client.getPerson() != null && client.getPerson().getFullName() != null)
+                    reportItem.setFio(client.getPerson().getFullName());
+                else
+                    reportItem.setFio("Не найдена");
                 map.put(client.getIdOfClient(), reportItem);
             }
 
-            if(map.keySet().isEmpty()){
+            if (map.keySet().isEmpty()) {
                 // составим пустой отчет
                 ReportItem emptyItem = new ReportItem();
                 emptyItem.setGroupName("");
@@ -295,13 +455,12 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             reportCrit.setProjection(Projections.projectionList().add(Projections.groupProperty("client.idOfClient"))
                     .add(Projections.sqlGroupProjection("({alias}.evtDateTime/24/3600/1000)*24*3600*1000 as eventDay",
                             "{alias}.evtDateTime", new String[]{"eventDay"}, new Type[]{new LongType()}))
-                    .add(Projections.sqlGroupProjection(
-                            "CASE WHEN (passdirection in (0,6)) then 0 else 1 end as passtext",
-                            "{alias}.passdirection", new String[]{"passtext"}, new Type[]{new IntegerType()}))
+                    .add(Projections
+                            .sqlGroupProjection("CASE WHEN (passdirection in (0,6)) then 0 else 1 end as passtext",
+                                    "{alias}.passdirection", new String[]{"passtext"}, new Type[]{new IntegerType()}))
                     .add(Projections.sqlGroupProjection(
                             "(case when {alias}.passDirection in (0,6) then min({alias}.evtDateTime) else max({alias}.evtDateTime) end) as eventDateTime",
-                            "{alias}.passDirection", new String[]{"eventDateTime"}, new Type[]{new LongType()}))
-            );
+                            "{alias}.passDirection", new String[]{"eventDateTime"}, new Type[]{new LongType()})));
             List list = reportCrit.list();
             for (Object obj : list) {
                 Object[] row = (Object[]) obj;
@@ -313,7 +472,7 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                 item.addEventTime(type, day, eventDateTime);
             }
             final List<ReportItem> values = new ArrayList<ReportItem>(map.values());
-            for (ReportItem item: values){
+            for (ReportItem item : values) {
                 item.buildTimeList();
             }
             // сортируем по имени групп
@@ -326,10 +485,10 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
             Collections.sort(values, fioComparator);
             // сортируем по имени групп
             Comparator<ReportItem> nameComparator = new Comparator<ReportItem>() {
-                 @Override
-                 public int compare(ReportItem o1, ReportItem o2) {
-                     return o1.getGroupName().compareTo(o2.getGroupName());
-                 }
+                @Override
+                public int compare(ReportItem o1, ReportItem o2) {
+                    return o1.getGroupName().compareTo(o2.getGroupName());
+                }
             };
             // сортируем по длите имени группы: например чтобы сначало были начальные классы потом старшие
             Collections.sort(values, nameComparator);
@@ -337,8 +496,9 @@ public class AutoEnterEventByDaysReport extends BasicReportForMainBuildingOrgJob
                 @Override
                 public int compare(ReportItem o1, ReportItem o2) {
                     //return o1.getGroupName().replaceAll("[\\s|-]+", "").length()-o2.getGroupName().replaceAll("[\\s|-]+", "").length();
-                    int stringCompareResult = ((Integer)o1.getGroupName().replaceAll("[\\s|-]+", "").length()).compareTo(o2.getGroupName().replaceAll("[\\s|-]+", "").length());
-                    if( stringCompareResult!= 0){
+                    int stringCompareResult = ((Integer) o1.getGroupName().replaceAll("[\\s|-]+", "").length())
+                            .compareTo(o2.getGroupName().replaceAll("[\\s|-]+", "").length());
+                    if (stringCompareResult != 0) {
                         return stringCompareResult;
                     }
 

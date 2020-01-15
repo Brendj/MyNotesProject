@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -108,6 +109,11 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
         private final Integer discountMode;
         private final String discountAsString;
         private final String guid;
+        private final String regId;
+        private final String externalId;
+        private final ClientCreatedFromType createdFrom;
+        private final String categoriesDiscounts;
+
 
         public void setExpenditureLimit(Long expenditureLimit) {
             this.expenditureLimit = expenditureLimit;
@@ -180,6 +186,14 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             } else {
                 this.discountAsString = Client.DISCOUNT_MODE_NAMES[discountMode];
             }
+            this.regId = client.getIacRegId();
+            if (client.getIacRegId() != null) {
+                this.externalId = client.getIacRegId();
+            } else {
+                this.externalId = client.getClientGUID();
+            }
+            this.createdFrom = client.getCreatedFrom();
+            this.categoriesDiscounts = client.getCategoriesDiscounts();
         }
 
         public Long getIdOfClient() {
@@ -272,6 +286,22 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
 
         public String getGuid() {
             return guid;
+        }
+
+        public String getRegId() {
+            return regId;
+        }
+
+        public String getExternalId() {
+            return externalId;
+        }
+
+        public ClientCreatedFromType getCreatedFrom() {
+            return createdFrom;
+        }
+
+        public String getCategoriesDiscounts() {
+            return categoriesDiscounts;
         }
     }
 
@@ -419,6 +449,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
             if(clientGroup==null) clientGroup = DAOUtils.createClientGroup(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_DISPLACED);
             for (Item item : this.items) {
                 Client client =  DAOUtils.findClient(session,item.idOfClient);
+                ClientManager.checkUserOPFlag(session, client.getOrg(), org, clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), client);
                 Set<Long> idOfFriendlyOrg = DAOUtils.getIdOfFriendlyOrg(session, client.getOrg().getIdOfOrg());
                 Boolean flag = !idOfFriendlyOrg.contains(org.getIdOfOrg());
                 org.hibernate.Query query = session.createQuery("update Client set org.idOfOrg = :newOrg, clientRegistryVersion=:clientRegistryVersion, idOfClientGroup=:idOfClientGroup where idOfClient=:idOfClient");

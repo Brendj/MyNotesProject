@@ -28,6 +28,9 @@ public class ApplicationForFoodReportItem {
     private boolean isChanged;
     private List<ApplicationForFoodStatus> statuses;
     private String mobile;
+    private Boolean archieved;
+    private Date startDate;
+    private Date endDate;
 
     public ApplicationForFoodReportItem() {
 
@@ -49,6 +52,7 @@ public class ApplicationForFoodReportItem {
         isChanged = false;
         this.mobile = applicationForFood.getMobile();
         statuses = new ArrayList<ApplicationForFoodStatus>();
+        this.archieved = applicationForFood.getArchived();
     }
 
     public String getApplicationForFoodStateString() {
@@ -63,17 +67,33 @@ public class ApplicationForFoodReportItem {
     }
 
     public Boolean getIsPaused() {
-        if (!isInoe) return false;
-        return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.PAUSED);
+        return false;
+        //if (!isInoe || archieved) return false;
+        //return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.PAUSED);
     }
 
     public Boolean getIsResumed() {
-        if (!isInoe) return false;
-        return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.RESUME);
+        return false;
+        //if (!isInoe || archieved) return false;
+        //return applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.RESUME);
+    }
+
+    public Boolean canBeMovedToArchieve() {
+        return isInoe && !archieved;
+    }
+
+    public Boolean canChangeDates() {
+        return isInoe && !archieved
+                && applicationForFoodStatus.getApplicationForFoodState().equals(ApplicationForFoodState.OK)
+                && startDate != null && endDate != null;
     }
 
     public String getArchieved() {
-        return applicationForFood.getArchived() ? "Да" : "Нет";
+        return this.archieved ? "Да" : "Нет";
+    }
+
+    public void setArchieved(Boolean archieved) {
+        this.archieved = archieved;
     }
 
     public String getServiceNumber() {
@@ -194,5 +214,21 @@ public class ApplicationForFoodReportItem {
 
     public void setApplicantFio(String applicantFio) {
         this.applicantFio = applicantFio;
+    }
+
+    public Date getStartDate() {
+        return startDate;
+    }
+
+    public void setStartDate(Date startDate) {
+        this.startDate = startDate;
+    }
+
+    public Date getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(Date endDate) {
+        this.endDate = endDate;
     }
 }
