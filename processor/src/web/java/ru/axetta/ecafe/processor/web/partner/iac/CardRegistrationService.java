@@ -72,7 +72,7 @@ public class CardRegistrationService {
         return ((st > 0) || (len < regId.length())) ? regId.substring(st, len) : regId;
     }
 
-    public void registerCard(Session session, Long cardId, Date validDate, Client client) throws Exception {
+    public void registerCard(Session session, Long cardId, Client client) throws Exception {
 
         if (null == cardId)
             throw new RequiredFieldsAreNotFilledException("Required fields are not filled: cardId = null");
@@ -80,16 +80,8 @@ public class CardRegistrationService {
         Card card = DAOUtils.findCardByCardNo(session, cardId);
 
         if (null == card) {
-            String strCardId = cardId.toString();
-            if (strCardId.length() == 13 && !strCardId.startsWith("1")) {
-                if (null == validDate) validDate = CalendarUtils.addYear(new Date(), 12);
-            } else {
-                if (client.getCards() != null && client.getCards().size() > 0 && null == validDate)
-                    validDate = CalendarUtils.addDays(new Date(), 10);
-            }
             blockAllOtherClientCards(session, client);
-            //if (null == validDate)
-                validDate = CalendarUtils.addYear(new Date(), 12);
+            Date validDate = CalendarUtils.addYear(new Date(), 12);
             RuntimeContext.getInstance().getCardManager().createCard(session, session.getTransaction(), client.getIdOfClient(),
                     cardId, Arrays.asList(Card.TYPE_NAMES).indexOf("Mifare"), CardState.ISSUED.getValue(), validDate,
                     Card.ISSUED_LIFE_STATE, null, new Date(), cardId);
@@ -102,9 +94,9 @@ public class CardRegistrationService {
                     blockAllOtherClientCards(session, client);
                     card.setState(CardState.ISSUED.getValue());
                 } else {
-                    RuntimeContext.getInstance().getCardManager().updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+                    RuntimeContext.getInstance().getCardManager().updateCardInSession(session, client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
                             CardState.ISSUED.getValue(), card.getValidTime(), card.getLifeState(), card.getLockReason(),
-                            card.getIssueTime(), card.getExternalId());
+                            card.getIssueTime(), card.getExternalId(), null, null, "", true);
                 }
             }
         }
@@ -123,7 +115,7 @@ public class CardRegistrationService {
                 if (card.getState() != CardState.BLOCKED.getValue() && card.getState() != CardState.TEMPBLOCKED.getValue())
                     cardManager.updateCardInSession(session, card.getClient().getIdOfClient(), card.getIdOfCard(), card.getCardType(),
                             CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(), card.getLockReason(),
-                            card.getIssueTime(), card.getExternalId(), null, null, "");
+                            card.getIssueTime(), card.getExternalId(), null, null, "", false);
             }
 
         //    transaction.commit();

@@ -252,7 +252,7 @@ public class CardManagerProcessor implements CardManager {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             updateCardInSession(persistenceSession, idOfClient, idOfCard, cardType, state, validTime, lifeState,
-            lockReason, issueTime, externalId, cardOperatorUser, idOfOrg, informationAboutCard);
+            lockReason, issueTime, externalId, cardOperatorUser, idOfOrg, informationAboutCard, false);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -263,7 +263,7 @@ public class CardManagerProcessor implements CardManager {
     }
 
     public void updateCardInSession(Session persistenceSession, Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
-            String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg, String informationAboutCard) throws Exception {
+            String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg, String informationAboutCard, boolean ignoreValidTime) throws Exception {
         String additionalInfoAboutCard = StringUtils.isBlank(informationAboutCard) ? "" : " (" + informationAboutCard + ")";
         Client newCardOwner = getClientReference(persistenceSession, idOfClient);
         Card updatedCard = getCardReference(persistenceSession, idOfCard);
@@ -325,9 +325,14 @@ public class CardManagerProcessor implements CardManager {
         updatedCard.setUpdateTime(new Date());
         updatedCard.setState(state);
         updatedCard.setLockReason(lockReason);
-        Date validTo = clientHadCards ? CalendarUtils.addDays(new Date(), 10) : CalendarUtils.addYear(new Date(), 12);
-        if (oldClient != newClient) updatedCard.setValidTime(validTo); //дату действия меняем, если карту выдаем другому клиенту
-        updatedCard.setIssueTime(new Date());
+        if (ignoreValidTime) {
+            Date validTo = clientHadCards ? CalendarUtils.addDays(new Date(), 10) : CalendarUtils.addYear(new Date(), 12);
+            if (oldClient != newClient) updatedCard.setValidTime(validTo); //дату действия меняем, если карту выдаем другому клиенту
+            updatedCard.setIssueTime(new Date());
+        } else {
+            updatedCard.setValidTime(validTime);
+            updatedCard.setIssueTime(issueTime);
+        }
         updatedCard.setLifeState(lifeState);
         updatedCard.setExternalId(externalId);
         persistenceSession.update(updatedCard);

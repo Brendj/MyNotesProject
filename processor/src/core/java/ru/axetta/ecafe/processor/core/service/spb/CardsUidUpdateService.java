@@ -118,7 +118,7 @@ public class CardsUidUpdateService {
                                         CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(),
                                         BALANCE_TRANSFER,
                                         card.getIssueTime(), card.getExternalId(),
-                                        user, fromClient.getOrg().getIdOfOrg(), "");
+                                        user, fromClient.getOrg().getIdOfOrg(), "", false);
                     }
                 }
 
