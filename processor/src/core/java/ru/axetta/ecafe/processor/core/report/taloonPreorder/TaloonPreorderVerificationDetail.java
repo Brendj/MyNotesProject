@@ -103,7 +103,7 @@ public class TaloonPreorderVerificationDetail {
     }
 
     public Integer getShippedQty() {
-        return shippedQty == null ? 0 : shippedQty;
+        return shippedQty;
     }
 
     public void setShippedQty(Integer shippedQty) {
@@ -458,7 +458,7 @@ public class TaloonPreorderVerificationDetail {
     }
 
     public Boolean needFillShippedQty() {
-        return (shippedQty == null || shippedQty == 0);
+        return (shippedQty == null);
     }
 
     public Boolean getRemarksEmpty() {
@@ -466,18 +466,26 @@ public class TaloonPreorderVerificationDetail {
     }
 
     public void addQtyAndGet(TaloonPreorderVerificationDetail arg) {
-        this.setRequestedQty(this.getRequestedQty() + arg.getRequestedQty());
-        this.setRequestedSum(this.getRequestedSum() + arg.getRequestedSum());
-        this.setSoldQty(this.getSoldQty() + arg.getSoldQty());
-        this.setSoldSum(this.getSoldSum() + arg.getSoldSum());
-        this.setShippedQty(this.getShippedQty() + arg.getShippedQty());
-        this.setShippedSum(this.getShippedSum() + arg.getShippedSum());
-        this.setReservedQty(this.getReservedQty() + arg.getReservedQty());
-        this.setReservedSum(this.getReservedSum() + arg.getReservedSum());
-        this.setBlockedQty(this.getBlockedQty() + arg.getBlockedQty());
-        this.setBlockedSum(this.getBlockedSum() + arg.getBlockedSum());
-        this.setDifferedQty(this.getDifferedQty() + arg.getDifferedQty());
-        this.setDifferedSum(this.getDifferedSum() + arg.getDifferedSum());
+        this.setRequestedQty(getIntSum(this.getRequestedQty(), arg.getRequestedQty()));
+        this.setRequestedSum(getLongSum(this.getRequestedSum(), arg.getRequestedSum()));
+        this.setSoldQty(getIntSum(this.getSoldQty(), arg.getSoldQty()));
+        this.setSoldSum(getLongSum(this.getSoldSum(), arg.getSoldSum()));
+        this.setShippedQty(getIntSum(this.getShippedQty(), arg.getShippedQty()));
+        this.setShippedSum(getLongSum(this.getShippedSum(), arg.getShippedSum()));
+        this.setReservedQty(getIntSum(this.getReservedQty(), arg.getReservedQty()));
+        this.setReservedSum(getLongSum(this.getReservedSum(), arg.getReservedSum()));
+        this.setBlockedQty(getIntSum(this.getBlockedQty(), arg.getBlockedQty()));
+        this.setBlockedSum(getLongSum(this.getBlockedSum(), arg.getBlockedSum()));
+        this.setDifferedQty(getIntSum(this.getDifferedQty(), arg.getDifferedQty()));
+        this.setDifferedSum(getLongSum(this.getDifferedSum(), arg.getDifferedSum()));
+    }
+
+    private Integer getIntSum(Integer value1, Integer value2) {
+        return (value1 == null ? 0 : value1) + (value2 == null ? 0 : value2);
+    }
+
+    private Long getLongSum(Long value1, Long value2) {
+        return (value1 == null ? 0L : value1) + (value2 == null ? 0L : value2);
     }
 
     public void confirmPpState() {
