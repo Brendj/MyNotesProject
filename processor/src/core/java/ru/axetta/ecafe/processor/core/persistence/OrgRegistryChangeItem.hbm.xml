@@ -39,8 +39,6 @@
         <property name="cityFrom" column="cityfrom" type="string" length="255"/>
         <property name="region" column="region" type="string" length="255"/>
         <property name="regionFrom" column="regionfrom" type="string" length="255"/>
-        <property name="introductionQueue" column="introductionQueue" type="string" length="64"/>
-        <property name="introductionQueueFrom" column="introductionQueueFrom" type="string" length="64"/>
         <property name="director" column="director" type="string" length="255"/>
         <property name="directorFrom" column="directorFrom" type="string" length="255"/>
 

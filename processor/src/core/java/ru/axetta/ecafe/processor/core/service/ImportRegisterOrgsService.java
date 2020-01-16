@@ -480,7 +480,9 @@ public class ImportRegisterOrgsService {
                         solveString(oi.getGuid()), oi.getGuidFrom(),
                         oi.getAdditionalId() == null ? -1L : oi.getAdditionalId(),
                         orgRegistryChange, oi.getShortNameSupplierFrom(),
-                        oi.getOrgState(), oi.getIntroductionQueue(), oi.getIntroductionQueueFrom(),
+                        oi.getOrgState(),
+                        oi.getDirector(), oi.getDirectorFrom()
+                        oi.getOrgState(),
                         oi.getDirector(), oi.getDirectorFrom(),
                         oi.getEkisId(), oi.getEkisIdFrom(),
                         solveString(oi.getEgissoId()), solveString(oi.getEgissoIdFrom()),
@@ -549,8 +551,6 @@ public class ImportRegisterOrgsService {
         private String directorFullName;
         private String OGRN;
         private String state;
-        private String introductionQueue;
-        private String introductionQueueFrom;
         private String director;
         private String directorFrom;
         private Long ekisId;
@@ -852,22 +852,6 @@ public class ImportRegisterOrgsService {
 
         public void setOrgState(Integer orgState) {
             this.orgState = orgState;
-        }
-
-        public String getIntroductionQueue() {
-            return introductionQueue;
-        }
-
-        public void setIntroductionQueue(String introductionQueue) {
-            this.introductionQueue = introductionQueue;
-        }
-
-        public String getIntroductionQueueFrom() {
-            return introductionQueueFrom;
-        }
-
-        public void setIntroductionQueueFrom(String introductionQueueFrom) {
-            this.introductionQueueFrom = introductionQueueFrom;
         }
 
         public String getDirector() {
