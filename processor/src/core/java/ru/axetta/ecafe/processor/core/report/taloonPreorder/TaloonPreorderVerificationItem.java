@@ -60,37 +60,42 @@ public class TaloonPreorderVerificationItem {
         changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
     }
 
+    // меняем статусы только там, где это разрешено
     private void changePpState(TaloonPPStatesEnum ppState) {
         for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                 if (!detail.isSummaryDay()) {
-                    detail.setPpState(ppState);
-                    this.ppState = ppState;
+                    if ((ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.allowedSetFirstFlag()) ||
+                            (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED && detail.allowedClearFirstFlag())) {
+                        detail.setPpState(ppState);
+                        this.ppState = ppState;
+                    }
                 }
             }
         }
     }
 
+    // разрешаем, если хотя бы у одной записи разрешен
     public boolean allowedSetFirstFlag() {
         for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-                if (!detail.allowedSetFirstFlag()) {
-                    return false;
+                if (detail.allowedSetFirstFlag()) {
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
 
     public boolean allowedClearFirstFlag() {
         for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-                if (!detail.allowedClearFirstFlag()) {
-                    return false;
+                if (detail.allowedClearFirstFlag()) {
+                    return true;
                 }
             }
         }
-        return true;
+        return false;
     }
 
     //public void changePpStateAllDay(TaloonPPStatesEnum state) {

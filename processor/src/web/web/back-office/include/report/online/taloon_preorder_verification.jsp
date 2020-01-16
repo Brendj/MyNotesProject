@@ -292,16 +292,13 @@
                     </a4j:commandLink>
 
                     <%--            Подтвердить для всего дня--%>
-<%--                    action="#{mainPage.taloonPreorderVerificationPage.confirmPpStateAllDay()}"--%>
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{item.isPpStateNotSelected() and detail.summaryDay}"
                                      action="#{item.confirmPpState()}"
                                      onclick="if (#{!item.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{item}" target="#{item.getPpState()}"/>
-<%--                        <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItem}"/>--%>
                         <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
                     </a4j:commandLink>
-                    <%--            Отменить выбор для всего дня-- ppStateNull--%>
-<%--                    action="#{mainPage.taloonPreorderVerificationPage.deselectPpStateAllDay()}"--%>
+                    <%--            Отменить выбор для всего дня--%>
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{item.isPpStateConfirmed() and detail.summaryDay}"
                                      action="#{item.deselectPpState()}" style="color:lightgray;"
                                      onclick="if (#{!item.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
