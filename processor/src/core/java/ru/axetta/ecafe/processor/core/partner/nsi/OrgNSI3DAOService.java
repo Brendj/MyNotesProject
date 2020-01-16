@@ -89,7 +89,6 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
                 item.setUnad(null);
             }
             item.setUniqueAddressId(((BigInteger)row[15]).longValue());
-            item.setIntroductionQueue((String)row[14]);
             item.setDirector((String)row[6]);
             item.setEgissoId((String)row[17]);
             item.setShortAddress((String)row[18]);

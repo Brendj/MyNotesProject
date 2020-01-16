@@ -295,9 +295,9 @@ public class ImportRegisterOrgsService {
                         org.setCity(orgRegistryChange.getCity());
                     }
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_SHORT_ADDRESS)))
-                        org.setShortAddress(orgRegistryChange.getShortAddress());
+                        org.setShortAddress(orgRegistryChangeItem.getShortAddress());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_MUNICIPAL_DISTRICT)))
-                        org.setMunicipalDistrict(orgRegistryChange.getMunicipalDistrict());
+                        org.setMunicipalDistrict(orgRegistryChangeItem.getMunicipalDistrict());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_OFFICIAL_NAME)))
                         org.setOfficialName(orgRegistryChange.getOfficialName());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_SHORT_NAME)))
@@ -480,8 +480,6 @@ public class ImportRegisterOrgsService {
                         solveString(oi.getGuid()), oi.getGuidFrom(),
                         oi.getAdditionalId() == null ? -1L : oi.getAdditionalId(),
                         orgRegistryChange, oi.getShortNameSupplierFrom(),
-                        oi.getOrgState(),
-                        oi.getDirector(), oi.getDirectorFrom()
                         oi.getOrgState(),
                         oi.getDirector(), oi.getDirectorFrom(),
                         oi.getEkisId(), oi.getEkisIdFrom(),
