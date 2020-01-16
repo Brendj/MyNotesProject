@@ -52,6 +52,9 @@ public class SmartWatchRestController {
     private final Long DEFAULT_SMART_WATCH_VALID_TIME = 157766400000L; // 5 year
     private final Integer DEFAULT_SAMPLE_LIMIT = 10;
 
+    private final String BLOCK_SMART_WATCH = "Блокировка чосов (Mifare)";
+    private final String REISSUE_SMART_WATCH = "Выдача чосов (Mifare) новому владельцу";
+
     private final String IS_BUFFET = StringUtils.join(Arrays.asList(
             OrderTypeEnumType.UNKNOWN.ordinal(),
             OrderTypeEnumType.DEFAULT.ordinal(),
@@ -222,7 +225,7 @@ public class SmartWatchRestController {
                         && card.getCardType().equals(CARD_TYPE_SMARTWATCH)) {
                     cardManager.updateCard(child.getIdOfClient(), card.getIdOfCard(), card.getCardType(), CardState.ISSUED.getValue(), validTime,
                             card.getLifeState(), "", issueTime, card.getExternalId(), null,
-                            child.getOrg().getIdOfOrg());
+                            child.getOrg().getIdOfOrg(), REISSUE_SMART_WATCH);
                 } else {
                     throw new Exception("Card CardNo: " + card.getCardNo()
                             + " is registered and owned Client contractID: "
@@ -1079,7 +1082,8 @@ public class SmartWatchRestController {
             RuntimeContext.getInstance().getCardManager()
                     .updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
                             CardState.BLOCKED.getValue(), card.getValidTime(), card.getLifeState(),
-                            CardLockReason.OTHER.getDescription(), card.getIssueTime(), card.getExternalId());
+                            CardLockReason.OTHER.getDescription(), card.getIssueTime(), card.getExternalId(),
+                            null, card.getOrg().getIdOfOrg(), BLOCK_SMART_WATCH);
         }
     }
 
