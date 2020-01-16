@@ -89,7 +89,6 @@ public class OrgSymmetricDAOService extends OrgMskNSIService {
                 item.setUnad(null);
             }
             item.setUniqueAddressId(((BigInteger)row[15]).longValue());
-            item.setIntroductionQueue((String)row[14]);
             item.setDirector((String)row[6]);
 
             ImportRegisterOrgsService.OrgInfo info;
@@ -155,7 +154,6 @@ public class OrgSymmetricDAOService extends OrgMskNSIService {
         info.setDirectorFullName(directorFullName);
         info.setOGRN(ogrn);
         info.setMainBuilding(false);
-        info.setIntroductionQueue(item.getIntroductionQueue());
         info.setDirector(item.getDirector());
         info.setRegion(region);
         if (info.getOrgInfos().size() == 0) {
