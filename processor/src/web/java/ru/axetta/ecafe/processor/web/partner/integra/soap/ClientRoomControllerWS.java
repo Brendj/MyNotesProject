@@ -68,6 +68,8 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsS
 import ru.axetta.ecafe.processor.web.partner.preorder.MenuDetailNotExistsException;
 import ru.axetta.ecafe.processor.web.partner.preorder.NotEditedDayException;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
+import ru.axetta.ecafe.processor.web.partner.preorder.PreorderGoodParamsContainer;
+import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderComplexItemExt;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderListWithComplexesGroupResult;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderSaveListParam;
 import ru.axetta.ecafe.processor.web.partner.preorder.soap.*;
@@ -2722,14 +2724,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             criteria.add(Restrictions.eq("org", org));
             criteria.add(Restrictions.gt("menuDate", startDate));
             criteria.add(Restrictions.lt("menuDate", endDate));
+            criteria.add(Restrictions.eq("modeVisible", 1));
             criteria.add(Restrictions
                     .or(Restrictions.not(Restrictions.ilike("detal.groupName", groupNotForMos, MatchMode.ANYWHERE)),
                             Restrictions.isNull("detal.groupName")));
 
             List<ComplexInfo> complexInfoList = criteria.list();
+            PreorderDAOService preorderDAOService = RuntimeContext.getAppContext().getBean(PreorderDAOService.class);
 
             List<MenuWithComplexesExt> list = new ArrayList<MenuWithComplexesExt>();
             for (ComplexInfo ci : complexInfoList) {
+                if (client.getClientGroup() != null && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()) {
+                    //для учеников
+                    PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(ci.getIdOfComplex(), ci.getComplexName(), ci.getCurrentPrice(), ci.getModeOfAdd(), ci.getModeFree());
+                    PreorderGoodParamsContainer complexParams = preorderDAOService.getComplexParams(complexItemExt, client, ci.getMenuDate());
+                    if (!preorderDAOService.isAcceptableComplex(complexItemExt, client.getClientGroup(), client.hasDiscount(), complexParams)) continue;
+                } else {
+                    //для предопределенных не включаем комплексы с какой-либо категорией
+                    if (ci.getGood() != null && !ci.getGood().getAgeGroupType().equals(GoodAgeGroupType.UNSPECIFIED)) continue;
+                }
+
                 List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, ci.getIdOfComplexInfo());
                 MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(ci);
                 menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
