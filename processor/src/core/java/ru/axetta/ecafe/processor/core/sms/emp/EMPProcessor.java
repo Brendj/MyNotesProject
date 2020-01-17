@@ -921,9 +921,9 @@ public class EMPProcessor {
             msisdn.getValue().add(clientMobileString);
             criteria.add(msisdn);
         }
+
         if (storage != null) {
             SelectEntriesResponse response = storage.selectEntries(request);
-
             if (response.getResult() != null) {
                 List<Entry> entries = response.getResult().getEntry();
                 for (Entry entry : entries) {
