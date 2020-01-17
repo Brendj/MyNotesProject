@@ -8,3 +8,5 @@
 ALTER TABLE cf_clients add column confirmvisualrecognition integer NOT NULL DEFAULT 0; -- Согласие на видеоидентификацию
 
 COMMENT ON COLUMN cf_clients.confirmvisualrecognition IS 'Согласие на видеоидентификацию';
+
+alter table cf_orgs add column preorderSyncParam integer;
