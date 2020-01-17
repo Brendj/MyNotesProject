@@ -496,6 +496,10 @@ public class TaloonPreorderVerificationDetail {
         changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
     }
 
+    public void cancelPpState() {
+        changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
+    }
+
     private void changePpState(TaloonPPStatesEnum ppState) {
         this.ppState = ppState;
         this.getComplex().getItem().setPpState();
