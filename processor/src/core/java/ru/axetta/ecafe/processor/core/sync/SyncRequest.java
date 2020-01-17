@@ -25,11 +25,10 @@ import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientsPhotos;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ListComplexSchedules;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZNBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountsDTSZNRequest;
-import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDBuilder;
-import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasRequest;
-import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSection;
+import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.GroupsOrganizationRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestBuilder;
@@ -183,6 +182,7 @@ public class SyncRequest {
                     String notifyViaPUSH = getStringValueNullSafe(namedNodeMap, "NotifyViaPush");
                     String groupName = getStringValueNullSafe(namedNodeMap, "GroupName");
                     String canConfirmGroupPayment = getStringValueNullSafe(namedNodeMap, "CanConfirmGroupPayment");
+                    String confirmVisualRecognition = getStringValueNullSafe(namedNodeMap, "IsInOutByVideo");
                     String guid = getStringValueNullSafe(namedNodeMap, "GUID");
                     Long expenditureLimit = getLongValueNullSafe(namedNodeMap, "ExpenditureLimit");
                     String isUseLastEEModeForPlan = getStringValueNullSafe(namedNodeMap, "IsUseLastEEModeForPlan");
@@ -210,7 +210,8 @@ public class SyncRequest {
                             fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
                             notifyViaSMS == null ? null : notifyViaSMS.equals("1"),
                             notifyViaPUSH == null ? null : notifyViaPUSH.equals("1"), groupName,
-                            canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
+                            canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"),
+                            confirmVisualRecognition == null ? null : confirmVisualRecognition.equals("1"), guid,
                             expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"),
                             gender,birthDate, version, balanceToNotify, disablePlanCreationDate, disablePlanEndDate, orgOwner, san,
                             passportNumber, passportSeries);
@@ -229,6 +230,7 @@ public class SyncRequest {
             private final String categoriesDiscounts;
             private final Boolean notifyViaEmail, notifyViaSMS, notifyViaPUSH;
             private final Boolean canConfirmGroupPayment;
+            private final Boolean confirmVisualRecognition;
             private final String guid;
             private final Long expenditureLimit;
             private final Boolean isUseLastEEModeForPlan;
@@ -248,7 +250,7 @@ public class SyncRequest {
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
                     String address, String phone, String mobilePhone, String middleGroup, String fax, String email,
                     String remarks, Boolean notifyViaEmail, Boolean notifyViaSMS, Boolean notifyViaPUSH, String groupName, Boolean canConfirmGroupPayment,
-                    String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan,Integer gender,Date birthDate, Long version, Long balanceToNotify,
+                    Boolean confirmVisualRecognition, String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan,Integer gender,Date birthDate, Long version, Long balanceToNotify,
                     Date disablePlanCreationDate, Date disablePlanEndDate, Long orgOwner, String san, String passportNumber, String passportSeries) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
@@ -271,6 +273,7 @@ public class SyncRequest {
                 this.notifyViaPUSH = notifyViaPUSH;
                 this.groupName = groupName;
                 this.canConfirmGroupPayment = canConfirmGroupPayment;
+                this.confirmVisualRecognition = confirmVisualRecognition;
                 this.guid = guid;
                 this.expenditureLimit = expenditureLimit;
                 this.isUseLastEEModeForPlan = isUseLastEEModeForPlan;
@@ -368,6 +371,10 @@ public class SyncRequest {
 
             public Boolean getCanConfirmGroupPayment() {
                 return canConfirmGroupPayment;
+            }
+
+            public Boolean getConfirmVisualRecognition() {
+                return confirmVisualRecognition;
             }
 
             public String getGuid() {

@@ -414,6 +414,8 @@
     <h:outputText escape="true" value="Клиент может подтверждать групповые платежи (для сотрудников школы, отвечающих за работу с системой)" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.canConfirmGroupPayment}" styleClass="output-text"
                              disabled="true"  readonly="true"/>
+    <h:outputText escape="true" value="Согласие на видеоидентификацию" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.confirmVisualRecognition}" styleClass="output-text" />
     <h:outputText escape="true" value="Пользователь ОП" styleClass="output-text"
                   rendered="#{mainPage.clientEditPage.isEligibleToViewUserOP()}" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.userOP}" styleClass="output-text" disabled="true"

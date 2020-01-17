@@ -121,6 +121,7 @@ public class Client {
     private Set<CategoryDiscount> categoriesInternal = new HashSet<CategoryDiscount>();
     private String fax;
     private Boolean canConfirmGroupPayment;
+    private Boolean confirmVisualRecognition;
     private Set<ClientAnswerByQuestionary> clientAnswerByQuestionary;
     private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
     private Set<ClientNotificationSetting> notificationSettings = new HashSet<ClientNotificationSetting>();
@@ -183,6 +184,7 @@ public class Client {
         this.categoriesDiscounts = categoriesDiscounts;
         this.categoriesDiscountsDSZN = categoriesDiscountsDSZN;
         this.canConfirmGroupPayment = false;
+        this.confirmVisualRecognition = false;
         this.disablePlanCreationDate = null;
         this.disablePlanEndDate = null;
         this.createdFrom = ClientCreatedFromType.DEFAULT;
@@ -937,6 +939,14 @@ public class Client {
 
     public void setCanConfirmGroupPayment(Boolean canConfirmGroupPayment) {
         this.canConfirmGroupPayment = canConfirmGroupPayment;
+    }
+
+    public Boolean getConfirmVisualRecognition() {
+        return confirmVisualRecognition;
+    }
+
+    public void setConfirmVisualRecognition(Boolean confirmVisualRecognition) {
+        this.confirmVisualRecognition = confirmVisualRecognition;
     }
 
     public String getFax() {

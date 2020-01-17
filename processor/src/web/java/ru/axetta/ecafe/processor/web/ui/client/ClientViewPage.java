@@ -117,6 +117,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.canConfirmGroupPayment = canConfirmGroupPayment;
     }
 
+    public void setConfirmVisualRecognition(Boolean confirmVisualRecognition) {
+        this.confirmVisualRecognition = confirmVisualRecognition;
+    }
+
+    public Boolean getConfirmVisualRecognition() {
+        return confirmVisualRecognition;
+    }
+
     public static class PersonData {
 
         private final String firstName;
@@ -213,6 +221,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Boolean visitsSections;
     private String parallel;
     private Boolean canConfirmGroupPayment;
+    private Boolean confirmVisualRecognition;
     private Boolean userOP;
     private Long idOfClientGroup;
 
@@ -535,6 +544,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.multiCardMode = client.activeMultiCardMode();
         this.clientDiscountItems = buildClientDiscountItem(session, client);
         this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
+        this.confirmVisualRecognition = client.getConfirmVisualRecognition();
 
         // опекуны
         // (Kadyrov D) 23.12.2011
