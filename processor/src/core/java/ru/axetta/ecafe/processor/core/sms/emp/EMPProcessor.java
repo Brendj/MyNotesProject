@@ -892,6 +892,7 @@ public class EMPProcessor {
             client = (Client) resultList.get(0);
         } catch (Exception e) {
             logger.warn("Failed to get Client from persistence for {contractId :" + clientMobileString + "\"} : ", e);
+            return resultMap;
         }
 
         StoragePortType storage = createStorageController();
@@ -920,22 +921,23 @@ public class EMPProcessor {
             msisdn.getValue().add(clientMobileString);
             criteria.add(msisdn);
         }
+        if (storage != null) {
+            SelectEntriesResponse response = storage.selectEntries(request);
 
-        SelectEntriesResponse response = storage.selectEntries(request);
-
-        if (response.getResult() != null) {
-            List<Entry> entries = response.getResult().getEntry();
-            for (Entry entry : entries) {
-                List<EntryAttribute> entryAttributeList = entry.getAttribute();
-                for (EntryAttribute entryAttribute : entryAttributeList) {
-                    List<String> attributeList = resultMap.get(entryAttribute.getName());
-                    if (attributeList == null) {
-                        attributeList = new ArrayList<String>();
+            if (response.getResult() != null) {
+                List<Entry> entries = response.getResult().getEntry();
+                for (Entry entry : entries) {
+                    List<EntryAttribute> entryAttributeList = entry.getAttribute();
+                    for (EntryAttribute entryAttribute : entryAttributeList) {
+                        List<String> attributeList = resultMap.get(entryAttribute.getName());
+                        if (attributeList == null) {
+                            attributeList = new ArrayList<String>();
+                        }
+                        if (entryAttribute.getValue().get(0) != null && ((Element) entryAttribute.getValue().get(0)).getFirstChild() != null) {
+                            attributeList.add(((Element) entryAttribute.getValue().get(0)).getFirstChild().getTextContent());
+                        }
+                        resultMap.put(entryAttribute.getName(), attributeList);
                     }
-                    if (entryAttribute.getValue().get(0) != null && ((Element) entryAttribute.getValue().get(0)).getFirstChild() != null) {
-                        attributeList.add(((Element) entryAttribute.getValue().get(0)).getFirstChild().getTextContent());
-                    }
-                    resultMap.put(entryAttribute.getName(), attributeList);
                 }
             }
         }
