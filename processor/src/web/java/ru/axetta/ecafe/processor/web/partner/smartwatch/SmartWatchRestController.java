@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CollectionUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
@@ -49,7 +50,6 @@ public class SmartWatchRestController {
     private boolean debug;
 
     private final Integer CARD_TYPE_SMARTWATCH = Arrays.asList(Card.TYPE_NAMES).indexOf("Часы (Mifare)");
-    private final Long DEFAULT_SMART_WATCH_VALID_TIME = 157766400000L; // 5 year
     private final Integer DEFAULT_SAMPLE_LIMIT = 10;
 
     private final String BLOCK_SMART_WATCH = "Блокировка чосов (Mifare)";
@@ -210,7 +210,7 @@ public class SmartWatchRestController {
             }
 
             Date issueTime = new Date();
-            Date validTime = new Date(issueTime.getTime() + this.DEFAULT_SMART_WATCH_VALID_TIME);
+            Date validTime = CalendarUtils.addYear(issueTime, 5); // Карта действительна с момента выдачи/передачи новому лицу + 5 лет
 
             CardManager cardManager = RuntimeContext.getInstance().getCardManager();
 
