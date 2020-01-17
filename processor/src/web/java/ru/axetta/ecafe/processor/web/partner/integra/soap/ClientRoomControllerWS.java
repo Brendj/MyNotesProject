@@ -22,9 +22,9 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Menu;
 import ru.axetta.ecafe.processor.core.persistence.Order;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -107,8 +107,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.List;
 import java.util.*;
+import java.util.List;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -9242,7 +9242,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         String.format("%s: guid = %s", RC_ORGANIZATION_NOT_FOUND_DESC, organizationSuid));
             }
 
-            service.registerCard(session, Long.parseLong(cardId, 16), validdate, client);
+            service.registerCard(session, Long.parseLong(cardId, 16), client);
 
             CardRegistrationService.ExternalInfo externalInfo = service
                     .loadExternalInfo(session, organizationSuid, suid, null);
@@ -9939,10 +9939,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Date newValidDate = CalendarUtils.addYear(new Date(), period);
 
             CardManager cardManager = RuntimeContext.getInstance().getCardManager();
-            cardManager.updateCard(client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
+            cardManager.updateCardInSession(persistenceSession, client.getIdOfClient(), card.getIdOfCard(), card.getCardType(),
                     card.getState(), newValidDate, card.getLifeState(), CardLockReason.EMPTY.getDescription(),
                     card.getIssueTime(), card.getExternalId(), null, card.getOrg().getIdOfOrg(),
-                    "Дата окончания изменена внешней системой");
+                    "Дата окончания изменена внешней системой", false);
 
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
