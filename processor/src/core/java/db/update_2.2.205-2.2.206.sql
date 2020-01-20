@@ -2,7 +2,7 @@
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
--- Пакет обновлений 205
+-- Пакет обновлений 206
 
 -- 358: Создание таблицы cf_taloon_preorder
 CREATE TABLE cf_taloon_preorder
@@ -10,8 +10,8 @@ CREATE TABLE cf_taloon_preorder
     guid character varying(36) NOT NULL,
     idoforg bigint NOT NULL,
     taloondate bigint NOT NULL,
-    complexid bigint, -- NOT NULL ?
-    complexname character varying(128), -- NOT NULL ?
+    complexid bigint,
+    complexname character varying(128),
     goodsname character varying(512),
     goodsguid character varying(36),
     idoforgcreated bigint,
