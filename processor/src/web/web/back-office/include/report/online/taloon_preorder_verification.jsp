@@ -212,14 +212,13 @@
                 </rich:column>
                 <%--        Отгрузка шт--%>
                 <rich:column headerClass="column-header">
-                    <h:inputText value="#{detail.shippedQty}" styleClass="output-text"
+                    <h:inputText value="#{detail.strShippedQty}" styleClass="output-text"
                                  rendered="#{detail.enableEditShippedQty()}">
                         <a4j:support event="onchange"/>
                     </h:inputText>
                     <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.shippedQty}" styleClass="output-text"
-                                  rendered="#{!detail.enableEditShippedQty()}" />
-<%--                    converter="quantityConverter"--%>
+                                  rendered="#{!detail.enableEditShippedQty()}"/>
                     <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Отгрузка руб--%>

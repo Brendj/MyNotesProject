@@ -35,6 +35,7 @@ public class TaloonPreorderVerificationDetail {
     private Integer soldQty;
     private Long soldSum;
     private Integer shippedQty;
+    private String strShippedQty;
     private Long shippedSum;
     private Integer reservedQty;
     private Long reservedSum;
@@ -107,14 +108,24 @@ public class TaloonPreorderVerificationDetail {
         return shippedQty;
     }
 
-    public void setShippedQty(String shippedQty) {
+    public void setShippedQty(Integer shippedQty) {
+        this.shippedQty = shippedQty;
+    }
+
+    public void setStrShippedQty(String strShippedQty) {
         // Решение для обхода бага сервера (приводит null к 0).
         // Необходимо обновление сервера и настройка COERCE_TO_ZERO = false
-        if (shippedQty != null && shippedQty.trim().length() > 0) {
-            this.shippedQty = new Integer(shippedQty);
+        if (strShippedQty != null && strShippedQty.trim().length() > 0) {
+            this.strShippedQty = strShippedQty;
+            this.shippedQty = new Integer(strShippedQty);
         } else {
+            this.strShippedQty = null;
             this.shippedQty = null;
         }
+    }
+
+    public String getStrShippedQty() {
+        return strShippedQty;
     }
 
     public Long getPrice() {
@@ -477,7 +488,7 @@ public class TaloonPreorderVerificationDetail {
         this.setRequestedSum(getLongSum(this.getRequestedSum(), arg.getRequestedSum()));
         this.setSoldQty(getIntSum(this.getSoldQty(), arg.getSoldQty()));
         this.setSoldSum(getLongSum(this.getSoldSum(), arg.getSoldSum()));
-        this.setShippedQty(getIntSum(this.getShippedQty(), arg.getShippedQty()).toString());
+        this.setShippedQty(getIntSum(this.getShippedQty(), arg.getShippedQty()));
         this.setShippedSum(getLongSum(this.getShippedSum(), arg.getShippedSum()));
         this.setReservedQty(getIntSum(this.getReservedQty(), arg.getReservedQty()));
         this.setReservedSum(getLongSum(this.getReservedSum(), arg.getReservedSum()));
