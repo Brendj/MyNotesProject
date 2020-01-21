@@ -81,6 +81,8 @@ public class MenuItemExt {
     protected Long idOfProhibition;
     @XmlAttribute(name = "IdOfMenuDetail")
     protected Long idOfMenuDetail;
+    @XmlAttribute(name = "FullName")
+    protected String fullName;
 
     /**
      * Gets the value of the group property.
@@ -562,5 +564,13 @@ public class MenuItemExt {
 
     public void setIdOfMenuDetail(Long idOfMenuDetail) {
         this.idOfMenuDetail = idOfMenuDetail;
+    }
+
+    public String getFullName() {
+        return fullName;
+    }
+
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
     }
 }

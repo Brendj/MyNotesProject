@@ -6598,7 +6598,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         for (MenuDetail menuDetail : menuDetails) {
             MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
             menuItemExt.setGroup(menuDetail.getGroupName());
-            menuItemExt.setName(menuDetail.getMenuDetailName());
+            menuItemExt.setName(menuDetail.getShortName());
+            menuItemExt.setFullName(menuDetail.getMenuDetailName());
             menuItemExt.setPrice(menuDetail.getPrice());
             menuItemExt.setCalories(menuDetail.getCalories());
             menuItemExt.setVitB1(menuDetail.getVitB1());
