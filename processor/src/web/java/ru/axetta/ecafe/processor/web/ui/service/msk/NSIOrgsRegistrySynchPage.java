@@ -937,6 +937,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return getResultString(guid, guidFrom);
         }
 
+        public String getEkisId() {
+            return getResultString(ekisId, ekisIdFrom);
+        }
+
         public String getGuidReestr() {
             return guid;
         }

@@ -204,6 +204,12 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
+                            <h:outputText value="ЕКИС ид" />
+                        </f:facet>
+                        <h:outputText value="#{org.ekisId}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
                             <h:outputText value="№ здания" />
                         </f:facet>
                         <h:outputText value="#{org.uniqueAddressId}" escape="false" />
