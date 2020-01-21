@@ -229,7 +229,7 @@ public class PreorderDAOService {
         return groupResult;
     }
 
-    private PreorderGoodParamsContainer getComplexParams(PreorderComplexItemExt item, Client client, Date date) {
+    public PreorderGoodParamsContainer getComplexParams(PreorderComplexItemExt item, Client client, Date date) {
         Integer goodTypeCode = GoodType.UNSPECIFIED.getCode();
         Integer ageGroupCode = GoodAgeGroupType.UNSPECIFIED.getCode();
         try {

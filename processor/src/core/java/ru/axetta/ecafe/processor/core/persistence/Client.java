@@ -209,6 +209,17 @@ public class Client {
         }
     }
 
+    public boolean hasDiscount() {
+        Set<CategoryDiscount> clientDiscounts = this.getCategories();
+        Boolean hasDiscount = false;
+        for (CategoryDiscount categoryDiscount : clientDiscounts) {
+            if(!categoryDiscount.getCategoryName().toLowerCase().contains("резерв")){
+                hasDiscount |= (categoryDiscount.getCategoryType() == CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
+            }
+        }
+        return hasDiscount;
+    }
+
     public boolean isDeletedOrLeaving() {
         if (getIdOfClientGroup() == null) return false;
         if (getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())
