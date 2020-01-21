@@ -53,11 +53,12 @@ public class TaloonPreorderVerificationDetail {
     public TaloonPreorderVerificationDetail() {
     }
 
-    public TaloonPreorderVerificationDetail(String guid, Long idOfOrg, Long idOfOrgCreated, Date taloonDate, Long complexId,
-            String complexName, String goodsName, String goodsGuid, Long price, Integer requestedQty, Long requestedSum,
-            Integer soldQty, Long soldSum, Integer shippedQty, Long shippedSum, Integer reservedQty, Long reservedSum,
-            Integer blockedQty, Long blockedSum, Integer differedQty, Long differedSum, TaloonISPPStatesEnum isppState,
-            TaloonPPStatesEnum ppState, String remarks, String comments, boolean summaryDay) {
+    public TaloonPreorderVerificationDetail(String guid, Long idOfOrg, Long idOfOrgCreated, Date taloonDate,
+            Long complexId, String complexName, String goodsName, String goodsGuid, Long price, Integer requestedQty,
+            Long requestedSum, Integer soldQty, Long soldSum, Integer shippedQty, Long shippedSum, Integer reservedQty,
+            Long reservedSum, Integer blockedQty, Long blockedSum, Integer differedQty, Long differedSum,
+            TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState, String remarks, String comments,
+            boolean summaryDay) {
         this.guid = guid;
         this.idOfOrg = idOfOrg;
         this.idOfOrgCreated = idOfOrgCreated;
@@ -106,8 +107,14 @@ public class TaloonPreorderVerificationDetail {
         return shippedQty;
     }
 
-    public void setShippedQty(Integer shippedQty) {
-        this.shippedQty = shippedQty;
+    public void setShippedQty(String shippedQty) {
+        // Решение для обхода бага сервера (приводит null к 0).
+        // Необходимо обновление сервера и настройка COERCE_TO_ZERO = false
+        if (shippedQty != null && shippedQty.trim().length() > 0) {
+            this.shippedQty = new Integer(shippedQty);
+        } else {
+            this.shippedQty = null;
+        }
     }
 
     public Long getPrice() {
@@ -470,7 +477,7 @@ public class TaloonPreorderVerificationDetail {
         this.setRequestedSum(getLongSum(this.getRequestedSum(), arg.getRequestedSum()));
         this.setSoldQty(getIntSum(this.getSoldQty(), arg.getSoldQty()));
         this.setSoldSum(getLongSum(this.getSoldSum(), arg.getSoldSum()));
-        this.setShippedQty(getIntSum(this.getShippedQty(), arg.getShippedQty()));
+        this.setShippedQty(getIntSum(this.getShippedQty(), arg.getShippedQty()).toString());
         this.setShippedSum(getLongSum(this.getShippedSum(), arg.getShippedSum()));
         this.setReservedQty(getIntSum(this.getReservedQty(), arg.getReservedQty()));
         this.setReservedSum(getLongSum(this.getReservedSum(), arg.getReservedSum()));
