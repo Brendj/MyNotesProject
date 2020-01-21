@@ -16,11 +16,11 @@
 <h:outputText escape="true" value="Основные данные:" styleClass="output-text-strong" />
 <h:panelGrid id="orgCreateGrid_basic" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="GUID" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgCreatePage.guid}" styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.guid}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="ЕКИС Id" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgCreatePage.ekisId}" styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.ekisId}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="ЕГИССО Id" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgCreatePage.egissoId}" styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgCreatePage.egissoId}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgCreatePage.officialName}" maxlength="256" styleClass="input-text" size="150" />
     <h:outputText escape="true" value="Краткое наименование" styleClass="output-text required-field" />

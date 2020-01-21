@@ -20,9 +20,9 @@
     <h:outputText escape="true" value="GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.guid}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="ЕКИС Id" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.ekisId}" styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgEditPage.ekisId}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="ЕГИССО Id" styleClass="output-text" />
-    <h:inputText value="#{mainPage.orgEditPage.egissoId}" styleClass="input-text" />
+    <h:inputText value="#{mainPage.orgEditPage.egissoId}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.officialName}" maxlength="256" styleClass="input-text" size="150" />
     <h:outputText escape="true" value="Краткое наименование" styleClass="output-text" />
