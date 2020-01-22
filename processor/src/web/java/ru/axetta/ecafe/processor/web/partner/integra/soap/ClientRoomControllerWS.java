@@ -90,7 +90,6 @@ import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
-import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -9096,9 +9095,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private ClientResult getClientOrError(Long contractId, String guardianMobile) {
         ClientResult result = new ClientResult();
         Client client;
-        try {
-            client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getClientByContractId(contractId);
-        } catch (NoResultException e) {
+        client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getClientByContractId(contractId);
+        if (client == null) {
             result.resultCode = RC_CLIENT_NOT_FOUND;
             result.description = RC_CLIENT_NOT_FOUND_DESC;
             return result;
