@@ -467,7 +467,7 @@ public class OnlinePaymentProcessor {
         }
 
         public String processFio() {
-            return String.format("%s %s %.1s.", clientFirstName, clientSecondName, clientSecondName);
+            return String.format("%s %s %.1s.", clientFirstName, clientSecondName, clientSurname);
         }
     }
 
