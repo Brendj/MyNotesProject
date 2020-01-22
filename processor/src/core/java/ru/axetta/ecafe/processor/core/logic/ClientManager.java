@@ -731,8 +731,10 @@ public class ClientManager {
             }
             if (fieldConfig.getValue(ClientManager.FieldId.OVERDRAFT) != null) {
                 //if (tokens.length >= 20 && StringUtils.isNotEmpty(tokens[19])) {
-                limit = CurrencyStringUtils
-                        .rublesToCopecks(fieldConfig.getValue(ClientManager.FieldId.OVERDRAFT));//tokens[19]);
+                String over = fieldConfig.getValue(ClientManager.FieldId.OVERDRAFT);
+                if (StringUtils.isNotEmpty(over)) {
+                    limit = CurrencyStringUtils.rublesToCopecks(over);//tokens[19]);
+                }
             }
             /*String password = fieldConfig.getValue(ClientManager.FieldId.PASSWORD);//tokens[1];
             if (password.equals("X")) {
