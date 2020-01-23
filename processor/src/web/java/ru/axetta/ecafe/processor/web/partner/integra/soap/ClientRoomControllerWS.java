@@ -6806,7 +6806,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             settingExt.setDaysToForbidChangeInPos(parser.getDaysToForbidChangeInPos());
             settingExt.setDayCreateVP(parser.getDayCreateVP());
             settingExt.setHoursForbidVP(parser.getHoursForbidVP());
-            settingExt.setHoursForbidPP(parser.getHoursForbidPP());
             result.subscriptionFeedingSettingExt = settingExt;
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
