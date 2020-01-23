@@ -80,10 +80,6 @@
             <key column="idOfDish"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtGroupItem" column="idOfGroupItem"/>
         </set>
-        <set name="userCatalogs" table="cf_wt_dish_usercatalog_relationships">
-            <key column="idOfDish"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtUserCatalogItem" column="idOfUserCatalogItem"/>
-        </set>
         <set name="menuGroups" table="cf_wt_menu_group_dish">
             <key column="dish_id"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup" column="menu_group_id"/>

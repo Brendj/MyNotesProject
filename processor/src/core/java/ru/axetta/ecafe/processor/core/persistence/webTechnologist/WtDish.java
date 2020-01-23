@@ -34,7 +34,6 @@ public class WtDish {
     private Set<WtCategoryItem> categoryItems = new HashSet<>();
     private Set<WtMenu> menus = new HashSet<>();
     private Set<WtGroupItem> groupItems = new HashSet<>();
-    private Set<WtUserCatalogItem> userCatalogs = new HashSet<>();
     private Set<WtMenuGroup> menuGroups = new HashSet<>();
 
     public Long getIdOfDish() {
@@ -211,14 +210,6 @@ public class WtDish {
 
     public void setGroupItems(Set<WtGroupItem> groupItems) {
         this.groupItems = groupItems;
-    }
-
-    public Set<WtUserCatalogItem> getUserCatalogs() {
-        return userCatalogs;
-    }
-
-    public void setUserCatalogs(Set<WtUserCatalogItem> userCatalogs) {
-        this.userCatalogs = userCatalogs;
     }
 
     public Set<WtMenuGroup> getMenuGroups() {
