@@ -52,8 +52,8 @@ public class ClientMskNSIService extends MskNSIService {
         //stub
     }
 
-    public List<String> getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
-        List<String> result = new ArrayList<String>();
+    public String getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
+        List<String> list = new ArrayList<String>();
         SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
         searchPredicateInfo.setCatalogName("Реестр образовательных учреждений");
 
@@ -100,10 +100,14 @@ public class ClientMskNSIService extends MskNSIService {
                 for (Org o : orgs) {
                     badGuidString += String.format("Guid: %s, Ид. организации: %s, Название организации: %s;\n", guid, o.getIdOfOrg(), o.getShortNameInfoService());
                 }
-                result.add(badGuidString);
+                list.add(badGuidString);
             }
         }
-        return result;
+        String badGuids = "Найдены следующие неактуальные идентификаторы организаций в НСИ:\n";
+        for (String g : list) {
+            badGuids += g;
+        }
+        return badGuids;
     }
 
     public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids,

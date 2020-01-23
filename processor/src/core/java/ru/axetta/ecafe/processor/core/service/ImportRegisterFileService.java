@@ -254,8 +254,8 @@ public class ImportRegisterFileService extends ClientMskNSIService {
     }*/
 
     @Override
-    public List<String> getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
-        List<String> result = new ArrayList<String>();
+    public String getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
+        List<String> list = new ArrayList<String>();
         Boolean guidOK;
         ImportRegisterClientsService service = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class);
         Session session = null;
@@ -280,12 +280,16 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                     for (Org o : orgs) {
                         badGuidString += String.format("Guid: %s, Ид. организации: %s, Название организации: %s;\n", guid, o.getIdOfOrg(), o.getShortNameInfoService());
                     }
-                    result.add(badGuidString);
+                    list.add(badGuidString);
                 }
             }
             transaction.commit();
             transaction = null;
-            return result;
+            String badGuids = "Найдены следующие неактуальные идентификаторы организаций в НСИ:\n";
+            for (String g : list) {
+                badGuids += g;
+            }
+            return badGuids;
         } finally {
             HibernateUtils.rollback(transaction, getLogger());
             HibernateUtils.close(session, getLogger());

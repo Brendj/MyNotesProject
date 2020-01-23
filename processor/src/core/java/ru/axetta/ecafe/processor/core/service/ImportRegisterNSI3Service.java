@@ -34,8 +34,11 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
         query.setParameterList("guids", orgGuids.getOrgEkisIds());
     }
 
-    public List<String> getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
-        List<String> result = new ArrayList<String>();
+    public String getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
+        List<String> list = new ArrayList<String>();
+        if (orgGuids.getOrgEkisIds().size() == 0) {
+            return "У организации не задан ЕКИС Id";
+        }
         Boolean guidOK;
         Session session = null;
         Transaction transaction = null;
@@ -58,12 +61,16 @@ public class ImportRegisterNSI3Service extends ImportRegisterFileService {
                     for (Org o : orgs) {
                         badGuidString += String.format("ЕКИС Ид: %s, Ид. организации: %s, Название организации: %s;\n", ekisId, o.getIdOfOrg(), o.getShortNameInfoService());
                     }
-                    result.add(badGuidString);
+                    list.add(badGuidString);
                 }
             }
             transaction.commit();
             transaction = null;
-            return result;
+            String badGuids = "Найдены следующие неактуальные идентификаторы организаций в НСИ:\n";
+            for (String g : list) {
+                badGuids += g;
+            }
+            return badGuids;
         } finally {
             HibernateUtils.rollback(transaction, getLogger());
             HibernateUtils.close(session, getLogger());

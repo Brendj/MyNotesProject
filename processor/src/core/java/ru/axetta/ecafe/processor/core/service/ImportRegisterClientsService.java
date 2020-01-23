@@ -1667,12 +1667,8 @@ public class ImportRegisterClientsService {
             //DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 1);
             //Проверка на устаревшие гуиды организаций
             ClientMskNSIService service = getNSIService();
-            List<String> list = service.getBadGuids(orgGuids);
-            if (list != null && !list.isEmpty()) {
-                String badGuids = "Найдены следующие неактуальные идентификаторы организаций в НСИ:\n";
-                for (String g : list) {
-                    badGuids += g;
-                }
+            String badGuids = service.getBadGuids(orgGuids);
+            if (!StringUtils.isEmpty(badGuids)) {
                 isSuccessEnd = false;
                 throw new BadOrgGuidsException(badGuids);
             }
