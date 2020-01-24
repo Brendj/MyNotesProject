@@ -172,7 +172,7 @@ public class TaloonApprovalVerificationItem {
         }
 
         public Boolean needFillShippedQty() {
-            return (shippedQty == null || shippedQty == 0);
+            return (shippedQty == null);
         }
 
         public int getPeriod() {

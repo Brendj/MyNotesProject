@@ -35,7 +35,7 @@ public class TaloonPreorderVerificationDetail {
     private Integer soldQty;
     private Long soldSum;
     private Integer shippedQty;
-    private String strShippedQty;
+    //private String strShippedQty;
     private Long shippedSum;
     private Integer reservedQty;
     private Long reservedSum;
@@ -112,21 +112,21 @@ public class TaloonPreorderVerificationDetail {
         this.shippedQty = shippedQty;
     }
 
-    public void setStrShippedQty(String strShippedQty) {
-        // Решение для обхода бага сервера (приводит null к 0).
-        // Необходимо обновление сервера и настройка COERCE_TO_ZERO = false
-        if (strShippedQty != null && strShippedQty.trim().length() > 0) {
-            this.strShippedQty = strShippedQty;
-            this.shippedQty = new Integer(strShippedQty);
-        } else {
-            this.strShippedQty = null;
-            this.shippedQty = null;
-        }
-    }
+    //public void setStrShippedQty(String strShippedQty) {
+    //    // Решение для обхода бага сервера (приводит null к 0).
+    //    // Необходимо обновление сервера и настройка COERCE_TO_ZERO = false
+    //    if (strShippedQty != null && strShippedQty.trim().length() > 0) {
+    //        this.strShippedQty = strShippedQty;
+    //        this.shippedQty = new Integer(strShippedQty);
+    //    } else {
+    //        this.strShippedQty = null;
+    //        this.shippedQty = null;
+    //    }
+    //}
 
-    public String getStrShippedQty() {
-        return strShippedQty;
-    }
+    //public String getStrShippedQty() {
+    //    return strShippedQty;
+    //}
 
     public Long getPrice() {
         return price;
