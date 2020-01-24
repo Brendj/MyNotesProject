@@ -421,11 +421,7 @@ public class ImportRegisterOrgsService {
     }
 
     private boolean safeCompare(Long byOrg, Long byRestrOrgInfo) {
-        if (byOrg == null || byRestrOrgInfo == null) {
-            return false;
-        } else {
-            return safeCompare(byOrg.toString(), byRestrOrgInfo.toString());
-        }
+        return safeCompare(byOrg == null ? "" : byOrg.toString(), byRestrOrgInfo == null ? "" : byRestrOrgInfo.toString());
     }
 
     private OrgRegistryChange fillOrgRegistryChange(OrgInfo oi, long createDate) {
