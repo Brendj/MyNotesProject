@@ -36,6 +36,7 @@ import java.util.*;
 public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Builder {
 
     private final String templateFilename;
+    public static final String SHOW_ALL_ORGS = "showAllOrgs";
 
     public ConsolidatedSellingReportBuilder(String templateFilename) {
         this.templateFilename = templateFilename;
@@ -81,10 +82,12 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
 
     private JRDataSource buildDataSource(Session session, Date startDate, Date endDate) throws Exception {
         String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+        String allOrgs = reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG).equals("0") ? "" : " and org.state = 1 ";
 
         String contragent = StringUtils.trimToEmpty(reportProperties.getProperty("contragent"));
         String org_condition = StringUtils.isEmpty(contragent) ? "" : " and org.defaultsupplier = " + contragent;
         org_condition += StringUtils.isEmpty(idOfOrgs) ? "" : String.format(" and org.idoforg in (%s)", idOfOrgs);
+        org_condition += allOrgs;
 
         List<ConsolidatedSellingReportItem> result_list = new ArrayList<ConsolidatedSellingReportItem>();
 

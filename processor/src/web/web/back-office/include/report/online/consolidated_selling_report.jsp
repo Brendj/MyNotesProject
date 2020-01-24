@@ -34,12 +34,17 @@
                                reRender="modalOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null})
                                         #{rich:component('modalOrgListSelectorPanel')}.show();"
-                               style="width: 25px;">
+                               style="width: 25px;" disabled="#{consolidatedSellingReportPage.showAllOrgs}">
                 <f:setPropertyActionListener value="#{consolidatedSellingReportPage.getStringIdOfOrgList}"
                                              target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{consolidatedSellingReportPage.filter}}" />
         </h:panelGroup>
+
+        <h:outputText styleClass="output-text" escape="true" value="Все организации" />
+        <h:selectBooleanCheckbox value="#{consolidatedSellingReportPage.showAllOrgs}" styleClass="output-text">
+            <a4j:support event="onclick" reRender="consolidatedSellingReportPanelGrid" action="#{consolidatedSellingReportPage.clearOrgs}" />
+        </h:selectBooleanCheckbox>
 
         <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
         <rich:calendar value="#{consolidatedSellingReportPage.startDate}" datePattern="dd.MM.yyyy"
