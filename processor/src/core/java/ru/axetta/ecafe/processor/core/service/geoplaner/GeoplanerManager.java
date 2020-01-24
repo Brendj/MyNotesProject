@@ -42,9 +42,10 @@ public class GeoplanerManager {
     }
 
     @Async
-    public void sendEnterEventsToGeoplaner(EnterEvent enterEvent) throws Exception{
+    public void sendEnterEventsToGeoplaner(EnterEvent enterEvent) throws Exception {
         Session session = null;
         Transaction transaction = null;
+        GeoplanerNotificationJournal journal = null;
         try {
             if(enterEvent == null){
                 throw new Exception("EnterEvent is null");
@@ -52,19 +53,28 @@ public class GeoplanerManager {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
+            journal = GeoplanerNotificationJournal.Builder.build(enterEvent.getClient(), enterEvent);
+
             JsonEnterEventInfo info = buildJsonEnterEventInfo(session, enterEvent);
             if (info == null) {
                 logger.warn("No EnterEventSendInfo records for send to Geoplaner App");
+                journal.setErrorText("No EnterEventSendInfo records for send to Geoplaner App");
                 return;
             }
             Integer statusCode = service.sendPost(info, ENTER_EVENTS);
+            journal.setResponse(statusCode);
+            journal.setIsSend(true);
+
             if(statusCode == null){
                 logger.error("Result code is null");
+                journal.setErrorText("Result code is null");
             }
             else if(!statusCode.equals(200)){
                 logger.error("The Geoplaner returned code " + statusCode
                         + " when sent EnterEvent IdOfOrg " + enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()
                         + " ID enterEvent " + enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent());
+
+                journal.setErrorText("The Geoplaner returned code " + statusCode);
             } else {
                 logger.info("Sends  EnterEvent ID: " + enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent()
                         + " idOfOrg: " + enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()
@@ -75,14 +85,16 @@ public class GeoplanerManager {
             transaction = null;
         } catch (Exception e) {
             logger.error("Can't send EnterEventSendInfo to Geoplaner App: ", e);
+            fillJournal(journal, e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+        saveJournal(journal);
     }
 
     @Async
-    public void sendPurchasesInfoToGeoplaner(Payment purchases, Client client) throws Exception{
+    public void sendPurchasesInfoToGeoplaner(Payment purchases, Client client) throws Exception {
         Session session = null;
         Transaction hibernateTransaction = null;
         try {
@@ -174,7 +186,11 @@ public class GeoplanerManager {
         info.setCardNo(card.getCardNo());
         info.setContractId(client.getContractId());
         info.setActualBalance(client.getBalance());
-        info.setGender(CLIENT_GENDERS[client.getGender()]);
+        if(client.getGender() == null){
+            info.setGender(CLIENT_GENDERS[1]);
+        } else {
+            info.setGender(CLIENT_GENDERS[client.getGender()]);
+        }
         info.setEvtDateTime(event.getEvtDateTime());
         info.setDirection(event.getPassDirection());
         if(event.getOrg() == null){
@@ -276,5 +292,32 @@ public class GeoplanerManager {
 
     public static boolean isOn() {
         return isOn;
+    }
+
+    private void fillJournal(GeoplanerNotificationJournal journal, Exception e) {
+        if(journal == null){
+            logger.warn("GeoplanerNotificationJournal is NULL");
+            return;
+        }
+        journal.setErrorText(e.getMessage());
+    }
+
+    private void saveJournal(GeoplanerNotificationJournal journal) {
+        Session session = null;
+        Transaction transaction = null;
+        try{
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            session.save(journal);
+
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e){
+            logger.error("Can't save GeoplanerNotificationJournal: ", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
     }
 }

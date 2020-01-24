@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 
 import org.apache.commons.httpclient.HttpClient;
 import org.apache.commons.httpclient.methods.PostMethod;
-
 import org.apache.commons.httpclient.methods.StringRequestEntity;
 import org.codehaus.jackson.map.ObjectMapper;
 import org.slf4j.Logger;
@@ -64,7 +63,7 @@ public class GeoplanerService {
         if(code == 1){
             return URL_FOR_ENTER_EVENTS;
         } else if(code == 2){
-            return  URL_FOR_PURCHASES;
+            return URL_FOR_PURCHASES;
         } else if(code == 3){
             return URL_FOR_PAYMENTS;
         } else {
