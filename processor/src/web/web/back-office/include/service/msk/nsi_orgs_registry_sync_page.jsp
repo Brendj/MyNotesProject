@@ -240,6 +240,12 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
+                            <h:outputText value="Короткий адрес" />
+                        </f:facet>
+                        <h:outputText value="#{org.shortAddress}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
                             <h:outputText value="Полное наименование" />
                         </f:facet>
                         <h:outputText value="#{org.officialName}" escape="false" />

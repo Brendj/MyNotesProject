@@ -857,6 +857,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return getResultString(address, addressFrom);
         }
 
+        public String getShortAddress() {
+            return getResultString(shortAddress, shortAddressFrom);
+        }
+
         public String getAddressReestr() {
             return address;
         }
