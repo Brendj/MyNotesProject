@@ -522,4 +522,8 @@ public class TaloonPreorderVerificationDetail {
         this.ppState = ppState;
         this.getComplex().getItem().setPpState();
     }
+
+    public Boolean isNullGoodsName() {
+        return goodsName == null;
+    }
 }

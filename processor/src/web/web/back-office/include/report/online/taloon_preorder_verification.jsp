@@ -338,6 +338,23 @@
                                                      target="#{item.getPpState()}"/>
                         <h:graphicImage value="/images/taloons/applied-big.png"/>
                     </a4j:commandLink>
+
+                    <%--            Подтвердить для всего периода--%>
+                    <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{item.isPpStateNotSelected() and detail.summaryDay and detail.isNullGoodsName()}"
+                                     action="#{item.confirmPpState()}"
+                                     onclick="if (#{!item.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                        <f:setPropertyActionListener value="#{item}" target="#{item.getPpState()}"/>
+                        <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
+                    </a4j:commandLink>
+                    <%--            Отменить выбор для всего периода--%>
+                    <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{item.isPpStateConfirmed() and detail.summaryDay and detail.isNullGoodsName()}"
+                                     action="#{item.deselectPpState()}" style="color:lightgray;"
+                                     onclick="if (#{!item.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                        <f:setPropertyActionListener value="#{item}"
+                                                     target="#{item.getPpState()}"/>
+                        <h:graphicImage value="/images/taloons/applied-big.png"/>
+                    </a4j:commandLink>
+
                 </rich:column>
 
                 <%--        Комментарий--%>

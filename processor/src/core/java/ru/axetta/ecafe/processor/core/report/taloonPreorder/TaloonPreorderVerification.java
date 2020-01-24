@@ -105,6 +105,17 @@ public class TaloonPreorderVerification {
         // Итого
         TaloonPreorderVerificationItem item = new TaloonPreorderVerificationItem();
         item.setTaloonDate(null);
+
+        // Пустая строка Итого
+        TaloonPreorderVerificationComplex emptyComplex = new TaloonPreorderVerificationComplex();
+        emptyComplex.setTaloonDate(null);
+        emptyComplex.setItem(item);
+        TaloonPreorderVerificationDetail emptyDetail = new TaloonPreorderVerificationDetail(null, null, null, null, null,
+                null, null, null, null, 0, 0L, 0, 0L, 0, 0L, 0, 0L, 0, 0L, 0, 0L, null, null, null, null, true);
+        emptyDetail.setComplex(emptyComplex);
+        emptyComplex.getDetails().add(emptyDetail);
+        item.getComplexes().add(emptyComplex);
+
         complexMap = new HashMap<>();
         Iterator<Map.Entry<String, TaloonPreorderVerificationDetail>> iter = summaryMap.entrySet().iterator();
         while (iter.hasNext()) {
@@ -112,7 +123,6 @@ public class TaloonPreorderVerification {
             addComplexToMap(item, complexMap, null, e.getValue(), e.getValue().getComplexId(), e.getValue().getComplexName());
         }
         addItemToList(items, complexMap, item);
-
         return items;
     }
 
