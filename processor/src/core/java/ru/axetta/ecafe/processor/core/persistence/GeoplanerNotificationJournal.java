@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
-
 import java.util.Date;
 
 public class GeoplanerNotificationJournal {
@@ -14,7 +12,7 @@ public class GeoplanerNotificationJournal {
     private Org org;
     private Long idOfEnterEvents;
     private Long idOfOrder;
-    private Long IdOfClientPayment;
+    private Long idOfClientPayment;
     private Integer eventType;
     private Integer response;
     private Boolean isSend = false;
@@ -66,11 +64,11 @@ public class GeoplanerNotificationJournal {
     }
 
     public Long getIdOfClientPayment() {
-        return IdOfClientPayment;
+        return idOfClientPayment;
     }
 
     public void setIdOfClientPayment(Long idOfClientPayment) {
-        IdOfClientPayment = idOfClientPayment;
+        idOfClientPayment = idOfClientPayment;
     }
 
     public Integer getEventType() {
@@ -114,38 +112,21 @@ public class GeoplanerNotificationJournal {
     }
 
     public static class Builder {
-        public static GeoplanerNotificationJournal build(Client client, EnterEvent enterEvent){
-            GeoplanerNotificationJournal journal = new GeoplanerNotificationJournal();
-            journal.setClient(client);
-            journal.setOrg(enterEvent.getOrg());
-            journal.setIdOfEnterEvents(enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent());
-            journal.setCreateDate(new Date());
-            journal.setEventType(EventType.ENTER_EVENTS.ordinal());
-            return journal;
-        }
-
-        public static GeoplanerNotificationJournal build(Client client, Payment payment, Org org){
+        public static GeoplanerNotificationJournal build(String errorText, Integer responseCode, Boolean isSend,
+                Client client, Org org, Integer eventType, Long idOfEnterEvents, Long idOfOrder, Long idOfClientPayment){
             GeoplanerNotificationJournal journal = new GeoplanerNotificationJournal();
             journal.setClient(client);
             journal.setOrg(org);
-            journal.setIdOfOrder(payment.getIdOfOrder());
+            journal.setIdOfEnterEvents(idOfEnterEvents);
+            journal.setIdOfOrder(idOfOrder);
+            journal.setIdOfClientPayment(idOfClientPayment);
             journal.setCreateDate(new Date());
-            journal.setEventType(EventType.PURCHASES.ordinal());
+            journal.setErrorText(errorText);
+            journal.setIsSend(isSend);
+            journal.setResponse(responseCode);
+            journal.setEventType(eventType);
+
             return journal;
         }
-
-        public static GeoplanerNotificationJournal build(Client client, ClientPayment clientPayment){
-            GeoplanerNotificationJournal journal = new GeoplanerNotificationJournal();
-            journal.setClient(client);
-            journal.setOrg(client.getOrg());
-            journal.setIdOfClientPayment(clientPayment.getIdOfClientPayment());
-            journal.setCreateDate(new Date());
-            journal.setEventType(EventType.PAYMENTS.ordinal());
-            return journal;
-        }
-    }
-
-    public enum EventType {
-        ENTER_EVENTS, PURCHASES, PAYMENTS;
     }
 }

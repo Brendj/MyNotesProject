@@ -3876,8 +3876,12 @@ public class Processor implements SyncProcessor {
                 /* не оповещаем в случае пробития корректировочных заказов */
                 if (client != null) {
                     if (GeoplanerManager.isOn() && client.clientHasActiveSmartWatch()) {
-                        GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
-                        manager.sendPurchasesInfoToGeoplaner(payment, client);
+                        try {
+                            GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
+                            manager.sendPurchasesInfoToGeoplaner(payment, client);
+                        } catch (Exception exc) {
+                            logger.error("Can't send to Geoplaner JSON with Purchases", exc);
+                        }
                     }
 
                     String[] values = generatePaymentNotificationParams(persistenceSession, client, payment);
@@ -5605,8 +5609,12 @@ public class Processor implements SyncProcessor {
                         DAOUtils.createEnterEventsSendInfo(enterEvent, persistenceSession);
                     }
                     if (GeoplanerManager.isOn() && enterEventOwnerHaveSmartWatch(persistenceSession, enterEvent)) {
-                        GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
-                        manager.sendEnterEventsToGeoplaner(enterEvent);
+                        try {
+                            GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
+                            manager.sendEnterEventsToGeoplaner(enterEvent);
+                        } catch (Exception exc) {
+                            logger.error("Can't send JSON to Geoplaner with EnterEvents:", exc);
+                        }
                     }
 
                     SyncResponse.ResEnterEvents.Item item = new SyncResponse.ResEnterEvents.Item(e.getIdOfEnterEvent(),

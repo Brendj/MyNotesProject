@@ -15,21 +15,18 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Component;
 
+import java.util.Objects;
+
 
 @Component
-@Scope("singleton")
 public class GeoplanerManager {
     private static final Logger logger = LoggerFactory.getLogger(GeoplanerManager.class);
     private final static boolean isOn = managerIsOn();
     private GeoplanerService service = RuntimeContext.getAppContext().getBean(GeoplanerService.class);
 
-    private final int ENTER_EVENTS = 1;
-    private final int PURCHASES = 2;
-    private final int PAYMENTS = 3;
     private final String[] CLIENT_GENDERS = {
             "female", "male"
     };
@@ -43,38 +40,28 @@ public class GeoplanerManager {
 
     @Async
     public void sendEnterEventsToGeoplaner(EnterEvent enterEvent) throws Exception {
+        Objects.requireNonNull(enterEvent);
+
         Session session = null;
         Transaction transaction = null;
-        GeoplanerNotificationJournal journal = null;
+        Integer statusCode = null;
+        String errorText = null;
         try {
-            if(enterEvent == null){
-                throw new Exception("EnterEvent is null");
-            }
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            journal = GeoplanerNotificationJournal.Builder.build(enterEvent.getClient(), enterEvent);
-
             JsonEnterEventInfo info = buildJsonEnterEventInfo(session, enterEvent);
-            if (info == null) {
-                logger.warn("No EnterEventSendInfo records for send to Geoplaner App");
-                journal.setErrorText("No EnterEventSendInfo records for send to Geoplaner App");
-                return;
-            }
-            Integer statusCode = service.sendPost(info, ENTER_EVENTS);
-            journal.setResponse(statusCode);
-            journal.setIsSend(true);
+
+            statusCode = service.sendPost(info, EventType.ENTER_EVENTS);
 
             if(statusCode == null){
-                logger.error("Result code is null");
-                journal.setErrorText("Result code is null");
+                throw new Exception("Result code is null");
             }
             else if(!statusCode.equals(200)){
-                logger.error("The Geoplaner returned code " + statusCode
+                throw new Exception("The Geoplaner returned code " + statusCode
                         + " when sent EnterEvent IdOfOrg " + enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()
                         + " ID enterEvent " + enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent());
 
-                journal.setErrorText("The Geoplaner returned code " + statusCode);
             } else {
                 logger.info("Sends  EnterEvent ID: " + enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent()
                         + " idOfOrg: " + enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg()
@@ -85,36 +72,38 @@ public class GeoplanerManager {
             transaction = null;
         } catch (Exception e) {
             logger.error("Can't send EnterEventSendInfo to Geoplaner App: ", e);
-            fillJournal(journal, e);
+            errorText = e.getMessage();
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
-        saveJournal(journal);
+        saveJournal(errorText, statusCode, statusCode != null,  enterEvent.getClient(),
+                enterEvent.getOrg(), EventType.ENTER_EVENTS.ordinal(), enterEvent.getCompositeIdOfEnterEvent().getIdOfEnterEvent(),
+                null, null, enterEvent.getCompositeIdOfEnterEvent().getIdOfOrg());
     }
 
     @Async
     public void sendPurchasesInfoToGeoplaner(Payment purchases, Client client) throws Exception {
+        Objects.requireNonNull(purchases);
+        Objects.requireNonNull(client);
+
         Session session = null;
         Transaction hibernateTransaction = null;
+        Integer statusCode = null;
+        String errorText = null;
         try {
-            if(purchases == null || client == null){
-                throw new NullPointerException("Purchases or Client is null");
-            }
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             hibernateTransaction = session.beginTransaction();
 
             JsonPurchasesInfo info = buildJsonPurchasesInfo(session, purchases, client);
-            if (info == null) {
-                logger.warn("No Purchases records for send to Geoplaner App");
-                return;
-            }
-            Integer statusCode = service.sendPost(info, PURCHASES);
+
+            statusCode = service.sendPost(info, EventType.PURCHASES);
+
             if(statusCode == null){
-                logger.error("Result code is null");
+                throw new Exception("Result code is null");
             }
             else if(!statusCode.equals(200)){
-                logger.error("The Geoplaner returned code " + statusCode + " when sent Purchases ID " + purchases.getIdOfOrder());
+                throw new Exception("The Geoplaner returned code " + statusCode + " when sent Purchases ID " + purchases.getIdOfOrder());
             } else {
                 logger.info("Sends PurchasesInfo of Order ID= " + purchases.getIdOfOrder() + " to Geoplaner ");
             }
@@ -123,34 +112,36 @@ public class GeoplanerManager {
             hibernateTransaction = null;
         } catch (Exception e) {
             logger.error("Can't send PurchasesInfo to Geoplaner App: ", e);
+            errorText = e.getMessage();
         } finally {
             HibernateUtils.rollback(hibernateTransaction, logger);
             HibernateUtils.close(session, logger);
         }
+        saveJournal(errorText, statusCode, statusCode != null,  client, null, EventType.PURCHASES.ordinal(),
+                null, purchases.getIdOfOrder(), null, purchases.getIdOfOrg());
     }
 
     @Async
-    public void sendPaymentInfoToGeoplaner(ClientPayment clientPayment, Client client) throws Exception{
+    public void sendPaymentInfoToGeoplaner(ClientPayment clientPayment, Client client) throws Exception {
+        Objects.requireNonNull(clientPayment);
+        Objects.requireNonNull(client);
+
         Session session = null;
         Transaction hibernateTransaction = null;
+        Integer statusCode = null;
+        String errorText = null;
         try {
-            if(clientPayment == null || client == null){
-                throw new NullPointerException("clientPayment or Client is null");
-            }
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             hibernateTransaction = session.beginTransaction();
 
             JsonPaymentInfo info = buildJsonPaymentInfo(session, clientPayment, client);
-            if (info == null) {
-                logger.warn("No clientPayment records for send to Geoplaner App");
-                return;
-            }
-            Integer statusCode = service.sendPost(info, PAYMENTS);
+
+            statusCode = service.sendPost(info, EventType.PAYMENTS);
             if(statusCode == null){
-                logger.error("Result code is null");
+                throw new Exception("Result code is null");
             }
             else if(!statusCode.equals(200)){
-                logger.error("The Geoplaner returned code " + statusCode + " when sent clientPayment ID " + clientPayment.getIdOfPayment());
+                throw new Exception("The Geoplaner returned code " + statusCode + " when sent clientPayment ID " + clientPayment.getIdOfPayment());
             } else {
                 logger.info("Sends clientPayment of Order ID= " + clientPayment.getIdOfPayment() + " to Geoplaner ");
             }
@@ -159,10 +150,13 @@ public class GeoplanerManager {
             hibernateTransaction = null;
         } catch (Exception e) {
             logger.error("Can't send clientPayment to Geoplaner App: ", e);
+            errorText = e.getMessage();
         } finally {
             HibernateUtils.rollback(hibernateTransaction, logger);
             HibernateUtils.close(session, logger);
         }
+        saveJournal(errorText, statusCode, statusCode != null,  client, client.getOrg(), EventType.PAYMENTS.ordinal(),
+                null, null, clientPayment.getIdOfClientPayment(), null);
     }
 
     private JsonEnterEventInfo buildJsonEnterEventInfo(Session session, EnterEvent event) throws Exception{
@@ -204,28 +198,27 @@ public class GeoplanerManager {
         return info;
     }
 
-    private JsonPurchasesInfo buildJsonPurchasesInfo(Session session, Payment purchases, Client client) throws Exception{
+    private JsonPurchasesInfo buildJsonPurchasesInfo(Session session, Payment purchases, Client client) throws Exception {
         JsonPurchasesInfo info = new JsonPurchasesInfo();
         Card card = getCardFromPaymentAndClient(session, purchases, client);
         if(card == null){
-            logger.error("Can't get Card for Client contractID = " + client.getContractId());
-            return null;
+            throw new Exception("Can't get Card for Client contractID = " + client.getContractId());
         }
         info.setCardNo(card.getCardPrintedNo());
         info.setCardPrintedNo(card.getCardNo());
         info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
-        info.setContractID(client.getContractId());
+        info.setContractId(client.getContractId());
         info.setActualBalance(client.getBalance());
         info.setGender(CLIENT_GENDERS[client.getGender()]);
         info.setOrderTime(purchases.getTime());
         info.setOrderType(purchases.getOrderType().ordinal());
         info.setRSum(purchases.getRSum());
 
-        String purchasesNames = "";
+        StringBuilder purchasesNames = new StringBuilder();
         for(Purchase pc : purchases.getPurchases()){
-            purchasesNames += pc.getName() + ";";
+            purchasesNames.append(pc.getName()).append(";");
         }
-        info.setPurchasesName(purchasesNames);
+        info.setPurchasesName(purchasesNames.toString());
 
         return info;
     }
@@ -234,8 +227,7 @@ public class GeoplanerManager {
         JsonPaymentInfo info = new JsonPaymentInfo();
         Card card = getCardFromClientPaymentAndClient(session, clientPayment, client);
         if(card == null){
-            logger.error("Can't get Card for Client contractID = " + client.getContractId());
-            return null;
+           throw new Exception("Can't get Card for Client contractID = " + client.getContractId());
         }
         info.setCardNo(card.getCardNo());
         info.setCardPrintedNo(card.getCardPrintedNo());
@@ -294,20 +286,20 @@ public class GeoplanerManager {
         return isOn;
     }
 
-    private void fillJournal(GeoplanerNotificationJournal journal, Exception e) {
-        if(journal == null){
-            logger.warn("GeoplanerNotificationJournal is NULL");
-            return;
-        }
-        journal.setErrorText(e.getMessage());
-    }
-
-    private void saveJournal(GeoplanerNotificationJournal journal) {
+    private void saveJournal(String errorText, Integer responseCode, Boolean isSend, Client client, Org org,
+            Integer eventType, Long idOfEnterEvents, Long idOfOrder, Long idOfClientPayment, Long idOfOrg) {
         Session session = null;
         Transaction transaction = null;
         try{
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
+
+            if(org == null){
+                org = (Org) session.get(Org.class, idOfOrg);
+            }
+
+            GeoplanerNotificationJournal journal = GeoplanerNotificationJournal.Builder
+                    .build(errorText, responseCode, isSend, client, org, eventType, idOfEnterEvents, idOfOrder, idOfClientPayment);
 
             session.save(journal);
 
