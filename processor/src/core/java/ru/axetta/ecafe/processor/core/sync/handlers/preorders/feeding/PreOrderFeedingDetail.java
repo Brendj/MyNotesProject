@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding;
 import ru.axetta.ecafe.processor.core.persistence.PreorderComplex;
 import ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail;
 
+import org.hibernate.Query;
+import org.hibernate.Session;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -18,8 +20,9 @@ public class PreOrderFeedingDetail {
     private final String guid;
     private final Long price;
     private final String itemCode;
+    private String goodsGuid;
 
-    public PreOrderFeedingDetail(PreorderMenuDetail menuDetail, Integer complexId, String guid) {
+    public PreOrderFeedingDetail(Session session, PreorderMenuDetail menuDetail, Integer complexId, String guid) {
         this.idOfMenu = menuDetail.getArmIdOfMenu();
         this.name = menuDetail.getMenuDetailName(); //DAOUtils.getPreorderMenuDetailName(session, menuDetail);
         this.qty = menuDetail.getAmount();
@@ -27,6 +30,12 @@ public class PreOrderFeedingDetail {
         this.guid = guid;
         this.price = menuDetail.getMenuDetailPrice();
         this.itemCode = menuDetail.getItemCode();
+        if (menuDetail.getIdOfGood() != null) {
+            Query query = session.createQuery("select g.guid from Good g where g.globalId = :id");
+            query.setParameter("id", menuDetail.getIdOfGood());
+            String goodsGuid = (String)query.uniqueResult();
+            this.goodsGuid = goodsGuid;
+        }
     }
 
     public PreOrderFeedingDetail(PreorderComplex complex) {
@@ -86,6 +95,9 @@ public class PreOrderFeedingDetail {
         }
         if (null != itemCode) {
             element.setAttribute("ItemCode", itemCode);
+        }
+        if (null != goodsGuid) {
+            element.setAttribute("GoodsGuid", goodsGuid);
         }
 
         return element;
