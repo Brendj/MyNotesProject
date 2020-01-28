@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.service.BadOrgGuidsException;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.service.RegistryTimeDeltaException;
 import ru.axetta.ecafe.processor.core.service.ServiceTemporaryUnavailableException;
@@ -372,6 +373,9 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
                 return;
             } catch (RegistryTimeDeltaException e) {
                 errorMessages = e.getMessage();
+                return;
+            } catch (BadOrgGuidsException q) {
+                errorMessages = q.getMessage();
                 return;
             } catch (Exception e) {
                 if (e instanceof SOAPFaultException) {

@@ -22,6 +22,7 @@ import org.springframework.context.annotation.Primary;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.io.BufferedReader;
 import java.util.*;
 
 /**
@@ -47,8 +48,12 @@ public class ClientMskNSIService extends MskNSIService {
         return group;
     }
 
-    public List<String> getBadGuids(Set<String> orgGuids) throws Exception {
-        List<String> result = new ArrayList<String>();
+    public void fillTable(BufferedReader bufferedReader) throws Exception {
+        //stub
+    }
+
+    public String getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
+        List<String> list = new ArrayList<String>();
         SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
         searchPredicateInfo.setCatalogName("Реестр образовательных учреждений");
 
@@ -60,7 +65,7 @@ public class ClientMskNSIService extends MskNSIService {
         searchPredicateInfo.addSearchPredicate(searchByStatus);
 
         Boolean guidOK;
-        for (String guid : orgGuids) {
+        for (String guid : orgGuids.getOrgGuids()) {
             guidOK = false;
             if (searchPredicateInfo.getSearchPredicates().size() > 1) {
                 searchPredicateInfo.getSearchPredicates().remove(1);
@@ -95,19 +100,23 @@ public class ClientMskNSIService extends MskNSIService {
                 for (Org o : orgs) {
                     badGuidString += String.format("Guid: %s, Ид. организации: %s, Название организации: %s;\n", guid, o.getIdOfOrg(), o.getShortNameInfoService());
                 }
-                result.add(badGuidString);
+                list.add(badGuidString);
             }
         }
-        return result;
+        String badGuids = "Найдены следующие неактуальные идентификаторы организаций в НСИ:\n";
+        for (String g : list) {
+            badGuids += g;
+        }
+        return badGuids;
     }
 
-    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(Set<String> orgGuids,
+    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids,
             String familyName, String firstName, String secondName) throws Exception {
         List<ImportRegisterClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
         int importIteration = 1;
         while (true) {
             List<ImportRegisterClientsService.ExpandedPupilInfo> iterationPupils = null;
-            iterationPupils = getClientsForOrgs(orgGuids, familyName, firstName, secondName, importIteration);
+            iterationPupils = getClientsForOrgs(orgGuids.getOrgGuids(), familyName, firstName, secondName, importIteration);
             if (iterationPupils == null) continue;
             if (iterationPupils.size() > 0) {
                 pupils.addAll(iterationPupils);

@@ -51,6 +51,15 @@ public class OrgRegistryChange {
     protected String guidFrom;
     protected Long additionalId;
 
+    protected Long ekisId;
+    protected Long ekisIdFrom;
+    protected String egissoId;
+    protected String egissoIdFrom;
+    protected String municipalDistrict;
+    protected String municipalDistrictFrom;
+    protected String shortAddress;
+    protected String shortAddressFrom;
+
     private Set<OrgRegistryChangeItem> orgs;
 
     protected Boolean applied = false;
@@ -78,7 +87,11 @@ public class OrgRegistryChange {
                              String inn, String innFrom,
 
                              String guid, String guidFrom,
-                             Long additionalId
+                             Long additionalId,
+                             Long ekisId, Long ekisIdFrom,
+                             String egissoId, String egissoIdFrom,
+                             String shortAddress, String shortAddressFrom,
+                             String municipalDistrict, String municipalDistrictFrom
             ) {
         this.idOfOrg = idOfOrg;
 
@@ -113,6 +126,14 @@ public class OrgRegistryChange {
         this.guidFrom = guidFrom;
         this.additionalId = additionalId;
 
+        this.ekisId = ekisId;
+        this.ekisIdFrom = ekisIdFrom;
+        this.egissoId = egissoId;
+        this.egissoIdFrom = egissoIdFrom;
+        this.shortAddress = shortAddress;
+        this.shortAddressFrom = shortAddressFrom;
+        this.municipalDistrict = municipalDistrict;
+        this.municipalDistrictFrom = municipalDistrictFrom;
     }
 
     public Long getAdditionalId() {
@@ -354,5 +375,69 @@ public class OrgRegistryChange {
         }
         OrgRegistryChange other = (OrgRegistryChange) obj;
         return this.idOfOrgRegistryChange.equals(other.getIdOfOrgRegistryChange());
+    }
+
+    public Long getEkisId() {
+        return ekisId;
+    }
+
+    public void setEkisId(Long ekisId) {
+        this.ekisId = ekisId;
+    }
+
+    public Long getEkisIdFrom() {
+        return ekisIdFrom;
+    }
+
+    public void setEkisIdFrom(Long ekisIdFrom) {
+        this.ekisIdFrom = ekisIdFrom;
+    }
+
+    public String getEgissoId() {
+        return egissoId;
+    }
+
+    public void setEgissoId(String egissoId) {
+        this.egissoId = egissoId;
+    }
+
+    public String getEgissoIdFrom() {
+        return egissoIdFrom;
+    }
+
+    public void setEgissoIdFrom(String egissoIdFrom) {
+        this.egissoIdFrom = egissoIdFrom;
+    }
+
+    public String getMunicipalDistrict() {
+        return municipalDistrict;
+    }
+
+    public void setMunicipalDistrict(String municipalDistrict) {
+        this.municipalDistrict = municipalDistrict;
+    }
+
+    public String getMunicipalDistrictFrom() {
+        return municipalDistrictFrom;
+    }
+
+    public void setMunicipalDistrictFrom(String municipalDistrictFrom) {
+        this.municipalDistrictFrom = municipalDistrictFrom;
+    }
+
+    public String getShortAddress() {
+        return shortAddress;
+    }
+
+    public void setShortAddress(String shortAddress) {
+        this.shortAddress = shortAddress;
+    }
+
+    public String getShortAddressFrom() {
+        return shortAddressFrom;
+    }
+
+    public void setShortAddressFrom(String shortAddressFrom) {
+        this.shortAddressFrom = shortAddressFrom;
     }
 }
