@@ -28,10 +28,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created by IntelliJ IDEA.
@@ -58,6 +55,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private List<ClientMigration> clientMigrations = new ArrayList<ClientMigration>();
     private List<DiscountChangeHistory> discountChangeHistories = new ArrayList<DiscountChangeHistory>();
     private List<ApplicationForFoodReportItem> applicationsForFood = new ArrayList<ApplicationForFoodReportItem>();
+    private List<GeoplanerNotificationJournal> geoplanerNotificationJournalList = new LinkedList<>();
     private ApplicationForFoodReportItem currentApplicationForFood;
 
     public String getPageFilename() {
@@ -206,6 +204,13 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         }
         Collections.sort(clientPasses);
 
+        criteria = session.createCriteria(GeoplanerNotificationJournal.class);
+        criteria.add(Restrictions.ge("createDate", startTime));
+        criteria.add(Restrictions.le("createDate", endTime));
+        criteria.add(Restrictions.eq("client", client));
+        criteria.addOrder(Order.asc("createDate"));
+        geoplanerNotificationJournalList = criteria.list();
+
         criteria = session.createCriteria(RegularPayment.class);
         criteria.add(Restrictions.eq("client", client)).add(Restrictions.ge("paymentDate", startTime))
                 .add(Restrictions.le("paymentDate", endTime)).addOrder(Order.asc("paymentDate"));
@@ -273,5 +278,14 @@ public class ClientOperationListPage extends BasicWorkspacePage {
             HibernateUtils.close(session, logger);
         }
         return result;
+    }
+
+    public List<GeoplanerNotificationJournal> getGeoplanerNotificationJournalList() {
+        return geoplanerNotificationJournalList;
+    }
+
+    public void setGeoplanerNotificationJournalList(
+            List<GeoplanerNotificationJournal> geoplanerNotificationJournalList) {
+        this.geoplanerNotificationJournalList = geoplanerNotificationJournalList;
     }
 }

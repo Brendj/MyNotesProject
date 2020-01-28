@@ -68,7 +68,7 @@ public class GeoplanerNotificationJournal {
     }
 
     public void setIdOfClientPayment(Long idOfClientPayment) {
-        idOfClientPayment = idOfClientPayment;
+        this.idOfClientPayment = idOfClientPayment;
     }
 
     public Integer getEventType() {

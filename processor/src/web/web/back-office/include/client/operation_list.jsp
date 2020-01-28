@@ -665,6 +665,77 @@
     </f:facet>
 </rich:dataTable>
 
+    <h:outputText value="История уведомлений Geoplaner (для владельцев Smart-часов):"/>
+    <rich:dataTable id="clientGeoplanerJournal" var="geoplanerJournal" value="#{mainPage.clientOperationListPage.geoplanerNotificationJournalList}"
+                    rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer" rows="8"
+                    columns="10">
+
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="ID OO" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Название ОО" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="ID события прохода" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="ID покупки" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="ID пополнения клиента" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Дата создания записи" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="HTTP-код ответа сервера" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Текст ошибки" styleClass="column-header"/>
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.org.idOfOrg}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.org.shortName}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.idOfEnterEvents}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.idOfOrder}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.idOfClientPayment}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.createDate}" styleClass="output-text" converter="timeMinuteConverter"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.response}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.errorText}" styleClass="output-text"/>
+        </rich:column>
+
+        <f:facet name="footer">
+            <rich:datascroller for="clientGeoplanerJournal" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                               stepControls="auto" boundaryControls="hide">
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                </f:facet>
+            </rich:datascroller>
+        </f:facet>
+    </rich:dataTable>
+
 <h:outputText value="Регулярные платежи:" />
 <rich:dataTable id="regularPaymentsTable" var="pay" value="#{mainPage.clientOperationListPage.regularPayments}"
                 rowKeyVar="row" footerClass="data-table-footer" rows="8"
