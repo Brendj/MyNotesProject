@@ -285,6 +285,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
             }
             transaction.commit();
             transaction = null;
+            if (list.size() == 0) return "";
             String badGuids = "Найдены следующие неактуальные идентификаторы организаций в НСИ:\n";
             for (String g : list) {
                 badGuids += g;
