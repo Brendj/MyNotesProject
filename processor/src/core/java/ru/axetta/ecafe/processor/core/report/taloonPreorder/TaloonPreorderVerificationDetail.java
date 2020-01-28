@@ -533,6 +533,6 @@ public class TaloonPreorderVerificationDetail {
     }
 
     public Boolean isTotal() {
-        return complexId == null && complexName == null && goodsGuid == null && goodsName == null;
+        return complexId == null && complexName == null && goodsGuid == null;
     }
 }

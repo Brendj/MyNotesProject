@@ -136,13 +136,13 @@
                 <rich:column headerClass="column-header" rowspan="#{item.getDetailsSize()}"
                              rendered="#{item.getRowInItem(rowComplexKey, rowDetailKey) eq 0}">
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{item.taloonDate}" styleClass="output-text"
                                   converter="dateConverter" rendered="#{!complex.taloonDateEmpty()}"/>
                     <h:outputText escape="true" value="Итого" styleClass="output-text"
                                   rendered="#{complex.taloonDateEmpty()}"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Комплекс--%>
                 <rich:column headerClass="column-header" rowspan="#{complex.details.size()}"
@@ -152,10 +152,10 @@
                 <%--        Товары--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.goodsName}" styleClass="output-text"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Цена, руб--%>
                 <rich:column headerClass="column-header">
@@ -165,70 +165,70 @@
                 <%--        Заказ ИСПП шт--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.requestedQty}" styleClass="output-text" converter="quantityConverter"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Заказ ИСПП руб--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.requestedSum}" styleClass="output-text"
                                   converter="copeckSumConverter"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Оплата ИСПП шт--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.soldQty}" styleClass="output-text" converter="quantityConverter"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Оплата ИСПП руб--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.soldSum}" styleClass="output-text"
                                   converter="copeckSumConverter"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Блокировано шт--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.blockedQty}" styleClass="output-text" converter="quantityConverter"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Блокировано руб--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.blockedSum}" styleClass="output-text"
                                   converter="copeckSumConverter"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Сторнировано шт--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.reservedQty}" styleClass="output-text" converter="quantityConverter"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Сторнировано руб--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.reservedSum}" styleClass="output-text"
                                   converter="copeckSumConverter"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Отгрузка шт--%>
                 <%--                <rich:column headerClass="column-header">--%>
@@ -247,37 +247,37 @@
                         <a4j:support event="onchange"/>
                     </h:inputText>
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.shippedQty}" styleClass="output-text"
                                   rendered="#{!detail.enableEditShippedQty()}" converter="quantityConverter"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--                Отгрузка руб--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.shippedSum}" styleClass="output-text"
                                   converter="copeckSumConverter"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Разница шт--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.differedQty}" styleClass="output-text" converter="quantityConverter"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Разница руб--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.differedSum}" styleClass="output-text"
                                   converter="copeckSumConverter"/>
                     <h:outputText escape="false" value="</strong>"
-                                  rendered="#{detail.summaryDay and !detail.isTotal()}"/>
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Статус ОО--%>
                 <rich:column headerClass="column-header">
@@ -353,7 +353,7 @@
 
                     <%--            Подтвердить для всего дня--%>
                     <a4j:commandLink reRender="taloonPreorderVerificationTable"
-                                     rendered="#{item.isPpStateNotSelected() and detail.summaryDay and !detail.isTotal()}"
+                                     rendered="#{detail.summaryDay and !detail.isTotal()}"
                                      action="#{item.confirmPpState()}"
                                      onclick="if (#{!item.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{item}" target="#{item.getPpState()}"/>
@@ -361,7 +361,7 @@
                     </a4j:commandLink>
                     <%--            Отменить выбор для всего дня--%>
                     <a4j:commandLink reRender="taloonPreorderVerificationTable"
-                                     rendered="#{item.isPpStateConfirmed() and detail.summaryDay and !detail.isTotal()}"
+                                     rendered="#{detail.summaryDay and !detail.isTotal()}"
                                      action="#{item.deselectPpState()}" style="color:lightgray;"
                                      onclick="if (#{!item.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{item}"
@@ -371,7 +371,7 @@
 
                     <%--            Подтвердить для всего периода--%>
                     <a4j:commandLink reRender="taloonPreorderVerificationTable"
-                                     rendered="#{mainPage.taloonPreorderVerificationPage.isPpStateNotSelected() and detail.isTotal()}"
+                                     rendered="#{detail.isTotal()}"
                                      action="#{mainPage.taloonPreorderVerificationPage.confirmPpStateAllDay()}"
                                      onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{mainPage.taloonPreorderVerificationPage}"
@@ -380,7 +380,7 @@
                     </a4j:commandLink>
                     <%--            Отменить выбор для всего периода--%>
                     <a4j:commandLink reRender="taloonPreorderVerificationTable"
-                                     rendered="#{mainPage.taloonPreorderVerificationPage.isPpStateConfirmed() and detail.isTotal()}"
+                                     rendered="#{detail.isTotal()}"
                                      action="#{mainPage.taloonPreorderVerificationPage.deselectPpStateAllDay()}"
                                      style="color:lightgray;"
                                      onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
