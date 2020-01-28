@@ -155,6 +155,7 @@ public class Org implements Serializable {
     private Boolean haveNewLP;
     private Long ekisId;
     private Boolean preorderSyncParam;
+    private Boolean useWebArm;
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -217,6 +218,7 @@ public class Org implements Serializable {
         this.helpdeskEnabled = false;
         this.requestForVisitsToOtherOrg = false;
         this.preordersEnabled = false;
+        this.useWebArm = false;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -1233,5 +1235,13 @@ public class Org implements Serializable {
 
     public Boolean getMainBuilding() {
         return mainBuilding;
+    }
+
+    public Boolean getUseWebArm() {
+        return useWebArm;
+    }
+
+    public void setUseWebArm(Boolean useWebArm) {
+        this.useWebArm = useWebArm;
     }
 }

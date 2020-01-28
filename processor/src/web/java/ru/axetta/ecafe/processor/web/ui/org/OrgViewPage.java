@@ -108,6 +108,8 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean oneActiveCard;
     private Boolean changesDSZN;
 
+    private Boolean useWebArm;
+
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
 
     private SelectItem[] readStatusDetailsComboMenuItems() {
@@ -285,6 +287,8 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.multiCardModeEnabled = org.multiCardModeIsEnabled();
         this.participantOP = org.getParticipantOP();
         this.preorderlp = org.getPreorderlp();
+
+        this.useWebArm = org.getUseWebArm();
     }
 
     public String getFilterOrgs() {
@@ -789,5 +793,13 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setEkisId(Long ekisId) {
         this.ekisId = ekisId;
+    }
+
+    public Boolean getUseWebArm() {
+        return useWebArm;
+    }
+
+    public void setUseWebArm(Boolean useWebArm) {
+        this.useWebArm = useWebArm;
     }
 }
