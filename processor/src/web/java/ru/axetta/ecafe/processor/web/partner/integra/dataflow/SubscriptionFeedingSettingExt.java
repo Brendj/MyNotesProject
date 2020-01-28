@@ -28,8 +28,6 @@ public class SubscriptionFeedingSettingExt{
     protected Integer dayCreateVP;  //Количество дней, на которые создаются заявки вариативного питания
     @XmlAttribute(name = "hoursForbidVP")
     protected Integer hoursForbidVP;  //Количество часов, в течение которых запрещено редактировать заявки вариативного питания
-    @XmlAttribute(name = "hoursForbidPP")
-    private Integer hoursForbidPP;  //Количество часов, в течение которых запрещено редактировать заявки по предзаказам
 
     public Integer getDayRequest() {
         return dayRequest;
@@ -95,11 +93,4 @@ public class SubscriptionFeedingSettingExt{
         this.hoursForbidVP = hoursForbidVP;
     }
 
-    public Integer getHoursForbidPP() {
-        return hoursForbidPP;
-    }
-
-    public void setHoursForbidPP(Integer hoursForbidPP) {
-        this.hoursForbidPP = hoursForbidPP;
-    }
 }
