@@ -201,7 +201,6 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String clientGUID;
     private String clientSSOID;
     private String clientIacRegId;
-    private List<BankSubscription> bankSubscriptions;
     private Integer gender;
     private Date birthDate;
     private Boolean disablePlanCreation;
