@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.client.items.ClientDiscountItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
@@ -416,14 +415,6 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.wasSuspended = wasSuspended;
     }
 
-    public List<BankSubscription> getBankSubscriptions() {
-        return bankSubscriptions;
-    }
-
-    public void setBankSubscriptions(List<BankSubscription> bankSubscriptions) {
-        this.bankSubscriptions = bankSubscriptions;
-    }
-
     public void setIdOfClient(Long idOfClient) {
         this.idOfClient = idOfClient;
     }
@@ -564,11 +555,6 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.idOfClientGroup = group == null ? null : group.getCompositeIdOfClientGroup().getIdOfClientGroup();
 
         this.middleGroup = client.getMiddleGroup();
-
-        Criteria bankSubscriptionCriteria = session.createCriteria(BankSubscription.class);
-        bankSubscriptionCriteria.add(Restrictions.eq("client", client))
-                .add(Restrictions.isNotNull("activationDate"));
-        this.bankSubscriptions = (List<BankSubscription>) bankSubscriptionCriteria.list();
 
         this.wasSuspended = DAOUtils.wasSuspendedLastSubscriptionFeedingByClient(session, idOfClient);
 

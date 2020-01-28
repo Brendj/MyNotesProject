@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.RegularPayment;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientDiscountChangeHistoryService;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientGroupMigrationHistoryService;
@@ -59,6 +60,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
     private List<DiscountChangeHistory> discountChangeHistories = new ArrayList<DiscountChangeHistory>();
     private List<ApplicationForFoodReportItem> applicationsForFood = new ArrayList<ApplicationForFoodReportItem>();
     private ApplicationForFoodReportItem currentApplicationForFood;
+    private List<BankSubscription> bankSubscriptions;
 
     public String getPageFilename() {
         return "client/operation_list";
@@ -184,6 +186,12 @@ public class ClientOperationListPage extends BasicWorkspacePage {
             accountTransactionList.add(accTrans);
         }
 
+        Criteria bankSubscriptionCriteria = session.createCriteria(BankSubscription.class);
+        bankSubscriptionCriteria.add(Restrictions.eq("client", client))
+                .add(Restrictions.isNotNull("activationDate"))
+                .addOrder(Order.asc("activationDate"));
+        this.bankSubscriptions = (List<BankSubscription>) bankSubscriptionCriteria.list();
+
         criteria = session.createCriteria(EnterEvent.class);
         criteria.add(Restrictions.ge("evtDateTime", startTime));
         criteria.add(Restrictions.le("evtDateTime", endTime));
@@ -207,8 +215,10 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         Collections.sort(clientPasses);
 
         criteria = session.createCriteria(RegularPayment.class);
-        criteria.add(Restrictions.eq("client", client)).add(Restrictions.ge("paymentDate", startTime))
-                .add(Restrictions.le("paymentDate", endTime)).addOrder(Order.asc("paymentDate"));
+        criteria.add(Restrictions.eq("client", client))
+                .add(Restrictions.ge("paymentDate", startTime))
+                .add(Restrictions.le("paymentDate", endTime))
+                .addOrder(Order.asc("paymentDate"));
         regularPayments = (List<RegularPayment>) criteria.list();
 
         //// client group migrations
@@ -273,5 +283,13 @@ public class ClientOperationListPage extends BasicWorkspacePage {
             HibernateUtils.close(session, logger);
         }
         return result;
+    }
+
+    public List<BankSubscription> getBankSubscriptions() {
+        return bankSubscriptions;
+    }
+
+    public void setBankSubscriptions(List<BankSubscription> bankSubscriptions) {
+        this.bankSubscriptions = bankSubscriptions;
     }
 }

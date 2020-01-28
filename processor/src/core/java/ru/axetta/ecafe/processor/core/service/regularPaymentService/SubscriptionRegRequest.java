@@ -60,7 +60,7 @@ public class SubscriptionRegRequest implements IRequestOperation {
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
     public MfrRequest createRequestForSubscriptionReg(Long contractId, Long paymentAmount, Long thresholdAmount,
-            int period) {
+            int period, Date validityDate, String mobile) {
         MfrRequest request = new MfrRequest();
         request.setPaySystem(MfrRequest.ACQUIROPAY_SYSTEM);
         request.setRequestType(MfrRequest.REQUEST_TYPE_ACTIVATION);
@@ -76,6 +76,8 @@ public class SubscriptionRegRequest implements IRequestOperation {
         bs.setClient(client);
         bs.setSan(client.getSan());
         bs.setPaySystem(request.getPaySystem());
+        bs.setValidToDate((validityDate == null && period > 0) ? CalendarUtils.addMonth(new Date(), period) : validityDate);
+        bs.setMobile(mobile);
         em.persist(bs);
         request.setBankSubscription(bs);
         em.persist(request);
@@ -147,13 +149,13 @@ public class SubscriptionRegRequest implements IRequestOperation {
             Integer expMonth = StringUtils.isEmpty(paymentResponse.getExpMonth()) ? null
                     : Integer.valueOf(paymentResponse.getExpMonth());
             bs.setExpMonth(expMonth);
-            Date validToDate = CalendarUtils.addMonth(paymentResponse.getDateTime(), bs.getMonthsCount());
+            /*Date validToDate = CalendarUtils.addMonth(paymentResponse.getDateTime(), bs.getMonthsCount());
             if (expMonth != null && expYear != null) {
                 Date cardValidityDate = CalendarUtils.getDateOfLastDay(expYear, expMonth);
                 bs.setValidToDate(cardValidityDate.before(validToDate) ? cardValidityDate : validToDate);
             } else {
                 bs.setValidToDate(validToDate);
-            }
+            }*/
             return true;
         } else if (MfrRequest.ERROR.equalsIgnoreCase(paymentResponse.getStatus())) {
             mfrRequest.setErrorDescription(paymentResponse.getErrorDescription());
