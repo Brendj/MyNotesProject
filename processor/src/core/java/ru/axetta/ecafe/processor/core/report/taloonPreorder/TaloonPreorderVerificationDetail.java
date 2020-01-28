@@ -520,7 +520,7 @@ public class TaloonPreorderVerificationDetail {
 
     private void changePpState(TaloonPPStatesEnum ppState) {
         this.ppState = ppState;
-        this.getComplex().getItem().setPpState();
+        //this.getComplex().getItem().setPpState();
     }
 
     public Boolean isTotal() {
