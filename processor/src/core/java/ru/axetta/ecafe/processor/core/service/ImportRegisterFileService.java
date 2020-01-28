@@ -418,7 +418,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
                 + "  status, "
                 + "  agegrouptype, "
                 + "  concat_ws('|', rep_firstname,  rep_secondname, rep_surname, rep_phone, rep_who, '', '', ''), "  //последние 3 поля - законный представитель, ссоид, гуид
-                + "  null as ekisId "
+                + "  cast(null as bigint) as ekisId "
                 + "from cf_registry_file r where r.guidoforg in :guids";
     }
 }
