@@ -13,14 +13,19 @@ import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
+import javax.faces.application.FacesMessage;
 import javax.faces.context.FacesContext;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.io.BufferedReader;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
@@ -36,6 +41,13 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
     private static final Logger logger = LoggerFactory.getLogger(ClientFileLoadPage.class);
     private static final long MAX_LINE_NUMBER = 80000;
+    public static final String UTF8_BOM = "\uFEFF";
+
+    protected static final String[] COLUMN_NAMES = new String[]{
+            "Номер л/счета", "Пароль", "Статус", "Дата договора", "Договор-фамилия", "Договор-имя", "Договор-отчество",
+            "Договор-документ", "Фамилия", "Имя", "Отчество", "Документ", "Адрес", "Телефон", "Мобильный", "E-mail",
+            "Платный SMS", "Уведомление по e-mail", "Уведомление по SMS", "Овердрафт", "Уведомление через PUSH",
+            "Группа/класс"};
 
     public static class OrgItem {
 
@@ -157,19 +169,24 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             int lineNo = 0;
             int successLineNumber = 0;
             ClientManager.ClientFieldConfig fieldConfig = new ClientManager.ClientFieldConfig();
-            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "windows-1251"));
+            BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
             String currLine = reader.readLine();
             while (null != currLine) {
                 fieldConfig.resetToDefaultValues();
-                if (lineNo==0 && currLine.startsWith("!")) {
+                if (lineNo == 0 && currLine.startsWith("!")) {
                     parseLineConfig(fieldConfig, currLine);
                 } else {
-                    LineResult result = createClient(fieldConfig, this.org.getIdOfOrg(),
-                            currLine, lineNo, this.checkFullNameUnique);
-                    if (result.getResultCode() == 0) {
-                        ++successLineNumber;
+                    if (lineNo == 0) {
+                        currLine = currLine.replace(UTF8_BOM, "");
                     }
-                    lineResults.add(result);
+                    if (!isTitle(currLine)) {
+                        LineResult result = createClient(fieldConfig, this.org.getIdOfOrg(), currLine, lineNo,
+                                this.checkFullNameUnique);
+                        if (result.getResultCode() == 0) {
+                            ++successLineNumber;
+                        }
+                        lineResults.add(result);
+                    }
                 }
                 currLine = reader.readLine();
                 if (lineNo == MAX_LINE_NUMBER) {
@@ -177,7 +194,6 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
                 }
                 ++lineNo;
             }
-
             this.lineResults = lineResults;
             this.successLineNumber = successLineNumber;
         } finally {
@@ -185,16 +201,30 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         }
     }
 
+    private boolean isTitle(String currLine) {
+        String[] data = currLine.split(";");
+        for (int i = 0; i < data.length; i++) {
+            String str = data[i].replace("\"", "");
+            if (str == null || StringUtils.isBlank(str)) {
+                continue;
+            }
+            if (StringUtils.equalsIgnoreCase(COLUMN_NAMES[i], str)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
     private void parseLineConfig(FieldProcessor.Config fc, String currLine) throws Exception {
         String attrs[] = currLine.substring(1).split(";");
-        for (int n=0;n<attrs.length;++n) {
+        for (int n = 0; n < attrs.length; ++n) {
             fc.registerField(attrs[n]);
         }
         fc.checkRequiredFields();
     }
 
-    private LineResult createClient(ClientManager.ClientFieldConfig fieldConfig,
-            Long idOfOrg, String line, int lineNo, boolean checkFullNameUnique) throws Exception {
+    private LineResult createClient(ClientManager.ClientFieldConfig fieldConfig, Long idOfOrg, String line, int lineNo,
+            boolean checkFullNameUnique) throws Exception {
         String[] tokens = line.split(";", -1);
         try {
             fieldConfig.setValues(tokens);
@@ -204,13 +234,17 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         //если флаг установки уведомления по Push не установлен в файле загрузки, устаноавливаем значение по умолчанию в соотв. с опцией
         Boolean notifyPushIsNull = fieldConfig.isValueNull(ClientManager.FieldId.NOTIFY_BY_PUSH);
         if (notifyPushIsNull) {
-            String notifyByPush = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
+            String notifyByPush =
+                    RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1"
+                            : "0";
             fieldConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
         }
 
         Boolean notifyEmailIsNull = fieldConfig.isValueNull(ClientManager.FieldId.NOTIFY_BY_EMAIL);
         if (notifyEmailIsNull) {
-            String notifyByEmail = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1" : "0";
+            String notifyByEmail =
+                    RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1"
+                            : "0";
             fieldConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
         }
 
@@ -223,9 +257,32 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique, false);
             return new LineResult(lineNo, 0, "Ok", idOfClient);
         } catch (Exception e) {
-            return new LineResult(lineNo, -1, "Ошибка: "+e.getMessage(), -1L);
+            return new LineResult(lineNo, -1, "Ошибка: " + e.getMessage(), -1L);
         }
 
+    }
+
+    public void downloadSample() {
+        String result = "\"Номер л/счета\";\"Пароль\";\"Статус\";\"Дата договора\";\"Договор-фамилия\";"
+                + "\"Договор-имя\";\"Договор-отчество\";\"Договор-документ\";\"Фамилия\";\"Имя\";"
+                + "\"Отчество\";\"Документ\";\"Адрес\";\"Телефон\";\"Мобильный\";\"E-mail\";\"Платный SMS\";"
+                + "\"Уведомление по e-mail\";\"Уведомление по SMS\";\"Овердрафт\";\"Уведомление через PUSH\";"
+                + "\"Группа/класс\";";
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
+            ServletOutputStream servletOutputStream = response.getOutputStream();
+            facesContext.responseComplete();
+            response.setContentType("application/csv");
+            response.setHeader("Content-disposition", "attachment;filename=\"clients.csv\"");
+            servletOutputStream.write(result.getBytes(StandardCharsets.UTF_8));
+            servletOutputStream.flush();
+            servletOutputStream.close();
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Не удалось сгенерировать пример файла для загрузки: " + e.getMessage(), null));
+        }
     }
 
 
