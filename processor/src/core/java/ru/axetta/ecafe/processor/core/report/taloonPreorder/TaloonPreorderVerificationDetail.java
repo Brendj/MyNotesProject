@@ -523,7 +523,7 @@ public class TaloonPreorderVerificationDetail {
         this.getComplex().getItem().setPpState();
     }
 
-    public Boolean isNullGoodsName() {
-        return goodsName == null;
+    public Boolean isTotal() {
+        return complexId == null && complexName == null && goodsGuid == null && goodsName == null;
     }
 }

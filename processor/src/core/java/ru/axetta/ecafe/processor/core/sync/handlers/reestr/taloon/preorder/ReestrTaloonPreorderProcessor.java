@@ -59,7 +59,7 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
                     String goodsGuid = item.getGoodsGuid();
                     Long price = item.getPrice();
                     if (goodsGuid == null) goodsGuid = "";
-                    TaloonPreorder taloon = DAOReadonlyService.getInstance().findTaloonPreorder(idOfOrg, date, complexId, goodsGuid, price);
+                    TaloonPreorder taloon = DAOReadonlyService.getInstance().findTaloonPreorder(guid);
                     Integer ordersCount = DAOReadonlyService.getInstance().findTaloonPreorderSoldQty(idOfOrg, date, complexName, goodsGuid, price);
                     Integer soldQty = item.getSoldQty();
                     if(ordersCount == null || ordersCount == 0 || soldQty.equals(ordersCount)) {

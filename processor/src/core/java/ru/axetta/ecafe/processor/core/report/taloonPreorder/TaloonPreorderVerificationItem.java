@@ -61,12 +61,18 @@ public class TaloonPreorderVerificationItem {
     }
 
     // меняем статусы только там, где это разрешено
-    private void changePpState(TaloonPPStatesEnum ppState) {
+    public void changePpState(TaloonPPStatesEnum ppState) {
         for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                 if (!detail.isSummaryDay()) {
-                    if ((ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.allowedSetFirstFlag()) ||
-                            (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED && detail.allowedClearFirstFlag())) {
+                    // согласование - только для записей, у которых нет отказа
+                    if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.allowedSetFirstFlag()) {
+                        if (!detail.isPpStateCanceled()) {
+                            detail.setPpState(ppState);
+                            this.ppState = ppState;
+                        }
+                    }
+                    if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED && detail.allowedClearFirstFlag()) {
                         detail.setPpState(ppState);
                         this.ppState = ppState;
                     }

@@ -46,6 +46,7 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
     private TaloonPreorderVerificationItem currentTaloonPreorderVerificationItem;
     private String currentState;
     private String remarksToShow;
+    private TaloonPPStatesEnum ppState;
 
     private static final Logger logger = LoggerFactory.getLogger(TaloonPreorderVerificationPage.class);
 
@@ -64,7 +65,7 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
         if (this.idOfOrg == null) {
             filter = "Не выбрано";
         } else {
-            Org org = (Org)session.load(Org.class, this.idOfOrg);
+            Org org = (Org) session.load(Org.class, this.idOfOrg);
             filter = org.getShortName();
         }
     }
@@ -127,11 +128,13 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
             for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
                 for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                     if (detail.equals(currentTaloonPreorderVerificationDetail)) {
-                        if (currentState.equals(ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CANCEL) && !detail.needFillShippedQty()
-                        ) {
+                        if (currentState
+                                .equals(ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CANCEL)
+                                && !detail.needFillShippedQty()) {
                             detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
                         }
-                        if (currentState.equals(ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CONFIRM)) {
+                        if (currentState
+                                .equals(ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CONFIRM)) {
                             detail.performConfirm();
                         }
                         break;
@@ -149,22 +152,60 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
         changePpStateAllDay(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
     }
 
-    public void changePpStateAllDay(TaloonPPStatesEnum state) {
+    public void changePpStateAllDay(TaloonPPStatesEnum ppState) {
         for (TaloonPreorderVerificationItem item : items) {
-            if (item.equals(currentTaloonPreorderVerificationItem)) {
-                for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
-                    for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-                        if (detail.getPpState() != null) {
-                            if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.allowedSetFirstFlag()
-                            ) || ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED || state == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED)) && detail.allowedClearFirstFlag()) {
-                                detail.setPpState(state);
-                            }
-                        }
+            item.changePpState(ppState);
+        }
+    }
+
+    public boolean allowedSetFirstFlag() {
+        for (TaloonPreorderVerificationItem item : items) {
+            if (item.allowedSetFirstFlag()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean allowedClearFirstFlag() {
+        for (TaloonPreorderVerificationItem item : items) {
+            if (item.allowedClearFirstFlag()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public boolean isPpStateNotSelected() {
+        return !isPpStateConfirmed();
+    }
+
+    public boolean isPpStateConfirmed() {
+        for (TaloonPreorderVerificationItem item : items) {
+            if (item.getPpState() != TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public TaloonPPStatesEnum getPpState() {
+        return ppState;
+    }
+
+    public void setPpState() {
+        TaloonPPStatesEnum ppState = TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED;
+        for (TaloonPreorderVerificationItem item : items) {
+            for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
+                for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
+                    if (!detail.isSummaryDay() && !detail.isPpStateConfirmed()) {
+                        this.ppState = TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED;
+                        return;
                     }
-                    break;
                 }
             }
         }
+        this.ppState = ppState;
     }
 
     public String getFilter() {
