@@ -71,6 +71,7 @@ public class SBMSKOnlinePaymentRequestParser extends OnlinePaymentRequestParser 
         stringBuilder.append(String.format("<MESSAGE>%s</MESSAGE>",result.toString()));
 
         if(action.equals(ACTION_CHECK)) {
+            stringBuilder.append(String.format("<FIO>%s</FIO>", response.processFio()));
             stringBuilder.append(String.format("<INN>%s</INN>", response.getInn()));
             stringBuilder.append(String.format("<NAZN>%s</NAZN>", response.getNazn()));
             stringBuilder.append(String.format("<BIC>%s</BIC>", response.getBic()));
