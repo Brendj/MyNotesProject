@@ -4,10 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.ui.converter;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.faces.component.EditableValueHolder;
 import javax.faces.component.UIComponent;
 import javax.faces.context.FacesContext;
 import javax.faces.convert.Converter;
@@ -26,34 +26,24 @@ public class QuantityConverter implements Converter {
 
     public Object getAsObject(FacesContext facesContext, UIComponent uiComponent, String string)
             throws ConverterException {
-        //if (StringUtils.isEmpty(string) || string == null) {
-        //    return "";
-        //}
-        //try {
-        //    return Integer.parseInt(string);
-        //} catch (Exception e) {
-        //    logger.error("Failed to convert qty", e);
-        //    throw new ConverterException(e);
-        //}
-
-        Integer result = null;
-        if (string != null && string.trim().length() > 0) {
-            try {
-                result = new Integer(string);
-            } catch (NumberFormatException ex) {
-                ex.printStackTrace();
-            }
-        } else {
-            //string = null;
-            ((EditableValueHolder) uiComponent).setSubmittedValue(null);
+        if (null == string) {
+            return null;
         }
-        return result;
+        if (StringUtils.isEmpty(string)) {
+            return 0;
+        }
+        try {
+            return Integer.parseInt(string);
+        } catch (Exception e) {
+            logger.error("Failed to convert quantity", e);
+            throw new ConverterException(e);
+        }
     }
 
     public String getAsString(FacesContext facesContext, UIComponent uiComponent, Object object) {
-        if (object == null) {
+        if (null == object) {
             return "";
         }
-        return ((Integer) object).toString();
+        return object.toString();
     }
 }

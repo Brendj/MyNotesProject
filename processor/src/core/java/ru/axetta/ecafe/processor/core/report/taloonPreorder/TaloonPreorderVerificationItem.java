@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.report.taloonPreorder;
 
 import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
+import ru.axetta.ecafe.processor.web.ui.report.online.TaloonPreorderVerificationPage;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -23,6 +24,7 @@ public class TaloonPreorderVerificationItem {
     private Date taloonDate;
     private TaloonPPStatesEnum ppState;
     private List<TaloonPreorderVerificationComplex> complexes = new ArrayList<>();
+    private TaloonPreorderVerificationPage page;
 
     public TaloonPreorderVerificationItem() {
     }
@@ -50,6 +52,15 @@ public class TaloonPreorderVerificationItem {
             }
         }
         this.ppState = ppState;
+
+    }
+
+    public TaloonPreorderVerificationPage getPage() {
+        return page;
+    }
+
+    public void setPage(TaloonPreorderVerificationPage page) {
+        this.page = page;
     }
 
     public void confirmPpState() {
@@ -103,25 +114,6 @@ public class TaloonPreorderVerificationItem {
         }
         return false;
     }
-
-    //public void changePpStateAllDay(TaloonPPStatesEnum state) {
-    //    for (TaloonPreorderVerificationItem item : items) {
-    //        if (item.equals(currentTaloonPreorderVerificationItem)) {
-    //            for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
-    //                for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-    //                    if (detail.getPpState() != null) {
-    //                        if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED // && detail.allowedSetFirstFlag()
-    //                        ) || ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED || state == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED)) //&& detail.allowedClearFirstFlag())
-    //                        ) {
-    //                            detail.setPpState(state);
-    //                        }
-    //                    }
-    //                }
-    //                break;
-    //            }
-    //        }
-    //    }
-    //}
 
     public List<TaloonPreorderVerificationComplex> getComplexes() {
         return complexes;

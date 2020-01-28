@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.report.taloonPreorder;
 import ru.axetta.ecafe.processor.core.persistence.TaloonISPPStatesEnum;
 import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.web.ui.report.online.TaloonPreorderVerificationPage;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -35,7 +36,6 @@ public class TaloonPreorderVerificationDetail {
     private Integer soldQty;
     private Long soldSum;
     private Integer shippedQty;
-    //private String strShippedQty;
     private Long shippedSum;
     private Integer reservedQty;
     private Long reservedSum;
@@ -519,8 +519,17 @@ public class TaloonPreorderVerificationDetail {
     }
 
     private void changePpState(TaloonPPStatesEnum ppState) {
+        TaloonPreorderVerificationItem item;
+        TaloonPreorderVerificationPage page;
         this.ppState = ppState;
-        //this.getComplex().getItem().setPpState();
+        item = this.getComplex().getItem();
+        if(item != null) {
+            item.setPpState();
+            page = item.getPage();
+            if (page != null) {
+                page.setPpState();
+            }
+        }
     }
 
     public Boolean isTotal() {

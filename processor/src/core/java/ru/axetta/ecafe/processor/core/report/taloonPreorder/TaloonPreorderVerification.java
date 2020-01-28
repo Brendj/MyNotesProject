@@ -111,7 +111,9 @@ public class TaloonPreorderVerification {
         emptyComplex.setTaloonDate(null);
         emptyComplex.setItem(item);
         TaloonPreorderVerificationDetail emptyDetail = new TaloonPreorderVerificationDetail(null, null, null, null, null,
-                null, null, null, null, 0, 0L, 0, 0L, 0, 0L, 0, 0L, 0, 0L, 0, 0L, null, null, null, null, true);
+                null, "За весь период", null, null, null, null, null, null,
+                null, null, null, null, null, null, null,
+                null, null, null, null, null, true);
         emptyDetail.setComplex(emptyComplex);
         emptyComplex.getDetails().add(emptyDetail);
         item.getComplexes().add(emptyComplex);

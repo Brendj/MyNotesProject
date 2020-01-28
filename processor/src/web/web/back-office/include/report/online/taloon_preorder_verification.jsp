@@ -166,7 +166,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay and !detail.isTotal()}"/>
-                    <h:outputText escape="true" value="#{detail.requestedQty}" styleClass="output-text"/>
+                    <h:outputText escape="true" value="#{detail.requestedQty}" styleClass="output-text" converter="quantityConverter"/>
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay and !detail.isTotal()}"/>
                 </rich:column>
@@ -183,7 +183,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay and !detail.isTotal()}"/>
-                    <h:outputText escape="true" value="#{detail.soldQty}" styleClass="output-text"/>
+                    <h:outputText escape="true" value="#{detail.soldQty}" styleClass="output-text" converter="quantityConverter"/>
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay and !detail.isTotal()}"/>
                 </rich:column>
@@ -200,7 +200,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay and !detail.isTotal()}"/>
-                    <h:outputText escape="true" value="#{detail.blockedQty}" styleClass="output-text"/>
+                    <h:outputText escape="true" value="#{detail.blockedQty}" styleClass="output-text" converter="quantityConverter"/>
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay and !detail.isTotal()}"/>
                 </rich:column>
@@ -217,7 +217,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay and !detail.isTotal()}"/>
-                    <h:outputText escape="true" value="#{detail.reservedQty}" styleClass="output-text"/>
+                    <h:outputText escape="true" value="#{detail.reservedQty}" styleClass="output-text" converter="quantityConverter"/>
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay and !detail.isTotal()}"/>
                 </rich:column>
@@ -249,7 +249,7 @@
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay and !detail.isTotal()}"/>
                     <h:outputText escape="true" value="#{detail.shippedQty}" styleClass="output-text"
-                                  rendered="#{!detail.enableEditShippedQty()}"/>
+                                  rendered="#{!detail.enableEditShippedQty()}" converter="quantityConverter"/>
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay and !detail.isTotal()}"/>
                 </rich:column>
@@ -266,7 +266,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay and !detail.isTotal()}"/>
-                    <h:outputText escape="true" value="#{detail.differedQty}" styleClass="output-text"/>
+                    <h:outputText escape="true" value="#{detail.differedQty}" styleClass="output-text" converter="quantityConverter"/>
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay and !detail.isTotal()}"/>
                 </rich:column>
