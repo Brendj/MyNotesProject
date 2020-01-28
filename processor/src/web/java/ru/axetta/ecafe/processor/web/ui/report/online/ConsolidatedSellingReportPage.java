@@ -80,13 +80,6 @@ public class ConsolidatedSellingReportPage extends OnlineReportWithContragentPag
         return null;
     }
 
-    public void clearOrgs() {
-        if (showAllOrgs) {
-            this.idOfOrgList.clear();
-            this.filter = "Не выбрано";
-        }
-    }
-
     public void exportToHtml() {
         consolidatedSellingReport =(ConsolidatedSellingReport)makeReport();
         if (consolidatedSellingReport != null) {
