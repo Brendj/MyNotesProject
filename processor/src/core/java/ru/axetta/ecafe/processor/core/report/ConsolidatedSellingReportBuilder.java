@@ -36,6 +36,7 @@ import java.util.*;
 public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Builder {
 
     private final String templateFilename;
+    public static final String SHOW_ALL_ORGS = "showAllOrgs";
 
     public ConsolidatedSellingReportBuilder(String templateFilename) {
         this.templateFilename = templateFilename;
@@ -85,6 +86,8 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
         String contragent = StringUtils.trimToEmpty(reportProperties.getProperty("contragent"));
         String org_condition = StringUtils.isEmpty(contragent) ? "" : " and org.defaultsupplier = " + contragent;
         org_condition += StringUtils.isEmpty(idOfOrgs) ? "" : String.format(" and org.idoforg in (%s)", idOfOrgs);
+        String org2_condition = StringUtils.isEmpty(contragent) ? "" : " and org2.defaultsupplier = " + contragent;
+        org2_condition += StringUtils.isEmpty(idOfOrgs) ? "" : String.format(" and org2.idoforg in (%s)", idOfOrgs);
 
         List<ConsolidatedSellingReportItem> result_list = new ArrayList<ConsolidatedSellingReportItem>();
 
@@ -92,39 +95,63 @@ public class ConsolidatedSellingReportBuilder extends BasicReportForAllOrgJob.Bu
         orderTypes.add(OrderTypeEnumType.DEFAULT.ordinal());
         orderTypes.add(OrderTypeEnumType.PAY_PLAN.ordinal());
         orderTypes.add(OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
-        Query query = session.createSQLQuery("select org.idoforg, org.shortnameinfoservice, org.district, org.address, "
+        String query_string = reportProperties.getProperty(ConsolidatedSellingReportBuilder.SHOW_ALL_ORGS).equals("0") ?
+                "select org.idoforg, org.shortnameinfoservice, org.district, org.address, "
                 + "od.rprice, od.qty, od.menuorigin, od.menutype, pl.idofpreorderlinkod is not NULL as ispreorder "
                 + "from cf_orgs org join cf_orders o on org.idoforg = o.idoforg "
                 + "join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
                 + "left join cf_preorder_linkod pl on pl.idoforder = o.idoforder "
                 + "where o.createddate between :startDate and :endDate and o.ordertype in (:orderTypes) and o.state = 0 "
                 + org_condition
-                + "order by org.idoforg");
+                + "order by org.idoforg"
+                :
+                "select org.idoforg, org.shortnameinfoservice, org.district, org.address, query.rprice, query.qty, query.menuorigin, query.menutype, query.ispreorder "
+                + " from cf_orgs org left join " + " ("
+                + " select org2.idoforg, od.rprice, od.qty, od.menuorigin, od.menutype, pl.idofpreorderlinkod is not NULL as ispreorder "
+                + " from cf_orgs org2 join cf_orders o on org2.idoforg = o.idoforg "
+                + " join cf_orderdetails od on o.idoforg = od.idoforg and o.idoforder = od.idoforder "
+                + " left join cf_preorder_linkod pl on pl.idoforder = o.idoforder "
+                + " where o.createddate between :startDate and :endDate and o.ordertype in (:orderTypes) and o.state = 0 "
+                + org2_condition
+                + " and org2.state = 1 "
+                + " ) as query on org.idoforg = query.idoforg"
+                + " where org.state = 1 "
+                + org_condition
+                + " order by org.idoforg\n";
+        Query query = session.createSQLQuery(query_string);
         query.setParameter("startDate", startDate.getTime());
         query.setParameter("endDate", endDate.getTime());
         query.setParameterList("orderTypes", orderTypes);
         List res = query.list();
 
         int number = 1;
+        Long rprice = null;
+        Integer qty = null;
+        Integer menuOrigin = null;
+        Integer menuType = null;
+        Boolean isPreorder = null;
         for (Object o : res ) {
             Object[] row = (Object[]) o;
             Long idOfOrg = ((BigInteger) row[0]).longValue();
             String shortNameInfoService = (String) row[1];
             String district = (String) row[2];
             String address = (String) row[3];
-            Long rprice = ((BigInteger) row[4]).longValue();
-            Integer qty = (Integer) row[5];
-            Integer menuOrigin = (Integer) row[6];
-            Integer menuType = (Integer) row[7];
-            Boolean isPreorder = (Boolean) row[8];
+            boolean data_exists = (row[4] != null);
+            if (data_exists) {
+                rprice = ((BigInteger) row[4]).longValue();
+                qty = (Integer) row[5];
+                menuOrigin = (Integer) row[6];
+                menuType = (Integer) row[7];
+                isPreorder = (Boolean) row[8];
+            }
             ConsolidatedSellingReportItem item = getReportItemByIdOfOrg(result_list, idOfOrg);
             if (item == null) {
                 item = new ConsolidatedSellingReportItem(idOfOrg, shortNameInfoService, district, address, number);
                 number++;
-                addValues(item, rprice, qty, menuOrigin, menuType, isPreorder);
+                if (data_exists) addValues(item, rprice, qty, menuOrigin, menuType, isPreorder);
                 result_list.add(item);
             } else {
-                addValues(item, rprice, qty, menuOrigin, menuType, isPreorder);
+                if (data_exists) addValues(item, rprice, qty, menuOrigin, menuType, isPreorder);
             }
         }
 
