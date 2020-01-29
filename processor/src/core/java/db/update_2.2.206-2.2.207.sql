@@ -4,60 +4,73 @@
 
 -- Пакет обновлений 207
 
--- 358: Создание таблицы cf_taloon_preorder
-CREATE TABLE cf_taloon_preorder
+CREATE TABLE cf_regularpayment_status
 (
-    guid character varying(36) NOT NULL,
-    idoforg bigint NOT NULL,
-    taloondate bigint NOT NULL,
-    complexid bigint,
-    complexname character varying(128),
-    goodsname character varying(512),
-    goodsguid character varying(36),
-    idoforgcreated bigint,
-    soldqty integer NOT NULL,
-    requestedqty integer NOT NULL,
-    shippedqty integer,
-    reservedqty integer,
-    blockedqty integer,
-    price bigint NOT NULL,
-    createdtype integer NOT NULL,
-    taloonnumber bigint,
-    idoforgowner bigint NOT NULL,
-    version bigint NOT NULL,
-    deletedstate boolean NOT NULL DEFAULT false,
-    ispp_state integer NOT NULL DEFAULT 0,
-    pp_state integer NOT NULL DEFAULT 0,
-    idoftaloonpreorder bigint NOT NULL,
-    remarks text,
-    comments character varying(128),
-    CONSTRAINT cf_taloon_preorder_pk PRIMARY KEY (idoftaloonpreorder)
-)
-    WITH (
-        OIDS=FALSE
-    );
+  idofregularpaymentstatus bigserial NOT NULL,
+  idofregularpayment bigint NOT NULL,
+  errorcode integer,
+  description character varying(255),
+  statusdate bigint,
+  createddate bigint NOT NULL,
+  CONSTRAINT cf_regularpayment_status_pk PRIMARY KEY (idofregularpaymentstatus),
+  CONSTRAINT cf_regularpayment_status_idofregularpayment_fk FOREIGN KEY (idofregularpayment)
+  REFERENCES cf_regular_payments (idofpayment) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION
+);
 
-CREATE UNIQUE INDEX cf_taloon_preorder_idoforg_taloondate_complexid_goodsguid_idx
-    ON cf_taloon_preorder
-        USING btree
-        (idoforg, taloondate, complexid, goodsguid COLLATE pg_catalog."default", price);
+alter table cf_bank_subscriptions add column mobile character varying(32);
 
-CREATE INDEX cf_taloons_preorder_version_idx
-    ON cf_taloon_preorder
-        USING btree
-        (version);
+alter table cf_regular_payments add column idofclientpayment bigint,
+  add column errorcode integer,
+  add column errordesc character varying(200);
 
-CREATE INDEX cf_taloons_preorder_guid_idx
-    ON cf_taloon_preorder
-        USING btree
-        (guid COLLATE pg_catalog."default");
+alter table cf_orgregistrychange_item
+  add column ekisId bigint,
+  add column ekisIdFrom bigint,
+  add column egissoId character varying(128),
+  add column egissoIdFrom character varying(128),
+  add column municipal_district character varying(256),
+  add column municipal_districtFrom character varying(256),
+  add column short_address character varying(128),
+  add column short_addressFrom character varying(128);
 
--- 358: Добавление id комплекса в cf_goods_requests_positions
-ALTER TABLE cf_goods_requests_positions
-    ADD complexId integer;
+alter table cf_orgregistrychange
+  add column ekisId bigint,
+  add column ekisIdFrom bigint,
+  add column egissoId character varying(128),
+  add column egissoIdFrom character varying(128),
+  add column municipal_district character varying(256),
+  add column municipal_districtFrom character varying(256),
+  add column short_address character varying(128),
+  add column short_addressFrom character varying(128);
 
--- 358: Добавление индекса в cf_preorder_complex
-CREATE INDEX cf_preorder_complex_armcomplexid_idx
-    ON cf_preorder_complex
-        USING btree
-        (armcomplexid);
+alter table cf_orgs add column egissoId character varying(128),
+  add column municipal_district character varying(256);
+
+alter table cf_registry_file add column ekisId character varying(32);
+
+COMMENT ON COLUMN cf_registry_file.ekisId IS 'Ид ЕКИС';
+
+COMMENT ON COLUMN cf_orgs.egissoId IS 'Ид ЕГИССО';
+COMMENT ON COLUMN cf_orgs.municipal_district IS 'Муниципальный округ (район)';
+
+COMMENT ON COLUMN cf_orgregistrychange.ekisId IS 'Ид ЕКИС';
+COMMENT ON COLUMN cf_orgregistrychange.ekisIdFrom IS 'Ид ЕКИС в ИСПП';
+COMMENT ON COLUMN cf_orgregistrychange.egissoId IS 'Ид ЕГИССО';
+COMMENT ON COLUMN cf_orgregistrychange.egissoIdFrom IS 'Ид ЕКИС в ИСПП';
+COMMENT ON COLUMN cf_orgregistrychange.municipal_district IS 'Муниципальный округ (район)';
+COMMENT ON COLUMN cf_orgregistrychange.municipal_districtFrom IS 'Ид ЕКИС в ИСПП';
+COMMENT ON COLUMN cf_orgregistrychange.short_address IS 'Короткий адрес';
+COMMENT ON COLUMN cf_orgregistrychange.short_addressFrom IS 'Ид ЕКИС в ИСПП';
+
+COMMENT ON COLUMN cf_orgregistrychange_item.ekisId IS 'Ид ЕКИС';
+COMMENT ON COLUMN cf_orgregistrychange_item.ekisIdFrom IS 'Ид ЕКИС в ИСПП';
+COMMENT ON COLUMN cf_orgregistrychange_item.egissoId IS 'Ид ЕГИССО';
+COMMENT ON COLUMN cf_orgregistrychange_item.egissoIdFrom IS 'Ид ЕКИС в ИСПП';
+COMMENT ON COLUMN cf_orgregistrychange_item.municipal_district IS 'Муниципальный округ (район)';
+COMMENT ON COLUMN cf_orgregistrychange_item.municipal_districtFrom IS 'Ид ЕКИС в ИСПП';
+COMMENT ON COLUMN cf_orgregistrychange_item.short_address IS 'Короткий адрес';
+COMMENT ON COLUMN cf_orgregistrychange_item.short_addressFrom IS 'Ид ЕКИС в ИСПП';
+
+
+--! ФИНАЛИЗИРОВАН 28.01.2020, НЕ МЕНЯТЬ
