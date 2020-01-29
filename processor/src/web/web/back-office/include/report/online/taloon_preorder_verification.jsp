@@ -353,40 +353,38 @@
 
                     <%--            Подтвердить для всего дня--%>
                     <a4j:commandLink reRender="taloonPreorderVerificationTable"
-                                     rendered="#{detail.summaryDay and !detail.isTotal()}"
+                                     rendered="#{detail.summaryDay and !detail.isTotal() and !detail.isEmptyTotal()}"
                                      action="#{item.confirmPpState()}"
                                      onclick="if (#{!item.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{item}" target="#{item.getPpState()}"/>
-                        <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
+                        <h:graphicImage value="/images/taloons/applied-big.png"/>
                     </a4j:commandLink>
                     <%--            Отменить выбор для всего дня--%>
                     <a4j:commandLink reRender="taloonPreorderVerificationTable"
-                                     rendered="#{detail.summaryDay and !detail.isTotal()}"
+                                     rendered="#{detail.summaryDay and !detail.isTotal() and !detail.isEmptyTotal()}"
                                      action="#{item.deselectPpState()}" style="color:lightgray;"
                                      onclick="if (#{!item.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{item}"
                                                      target="#{item.getPpState()}"/>
-                        <h:graphicImage value="/images/taloons/applied-big.png"/>
+                        <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
                     </a4j:commandLink>
 
                     <%--            Подтвердить для всего периода--%>
                     <a4j:commandLink reRender="taloonPreorderVerificationTable"
-                                     rendered="#{detail.isTotal()}"
+                                     rendered="#{detail.summaryDay and !detail.isTotal() and detail.isEmptyTotal()}"
                                      action="#{mainPage.taloonPreorderVerificationPage.confirmPpStateAllDay()}"
-                                     onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
-                        <f:setPropertyActionListener value="#{mainPage.taloonPreorderVerificationPage}"
-                                                     target="#{mainPage.taloonPreorderVerificationPage.getPpState()}"/>
-                        <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
+                                     onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedSetPeriodFirstFlag()}) { alert('Операция запрещена'); return false; }">
+
+                        <h:graphicImage value="/images/taloons/applied-big.png"/>
                     </a4j:commandLink>
                     <%--            Отменить выбор для всего периода--%>
                     <a4j:commandLink reRender="taloonPreorderVerificationTable"
-                                     rendered="#{detail.isTotal()}"
+                                     rendered="#{detail.summaryDay and !detail.isTotal() and detail.isEmptyTotal()}"
                                      action="#{mainPage.taloonPreorderVerificationPage.deselectPpStateAllDay()}"
                                      style="color:lightgray;"
-                                     onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
-                        <f:setPropertyActionListener value="#{mainPage.taloonPreorderVerificationPage}"
-                                                     target="#{mainPage.taloonPreorderVerificationPage.getPpState()}"/>
-                        <h:graphicImage value="/images/taloons/applied-big.png"/>
+                                     onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedClearPeriodFirstFlag()}) { alert('Операция запрещена'); return false; }">
+
+                        <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
                     </a4j:commandLink>
 
                 </rich:column>

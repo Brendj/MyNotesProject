@@ -418,7 +418,6 @@ public class TaloonPreorderVerificationDetail {
         if (currentDate.after(redDate)) {
             return false;
         }
-
         if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED
                 || ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
             return true;
@@ -525,14 +524,14 @@ public class TaloonPreorderVerificationDetail {
         item = this.getComplex().getItem();
         if(item != null) {
             item.setPpState();
-            page = item.getPage();
-            if (page != null) {
-                page.setPpState();
-            }
         }
     }
 
+    public Boolean isEmptyTotal() {
+        return isSummaryDay() && complexId == null && complexName == null && goodsGuid == null && taloonDate == null;
+    }
+
     public Boolean isTotal() {
-        return complexId == null && complexName == null && goodsGuid == null;
+        return isSummaryDay() && complexId != null && taloonDate == null;
     }
 }

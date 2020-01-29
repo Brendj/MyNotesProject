@@ -79,6 +79,7 @@ public class TaloonPreorderVerification {
                 detailSum.addQtyAndGet(detail);
 
                 if (!summaryMap.containsKey(detail.getComplexId() + detail.getGoodsGuid())) {
+                    // Формирование итоговой строки
                     summaryMap.put(taloon.getComplexId() + taloon.getGoodsGuid(),
                             new TaloonPreorderVerificationDetail(null, null, null, null, detail.getComplexId(),
                                     detail.getComplexName(), detail.getGoodsName(), detail.getGoodsGuid(),

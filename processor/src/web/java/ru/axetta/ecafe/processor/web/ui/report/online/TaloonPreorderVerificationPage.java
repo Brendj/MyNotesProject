@@ -46,7 +46,6 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
     private TaloonPreorderVerificationItem currentTaloonPreorderVerificationItem;
     private String currentState;
     private String remarksToShow;
-    private TaloonPPStatesEnum ppState;
 
     private static final Logger logger = LoggerFactory.getLogger(TaloonPreorderVerificationPage.class);
 
@@ -158,7 +157,7 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
         }
     }
 
-    public boolean allowedSetFirstFlag() {
+    public boolean allowedSetPeriodFirstFlag() {
         for (TaloonPreorderVerificationItem item : items) {
             if (item.allowedSetFirstFlag()) {
                 return true;
@@ -167,7 +166,7 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
         return false;
     }
 
-    public boolean allowedClearFirstFlag() {
+    public boolean allowedClearPeriodFirstFlag() {
         for (TaloonPreorderVerificationItem item : items) {
             if (item.allowedClearFirstFlag()) {
                 return true;
@@ -187,25 +186,6 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
             }
         }
         return true;
-    }
-
-    public TaloonPPStatesEnum getPpState() {
-        return ppState;
-    }
-
-    public void setPpState() {
-        TaloonPPStatesEnum ppState = TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED;
-        for (TaloonPreorderVerificationItem item : items) {
-            for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
-                for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-                    if (!detail.isSummaryDay() && !detail.isPpStateConfirmed()) {
-                        this.ppState = TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED;
-                        return;
-                    }
-                }
-            }
-        }
-        this.ppState = ppState;
     }
 
     public String getFilter() {

@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.report.taloonPreorder;
 
 import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
-import ru.axetta.ecafe.processor.web.ui.report.online.TaloonPreorderVerificationPage;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -24,7 +23,6 @@ public class TaloonPreorderVerificationItem {
     private Date taloonDate;
     private TaloonPPStatesEnum ppState;
     private List<TaloonPreorderVerificationComplex> complexes = new ArrayList<>();
-    private TaloonPreorderVerificationPage page;
 
     public TaloonPreorderVerificationItem() {
     }
@@ -53,14 +51,6 @@ public class TaloonPreorderVerificationItem {
         }
         this.ppState = ppState;
 
-    }
-
-    public TaloonPreorderVerificationPage getPage() {
-        return page;
-    }
-
-    public void setPage(TaloonPreorderVerificationPage page) {
-        this.page = page;
     }
 
     public void confirmPpState() {
@@ -96,8 +86,10 @@ public class TaloonPreorderVerificationItem {
     public boolean allowedSetFirstFlag() {
         for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-                if (detail.allowedSetFirstFlag()) {
-                    return true;
+                if (!detail.isSummaryDay()) {
+                    if (detail.allowedClearFirstFlag()) {
+                        return true;
+                    }
                 }
             }
         }
@@ -107,8 +99,10 @@ public class TaloonPreorderVerificationItem {
     public boolean allowedClearFirstFlag() {
         for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-                if (detail.allowedClearFirstFlag()) {
-                    return true;
+                if (!detail.isSummaryDay()) {
+                    if (detail.allowedClearFirstFlag()) {
+                        return true;
+                    }
                 }
             }
         }
@@ -121,10 +115,6 @@ public class TaloonPreorderVerificationItem {
 
     public void setComplexes(List<TaloonPreorderVerificationComplex> complexes) {
         this.complexes = complexes;
-    }
-
-    public boolean taloonDateEmpty() {
-        return taloonDate == null;
     }
 
     public int getDetailsSize() {
