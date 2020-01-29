@@ -177,13 +177,25 @@
                     <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItem}" />
                     <h:graphicImage value="/images/taloons/applied-big.png" />
                 </a4j:commandLink>
-                &nbsp;
                 <a4j:commandLink reRender="taloonApprovalVerificationTable" rendered="#{detail.ppStateNull}"
                                  action="#{mainPage.taloonApprovalVerificationPage.deselectPpStateAllDay()}" style="color:lightgray;"
                                  onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
                     <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItem}" />
                     <h:graphicImage value="/images/taloons/applied-big-gray.png" />
                 </a4j:commandLink>
+
+<%--                <a4j:commandLink reRender="taloonApprovalVerificationTable" rendered="#{!detail.ppStateNull}"--%>
+<%--                                 action="#{mainPage.taloonApprovalVerificationPage.confirmPpStatePeriod()}" style="color:lightgray;"--%>
+<%--                                 onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
+<%--                    <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItem}" />--%>
+<%--                    <h:graphicImage value="/images/taloons/applied-big.png" />--%>
+<%--                </a4j:commandLink>--%>
+<%--                <a4j:commandLink reRender="taloonApprovalVerificationTable" rendered="#{!detail.ppStateNull}"--%>
+<%--                                 action="#{mainPage.taloonApprovalVerificationPage.deselectPpStatePeriod()}" style="color:lightgray;"--%>
+<%--                                 onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">--%>
+<%--                    <f:setPropertyActionListener value="#{item}" target="#{mainPage.taloonApprovalVerificationPage.currentTaloonApprovalVerificationItem}" />--%>
+<%--                    <h:graphicImage value="/images/taloons/applied-big-gray.png" />--%>
+<%--                </a4j:commandLink>--%>
 
             </rich:column>
             <rich:column headerClass="column-header">
