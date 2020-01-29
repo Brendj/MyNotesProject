@@ -70,10 +70,12 @@ public class OrgEditPage extends BasicWorkspacePage
     private String mailingListReports2;
     private String guid;
     private Long ekisId;
+    private String egissoId;
     private ConfigurationProvider configurationProvider;
     private List<Long> idOfOrgList = new ArrayList<Long>();
     private String city;
     private String district;
+    private String municipalDistrict;
     private String location;
     private String latitude;
     private String longitude;
@@ -201,6 +203,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setTag(tag);
         org.setCity(city);
         org.setDistrict(district);
+        org.setMunicipalDistrict(municipalDistrict);
         org.setLocation(location);
         org.setLongitude(longitude);
         org.setLatitude(latitude);
@@ -237,6 +240,7 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setMailingListReports2(mailingListReports2);
         org.setGuid(guid);
         org.setEkisId(ekisId.equals(0L) ? null : ekisId);
+        org.setEgissoId(egissoId);
         org.setCategoriesInternal(new HashSet<CategoryOrg>());
         if (this.idOfCategoryOrgList.isEmpty()) org.setCategoriesInternal(null);
         else {
@@ -428,6 +432,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.tag = org.getTag();
         this.city = org.getCity();
         this.district = org.getDistrict();
+        this.municipalDistrict = org.getMunicipalDistrict();
         this.location = org.getLocation();
         this.longitude = org.getLongitude();
         this.latitude = org.getLatitude();
@@ -458,6 +463,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.mailingListReports2 = org.getMailingListReports2();
         this.guid = org.getGuid();
         this.ekisId = org.getEkisId();
+        this.egissoId = org.getEgissoId();
         this.fullSyncParam = org.getFullSyncParam();
         this.usePlanOrders = org.getUsePlanOrders();
         this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
@@ -1198,6 +1204,22 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setUseWebArm(Boolean useWebArm) {
         this.useWebArm = useWebArm;
+    }
+
+    public String getEgissoId() {
+        return egissoId;
+    }
+
+    public void setEgissoId(String egissoId) {
+        this.egissoId = egissoId;
+    }
+
+    public String getMunicipalDistrict() {
+        return municipalDistrict;
+    }
+
+    public void setMunicipalDistrict(String municipalDistrict) {
+        this.municipalDistrict = municipalDistrict;
     }
 
     public static class ContragentItem {

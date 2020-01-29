@@ -46,8 +46,12 @@ public class ImportRegisterOrgsService {
     public static final int MOVE_OPERATION = 4;
 
     public static final String VALUE_GUID = "Guid";
+    public static final String VALUE_EKIS_ID = "ЕКИС Id";
+    public static final String VALUE_EGISSO_ID = "ЕГИССО Id";
     public static final String VALUE_UNIQUE_ADDRESS_ID = "№ здания";
     public static final String VALUE_ADDRESS = "Адрес корпуса";
+    public static final String VALUE_SHORT_ADDRESS = "Короткий адрес";
+    public static final String VALUE_MUNICIPAL_DISTRICT = "Район";
     public static final String VALUE_SHORT_NAME = "Краткое наименование";
     public static final String VALUE_OFFICIAL_NAME = "Полное наименование";
     public static final String VALUE_UNOM = "УНОМ";
@@ -280,6 +284,8 @@ public class ImportRegisterOrgsService {
                         org.setINN(orgRegistryChangeItem.getInn());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_GUID)))
                         org.setGuid(orgRegistryChange.getGuid());
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_EKIS_ID)))
+                        org.setEkisId(orgRegistryChange.getEkisId());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_UNIQUE_ADDRESS_ID))) {
                         org.setUniqueAddressId(orgRegistryChangeItem.getUniqueAddressId());
                         org.setAdditionalIdBuilding(org.getUniqueAddressId()); // ??
@@ -288,6 +294,10 @@ public class ImportRegisterOrgsService {
                         org.setAddress(orgRegistryChangeItem.getAddress());
                         org.setCity(orgRegistryChange.getCity());
                     }
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_SHORT_ADDRESS)))
+                        org.setShortAddress(orgRegistryChangeItem.getShortAddress());
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_MUNICIPAL_DISTRICT)))
+                        org.setMunicipalDistrict(orgRegistryChangeItem.getMunicipalDistrict());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_OFFICIAL_NAME)))
                         org.setOfficialName(orgRegistryChange.getOfficialName());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_SHORT_NAME)))
@@ -371,11 +381,12 @@ public class ImportRegisterOrgsService {
             }
             addChange = false;
             for (OrgInfo orgInfo : oi.getOrgInfos()) {
-                //если полное совпадение по сверяемым полям, то запись не включаем в таблицу сверки
                 if (safeCompare(orgInfo.address, orgInfo.addressFrom) && safeCompare(orgInfo.shortName, orgInfo.shortNameFrom) &&
                         safeCompare(orgInfo.officialName, orgInfo.officialNameFrom) && safeCompare(orgInfo.unom, orgInfo.unomFrom) &&
                         safeCompare(orgInfo.unad, orgInfo.unadFrom) && safeCompare(orgInfo.inn, orgInfo.innFrom) &&
-                        safeCompare(orgInfo.director, orgInfo.directorFrom)) {
+                        safeCompare(orgInfo.director, orgInfo.directorFrom) && safeCompare(orgInfo.egissoId, orgInfo.egissoIdFrom) &&
+                        safeCompare(orgInfo.shortAddress, orgInfo.shortAddressFrom) && safeCompare(orgInfo.municipalDistrict, orgInfo.municipalDistrictFrom)) {
+                    //если полное совпадение по сверяемым полям, то запись не включаем в таблицу сверки
                 } else {
                     if(orgRegistryChange.getOrgs() == null){
                         orgRegistryChange.setOrgs(new HashSet<OrgRegistryChangeItem>());
@@ -410,11 +421,7 @@ public class ImportRegisterOrgsService {
     }
 
     private boolean safeCompare(Long byOrg, Long byRestrOrgInfo) {
-        if (byOrg == null || byRestrOrgInfo == null) {
-            return false;
-        } else {
-            return safeCompare(byOrg.toString(), byRestrOrgInfo.toString());
-        }
+        return safeCompare(byOrg == null ? "" : byOrg.toString(), byRestrOrgInfo == null ? "" : byRestrOrgInfo.toString());
     }
 
     private OrgRegistryChange fillOrgRegistryChange(OrgInfo oi, long createDate) {
@@ -438,7 +445,11 @@ public class ImportRegisterOrgsService {
                         solveString(oi.getInn()), oi.getInnFrom(),
 
                         solveString(oi.getGuid()), oi.getGuidFrom(),
-                        oi.getAdditionalId() == null ? -1L : oi.getAdditionalId()
+                        oi.getAdditionalId() == null ? -1L : oi.getAdditionalId(),
+                        oi.getEkisId(), oi.getEkisIdFrom(),
+                        solveString(oi.getEgissoId()), solveString(oi.getEgissoIdFrom()),
+                        solveString(oi.getShortAddress()), solveString(oi.getShortAddressFrom()),
+                        solveString(oi.getMunicipalDistrict()), solveString(oi.getMunicipalDistrictFrom())
                 );
     }
 
@@ -465,8 +476,12 @@ public class ImportRegisterOrgsService {
                         solveString(oi.getGuid()), oi.getGuidFrom(),
                         oi.getAdditionalId() == null ? -1L : oi.getAdditionalId(),
                         orgRegistryChange, oi.getShortNameSupplierFrom(),
-                        oi.getOrgState(), oi.getIntroductionQueue(), oi.getIntroductionQueueFrom(),
-                        oi.getDirector(), oi.getDirectorFrom()
+                        oi.getOrgState(),
+                        oi.getDirector(), oi.getDirectorFrom(),
+                        oi.getEkisId(), oi.getEkisIdFrom(),
+                        solveString(oi.getEgissoId()), solveString(oi.getEgissoIdFrom()),
+                        solveString(oi.getShortAddress()), solveString(oi.getShortAddressFrom()),
+                        solveString(oi.getMunicipalDistrict()), solveString(oi.getMunicipalDistrictFrom())
                 );
     }
 
@@ -530,10 +545,16 @@ public class ImportRegisterOrgsService {
         private String directorFullName;
         private String OGRN;
         private String state;
-        private String introductionQueue;
-        private String introductionQueueFrom;
         private String director;
         private String directorFrom;
+        private Long ekisId;
+        private Long ekisIdFrom;
+        private String egissoId;
+        private String egissoIdFrom;
+        private String shortAddress;
+        private String shortAddressFrom;
+        private String municipalDistrict;
+        private String municipalDistrictFrom;
 
         private List<OrgInfo> orgInfos = new LinkedList<OrgInfo>();
         private Boolean mainBuilding;
@@ -827,22 +848,6 @@ public class ImportRegisterOrgsService {
             this.orgState = orgState;
         }
 
-        public String getIntroductionQueue() {
-            return introductionQueue;
-        }
-
-        public void setIntroductionQueue(String introductionQueue) {
-            this.introductionQueue = introductionQueue;
-        }
-
-        public String getIntroductionQueueFrom() {
-            return introductionQueueFrom;
-        }
-
-        public void setIntroductionQueueFrom(String introductionQueueFrom) {
-            this.introductionQueueFrom = introductionQueueFrom;
-        }
-
         public String getDirector() {
             return director;
         }
@@ -857,6 +862,70 @@ public class ImportRegisterOrgsService {
 
         public void setDirectorFrom(String directorFrom) {
             this.directorFrom = directorFrom;
+        }
+
+        public Long getEkisId() {
+            return ekisId;
+        }
+
+        public void setEkisId(Long ekisId) {
+            this.ekisId = ekisId;
+        }
+
+        public Long getEkisIdFrom() {
+            return ekisIdFrom;
+        }
+
+        public void setEkisIdFrom(Long ekisIdFrom) {
+            this.ekisIdFrom = ekisIdFrom;
+        }
+
+        public String getEgissoId() {
+            return egissoId;
+        }
+
+        public void setEgissoId(String egissoId) {
+            this.egissoId = egissoId;
+        }
+
+        public String getEgissoIdFrom() {
+            return egissoIdFrom;
+        }
+
+        public void setEgissoIdFrom(String egissoIdFrom) {
+            this.egissoIdFrom = egissoIdFrom;
+        }
+
+        public String getShortAddress() {
+            return shortAddress;
+        }
+
+        public void setShortAddress(String shortAddress) {
+            this.shortAddress = shortAddress;
+        }
+
+        public String getShortAddressFrom() {
+            return shortAddressFrom;
+        }
+
+        public void setShortAddressFrom(String shortAddressFrom) {
+            this.shortAddressFrom = shortAddressFrom;
+        }
+
+        public String getMunicipalDistrict() {
+            return municipalDistrict;
+        }
+
+        public void setMunicipalDistrict(String municipalDistrict) {
+            this.municipalDistrict = municipalDistrict;
+        }
+
+        public String getMunicipalDistrictFrom() {
+            return municipalDistrictFrom;
+        }
+
+        public void setMunicipalDistrictFrom(String municipalDistrictFrom) {
+            this.municipalDistrictFrom = municipalDistrictFrom;
         }
     }
 }

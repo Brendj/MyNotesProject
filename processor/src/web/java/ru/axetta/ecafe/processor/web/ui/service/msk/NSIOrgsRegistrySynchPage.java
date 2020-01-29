@@ -55,11 +55,15 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         super();
         orgModifyChangeItems.clear();
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_GUID, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_EKIS_ID, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_EGISSO_ID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_UNIQUE_ADDRESS_ID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_INN, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_UNOM, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_UNAD, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_ADDRESS, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_SHORT_ADDRESS, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_MUNICIPAL_DISTRICT, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_OFFICIAL_NAME, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_SHORT_NAME, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_DIRECTOR, "", ""));
@@ -466,6 +470,14 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
                 item.setOldValue(orgForEdit.getGuidFrom());
                 item.setNewValue(orgForEdit.getGuidReestr());
             }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_EKIS_ID)) {
+                item.setOldValue(orgForEdit.getEkisIdFromNullSafe());
+                item.setNewValue(orgForEdit.getEkisIdReestrNullSafe());
+            }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_EGISSO_ID)) {
+                item.setOldValue(orgForEdit.getEgissoIdFrom());
+                item.setNewValue(orgForEdit.getEgissoIdReestr());
+            }
             if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_UNIQUE_ADDRESS_ID)) {
                 item.setOldValue(orgForEdit.getUniqueAddressIdFromNullSafe());
                 item.setNewValue(orgForEdit.getUniqueAddressIdReestrNullSafe());
@@ -485,6 +497,14 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_ADDRESS)) {
                 item.setOldValue(orgForEdit.getAddressFrom());
                 item.setNewValue(orgForEdit.getAddressReestr());
+            }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_SHORT_ADDRESS)) {
+                item.setOldValue(orgForEdit.getShortAddressFrom());
+                item.setNewValue(orgForEdit.getShortAddressReestr());
+            }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_MUNICIPAL_DISTRICT)) {
+                item.setOldValue(orgForEdit.getMunicipalDistrictFrom());
+                item.setNewValue(orgForEdit.getMunicipalDistrictReestr());
             }
             if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_OFFICIAL_NAME)) {
                 item.setOldValue(orgForEdit.getOfficialNameFrom());
@@ -551,11 +571,17 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         protected String guid;
         protected String guidFrom;
+        protected Long ekisId;
+        protected Long ekisIdFrom;
+        protected String egissoId;
+        protected String egissoIdFrom;
         protected Long additionalId;
-        protected String introductionQueue;
-        protected String introductionQueueFrom;
         protected String director;
         protected String directorFrom;
+        protected String shortAddress;
+        protected String shortAddressFrom;
+        protected String municipalDistrict;
+        protected String municipalDistrictFrom;
 
         private boolean selected = false;
 
@@ -584,11 +610,19 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.unadFrom = registryChange.getUnadFrom();
             this.guid = registryChange.getGuid();
             this.guidFrom = registryChange.getGuidFrom();
+            this.ekisId = registryChange.getEkisId();
+            this.ekisIdFrom = registryChange.getEkisIdFrom();
+            this.egissoId = registryChange.getEgissoId();
+            this.egissoIdFrom = registryChange.getEgissoIdFrom();
             this.uniqueAddressId = registryChange.getUniqueAddressId();
             this.uniqueAddressIdFrom = registryChange.getUniqueAddressIdFrom();
             this.inn = registryChange.getInn();
             this.innFrom = registryChange.getInnFrom();
             this.additionalId = registryChange.getAdditionalId();
+            this.shortAddress = registryChange.getShortAddress();
+            this.shortAddressFrom = registryChange.getShortAddressFrom();
+            this.municipalDistrict = registryChange.getMunicipalDistrict();
+            this.municipalDistrictFrom = registryChange.getMunicipalDistrictFrom();
 
             this.selected = registryChange.getApplied() ? true: false;
             boolean doAdd;
@@ -632,11 +666,17 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.innFrom = registryChangeItem.getInnFrom();
             this.guid = registryChangeItem.getGuid();
             this.guidFrom = registryChangeItem.getGuidFrom();
+            this.ekisId = registryChangeItem.getEkisId();
+            this.ekisIdFrom = registryChangeItem.getEkisIdFrom();
+            this.egissoId = registryChangeItem.getEgissoId();
+            this.egissoIdFrom = registryChangeItem.getEgissoIdFrom();
             this.additionalId = registryChangeItem.getAdditionalId();
-            this.introductionQueue = registryChangeItem.getIntroductionQueue();
-            this.introductionQueueFrom = registryChangeItem.getIntroductionQueueFrom();
             this.director = registryChangeItem.getDirector();
             this.directorFrom = registryChangeItem.getDirectorFrom();
+            this.shortAddress = registryChangeItem.getShortAddress();
+            this.shortAddressFrom = registryChangeItem.getShortAddressFrom();
+            this.municipalDistrict = registryChangeItem.getMunicipalDistrict();
+            this.municipalDistrictFrom = registryChangeItem.getMunicipalDistrictFrom();
 
             this.selected = registryChangeItem.getOperationType().equals(OrgRegistryChange.CREATE_OPERATION) ? false : true;
         }
@@ -817,6 +857,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return getResultString(address, addressFrom);
         }
 
+        public String getShortAddress() {
+            return getResultString(shortAddress, shortAddressFrom);
+        }
+
         public String getAddressReestr() {
             return address;
         }
@@ -827,6 +871,22 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public String getAddressFrom() {
             return addressFrom;
+        }
+
+        public String getShortAddressFrom() {
+            return shortAddressFrom;
+        }
+
+        public String getShortAddressReestr() {
+            return shortAddress;
+        }
+
+        public String getMunicipalDistrictFrom() {
+            return municipalDistrictFrom;
+        }
+
+        public String getMunicipalDistrictReestr() {
+            return municipalDistrict;
         }
 
         public String getCity() {
@@ -879,6 +939,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
         public String getGuid() {
             return getResultString(guid, guidFrom);
+        }
+
+        public String getEkisId() {
+            return getResultString(ekisId, ekisIdFrom);
         }
 
         public String getGuidReestr() {
@@ -1001,14 +1065,6 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.state = state;
         }
 
-        public String getIntroductionQueue() {
-            return getResultString(introductionQueue, introductionQueueFrom);
-        }
-
-        public void setIntroductionQueue(String introductionQueue) {
-            this.introductionQueue = introductionQueue;
-        }
-
         public String getDirector() {
             return getResultString(director, directorFrom);
         }
@@ -1029,12 +1085,21 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.directorFrom = directorFrom;
         }
 
-        public String getIntroductionQueueFrom() {
-            return introductionQueueFrom;
+        public String getEkisIdReestrNullSafe() {
+            return ekisId == null ? "" : ekisId.toString();
         }
 
-        public void setIntroductionQueueFrom(String introductionQueueFrom) {
-            this.introductionQueueFrom = introductionQueueFrom;
+        public String getEkisIdFromNullSafe() {
+            return ekisIdFrom == null ? "" : ekisIdFrom.toString();
         }
+
+        public String getEgissoIdFrom() {
+            return egissoIdFrom;
+        }
+
+        public String getEgissoIdReestr() {
+            return egissoId;
+        }
+
     }
 }

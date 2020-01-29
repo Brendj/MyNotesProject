@@ -156,6 +156,8 @@ public class Org implements Serializable {
     private Long ekisId;
     private Boolean preorderSyncParam;
     private Boolean useWebArm;
+    private String egissoId;
+    private String municipalDistrict;
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -1223,6 +1225,22 @@ public class Org implements Serializable {
 
     public void setEkisId(Long ekisId) {
         this.ekisId = ekisId;
+    }
+
+    public String getEgissoId() {
+        return egissoId;
+    }
+
+    public void setEgissoId(String egissoId) {
+        this.egissoId = egissoId;
+    }
+
+    public String getMunicipalDistrict() {
+        return municipalDistrict;
+    }
+
+    public void setMunicipalDistrict(String municipalDistrict) {
+        this.municipalDistrict = municipalDistrict;
     }
 
     public Boolean getPreorderSyncParam() {

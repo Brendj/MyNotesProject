@@ -4,6 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.ui.service;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.nsi.OrgMskNSIService;
+import ru.axetta.ecafe.processor.core.partner.nsi.OrgNSI3DAOService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterOrgsService;
+
 /**
  * Created with IntelliJ IDEA.
  * User: i.semenov
@@ -21,7 +26,11 @@ public class OrgModifyChangeItem {
         this.valueName = valueName;
         this.oldValue = oldValue;
         this.newValue = newValue;
-        this.selected = true;
+        if (valueName.equals(ImportRegisterOrgsService.VALUE_EKIS_ID) || valueName.equals(ImportRegisterOrgsService.VALUE_EGISSO_ID)) {
+            this.selected = RuntimeContext.getAppContext().getBean("OrgMskNSIService", OrgMskNSIService.class).getNSIService() instanceof OrgNSI3DAOService;
+        } else {
+            this.selected = true;
+        }
     }
 
     public String getOldValue() {

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientPayment;
 
 import java.util.Date;
 
@@ -20,6 +21,7 @@ public class RegularPayment {
     private Long idOfPayment;
     private BankSubscription bankSubscription;
     private MfrRequest mfrRequest;
+    private ClientPayment clientPayment;
     private Long paymentAmount;
     private Date paymentDate;
     private Client client;
@@ -29,6 +31,8 @@ public class RegularPayment {
     private String status;
     private String authCode;
     private Long rrn;
+    private Integer errorCode;
+    private String errorDesc;
 
     public Long getIdOfPayment() {
         return idOfPayment;
@@ -40,6 +44,11 @@ public class RegularPayment {
 
     public BankSubscription getBankSubscription() {
         return bankSubscription;
+    }
+
+    public void setStatusFields(Integer errorCode, String errorDesc) {
+        this.errorCode = errorCode;
+        this.errorDesc = errorDesc;
     }
 
     public void setBankSubscription(BankSubscription bankSubscription) {
@@ -141,5 +150,29 @@ public class RegularPayment {
     @Override
     public int hashCode() {
         return idOfPayment != null ? idOfPayment.hashCode() : 0;
+    }
+
+    public ClientPayment getClientPayment() {
+        return clientPayment;
+    }
+
+    public void setClientPayment(ClientPayment clientPayment) {
+        this.clientPayment = clientPayment;
+    }
+
+    public Integer getErrorCode() {
+        return errorCode;
+    }
+
+    public void setErrorCode(Integer errorCode) {
+        this.errorCode = errorCode;
+    }
+
+    public String getErrorDesc() {
+        return errorDesc;
+    }
+
+    public void setErrorDesc(String errorDesc) {
+        this.errorDesc = errorDesc;
     }
 }

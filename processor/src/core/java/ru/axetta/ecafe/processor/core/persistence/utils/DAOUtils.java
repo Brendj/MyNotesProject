@@ -2415,6 +2415,16 @@ public class DAOUtils {
         return q.list();
     }
 
+    public static boolean guardianExistsByMobile(Session session, String mobile, Client client) throws Exception {
+        if (!StringUtils.isEmpty(client.getMobile()) && client.getMobile().equals(mobile)) return true;
+        List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
+        if (guardians.size() == 0) return false;
+        for (Client guardian : guardians) {
+            if (guardian.getMobile() != null && guardian.getMobile().equals(mobile)) return true;
+        }
+        return false;
+    }
+
     /*
      * Находит детей представителя или ребенка, у которого указан телефонный номер
      * */

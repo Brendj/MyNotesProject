@@ -1191,11 +1191,15 @@ public class ImportRegisterClientsService {
 
         Set<String> orgGuids;
         String guidInfo;
+        private Set<String> orgEkisIds;
+        private String ekisInfo;
 
         public OrgRegistryGUIDInfo(Org org) {
             Set<Org> orgs = DAOService.getInstance().getFriendlyOrgs(org.getIdOfOrg());
             orgGuids = new HashSet<String>();
             guidInfo = "";
+            orgEkisIds = new HashSet<>();
+            ekisInfo = "";
             for (Org o : orgs) {
                 if (StringUtils.isEmpty(o.getGuid())) {
                     continue;
@@ -1206,6 +1210,12 @@ public class ImportRegisterClientsService {
                 guidInfo += o.getOrgNumberInName() + ": " + o.getGuid();
                 orgGuids.add(o.getGuid());
             }
+            for (Org o : orgs) {
+                if (o.getEkisId() == null) continue;
+                if (ekisInfo.length() > 0) ekisInfo += ", ";
+                ekisInfo += o.getOrgNumberInName() + ": " + o.getEkisId().toString();
+                orgEkisIds.add(o.getEkisId().toString());
+            }
         }
 
         public Set<String> getOrgGuids() {
@@ -1214,6 +1224,14 @@ public class ImportRegisterClientsService {
 
         public String getGuidInfo() {
             return guidInfo;
+        }
+
+        public Set<String> getOrgEkisIds() {
+            return orgEkisIds;
+        }
+
+        public String getEkisInfo() {
+            return ekisInfo;
         }
     }
 
@@ -1604,13 +1622,21 @@ public class ImportRegisterClientsService {
         }
     }
 
-    private ClientMskNSIService getNSIService() {
+    public ClientMskNSIService getNSIService() {
+        switch (RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION)) {
+            case Option.NSI3 :
+                //Не смотрим на настройку из MODE_PROPERTY. Pабота с файлом НСИ-3 по екис ид
+                return RuntimeContext.getAppContext().getBean("ImportRegisterNSI3Service", ImportRegisterNSI3Service.class);
+        }
         String mode = RuntimeContext.getInstance().getPropertiesValue(ImportRegisterFileService.MODE_PROPERTY, null);
         if (mode.equals(ImportRegisterFileService.MODE_SYMMETRIC)) {
+            //забор клиентов из таблиц симметрика
             return RuntimeContext.getAppContext().getBean("ImportRegisterSymmetricService", ImportRegisterSymmetricService.class);
         } else if (mode.equals(ImportRegisterFileService.MODE_FILE)) {
+            //клиенты из файла НСИ-2
             return RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class);
         } else {
+            //запросы в апи НСИ-1
             return RuntimeContext.getAppContext().getBean("ClientMskNSIService", ClientMskNSIService.class);
         }
     }
@@ -1630,7 +1656,7 @@ public class ImportRegisterClientsService {
         String synchDate = "[Синхронизация с Реестрами от " + date + " для " + org.getIdOfOrg() + "]: ";
         OrgRegistryGUIDInfo orgGuids = new OrgRegistryGUIDInfo(org);
         log(synchDate + "Производится синхронизация для " + org.getOfficialName() + " GUID [" + orgGuids.getGuidInfo()
-                + "]", logBuffer);
+                + "] + EKIS Id [" + orgGuids.getEkisInfo() + "]", logBuffer);
 
         SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
                 SecurityJournalProcess.EventType.NSI_CLIENTS, new Date());
@@ -1641,18 +1667,14 @@ public class ImportRegisterClientsService {
             //DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 1);
             //Проверка на устаревшие гуиды организаций
             ClientMskNSIService service = getNSIService();
-            List<String> list = service.getBadGuids(orgGuids.orgGuids);
-            if (list != null && !list.isEmpty()) {
-                String badGuids = "Найдены следующие неактуальные GUIDы организаций:\n";
-                for (String g : list) {
-                    badGuids += g;
-                }
+            String badGuids = service.getBadGuids(orgGuids);
+            if (!StringUtils.isEmpty(badGuids)) {
                 isSuccessEnd = false;
                 throw new BadOrgGuidsException(badGuids);
             }
 
             //  Итеративно загружаем клиентов, используя ограничения
-            List<ExpandedPupilInfo> pupils = service.getPupilsByOrgGUID(orgGuids.orgGuids, null, null, null);
+            List<ExpandedPupilInfo> pupils = service.getPupilsByOrgGUID(orgGuids, null, null, null);
             log(synchDate + "Получено " + pupils.size() + " записей", logBuffer);
             //  !!!!!!!!!!
             //  !!!!!!!!!!

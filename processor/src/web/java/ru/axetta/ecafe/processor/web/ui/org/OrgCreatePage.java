@@ -59,9 +59,11 @@ public class OrgCreatePage extends BasicWorkspacePage
     private String mailingListReports2;
     private String guid;
     private Long ekisId;
+    private String egissoId;
     private String tag;
     private String city;
     private String district;
+    private String municipalDistrict;
     private String location;
     private String latitude;
     private String longitude;
@@ -306,6 +308,22 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setEkisId(Long ekisId) {
         this.ekisId = ekisId;
+    }
+
+    public String getEgissoId() {
+        return egissoId;
+    }
+
+    public void setEgissoId(String egissoId) {
+        this.egissoId = egissoId;
+    }
+
+    public String getMunicipalDistrict() {
+        return municipalDistrict;
+    }
+
+    public void setMunicipalDistrict(String municipalDistrict) {
+        this.municipalDistrict = municipalDistrict;
     }
 
     public static class ContragentItem {
@@ -620,11 +638,13 @@ public class OrgCreatePage extends BasicWorkspacePage
                 this.introductionQueue, this.additionalIdBuilding, this.statusDetailing, version, changesDSZN);
         org.setCity(city);
         org.setDistrict(district);
+        org.setMunicipalDistrict(municipalDistrict);
         org.setLocation(location);
         org.setLongitude(longitude);
         org.setLatitude(latitude);
         org.setGuid(this.guid);
         org.setEkisId(ekisId.equals(0L) ? null : ekisId);
+        org.setEgissoId(egissoId);
         org.setPhone(this.phone);
         org.setSmsSender(this.smsSender);
         if (StringUtils.isNotEmpty(plainSsoPassword)) {

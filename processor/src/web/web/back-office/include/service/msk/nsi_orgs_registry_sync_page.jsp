@@ -204,6 +204,12 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
+                            <h:outputText value="ЕКИС ид" />
+                        </f:facet>
+                        <h:outputText value="#{org.ekisId}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
                             <h:outputText value="№ здания" />
                         </f:facet>
                         <h:outputText value="#{org.uniqueAddressId}" escape="false" />
@@ -234,6 +240,12 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
+                            <h:outputText value="Короткий адрес" />
+                        </f:facet>
+                        <h:outputText value="#{org.shortAddress}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
                             <h:outputText value="Полное наименование" />
                         </f:facet>
                         <h:outputText value="#{org.officialName}" escape="false" />
@@ -243,12 +255,6 @@
                             <h:outputText value="Краткое наименование" />
                         </f:facet>
                         <h:outputText value="#{org.shortName}" escape="false" />
-                    </rich:column>
-                    <rich:column>
-                        <f:facet name="header">
-                            <h:outputText value="Очередь внедрения" />
-                        </f:facet>
-                        <h:outputText value="#{org.introductionQueue}" escape="false" />
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
