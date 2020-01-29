@@ -82,6 +82,8 @@ public class CardRegistrationService {
         if (null == card) {
             blockAllOtherClientCards(session, client);
             Date validDate = CalendarUtils.addYear(new Date(), 12);
+            if (client.getCards() != null && client.getCards().size() > 0)
+                validDate = CalendarUtils.addDays(new Date(), 10);
             RuntimeContext.getInstance().getCardManager().createCard(session, session.getTransaction(), client.getIdOfClient(),
                     cardId, Arrays.asList(Card.TYPE_NAMES).indexOf("Mifare"), CardState.ISSUED.getValue(), validDate,
                     Card.ISSUED_LIFE_STATE, null, new Date(), cardId);

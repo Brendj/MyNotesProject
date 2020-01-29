@@ -43,6 +43,7 @@ public class BankSubscription {
     private Set<MfrRequest> mfrRequests = new HashSet<MfrRequest>();
     private Set<RegularPayment> regularPayments = new HashSet<RegularPayment>();
     private Boolean notificationSent;
+    private String mobile;
 
     public Long getIdOfSubscription() {
         return idOfSubscription;
@@ -70,6 +71,10 @@ public class BankSubscription {
 
     public int getMonthsCount() {
         return monthsCount;
+    }
+
+    public boolean showMonthsCount() {
+        return monthsCount > 0;
     }
 
     public void setMonthsCount(int monthsCount) {
@@ -251,5 +256,13 @@ public class BankSubscription {
 
     public void setNotificationSent(Boolean notificationSent) {
         this.notificationSent = notificationSent;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
     }
 }

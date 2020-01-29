@@ -39,6 +39,7 @@
         <property name="expYear" column="ExpYear" type="integer"/>
         <property name="notificationSent" column="notificationSent"
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="mobile" column="mobile" type="string" length="32"/>
         <set name="mfrRequests" inverse="true" cascade="save-update" lazy="true">
             <key column="IdOfSubscription"/>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.MfrRequest"/>

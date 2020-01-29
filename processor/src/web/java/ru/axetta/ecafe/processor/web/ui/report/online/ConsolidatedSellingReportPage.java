@@ -54,6 +54,7 @@ public class ConsolidatedSellingReportPage extends OnlineReportWithContragentPag
     private ConsolidatedSellingReport consolidatedSellingReport;
     private String htmlReport;
     private Contragent contragent;
+    private Boolean showAllOrgs = false;
 
     @PostConstruct
     private void setDates() {
@@ -105,6 +106,7 @@ public class ConsolidatedSellingReportPage extends OnlineReportWithContragentPag
             idOfOrgString = StringUtils.join(idOfOrgList.iterator(), ",");
         }
         properties.setProperty(ReportPropertiesUtils.P_ID_OF_ORG, idOfOrgString);
+        properties.setProperty(ConsolidatedSellingReportBuilder.SHOW_ALL_ORGS, showAllOrgs ? "1" : "0");
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         BasicReportJob report = null;
@@ -191,5 +193,13 @@ public class ConsolidatedSellingReportPage extends OnlineReportWithContragentPag
 
     public void setContragent(Contragent contragent) {
         this.contragent = contragent;
+    }
+
+    public Boolean getShowAllOrgs() {
+        return showAllOrgs;
+    }
+
+    public void setShowAllOrgs(Boolean showAllOrgs) {
+        this.showAllOrgs = showAllOrgs;
     }
 }

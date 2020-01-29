@@ -359,6 +359,10 @@
                                        reRender="workspaceTogglePanel, optionPanelGrid" styleClass="command-button" />
                     <a4j:commandButton value="Выключить" action="#{optionPage.turnOffSverka()}" rendered="#{optionPage.isSverkaEnabled()}"
                                        reRender="workspaceTogglePanel, optionPanelGrid" styleClass="command-button" />
+                    <h:outputText escape="true" value="Версия НСИ" styleClass="output-text" />
+                    <h:selectOneMenu value="#{optionPage.nsiVersion}" styleClass="input-text">
+                        <f:selectItems value="#{optionPage.nsiVersions}" />
+                    </h:selectOneMenu>
                     <h:outputText escape="true" value="Производить автоматическую сверку клиентов"
                                                        styleClass="output-text" />
                     <h:selectBooleanCheckbox value="#{optionPage.syncRegisterClients}" styleClass="output-text" />

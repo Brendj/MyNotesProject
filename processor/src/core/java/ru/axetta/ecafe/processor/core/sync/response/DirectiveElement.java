@@ -54,7 +54,7 @@ public class DirectiveElement implements AbstractToElement{
         directiveItemList.add(new DirectiveItem("DoRequestsEZDSync", (org.getHaveNewLP())?"1":"0"));
 
         Boolean preorderSync = org.getPreorderSyncParam();
-        if(preorderSync) {
+        if(preorderSync != null && preorderSync) {
             directiveItemList.add(new DirectiveItem("PreorderSync","1"));
             DAOUtils.savePreorderDirectiveWithValue(session, org.getIdOfOrg(), false);
         }
