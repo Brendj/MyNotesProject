@@ -190,6 +190,28 @@ public class TaloonApprovalVerificationPage extends BasicWorkspacePage implement
         }
     }
 
+    public boolean allowedSetFirstFlagPeriod() {
+        for (TaloonApprovalVerificationItem item : items) {
+            for (TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail : item.getDetails()) {
+                if (detail.allowedSetFirstFlag()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
+    public boolean allowedClearFirstFlagPeriod() {
+        for (TaloonApprovalVerificationItem item : items) {
+            for (TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail : item.getDetails()) {
+                if (detail.allowedClearFirstFlag()) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
+
     public String getFilter() {
         return filter;
     }

@@ -43,6 +43,7 @@ public class TaloonApprovalVerificationItem {
     }
 
     public static class TaloonApprovalVerificationItemDetail {
+
         private String taloonName;
         private Long idOfOrgCreated;
         private Integer soldedQty;
@@ -58,11 +59,13 @@ public class TaloonApprovalVerificationItem {
         private String goodsGuid;
         private String remarks;
 
-        public TaloonApprovalVerificationItemDetail() {}
+        public TaloonApprovalVerificationItemDetail() {
+        }
 
-        public TaloonApprovalVerificationItemDetail(String taloonName, Long idOfOrgCreated, Integer soldedQty, Integer requestedQty,
-                Integer shippedQty, Long price, Long summa, TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,
-                Long idOfOrg, Date taloonDate, boolean summaryDay, String goodsGuid, String remarks) {
+        public TaloonApprovalVerificationItemDetail(String taloonName, Long idOfOrgCreated, Integer soldedQty,
+                Integer requestedQty, Integer shippedQty, Long price, Long summa, TaloonISPPStatesEnum isppState,
+                TaloonPPStatesEnum ppState, Long idOfOrg, Date taloonDate, boolean summaryDay, String goodsGuid,
+                String remarks) {
             this.setTaloonName(taloonName);
             this.setIdOfOrgCreated(idOfOrgCreated);
             this.setRequestedQty(requestedQty);
@@ -168,7 +171,11 @@ public class TaloonApprovalVerificationItem {
         }
 
         public boolean isPpStateNull() {
-            return (ppState == null && taloonDate != null);
+            return ppState == null;
+        }
+
+        public boolean isTotal() {
+            return taloonDate == null;
         }
 
         public Boolean needFillShippedQty() {
@@ -194,34 +201,39 @@ public class TaloonApprovalVerificationItem {
         }
 
         public Boolean allowedSetFirstFlag() {
-            int period = getPeriod();
-            if (period == 1) {
-                if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED) {
-                    return false;
-                } else {
-                    return true;
+            if (!isTotal()) {
+                int period = getPeriod();
+                if (period == 1) {
+                    if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED
+                            && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
-            }
-            if (period == 2 || period == 3) {
-                if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
-                    return false;
-                } else {
-                    return true;
+                if (period == 2 || period == 3) {
+                    if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
             }
             return true;
         }
 
         public Boolean allowedClearFirstFlag() {
-            int period = getPeriod();
-            if (period == 1) {
-                return false;
-            }
-            if (period == 2 || period == 3) {
-                if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
+            if (!isTotal()) {
+                int period = getPeriod();
+                if (period == 1) {
                     return false;
-                } else {
-                    return true;
+                }
+                if (period == 2 || period == 3) {
+                    if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
+                        return false;
+                    } else {
+                        return true;
+                    }
                 }
             }
             return true;
@@ -245,7 +257,8 @@ public class TaloonApprovalVerificationItem {
         public Boolean allowedClearSecondFlag() {
             int period = getPeriod();
             if (period == 1) {
-                if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
+                if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED
+                        && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
                     return true;
                 } else {
                     return false;
@@ -262,13 +275,18 @@ public class TaloonApprovalVerificationItem {
         }
 
         public Boolean enableEditShippedQty() {
-            if (summaryDay) return false;
+            if (summaryDay) {
+                return false;
+            }
             Date currentDate = new Date();
             Date firstMonthDate = CalendarUtils.getFirstDayOfNextMonth(taloonDate);
             Date redDate = CalendarUtils.addDays(firstMonthDate, 5);
-            if (currentDate.after(redDate)) return false;
+            if (currentDate.after(redDate)) {
+                return false;
+            }
 
-            if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED || ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
+            if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED
+                    || ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
                 return true;
             } else {
                 return false;
@@ -276,7 +294,9 @@ public class TaloonApprovalVerificationItem {
         }
 
         public void performConfirm() {
-            if (this.ppState == null) return;
+            if (this.ppState == null) {
+                return;
+            }
             this.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
         }
 
@@ -344,6 +364,7 @@ public class TaloonApprovalVerificationItem {
         public Boolean getRemarksEmpty() {
             return StringUtils.isEmpty(remarks);
         }
+
     }
 
 }
