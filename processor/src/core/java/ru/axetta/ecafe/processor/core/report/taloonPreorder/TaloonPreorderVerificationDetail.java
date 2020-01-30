@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.report.taloonPreorder;
 import ru.axetta.ecafe.processor.core.persistence.TaloonISPPStatesEnum;
 import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.web.ui.report.online.TaloonPreorderVerificationPage;
 
 import org.apache.commons.lang.StringUtils;
 
@@ -519,7 +518,6 @@ public class TaloonPreorderVerificationDetail {
 
     private void changePpState(TaloonPPStatesEnum ppState) {
         TaloonPreorderVerificationItem item;
-        TaloonPreorderVerificationPage page;
         this.ppState = ppState;
         item = this.getComplex().getItem();
         if(item != null) {
