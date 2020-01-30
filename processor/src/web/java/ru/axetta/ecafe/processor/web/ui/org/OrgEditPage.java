@@ -136,6 +136,8 @@ public class OrgEditPage extends BasicWorkspacePage
     private Boolean participantOP;
     private Boolean preorderlp;
 
+    private Boolean useWebArm;
+
     public String getDefaultSupplierMode() {
         return DEFAULT_SUPPLIER;
     }
@@ -413,6 +415,7 @@ public class OrgEditPage extends BasicWorkspacePage
 
         org.setRequestForVisitsToOtherOrg(requestForVisitsToOtherOrg);
         org.setPreorderlp(preorderlp);
+        org.setUseWebArm(useWebArm);
 
         session.update(org);
         fill(org);
@@ -566,6 +569,7 @@ public class OrgEditPage extends BasicWorkspacePage
         this.multiCardModeEnabled = org.multiCardModeIsEnabled();
         this.participantOP = org.getParticipantOP();
         this.preorderlp = org.getPreorderlp();
+        this.useWebArm = org.getUseWebArm();
     }
 
     public void checkCommodityAccountingConfiguration(Session session) throws Exception{
@@ -1192,6 +1196,14 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setEkisId(Long ekisId) {
         this.ekisId = ekisId;
+    }
+
+    public Boolean getUseWebArm() {
+        return useWebArm;
+    }
+
+    public void setUseWebArm(Boolean useWebArm) {
+        this.useWebArm = useWebArm;
     }
 
     public String getEgissoId() {

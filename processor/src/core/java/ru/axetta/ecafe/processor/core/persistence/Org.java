@@ -155,6 +155,7 @@ public class Org implements Serializable {
     private Boolean haveNewLP;
     private Long ekisId;
     private Boolean preorderSyncParam;
+    private Boolean useWebArm;
     private String egissoId;
     private String municipalDistrict;
 
@@ -219,6 +220,7 @@ public class Org implements Serializable {
         this.helpdeskEnabled = false;
         this.requestForVisitsToOtherOrg = false;
         this.preordersEnabled = false;
+        this.useWebArm = false;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -1251,5 +1253,13 @@ public class Org implements Serializable {
 
     public Boolean getMainBuilding() {
         return mainBuilding;
+    }
+
+    public Boolean getUseWebArm() {
+        return useWebArm;
+    }
+
+    public void setUseWebArm(Boolean useWebArm) {
+        this.useWebArm = useWebArm;
     }
 }
