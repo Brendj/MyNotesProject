@@ -238,8 +238,9 @@ public class Client {
         return null;
     }
 
-    public boolean isParentGroup() {
-        return idOfClientGroup != null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+    public boolean isParentMsk() {
+        return !isStudent() && !isSotrudnikMsk();
+        //return idOfClientGroup != null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
     }
 
     public boolean isStudent() {

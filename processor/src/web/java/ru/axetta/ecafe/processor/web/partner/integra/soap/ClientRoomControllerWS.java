@@ -9295,20 +9295,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Map<Integer, Integer> map = new HashMap<>();
         boolean isStudent = false;
         boolean isParent = false;
+        boolean isTrueParent = false;
         boolean isEmployee = false;
+        boolean isEmployeeParent = false;
         for (Client client : clients) {
             int type = 0;
             if (client.isStudent()) {
                 type = ClientGroupResult.STUDENT;
                 isStudent = true;
             }
-            if (client.isParentGroup()) {
+            if (client.isParentMsk()) {
                 type = ClientGroupResult.PARENT;
                 isParent = true;
+                isTrueParent = ClientManager.clientHasChildren(session, client.getIdOfClient());
             }
             if (client.isSotrudnikMsk()) {
                 type = ClientGroupResult.EMPLOYEE;
                 isEmployee = true;
+                isEmployeeParent = ClientManager.clientHasChildren(session, client.getIdOfClient());
             }
             if (type == 0) continue;
             Integer count = map.get(type);
@@ -9325,24 +9329,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return new ClientGroupResult(RC_PREORDERS_NOT_UNIQUE_CLIENT, RC_PREORDERS_NOT_UNIQUE_CLIENT_DESC);
         }
         Integer value;
-        if (isParent && isEmployee)
+        if (isEmployeeParent && !isStudent && !isParent)
             value = ClientGroupResult.PARENT_EMPLOYEE;
+        else if (isTrueParent && !isStudent && !isEmployee)
+            value = ClientGroupResult.PARENT;
         else if (isEmployee && !isStudent && !isParent)
             value = ClientGroupResult.EMPLOYEE;
-        else if (isParent && !isStudent && !isEmployee)
-            value = ClientGroupResult.PARENT;
         else if (isStudent && !isEmployee && !isParent)
             value = ClientGroupResult.STUDENT;
         else value = null;
         if (value == null) return new ClientGroupResult(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
-
-        if (value.equals(ClientGroupResult.EMPLOYEE)) {
-            Criteria criteria = session.createCriteria(ClientGuardian.class);
-            criteria.add(Restrictions.eq("idOfGuardian", clients.get(0).getIdOfClient()));
-            criteria.add(Restrictions.ne("deletedState", true));
-            criteria.add(Restrictions.ne("disabled", true));
-            if (criteria.list().size() > 0) value = ClientGroupResult.PARENT_EMPLOYEE;
-        }
 
         ClientGroupResult result = new ClientGroupResult(RC_OK, RC_OK_DESC);
         result.setValue(value);

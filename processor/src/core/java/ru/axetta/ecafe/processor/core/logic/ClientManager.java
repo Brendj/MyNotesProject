@@ -1619,6 +1619,15 @@ public class ClientManager {
         return wardItems;
     }
 
+    public static boolean clientHasChildren(Session session, Long idOfClient) {
+        Criteria criteria = session.createCriteria(ClientGuardian.class);
+        criteria.add(Restrictions.eq("idOfGuardian", idOfClient));
+        criteria.add(Restrictions.eq("deletedState", false));
+        criteria.add(Restrictions.eq("disabled", false));
+        return criteria.list().size() > 0;
+
+    }
+
     public static List<NotificationSettingItem> getNotificationSettings(ClientGuardian clientGuardian) {
         Set<ClientGuardianNotificationSetting> settings = clientGuardian.getNotificationSettings();
         List<NotificationSettingItem> notificationSettings = new ArrayList<NotificationSettingItem>();
