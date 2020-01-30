@@ -11,6 +11,9 @@
             <generator class="identity"/>
         </id>
         <property name="armComplexId" column="armComplexId" type="integer" not-null="true"/>
+        <property name="idOfOrgOnCreate" column="idOfOrgOnCreate" type="long" />
+        <property name="idOfConfigurationProoviderOnCreate" column="idOfConfigurationProoviderOnCreate" type="long" />
+        <property name="complexName" column="complexName" type="string" />
         <property name="planOrdersRestrictionType" column="planType" not-null="true">
             <type name="org.hibernate.type.EnumType">
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.PlanOrdersRestrictionType</param>
@@ -22,10 +25,6 @@
         <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
         <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client"
                      column="IdOfClient" not-null="true" fetch="select"/>
-        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org"
-                     column="IdOfOrg" not-null="true" fetch="select"/>
-        <many-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent"
-                     column="IdOfContragent" not-null="true" fetch="select"/>
     </class>
 </hibernate-mapping>
 

@@ -12,8 +12,9 @@ import java.util.Date;
 public class PlanOrdersRestriction {
     private Long idOfPlanOrdersRestriction;
     private Client client;
-    private Org org;
-    private Contragent contragent;
+    private Long idOfOrgOnCreate;
+    private Long idOfConfigurationProoviderOnCreate;
+    private String complexName;
     private Integer armComplexId;
     private PlanOrdersRestrictionType planOrdersRestrictionType;
     private Long version;
@@ -39,22 +40,6 @@ public class PlanOrdersRestriction {
 
     public void setClient(Client client) {
         this.client = client;
-    }
-
-    public Org getOrg() {
-        return org;
-    }
-
-    public void setOrg(Org org) {
-        this.org = org;
-    }
-
-    public Contragent getContragent() {
-        return contragent;
-    }
-
-    public void setContragent(Contragent contragent) {
-        this.contragent = contragent;
     }
 
     public Integer getArmComplexId() {
@@ -103,5 +88,29 @@ public class PlanOrdersRestriction {
 
     public void setDeletedState(Boolean deletedState) {
         this.deletedState = deletedState;
+    }
+
+    public Long getIdOfOrgOnCreate() {
+        return idOfOrgOnCreate;
+    }
+
+    public void setIdOfOrgOnCreate(Long idOfOrgOnCreate) {
+        this.idOfOrgOnCreate = idOfOrgOnCreate;
+    }
+
+    public Long getIdOfConfigurationProoviderOnCreate() {
+        return idOfConfigurationProoviderOnCreate;
+    }
+
+    public void setIdOfConfigurationProoviderOnCreate(Long idOfConfigurationProoviderOnCreate) {
+        this.idOfConfigurationProoviderOnCreate = idOfConfigurationProoviderOnCreate;
+    }
+
+    public String getComplexName() {
+        return complexName;
+    }
+
+    public void setComplexName(String complexName) {
+        this.complexName = complexName;
     }
 }

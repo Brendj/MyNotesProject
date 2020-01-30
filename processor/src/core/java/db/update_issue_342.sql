@@ -8,8 +8,9 @@ create table cf_plan_orders_restrictions
 (
   idOfPlanOrdersRestriction bigserial,
   idOfClient bigint not null,
-  idOfOrg bigint not null,
-  idOfContragent bigint not null,
+  idOfOrgOnCreate bigint,
+  idOfConfigurationProoviderOnCreate bigint,
+  complexName character varying(128),
   armComplexId integer not null,
   planType integer not null,
   version bigint not null,
