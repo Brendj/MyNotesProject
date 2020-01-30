@@ -117,8 +117,8 @@ public class GeoplanerManager {
             HibernateUtils.rollback(hibernateTransaction, logger);
             HibernateUtils.close(session, logger);
         }
-        saveJournal(errorText, statusCode, statusCode != null,  client, null, EventType.PURCHASES.ordinal(),
-                null, purchases.getIdOfOrder(), null, purchases.getIdOfOrg());
+        saveJournal(errorText, statusCode, statusCode != null,  client, purchases.getIdOfOrg() == null ? client.getOrg() : null,
+                EventType.PURCHASES.ordinal(), null, purchases.getIdOfOrder(), null, purchases.getIdOfOrg());
     }
 
     @Async
