@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -268,8 +269,8 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         }
 
         try {
-            long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique, false);
-
+            long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique, true);
+            ClientManager.updateComment(idOfClient, MskNSIService.COMMENT_MANUAL_IMPORT);
             return new LineResult(lineNo, 0, "Ok", idOfClient);
         } catch (Exception e) {
             return new LineResult(lineNo, -1, "Ошибка: " + e.getMessage(), -1L);
