@@ -62,17 +62,17 @@ public class TaloonPreorderVerification {
                         (taloon.getPrice() == null || taloon.getRequestedQty() == null) ? 0
                                 : taloon.getPrice() * taloon.getRequestedQty(), taloon.getSoldQty(),
                         (taloon.getPrice() == null || taloon.getSoldQty() == null) ? 0
-                                : taloon.getPrice() * taloon.getSoldQty(), taloon.getShippedQty(),
-                        (taloon.getPrice() == null || taloon.getShippedQty() == null) ? 0
-                                : taloon.getPrice() * taloon.getShippedQty(), taloon.getReservedQty(),
+                                : taloon.getPrice() * taloon.getSoldQty(), taloon.getRequestedQty(),
+                        (taloon.getPrice() == null || taloon.getRequestedQty() == null) ? 0
+                                : taloon.getPrice() * taloon.getRequestedQty(), taloon.getReservedQty(),
                         (taloon.getPrice() == null || taloon.getReservedQty() == null) ? 0
                                 : taloon.getPrice() * taloon.getReservedQty(), taloon.getBlockedQty(),
                         (taloon.getPrice() == null || taloon.getBlockedQty() == null) ? 0
                                 : taloon.getPrice() * taloon.getBlockedQty(),
-                        (taloon.getShippedQty() == null || taloon.getSoldQty() == null) ? 0
-                                : (taloon.getShippedQty() - taloon.getSoldQty()),
-                        (taloon.getPrice() == null || taloon.getShippedQty() == null || taloon.getSoldQty() == null) ? 0
-                                : taloon.getPrice() * (taloon.getShippedQty() - taloon.getSoldQty()),
+                        (taloon.getRequestedQty() == null || taloon.getSoldQty() == null) ? 0
+                                : (taloon.getRequestedQty() - taloon.getSoldQty()),
+                        (taloon.getPrice() == null || taloon.getRequestedQty() == null || taloon.getSoldQty() == null) ? 0
+                                : taloon.getPrice() * (taloon.getRequestedQty() - taloon.getSoldQty()),
                         taloon.getIsppState(), taloon.getPpState(), taloon.getRemarks(), taloon.getComments(), false);
 
                 addComplexToMap(item, complexMap, date, detail, taloon.getComplexId(), taloon.getComplexName());
