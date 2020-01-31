@@ -688,6 +688,9 @@
                     <h:outputText escape="true" value="ID пополнения клиента" styleClass="column-header"/>
                 </rich:column>
                 <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Сервер отправки" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Дата создания записи" styleClass="column-header"/>
                 </rich:column>
                 <rich:column headerClass="column-header">
@@ -712,6 +715,9 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <h:outputText escape="true" value="#{geoplanerJournal.idOfClientPayment}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.nodeName}" styleClass="output-text"/>
         </rich:column>
         <rich:column headerClass="column-header">
             <h:outputText escape="true" value="#{geoplanerJournal.createDate}" styleClass="output-text" converter="timeMinuteConverter"/>

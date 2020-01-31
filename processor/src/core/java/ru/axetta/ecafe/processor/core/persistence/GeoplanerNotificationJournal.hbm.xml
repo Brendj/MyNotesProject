@@ -18,6 +18,7 @@
         <property name="idOfOrder" column="idOfOrder" type="long"/>
         <property name="idOfClientPayment" column="idOfClientPayment" type="long"/>
         <property name="errorText" column="errortext" type="string"/>
+        <property name="nodeName" column="nodeName" type="string"/>
         <many-to-one name="org" column="idOfOrg" class="ru.axetta.ecafe.processor.core.persistence.Org" not-null="true"/>
         <many-to-one name="client" column="idOfClient" class="ru.axetta.ecafe.processor.core.persistence.Client" not-null="true"/>
     </class>

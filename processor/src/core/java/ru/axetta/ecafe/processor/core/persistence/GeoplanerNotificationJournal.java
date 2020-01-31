@@ -18,6 +18,7 @@ public class GeoplanerNotificationJournal {
     private Boolean isSend = false;
     private Date createDate;
     private String errorText;
+    private String nodeName;
 
     public GeoplanerNotificationJournal() {
         // for hibernate
@@ -111,9 +112,18 @@ public class GeoplanerNotificationJournal {
         this.errorText = errorText;
     }
 
+    public String getNodeName() {
+        return nodeName;
+    }
+
+    public void setNodeName(String nodeName) {
+        this.nodeName = nodeName;
+    }
+
     public static class Builder {
         public static GeoplanerNotificationJournal build(String errorText, Integer responseCode, Boolean isSend,
-                Client client, Org org, Integer eventType, Long idOfEnterEvents, Long idOfOrder, Long idOfClientPayment){
+                Client client, Org org, Integer eventType, Long idOfEnterEvents, Long idOfOrder,
+                Long idOfClientPayment, String nodeName){
             GeoplanerNotificationJournal journal = new GeoplanerNotificationJournal();
             journal.setClient(client);
             journal.setOrg(org);
@@ -125,6 +135,7 @@ public class GeoplanerNotificationJournal {
             journal.setIsSend(isSend);
             journal.setResponse(responseCode);
             journal.setEventType(eventType);
+            journal.setNodeName(nodeName);
 
             return journal;
         }

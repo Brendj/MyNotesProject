@@ -72,7 +72,7 @@ public class GeoplanerManager {
             transaction = null;
         } catch (Exception e) {
             logger.error("Can't send EnterEventSendInfo to Geoplaner App: ", e);
-            errorText = e.getMessage();
+            errorText = String.format("%s: %s", e.getClass().getSimpleName(), e.getMessage());
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -112,7 +112,7 @@ public class GeoplanerManager {
             hibernateTransaction = null;
         } catch (Exception e) {
             logger.error("Can't send PurchasesInfo to Geoplaner App: ", e);
-            errorText = e.getMessage();
+            errorText = String.format("%s: %s", e.getClass().getSimpleName(), e.getMessage());
         } finally {
             HibernateUtils.rollback(hibernateTransaction, logger);
             HibernateUtils.close(session, logger);
@@ -150,7 +150,7 @@ public class GeoplanerManager {
             hibernateTransaction = null;
         } catch (Exception e) {
             logger.error("Can't send clientPayment to Geoplaner App: ", e);
-            errorText = e.getMessage();
+            errorText = String.format("%s: %s", e.getClass().getSimpleName(), e.getMessage());
         } finally {
             HibernateUtils.rollback(hibernateTransaction, logger);
             HibernateUtils.close(session, logger);
@@ -209,7 +209,11 @@ public class GeoplanerManager {
         info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
         info.setContractId(client.getContractId());
         info.setActualBalance(client.getBalance());
-        info.setGender(CLIENT_GENDERS[client.getGender()]);
+        if(client.getGender() == null){
+            info.setGender(CLIENT_GENDERS[1]);
+        } else {
+            info.setGender(CLIENT_GENDERS[client.getGender()]);
+        }
         info.setOrderTime(purchases.getTime());
         info.setOrderType(purchases.getOrderType().ordinal());
         info.setRSum(purchases.getRSum());
@@ -234,7 +238,11 @@ public class GeoplanerManager {
         info.setCardType(Card.TYPE_NAMES[card.getCardType()]);
         info.setContractId(client.getContractId());
         info.setActualBalance(client.getBalance());
-        info.setGender(CLIENT_GENDERS[client.getGender()]);
+        if(client.getGender() == null){
+            info.setGender(CLIENT_GENDERS[1]);
+        } else {
+            info.setGender(CLIENT_GENDERS[client.getGender()]);
+        }
         info.setCreateTime(clientPayment.getCreateTime());
         if(clientPayment.getTransaction()!= null){
             info.setSourceType(clientPayment.getTransaction().getSourceType());
@@ -294,12 +302,15 @@ public class GeoplanerManager {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
+            String nodeName = RuntimeContext.getInstance().getNodeName();
+
             if(org == null){
                 org = (Org) session.get(Org.class, idOfOrg);
             }
 
             GeoplanerNotificationJournal journal = GeoplanerNotificationJournal.Builder
-                    .build(errorText, responseCode, isSend, client, org, eventType, idOfEnterEvents, idOfOrder, idOfClientPayment);
+                    .build(errorText, responseCode, isSend, client, org, eventType, idOfEnterEvents, idOfOrder,
+                            idOfClientPayment, nodeName);
 
             session.save(journal);
 
