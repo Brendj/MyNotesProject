@@ -45,7 +45,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
     protected static final String[] COLUMN_NAMES = new String[]{
             "Номер л/счета", "Пароль", "Статус", "Дата договора", "Договор-фамилия", "Договор-имя", "Договор-отчество",
-            "Договор-документ", "Фамилия", "Имя", "Отчество", "Документ", "Адрес", "Телефон", "Мобильный", "E-mail",
+            "Договор-документ", "Фамилия", "Имя", "Отчество", "Пол(ж-0 м-1)","Документ", "Адрес", "Телефон", "Мобильный", "E-mail",
             "Платный SMS", "Уведомление по e-mail", "Уведомление по SMS", "Овердрафт", "Уведомление через PUSH",
             "Группа/класс"};
 
@@ -225,7 +225,16 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
     private LineResult createClient(ClientManager.ClientFieldConfig fieldConfig, Long idOfOrg, String line, int lineNo,
             boolean checkFullNameUnique) throws Exception {
-        String[] tokens = line.split(";", -1);
+        String[] data = line.split(";", -1);
+        String[] tokens = new String[34];
+        for (int i = 0; i < data.length; i++) {
+            if (i < 11) {
+                tokens[i] = data[i];
+            } else if (i > 11) {
+                tokens[i - 1] = data[i];
+            }
+        }
+        tokens[33] = data[11].equals("0") ? "f" : "m"; // GENDER
         try {
             fieldConfig.setValues(tokens);
         } catch (Exception e) {
@@ -253,8 +262,14 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             fieldConfig.setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup());
         }
 
+        Boolean isGenderEmpty = fieldConfig.isValueNull(ClientManager.FieldId.GENDER);
+        if (isGenderEmpty) {
+            fieldConfig.setValue(ClientManager.FieldId.GENDER, 0);
+        }
+
         try {
             long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique, false);
+
             return new LineResult(lineNo, 0, "Ok", idOfClient);
         } catch (Exception e) {
             return new LineResult(lineNo, -1, "Ошибка: " + e.getMessage(), -1L);
@@ -265,7 +280,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
     public void downloadSample() {
         String result = "\"Номер л/счета\";\"Пароль\";\"Статус\";\"Дата договора\";\"Договор-фамилия\";"
                 + "\"Договор-имя\";\"Договор-отчество\";\"Договор-документ\";\"Фамилия\";\"Имя\";"
-                + "\"Отчество\";\"Документ\";\"Адрес\";\"Телефон\";\"Мобильный\";\"E-mail\";\"Платный SMS\";"
+                + "\"Отчество\"; \"Пол(ж-0 м-1)\";\"Документ\";\"Адрес\";\"Телефон\";\"Мобильный\";\"E-mail\";\"Платный SMS\";"
                 + "\"Уведомление по e-mail\";\"Уведомление по SMS\";\"Овердрафт\";\"Уведомление через PUSH\";"
                 + "\"Группа/класс\";";
         FacesContext facesContext = FacesContext.getCurrentInstance();

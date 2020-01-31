@@ -383,7 +383,7 @@ public class ClientManager {
             if (fax != null && StringUtils.isNotEmpty(fax)) {
                 fax = Client.checkAndConvertMobile(fax);
                 if (fax == null) {
-                    throw new Exception("Неправильный формат факса");
+                    //throw new Exception("Неправильный формат факса");
                 }
                 client.setFax(fax);
             }
@@ -811,7 +811,7 @@ public class ClientManager {
             if (fax != null) {
                 fax = Client.checkAndConvertMobile(fax);
                 if (fax == null) {
-                    throw new Exception("Неправильный формат факса");
+                    //throw new Exception("Неправильный формат факса");
                 }
             }
             client.setMobile(mobilePhone);//tokens[14]);
