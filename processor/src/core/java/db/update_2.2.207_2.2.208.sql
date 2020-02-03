@@ -23,3 +23,17 @@ CREATE TABLE cf_geoplaner_notifications_journal
     errortext TEXT,
     nodename VARCHAR(32)
 );
+
+-- Сделать поле Пол обязательным. Всем "бесполым" клиентам по умолчанию устанавливается 1
+UPDATE cf_registry
+SET clientregistryversion = (SELECT max(clientregistryversion) FROM cf_registry) + 1
+WHERE idofregistry = 1;
+
+UPDATE cf_clients
+SET gender                = 1,
+    clientregistryversion = (SELECT max(clientregistryversion) FROM cf_registry)
+WHERE gender IS NULL;
+
+ALTER TABLE cf_clients
+    ALTER gender SET DEFAULT 1,
+    ALTER gender SET NOT NULL;

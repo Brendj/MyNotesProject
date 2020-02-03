@@ -881,6 +881,8 @@ public class ClientManager {
                 if (fieldConfig.getValue(FieldId.GENDER).equals("f")) {
                     client.setGender(0);
                 }
+            } else {
+                client.setGender(1); // set default as male
             }
 
             //token[33])
