@@ -11,7 +11,7 @@ import java.util.Date;
  */
 public class PlanOrdersRestriction {
     private Long idOfPlanOrdersRestriction;
-    private Client client;
+    private Long idOfClient;
     private Long idOfOrgOnCreate;
     private Long idOfConfigurationProoviderOnCreate;
     private String complexName;
@@ -23,7 +23,7 @@ public class PlanOrdersRestriction {
     private Boolean deletedState;
 
     public PlanOrdersRestriction() {
-
+        this.createdDate = new Date();
     }
 
     public Long getIdOfPlanOrdersRestriction() {
@@ -32,14 +32,6 @@ public class PlanOrdersRestriction {
 
     public void setIdOfPlanOrdersRestriction(Long idOfPlanOrdersRestriction) {
         this.idOfPlanOrdersRestriction = idOfPlanOrdersRestriction;
-    }
-
-    public Client getClient() {
-        return client;
-    }
-
-    public void setClient(Client client) {
-        this.client = client;
     }
 
     public Integer getArmComplexId() {
@@ -112,5 +104,13 @@ public class PlanOrdersRestriction {
 
     public void setComplexName(String complexName) {
         this.complexName = complexName;
+    }
+
+    public Long getIdOfClient() {
+        return idOfClient;
+    }
+
+    public void setIdOfClient(Long idOfClient) {
+        this.idOfClient = idOfClient;
     }
 }

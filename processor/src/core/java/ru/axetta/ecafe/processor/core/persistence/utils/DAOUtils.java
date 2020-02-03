@@ -2690,6 +2690,17 @@ public class DAOUtils {
         return version;
     }
 
+    //todo Можно переделать все получения версии без for update на этот метод
+    public static long nextVersionByTableWithoutLock(Session session, String tableName) {
+        long version = 0L;
+        Query query = session.createSQLQuery(String.format("select t.version from %s as t order by t.version desc limit 1", tableName));
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
     public static long nextVersionByComplexSchedule(Session session){
         long version = 0L;
         Query query = session.createSQLQuery("select s.version from cf_complex_schedules as s order by s.version desc limit 1 for update");
@@ -2794,6 +2805,25 @@ public class DAOUtils {
             version = Long.valueOf(o.toString())+1;
         }
         return version;
+    }
+
+    public static PlanOrdersRestriction findPlanOrdersRestriction(Session session, Long idOfClient, Long idOfOrg, Integer complexId) {
+        Query query = session.createQuery("select p from PlanOrdersRestriction p where p.client.idOfClient = :idOfClient "
+                + "and p.idOfOrgOnCreate = :idOfOrg and p.armComplexId = :complexId");
+        query.setParameter("idOfClient", idOfClient);
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("complexId", complexId);
+        List<PlanOrdersRestriction> list = query.list();
+        if (list.size() == 0)
+            return null;
+        else
+            return list.get(0);
+    }
+
+    public static List<PlanOrdersRestriction> findPlanOrdersRestrictionSinceVersion(Session session, Long maxVersion) {
+        Query query = session.createQuery("select p from PlanOrdersRestriction p where p.version > :version order by version");
+        query.setParameter("version", maxVersion);
+        return query.list();
     }
 
     public static boolean cardRequestExists(Session session, Client client) {

@@ -74,6 +74,9 @@ import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettin
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions.PlanOrdersRestrictions;
+import ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions.PlanOrdersRestrictionsProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions.PlanOrdersRestrictionsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrderFeedingProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingRequest;
@@ -329,6 +332,7 @@ public class Processor implements SyncProcessor {
         AccountsRegistry accountsRegistry = null;
         ResReestrTaloonApproval resReestrTaloonApproval = null;
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        PlanOrdersRestrictions planOrdersRestrictionsData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
         InteractiveReportData interactiveReportData = null;
         InteractiveReport interactiveReport = null;
@@ -793,6 +797,19 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
         timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processReestrTaloonApproval",
+                timeForDelta);
+
+        try {
+            if (request.getPlanOrdersRestrictionsRequest() != null) {
+                planOrdersRestrictionsData = processPlanOrdersRestrictions(request.getPlanOrdersRestrictionsRequest());
+            }
+        } catch (Exception e) {
+            String message = String.format("processPlanOrdersRestrictions: %s", e.getMessage());
+            processorUtils
+                    .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processPlanOrdersRestrictions",
                 timeForDelta);
 
         try {
@@ -3139,6 +3156,24 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return resTempCardsOperations;
+    }
+
+    private PlanOrdersRestrictions processPlanOrdersRestrictions(PlanOrdersRestrictionsRequest planOrdersRestrictionsRequest) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        PlanOrdersRestrictions planOrdersRestrictions = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            PlanOrdersRestrictionsProcessor processor = new PlanOrdersRestrictionsProcessor(persistenceSession, planOrdersRestrictionsRequest);
+            planOrdersRestrictions = processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return planOrdersRestrictions;
     }
 
     private ResReestrTaloonApproval processReestrTaloonApproval(ReestrTaloonApproval reestrTaloonApproval)

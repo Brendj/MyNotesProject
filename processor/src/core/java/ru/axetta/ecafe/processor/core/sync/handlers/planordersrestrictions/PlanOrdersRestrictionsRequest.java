@@ -16,7 +16,7 @@ import java.util.List;
  * Created by i.semenov on 28.01.2020.
  */
 public class PlanOrdersRestrictionsRequest implements SectionRequest {
-    public static final String SECTION_NAME="PlanOrdersRestrictions";
+    public static final String SECTION_NAME = "PlanOrdersRestrictions";
     private final Long maxVersion;
     private final Long orgOwner;
     private final List<PlanOrdersRestrictionItem> items;
@@ -30,8 +30,8 @@ public class PlanOrdersRestrictionsRequest implements SectionRequest {
         Node itemNode = planOrdersRestrictionsRequestNode.getFirstChild();
         while (null != itemNode) {
             if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("RTA")) {
-                PlanOrdersRestrictionItem item = PlanOrdersRestrictionItem.build(itemNode, orgOwner);
-                items.add(item);
+                PlanOrdersRestrictionItem item = PlanOrdersRestrictionItem.build(itemNode);
+                getItems().add(item);
             }
             itemNode = itemNode.getNextSibling();
         }
@@ -48,5 +48,9 @@ public class PlanOrdersRestrictionsRequest implements SectionRequest {
     @Override
     public String getRequestSectionName() {
         return SECTION_NAME;
+    }
+
+    public List<PlanOrdersRestrictionItem> getItems() {
+        return items;
     }
 }

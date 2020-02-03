@@ -23,7 +23,8 @@ create table cf_plan_orders_restrictions
   ON UPDATE NO ACTION ON DELETE NO ACTION,
   constraint cf_plan_orders_restrictions_org_fk foreign key (idoforgoncreate)
   REFERENCES cf_orgs (idoforg) MATCH SIMPLE
-  ON UPDATE NO ACTION ON DELETE NO ACTION
+  ON UPDATE NO ACTION ON DELETE NO ACTION,
+  CONSTRAINT cf_plan_orders_restrictions_unique UNIQUE (idOfClient, idOfOrgOnCreate, armComplexId)
 );
 
 CREATE INDEX cf_plan_orders_restrictions_version_idx ON cf_plan_orders_restrictions USING btree (version);
