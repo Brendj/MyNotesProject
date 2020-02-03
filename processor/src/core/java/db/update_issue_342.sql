@@ -21,11 +21,8 @@ create table cf_plan_orders_restrictions
   constraint cf_plan_orders_restrictions_client_fk foreign key (idofclient)
   REFERENCES cf_clients (idofclient) MATCH SIMPLE
   ON UPDATE NO ACTION ON DELETE NO ACTION,
-  constraint cf_plan_orders_restrictions_org_fk foreign key (idoforg)
+  constraint cf_plan_orders_restrictions_org_fk foreign key (idoforgoncreate)
   REFERENCES cf_orgs (idoforg) MATCH SIMPLE
-  ON UPDATE NO ACTION ON DELETE NO ACTION,
-  constraint cf_plan_orders_restrictions_contragent_fk foreign key (idofcontragent)
-  REFERENCES cf_contragents (idofcontragent) MATCH SIMPLE
   ON UPDATE NO ACTION ON DELETE NO ACTION
 );
 
