@@ -46,9 +46,9 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
     protected static final String[] COLUMN_NAMES = new String[]{
             "Номер л/счета", "Пароль", "Статус", "Дата договора", "Договор-фамилия", "Договор-имя", "Договор-отчество",
-            "Договор-документ", "Фамилия", "Имя", "Отчество", "Пол(ж-0 м-1)","Документ", "Адрес", "Телефон", "Мобильный", "E-mail",
-            "Платный SMS", "Уведомление по e-mail", "Уведомление по SMS", "Овердрафт", "Уведомление через PUSH",
-            "Группа/класс"};
+            "Договор-документ", "Фамилия", "Имя", "Отчество", "Пол(ж-0 м-1)", "Документ", "Адрес", "Телефон",
+            "Мобильный", "E-mail", "Платный SMS", "Уведомление по e-mail", "Уведомление по SMS", "Овердрафт",
+            "Уведомление через PUSH", "Группа/класс"};
 
     public static class OrgItem {
 
@@ -166,11 +166,12 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             if (lineCount > MAX_LINE_NUMBER) {
                 lineCount = MAX_LINE_NUMBER;
             }
-            List<LineResult> lineResults = new ArrayList<LineResult>((int) lineCount);
+            List<LineResult> lineResults = new ArrayList<>((int) lineCount);
             int lineNo = 0;
             int successLineNumber = 0;
             ClientManager.ClientFieldConfig fieldConfig = new ClientManager.ClientFieldConfig();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            LineResult result;
             String currLine = reader.readLine();
             while (null != currLine) {
                 fieldConfig.resetToDefaultValues();
@@ -180,8 +181,13 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
                     if (lineNo == 0) {
                         currLine = currLine.replace(UTF8_BOM, "");
                     }
+                    result = checkLength(currLine, lineNo);
+                    if (result != null) {
+                        lineResults.add(result);
+                        break;
+                    }
                     if (!isTitle(currLine)) {
-                        LineResult result = createClient(fieldConfig, this.org.getIdOfOrg(), currLine, lineNo,
+                        result = createClient(fieldConfig, this.org.getIdOfOrg(), currLine, lineNo,
                                 this.checkFullNameUnique);
                         if (result.getResultCode() == 0) {
                             ++successLineNumber;
@@ -202,7 +208,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         }
     }
 
-    private boolean isTitle(String currLine) {
+    private boolean isTitle(String currLine) throws Exception {
         String[] data = currLine.split(";");
         for (int i = 0; i < data.length; i++) {
             String str = data[i].replace("\"", "");
@@ -214,6 +220,15 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             }
         }
         return false;
+    }
+
+    private LineResult checkLength(String row, int lineNo) {
+        String[] data = row.split(";");
+        if (data.length > 0 && data.length != 23) {
+            return new LineResult(lineNo, -1, "Ошибка: " + "Количество полей в строке " + lineNo
+                    + " не совпадает с заголовком", -1L);
+        }
+        return null;
     }
 
     private void parseLineConfig(FieldProcessor.Config fc, String currLine) throws Exception {
