@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions;
 import ru.axetta.ecafe.processor.core.persistence.PlanOrdersRestriction;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -30,8 +31,13 @@ public class PlanOrdersRestrictionsProcessor {
     }
 
     public PlanOrdersRestrictions process() {
+        PlanOrdersRestrictions result = new PlanOrdersRestrictions();
         Long nextVersion = DAOUtils.nextVersionByTableWithoutLock(session, "cf_plan_orders_restrictions");
         for (PlanOrdersRestrictionItem item : planOrdersRestrictionsRequest.getItems()) {
+            if (!StringUtils.isEmpty(item.getErrorMessage())) {
+                logger.error(String.format("Error in PRI item %s : %s", item, item.getErrorMessage()));
+                continue;
+            }
             try {
                 PlanOrdersRestriction planOrdersRestriction = DAOUtils
                         .findPlanOrdersRestriction(session, item.getIdOfClient(), item.getIdOfOrg(), item.getComplexId());
@@ -54,13 +60,13 @@ public class PlanOrdersRestrictionsProcessor {
         }
         session.flush();
 
-        PlanOrdersRestrictions result = new PlanOrdersRestrictions();
         List<PlanOrdersRestrictionItem> items = new ArrayList<>();
-        List<PlanOrdersRestriction> list = DAOUtils.findPlanOrdersRestrictionSinceVersion(session, planOrdersRestrictionsRequest.getMaxVersion());
+        List<PlanOrdersRestriction> list = DAOUtils.findPlanOrdersRestrictionSinceVersion(session, planOrdersRestrictionsRequest.getMaxVersion(),
+                planOrdersRestrictionsRequest.getOrgOwner());
         for (PlanOrdersRestriction planOrdersRestriction : list) {
             PlanOrdersRestrictionItem item = new PlanOrdersRestrictionItem(planOrdersRestriction.getIdOfClient(), planOrdersRestriction.getIdOfOrgOnCreate(),
                     planOrdersRestriction.getIdOfClient(), planOrdersRestriction.getComplexName(), planOrdersRestriction.getArmComplexId(),
-                    planOrdersRestriction.getPlanOrdersRestrictionType(), planOrdersRestriction.getVersion(), planOrdersRestriction.getDeletedState());
+                    planOrdersRestriction.getPlanOrdersRestrictionType(), planOrdersRestriction.getVersion(), planOrdersRestriction.getDeletedState(), "");
             items.add(item);
         }
         result.setItems(items);

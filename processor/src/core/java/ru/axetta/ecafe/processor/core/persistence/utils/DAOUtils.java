@@ -2808,7 +2808,7 @@ public class DAOUtils {
     }
 
     public static PlanOrdersRestriction findPlanOrdersRestriction(Session session, Long idOfClient, Long idOfOrg, Integer complexId) {
-        Query query = session.createQuery("select p from PlanOrdersRestriction p where p.client.idOfClient = :idOfClient "
+        Query query = session.createQuery("select p from PlanOrdersRestriction p where p.idOfClient = :idOfClient "
                 + "and p.idOfOrgOnCreate = :idOfOrg and p.armComplexId = :complexId");
         query.setParameter("idOfClient", idOfClient);
         query.setParameter("idOfOrg", idOfOrg);
@@ -2820,9 +2820,25 @@ public class DAOUtils {
             return list.get(0);
     }
 
-    public static List<PlanOrdersRestriction> findPlanOrdersRestrictionSinceVersion(Session session, Long maxVersion) {
-        Query query = session.createQuery("select p from PlanOrdersRestriction p where p.version > :version order by version");
+    public static List<PlanOrdersRestriction> findPlanOrdersRestrictionSinceVersion(Session session, Long maxVersion, Long idOfOrg) {
+        List<PlanOrdersRestriction> result = new ArrayList<>();
+        Query query = session.createSQLQuery("select p.idOfPlanOrdersRestriction from cf_plan_orders_restrictions p join cf_clients c "
+                + "on p.idOfClient = c.idOfClient where p.version > :version and c.idOfOrg in (select friendlyorg from "
+                + "cf_friendly_organization fo where fo.currentOrg = :idOfOrg)");
         query.setParameter("version", maxVersion);
+        query.setParameter("idOfOrg", idOfOrg);
+        List list = query.list();
+        for (Object obj : list) {
+            Long id = ((BigInteger) obj).longValue();
+            PlanOrdersRestriction planOrdersRestriction = (PlanOrdersRestriction)session.load(PlanOrdersRestriction.class, id);
+            result.add(planOrdersRestriction);
+        }
+        return result;
+    }
+
+    public static List<PlanOrdersRestriction> getPlanOrdersRestrictionByClient(Session session, Long idOfClient) {
+        Query query = session.createQuery("select p from PlanOrdersRestriction p where p.idOfClient = :idOfClient");
+        query.setParameter("idOfClient", idOfClient);
         return query.list();
     }
 

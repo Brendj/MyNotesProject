@@ -800,19 +800,6 @@ public class Processor implements SyncProcessor {
                 timeForDelta);
 
         try {
-            if (request.getPlanOrdersRestrictionsRequest() != null) {
-                planOrdersRestrictionsData = processPlanOrdersRestrictions(request.getPlanOrdersRestrictionsRequest());
-            }
-        } catch (Exception e) {
-            String message = String.format("processPlanOrdersRestrictions: %s", e.getMessage());
-            processorUtils
-                    .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
-            logger.error(message, e);
-        }
-        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processPlanOrdersRestrictions",
-                timeForDelta);
-
-        try {
             if (request.getZeroTransactions() != null) {
                 zeroTransactionData = processZeroTransactionsData(request.getZeroTransactions());
                 resZeroTransactions = processZeroTransactions(request.getZeroTransactions());
@@ -1020,6 +1007,7 @@ public class Processor implements SyncProcessor {
 
         fullProcessingRequestFeeding(request, syncHistory, responseSections);
         fullProcessingClientDiscountDSZN(request, syncHistory, responseSections);
+        fullProcessingPlanOrdersRestrictionsData(request, syncHistory, responseSections);
 
         logger.info("Full sync performance info: " + performanceLogger.toString());
 
@@ -1191,6 +1179,8 @@ public class Processor implements SyncProcessor {
 
         //process SyncSetting
         fullProcessingSyncSetting(request, syncHistory, responseSections);
+
+        fullProcessingPlanOrdersRestrictionsData(request, syncHistory, responseSections);
 
         // время окончания обработки
         Date syncEndTime = new Date();
@@ -6649,6 +6639,22 @@ public class Processor implements SyncProcessor {
             }
         } catch (Exception e) {
             String message = String.format("fullProcessingRequestFeeding: %s", e.getMessage());
+            processorUtils
+                    .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingPlanOrdersRestrictionsData(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            PlanOrdersRestrictionsRequest planOrdersRestrictionsRequest = request.getPlanOrdersRestrictionsRequest();
+            if (null != planOrdersRestrictionsRequest) {
+                PlanOrdersRestrictions planOrdersRestrictionsData = processPlanOrdersRestrictions(planOrdersRestrictionsRequest);
+                addToResponseSections(planOrdersRestrictionsData, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("fullProcessingPlanOrdersRestrictionsData: %s", e.getMessage());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);

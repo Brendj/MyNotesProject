@@ -29,7 +29,7 @@ public class PlanOrdersRestrictionsRequest implements SectionRequest {
 
         Node itemNode = planOrdersRestrictionsRequestNode.getFirstChild();
         while (null != itemNode) {
-            if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("RTA")) {
+            if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("PRI")) {
                 PlanOrdersRestrictionItem item = PlanOrdersRestrictionItem.build(itemNode);
                 getItems().add(item);
             }

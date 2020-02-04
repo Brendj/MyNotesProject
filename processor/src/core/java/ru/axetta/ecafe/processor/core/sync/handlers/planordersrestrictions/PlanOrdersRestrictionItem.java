@@ -25,9 +25,10 @@ public class PlanOrdersRestrictionItem {
     private PlanOrdersRestrictionType planType;
     private Long version;
     private Boolean deletedState;
+    private String errorMessage;
 
     public PlanOrdersRestrictionItem(Long idOfClient, Long idOfOrg, Long idOfConfigarationProvider, String complexName,
-            Integer complexId, PlanOrdersRestrictionType planType, Long version, boolean deletedState) {
+            Integer complexId, PlanOrdersRestrictionType planType, Long version, boolean deletedState, String errorMessage) {
         this.idOfClient = idOfClient;
         this.idOfOrg = idOfOrg;
         this.idOfConfigarationProvider = idOfConfigarationProvider;
@@ -36,13 +37,14 @@ public class PlanOrdersRestrictionItem {
         this.planType = planType;
         this.version = version;
         this.deletedState = deletedState;
+        this.errorMessage = errorMessage;
     }
 
     @Override
     public String toString() {
-        return "{PlanOrdersRestriction: idOfClient=" + idOfClient == null ? "NULL" : idOfClient.toString() +
-                ", idOfOrg=" + idOfOrg == null ? "NULL" : idOfOrg.toString() +
-                ", complexId=" + complexId == null ? "NULL" : complexId.toString() + "}";
+        return "{PlanOrdersRestriction: idOfClient=" + (idOfClient == null ? "NULL" : idOfClient.toString()) +
+                ", idOfOrg=" + (idOfOrg == null ? "NULL" : idOfOrg.toString()) +
+                ", complexId=" + (complexId == null ? "NULL" : complexId.toString()) + "}";
     }
 
     public Element toElement(Document document) throws Exception {
@@ -55,8 +57,9 @@ public class PlanOrdersRestrictionItem {
         element.setAttribute("ComplexId", Integer.toString(complexId));
         element.setAttribute("PlanType", Integer.toString(planType.ordinal()));
         element.setAttribute("V", Long.toString(version));
-        element.setAttribute("D", deletedState ? "1" : "0");
-
+        if (deletedState) {
+            element.setAttribute("D", "1");
+        }
         return element;
     }
 
@@ -69,15 +72,16 @@ public class PlanOrdersRestrictionItem {
         Long idOfConfigurationProvider = getLongValue(itemNode, "ConfId", errorMessage);
         String complexName = XMLUtils.getAttributeValue(itemNode, "ComplexName");
         Integer complexId = null;
-        Long complexIdLong = getLongValue(itemNode, "complexId", errorMessage);
+        Long complexIdLong = getLongValue(itemNode, "ComplexId", errorMessage);
         if (complexIdLong != null) complexId = complexIdLong.intValue();
         PlanOrdersRestrictionType planType = null;
-        Long planTypeLong = getLongValue(itemNode, "planType", errorMessage);
+        Long planTypeLong = getLongValue(itemNode, "PlanType", errorMessage);
         if (planTypeLong != null) planType = PlanOrdersRestrictionType.fromInteger(planTypeLong.intValue());
-        Long version = getLongValue(itemNode, "V", errorMessage);
+        Long version = getLongValue(itemNode, "V", null);
         String deletedStr = XMLUtils.getAttributeValue(itemNode, "D");
         Boolean deletedState = deletedStr == null ? false : deletedStr.equals("1");
-        return new PlanOrdersRestrictionItem(idOfClient, idOfOrg, idOfConfigurationProvider, complexName, complexId, planType, version, deletedState);
+        return new PlanOrdersRestrictionItem(idOfClient, idOfOrg, idOfConfigurationProvider, complexName, complexId, planType,
+                version, deletedState, errorMessage.toString());
     }
 
     private static Long getLongValue(Node itemNode, String attrName, StringBuilder sb) {
@@ -87,10 +91,10 @@ public class PlanOrdersRestrictionItem {
             try {
                 result =  Long.parseLong(str);
             } catch (NumberFormatException e){
-                sb.append("NumberFormatException OrgId not found");
+                if (sb != null) sb.append(String.format("NumberFormatException in attr %s", attrName));
             }
         } else {
-            sb.append("Attribute OrgId not found");
+            if (sb != null) sb.append(String.format("Attribute %s not found", attrName));
         }
         return result;
     }
@@ -157,5 +161,13 @@ public class PlanOrdersRestrictionItem {
 
     public void setDeletedState(boolean deletedState) {
         this.deletedState = deletedState;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 }

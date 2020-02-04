@@ -4,6 +4,8 @@
 
 -- Пакет обновлений issue 342
 
+--ecafe.processor.planOrdersRestrictions.serviceNode - новый параметр в конфигурацию, имя ноды для сервисных операций по функционалу ограничения рационов
+
 create table cf_plan_orders_restrictions
 (
   idOfPlanOrdersRestriction bigserial,
@@ -23,6 +25,9 @@ create table cf_plan_orders_restrictions
   ON UPDATE NO ACTION ON DELETE NO ACTION,
   constraint cf_plan_orders_restrictions_org_fk foreign key (idoforgoncreate)
   REFERENCES cf_orgs (idoforg) MATCH SIMPLE
+  ON UPDATE NO ACTION ON DELETE NO ACTION,
+  constraint cf_plan_orders_restrictions_config_fk foreign key (idOfConfigurationProoviderOnCreate)
+  REFERENCES cf_provider_configurations (idofconfigurationprovider) MATCH SIMPLE
   ON UPDATE NO ACTION ON DELETE NO ACTION,
   CONSTRAINT cf_plan_orders_restrictions_unique UNIQUE (idOfClient, idOfOrgOnCreate, armComplexId)
 );

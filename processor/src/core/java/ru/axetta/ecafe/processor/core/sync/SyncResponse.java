@@ -26,6 +26,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.migrants.ResMigrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistry;
+import ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions.PlanOrdersRestrictions;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ResReestrTaloonApproval;
@@ -1204,6 +1205,7 @@ public class SyncResponse {
     private  OrganizationStructure organizationStructure;
     private  ResReestrTaloonApproval resReestrTaloonApproval;
     private  ReestrTaloonApprovalData reestrTaloonApprovalData;
+    private  PlanOrdersRestrictions planOrdersRestrictionsData;
     private  OrganizationComplexesStructure organizationComplexesStructure;
     private  ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData interactiveReportData;
     private  ZeroTransactionData zeroTransactionData;
@@ -1517,6 +1519,10 @@ public class SyncResponse {
 
         if (reestrTaloonApprovalData != null) {
             envelopeElement.appendChild(reestrTaloonApprovalData.toElement(document));
+        }
+
+        if (planOrdersRestrictionsData != null) {
+            envelopeElement.appendChild(planOrdersRestrictionsData.toElement(document));
         }
 
         if (organizationComplexesStructure != null) {
