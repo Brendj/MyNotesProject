@@ -122,18 +122,20 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
         }
     }
 
+    //public void deselectPpState() {
+    //    changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
+    //}
+
     public void switchPpState() {
         for (TaloonPreorderVerificationItem item : items) {
             for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
                 for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                     if (detail.equals(currentTaloonPreorderVerificationDetail)) {
                         if (currentState
-                                .equals(ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CANCEL)
-                                && !detail.needFillShippedQty()) {
+                                .equals(TaloonPreorderVerificationItem.MAKE_CANCEL) && !detail.needFillShippedQty()) {
                             detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
                         }
-                        if (currentState
-                                .equals(ru.axetta.ecafe.processor.core.report.taloonPreorder.TaloonPreorderVerificationItem.MAKE_CONFIRM)) {
+                        if (currentState.equals(TaloonPreorderVerificationItem.MAKE_CONFIRM)) {
                             detail.performConfirm();
                         }
                         break;
@@ -142,6 +144,19 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
             }
         }
     }
+
+    //public void confirmPpState() {
+    //    changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
+    //}
+    //
+    //private void changePpState(TaloonPPStatesEnum ppState) {
+    //    TaloonPreorderVerificationItem item;
+    //    this.ppState = ppState;
+    //    item = this.getComplex().getItem();
+    //    if(item != null) {
+    //        item.setPpState();
+    //    }
+    //}
 
     public void confirmPpStateAllDay() {
         changePpStateAllDay(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
