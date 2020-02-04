@@ -224,7 +224,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
     private LineResult checkLength(String row, int lineNo) {
         String[] data = row.split(";");
-        if (data.length > 0 && data.length != 23) {
+        if (data.length > 23) {
             return new LineResult(lineNo, -1, "Ошибка: " + "Количество полей в строке " + lineNo
                     + " не совпадает с заголовком", -1L);
         }
