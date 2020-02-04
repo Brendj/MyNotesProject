@@ -184,6 +184,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED = 690L;
     private static final Long RC_NOT_EDITED_DAY = 700L;
     private static final Long RC_WRONG_GROUP = 710L;
+    private static final Long RC_MOBILE_DIFFERENT_GROUPS = 711L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -236,6 +237,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_INVALID_MOBILE = "Неверный формат мобильного телефона";
     private static final String RC_INVALID_INPUT_DATA = "Неверные входные данные";
     private static final String RC_WRONG_GROUP_DESC = "Неверная группа клиента";
+    private static final String RC_MOBILE_DIFFERENT_GROUPS_DESC = "Номер принадлежит клиентам из разных групп";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -9338,7 +9340,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         else if (isStudent && !isEmployee && !isParent)
             value = ClientGroupResult.STUDENT;
         else value = null;
-        if (value == null) return new ClientGroupResult(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+        if (value == null) {
+            if (map.size() == 1) {
+                return new ClientGroupResult(RC_WRONG_GROUP, RC_WRONG_GROUP_DESC);
+            } else {
+                return new ClientGroupResult(RC_MOBILE_DIFFERENT_GROUPS, RC_MOBILE_DIFFERENT_GROUPS_DESC);
+            }
+        }
 
         ClientGroupResult result = new ClientGroupResult(RC_OK, RC_OK_DESC);
         result.setValue(value);
