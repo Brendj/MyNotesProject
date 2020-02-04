@@ -245,9 +245,12 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         String[] tokens = new String[34];
         for (int i = 0; i < data.length; i++) {
             if (i < 11) {
-                tokens[i] = data[i];
+                tokens[i] = data[i].trim();
             } else if (i > 11) {
-                tokens[i - 1] = data[i];
+                if ((i == 17 || i == 18 || i == 19) && (data[i].equals(""))) { // PAY_FOR_SMS, NOTIFY_BY_SMS, NOTIFY_BY_PUSH
+                    data[i] = "0";
+                }
+                tokens[i - 1] = data[i].trim();
             }
         }
         tokens[33] = data[11].equals("0") ? "f" : "m"; // GENDER
