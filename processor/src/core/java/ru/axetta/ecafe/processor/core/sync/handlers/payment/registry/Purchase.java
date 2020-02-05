@@ -7,8 +7,7 @@ import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.getLongValue;
-import static ru.axetta.ecafe.processor.core.utils.XMLUtils.getStringValueNullSafe;
+import static ru.axetta.ecafe.processor.core.utils.XMLUtils.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -36,6 +35,7 @@ public class Purchase {
     private final Long idOfMenu;
     private final String manufacturer;
     private final String guidPreOrderDetail;
+    private final Integer fRation;
 
     public static Purchase build(Node purchaseNode, SyncRequest.MenuGroups menuGroups) throws Exception {
         NamedNodeMap namedNodeMap = purchaseNode.getAttributes();
@@ -96,14 +96,15 @@ public class Purchase {
         String manufacturer = getStringValueNullSafe(namedNodeMap, "Manufacturer");
 
         String guidPreOrderDetail = getStringValueNullSafe(namedNodeMap, "GuidPreOrderDetail");
+        Integer fRation = getIntegerValueNullSafe(namedNodeMap, "FRation");
 
         return new Purchase(discount, socDiscount, idOfOrderDetail, name, qty, rPrice, rootMenu,
-                menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods, idOfRule, idOfMenu, manufacturer, guidPreOrderDetail);
+                menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods, idOfRule, idOfMenu, manufacturer, guidPreOrderDetail, fRation);
     }
 
     public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty,
             long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin,
-            String itemCode, String guidOfGoods, Long idOfRule, Long idOfMenu, String manufacturer, String guidPreOrderDetail) {
+            String itemCode, String guidOfGoods, Long idOfRule, Long idOfMenu, String manufacturer, String guidPreOrderDetail, Integer fRation) {
         this.discount = discount;
         this.socDiscount = socDiscount;
         this.idOfOrderDetail = idOfOrderDetail;
@@ -121,6 +122,7 @@ public class Purchase {
         this.idOfMenu = idOfMenu;
         this.manufacturer = manufacturer;
         this.guidPreOrderDetail = guidPreOrderDetail;
+        this.fRation = fRation;
     }
 
     public Long getDiscount() {
@@ -211,5 +213,9 @@ public class Purchase {
 
     public String getGuidPreOrderDetail() {
         return guidPreOrderDetail;
+    }
+
+    public Integer getfRation() {
+        return fRation;
     }
 }

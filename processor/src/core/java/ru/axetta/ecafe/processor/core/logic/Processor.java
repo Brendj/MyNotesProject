@@ -3825,13 +3825,8 @@ public class Processor implements SyncProcessor {
                             purchase.getSocDiscount(), purchase.getrPrice(), purchase.getName(), purchase.getRootMenu(),
                             purchase.getMenuGroup(), purchase.getMenuOrigin(), purchase.getMenuOutput(),
                             purchase.getType(), purchase.getIdOfMenu(), purchase.getManufacturer(),
-                            payment.getIdOfClient() == null || !MealManager.isSendToExternal);
-                    if (purchase.getItemCode() != null) {
-                        orderDetail.setItemCode(purchase.getItemCode());
-                    }
-                    if (purchase.getIdOfRule() != null) {
-                        orderDetail.setIdOfRule(purchase.getIdOfRule());
-                    }
+                            payment.getIdOfClient() == null || !MealManager.isSendToExternal, purchase.getItemCode(),
+                            purchase.getIdOfRule(), OrderDetailFRationType.fromInteger(purchase.getfRation()));
                     if (purchase.getGuidOfGoods() != null) {
                         Good good = findGoodByGuid(persistenceSession, purchase.getGuidOfGoods());
                         if (good != null) {

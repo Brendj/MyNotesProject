@@ -43,6 +43,8 @@ public class PurchaseElementExt {
     protected Integer type;
     @XmlAttribute(name = "MenuType")
     protected Integer menuType;
+    @XmlAttribute(name = "FRation")
+    private Integer fRation;
 
     public Long getIdOfOrderDetail() {
         return idOfOrderDetail;
@@ -154,5 +156,13 @@ public class PurchaseElementExt {
 
     public void setMenuType(Integer menuType) {
         this.menuType = menuType;
+    }
+
+    public Integer getfRation() {
+        return fRation;
+    }
+
+    public void setfRation(Integer fRation) {
+        this.fRation = fRation;
     }
 }

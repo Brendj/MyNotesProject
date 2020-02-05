@@ -75,6 +75,8 @@ public class PurchaseWithDetailsElementExt {
     protected Double minMg;
     @XmlAttribute(name = "MinFe")
     protected Double minFe;
+    @XmlAttribute(name = "FRation")
+    private Integer fRation;
 
     @XmlAttribute(name = "LastUpdateDate")
     @XmlSchemaType(name = "dateTime")
@@ -374,5 +376,13 @@ public class PurchaseWithDetailsElementExt {
 
     public void setLastUpdateDate(XMLGregorianCalendar lastUpdateDate) {
         this.lastUpdateDate = lastUpdateDate;
+    }
+
+    public Integer getfRation() {
+        return fRation;
+    }
+
+    public void setfRation(Integer fRation) {
+        this.fRation = fRation;
     }
 }
