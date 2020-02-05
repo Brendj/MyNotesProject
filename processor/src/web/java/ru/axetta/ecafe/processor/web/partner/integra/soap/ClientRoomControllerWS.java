@@ -2528,32 +2528,28 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private void processMenuFirstDay(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
             Date endDate) throws DatatypeConfigurationException {
+        Criteria menuCriteria = session.createCriteria(Menu.class);
+        menuCriteria.createAlias("menuDetailsInternal", "detal", JoinType.LEFT_OUTER_JOIN);
+        Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
+        fromCal.setTime(startDate);
+        toCal.setTime(endDate);
+        truncateToDayOfMonth(fromCal);
+        truncateToDayOfMonth(toCal);
+        fromCal.add(Calendar.HOUR, -1);
+        menuCriteria.add(Restrictions.eq("org", org));
+        menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
+        menuCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
+        menuCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
+        menuCriteria.add(Restrictions
+                .or(Restrictions.not(Restrictions.ilike("detal.groupName", groupNotForMos, MatchMode.ANYWHERE)),
+                        Restrictions.isNull("detal.groupName")));
+        menuCriteria.add(Restrictions.eq("detal.availableNow", 1));
+        HibernateUtils.addAscOrder(menuCriteria, "detal.groupName");
+        HibernateUtils.addAscOrder(menuCriteria, "detal.menuDetailName");
 
-        List<Menu> menuByOneDayList = getMenuByOneDay(session, startDate, org);
+        ArrayList<Menu> menus = new ArrayList<>(new HashSet(menuCriteria.list()));
 
-        if (menuByOneDayList != null) {
-            if (menuByOneDayList.size() > 1) {
-                List<Menu> menuList = new ArrayList<Menu>();
-                for (Menu menuItem : menuByOneDayList) {
-                    if (menuItem.getMenuDetails().isEmpty() || menuItem.getMenuDetails().size() < 30) {
-                        menuList.add(menuItem);
-                    }
-                }
-                if (menuList.isEmpty()) {
-                    processMenuByMaxIdOfMenu(session, startDate, endDate, objectFactory, org, data);
-                } else {
-                    if (menuList.get(0).getMenuDetails().isEmpty() || menuList.get(0).getMenuDetails().size() < 30) {
-                        processMenuByMaxIdOfMenu(session, startDate, endDate, objectFactory, org, data);
-                    } else {
-                        processMenuList(org, data, objectFactory, session, startDate, endDate);
-                    }
-                }
-            } else {
-                processMenuList(org, data, objectFactory, session, startDate, endDate);
-            }
-        } else {
-            processMenuByMaxIdOfMenu(session, startDate, endDate, objectFactory, org, data);
-        }
+        generateMenuDetail(objectFactory, menus, session, data);
     }
 
     private List<Menu> getMenuByOneDay(Session session, Date startDate, Org org) {
@@ -2579,65 +2575,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return (List<Menu>) menuByDayCriteria.list();
     }
 
-    private void processMenuByMaxIdOfMenu(Session session, Date startDate, Date endDate, ObjectFactory objectFactory,
-            Org org, Data data) throws DatatypeConfigurationException {
-        Criteria menuMaxIdCriteria = session.createCriteria(MenuDetail.class);
-        menuMaxIdCriteria.createAlias("menu", "m", JoinType.LEFT_OUTER_JOIN);
-        Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
-        fromCal.setTime(startDate);
-        truncateToDayOfMonth(fromCal);
-        truncateToDayOfMonth(toCal);
-        fromCal.add(Calendar.HOUR, -1);
-        menuMaxIdCriteria.add(Restrictions.eq("m.org", org));
-        menuMaxIdCriteria.add(Restrictions.eq("m.menuSource", Menu.ORG_MENU_SOURCE));
-        menuMaxIdCriteria.add(Restrictions.lt("m.menuDate", fromCal.getTime()));
-        menuMaxIdCriteria.add(Restrictions.like("menuPath", "%уфет%"));
-        menuMaxIdCriteria.setProjection(Projections.max("m.idOfMenu"));
-        menuMaxIdCriteria.add(Restrictions
-                .or(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)),
-                        Restrictions.isNull("groupName")));
-        Long menuMaxId = (Long) menuMaxIdCriteria.uniqueResult();
-
-        List menus = new ArrayList();
-
-        if (menuMaxId != null) {
-            Criteria menuCriteria = session.createCriteria(Menu.class);
-            menuCriteria.createAlias("menuDetailsInternal", "detal", JoinType.LEFT_OUTER_JOIN);
-            menuCriteria.add(Restrictions.eq("org", org));
-            menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
-            menuCriteria.add(Restrictions.eq("idOfMenu", menuMaxId));
-            menuCriteria.add(Restrictions
-                    .or(Restrictions.not(Restrictions.ilike("detal.groupName", groupNotForMos, MatchMode.ANYWHERE)),
-                            Restrictions.isNull("detal.groupName")));
-
-            Menu menu = (Menu) menuCriteria.uniqueResult();
-            menu.setMenuDate(startDate);
-
-
-            menus.add(menu);
-
-            startDate = CalendarUtils.addOneDay(startDate);
-        }
-        Criteria menuByDayCriteria = session.createCriteria(Menu.class);
-        menuByDayCriteria.createAlias("menuDetailsInternal", "detal", JoinType.LEFT_OUTER_JOIN);
-        fromCal.setTime(startDate);
-        toCal.setTime(endDate);
-        truncateToDayOfMonth(fromCal);
-        truncateToDayOfMonth(toCal);
-        fromCal.add(Calendar.HOUR, -1);
-        menuByDayCriteria.add(Restrictions.eq("org", org));
-        menuByDayCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
-        menuByDayCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
-        menuByDayCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
-        menuByDayCriteria.add(Restrictions
-                .or(Restrictions.not(Restrictions.ilike("detal.groupName", groupNotForMos, MatchMode.ANYWHERE)),
-                        Restrictions.isNull("detal.groupName")));
-
-        List menusRemaining = menuByDayCriteria.list();
-        menus.addAll(menusRemaining);
-        generateMenuDetail(objectFactory, menus, session, data);
-    }
-
     private void generateMenuDetail(ObjectFactory objectFactory, List menus, Session session, Data data)
             throws DatatypeConfigurationException {
 
@@ -2652,17 +2589,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
             menuDateItemExt.setDate(toXmlDateTime(menu.getMenuDate()));
 
-            Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
-            menuDetailCriteria.add(Restrictions.eq("menu", menu));
-            menuDetailCriteria.add(Restrictions.eq("availableNow", 1));
-            menuDetailCriteria.add(Restrictions
-                    .or(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)),
-                            Restrictions.isNull("groupName")));
-            HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
-            HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
-            List menuDetails = menuDetailCriteria.list();
-
-            for (Object o : menuDetails) {
+            //Получаем все menuDetail для одного Menu
+            for (Object o :  menu.getMenuDetails()) {
                 MenuDetail menuDetail = (MenuDetail) o;
                 MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
                 menuItemExt.setGroup(menuDetail.getGroupName());
@@ -3091,77 +3019,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
                 menuDateItemExt.getE().add(menuItemExt);
             }
-            menuListExt.getM().add(menuDateItemExt);
-        }
-        data.setMenuListExt(menuListExt);
-    }
-
-    private void processMenuList(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
-            Date endDate) throws DatatypeConfigurationException {
-        Criteria menuCriteria = session.createCriteria(Menu.class);
-        menuCriteria.createAlias("menuDetailsInternal", "detal", JoinType.LEFT_OUTER_JOIN);
-        Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
-        fromCal.setTime(startDate);
-        toCal.setTime(endDate);
-        truncateToDayOfMonth(fromCal);
-        truncateToDayOfMonth(toCal);
-        fromCal.add(Calendar.HOUR, -1);
-        menuCriteria.add(Restrictions.eq("org", org));
-        menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
-        menuCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
-        menuCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
-        menuCriteria.add(Restrictions
-                .or(Restrictions.not(Restrictions.ilike("detal.groupName", groupNotForMos, MatchMode.ANYWHERE)),
-                        Restrictions.isNull("detal.groupName")));
-        //menuCriteria.add(Restrictions.lt("menuDate", DateUtils.addDays(endDate, 1)));
-
-        List menus = menuCriteria.list();
-        MenuListExt menuListExt = objectFactory.createMenuListExt();
-        int nRecs = 0;
-        for (Object currObject : menus) {
-            if (nRecs++ > MAX_RECS) {
-                break;
-            }
-
-            Menu menu = (Menu) currObject;
-            MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
-            menuDateItemExt.setDate(toXmlDateTime(menu.getMenuDate()));
-
-            Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
-            menuDetailCriteria.add(Restrictions.eq("menu", menu));
-            menuDetailCriteria.add(Restrictions.eq("availableNow", 1));
-            menuDetailCriteria.add(Restrictions
-                    .or(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)),
-                            Restrictions.isNull("groupName")));
-            HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
-            HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
-            List menuDetails = menuDetailCriteria.list();
-
-            for (Object o : menuDetails) {
-                MenuDetail menuDetail = (MenuDetail) o;
-                MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-                menuItemExt.setGroup(menuDetail.getGroupName());
-                menuItemExt.setName(menuDetail.getMenuDetailName());
-                menuItemExt.setPrice(menuDetail.getPrice());
-                menuItemExt.setCalories(menuDetail.getCalories());
-                menuItemExt.setVitB1(menuDetail.getVitB1());
-                menuItemExt.setVitB2(menuDetail.getVitB2());
-                menuItemExt.setVitPp(menuDetail.getVitPp());
-                menuItemExt.setVitC(menuDetail.getVitC());
-                menuItemExt.setVitA(menuDetail.getVitA());
-                menuItemExt.setVitE(menuDetail.getVitE());
-                menuItemExt.setMinCa(menuDetail.getMinCa());
-                menuItemExt.setMinP(menuDetail.getMinP());
-                menuItemExt.setMinMg(menuDetail.getMinMg());
-                menuItemExt.setMinFe(menuDetail.getMinFe());
-                menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
-                menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
-                menuItemExt.setProtein(menuDetail.getProtein());
-                menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
-                menuItemExt.setFat(menuDetail.getFat());
-                menuDateItemExt.getE().add(menuItemExt);
-            }
-
             menuListExt.getM().add(menuDateItemExt);
         }
         data.setMenuListExt(menuListExt);
