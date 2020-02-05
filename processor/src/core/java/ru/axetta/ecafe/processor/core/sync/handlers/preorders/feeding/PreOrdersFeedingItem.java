@@ -40,7 +40,7 @@ public class PreOrdersFeedingItem {
         this.preOrderFeedingDetailList.add(feedingDetail);
 
         for (PreorderMenuDetail menuDetail : preorderComplex.getPreorderMenuDetails()) {
-            PreOrderFeedingDetail preOrderFeedingDetail = new PreOrderFeedingDetail(menuDetail,
+            PreOrderFeedingDetail preOrderFeedingDetail = new PreOrderFeedingDetail(session, menuDetail,
                     preorderComplex.getArmComplexId(), preorderComplex.getGuid());
             this.preOrderFeedingDetailList.add(preOrderFeedingDetail);
         }
