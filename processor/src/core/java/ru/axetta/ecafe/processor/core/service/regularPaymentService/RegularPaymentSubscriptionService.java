@@ -534,7 +534,7 @@ public class RegularPaymentSubscriptionService {
             pr.setResponseCode(StringUtils.trim(responseCode.getTextContent()));
             pr.setResponseCodeShortDescription(getResponseCodeShortDescription(pr.getResponseCode()));
             pr.setResponseCodeFullDescription(getResponseCodeFullDescription(pr.getResponseCode()));
-        } else if(pr.getExtendedStatus().equalsIgnoreCase("DECLINE")) {
+        } else if(pr.getExtendedStatus() != null && pr.getExtendedStatus().equalsIgnoreCase("DECLINE")) {
             pr.setResponseCodeShortDescription(getResponseCodeShortDescription(DEFAULT_RESPONSE_CODE));
             pr.setResponseCodeFullDescription(getResponseCodeFullDescription(DEFAULT_RESPONSE_CODE));
         }
