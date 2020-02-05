@@ -37,6 +37,8 @@ public class MigrantsUtils {
                                                      "Сдана в архив по истечению срока действия",      //4
                                                      "Сдана в архив по истечению срока действия"};     //5
 
+    public static final Integer MAX_MIGRANTS_FOR_QUERY = 1000;
+
     private MigrantsUtils() {
     }
 
@@ -127,11 +129,25 @@ public class MigrantsUtils {
 
     public static List<VisitReqResolutionHist> getResolutionsForMigrants(Session session, List<Migrant> migrants) throws Exception {
         if(migrants.size() < 1){
-            return new ArrayList<VisitReqResolutionHist>();
+            return new ArrayList<>();
         }
-        Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
-        criteria.add(Restrictions.in("migrant", migrants));
-        return criteria.list();
+        List<VisitReqResolutionHist> result = new ArrayList<>();
+        List<Migrant> mig_list = new ArrayList<>();
+        for (Migrant migrant : migrants) {
+            mig_list.add(migrant);
+            if (mig_list.size() > MAX_MIGRANTS_FOR_QUERY) {
+                Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
+                criteria.add(Restrictions.in("migrant", mig_list));
+                result.addAll(criteria.list());
+                mig_list.clear();
+            }
+        }
+        if (mig_list.size() > 0) {
+            Criteria criteria = session.createCriteria(VisitReqResolutionHist.class);
+            criteria.add(Restrictions.in("migrant", mig_list));
+            result.addAll(criteria.list());
+        }
+        return result;
     }
 
     public static List<Client> getActiveMigrantsForOrg(Session session, Long idOfOrg) throws Exception {
