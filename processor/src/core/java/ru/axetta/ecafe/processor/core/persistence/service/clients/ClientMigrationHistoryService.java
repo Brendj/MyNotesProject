@@ -118,6 +118,7 @@ public class ClientMigrationHistoryService {
             Session session = null;
             Transaction transaction = null;
             try {
+                session = RuntimeContext.getInstance().createPersistenceSession();
                 transaction = session.beginTransaction();
                 Long nextVersion = DAOUtils.nextVersionByTableWithoutLock(session, "cf_plan_orders_restrictions");
                 for (ClientMigration clientMigration : list) {
