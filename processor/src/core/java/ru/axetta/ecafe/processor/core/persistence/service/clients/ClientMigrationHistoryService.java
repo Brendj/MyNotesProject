@@ -125,6 +125,7 @@ public class ClientMigrationHistoryService {
                     List<PlanOrdersRestriction> planOrdersRestrictions = DAOUtils.getPlanOrdersRestrictionByClient(session, clientMigration.getClient().getIdOfClient());
                     for (PlanOrdersRestriction planOrdersRestriction : planOrdersRestrictions) {
                         planOrdersRestriction.setVersion(nextVersion);
+                        planOrdersRestriction.setLastUpdate(new Date());
                         session.update(planOrdersRestriction);
                     }
                 }
