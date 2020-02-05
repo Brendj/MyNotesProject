@@ -11,7 +11,7 @@
             <generator class="hilo">
                 <param name="table">CF_Generators</param>
                 <param name="column">IdOfComplexInfo</param>
-                <param name="max_lo">64</param>
+                <param name="max_lo">128</param>
             </generator>
         </id>
         <property name="idOfComplex" column="IdOfComplex" type="int" not-null="true" update="false"/>
