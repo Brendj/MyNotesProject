@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.items.ClientDiscountItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
@@ -124,6 +125,14 @@ public class ClientViewPage extends BasicWorkspacePage {
         return confirmVisualRecognition;
     }
 
+    public Boolean getInformedSpecialMenu() {
+        return informedSpecialMenu;
+    }
+
+    public void setInformedSpecialMenu(Boolean informedSpecialMenu) {
+        this.informedSpecialMenu = informedSpecialMenu;
+    }
+
     public static class PersonData {
 
         private final String firstName;
@@ -211,6 +220,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Long balanceToNotify;
     private Date lastConfirmMobile;
     private Boolean specialMenu;
+    private Boolean informedSpecialMenu;
     private String passportNumber;
     private String passportSeries;
     private String cardRequest;
@@ -573,6 +583,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         }
 
         this.specialMenu = client.getSpecialMenu();
+        this.informedSpecialMenu = ClientManager.getInformedSpecialMenu(session, client.getIdOfClient(), null);
         this.passportNumber = client.getPassportNumber();
         this.passportSeries = client.getPassportSeries();
         this.cardRequest = DAOUtils.getCardRequestString(session, client);
