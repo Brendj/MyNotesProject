@@ -241,26 +241,23 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
     private LineResult createClient(ClientManager.ClientFieldConfig fieldConfig, Long idOfOrg, String line, int lineNo,
             boolean checkFullNameUnique) throws Exception {
-        String[] data = line.split(";", -1);
-        String[] tokens = new String[34];
-        for (int i = 0; i < data.length; i++) {
-            if (i < 11) {
-                tokens[i] = data[i].trim();
-            } else if (i > 11) {
-                if ((i == 17 || i == 18 || i == 19) && (data[i].equals(""))) { // PAY_FOR_SMS, NOTIFY_BY_SMS, NOTIFY_BY_PUSH
-                    data[i] = "0";
-                }
-                tokens[i - 1] = data[i].trim();
-            }
-        }
-        tokens[33] = data[11].equals("0") ? "f" : "m"; // GENDER
+        String[] tokens = modifyData(line);
         try {
             fieldConfig.setValues(tokens);
         } catch (Exception e) {
             return new LineResult(lineNo, 1, e.getMessage(), null);
         }
+
+        boolean payForSmsIsNull = fieldConfig.isValueNull(ClientManager.FieldId.PAY_FOR_SMS);
+        if (payForSmsIsNull) {
+            String payForSms =
+                    RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_SEND_PAYMENT_NOTIFY_SMS_ON) ? "1"
+                            : "0";
+            fieldConfig.setValue(ClientManager.FieldId.PAY_FOR_SMS, payForSms);
+        }
+
         //если флаг установки уведомления по Push не установлен в файле загрузки, устаноавливаем значение по умолчанию в соотв. с опцией
-        Boolean notifyPushIsNull = fieldConfig.isValueNull(ClientManager.FieldId.NOTIFY_BY_PUSH);
+        boolean notifyPushIsNull = fieldConfig.isValueNull(ClientManager.FieldId.NOTIFY_BY_PUSH);
         if (notifyPushIsNull) {
             String notifyByPush =
                     RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1"
@@ -268,7 +265,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             fieldConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
         }
 
-        Boolean notifyEmailIsNull = fieldConfig.isValueNull(ClientManager.FieldId.NOTIFY_BY_EMAIL);
+        boolean notifyEmailIsNull = fieldConfig.isValueNull(ClientManager.FieldId.NOTIFY_BY_EMAIL);
         if (notifyEmailIsNull) {
             String notifyByEmail =
                     RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1"
@@ -276,14 +273,19 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             fieldConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
         }
 
-        Boolean isGroupsFieldEmpty = fieldConfig.isValueNull(ClientManager.FieldId.GROUP);
+        boolean isGroupsFieldEmpty = fieldConfig.isValueNull(ClientManager.FieldId.GROUP);
         if (isGroupsFieldEmpty) {
             fieldConfig.setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup());
         }
 
-        Boolean isGenderEmpty = fieldConfig.isValueNull(ClientManager.FieldId.GENDER);
+        boolean isGenderEmpty = fieldConfig.isValueNull(ClientManager.FieldId.GENDER);
         if (isGenderEmpty) {
             fieldConfig.setValue(ClientManager.FieldId.GENDER, 0);
+        }
+
+        boolean isContractDateEmpty = fieldConfig.isValueNull(ClientManager.FieldId.CONTRACT_DATE);
+        if (isContractDateEmpty)  {
+            fieldConfig.setValue(ClientManager.FieldId.CONTRACT_DATE, "#CURRENT_DATE");
         }
 
         try {
@@ -294,6 +296,34 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             return new LineResult(lineNo, -1, "Ошибка: " + e.getMessage(), -1L);
         }
 
+    }
+
+    private String[] modifyData(String line) {
+        String[] data = line.split(";", -1);
+        String[] tokens = new String[34];
+
+        for (int i = 0; i < data.length; i++) {
+            data[i] = data[i].trim();
+            if (i < 11) {
+                if (i == 0 && data[i].equals("")) {
+                    data[i] = "AUTO";
+                }
+                if (i == 3 && data[i].equals("")) {
+                    data[i] = "#CURRENT_DATE";
+                }
+                if ((i == 2) && data[i].equals("")) {
+                    data[i] = "0";
+                }
+                tokens[i] = data[i].trim();
+            } else if (i > 11) {
+                if ((i == 16 || i == 17 || i == 18) && data[i].equals("")) {
+                    data[i] = "0";
+                }
+                tokens[i - 1] = data[i];
+            }
+        }
+        tokens[33] = data[11].equals("0") ? "f" : "m"; // GENDER
+        return tokens;
     }
 
     public void downloadSample() {
