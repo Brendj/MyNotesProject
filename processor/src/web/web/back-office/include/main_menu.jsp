@@ -812,10 +812,6 @@
     <rich:panelMenuItem id="showJournal" label="Очередь выгрузки транзакций"
                         binding="#{journalViewPage.mainMenuComponent}" action="#{journalViewPage.show}"
                         rendered="#{mainPage.eligibleToServiceAdmin}" reRender="workspaceForm" />
-    <%--@elvariable id="fullSyncRequestPage" type="ru.axetta.ecafe.processor.web.ui.service.FullSyncRequestPage"--%>
-    <rich:panelMenuItem id="fullSyncRequestItem" label="Запрос полной синхронизации"
-                        binding="#{fullSyncRequestPage.mainMenuComponent}" action="#{fullSyncRequestPage.show}"
-                        reRender="workspaceForm" />
 
     <%--@elvariable id="usePlanOrdersRequestPage" type="ru.axetta.ecafe.processor.web.ui.service.UsePlanOrdersRequestPage"--%>
     <rich:panelMenuItem id="usePlanOrdersRequestItem" label="Запрос использования плана питания"
@@ -975,6 +971,9 @@
         <%--@elvariable id="orgSyncSettingReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncSettingReportPage"--%>
         <rich:panelMenuItem id="orgSyncSettingsReport" binding="#{orgSyncSettingReportPage.mainMenuComponent}"
                             label="Расписание синхронизации" action="#{orgSyncSettingReportPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="orgSyncRequestPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncRequestPage"--%>
+        <rich:panelMenuItem id="orgSyncRequest" binding="#{orgSyncRequestPage.mainMenuComponent}" reRender="workspaceForm"
+                            label="Запрос проведения синхронизации" action="#{orgSyncSettingReportPage.show}"/>
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 

@@ -14,8 +14,8 @@
     return;
 } %>
 
-<%--@elvariable id="fullSyncRequestPage" type="ru.axetta.ecafe.processor.web.ui.service.FullSyncRequestPage"--%>
-<h:panelGrid id="fullSyncRequestPage" binding="#{fullSyncRequestPage.pageComponent}" styleClass="borderless-grid"
+<%--@elvariable id="orgSyncRequestPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncRequestPage"--%>
+<h:panelGrid id="orgSyncRequestPage" binding="#{orgSyncRequestPage.pageComponent}" styleClass="borderless-grid"
              columns="2">
     <rich:panel>
         <f:facet name="header"><h:outputText styleClass="column-header" value="Запрос полной синхронизации" /></f:facet>
@@ -23,13 +23,13 @@
 
             <h:outputText escape="true" value="Поставщик" styleClass="output-text required-field" />
             <h:panelGroup styleClass="borderless-div">
-                <h:inputText value="#{fullSyncRequestPage.defaultSupplier.contragentName}" readonly="true"
+                <h:inputText value="#{orgSyncRequestPage.defaultSupplier.contragentName}" readonly="true"
                              styleClass="input-text" style="margin-right: 2px;" />
                 <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage()}"
                                    reRender="modalContragentSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;">
-                    <f:setPropertyActionListener value="#{true}" target="#{fullSyncRequestPage.selectReceiver}" />
+                    <f:setPropertyActionListener value="#{true}" target="#{orgSyncRequestPage.selectReceiver}" />
                     <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
                     <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
                 </a4j:commandButton>
@@ -37,19 +37,19 @@
 
             <h:outputText escape="true" value="Организации" styleClass="output-text required-field" />
             <h:panelGrid columns="2">
-                <a4j:commandButton value="..." action="#{fullSyncRequestPage.showOrgListSelectPage}"
+                <a4j:commandButton value="..." action="#{orgSyncRequestPage.showOrgListSelectPage}"
                                    reRender="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;">
                     <%--<f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.filterMode}" />--%>
-                    <f:setPropertyActionListener value="#{fullSyncRequestPage.idOfOrgList}"
+                    <f:setPropertyActionListener value="#{orgSyncRequestPage.idOfOrgList}"
                                                  target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
                 </a4j:commandButton>
-                <h:outputText styleClass="output-text" id="fullSyncRequestPageFilter" escape="true"
-                              value=" {#{fullSyncRequestPage.filter}}" />
+                <h:outputText styleClass="output-text" id="orgSyncRequestPageFilter" escape="true"
+                              value=" {#{orgSyncRequestPage.filter}}" />
             </h:panelGrid>
 
-            <a4j:commandButton value="Запросить" action="#{fullSyncRequestPage.applyFullSyncOperation}" />
+            <a4j:commandButton value="Запросить" action="#{orgSyncRequestPage.applyFullSyncOperation}" />
             <rich:spacer />
         </h:panelGrid>
         <h:panelGrid styleClass="borderless-grid">
