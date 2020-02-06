@@ -4,60 +4,71 @@
 
 -- Пакет обновлений 208
 
--- 358: Создание таблицы cf_taloon_preorder
-CREATE TABLE cf_taloon_preorder
+-- флаг "Использовать Web-АРМ"
+ALTER TABLE cf_orgs ADD COLUMN useWebArm BOOLEAN NOT NULL DEFAULT FALSE;
+
+-- Таблица журнала отправки событий в Геопланер
+CREATE TABLE cf_geoplaner_notifications_journal
 (
-    guid character varying(36) NOT NULL,
-    idoforg bigint NOT NULL,
-    taloondate bigint NOT NULL,
-    complexid bigint,
-    complexname character varying(128),
-    goodsname character varying(512),
-    goodsguid character varying(36),
-    idoforgcreated bigint,
-    soldqty integer NOT NULL,
-    requestedqty integer NOT NULL,
-    shippedqty integer,
-    reservedqty integer,
-    blockedqty integer,
-    price bigint NOT NULL,
-    createdtype integer NOT NULL,
-    taloonnumber bigint,
-    idoforgowner bigint NOT NULL,
-    version bigint NOT NULL,
-    deletedstate boolean NOT NULL DEFAULT false,
-    ispp_state integer NOT NULL DEFAULT 0,
-    pp_state integer NOT NULL DEFAULT 0,
-    idoftaloonpreorder bigint NOT NULL,
-    remarks text,
-    comments character varying(128),
-    CONSTRAINT cf_taloon_preorder_pk PRIMARY KEY (idoftaloonpreorder)
-)
-    WITH (
-        OIDS=FALSE
-    );
+    idofnotification BIGSERIAL PRIMARY KEY,
+    idofclient BIGINT REFERENCES cf_clients(idofclient),
+    idoforg BIGINT REFERENCES cf_orgs(idoforg),
+    idofenterevents BIGINT,
+    idoforder BIGINT,
+    idofclientpayment BIGINT REFERENCES cf_clientpayments(idofclientpayment),
+    eventtype INTEGER NOT NULL,
+    response INTEGER,
+    issend BOOLEAN NOT NULL DEFAULT FALSE,
+    createdate BIGINT NOT NULL,
+    errortext TEXT,
+    nodename VARCHAR(32)
+);
 
-CREATE UNIQUE INDEX cf_taloon_preorder_idoforg_taloondate_complexid_goodsguid_idx
-    ON cf_taloon_preorder
-        USING btree
-        (idoforg, taloondate, complexid, goodsguid COLLATE pg_catalog."default", price);
+-- Сделать поле Пол обязательным. Всем "бесполым" клиентам по умолчанию устанавливается 1
+UPDATE cf_registry
+SET clientregistryversion = (SELECT max(clientregistryversion) FROM cf_registry) + 1
+WHERE idofregistry = 1;
 
-CREATE INDEX cf_taloons_preorder_version_idx
-    ON cf_taloon_preorder
-        USING btree
-        (version);
+UPDATE cf_clients
+SET gender                = 1,
+    clientregistryversion = (SELECT max(clientregistryversion) FROM cf_registry)
+WHERE gender IS NULL;
 
-CREATE INDEX cf_taloons_preorder_guid_idx
-    ON cf_taloon_preorder
-        USING btree
-        (guid COLLATE pg_catalog."default");
+ALTER TABLE cf_clients
+    ALTER gender SET DEFAULT 1,
+    ALTER gender SET NOT NULL;
 
--- 358: Добавление id комплекса в cf_goods_requests_positions
-ALTER TABLE cf_goods_requests_positions
-    ADD complexId integer;
+create table cf_preorder_flags
+(
+    idofpreorderflag bigserial NOT NULL PRIMARY KEY,
+    idofclient bigint NOT NULL,
+    informedspecialmenu integer,
+    idofguardianspecialmenu bigint,
+    allowedpreorder integer,
+    idofguardianallowedpreorder bigint,
+    createddate bigint,
+    lastupdate bigint
+);
 
--- 358: Добавление индекса в cf_preorder_complex
-CREATE INDEX cf_preorder_complex_armcomplexid_idx
-    ON cf_preorder_complex
-        USING btree
-        (armcomplexid);
+insert into cf_preorder_flags(idofclient, informedspecialmenu, idofguardianspecialmenu, createddate)
+    select c.idofclient, 1, cg.idofguardian, extract(epoch from now()) * 1000
+    from cf_clients c join cf_client_guardian cg on c.idofclient = cg.idofchildren where cg.informedspecialmenu = 1;
+
+CREATE INDEX cf_preorder_flags_idofclient_idx
+ON cf_preorder_flags
+USING btree
+(idofclient);
+
+alter table cf_preorder_flags
+    ADD CONSTRAINT cf_preorder_flags_fk_client FOREIGN KEY (idofclient)
+REFERENCES cf_clients (idofclient) MATCH SIMPLE
+ON UPDATE NO ACTION ON DELETE NO ACTION,
+    ADD CONSTRAINT cf_preorder_flags_fk_specialmenu FOREIGN KEY (idofguardianspecialmenu)
+REFERENCES cf_clients (idofclient) MATCH SIMPLE
+ON UPDATE NO ACTION ON DELETE NO ACTION,
+    ADD CONSTRAINT cf_preorder_flags_fk_allowedpreorder FOREIGN KEY (idofguardianallowedpreorder)
+REFERENCES cf_clients (idofclient) MATCH SIMPLE
+ON UPDATE NO ACTION ON DELETE NO ACTION,
+    ADD CONSTRAINT cf_preorder_flags_client_informedspecialmenu_key UNIQUE (idofclient, idofguardianspecialmenu);
+
+--! ФИНАЛИЗИРОВАН 05.02.2020, НЕ МЕНЯТЬ
