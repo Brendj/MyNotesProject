@@ -973,7 +973,7 @@
                             label="Расписание синхронизации" action="#{orgSyncSettingReportPage.show}" reRender="workspaceForm" />
         <%--@elvariable id="orgSyncRequestPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncRequestPage"--%>
         <rich:panelMenuItem id="orgSyncRequest" binding="#{orgSyncRequestPage.mainMenuComponent}" reRender="workspaceForm"
-                            label="Запрос проведения синхронизации" action="#{orgSyncSettingReportPage.show}"/>
+                            label="Запрос проведения синхронизации" action="#{orgSyncRequestPage.show}"/>
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 
