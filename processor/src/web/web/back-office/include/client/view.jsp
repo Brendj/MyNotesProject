@@ -264,6 +264,12 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
+                <h:outputText escape="true" value="Самостоятельный предзаказ" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{clientGuardian.allowedPreorders}" disabled="true" readonly="true" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
                 <h:outputText escape="true" value="Законный представитель" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientGuardian.legalRepresentative}" disabled="true" readonly="true" styleClass="output-text" />
@@ -329,6 +335,12 @@
                 <h:outputText escape="true" value="Согласие на предзаказ" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientWard.informedSpecialMenu}" disabled="true" readonly="true" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Самостоятельный предзаказ" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{clientWard.allowedPreorders}" disabled="true" readonly="true" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -409,6 +421,10 @@
 
     <h:outputText escape="true" value="Особенности в питании" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.specialMenu}" disabled="true" readonly="true"
+                             styleClass="output-text" />
+
+    <h:outputText escape="true" value="Согласие на предзаказ получено" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.informedSpecialMenu}" disabled="true" readonly="true"
                              styleClass="output-text" />
 
     <h:outputText escape="true" value="Режим выдачи нескольких активных карт" styleClass="output-text" />

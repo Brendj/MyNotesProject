@@ -197,4 +197,5 @@ public class ClientGuardian {
     public Boolean isLegalRepresent(){
         return isLegalRepresent == null ? false : isLegalRepresent;
     }
+
 }

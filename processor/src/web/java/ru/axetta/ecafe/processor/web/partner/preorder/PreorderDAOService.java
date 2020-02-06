@@ -1369,6 +1369,13 @@ public class PreorderDAOService {
     }
 
     @Transactional
+    public String getAddress(Integer idOfOrg) {
+        Query query = emReport.createQuery("select o.shortAddress from Org o where o.idOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg.longValue());
+        return (String)query.getSingleResult();
+    }
+
+    @Transactional
     public Long getPreordersSum(Client client, Date startDate, Date endDate) {
         Query query = emReport.createQuery("select pc from PreorderComplex pc join fetch pc.preorderMenuDetails pmd "
                 + "where pc.client.idOfClient = :idOfClient and pc.preorderDate between :startDate and :endDate "
@@ -1398,11 +1405,11 @@ public class PreorderDAOService {
     }
 
     @Transactional(readOnly = true)
-    public Map<Date, Long> existPreordersByDate(Long idOfClient, Date startDate, Date endDate) {
-        Map map = new HashMap<Date, Long>();
-        Query query = emReport.createQuery("select sum(p.amount), p.preorderDate from PreorderComplex p "
+    public Map<Date, Long[]> existPreordersByDate(Long idOfClient, Date startDate, Date endDate) {
+        Map map = new HashMap<Date, Long[]>();
+        Query query = emReport.createQuery("select sum(p.amount), p.preorderDate, coalesce(p.idOfOrgOnCreate, p.client.org.idOfOrg) as org from PreorderComplex p "
                 + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate and p.deletedState = false "
-                + "group by p.preorderDate");
+                + "group by p.preorderDate, coalesce(p.idOfOrgOnCreate, p.client.org.idOfOrg)");
         query.setParameter("idOfClient", idOfClient);
         query.setParameter("startDate", CalendarUtils.startOfDay(startDate));
         query.setParameter("endDate", CalendarUtils.endOfDay(endDate));
@@ -1410,13 +1417,16 @@ public class PreorderDAOService {
         if (result != null) {
             for (Object obj : result) {
                 Object[] row = (Object[]) obj;
-                map.put((Date)row[1], (Long)row[0]);
+                Long[] arr = new Long[2];
+                arr[0] = (Long)row[0];//количество заказов
+                arr[1] = (Long)row[2];//ид ОО
+                map.put((Date)row[1], arr);
             }
         }
 
-        query = emReport.createQuery("select sum(p.amount), p.preorderDate from PreorderMenuDetail p "
+        query = emReport.createQuery("select sum(p.amount), p.preorderDate, coalesce(p.preorderComplex.idOfOrgOnCreate, p.client.org.idOfOrg) from PreorderMenuDetail p "
                 + "where p.client.idOfClient = :idOfClient and p.preorderDate between :startDate and :endDate and p.preorderComplex.deletedState = false "
-                + "group by p.preorderDate");
+                + "group by p.preorderDate, coalesce(p.preorderComplex.idOfOrgOnCreate, p.client.org.idOfOrg)");
         query.setParameter("idOfClient", idOfClient);
         query.setParameter("startDate", CalendarUtils.startOfDay(startDate));
         query.setParameter("endDate", CalendarUtils.endOfDay(endDate));
@@ -1426,10 +1436,14 @@ public class PreorderDAOService {
                 Object[] row = (Object[]) obj;
                 Date date2 = (Date)row[1];
                 Long amount = (Long)row[0];
+                Long idOfOrg = (Long)row[2];;
                 if (map.containsKey(date2)) {
-                    amount = amount + (Long)map.get(date2);
+                    amount = amount + ((Long[])map.get(date2))[0];
                 }
-                map.put(date2, amount);
+                Long[] arr = new Long[2];
+                arr[0] = amount;
+                arr[1] = idOfOrg;
+                map.put(date2, arr);
             }
         }
         return map;
@@ -1710,7 +1724,7 @@ public class PreorderDAOService {
 
         Date endDate = CalendarUtils.addDays(today, syncCountDays);                   //14 календарных дней вперед
 
-        Map<Date, Long> usedAmounts = existPreordersByDate(client.getIdOfClient(), today, endDate);                 //для показа есть ли предзаказы по датам
+        Map<Date, Long[]> usedAmounts = existPreordersByDate(client.getIdOfClient(), today, endDate);                 //для показа есть ли предзаказы по датам
         List<SpecialDate> specialDates = DAOReadonlyService.getInstance().getSpecialDates(today, endDate, orgId);   //выходные дни по ОО в целом или ее группам
         Integer forbiddenDays = DAOUtils.getPreorderFeedingForbiddenDays(client);                                   //дни запрета редактирования
         List<ProductionCalendar> productionCalendar = DAOReadonlyService.getInstance().getProductionCalendar(today, endDate);
@@ -1723,7 +1737,8 @@ public class PreorderDAOService {
 
             if (two_days <= forbiddenDays) {
                 c.add(Calendar.DATE, 1);
-                map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
+                map.put(CalendarUtils.dateToString(currentDate), new Integer[] {1, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate)[0].intValue(),
+                        usedAmounts.get(currentDate) == null ? client.getOrg().getIdOfOrg().intValue() : usedAmounts.get(currentDate)[1].intValue()});
                 if (!isWeekend) {
                     two_days++;
                 }
@@ -1747,7 +1762,8 @@ public class PreorderDAOService {
                     .isHolidayByProductionCalendar(currentDate, productionCalendar); //если праздничный день по производственному календарю - то запрет редактирования
 
             c.add(Calendar.DATE, 1);
-            map.put(CalendarUtils.dateToString(currentDate), new Integer[] {isWeekend ? 1 : 0, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate).intValue()});
+            map.put(CalendarUtils.dateToString(currentDate), new Integer[] {isWeekend ? 1 : 0, usedAmounts.get(currentDate) == null ? 0 : usedAmounts.get(currentDate)[0].intValue(),
+                    usedAmounts.get(currentDate) == null ? client.getOrg().getIdOfOrg().intValue() : usedAmounts.get(currentDate)[1].intValue()});
         }
         return map;
     }

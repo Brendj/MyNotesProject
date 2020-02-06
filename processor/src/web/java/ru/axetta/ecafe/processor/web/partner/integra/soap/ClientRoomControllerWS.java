@@ -17,6 +17,7 @@ import ru.axetta.ecafe.processor.core.daoservices.questionary.QuestionaryService
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.FinancialOpsManager;
+import ru.axetta.ecafe.processor.core.logic.NotInformedSpecialMenuException;
 import ru.axetta.ecafe.processor.core.partner.chronopay.ChronopayConfig;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
@@ -91,7 +92,6 @@ import javax.annotation.Resource;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
-import javax.persistence.NoResultException;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.xml.datatype.DatatypeConfigurationException;
@@ -175,12 +175,18 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     //private static final Long RC_START_WEEK_POSITION_NOT_FOUND = 620L;
     private static final Long RC_START_WEEK_POSITION_NOT_CORRECT = 630L;
     private static final Long RC_NOT_INFORMED_SPECIAL_MENU = 640L;
+    private static final Long RC_NOT_ALLOWED_PREORDERS = 641L;
+    private static final Long RC_PREORDERS_NOT_ENABLED = 642L;
+    private static final Long RC_PREORDERS_NOT_STAFF = 643L;
+    private static final Long RC_PREORDERS_NOT_UNIQUE_CLIENT = 644L;
     private static final Long RC_ORGANIZATION_NOT_FOUND = 650L;
     private static final Long RC_REQUIRED_FIELDS_ARE_NOT_FILLED = 660L;
     private static final Long RC_NOT_FOUND_MENUDETAIL = 670L;
     private static final Long RC_NOT_ENOUGH_BALANCE = 680L;
     private static final Long RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED = 690L;
     private static final Long RC_NOT_EDITED_DAY = 700L;
+    private static final Long RC_WRONG_GROUP = 710L;
+    private static final Long RC_MOBILE_DIFFERENT_GROUPS = 711L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -220,12 +226,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     //private static final String RC_START_WEEK_POSITION_NOT_FOUND_DESC = "Для циклограммы вариативного питания не указан номер стартовой недели";
     private static final String RC_START_WEEK_POSITION_NOT_CORRECT_DESC = "Номер стартовой недели некорректен";
     private static final String RC_NOT_INFORMED_SPECIAL_MENU_DESC = "Представитель не проинформирован об условиях предоставления услуги";
+    private static final String RC_NOT_ALLOWED_PREORDERS_DESC = "Клиенту  не установлен флаг разрешения самостоятельного заказа";
+    private static final String RC_PREORDERS_NOT_ENABLED_DESC = "В ОО клиента не включен функционал «Предзаказ»";
+    private static final String RC_PREORDERS_NOT_STAFF_DESC = "Клиент не принадлежит группе сотрудников";
+    private static final String RC_PREORDERS_NOT_UNIQUE_CLIENT_DESC = "Клиент из группы учащихся имеет не уникальный номер";
     private static final String RC_ORGANIZATION_NOT_FOUND_DESC = "Организация не найдена";
     private static final String RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC = "Не заполнены обязательные параметры";
     private static final String RC_NOT_FOUND_MENUDETAIL_DESC = "На данный момент блюдо в меню не найдено";
     private static final String RC_NOT_ENOUGH_BALANCE_DESC = "Недостаточно средств на балансе лицевого счета";
     private static final String RC_REQUEST_NOT_FOUND_OR_CANT_BE_DELETED_DESC = "Заявление не найдено или имеет статус, в котором удаление запрещено";
     private static final String RC_NOT_EDITED_DAY_DESC = "День недоступен для редактирования предзаказа";
+    private static final String RC_INVALID_MOBILE = "Неверный формат мобильного телефона";
+    private static final String RC_INVALID_INPUT_DATA = "Неверные входные данные";
+    private static final String RC_WRONG_GROUP_DESC = "Неверная группа клиента";
+    private static final String RC_MOBILE_DIFFERENT_GROUPS_DESC = "Номер принадлежит клиентам из разных групп";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -3752,12 +3766,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         if (result.get(row[0]) == null || (result.get(row[0]) != null && result.get(row[0])
                                 .isDisabled())) {
                             //если по клиенту инфы еще нет то добавляем, или инфа уже есть, но связка выключена, то обновляем инфу
+                            Client child = (Client) row[0];
                             ClientGuardian cg = (ClientGuardian) row[1];
                             ClientWithAddInfo addInfo = new ClientWithAddInfo();
-                            addInfo.setInformedSpecialMenu(cg.getInformedSpecialMenu() ? 1 : null);
+                            addInfo.setInformedSpecialMenu(ClientManager.getInformedSpecialMenu(session, child.getIdOfClient(), cg.getIdOfGuardian()) ? 1 : null);
+                            addInfo.setPreorderAllowed(ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient(), cg.getIdOfGuardian()) ? 1 : null);
                             addInfo.setClientCreatedFrom(cg.isDisabled() ? null : cg.getCreatedFrom());
                             addInfo.setDisabled(cg.isDisabled());
-                            result.put((Client) row[0], addInfo);
+                            result.put(child, addInfo);
                         }
                     }
                 } else {
@@ -4313,7 +4329,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         mobilePhone = Client.checkAndConvertMobile(mobilePhone);
         if (mobilePhone == null) {
             r.resultCode = RC_INVALID_DATA;
-            r.description = "Неверный формат телефона";
+            r.description = RC_INVALID_MOBILE;
             return r;
         }
         if (!DAOService.getInstance().setClientMobilePhone(contractId, mobilePhone, dateConfirm)) {
@@ -5387,7 +5403,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             mobilePhone = Client.checkAndConvertMobile(mobilePhone);
             if (mobilePhone == null) {
                 result.resultCode = RC_INVALID_DATA;
-                result.description = "Неверный формат телефона";
+                result.description = RC_INVALID_MOBILE;
                 return result;
             }
 
@@ -5937,7 +5953,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             mobilePhone = Client.checkAndConvertMobile(mobilePhone);
             if (mobilePhone == null) {
                 r.resultCode = RC_INVALID_DATA;
-                r.description = "Неверный формат телефона";
+                r.description = RC_INVALID_MOBILE;
                 return r;
             }
             if (!daoService.setClientMobilePhone(contractId, mobilePhone, null)) {
@@ -8213,7 +8229,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
         }
         if (StringUtils.isEmpty(mobilePhone)) {
-            return new Result(RC_INVALID_DATA, "Неверный формат мобильного телефона");
+            return new Result(RC_INVALID_DATA, RC_INVALID_MOBILE);
         }
 
         Result result = new Result();
@@ -8731,6 +8747,126 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public ClientSummaryBaseListResult getSummaryByStaffMobileMin(String staffMobile) {
+        authenticateRequest(null);
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
+            transaction = session.beginTransaction();
+
+            List<Long> staffGroups = new ArrayList<>();
+
+            Query query = session.createQuery("select c from Client c where c.mobile = :mobile");
+            query.setParameter("mobile", Client.checkAndConvertMobile(staffMobile));
+            List<Client> clients = query.list();
+            ClientSummaryBaseListResult result = processClientSummaryByMobileResult(session, clients, "staff");
+
+            transaction.commit();
+            transaction = null;
+            return result;
+        } catch (Exception e) {
+            ClientSummaryBaseListResult result = new ClientSummaryBaseListResult();
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+            return result;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    @Override
+    public ClientSummaryBaseListResult getSummaryByChildMobileMin(String childMobile) {
+        authenticateRequest(null);
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Query query = session.createQuery("select c from Client c where c.mobile = :mobile and c.idOfClientGroup < :clientGroup");
+            query.setParameter("mobile", Client.checkAndConvertMobile(childMobile));
+            query.setParameter("clientGroup", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+            List<Client> clients = query.list();
+            ClientSummaryBaseListResult result = processClientSummaryByMobileResult(session, clients, "child");
+
+            transaction.commit();
+            transaction = null;
+            return result;
+        } catch (Exception e) {
+            ClientSummaryBaseListResult result = new ClientSummaryBaseListResult();
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+            return result;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    private ClientSummaryBaseListResult processClientSummaryByMobileResult(Session session, List<Client> clients,
+            String mode) throws Exception {
+        ClientSummaryBaseListResult result = new ClientSummaryBaseListResult();
+        if (clients.size() == 0) {
+            result.resultCode = RC_CLIENT_NOT_FOUND;
+            result.description = RC_CLIENT_NOT_FOUND_DESC;
+            return result;
+        }
+        if (clients.size() > 1) {
+            result.resultCode = RC_SEVERAL_CLIENTS_WERE_FOUND;
+            result.description = RC_SEVERAL_CLIENTS_WERE_FOUND_DESC;
+            return result;
+        }
+        Client child = clients.get(0);
+        if (!child.getOrg().getPreordersEnabled()) {
+            result.resultCode = RC_PREORDERS_NOT_ENABLED;
+            result.description = RC_PREORDERS_NOT_ENABLED_DESC;
+            return result;
+        }
+        if (mode.equals("child")) {
+            List<ClientGuardianItem> guardians = ClientManager.loadGuardiansByClient(session, child.getIdOfClient());
+            boolean informed = false;
+            for (ClientGuardianItem item : guardians) {
+                if (item.getInformedSpecialMenu()) {
+                    informed = true;
+                    break;
+                }
+            }
+            if (!informed) {
+                result.resultCode = RC_NOT_INFORMED_SPECIAL_MENU;
+                result.description = RC_NOT_INFORMED_SPECIAL_MENU_DESC;
+                return result;
+            }
+            boolean allowed = ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient(), null);
+            if (!allowed) {
+                result.resultCode = RC_NOT_ALLOWED_PREORDERS;
+                result.description = RC_NOT_ALLOWED_PREORDERS_DESC;
+                return result;
+            }
+        } else if (mode.equals("staff") && !child.isSotrudnikMsk()) {
+            result.resultCode = RC_PREORDERS_NOT_STAFF;
+            result.description = RC_PREORDERS_NOT_STAFF_DESC;
+            return result;
+        }
+        ClientSummaryBase summaryBase = new ClientSummaryBase();
+        summaryBase.setContractId(child.getContractId());
+        summaryBase.setFirstName(child.getPerson().getFirstName());
+        summaryBase.setLastName(child.getPerson().getSurname());
+        summaryBase.setMiddleName(child.getPerson().getSecondName());
+        summaryBase.setBalance(child.getBalance());
+        summaryBase.setOfficialName(child.getOrg().getOfficialName());
+        summaryBase.setGrade(child.getClientGroup().getGroupName());
+        if (mode.equals("child")) summaryBase.setPreorderAllowed(1); //т.к. если флаг выключен, то выше уже кидаем ошибку
+        summaryBase.setAddress(child.getOrg().getShortAddress());
+
+        List<ClientSummaryBase> list = new ArrayList<>();
+        list.add(summaryBase);
+        result.setClientSummary(list);
+        return result;
+    }
+
+    @Override
     public ClientSummaryBaseListResult getSummaryByGuardMobileMin(String guardMobile) {
         HTTPData data = new HTTPData();
         HTTPDataHandler handler = new HTTPDataHandler(data);
@@ -8753,6 +8889,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     ClientSummaryBase base = processSummaryBase(entry.getKey());
                     base.setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
                     base.setInformedSpecialMenu(entry.getValue().getInformedSpecialMenu());
+                    base.setPreorderAllowed(entry.getValue().getPreorderAllowed());
                     base.setIsInside(DAOReadExternalsService.getInstance()
                             .isClientInside(session, entry.getKey().getIdOfClient()));
                     if (base != null) {
@@ -8960,6 +9097,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             item.setDate(toXmlDateTime(CalendarUtils.parseDate(entry.getKey())));
             item.setEditForbidden((entry.getValue())[0]);
             item.setPreorderExists((entry.getValue())[1]);
+            item.setAddress(preorderDAOService.getAddress((entry.getValue())[2]));
             calendar.getItems().add(item);
         }
         result.setCalendar(calendar);
@@ -8973,9 +9111,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private ClientResult getClientOrError(Long contractId, String guardianMobile) {
         ClientResult result = new ClientResult();
         Client client;
-        try {
-            client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getClientByContractId(contractId);
-        } catch (NoResultException e) {
+        client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getClientByContractId(contractId);
+        if (client == null) {
             result.resultCode = RC_CLIENT_NOT_FOUND;
             result.description = RC_CLIENT_NOT_FOUND_DESC;
             return result;
@@ -8989,18 +9126,32 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return result;
         }
 
-        ClientGuardianResult cgr = getClientGuardianOrError(client, guardianMobile);
-        if (!cgr.resultCode.equals(RC_OK)) {
-            result.resultCode = cgr.resultCode;
-            result.description = cgr.description;
-            return result;
-        }
-
         boolean informed = false;
-        for (ClientGuardian cg : cgr.getClientGuardian()) {
-            if (cg.getInformedSpecialMenu()) {
+
+        if (client.isSotrudnikMsk()) {
+            informed = ClientManager.getInformedSpecialMenuWithoutSession(client.getIdOfClient(), null);
+        } else if (client.isStudent() && !client.getMobile().equals(guardianMobile)) {
+            ClientGuardianResult cgr = getClientGuardianOrError(client, guardianMobile);
+            if (!cgr.resultCode.equals(RC_OK)) {
+                result.resultCode = cgr.resultCode;
+                result.description = cgr.description;
+                return result;
+            }
+
+            for (ClientGuardian cg : cgr.getClientGuardian()) {
+                if (ClientManager.getInformedSpecialMenuWithoutSession(client.getIdOfClient(), cg.getIdOfGuardian())) {
+                    informed = true;
+                    break;
+                }
+            }
+        }
+        if (client.isStudent() && client.getMobile().equals(guardianMobile)) {
+            if (!ClientManager.getAllowedPreorderByClientWithoutSession(client.getIdOfClient(), null)) {
+                result.resultCode = RC_NOT_ALLOWED_PREORDERS;
+                result.description = RC_NOT_ALLOWED_PREORDERS_DESC;
+                return result;
+            } else {
                 informed = true;
-                break;
             }
         }
         if (!informed) {
@@ -9030,6 +9181,77 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public Result setPreorderAllowed(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "guardianMobile") String guardianMobile,
+            @WebParam(name = "staffMobile") String childMobile, @WebParam(name = "value") Boolean value) {
+        authenticateRequest(contractId);
+        Result result = new Result();
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(session, contractId);
+            if (client == null) {
+                result.resultCode = RC_CLIENT_NOT_FOUND;
+                result.description = RC_CLIENT_NOT_FOUND_DESC;
+                return result;
+            }
+
+            if ((client.isStudent() && (StringUtils.isEmpty(guardianMobile) || StringUtils.isEmpty(childMobile)))
+                    || (client.isSotrudnikMsk() && (!StringUtils.isEmpty(guardianMobile) || !StringUtils.isEmpty(childMobile)))) {
+                //если для ученика не указаны телефоны представителя и самого ученика или наоборот, для сотрудника они указаны, то это ошибка
+                result.resultCode = RC_INVALID_DATA;
+                result.description = RC_INVALID_INPUT_DATA;
+                return result;
+            }
+
+            if (client.isSotrudnikMsk()) {
+                ClientManager.setPreorderAllowedForClient(session, client, value);
+            } else {
+
+                String mobile = Client.checkAndConvertMobile(childMobile);
+                if (mobile == null) {
+                    result.resultCode = RC_INVALID_DATA;
+                    result.description = RC_INVALID_MOBILE;
+                    return result;
+                }
+                List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
+                boolean guardianWithMobileFound = false;
+                for (Client guardian : guardians) {
+                    if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile().equals(Client.checkAndConvertMobile(guardianMobile))) {
+                        guardianWithMobileFound = true;
+                        ClientManager.setPreorderAllowed(session, client, guardian, mobile, value);
+                    }
+                }
+
+                if (!guardianWithMobileFound) {
+                    result.resultCode = RC_CLIENT_GUARDIAN_NOT_FOUND;
+                    result.description = RC_CLIENT_GUARDIAN_NOT_FOUND_DESC;
+                    return result;
+                }
+            }
+
+            transaction.commit();
+            transaction = null;
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (NotInformedSpecialMenuException ne) {
+            result.resultCode = RC_NOT_INFORMED_SPECIAL_MENU;
+            result.description = RC_NOT_INFORMED_SPECIAL_MENU_DESC;
+        } catch (Exception e) {
+            logger.error("Error in setPreorderAllowed", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
+
+    @Override
     public Result setInformedSpecialMenu(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "guardianMobile") String guardianMobile) {
         authenticateRequest(contractId);
@@ -9047,21 +9269,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
 
-            List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
             Long version = getClientGuardiansResultVersion(session);
-            boolean guardianWithMobileFound = false;
-            for (Client guardian : guardians) {
-                if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile()
-                        .equals(Client.checkAndConvertMobile(guardianMobile))) {
-                    guardianWithMobileFound = true;
-                    ClientManager
-                            .setInformSpecialMenu(session, client.getIdOfClient(), guardian.getIdOfClient(), version);
+            if (client.isStudent()) {
+                List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
+                boolean guardianWithMobileFound = false;
+                for (Client guardian : guardians) {
+                    if (!StringUtils.isEmpty(guardian.getMobile()) && guardian.getMobile().equals(Client.checkAndConvertMobile(guardianMobile))) {
+                        guardianWithMobileFound = true;
+                        ClientManager.setInformSpecialMenu(session, client, guardian, version);
+                    }
                 }
-            }
-
-            if (!guardianWithMobileFound) {
-                result.resultCode = RC_CLIENT_GUARDIAN_NOT_FOUND;
-                result.description = RC_CLIENT_GUARDIAN_NOT_FOUND_DESC;
+                if (!guardianWithMobileFound) {
+                    result.resultCode = RC_CLIENT_GUARDIAN_NOT_FOUND;
+                    result.description = RC_CLIENT_GUARDIAN_NOT_FOUND_DESC;
+                    return result;
+                }
+            } else if (client.isSotrudnikMsk() && StringUtils.isEmpty(guardianMobile)) {
+                ClientManager.setInformSpecialMenu(session, client, null, version);
+            } else {
+                result.resultCode = RC_WRONG_GROUP;
+                result.description = RC_WRONG_GROUP_DESC;
                 return result;
             }
 
@@ -9078,6 +9305,98 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             HibernateUtils.close(session, logger);
         }
         return result;
+    }
+
+    private ClientGroupResult getClientGroupResult(Session session, List<Client> clients) {
+        Map<Integer, Integer> map = new HashMap<>();
+        boolean isStudent = false;
+        boolean isParent = false;
+        boolean isTrueParent = false;
+        boolean isEmployee = false;
+        boolean isEmployeeParent = false;
+        for (Client client : clients) {
+            int type = 0;
+            if (client.isStudent()) {
+                type = ClientGroupResult.STUDENT;
+                isStudent = true;
+            }
+            if (client.isParentMsk()) {
+                type = ClientGroupResult.PARENT;
+                isParent = true;
+                isTrueParent = ClientManager.clientHasChildren(session, client.getIdOfClient());
+            }
+            if (client.isSotrudnikMsk()) {
+                type = ClientGroupResult.EMPLOYEE;
+                isEmployee = true;
+                isEmployeeParent = ClientManager.clientHasChildren(session, client.getIdOfClient());
+            }
+            if (type == 0) continue;
+            Integer count = map.get(type);
+            if (count == null) count = 0;
+            map.put(type, count + 1);
+        }
+        if (map.size() == 0) return new ClientGroupResult(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+
+        for (Integer value : map.keySet()) {
+            if (map.get(value) > 1) return new ClientGroupResult(RC_SEVERAL_CLIENTS_WERE_FOUND, RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
+        }
+
+        if ((isStudent && isParent && isEmployee) || (isEmployee && isStudent) || (isParent && isStudent)) {
+            return new ClientGroupResult(RC_PREORDERS_NOT_UNIQUE_CLIENT, RC_PREORDERS_NOT_UNIQUE_CLIENT_DESC);
+        }
+        Integer value;
+        if (isEmployeeParent && !isStudent && !isParent)
+            value = ClientGroupResult.PARENT_EMPLOYEE;
+        else if (isTrueParent && !isStudent && !isEmployee)
+            value = ClientGroupResult.PARENT;
+        else if (isEmployee && !isStudent && !isParent)
+            value = ClientGroupResult.EMPLOYEE;
+        else if (isStudent && !isEmployee && !isParent)
+            value = ClientGroupResult.STUDENT;
+        else value = null;
+        if (value == null) {
+            if (map.size() == 1) {
+                return new ClientGroupResult(RC_WRONG_GROUP, RC_WRONG_GROUP_DESC);
+            } else {
+                return new ClientGroupResult(RC_MOBILE_DIFFERENT_GROUPS, RC_MOBILE_DIFFERENT_GROUPS_DESC);
+            }
+        }
+
+        ClientGroupResult result = new ClientGroupResult(RC_OK, RC_OK_DESC);
+        result.setValue(value);
+
+        return result;
+    }
+
+    @Override
+    public ClientGroupResult getClientsGroupForPreorder(@WebParam(name="mobile") String mobile) {
+        authenticateRequest(null);
+        String mobilePhone = Client.checkAndConvertMobile(mobile);
+        if (mobilePhone == null) {
+            return new ClientGroupResult(RC_INVALID_DATA, RC_INVALID_MOBILE);
+        }
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createExternalServicesPersistenceSession();
+            transaction = session.beginTransaction();
+
+
+            Query query = session.createQuery("select c from Client c where c.mobile = :mobile");
+            query.setParameter("mobile", mobilePhone);
+            List<Client> clients = query.list();
+            ClientGroupResult result = getClientGroupResult(session, clients);
+            //ClientSummaryBaseListResult result = processClientSummaryByMobileResult(session, clients, "child");
+
+            transaction.commit();
+            transaction = null;
+            return result;
+        } catch (Exception e) {
+            return new ClientGroupResult(RC_INTERNAL_ERROR, RC_INTERNAL_ERROR_DESC);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
     }
 
     @Override
@@ -9683,7 +10002,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
         }
         if (StringUtils.isEmpty(mobilePhone)) {
-            return new Result(RC_INVALID_DATA, "Неверный формат мобильного телефона");
+            return new Result(RC_INVALID_DATA, RC_INVALID_MOBILE);
         }
         if (null == guardianSecondName) {
             guardianSecondName = "";

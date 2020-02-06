@@ -23,6 +23,9 @@ public class PreorderCalendarItem {
     @XmlAttribute(name = "preorderExists")
     private Integer preorderExists;
 
+    @XmlAttribute(name = "address")
+    private String address;
+
     public PreorderCalendarItem() {
 
     }
@@ -49,5 +52,13 @@ public class PreorderCalendarItem {
 
     public void setPreorderExists(Integer preorderExists) {
         this.preorderExists = preorderExists;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

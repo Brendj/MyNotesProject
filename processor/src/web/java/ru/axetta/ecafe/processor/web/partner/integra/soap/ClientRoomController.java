@@ -528,6 +528,10 @@ public interface ClientRoomController {
 
     @WebMethod ClientSummaryBaseListResult getSummaryByGuardMobileMin(@WebParam(name = "guardMobile") String guardMobile);
 
+    @WebMethod ClientSummaryBaseListResult getSummaryByChildMobileMin(@WebParam(name = "childMobile") String guardMobile);
+
+    @WebMethod ClientSummaryBaseListResult getSummaryByStaffMobileMin(@WebParam(name = "staffMobile") String guardMobile);
+
     @WebMethod TransactionInfoListResult getOrderTransactions();
 
     @WebMethod(operationName = "getGuardiansFromDate")
@@ -543,8 +547,15 @@ public interface ClientRoomController {
     @WebMethod(operationName = "setInformedSpecialMenu")
     Result setInformedSpecialMenu(@WebParam(name="contractId") Long contractId, @WebParam(name="guardianMobile") String guardianMobile);
 
+    @WebMethod(operationName = "setPreorderAllowed")
+    Result setPreorderAllowed(@WebParam(name="contractId") Long contractId, @WebParam(name="guardianMobile") String guardianMobile,
+            @WebParam(name="childMobile") String childMobile, @WebParam(name="value") Boolean value);
+
     @WebMethod(operationName = "setSpecialMenu")
     Result setSpecialMenu(@WebParam(name = "contractId") Long contractId, @WebParam(name = "value") Boolean value);
+
+    @WebMethod(operationName = "getClientsGroupForPreorder")
+    ClientGroupResult getClientsGroupForPreorder(@WebParam(name="mobile") String mobile);
 
     @WebMethod(operationName = "getPreorderComplexes")
     PreorderComplexesResult getPreorderComplexes(@WebParam(name = "contractId") Long contractId, @WebParam(name = "date") Date date);
