@@ -154,12 +154,6 @@
     </converter>
 
     <converter>
-        <description>Quantity converter</description>
-        <converter-id>quantityConverter</converter-id>
-        <converter-class>ru.axetta.ecafe.processor.web.ui.converter.QuantityConverter</converter-class>
-    </converter>
-
-    <converter>
         <description>Client discount mode converter</description>
         <converter-id>clientDiscountModeConverter</converter-id>
         <converter-class>ru.axetta.ecafe.processor.web.ui.client.ClientDiscountModeConverter</converter-class>

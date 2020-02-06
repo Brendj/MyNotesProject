@@ -133,12 +133,4 @@ public class TaloonPreorderVerificationItem {
         return complexesSize + rowId;
     }
 
-    public boolean isPpStateNotSelected() {
-        return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
-    }
-
-    public boolean isPpStateConfirmed() {
-        return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
-    }
-
 }

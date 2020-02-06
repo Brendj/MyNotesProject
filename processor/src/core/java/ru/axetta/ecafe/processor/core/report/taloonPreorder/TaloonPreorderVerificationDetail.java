@@ -48,8 +48,6 @@ public class TaloonPreorderVerificationDetail {
     private String comments;
     private boolean summaryDay;
 
-    private TaloonPreorderVerificationComplex complex;
-
     public TaloonPreorderVerificationDetail() {
     }
 
@@ -295,14 +293,6 @@ public class TaloonPreorderVerificationDetail {
         this.complexId = complexId;
     }
 
-    public TaloonPreorderVerificationComplex getComplex() {
-        return complex;
-    }
-
-    public void setComplex(TaloonPreorderVerificationComplex complex) {
-        this.complex = complex;
-    }
-
     public String getComments() {
         return comments;
     }
@@ -469,10 +459,6 @@ public class TaloonPreorderVerificationDetail {
         return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
     }
 
-    public boolean isPpStateNull() {
-        return (ppState == null && taloonDate != null);
-    }
-
     public Boolean needFillShippedQty() {
         return (shippedQty == null);
     }
@@ -504,10 +490,6 @@ public class TaloonPreorderVerificationDetail {
         return (value1 == null ? 0L : value1) + (value2 == null ? 0L : value2);
     }
 
-    public void confirmPpState() {
-        changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
-    }
-
     public void deselectPpState() {
         changePpState(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
     }
@@ -517,12 +499,7 @@ public class TaloonPreorderVerificationDetail {
     }
 
     private void changePpState(TaloonPPStatesEnum ppState) {
-        TaloonPreorderVerificationItem item;
         this.ppState = ppState;
-        item = this.getComplex().getItem();
-        if(item != null) {
-            item.setPpState();
-        }
     }
 
     public Boolean isEmptyTotal() {

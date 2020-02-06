@@ -166,7 +166,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.requestedQty}" styleClass="output-text" converter="quantityConverter"/>
+                    <h:outputText escape="true" value="#{detail.requestedQty}" styleClass="output-text" />
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
@@ -183,7 +183,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.soldQty}" styleClass="output-text" converter="quantityConverter"/>
+                    <h:outputText escape="true" value="#{detail.soldQty}" styleClass="output-text" />
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
@@ -200,7 +200,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.blockedQty}" styleClass="output-text" converter="quantityConverter"/>
+                    <h:outputText escape="true" value="#{detail.blockedQty}" styleClass="output-text" />
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
@@ -217,7 +217,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.reservedQty}" styleClass="output-text" converter="quantityConverter"/>
+                    <h:outputText escape="true" value="#{detail.reservedQty}" styleClass="output-text" />
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
@@ -249,7 +249,7 @@
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.shippedQty}" styleClass="output-text"
-                                  rendered="#{!detail.enableEditShippedQty()}" converter="quantityConverter"/>
+                                  rendered="#{!detail.enableEditShippedQty()}" />
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
@@ -266,7 +266,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.differedQty}" styleClass="output-text" converter="quantityConverter"/>
+                    <h:outputText escape="true" value="#{detail.differedQty}" styleClass="output-text" />
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
@@ -298,14 +298,6 @@
                         <h:graphicImage value="/images/taloons/applied-gray.png"/>
                     </a4j:commandLink>
 
-<%--                    <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateNotSelected}"--%>
-<%--                                     action="#{detail.confirmPpState}"--%>
-<%--                                     onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }"--%>
-<%--                                     style="color:lightgray;">--%>
-<%--                        <f:setPropertyActionListener value="#{detail}" target="#{detail.ppState}"/>--%>
-<%--                        <h:graphicImage value="/images/taloons/applied-gray.png"/>--%>
-<%--                    </a4j:commandLink>--%>
-
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateNotSelected}"
                                      action="#{mainPage.taloonPreorderVerificationPage.switchPpState()}"
                                      oncomplete="if (#{detail.needFillShippedQty()}) { alert('Заполните отгрузку ПП'); }"
@@ -318,15 +310,6 @@
                         <h:graphicImage value="/images/taloons/canceled-gray.png"/>
                     </a4j:commandLink>
 
-<%--                    <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateNotSelected}"--%>
-<%--                                     action="#{detail.cancelPpState}"--%>
-<%--                                     oncomplete="if (#{detail.needFillShippedQty()}) { alert('Заполните отгрузку ПП'); }"--%>
-<%--                                     onclick="if (#{!detail.allowedSetSecondFlag()}) { alert('Операция запрещена'); return false; }"--%>
-<%--                                     style="color:lightgray;">--%>
-<%--                        <f:setPropertyActionListener value="#{detail}" target="#{detail.ppState}"/>--%>
-<%--                        <h:graphicImage value="/images/taloons/canceled-gray.png"/>--%>
-<%--                    </a4j:commandLink>--%>
-
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateCanceled}"
                                      action="#{mainPage.taloonPreorderVerificationPage.resetPpState()}"
                                      onclick="if (#{!detail.allowedClearSecondFlag()}) { alert('Операция запрещена'); return false; }">
@@ -336,13 +319,6 @@
                                                      target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
                         <h:graphicImage value="/images/taloons/canceled.png"/>
                     </a4j:commandLink>
-
-<%--                    <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateCanceled}"--%>
-<%--                                     action="#{detail.deselectPpState}"--%>
-<%--                                     onclick="if (#{!detail.allowedClearSecondFlag()}) { alert('Операция запрещена'); return false; }">--%>
-<%--                        <f:setPropertyActionListener value="#{detail}" target="#{detail.ppState}"/>--%>
-<%--                        <h:graphicImage value="/images/taloons/canceled.png"/>--%>
-<%--                    </a4j:commandLink>--%>
 
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateConfirmed}"
                                      action="#{detail.deselectPpState}"
