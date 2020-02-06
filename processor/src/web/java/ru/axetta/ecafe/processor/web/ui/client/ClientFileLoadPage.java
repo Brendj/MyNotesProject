@@ -186,13 +186,16 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
                         break;
                     }
                     if (!isTitle(currLine)) {
-
                         result = checkNames(currLine, lineNo);
                         if (result != null) {
                             lineResults.add(result);
-                            break;
+                            currLine = reader.readLine();
+                            if (lineNo == MAX_LINE_NUMBER) {
+                                break;
+                            }
+                            ++lineNo;
+                            continue;
                         }
-
                         result = createClient(fieldConfig, this.org.getIdOfOrg(), currLine, lineNo,
                                 this.checkFullNameUnique);
                         if (result.getResultCode() == 0) {
