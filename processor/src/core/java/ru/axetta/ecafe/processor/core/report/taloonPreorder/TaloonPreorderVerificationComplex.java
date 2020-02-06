@@ -17,6 +17,7 @@ public class TaloonPreorderVerificationComplex {
     private Long complexId;
     private String complexName;
     private final List<TaloonPreorderVerificationDetail> details = new ArrayList<>();
+    private TaloonPreorderVerificationItem item;
 
     public TaloonPreorderVerificationComplex() {
     }
@@ -51,5 +52,13 @@ public class TaloonPreorderVerificationComplex {
 
     public boolean taloonDateEmpty() {
         return taloonDate == null;
+    }
+
+    public TaloonPreorderVerificationItem getItem() {
+        return item;
+    }
+
+    public void setItem(TaloonPreorderVerificationItem item) {
+        this.item = item;
     }
 }

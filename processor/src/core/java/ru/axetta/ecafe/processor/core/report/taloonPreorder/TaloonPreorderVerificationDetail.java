@@ -47,6 +47,7 @@ public class TaloonPreorderVerificationDetail {
     private String remarks;
     private String comments;
     private boolean summaryDay;
+    private TaloonPreorderVerificationComplex complex;
 
     public TaloonPreorderVerificationDetail() {
     }
@@ -307,6 +308,14 @@ public class TaloonPreorderVerificationDetail {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    public TaloonPreorderVerificationComplex getComplex() {
+        return complex;
+    }
+
+    public void setComplex(TaloonPreorderVerificationComplex complex) {
+        this.complex = complex;
     }
 
     public int getPeriod() {
