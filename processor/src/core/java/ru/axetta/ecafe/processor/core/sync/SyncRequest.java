@@ -38,6 +38,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendar
 import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendarSupplierRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request.OrgEquipmentRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request.OrgEquipmentRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
@@ -2721,6 +2723,7 @@ public class SyncRequest {
             builders.add(new OrgSettingsBuilder(idOfOrg));
             builders.add(new GoodRequestEZDBuilder());
             builders.add(new SyncSettingsRequestBuilder(idOfOrg));
+            builders.add(new OrgEquipmentRequestBuilder(idOfOrg));
             return builders;
         }
 
@@ -3008,6 +3011,10 @@ public class SyncRequest {
 
     public GoodRequestEZDRequest getGoodRequestEZDRequest(){
         return this.<GoodRequestEZDRequest>findSection(GoodRequestEZDRequest.class);
+    }
+
+    public OrgEquipmentRequest getOrgEquipmentRequest() {
+        return this.<OrgEquipmentRequest>findSection(OrgEquipmentRequest.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

@@ -10,11 +10,11 @@ import ru.axetta.ecafe.processor.core.emias.LiberateClientsList;
 import ru.axetta.ecafe.processor.core.logic.ProcessorUtils;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -32,6 +32,7 @@ import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
+import ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request.OrgEquipmentRequest;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -4493,4 +4494,31 @@ public class DAOUtils {
             return new ArrayList<EMIAS>();
         }
     }
+
+    public static long nextVersionByOrgEquipmentRequest(Session session) {
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select r.version from cf_hardware_settings as r order by r.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
+    public static OrgEquipment getOrgEquipmentRequestByOrg(Session session, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(OrgEquipmentRequest.class);
+        Org org = (Org) session.load(Org.class, idOfOrg);
+        criteria.add(Restrictions.eq("org", org));
+        return (OrgEquipment) criteria.uniqueResult();
+    }
+
+    public static List<OrgEquipment> getOrgEquipmentsForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        Criteria criteria = session.createCriteria(OrgEquipment.class);
+        Org org = (Org) session.load(Org.class, idOfOrg);
+        criteria.add(Restrictions.eq("org", org));
+        criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
+
 }

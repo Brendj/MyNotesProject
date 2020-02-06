@@ -22,6 +22,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.ResMenusCalen
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsData;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.ResMigrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
+import ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request.ResOrgEquipmentRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeeding;
@@ -1217,6 +1218,7 @@ public class SyncResponse {
     private GoodRequestEZDSection goodRequestEZDSection;
     private ResSyncSettingsSection resSyncSettingsSection;
     private SyncSettingsSection syncSettingsSection;
+    private ResOrgEquipmentRequest orgEquipmentRequest;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1239,7 +1241,7 @@ public class SyncResponse {
             ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData,
             ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
             ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, GoodRequestEZDSection goodRequestEZDSection,
-            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection) {
+            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, ResOrgEquipmentRequest resOrgEquipmentRequest) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1299,6 +1301,7 @@ public class SyncResponse {
         this.goodRequestEZDSection = goodRequestEZDSection;
         this.resSyncSettingsSection = resSyncSettingsSection;
         this.syncSettingsSection = syncSettingsSection;
+        this.orgEquipmentRequest = resOrgEquipmentRequest;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
