@@ -161,7 +161,6 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         RuntimeContext runtimeContext = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-
             long lineCount = dataSize / 100;
             if (lineCount > MAX_LINE_NUMBER) {
                 lineCount = MAX_LINE_NUMBER;
@@ -187,6 +186,13 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
                         break;
                     }
                     if (!isTitle(currLine)) {
+
+                        result = checkNames(currLine, lineNo);
+                        if (result != null) {
+                            lineResults.add(result);
+                            break;
+                        }
+
                         result = createClient(fieldConfig, this.org.getIdOfOrg(), currLine, lineNo,
                                 this.checkFullNameUnique);
                         if (result.getResultCode() == 0) {
@@ -225,8 +231,18 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
     private LineResult checkLength(String row, int lineNo) {
         String[] data = row.split(";");
         if (data.length > 23) {
-            return new LineResult(lineNo, -1, "Ошибка: " + "Количество полей в строке " + lineNo
-                    + " не совпадает с заголовком", -1L);
+            return new LineResult(lineNo, -1,
+                    "Ошибка: " + "Количество полей в строке " + lineNo + " не совпадает с заголовком", -1L);
+        }
+        return null;
+    }
+
+    private LineResult checkNames(String line, int lineNo) {
+        String[] data = line.split(";");
+        if (data[8].equals("") || data[9].equals("")) {     // SURNAME, NAME
+            String value = data[8].equals("") ? COLUMN_NAMES[8] : COLUMN_NAMES[9];
+            return new LineResult(lineNo, -1,
+                    "Ошибка: " + "Не заполнено обязательное поле " + value + " в строке " + lineNo, -1L);
         }
         return null;
     }
@@ -241,7 +257,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
     private LineResult createClient(ClientManager.ClientFieldConfig fieldConfig, Long idOfOrg, String line, int lineNo,
             boolean checkFullNameUnique) throws Exception {
-        String[] tokens = modifyData(line);
+        String[] tokens = modifyData(line, lineNo);
         try {
             fieldConfig.setValues(tokens);
         } catch (Exception e) {
@@ -284,7 +300,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         }
 
         boolean isContractDateEmpty = fieldConfig.isValueNull(ClientManager.FieldId.CONTRACT_DATE);
-        if (isContractDateEmpty)  {
+        if (isContractDateEmpty) {
             fieldConfig.setValue(ClientManager.FieldId.CONTRACT_DATE, "#CURRENT_DATE");
         }
 
@@ -298,31 +314,31 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
     }
 
-    private String[] modifyData(String line) {
+    private String[] modifyData(String line, int lineNo) {
         String[] data = line.split(";", -1);
         String[] tokens = new String[34];
-
         for (int i = 0; i < data.length; i++) {
             data[i] = data[i].trim();
             if (i < 11) {
-                if (i == 0 && data[i].equals("")) {
+                if (i == 0 && data[i].equals("")) {     // CONTRACT_ID
                     data[i] = "AUTO";
                 }
-                if (i == 3 && data[i].equals("")) {
+                if (i == 3 && data[i].equals("")) {     // CONTRACT_DATE
                     data[i] = "#CURRENT_DATE";
                 }
-                if ((i == 2) && data[i].equals("")) {
+                if ((i == 2) && data[i].equals("")) {   // CONTRACT_STATE
                     data[i] = "0";
                 }
                 tokens[i] = data[i].trim();
             } else if (i > 11) {
-                if ((i == 16 || i == 17 || i == 18) && data[i].equals("")) {
+                if ((i == 16 || i == 17 || i == 18) && data[i]
+                        .equals("")) {        // PAY_FOR_SMS, NOTIFY_BY_PUSH, NOTIFY_BY_EMAIL
                     data[i] = "0";
                 }
                 tokens[i - 1] = data[i];
             }
         }
-        tokens[33] = data[11].equals("0") ? "f" : "m"; // GENDER
+        tokens[33] = data[11].equals("0") ? "f" : "m";      // GENDER
         return tokens;
     }
 
