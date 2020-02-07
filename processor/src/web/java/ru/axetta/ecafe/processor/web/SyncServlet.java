@@ -162,13 +162,15 @@ public class SyncServlet extends HttpServlet {
             }
             ///////
             currentSyncWasGranted.set(false);
-            if (permitsForSync.tryAcquire(permitsTimeout, TimeUnit.MINUTES)) {
-                currentSyncWasGranted.set(true);
-            } else {
-                String message = "Failed to perform this sync. Wait timeout is expired. Available permits is " + permitsForSync.availablePermits();
-                logger.error(message);
-                sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);
-                return;
+            if (syncType != SyncType.TYPE_GET_ACC_INC) {
+                if (permitsForSync.tryAcquire(permitsTimeout, TimeUnit.MINUTES)) {
+                    currentSyncWasGranted.set(true);
+                } else {
+                    String message = "Failed to perform this sync. Wait timeout is expired. Available permits is " + permitsForSync.availablePermits();
+                    logger.error(message);
+                    sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);
+                    return;
+                }
             }
 
 
