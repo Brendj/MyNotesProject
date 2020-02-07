@@ -2700,6 +2700,16 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByTaloonPreorder(Session session){
+        long version = 0L;
+        Query query = session.createSQLQuery("select t.version from cf_taloon_preorder as t order by t.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
     public static long nextVersionByComplexSchedule(Session session){
         long version = 0L;
         Query query = session.createSQLQuery("select s.version from cf_complex_schedules as s order by s.version desc limit 1 for update");
@@ -2872,6 +2882,16 @@ public class DAOUtils {
         //Org org = (Org)session.load(Org.class, idOfOrg);
         List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
         Criteria criteria = session.createCriteria(TaloonApproval.class);
+        criteria.add(Restrictions.in("org", orgs));
+        criteria.add(Restrictions.gt("version", version));
+        //criteria.add(Restrictions.eq("deletedState", false));
+        return criteria.list();
+    }
+
+    public static List<TaloonPreorder> getTaloonPreorderForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        //Org org = (Org)session.load(Org.class, idOfOrg);
+        List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
+        Criteria criteria = session.createCriteria(TaloonPreorder.class);
         criteria.add(Restrictions.in("org", orgs));
         criteria.add(Restrictions.gt("version", version));
         //criteria.add(Restrictions.eq("deletedState", false));
@@ -4539,7 +4559,7 @@ public class DAOUtils {
             return new ArrayList<EMIAS>();
         }
     }
-	
+
 	public static Long getMaxVersionOfEmias(Session session) {
         Query query = session.createQuery("SELECT MAX(em.version) FROM EMIAS AS em");
         Long maxVer = (Long) query.uniqueResult();
@@ -4550,5 +4570,14 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(EMIAS.class);
         criteria.add(Restrictions.gt("version", maxVersion));
         return criteria.list();
+    }
+
+    public static Integer getComplexIdForGoodRequestPosition(Session persistenceSession, String guidOfPosition) {
+        Query q = persistenceSession.createSQLQuery("select pc.armcomplexid from cf_goods_requests_positions p "
+                + "inner join cf_preorder_menudetail pm on p.idofgoodsrequestposition = pm.idofgoodsrequestposition "
+                + "inner join cf_preorder_complex pc on pc.idofpreordercomplex = pm.idofpreordercomplex "
+                + "where p.guid = :guidOfPosition");
+        q.setParameter("guidOfPosition", guidOfPosition);
+        return (Integer) q.uniqueResult();
     }
 }
