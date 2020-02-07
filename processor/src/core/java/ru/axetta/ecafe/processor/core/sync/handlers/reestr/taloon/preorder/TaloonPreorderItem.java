@@ -282,8 +282,8 @@ public class TaloonPreorderItem {
         this.setSoldQty(soldQty);
         this.setRequestedQty(requestedQty);
         this.setShippedQty(shippedQty);
-        this.setReservedQty(shippedQty);
-        this.setBlockedQty(shippedQty);
+        this.setReservedQty(reservedQty);
+        this.setBlockedQty(blockedQty);
         this.setPrice(price);
         this.setCreatedType(createdType);
         this.setIsppState(isppState);

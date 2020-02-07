@@ -62,23 +62,24 @@ public class TaloonPreorderVerification {
                         (taloon.getPrice() == null || taloon.getRequestedQty() == null) ? 0
                                 : taloon.getPrice() * taloon.getRequestedQty(), taloon.getSoldQty(),
                         (taloon.getPrice() == null || taloon.getSoldQty() == null) ? 0
-                                : taloon.getPrice() * taloon.getSoldQty(), taloon.getShippedQty(),
-                        (taloon.getPrice() == null || taloon.getShippedQty() == null) ? 0
-                                : taloon.getPrice() * taloon.getShippedQty(), taloon.getReservedQty(),
+                                : taloon.getPrice() * taloon.getSoldQty(), taloon.getRequestedQty(),
+                        (taloon.getPrice() == null || taloon.getRequestedQty() == null) ? 0
+                                : taloon.getPrice() * taloon.getRequestedQty(), taloon.getReservedQty(),
                         (taloon.getPrice() == null || taloon.getReservedQty() == null) ? 0
                                 : taloon.getPrice() * taloon.getReservedQty(), taloon.getBlockedQty(),
                         (taloon.getPrice() == null || taloon.getBlockedQty() == null) ? 0
                                 : taloon.getPrice() * taloon.getBlockedQty(),
-                        (taloon.getShippedQty() == null || taloon.getSoldQty() == null) ? 0
-                                : (taloon.getShippedQty() - taloon.getSoldQty()),
-                        (taloon.getPrice() == null || taloon.getShippedQty() == null || taloon.getSoldQty() == null) ? 0
-                                : taloon.getPrice() * (taloon.getShippedQty() - taloon.getSoldQty()),
+                        (taloon.getRequestedQty() == null || taloon.getSoldQty() == null) ? 0
+                                : (taloon.getRequestedQty() - taloon.getSoldQty()),
+                        (taloon.getPrice() == null || taloon.getRequestedQty() == null || taloon.getSoldQty() == null) ? 0
+                                : taloon.getPrice() * (taloon.getRequestedQty() - taloon.getSoldQty()),
                         taloon.getIsppState(), taloon.getPpState(), taloon.getRemarks(), taloon.getComments(), false);
 
                 addComplexToMap(item, complexMap, date, detail, taloon.getComplexId(), taloon.getComplexName());
                 detailSum.addQtyAndGet(detail);
 
                 if (!summaryMap.containsKey(detail.getComplexId() + detail.getGoodsGuid())) {
+                    // Формирование итоговой строки
                     summaryMap.put(taloon.getComplexId() + taloon.getGoodsGuid(),
                             new TaloonPreorderVerificationDetail(null, null, null, null, detail.getComplexId(),
                                     detail.getComplexName(), detail.getGoodsName(), detail.getGoodsGuid(),
@@ -105,6 +106,19 @@ public class TaloonPreorderVerification {
         // Итого
         TaloonPreorderVerificationItem item = new TaloonPreorderVerificationItem();
         item.setTaloonDate(null);
+
+        // Пустая строка Итого
+        TaloonPreorderVerificationComplex emptyComplex = new TaloonPreorderVerificationComplex();
+        emptyComplex.setTaloonDate(null);
+        emptyComplex.setItem(item);
+        TaloonPreorderVerificationDetail emptyDetail = new TaloonPreorderVerificationDetail(null, null, null, null, null,
+                null, "За весь период", null, null, null, null, null, null,
+                null, null, null, null, null, null, null,
+                null, null, null, null, null, true);
+        emptyDetail.setComplex(emptyComplex);
+        emptyComplex.getDetails().add(emptyDetail);
+        item.getComplexes().add(emptyComplex);
+
         complexMap = new HashMap<>();
         Iterator<Map.Entry<String, TaloonPreorderVerificationDetail>> iter = summaryMap.entrySet().iterator();
         while (iter.hasNext()) {
@@ -112,7 +126,6 @@ public class TaloonPreorderVerification {
             addComplexToMap(item, complexMap, null, e.getValue(), e.getValue().getComplexId(), e.getValue().getComplexName());
         }
         addItemToList(items, complexMap, item);
-
         return items;
     }
 
@@ -142,43 +155,41 @@ public class TaloonPreorderVerification {
 
     @Transactional
     public void applyChanges(Session session, List<TaloonPreorderVerificationItem> items) throws Exception {
-        for (TaloonPreorderVerificationItem item : items) {
-            Date taloonDate = item.getTaloonDate();
-            for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
-                for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-                    if (detail.isSummaryDay()) {
-                        continue;
-                    }
-                    String guid = detail.getGuid();
-                    Long complexId = detail.getComplexId();
-                    String goodsGuid = detail.getGoodsGuid();
-                    Long idOfOrg = detail.getIdOfOrg();
-                    Long price = detail.getPrice();
-                    //TaloonPreorder taloon = DAOReadonlyService.getInstance()
-                    //        .findTaloonPreorder(idOfOrg, taloonDate, complexId, goodsGuid, price);
-                    TaloonPreorder taloon = DAOReadonlyService.getInstance()
-                            .findTaloonPreorder(guid);
-                    if (taloon != null) {
-                        if (itemChangedNullSafe(taloon.getShippedQty(), detail.getShippedQty()) ||
-                                !taloon.getPpState().equals(detail.getPpState()) ||
-                                itemChangedNullSafe(taloon.getComments(), detail.getComments())) {
-                            String rem = (taloon.getRemarks() == null ? "-" : taloon.getRemarks());
-                            taloon.setRemarks(rem.concat("\n").concat(String
-                                    .format("Изменено в АРМ отчетности, пользователь=%s, %2$td.%2$tm.%2$tY %2$tT",
-                                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(),
-                                            new Date())));
-                            taloon.setComments(detail.getComments());
-                            taloon.setShippedQty(detail.getShippedQty());
-                            taloon.setPpState(detail.getPpState());
-                            Long nextVersion = DAOUtils.nextVersionByTaloonPreorder(session);
-                            taloon.setVersion(nextVersion);
-                            session.update(taloon);
+        if (items != null) {
+            for (TaloonPreorderVerificationItem item : items) {
+                Date taloonDate = item.getTaloonDate();
+                for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
+                    for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
+                        if (detail.isSummaryDay()) {
+                            continue;
+                        }
+                        String guid = detail.getGuid();
+                        Long complexId = detail.getComplexId();
+                        String goodsGuid = detail.getGoodsGuid();
+                        Long idOfOrg = detail.getIdOfOrg();
+                        Long price = detail.getPrice();
+                        //TaloonPreorder taloon = DAOReadonlyService.getInstance()
+                        //        .findTaloonPreorder(idOfOrg, taloonDate, complexId, goodsGuid, price);
+                        TaloonPreorder taloon = DAOReadonlyService.getInstance().findTaloonPreorder(guid);
+                        if (taloon != null) {
+                            if (itemChangedNullSafe(taloon.getShippedQty(), detail.getShippedQty()) || !taloon.getPpState().equals(detail.getPpState()) || itemChangedNullSafe(
+                                    taloon.getComments(), detail.getComments())) {
+                                String rem = (taloon.getRemarks() == null ? "-" : taloon.getRemarks());
+                                taloon.setRemarks(rem.concat("\n").concat(String.format("Изменено в АРМ отчетности, пользователь=%s, %2$td.%2$tm.%2$tY %2$tT",
+                                        DAOReadonlyService.getInstance().getUserFromSession().getUserName(), new Date())));
+                                taloon.setComments(detail.getComments());
+                                taloon.setShippedQty(detail.getShippedQty());
+                                taloon.setPpState(detail.getPpState());
+                                Long nextVersion = DAOUtils.nextVersionByTaloonPreorder(session);
+                                taloon.setVersion(nextVersion);
+                                session.update(taloon);
+                            }
                         }
                     }
                 }
             }
+            session.flush();
         }
-        session.flush();
     }
 
     private boolean itemChangedNullSafe(Integer fromDB, Integer fromApp) {

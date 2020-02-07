@@ -78,7 +78,7 @@
 
     <rich:dataTable id="taloonPreorderVerificationTable" value="#{mainPage.taloonPreorderVerificationPage.items}"
                     var="item" rows="25"
-                    footerClass="data-table-footer" rowKeyVar="rowItemKey" >
+                    footerClass="data-table-footer" rowKeyVar="rowItemKey">
         <f:facet name="header">
             <rich:columnGroup>
 
@@ -134,13 +134,15 @@
                            center-aligned-column">
                 <%--       Дата--%>
                 <rich:column headerClass="column-header" rowspan="#{item.getDetailsSize()}"
-                             rendered="#{item.getRowInItem(rowComplexKey, rowDetailKey) eq 0}" >
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
+                             rendered="#{item.getRowInItem(rowComplexKey, rowDetailKey) eq 0}">
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{item.taloonDate}" styleClass="output-text"
                                   converter="dateConverter" rendered="#{!complex.taloonDateEmpty()}"/>
                     <h:outputText escape="true" value="Итого" styleClass="output-text"
                                   rendered="#{complex.taloonDateEmpty()}"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Комплекс--%>
                 <rich:column headerClass="column-header" rowspan="#{complex.details.size()}"
@@ -149,9 +151,11 @@
                 </rich:column>
                 <%--        Товары--%>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.goodsName}" styleClass="output-text"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Цена, руб--%>
                 <rich:column headerClass="column-header">
@@ -160,86 +164,120 @@
                 </rich:column>
                 <%--        Заказ ИСПП шт--%>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.requestedQty}" styleClass="output-text"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="true" value="#{detail.requestedQty}" styleClass="output-text" />
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Заказ ИСПП руб--%>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.requestedSum}" styleClass="output-text"
                                   converter="copeckSumConverter"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Оплата ИСПП шт--%>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.soldQty}" styleClass="output-text"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="true" value="#{detail.soldQty}" styleClass="output-text" />
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Оплата ИСПП руб--%>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.soldSum}" styleClass="output-text"
                                   converter="copeckSumConverter"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Блокировано шт--%>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.blockedQty}" styleClass="output-text"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="true" value="#{detail.blockedQty}" styleClass="output-text" />
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Блокировано руб--%>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.blockedSum}" styleClass="output-text"
                                   converter="copeckSumConverter"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Сторнировано шт--%>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.reservedQty}" styleClass="output-text"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="true" value="#{detail.reservedQty}" styleClass="output-text" />
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Сторнировано руб--%>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.reservedSum}" styleClass="output-text"
                                   converter="copeckSumConverter"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Отгрузка шт--%>
+                <%--                <rich:column headerClass="column-header">--%>
+                <%--                    <h:inputText value="#{detail.strShippedQty}" styleClass="output-text"--%>
+                <%--                                 rendered="#{detail.enableEditShippedQty()}">--%>
+                <%--                        <a4j:support event="onchange"/>--%>
+                <%--                    </h:inputText>--%>
+                <%--                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>--%>
+                <%--                    <h:outputText escape="true" value="#{detail.shippedQty}" styleClass="output-text"--%>
+                <%--                                  rendered="#{!detail.enableEditShippedQty()}"/>--%>
+                <%--                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>--%>
+                <%--                </rich:column>--%>
                 <rich:column headerClass="column-header">
                     <h:inputText value="#{detail.shippedQty}" styleClass="output-text"
                                  rendered="#{detail.enableEditShippedQty()}">
                         <a4j:support event="onchange"/>
                     </h:inputText>
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.shippedQty}" styleClass="output-text"
-                                  rendered="#{!detail.enableEditShippedQty()}"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                                  rendered="#{!detail.enableEditShippedQty()}" />
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
-                <%--        Отгрузка руб--%>
+                <%--                Отгрузка руб--%>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.shippedSum}" styleClass="output-text"
                                   converter="copeckSumConverter"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Разница шт--%>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.differedQty}" styleClass="output-text"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="true" value="#{detail.differedQty}" styleClass="output-text" />
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Разница руб--%>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="<strong>"
+                                  rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.differedSum}" styleClass="output-text"
                                   converter="copeckSumConverter"/>
-                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>
+                    <h:outputText escape="false" value="</strong>"
+                                  rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Статус ОО--%>
                 <rich:column headerClass="column-header">
@@ -248,12 +286,13 @@
                 <%--        Статус ПП--%>
                 <rich:column headerClass="column-header">
                     <%--            Изменить статус записи--%>
+
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateNotSelected}"
                                      action="#{mainPage.taloonPreorderVerificationPage.switchPpState()}"
                                      onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }"
                                      style="color:lightgray;">
                         <f:setPropertyActionListener value="#{detail}"
-                                                     target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItemDetail}"/>
+                                                     target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
                         <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}"
                                                      target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
                         <h:graphicImage value="/images/taloons/applied-gray.png"/>
@@ -263,9 +302,9 @@
                                      action="#{mainPage.taloonPreorderVerificationPage.switchPpState()}"
                                      oncomplete="if (#{detail.needFillShippedQty()}) { alert('Заполните отгрузку ПП'); }"
                                      onclick="if (#{!detail.allowedSetSecondFlag()}) { alert('Операция запрещена'); return false; }"
-                    style="color:lightgray;">
+                                     style="color:lightgray;">
                         <f:setPropertyActionListener value="#{detail}"
-                                                     target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItemDetail}"/>
+                                                     target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
                         <f:setPropertyActionListener value="#{detail.ppStateToTurnOnSecond}"
                                                      target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
                         <h:graphicImage value="/images/taloons/canceled-gray.png"/>
@@ -275,43 +314,62 @@
                                      action="#{mainPage.taloonPreorderVerificationPage.resetPpState()}"
                                      onclick="if (#{!detail.allowedClearSecondFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{detail}"
-                                                     target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItemDetail}"/>
+                                                     target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
                         <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}"
                                                      target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
                         <h:graphicImage value="/images/taloons/canceled.png"/>
                     </a4j:commandLink>
 
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateConfirmed}"
-                                     action="#{mainPage.taloonPreorderVerificationPage.resetPpState()}"
+                                     action="#{detail.deselectPpState}"
                                      onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
-                        <f:setPropertyActionListener value="#{detail}"
-                                                     target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationItemDetail}"/>
-                        <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}"
-                                                     target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
+                        <f:setPropertyActionListener value="#{detail}" target="#{detail.ppState}"/>
                         <h:graphicImage value="/images/taloons/applied.png"/>
                     </a4j:commandLink>
 
                     <%--            Подтвердить для всего дня--%>
-                    <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{item.isPpStateNotSelected() and detail.summaryDay}"
+                    <a4j:commandLink reRender="taloonPreorderVerificationTable"
+                                     rendered="#{detail.summaryDay and !detail.isTotal() and !detail.isEmptyTotal()}"
                                      action="#{item.confirmPpState()}"
                                      onclick="if (#{!item.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{item}" target="#{item.getPpState()}"/>
-                        <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
+                        <h:graphicImage value="/images/taloons/applied-big.png"/>
                     </a4j:commandLink>
                     <%--            Отменить выбор для всего дня--%>
-                    <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{item.isPpStateConfirmed() and detail.summaryDay}"
+                    <a4j:commandLink reRender="taloonPreorderVerificationTable"
+                                     rendered="#{detail.summaryDay and !detail.isTotal() and !detail.isEmptyTotal()}"
                                      action="#{item.deselectPpState()}" style="color:lightgray;"
                                      onclick="if (#{!item.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{item}"
                                                      target="#{item.getPpState()}"/>
+                        <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
+                    </a4j:commandLink>
+
+                    <%--            Подтвердить для всего периода--%>
+                    <a4j:commandLink reRender="taloonPreorderVerificationTable"
+                                     rendered="#{detail.summaryDay and !detail.isTotal() and detail.isEmptyTotal()}"
+                                     action="#{mainPage.taloonPreorderVerificationPage.confirmPpStateAllDay()}"
+                                     onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedSetPeriodFirstFlag()}) { alert('Операция запрещена'); return false; }">
+
                         <h:graphicImage value="/images/taloons/applied-big.png"/>
                     </a4j:commandLink>
+                    <%--            Отменить выбор для всего периода--%>
+                    <a4j:commandLink reRender="taloonPreorderVerificationTable"
+                                     rendered="#{detail.summaryDay and !detail.isTotal() and detail.isEmptyTotal()}"
+                                     action="#{mainPage.taloonPreorderVerificationPage.deselectPpStateAllDay()}"
+                                     style="color:lightgray;"
+                                     onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedClearPeriodFirstFlag()}) { alert('Операция запрещена'); return false; }">
+
+                        <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
+                    </a4j:commandLink>
+
                 </rich:column>
 
                 <%--        Комментарий--%>
                 <rich:column headerClass="column-header">
-                    <h:inputText value="#{detail.comments}" styleClass="output-text" rendered="#{!detail.summaryDay}">
-                    <a4j:support event="onchange"/>
+                    <h:inputText value="#{detail.comments}" styleClass="output-text"
+                                 rendered="#{!detail.summaryDay and !detail.isTotal()}">
+                        <a4j:support event="onchange"/>
                     </h:inputText>
                 </rich:column>
 

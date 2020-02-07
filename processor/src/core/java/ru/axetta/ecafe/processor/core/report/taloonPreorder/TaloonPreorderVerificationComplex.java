@@ -16,8 +16,8 @@ public class TaloonPreorderVerificationComplex {
     private Date taloonDate;
     private Long complexId;
     private String complexName;
-    private TaloonPreorderVerificationItem item;
     private final List<TaloonPreorderVerificationDetail> details = new ArrayList<>();
+    private TaloonPreorderVerificationItem item;
 
     public TaloonPreorderVerificationComplex() {
     }

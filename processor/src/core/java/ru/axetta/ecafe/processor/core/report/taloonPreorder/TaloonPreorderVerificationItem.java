@@ -50,6 +50,7 @@ public class TaloonPreorderVerificationItem {
             }
         }
         this.ppState = ppState;
+
     }
 
     public void confirmPpState() {
@@ -61,12 +62,18 @@ public class TaloonPreorderVerificationItem {
     }
 
     // меняем статусы только там, где это разрешено
-    private void changePpState(TaloonPPStatesEnum ppState) {
+    public void changePpState(TaloonPPStatesEnum ppState) {
         for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                 if (!detail.isSummaryDay()) {
-                    if ((ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.allowedSetFirstFlag()) ||
-                            (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED && detail.allowedClearFirstFlag())) {
+                    // согласование - только для записей, у которых нет отказа
+                    if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.allowedSetFirstFlag()) {
+                        if (!detail.isPpStateCanceled()) {
+                            detail.setPpState(ppState);
+                            this.ppState = ppState;
+                        }
+                    }
+                    if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED && detail.allowedClearFirstFlag()) {
                         detail.setPpState(ppState);
                         this.ppState = ppState;
                     }
@@ -79,8 +86,10 @@ public class TaloonPreorderVerificationItem {
     public boolean allowedSetFirstFlag() {
         for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-                if (detail.allowedSetFirstFlag()) {
-                    return true;
+                if (!detail.isSummaryDay()) {
+                    if (detail.allowedClearFirstFlag()) {
+                        return true;
+                    }
                 }
             }
         }
@@ -90,32 +99,15 @@ public class TaloonPreorderVerificationItem {
     public boolean allowedClearFirstFlag() {
         for (TaloonPreorderVerificationComplex complex : this.getComplexes()) {
             for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-                if (detail.allowedClearFirstFlag()) {
-                    return true;
+                if (!detail.isSummaryDay()) {
+                    if (detail.allowedClearFirstFlag()) {
+                        return true;
+                    }
                 }
             }
         }
         return false;
     }
-
-    //public void changePpStateAllDay(TaloonPPStatesEnum state) {
-    //    for (TaloonPreorderVerificationItem item : items) {
-    //        if (item.equals(currentTaloonPreorderVerificationItem)) {
-    //            for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
-    //                for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-    //                    if (detail.getPpState() != null) {
-    //                        if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED // && detail.allowedSetFirstFlag()
-    //                        ) || ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED || state == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED)) //&& detail.allowedClearFirstFlag())
-    //                        ) {
-    //                            detail.setPpState(state);
-    //                        }
-    //                    }
-    //                }
-    //                break;
-    //            }
-    //        }
-    //    }
-    //}
 
     public List<TaloonPreorderVerificationComplex> getComplexes() {
         return complexes;
@@ -123,10 +115,6 @@ public class TaloonPreorderVerificationItem {
 
     public void setComplexes(List<TaloonPreorderVerificationComplex> complexes) {
         this.complexes = complexes;
-    }
-
-    public boolean taloonDateEmpty() {
-        return taloonDate == null;
     }
 
     public int getDetailsSize() {
@@ -143,14 +131,6 @@ public class TaloonPreorderVerificationItem {
             complexesSize += this.complexes.get(i).getDetails().size();
         }
         return complexesSize + rowId;
-    }
-
-    public boolean isPpStateNotSelected() {
-        return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
-    }
-
-    public boolean isPpStateConfirmed() {
-        return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
     }
 
 }
