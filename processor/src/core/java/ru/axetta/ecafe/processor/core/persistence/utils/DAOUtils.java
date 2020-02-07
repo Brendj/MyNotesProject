@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -108,6 +108,12 @@ public class DAOUtils {
 
     public static Client findClient(Session persistenceSession, long idOfClient) throws Exception {
         return (Client) persistenceSession.get(Client.class, idOfClient);
+    }
+
+    public static void updateCommentByIdOfClient(Session session, long idOfClient, String comment) throws Exception {
+        Client client = findClient(session, idOfClient);
+        client.setRemarks(comment);
+        session.update(client);
     }
 
     @SuppressWarnings("unchecked")

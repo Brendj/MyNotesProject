@@ -811,7 +811,7 @@ public class ClientManager {
             if (fax != null) {
                 fax = Client.checkAndConvertMobile(fax);
                 if (fax == null) {
-                    throw new Exception("Неправильный формат факса");
+                    //throw new Exception("Неправильный формат факса");
                 }
             }
             client.setMobile(mobilePhone);//tokens[14]);
@@ -1215,6 +1215,25 @@ public class ClientManager {
             return client.getIdOfClient();
         } catch (Exception e) {
             logger.error("Ошибка при создании клиента", e);
+            throw new Exception("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    public static void updateComment(long idOfClient, String comment) throws Exception {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            DAOUtils.updateCommentByIdOfClient(persistenceSession, idOfClient, comment);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Ошибка при обновлении комментария", e);
             throw new Exception("Ошибка: " + e.getMessage());
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
