@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier;
 
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
-import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
 
@@ -25,10 +24,9 @@ public class ReestrMenuSupplier implements SectionRequest {
     public static final String SECTION_NAME = "MenuSupplier";
 
     private final List<MenuSupplierItem> items;
-    private final Long maxVersion;
+    private Boolean deletedState;
 
     public ReestrMenuSupplier(Node menuSupplierRequestNode, Long orgOwner) {
-        maxVersion = XMLUtils.getLongAttributeValue(menuSupplierRequestNode, "V");
         this.items = new ArrayList<>();
 
         Node itemNode = menuSupplierRequestNode.getFirstChild();
@@ -45,8 +43,12 @@ public class ReestrMenuSupplier implements SectionRequest {
         return items;
     }
 
-    public Long getMaxVersion() {
-        return maxVersion;
+    public Boolean getDeletedState() {
+        return deletedState;
+    }
+
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
     }
 
     @Override

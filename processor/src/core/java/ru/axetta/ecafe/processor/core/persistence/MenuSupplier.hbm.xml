@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.TaloonApproval" table="cf_menu_suppliers">
+    <class name="ru.axetta.ecafe.processor.core.persistence.MenuSupplier" table="cf_menu_suppliers">
 
         <id name="idOfMenuSupplier" column="idOfMenuSupplier" type="long">
             <generator class="hilo">

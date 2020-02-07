@@ -19,7 +19,7 @@ import org.w3c.dom.Element;
 
 public class ResMenuSupplierItem {
 
-    private Long version;
+    private Long idOfMenuSupplier;
     private Boolean deletedState;
     private Integer resultCode;
     private String errorMessage;
@@ -28,21 +28,18 @@ public class ResMenuSupplierItem {
 
     }
 
-    //public ResMenuSupplierItem(ReestrMenuSupplier menuSupplier) {
-    //    this.version = menuSupplier.getVersion();
-    //    this.deletedState = menuSupplier.getDeletedState();
-    //}
+    public ResMenuSupplierItem(ReestrMenuSupplier reestrMenuSupplier) {
+        this.deletedState = reestrMenuSupplier.getDeletedState();
+    }
 
-    //public ResMenuSupplierItem(ReestrMenuSupplier menuSupplier, Integer resCode) {
-    //    this.version = menuSupplier.getVersion();
-    //    this.deletedState = menuSupplier.getDeletedState();
-    //    this.resultCode = resCode;
-    //}
+    public ResMenuSupplierItem(ReestrMenuSupplier menuSupplier, Integer resCode) {
+        this.deletedState = menuSupplier.getDeletedState();
+        this.resultCode = resCode;
+    }
 
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
 
-        XMLUtils.setAttributeIfNotNull(element, "V", version);
         XMLUtils.setAttributeIfNotNull(element, "D", deletedState);
         XMLUtils.setAttributeIfNotNull(element, "Res", resultCode);
 
@@ -52,20 +49,20 @@ public class ResMenuSupplierItem {
         return element;
     }
 
+    public Long getIdOfMenuSupplier() {
+        return idOfMenuSupplier;
+    }
+
+    public void setIdOfMenuSupplier(Long idOfMenuSupplier) {
+        this.idOfMenuSupplier = idOfMenuSupplier;
+    }
+
     public String getErrorMessage() {
         return errorMessage;
     }
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
-    }
-
-    public Long getVersion() {
-        return version;
-    }
-
-    public void setVersion(Long version) {
-        this.version = version;
     }
 
     public Boolean getDeletedState() {

@@ -126,14 +126,6 @@ public class MenuSupplier {
         this.typeOfProductions = typeOfProductions;
     }
 
-    public List<WtAgeGroupItem> getAgeGroupItems() {
-        return ageGroupItems;
-    }
-
-    public void setAgeGroupItem(List<WtAgeGroupItem> ageGroupItems) {
-        this.ageGroupItems = ageGroupItems;
-    }
-
     public List<WtDietType> getDietTypes() {
         return dietTypes;
     }
@@ -188,5 +180,13 @@ public class MenuSupplier {
 
     public void setComplexes(List<WtComplex> complexes) {
         this.complexes = complexes;
+    }
+
+    public void setAgeGroupItems(List<WtAgeGroupItem> ageGroupItems) {
+        this.ageGroupItems = ageGroupItems;
+    }
+
+    public List<WtAgeGroupItem> getAgeGroupItems() {
+        return ageGroupItems;
     }
 }
