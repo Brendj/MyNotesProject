@@ -403,6 +403,12 @@
                     <h:outputText escape="true" value="Максимальное количество параллельных сессий синхронизации всех типов"
                                   styleClass="output-text" />
                     <h:inputText value="#{optionPage.syncLimitFilter}" styleClass="input-text" size="3" />
+                    <h:outputText escape="true" value="Количество одновременно обрабатываемых синхронизаций"
+                                  styleClass="output-text" />
+                    <h:inputText value="#{optionPage.simultaneousSyncThreads}" styleClass="input-text" size="3" />
+                    <h:outputText escape="true" value="Таймаут ожидания одновременно обрабатываемых синхронизаций, минуты"
+                                  styleClass="output-text" />
+                    <h:inputText value="#{optionPage.simultaneousSyncTimeout}" styleClass="input-text" size="3" />
                     <h:outputText escape="true" value="Периоды запрета полной синхронизации"
                                   styleClass="output-text" />
                     <h:inputText value="#{optionPage.syncRestrictFullSyncPeriods}" styleClass="input-text" size="25" />

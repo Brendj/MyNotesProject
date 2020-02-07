@@ -89,6 +89,8 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean syncRegisterLogging;
     private Integer syncRegisterMaxAttempts;
     private Integer syncLimits;
+    private Integer simultaneousSyncThreads;
+    private Integer simultaneousSyncTimeout;
     private Integer retryAfter;
     private Integer syncLimitFilter;
     private String syncRestrictFullSyncPeriods;
@@ -952,6 +954,8 @@ public class OptionPage extends BasicWorkspacePage {
         enableSubscriptionFeeding = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
         enableSubBalanceOperation = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
         syncLimits = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
+        simultaneousSyncThreads = runtimeContext.getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_THREADS);
+        simultaneousSyncTimeout = runtimeContext.getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT);
         retryAfter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
         syncLimitFilter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITFILTER);
         arrayOfFilterText = runtimeContext.getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
@@ -1181,6 +1185,8 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS, thinClientMinClaimsEditableDays);
 
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITS, syncLimits);
+            runtimeContext.setOptionValue(Option.OPTION_SIMULTANEOUS_SYNC_THREADS, simultaneousSyncThreads);
+            runtimeContext.setOptionValue(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT, simultaneousSyncTimeout);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_RETRY_AFTER, retryAfter);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITFILTER, syncLimitFilter);
             runtimeContext.setOptionValue(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS, syncRestrictFullSyncPeriods);
@@ -1390,5 +1396,21 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setNsiVersion(String nsiVersion) {
         this.nsiVersion = nsiVersion;
+    }
+
+    public Integer getSimultaneousSyncThreads() {
+        return simultaneousSyncThreads;
+    }
+
+    public void setSimultaneousSyncThreads(Integer simultaneousSyncThreads) {
+        this.simultaneousSyncThreads = simultaneousSyncThreads;
+    }
+
+    public Integer getSimultaneousSyncTimeout() {
+        return simultaneousSyncTimeout;
+    }
+
+    public void setSimultaneousSyncTimeout(Integer simultaneousSyncTimeout) {
+        this.simultaneousSyncTimeout = simultaneousSyncTimeout;
     }
 }
