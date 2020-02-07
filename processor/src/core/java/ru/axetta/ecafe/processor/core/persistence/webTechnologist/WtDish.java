@@ -4,37 +4,105 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
-import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import ru.axetta.ecafe.processor.core.persistence.MenuSupplier;
 
+import javax.persistence.*;
+import java.math.BigDecimal;
+import java.util.*;
+
+@Entity
+@Table(name = "cf_wt_dishes")
 public class WtDish {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idOfDish")
     private Long idOfDish;
+
+    @Column(name = "dishName")
     private String dishName;
+
+    @Column(name = "componentsOfDish")
     private String componentsOfDish;
+
+    @Column(name = "code")
     private Integer code;
+
+    @Column(name = "price")
     private BigDecimal price;
+
+    @Column(name = "dateOfBeginMenuIncluding")
     private Date dateOfBeginMenuIncluding;
+
+    @Column(name = "dateOfEndMenuIncluding")
     private Date dateOfEndMenuIncluding;
+
+    @Column(name = "createDate")
     private Date createDate;
+
+    @Column(name = "lastUpdate")
     private Date lastUpdate;
+
+    @Column(name = "version")
     private Long version;
+
+    @Column(name = "deleteState")
     private Integer deleteState;
+
+    @Column(name = "guid")
     private String guid;
+
+    @Column(name = "protein")
     private Integer protein;
+
+    @Column(name = "fat")
     private Integer fat;
+
+    @Column(name = "carbohydrates")
     private Integer carbohydrates;
+
+    @Column(name = "calories")
     private Integer calories;
+
+    @Column(name = "qty")
     private String qty;
+
+    @ManyToOne
+    @JoinColumn(name = "idOfAgeGroupItem")
     private WtAgeGroupItem wtAgeGroupItem;
+
+    @ManyToMany
+    @JoinTable(name = "cf_wt_complex_items_dish",
+            joinColumns = @JoinColumn(name = "idOfDish"),
+            inverseJoinColumns = @JoinColumn(name = "idOfComplexItem"))
     private Set<WtComplexesItem> complexItems = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "cf_wt_dish_categoryitem_relationships",
+            joinColumns = @JoinColumn(name = "idOfDish"),
+            inverseJoinColumns = @JoinColumn(name = "idOfCategoryItem"))
     private Set<WtCategoryItem> categoryItems = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "cf_wt_dishes_menu_relationships",
+            joinColumns = @JoinColumn(name = "idOfDish"),
+            inverseJoinColumns = @JoinColumn(name = "idOfMenu"))
     private Set<WtMenu> menus = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "cf_wt_dish_groupitem_relationships",
+            joinColumns = @JoinColumn(name = "idOfDish"),
+            inverseJoinColumns = @JoinColumn(name = "idOfGroupItem"))
     private Set<WtGroupItem> groupItems = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "cf_wt_menu_group_dish",
+            joinColumns = @JoinColumn(name = "dish_id"),
+            inverseJoinColumns = @JoinColumn(name = "menu_group_id"))
     private Set<WtMenuGroup> menuGroups = new HashSet<>();
+
+    @OneToMany(mappedBy = "dish")
+    private List<MenuSupplier> menuSupplierList;
 
     public Long getIdOfDish() {
         return idOfDish;
@@ -218,6 +286,14 @@ public class WtDish {
 
     public void setMenuGroups(Set<WtMenuGroup> menuGroups) {
         this.menuGroups = menuGroups;
+    }
+
+    public List<MenuSupplier> getMenuSupplierList() {
+        return menuSupplierList;
+    }
+
+    public void setMenuSupplierList(List<MenuSupplier> menuSupplierList) {
+        this.menuSupplierList = menuSupplierList;
     }
 
     @Override

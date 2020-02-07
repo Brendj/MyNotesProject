@@ -7,7 +7,6 @@
     "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem" table="cf_wt_category_items">
         <cache usage="transactional"/>
         <id name="idOfCategoryItem">

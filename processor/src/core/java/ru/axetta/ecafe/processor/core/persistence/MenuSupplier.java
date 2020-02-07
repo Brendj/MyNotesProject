@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.persistence;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 
 import javax.persistence.*;
-import java.util.List;
 import java.util.Objects;
 
 /**
@@ -27,54 +26,64 @@ public class MenuSupplier {
     @Column(name = "idOfMenuSupplier")
     private Long idOfMenuSupplier;
 
-    @OneToMany(mappedBy = "idOfCategoryItem")
-    private List<WtCategoryItem> categoryItems;
+    @ManyToOne
+    @JoinColumn(name = "idOfCategoryItem")
+    private WtCategoryItem categoryItem;
 
-    @OneToMany(mappedBy = "idOfTypeProduction")
-    private List<WtTypeOfProductionItem> typeOfProductions;
+    @ManyToOne
+    @JoinColumn(name = "idOfTypeProduction")
+    private WtTypeOfProductionItem typeOfProduction;
 
-    @OneToMany(mappedBy = "idOfAgeGroupItem")
-    private List<WtAgeGroupItem> ageGroupItems;
+    @ManyToOne
+    @JoinColumn(name = "idOfAgeGroupItem")
+    private WtAgeGroupItem ageGroupItem;
 
-    @OneToMany(mappedBy = "idOfDietType")
-    private List<WtDietType> dietTypes;
+    @ManyToOne
+    @JoinColumn(name = "idOfDietType")
+    private WtDietType dietType;
 
-    @OneToMany(mappedBy = "idOfComplexGroupItem")
-    private List<WtComplexGroupItem> complexGroupItems;
+    @ManyToOne
+    @JoinColumn(name = "idOfComplexGroupItem")
+    private WtComplexGroupItem complexGroupItem;
 
-    @OneToMany(mappedBy = "idOfGroupItem")
-    private List<WtGroupItem> groupItems;
+    @ManyToOne
+    @JoinColumn(name = "idOfGroupItem")
+    private WtGroupItem groupItem;
 
-    @OneToMany(mappedBy = "idOfDish")
-    private List<WtDish> dishes;
+    @ManyToOne
+    @JoinColumn(name = "idOfDish")
+    private WtDish dish;
 
-    @OneToMany(mappedBy = "idOfMenuGroup")
-    private List<WtMenuGroup> menuGroups;
+    @ManyToOne
+    @JoinColumn(name = "idOfMenuGroup")
+    private WtMenuGroup menuGroup;
 
-    @OneToMany(mappedBy = "idOfMenu")
-    private List<WtMenu> menus;
+    @ManyToOne
+    @JoinColumn(name = "idOfMenu")
+    private WtMenu menu;
 
-    @OneToMany(mappedBy = "idOfComplex")
-    private List<WtComplex> complexes;
+    @ManyToOne
+    @JoinColumn(name = "idOfComplex")
+    private WtComplex complex;
 
     public MenuSupplier() {
     }
 
-    public MenuSupplier(Long idOfMenuSupplier, List<WtCategoryItem> categoryItems,
-            List<WtTypeOfProductionItem> typeOfProductions, List<WtAgeGroupItem> ageGroupItems,
-            List<WtDietType> dietTypes, List<WtComplexGroupItem> complexGroupItems, List<WtGroupItem> groupItems,
-            List<WtDish> dishes, List<WtMenuGroup> menuGroups, List<WtMenu> menus, List<WtComplex> complexes) {
+    public MenuSupplier(Long idOfMenuSupplier, WtCategoryItem categoryItem,
+            WtTypeOfProductionItem typeOfProduction, WtAgeGroupItem ageGroupItem,
+            WtDietType dietType, WtComplexGroupItem complexGroupItem, WtGroupItem groupItem,
+            WtDish dish, WtMenuGroup menuGroup, WtMenu menu, WtComplex complex) {
         this.idOfMenuSupplier = idOfMenuSupplier;
-        this.categoryItems = categoryItems;
-        this.typeOfProductions = typeOfProductions;
-        this.ageGroupItems = ageGroupItems;
-        this.dietTypes = dietTypes;
-        this.complexGroupItems = complexGroupItems;
-        this.groupItems = groupItems;
-        this.dishes = dishes;
-        this.menuGroups = menuGroups;
-        this.menus = menus;
-        this.complexes = complexes;
+        this.categoryItem = categoryItem;
+        this.typeOfProduction = typeOfProduction;
+        this.ageGroupItem = ageGroupItem;
+        this.dietType = dietType;
+        this.complexGroupItem = complexGroupItem;
+        this.groupItem = groupItem;
+        this.dish = dish;
+        this.menuGroup = menuGroup;
+        this.menu = menu;
+        this.complex = complex;
     }
 
     @Override
@@ -94,99 +103,99 @@ public class MenuSupplier {
         return Objects.hash(idOfMenuSupplier);
     }
 
-    public Long getIdOfMenuSupplier() {
-        return idOfMenuSupplier;
-    }
-
     @Override
     public String toString() {
-        return "MenuSupplier{" + "idOfMenuSupplier=" + idOfMenuSupplier + ", categoryItems=" + categoryItems
-                + ", typeOfProductions=" + typeOfProductions + ", ageGroupItems=" + ageGroupItems + ", dietTypes="
-                + dietTypes + ", complexGroupItems=" + complexGroupItems + ", groupItems=" + groupItems + ", dishes="
-                + dishes + ", menuGroups=" + menuGroups + ", menus=" + menus + ", complexes=" + complexes + '}';
+        return "MenuSupplier{" + "idOfMenuSupplier=" + idOfMenuSupplier + ", categoryItem=" + categoryItem
+                + ", typeOfProduction=" + typeOfProduction + ", ageGroupItem=" + ageGroupItem + ", dietType=" + dietType
+                + ", complexGroupItem=" + complexGroupItem + ", groupItem=" + groupItem + ", dish=" + dish
+                + ", menuGroup=" + menuGroup + ", menu=" + menu + ", complex=" + complex + '}';
+    }
+
+    public Long getIdOfMenuSupplier() {
+        return idOfMenuSupplier;
     }
 
     public void setIdOfMenuSupplier(Long idOfMenuSupplier) {
         this.idOfMenuSupplier = idOfMenuSupplier;
     }
 
-    public List<WtCategoryItem> getCategoryItems() {
-        return categoryItems;
+    public WtCategoryItem getCategoryItem() {
+        return categoryItem;
     }
 
-    public void setCategoryItems(List<WtCategoryItem> categoryItems) {
-        this.categoryItems = categoryItems;
+    public void setCategoryItem(WtCategoryItem categoryItem) {
+        this.categoryItem = categoryItem;
     }
 
-    public List<WtTypeOfProductionItem> getTypeOfProductions() {
-        return typeOfProductions;
+    public WtTypeOfProductionItem getTypeOfProduction() {
+        return typeOfProduction;
     }
 
-    public void setTypeOfProductions(List<WtTypeOfProductionItem> typeOfProductions) {
-        this.typeOfProductions = typeOfProductions;
+    public void setTypeOfProduction(WtTypeOfProductionItem typeOfProduction) {
+        this.typeOfProduction = typeOfProduction;
     }
 
-    public List<WtDietType> getDietTypes() {
-        return dietTypes;
+    public WtAgeGroupItem getAgeGroupItem() {
+        return ageGroupItem;
     }
 
-    public void setDietTypes(List<WtDietType> dietTypes) {
-        this.dietTypes = dietTypes;
+    public void setAgeGroupItem(WtAgeGroupItem ageGroupItem) {
+        this.ageGroupItem = ageGroupItem;
     }
 
-    public List<WtComplexGroupItem> getComplexGroupItems() {
-        return complexGroupItems;
+    public WtDietType getDietType() {
+        return dietType;
     }
 
-    public void setComplexGroupItems(List<WtComplexGroupItem> complexGroupItems) {
-        this.complexGroupItems = complexGroupItems;
+    public void setDietType(WtDietType dietType) {
+        this.dietType = dietType;
     }
 
-    public List<WtGroupItem> getGroupItems() {
-        return groupItems;
+    public WtComplexGroupItem getComplexGroupItem() {
+        return complexGroupItem;
     }
 
-    public void setGroupItems(List<WtGroupItem> groupItems) {
-        this.groupItems = groupItems;
+    public void setComplexGroupItem(WtComplexGroupItem complexGroupItem) {
+        this.complexGroupItem = complexGroupItem;
     }
 
-    public List<WtDish> getDishes() {
-        return dishes;
+    public WtGroupItem getGroupItem() {
+        return groupItem;
     }
 
-    public void setDishes(List<WtDish> dishes) {
-        this.dishes = dishes;
+    public void setGroupItem(WtGroupItem groupItem) {
+        this.groupItem = groupItem;
     }
 
-    public List<WtMenuGroup> getMenuGroups() {
-        return menuGroups;
+    public WtDish getDish() {
+        return dish;
     }
 
-    public void setMenuGroups(List<WtMenuGroup> menuGroups) {
-        this.menuGroups = menuGroups;
+    public void setDish(WtDish dish) {
+        this.dish = dish;
     }
 
-    public List<WtMenu> getMenus() {
-        return menus;
+    public WtMenuGroup getMenuGroup() {
+        return menuGroup;
     }
 
-    public void setMenus(List<WtMenu> menus) {
-        this.menus = menus;
+    public void setMenuGroup(WtMenuGroup menuGroup) {
+        this.menuGroup = menuGroup;
     }
 
-    public List<WtComplex> getComplexes() {
-        return complexes;
+    public WtMenu getMenu() {
+        return menu;
     }
 
-    public void setComplexes(List<WtComplex> complexes) {
-        this.complexes = complexes;
+    public void setMenu(WtMenu menu) {
+        this.menu = menu;
     }
 
-    public void setAgeGroupItems(List<WtAgeGroupItem> ageGroupItems) {
-        this.ageGroupItems = ageGroupItems;
+    public WtComplex getComplex() {
+        return complex;
     }
 
-    public List<WtAgeGroupItem> getAgeGroupItems() {
-        return ageGroupItems;
+    public void setComplex(WtComplex complex) {
+        this.complex = complex;
     }
 }
