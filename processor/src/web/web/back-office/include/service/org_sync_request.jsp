@@ -20,13 +20,27 @@
     <rich:panel>
         <f:facet name="header"><h:outputText styleClass="column-header" value="Запрос синхронизации" /></f:facet>
         <h:panelGrid columns="2" styleClass="borderless-grid">
+            <h:outputText escape="true" value="Поставщик" styleClass="output-text required-field" />
+            <h:panelGroup styleClass="borderless-div">
+                <h:inputText value="#{orgSyncRequestPage.defaultSupplier.contragentName}" readonly="true"
+                             styleClass="input-text" style="margin-right: 2px;" />
+                <a4j:commandButton value="..." action="#{mainPage.showContragentSelectPage()}"
+                                   reRender="modalContragentSelectorPanel"
+                                   oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentSelectorPanel')}.show();"
+                                   styleClass="command-link" style="width: 25px;">
+                    <f:setPropertyActionListener value="#{true}" target="#{orgSyncRequestPage.selectReceiver}" />
+                    <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
+                    <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
+                </a4j:commandButton>
+            </h:panelGroup>
+
             <h:outputText escape="true" value="Организации" styleClass="output-text required-field" />
             <h:panelGrid columns="2">
                 <a4j:commandButton value="..." action="#{mainPage.showOrgListSelectPage}"
                                    reRender="modalOrgListSelectorPanel"
                                    oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                    styleClass="command-link" style="width: 25px;">
-                    <f:setPropertyActionListener value="#{orgSyncRequestPage.getStringIdOfOrgList}"
+                    <f:setPropertyActionListener value="#{orgSyncRequestPage.idOfOrgList}"
                                                  target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
                 </a4j:commandButton>
                 <h:outputText styleClass="output-text" id="orgSyncRequestPageFilter" escape="true"
