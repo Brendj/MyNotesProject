@@ -2711,6 +2711,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public MenuListResult getMenuListByOrg(@WebParam(name = "orgId") Long orgId, final Date startDate,
             final Date endDate) {
         authenticateRequest(null);
+        MenuListResult menuListResult = new MenuListResult();
+        if (CalendarUtils.addDays(startDate, 1).getTime() < endDate.getTime())
+        {
+            menuListResult.resultCode = RC_INVALID_DATA;
+            menuListResult.description = RC_INVALID_INPUT_DATA;
+            return menuListResult;
+        }
 
         Data data = new OrgRequest().process(orgId, new Processor() {
             public void process(Org org, Data data, ObjectFactory objectFactory, Session session,
@@ -2719,7 +2726,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
         });
 
-        MenuListResult menuListResult = new MenuListResult();
+
         if (data.getMenuListExt() != null) {
             Collections.sort(data.getMenuListExt().getM());
         }
