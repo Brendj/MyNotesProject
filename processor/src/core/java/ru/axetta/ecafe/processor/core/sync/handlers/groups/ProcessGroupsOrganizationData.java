@@ -5,7 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.groups;
 
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
-import ru.axetta.ecafe.processor.core.utils.*;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

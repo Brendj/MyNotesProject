@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -45,9 +46,9 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
     protected static final String[] COLUMN_NAMES = new String[]{
             "Номер л/счета", "Пароль", "Статус", "Дата договора", "Договор-фамилия", "Договор-имя", "Договор-отчество",
-            "Договор-документ", "Фамилия", "Имя", "Отчество", "Документ", "Адрес", "Телефон", "Мобильный", "E-mail",
-            "Платный SMS", "Уведомление по e-mail", "Уведомление по SMS", "Овердрафт", "Уведомление через PUSH",
-            "Группа/класс"};
+            "Договор-документ", "Фамилия", "Имя", "Отчество", "Пол(ж-0 м-1)", "Документ", "Адрес", "Телефон",
+            "Мобильный", "E-mail", "Платный SMS", "Уведомление по e-mail", "Уведомление по SMS", "Овердрафт",
+            "Уведомление через PUSH", "Группа/класс"};
 
     public static class OrgItem {
 
@@ -160,16 +161,16 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         RuntimeContext runtimeContext = null;
         try {
             runtimeContext = RuntimeContext.getInstance();
-
             long lineCount = dataSize / 100;
             if (lineCount > MAX_LINE_NUMBER) {
                 lineCount = MAX_LINE_NUMBER;
             }
-            List<LineResult> lineResults = new ArrayList<LineResult>((int) lineCount);
+            List<LineResult> lineResults = new ArrayList<>((int) lineCount);
             int lineNo = 0;
             int successLineNumber = 0;
             ClientManager.ClientFieldConfig fieldConfig = new ClientManager.ClientFieldConfig();
             BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, StandardCharsets.UTF_8));
+            LineResult result;
             String currLine = reader.readLine();
             while (null != currLine) {
                 fieldConfig.resetToDefaultValues();
@@ -179,8 +180,23 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
                     if (lineNo == 0) {
                         currLine = currLine.replace(UTF8_BOM, "");
                     }
+                    result = checkLength(currLine, lineNo);
+                    if (result != null) {
+                        lineResults.add(result);
+                        break;
+                    }
                     if (!isTitle(currLine)) {
-                        LineResult result = createClient(fieldConfig, this.org.getIdOfOrg(), currLine, lineNo,
+                        result = checkNames(currLine, lineNo);
+                        if (result != null) {
+                            lineResults.add(result);
+                            currLine = reader.readLine();
+                            if (lineNo == MAX_LINE_NUMBER) {
+                                break;
+                            }
+                            ++lineNo;
+                            continue;
+                        }
+                        result = createClient(fieldConfig, this.org.getIdOfOrg(), currLine, lineNo,
                                 this.checkFullNameUnique);
                         if (result.getResultCode() == 0) {
                             ++successLineNumber;
@@ -201,7 +217,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         }
     }
 
-    private boolean isTitle(String currLine) {
+    private boolean isTitle(String currLine) throws Exception {
         String[] data = currLine.split(";");
         for (int i = 0; i < data.length; i++) {
             String str = data[i].replace("\"", "");
@@ -215,6 +231,25 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
         return false;
     }
 
+    private LineResult checkLength(String row, int lineNo) {
+        String[] data = row.split(";");
+        if (data.length > 23) {
+            return new LineResult(lineNo, -1,
+                    "Ошибка: " + "Количество полей в строке " + lineNo + " не совпадает с заголовком", -1L);
+        }
+        return null;
+    }
+
+    private LineResult checkNames(String line, int lineNo) {
+        String[] data = line.split(";");
+        if (data[8].equals("") || data[9].equals("")) {     // SURNAME, NAME
+            String value = data[8].equals("") ? COLUMN_NAMES[8] : COLUMN_NAMES[9];
+            return new LineResult(lineNo, -1,
+                    "Ошибка: " + "Не заполнено обязательное поле " + value + " в строке " + lineNo, -1L);
+        }
+        return null;
+    }
+
     private void parseLineConfig(FieldProcessor.Config fc, String currLine) throws Exception {
         String attrs[] = currLine.substring(1).split(";");
         for (int n = 0; n < attrs.length; ++n) {
@@ -225,14 +260,23 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
     private LineResult createClient(ClientManager.ClientFieldConfig fieldConfig, Long idOfOrg, String line, int lineNo,
             boolean checkFullNameUnique) throws Exception {
-        String[] tokens = line.split(";", -1);
+        String[] tokens = modifyData(line, lineNo);
         try {
             fieldConfig.setValues(tokens);
         } catch (Exception e) {
             return new LineResult(lineNo, 1, e.getMessage(), null);
         }
+
+        boolean payForSmsIsNull = fieldConfig.isValueNull(ClientManager.FieldId.PAY_FOR_SMS);
+        if (payForSmsIsNull) {
+            String payForSms =
+                    RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_SEND_PAYMENT_NOTIFY_SMS_ON) ? "1"
+                            : "0";
+            fieldConfig.setValue(ClientManager.FieldId.PAY_FOR_SMS, payForSms);
+        }
+
         //если флаг установки уведомления по Push не установлен в файле загрузки, устаноавливаем значение по умолчанию в соотв. с опцией
-        Boolean notifyPushIsNull = fieldConfig.isValueNull(ClientManager.FieldId.NOTIFY_BY_PUSH);
+        boolean notifyPushIsNull = fieldConfig.isValueNull(ClientManager.FieldId.NOTIFY_BY_PUSH);
         if (notifyPushIsNull) {
             String notifyByPush =
                     RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1"
@@ -240,7 +284,7 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             fieldConfig.setValue(ClientManager.FieldId.NOTIFY_BY_PUSH, notifyByPush);
         }
 
-        Boolean notifyEmailIsNull = fieldConfig.isValueNull(ClientManager.FieldId.NOTIFY_BY_EMAIL);
+        boolean notifyEmailIsNull = fieldConfig.isValueNull(ClientManager.FieldId.NOTIFY_BY_EMAIL);
         if (notifyEmailIsNull) {
             String notifyByEmail =
                     RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS) ? "1"
@@ -248,13 +292,24 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
             fieldConfig.setValue(ClientManager.FieldId.NOTIFY_BY_EMAIL, notifyByEmail);
         }
 
-        Boolean isGroupsFieldEmpty = fieldConfig.isValueNull(ClientManager.FieldId.GROUP);
+        boolean isGroupsFieldEmpty = fieldConfig.isValueNull(ClientManager.FieldId.GROUP);
         if (isGroupsFieldEmpty) {
             fieldConfig.setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup());
         }
 
+        boolean isGenderEmpty = fieldConfig.isValueNull(ClientManager.FieldId.GENDER);
+        if (isGenderEmpty) {
+            fieldConfig.setValue(ClientManager.FieldId.GENDER, 0);
+        }
+
+        boolean isContractDateEmpty = fieldConfig.isValueNull(ClientManager.FieldId.CONTRACT_DATE);
+        if (isContractDateEmpty) {
+            fieldConfig.setValue(ClientManager.FieldId.CONTRACT_DATE, "#CURRENT_DATE");
+        }
+
         try {
-            long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique, false);
+            long idOfClient = ClientManager.registerClient(idOfOrg, fieldConfig, checkFullNameUnique, true);
+            ClientManager.updateComment(idOfClient, MskNSIService.COMMENT_MANUAL_IMPORT);
             return new LineResult(lineNo, 0, "Ok", idOfClient);
         } catch (Exception e) {
             return new LineResult(lineNo, -1, "Ошибка: " + e.getMessage(), -1L);
@@ -262,10 +317,38 @@ public class ClientFileLoadPage extends BasicWorkspacePage implements OrgSelectP
 
     }
 
+    private String[] modifyData(String line, int lineNo) {
+        String[] data = line.split(";", -1);
+        String[] tokens = new String[34];
+        for (int i = 0; i < data.length; i++) {
+            data[i] = data[i].trim();
+            if (i < 11) {
+                if (i == 0 && data[i].equals("")) {     // CONTRACT_ID
+                    data[i] = "AUTO";
+                }
+                if (i == 3 && data[i].equals("")) {     // CONTRACT_DATE
+                    data[i] = "#CURRENT_DATE";
+                }
+                if ((i == 2) && data[i].equals("")) {   // CONTRACT_STATE
+                    data[i] = "0";
+                }
+                tokens[i] = data[i].trim();
+            } else if (i > 11) {
+                if ((i == 16 || i == 17 || i == 18) && data[i]
+                        .equals("")) {        // PAY_FOR_SMS, NOTIFY_BY_PUSH, NOTIFY_BY_EMAIL
+                    data[i] = "0";
+                }
+                tokens[i - 1] = data[i];
+            }
+        }
+        tokens[33] = data[11].equals("0") ? "f" : "m";      // GENDER
+        return tokens;
+    }
+
     public void downloadSample() {
         String result = "\"Номер л/счета\";\"Пароль\";\"Статус\";\"Дата договора\";\"Договор-фамилия\";"
                 + "\"Договор-имя\";\"Договор-отчество\";\"Договор-документ\";\"Фамилия\";\"Имя\";"
-                + "\"Отчество\";\"Документ\";\"Адрес\";\"Телефон\";\"Мобильный\";\"E-mail\";\"Платный SMS\";"
+                + "\"Отчество\"; \"Пол(ж-0 м-1)\";\"Документ\";\"Адрес\";\"Телефон\";\"Мобильный\";\"E-mail\";\"Платный SMS\";"
                 + "\"Уведомление по e-mail\";\"Уведомление по SMS\";\"Овердрафт\";\"Уведомление через PUSH\";"
                 + "\"Группа/класс\";";
         FacesContext facesContext = FacesContext.getCurrentInstance();

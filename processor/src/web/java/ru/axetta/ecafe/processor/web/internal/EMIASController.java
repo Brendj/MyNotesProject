@@ -10,7 +10,6 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
-import ru.axetta.ecafe.processor.web.partner.integra.dataflow.Result;
 
 import org.apache.cxf.message.Message;
 import org.hibernate.Session;

@@ -26,7 +26,8 @@ public enum SyncType {
     TYPE_MIGRANTS(8, "Migrants"),
     TYPE_HELP_REQUESTS(13, "HelpRequests"),
     TYPE_CONSTRUCTED(20,"ConstructedSections"),
-    TYPE_ORG_SETTINGS(25, "OrgSettings");
+    TYPE_ORG_SETTINGS(25, "OrgSettings"),
+    TYPE_REESTR_TALOONS_PREORDER(26,"ReestrTaloonsPreorder");
 
     private static Map<String,SyncType> map = new HashMap<String,SyncType>();
     static {

@@ -188,6 +188,8 @@ public class Client {
         this.disablePlanCreationDate = null;
         this.disablePlanEndDate = null;
         this.createdFrom = ClientCreatedFromType.DEFAULT;
+        this.gender = 1; //set default as male
+
         /*// При создании клиента проставляем ему настройки оповещений по умолчанию.
         for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
             if (predefined.isEnabledAtDefault()) {
@@ -251,8 +253,21 @@ public class Client {
         return null;
     }
 
-    public boolean isParentGroup() {
-        return idOfClientGroup != null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+    public boolean isParentMsk() {
+        return !isStudent() && !isSotrudnikMsk();
+        //return idOfClientGroup != null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+    }
+
+    public boolean isStudent() {
+        return idOfClientGroup != null && idOfClientGroup < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue();
+    }
+
+    public boolean isSotrudnikMsk() {
+        return idOfClientGroup != null && (idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue())
+            || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue())
+            || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue())
+            || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_OTHERS.getValue())
+            || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_EMPLOYEE_OTHER_ORG.getValue()));
     }
 
     public static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {

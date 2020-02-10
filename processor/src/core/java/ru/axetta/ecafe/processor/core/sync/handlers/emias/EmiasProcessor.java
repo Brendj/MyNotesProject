@@ -11,12 +11,13 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
 
-
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class EmiasProcessor extends AbstractProcessor<OrgSettingSection> {
 
