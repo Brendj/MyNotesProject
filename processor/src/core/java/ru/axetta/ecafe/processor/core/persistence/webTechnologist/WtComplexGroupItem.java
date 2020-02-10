@@ -4,12 +4,26 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import ru.axetta.ecafe.processor.core.persistence.MenuSupplier;
+
+import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "cf_wt_complex_group_items")
 public class WtComplexGroupItem {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idOfComplexGroupItem")
     private Long idOfComplexGroupItem;
+
+    @Column(name = "description")
     private String description;
+
+    @OneToMany(mappedBy = "complexGroupItem")
+    private List<MenuSupplier> menuSupplierList;
 
     public Long getIdOfComplexGroupItem() {
         return idOfComplexGroupItem;
@@ -25,6 +39,14 @@ public class WtComplexGroupItem {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<MenuSupplier> getMenuSupplierList() {
+        return menuSupplierList;
+    }
+
+    public void setMenuSupplierList(List<MenuSupplier> menuSupplierList) {
+        this.menuSupplierList = menuSupplierList;
     }
 
     @Override

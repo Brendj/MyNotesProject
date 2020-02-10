@@ -4,16 +4,34 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import javax.persistence.*;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@Entity
+@Table(name = "cf_wt_complexes_items")
 public class WtComplexesItem {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idOfComplexItem")
     private Long idOfComplexItem;
+
+    @Column(name = "cycle_day")
     private Integer cycleDay;
+
+    @Column(name = "count_dishes")
     private Integer countDishes;
+
+    @ManyToOne
+    @JoinColumn(name = "idOfComplex")
     private WtComplex wtComplex;
+
+    @ManyToMany
+    @JoinTable(name = "cf_wt_complex_items_dish",
+            joinColumns = @JoinColumn(name = "idOfComplexItem"),
+            inverseJoinColumns = @JoinColumn(name = "idOfDish"))
     private Set<WtDish> dishes = new HashSet<>();
 
     public Long getIdOfComplexItem() {

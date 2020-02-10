@@ -6,19 +6,40 @@ package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
+import javax.persistence.*;
 import java.util.Date;
 import java.util.HashSet;
 import java.util.Objects;
 import java.util.Set;
 
+@Entity
+@Table(name = "cf_wt_org_groups")
 public class WtOrgGroup {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idOfOrgGroup")
     private Long idOfOrgGroup;
+
+    @Column(name = "nameOfOrgGroup")
     private String nameOfOrgGroup;
+
+    @Column(name = "createDate")
     private Date createDate;
+
+    @Column(name = "lastUpdate")
     private Date lastUpdate;
+
+    @Column(name = "deleteState")
     private Integer deleteState;
+
+    @Column(name = "version")
     private Long version;
+
+    @ManyToMany
+    @JoinTable(name = "cf_wt_org_group_relations",
+            joinColumns = @JoinColumn(name = "idOfOrgGroup"),
+            inverseJoinColumns = @JoinColumn(name = "idOfOrg"))
     private Set<Org> orgs = new HashSet<>();
 
     public Long getIdOfOrgGroup() {

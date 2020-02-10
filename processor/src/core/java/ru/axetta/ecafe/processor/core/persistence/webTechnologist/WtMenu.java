@@ -4,25 +4,59 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import ru.axetta.ecafe.processor.core.persistence.MenuSupplier;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import javax.persistence.*;
+import java.util.*;
 
+@Entity
+@Table(name = "cf_wt_menu")
 public class WtMenu {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idOfMenu")
     private Long idOfMenu;
+
+    @Column(name = "menuName")
     private String menuName;
+
+    @Column(name = "beginDate")
     private Date beginDate;
+
+    @Column(name = "endDate")
     private Date endDate;
+
+    @Column(name = "createDate")
     private Date createDate;
+
+    @Column(name = "lastUpdate")
     private Date lastUpdate;
+
+    @Column(name = "version")
     private Long version;
+
+    @Column(name = "deleteState")
     private Integer deleteState;
+
+    @ManyToMany
+    @JoinTable(name = "cf_wt_dishes_menu_relationships",
+            joinColumns = @JoinColumn(name = "idOfMenu"),
+            inverseJoinColumns = @JoinColumn(name = "idOfDish"))
     private Set<WtDish> dishes = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "cf_wt_menu_org",
+            joinColumns = @JoinColumn(name = "idOfMenu"),
+            inverseJoinColumns = @JoinColumn(name = "idOfOrg"))
     private Set<Org> orgs = new HashSet<>();
+
+    @OneToMany(mappedBy = "menu")
+    private List<MenuSupplier> menuSupplierList;
+
+    @OneToMany(mappedBy = "wtMenu")
+    private List<WtMenuGroup> menuGroupList;
 
     public Long getIdOfMenu() {
         return idOfMenu;
@@ -102,6 +136,22 @@ public class WtMenu {
 
     public void setOrgs(Set<Org> orgs) {
         this.orgs = orgs;
+    }
+
+    public List<WtMenuGroup> getMenuGroupList() {
+        return menuGroupList;
+    }
+
+    public void setMenuGroupList(List<WtMenuGroup> menuGroupList) {
+        this.menuGroupList = menuGroupList;
+    }
+
+    public List<MenuSupplier> getMenuSupplierList() {
+        return menuSupplierList;
+    }
+
+    public void setMenuSupplierList(List<MenuSupplier> menuSupplierList) {
+        this.menuSupplierList = menuSupplierList;
     }
 
     @Override

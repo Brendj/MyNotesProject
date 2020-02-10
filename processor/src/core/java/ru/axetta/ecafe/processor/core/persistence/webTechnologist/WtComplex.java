@@ -4,32 +4,80 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import ru.axetta.ecafe.processor.core.persistence.MenuSupplier;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
+import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import java.util.*;
 
+@Entity
+@Table(name = "cf_wt_complexes")
 public class WtComplex {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idOfComplex")
     private Long idOfComplex;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "price")
     private BigDecimal price;
+
+    @Column(name = "beginDate")
     private Date beginDate;
+
+    @Column(name = "endDate")
     private Date endDate;
+
+    @Column(name = "cycleMotion")
     private Integer cycleMotion;
+
+    @Column(name = "dayInCycle")
     private Integer dayInCycle;
+
+    @Column(name = "version")
     private Long version;
+
+    @Column(name = "guid")
     private String guid;
+
+    @Column(name = "createDate")
     private Date createDate;
+
+    @Column(name = "lastUpdate")
     private Date lastUpdate;
+
+    @Column(name = "deleteState")
     private Integer deleteState;
+
+    @Column(name = "composite")
     private Boolean composite;
+
+    @Column(name = "is_portal")
     private Boolean isPortal;
 
+    @Column(name = "start_cycle_day")
+    private Integer startCycleDay;
+
+    @ManyToOne
+    @JoinColumn(name = "idOfComplexGroupItem")
+    private WtComplexGroupItem wtComplexGroupItem;
+
+    @ManyToOne
+    @JoinColumn(name = "idOfAgeGroupItem")
+    private WtAgeGroupItem wtAgeGroupItem;
+
+    @ManyToMany
+    @JoinTable(name = "cf_wt_complexes_org",
+            joinColumns = @JoinColumn(name = "IdOfComplex"),
+            inverseJoinColumns = @JoinColumn(name = "IdOfOrg"))
     private Set<Org> orgs = new HashSet<>();
+
+    @OneToMany(mappedBy = "complex")
+    private List<MenuSupplier> menuSupplierList;
 
     public Boolean getIsPortal() {
         return isPortal;
@@ -38,10 +86,6 @@ public class WtComplex {
     public void setIsPortal(Boolean isPortal) {
         this.isPortal = isPortal;
     }
-
-    private Integer startCycleDay;
-    private WtComplexGroupItem wtComplexGroupItem;
-    private WtAgeGroupItem wtAgeGroupItem;
 
     public Long getIdOfComplex() {
         return idOfComplex;
@@ -186,6 +230,14 @@ public class WtComplex {
 
     public void setOrgs(Set<Org> orgs) {
         this.orgs = orgs;
+    }
+
+    public List<MenuSupplier> getMenuSupplierList() {
+        return menuSupplierList;
+    }
+
+    public void setMenuSupplierList(List<MenuSupplier> menuSupplierList) {
+        this.menuSupplierList = menuSupplierList;
     }
 
     @Override

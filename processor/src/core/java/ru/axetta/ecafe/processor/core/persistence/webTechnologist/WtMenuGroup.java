@@ -4,20 +4,46 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Objects;
-import java.util.Set;
+import ru.axetta.ecafe.processor.core.persistence.MenuSupplier;
 
+import javax.persistence.*;
+import java.util.*;
+
+@Entity
+@Table(name = "cf_wt_menu_groups")
 public class WtMenuGroup {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
+
+    @Column(name = "name")
     private String name;
+
+    @Column(name = "createDate")
     private Date createDate;
+
+    @Column(name = "lastUpdate")
     private Date lastUpdate;
+
+    @Column(name = "version")
     private Long version;
+
+    @Column(name = "deleteState")
     private Integer deleteState;
+
+    @OneToMany(mappedBy = "menuGroup")
+    private List<MenuSupplier> menuSupplierList;
+
+    @ManyToOne
+    @JoinColumn(name = "menu_id")
     private WtMenu wtMenu;
+
+    @ManyToMany
+    @JoinTable(name = "cf_wt_menu_group_dish",
+            joinColumns = @JoinColumn(name = "menu_group_id"),
+            inverseJoinColumns = @JoinColumn(name = "dish_id"))
     private Set<WtDish> dishes = new HashSet<>();
 
     public Long getId() {
@@ -82,6 +108,14 @@ public class WtMenuGroup {
 
     public void setDishes(Set<WtDish> dishes) {
         this.dishes = dishes;
+    }
+
+    public List<MenuSupplier> getMenuSupplierList() {
+        return menuSupplierList;
+    }
+
+    public void setMenuSupplierList(List<MenuSupplier> menuSupplierList) {
+        this.menuSupplierList = menuSupplierList;
     }
 
     @Override

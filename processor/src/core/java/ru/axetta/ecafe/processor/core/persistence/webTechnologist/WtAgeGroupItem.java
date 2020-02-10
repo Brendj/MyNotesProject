@@ -4,12 +4,26 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import ru.axetta.ecafe.processor.core.persistence.MenuSupplier;
+
+import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
+@Entity
+@Table(name = "cf_wt_agegroup_items")
 public class WtAgeGroupItem {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "idOfAgeGroupItem")
     private Long idOfAgeGroupItem;
+
+    @Column(name = "description")
     private String description;
+
+    @OneToMany(mappedBy = "ageGroupItem")
+    private List<MenuSupplier> menuSupplierList;
 
     public Long getIdOfAgeGroupItem() {
         return idOfAgeGroupItem;
@@ -25,6 +39,14 @@ public class WtAgeGroupItem {
 
     public void setDescription(String description) {
         this.description = description;
+    }
+
+    public List<MenuSupplier> getMenuSupplierList() {
+        return menuSupplierList;
+    }
+
+    public void setMenuSupplierList(List<MenuSupplier> menuSupplierList) {
+        this.menuSupplierList = menuSupplierList;
     }
 
     @Override

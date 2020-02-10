@@ -4,12 +4,20 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
 
+@Entity
+@Table(name = "cf_wt_refresh_token")
 public class WtRefreshToken {
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "hash")
     private String hash;
+
+    @Column(name = "last_session")
     private Date lastSession;
 
     public String getHash() {
