@@ -27,6 +27,10 @@ public class MenuSupplier {
     private Long idOfMenuSupplier;
 
     @ManyToOne
+    @JoinColumn(name = "idOfOrgGroup")
+    private WtOrgGroup orgGroup;
+
+    @ManyToOne
     @JoinColumn(name = "idOfCategoryItem")
     private WtCategoryItem categoryItem;
 
@@ -69,11 +73,11 @@ public class MenuSupplier {
     public MenuSupplier() {
     }
 
-    public MenuSupplier(Long idOfMenuSupplier, WtCategoryItem categoryItem,
+    public MenuSupplier(WtOrgGroup orgGroup, WtCategoryItem categoryItem,
             WtTypeOfProductionItem typeOfProduction, WtAgeGroupItem ageGroupItem,
             WtDietType dietType, WtComplexGroupItem complexGroupItem, WtGroupItem groupItem,
             WtDish dish, WtMenuGroup menuGroup, WtMenu menu, WtComplex complex) {
-        this.idOfMenuSupplier = idOfMenuSupplier;
+        this.orgGroup = orgGroup;
         this.categoryItem = categoryItem;
         this.typeOfProduction = typeOfProduction;
         this.ageGroupItem = ageGroupItem;
@@ -105,10 +109,10 @@ public class MenuSupplier {
 
     @Override
     public String toString() {
-        return "MenuSupplier{" + "idOfMenuSupplier=" + idOfMenuSupplier + ", categoryItem=" + categoryItem
-                + ", typeOfProduction=" + typeOfProduction + ", ageGroupItem=" + ageGroupItem + ", dietType=" + dietType
-                + ", complexGroupItem=" + complexGroupItem + ", groupItem=" + groupItem + ", dish=" + dish
-                + ", menuGroup=" + menuGroup + ", menu=" + menu + ", complex=" + complex + '}';
+        return "MenuSupplier{" + "idOfMenuSupplier=" + idOfMenuSupplier + ", orgGroup=" + orgGroup + ", categoryItem="
+                + categoryItem + ", typeOfProduction=" + typeOfProduction + ", ageGroupItem=" + ageGroupItem
+                + ", dietType=" + dietType + ", complexGroupItem=" + complexGroupItem + ", groupItem=" + groupItem
+                + ", dish=" + dish + ", menuGroup=" + menuGroup + ", menu=" + menu + ", complex=" + complex + '}';
     }
 
     public Long getIdOfMenuSupplier() {
@@ -117,6 +121,14 @@ public class MenuSupplier {
 
     public void setIdOfMenuSupplier(Long idOfMenuSupplier) {
         this.idOfMenuSupplier = idOfMenuSupplier;
+    }
+
+    public WtOrgGroup getOrgGroup() {
+        return orgGroup;
+    }
+
+    public void setOrgGroup(WtOrgGroup orgGroup) {
+        this.orgGroup = orgGroup;
     }
 
     public WtCategoryItem getCategoryItem() {

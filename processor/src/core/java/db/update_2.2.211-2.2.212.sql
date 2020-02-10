@@ -12,6 +12,7 @@
 CREATE TABLE cf_menu_suppliers
 (
     idOfMenuSupplier bigint NOT NULL,
+    idOfOrgGroup bigint,
     idOfCategoryItem bigint,
     idOfTypeProduction bigint,
     idOfAgeGroupItem bigint,
