@@ -3806,6 +3806,7 @@ public class Processor implements SyncProcessor {
                 long totalPurchaseDiscount = 0;
                 long totalPurchaseRSum = 0;
                 long totalLunchRSum = 0;
+                Set<String> rations = new HashSet<>();
                 // Register order details (purchase)
                 for (Purchase purchase : payment.getPurchases()) {
                     if (null != findOrderDetail(persistenceSession,
@@ -3843,6 +3844,9 @@ public class Processor implements SyncProcessor {
 
                     if (orderDetail.isComplex() || orderDetail.isComplexItem()) {
                         totalLunchRSum += purchase.getrPrice() * Math.abs(purchase.getQty());
+                    }
+                    if (purchase.getfRation() != null) {
+                        rations.add(OrderDetailFRationType.fromInteger(purchase.getfRation()).toString());
                     }
                 }
                 // Check payment sums
@@ -3895,6 +3899,10 @@ public class Processor implements SyncProcessor {
                             .equals(OrderTypeEnumType.DISCOUNT_PLAN_CHANGE) || payment.getOrderType()
                             .equals(OrderTypeEnumType.RECYCLING_RETIONS)) {
                         values = EventNotificationService.attachToValues("isFreeOrder", "true", values);
+                    }
+                    if (rations.size() > 0) {
+                        values = EventNotificationService
+                                .attachToValues(EventNotificationService.PARAM_FRATION, StringUtils.join(rations, ","), values);
                     }
                     String date = new SimpleDateFormat("dd.MM.yyyy HH:mm").format(payment.getTime());
                     values = EventNotificationService
