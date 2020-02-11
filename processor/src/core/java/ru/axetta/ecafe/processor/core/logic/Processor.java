@@ -3845,7 +3845,7 @@ public class Processor implements SyncProcessor {
                     if (orderDetail.isComplex() || orderDetail.isComplexItem()) {
                         totalLunchRSum += purchase.getrPrice() * Math.abs(purchase.getQty());
                     }
-                    if (purchase.getfRation() != null) {
+                    if (purchase.getfRation() != null && OrderDetailFRationType.fromInteger(purchase.getfRation()) != OrderDetailFRationType.NOT_SPECIFIED) {
                         rations.add(OrderDetailFRationType.fromInteger(purchase.getfRation()).toString());
                     }
                 }
