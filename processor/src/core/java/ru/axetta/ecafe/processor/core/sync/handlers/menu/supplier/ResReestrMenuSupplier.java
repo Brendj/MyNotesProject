@@ -28,9 +28,9 @@ public class ResReestrMenuSupplier implements AbstractToElement {
 
     @Override
     public Element toElement(Document document) throws Exception {
-        Element element = document.createElement("ResReestrMenuSupplier");
+        Element element = document.createElement("MenuSupplier");
         for (ResMenuSupplierItem item : this.getItems()) {
-            element.appendChild(item.toElement(document, "RMSR"));
+            element.appendChild(item.toElement(document, "MS"));
         }
         return element;
     }

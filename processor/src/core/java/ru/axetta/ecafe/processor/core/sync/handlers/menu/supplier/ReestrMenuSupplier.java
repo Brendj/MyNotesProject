@@ -26,7 +26,7 @@ public class ReestrMenuSupplier implements SectionRequest {
     private final List<MenuSupplierItem> items;
     private Boolean deletedState;
 
-    public ReestrMenuSupplier(Node menuSupplierRequestNode, Long orgOwner) {
+    public ReestrMenuSupplier(Node menuSupplierRequestNode) {
         this.items = new ArrayList<>();
 
         Node itemNode = menuSupplierRequestNode.getFirstChild();
