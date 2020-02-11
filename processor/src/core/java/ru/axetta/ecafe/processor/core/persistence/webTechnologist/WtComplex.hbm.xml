@@ -1,0 +1,69 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex" table="cf_wt_complexes">
+        <cache usage="transactional"/>
+        <id name="idOfComplex">
+            <column name="idofcomplex" sql-type="long"/>
+        </id>
+        <property name="name">
+            <column name="name" sql-type="string" length="256"/>
+        </property>
+        <property name="price">
+            <column name="price" sql-type="numeric(10,2)" precision="10" scale="2" not-null="true"/>
+        </property>
+        <property name="beginDate">
+            <column name="begindate" sql-type="date" not-null="true"/>
+        </property>
+        <property name="endDate">
+            <column name="enddate" sql-type="date" not-null="true"/>
+        </property>
+        <property name="cycleMotion">
+            <column name="cyclemotion" sql-type="integer" not-null="true"/>
+        </property>
+        <property name="dayInCycle">
+            <column name="dayincycle" sql-type="integer" not-null="true"/>
+        </property>
+        <property name="version">
+            <column name="version" sql-type="long"/>
+        </property>
+        <property name="guid">
+            <column name="guid" sql-type="string" length="36"/>
+        </property>
+        <property name="createDate">
+            <column name="createdate" sql-type="date"/>
+        </property>
+        <property name="lastUpdate">
+            <column name="lastupdate" sql-type="date"/>
+        </property>
+        <property name="deleteState">
+            <column name="deletestate" sql-type="integer"/>
+        </property>
+        <property name="composite">
+            <column name="composite" sql-type="boolean"/>
+        </property>
+        <property name="isPortal">
+            <column name="is_portal" sql-type="boolean"/>
+        </property>
+        <property name="startCycleDay">
+            <column name="start_cycle_day" sql-type="integer" not-null="true"/>
+        </property>
+        <many-to-one name="wtComplexGroupItem" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem">
+            <column name="idofcomplexgroupitem"/>
+        </many-to-one>
+        <many-to-one name="wtAgeGroupItem" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem">
+            <column name="idofagegroupitem"/>
+        </many-to-one>
+        <set name="orgs" table="cf_wt_complexes_org">
+            <key column="IdOfComplex"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
+        </set>
+    </class>
+</hibernate-mapping>

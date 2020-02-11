@@ -1,0 +1,35 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem" table="cf_wt_category_items">
+        <cache usage="transactional"/>
+        <id name="idOfCategoryItem">
+            <column name="idofcategoryitem" sql-type="long"/>
+        </id>
+        <property name="createDate">
+            <column name="createdate" sql-type="date"/>
+        </property>
+        <property name="lastUpdate">
+            <column name="lastupdate" sql-type="date"/>
+        </property>
+        <property name="version">
+            <column name="version" sql-type="long"/>
+        </property>
+        <property name="guid">
+            <column name="guid" sql-type="string" length="36"/>
+        </property>
+        <property name="description">
+            <column name="description" sql-type="string" length="255"/>
+        </property>
+        <set name="dishes" table="cf_wt_dish_categoryitem_relationships">
+            <key column="idOfCategoryItem"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish" column="idOfDish"/>
+        </set>
+    </class>
+</hibernate-mapping>

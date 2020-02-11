@@ -1,0 +1,88 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+
+    <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish" table="cf_wt_dishes">
+        <cache usage="transactional"/>
+        <id name="idOfDish">
+            <column name="idofdish" sql-type="long"/>
+        </id>
+        <property name="dishName">
+            <column name="dishname" sql-type="string" length="128"/>
+        </property>
+        <property name="componentsOfDish">
+            <column name="componentsofdish" sql-type="string" length="512" not-null="true"/>
+        </property>
+        <property name="code">
+            <column name="code" sql-type="integer" not-null="true"/>
+        </property>
+        <property name="price">
+            <column name="price" sql-type="numeric(10,2)" precision="10" scale="2"/>
+        </property>
+        <property name="dateOfBeginMenuIncluding">
+            <column name="dateofbeginmenuincluding" sql-type="date" not-null="true"/>
+        </property>
+        <property name="dateOfEndMenuIncluding">
+            <column name="dateofendmenuincluding" sql-type="date" not-null="true"/>
+        </property>
+        <property name="createDate">
+            <column name="createdate" sql-type="date"/>
+        </property>
+        <property name="lastUpdate">
+            <column name="lastupdate" sql-type="date"/>
+        </property>
+        <property name="version">
+            <column name="version" sql-type="long"/>
+        </property>
+        <property name="deleteState">
+            <column name="deletestate" sql-type="integer"/>
+        </property>
+        <property name="guid">
+            <column name="guid" sql-type="string" length="36"/>
+        </property>
+        <property name="protein">
+            <column name="protein" sql-type="integer" not-null="true"/>
+        </property>
+        <property name="fat">
+            <column name="fat" sql-type="integer" not-null="true"/>
+        </property>
+        <property name="carbohydrates">
+            <column name="carbohydrates" sql-type="integer" not-null="true"/>
+        </property>
+        <property name="calories">
+            <column name="calories" sql-type="integer" not-null="true"/>
+        </property>
+        <property name="qty">
+            <column name="qty" sql-type="string" length="32" not-null="true"/>
+        </property>
+        <many-to-one name="wtAgeGroupItem" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem">
+            <column name="idofagegroupitem"/>
+        </many-to-one>
+        <set name="complexItems" table="cf_wt_complex_items_dish">
+            <key column="idOfDish"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexesItem" column="idOfComplexItem"/>
+        </set>
+        <set name="categoryItems" table="cf_wt_dish_categoryitem_relationships">
+            <key column="idOfDish"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem" column="idOfCategoryItem"/>
+        </set>
+        <set name="menus" table="cf_wt_dishes_menu_relationships">
+            <key column="idOfDish"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu" column="idOfMenu"/>
+        </set>
+        <set name="groupItems" table="cf_wt_dish_groupitem_relationships">
+            <key column="idOfDish"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtGroupItem" column="idOfGroupItem"/>
+        </set>
+        <set name="menuGroups" table="cf_wt_menu_group_dish">
+            <key column="dish_id"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup" column="menu_group_id"/>
+        </set>
+    </class>
+</hibernate-mapping>
