@@ -685,6 +685,10 @@ public class PreorderDAOService {
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
             return null;
         }
+        if (preorderComplex.getPreorderMenuDetails().size() == 0) {
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
+            return null;
+        }
         if (preorderComplex.getAmount() > 0) {
             if (!preorderComplex.getComplexPrice().equals(complexInfo.getCurrentPrice())) {
                 testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false);
@@ -1092,23 +1096,6 @@ public class PreorderDAOService {
         }
         preorderComplex.deleteByReason(nextVersion, true, preorderState);
         em.merge(preorderComplex);
-    }
-
-    @Transactional
-    public void generatePreordersBySchedule() throws Exception {
-        //Query query = em.createQuery("select r from RegularPreorder r where r.deletedState = false and r.startDate < :date and r.endDate > :date");
-        Query query = em.createQuery("select r from RegularPreorder r where r.deletedState = false and r.endDate > :date");
-        query.setParameter("date", new Date());
-        List<RegularPreorder> list = query.getResultList();
-        for (RegularPreorder regularPreorder : list) {
-            if (regularPreorder.getIdOfComplex() != null) {
-                try {
-                    createPreordersFromRegular(regularPreorder, false);
-                } catch (Exception e) {
-                    logger.error("Error in generate preorders by schedule: ", e);
-                }
-            }
-        }
     }
 
     @Transactional
