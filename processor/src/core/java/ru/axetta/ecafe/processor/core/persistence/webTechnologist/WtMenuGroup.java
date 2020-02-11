@@ -4,10 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
-import ru.axetta.ecafe.processor.core.persistence.MenuSupplier;
-
 import javax.persistence.*;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_menu_groups")
@@ -32,9 +33,6 @@ public class WtMenuGroup {
 
     @Column(name = "deleteState")
     private Integer deleteState;
-
-    @OneToMany(mappedBy = "menuGroup")
-    private List<MenuSupplier> menuSupplierList;
 
     @ManyToOne
     @JoinColumn(name = "menu_id")
@@ -108,14 +106,6 @@ public class WtMenuGroup {
 
     public void setDishes(Set<WtDish> dishes) {
         this.dishes = dishes;
-    }
-
-    public List<MenuSupplier> getMenuSupplierList() {
-        return menuSupplierList;
-    }
-
-    public void setMenuSupplierList(List<MenuSupplier> menuSupplierList) {
-        this.menuSupplierList = menuSupplierList;
     }
 
     @Override

@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
-import ru.axetta.ecafe.processor.core.persistence.MenuSupplier;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import javax.persistence.*;
@@ -51,9 +50,6 @@ public class WtMenu {
             joinColumns = @JoinColumn(name = "idOfMenu"),
             inverseJoinColumns = @JoinColumn(name = "idOfOrg"))
     private Set<Org> orgs = new HashSet<>();
-
-    @OneToMany(mappedBy = "menu")
-    private List<MenuSupplier> menuSupplierList;
 
     @OneToMany(mappedBy = "wtMenu")
     private List<WtMenuGroup> menuGroupList;
@@ -144,14 +140,6 @@ public class WtMenu {
 
     public void setMenuGroupList(List<WtMenuGroup> menuGroupList) {
         this.menuGroupList = menuGroupList;
-    }
-
-    public List<MenuSupplier> getMenuSupplierList() {
-        return menuSupplierList;
-    }
-
-    public void setMenuSupplierList(List<MenuSupplier> menuSupplierList) {
-        this.menuSupplierList = menuSupplierList;
     }
 
     @Override

@@ -4,12 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
-import ru.axetta.ecafe.processor.core.persistence.MenuSupplier;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_complexes")
@@ -75,9 +77,6 @@ public class WtComplex {
             joinColumns = @JoinColumn(name = "IdOfComplex"),
             inverseJoinColumns = @JoinColumn(name = "IdOfOrg"))
     private Set<Org> orgs = new HashSet<>();
-
-    @OneToMany(mappedBy = "complex")
-    private List<MenuSupplier> menuSupplierList;
 
     public Boolean getIsPortal() {
         return isPortal;
@@ -230,14 +229,6 @@ public class WtComplex {
 
     public void setOrgs(Set<Org> orgs) {
         this.orgs = orgs;
-    }
-
-    public List<MenuSupplier> getMenuSupplierList() {
-        return menuSupplierList;
-    }
-
-    public void setMenuSupplierList(List<MenuSupplier> menuSupplierList) {
-        this.menuSupplierList = menuSupplierList;
     }
 
     @Override

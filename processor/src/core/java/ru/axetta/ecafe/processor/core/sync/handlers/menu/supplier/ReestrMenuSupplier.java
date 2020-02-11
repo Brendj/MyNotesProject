@@ -8,8 +8,8 @@ import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -22,33 +22,19 @@ import java.util.List;
 public class ReestrMenuSupplier implements SectionRequest {
 
     public static final String SECTION_NAME = "MenuSupplier";
-
-    private final List<MenuSupplierItem> items;
-    private Boolean deletedState;
+    private final Map<String, String> versions;
 
     public ReestrMenuSupplier(Node menuSupplierRequestNode) {
-        this.items = new ArrayList<>();
+        this.versions = new HashMap<>();
 
         Node itemNode = menuSupplierRequestNode.getFirstChild();
-        while (null != itemNode) {
-            if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("MS")) {
-                MenuSupplierItem item = MenuSupplierItem.build(itemNode);
-                items.add(item);
-            }
-            itemNode = itemNode.getNextSibling();
+        if (itemNode != null && Node.ELEMENT_NODE == itemNode.getNodeType()) {
+            versions.put(itemNode.getNodeName(), itemNode.getAttributes().getNamedItem("V").getNodeValue());
         }
     }
 
-    public List<MenuSupplierItem> getItems() {
-        return items;
-    }
-
-    public Boolean getDeletedState() {
-        return deletedState;
-    }
-
-    public void setDeletedState(Boolean deletedState) {
-        this.deletedState = deletedState;
+    public Map<String, String> getVersions() {
+        return versions;
     }
 
     @Override

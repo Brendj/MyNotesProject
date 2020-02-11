@@ -20,7 +20,7 @@ import java.util.List;
  */
 
 public class ResReestrMenuSupplier implements AbstractToElement {
-    private List<ResMenuSupplierItem> items;
+    private List<MenuSupplier> items;
 
     public ResReestrMenuSupplier() {
 
@@ -29,17 +29,18 @@ public class ResReestrMenuSupplier implements AbstractToElement {
     @Override
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("MenuSupplier");
-        for (ResMenuSupplierItem item : this.getItems()) {
-            element.appendChild(item.toElement(document, "MS"));
+        for (MenuSupplier item : this.getItems()) {
+            element.appendChild(item.toElement(document, "MenuSupplier"
+                    + ""));
         }
         return element;
     }
 
-    public List<ResMenuSupplierItem> getItems() {
+    public List<MenuSupplier> getItems() {
         return items;
     }
 
-    public void setItems(List<ResMenuSupplierItem> items) {
+    public void setItems(List<MenuSupplier> items) {
         this.items = items;
     }
 }

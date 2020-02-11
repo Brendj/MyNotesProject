@@ -4,11 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
-import ru.axetta.ecafe.processor.core.persistence.MenuSupplier;
-
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_dishes")
@@ -100,9 +101,6 @@ public class WtDish {
             joinColumns = @JoinColumn(name = "dish_id"),
             inverseJoinColumns = @JoinColumn(name = "menu_group_id"))
     private Set<WtMenuGroup> menuGroups = new HashSet<>();
-
-    @OneToMany(mappedBy = "dish")
-    private List<MenuSupplier> menuSupplierList;
 
     public Long getIdOfDish() {
         return idOfDish;
@@ -286,14 +284,6 @@ public class WtDish {
 
     public void setMenuGroups(Set<WtMenuGroup> menuGroups) {
         this.menuGroups = menuGroups;
-    }
-
-    public List<MenuSupplier> getMenuSupplierList() {
-        return menuSupplierList;
-    }
-
-    public void setMenuSupplierList(List<MenuSupplier> menuSupplierList) {
-        this.menuSupplierList = menuSupplierList;
     }
 
     @Override

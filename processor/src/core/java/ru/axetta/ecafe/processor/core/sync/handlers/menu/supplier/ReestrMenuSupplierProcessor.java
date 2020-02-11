@@ -4,8 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier;
 
-import ru.axetta.ecafe.processor.core.persistence.MenuSupplier;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
 import org.hibernate.Session;
@@ -27,52 +25,52 @@ public class ReestrMenuSupplierProcessor extends AbstractProcessor<ResReestrMenu
 
     private static final Logger logger = LoggerFactory.getLogger(ReestrMenuSupplierProcessor.class);
     private final ReestrMenuSupplier reestrMenuSupplier;
-    private final List<ResMenuSupplierItem> resMenuSupplierItems;
+    private final List<MenuSupplier> resMenuSupplierItems;
 
     public ReestrMenuSupplierProcessor(Session persistenceSession, ReestrMenuSupplier reestrMenuSupplier) {
         super(persistenceSession);
         this.reestrMenuSupplier = reestrMenuSupplier;
-        resMenuSupplierItems = new ArrayList<ResMenuSupplierItem>();
+        resMenuSupplierItems = new ArrayList<MenuSupplier>();
     }
 
     @Override
     public ResReestrMenuSupplier process() throws Exception {
         ResReestrMenuSupplier result = new ResReestrMenuSupplier();
-        List<ResMenuSupplierItem> items = new ArrayList<ResMenuSupplierItem>();
+        List<MenuSupplier> items = new ArrayList<MenuSupplier>();
         try {
-            ResMenuSupplierItem resItem = null;
+            MenuSupplier resItem = null;
             boolean errorFound = false;
-            for (MenuSupplierItem item : reestrMenuSupplier.getItems()) {
-
-                errorFound = !item.getResCode().equals(MenuSupplierItem.ERROR_CODE_ALL_OK);
-                if (!errorFound) {
-
-                    WtOrgGroup orgGroup = item.getOrgGroup();
-                    WtCategoryItem categoryItem = item.getCategoryItem();
-                    WtTypeOfProductionItem typeOfProduction = item.getTypeOfProduction();
-                    WtAgeGroupItem ageGroupItem = item.getAgeGroupItem();
-                    WtDietType dietType = item.getDietType();
-                    WtComplexGroupItem complexGroupItem = item.getComplexGroupItem();
-                    WtGroupItem groupItem = item.getGroupItem();
-                    WtDish dish = item.getDish();
-                    WtMenuGroup menuGroup = item.getMenuGroup();
-                    WtMenu menu = item.getMenu();
-                    WtComplex complex = item.getComplex();
-
-                    MenuSupplier menuSupplier = new MenuSupplier(orgGroup, categoryItem, typeOfProduction, ageGroupItem,
-                            dietType, complexGroupItem, groupItem, dish, menuGroup, menu, complex);
-
-                    session.saveOrUpdate(menuSupplier);
-
-                    resItem = new ResMenuSupplierItem(menuSupplier, item.getResCode());
-                }
-                if (errorFound) {
-                    resItem = new ResMenuSupplierItem();
-                    resItem.setResultCode(item.getResCode());
-                    resItem.setErrorMessage(item.getErrorMessage());
-                }
-                items.add(resItem);
-            }
+            //for (MenuSupplierItem item : reestrMenuSupplier.getItems()) {
+            //
+            //    errorFound = !item.getResCode().equals(MenuSupplierItem.ERROR_CODE_ALL_OK);
+            //    if (!errorFound) {
+            //
+            //        WtOrgGroup orgGroup = item.getOrgGroup();
+            //        WtCategoryItem categoryItem = item.getCategoryItem();
+            //        WtTypeOfProductionItem typeOfProduction = item.getTypeOfProduction();
+            //        WtAgeGroupItem ageGroupItem = item.getAgeGroupItem();
+            //        WtDietType dietType = item.getDietType();
+            //        WtComplexGroupItem complexGroupItem = item.getComplexGroupItem();
+            //        WtGroupItem groupItem = item.getGroupItem();
+            //        WtDish dish = item.getDish();
+            //        WtMenuGroup menuGroup = item.getMenuGroup();
+            //        WtMenu menu = item.getMenu();
+            //        WtComplex complex = item.getComplex();
+            //
+            //        MenuSupplier menuSupplier = new MenuSupplier(orgGroup, categoryItem, typeOfProduction, ageGroupItem,
+            //                dietType, complexGroupItem, groupItem, dish, menuGroup, menu, complex);
+            //
+            //        session.saveOrUpdate(menuSupplier);
+            //
+            //        resItem = new ResMenuSupplierItem(menuSupplier, item.getResCode());
+            //    }
+            //    if (errorFound) {
+            //        resItem = new ResMenuSupplierItem();
+            //        resItem.setResultCode(item.getResCode());
+            //        resItem.setErrorMessage(item.getErrorMessage());
+            //    }
+            //    items.add(resItem);
+            //}
             session.flush();
         } catch (Exception e) {
             logger.error("Error saving ReestrMenuSupplier", e);
@@ -84,8 +82,8 @@ public class ReestrMenuSupplierProcessor extends AbstractProcessor<ResReestrMenu
 
     public ReestrMenuSupplierData processData() throws Exception {
         ReestrMenuSupplierData result = new ReestrMenuSupplierData();
-        List<ResMenuSupplierItem> items = new ArrayList<ResMenuSupplierItem>();
-        ResMenuSupplierItem resItem;
+        List<MenuSupplier> items = new ArrayList<MenuSupplier>();
+        MenuSupplier resItem;
         //List<MenuSupplier> list = DAOUtils
         //        .getMenuSupplierForOrgSinceVersion(session, reestrMenuSupplier.getIdOfOrgOwner(),
         //                reestrMenuSupplier.getMaxVersion());
@@ -100,7 +98,7 @@ public class ReestrMenuSupplierProcessor extends AbstractProcessor<ResReestrMenu
         return result;
     }
 
-    public List<ResMenuSupplierItem> getResMenuSupplierItems() {
+    public List<MenuSupplier> getResMenuSupplierItems() {
         return resMenuSupplierItems;
     }
 }
