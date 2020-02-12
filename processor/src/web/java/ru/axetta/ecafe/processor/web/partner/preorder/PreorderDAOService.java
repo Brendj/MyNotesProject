@@ -685,7 +685,7 @@ public class PreorderDAOService {
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
             return null;
         }
-        if (preorderComplex.getPreorderMenuDetails().size() == 0) {
+        if (preorderComplex.getPreorderMenuDetails().size() == 0 || getMenuDetailList(complexInfo.getIdOfComplexInfo()).size() == 0) {
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
             return null;
         }
@@ -1238,7 +1238,12 @@ public class PreorderDAOService {
         preorderComplex.setState(PreorderState.OK);
         preorderComplex.setIdOfOrgOnCreate(client.getOrg().getIdOfOrg());
         preorderComplex.setMobile(guardianMobile);
-        if (ci == null) ci = getComplexInfo(client, idOfComplex, date);
+        if (ci == null) {
+            ci = getComplexInfo(client, idOfComplex, date);
+            if (ci != null && getMenuDetailList(ci.getIdOfComplexInfo()).size() == 0) {
+                throw new MenuDetailNotExistsException("Не найдены блюда для комплекса с ид.=" + idOfComplex.toString());
+            }
+        }
         if (ci != null) {
             preorderComplex.setComplexName(ci.getComplexName());
             preorderComplex.setComplexPrice(ci.getCurrentPrice());
