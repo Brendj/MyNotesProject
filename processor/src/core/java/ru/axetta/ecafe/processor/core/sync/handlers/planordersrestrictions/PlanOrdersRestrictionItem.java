@@ -26,9 +26,10 @@ public class PlanOrdersRestrictionItem {
     private Long version;
     private Boolean deletedState;
     private String errorMessage;
+    private Integer resol;
 
     public PlanOrdersRestrictionItem(Long idOfClient, Long idOfOrg, Long idOfConfigarationProvider, String complexName,
-            Integer complexId, PlanOrdersRestrictionType planType, Long version, boolean deletedState, String errorMessage) {
+            Integer complexId, PlanOrdersRestrictionType planType, Integer resol, Long version, boolean deletedState, String errorMessage) {
         this.idOfClient = idOfClient;
         this.idOfOrg = idOfOrg;
         this.idOfConfigarationProvider = idOfConfigarationProvider;
@@ -60,6 +61,9 @@ public class PlanOrdersRestrictionItem {
         if (deletedState) {
             element.setAttribute("D", "1");
         }
+        if (resol != null) {
+            element.setAttribute("Resol", resol.toString());
+        }
         return element;
     }
 
@@ -77,11 +81,14 @@ public class PlanOrdersRestrictionItem {
         PlanOrdersRestrictionType planType = null;
         Long planTypeLong = getLongValue(itemNode, "PlanType", errorMessage);
         if (planTypeLong != null) planType = PlanOrdersRestrictionType.fromInteger(planTypeLong.intValue());
+        Integer resol = null;
+        Long resolLong = getLongValue(itemNode, "Resol", errorMessage);
+        if (resolLong != null) resol = resolLong.intValue();
         Long version = getLongValue(itemNode, "V", null);
         String deletedStr = XMLUtils.getAttributeValue(itemNode, "D");
         Boolean deletedState = deletedStr == null ? false : deletedStr.equals("1");
         return new PlanOrdersRestrictionItem(idOfClient, idOfOrg, idOfConfigurationProvider, complexName, complexId, planType,
-                version, deletedState, errorMessage.toString());
+                resol, version, deletedState, errorMessage.toString());
     }
 
     private static Long getLongValue(Node itemNode, String attrName, StringBuilder sb) {
@@ -169,5 +176,13 @@ public class PlanOrdersRestrictionItem {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public Integer getResol() {
+        return resol;
+    }
+
+    public void setResol(Integer resol) {
+        this.resol = resol;
     }
 }

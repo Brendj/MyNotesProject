@@ -21,6 +21,7 @@ public class PlanOrdersRestriction {
     private Date createdDate;
     private Date lastUpdate;
     private Boolean deletedState;
+    private Integer resol;
 
     public PlanOrdersRestriction() {
         this.createdDate = new Date();
@@ -112,5 +113,13 @@ public class PlanOrdersRestriction {
 
     public void setIdOfClient(Long idOfClient) {
         this.idOfClient = idOfClient;
+    }
+
+    public Integer getResol() {
+        return resol;
+    }
+
+    public void setResol(Integer resol) {
+        this.resol = resol;
     }
 }

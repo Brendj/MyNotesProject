@@ -15,6 +15,7 @@ create table cf_plan_orders_restrictions
   complexName character varying(128),
   armComplexId integer not null,
   planType integer not null,
+  resol integer,
   version bigint not null,
   createdDate bigint,
   lastUpdate bigint,

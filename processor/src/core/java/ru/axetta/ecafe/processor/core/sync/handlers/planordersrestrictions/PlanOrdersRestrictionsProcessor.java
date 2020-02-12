@@ -51,6 +51,7 @@ public class PlanOrdersRestrictionsProcessor {
                 planOrdersRestriction.setIdOfConfigurationProoviderOnCreate(item.getIdOfConfigarationProvider());
                 planOrdersRestriction.setPlanOrdersRestrictionType(item.getPlanType());
                 planOrdersRestriction.setDeletedState(item.getDeletedState());
+                planOrdersRestriction.setResol(item.getResol());
                 planOrdersRestriction.setVersion(nextVersion);
                 planOrdersRestriction.setLastUpdate(new Date());
                 session.saveOrUpdate(planOrdersRestriction);
@@ -66,7 +67,8 @@ public class PlanOrdersRestrictionsProcessor {
         for (PlanOrdersRestriction planOrdersRestriction : list) {
             PlanOrdersRestrictionItem item = new PlanOrdersRestrictionItem(planOrdersRestriction.getIdOfClient(), planOrdersRestriction.getIdOfOrgOnCreate(),
                     planOrdersRestriction.getIdOfConfigurationProoviderOnCreate(), planOrdersRestriction.getComplexName(), planOrdersRestriction.getArmComplexId(),
-                    planOrdersRestriction.getPlanOrdersRestrictionType(), planOrdersRestriction.getVersion(), planOrdersRestriction.getDeletedState(), "");
+                    planOrdersRestriction.getPlanOrdersRestrictionType(), planOrdersRestriction.getResol(), planOrdersRestriction.getVersion(),
+                    planOrdersRestriction.getDeletedState(), "");
             items.add(item);
         }
         result.setItems(items);

@@ -24,6 +24,7 @@
         <property name="createdDate" column="createdDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" />
         <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="resol" column="resol" type="integer"/>
     </class>
 </hibernate-mapping>
 
