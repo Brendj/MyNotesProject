@@ -165,7 +165,12 @@ public class ImportMigrantsService {
                         resolution = VisitReqResolutionHist.RES_CANCELED;
                     }
 
-                    Date endDate = (null == request.getDateEnd()) ? request.getDateLearnEnd() : request.getDateEnd();
+                    Date endDate = null;
+                    if (request.getDateEnd() == null) {
+                        endDate = request.getDateLearnEnd();
+                    } else if (checkLastDate(request.getDateEnd(), lastDateEnd)) {
+                        endDate = request.getDateEnd();
+                    }
 
                     // флаг, показывающий наличие изменений в заявке
                     boolean isMigrantChanged = false;
@@ -180,13 +185,15 @@ public class ImportMigrantsService {
                                 orgVisitList.get(0).getIdOfOrg(), idOfProcessorMigrantRequest, date);
 
                         // создаем нового мигранта
-                        Migrant migrantNew = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(),
-                                requestNumber, client, orgVisitList.get(0), request.getDateLearnStart(), endDate,
-                                Migrant.NOT_SYNCHRONIZED);
-                        migrantNew.setInitiator(MigrantInitiatorEnum.INITIATOR_ESZ);
-                        migrantNew.setSection(request.getGroupName());
-                        migrantNew.setResolutionCodeGroup(request.getIdOfServiceClass());
-                        session.save(migrantNew);
+                        if (endDate != null) {
+                            Migrant migrantNew = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(),
+                                    requestNumber, client, orgVisitList.get(0), request.getDateLearnStart(), endDate,
+                                    Migrant.NOT_SYNCHRONIZED);
+                            migrantNew.setInitiator(MigrantInitiatorEnum.INITIATOR_ESZ);
+                            migrantNew.setSection(request.getGroupName());
+                            migrantNew.setResolutionCodeGroup(request.getIdOfServiceClass());
+                            session.save(migrantNew);
+                        }
 
                         session.save(
                                 createResolutionHistoryInternal(session, client, compositeIdOfMigrant.getIdOfRequest(),
@@ -216,7 +223,7 @@ public class ImportMigrantsService {
                             isMigrantChanged = true;
                         }
 
-                        if (!migrant.getVisitEndDate().equals(endDate)) {
+                        if (endDate!= null && !migrant.getVisitEndDate().equals(endDate)) {
                             migrant.setVisitEndDate(endDate);
                             isMigrantChanged = true;
                         }
@@ -236,7 +243,8 @@ public class ImportMigrantsService {
                         }
 
                         VisitReqResolutionHist hist = MigrantsUtils.getLastResolutionForMigrant(session, migrant);
-                        if (!resolution.equals(hist.getResolution()) && request.getDateEnd().equals(lastDateEnd)) {
+                        // if (!resolution.equals(hist.getResolution())
+                        if (checkLastDate(request.getDateEnd(), lastDateEnd)) {
                             session.save(createResolutionHistoryInternal(session, client,
                                     migrant.getCompositeIdOfMigrant().getIdOfRequest(), resolution, date));
                         }
@@ -258,6 +266,10 @@ public class ImportMigrantsService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private boolean checkLastDate(Date date, Date lastDateEnd) {
+        return (date == null && lastDateEnd == null) || (date != null && date.equals(lastDateEnd));
     }
 
     private Date getLastDateEnd(List<ESZMigrantsRequest> requestList) {
