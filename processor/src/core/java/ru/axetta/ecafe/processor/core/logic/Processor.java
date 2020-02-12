@@ -3195,6 +3195,54 @@ public class Processor implements SyncProcessor {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             falseFullSyncByOrg(persistenceSession, idOfOrg);
+            falseClientsSyncByOrg(persistenceSession, idOfOrg);
+            falseMenusSyncByOrg(persistenceSession, idOfOrg);
+            falseOrgSettingsSyncByOrg(persistenceSession, idOfOrg);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private void discardClientSyncParam(Long idOfOrg) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            falseClientsSyncByOrg(persistenceSession, idOfOrg);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private void discardMenusSyncParam(Long idOfOrg) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            falseMenusSyncByOrg(persistenceSession, idOfOrg);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private void discardOrgSettingsSyncParam(Long idOfOrg) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            falseOrgSettingsSyncByOrg(persistenceSession, idOfOrg);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -6890,6 +6938,7 @@ public class Processor implements SyncProcessor {
                 OrgSettingSection orgSettingSection = processOrgSettings(orgSettingsRequest);
                 addToResponseSections(orgSettingSection, responseSections);
             }
+            discardOrgSettingsSyncParam(request.getIdOfOrg());
         } catch (Exception e) {
             String message = String.format("Error when process OrgSettingSetting: %s", e.getMessage());
             processorUtils
@@ -7136,6 +7185,8 @@ public class Processor implements SyncProcessor {
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+
+        discardOrgSettingsSyncParam(request.getIdOfOrg());
 
         Date syncEndTime = new Date();
 

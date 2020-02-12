@@ -41,6 +41,27 @@ public class DirectiveElement implements AbstractToElement{
         if(fullSync) {
             directiveItemList.add(new DirectiveItem("FullSync","1"));
             DAOUtils.falseFullSyncByOrg(session, org.getIdOfOrg());
+            DAOUtils.falseMenusSyncByOrg(session, org.getIdOfOrg());
+            DAOUtils.falseOrgSettingsSyncByOrg(session, org.getIdOfOrg());
+            DAOUtils.falseClientsSyncByOrg(session, org.getIdOfOrg());
+        } else {
+            Boolean menusSyncParam = org.getMenusSyncParam();
+            if (menusSyncParam) {
+                directiveItemList.add(new DirectiveItem("DoMenusSync", "1"));
+                DAOUtils.falseMenusSyncByOrg(session, org.getIdOfOrg());
+            }
+
+            Boolean orgSettingsSyncParam = org.getOrgSettingsSyncParam();
+            if (orgSettingsSyncParam) {
+                directiveItemList.add(new DirectiveItem("DoOrgSettingsSync", "1"));
+                DAOUtils.falseOrgSettingsSyncByOrg(session, org.getIdOfOrg());
+            }
+
+            Boolean clientSyncParam = org.getClientsSyncParam();
+            if (clientSyncParam) {
+                directiveItemList.add(new DirectiveItem("DoMenusSync", "1"));
+                DAOUtils.falseClientsSyncByOrg(session, org.getIdOfOrg());
+            }
         }
 
         Boolean commodityAccounting = org.getCommodityAccounting();

@@ -2255,6 +2255,24 @@ public class DAOUtils {
         query.executeUpdate();
     }
 
+    public static void falseMenusSyncByOrg(Session session, Long idOfOrg) {
+        Query query = session.createQuery("update Org set menusSyncParam=0 where id=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.executeUpdate();
+    }
+
+    public static void falseClientsSyncByOrg(Session session, Long idOfOrg) {
+        Query query = session.createQuery("update Org set clientsSyncParam=0 where id=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.executeUpdate();
+    }
+
+    public static void falseOrgSettingsSyncByOrg(Session session, Long idOfOrg) {
+        Query query = session.createQuery("update Org set orgSettingsSyncParam=0 where id=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.executeUpdate();
+    }
+
     public static void savePreorderDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
         Query query = session.createQuery("update Org set preorderSyncParam = :value where id = :idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
