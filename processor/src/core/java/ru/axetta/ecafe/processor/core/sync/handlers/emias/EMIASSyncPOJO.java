@@ -4,15 +4,12 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.emias;
 
-import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingItemSyncPOJO;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.util.Date;
-import java.util.LinkedList;
-import java.util.List;
 
 public class EMIASSyncPOJO {
     private String guid;

@@ -39,6 +39,7 @@
             </type>
         </property>
         <property name="totalCount" column="TotalCount" type="long"/>
+        <property name="complexId" column="ComplexId" type="int"/>
         <property name="netWeight" column="NetWeight" type="long"/>
 
         <many-to-one name="goodRequest" fetch="join" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest">

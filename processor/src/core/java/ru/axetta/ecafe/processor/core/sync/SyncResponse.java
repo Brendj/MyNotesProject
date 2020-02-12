@@ -29,6 +29,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentR
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ResReestrTaloonApproval;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ReestrTaloonPreorderData;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ResReestrTaloonPreorder;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingData;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeeding;
@@ -1204,6 +1206,8 @@ public class SyncResponse {
     private  OrganizationStructure organizationStructure;
     private  ResReestrTaloonApproval resReestrTaloonApproval;
     private  ReestrTaloonApprovalData reestrTaloonApprovalData;
+    private  ResReestrTaloonPreorder resReestrTaloonPreorder;
+    private  ReestrTaloonPreorderData reestrTaloonPreorderData;
     private  OrganizationComplexesStructure organizationComplexesStructure;
     private  ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData interactiveReportData;
     private  ZeroTransactionData zeroTransactionData;
@@ -1245,6 +1249,7 @@ public class SyncResponse {
             ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate, ProhibitionsMenu prohibitionsMenu,
             AccountsRegistry accountsRegistry,ResCardsOperationsRegistry resCardsOperationsRegistry, OrganizationStructure organizationStructure,
             ResReestrTaloonApproval resReestrTaloonApproval, ReestrTaloonApprovalData reestrTaloonApprovalData,
+            ResReestrTaloonPreorder resReestrTaloonPreorder, ReestrTaloonPreorderData reestrTaloonPreorderData,
             OrganizationComplexesStructure organizationComplexesStructure, InteractiveReportData interactiveReportData,
             ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions, SpecialDatesData specialDatesData,
             ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections,
@@ -1290,6 +1295,8 @@ public class SyncResponse {
         this.organizationStructure = organizationStructure;
         this.resReestrTaloonApproval = resReestrTaloonApproval;
         this.reestrTaloonApprovalData = reestrTaloonApprovalData;
+        this.resReestrTaloonPreorder = resReestrTaloonPreorder;
+        this.reestrTaloonPreorderData = reestrTaloonPreorderData;
         this.organizationComplexesStructure = organizationComplexesStructure;
         this.interactiveReportData = interactiveReportData;
         this.zeroTransactionData = zeroTransactionData;
@@ -1517,6 +1524,14 @@ public class SyncResponse {
 
         if (reestrTaloonApprovalData != null) {
             envelopeElement.appendChild(reestrTaloonApprovalData.toElement(document));
+        }
+
+        if (resReestrTaloonPreorder != null) {
+            envelopeElement.appendChild(resReestrTaloonPreorder.toElement(document));
+        }
+
+        if (reestrTaloonPreorderData != null) {
+            envelopeElement.appendChild(reestrTaloonPreorderData.toElement(document));
         }
 
         if (organizationComplexesStructure != null) {

@@ -5,7 +5,6 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.emias;
 
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSyncPOJO;
 
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;

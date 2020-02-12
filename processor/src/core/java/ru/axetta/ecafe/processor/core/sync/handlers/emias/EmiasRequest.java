@@ -4,9 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.emias;
 
-import ru.axetta.ecafe.processor.core.persistence.orgsettings.orgsettingstypes.OrgSettingsDataTypes;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingItemSyncPOJO;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSyncPOJO;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 

@@ -61,7 +61,7 @@ public class TaloonApprovalVerificationPage extends BasicWorkspacePage implement
         if (this.idOfOrg == null) {
             filter = "Не выбрано";
         } else {
-            Org org = (Org)session.load(Org.class, this.idOfOrg);
+            Org org = (Org) session.load(Org.class, this.idOfOrg);
             filter = org.getShortName();
         }
     }
@@ -121,7 +121,8 @@ public class TaloonApprovalVerificationPage extends BasicWorkspacePage implement
         for (TaloonApprovalVerificationItem item : items) {
             for (TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail : item.getDetails()) {
                 if (detail.equals(currentTaloonApprovalVerificationItemDetail)) {
-                    if (currentState.equals(TaloonApprovalVerificationItem.MAKE_CANCEL) && !detail.needFillShippedQty()) {
+                    if (currentState.equals(TaloonApprovalVerificationItem.MAKE_CANCEL) && !detail
+                            .needFillShippedQty()) {
                         detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
                     }
                     if (currentState.equals(TaloonApprovalVerificationItem.MAKE_CONFIRM)) {
@@ -141,21 +142,74 @@ public class TaloonApprovalVerificationPage extends BasicWorkspacePage implement
         changePpStateAllDay(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
     }
 
+    public void deselectPpStatePeriod() {
+        changePpStatePeriod(TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
+    }
+
     public void changePpStateAllDay(TaloonPPStatesEnum state) {
         for (TaloonApprovalVerificationItem item : items) {
             if (item.equals(currentTaloonApprovalVerificationItem)) {
                 for (TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail : item.getDetails()) {
                     if (detail.getPpState() != null) {
-                        if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.allowedSetFirstFlag())
-                                ||
-                                ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED || state == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED) && detail.allowedClearFirstFlag())) {
+                        if (state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.allowedSetFirstFlag()) {
+                            if (!detail.isPpStateCanceled()) {
+                                detail.setPpState(state);
+                            }
+                        }
+                        if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED
+                                || state == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED) &&
+                        detail.allowedClearFirstFlag()){
+                            detail.setPpState(state);
+                        }
+                    }
+                } break;
+            }
+        }
+    }
+
+    public void confirmPpStatePeriod() {
+        changePpStatePeriod(TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED);
+    }
+
+    public void changePpStatePeriod(TaloonPPStatesEnum state) {
+        for (TaloonApprovalVerificationItem item : items) {
+                for (TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail : item.getDetails()) {
+                    if (detail.getPpState() != null) {
+                        if (state == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED && detail.allowedSetFirstFlag()) {
+                            if (!detail.isPpStateCanceled()) {
+                                detail.setPpState(state);
+                            }
+                        }
+                        if ((state == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED
+                                || state == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED) &&
+                                detail.allowedClearFirstFlag()){
                             detail.setPpState(state);
                         }
                     }
                 }
-                break;
+        }
+    }
+
+    public boolean allowedSetFirstFlagPeriod() {
+        for (TaloonApprovalVerificationItem item : items) {
+            for (TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail : item.getDetails()) {
+                if (detail.allowedSetFirstFlag()) {
+                    return true;
+                }
             }
         }
+        return false;
+    }
+
+    public boolean allowedClearFirstFlagPeriod() {
+        for (TaloonApprovalVerificationItem item : items) {
+            for (TaloonApprovalVerificationItem.TaloonApprovalVerificationItemDetail detail : item.getDetails()) {
+                if (detail.allowedClearFirstFlag()) {
+                    return true;
+                }
+            }
+        }
+        return false;
     }
 
     public String getFilter() {
