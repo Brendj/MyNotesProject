@@ -2041,7 +2041,7 @@ public class Processor implements SyncProcessor {
                 clientGuardianData, accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
-                resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding, cardRequestsData, 
+                resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding, cardRequestsData,
 				resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
     }
@@ -2129,7 +2129,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                  specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData, 
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
 				clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
     }
@@ -2217,7 +2217,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData, 
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
 				clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
     }
@@ -2340,7 +2340,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData, 
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
 				clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
     }
@@ -2505,7 +2505,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData, 
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
 				clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
     }
@@ -2649,7 +2649,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, 
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar,
 				menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
     }
@@ -2849,7 +2849,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData, 
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
 				clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
     }
@@ -3680,6 +3680,10 @@ public class Processor implements SyncProcessor {
                             String.format("Invalid sum of order card and cash payments, IdOfOrg == %s, IdOfOrder == %s",
                                     idOfOrg, payment.getIdOfOrder()));
                 }
+
+                //Если заказ есть и по нему не было сообщения, то отправляем сообщение
+                NotificationOrders notificationOrder =
+                        DAOUtils.findNotificationOrder(persistenceSession,payment.getIdOfOrder(), client,false);
 
                 // Commit data model transaction
                 persistenceSession.flush();
@@ -6229,7 +6233,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData, 
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
 				clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
     }
@@ -6686,7 +6690,7 @@ public class Processor implements SyncProcessor {
                 organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData,
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData, 
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
 				clientBalanceHoldFeeding, resClientBalanceHoldData, orgSetting, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
     }

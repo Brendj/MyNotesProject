@@ -22,6 +22,7 @@ public class NotificationOrders {
     private Long idOfOrder;
     private Long idOfClient;
     private Date createddate;
+    private Boolean sended;
 
     public Long getIdOfOrder() {
         return idOfOrder;
@@ -53,5 +54,13 @@ public class NotificationOrders {
 
     public void setIdOfNotificationOrders(Long idOfNotificationOrders) {
         this.idOfNotificationOrders = idOfNotificationOrders;
+    }
+
+    public Boolean getSended() {
+        return sended;
+    }
+
+    public void setSended(Boolean sended) {
+        this.sended = sended;
     }
 }

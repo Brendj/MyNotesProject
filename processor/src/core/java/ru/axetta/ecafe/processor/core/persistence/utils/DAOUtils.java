@@ -1263,19 +1263,7 @@ public class DAOUtils {
                         SectionType.LAST_TRANSACTION, transactionDate);
         boolean flagOrder;
         if (orderId != null) {
-            Criteria criteria = session.createCriteria(NotificationOrders.class);
-            criteria.add(Restrictions.eq("idOfOrder", orderId));
-            criteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
-            NotificationOrders notificationOrder = null;
-            try {
-                List notificationOrders = criteria.list();
-                if (notificationOrders != null) {
-                    notificationOrder = (NotificationOrders) notificationOrders.get(0);
-                }
-            } catch (Exception e) {
-                notificationOrder = null;
-            }
-            if (notificationOrder != null) {
+            if (findNotificationOrder(session,orderId, client,true) != null) {
                 flagOrder = true;
             } else {
                 flagOrder = false;
@@ -1286,16 +1274,42 @@ public class DAOUtils {
 
         if ((client.getBalanceToNotify() != null) && (client.getBalance() < client.getBalanceToNotify())
                 && !flagOrder) {
-            sendNotificationLowBalance(session, client, transactionDate);
-            if (orderId != null) {
-                //Сохраняем информацию об отправленном сообщении
+            if (orderId == null)
+                sendNotificationLowBalance(session, client, transactionDate);
+            else {
+                //Сохраняем информацию о том, что сообщение нужно отправить
                 NotificationOrders notificationOrders = new NotificationOrders();
                 notificationOrders.setIdOfClient(client.getIdOfClient());
                 notificationOrders.setIdOfOrder(orderId);
                 notificationOrders.setCreateddate(new Date());
+                notificationOrders.setSended(false);
                 DAOService.getInstance().saveNotificationOrder(notificationOrders);
             }
         }
+    }
+
+    public static NotificationOrders findNotificationOrder (Session session, Long orderId, Client client, boolean sended)
+    {
+        Criteria criteria = session.createCriteria(NotificationOrders.class);
+        criteria.add(Restrictions.eq("idOfOrder", orderId));
+        criteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+        criteria.add(Restrictions.eq("sended", sended)); //Сообщение уже было отослано
+        NotificationOrders notificationOrder = null;
+        try {
+            List notificationOrders = criteria.list();
+            if (notificationOrders != null) {
+                notificationOrder = (NotificationOrders) notificationOrders.get(0);
+            }
+        } catch (Exception e) {
+            notificationOrder = null;
+        }
+        if (!sended && notificationOrder != null)
+        {
+            sendNotificationLowBalance(session, client, new Date());
+            notificationOrder.setSended(true);
+            session.save(notificationOrder);
+        }
+        return notificationOrder;
     }
 
     private static void sendNotificationLowBalance(Session session, Client client, Date transactionDate) {
