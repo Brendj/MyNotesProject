@@ -82,7 +82,7 @@ public class PlanOrdersRestrictionItem {
         Long planTypeLong = getLongValue(itemNode, "PlanType", errorMessage);
         if (planTypeLong != null) planType = PlanOrdersRestrictionType.fromInteger(planTypeLong.intValue());
         Integer resol = null;
-        Long resolLong = getLongValue(itemNode, "Resol", errorMessage);
+        Long resolLong = getLongValue(itemNode, "Resol", null);
         if (resolLong != null) resol = resolLong.intValue();
         Long version = getLongValue(itemNode, "V", null);
         String deletedStr = XMLUtils.getAttributeValue(itemNode, "D");
