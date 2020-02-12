@@ -20,6 +20,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
 
@@ -70,12 +72,18 @@ public class ImportMigrantsService {
                     transaction = session.beginTransaction();
                 }
                 try {
+                    List<ESZMigrantsRequest> eszRequestList = MigrantsUtils
+                            .getRequestsByExternalIdAndGroupId(session, request.getIdOfESZ(),
+                                    request.getIdOfServiceClass());
+                    Date lastDateEnd = getLastDateEnd(eszRequestList);
+
                     Migrant migrant = MigrantsUtils.getMigrantRequestByGuidAndGroupId(session, request.getClientGuid(),
                             request.getIdOfServiceClass());
 
                     if (null == migrant) {
                         List<Migrant> migrants = MigrantsUtils
-                                .getMigrantRequestsByExternalIdAndGroupId(session, request.getIdOfESZ(), request.getIdOfServiceClass());
+                                .getMigrantRequestsByExternalIdAndGroupId(session, request.getIdOfESZ(),
+                                        request.getIdOfServiceClass());
                         if (migrants.isEmpty() || migrants.size() > 1) {
                             migrant = null;
                         } else {
@@ -83,7 +91,8 @@ public class ImportMigrantsService {
                         }
                     }
 
-                    List<Org> orgVisitList = DAOUtils.getOrgByInnAndUnom(session, request.getVisitOrgInn(), request.getVisitOrgUnom());
+                    List<Org> orgVisitList = DAOUtils
+                            .getOrgByInnAndUnom(session, request.getVisitOrgInn(), request.getVisitOrgUnom());
 
                     if (orgVisitList.size() > 1) {
                         logger.warn(String.format(
@@ -95,7 +104,8 @@ public class ImportMigrantsService {
 
                     if (orgVisitList.isEmpty()) {
                         logger.warn(String.format(
-                                "No organization was found with unom=%d and inn=%s for client with guid={%s}", request.getVisitOrgUnom(), request.getVisitOrgInn(), request.getClientGuid()));
+                                "No organization was found with unom=%d and inn=%s for client with guid={%s}",
+                                request.getVisitOrgUnom(), request.getVisitOrgInn(), request.getClientGuid()));
                         cycleTime = loggingInfoAndFlushSession(counter++, size, cycleTime, session);
                         continue;
                     }
@@ -113,19 +123,23 @@ public class ImportMigrantsService {
                                 (request.getSecondname() == null) ? "" : request.getSecondname(),
                                 (request.getClientGuid() == null) ? "" : request.getClientGuid());
                         client = (Client) session.load(Client.class, idOfClient);
-                        if (client.getClientGroup() != null && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
+                        if (client.getClientGroup() != null && client.getClientGroup().getCompositeIdOfClientGroup()
+                                .getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) {
                             ClientManager.ClientFieldConfigForUpdate fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
-                            fieldConfig.setValue(ClientManager.FieldId.GROUP, ClientGroup.Predefined.CLIENT_OTHER_ORG.getNameOfGroup());
+                            fieldConfig.setValue(ClientManager.FieldId.GROUP,
+                                    ClientGroup.Predefined.CLIENT_OTHER_ORG.getNameOfGroup());
                             ClientManager.modifyClientTransactionFree(fieldConfig, null, "", client, session);
                             ClientGroup clientGroup = DAOUtils
-                                    .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(session, client.getOrg().getIdOfOrg(),
+                                    .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(session,
+                                            client.getOrg().getIdOfOrg(),
                                             ClientGroup.Predefined.CLIENT_OTHER_ORG.getNameOfGroup());
                             if (null != clientGroup) {
                                 ESZMigrantsUpdateService.addGroupHistory(session, client,
                                         clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
                             } else {
                                 logger.error(String.format(
-                                        "Unable to save client group migration history for client with id = %d", client.getIdOfClient()));
+                                        "Unable to save client group migration history for client with id = %d",
+                                        client.getIdOfClient()));
                             }
                         }
                     } else {
@@ -160,9 +174,10 @@ public class ImportMigrantsService {
                     if (null == migrant) {
                         Long idOfProcessorMigrantRequest = MigrantsUtils
                                 .nextIdOfProcessorMigrantRequest(session, client.getOrg().getIdOfOrg());
-                        CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
-                                client.getOrg().getIdOfOrg());
-                        String requestNumber = formRequestNumber(client.getOrg().getIdOfOrg(), orgVisitList.get(0).getIdOfOrg(), idOfProcessorMigrantRequest, date);
+                        CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(
+                                idOfProcessorMigrantRequest, client.getOrg().getIdOfOrg());
+                        String requestNumber = formRequestNumber(client.getOrg().getIdOfOrg(),
+                                orgVisitList.get(0).getIdOfOrg(), idOfProcessorMigrantRequest, date);
 
                         // создаем нового мигранта
                         Migrant migrantNew = new Migrant(compositeIdOfMigrant, client.getOrg().getDefaultSupplier(),
@@ -173,11 +188,13 @@ public class ImportMigrantsService {
                         migrantNew.setResolutionCodeGroup(request.getIdOfServiceClass());
                         session.save(migrantNew);
 
-                        session.save(createResolutionHistoryInternal(session, client, compositeIdOfMigrant.getIdOfRequest(),
-                                VisitReqResolutionHist.RES_CREATED, date));
+                        session.save(
+                                createResolutionHistoryInternal(session, client, compositeIdOfMigrant.getIdOfRequest(),
+                                        VisitReqResolutionHist.RES_CREATED, date));
                         session.flush();
-                        session.save(createResolutionHistoryInternal(session, client, compositeIdOfMigrant.getIdOfRequest(),
-                                resolution, CalendarUtils.addSeconds(date, 1)));
+                        session.save(
+                                createResolutionHistoryInternal(session, client, compositeIdOfMigrant.getIdOfRequest(),
+                                        resolution, CalendarUtils.addSeconds(date, 1)));
                     } else {    // сравниваем, если надо - обновляем
                         if (!migrant.getOrgRegVendor().equals(client.getOrg().getDefaultSupplier())) {
                             migrant.setOrgRegVendor(client.getOrg().getDefaultSupplier());
@@ -219,7 +236,7 @@ public class ImportMigrantsService {
                         }
 
                         VisitReqResolutionHist hist = MigrantsUtils.getLastResolutionForMigrant(session, migrant);
-                        if (!resolution.equals(hist.getResolution())) {
+                        if (!resolution.equals(hist.getResolution()) && request.getDateEnd().equals(lastDateEnd)) {
                             session.save(createResolutionHistoryInternal(session, client,
                                     migrant.getCompositeIdOfMigrant().getIdOfRequest(), resolution, date));
                         }
@@ -241,6 +258,21 @@ public class ImportMigrantsService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
+    }
+
+    private Date getLastDateEnd(List<ESZMigrantsRequest> requestList) {
+        List<Date> endDates = new ArrayList<>();
+        for (ESZMigrantsRequest request : requestList) {
+            Date endDate = request.getDateEnd();
+            if (endDate == null) {
+                return null;
+            } else {
+                endDates.add(endDate);
+            }
+        }
+        Date[] arrDates = (Date[]) endDates.toArray();
+        Arrays.sort(arrDates);
+        return arrDates[arrDates.length - 1];
     }
 
     public static String formRequestNumber(Long idOfOrg, Long idOfOrgVisit, Long idOfFirstRequest, Date startDate) {
