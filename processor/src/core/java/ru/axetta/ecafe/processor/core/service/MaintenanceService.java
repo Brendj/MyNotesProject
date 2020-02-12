@@ -39,9 +39,6 @@ public class MaintenanceService {
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
 
-    @Autowired
-    private RuntimeContext runtimeContext;
-
     private MaintenanceService getProxy() {
         return RuntimeContext.getAppContext().getBean(MaintenanceService.class);
     }
@@ -50,7 +47,7 @@ public class MaintenanceService {
         if (!RuntimeContext.getInstance().isMainNode()) {
             return;
         }
-        if (!runtimeContext.getOptionValueBool(Option.OPTION_CLEAN_MENU)) {
+        if (!RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_CLEAN_MENU)) {
             return;
         }
 
@@ -82,7 +79,7 @@ public class MaintenanceService {
     public String clean(boolean isSource) throws Exception {
         logger.debug("start clean: "+ new Date());
         //Получаем количество дней, старше которых нужно чистить таблицу
-        long menuDaysForDeletion = runtimeContext.getOptionValueInt(
+        long menuDaysForDeletion =  RuntimeContext.getInstance().getOptionValueInt(
                 isSource ? Option.OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION : Option.OPTION_MENU_DAYS_FOR_DELETION);
         if (menuDaysForDeletion < 0) {
             menuDaysForDeletion = 1;
@@ -148,6 +145,7 @@ public class MaintenanceService {
             Long idOfMenu = ((BigInteger) row[0]).longValue();
             orgIds.add(((BigInteger) row[1]).longValue());
             int[] res = cleanMenuInformationInternal(idOfMenu);
+            logger.debug(String.format("Successfully delete menu[%d]", idOfMenu));
             complexInfoDeletedCount += res[0];
             complexDeletedCount += res[1];
             basicBasketDeletedCount += res[2];

@@ -49,6 +49,8 @@
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Отправить пробное событие на ЕМП" action="#{otherActionsPage.runSendEMPEvent}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+    <a4j:commandButton value="Очистить таблицу меню" action="#{otherActionsPage.cleaningMenu}"
+                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
         <rich:panel>
             <h:panelGrid columns="2">
                 <h:outputText escape="true" value="Отправить все события ЕМИАС по клиенту на тестовый сервис ЕМП"
