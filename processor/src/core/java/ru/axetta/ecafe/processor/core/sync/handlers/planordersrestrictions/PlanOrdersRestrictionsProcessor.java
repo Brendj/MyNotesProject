@@ -65,7 +65,7 @@ public class PlanOrdersRestrictionsProcessor {
                 planOrdersRestrictionsRequest.getOrgOwner());
         for (PlanOrdersRestriction planOrdersRestriction : list) {
             PlanOrdersRestrictionItem item = new PlanOrdersRestrictionItem(planOrdersRestriction.getIdOfClient(), planOrdersRestriction.getIdOfOrgOnCreate(),
-                    planOrdersRestriction.getIdOfClient(), planOrdersRestriction.getComplexName(), planOrdersRestriction.getArmComplexId(),
+                    planOrdersRestriction.getIdOfConfigurationProoviderOnCreate(), planOrdersRestriction.getComplexName(), planOrdersRestriction.getArmComplexId(),
                     planOrdersRestriction.getPlanOrdersRestrictionType(), planOrdersRestriction.getVersion(), planOrdersRestriction.getDeletedState(), "");
             items.add(item);
         }
