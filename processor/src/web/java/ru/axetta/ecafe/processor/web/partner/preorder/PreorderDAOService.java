@@ -594,6 +594,9 @@ public class PreorderDAOService {
         } catch (NoResultException e) {
             if (isComplex) {
                 ComplexInfo ci = getComplexInfo(client, idOfComplex, date);
+                if (getMenuDetailList(ci.getIdOfComplexInfo()).size() == 0) {
+                    throw new MenuDetailNotExistsException("Не найдены блюда для комплекса с ид.=" + idOfComplex.toString());
+                }
                 String complexName = null;
                 Long complexPrice = null;
                 if (ci != null) {
@@ -668,7 +671,7 @@ public class PreorderDAOService {
 
     @Transactional
     public List<PreorderComplex> getPreorderComplexListForRelevanceToMenu(PreorderRequestsReportServiceParam params) {
-        Query query = em.createQuery("select pc from PreorderComplex pc join fetch pc.preorderMenuDetails join fetch pc.client c join fetch c.org "
+        Query query = em.createQuery("select pc from PreorderComplex pc left join fetch pc.preorderMenuDetails join fetch pc.client c join fetch c.org "
                 + "where pc.preorderDate > :date and pc.deletedState = false "
                 + params.getJPACondition()
                 + "order by pc.preorderDate");
