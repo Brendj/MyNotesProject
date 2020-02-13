@@ -13,7 +13,7 @@
         <property name="idOfOrder" column="idOfOrder" type="long"/>
         <property name="idOfClient" column="idOfClient" type="long"/>
         <property name="createddate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <property name="sended" column="sended" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="sended" column="sended" type="java.lang.Boolean"/>
     </class>
 </hibernate-mapping>
 
