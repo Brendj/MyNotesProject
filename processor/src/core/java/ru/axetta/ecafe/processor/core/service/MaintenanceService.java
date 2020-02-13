@@ -145,7 +145,7 @@ public class MaintenanceService {
             Long idOfMenu = ((BigInteger) row[0]).longValue();
             orgIds.add(((BigInteger) row[1]).longValue());
             int[] res = cleanMenuInformationInternal(idOfMenu);
-            logger.debug(String.format("Successfully delete menu[%d]", idOfMenu));
+            logger.info(String.format("Successfully delete menu[%d]", idOfMenu));
             complexInfoDeletedCount += res[0];
             complexDeletedCount += res[1];
             basicBasketDeletedCount += res[2];
