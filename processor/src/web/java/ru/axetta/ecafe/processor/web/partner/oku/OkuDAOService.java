@@ -49,13 +49,25 @@ public class OkuDAOService {
                 + "where c.contractId = :contractId and lower(p.surname) = :surname and o.participantOP = true "
                 + "     and (c.clientGroup.compositeIdOfClientGroup.idOfClientGroup in (:clientGroupList) "
                 + "         or ((c.clientGroup.compositeIdOfClientGroup.idOfClientGroup < :clientGroupEmployees)"
-                + "             and ((c.parallel like :parallel10) or (c.parallel like :parallel11))))");
+                + "             and c.ageTypeGroup not like :kindergarten and c.ageTypeGroup like :school "
+                + "             and ((c.parallel like :parallel5) or (c.parallel like :parallel6) "
+                + "                  or (c.parallel like :parallel7) or (c.parallel like :parallel8) "
+                + "                  or (c.parallel like :parallel9) or (c.parallel like :parallel10) "
+                + "                  or (c.parallel like :parallel11) or (c.parallel like :parallel12))))");
         query.setParameter("contractId", contractId);
         query.setParameter("surname", surname.toLowerCase());
         query.setParameter("clientGroupList", clientGroupList);
         query.setParameter("clientGroupEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+        query.setParameter("parallel5", "%5%");
+        query.setParameter("parallel6", "%6%");
+        query.setParameter("parallel7", "%7%");
+        query.setParameter("parallel8", "%8%");
+        query.setParameter("parallel9", "%9%");
         query.setParameter("parallel10", "%10%");
         query.setParameter("parallel11", "%11%");
+        query.setParameter("parallel12", "%12%");
+        query.setParameter("school", "%школ%");
+        query.setParameter("kindergarten", "%дошкол%");
         query.setMaxResults(1);
         try {
             Client client = (Client) query.getSingleResult();
