@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contrac
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -22,8 +23,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -2686,5 +2687,82 @@ public class DAOService {
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    public List<WtOrgGroup> getOrgGroupsListByVersion(Long value) {
+        TypedQuery<WtOrgGroup> q = entityManager
+                .createQuery("from WtOrgGroup where version = " + value + " order by idOfOrgGroup", WtOrgGroup.class);
+        return q.getResultList();
+    }
+
+    public List<WtCategoryItem> getCategoryItemsListByVersion(Long value) {
+        TypedQuery<WtCategoryItem> q = entityManager
+                .createQuery("from WtCategoryItem where version = " + value + " order by idOfCategoryItem",
+                        WtCategoryItem.class);
+        return q.getResultList();
+    }
+
+    public List<WtTypeOfProductionItem> getTypeProductionsListByVersion(Long value) {
+        TypedQuery<WtTypeOfProductionItem> q = entityManager
+                .createQuery("from WtTypeOfProductionItem where version = " + value + " order by idOfTypeProductionItem",
+                        WtTypeOfProductionItem.class);
+        return q.getResultList();
+    }
+
+
+    public List<WtAgeGroupItem> getAgeGroupItemsListByVersion(Long value) {
+        TypedQuery<WtAgeGroupItem> q = entityManager
+                .createQuery("from WtAgeGroupItem where version = " + value + " order by idOfAgeGroupItem",
+                        WtAgeGroupItem.class);
+        return q.getResultList();
+    }
+
+    public List<WtDietType> getDietTypesListByVersion(Long value) {
+        TypedQuery<WtDietType> q = entityManager
+                .createQuery("from WtDietType where version = " + value + " order by idOfDietType",
+                        WtDietType.class);
+        return q.getResultList();
+    }
+
+    public List<WtComplexGroupItem> getComplexGroupItemsListByVersion(Long value) {
+        TypedQuery<WtComplexGroupItem> q = entityManager
+                .createQuery("from WtComplexGroupItem where version = " + value + " order by idOfComplexGroupItem",
+                        WtComplexGroupItem.class);
+        return q.getResultList();
+    }
+
+    public List<WtGroupItem> getGroupItemsListByVersion(Long value) {
+        TypedQuery<WtGroupItem> q = entityManager
+                .createQuery("from WtGroupItem where version = " + value + " order by idOfGroupItem",
+                        WtGroupItem.class);
+        return q.getResultList();
+    }
+
+    public List<WtDish> getDishesListByVersion(Long value) {
+        TypedQuery<WtDish> q = entityManager
+                .createQuery("from WtDish where version = " + value + " order by idOfDish",
+                        WtDish.class);
+        return q.getResultList();
+    }
+
+    public List<WtMenuGroup> getMenuGroupsListByVersion(Long value) {
+        TypedQuery<WtMenuGroup> q = entityManager
+                .createQuery("from WtMenuGroup where version = " + value + " order by id",
+                        WtMenuGroup.class);
+        return q.getResultList();
+    }
+
+    public List<WtMenu> getMenusListByVersion(Long value) {
+        TypedQuery<WtMenu> q = entityManager
+                .createQuery("from WtMenu where version = " + value + " order by idOfMenu",
+                        WtMenu.class);
+        return q.getResultList();
+    }
+
+    public List<WtComplex> getComplexesListByVersion(Long value) {
+        TypedQuery<WtComplex> q = entityManager
+                .createQuery("from WtComplex where version = " + value + " order by idOfComplex",
+                        WtComplex.class);
+        return q.getResultList();
     }
 }

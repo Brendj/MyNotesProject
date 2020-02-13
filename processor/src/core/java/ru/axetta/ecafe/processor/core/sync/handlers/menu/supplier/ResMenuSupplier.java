@@ -29,10 +29,10 @@ public class ResMenuSupplier implements AbstractToElement {
     @Override
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("MenuSupplier");
-        for (MenuSupplier item : this.getItems()) {
-            element.appendChild(item.toElement(document, "MenuSupplier"
-                    + ""));
-        }
+        //for (MenuSupplier item : this.getItems()) {
+        //    element.appendChild(item.toElement(document, "MenuSupplier"
+        //            + ""));
+        //}
         return element;
     }
 

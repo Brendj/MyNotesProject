@@ -4,16 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier;
 
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -53,11 +51,13 @@ public class MenuSupplierItem {
         categoryItems = new ArrayList<>();
         typeProductions = new ArrayList<>();
         ageGroupItems = new ArrayList<>();
+        dietTypes = new ArrayList<>();
         complexGroupItems = new ArrayList<>();
         groupItems = new ArrayList<>();
         dishes = new ArrayList<>();
         menuGroups = new ArrayList<>();
         menus = new ArrayList<>();
+        complexes = new ArrayList<>();
 
         StringBuilder errorMessage = new StringBuilder();
 
@@ -77,7 +77,60 @@ public class MenuSupplierItem {
 
     private MenuSupplierItem(Map<String, Long> versions, String errorMessage) {
 
-        // TO DO!
+        Iterator<Map.Entry<String, Long>> iter = versions.entrySet().iterator();
+        while(iter.hasNext()) {
+            Map.Entry<String, Long> entry = iter.next();
+
+            // Выбор по максимальной версии, если она больше версии клиента - TO DO!
+
+            switch(entry.getKey()) {
+                case "OrgGroupsRequest" : {
+                    orgGroups = DAOService.getInstance().getOrgGroupsListByVersion(entry.getValue());
+                    break;
+                }
+                case "CategoryItemsRequest" : {
+                    categoryItems = DAOService.getInstance().getCategoryItemsListByVersion(entry.getValue());
+                    break;
+                }
+                case "TypeProductionsRequest" : {
+                    typeProductions = DAOService.getInstance().getTypeProductionsListByVersion(entry.getValue());
+                    break;
+                }
+                case "AgeGroupItemsRequest" : {
+                    ageGroupItems = DAOService.getInstance().getAgeGroupItemsListByVersion(entry.getValue());
+                    break;
+                }
+                case "DietTypesRequest" : {
+                    dietTypes = DAOService.getInstance().getDietTypesListByVersion(entry.getValue());
+                    break;
+                }
+                case "ComplexGroupItemsRequest" : {
+                    complexGroupItems = DAOService.getInstance().getComplexGroupItemsListByVersion(entry.getValue());
+                    break;
+                }
+                case "GroupItemsRequest" : {
+                    groupItems = DAOService.getInstance().getGroupItemsListByVersion(entry.getValue());
+                    break;
+                }
+                case "DishesRequest" : {
+                    dishes = DAOService.getInstance().getDishesListByVersion(entry.getValue());
+                    break;
+                }
+                case "MenuGroupsRequest" : {
+                    menuGroups = DAOService.getInstance().getMenuGroupsListByVersion(entry.getValue());
+                    break;
+                }
+                case "MenusRequest" : {
+                    menus = DAOService.getInstance().getMenusListByVersion(entry.getValue());
+                    break;
+                }
+                case "ComplexesRequest" : {
+                    complexes = DAOService.getInstance().getComplexesListByVersion(entry.getValue());
+                    break;
+                }
+            }
+
+        }
 
         this.setErrorMessage(errorMessage);
         if (errorMessage.equals("")) {
