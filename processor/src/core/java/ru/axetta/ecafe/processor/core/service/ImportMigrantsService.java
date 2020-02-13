@@ -20,10 +20,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.SortedSet;
+import java.util.TreeSet;
 
 @Component("ImportMigrantsService")
 @Scope("singleton")
@@ -273,7 +273,8 @@ public class ImportMigrantsService {
     }
 
     private Date getLastDateEnd(List<ESZMigrantsRequest> requestList) {
-        List<Date> endDates = new ArrayList<>();
+        // Ищем дату аннулирования: null или максимальную, если все непусты
+        SortedSet<Date> endDates = new TreeSet<>();
         for (ESZMigrantsRequest request : requestList) {
             Date endDate = request.getDateEnd();
             if (endDate == null) {
@@ -282,9 +283,7 @@ public class ImportMigrantsService {
                 endDates.add(endDate);
             }
         }
-        Date[] arrDates = (Date[]) endDates.toArray();
-        Arrays.sort(arrDates);
-        return arrDates[arrDates.length - 1];
+        return endDates.last();
     }
 
     public static String formRequestNumber(Long idOfOrg, Long idOfOrgVisit, Long idOfFirstRequest, Date startDate) {
