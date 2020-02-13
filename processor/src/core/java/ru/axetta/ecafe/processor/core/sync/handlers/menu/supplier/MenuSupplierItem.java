@@ -10,8 +10,10 @@ import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
-import javax.persistence.JoinColumn;
-import javax.persistence.OneToOne;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Created with IntelliJ IDEA.
@@ -26,87 +28,57 @@ public class MenuSupplierItem {
     public static final Integer ERROR_CODE_ALL_OK = 0;
     public static final Integer ERROR_CODE_NOT_VALID_ATTRIBUTE = 100;
 
+    private static Map<String, Long> versions = new HashMap<>();
+
+    private static List<WtOrgGroup> orgGroups;
+    private static List<WtCategoryItem> categoryItems;
+    private static List<WtTypeOfProductionItem> typeProductions;
+    private static List<WtAgeGroupItem> ageGroupItems;
+    private static List<WtDietType> dietTypes;
+    private static List<WtComplexGroupItem> complexGroupItems;
+    private static List<WtGroupItem> groupItems;
+    private static List<WtDish> dishes;
+    private static List<WtMenuGroup> menuGroups;
+    private static List<WtMenu> menus;
+    private static List<WtComplex> complexes;
+
     private Integer resCode;
     private String errorMessage;
 
-    @OneToOne
-    @JoinColumn(name = "idOfOrgGroup")
-    private WtOrgGroup orgGroup;
-
-    @OneToOne
-    @JoinColumn(name = "idOfCategoryItem")
-    private WtCategoryItem categoryItem;
-
-    @OneToOne
-    @JoinColumn(name = "idOfTypeProduction")
-    private WtTypeOfProductionItem typeOfProduction;
-
-    @OneToOne
-    @JoinColumn(name = "idOfAgeGroupItem")
-    private WtAgeGroupItem ageGroupItem;
-
-    @OneToOne
-    @JoinColumn(name = "idOfDietType")
-    private WtDietType dietType;
-
-    @OneToOne
-    @JoinColumn(name = "idOfComplexGroupItem")
-    private WtComplexGroupItem complexGroupItem;
-
-    @OneToOne
-    @JoinColumn(name = "idOfGroupItem")
-    private WtGroupItem groupItem;
-
-    @OneToOne
-    @JoinColumn(name = "idOfDish")
-    private WtDish dish;
-
-    @OneToOne
-    @JoinColumn(name = "idOfMenuGroup")
-    private WtMenuGroup menuGroup;
-
-    @OneToOne
-    @JoinColumn(name = "idOfMenu")
-    private WtMenu menu;
-
-    @OneToOne
-    @JoinColumn(name = "idOfComplex")
-    private WtComplex complex;
-
     public static MenuSupplierItem build(Node itemNode) {
 
-        WtOrgGroup orgGroup = null;
-        WtCategoryItem categoryItem = null;
-        WtTypeOfProductionItem typeOfProduction = null;
-        WtAgeGroupItem ageGroupItem = null;
-        WtDietType dietType = null;
-        WtComplexGroupItem complexGroupItem = null;
-        WtGroupItem groupItem = null;
-        WtDish dish = null;
-        WtMenuGroup menuGroup = null;
-        WtMenu menu = null;
-        WtComplex complex = null;
+        versions = new HashMap<>();
+
+        orgGroups = new ArrayList<>();
+        categoryItems = new ArrayList<>();
+        typeProductions = new ArrayList<>();
+        ageGroupItems = new ArrayList<>();
+        complexGroupItems = new ArrayList<>();
+        groupItems = new ArrayList<>();
+        dishes = new ArrayList<>();
+        menuGroups = new ArrayList<>();
+        menus = new ArrayList<>();
 
         StringBuilder errorMessage = new StringBuilder();
 
-        return new MenuSupplierItem(errorMessage.toString());
-    }
-
-    private static Integer readIntegerValue(Node itemNode, String nameAttr, StringBuilder errorMessage) {
-        String strValue = XMLUtils.getAttributeValue(itemNode, nameAttr);
-        if (StringUtils.isNotEmpty(strValue)) {
+        String strVersion = XMLUtils.getAttributeValue(itemNode, "V");
+        if (StringUtils.isNotEmpty(strVersion)) {
             try {
-                return Integer.parseInt(strValue);
+                versions.put(itemNode.getNodeName(), Long.parseLong(strVersion));
             } catch (NumberFormatException e) {
-                errorMessage.append(String.format("NumberFormatException incorrect format %s", nameAttr));
+                errorMessage.append("NumberFormatException Version not found");
             }
         } else {
-            errorMessage.append(String.format("Attribute %s not found", nameAttr));
+            errorMessage.append("Attribute Version not found");
         }
-        return null;
+
+        return new MenuSupplierItem(versions, errorMessage.toString());
     }
 
-    private MenuSupplierItem(String errorMessage) {
+    private MenuSupplierItem(Map<String, Long> versions, String errorMessage) {
+
+        // TO DO!
+
         this.setErrorMessage(errorMessage);
         if (errorMessage.equals("")) {
             this.setResCode(ERROR_CODE_ALL_OK);
@@ -115,100 +87,108 @@ public class MenuSupplierItem {
         }
     }
 
+    public static Map<String, Long> getVersions() {
+        return versions;
+    }
+
+    public static void setVersions(Map<String, Long> versions) {
+        MenuSupplierItem.versions = versions;
+    }
+
+    public static List<WtOrgGroup> getOrgGroups() {
+        return orgGroups;
+    }
+
+    public static void setOrgGroups(List<WtOrgGroup> orgGroups) {
+        MenuSupplierItem.orgGroups = orgGroups;
+    }
+
+    public static List<WtCategoryItem> getCategoryItems() {
+        return categoryItems;
+    }
+
+    public static void setCategoryItems(List<WtCategoryItem> categoryItems) {
+        MenuSupplierItem.categoryItems = categoryItems;
+    }
+
+    public static List<WtTypeOfProductionItem> getTypeProductions() {
+        return typeProductions;
+    }
+
+    public static void setTypeProductions(List<WtTypeOfProductionItem> typeProductions) {
+        MenuSupplierItem.typeProductions = typeProductions;
+    }
+
+    public static List<WtAgeGroupItem> getAgeGroupItems() {
+        return ageGroupItems;
+    }
+
+    public static void setAgeGroupItems(List<WtAgeGroupItem> ageGroupItems) {
+        MenuSupplierItem.ageGroupItems = ageGroupItems;
+    }
+
+    public static List<WtDietType> getDietTypes() {
+        return dietTypes;
+    }
+
+    public static void setDietTypes(List<WtDietType> dietTypes) {
+        MenuSupplierItem.dietTypes = dietTypes;
+    }
+
+    public static List<WtComplexGroupItem> getComplexGroupItems() {
+        return complexGroupItems;
+    }
+
+    public static void setComplexGroupItems(List<WtComplexGroupItem> complexGroupItems) {
+        MenuSupplierItem.complexGroupItems = complexGroupItems;
+    }
+
+    public static List<WtGroupItem> getGroupItems() {
+        return groupItems;
+    }
+
+    public static void setGroupItems(List<WtGroupItem> groupItems) {
+        MenuSupplierItem.groupItems = groupItems;
+    }
+
+    public static List<WtDish> getDishes() {
+        return dishes;
+    }
+
+    public static void setDishes(List<WtDish> dishes) {
+        MenuSupplierItem.dishes = dishes;
+    }
+
+    public static List<WtMenuGroup> getMenuGroups() {
+        return menuGroups;
+    }
+
+    public static void setMenuGroups(List<WtMenuGroup> menuGroups) {
+        MenuSupplierItem.menuGroups = menuGroups;
+    }
+
+    public static List<WtMenu> getMenus() {
+        return menus;
+    }
+
+    public static void setMenus(List<WtMenu> menus) {
+        MenuSupplierItem.menus = menus;
+    }
+
+    public static List<WtComplex> getComplexes() {
+        return complexes;
+    }
+
+    public static void setComplexes(List<WtComplex> complexes) {
+        MenuSupplierItem.complexes = complexes;
+    }
+
     public Integer getResCode() {
         return resCode;
     }
 
     public void setResCode(Integer resCode) {
         this.resCode = resCode;
-    }
-
-    public WtOrgGroup getOrgGroup() {
-        return orgGroup;
-    }
-
-    public void setOrgGroup(WtOrgGroup orgGroup) {
-        this.orgGroup = orgGroup;
-    }
-
-    public WtCategoryItem getCategoryItem() {
-        return categoryItem;
-    }
-
-    public void setCategoryItem(WtCategoryItem categoryItem) {
-        this.categoryItem = categoryItem;
-    }
-
-    public WtTypeOfProductionItem getTypeOfProduction() {
-        return typeOfProduction;
-    }
-
-    public void setTypeOfProduction(WtTypeOfProductionItem typeOfProduction) {
-        this.typeOfProduction = typeOfProduction;
-    }
-
-    public WtAgeGroupItem getAgeGroupItem() {
-        return ageGroupItem;
-    }
-
-    public void setAgeGroupItem(WtAgeGroupItem ageGroupItem) {
-        this.ageGroupItem = ageGroupItem;
-    }
-
-    public WtDietType getDietType() {
-        return dietType;
-    }
-
-    public void setDietType(WtDietType dietType) {
-        this.dietType = dietType;
-    }
-
-    public WtComplexGroupItem getComplexGroupItem() {
-        return complexGroupItem;
-    }
-
-    public void setComplexGroupItem(WtComplexGroupItem complexGroupItem) {
-        this.complexGroupItem = complexGroupItem;
-    }
-
-    public WtGroupItem getGroupItem() {
-        return groupItem;
-    }
-
-    public void setGroupItem(WtGroupItem groupItem) {
-        this.groupItem = groupItem;
-    }
-
-    public WtDish getDish() {
-        return dish;
-    }
-
-    public void setDish(WtDish dish) {
-        this.dish = dish;
-    }
-
-    public WtMenuGroup getMenuGroup() {
-        return menuGroup;
-    }
-
-    public void setMenuGroup(WtMenuGroup menuGroup) {
-        this.menuGroup = menuGroup;
-    }
-
-    public WtMenu getMenu() {
-        return menu;
-    }
-
-    public void setMenu(WtMenu menu) {
-        this.menu = menu;
-    }
-
-    public WtComplex getComplex() {
-        return complex;
-    }
-
-    public void setComplex(WtComplex complex) {
-        this.complex = complex;
     }
 
     public String getErrorMessage() {

@@ -15,14 +15,14 @@ import java.util.List;
  * Created with IntelliJ IDEA.
  * User: o.petrova
  * Date: 10.02.20
- * Time: 13:12
+ * Time: 13:02
  * To change this template use File | Settings | File Templates.
  */
 
-public class ReestrMenuSupplierData implements AbstractToElement {
+public class ResMenuSupplier implements AbstractToElement {
     private List<MenuSupplier> items;
 
-    public ReestrMenuSupplierData() {
+    public ResMenuSupplier() {
 
     }
 
@@ -30,7 +30,8 @@ public class ReestrMenuSupplierData implements AbstractToElement {
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("MenuSupplier");
         for (MenuSupplier item : this.getItems()) {
-            element.appendChild(item.toElement(document, "MS"));
+            element.appendChild(item.toElement(document, "MenuSupplier"
+                    + ""));
         }
         return element;
     }

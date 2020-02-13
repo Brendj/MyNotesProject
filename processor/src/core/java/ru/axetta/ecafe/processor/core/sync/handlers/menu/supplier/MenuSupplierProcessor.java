@@ -21,26 +21,26 @@ import java.util.List;
  * To change this template use File | Settings | File Templates.
  */
 
-public class ReestrMenuSupplierProcessor extends AbstractProcessor<ResReestrMenuSupplier> {
+public class MenuSupplierProcessor extends AbstractProcessor<ResMenuSupplier> {
 
-    private static final Logger logger = LoggerFactory.getLogger(ReestrMenuSupplierProcessor.class);
-    private final ReestrMenuSupplier reestrMenuSupplier;
+    private static final Logger logger = LoggerFactory.getLogger(MenuSupplierProcessor.class);
+    private final MenuSupplier menuSupplier;
     private final List<MenuSupplier> resMenuSupplierItems;
 
-    public ReestrMenuSupplierProcessor(Session persistenceSession, ReestrMenuSupplier reestrMenuSupplier) {
+    public MenuSupplierProcessor(Session persistenceSession, MenuSupplier menuSupplier) {
         super(persistenceSession);
-        this.reestrMenuSupplier = reestrMenuSupplier;
+        this.menuSupplier = menuSupplier;
         resMenuSupplierItems = new ArrayList<MenuSupplier>();
     }
 
     @Override
-    public ResReestrMenuSupplier process() throws Exception {
-        ResReestrMenuSupplier result = new ResReestrMenuSupplier();
+    public ResMenuSupplier process() throws Exception {
+        ResMenuSupplier result = new ResMenuSupplier();
         List<MenuSupplier> items = new ArrayList<MenuSupplier>();
         try {
             MenuSupplier resItem = null;
             boolean errorFound = false;
-            //for (MenuSupplierItem item : reestrMenuSupplier.getItems()) {
+            //for (MenuSupplierItem item : menuSupplier.getItems()) {
             //
             //    errorFound = !item.getResCode().equals(MenuSupplierItem.ERROR_CODE_ALL_OK);
             //    if (!errorFound) {
@@ -73,20 +73,20 @@ public class ReestrMenuSupplierProcessor extends AbstractProcessor<ResReestrMenu
             //}
             session.flush();
         } catch (Exception e) {
-            logger.error("Error saving ReestrMenuSupplier", e);
+            logger.error("Error saving menuSupplier", e);
             return null;
         }
         result.setItems(items);
         return result;
     }
 
-    public ReestrMenuSupplierData processData() throws Exception {
-        ReestrMenuSupplierData result = new ReestrMenuSupplierData();
+    public MenuSupplierData processData() throws Exception {
+        MenuSupplierData result = new MenuSupplierData();
         List<MenuSupplier> items = new ArrayList<MenuSupplier>();
         MenuSupplier resItem;
         //List<MenuSupplier> list = DAOUtils
-        //        .getMenuSupplierForOrgSinceVersion(session, reestrMenuSupplier.getIdOfOrgOwner(),
-        //                reestrMenuSupplier.getMaxVersion());
+        //        .getMenuSupplierForOrgSinceVersion(session, menuSupplier.getIdOfOrgOwner(),
+        //                menuSupplier.getMaxVersion());
         //for (MenuSupplier taloon : list) {
         //    if (taloon != null) {
         //        resItem = new ResMenuSupplierItem(taloon);

@@ -18,23 +18,23 @@ import org.w3c.dom.Node;
  * To change this template use File | Settings | File Templates.
  */
 
-public class ReestrMenuSupplierBuilder implements SectionRequestBuilder {
+public class MenuSupplierBuilder implements SectionRequestBuilder {
     //private final long owner;
 
-    public ReestrMenuSupplierBuilder(){
+    public MenuSupplierBuilder(){
         //this.owner = owner;
     }
 
-    public ReestrMenuSupplier build(Node envelopeNode) throws Exception {
+    public MenuSupplier build(Node envelopeNode) throws Exception {
         SectionRequest sectionRequest = searchSectionNodeAndBuild(envelopeNode);
-        return sectionRequest != null ? (ReestrMenuSupplier) sectionRequest : null;
+        return sectionRequest != null ? (MenuSupplier) sectionRequest : null;
     }
 
     @Override
     public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
-        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, ReestrMenuSupplier.SECTION_NAME);
+        Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, MenuSupplier.SECTION_NAME);
         if (sectionElement != null) {
-            return new ReestrMenuSupplier(sectionElement);
+            return new MenuSupplier(sectionElement);
         } else
             return null;
     }
