@@ -135,22 +135,22 @@ public class MaintenanceService {
         MaintenanceService proxy = getProxy();
 
         logger.info("Cleaning menu details and menu...");
-        int menuDetailDeletedCount = 0;
-        int menuDeletedCount = 0;
-        int complexInfoDeletedCount = 0;
-        int complexDeletedCount = 0;
-        int basicBasketDeletedCount = 0;
+        int complexInfoDetailCount  = 0;
+        int complexInfoCount = 0;
+        int goodBasicBasketPriceCount  = 0;
+        int menuDetailCount = 0;
+        int menuCount = 0;
         //Для каждого меню
         for (Object[] row : records) {
             Long idOfMenu = ((BigInteger) row[0]).longValue();
             orgIds.add(((BigInteger) row[1]).longValue());
             int[] res = cleanMenuInformationInternal(idOfMenu);
             logger.info(String.format("Successfully delete menu[%d]", idOfMenu));
-            complexInfoDeletedCount += res[0];
-            complexDeletedCount += res[1];
-            basicBasketDeletedCount += res[2];
-            menuDetailDeletedCount += res[3];
-            menuDeletedCount += res[4];
+            complexInfoDetailCount += res[0];
+            complexInfoCount += res[1];
+            goodBasicBasketPriceCount += res[2];
+            menuDetailCount  += res[3];
+            menuCount += res[4];
         }
 
         logger.info("Cleaning menu exchange...");
@@ -160,13 +160,13 @@ public class MaintenanceService {
             menuExchangeDeletedCount += proxy.cleanMenuExchange(idOfOrg, timeToClean);
         }
 
-        final String format = "Deleted all records before - %s, deleted records count: menu -%d, "
-                + "menudetail - %d, menuexchange - %d, "
-                + "complex - %d, complexinfo - %d, "
-                + "goodbasicbasketprice - %d";
-        return String.format(format, new Date(timeToClean), menuDeletedCount,
-                menuDetailDeletedCount, menuExchangeDeletedCount,
-                complexDeletedCount, complexInfoDeletedCount, basicBasketDeletedCount);
+        final String format = "Deleted all records before - %s, deleted records count: Menu - %d, "
+                + "MenuDetail - %d, GoodBasicBasketPrice - %d, "
+                + "ComplexInfo - %d, ComplexInfoDetail - %d, "
+                + "MenuExchange - %d";
+        return String.format(format, new Date(timeToClean), menuCount,
+                menuDetailCount , goodBasicBasketPriceCount,
+                complexInfoCount, complexInfoDetailCount, menuExchangeDeletedCount);
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
