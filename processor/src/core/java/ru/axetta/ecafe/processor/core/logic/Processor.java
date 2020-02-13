@@ -3195,9 +3195,9 @@ public class Processor implements SyncProcessor {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             falseFullSyncByOrg(persistenceSession, idOfOrg);
-            falseClientsSyncByOrg(persistenceSession, idOfOrg);
-            falseMenusSyncByOrg(persistenceSession, idOfOrg);
-            falseOrgSettingsSyncByOrg(persistenceSession, idOfOrg);
+            setValueForClientsSyncByOrg(persistenceSession, idOfOrg, Boolean.FALSE);
+            setValueForMenusSyncByOrg(persistenceSession, idOfOrg, Boolean.FALSE);
+            setValueForOrgSettingsSyncByOrg(persistenceSession, idOfOrg, Boolean.FALSE);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -3212,7 +3212,7 @@ public class Processor implements SyncProcessor {
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            falseClientsSyncByOrg(persistenceSession, idOfOrg);
+            setValueForClientsSyncByOrg(persistenceSession, idOfOrg, Boolean.FALSE);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -3227,7 +3227,7 @@ public class Processor implements SyncProcessor {
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            falseMenusSyncByOrg(persistenceSession, idOfOrg);
+            setValueForMenusSyncByOrg(persistenceSession, idOfOrg, Boolean.FALSE);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -3242,7 +3242,7 @@ public class Processor implements SyncProcessor {
         try {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            falseOrgSettingsSyncByOrg(persistenceSession, idOfOrg);
+            setValueForOrgSettingsSyncByOrg(persistenceSession, idOfOrg, Boolean.FALSE);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -6937,8 +6937,8 @@ public class Processor implements SyncProcessor {
                 orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
                 OrgSettingSection orgSettingSection = processOrgSettings(orgSettingsRequest);
                 addToResponseSections(orgSettingSection, responseSections);
+                discardOrgSettingsSyncParam(request.getIdOfOrg());
             }
-            discardOrgSettingsSyncParam(request.getIdOfOrg());
         } catch (Exception e) {
             String message = String.format("Error when process OrgSettingSetting: %s", e.getMessage());
             processorUtils
@@ -6981,6 +6981,7 @@ public class Processor implements SyncProcessor {
                     processor = null;
                     addToResponseSections(resSyncSettingsSection, responseSections);
                     addToResponseSections(syncSettingsSection, responseSections);
+                    discardOrgSettingsSyncParam(request.getIdOfOrg());
                 }
             }
         } catch (Exception e) {
@@ -7185,7 +7186,6 @@ public class Processor implements SyncProcessor {
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
-
         discardOrgSettingsSyncParam(request.getIdOfOrg());
 
         Date syncEndTime = new Date();

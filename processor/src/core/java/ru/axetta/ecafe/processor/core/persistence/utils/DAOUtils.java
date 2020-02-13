@@ -2255,21 +2255,24 @@ public class DAOUtils {
         query.executeUpdate();
     }
 
-    public static void falseMenusSyncByOrg(Session session, Long idOfOrg) {
-        Query query = session.createQuery("update Org set menusSyncParam=0 where id=:idOfOrg");
+    public static void setValueForMenusSyncByOrg(Session session, Long idOfOrg, Boolean value) {
+        Query query = session.createQuery("update Org set menusSyncParam = :Value where id=:idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
         query.executeUpdate();
     }
 
-    public static void falseClientsSyncByOrg(Session session, Long idOfOrg) {
-        Query query = session.createQuery("update Org set clientsSyncParam=0 where id=:idOfOrg");
+    public static void setValueForClientsSyncByOrg(Session session, Long idOfOrg, Boolean value) {
+        Query query = session.createQuery("update Org set clientsSyncParam = :Value where id=:idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
         query.executeUpdate();
     }
 
-    public static void falseOrgSettingsSyncByOrg(Session session, Long idOfOrg) {
-        Query query = session.createQuery("update Org set orgSettingsSyncParam=0 where id=:idOfOrg");
+    public static void setValueForOrgSettingsSyncByOrg(Session session, Long idOfOrg, Boolean value) {
+        Query query = session.createQuery("update Org set orgSettingsSyncParam = :Value where id=:idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
         query.executeUpdate();
     }
 
