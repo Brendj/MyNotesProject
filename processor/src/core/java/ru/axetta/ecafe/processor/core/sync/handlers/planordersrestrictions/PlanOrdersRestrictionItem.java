@@ -36,6 +36,7 @@ public class PlanOrdersRestrictionItem {
         this.complexName = complexName;
         this.complexId = complexId;
         this.planType = planType;
+        this.resol = resol;
         this.version = version;
         this.deletedState = deletedState;
         this.errorMessage = errorMessage;
