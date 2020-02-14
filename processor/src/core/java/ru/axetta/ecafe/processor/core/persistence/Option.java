@@ -184,7 +184,7 @@ public class Option {
             OPTION_RBK_SECTION, "1", 
             OPTION_CHRONOPAY_RATE, "3.3", 
             OPTION_RBK_RATE, "3",
-            OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION, "365",
+            OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION, "730",
             OPTION_SMS_PAYMENT_TYPE, String.valueOf(SMSSubscriptionFeeService.SMS_PAYMENT_BY_THE_PIECE),
             OPTION_SMS_DEFAULT_SUBSCRIPTION_FEE, "0",
             OPTION_ENABLE_BALANCE_AUTOREFILL, "",

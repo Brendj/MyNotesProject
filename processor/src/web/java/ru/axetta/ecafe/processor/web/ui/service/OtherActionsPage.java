@@ -170,6 +170,12 @@ public class OtherActionsPage extends OnlineReportPage {
         printMessage("Пробное  событие успешно отправлено на ЕМП");
     }
 
+    public void cleaningMenu() {
+        MaintenanceService maintenanceService = new MaintenanceService();
+        maintenanceService.run();
+        printMessage("Очистка выполнена. Смотри лог");
+    }
+
     public void runSendEMPEventEMIAS() throws Exception {
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
