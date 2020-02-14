@@ -72,9 +72,11 @@ CREATE TABLE cf_notification_orders (
     createddate 						int8,
     sended       						bool
 );
-CREATE INDEX cf_notification_orders_idoforder_idx ON public.cf_notification_orders (idoforder,idofclient);
+CREATE INDEX cf_notification_orders_idoforder_idx ON cf_notification_orders (idoforder,idofclient);
 
 -- 410: Срок действия меню увеличен с 365 до 730 дней
-UPDATE public.cf_options
+UPDATE cf_options
 SET optiontext='730'
 WHERE idofoption=1004;
+
+--! ФИНАЛИЗИРОВАН 14.02.2020, НЕ МЕНЯТЬ

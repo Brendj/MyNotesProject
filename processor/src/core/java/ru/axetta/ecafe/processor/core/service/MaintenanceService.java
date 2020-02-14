@@ -5,17 +5,11 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 
-import org.hibernate.Criteria;
 import org.hibernate.Session;
-import org.hibernate.criterion.Projections;
-import org.hibernate.criterion.Restrictions;
-import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Propagation;
@@ -26,7 +20,6 @@ import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
 import java.math.BigInteger;
 import java.text.DateFormat;
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -93,7 +86,7 @@ public class MaintenanceService {
 
         //Получаем список меню
         Query query = entityManager.createNativeQuery(
-                "select m.IdOfMenu, m.IdOfOrg from CF_Menu m where m.IdOfOrg " + orgFilter + " and m.MenuDate < :date")
+                "select m.IdOfMenu, m.IdOfOrg from CF_Menu m where m.IdOfOrg " + orgFilter + " and m.MenuDate < :date order by m.MenuDate")
                 .setParameter("date", timeToClean);
         //Максимальное количество записей для очистки - 60000
         List<Object[]> records = query.setMaxResults(60000).getResultList();
