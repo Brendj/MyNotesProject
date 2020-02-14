@@ -95,7 +95,8 @@ public class MaintenanceService {
         Query query = entityManager.createNativeQuery(
                 "select m.IdOfMenu, m.IdOfOrg from CF_Menu m where m.IdOfOrg " + orgFilter + " and m.MenuDate < :date")
                 .setParameter("date", timeToClean);
-        List<Object[]> records = query.getResultList();
+        //Максимальное количество записей для очистки - 60000
+        List<Object[]> records = query.setMaxResults(60000).getResultList();
 
         Iterator<Object[]> it = records.iterator();
         while (it.hasNext()) {
@@ -187,7 +188,7 @@ public class MaintenanceService {
         qGoodBasicBasketPrice.setParameter("idOfMenu", idOfMenu);
         res[2] = qGoodBasicBasketPrice.executeUpdate();
 
-        org.hibernate.Query qMenuDetail = session.createQuery("delete from MenuDetail where idOfMenuDetail in (select idOfMenuDetail from MenuDetail WHERE menu.idOfMenu = :idOfMenu)");
+        org.hibernate.Query qMenuDetail = session.createQuery("delete from MenuDetail where idOfMenu = :idOfMenu");
         qMenuDetail.setParameter("idOfMenu", idOfMenu);
         res[3] = qMenuDetail.executeUpdate();
 
