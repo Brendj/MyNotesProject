@@ -61,3 +61,5 @@ CREATE INDEX cf_preorder_complex_armcomplexid_idx
     ON cf_preorder_complex
         USING btree
         (armcomplexid);
+
+ALTER TABLE CF_OrderDetails ADD COLUMN FRation integer;
