@@ -93,7 +93,8 @@ public class MaintenanceService {
 
         //Получаем список меню
         Query query = entityManager.createNativeQuery(
-                "select m.IdOfMenu, m.IdOfOrg from CF_Menu m where m.IdOfOrg " + orgFilter + " and m.MenuDate < :date")
+                "select m.IdOfMenu, m.IdOfOrg from CF_Menu m where m.IdOfOrg " + orgFilter + " and m.MenuDate < :date "
+                        + "order by m.MenuDate")
                 .setParameter("date", timeToClean);
         //Максимальное количество записей для очистки - 60000
         List<Object[]> records = query.setMaxResults(60000).getResultList();
