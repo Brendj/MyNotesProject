@@ -2229,6 +2229,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 } else {
                     purchaseElementExt.setType(0);
                 }
+                if (od.isFRationSpecified()) purchaseElementExt.setfRation(od.getfRation().getCode());
                 purchaseExt.getE().add(purchaseElementExt);
             }
 
@@ -2319,7 +2320,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     } else {
                         purchaseWithDetailsElementExt.setType(0);
                     }
-
+                    if (od.isFRationSpecified()) {
+                        purchaseWithDetailsElementExt.setfRation(od.getfRation().getCode());
+                    }
                     if (od.getIdOfMenuFromSync() != null) {
 
                         MenuDetail menuDetail = findMenuDetailByOrderDetail(od.getIdOfMenuFromSync(), menuDetails);

@@ -93,6 +93,7 @@ public class EventNotificationService {
     public static final String PARAM_COMPLEX_NAME = "complexName";
     public static final String PARAM_DATE = "date";
     public static final String PARAM_AMOUNT_BUY_ALL = "amountBuyAll";
+    public static final String PARAM_FRATION = "FRation";
 
     @Resource
     SMSService smsService;

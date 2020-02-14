@@ -68,6 +68,7 @@ public class OrderDetail {
     private Long idOfMenuFromSync;
     private String manufacturer;
     private boolean sendToExternal;
+    private OrderDetailFRationType fRation;
 
     public String getManufacturer() {
         return manufacturer;
@@ -139,7 +140,8 @@ public class OrderDetail {
 
     public OrderDetail(CompositeIdOfOrderDetail compositeIdOfOrderDetail, long idOfOrder, long qty, long discount,
             long socDiscount, long rPrice, String menuDetailName, String rootMenu, String menuGroup, int menuOrigin,
-            String menuOutput, int menuType, Long idOfMenuFromSync, String manufacturer, boolean sendToExternal) {
+            String menuOutput, int menuType, Long idOfMenuFromSync, String manufacturer, boolean sendToExternal,
+            String itemCode, Long idOfRule, OrderDetailFRationType fRation) {
         this.compositeIdOfOrderDetail = compositeIdOfOrderDetail;
         this.idOfOrder = idOfOrder;
         this.qty = qty;
@@ -155,6 +157,13 @@ public class OrderDetail {
         this.idOfMenuFromSync = idOfMenuFromSync;
         this.manufacturer = manufacturer;
         this.sendToExternal = sendToExternal;
+        this.itemCode = itemCode;
+        this.idOfRule = idOfRule;
+        this.fRation = fRation;
+    }
+
+    public boolean isFRationSpecified() {
+        return fRation != null && !fRation.equals(OrderDetailFRationType.NOT_SPECIFIED);
     }
 
     public CompositeIdOfOrderDetail getCompositeIdOfOrderDetail() {
@@ -346,4 +355,11 @@ public class OrderDetail {
         return menuType>=TYPE_COMPLEX_ITEM_MIN && menuType<=TYPE_COMPLEX_ITEM_MAX;
     }
 
+    public OrderDetailFRationType getfRation() {
+        return fRation;
+    }
+
+    public void setfRation(OrderDetailFRationType fRation) {
+        this.fRation = fRation;
+    }
 }
