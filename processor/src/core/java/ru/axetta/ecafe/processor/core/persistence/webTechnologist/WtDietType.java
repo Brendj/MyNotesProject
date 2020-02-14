@@ -19,6 +19,9 @@ public class WtDietType {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "version")
+    private Long version;
+
     public Long getIdOfDietType() {
         return idOfDietType;
     }
@@ -35,6 +38,14 @@ public class WtDietType {
         this.description = description;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -44,11 +55,12 @@ public class WtDietType {
             return false;
         }
         WtDietType that = (WtDietType) o;
-        return Objects.equals(idOfDietType, that.idOfDietType) && Objects.equals(description, that.description);
+        return Objects.equals(idOfDietType, that.idOfDietType) && Objects.equals(description, that.description)
+                && Objects.equals(version, that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfDietType, description);
+        return Objects.hash(idOfDietType, description, version);
     }
 }

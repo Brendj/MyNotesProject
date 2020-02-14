@@ -19,6 +19,9 @@ public class WtTypeOfProductionItem {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "version")
+    private Long version;
+
     public Long getIdOfTypeProductionItem() {
         return idOfTypeProductionItem;
     }
@@ -35,6 +38,14 @@ public class WtTypeOfProductionItem {
         this.description = description;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -45,11 +56,11 @@ public class WtTypeOfProductionItem {
         }
         WtTypeOfProductionItem that = (WtTypeOfProductionItem) o;
         return Objects.equals(idOfTypeProductionItem, that.idOfTypeProductionItem) && Objects
-                .equals(description, that.description);
+                .equals(description, that.description) && Objects.equals(version, that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfTypeProductionItem, description);
+        return Objects.hash(idOfTypeProductionItem, description, version);
     }
 }

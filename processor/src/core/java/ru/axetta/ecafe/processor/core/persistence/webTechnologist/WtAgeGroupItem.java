@@ -19,6 +19,9 @@ public class WtAgeGroupItem {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "version")
+    private Long version;
+
     public Long getIdOfAgeGroupItem() {
         return idOfAgeGroupItem;
     }
@@ -35,6 +38,14 @@ public class WtAgeGroupItem {
         this.description = description;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -44,11 +55,12 @@ public class WtAgeGroupItem {
             return false;
         }
         WtAgeGroupItem that = (WtAgeGroupItem) o;
-        return Objects.equals(idOfAgeGroupItem, that.idOfAgeGroupItem) && Objects.equals(description, that.description);
+        return Objects.equals(idOfAgeGroupItem, that.idOfAgeGroupItem) && Objects.equals(description, that.description)
+                && Objects.equals(version, that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfAgeGroupItem, description);
+        return Objects.hash(idOfAgeGroupItem, description, version);
     }
 }

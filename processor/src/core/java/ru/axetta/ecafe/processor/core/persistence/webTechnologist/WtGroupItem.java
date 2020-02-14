@@ -21,6 +21,9 @@ public class WtGroupItem {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "version")
+    private Long version;
+
     @ManyToMany
     @JoinTable(name = "cf_wt_dish_groupitem_relationships",
             joinColumns = @JoinColumn(name = "idOfGroupItem"),
@@ -51,6 +54,14 @@ public class WtGroupItem {
         this.dishes = dishes;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -60,11 +71,12 @@ public class WtGroupItem {
             return false;
         }
         WtGroupItem that = (WtGroupItem) o;
-        return Objects.equals(idOfGroupItem, that.idOfGroupItem) && Objects.equals(description, that.description);
+        return Objects.equals(idOfGroupItem, that.idOfGroupItem) && Objects.equals(description, that.description)
+                && Objects.equals(version, that.version) && Objects.equals(dishes, that.dishes);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfGroupItem, description);
+        return Objects.hash(idOfGroupItem, description, version, dishes);
     }
 }
