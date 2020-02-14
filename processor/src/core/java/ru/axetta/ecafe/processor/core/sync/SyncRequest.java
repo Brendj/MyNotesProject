@@ -112,6 +112,14 @@ public class SyncRequest {
         this.databaseSize = databaseSize;
     }
 
+    public CafeteriaExchangeContentType getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(CafeteriaExchangeContentType contentType) {
+        this.contentType = contentType;
+    }
+
     public static class ClientParamRegistry implements SectionRequest {
 
         public static final String SECTION_NAME = "ClientParams";
@@ -2639,6 +2647,7 @@ public class SyncRequest {
             String clientVersion = getClientVersion(namedNodeMap);
             String sqlServerVersion = getSQLServerVersion(namedNodeMap);
             Double databaseSize = getDatabaseSizeValue(namedNodeMap);
+            CafeteriaExchangeContentType contentType = getCafeterialExchangeContentType(namedNodeMap);
             Date syncTime = timeFormat.parse(idOfSync);
             Long idOfPacket = getIdOfPacket(namedNodeMap);
             List<SectionRequest> result = new ArrayList<SectionRequest>();
@@ -2652,7 +2661,16 @@ public class SyncRequest {
             Manager manager = createManagerSyncRO(envelopeNode, syncType, org);
             String message = getMessage(envelopeNode);
             return new SyncRequest(remoteAddr, version, syncType, clientVersion, org, syncTime, idOfPacket, message,
-                    result, manager, sqlServerVersion, databaseSize);
+                    result, manager, sqlServerVersion, databaseSize, contentType);
+        }
+
+        private CafeteriaExchangeContentType getCafeterialExchangeContentType(NamedNodeMap namedNodeMap) {
+            String contentType = namedNodeMap.getNamedItem("ContentType") == null ?
+                    null : namedNodeMap.getNamedItem("ContentType").getTextContent();
+            if(contentType != null){
+                return CafeteriaExchangeContentType.getContentTypeByCode(Integer.valueOf(contentType));
+            }
+            return null;
         }
 
         private String getSQLServerVersion(NamedNodeMap namedNodeMap) {
@@ -2802,9 +2820,11 @@ public class SyncRequest {
     private String sqlServerVersion;
     private Double databaseSize;
     private final List<SectionRequest> sectionRequests = new ArrayList<SectionRequest>();
+    private CafeteriaExchangeContentType contentType;
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket,
-            String message, List<SectionRequest> sectionRequests, Manager manager, String sqlServerVersion, Double databaseSize) {
+            String message, List<SectionRequest> sectionRequests, Manager manager, String sqlServerVersion, Double databaseSize,
+            CafeteriaExchangeContentType contentType) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2818,6 +2838,7 @@ public class SyncRequest {
         this.sectionRequests.addAll(sectionRequests);
         this.sqlServerVersion = sqlServerVersion;
         this.databaseSize = databaseSize;
+        this.contentType = contentType;
     }
 
     public String getClientVersion() {

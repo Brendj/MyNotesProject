@@ -1059,6 +1059,12 @@ public class Processor implements SyncProcessor {
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(), request.getRemoteAddr(),
                 request.getSqlServerVersion(), request.getDatabaseSize());
 
+        if(CafeteriaExchangeContentType.MENU.equals(request.getContentType())){
+            discardMenusSyncParam(request.getIdOfOrg());
+        } else if(CafeteriaExchangeContentType.CLIENTS_DATA.equals(request.getContentType())){
+            discardClientSyncParam(request.getIdOfOrg());
+        }
+
         // мигранты
         processMigrantsSectionsWithClientsData(request, syncHistory, responseSections);
 
