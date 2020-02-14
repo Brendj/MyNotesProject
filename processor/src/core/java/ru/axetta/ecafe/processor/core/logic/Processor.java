@@ -1026,6 +1026,9 @@ public class Processor implements SyncProcessor {
         // обработка реестра TallonApproval
         fullProcessingReestTaloonApproval(request, syncHistory, responseSections);
 
+        //обработка стaтусов предзаказов
+        fullProcessingPreorderFeedingStatus(request, responseSections);
+
         // обработка нулевых транзакций
         fullProcessingZeroTransactions(request, syncHistory, responseSections);
 
@@ -1240,6 +1243,14 @@ public class Processor implements SyncProcessor {
             String message = String.format("processComplexSchedules: %s", e.getMessage());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingPreorderFeedingStatus(SyncRequest request, List<AbstractToElement> responseSections) {
+        try {
+            PreorderFeedingStatusRequest preorderFeedingStatusRequest = request.getPreOrderFeedingStatusRequest();
+        } catch (Exception e) {
+            logger.error("Error in fullProcessingPreorderFeedingStatus: ", e);
         }
     }
 

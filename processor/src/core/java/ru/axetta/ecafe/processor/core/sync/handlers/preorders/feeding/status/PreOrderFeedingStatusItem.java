@@ -24,6 +24,10 @@ public class PreOrderFeedingStatusItem {
         this.deletedState = deletedState;
     }
 
+    public static PreOrderFeedingStatusItem build() {
+
+    }
+
     public Date getDate() {
         return date;
     }

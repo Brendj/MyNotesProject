@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.PreorderStatus" table="cf_preorder_status">
+        <id name="idOfPreorderStatus" column="IdOfPridOfPreorderStatuseorderComplex" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="version" column="version" type="long" not-null="true"/>
+        <property name="date" column="date" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="storno" column="storno" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="guid" column="guid" type="string" length="36" not-null="true"/>
+        <property name="createdDate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="idOfOrgOnCreate" column="idOfOrgOnCreate" type="long" not-null="true"/>
+        <property name="status" column="status">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.PreorderStatusType</param>
+            </type>
+        </property>
+    </class>
+</hibernate-mapping>
