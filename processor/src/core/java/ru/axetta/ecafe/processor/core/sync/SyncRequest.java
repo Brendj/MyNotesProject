@@ -44,6 +44,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegi
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistry;
@@ -2938,6 +2939,10 @@ public class SyncRequest {
 
     public AccountsRegistryRequest getAccountsRegistryRequest() {
         return this.<AccountsRegistryRequest>findSection(AccountsRegistryRequest.class);
+    }
+
+    public PreorderFeedingStatusRequest getPreorderFeedingStatusRequest() {
+        return this.<PreorderFeedingStatusRequest>findSection(PreorderFeedingStatusRequest.class);
     }
 
     public ReestrTaloonApproval getReestrTaloonApproval() {

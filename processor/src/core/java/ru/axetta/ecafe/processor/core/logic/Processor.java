@@ -76,6 +76,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrderFeedingProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalProcessor;
@@ -1246,9 +1247,17 @@ public class Processor implements SyncProcessor {
         }
     }
 
+    private ResPreorderFeedingStatus processPreorderFeedingStatus(PreorderFeedingStatusRequest preorderFeedingStatusRequest) {
+
+    }
+
     private void fullProcessingPreorderFeedingStatus(SyncRequest request, List<AbstractToElement> responseSections) {
         try {
-            PreorderFeedingStatusRequest preorderFeedingStatusRequest = request.getPreOrderFeedingStatusRequest();
+            PreorderFeedingStatusRequest preorderFeedingStatusRequest = request.getPreorderFeedingStatusRequest();
+            if (preorderFeedingStatusRequest != null) {
+                ResPreorderFeedingStatus resPreorderFeedingStatus = processPreorderFeedingStatus(preorderFeedingStatusRequest);
+            }
+            //addToResponseSections(reestrTaloonApprovalData, responseSections);
         } catch (Exception e) {
             logger.error("Error in fullProcessingPreorderFeedingStatus: ", e);
         }
