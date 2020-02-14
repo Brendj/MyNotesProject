@@ -63,3 +63,18 @@ CREATE INDEX cf_preorder_complex_armcomplexid_idx
         (armcomplexid);
 
 ALTER TABLE CF_OrderDetails ADD COLUMN FRation integer;
+
+-- 370: Таблица для хранения информации о том, отправлено ли было сообщение клиенту по конкретному заказу
+CREATE TABLE cf_notification_orders (
+    idOfNotificationOrders   			bigserial,	-- первичный ключ
+    idOfOrder   						int8,		-- Идентификатор заказа
+    idOfClient   						int8,		-- Идентификатор клиента
+    createddate 						int8,		-- дата получения заказа
+    sended       						bool		-- сообщение отправлено
+);
+
+
+-- 410: Срок действия меню увеличен с 365 до 730 дней
+UPDATE public.cf_options
+SET optiontext='730'
+WHERE idofoption=1004;
