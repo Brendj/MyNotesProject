@@ -19,6 +19,9 @@ public class WtComplexGroupItem {
     @Column(name = "description")
     private String description;
 
+    @Column(name = "version")
+    private Long version;
+
     public Long getIdOfComplexGroupItem() {
         return idOfComplexGroupItem;
     }
@@ -35,6 +38,14 @@ public class WtComplexGroupItem {
         this.description = description;
     }
 
+    public Long getVersion() {
+        return version;
+    }
+
+    public void setVersion(Long version) {
+        this.version = version;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -45,11 +56,11 @@ public class WtComplexGroupItem {
         }
         WtComplexGroupItem that = (WtComplexGroupItem) o;
         return Objects.equals(idOfComplexGroupItem, that.idOfComplexGroupItem) && Objects
-                .equals(description, that.description);
+                .equals(description, that.description) && Objects.equals(version, that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfComplexGroupItem, description);
+        return Objects.hash(idOfComplexGroupItem, description, version);
     }
 }

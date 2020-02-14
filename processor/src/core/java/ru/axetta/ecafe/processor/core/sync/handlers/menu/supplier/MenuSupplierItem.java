@@ -28,36 +28,22 @@ public class MenuSupplierItem {
 
     private static Map<String, Long> versions = new HashMap<>();
 
-    private static List<WtOrgGroup> orgGroups;
-    private static List<WtCategoryItem> categoryItems;
-    private static List<WtTypeOfProductionItem> typeProductions;
-    private static List<WtAgeGroupItem> ageGroupItems;
-    private static List<WtDietType> dietTypes;
-    private static List<WtComplexGroupItem> complexGroupItems;
-    private static List<WtGroupItem> groupItems;
-    private static List<WtDish> dishes;
-    private static List<WtMenuGroup> menuGroups;
-    private static List<WtMenu> menus;
-    private static List<WtComplex> complexes;
+    private static List<WtOrgGroup> orgGroups = new ArrayList<>();
+    private static List<WtCategoryItem> categoryItems = new ArrayList<>();
+    private static List<WtTypeOfProductionItem> typeProductions = new ArrayList<>();
+    private static List<WtAgeGroupItem> ageGroupItems = new ArrayList<>();
+    private static List<WtDietType> dietTypes = new ArrayList<>();
+    private static List<WtComplexGroupItem> complexGroupItems = new ArrayList<>();
+    private static List<WtGroupItem> groupItems = new ArrayList<>();
+    private static List<WtDish> dishes = new ArrayList<>();
+    private static List<WtMenuGroup> menuGroups = new ArrayList<>();
+    private static List<WtMenu> menus = new ArrayList<>();
+    private static List<WtComplex> complexes = new ArrayList<>();
 
     private Integer resCode;
     private String errorMessage;
 
     public static MenuSupplierItem build(Node itemNode) {
-
-        versions = new HashMap<>();
-
-        orgGroups = new ArrayList<>();
-        categoryItems = new ArrayList<>();
-        typeProductions = new ArrayList<>();
-        ageGroupItems = new ArrayList<>();
-        dietTypes = new ArrayList<>();
-        complexGroupItems = new ArrayList<>();
-        groupItems = new ArrayList<>();
-        dishes = new ArrayList<>();
-        menuGroups = new ArrayList<>();
-        menus = new ArrayList<>();
-        complexes = new ArrayList<>();
 
         StringBuilder errorMessage = new StringBuilder();
 
@@ -66,10 +52,11 @@ public class MenuSupplierItem {
             try {
                 versions.put(itemNode.getNodeName(), Long.parseLong(strVersion));
             } catch (NumberFormatException e) {
-                errorMessage.append("NumberFormatException Version not found");
+                errorMessage.append("NumberFormatException Version for node ").append(itemNode.getNodeName())
+                        .append(" not found\n");
             }
         } else {
-            errorMessage.append("Attribute Version not found");
+            errorMessage.append("Attribute Version fir node ").append(itemNode.getNodeName()).append(" not found\n");
         }
 
         return new MenuSupplierItem(versions, errorMessage.toString());
@@ -81,55 +68,52 @@ public class MenuSupplierItem {
         while(iter.hasNext()) {
             Map.Entry<String, Long> entry = iter.next();
 
-            // Выбор по максимальной версии, если она больше версии клиента - TO DO!
-
             switch(entry.getKey()) {
                 case "OrgGroupsRequest" : {
-                    orgGroups = DAOService.getInstance().getOrgGroupsListByVersion(entry.getValue());
+                    orgGroups = DAOService.getInstance().getOrgGroupsListFromVersion(entry.getValue());
                     break;
                 }
                 case "CategoryItemsRequest" : {
-                    categoryItems = DAOService.getInstance().getCategoryItemsListByVersion(entry.getValue());
+                    categoryItems = DAOService.getInstance().getCategoryItemsListFromVersion(entry.getValue());
                     break;
                 }
                 case "TypeProductionsRequest" : {
-                    typeProductions = DAOService.getInstance().getTypeProductionsListByVersion(entry.getValue());
+                    typeProductions = DAOService.getInstance().getTypeProductionsListFromVersion(entry.getValue());
                     break;
                 }
                 case "AgeGroupItemsRequest" : {
-                    ageGroupItems = DAOService.getInstance().getAgeGroupItemsListByVersion(entry.getValue());
+                    ageGroupItems = DAOService.getInstance().getAgeGroupItemsListFromVersion(entry.getValue());
                     break;
                 }
                 case "DietTypesRequest" : {
-                    dietTypes = DAOService.getInstance().getDietTypesListByVersion(entry.getValue());
+                    dietTypes = DAOService.getInstance().getDietTypesListFromVersion(entry.getValue());
                     break;
                 }
                 case "ComplexGroupItemsRequest" : {
-                    complexGroupItems = DAOService.getInstance().getComplexGroupItemsListByVersion(entry.getValue());
+                    complexGroupItems = DAOService.getInstance().getComplexGroupItemsListFromVersion(entry.getValue());
                     break;
                 }
                 case "GroupItemsRequest" : {
-                    groupItems = DAOService.getInstance().getGroupItemsListByVersion(entry.getValue());
+                    groupItems = DAOService.getInstance().getGroupItemsListFromVersion(entry.getValue());
                     break;
                 }
                 case "DishesRequest" : {
-                    dishes = DAOService.getInstance().getDishesListByVersion(entry.getValue());
+                    dishes = DAOService.getInstance().getDishesListFromVersion(entry.getValue());
                     break;
                 }
                 case "MenuGroupsRequest" : {
-                    menuGroups = DAOService.getInstance().getMenuGroupsListByVersion(entry.getValue());
+                    menuGroups = DAOService.getInstance().getMenuGroupsListFromVersion(entry.getValue());
                     break;
                 }
                 case "MenusRequest" : {
-                    menus = DAOService.getInstance().getMenusListByVersion(entry.getValue());
+                    menus = DAOService.getInstance().getMenusListFromVersion(entry.getValue());
                     break;
                 }
                 case "ComplexesRequest" : {
-                    complexes = DAOService.getInstance().getComplexesListByVersion(entry.getValue());
+                    complexes = DAOService.getInstance().getComplexesListFromVersion(entry.getValue());
                     break;
                 }
             }
-
         }
 
         this.setErrorMessage(errorMessage);

@@ -2689,79 +2689,79 @@ public class DAOService {
         }
     }
 
-    public List<WtOrgGroup> getOrgGroupsListByVersion(Long value) {
+    public List<WtOrgGroup> getOrgGroupsListFromVersion(Long value) {
         TypedQuery<WtOrgGroup> q = entityManager
-                .createQuery("from WtOrgGroup where version = " + value + " order by idOfOrgGroup", WtOrgGroup.class);
+                .createQuery("from WtOrgGroup where version > " + value + " order by idOfOrgGroup", WtOrgGroup.class);
         return q.getResultList();
     }
 
-    public List<WtCategoryItem> getCategoryItemsListByVersion(Long value) {
+    public List<WtCategoryItem> getCategoryItemsListFromVersion(Long value) {
         TypedQuery<WtCategoryItem> q = entityManager
-                .createQuery("from WtCategoryItem where version = " + value + " order by idOfCategoryItem",
+                .createQuery("from WtCategoryItem where version > " + value + " order by idOfCategoryItem",
                         WtCategoryItem.class);
         return q.getResultList();
     }
 
-    public List<WtTypeOfProductionItem> getTypeProductionsListByVersion(Long value) {
+    public List<WtTypeOfProductionItem> getTypeProductionsListFromVersion(Long value) {
         TypedQuery<WtTypeOfProductionItem> q = entityManager
-                .createQuery("from WtTypeOfProductionItem where version = " + value + " order by idOfTypeProductionItem",
+                .createQuery("from WtTypeOfProductionItem where version > " + value + " order by idOfTypeProductionItem",
                         WtTypeOfProductionItem.class);
         return q.getResultList();
     }
 
 
-    public List<WtAgeGroupItem> getAgeGroupItemsListByVersion(Long value) {
+    public List<WtAgeGroupItem> getAgeGroupItemsListFromVersion(Long value) {
         TypedQuery<WtAgeGroupItem> q = entityManager
-                .createQuery("from WtAgeGroupItem where version = " + value + " order by idOfAgeGroupItem",
+                .createQuery("from WtAgeGroupItem where version > " + value + " order by idOfAgeGroupItem",
                         WtAgeGroupItem.class);
         return q.getResultList();
     }
 
-    public List<WtDietType> getDietTypesListByVersion(Long value) {
+    public List<WtDietType> getDietTypesListFromVersion(Long value) {
         TypedQuery<WtDietType> q = entityManager
-                .createQuery("from WtDietType where version = " + value + " order by idOfDietType",
+                .createQuery("from WtDietType where version > " + value + " order by idOfDietType",
                         WtDietType.class);
         return q.getResultList();
     }
 
-    public List<WtComplexGroupItem> getComplexGroupItemsListByVersion(Long value) {
+    public List<WtComplexGroupItem> getComplexGroupItemsListFromVersion(Long value) {
         TypedQuery<WtComplexGroupItem> q = entityManager
-                .createQuery("from WtComplexGroupItem where version = " + value + " order by idOfComplexGroupItem",
+                .createQuery("from WtComplexGroupItem where version > " + value + " order by idOfComplexGroupItem",
                         WtComplexGroupItem.class);
         return q.getResultList();
     }
 
-    public List<WtGroupItem> getGroupItemsListByVersion(Long value) {
+    public List<WtGroupItem> getGroupItemsListFromVersion(Long value) {
         TypedQuery<WtGroupItem> q = entityManager
-                .createQuery("from WtGroupItem where version = " + value + " order by idOfGroupItem",
+                .createQuery("from WtGroupItem where version > " + value + " order by idOfGroupItem",
                         WtGroupItem.class);
         return q.getResultList();
     }
 
-    public List<WtDish> getDishesListByVersion(Long value) {
+    public List<WtDish> getDishesListFromVersion(Long value) {
         TypedQuery<WtDish> q = entityManager
-                .createQuery("from WtDish where version = " + value + " order by idOfDish",
+                .createQuery("from WtDish where version > " + value + " order by idOfDish",
                         WtDish.class);
         return q.getResultList();
     }
 
-    public List<WtMenuGroup> getMenuGroupsListByVersion(Long value) {
+    public List<WtMenuGroup> getMenuGroupsListFromVersion(Long value) {
         TypedQuery<WtMenuGroup> q = entityManager
-                .createQuery("from WtMenuGroup where version = " + value + " order by id",
+                .createQuery("from WtMenuGroup where version > " + value + " order by id",
                         WtMenuGroup.class);
         return q.getResultList();
     }
 
-    public List<WtMenu> getMenusListByVersion(Long value) {
+    public List<WtMenu> getMenusListFromVersion(Long value) {
         TypedQuery<WtMenu> q = entityManager
-                .createQuery("from WtMenu where version = " + value + " order by idOfMenu",
+                .createQuery("from WtMenu where version > " + value + " order by idOfMenu",
                         WtMenu.class);
         return q.getResultList();
     }
 
-    public List<WtComplex> getComplexesListByVersion(Long value) {
+    public List<WtComplex> getComplexesListFromVersion(Long value) {
         TypedQuery<WtComplex> q = entityManager
-                .createQuery("from WtComplex where version = " + value + " order by idOfComplex",
+                .createQuery("from WtComplex where version > " + value + " order by idOfComplex",
                         WtComplex.class);
         return q.getResultList();
     }

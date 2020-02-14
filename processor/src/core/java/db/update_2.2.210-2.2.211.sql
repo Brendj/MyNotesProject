@@ -22,3 +22,6 @@ COMMENT ON COLUMN cf_wt_diet_type.version IS 'Версия (для АРМ)';
 ALTER TABLE cf_wt_complex_group_items add column version bigint NOT NULL DEFAULT 0; -- Версия (для АРМ)
 COMMENT ON COLUMN cf_wt_complex_group_items.version IS 'Версия (для АРМ)';
 
+ALTER TABLE cf_wt_group_items add column version bigint NOT NULL DEFAULT 0; -- Версия (для АРМ)
+COMMENT ON COLUMN cf_wt_group_items.version IS 'Версия (для АРМ)';
+
