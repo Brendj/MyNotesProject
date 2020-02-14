@@ -59,57 +59,57 @@ public class ResMenuSupplier implements AbstractToElement {
 
         Element orgGroupsElem = document.createElement("OrgGroups");
         for (WtOrgGroup orgGroup : orgGroups) {
-            orgGroupsElem.appendChild(toElement(document, "OGI", orgGroup));
+            orgGroupsElem.appendChild(orgGroupToElement(document, orgGroup));
         }
 
         Element categoryItemsElem = document.createElement("CategoryItems");
         for (WtCategoryItem categoryItem : categoryItems) {
-            categoryItemsElem.appendChild(toElement(document, "CTI", categoryItem));
+            categoryItemsElem.appendChild(categoryItemToElement(document, categoryItem));
         }
 
         Element typeProductionsElem = document.createElement("TypeProductions");
         for (WtTypeOfProductionItem typeProduction : typeProductions) {
-            typeProductionsElem.appendChild(toElement(document, "TPI", typeProduction));
+            typeProductionsElem.appendChild(typeProductionToElement(document, typeProduction));
         }
 
         Element ageGroupItemsElem = document.createElement("AgeGroupItems");
         for (WtAgeGroupItem ageGroupItem : ageGroupItems) {
-            ageGroupItemsElem.appendChild(toElement(document, "AGI", ageGroupItem));
+            ageGroupItemsElem.appendChild(ageGroupToElement(document, ageGroupItem));
         }
 
         Element dietTypesElem = document.createElement("DietTypes");
         for (WtDietType dietType : dietTypes) {
-            dietTypesElem.appendChild(toElement(document, "DTI", dietType));
+            dietTypesElem.appendChild(dietTypeToElement(document, dietType));
         }
 
         Element complexGroupItemsElem = document.createElement("ComplexGroupItems");
         for (WtComplexGroupItem complexGroupItem : complexGroupItems) {
-            complexGroupItemsElem.appendChild(toElement(document, "CGI", complexGroupItem));
+            complexGroupItemsElem.appendChild(complexGroupItemToElement(document, complexGroupItem));
         }
 
         Element groupItemsElem = document.createElement("GroupItems");
         for (WtGroupItem groupItem : groupItems) {
-            groupItemsElem.appendChild(toElement(document, "GRI", groupItem));
+            groupItemsElem.appendChild(groupItemToElement(document, groupItem));
         }
 
         Element dishesElem = document.createElement("Dishes");
         for (WtDish dish : dishes) {
-            dishesElem.appendChild(toElement(document, "DSI", dish));
+            dishesElem.appendChild(dishToElement(document, dish));
         }
 
         Element menuGroupsElem = document.createElement("MenuGroups");
         for (WtMenuGroup menuGroup : menuGroups) {
-            menuGroupsElem.appendChild(toElement(document, "MGI", menuGroup));
+            menuGroupsElem.appendChild(menuGroupToElement(document, menuGroup));
         }
 
         Element menusElem = document.createElement("Menus");
         for (WtMenu menu : menus) {
-            menusElem.appendChild(toElement(document, "MSI", menu));
+            menusElem.appendChild(menuToElement(document, menu));
         }
 
         Element complexesElem = document.createElement("Complexes");
         for (WtComplex complex : complexes) {
-            complexesElem.appendChild(toElement(document, "CMI", complex));
+            complexesElem.appendChild(complexToElement(document, complex));
         }
 
         element.appendChild(orgGroupsElem);
@@ -127,16 +127,109 @@ public class ResMenuSupplier implements AbstractToElement {
         return element;
     }
 
-    public Element toElement(Document document, String elementName, Object object)
-            throws Exception {
-        Element element = document.createElement(elementName);
-        XMLUtils.setAttributeIfNotNull(element, "V", object.getClass()); /// Интерфейс! TO_DO
-        //XMLUtils.setAttributeIfNotNull(element, "D", deletedState);
+    private Element orgGroupToElement(Document document, WtOrgGroup orgGroup) {
+        Element element = document.createElement("OGI");
+        XMLUtils.setAttributeIfNotNull(element, "Id", orgGroup.getIdOfOrgGroup());
+        XMLUtils.setAttributeIfNotNull(element, "Name", orgGroup.getNameOfOrgGroup());
+        //XMLUtils.setAttributeIfNotNull(element, "ContragentId", orgGroup.getOrgs().toString()); // !!!
+        XMLUtils.setAttributeIfNotNull(element, "V", orgGroup.getVersion());
+        XMLUtils.setAttributeIfNotNull(element, "D", orgGroup.getDeleteState());
         return element;
     }
 
-    public Element toElement(Document document, String elementName)
-            throws Exception {
+    private Element categoryItemToElement(Document document, WtCategoryItem categoryItem) throws Exception {
+        Element element = document.createElement("CTI");
+        XMLUtils.setAttributeIfNotNull(element, "Id", categoryItem.getIdOfCategoryItem());
+        XMLUtils.setAttributeIfNotNull(element, "Guid", categoryItem.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "Name", categoryItem.getDescription());
+        XMLUtils.setAttributeIfNotNull(element, "V", categoryItem.getVersion());
+        //XMLUtils.setAttributeIfNotNull(element, "D", categoryItem.getDeleteState());
+        return element;
+    }
+
+    private Element typeProductionToElement(Document document, WtTypeOfProductionItem typeProduction) {
+        Element element = document.createElement("TPI");
+        XMLUtils.setAttributeIfNotNull(element, "Id", typeProduction.getIdOfTypeProductionItem());
+        XMLUtils.setAttributeIfNotNull(element, "Name", typeProduction.getDescription());
+        XMLUtils.setAttributeIfNotNull(element, "V", typeProduction.getVersion());
+        return element;
+    }
+
+    private Element ageGroupToElement(Document document, WtAgeGroupItem ageGroupItem) {
+        Element element = document.createElement("AGI");
+        XMLUtils.setAttributeIfNotNull(element, "Id", ageGroupItem.getIdOfAgeGroupItem());
+        XMLUtils.setAttributeIfNotNull(element, "Name", ageGroupItem.getDescription());
+        XMLUtils.setAttributeIfNotNull(element, "V", ageGroupItem.getVersion());
+        return element;
+    }
+
+    private Element dietTypeToElement(Document document, WtDietType dietType) {
+        Element element = document.createElement("DTI");
+        XMLUtils.setAttributeIfNotNull(element, "Id", dietType.getIdOfDietType());
+        XMLUtils.setAttributeIfNotNull(element, "Name", dietType.getDescription());
+        XMLUtils.setAttributeIfNotNull(element, "V", dietType.getVersion());
+        return element;
+    }
+
+    private Element complexGroupItemToElement(Document document, WtComplexGroupItem complexGroupItem) {
+        Element element = document.createElement("CGI");
+        XMLUtils.setAttributeIfNotNull(element, "Id", complexGroupItem.getIdOfComplexGroupItem());
+        XMLUtils.setAttributeIfNotNull(element, "Name", complexGroupItem.getDescription());
+        XMLUtils.setAttributeIfNotNull(element, "V", complexGroupItem.getVersion());
+        return element;
+    }
+
+    private Element groupItemToElement(Document document, WtGroupItem groupItem) {
+        Element element = document.createElement("GRI");
+        XMLUtils.setAttributeIfNotNull(element, "Id", groupItem.getIdOfGroupItem());
+        XMLUtils.setAttributeIfNotNull(element, "Name", groupItem.getDescription());
+        XMLUtils.setAttributeIfNotNull(element, "V", groupItem.getVersion());
+        return element;
+    }
+
+    private Element dishToElement(Document document, WtDish dish) {
+        Element element = document.createElement("DSI");
+
+        Element prop = document.createElement("Prop");
+        XMLUtils.setAttributeIfNotNull(prop, "Id", dish.getIdOfDish());
+        XMLUtils.setAttributeIfNotNull(prop, "Name", dish.getDishName());
+        XMLUtils.setAttributeIfNotNull(prop, "Components", dish.getComponentsOfDish());
+        XMLUtils.setAttributeIfNotNull(prop, "Code", dish.getDishName());
+        XMLUtils.setAttributeIfNotNull(prop, "Price", dish.getPrice());
+        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", dish.getDateOfBeginMenuIncluding());
+        XMLUtils.setAttributeIfNotNull(prop, "EndDate", dish.getDateOfEndMenuIncluding());
+        XMLUtils.setAttributeIfNotNull(prop, "V", dish.getVersion());
+        XMLUtils.setAttributeIfNotNull(element, "D", dish.getDeleteState());
+        XMLUtils.setAttributeIfNotNull(element, "Guid", dish.getGuid());
+        XMLUtils.setAttributeIfNotNull(element, "AgeGroupId", dish.getWtAgeGroupItem().getIdOfAgeGroupItem());
+        //XMLUtils.setAttributeIfNotNull(element, "TypeProductionId", dish.);
+        XMLUtils.setAttributeIfNotNull(element, "Protein", dish.getProtein());
+        XMLUtils.setAttributeIfNotNull(element, "Fat", dish.getFat());
+        XMLUtils.setAttributeIfNotNull(element, "Carbohydrates", dish.getCarbohydrates());
+        XMLUtils.setAttributeIfNotNull(element, "Calories", dish.getCalories());
+        XMLUtils.setAttributeIfNotNull(element, "Qty", dish.getQty());
+        //XMLUtils.setAttributeIfNotNull(element, "ContragentId", dish.get);
+
+        element.appendChild(prop);
+        return element;
+    }
+
+    private Element menuGroupToElement(Document document, WtMenuGroup menuGroup) {
+        Element element = document.createElement("MGI");
+        return element;
+    }
+
+    private Element menuToElement(Document document, WtMenu menu) {
+        Element element = document.createElement("MSI");
+        return element;
+    }
+
+    private Element complexToElement(Document document, WtComplex complex) {
+        Element element = document.createElement("CMI");
+        return element;
+    }
+
+    public Element toElement(Document document, String elementName) throws Exception {
         return document.createElement(elementName);
     }
 
