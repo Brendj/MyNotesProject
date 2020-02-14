@@ -4052,6 +4052,10 @@ public class Processor implements SyncProcessor {
                                     idOfOrg, payment.getIdOfOrder()));
                 }
 
+                //Если заказ есть и по нему не было сообщения, то отправляем сообщение
+                NotificationOrders notificationOrder =
+                        DAOUtils.findNotificationOrder(persistenceSession,payment.getIdOfOrder(), client,false);
+
                 // Commit data model transaction
                 persistenceSession.flush();
                 persistenceTransaction.commit();
