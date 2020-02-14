@@ -9,8 +9,6 @@ import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.List;
-
 /**
  * Created with IntelliJ IDEA.
  * User: o.petrova
@@ -20,26 +18,21 @@ import java.util.List;
  */
 
 public class MenuSupplierData implements AbstractToElement {
-    private List<MenuSupplier> items;
+    private ResMenuSupplier menuSupplier;
 
     public MenuSupplierData() {
-
     }
 
     @Override
     public Element toElement(Document document) throws Exception {
-        Element element = document.createElement("MenuSupplier");
-        //for (MenuSupplier item : this.getItems()) {
-        //    element.appendChild(item.toElement(document, "MS"));
-        //}
-        return element;
+        return menuSupplier.toElement(document);
     }
 
-    public List<MenuSupplier> getItems() {
-        return items;
+    public ResMenuSupplier getMenuSupplier() {
+        return menuSupplier;
     }
 
-    public void setItems(List<MenuSupplier> items) {
-        this.items = items;
+    public void setMenuSupplier(ResMenuSupplier menuSupplier) {
+        this.menuSupplier = menuSupplier;
     }
 }

@@ -19,10 +19,8 @@ import org.w3c.dom.Node;
  */
 
 public class MenuSupplierBuilder implements SectionRequestBuilder {
-    //private final long owner;
 
-    public MenuSupplierBuilder(){
-        //this.owner = owner;
+    public MenuSupplierBuilder() {
     }
 
     public MenuSupplier build(Node envelopeNode) throws Exception {
