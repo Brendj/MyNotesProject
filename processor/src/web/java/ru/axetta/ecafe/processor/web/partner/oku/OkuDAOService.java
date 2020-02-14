@@ -49,11 +49,13 @@ public class OkuDAOService {
                 + "where c.contractId = :contractId and lower(p.surname) = :surname and o.participantOP = true "
                 + "     and (c.clientGroup.compositeIdOfClientGroup.idOfClientGroup in (:clientGroupList) "
                 + "         or ((c.clientGroup.compositeIdOfClientGroup.idOfClientGroup < :clientGroupEmployees)"
-                + "             and c.ageTypeGroup not like :kindergarten and c.ageTypeGroup like :school "
+                + "             and lower(c.ageTypeGroup) not like :kindergarten and lower(c.ageTypeGroup) like :school "
                 + "             and ((c.parallel like :parallel5) or (c.parallel like :parallel6) "
                 + "                  or (c.parallel like :parallel7) or (c.parallel like :parallel8) "
                 + "                  or (c.parallel like :parallel9) or (c.parallel like :parallel10) "
-                + "                  or (c.parallel like :parallel11) or (c.parallel like :parallel12))))");
+                + "                  or (c.parallel like :parallel11) or (c.parallel like :parallel12))) "
+                + "         or ((c.clientGroup.compositeIdOfClientGroup.idOfClientGroup < :clientGroupEmployees) "
+                + "             and lower(c.ageTypeGroup) not like :kindergarten and lower(c.ageTypeGroup) not like :school))");
         query.setParameter("contractId", contractId);
         query.setParameter("surname", surname.toLowerCase());
         query.setParameter("clientGroupList", clientGroupList);
