@@ -66,13 +66,13 @@ ALTER TABLE CF_OrderDetails ADD COLUMN FRation integer;
 
 -- 370: Таблица для хранения информации о том, отправлено ли было сообщение клиенту по конкретному заказу
 CREATE TABLE cf_notification_orders (
-    idOfNotificationOrders   			bigserial,	-- первичный ключ
-    idOfOrder   						int8,		-- Идентификатор заказа
-    idOfClient   						int8,		-- Идентификатор клиента
-    createddate 						int8,		-- дата получения заказа
-    sended       						bool		-- сообщение отправлено
+    idOfNotificationOrders   			bigserial,
+    idOfOrder   						int8,
+    idOfClient   						int8,
+    createddate 						int8,
+    sended       						bool
 );
-
+CREATE INDEX cf_notification_orders_idoforder_idx ON public.cf_notification_orders (idoforder,idofclient);
 
 -- 410: Срок действия меню увеличен с 365 до 730 дней
 UPDATE public.cf_options
