@@ -162,6 +162,7 @@ public class SyncServlet extends HttpServlet {
             }
             ///////
             currentSyncWasGranted.set(false);
+            long currentTime = System.currentTimeMillis();
             if (syncType != SyncType.TYPE_GET_ACC_INC) {
                 if (permitsForSync.tryAcquire(permitsTimeout, TimeUnit.MINUTES)) {
                     currentSyncWasGranted.set(true);
@@ -175,8 +176,8 @@ public class SyncServlet extends HttpServlet {
 
 
             long begin_sync = System.currentTimeMillis();
-            logger.info(String.format("-Starting synchronization with %s: id: %s, current count syncs: %s, full syncs: %s, accInc syncs: %s, available permits: %s",
-                    request.getRemoteAddr(), idOfOrg, allSyncsCount, fullSyncsCount, accIncSyncsCount, permitsForSync.availablePermits()));
+            logger.info(String.format("-Starting synchronization with %s: id: %s, current count syncs: %s, full syncs: %s, accInc syncs: %s, available permits: %s, permit acquired in: %s ms",
+                    request.getRemoteAddr(), idOfOrg, allSyncsCount, fullSyncsCount, accIncSyncsCount, permitsForSync.availablePermits(), System.currentTimeMillis() - currentTime));
 
             boolean bLogPackets = (syncType==SyncType.TYPE_FULL);
 
