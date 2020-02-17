@@ -55,9 +55,3 @@ CREATE INDEX cf_taloons_preorder_guid_idx
 -- 358: Добавление id комплекса в cf_goods_requests_positions
 ALTER TABLE cf_goods_requests_positions
     ADD complexId integer;
-
--- 358: Добавление индекса в cf_preorder_complex
-CREATE INDEX cf_preorder_complex_armcomplexid_idx
-    ON cf_preorder_complex
-        USING btree
-        (armcomplexid);
