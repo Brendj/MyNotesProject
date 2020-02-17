@@ -18,6 +18,13 @@ public class ResPreorderFeedingStatusItem {
     private Integer res;
     private String error;
 
+    public ResPreorderFeedingStatusItem(String guid, Long version, Integer res, String error) {
+        this.guid = guid;
+        this.version = version;
+        this.res = res;
+        this.error = error;
+    }
+
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
         XMLUtils.setAttributeIfNotNull(element, "Guid", guid);
