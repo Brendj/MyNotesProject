@@ -403,6 +403,13 @@ public class MigrantsUtils {
         return criteria.list();
     }
 
+    public static List<ESZMigrantsRequest> getRequestsByExternalIdAndGroupId(Session session, Long externalId, Long groupId) {
+        Criteria criteria = session.createCriteria(ESZMigrantsRequest.class);
+        criteria.add(Restrictions.eq("idOfESZ", externalId));
+        criteria.add(Restrictions.eq("idOfServiceClass", groupId));
+        return criteria.list();
+    }
+
     public enum MigrantsEnumType {
         /*0*/ ALL("all", "По всем заявкам"),
         /*1*/ OUTCOME("outcome", "По исходящим заявкам"),

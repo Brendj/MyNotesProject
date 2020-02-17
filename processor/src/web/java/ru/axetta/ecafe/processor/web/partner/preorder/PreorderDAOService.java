@@ -594,6 +594,9 @@ public class PreorderDAOService {
         } catch (NoResultException e) {
             if (isComplex) {
                 ComplexInfo ci = getComplexInfo(client, idOfComplex, date);
+                if (getMenuDetailList(ci.getIdOfComplexInfo()).size() == 0) {
+                    throw new MenuDetailNotExistsException("Не найдены блюда для комплекса с ид.=" + idOfComplex.toString());
+                }
                 String complexName = null;
                 Long complexPrice = null;
                 if (ci != null) {
@@ -668,7 +671,7 @@ public class PreorderDAOService {
 
     @Transactional
     public List<PreorderComplex> getPreorderComplexListForRelevanceToMenu(PreorderRequestsReportServiceParam params) {
-        Query query = em.createQuery("select pc from PreorderComplex pc join fetch pc.preorderMenuDetails join fetch pc.client c join fetch c.org "
+        Query query = em.createQuery("select pc from PreorderComplex pc left join fetch pc.preorderMenuDetails join fetch pc.client c join fetch c.org "
                 + "where pc.preorderDate > :date and pc.deletedState = false "
                 + params.getJPACondition()
                 + "order by pc.preorderDate");
@@ -682,6 +685,10 @@ public class PreorderDAOService {
 
         ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
         if (complexInfo == null) {
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
+            return null;
+        }
+        if (preorderComplex.getPreorderMenuDetails().size() == 0 || getMenuDetailList(complexInfo.getIdOfComplexInfo()).size() == 0) {
             testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
             return null;
         }
@@ -956,6 +963,13 @@ public class PreorderDAOService {
                 currentDate = CalendarUtils.addDays(currentDate, 1);
                 continue;
             }
+
+            List menuDetails = getMenuDetailList(complexInfo.getIdOfComplexInfo());
+            if (menuDetails.size() == 0) {
+                currentDate = CalendarUtils.addDays(currentDate, 1);
+                continue;
+            }
+
             if ((preorderComplex == null || (preorderComplex != null && allowCreateNewPreorderComplex(preorderComplex)))
                     && !forcePreorderComplexExists(regularPreorder, currentDate)) {
                 //на искомую дату нет предзаказа, надо создавать
@@ -1009,7 +1023,7 @@ public class PreorderDAOService {
                     em.persist(preorderMenuDetail);
                 }
             }
-            Set<PreorderMenuDetail> set = createPreorderMenuDetails(regularPreorder.getIdOfComplex(), regularPreorder.getClient(),
+            Set<PreorderMenuDetail> set = createPreorderMenuDetails(menuDetails, regularPreorder.getClient(),
                     complexInfo.getMenuDate(), preorderComplex);
             preorderComplex.setPreorderMenuDetails(set);
             em.merge(preorderComplex);
@@ -1092,23 +1106,6 @@ public class PreorderDAOService {
         }
         preorderComplex.deleteByReason(nextVersion, true, preorderState);
         em.merge(preorderComplex);
-    }
-
-    @Transactional
-    public void generatePreordersBySchedule() throws Exception {
-        //Query query = em.createQuery("select r from RegularPreorder r where r.deletedState = false and r.startDate < :date and r.endDate > :date");
-        Query query = em.createQuery("select r from RegularPreorder r where r.deletedState = false and r.endDate > :date");
-        query.setParameter("date", new Date());
-        List<RegularPreorder> list = query.getResultList();
-        for (RegularPreorder regularPreorder : list) {
-            if (regularPreorder.getIdOfComplex() != null) {
-                try {
-                    createPreordersFromRegular(regularPreorder, false);
-                } catch (Exception e) {
-                    logger.error("Error in generate preorders by schedule: ", e);
-                }
-            }
-        }
     }
 
     @Transactional
@@ -1244,7 +1241,12 @@ public class PreorderDAOService {
         preorderComplex.setState(PreorderState.OK);
         preorderComplex.setIdOfOrgOnCreate(client.getOrg().getIdOfOrg());
         preorderComplex.setMobile(guardianMobile);
-        if (ci == null) ci = getComplexInfo(client, idOfComplex, date);
+        if (ci == null) {
+            ci = getComplexInfo(client, idOfComplex, date);
+            if (ci != null && getMenuDetailList(ci.getIdOfComplexInfo()).size() == 0) {
+                throw new MenuDetailNotExistsException("Не найдены блюда для комплекса с ид.=" + idOfComplex.toString());
+            }
+        }
         if (ci != null) {
             preorderComplex.setComplexName(ci.getComplexName());
             preorderComplex.setComplexPrice(ci.getCurrentPrice());
@@ -1274,15 +1276,17 @@ public class PreorderDAOService {
         }
     }
 
-    private Set<PreorderMenuDetail> createPreorderMenuDetails(Integer idOfComplex, Client client, Date date,
-            PreorderComplex preorderComplex) throws Exception {
-        Set<PreorderMenuDetail> result = new HashSet<PreorderMenuDetail>();
-        ComplexInfo ci = getComplexInfo(client, idOfComplex, date);
+    private List getMenuDetailList(Long idOfComplexInfo) {
         Query query = emReport.createNativeQuery("SELECT md.idofmenudetail, md.LocalIdOfMenu "
                 + "FROM CF_MenuDetails md INNER JOIN CF_ComplexInfoDetail cid ON cid.IdOfMenuDetail = md.IdOfMenuDetail "
                 + "WHERE cid.IdOfComplexInfo = :idOfComplexInfo");
-        query.setParameter("idOfComplexInfo", ci.getIdOfComplexInfo());
-        List list = query.getResultList();
+        query.setParameter("idOfComplexInfo", idOfComplexInfo);
+        return query.getResultList();
+    }
+
+    private Set<PreorderMenuDetail> createPreorderMenuDetails(List list, Client client, Date date,
+            PreorderComplex preorderComplex) throws Exception {
+        Set<PreorderMenuDetail> result = new HashSet<PreorderMenuDetail>();
         for (Object o : list) {
             Object[] row = (Object[]) o;
             Long idOfMenu = ((BigInteger) row[1]).longValue();
@@ -1292,6 +1296,13 @@ public class PreorderDAOService {
             }
         }
         return result;
+    }
+
+    private Set<PreorderMenuDetail> createPreorderMenuDetails(Integer idOfComplex, Client client, Date date,
+            PreorderComplex preorderComplex) throws Exception {
+        ComplexInfo ci = getComplexInfo(client, idOfComplex, date);
+        List list = getMenuDetailList(ci.getIdOfComplexInfo());
+        return createPreorderMenuDetails(list, client, date, preorderComplex);
     }
 
     private PreorderMenuDetail createPreorderMenuDetail(Client client, PreorderComplex preorderComplex, MenuDetail md, Date date, Long idOfMenu, Integer amount) throws MenuDetailNotExistsException {

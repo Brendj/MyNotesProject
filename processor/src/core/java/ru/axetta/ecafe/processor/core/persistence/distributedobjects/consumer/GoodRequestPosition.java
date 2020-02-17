@@ -103,7 +103,9 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "TotalCount", totalCount);
         XMLUtils.setAttributeIfNotNull(element, "DailySampleCount", dailySampleCount);  // суточная проба
         XMLUtils.setAttributeIfNotNull(element, "TempClientsCount", tempClientsCount);
-        XMLUtils.setAttributeIfNotNull(element, "ComplexId", complexId);
+        if (complexId != 0) {
+            element.setAttribute("ComplexId", complexId.toString());
+        }
         XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
         if (!StringUtils.isEmpty(guidOfGR)) {
             XMLUtils.setAttributeIfNotNull(element, "GuidOfGoodsRequest", guidOfGR);
@@ -121,8 +123,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         GoodRequest gr = DAOUtils.findDistributedObjectByRefGUID(GoodRequest.class, session, guidOfGR);
-        Integer currentComplexID = DAOUtils.getComplexIdForGoodRequestPosition(session, guid);
-        complexId = (currentComplexID == null) ?  0 : currentComplexID;
+        complexId = DAOUtils.getComplexIdForGoodRequestPosition(session, guid);
         if (gr == null) {
             throw new DistributedObjectException("NOT_FOUND_VALUE GOOD_REQUEST");
         }
