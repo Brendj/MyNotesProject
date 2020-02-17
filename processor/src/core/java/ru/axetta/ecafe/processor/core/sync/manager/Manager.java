@@ -428,10 +428,15 @@ public class Manager implements AbstractToElement {
 
         if (doClass.getSimpleName().equals("GoodRequestPosition")) {
             List<DistributedObject> currentResultDOListResult = new ArrayList<DistributedObject>();
+            Session reportsSession = null;
+            RuntimeContext runtimeContext = RuntimeContext.getInstance();
             try {
-                currentResultDOListResult = currentResultDOListFind(sessionFactory, currentResultDOList);
+                reportsSession = runtimeContext.createReportPersistenceSession();
+                currentResultDOListResult = currentResultDOListFind(reportsSession, currentResultDOList);
             } catch (Exception e) {
                 e.printStackTrace();
+            } finally {
+                HibernateUtils.close(reportsSession, LOGGER);
             }
             currentResultDOList = currentResultDOListResult;
         }
@@ -439,17 +444,15 @@ public class Manager implements AbstractToElement {
         return currentResultDOList;
     }
 
-    private List<DistributedObject> currentResultDOListFind(SessionFactory sessionFactory,
-            List<DistributedObject> currentResultDOList) throws Exception {
+    private List<DistributedObject> currentResultDOListFind(Session session,
+            List<DistributedObject> currentResultDOList) {
         List<DistributedObject> currentResultDOListResult = new ArrayList<DistributedObject>();
-        Session session = null;
 
         for (DistributedObject distributedObject : currentResultDOList) {
             GoodRequestPosition goodRequestPosition = (GoodRequestPosition) distributedObject;
             if (goodRequestPosition.getGuidOfGR() != null && (goodRequestPosition.getComplexId() == null ||
                     goodRequestPosition.getComplexId() == 0)) {
                 try {
-                    session = sessionFactory.openSession();
                     Integer currentComplexID = DAOUtils.getComplexIdForGoodRequestPosition(session,
                             goodRequestPosition.getGuid());
                     if (currentComplexID == null) {
@@ -464,8 +467,6 @@ public class Manager implements AbstractToElement {
                     query.executeUpdate();
                 } catch (Exception e) {
                     LOGGER.error("Error findResponseResult: " + e.getMessage(), e);
-                } finally {
-                    HibernateUtils.close(session, LOGGER);
                 }
                 currentResultDOListResult.add(goodRequestPosition);
             }
