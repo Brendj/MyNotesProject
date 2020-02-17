@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.web.ui.service.orgparameters;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -15,7 +14,6 @@ import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -36,9 +34,7 @@ public class OrgSyncRequestPage extends BasicWorkspacePage implements OrgListSel
     private final Logger logger = LoggerFactory.getLogger(OrgSyncRequestPage.class);
 
     private LinkedList<Long> idOfOrgList;
-    private List<SelectItem> listOfOrgDistricts;
     private List<SelectItem> listOfSyncType;
-    private String selectedDistricts = "";
     private String filter;
     private Integer selectedSyncType = SyncType.FULL_SYNC.ordinal();
     private Contragent defaultSupplier;
@@ -49,7 +45,6 @@ public class OrgSyncRequestPage extends BasicWorkspacePage implements OrgListSel
         Session session = null;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
-            listOfOrgDistricts = buildListOfOrgDistricts(session);
             listOfSyncType = buildListOfSyncType();
         } catch (Exception e){
             logger.error("Exception when prepared the OrgSyncRequestPage: ", e);
@@ -57,22 +52,6 @@ public class OrgSyncRequestPage extends BasicWorkspacePage implements OrgListSel
         } finally {
             HibernateUtils.close(session, logger);
         }
-    }
-
-    private List<SelectItem> buildListOfOrgDistricts(Session session) {
-        List<String> allDistricts = null;
-        List<SelectItem> selectItemList = new LinkedList<SelectItem>();
-        selectItemList.add(new SelectItem("", "Все"));
-        try{
-            allDistricts = DAOUtils.getAllDistinctDepartmentsFromOrgs(session);
-
-            for(String district : allDistricts){
-                selectItemList.add(new SelectItem(district, district));
-            }
-        } catch (Exception e){
-            logger.error("Cant build Districts items", e);
-        }
-        return selectItemList;
     }
 
     private List<SelectItem> buildListOfSyncType() {
@@ -91,7 +70,7 @@ public class OrgSyncRequestPage extends BasicWorkspacePage implements OrgListSel
         Session session = null;
         Transaction transaction = null;
         try{
-            if(defaultSupplier == null && StringUtils.isBlank(selectedDistricts) && CollectionUtils.isNotEmpty(idOfOrgList)){
+            if(defaultSupplier == null &&  CollectionUtils.isNotEmpty(idOfOrgList)){
                 throw new Exception("Не выбран не один из необходимых параметров");
             }
             session = RuntimeContext.getInstance().createPersistenceSession();
@@ -103,9 +82,6 @@ public class OrgSyncRequestPage extends BasicWorkspacePage implements OrgListSel
             }
             if(defaultSupplier != null){
                 criteria.add(Restrictions.eq("defaultSupplier", defaultSupplier));
-            }
-            if(StringUtils.isNotBlank(selectedDistricts)){
-                criteria.add(Restrictions.eq("district", selectedDistricts));
             }
 
             List<Org> listOfOrg = criteria.list();
@@ -184,22 +160,6 @@ public class OrgSyncRequestPage extends BasicWorkspacePage implements OrgListSel
 
     public void setSelectReceiver(Boolean selectReceiver) {
         this.selectReceiver = selectReceiver;
-    }
-
-    public List<SelectItem> getListOfOrgDistricts() {
-        return listOfOrgDistricts;
-    }
-
-    public void setListOfOrgDistricts(List<SelectItem> listOfOrgDistricts) {
-        this.listOfOrgDistricts = listOfOrgDistricts;
-    }
-
-    public String getSelectedDistricts() {
-        return selectedDistricts;
-    }
-
-    public void setSelectedDistricts(String selectedDistricts) {
-        this.selectedDistricts = selectedDistricts;
     }
 
     public List<SelectItem> getListOfSyncType() {
