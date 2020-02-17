@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.ResTurnstileSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ResClientBalanceHoldData;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequestsData;
@@ -14,6 +15,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOpera
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZN;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDSection;
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.ResHardwareSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.ResHelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
@@ -22,7 +24,6 @@ import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.ResMenusCalen
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsData;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.ResMigrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request.ResOrgEquipmentRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeeding;
@@ -1218,7 +1219,8 @@ public class SyncResponse {
     private GoodRequestEZDSection goodRequestEZDSection;
     private ResSyncSettingsSection resSyncSettingsSection;
     private SyncSettingsSection syncSettingsSection;
-    private ResOrgEquipmentRequest orgEquipmentRequest;
+    private ResHardwareSettingsRequest resHardwareSettingsRequest;
+    private ResTurnstileSettingsRequest resTurnstileSettingsRequest;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1241,7 +1243,9 @@ public class SyncResponse {
             ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData,
             ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
             ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, GoodRequestEZDSection goodRequestEZDSection,
-            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, ResOrgEquipmentRequest resOrgEquipmentRequest) {
+            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection,
+            ResHardwareSettingsRequest resHardwareSettingsRequest,
+            ResTurnstileSettingsRequest resTurnstileSettingsRequest) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1301,7 +1305,8 @@ public class SyncResponse {
         this.goodRequestEZDSection = goodRequestEZDSection;
         this.resSyncSettingsSection = resSyncSettingsSection;
         this.syncSettingsSection = syncSettingsSection;
-        this.orgEquipmentRequest = resOrgEquipmentRequest;
+        this.resHardwareSettingsRequest = resHardwareSettingsRequest;
+        this.resTurnstileSettingsRequest = resTurnstileSettingsRequest;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1598,6 +1603,12 @@ public class SyncResponse {
         }
         if(syncSettingsSection != null){
             envelopeElement.appendChild(syncSettingsSection.toElement(document));
+        }
+        if (resHardwareSettingsRequest != null) {
+            envelopeElement.appendChild(resHardwareSettingsRequest.toElement(document));
+        }
+        if (resTurnstileSettingsRequest != null) {
+            envelopeElement.appendChild(resTurnstileSettingsRequest.toElement(document));
         }
     }
 

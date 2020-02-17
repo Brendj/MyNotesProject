@@ -32,7 +32,6 @@ import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request.OrgEquipmentRequest;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -4495,7 +4494,7 @@ public class DAOUtils {
         }
     }
 
-    public static long nextVersionByOrgEquipmentRequest(Session session) {
+    public static long nextVersionByHardwareSettingsRequest(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
                 "select r.version from cf_hardware_settings as r order by r.version desc limit 1 for update");
@@ -4506,19 +4505,34 @@ public class DAOUtils {
         return version;
     }
 
-    public static OrgEquipment getOrgEquipmentRequestByOrg(Session session, Long idOfOrg) throws Exception {
-        Criteria criteria = session.createCriteria(OrgEquipmentRequest.class);
-        Org org = (Org) session.load(Org.class, idOfOrg);
-        criteria.add(Restrictions.eq("org", org));
-        return (OrgEquipment) criteria.uniqueResult();
+    public static HardwareSettings getHardwareSettingsRequestByOrg(Session session, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(HardwareSettings.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        return (HardwareSettings) criteria.uniqueResult();
     }
 
-    public static List<OrgEquipment> getOrgEquipmentsForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
-        Criteria criteria = session.createCriteria(OrgEquipment.class);
+    public static List<HardwareSettings> getOrgEquipmentsForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        Criteria criteria = session.createCriteria(HardwareSettings.class);
         Org org = (Org) session.load(Org.class, idOfOrg);
         criteria.add(Restrictions.eq("org", org));
         criteria.add(Restrictions.gt("version", version));
         return criteria.list();
     }
 
+    public static long nextVersionByTurnstileSettingsRequest(Session session) {
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select r.version from cf_turnstile_settings as r order by r.version desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
+    public static TurnstileSettings getTurnstileSettingsRequestByOrg(Session session, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(TurnstileSettings.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        return (TurnstileSettings) criteria.uniqueResult();
+    }
 }

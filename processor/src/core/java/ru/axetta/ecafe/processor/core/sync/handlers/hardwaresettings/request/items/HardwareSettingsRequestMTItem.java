@@ -2,7 +2,7 @@
  * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request;
+package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.items;
 
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -12,19 +12,19 @@ import org.w3c.dom.Node;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 
-public class OrgEquipmentRequestMTItem extends OrgEquipmentRequestItem {
+public class HardwareSettingsRequestMTItem extends HardwareSettingsRequestItem {
 
     private Integer installStatus;
     private Integer value;
 
-    public OrgEquipmentRequestMTItem(Integer value, Integer installStatus, Date lastUpdate, String type,
+    public HardwareSettingsRequestMTItem(Integer value, Integer installStatus, Date lastUpdate, String type,
             String errorMessage) {
         super(lastUpdate, type, errorMessage);
         this.installStatus = installStatus;
         this.value = value;
     }
 
-    public static OrgEquipmentRequestMTItem build(Node itemNode) {
+    public static HardwareSettingsRequestMTItem build(Node itemNode) {
         Integer value = null;
         Integer installStatus = null;
         Date lastUpdate = null;
@@ -53,7 +53,7 @@ public class OrgEquipmentRequestMTItem extends OrgEquipmentRequestItem {
         } else {
             errorMessage.append("Attribute RequestDate not found");
         }
-        return new OrgEquipmentRequestMTItem(value, installStatus, lastUpdate, type, errorMessage.toString());
+        return new HardwareSettingsRequestMTItem(value, installStatus, lastUpdate, type, errorMessage.toString());
     }
 
     public Integer getInstallStatus() {

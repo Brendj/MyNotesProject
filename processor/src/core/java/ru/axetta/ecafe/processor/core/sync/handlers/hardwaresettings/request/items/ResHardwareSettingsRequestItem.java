@@ -2,21 +2,21 @@
  * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request;
+package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.items;
 
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 
 import java.util.Date;
 
-public abstract class ResOrgEquipmentRequestItem implements AbstractToElement {
+public abstract class ResHardwareSettingsRequestItem implements AbstractToElement {
 
     private Date lastUpdate;
     private String type;
 
-    public ResOrgEquipmentRequestItem() {
+    public ResHardwareSettingsRequestItem() {
     }
 
-    public ResOrgEquipmentRequestItem(Date lastUpdate, String type) {
+    public ResHardwareSettingsRequestItem(Date lastUpdate, String type) {
         this.lastUpdate = lastUpdate;
         this.type = type;
     }

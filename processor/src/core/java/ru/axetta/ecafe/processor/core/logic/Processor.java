@@ -25,6 +25,9 @@ import ru.axetta.ecafe.processor.core.service.geoplaner.GeoplanerManager;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
 import ru.axetta.ecafe.processor.core.service.scud.ScudManager;
 import ru.axetta.ecafe.processor.core.sync.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.ResTurnstileSettingsRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequestProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequests;
 import ru.axetta.ecafe.processor.core.sync.handlers.card.request.CardRequestsData;
@@ -54,6 +57,9 @@ import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodR
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.HardwareSettingsRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.HardwareSettingsRequestProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.ResHardwareSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestProcessor;
@@ -69,9 +75,6 @@ import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.ResMigrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerProcessor;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request.OrgEquipmentRequest;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request.OrgEquipmentRequestProcessor;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request.ResOrgEquipmentRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsRequest;
@@ -349,7 +352,8 @@ public class Processor implements SyncProcessor {
         SyncSettingsSection syncSettingsSection = null;
         ResSyncSettingsSection resSyncSettingsSection = null;
         GoodRequestEZDSection goodRequestEZDSection = null;
-        ResOrgEquipmentRequest resOrgEquipmentRequest = null;
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
         StringBuilder performanceLogger = new StringBuilder();
@@ -946,7 +950,7 @@ public class Processor implements SyncProcessor {
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding,
                 cardRequestsData, resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection,goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, resOrgEquipmentRequest);
+                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private SyncResponse buildUniversalConstructedSectionsSyncResponse(SyncRequest request, Date syncStartTime,
@@ -1994,7 +1998,8 @@ public class Processor implements SyncProcessor {
         SyncSettingsSection syncSettingsSection = null;
         ResSyncSettingsSection resSyncSettingsSection = null;
         GoodRequestEZDSection goodRequestEZDSection = null;
-        ResOrgEquipmentRequest resOrgEquipmentRequest = null;
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2042,7 +2047,7 @@ public class Processor implements SyncProcessor {
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding, cardRequestsData,
                 resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, resOrgEquipmentRequest);
+                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
@@ -2097,7 +2102,8 @@ public class Processor implements SyncProcessor {
         SyncSettingsSection syncSettingsSection = null;
         ResSyncSettingsSection resSyncSettingsSection = null;
         GoodRequestEZDSection goodRequestEZDSection = null;
-        ResOrgEquipmentRequest resOrgEquipmentRequest = null;
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2128,7 +2134,7 @@ public class Processor implements SyncProcessor {
                  specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, resOrgEquipmentRequest);
+                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private SyncResponse buildZeroTransactionsSyncResponse(SyncRequest request) throws Exception {
@@ -2183,7 +2189,8 @@ public class Processor implements SyncProcessor {
         SyncSettingsSection syncSettingsSection = null;
         ResSyncSettingsSection resSyncSettingsSection = null;
         GoodRequestEZDSection goodRequestEZDSection = null;
-        ResOrgEquipmentRequest resOrgEquipmentRequest = null;
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2214,7 +2221,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, resOrgEquipmentRequest);
+                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private SyncResponse buildMigrantsSyncResponse(SyncRequest request) throws Exception {
@@ -2269,7 +2276,8 @@ public class Processor implements SyncProcessor {
         SyncSettingsSection syncSettingsSection = null;
         ResSyncSettingsSection resSyncSettingsSection = null;
         GoodRequestEZDSection goodRequestEZDSection = null;
-        ResOrgEquipmentRequest resOrgEquipmentRequest = null;
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2335,7 +2343,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, resOrgEquipmentRequest);
+                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private void processInfoMessageSections(SyncRequest request, List<AbstractToElement> responseSections) {
@@ -2410,7 +2418,8 @@ public class Processor implements SyncProcessor {
         SyncSettingsSection syncSettingsSection = null;
         ResSyncSettingsSection resSyncSettingsSection = null;
         GoodRequestEZDSection goodRequestEZDSection = null;
-        ResOrgEquipmentRequest resOrgEquipmentRequest = null;
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2498,7 +2507,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, resOrgEquipmentRequest);
+                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -2557,7 +2566,8 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         SyncSettingsSection syncSettingsSection = null;
         ResSyncSettingsSection resSyncSettingsSection = null;
-        ResOrgEquipmentRequest resOrgEquipmentRequest = null;
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2642,7 +2652,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, resOrgEquipmentRequest);
+                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -2698,7 +2708,8 @@ public class Processor implements SyncProcessor {
         SyncSettingsSection syncSettingsSection = null;
         ResSyncSettingsSection resSyncSettingsSection = null;
         GoodRequestEZDSection goodRequestEZDSection = null;
-        ResOrgEquipmentRequest resOrgEquipmentRequest = null;
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2826,7 +2837,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, resOrgEquipmentRequest);
+                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -6174,7 +6185,8 @@ public class Processor implements SyncProcessor {
         SyncSettingsSection syncSettingsSection = null;
         ResSyncSettingsSection resSyncSettingsSection = null;
         GoodRequestEZDSection goodRequestEZDSection = null;
-        ResOrgEquipmentRequest resOrgEquipmentRequest = null;
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -6204,7 +6216,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, resOrgEquipmentRequest);
+                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private void fullProcessingHelpRequests(SyncRequest request, SyncHistory syncHistory, List<AbstractToElement> responseSections) {
@@ -6598,8 +6610,8 @@ public class Processor implements SyncProcessor {
         SyncSettingsSection syncSettingsSection = null;
         ResSyncSettingsSection resSyncSettingsSection = null;
         GoodRequestEZDSection goodRequestEZDSection = null;
-        ResOrgEquipmentRequest resOrgEquipmentRequest = null;
-
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -6647,7 +6659,8 @@ public class Processor implements SyncProcessor {
             logger.error(message, e);
         }
 
-        fullProcessingOrgEquipmentRequest(request,syncHistory,responseSections);
+        ProcessingHardwareSettingsRequest(request, syncHistory, responseSections);
+        ProcessingTurnstileSettingsRequest(request, syncHistory, responseSections);
 
         Date syncEndTime = new Date();
 
@@ -6663,7 +6676,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSetting, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, resOrgEquipmentRequest);
+                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private OrgSettingSection processOrgSettings(OrgSettingsRequest orgSettingsRequest) throws Exception{
@@ -6722,56 +6735,71 @@ public class Processor implements SyncProcessor {
         return goodRequestEZDSection;
     }
 
-    /*private OrgEquipmentRequestData processOrgEquipmentRequestData(OrgEquipmentRequest orgEquipmentRequest) throws Exception{
+    private ResHardwareSettingsRequest processResHardwareSettingsRequest(HardwareSettingsRequest orgEquipmentRequest) throws Exception{
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        OrgEquipmentRequestData orgEquipmentRequestData = null;
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         try{
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            OrgEquipmentRequestProcessor processor = new OrgEquipmentRequestProcessor(persistenceSession, orgEquipmentRequest);
-            orgEquipmentRequestData = processor.processData();
+            AbstractProcessor processor = new HardwareSettingsRequestProcessor(persistenceSession, orgEquipmentRequest);
+            resHardwareSettingsRequest = ((HardwareSettingsRequestProcessor) processor).process();
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-        return orgEquipmentRequestData;
-    }*/
-
-    private ResOrgEquipmentRequest processResOrgEquipmentRequest(OrgEquipmentRequest orgEquipmentRequest) throws Exception{
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        ResOrgEquipmentRequest resOrgEquipmentRequest = null;
-        try{
-            persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            AbstractProcessor processor = new OrgEquipmentRequestProcessor(persistenceSession, orgEquipmentRequest);
-            resOrgEquipmentRequest = ((OrgEquipmentRequestProcessor) processor).process();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        return resOrgEquipmentRequest;
+        return resHardwareSettingsRequest;
     }
 
-    private void fullProcessingOrgEquipmentRequest(SyncRequest request, SyncHistory syncHistory,
+    private void ProcessingHardwareSettingsRequest(SyncRequest request, SyncHistory syncHistory,
             List<AbstractToElement> responseSections) {
         try {
-            OrgEquipmentRequest orgEquipmentRequest = request.getOrgEquipmentRequest();
-            if (orgEquipmentRequest != null) {
-                ResOrgEquipmentRequest resOrgEquipmentRequest = processResOrgEquipmentRequest(orgEquipmentRequest);
-                addToResponseSections(resOrgEquipmentRequest, responseSections);
+            HardwareSettingsRequest hardwareSettingsRequest = request.getHardwareSettingsRequest();
+            if (hardwareSettingsRequest != null) {
+                ResHardwareSettingsRequest resHardwareSettingsRequest = processResHardwareSettingsRequest(hardwareSettingsRequest);
+                addToResponseSections(resHardwareSettingsRequest, responseSections);
             }
         } catch (Exception e) {
-            String message = String.format("Error when process OrgEquipmentRequest: %s", e.getMessage());
+            String message = String.format("Error when process HardwareSettingsRequest: %s", e.getMessage());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
     }
 
+    private ResTurnstileSettingsRequest processResTurnstileSettingsRequest(TurnstileSettingsRequest turnstileSettingsRequest) throws Exception{
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
+        try{
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new TurnstileSettingsRequestProcessor(persistenceSession, turnstileSettingsRequest);
+            resTurnstileSettingsRequest = ((TurnstileSettingsRequestProcessor) processor).process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return resTurnstileSettingsRequest;
+    }
+
+    private void ProcessingTurnstileSettingsRequest(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            TurnstileSettingsRequest turnstileSettingsRequest = request.getTurnstileSettingsRequest();
+            if (turnstileSettingsRequest != null) {
+                ResTurnstileSettingsRequest resTurnstileSettingsRequest = processResTurnstileSettingsRequest(turnstileSettingsRequest);
+                addToResponseSections(resTurnstileSettingsRequest, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("Error when process TurnstileSettingsRequest: %s", e.getMessage());
+            processorUtils
+                    .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
 }

@@ -6,7 +6,7 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.OrgEquipment" table="CF_Hardware_Settings">
+    <class name="ru.axetta.ecafe.processor.core.persistence.HardwareSettings" table="CF_Hardware_Settings">
         <id name="idOfHardwareSetting" column="IdOfHardwareSetting" type="long">
             <generator class="sequence">
                 <param name="sequence">cf_hardwaresettings_idofhardwaresetting_seq</param>
@@ -17,7 +17,7 @@
         <property name="lastUpdateForModuleType" column="LastUpdateForModuleType"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" length="64" update="true"/>
-        <property name="ipHost" column="IPHost" type="string" length="64" not-null="true"/>
+        <property name="ipHost" column="ipHost" type="string" length="64" not-null="true"/>
         <property name="lastUpdateForIPHost" column="LastUpdateForIPHost"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true"/>
@@ -36,20 +36,13 @@
         <property name="cpuHost" column="CPUHost" type="string" length="64" not-null="true"/>
         <property name="lastUpdateForCPUHost" column="LastUpdateForCPUHost"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
-        <property name="readerUsedByModule" column="ReaderUsedByModule" type="integer" not-null="true"/>
+        <property name="usedByModule" column="UsedByModule" type="integer" not-null="true"/>
         <property name="readerName" column="ReaderName" type="string" not-null="true" length="64"/>
         <property name="firmwareVer" column="FirmwareVer" type="string" length="64"/>
-        <property name="lastUpdateReader" column="LastUpdateReader"
-                  type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
-        <property name="turnstileId" column="TurnstileId" type="string" length="64" not-null="true"/>
-        <property name="controllerModel" column="ControllerModel" type="string" length="64"/>
-        <property name="controllerFirmwareVersion" column="ControllerFirmwareVersion" type="string" length="64"/>
-        <property name="workWithLongIds" column="IsWorkWithLongIds"
-                  type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
-        <property name="lastUpdateForTurnstile" column="LastUpdateForTurnstile"
+        <property name="lastUpdateForReader" column="LastUpdateForReader"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="version" column="Version" type="long"/>
-        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org">
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" fetch="select" lazy="proxy">
             <column name="idOfOrg"/>
         </many-to-one>
     </class>

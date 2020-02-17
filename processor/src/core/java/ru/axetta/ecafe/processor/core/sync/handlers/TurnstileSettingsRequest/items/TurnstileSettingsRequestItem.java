@@ -1,46 +1,34 @@
 /*
- * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request;
+package ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.items;
 
-import java.util.Date;
-
-public abstract class OrgEquipmentRequestItem {
+public abstract class TurnstileSettingsRequestItem {
 
     public static final Integer ERROR_CODE_ALL_OK = 0;
     public static final Integer ERROR_CODE_NOT_VALID_ATTRIBUTE = 100;
 
-    private Date lastUpdate;
-    private String type;
     private String errorMessage;
     private Integer resCode;
+    private String type;
 
-    public OrgEquipmentRequestItem (Date lastUpdate, String type, String errorMessage) {
-        this.lastUpdate = lastUpdate;
+    public TurnstileSettingsRequestItem (String type, String errorMessage) {
         this.type = type;
         this.errorMessage = errorMessage;
-        if(errorMessage.equals("")) {
+        if(errorMessage.equals("")){
             this.setResCode(ERROR_CODE_ALL_OK);
         } else {
             this.setResCode(ERROR_CODE_NOT_VALID_ATTRIBUTE);
         }
     }
 
-    public Date getLastUpdate() {
-        return lastUpdate;
+    public static Integer getErrorCodeAllOk() {
+        return ERROR_CODE_ALL_OK;
     }
 
-    public void setLastUpdate(Date lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
+    public static Integer getErrorCodeNotValidAttribute() {
+        return ERROR_CODE_NOT_VALID_ATTRIBUTE;
     }
 
     public String getErrorMessage() {
@@ -59,4 +47,11 @@ public abstract class OrgEquipmentRequestItem {
         this.resCode = resCode;
     }
 
+    public String getType() {
+        return type;
+    }
+
+    public void setType(String type) {
+        this.type = type;
+    }
 }

@@ -11,6 +11,8 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.TurnstileSettingsRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldData;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldRequest;
@@ -28,6 +30,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountsDTSZNR
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.GroupsOrganizationRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.HardwareSettingsRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.HardwareSettingsRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
@@ -38,8 +42,6 @@ import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendar
 import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendarSupplierRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsBuilder;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request.OrgEquipmentRequest;
-import ru.axetta.ecafe.processor.core.sync.handlers.orgequipment.request.OrgEquipmentRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
@@ -2723,7 +2725,8 @@ public class SyncRequest {
             builders.add(new OrgSettingsBuilder(idOfOrg));
             builders.add(new GoodRequestEZDBuilder());
             builders.add(new SyncSettingsRequestBuilder(idOfOrg));
-            builders.add(new OrgEquipmentRequestBuilder(idOfOrg));
+            builders.add(new HardwareSettingsRequestBuilder(idOfOrg));
+            builders.add(new TurnstileSettingsRequestBuilder(idOfOrg));
             return builders;
         }
 
@@ -3013,8 +3016,12 @@ public class SyncRequest {
         return this.<GoodRequestEZDRequest>findSection(GoodRequestEZDRequest.class);
     }
 
-    public OrgEquipmentRequest getOrgEquipmentRequest() {
-        return this.<OrgEquipmentRequest>findSection(OrgEquipmentRequest.class);
+    public HardwareSettingsRequest getHardwareSettingsRequest() {
+        return this.<HardwareSettingsRequest>findSection(HardwareSettingsRequest.class);
+    }
+
+    public TurnstileSettingsRequest getTurnstileSettingsRequest() {
+        return this.<TurnstileSettingsRequest>findSection(TurnstileSettingsRequest.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {
