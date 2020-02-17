@@ -172,18 +172,26 @@ public class MaintenanceService {
 
         List menuDetailsForDelete = qMenuDetailsDelete.list();
 
-        org.hibernate.Query qComplexInfo = session.createQuery("delete from ComplexInfoDetail where menuDetail.idOfMenuDetail in (:menuDetailsForDelete)");
-        qComplexInfo.setParameterList("menuDetailsForDelete",menuDetailsForDelete);
-        res[0] = qComplexInfo.executeUpdate();
+        if (menuDetailsForDelete != null && !menuDetailsForDelete.isEmpty()) {
+            org.hibernate.Query qComplexInfo = session.createQuery(
+                    "delete from ComplexInfoDetail where menuDetail.idOfMenuDetail in (:menuDetailsForDelete)");
+            qComplexInfo.setParameterList("menuDetailsForDelete", menuDetailsForDelete);
+            res[0] = qComplexInfo.executeUpdate();
 
-        org.hibernate.Query qComplex = session.createQuery("delete from ComplexInfo where menuDetail.idOfMenuDetail in (:menuDetailsForDelete)");
-        qComplex.setParameterList("menuDetailsForDelete",menuDetailsForDelete);
-        res[1] = qComplex.executeUpdate();
+            org.hibernate.Query qComplex = session.createQuery("delete from ComplexInfo where menuDetail.idOfMenuDetail in (:menuDetailsForDelete)");
+            qComplex.setParameterList("menuDetailsForDelete", menuDetailsForDelete);
+            res[1] = qComplex.executeUpdate();
 
-        //org.hibernate.Query qGoodBasicBasketPrice = session.createQuery("update GoodBasicBasketPrice set idofmenudetail = null where idOfMenuDetail in (select idOfMenuDetail from MenuDetail WHERE menu.idOfMenu = :idOfMenu)");
-        org.hibernate.Query qGoodBasicBasketPrice = session.createQuery("delete from GoodBasicBasketPrice where idOfMenuDetail in (:menuDetailsForDelete)");
-        qGoodBasicBasketPrice.setParameterList("menuDetailsForDelete",menuDetailsForDelete);
-        res[2] = qGoodBasicBasketPrice.executeUpdate();
+            //org.hibernate.Query qGoodBasicBasketPrice = session.createQuery("update GoodBasicBasketPrice set idofmenudetail = null where idOfMenuDetail in (select idOfMenuDetail from MenuDetail WHERE menu.idOfMenu = :idOfMenu)");
+            org.hibernate.Query qGoodBasicBasketPrice = session.createQuery("delete from GoodBasicBasketPrice where idOfMenuDetail in (:menuDetailsForDelete)");
+            qGoodBasicBasketPrice.setParameterList("menuDetailsForDelete", menuDetailsForDelete);
+            res[2] = qGoodBasicBasketPrice.executeUpdate();
+        } else
+        {
+            res[0] = 0;
+            res[1] = 0;
+            res[2] = 0;
+        }
 
         org.hibernate.Query qMenuDetail = session.createQuery("delete from MenuDetail where idOfMenu = :idOfMenu");
         qMenuDetail.setParameter("idOfMenu", idOfMenu);
