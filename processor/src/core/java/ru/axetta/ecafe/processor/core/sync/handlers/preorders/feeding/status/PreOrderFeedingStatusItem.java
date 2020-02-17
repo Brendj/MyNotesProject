@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status;
 
 import java.util.Date;
 
-public class PreOrderFeedingStatusItem {
+public class PreorderFeedingStatusItem {
     private Date date;
     private String guid;
     private Integer status;
@@ -14,7 +14,7 @@ public class PreOrderFeedingStatusItem {
     private Long version;
     private Boolean deletedState;
 
-    public PreOrderFeedingStatusItem(Date date, String guid, Integer status, Integer storno, Long version,
+    public PreorderFeedingStatusItem(Date date, String guid, Integer status, Integer storno, Long version,
             Boolean deletedState) {
         this.date = date;
         this.guid = guid;
@@ -24,7 +24,7 @@ public class PreOrderFeedingStatusItem {
         this.deletedState = deletedState;
     }
 
-    public static PreOrderFeedingStatusItem build() {
+    public static PreorderFeedingStatusItem build() {
 
     }
 

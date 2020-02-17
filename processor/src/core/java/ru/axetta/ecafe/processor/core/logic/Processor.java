@@ -76,6 +76,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrderFeedingProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.ResPreorderFeedingStatus;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
@@ -1248,8 +1249,22 @@ public class Processor implements SyncProcessor {
         }
     }
 
-    private ResPreorderFeedingStatus processPreorderFeedingStatus(PreorderFeedingStatusRequest preorderFeedingStatusRequest) {
-
+    private ResPreorderFeedingStatus processPreorderFeedingStatus(PreorderFeedingStatusRequest preorderFeedingStatusRequest) throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResPreorderFeedingStatus resPreorderFeedingStatus = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new PreorderFeedingStatusProcessor(persistenceSession, preorderFeedingStatusRequest);
+            resPreorderFeedingStatus = (ResPreorderFeedingStatus) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return resPreorderFeedingStatus;
     }
 
     private void fullProcessingPreorderFeedingStatus(SyncRequest request, List<AbstractToElement> responseSections) {
@@ -1257,8 +1272,8 @@ public class Processor implements SyncProcessor {
             PreorderFeedingStatusRequest preorderFeedingStatusRequest = request.getPreorderFeedingStatusRequest();
             if (preorderFeedingStatusRequest != null) {
                 ResPreorderFeedingStatus resPreorderFeedingStatus = processPreorderFeedingStatus(preorderFeedingStatusRequest);
+                addToResponseSections(resPreorderFeedingStatus, responseSections);
             }
-            //addToResponseSections(reestrTaloonApprovalData, responseSections);
         } catch (Exception e) {
             logger.error("Error in fullProcessingPreorderFeedingStatus: ", e);
         }
