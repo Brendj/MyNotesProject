@@ -67,7 +67,7 @@ public class MenuSupplier implements SectionRequest {
 
         while (null != itemNode) {
 
-            if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals(CLIENT_SECTION_NAMES[i])) {
+            if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals(CLIENT_SECTION_NAMES[i++])) {
                 String strVersion = XMLUtils.getAttributeValue(itemNode, "V");
                 if (StringUtils.isNotEmpty(strVersion)) {
                     try {

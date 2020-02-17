@@ -63,7 +63,9 @@ import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.Inte
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier.MenuSupplier;
 import ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier.MenuSupplierData;
+import ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier.MenuSupplierProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier.ResMenuSupplier;
 import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.Migrants;
@@ -225,6 +227,11 @@ public class Processor implements SyncProcessor {
                 case TYPE_REESTR_TALOONS_PREORDER: {
                     //обработка синхронизации ручного реестра талонов (платное питание)
                     response = buildReestrTaloonsPreorderSyncResponse(request);
+                    break;
+                }
+                case TYPE_MENU_SUPPLIER: {
+                    //обработка синхронизации веб-технолога
+                    response = buildMenuSupplierSyncResponse(request);
                     break;
                 }
             }
@@ -3206,6 +3213,97 @@ public class Processor implements SyncProcessor {
                 resMenuSupplier, menuSupplierData);
     }
 
+    private SyncResponse buildMenuSupplierSyncResponse(SyncRequest request) throws Exception {
+        SyncHistory syncHistory = null;
+        Long idOfPacket = null, idOfSync = null; // регистируются и заполняются только для полной синхронизации
+        ResAccountOperationsRegistry resAccountOperationsRegistry = null;
+        ResPaymentRegistry resPaymentRegistry = null;
+        SyncResponse.AccRegistry accRegistry = null;
+        SyncResponse.AccIncRegistry accIncRegistry = null;
+        SyncResponse.ClientRegistry clientRegistry = null;
+        SyncResponse.ResOrgStructure resOrgStructure = null;
+        SyncResponse.ResMenuExchangeData resMenuExchange = null;
+        SyncResponse.ResDiary resDiary = null;
+        SyncResponse.ResEnterEvents resEnterEvents = null;
+        ResTempCardsOperations resTempCardsOperations = null;
+        TempCardOperationData tempCardOperationData = null;
+        ComplexRoles complexRoles = null;
+        ResCategoriesDiscountsAndRules resCategoriesDiscountsAndRules = null;
+        SyncResponse.CorrectingNumbersOrdersRegistry correctingNumbersOrdersRegistry = null;
+        Manager manager = null;
+        OrgOwnerData orgOwnerData = null;
+        QuestionaryData questionaryData = null;
+        GoodsBasicBasketData goodsBasicBasketData = null;
+        DirectiveElement directiveElement = null;
+        List<Long> errorClientIds = new ArrayList<Long>();
+        ResultClientGuardian resultClientGuardian = null;
+        ClientGuardianData clientGuardianData = null;
+        AccRegistryUpdate accRegistryUpdate = null;
+        ProhibitionsMenu prohibitionsMenu = null;
+        OrganizationStructure organizationStructure = null;
+        ResCardsOperationsRegistry resCardsOperationsRegistry = null;
+        AccountsRegistry accountsRegistry = null;
+        ResReestrTaloonApproval resReestrTaloonApproval = null;
+        ReestrTaloonApprovalData reestrTaloonApprovalData = null;
+        ResReestrTaloonPreorder resReestrTaloonPreorder = null;
+        ReestrTaloonPreorderData reestrTaloonPreorderData = null;
+        OrganizationComplexesStructure organizationComplexesStructure = null;
+        InteractiveReportData interactiveReportData = null;
+        ZeroTransactionData zeroTransactionData = null;
+        ResZeroTransactions resZeroTransactions = null;
+        SpecialDatesData specialDatesData = null;
+        ResSpecialDates resSpecialDates = null;
+        MigrantsData migrantsData = null;
+        ResMigrants resMigrants = null;
+        ResHelpRequest resHelpRequest = null;
+        HelpRequestData helpRequestData = null;
+        PreOrdersFeeding preOrdersFeeding = null;
+        CardRequestsData cardRequestsData = null;
+        ResMenusCalendar resMenusCalendar = null;
+        MenusCalendarData menusCalendarData = null;
+        ClientBalanceHoldFeeding clientBalanceHoldFeeding = null;
+        ResClientBalanceHoldData resClientBalanceHoldData = null;
+        OrgSettingSection orgSettingSection = null;
+        SyncSettingsSection syncSettingsSection = null;
+        ResSyncSettingsSection resSyncSettingsSection = null;
+        GoodRequestEZDSection goodRequestEZDSection = null;
+        EmiasSection emiasSection = null;
+        EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ResMenuSupplier resMenuSupplier = null;
+        MenuSupplierData menuSupplierData = null;
+
+        List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
+
+        boolean bError = false;
+
+        try {
+            if (request.getMenuSupplier() != null) {
+                resMenuSupplier = processMenuSupplier(request.getMenuSupplier());
+                menuSupplierData = processMenuSupplierData(request.getMenuSupplier());
+            }
+        } catch (Exception e) {
+            String message = String.format("processMenuSupplier(): %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+
+        Date syncEndTime = new Date();
+
+        return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
+                request.getOrg().getType(), "", idOfPacket, request.getProtoVersion(), syncEndTime, "", accRegistry,
+                resPaymentRegistry, resAccountOperationsRegistry, accIncRegistry, clientRegistry, resOrgStructure,
+                resMenuExchange, resDiary, "", resEnterEvents, resTempCardsOperations, tempCardOperationData,
+                resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry, manager, orgOwnerData,
+                questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
+                accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
+                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
+                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
+                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
+                clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resMenuSupplier, menuSupplierData);
+    }
+
     private void updateOrgSyncDate(long idOfOrg) {
         try {
             OrgSyncWritableRepository orgSyncWritableRepository = OrgSyncWritableRepository.getInstance();
@@ -4189,6 +4287,45 @@ public class Processor implements SyncProcessor {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    private ResMenuSupplier processMenuSupplier(MenuSupplier menuSupplier)
+            throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        ResMenuSupplier resMenuSupplier = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            AbstractProcessor processor = new MenuSupplierProcessor(persistenceSession, menuSupplier);
+            resMenuSupplier = (ResMenuSupplier) processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return resMenuSupplier;
+    }
+
+    private MenuSupplierData processMenuSupplierData(MenuSupplier menuSupplier)
+            throws Exception {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        MenuSupplierData menuSupplierData = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            MenuSupplierProcessor processor = new MenuSupplierProcessor(persistenceSession,
+                    menuSupplier);
+            menuSupplierData = processor.processData();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return menuSupplierData;
     }
 
     private boolean transactionOwnerHaveSmartWatch(AccountTransaction transaction) {

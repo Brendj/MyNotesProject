@@ -34,6 +34,11 @@ public class MenuSupplierProcessor extends AbstractProcessor<ResMenuSupplier> {
         return result;
     }
 
+    public MenuSupplierData processData() throws Exception {
+        MenuSupplierData result = new MenuSupplierData();
+        return result;
+    }
+
     public MenuSupplier getMenuSupplier() {
         return menuSupplier;
     }
