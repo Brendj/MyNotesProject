@@ -4,11 +4,54 @@
 
 -- Пакет обновлений 205
 
--- 239: добавление поля в карточку клиента
-ALTER TABLE cf_clients add column confirmvisualrecognition integer NOT NULL DEFAULT 0; -- Согласие на видеоидентификацию
+-- 358: Создание таблицы cf_taloon_preorder
+CREATE TABLE cf_taloon_preorder
+(
+    guid character varying(36) NOT NULL,
+    idoforg bigint NOT NULL,
+    taloondate bigint NOT NULL,
+    complexid bigint, -- NOT NULL ?
+    complexname character varying(128), -- NOT NULL ?
+    goodsname character varying(512),
+    goodsguid character varying(36),
+    idoforgcreated bigint,
+    soldqty integer NOT NULL,
+    requestedqty integer NOT NULL,
+    shippedqty integer,
+    reservedqty integer,
+    blockedqty integer,
+    price bigint NOT NULL,
+    createdtype integer NOT NULL,
+    taloonnumber bigint,
+    idoforgowner bigint NOT NULL,
+    version bigint NOT NULL,
+    deletedstate boolean NOT NULL DEFAULT false,
+    ispp_state integer NOT NULL DEFAULT 0,
+    pp_state integer NOT NULL DEFAULT 0,
+    idoftaloonpreorder bigint NOT NULL,
+    remarks text,
+    comments character varying(128),
+    CONSTRAINT cf_taloon_preorder_pk PRIMARY KEY (idoftaloonpreorder)
+)
+    WITH (
+        OIDS=FALSE
+    );
 
-COMMENT ON COLUMN cf_clients.confirmvisualrecognition IS 'Согласие на видеоидентификацию';
+CREATE UNIQUE INDEX cf_taloon_preorder_idoforg_taloondate_complexid_goodsguid_idx
+    ON cf_taloon_preorder
+        USING btree
+        (idoforg, taloondate, complexid, goodsguid COLLATE pg_catalog."default", price);
 
-alter table cf_orgs add column preorderSyncParam integer;
+CREATE INDEX cf_taloons_preorder_version_idx
+    ON cf_taloon_preorder
+        USING btree
+        (version);
 
---! ФИНАЛИЗИРОВАН 30.12.2019, НЕ МЕНЯТЬ
+CREATE INDEX cf_taloons_preorder_guid_idx
+    ON cf_taloon_preorder
+        USING btree
+        (guid COLLATE pg_catalog."default");
+
+-- 358: Добавление id комплекса в cf_goods_requests_positions
+ALTER TABLE cf_goods_requests_positions
+    ADD complexId integer;
