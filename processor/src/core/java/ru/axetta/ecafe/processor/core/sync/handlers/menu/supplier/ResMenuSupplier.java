@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -131,7 +132,7 @@ public class ResMenuSupplier implements AbstractToElement {
         Element element = document.createElement("OGI");
         XMLUtils.setAttributeIfNotNull(element, "Id", orgGroup.getIdOfOrgGroup());
         XMLUtils.setAttributeIfNotNull(element, "Name", orgGroup.getNameOfOrgGroup());
-        //XMLUtils.setAttributeIfNotNull(element, "ContragentId", orgGroup.getOrgs().toString()); // !!!
+        //XMLUtils.setAttributeIfNotNull(element, "ContragentId", orgGroup.getOrgs().toString());
         XMLUtils.setAttributeIfNotNull(element, "V", orgGroup.getVersion());
         XMLUtils.setAttributeIfNotNull(element, "D", orgGroup.getDeleteState());
         return element;
@@ -199,33 +200,140 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "BeginDate", dish.getDateOfBeginMenuIncluding());
         XMLUtils.setAttributeIfNotNull(prop, "EndDate", dish.getDateOfEndMenuIncluding());
         XMLUtils.setAttributeIfNotNull(prop, "V", dish.getVersion());
-        XMLUtils.setAttributeIfNotNull(element, "D", dish.getDeleteState());
-        XMLUtils.setAttributeIfNotNull(element, "Guid", dish.getGuid());
-        XMLUtils.setAttributeIfNotNull(element, "AgeGroupId", dish.getWtAgeGroupItem().getIdOfAgeGroupItem());
-        //XMLUtils.setAttributeIfNotNull(element, "TypeProductionId", dish.);
-        XMLUtils.setAttributeIfNotNull(element, "Protein", dish.getProtein());
-        XMLUtils.setAttributeIfNotNull(element, "Fat", dish.getFat());
-        XMLUtils.setAttributeIfNotNull(element, "Carbohydrates", dish.getCarbohydrates());
-        XMLUtils.setAttributeIfNotNull(element, "Calories", dish.getCalories());
-        XMLUtils.setAttributeIfNotNull(element, "Qty", dish.getQty());
-        //XMLUtils.setAttributeIfNotNull(element, "ContragentId", dish.get);
+        XMLUtils.setAttributeIfNotNull(prop, "D", dish.getDeleteState());
+        XMLUtils.setAttributeIfNotNull(prop, "Guid", dish.getGuid());
+        XMLUtils.setAttributeIfNotNull(prop, "AgeGroupId", dish.getWtAgeGroupItem().getIdOfAgeGroupItem());
+        //XMLUtils.setAttributeIfNotNull(prop, "TypeProductionId", dish.);
+        XMLUtils.setAttributeIfNotNull(prop, "Protein", dish.getProtein());
+        XMLUtils.setAttributeIfNotNull(prop, "Fat", dish.getFat());
+        XMLUtils.setAttributeIfNotNull(prop, "Carbohydrates", dish.getCarbohydrates());
+        XMLUtils.setAttributeIfNotNull(prop, "Calories", dish.getCalories());
+        XMLUtils.setAttributeIfNotNull(prop, "Qty", dish.getQty());
+        //XMLUtils.setAttributeIfNotNull(prop, "ContragentId", dish.get);
+
+        Element categories = document.createElement("Categories");
+        for (WtCategoryItem item : dish.getCategoryItems()) {
+            Element elem = document.createElement("CGI");
+            XMLUtils.setAttributeIfNotNull(elem, "DishId", dish.getIdOfDish());
+            XMLUtils.setAttributeIfNotNull(elem, "CategoryId", item.getIdOfCategoryItem());
+            categories.appendChild(elem);
+        }
+
+        Element groupItems = document.createElement("GroupItems");
+        for (WtGroupItem item : dish.getGroupItems()) {
+            Element elem = document.createElement("GGI");
+            XMLUtils.setAttributeIfNotNull(elem, "DishId", dish.getIdOfDish());
+            XMLUtils.setAttributeIfNotNull(elem, "GroupItemId", item.getIdOfGroupItem());
+            categories.appendChild(elem);
+        }
 
         element.appendChild(prop);
+        element.appendChild(categories);
+        element.appendChild(groupItems);
+
         return element;
     }
 
     private Element menuGroupToElement(Document document, WtMenuGroup menuGroup) {
         Element element = document.createElement("MGI");
+        XMLUtils.setAttributeIfNotNull(element, "Id", menuGroup.getId());
+        XMLUtils.setAttributeIfNotNull(element, "Name", menuGroup.getName());
+        XMLUtils.setAttributeIfNotNull(element, "MenuId", menuGroup.getWtMenu().getIdOfMenu());
+        XMLUtils.setAttributeIfNotNull(element, "V", menuGroup.getVersion());
+        XMLUtils.setAttributeIfNotNull(element, "D", menuGroup.getDeleteState());
         return element;
     }
 
     private Element menuToElement(Document document, WtMenu menu) {
         Element element = document.createElement("MSI");
+
+        Element prop = document.createElement("Prop");
+        XMLUtils.setAttributeIfNotNull(prop, "Id", menu.getIdOfMenu());
+        XMLUtils.setAttributeIfNotNull(prop, "Name", menu.getMenuName());
+        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", menu.getBeginDate());
+        XMLUtils.setAttributeIfNotNull(prop, "EndDate", menu.getEndDate());
+        //XMLUtils.setAttributeIfNotNull(prop, "OrgGroupId", menu.);
+        //XMLUtils.setAttributeIfNotNull(prop, "ContragentId", menu.);
+        XMLUtils.setAttributeIfNotNull(prop, "V", menu.getVersion());
+        XMLUtils.setAttributeIfNotNull(prop, "D", menu.getDeleteState());
+
+        Element dishes = document.createElement("Dishes");
+        for (WtDish item : menu.getDishes()) {
+            Element elem = document.createElement("DSI");
+            XMLUtils.setAttributeIfNotNull(elem, "MenuId", menu.getIdOfMenu());
+            XMLUtils.setAttributeIfNotNull(elem, "DishId", item.getIdOfDish());
+            dishes.appendChild(elem);
+        }
+
+        Element orgs = document.createElement("Orgs");
+        for (Org item : menu.getOrgs()) {
+            Element elem = document.createElement("OGI");
+            XMLUtils.setAttributeIfNotNull(elem, "MenuId", menu.getIdOfMenu());
+            XMLUtils.setAttributeIfNotNull(elem, "OrgId", item.getIdOfOrg());
+            orgs.appendChild(elem);
+        }
+
+        element.appendChild(prop);
+        element.appendChild(dishes);
+        element.appendChild(orgs);
+
         return element;
     }
 
     private Element complexToElement(Document document, WtComplex complex) {
         Element element = document.createElement("CMI");
+
+        Element prop = document.createElement("Prop");
+        XMLUtils.setAttributeIfNotNull(prop, "Id", complex.getIdOfComplex());
+        XMLUtils.setAttributeIfNotNull(prop, "Name", complex.getName());
+        XMLUtils.setAttributeIfNotNull(prop, "Price", complex.getPrice());
+        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", complex.getBeginDate());
+        XMLUtils.setAttributeIfNotNull(prop, "EndDate", complex.getEndDate());
+        XMLUtils.setAttributeIfNotNull(prop, "CycleMotion", complex.getCycleMotion());
+        XMLUtils.setAttributeIfNotNull(prop, "DayInCycle", complex.getDayInCycle());
+        XMLUtils.setAttributeIfNotNull(prop, "V", complex.getVersion());
+        XMLUtils.setAttributeIfNotNull(prop, "Guid", complex.getGuid());
+        XMLUtils.setAttributeIfNotNull(prop, "D", complex.getDeleteState());
+        XMLUtils.setAttributeIfNotNull(prop, "ComplexGroupItemId", complex.getWtComplexGroupItem().getIdOfComplexGroupItem());
+        XMLUtils.setAttributeIfNotNull(prop, "AgeGroupItemId", complex.getWtAgeGroupItem().getIdOfAgeGroupItem());
+        //XMLUtils.setAttributeIfNotNull(prop, "DietTypeId", complex.);
+        //XMLUtils.setAttributeIfNotNull(prop, "ContragentId", complex.);
+        //XMLUtils.setAttributeIfNotNull(prop, "OrgGroupId", complex.);
+        XMLUtils.setAttributeIfNotNull(prop, "Composite", complex.getComposite());
+        XMLUtils.setAttributeIfNotNull(prop, "IsPortal", complex.getIsPortal());
+        XMLUtils.setAttributeIfNotNull(prop, "StartCycleDay", complex.getStartCycleDay());
+
+        Element items = document.createElement("Items");
+        //for ( item : complex.) {
+        //    Element elem = document.createElement("CII");
+        //    XMLUtils.setAttributeIfNotNull(elem, "Id", );
+        //    XMLUtils.setAttributeIfNotNull(elem, "ComplexId", );
+        //    XMLUtils.setAttributeIfNotNull(elem, "CycleDay", );
+        //    XMLUtils.setAttributeIfNotNull(elem, "CountDishes", );
+        //    items.appendChild(elem);
+        //}
+
+        Element itemsDishes = document.createElement("Items");
+        //for ( item : complex.) {
+        //    Element elem = document.createElement("CID");
+        //    XMLUtils.setAttributeIfNotNull(elem, "ComplexItemId", );
+        //    XMLUtils.setAttributeIfNotNull(elem, "DishId", );
+        //    itemsDishes.appendChild(elem);
+        //}
+
+        Element orgs = document.createElement("Orgs");
+        for (Org item : complex.getOrgs()) {
+            Element elem = document.createElement("ORI");
+            XMLUtils.setAttributeIfNotNull(elem, "MenuId", complex.getIdOfComplex());
+            XMLUtils.setAttributeIfNotNull(elem, "OrgId", item.getIdOfOrg());
+            orgs.appendChild(elem);
+        }
+
+        element.appendChild(prop);
+        element.appendChild(items);
+        element.appendChild(itemsDishes);
+        element.appendChild(orgs);
+
         return element;
     }
 
