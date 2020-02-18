@@ -187,6 +187,14 @@ public class WtMenu {
         this.orgs = orgs;
     }
 
+    public List<WtDish> getDishes() {
+        return dishes;
+    }
+
+    public List<Org> getOrgs() {
+        return orgs;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {

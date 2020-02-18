@@ -144,7 +144,7 @@ public class ResMenuSupplier implements AbstractToElement {
         Element element = document.createElement("OGI");
         XMLUtils.setAttributeIfNotNull(element, "Id", orgGroup.getIdOfOrgGroup());
         XMLUtils.setAttributeIfNotNull(element, "Name", orgGroup.getNameOfOrgGroup());
-        //XMLUtils.setAttributeIfNotNull(element, "ContragentId", orgGroup.getOrgs().toString());
+        XMLUtils.setAttributeIfNotNull(element, "ContragentId", orgGroup.getContragent().getIdOfContragent());
         XMLUtils.setAttributeIfNotNull(element, "V", orgGroup.getVersion());
         XMLUtils.setAttributeIfNotNull(element, "D", orgGroup.getDeleteState());
         return element;
@@ -215,13 +215,13 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "D", dish.getDeleteState());
         XMLUtils.setAttributeIfNotNull(prop, "Guid", dish.getGuid());
         XMLUtils.setAttributeIfNotNull(prop, "AgeGroupId", dish.getWtAgeGroupItem().getIdOfAgeGroupItem());
-        //XMLUtils.setAttributeIfNotNull(prop, "TypeProductionId", dish.);
+        XMLUtils.setAttributeIfNotNull(prop, "TypeProductionId", dish.getWtTypeProductionItem().getIdOfTypeProductionItem());
         XMLUtils.setAttributeIfNotNull(prop, "Protein", dish.getProtein());
         XMLUtils.setAttributeIfNotNull(prop, "Fat", dish.getFat());
         XMLUtils.setAttributeIfNotNull(prop, "Carbohydrates", dish.getCarbohydrates());
         XMLUtils.setAttributeIfNotNull(prop, "Calories", dish.getCalories());
         XMLUtils.setAttributeIfNotNull(prop, "Qty", dish.getQty());
-        //XMLUtils.setAttributeIfNotNull(prop, "ContragentId", dish.get);
+        XMLUtils.setAttributeIfNotNull(prop, "ContragentId", dish.getContragent().getIdOfContragent());
 
         Element categories = document.createElement("Categories");
         for (WtCategoryItem item : dish.getCategoryItems()) {
@@ -264,8 +264,8 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "Name", menu.getMenuName());
         XMLUtils.setAttributeIfNotNull(prop, "BeginDate", menu.getBeginDate());
         XMLUtils.setAttributeIfNotNull(prop, "EndDate", menu.getEndDate());
-        //XMLUtils.setAttributeIfNotNull(prop, "OrgGroupId", menu.);
-        //XMLUtils.setAttributeIfNotNull(prop, "ContragentId", menu.);
+        XMLUtils.setAttributeIfNotNull(prop, "OrgGroupId", menu.getWtOrgGroup().getIdOfOrgGroup());
+        XMLUtils.setAttributeIfNotNull(prop, "ContragentId", menu.getContragent().getIdOfContragent());
         XMLUtils.setAttributeIfNotNull(prop, "V", menu.getVersion());
         XMLUtils.setAttributeIfNotNull(prop, "D", menu.getDeleteState());
 
@@ -308,30 +308,32 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "D", complex.getDeleteState());
         XMLUtils.setAttributeIfNotNull(prop, "ComplexGroupItemId", complex.getWtComplexGroupItem().getIdOfComplexGroupItem());
         XMLUtils.setAttributeIfNotNull(prop, "AgeGroupItemId", complex.getWtAgeGroupItem().getIdOfAgeGroupItem());
-        //XMLUtils.setAttributeIfNotNull(prop, "DietTypeId", complex.);
-        //XMLUtils.setAttributeIfNotNull(prop, "ContragentId", complex.);
-        //XMLUtils.setAttributeIfNotNull(prop, "OrgGroupId", complex.);
+        XMLUtils.setAttributeIfNotNull(prop, "DietTypeId", complex.getWtDietType().getIdOfDietType());
+        XMLUtils.setAttributeIfNotNull(prop, "ContragentId", complex.getContragent().getIdOfContragent());
+        XMLUtils.setAttributeIfNotNull(prop, "OrgGroupId", complex.getWtOrgGroup().getIdOfOrgGroup());
         XMLUtils.setAttributeIfNotNull(prop, "Composite", complex.getComposite());
         XMLUtils.setAttributeIfNotNull(prop, "IsPortal", complex.getIsPortal());
         XMLUtils.setAttributeIfNotNull(prop, "StartCycleDay", complex.getStartCycleDay());
 
         Element items = document.createElement("Items");
-        //for ( item : complex.) {
-        //    Element elem = document.createElement("CII");
-        //    XMLUtils.setAttributeIfNotNull(elem, "Id", );
-        //    XMLUtils.setAttributeIfNotNull(elem, "ComplexId", );
-        //    XMLUtils.setAttributeIfNotNull(elem, "CycleDay", );
-        //    XMLUtils.setAttributeIfNotNull(elem, "CountDishes", );
-        //    items.appendChild(elem);
-        //}
+        for (WtComplexesItem item : complex.getWtComplexesItemList()) {
+            Element elem = document.createElement("CII");
+            XMLUtils.setAttributeIfNotNull(elem, "Id", item.getIdOfComplexItem());
+            XMLUtils.setAttributeIfNotNull(elem, "ComplexId", complex.getIdOfComplex());
+            XMLUtils.setAttributeIfNotNull(elem, "CycleDay", item.getCycleDay());
+            XMLUtils.setAttributeIfNotNull(elem, "CountDishes", item.getCountDishes());
+            items.appendChild(elem);
+        }
 
-        Element itemsDishes = document.createElement("Items");
-        //for ( item : complex.) {
-        //    Element elem = document.createElement("CID");
-        //    XMLUtils.setAttributeIfNotNull(elem, "ComplexItemId", );
-        //    XMLUtils.setAttributeIfNotNull(elem, "DishId", );
-        //    itemsDishes.appendChild(elem);
-        //}
+        Element itemsDishes = document.createElement("ItemsDishes");
+        for (WtComplexesItem item : complex.getWtComplexesItemList()) {
+            for (WtDish dish : item.getDishes()) {
+                Element elem = document.createElement("CID");
+                XMLUtils.setAttributeIfNotNull(elem, "ComplexItemId", item.getIdOfComplexItem());
+                XMLUtils.setAttributeIfNotNull(elem, "DishId", dish.getIdOfDish());
+                itemsDishes.appendChild(elem);
+            }
+        }
 
         Element orgs = document.createElement("Orgs");
         for (Org item : complex.getOrgs()) {

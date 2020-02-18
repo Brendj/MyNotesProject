@@ -100,6 +100,9 @@ public class WtComplex {
             inverseJoinColumns = @JoinColumn(name = "IdOfOrg"))
     private List<Org> orgs = new ArrayList<>();
 
+    @OneToMany(mappedBy = "wtComplex")
+    private List<WtComplexesItem> wtComplexesItemList;
+
     public Boolean getIsPortal() {
         return isPortal;
     }
@@ -291,6 +294,14 @@ public class WtComplex {
 
     public void setOrgs(List<Org> orgs) {
         this.orgs = orgs;
+    }
+
+    public List<WtComplexesItem> getWtComplexesItemList() {
+        return wtComplexesItemList;
+    }
+
+    public void setWtComplexesItemList(List<WtComplexesItem> wtComplexesItemList) {
+        this.wtComplexesItemList = wtComplexesItemList;
     }
 
     @Override
