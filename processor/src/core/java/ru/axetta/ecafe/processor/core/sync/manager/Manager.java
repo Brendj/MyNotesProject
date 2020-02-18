@@ -428,26 +428,23 @@ public class Manager implements AbstractToElement {
 
         if (doClass.getSimpleName().equals("GoodRequestPosition")) {
             List<DistributedObject> currentResultDOListResult = new ArrayList<DistributedObject>();
-            Session reportsSession = null;
-            RuntimeContext runtimeContext = RuntimeContext.getInstance();
+            Session session = null;
             try {
-                reportsSession = runtimeContext.createReportPersistenceSession();
-                currentResultDOListResult = currentResultDOListFind(reportsSession, currentResultDOList);
+                session = sessionFactory.openSession();
+                currentResultDOListResult = currentResultDOListFind(session, currentResultDOList);
             } catch (Exception e) {
                 e.printStackTrace();
             } finally {
-                HibernateUtils.close(reportsSession, LOGGER);
+                HibernateUtils.close(session, LOGGER);
             }
             currentResultDOList = currentResultDOListResult;
         }
-
         return currentResultDOList;
     }
 
     private List<DistributedObject> currentResultDOListFind(Session session,
             List<DistributedObject> currentResultDOList) {
         List<DistributedObject> currentResultDOListResult = new ArrayList<DistributedObject>();
-
         for (DistributedObject distributedObject : currentResultDOList) {
             GoodRequestPosition goodRequestPosition = (GoodRequestPosition) distributedObject;
             if (goodRequestPosition.getGuidOfGR() != null && (goodRequestPosition.getComplexId() == null ||
