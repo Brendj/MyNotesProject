@@ -9,31 +9,8 @@
 <hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup" table="cf_wt_menu_groups">
-        <cache usage="transactional"/>
         <id name="id">
             <column name="id" sql-type="long"/>
         </id>
-        <property name="name">
-            <column name="name" sql-type="string" length="64"/>
-        </property>
-        <property name="createDate">
-            <column name="createdate" sql-type="date"/>
-        </property>
-        <property name="lastUpdate">
-            <column name="lastupdate" sql-type="date"/>
-        </property>
-        <property name="version">
-            <column name="version" sql-type="long"/>
-        </property>
-        <property name="deleteState">
-            <column name="deletestate" sql-type="integer"/>
-        </property>
-        <many-to-one name="wtMenu" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu">
-            <column name="menu_id"/>
-        </many-to-one>
-        <set name="dishes" table="cf_wt_menu_group_dish">
-            <key column="menu_group_id"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish" column="dish_id"/>
-        </set>
     </class>
 </hibernate-mapping>

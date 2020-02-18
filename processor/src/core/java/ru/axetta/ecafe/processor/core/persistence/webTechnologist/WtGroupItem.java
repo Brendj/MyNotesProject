@@ -5,9 +5,9 @@
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
 import javax.persistence.*;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_group_items")
@@ -24,11 +24,11 @@ public class WtGroupItem {
     @Column(name = "version")
     private Long version;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_dish_groupitem_relationships",
             joinColumns = @JoinColumn(name = "idOfGroupItem"),
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))
-    private Set<WtDish> dishes = new HashSet<>();
+    private List<WtDish> dishes = new ArrayList<>();
 
     public Long getIdOfGroupItem() {
         return idOfGroupItem;
@@ -46,11 +46,11 @@ public class WtGroupItem {
         this.description = description;
     }
 
-    public Set<WtDish> getDishes() {
+    public List<WtDish> getDishes() {
         return dishes;
     }
 
-    public void setDishes(Set<WtDish> dishes) {
+    public void setDishes(List<WtDish> dishes) {
         this.dishes = dishes;
     }
 
@@ -71,12 +71,12 @@ public class WtGroupItem {
             return false;
         }
         WtGroupItem that = (WtGroupItem) o;
-        return Objects.equals(idOfGroupItem, that.idOfGroupItem) && Objects.equals(description, that.description)
-                && Objects.equals(version, that.version) && Objects.equals(dishes, that.dishes);
+        return idOfGroupItem.equals(that.idOfGroupItem) && Objects.equals(description, that.description) && Objects
+                .equals(version, that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfGroupItem, description, version, dishes);
+        return Objects.hash(idOfGroupItem, description, version);
     }
 }

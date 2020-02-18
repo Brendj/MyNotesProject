@@ -4,14 +4,16 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.User;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_complexes")
@@ -52,8 +54,36 @@ public class WtComplex {
     @Column(name = "lastUpdate")
     private Date lastUpdate;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "create_by_id")
+    private User createdUser;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "update_by_id")
+    private User updatedUser;
+
     @Column(name = "deleteState")
     private Integer deleteState;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idOfComplexGroupItem")
+    private WtComplexGroupItem wtComplexGroupItem;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idOfAgeGroupItem")
+    private WtAgeGroupItem wtAgeGroupItem;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idOfDietType")
+    private WtDietType wtDietType;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idOfContragent")
+    private Contragent contragent;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idOfOrgGroup")
+    private WtOrgGroup wtOrgGroup;
 
     @Column(name = "composite")
     private Boolean composite;
@@ -64,19 +94,11 @@ public class WtComplex {
     @Column(name = "start_cycle_day")
     private Integer startCycleDay;
 
-    @ManyToOne
-    @JoinColumn(name = "idOfComplexGroupItem")
-    private WtComplexGroupItem wtComplexGroupItem;
-
-    @ManyToOne
-    @JoinColumn(name = "idOfAgeGroupItem")
-    private WtAgeGroupItem wtAgeGroupItem;
-
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_complexes_org",
             joinColumns = @JoinColumn(name = "IdOfComplex"),
             inverseJoinColumns = @JoinColumn(name = "IdOfOrg"))
-    private Set<Org> orgs = new HashSet<>();
+    private List<Org> orgs = new ArrayList<>();
 
     public Boolean getIsPortal() {
         return isPortal;
@@ -223,11 +245,51 @@ public class WtComplex {
         this.wtAgeGroupItem = wtAgeGroupItem;
     }
 
-    public Set<Org> getOrgs() {
+    public User getCreatedUser() {
+        return createdUser;
+    }
+
+    public void setCreatedUser(User createdUser) {
+        this.createdUser = createdUser;
+    }
+
+    public User getUpdatedUser() {
+        return updatedUser;
+    }
+
+    public void setUpdatedUser(User updatedUser) {
+        this.updatedUser = updatedUser;
+    }
+
+    public WtDietType getWtDietType() {
+        return wtDietType;
+    }
+
+    public void setWtDietType(WtDietType wtDietType) {
+        this.wtDietType = wtDietType;
+    }
+
+    public Contragent getContragent() {
+        return contragent;
+    }
+
+    public void setContragent(Contragent contragent) {
+        this.contragent = contragent;
+    }
+
+    public WtOrgGroup getWtOrgGroup() {
+        return wtOrgGroup;
+    }
+
+    public void setWtOrgGroup(WtOrgGroup wtOrgGroup) {
+        this.wtOrgGroup = wtOrgGroup;
+    }
+
+    public List<Org> getOrgs() {
         return orgs;
     }
 
-    public void setOrgs(Set<Org> orgs) {
+    public void setOrgs(List<Org> orgs) {
         this.orgs = orgs;
     }
 

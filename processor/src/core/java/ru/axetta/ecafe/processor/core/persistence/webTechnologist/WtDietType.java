@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -21,6 +22,9 @@ public class WtDietType {
 
     @Column(name = "version")
     private Long version;
+
+    @OneToMany(mappedBy = "wtDietType")
+    private List<WtComplex> wtComplexList;
 
     public Long getIdOfDietType() {
         return idOfDietType;
@@ -44,6 +48,14 @@ public class WtDietType {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public List<WtComplex> getWtComplexList() {
+        return wtComplexList;
+    }
+
+    public void setWtComplexList(List<WtComplex> wtComplexList) {
+        this.wtComplexList = wtComplexList;
     }
 
     @Override

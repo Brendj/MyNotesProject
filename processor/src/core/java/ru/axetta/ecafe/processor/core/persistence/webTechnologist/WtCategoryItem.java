@@ -4,11 +4,13 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import ru.axetta.ecafe.processor.core.persistence.User;
+
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_category_items")
@@ -28,17 +30,21 @@ public class WtCategoryItem {
     @Column(name = "version")
     private Long version;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idOfUser")
+    private User user;
+
     @Column(name = "guid")
     private String guid;
 
     @Column(name = "description")
     private String description;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_dish_categoryitem_relationships",
             joinColumns = @JoinColumn(name = "idOfCategoryItem"),
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))
-    private Set<WtDish> dishes = new HashSet<>();
+    private List<WtDish> dishes = new ArrayList<>();
 
     public Long getIdOfCategoryItem() {
         return idOfCategoryItem;
@@ -88,12 +94,20 @@ public class WtCategoryItem {
         this.description = description;
     }
 
-    public Set<WtDish> getDishes() {
+    public List<WtDish> getDishes() {
         return dishes;
     }
 
-    public void setDishes(Set<WtDish> dishes) {
+    public void setDishes(List<WtDish> dishes) {
         this.dishes = dishes;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override

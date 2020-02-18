@@ -4,12 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.User;
+
 import javax.persistence.*;
 import java.math.BigDecimal;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_dishes")
@@ -50,8 +53,24 @@ public class WtDish {
     @Column(name = "deleteState")
     private Integer deleteState;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "create_by_id")
+    private User createdUser;
+
     @Column(name = "guid")
     private String guid;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idOfAgeGroupItem")
+    private WtAgeGroupItem wtAgeGroupItem;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idOfTypeOfProductionItem")
+    private WtTypeOfProductionItem wtTypeProductionItem;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "update_by_id")
+    private User updatedUser;
 
     @Column(name = "protein")
     private Integer protein;
@@ -68,39 +87,42 @@ public class WtDish {
     @Column(name = "qty")
     private String qty;
 
-    @ManyToOne
-    @JoinColumn(name = "idOfAgeGroupItem")
-    private WtAgeGroupItem wtAgeGroupItem;
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idOfContragent")
+    private Contragent contragent;
 
-    @ManyToMany
+    @Column(name = "barcode")
+    private String barcode;
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_complex_items_dish",
             joinColumns = @JoinColumn(name = "idOfDish"),
             inverseJoinColumns = @JoinColumn(name = "idOfComplexItem"))
-    private Set<WtComplexesItem> complexItems = new HashSet<>();
+    private List<WtComplexesItem> complexItems = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_dish_categoryitem_relationships",
             joinColumns = @JoinColumn(name = "idOfDish"),
             inverseJoinColumns = @JoinColumn(name = "idOfCategoryItem"))
-    private Set<WtCategoryItem> categoryItems = new HashSet<>();
+    private List<WtCategoryItem> categoryItems = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_dishes_menu_relationships",
             joinColumns = @JoinColumn(name = "idOfDish"),
             inverseJoinColumns = @JoinColumn(name = "idOfMenu"))
-    private Set<WtMenu> menus = new HashSet<>();
+    private List<WtMenu> menus = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_dish_groupitem_relationships",
             joinColumns = @JoinColumn(name = "idOfDish"),
             inverseJoinColumns = @JoinColumn(name = "idOfGroupItem"))
-    private Set<WtGroupItem> groupItems = new HashSet<>();
+    private List<WtGroupItem> groupItems = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_menu_group_dish",
             joinColumns = @JoinColumn(name = "dish_id"),
             inverseJoinColumns = @JoinColumn(name = "menu_group_id"))
-    private Set<WtMenuGroup> menuGroups = new HashSet<>();
+    private List<WtMenuGroup> menuGroups = new ArrayList<>();
 
     public Long getIdOfDish() {
         return idOfDish;
@@ -246,43 +268,83 @@ public class WtDish {
         this.wtAgeGroupItem = wtAgeGroupItem;
     }
 
-    public Set<WtComplexesItem> getComplexItems() {
+    public User getCreatedUser() {
+        return createdUser;
+    }
+
+    public void setCreatedUser(User createdUser) {
+        this.createdUser = createdUser;
+    }
+
+    public WtTypeOfProductionItem getWtTypeProductionItem() {
+        return wtTypeProductionItem;
+    }
+
+    public void setWtTypeProductionItem(WtTypeOfProductionItem wtTypeProductionItem) {
+        this.wtTypeProductionItem = wtTypeProductionItem;
+    }
+
+    public User getUpdatedUser() {
+        return updatedUser;
+    }
+
+    public void setUpdatedUser(User updatedUser) {
+        this.updatedUser = updatedUser;
+    }
+
+    public Contragent getContragent() {
+        return contragent;
+    }
+
+    public void setContragent(Contragent contragent) {
+        this.contragent = contragent;
+    }
+
+    public String getBarcode() {
+        return barcode;
+    }
+
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
+    }
+
+    public List<WtComplexesItem> getComplexItems() {
         return complexItems;
     }
 
-    public void setComplexItems(Set<WtComplexesItem> complexItems) {
+    public void setComplexItems(List<WtComplexesItem> complexItems) {
         this.complexItems = complexItems;
     }
 
-    public Set<WtCategoryItem> getCategoryItems() {
+    public List<WtCategoryItem> getCategoryItems() {
         return categoryItems;
     }
 
-    public void setCategoryItems(Set<WtCategoryItem> categoryItems) {
+    public void setCategoryItems(List<WtCategoryItem> categoryItems) {
         this.categoryItems = categoryItems;
     }
 
-    public Set<WtMenu> getMenus() {
+    public List<WtMenu> getMenus() {
         return menus;
     }
 
-    public void setMenus(Set<WtMenu> menus) {
+    public void setMenus(List<WtMenu> menus) {
         this.menus = menus;
     }
 
-    public Set<WtGroupItem> getGroupItems() {
+    public List<WtGroupItem> getGroupItems() {
         return groupItems;
     }
 
-    public void setGroupItems(Set<WtGroupItem> groupItems) {
+    public void setGroupItems(List<WtGroupItem> groupItems) {
         this.groupItems = groupItems;
     }
 
-    public Set<WtMenuGroup> getMenuGroups() {
+    public List<WtMenuGroup> getMenuGroups() {
         return menuGroups;
     }
 
-    public void setMenuGroups(Set<WtMenuGroup> menuGroups) {
+    public void setMenuGroups(List<WtMenuGroup> menuGroups) {
         this.menuGroups = menuGroups;
     }
 
@@ -294,22 +356,23 @@ public class WtDish {
         if (o == null || getClass() != o.getClass()) {
             return false;
         }
-        WtDish that = (WtDish) o;
-        return Objects.equals(idOfDish, that.idOfDish) && Objects.equals(dishName, that.dishName) && Objects
-                .equals(componentsOfDish, that.componentsOfDish) && Objects.equals(code, that.code) && Objects
-                .equals(price, that.price) && Objects.equals(dateOfBeginMenuIncluding, that.dateOfBeginMenuIncluding)
-                && Objects.equals(dateOfEndMenuIncluding, that.dateOfEndMenuIncluding) && Objects
-                .equals(createDate, that.createDate) && Objects.equals(lastUpdate, that.lastUpdate) && Objects
-                .equals(version, that.version) && Objects.equals(deleteState, that.deleteState) && Objects
-                .equals(guid, that.guid) && Objects.equals(protein, that.protein) && Objects.equals(fat, that.fat)
-                && Objects.equals(carbohydrates, that.carbohydrates) && Objects.equals(calories, that.calories)
-                && Objects.equals(qty, that.qty);
+        WtDish wtDish = (WtDish) o;
+        return idOfDish.equals(wtDish.idOfDish) && Objects.equals(dishName, wtDish.dishName) && Objects
+                .equals(componentsOfDish, wtDish.componentsOfDish) && Objects.equals(code, wtDish.code) && Objects
+                .equals(price, wtDish.price) && Objects
+                .equals(dateOfBeginMenuIncluding, wtDish.dateOfBeginMenuIncluding) && Objects
+                .equals(dateOfEndMenuIncluding, wtDish.dateOfEndMenuIncluding) && Objects
+                .equals(createDate, wtDish.createDate) && Objects.equals(lastUpdate, wtDish.lastUpdate) && Objects
+                .equals(version, wtDish.version) && Objects.equals(deleteState, wtDish.deleteState) && Objects
+                .equals(guid, wtDish.guid) && Objects.equals(protein, wtDish.protein) && Objects.equals(fat, wtDish.fat)
+                && Objects.equals(carbohydrates, wtDish.carbohydrates) && Objects.equals(calories, wtDish.calories)
+                && Objects.equals(qty, wtDish.qty) && Objects.equals(barcode, wtDish.barcode);
     }
 
     @Override
     public int hashCode() {
         return Objects.hash(idOfDish, dishName, componentsOfDish, code, price, dateOfBeginMenuIncluding,
                 dateOfEndMenuIncluding, createDate, lastUpdate, version, deleteState, guid, protein, fat, carbohydrates,
-                calories, qty);
+                calories, qty, barcode);
     }
 }

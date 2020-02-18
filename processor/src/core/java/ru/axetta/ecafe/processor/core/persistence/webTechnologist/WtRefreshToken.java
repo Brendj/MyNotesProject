@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import ru.axetta.ecafe.processor.core.persistence.User;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
@@ -16,6 +18,10 @@ public class WtRefreshToken {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "hash")
     private String hash;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "user_id")
+    private User user;
 
     @Column(name = "last_session")
     private Date lastSession;
@@ -34,6 +40,14 @@ public class WtRefreshToken {
 
     public void setLastSession(Date lastSession) {
         this.lastSession = lastSession;
+    }
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
     }
 
     @Override

@@ -5,9 +5,9 @@
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
 import javax.persistence.*;
-import java.util.HashSet;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_complexes_items")
@@ -18,21 +18,21 @@ public class WtComplexesItem {
     @Column(name = "idOfComplexItem")
     private Long idOfComplexItem;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idOfComplex")
+    private WtComplex wtComplex;
+
     @Column(name = "cycle_day")
     private Integer cycleDay;
 
     @Column(name = "count_dishes")
     private Integer countDishes;
 
-    @ManyToOne
-    @JoinColumn(name = "idOfComplex")
-    private WtComplex wtComplex;
-
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_complex_items_dish",
             joinColumns = @JoinColumn(name = "idOfComplexItem"),
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))
-    private Set<WtDish> dishes = new HashSet<>();
+    private List<WtDish> dishes = new ArrayList<>();
 
     public Long getIdOfComplexItem() {
         return idOfComplexItem;
@@ -66,11 +66,11 @@ public class WtComplexesItem {
         this.wtComplex = wtComplex;
     }
 
-    public Set<WtDish> getDishes() {
+    public List<WtDish> getDishes() {
         return dishes;
     }
 
-    public void setDishes(Set<WtDish> dishes) {
+    public void setDishes(List<WtDish> dishes) {
         this.dishes = dishes;
     }
 

@@ -9,28 +9,8 @@
 <hibernate-mapping>
 
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtOrgGroup" table="cf_wt_org_groups">
-        <cache usage="transactional"/>
         <id name="idOfOrgGroup">
             <column name="idoforggroup" sql-type="long"/>
         </id>
-        <property name="nameOfOrgGroup">
-            <column name="nameoforggroup" sql-type="string" length="128"/>
-        </property>
-        <property name="createDate">
-            <column name="createdate" sql-type="date"/>
-        </property>
-        <property name="lastUpdate">
-            <column name="lastupdate" sql-type="date" not-null="true"/>
-        </property>
-        <property name="deleteState">
-            <column name="deletestate" sql-type="integer"/>
-        </property>
-        <property name="version">
-            <column name="version" sql-type="long"/>
-        </property>
-        <set name="orgs" table="cf_wt_org_group_relations">
-            <key column="idOfOrgGroup"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="idOfOrg"/>
-        </set>
     </class>
 </hibernate-mapping>

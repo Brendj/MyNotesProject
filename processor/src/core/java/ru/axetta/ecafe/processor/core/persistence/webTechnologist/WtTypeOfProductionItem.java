@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
 import javax.persistence.*;
+import java.util.List;
 import java.util.Objects;
 
 @Entity
@@ -21,6 +22,9 @@ public class WtTypeOfProductionItem {
 
     @Column(name = "version")
     private Long version;
+
+    @OneToMany(mappedBy = "wtTypeProductionItem")
+    private List<WtDish> wtDishList;
 
     public Long getIdOfTypeProductionItem() {
         return idOfTypeProductionItem;
@@ -46,6 +50,14 @@ public class WtTypeOfProductionItem {
         this.version = version;
     }
 
+    public List<WtDish> getWtDishList() {
+        return wtDishList;
+    }
+
+    public void setWtDishList(List<WtDish> wtDishList) {
+        this.wtDishList = wtDishList;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -55,7 +67,7 @@ public class WtTypeOfProductionItem {
             return false;
         }
         WtTypeOfProductionItem that = (WtTypeOfProductionItem) o;
-        return Objects.equals(idOfTypeProductionItem, that.idOfTypeProductionItem) && Objects
+        return idOfTypeProductionItem.equals(that.idOfTypeProductionItem) && Objects
                 .equals(description, that.description) && Objects.equals(version, that.version);
     }
 

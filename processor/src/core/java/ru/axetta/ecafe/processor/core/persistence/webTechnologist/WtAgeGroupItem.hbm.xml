@@ -8,12 +8,8 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem" table="cf_wt_agegroup_items">
-        <cache usage="transactional"/>
         <id name="idOfAgeGroupItem">
             <column name="idofagegroupitem" sql-type="long"/>
         </id>
-        <property name="description">
-            <column name="description" sql-type="string" length="255"/>
-        </property>
     </class>
 </hibernate-mapping>

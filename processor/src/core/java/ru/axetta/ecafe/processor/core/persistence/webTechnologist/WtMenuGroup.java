@@ -5,10 +5,10 @@
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_menu_groups")
@@ -34,7 +34,7 @@ public class WtMenuGroup {
     @Column(name = "deleteState")
     private Integer deleteState;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "menu_id")
     private WtMenu wtMenu;
 
@@ -42,7 +42,7 @@ public class WtMenuGroup {
     @JoinTable(name = "cf_wt_menu_group_dish",
             joinColumns = @JoinColumn(name = "menu_group_id"),
             inverseJoinColumns = @JoinColumn(name = "dish_id"))
-    private Set<WtDish> dishes = new HashSet<>();
+    private List<WtDish> dishes = new ArrayList<>();
 
     public Long getId() {
         return id;
@@ -100,11 +100,11 @@ public class WtMenuGroup {
         this.wtMenu = wtMenu;
     }
 
-    public Set<WtDish> getDishes() {
+    public List<WtDish> getDishes() {
         return dishes;
     }
 
-    public void setDishes(Set<WtDish> dishes) {
+    public void setDishes(List<WtDish> dishes) {
         this.dishes = dishes;
     }
 

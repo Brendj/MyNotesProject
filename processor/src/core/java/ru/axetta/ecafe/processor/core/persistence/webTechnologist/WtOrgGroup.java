@@ -4,13 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.User;
 
 import javax.persistence.*;
+import java.util.ArrayList;
 import java.util.Date;
-import java.util.HashSet;
+import java.util.List;
 import java.util.Objects;
-import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_org_groups")
@@ -36,11 +38,29 @@ public class WtOrgGroup {
     @Column(name = "version")
     private Long version;
 
-    @ManyToMany
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "create_by_id")
+    private User createdUser;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "update_by_id")
+    private User updatedUser;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idOfContragent")
+    private Contragent contragent;
+
+    @OneToMany(mappedBy = "wtOrgGroup")
+    private List<WtComplex> wtComplexList;
+
+    @OneToMany(mappedBy = "wtOrgGroup")
+    private List<WtMenu> wtMenuList;
+
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_org_group_relations",
             joinColumns = @JoinColumn(name = "idOfOrgGroup"),
             inverseJoinColumns = @JoinColumn(name = "idOfOrg"))
-    private Set<Org> orgs = new HashSet<>();
+    private List<Org> orgs = new ArrayList<>();
 
     public Long getIdOfOrgGroup() {
         return idOfOrgGroup;
@@ -90,12 +110,52 @@ public class WtOrgGroup {
         this.version = version;
     }
 
-    public Set<Org> getOrgs() {
+    public User getCreatedUser() {
+        return createdUser;
+    }
+
+    public void setCreatedUser(User createdUser) {
+        this.createdUser = createdUser;
+    }
+
+    public User getUpdatedUser() {
+        return updatedUser;
+    }
+
+    public void setUpdatedUser(User updatedUser) {
+        this.updatedUser = updatedUser;
+    }
+
+    public Contragent getContragent() {
+        return contragent;
+    }
+
+    public void setContragent(Contragent contragent) {
+        this.contragent = contragent;
+    }
+
+    public List<WtComplex> getWtComplexList() {
+        return wtComplexList;
+    }
+
+    public void setWtComplexList(List<WtComplex> wtComplexList) {
+        this.wtComplexList = wtComplexList;
+    }
+
+    public List<Org> getOrgs() {
         return orgs;
     }
 
-    public void setOrgs(Set<Org> orgs) {
+    public void setOrgs(List<Org> orgs) {
         this.orgs = orgs;
+    }
+
+    public List<WtMenu> getWtMenuList() {
+        return wtMenuList;
+    }
+
+    public void setWtMenuList(List<WtMenu> wtMenuList) {
+        this.wtMenuList = wtMenuList;
     }
 
     @Override

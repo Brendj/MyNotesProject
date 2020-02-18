@@ -4,10 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.User;
 
 import javax.persistence.*;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.Objects;
 
 @Entity
 @Table(name = "cf_wt_menu")
@@ -33,23 +38,39 @@ public class WtMenu {
     @Column(name = "lastUpdate")
     private Date lastUpdate;
 
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idOfOrgGroup")
+    private WtOrgGroup wtOrgGroup;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "create_by_id")
+    private User createdUser;
+
+    @ManyToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "update_by_id")
+    private User updatedUser;
+
     @Column(name = "version")
     private Long version;
+
+    @OneToOne(fetch = FetchType.EAGER)
+    @JoinColumn(name = "idOfContragent")
+    private Contragent contragent;
 
     @Column(name = "deleteState")
     private Integer deleteState;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_dishes_menu_relationships",
             joinColumns = @JoinColumn(name = "idOfMenu"),
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))
-    private Set<WtDish> dishes = new HashSet<>();
+    private List<WtDish> dishes = new ArrayList<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_menu_org",
             joinColumns = @JoinColumn(name = "idOfMenu"),
             inverseJoinColumns = @JoinColumn(name = "idOfOrg"))
-    private Set<Org> orgs = new HashSet<>();
+    private List<Org> orgs = new ArrayList<>();
 
     @OneToMany(mappedBy = "wtMenu")
     private List<WtMenuGroup> menuGroupList;
@@ -118,28 +139,52 @@ public class WtMenu {
         this.deleteState = deleteState;
     }
 
-    public Set<WtDish> getDishes() {
-        return dishes;
-    }
-
-    public void setDishes(Set<WtDish> dishes) {
-        this.dishes = dishes;
-    }
-
-    public Set<Org> getOrgs() {
-        return orgs;
-    }
-
-    public void setOrgs(Set<Org> orgs) {
-        this.orgs = orgs;
-    }
-
     public List<WtMenuGroup> getMenuGroupList() {
         return menuGroupList;
     }
 
     public void setMenuGroupList(List<WtMenuGroup> menuGroupList) {
         this.menuGroupList = menuGroupList;
+    }
+
+    public WtOrgGroup getWtOrgGroup() {
+        return wtOrgGroup;
+    }
+
+    public void setWtOrgGroup(WtOrgGroup wtOrgGroup) {
+        this.wtOrgGroup = wtOrgGroup;
+    }
+
+    public User getCreatedUser() {
+        return createdUser;
+    }
+
+    public void setCreatedUser(User createdUser) {
+        this.createdUser = createdUser;
+    }
+
+    public User getUpdatedUser() {
+        return updatedUser;
+    }
+
+    public void setUpdatedUser(User updatedUser) {
+        this.updatedUser = updatedUser;
+    }
+
+    public Contragent getContragent() {
+        return contragent;
+    }
+
+    public void setContragent(Contragent contragent) {
+        this.contragent = contragent;
+    }
+
+    public void setDishes(List<WtDish> dishes) {
+        this.dishes = dishes;
+    }
+
+    public void setOrgs(List<Org> orgs) {
+        this.orgs = orgs;
     }
 
     @Override
