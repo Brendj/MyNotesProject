@@ -18,3 +18,8 @@ CREATE TABLE cf_preorder_status (
   idoforgoncreate bigint NOT NULL,
   CONSTRAINT cf_preorder_block_pk PRIMARY KEY (idOfPreorderStatus)
 );
+
+CREATE UNIQUE INDEX cf_preorder_status_guid_date_unique
+ON cf_preorder_status
+USING btree
+(guid, date);

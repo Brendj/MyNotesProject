@@ -5,7 +5,10 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status;
 
 import ru.axetta.ecafe.processor.core.sync.handlers.SyncPacketUtils;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
 import java.util.Date;
@@ -41,6 +44,17 @@ public class PreorderFeedingStatusItem {
         Long version = SyncPacketUtils.readLongValue(itemNode, "V", sbError, false);
         Boolean deletedState = SyncPacketUtils.getDeletedState(itemNode, sbError);
         return new PreorderFeedingStatusItem(date, guid, status, storno, version, deletedState, orgOwner, sbError.toString());
+    }
+
+    public Element toElement(Document document, String elementName) throws Exception {
+        Element element = document.createElement(elementName);
+        XMLUtils.setAttributeIfNotNull(element, "Date", date);
+        XMLUtils.setAttributeIfNotNull(element, "Guid", guid);
+        XMLUtils.setAttributeIfNotNull(element, "Status", status);
+        XMLUtils.setAttributeIfNotNull(element, "Storno", storno);
+        XMLUtils.setAttributeIfNotNull(element, "V", version);
+        if (deletedState != null) XMLUtils.setAttributeIfNotNull(element, "D", deletedState ? "1" : "0");
+        return element;
     }
 
     public Date getDate() {

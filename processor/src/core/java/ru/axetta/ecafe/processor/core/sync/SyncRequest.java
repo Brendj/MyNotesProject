@@ -44,6 +44,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegi
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalBuilder;
@@ -2692,6 +2693,7 @@ public class SyncRequest {
             builders.add(new CategoriesDiscountsAndRulesBuilder());
             builders.add(new ClientGroupManagerBuilder());
             builders.add(new AccountsRegistryRequestBuilder());
+            builders.add(new PreorderFeedingStatusBuilder(idOfOrg));
             builders.add(new ReestrTaloonApprovalBuilder(idOfOrg));
             builders.add(new ZeroTransactionsBuilder(idOfOrg));
             builders.add(new SpecialDatesBuilder(idOfOrg));

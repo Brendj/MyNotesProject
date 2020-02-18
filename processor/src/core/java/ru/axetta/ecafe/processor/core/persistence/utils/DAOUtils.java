@@ -2766,6 +2766,13 @@ public class DAOUtils {
         return version;
     }
 
+    public static List<PreorderStatus> getPreorderStatusListSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        Criteria criteria = session.createCriteria(PreorderStatus.class);
+        criteria.add(Restrictions.eq("idOfOrgOnCreate", idOfOrg));
+        criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
+
     public static List<TaloonApproval> getTaloonApprovalForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
         //Org org = (Org)session.load(Org.class, idOfOrg);
         List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);

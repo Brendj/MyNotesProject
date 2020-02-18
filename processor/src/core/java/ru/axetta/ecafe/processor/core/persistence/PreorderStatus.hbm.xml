@@ -7,7 +7,7 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.PreorderStatus" table="cf_preorder_status">
-        <id name="idOfPreorderStatus" column="IdOfPridOfPreorderStatuseorderComplex" type="long">
+        <id name="idOfPreorderStatus" column="idOfPreorderStatus" type="long">
             <generator class="identity"/>
         </id>
         <property name="version" column="version" type="long" not-null="true"/>

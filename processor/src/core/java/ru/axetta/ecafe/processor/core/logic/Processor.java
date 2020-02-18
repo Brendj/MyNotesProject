@@ -76,6 +76,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrderFeedingProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusData;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.ResPreorderFeedingStatus;
@@ -907,6 +908,7 @@ public class Processor implements SyncProcessor {
 
         fullProcessingRequestFeeding(request, syncHistory, responseSections);
         fullProcessingClientDiscountDSZN(request, syncHistory, responseSections);
+        fullProcessingPreorderFeedingStatus(request, responseSections);
 
         logger.info("Full sync performance info: " + performanceLogger.toString());
 
@@ -1249,33 +1251,30 @@ public class Processor implements SyncProcessor {
         }
     }
 
-    private ResPreorderFeedingStatus processPreorderFeedingStatus(PreorderFeedingStatusRequest preorderFeedingStatusRequest) throws Exception {
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
-        ResPreorderFeedingStatus resPreorderFeedingStatus = null;
-        try {
-            persistenceSession = persistenceSessionFactory.openSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            AbstractProcessor processor = new PreorderFeedingStatusProcessor(persistenceSession, preorderFeedingStatusRequest);
-            resPreorderFeedingStatus = (ResPreorderFeedingStatus) processor.process();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, logger);
-            HibernateUtils.close(persistenceSession, logger);
-        }
-        return resPreorderFeedingStatus;
-    }
-
     private void fullProcessingPreorderFeedingStatus(SyncRequest request, List<AbstractToElement> responseSections) {
-        try {
-            PreorderFeedingStatusRequest preorderFeedingStatusRequest = request.getPreorderFeedingStatusRequest();
-            if (preorderFeedingStatusRequest != null) {
-                ResPreorderFeedingStatus resPreorderFeedingStatus = processPreorderFeedingStatus(preorderFeedingStatusRequest);
+        PreorderFeedingStatusRequest preorderFeedingStatusRequest = request.getPreorderFeedingStatusRequest();
+        if (preorderFeedingStatusRequest != null) {
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = persistenceSessionFactory.openSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+
+                PreorderFeedingStatusProcessor processor = new PreorderFeedingStatusProcessor(persistenceSession, preorderFeedingStatusRequest);
+                ResPreorderFeedingStatus resPreorderFeedingStatus = processor.process();
                 addToResponseSections(resPreorderFeedingStatus, responseSections);
+
+                PreorderFeedingStatusData preorderFeedingStatusData = processor.processData(resPreorderFeedingStatus);
+                addToResponseSections(preorderFeedingStatusData, responseSections);
+
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } catch (Exception e) {
+                logger.error("Error in fullProcessingPreorderFeedingStatus: ", e);
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
             }
-        } catch (Exception e) {
-            logger.error("Error in fullProcessingPreorderFeedingStatus: ", e);
         }
     }
 

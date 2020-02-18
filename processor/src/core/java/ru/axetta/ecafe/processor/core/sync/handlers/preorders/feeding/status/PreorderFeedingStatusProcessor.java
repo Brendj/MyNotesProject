@@ -42,34 +42,32 @@ public class PreorderFeedingStatusProcessor extends AbstractProcessor<ResPreorde
             Long nextVersion = DAOUtils.nextVersionByTableWithoutLock(session, "cf_preorder_status");
 
             for (PreorderFeedingStatusItem item : preorderFeedingStatusRequest.getItems()) {
-
+                boolean isNew = false;
                 boolean errorFound = !StringUtils.isEmpty(item.getErrorMessage());
-                PreorderStatus preorderStatus;
                 if (!errorFound) {
-                    preorderStatus = DAOReadonlyService
+                    PreorderStatus preorderStatus = DAOReadonlyService
                             .getInstance().findPreorderStatus(item.getGuid(), item.getDate());
-                    Long versionFromClient = item.getVersion();
-                    if ((versionFromClient == null && preorderStatus != null) || (versionFromClient != null && preorderStatus != null && versionFromClient < preorderStatus.getVersion())) {
-                        item.setErrorMessage("Record version conflict");
-                    } else {
-                        if (preorderStatus == null)
-                            preorderStatus = new PreorderStatus();
-                        PreorderStatusType status = item.getStatus() == null ? null : PreorderStatusType.fromInteger(item.getStatus());
-                        Boolean storno = item.getStorno() == null ? null : item.getStorno().equals(1);
-                        preorderStatus.setGuid(item.getGuid());
-                        preorderStatus.setDate(item.getDate());
-                        preorderStatus.setStatus(status);
-                        preorderStatus.setStorno(storno);
-                        preorderStatus.setIdOfOrgOnCreate(item.getOrgOwner());
-                        preorderStatus.setDeletedState(item.getDeletedState());
-                        preorderStatus.setLastUpdate(new Date());
-
-                        preorderStatus.setVersion(nextVersion);
-                        session.saveOrUpdate(preorderStatus);
+                    if (preorderStatus == null) {
+                        preorderStatus = new PreorderStatus();
+                        isNew = true;
                     }
+                    PreorderStatusType status = item.getStatus() == null ? null : PreorderStatusType.fromInteger(item.getStatus());
+                    Boolean storno = item.getStorno() == null ? null : item.getStorno().equals(1);
+                    preorderStatus.setGuid(item.getGuid());
+                    preorderStatus.setDate(item.getDate());
+                    preorderStatus.setStatus(status);
+                    preorderStatus.setStorno(storno);
+                    preorderStatus.setIdOfOrgOnCreate(item.getOrgOwner());
+                    preorderStatus.setDeletedState(item.getDeletedState());
+                    preorderStatus.setLastUpdate(new Date());
 
+                    preorderStatus.setVersion(nextVersion);
+                    if (isNew)
+                        session.save(preorderStatus);
+                    else
+                        session.merge(preorderStatus);
                 }
-                resItem = new ResPreorderFeedingStatusItem(item.getGuid(), item.getVersion(), item.getErrorMessage());
+                resItem = new ResPreorderFeedingStatusItem(item.getGuid(), nextVersion, item.getErrorMessage());
                 items.add(resItem);
             }
             session.flush();
@@ -82,19 +80,27 @@ public class PreorderFeedingStatusProcessor extends AbstractProcessor<ResPreorde
         return result;
     }
 
-    public ReestrTaloonApprovalData processData() throws Exception {
-        ReestrTaloonApprovalData result = new ReestrTaloonApprovalData();
-        List<ResTaloonApprovalItem> items = new ArrayList<ResTaloonApprovalItem>();
-        ResTaloonApprovalItem resItem;
-        List<TaloonApproval> list = DAOUtils.getTaloonApprovalForOrgSinceVersion(session, reestrTaloonApproval.getIdOfOrgOwner(), reestrTaloonApproval.getMaxVersion());
-        for (TaloonApproval taloon : list) {
-            if (taloon != null) {
-                resItem = new ResTaloonApprovalItem(taloon);
-                items.add(resItem);
-            }
+    public PreorderFeedingStatusData processData(ResPreorderFeedingStatus resPreorderFeedingStatus) throws Exception {
+        PreorderFeedingStatusData result = new PreorderFeedingStatusData();
+        List<PreorderFeedingStatusItem> items = new ArrayList<PreorderFeedingStatusItem>();
+        PreorderFeedingStatusItem resItem;
+        List<PreorderStatus> list = DAOUtils.getPreorderStatusListSinceVersion(session, preorderFeedingStatusRequest.getOrgOwner(), preorderFeedingStatusRequest.getMaxVersion());
+        for (PreorderStatus preorderStatus : list) {
+            if (existInResitems(preorderStatus, resPreorderFeedingStatus)) continue;
+            Integer storno = preorderStatus.getStorno() == null ? null : (preorderStatus.getStorno() ? 1 : 0);
+            Integer status = preorderStatus.getStatus() == null ? null : preorderStatus.getStatus().getCode();
+            resItem = new PreorderFeedingStatusItem(preorderStatus.getDate(), preorderStatus.getGuid(), status,
+                    storno, preorderStatus.getVersion(), preorderStatus.getDeletedState(), preorderStatus.getIdOfOrgOnCreate(), null);
+            items.add(resItem);
         }
-
         result.setItems(items);
         return result;
+    }
+
+    private boolean existInResitems(PreorderStatus preorderStatus, ResPreorderFeedingStatus resPreorderFeedingStatus) {
+        for (ResPreorderFeedingStatusItem item : resPreorderFeedingStatus.getItems()) {
+            if (item.getGuid().equals(preorderStatus.getGuid())) return true;
+        }
+        return false;
     }
 }
