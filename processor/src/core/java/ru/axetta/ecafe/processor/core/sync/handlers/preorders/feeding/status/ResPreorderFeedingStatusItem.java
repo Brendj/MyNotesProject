@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status;
 
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.apache.cxf.common.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
@@ -17,11 +18,13 @@ public class ResPreorderFeedingStatusItem {
     private Long version;
     private Integer res;
     private String error;
+    private static final int ERROR_CODE = 100;
+    private static final int NO_ERRORS = 0;
 
-    public ResPreorderFeedingStatusItem(String guid, Long version, Integer res, String error) {
+    public ResPreorderFeedingStatusItem(String guid, Long version, String error) {
         this.guid = guid;
         this.version = version;
-        this.res = res;
+        this.res = StringUtils.isEmpty(error) ? NO_ERRORS : ERROR_CODE;
         this.error = error;
     }
 
