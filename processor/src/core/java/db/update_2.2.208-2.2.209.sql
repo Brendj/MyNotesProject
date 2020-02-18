@@ -61,3 +61,27 @@ CREATE INDEX cf_preorder_complex_armcomplexid_idx
     ON cf_preorder_complex
         USING btree
         (armcomplexid);
+
+ALTER TABLE CF_OrderDetails ADD COLUMN FRation integer;
+
+-- 370: Таблица для хранения информации о том, отправлено ли было сообщение клиенту по конкретному заказу
+CREATE TABLE cf_notification_orders (
+    idOfNotificationOrders   			bigserial,
+    idOfOrder   						int8,
+    idOfClient   						int8,
+    createddate 						int8,
+    sended       						bool
+);
+CREATE INDEX cf_notification_orders_idoforder_idx ON cf_notification_orders (idoforder,idofclient);
+
+-- 410: Срок действия меню увеличен с 365 до 730 дней
+UPDATE cf_options
+SET optiontext='730'
+WHERE idofoption=1004;
+
+CREATE INDEX cf_preorder_menudetail_idofgoodsrequestposition_idx
+ON cf_preorder_menudetail
+USING btree
+(idofgoodsrequestposition);
+
+--! ФИНАЛИЗИРОВАН 14.02.2020, НЕ МЕНЯТЬ
