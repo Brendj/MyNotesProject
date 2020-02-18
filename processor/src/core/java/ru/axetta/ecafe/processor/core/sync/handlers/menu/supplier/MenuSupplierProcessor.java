@@ -30,12 +30,11 @@ public class MenuSupplierProcessor extends AbstractProcessor<ResMenuSupplier> {
 
     @Override
     public ResMenuSupplier process() throws Exception {
-        ResMenuSupplier result = new ResMenuSupplier();
-        return result;
+        return new ResMenuSupplier(menuSupplier);
     }
 
     public MenuSupplierData processData() throws Exception {
-        MenuSupplierData result = new MenuSupplierData();
+        MenuSupplierData result = new MenuSupplierData(menuSupplier);
         return result;
     }
 

@@ -37,9 +37,7 @@ public class ResMenuSupplier implements AbstractToElement {
     private List<WtMenu> menus;
     private List<WtComplex> complexes;
 
-
     public ResMenuSupplier() {
-
         orgGroups = new ArrayList<>();
         categoryItems = new ArrayList<>();
         typeProductions = new ArrayList<>();
@@ -51,6 +49,20 @@ public class ResMenuSupplier implements AbstractToElement {
         menuGroups = new ArrayList<>();
         menus = new ArrayList<>();
         complexes = new ArrayList<>();
+    }
+
+    public ResMenuSupplier(MenuSupplier menuSupplier) {
+        orgGroups = menuSupplier.getOrgGroups();
+        categoryItems = menuSupplier.getCategoryItems();
+        typeProductions = menuSupplier.getTypeProductions();
+        ageGroupItems = menuSupplier.getAgeGroupItems();
+        dietTypes = menuSupplier.getDietTypes();
+        complexGroupItems = menuSupplier.getComplexGroupItems();
+        groupItems = menuSupplier.getGroupItems();
+        dishes = menuSupplier.getDishes();
+        menuGroups = menuSupplier.getMenuGroups();
+        menus = menuSupplier.getMenus();
+        complexes = menuSupplier.getComplexes();
     }
 
     @Override

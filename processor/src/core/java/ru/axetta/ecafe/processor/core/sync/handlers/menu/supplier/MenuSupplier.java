@@ -42,7 +42,7 @@ public class MenuSupplier implements SectionRequest {
     public static final Integer ERROR_CODE_ALL_OK = 0;
     public static final Integer ERROR_CODE_NOT_VALID_ATTRIBUTE = 100;
 
-    private Map<String, Long> versions = new HashMap<>();
+    private static Map<String, Long> versions = new HashMap<>();
 
     private List<WtOrgGroup> orgGroups = new ArrayList<>();
     private List<WtCategoryItem> categoryItems = new ArrayList<>();
@@ -58,6 +58,9 @@ public class MenuSupplier implements SectionRequest {
 
     private Integer resCode;
     private String errorMessage;
+
+    public MenuSupplier() {
+    }
 
     public MenuSupplier(Node menuSupplierNode) {
 
@@ -83,10 +86,10 @@ public class MenuSupplier implements SectionRequest {
             errorMessage = err.toString();
             itemNode = itemNode.getNextSibling();
         }
-        buildMenuSupplier();
+        build();
     }
 
-    private void buildMenuSupplier() {
+    public void build() {
 
         Iterator<Map.Entry<String, Long>> iter = versions.entrySet().iterator();
         while(iter.hasNext()) {

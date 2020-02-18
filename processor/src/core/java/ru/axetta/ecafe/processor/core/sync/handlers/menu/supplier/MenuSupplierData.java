@@ -18,21 +18,22 @@ import org.w3c.dom.Element;
  */
 
 public class MenuSupplierData implements AbstractToElement {
-    private ResMenuSupplier menuSupplier;
+    private ResMenuSupplier resMenuSupplier;
 
-    public MenuSupplierData() {
+    public MenuSupplierData(MenuSupplier menuSupplier) {
+        resMenuSupplier = new ResMenuSupplier(menuSupplier);
     }
 
     @Override
     public Element toElement(Document document) throws Exception {
-        return menuSupplier.toElement(document);
+        return resMenuSupplier.toElement(document);
     }
 
     public ResMenuSupplier getMenuSupplier() {
-        return menuSupplier;
+        return resMenuSupplier;
     }
 
-    public void setMenuSupplier(ResMenuSupplier menuSupplier) {
-        this.menuSupplier = menuSupplier;
+    public void setMenuSupplier(ResMenuSupplier resMenuSupplier) {
+        this.resMenuSupplier = resMenuSupplier;
     }
 }
