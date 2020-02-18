@@ -79,4 +79,9 @@ UPDATE cf_options
 SET optiontext='730'
 WHERE idofoption=1004;
 
+CREATE INDEX cf_preorder_menudetail_idofgoodsrequestposition_idx
+ON cf_preorder_menudetail
+USING btree
+(idofgoodsrequestposition);
+
 --! ФИНАЛИЗИРОВАН 14.02.2020, НЕ МЕНЯТЬ
