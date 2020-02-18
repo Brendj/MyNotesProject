@@ -829,6 +829,19 @@ public class Processor implements SyncProcessor {
         }
         timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processReestrTaloonPreorder", timeForDelta);
 
+        // Process MenuSupplier
+        try {
+            if (request.getMenuSupplier() != null) {
+                resMenuSupplier = processMenuSupplier(request.getMenuSupplier());
+                menuSupplierData = processMenuSupplierData(request.getMenuSupplier());
+            }
+        } catch (Exception e) {
+            String message = String.format("processMenuSupplier: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processMenuSupplier", timeForDelta);
+
         try {
             if (request.getZeroTransactions() != null) {
                 zeroTransactionData = processZeroTransactionsData(request.getZeroTransactions());
@@ -1165,6 +1178,9 @@ public class Processor implements SyncProcessor {
         // обработка реестра TaloonPreorder
         fullProcessingReestrTaloonPreorder(request, syncHistory, responseSections);
 
+        // обработка справочников веб-технолога
+        fullProcessingMenuSuplier(request, syncHistory, responseSections);
+
         // обработка нулевых транзакций
         fullProcessingZeroTransactions(request, syncHistory, responseSections);
 
@@ -1431,6 +1447,24 @@ public class Processor implements SyncProcessor {
             }
         } catch (Exception e) {
             String message = String.format("processReestrTaloonPreorder: %s", e.getMessage());
+            processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingMenuSuplier(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            MenuSupplier menuSupplierRequest = request.getMenuSupplier();
+            if (menuSupplierRequest != null) {
+                ResMenuSupplier resMenuSupplier = processMenuSupplier(menuSupplierRequest);
+                addToResponseSections(resMenuSupplier, responseSections);
+
+                MenuSupplierData menuSupplierData = processMenuSupplierData(menuSupplierRequest);
+                addToResponseSections(menuSupplierData, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("processMenuSupplier: %s", e.getMessage());
             processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
