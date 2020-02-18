@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.web.ui.contragent.ContragentSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 
 import org.apache.commons.collections.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -69,8 +70,9 @@ public class OrgSyncRequestPage extends BasicWorkspacePage implements OrgListSel
     public void applySyncOperation(){
         Session session = null;
         Transaction transaction = null;
+        List<Long> ids = new LinkedList<>();
         try{
-            if(defaultSupplier == null &&  CollectionUtils.isNotEmpty(idOfOrgList)){
+            if(defaultSupplier == null && CollectionUtils.isEmpty(idOfOrgList)){
                 throw new Exception("Не выбран не один из необходимых параметров");
             }
             session = RuntimeContext.getInstance().createPersistenceSession();
@@ -106,11 +108,14 @@ public class OrgSyncRequestPage extends BasicWorkspacePage implements OrgListSel
                         throw new Exception("Unknown SyncType, ordinal: " + selectedSyncType);
                 }
                 session.save(o);
+                ids.add(o.getIdOfOrg());
             }
             transaction.commit();
             transaction = null;
 
             session.close();
+
+            printMessage("Запрос отправлен для ID OO: " + StringUtils.join(ids, ", "));
         } catch (Exception e){
             logger.error("Can't apply SyncParam ", e);
             printError("Ошибка при обработке: " + e.getMessage());

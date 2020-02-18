@@ -45,6 +45,12 @@
                 <h:outputText styleClass="output-text" id="orgSyncRequestPageFilter" escape="true"
                               value=" {#{orgSyncRequestPage.filter}}"/>
             </h:panelGrid>
+            <h:outputText styleClass="output-text" escape="true" value="Тип синхронизации" />
+            <h:selectOneMenu id="contentType" value="#{orgSyncRequestPage.selectedSyncType}"
+                             styleClass="input-text" style="width: 250px;">
+                <f:selectItems value="#{orgSyncRequestPage.listOfSyncType}" />
+            </h:selectOneMenu>
+            <rich:spacer />
             <a4j:commandButton value="Запросить" action="#{orgSyncRequestPage.applySyncOperation()}"/>
             <rich:spacer/>
         </h:panelGrid>
