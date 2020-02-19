@@ -2422,21 +2422,21 @@ public class DAOUtils {
     }
 
     public static void setValueForMenusSyncByOrg(Session session, Long idOfOrg, Boolean value) {
-        Query query = session.createQuery("update Org set menusSyncParam = :Value where id=:idOfOrg");
+        Query query = session.createQuery("update Org set menusSyncParam = :value where id=:idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
     }
 
     public static void setValueForClientsSyncByOrg(Session session, Long idOfOrg, Boolean value) {
-        Query query = session.createQuery("update Org set clientsSyncParam = :Value where id=:idOfOrg");
+        Query query = session.createQuery("update Org set clientsSyncParam = :value where id=:idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
     }
 
     public static void setValueForOrgSettingsSyncByOrg(Session session, Long idOfOrg, Boolean value) {
-        Query query = session.createQuery("update Org set orgSettingsSyncParam = :Value where id=:idOfOrg");
+        Query query = session.createQuery("update Org set orgSettingsSyncParam = :value where id=:idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
         query.setParameter("value", value);
         query.executeUpdate();
