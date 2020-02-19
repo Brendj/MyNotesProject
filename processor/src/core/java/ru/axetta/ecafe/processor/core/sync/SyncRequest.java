@@ -2589,6 +2589,8 @@ public class SyncRequest {
 
         private final DateFormat dateOnlyFormat;
         private final DateFormat timeFormat;
+        private final static int CLIENT_VERSION_FOR_PLAN_ORDER_MAJOR = 93;
+        private final static int CLIENT_VERSION_FOR_PLAN_ORDER_MINOR = 1;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2642,7 +2644,7 @@ public class SyncRequest {
             Date syncTime = timeFormat.parse(idOfSync);
             Long idOfPacket = getIdOfPacket(namedNodeMap);
             List<SectionRequest> result = new ArrayList<SectionRequest>();
-            List<SectionRequestBuilder> builders = createSectionRequestBuilders(version, org.getIdOfOrg(), envelopeNode);
+            List<SectionRequestBuilder> builders = createSectionRequestBuilders(version, org.getIdOfOrg(), envelopeNode, clientVersion);
             for (SectionRequestBuilder builder : builders) {
                 SectionRequest sectionRequest = buildSeactionRequest(envelopeNode, builder);
                 if (sectionRequest != null) {
@@ -2681,7 +2683,34 @@ public class SyncRequest {
             return request;
         }
 
-        private List<SectionRequestBuilder> createSectionRequestBuilders(long version, long idOfOrg, Node envelopeNode) {
+        private int[] parseClientVersion(String clientVersion) throws Exception {
+            String[] arr = clientVersion.split(".");
+            int[] result = new int[arr.length];
+            int i = 0;
+            for (String str : arr) {
+                result[i] = Integer.parseInt(str);
+                i++;
+            }
+            return result;
+        }
+
+        private boolean addPlanOrdersBuilderByClientVersion(String clientVersion) {
+            //false если clientVersion < 93.1
+            try {
+                int[] versions = parseClientVersion(clientVersion);
+                if (versions[2] < CLIENT_VERSION_FOR_PLAN_ORDER_MAJOR) {
+                    return false;
+                } else {
+                    if (versions[2] == CLIENT_VERSION_FOR_PLAN_ORDER_MAJOR && versions[3] < CLIENT_VERSION_FOR_PLAN_ORDER_MINOR) return false; else return true;
+                }
+            } catch (Exception e) {
+                logger.error("Error in parsing client version from packet: ", e);
+                return false;
+            }
+        }
+
+        private List<SectionRequestBuilder> createSectionRequestBuilders(long version, long idOfOrg, Node envelopeNode,
+                String clientVersion) {
             MenuGroups menuGroups = new MenuGroups.Builder().build(envelopeNode);
             LoadContext loadContext = new LoadContext(menuGroups, version, timeFormat, dateOnlyFormat);
 
@@ -2705,7 +2734,9 @@ public class SyncRequest {
             builders.add(new ClientGroupManagerBuilder());
             builders.add(new AccountsRegistryRequestBuilder());
             builders.add(new ReestrTaloonApprovalBuilder(idOfOrg));
-            builders.add(new PlanOrdersRestrictionsBuilder(idOfOrg));
+            if (addPlanOrdersBuilderByClientVersion(clientVersion)) {
+                builders.add(new PlanOrdersRestrictionsBuilder(idOfOrg));
+            }
             builders.add(new ZeroTransactionsBuilder(idOfOrg));
             builders.add(new SpecialDatesBuilder(idOfOrg));
             builders.add(new MigrantsBuilder(idOfOrg));
