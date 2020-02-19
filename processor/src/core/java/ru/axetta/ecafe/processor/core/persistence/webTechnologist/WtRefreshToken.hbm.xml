@@ -13,8 +13,14 @@
         <id name="hash">
             <column name="hash" sql-type="string" length="128"/>
         </id>
+
+        <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User">
+            <column name="user_id"/>
+        </many-to-one>
+
         <property name="lastSession">
             <column name="last_session" sql-type="date" not-null="true"/>
         </property>
+
     </class>
 </hibernate-mapping>

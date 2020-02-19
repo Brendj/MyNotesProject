@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import ru.axetta.ecafe.processor.core.persistence.User;
+
 import javax.persistence.*;
 import java.util.ArrayList;
 import java.util.Date;
@@ -28,13 +30,21 @@ public class WtMenuGroup {
     @Column(name = "lastUpdate")
     private Date lastUpdate;
 
+    @ManyToOne
+    @JoinColumn(name = "create_by_id")
+    private User createdUser;
+
+    @ManyToOne
+    @JoinColumn(name = "update_by_id")
+    private User updatedUser;
+
     @Column(name = "version")
     private Long version;
 
     @Column(name = "deleteState")
     private Integer deleteState;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "menu_id")
     private WtMenu wtMenu;
 
@@ -106,6 +116,22 @@ public class WtMenuGroup {
 
     public void setDishes(List<WtDish> dishes) {
         this.dishes = dishes;
+    }
+
+    public User getCreatedUser() {
+        return createdUser;
+    }
+
+    public void setCreatedUser(User createdUser) {
+        this.createdUser = createdUser;
+    }
+
+    public User getUpdatedUser() {
+        return updatedUser;
+    }
+
+    public void setUpdatedUser(User updatedUser) {
+        this.updatedUser = updatedUser;
     }
 
     @Override

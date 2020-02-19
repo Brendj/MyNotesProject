@@ -38,35 +38,35 @@ public class WtMenu {
     @Column(name = "lastUpdate")
     private Date lastUpdate;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "idOfOrgGroup")
     private WtOrgGroup wtOrgGroup;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "create_by_id")
     private User createdUser;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "update_by_id")
     private User updatedUser;
 
     @Column(name = "version")
     private Long version;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 
     @Column(name = "deleteState")
     private Integer deleteState;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "cf_wt_dishes_menu_relationships",
             joinColumns = @JoinColumn(name = "idOfMenu"),
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))
     private List<WtDish> dishes = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "cf_wt_menu_org",
             joinColumns = @JoinColumn(name = "idOfMenu"),
             inverseJoinColumns = @JoinColumn(name = "idOfOrg"))

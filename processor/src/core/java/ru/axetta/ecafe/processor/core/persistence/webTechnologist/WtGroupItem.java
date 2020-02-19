@@ -24,7 +24,7 @@ public class WtGroupItem {
     @Column(name = "version")
     private Long version;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "cf_wt_dish_groupitem_relationships",
             joinColumns = @JoinColumn(name = "idOfGroupItem"),
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))

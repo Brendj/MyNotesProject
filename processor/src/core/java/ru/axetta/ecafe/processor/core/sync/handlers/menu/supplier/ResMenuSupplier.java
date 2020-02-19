@@ -156,7 +156,6 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(element, "Guid", categoryItem.getGuid());
         XMLUtils.setAttributeIfNotNull(element, "Name", categoryItem.getDescription());
         XMLUtils.setAttributeIfNotNull(element, "V", categoryItem.getVersion());
-        //XMLUtils.setAttributeIfNotNull(element, "D", categoryItem.getDeleteState());
         return element;
     }
 
@@ -435,7 +434,9 @@ public class ResMenuSupplier implements AbstractToElement {
         this.menus = menus;
     }
 
-    public List<WtComplex> getComplexes() {
+    public List<WtComplex> getComplexes(
+
+    ) {
         return complexes;
     }
 

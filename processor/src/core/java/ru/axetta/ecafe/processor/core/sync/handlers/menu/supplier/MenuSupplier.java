@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier;
 
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -24,18 +24,10 @@ import java.util.*;
 
 public class MenuSupplier implements SectionRequest {
 
-    protected static final String[] CLIENT_SECTION_NAMES = new String[] {
-            "OrgGroupsRequest",
-            "CategoryItemsRequest",
-            "TypeProductionsRequest",
-            "AgeGroupItemsRequest",
-            "DietTypesRequest",
-            "ComplexGroupItemsRequest",
-            "GroupItemsRequest",
-            "DishesRequest",
-            "MenuGroupsRequest",
-            "MenusRequest",
-            "ComplexesRequest"};
+    protected static final String[] CLIENT_SECTION_NAMES = new String[]{
+            "OrgGroupsRequest", "CategoryItemsRequest", "TypeProductionsRequest", "AgeGroupItemsRequest",
+            "DietTypesRequest", "ComplexGroupItemsRequest", "GroupItemsRequest", "DishesRequest", "MenuGroupsRequest",
+            "MenusRequest", "ComplexesRequest"};
 
     public static final String SECTION_NAME = "MenuSupplier";
 
@@ -70,7 +62,8 @@ public class MenuSupplier implements SectionRequest {
 
         while (null != itemNode) {
 
-            if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals(CLIENT_SECTION_NAMES[i++])) {
+            if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName()
+                    .equals(CLIENT_SECTION_NAMES[i++])) {
                 String strVersion = XMLUtils.getAttributeValue(itemNode, "V");
                 if (StringUtils.isNotEmpty(strVersion)) {
                     try {
@@ -92,52 +85,54 @@ public class MenuSupplier implements SectionRequest {
     public void build() {
 
         Iterator<Map.Entry<String, Long>> iter = versions.entrySet().iterator();
-        while(iter.hasNext()) {
+
+        while (iter.hasNext()) {
             Map.Entry<String, Long> entry = iter.next();
 
-            switch(entry.getKey()) {
-                case "OrgGroupsRequest" : {
-                    orgGroups = DAOService.getInstance().getOrgGroupsListFromVersion(entry.getValue());
+            switch (entry.getKey()) {
+                case "OrgGroupsRequest": {
+                    //orgGroups = DAOService.getInstance().getOrgGroupsListFromVersion(entry.getValue());
+                    orgGroups = DAOReadonlyService.getInstance().getOrgGroupsListFromVersion(entry.getValue());
                     break;
                 }
-                case "CategoryItemsRequest" : {
-                    categoryItems = DAOService.getInstance().getCategoryItemsListFromVersion(entry.getValue());
+                case "CategoryItemsRequest": {
+                    categoryItems = DAOReadonlyService.getInstance().getCategoryItemsListFromVersion(entry.getValue());
                     break;
                 }
-                case "TypeProductionsRequest" : {
-                    typeProductions = DAOService.getInstance().getTypeProductionsListFromVersion(entry.getValue());
+                case "TypeProductionsRequest": {
+                    typeProductions = DAOReadonlyService.getInstance().getTypeProductionsListFromVersion(entry.getValue());
                     break;
                 }
-                case "AgeGroupItemsRequest" : {
-                    ageGroupItems = DAOService.getInstance().getAgeGroupItemsListFromVersion(entry.getValue());
+                case "AgeGroupItemsRequest": {
+                    ageGroupItems = DAOReadonlyService.getInstance().getAgeGroupItemsListFromVersion(entry.getValue());
                     break;
                 }
-                case "DietTypesRequest" : {
-                    dietTypes = DAOService.getInstance().getDietTypesListFromVersion(entry.getValue());
+                case "DietTypesRequest": {
+                    dietTypes = DAOReadonlyService.getInstance().getDietTypesListFromVersion(entry.getValue());
                     break;
                 }
-                case "ComplexGroupItemsRequest" : {
-                    complexGroupItems = DAOService.getInstance().getComplexGroupItemsListFromVersion(entry.getValue());
+                case "ComplexGroupItemsRequest": {
+                    complexGroupItems = DAOReadonlyService.getInstance().getComplexGroupItemsListFromVersion(entry.getValue());
                     break;
                 }
-                case "GroupItemsRequest" : {
-                    groupItems = DAOService.getInstance().getGroupItemsListFromVersion(entry.getValue());
+                case "GroupItemsRequest": {
+                    groupItems = DAOReadonlyService.getInstance().getGroupItemsListFromVersion(entry.getValue());
                     break;
                 }
-                case "DishesRequest" : {
-                    dishes = DAOService.getInstance().getDishesListFromVersion(entry.getValue());
+                case "DishesRequest": {
+                    dishes = DAOReadonlyService.getInstance().getDishesListFromVersion(entry.getValue());
                     break;
                 }
-                case "MenuGroupsRequest" : {
-                    menuGroups = DAOService.getInstance().getMenuGroupsListFromVersion(entry.getValue());
+                case "MenuGroupsRequest": {
+                    menuGroups = DAOReadonlyService.getInstance().getMenuGroupsListFromVersion(entry.getValue());
                     break;
                 }
-                case "MenusRequest" : {
-                    menus = DAOService.getInstance().getMenusListFromVersion(entry.getValue());
+                case "MenusRequest": {
+                    menus = DAOReadonlyService.getInstance().getMenusListFromVersion(entry.getValue());
                     break;
                 }
-                case "ComplexesRequest" : {
-                    complexes = DAOService.getInstance().getComplexesListFromVersion(entry.getValue());
+                case "ComplexesRequest": {
+                    complexes = DAOReadonlyService.getInstance().getComplexesListFromVersion(entry.getValue());
                     break;
                 }
             }

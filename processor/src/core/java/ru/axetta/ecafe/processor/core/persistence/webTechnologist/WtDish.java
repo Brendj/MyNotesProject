@@ -53,22 +53,22 @@ public class WtDish {
     @Column(name = "deleteState")
     private Integer deleteState;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "create_by_id")
     private User createdUser;
 
     @Column(name = "guid")
     private String guid;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "idOfAgeGroupItem")
     private WtAgeGroupItem wtAgeGroupItem;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "idOfTypeOfProductionItem")
     private WtTypeOfProductionItem wtTypeProductionItem;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "update_by_id")
     private User updatedUser;
 
@@ -87,38 +87,38 @@ public class WtDish {
     @Column(name = "qty")
     private String qty;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 
     @Column(name = "barcode")
     private String barcode;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "cf_wt_complex_items_dish",
             joinColumns = @JoinColumn(name = "idOfDish"),
             inverseJoinColumns = @JoinColumn(name = "idOfComplexItem"))
     private List<WtComplexesItem> complexItems = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "cf_wt_dish_categoryitem_relationships",
             joinColumns = @JoinColumn(name = "idOfDish"),
             inverseJoinColumns = @JoinColumn(name = "idOfCategoryItem"))
     private List<WtCategoryItem> categoryItems = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "cf_wt_dishes_menu_relationships",
             joinColumns = @JoinColumn(name = "idOfDish"),
             inverseJoinColumns = @JoinColumn(name = "idOfMenu"))
     private List<WtMenu> menus = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "cf_wt_dish_groupitem_relationships",
             joinColumns = @JoinColumn(name = "idOfDish"),
             inverseJoinColumns = @JoinColumn(name = "idOfGroupItem"))
     private List<WtGroupItem> groupItems = new ArrayList<>();
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "cf_wt_menu_group_dish",
             joinColumns = @JoinColumn(name = "dish_id"),
             inverseJoinColumns = @JoinColumn(name = "menu_group_id"))

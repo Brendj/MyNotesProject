@@ -38,15 +38,15 @@ public class WtOrgGroup {
     @Column(name = "version")
     private Long version;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "create_by_id")
     private User createdUser;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "update_by_id")
     private User updatedUser;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @OneToOne
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 
@@ -56,7 +56,7 @@ public class WtOrgGroup {
     @OneToMany(mappedBy = "wtOrgGroup")
     private List<WtMenu> wtMenuList;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "cf_wt_org_group_relations",
             joinColumns = @JoinColumn(name = "idOfOrgGroup"),
             inverseJoinColumns = @JoinColumn(name = "idOfOrg"))

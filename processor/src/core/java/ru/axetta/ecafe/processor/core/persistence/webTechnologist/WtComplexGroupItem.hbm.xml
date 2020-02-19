@@ -12,5 +12,11 @@
         <id name="idOfComplexGroupItem">
             <column name="idofcomplexgroupitem" sql-type="long"/>
         </id>
+        <property name="description">
+            <column name="description" sql-type="varchar(255)" length="255"/>
+        </property>
+        <property name="version">
+            <column name="version" sql-type="long"/>
+        </property>
     </class>
 </hibernate-mapping>

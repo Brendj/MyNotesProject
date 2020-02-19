@@ -18,7 +18,7 @@ public class WtComplexesItem {
     @Column(name = "idOfComplexItem")
     private Long idOfComplexItem;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "idOfComplex")
     private WtComplex wtComplex;
 
@@ -28,7 +28,7 @@ public class WtComplexesItem {
     @Column(name = "count_dishes")
     private Integer countDishes;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "cf_wt_complex_items_dish",
             joinColumns = @JoinColumn(name = "idOfComplexItem"),
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))

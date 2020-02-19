@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.OrgDeliveryInfo;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -735,4 +736,138 @@ public class DAOReadonlyService {
             return new ArrayList<>();
         }
     }
+
+    public List<WtOrgGroup> getOrgGroupsListFromVersion(Long value) {
+        try {
+            Query query = entityManager.createQuery("SELECT orgGroup from WtOrgGroup orgGroup "
+                    + "where orgGroup.version > :value");
+            query.setParameter("value", value);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<WtCategoryItem> getCategoryItemsListFromVersion(Long value) {
+        try {
+            Query query = entityManager.createQuery("SELECT catItem from WtCategoryItem catItem "
+                    + "where catItem.version > :value");
+            query.setParameter("value", value);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<WtTypeOfProductionItem> getTypeProductionsListFromVersion(Long value) {
+        try {
+            Query query = entityManager.createQuery("SELECT typeProd from WtTypeOfProductionItem typeProd "
+                    + "where typeProd.version > :value");
+            query.setParameter("value", value);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+
+    public List<WtAgeGroupItem> getAgeGroupItemsListFromVersion(Long value) {
+        try {
+            Query query = entityManager.createQuery("SELECT ageGroup from WtAgeGroupItem ageGroup "
+                    + "where ageGroup.version > :value");
+            query.setParameter("value", value);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<WtDietType> getDietTypesListFromVersion(Long value) {
+        try {
+            Query query = entityManager.createQuery("SELECT dietType from WtDietType dietType "
+                    + "where dietType.version > :value");
+            query.setParameter("value", value);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<WtComplexGroupItem> getComplexGroupItemsListFromVersion(Long value) {
+        try {
+            Query query = entityManager.createQuery("SELECT complexGroup from WtComplexGroupItem complexGroup "
+                    + "where complexGroup.version > :value");
+            query.setParameter("value", value);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<WtGroupItem> getGroupItemsListFromVersion(Long value) {
+        try {
+            Query query = entityManager.createQuery("SELECT groupItem from WtGroupItem groupItem "
+                    + "where groupItem.version > :value");
+            query.setParameter("value", value);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<WtDish> getDishesListFromVersion(Long value) {
+        try {
+            Query query = entityManager.createQuery("SELECT dish from WtDish dish "
+                    + "where dish.version > :value");
+            query.setParameter("value", value);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<WtMenuGroup> getMenuGroupsListFromVersion(Long value) {
+        try {
+            Query query = entityManager.createQuery("SELECT menuGroup from WtMenuGroup menuGroup "
+                    + "where menuGroup.version > :value");
+            query.setParameter("value", value);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<WtMenu> getMenusListFromVersion(Long value) {
+        try {
+            Query query = entityManager.createQuery("SELECT menu from WtMenu menu "
+                    + "where menu.version > :value");
+            query.setParameter("value", value);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<WtComplex> getComplexesListFromVersion(Long value) {
+        try {
+            Query query = entityManager.createQuery("SELECT complex from WtComplex complex "
+                    + "where complex.version > :value");
+            query.setParameter("value", value);
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
 }

@@ -30,7 +30,7 @@ public class WtCategoryItem {
     @Column(name = "version")
     private Long version;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "idOfUser")
     private User user;
 
@@ -40,7 +40,7 @@ public class WtCategoryItem {
     @Column(name = "description")
     private String description;
 
-    @ManyToMany(fetch = FetchType.EAGER)
+    @ManyToMany
     @JoinTable(name = "cf_wt_dish_categoryitem_relationships",
             joinColumns = @JoinColumn(name = "idOfCategoryItem"),
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))

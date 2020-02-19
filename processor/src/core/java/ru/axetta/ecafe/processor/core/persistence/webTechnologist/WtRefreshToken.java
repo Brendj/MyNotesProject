@@ -19,7 +19,7 @@ public class WtRefreshToken {
     @Column(name = "hash")
     private String hash;
 
-    @ManyToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "user_id")
     private User user;
 
