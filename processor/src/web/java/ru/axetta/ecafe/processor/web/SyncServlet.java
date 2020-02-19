@@ -81,6 +81,7 @@ public class SyncServlet extends HttpServlet {
         SyncCollector.registerSyncStart(syncTime);
         long idOfOrg = -1;
         try {
+            currentSyncWasGranted.set(false);
             runtimeContext = RuntimeContext.getInstance();
 
             RequestData requestData = new RequestData();
@@ -161,7 +162,6 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
             ///////
-            currentSyncWasGranted.set(false);
             long currentTime = System.currentTimeMillis();
             if (syncType != SyncType.TYPE_GET_ACC_INC) {
                 if (permitsForSync.tryAcquire(permitsTimeout, TimeUnit.MINUTES)) {
