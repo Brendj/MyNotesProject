@@ -2637,13 +2637,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
 
-            Org org = client.getOrg();
-
-            DAOService daoService = DAOService.getInstance();
-
             Criteria criteria = session.createCriteria(ComplexInfo.class);
             criteria.createAlias("menuDetail", "detal", JoinType.LEFT_OUTER_JOIN);
-            criteria.add(Restrictions.eq("org", org));
+            criteria.add(Restrictions.eq("org", client.getOrg()));
             criteria.add(Restrictions.gt("menuDate", startDate));
             criteria.add(Restrictions.lt("menuDate", endDate));
             criteria.add(Restrictions.eq("modeVisible", 1));
