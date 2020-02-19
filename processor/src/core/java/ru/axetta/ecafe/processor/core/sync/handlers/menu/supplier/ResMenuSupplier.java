@@ -141,12 +141,26 @@ public class ResMenuSupplier implements AbstractToElement {
     }
 
     private Element orgGroupToElement(Document document, WtOrgGroup orgGroup) {
-        Element element = document.createElement("OGI");  /////
-        XMLUtils.setAttributeIfNotNull(element, "Id", orgGroup.getIdOfOrgGroup());
-        XMLUtils.setAttributeIfNotNull(element, "Name", orgGroup.getNameOfOrgGroup());
-        XMLUtils.setAttributeIfNotNull(element, "ContragentId", orgGroup.getContragent().getIdOfContragent());
-        XMLUtils.setAttributeIfNotNull(element, "V", orgGroup.getVersion());
-        XMLUtils.setAttributeIfNotNull(element, "D", orgGroup.getDeleteState());
+        Element element = document.createElement("OGI");
+
+        Element prop = document.createElement("Prop");
+        XMLUtils.setAttributeIfNotNull(prop, "Id", orgGroup.getIdOfOrgGroup());
+        XMLUtils.setAttributeIfNotNull(prop, "Name", orgGroup.getNameOfOrgGroup());
+        XMLUtils.setAttributeIfNotNull(prop, "ContragentId", orgGroup.getContragent().getIdOfContragent());
+        XMLUtils.setAttributeIfNotNull(prop, "D", orgGroup.getDeleteState());
+        XMLUtils.setAttributeIfNotNull(prop, "V", orgGroup.getVersion());
+
+        Element orgs = document.createElement("Orgs");
+        for (Org item : orgGroup.getOrgs()) {
+            Element elem = document.createElement("OGI");
+            XMLUtils.setAttributeIfNotNull(elem, "OrgGroupId", orgGroup.getIdOfOrgGroup());
+            XMLUtils.setAttributeIfNotNull(elem, "OrgId", item.getIdOfOrg());
+            orgs.appendChild(elem);
+        }
+
+        element.appendChild(prop);
+        element.appendChild(orgs);
+
         return element;
     }
 
@@ -208,8 +222,8 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "Components", dish.getComponentsOfDish());
         XMLUtils.setAttributeIfNotNull(prop, "Code", dish.getDishName());
         XMLUtils.setAttributeIfNotNull(prop, "Price", dish.getPrice());
-        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", dish.getDateOfBeginMenuIncluding()); //
-        XMLUtils.setAttributeIfNotNull(prop, "EndDate", dish.getDateOfEndMenuIncluding());     //
+        XMLUtils.setAttributeIfNotNull(prop, "DateBeginIncludeMenu", dish.getDateOfBeginMenuIncluding());
+        XMLUtils.setAttributeIfNotNull(prop, "DateEndIncludeMenu", dish.getDateOfEndMenuIncluding());
         XMLUtils.setAttributeIfNotNull(prop, "V", dish.getVersion());
         XMLUtils.setAttributeIfNotNull(prop, "D", dish.getDeleteState());
         XMLUtils.setAttributeIfNotNull(prop, "Guid", dish.getGuid());
@@ -233,10 +247,10 @@ public class ResMenuSupplier implements AbstractToElement {
 
         Element groupItems = document.createElement("GroupItems");
         for (WtGroupItem item : dish.getGroupItems()) {
-            Element elem = document.createElement("GGI");
+            Element elem = document.createElement("GII");
             XMLUtils.setAttributeIfNotNull(elem, "DishId", dish.getIdOfDish());
             XMLUtils.setAttributeIfNotNull(elem, "GroupItemId", item.getIdOfGroupItem());
-            categories.appendChild(elem);
+            groupItems.appendChild(elem);
         }
 
         element.appendChild(prop);
@@ -248,11 +262,25 @@ public class ResMenuSupplier implements AbstractToElement {
 
     private Element menuGroupToElement(Document document, WtMenuGroup menuGroup) {
         Element element = document.createElement("MGI");
-        XMLUtils.setAttributeIfNotNull(element, "Id", menuGroup.getId());
-        XMLUtils.setAttributeIfNotNull(element, "Name", menuGroup.getName());
-        XMLUtils.setAttributeIfNotNull(element, "MenuId", menuGroup.getWtMenu().getIdOfMenu());
-        XMLUtils.setAttributeIfNotNull(element, "V", menuGroup.getVersion());
-        XMLUtils.setAttributeIfNotNull(element, "D", menuGroup.getDeleteState());
+
+        Element prop = document.createElement("Prop");
+        XMLUtils.setAttributeIfNotNull(prop, "Id", menuGroup.getId());
+        XMLUtils.setAttributeIfNotNull(prop, "Name", menuGroup.getName());
+        XMLUtils.setAttributeIfNotNull(prop, "MenuId", menuGroup.getWtMenu().getIdOfMenu());
+        XMLUtils.setAttributeIfNotNull(prop, "V", menuGroup.getVersion());
+        XMLUtils.setAttributeIfNotNull(prop, "D", menuGroup.getDeleteState());
+
+        Element dishes = document.createElement("Dishes");
+        for (WtDish item : menuGroup.getDishes()) {
+            Element elem = document.createElement("DSI");
+            XMLUtils.setAttributeIfNotNull(elem, "MenuGroupId", menuGroup.getId());
+            XMLUtils.setAttributeIfNotNull(elem, "DishId", item.getIdOfDish());
+            dishes.appendChild(elem);
+        }
+
+        element.appendChild(prop);
+        element.appendChild(dishes);
+
         return element;
     }
 
