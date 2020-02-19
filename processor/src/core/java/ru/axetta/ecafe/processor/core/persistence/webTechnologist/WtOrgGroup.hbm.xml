@@ -39,7 +39,6 @@
 
         <set name="wtComplexList" inverse="true" cascade="all" lazy="true">
             <key>
-                <column name="idOfOrgGroup"/>
                 <column name="idOfComplex"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex"/>
@@ -48,7 +47,6 @@
         <set name="wtMenuList" inverse="true" cascade="all" lazy="true" order-by="resolutionDateTime">
             <key>
                 <column name="idOfMenu"/>
-                <column name="idOfComplex"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu"/>
         </set>

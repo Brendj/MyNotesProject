@@ -10,7 +10,7 @@
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex" table="cf_wt_complexes">
         <cache usage="transactional"/>
         <id name="idOfComplex">
-            <column name="idofcomplex" sql-type="long"/>
+            <column name="idOfComplex" sql-type="long"/>
         </id>
         <property name="name">
             <column name="name" sql-type="varchar(256)" length="256"/>
@@ -92,7 +92,6 @@
 
         <set name="wtComplexesItemList" inverse="true" cascade="all" lazy="true">
             <key>
-                <column name="idOfComplex"/>
                 <column name="idOfComplexItem"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexesItem"/>

@@ -215,6 +215,7 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "Guid", dish.getGuid());
         XMLUtils.setAttributeIfNotNull(prop, "AgeGroupId", dish.getWtAgeGroupItem().getIdOfAgeGroupItem());
         XMLUtils.setAttributeIfNotNull(prop, "TypeProductionId", dish.getWtTypeProductionItem().getIdOfTypeProductionItem());
+        XMLUtils.setAttributeIfNotNull(prop, "BarCode", dish.getBarcode());
         XMLUtils.setAttributeIfNotNull(prop, "Protein", dish.getProtein());
         XMLUtils.setAttributeIfNotNull(prop, "Fat", dish.getFat());
         XMLUtils.setAttributeIfNotNull(prop, "Carbohydrates", dish.getCarbohydrates());

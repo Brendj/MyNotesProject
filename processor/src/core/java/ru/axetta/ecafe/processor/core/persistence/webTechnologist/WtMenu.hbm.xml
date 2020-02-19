@@ -67,7 +67,6 @@
 
         <set name="menuGroupList" inverse="true" cascade="all" lazy="true">
             <key>
-                <column name="menu_id"/>
                 <column name="id"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup"/>
