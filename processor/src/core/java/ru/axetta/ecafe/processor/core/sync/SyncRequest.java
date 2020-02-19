@@ -2684,7 +2684,7 @@ public class SyncRequest {
         }
 
         private int[] parseClientVersion(String clientVersion) throws Exception {
-            String[] arr = clientVersion.split(".");
+            String[] arr = clientVersion.split("\\.");
             int[] result = new int[arr.length];
             int i = 0;
             for (String str : arr) {
