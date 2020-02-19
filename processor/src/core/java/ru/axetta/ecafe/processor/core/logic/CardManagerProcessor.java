@@ -326,7 +326,12 @@ public class CardManagerProcessor implements CardManager {
         updatedCard.setState(state);
         updatedCard.setLockReason(lockReason);
         if (ignoreValidTime) {
-            Date validTo = clientHadCards ? CalendarUtils.addDays(new Date(), 10) : CalendarUtils.addYear(new Date(), 12);
+            Date validTo;
+            if (isSpecialSpbCard(updatedCard.getCardNo())) {
+                validTo = CalendarUtils.addYear(new Date(), 12);
+            } else {
+                validTo = clientHadCards ? CalendarUtils.addDays(new Date(), 10) : CalendarUtils.addYear(new Date(), 12);
+            }
             if (oldClient != newClient) updatedCard.setValidTime(validTo); //дату действия меняем, если карту выдаем другому клиенту
             updatedCard.setIssueTime(new Date());
         } else {
@@ -339,6 +344,12 @@ public class CardManagerProcessor implements CardManager {
 
         persistenceSession.flush();
 
+    }
+    private boolean isSpecialSpbCard(Long cardNo) {
+        boolean result = false;
+        String str = cardNo.toString();
+        if ((str.length() == 13 && !str.startsWith("1")) || str.length() == 15) result = true;
+        return result;
     }
 
     @Override
