@@ -9,10 +9,10 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_dishes")
@@ -98,31 +98,31 @@ public class WtDish {
     @JoinTable(name = "cf_wt_complex_items_dish",
             joinColumns = @JoinColumn(name = "idOfDish"),
             inverseJoinColumns = @JoinColumn(name = "idOfComplexItem"))
-    private List<WtComplexesItem> complexItems = new ArrayList<>();
+    private Set<WtComplexesItem> complexItems = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "cf_wt_dish_categoryitem_relationships",
             joinColumns = @JoinColumn(name = "idOfDish"),
             inverseJoinColumns = @JoinColumn(name = "idOfCategoryItem"))
-    private List<WtCategoryItem> categoryItems = new ArrayList<>();
+    private Set<WtCategoryItem> categoryItems = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "cf_wt_dishes_menu_relationships",
             joinColumns = @JoinColumn(name = "idOfDish"),
             inverseJoinColumns = @JoinColumn(name = "idOfMenu"))
-    private List<WtMenu> menus = new ArrayList<>();
+    private Set<WtMenu> menus = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "cf_wt_dish_groupitem_relationships",
             joinColumns = @JoinColumn(name = "idOfDish"),
             inverseJoinColumns = @JoinColumn(name = "idOfGroupItem"))
-    private List<WtGroupItem> groupItems = new ArrayList<>();
+    private Set<WtGroupItem> groupItems = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "cf_wt_menu_group_dish",
             joinColumns = @JoinColumn(name = "dish_id"),
             inverseJoinColumns = @JoinColumn(name = "menu_group_id"))
-    private List<WtMenuGroup> menuGroups = new ArrayList<>();
+    private Set<WtMenuGroup> menuGroups = new HashSet<>();
 
     public Long getIdOfDish() {
         return idOfDish;
@@ -308,43 +308,43 @@ public class WtDish {
         this.barcode = barcode;
     }
 
-    public List<WtComplexesItem> getComplexItems() {
+    public Set<WtComplexesItem> getComplexItems() {
         return complexItems;
     }
 
-    public void setComplexItems(List<WtComplexesItem> complexItems) {
+    public void setComplexItems(Set<WtComplexesItem> complexItems) {
         this.complexItems = complexItems;
     }
 
-    public List<WtCategoryItem> getCategoryItems() {
+    public Set<WtCategoryItem> getCategoryItems() {
         return categoryItems;
     }
 
-    public void setCategoryItems(List<WtCategoryItem> categoryItems) {
+    public void setCategoryItems(Set<WtCategoryItem> categoryItems) {
         this.categoryItems = categoryItems;
     }
 
-    public List<WtMenu> getMenus() {
+    public Set<WtMenu> getMenus() {
         return menus;
     }
 
-    public void setMenus(List<WtMenu> menus) {
+    public void setMenus(Set<WtMenu> menus) {
         this.menus = menus;
     }
 
-    public List<WtGroupItem> getGroupItems() {
+    public Set<WtGroupItem> getGroupItems() {
         return groupItems;
     }
 
-    public void setGroupItems(List<WtGroupItem> groupItems) {
+    public void setGroupItems(Set<WtGroupItem> groupItems) {
         this.groupItems = groupItems;
     }
 
-    public List<WtMenuGroup> getMenuGroups() {
+    public Set<WtMenuGroup> getMenuGroups() {
         return menuGroups;
     }
 
-    public void setMenuGroups(List<WtMenuGroup> menuGroups) {
+    public void setMenuGroups(Set<WtMenuGroup> menuGroups) {
         this.menuGroups = menuGroups;
     }
 

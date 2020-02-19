@@ -7,10 +7,10 @@ package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 import ru.axetta.ecafe.processor.core.persistence.User;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_category_items")
@@ -44,7 +44,7 @@ public class WtCategoryItem {
     @JoinTable(name = "cf_wt_dish_categoryitem_relationships",
             joinColumns = @JoinColumn(name = "idOfCategoryItem"),
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))
-    private List<WtDish> dishes = new ArrayList<>();
+    private Set<WtDish> dishes = new HashSet<>();
 
     public Long getIdOfCategoryItem() {
         return idOfCategoryItem;
@@ -94,11 +94,11 @@ public class WtCategoryItem {
         this.description = description;
     }
 
-    public List<WtDish> getDishes() {
+    public Set<WtDish> getDishes() {
         return dishes;
     }
 
-    public void setDishes(List<WtDish> dishes) {
+    public void setDishes(Set<WtDish> dishes) {
         this.dishes = dishes;
     }
 

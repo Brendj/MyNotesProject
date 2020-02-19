@@ -141,7 +141,7 @@ public class ResMenuSupplier implements AbstractToElement {
     }
 
     private Element orgGroupToElement(Document document, WtOrgGroup orgGroup) {
-        Element element = document.createElement("OGI");
+        Element element = document.createElement("OGI");  /////
         XMLUtils.setAttributeIfNotNull(element, "Id", orgGroup.getIdOfOrgGroup());
         XMLUtils.setAttributeIfNotNull(element, "Name", orgGroup.getNameOfOrgGroup());
         XMLUtils.setAttributeIfNotNull(element, "ContragentId", orgGroup.getContragent().getIdOfContragent());
@@ -208,8 +208,8 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "Components", dish.getComponentsOfDish());
         XMLUtils.setAttributeIfNotNull(prop, "Code", dish.getDishName());
         XMLUtils.setAttributeIfNotNull(prop, "Price", dish.getPrice());
-        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", dish.getDateOfBeginMenuIncluding());
-        XMLUtils.setAttributeIfNotNull(prop, "EndDate", dish.getDateOfEndMenuIncluding());
+        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", dish.getDateOfBeginMenuIncluding()); //
+        XMLUtils.setAttributeIfNotNull(prop, "EndDate", dish.getDateOfEndMenuIncluding());     //
         XMLUtils.setAttributeIfNotNull(prop, "V", dish.getVersion());
         XMLUtils.setAttributeIfNotNull(prop, "D", dish.getDeleteState());
         XMLUtils.setAttributeIfNotNull(prop, "Guid", dish.getGuid());
@@ -316,7 +316,7 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "StartCycleDay", complex.getStartCycleDay());
 
         Element items = document.createElement("Items");
-        for (WtComplexesItem item : complex.getWtComplexesItemList()) {
+        for (WtComplexesItem item : complex.getWtComplexesItems()) {
             Element elem = document.createElement("CII");
             XMLUtils.setAttributeIfNotNull(elem, "Id", item.getIdOfComplexItem());
             XMLUtils.setAttributeIfNotNull(elem, "ComplexId", complex.getIdOfComplex());
@@ -326,7 +326,7 @@ public class ResMenuSupplier implements AbstractToElement {
         }
 
         Element itemsDishes = document.createElement("ItemsDishes");
-        for (WtComplexesItem item : complex.getWtComplexesItemList()) {
+        for (WtComplexesItem item : complex.getWtComplexesItems()) {
             for (WtDish dish : item.getDishes()) {
                 Element elem = document.createElement("CID");
                 XMLUtils.setAttributeIfNotNull(elem, "ComplexItemId", item.getIdOfComplexItem());

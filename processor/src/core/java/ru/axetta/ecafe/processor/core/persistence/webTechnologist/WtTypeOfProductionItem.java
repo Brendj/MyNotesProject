@@ -5,8 +5,9 @@
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
 import javax.persistence.*;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_typeofproduction_items")
@@ -24,7 +25,7 @@ public class WtTypeOfProductionItem {
     private Long version;
 
     @OneToMany(mappedBy = "wtTypeProductionItem")
-    private List<WtDish> wtDishList;
+    private Set<WtDish> wtDishes = new HashSet<>();
 
     public Long getIdOfTypeProductionItem() {
         return idOfTypeProductionItem;
@@ -50,12 +51,12 @@ public class WtTypeOfProductionItem {
         this.version = version;
     }
 
-    public List<WtDish> getWtDishList() {
-        return wtDishList;
+    public Set<WtDish> getWtDishes() {
+        return wtDishes;
     }
 
-    public void setWtDishList(List<WtDish> wtDishList) {
-        this.wtDishList = wtDishList;
+    public void setWtDishes(Set<WtDish> wtDishes) {
+        this.wtDishes = wtDishes;
     }
 
     @Override

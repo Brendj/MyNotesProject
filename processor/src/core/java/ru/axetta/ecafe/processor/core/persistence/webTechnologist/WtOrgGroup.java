@@ -9,10 +9,10 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_org_groups")
@@ -51,16 +51,16 @@ public class WtOrgGroup {
     private Contragent contragent;
 
     @OneToMany(mappedBy = "wtOrgGroup")
-    private List<WtComplex> wtComplexList;
+    private Set<WtComplex> wtComplexes = new HashSet<>();
 
     @OneToMany(mappedBy = "wtOrgGroup")
-    private List<WtMenu> wtMenuList;
+    private Set<WtMenu> wtMenus = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "cf_wt_org_group_relations",
             joinColumns = @JoinColumn(name = "idOfOrgGroup"),
             inverseJoinColumns = @JoinColumn(name = "idOfOrg"))
-    private List<Org> orgs = new ArrayList<>();
+    private Set<Org> orgs = new HashSet<>();
 
     public Long getIdOfOrgGroup() {
         return idOfOrgGroup;
@@ -134,28 +134,28 @@ public class WtOrgGroup {
         this.contragent = contragent;
     }
 
-    public List<WtComplex> getWtComplexList() {
-        return wtComplexList;
+    public Set<WtComplex> getWtComplexes() {
+        return wtComplexes;
     }
 
-    public void setWtComplexList(List<WtComplex> wtComplexList) {
-        this.wtComplexList = wtComplexList;
+    public void setWtComplexes(Set<WtComplex> wtComplexes) {
+        this.wtComplexes = wtComplexes;
     }
 
-    public List<Org> getOrgs() {
+    public Set<WtMenu> getWtMenus() {
+        return wtMenus;
+    }
+
+    public void setWtMenus(Set<WtMenu> wtMenus) {
+        this.wtMenus = wtMenus;
+    }
+
+    public Set<Org> getOrgs() {
         return orgs;
     }
 
-    public void setOrgs(List<Org> orgs) {
+    public void setOrgs(Set<Org> orgs) {
         this.orgs = orgs;
-    }
-
-    public List<WtMenu> getWtMenuList() {
-        return wtMenuList;
-    }
-
-    public void setWtMenuList(List<WtMenu> wtMenuList) {
-        this.wtMenuList = wtMenuList;
     }
 
     @Override

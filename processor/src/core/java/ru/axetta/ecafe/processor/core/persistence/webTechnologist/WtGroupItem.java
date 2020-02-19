@@ -5,9 +5,9 @@
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
 import javax.persistence.*;
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_group_items")
@@ -28,7 +28,7 @@ public class WtGroupItem {
     @JoinTable(name = "cf_wt_dish_groupitem_relationships",
             joinColumns = @JoinColumn(name = "idOfGroupItem"),
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))
-    private List<WtDish> dishes = new ArrayList<>();
+    private Set<WtDish> dishes = new HashSet<>();
 
     public Long getIdOfGroupItem() {
         return idOfGroupItem;
@@ -46,11 +46,11 @@ public class WtGroupItem {
         this.description = description;
     }
 
-    public List<WtDish> getDishes() {
+    public Set<WtDish> getDishes() {
         return dishes;
     }
 
-    public void setDishes(List<WtDish> dishes) {
+    public void setDishes(Set<WtDish> dishes) {
         this.dishes = dishes;
     }
 

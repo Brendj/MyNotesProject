@@ -10,10 +10,10 @@ import ru.axetta.ecafe.processor.core.persistence.User;
 
 import javax.persistence.*;
 import java.math.BigDecimal;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_complexes")
@@ -98,10 +98,10 @@ public class WtComplex {
     @JoinTable(name = "cf_wt_complexes_org",
             joinColumns = @JoinColumn(name = "IdOfComplex"),
             inverseJoinColumns = @JoinColumn(name = "IdOfOrg"))
-    private List<Org> orgs = new ArrayList<>();
+    private Set<Org> orgs = new HashSet<>();
 
     @OneToMany(mappedBy = "wtComplex")
-    private List<WtComplexesItem> wtComplexesItemList;
+    private Set<WtComplexesItem> wtComplexesItems = new HashSet<>();
 
     public Boolean getIsPortal() {
         return isPortal;
@@ -288,20 +288,20 @@ public class WtComplex {
         this.wtOrgGroup = wtOrgGroup;
     }
 
-    public List<Org> getOrgs() {
+    public Set<Org> getOrgs() {
         return orgs;
     }
 
-    public void setOrgs(List<Org> orgs) {
+    public void setOrgs(Set<Org> orgs) {
         this.orgs = orgs;
     }
 
-    public List<WtComplexesItem> getWtComplexesItemList() {
-        return wtComplexesItemList;
+    public Set<WtComplexesItem> getWtComplexesItems() {
+        return wtComplexesItems;
     }
 
-    public void setWtComplexesItemList(List<WtComplexesItem> wtComplexesItemList) {
-        this.wtComplexesItemList = wtComplexesItemList;
+    public void setWtComplexesItems(Set<WtComplexesItem> wtComplexesItems) {
+        this.wtComplexesItems = wtComplexesItems;
     }
 
     @Override

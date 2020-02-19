@@ -9,10 +9,10 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
 
 import javax.persistence.*;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
 import java.util.Objects;
+import java.util.Set;
 
 @Entity
 @Table(name = "cf_wt_menu")
@@ -64,16 +64,16 @@ public class WtMenu {
     @JoinTable(name = "cf_wt_dishes_menu_relationships",
             joinColumns = @JoinColumn(name = "idOfMenu"),
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))
-    private List<WtDish> dishes = new ArrayList<>();
+    private Set<WtDish> dishes = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "cf_wt_menu_org",
             joinColumns = @JoinColumn(name = "idOfMenu"),
             inverseJoinColumns = @JoinColumn(name = "idOfOrg"))
-    private List<Org> orgs = new ArrayList<>();
+    private Set<Org> orgs = new HashSet<>();
 
     @OneToMany(mappedBy = "wtMenu")
-    private List<WtMenuGroup> menuGroupList;
+    private Set<WtMenuGroup> menuGroups;
 
     public Long getIdOfMenu() {
         return idOfMenu;
@@ -139,12 +139,28 @@ public class WtMenu {
         this.deleteState = deleteState;
     }
 
-    public List<WtMenuGroup> getMenuGroupList() {
-        return menuGroupList;
+    public Set<WtDish> getDishes() {
+        return dishes;
     }
 
-    public void setMenuGroupList(List<WtMenuGroup> menuGroupList) {
-        this.menuGroupList = menuGroupList;
+    public void setDishes(Set<WtDish> dishes) {
+        this.dishes = dishes;
+    }
+
+    public Set<Org> getOrgs() {
+        return orgs;
+    }
+
+    public void setOrgs(Set<Org> orgs) {
+        this.orgs = orgs;
+    }
+
+    public Set<WtMenuGroup> getMenuGroups() {
+        return menuGroups;
+    }
+
+    public void setMenuGroups(Set<WtMenuGroup> menuGroups) {
+        this.menuGroups = menuGroups;
     }
 
     public WtOrgGroup getWtOrgGroup() {
@@ -177,22 +193,6 @@ public class WtMenu {
 
     public void setContragent(Contragent contragent) {
         this.contragent = contragent;
-    }
-
-    public void setDishes(List<WtDish> dishes) {
-        this.dishes = dishes;
-    }
-
-    public void setOrgs(List<Org> orgs) {
-        this.orgs = orgs;
-    }
-
-    public List<WtDish> getDishes() {
-        return dishes;
-    }
-
-    public List<Org> getOrgs() {
-        return orgs;
     }
 
     @Override

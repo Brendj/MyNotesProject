@@ -65,7 +65,7 @@
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         </set>
 
-        <set name="menuGroupList" inverse="true" cascade="all" lazy="true">
+        <set name="menuGroups" inverse="true" cascade="all" lazy="true">
             <key>
                 <column name="id"/>
             </key>
