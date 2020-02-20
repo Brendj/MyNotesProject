@@ -53,6 +53,9 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
     @Autowired
     private DAOService daoService;
 
+    private int complexType;
+    private int ageGroup;
+
     public Integer[] getSelectedComplexIds() {
         return selectedComplexIds;
     }
@@ -145,6 +148,22 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         this.description = description;
     }
 
+    public int getComplexType() {
+        return complexType;
+    }
+
+    public void setComplexType(int complexType) {
+        this.complexType = complexType;
+    }
+
+    public int getAgeGroup() {
+        return ageGroup;
+    }
+
+    public void setAgeGroup(int ageGroup) {
+        this.ageGroup = ageGroup;
+    }
+
     public List<SelectItem> getSubCategories() throws Exception {
         List<SelectItem> res = new ArrayList<SelectItem>();
         res.add(new SelectItem("", ""));
@@ -152,6 +171,28 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             String group = RuleCreatePage.SUB_CATEGORIES[i];
             res.add(new SelectItem(i, group));
         }
+        return res;
+    }
+
+    public List<SelectItem> getComplexTypes() throws Exception {
+        List<SelectItem> res = new ArrayList<>();
+        res.add(new SelectItem("", ""));
+        //daoService
+        //
+        //for (int i=0; i<RuleCreatePage.SUB_CATEGORIES.length; i++) {
+        //    String group = RuleCreatePage.SUB_CATEGORIES[i];
+        //    res.add(new SelectItem(i, group));
+        //}
+        return res;
+    }
+
+    public List<SelectItem> getAgeGroups() throws Exception {
+        List<SelectItem> res = new ArrayList<SelectItem>();
+        res.add(new SelectItem("", ""));
+        //for (int i=0; i<RuleCreatePage.SUB_CATEGORIES.length; i++) {
+        //    String group = RuleCreatePage.SUB_CATEGORIES[i];
+        //    res.add(new SelectItem(i, group));
+        //}
         return res;
     }
 
@@ -468,7 +509,7 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         RuntimeContext.getAppContext().getBean(getClass()).reload();
     }
     public void reload() throws Exception {
-        DiscountRule discountRule = em.merge(entity);
+        DiscountRule discountRule = em.merge(entity); ///
 
         StringBuilder categoryFilter = new StringBuilder();
         if(!discountRule.getCategoriesDiscounts().isEmpty()){

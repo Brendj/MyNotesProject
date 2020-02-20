@@ -16,71 +16,114 @@
 
 <%-- Панель редактирования правила --%>
 <%--@elvariable id="ruleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleEditPage"--%>
-<h:panelGrid id="ruleEditPanel" binding="#{ruleEditPage.pageComponent}" styleClass="borderless-grid" columns="2">
+<h:panelGrid id="ruleEditPanel" binding="#{ruleEditPage.pageComponent}"
+             styleClass="borderless-grid borderless-grid-align-top" columns="2">
 
-    <h:outputText escape="true" value="Категории клиентов" styleClass="output-text" />
-    <h:panelGroup>
-        <a4j:commandButton id="categoryAjaxButton" value="..." action="#{mainPage.showCategoryListSelectPage}"
-                           reRender="modalCategoryListSelectorPanel"
-                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;">
-            <f:setPropertyActionListener value="#{ruleEditPage.idOfCategoryListString}"
-                                         target="#{mainPage.categoryFilterOfSelectCategoryListSelectPage}" />
-        </a4j:commandButton>
-        <h:outputText styleClass="output-text" id="categoryListFilter" escape="true"
-                      value=" {#{ruleEditPage.filter}}" />
-    </h:panelGroup>
+    <h:panelGrid styleClass="borderless-grid">
+        <h:outputText escape="true" value="Категории клиентов" styleClass="output-text"/>
+        <h:panelGroup>
+            <a4j:commandButton id="categoryAjaxButton" value="..." action="#{mainPage.showCategoryListSelectPage}"
+                               reRender="modalCategoryListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="#{ruleEditPage.idOfCategoryListString}"
+                                             target="#{mainPage.categoryFilterOfSelectCategoryListSelectPage}"/>
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" id="categoryListFilter" escape="true"
+                          value=" {#{ruleEditPage.filter}}"/>
+        </h:panelGroup>
 
-    <h:outputText escape="true" value="Категории организаций" styleClass="output-text" />
+        <h:outputText escape="true" value="Категории организаций" styleClass="output-text"/>
 
-    <h:panelGroup>
-        <a4j:commandButton id="categoryOrgAjaxButton" value="..." action="#{mainPage.showCategoryOrgListSelectPage}"
-                           reRender="modalCategoryOrgListSelectorPanel"
-                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryOrgListSelectorPanel')}.show();"
-                           styleClass="command-link" style="width: 25px;">
-            <f:setPropertyActionListener value="#{ruleEditPage.idOfCategoryOrgListString}"
-                                         target="#{mainPage.categoryOrgFilterOfSelectCategoryOrgListSelectPage}" />
-        </a4j:commandButton>
-        <h:outputText styleClass="output-text" id="categoryOrgListFilter" escape="true"
-                      value=" {#{ruleEditPage.filterOrg}}" />
-    </h:panelGroup>
+        <h:panelGroup>
+            <a4j:commandButton id="categoryOrgAjaxButton" value="..." action="#{mainPage.showCategoryOrgListSelectPage}"
+                               reRender="modalCategoryOrgListSelectorPanel"
+                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryOrgListSelectorPanel')}.show();"
+                               styleClass="command-link" style="width: 25px;">
+                <f:setPropertyActionListener value="#{ruleEditPage.idOfCategoryOrgListString}"
+                                             target="#{mainPage.categoryOrgFilterOfSelectCategoryOrgListSelectPage}"/>
+            </a4j:commandButton>
+            <h:outputText styleClass="output-text" id="categoryOrgListFilter" escape="true"
+                          value=" {#{ruleEditPage.filterOrg}}"/>
+        </h:panelGroup>
 
-    <h:outputText escape="true" value="Супер-категория" styleClass="output-text required-field" />
-    <h:selectOneMenu id="group" value="#{ruleEditPage.subCategory}" style="width:300px;" styleClass="groupSelect">
-        <f:selectItems value="#{ruleEditPage.subCategories}"/>
-    </h:selectOneMenu>
-    <h:outputText escape="true" value="Описание" styleClass="output-text required-field" />
-    <h:inputText value="#{ruleEditPage.description}" maxlength="99" size="40" styleClass="input-text" />
-    <h:outputText escape="true" value="Ставка дисконтирования" styleClass="output-text" />
-    <h:panelGrid columns="2">
-        <h:inputText value="#{ruleEditPage.discountRate}" maxlength="3" styleClass="input-text" />
-        <h:outputText escape="true" value="%" styleClass="output-text" />
+        <h:outputText escape="true" value="Супер-категория" styleClass="output-text required-field"/>
+        <h:selectOneMenu id="group" value="#{ruleEditPage.subCategory}" style="width:300px;" styleClass="groupSelect">
+            <f:selectItems value="#{ruleEditPage.subCategories}"/>
+        </h:selectOneMenu>
+
+        <h:outputText escape="true" value="Описание" styleClass="output-text required-field"/>
+        <h:inputText value="#{ruleEditPage.description}" maxlength="99" size="40" styleClass="input-text"/>
+
+        <h:outputText escape="true" value="Ставка дисконтирования" styleClass="output-text"/>
+        <h:panelGrid columns="2">
+            <h:inputText value="#{ruleEditPage.discountRate}" maxlength="3" styleClass="input-text"/>
+            <h:outputText escape="true" value="%" styleClass="output-text"/>
+        </h:panelGrid>
+
+        <h:outputText escape="true" value="Приоритет" styleClass="output-text required-field"/>
+        <h:inputText value="#{ruleEditPage.priority}" maxlength="11" styleClass="input-text"/>
+        <h:outputText escape="true" value="Объединение комплексов" styleClass="output-text"/>
+        <h:selectOneListbox value="#{ruleEditPage.operationor}" size="1">
+            <f:selectItem itemLabel="И" itemValue="false"/>
+            <f:selectItem itemLabel="ИЛИ" itemValue="true"/>
+        </h:selectOneListbox>
+
+        <h:outputText value="Комплексы" styleClass="output-text"/>
+        <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;">
+            <h:selectManyCheckbox id="complexs" value="#{ruleEditPage.selectedComplexIds}" layout="pageDirection"
+                                  styleClass="output-text">
+                <f:selectItems value="#{ruleEditPage.availableComplexs}"/>
+            </h:selectManyCheckbox>
+        </h:panelGroup>
+
+
+        <h:panelGrid columns="4" styleClass="borderless-grid">
+            <a4j:commandButton value="Сохранить" action="#{ruleEditPage.updateRule}" reRender="workspaceTogglePanel"
+                               styleClass="command-button"/>
+            <a4j:commandButton value="Восстановить" action="#{ruleEditPage.reload}" reRender="workspaceTogglePanel"
+                               ajaxSingle="true" styleClass="command-button"/>
+        </h:panelGrid>
+
+        <h:panelGrid styleClass="borderless-grid">
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
+        </h:panelGrid>
+
     </h:panelGrid>
-    <h:outputText escape="true" value="Приоритет" styleClass="output-text required-field" />
-    <h:inputText value="#{ruleEditPage.priority}" maxlength="11" styleClass="input-text" />
-    <h:outputText escape="true" value="Объединение комплексов" styleClass="output-text" />
-    <h:selectOneListbox value="#{ruleEditPage.operationor}" size="1">
-        <f:selectItem itemLabel="И" itemValue="false" />
-        <f:selectItem itemLabel="ИЛИ" itemValue="true" />
-    </h:selectOneListbox>
+    <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" id="specialDatesFileLoaderPanel">
+        <rich:panel>
 
-    <h:outputText value="Комплексы" styleClass="output-text"/>
-    <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;">
-        <h:selectManyCheckbox id="complexs" value="#{ruleEditPage.selectedComplexIds}" layout="pageDirection"
-                              styleClass="output-text">
-            <f:selectItems value="#{ruleEditPage.availableComplexs}" />
-        </h:selectManyCheckbox>
-    </h:panelGroup>
+            <h:panelGrid columns="2">
 
-</h:panelGrid>
-<h:panelGrid columns="4" styleClass="borderless-grid">
-    <a4j:commandButton value="Сохранить" action="#{ruleEditPage.updateRule}" reRender="workspaceTogglePanel"
-                       styleClass="command-button" />
-    <a4j:commandButton value="Восстановить" action="#{ruleEditPage.reload}" reRender="workspaceTogglePanel"
-                       ajaxSingle="true" styleClass="command-button" />
+            <h:outputText escape="true" value="Использовать правило для Web-АРМа" styleClass="output-text"/>
+            <h:selectBooleanCheckbox id="arm" value="true">
+            </h:selectBooleanCheckbox>
+
+            <h:outputText escape="true" value="Тип комплекса" styleClass="output-text"/>
+            <h:selectOneMenu id="type" value="#{ruleEditPage.complexType}" style="width:300px;"
+                             styleClass="groupSelect">
+                <f:selectItems value="#{ruleEditPage.complexTypes}"/>
+            </h:selectOneMenu>
+
+            <h:outputText escape="true" value="Возрастная категория" styleClass="output-text"/>
+            <h:selectOneMenu id="age" value="#{ruleEditPage.ageGroup}" style="width:300px;" styleClass="groupSelect">
+                <f:selectItems value="#{ruleEditPage.ageGroups}"/>
+            </h:selectOneMenu>
+
+            </h:panelGrid>
+
+            <h:panelGrid columns="2" styleClass="borderless-grid">
+                <a4j:commandButton value="Отобразить" action="#{ruleEditPage.updateRule}" reRender="workspaceTogglePanel"
+                                   styleClass="command-button"/>
+            </h:panelGrid>
+
+            <h:panelGrid styleClass="borderless-grid">
+                <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                               warnClass="warn-messages"/>
+            </h:panelGrid>
+
+        </rich:panel>
+    </h:panelGrid>
 </h:panelGrid>
 
-<h:panelGrid styleClass="borderless-grid">
-    <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                   warnClass="warn-messages" />
-</h:panelGrid>
