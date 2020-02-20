@@ -11,6 +11,8 @@ import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -176,23 +178,25 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
 
     public List<SelectItem> getComplexTypes() throws Exception {
         List<SelectItem> res = new ArrayList<>();
+        List<WtComplexGroupItem> complexGroupItems = new ArrayList<>();
         res.add(new SelectItem("", ""));
-        //daoService
-        //
-        //for (int i=0; i<RuleCreatePage.SUB_CATEGORIES.length; i++) {
-        //    String group = RuleCreatePage.SUB_CATEGORIES[i];
-        //    res.add(new SelectItem(i, group));
-        //}
+        complexGroupItems = daoService.getWtComplexGroupList();
+        int i = 0;
+        for (WtComplexGroupItem item : complexGroupItems) {
+            res.add(new SelectItem(i++, item.getDescription()));
+        }
         return res;
     }
 
     public List<SelectItem> getAgeGroups() throws Exception {
-        List<SelectItem> res = new ArrayList<SelectItem>();
+        List<SelectItem> res = new ArrayList<>();
+        List<WtAgeGroupItem> ageGroupItems = new ArrayList<>();
         res.add(new SelectItem("", ""));
-        //for (int i=0; i<RuleCreatePage.SUB_CATEGORIES.length; i++) {
-        //    String group = RuleCreatePage.SUB_CATEGORIES[i];
-        //    res.add(new SelectItem(i, group));
-        //}
+        ageGroupItems = daoService.getWtAgeGroupList();
+        int i = 0;
+        for (WtAgeGroupItem item : ageGroupItems) {
+            res.add(new SelectItem(i++, item.getDescription()));
+        }
         return res;
     }
 

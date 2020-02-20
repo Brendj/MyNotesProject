@@ -14,6 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contrac
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -2691,5 +2693,17 @@ public class DAOService {
     public void saveNotificationOrder(NotificationOrders object) {
         entityManager.persist(object);
         entityManager.flush();
+    }
+
+    public List<WtComplexGroupItem> getWtComplexGroupList() {
+        TypedQuery<WtComplexGroupItem> q = entityManager
+                .createQuery("from WtComplexGroupItem order by idOfComplexGroupItem", WtComplexGroupItem.class);
+        return q.getResultList();
+    }
+
+    public List<WtAgeGroupItem> getWtAgeGroupList() {
+        TypedQuery<WtAgeGroupItem> q = entityManager
+                .createQuery("from WtAgeGroupItem order by idOfAgeGroupItem", WtAgeGroupItem.class);
+        return q.getResultList();
     }
 }
