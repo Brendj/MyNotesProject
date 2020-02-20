@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.partner.iac;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.card.CardManager;
+import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardState;
@@ -82,7 +83,7 @@ public class CardRegistrationService {
         if (null == card) {
             blockAllOtherClientCards(session, client);
             Date validDate = CalendarUtils.addYear(new Date(), 12);
-            if (client.getCards() != null && client.getCards().size() > 0)
+            if (client.getCards() != null && client.getCards().size() > 0 && !CardManagerProcessor.isSpecialSpbCard(cardId))
                 validDate = CalendarUtils.addDays(new Date(), 10);
             RuntimeContext.getInstance().getCardManager().createCard(session, session.getTransaction(), client.getIdOfClient(),
                     cardId, Arrays.asList(Card.TYPE_NAMES).indexOf("Mifare"), CardState.ISSUED.getValue(), validDate,

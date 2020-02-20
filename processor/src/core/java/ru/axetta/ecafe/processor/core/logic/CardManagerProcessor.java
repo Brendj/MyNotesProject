@@ -345,7 +345,8 @@ public class CardManagerProcessor implements CardManager {
         persistenceSession.flush();
 
     }
-    private boolean isSpecialSpbCard(Long cardNo) {
+
+    public static boolean isSpecialSpbCard(Long cardNo) {
         boolean result = false;
         String str = cardNo.toString();
         if ((str.length() == 13 && !str.startsWith("1")) || str.length() == 15) result = true;
