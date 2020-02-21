@@ -96,25 +96,27 @@
 
             <h:panelGrid columns="2">
 
-            <h:outputText escape="true" value="Использовать правило для Web-АРМа" styleClass="output-text"/>
-            <h:selectBooleanCheckbox id="arm" value="true">
-            </h:selectBooleanCheckbox>
+                <h:outputText escape="true" value="Использовать правило для Web-АРМа" styleClass="output-text"/>
+                <h:selectBooleanCheckbox id="arm" value="true">
+                </h:selectBooleanCheckbox>
 
-            <h:outputText escape="true" value="Тип комплекса" styleClass="output-text"/>
-            <h:selectOneMenu id="type" value="#{ruleEditPage.complexType}" style="width:300px;"
-                             styleClass="groupSelect">
-                <f:selectItems value="#{ruleEditPage.complexTypes}"/>
-            </h:selectOneMenu>
+                <h:outputText escape="true" value="Тип комплекса" styleClass="output-text"/>
+                <h:selectOneMenu id="type" value="#{ruleEditPage.complexType}" style="width:300px;"
+                                 styleClass="groupSelect">
+                    <f:selectItems value="#{ruleEditPage.complexTypes}"/>
+                </h:selectOneMenu>
 
-            <h:outputText escape="true" value="Возрастная категория" styleClass="output-text"/>
-            <h:selectOneMenu id="age" value="#{ruleEditPage.ageGroup}" style="width:300px;" styleClass="groupSelect">
-                <f:selectItems value="#{ruleEditPage.ageGroups}"/>
-            </h:selectOneMenu>
+                <h:outputText escape="true" value="Возрастная категория" styleClass="output-text"/>
+                <h:selectOneMenu id="age" value="#{ruleEditPage.ageGroup}" style="width:300px;"
+                                 styleClass="groupSelect">
+                    <f:selectItems value="#{ruleEditPage.ageGroups}"/>
+                </h:selectOneMenu>
 
             </h:panelGrid>
 
             <h:panelGrid columns="2" styleClass="borderless-grid">
-                <a4j:commandButton value="Отобразить" action="#{ruleEditPage.updateRule}" reRender="workspaceTogglePanel"
+                <a4j:commandButton value="Отобразить" action="#{ruleEditPage.updateRule}"
+                                   reRender="workspaceTogglePanel"
                                    styleClass="command-button"/>
             </h:panelGrid>
 
@@ -123,6 +125,94 @@
                                warnClass="warn-messages"/>
             </h:panelGrid>
 
+            <a4j:status id="reportGenerateStatus">
+                <f:facet name="start">
+                    <h:graphicImage value="/images/gif/waiting.gif" alt="waiting"/>
+                </f:facet>
+            </a4j:status>
+
+            <rich:dataTable id="wtDiscountRules" value="#{RuleEditPage.wtRules}"
+                            var="wtrule" rows="25"
+                            footerClass="data-table-footer" rowKeyVar="rowItemKey">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="Статус"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="Название контрагента"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="ИД контрагента"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="ИД комплекса"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="Название"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="Возрастная категория"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="Цена"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="Тип"/>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
+
+
+                <rich:subTable value="#{wtrule}" var="item" rowKeyVar="rowDetailKey"
+                               columnClasses="center-aligned-column, left-aligned-column, left-aligned-column,
+                           left-aligned-column, left-aligned-column, center-aligned-column, left-aligned-column,
+                           center-aligned-column">
+
+                    <%--       Статус--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{item.contragentName}" styleClass="output-text"
+                                      converter="dateConverter"/>
+                    </rich:column>
+
+                    <%--        Название контрагента--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{item.contragentName}" styleClass="output-text"/>
+                    </rich:column>
+
+                    <%--        ИД контрагента--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{item.contragentId}" styleClass="output-text"/>
+                    </rich:column>
+
+                    <%--        ИД комплекса--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{item.complexId}" styleClass="output-text"/>
+                    </rich:column>
+
+                    <%--        Название--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{item.complexName}" styleClass="output-text"/>
+                    </rich:column>
+
+                    <%--        Возрастная категория--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{item.ageCategory}" styleClass="output-text"/>
+                    </rich:column>
+
+                    <%--        Цена, руб--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{item.price}" styleClass="output-text"
+                                      converter="copeckSumConverter"/>
+                    </rich:column>
+
+                    <%--        Тип--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{item.complexType}" styleClass="output-text"/>
+                    </rich:column>
+
+                </rich:subTable>
+            </rich:dataTable>
         </rich:panel>
     </h:panelGrid>
 </h:panelGrid>
