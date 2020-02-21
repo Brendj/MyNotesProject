@@ -59,7 +59,7 @@ public class DirectiveElement implements AbstractToElement{
 
             Boolean clientSyncParam = org.getClientsSyncParam();
             if (clientSyncParam) {
-                directiveItemList.add(new DirectiveItem("DoMenusSync", "1"));
+                directiveItemList.add(new DirectiveItem("DoClientsSync", "1"));
                 DAOUtils.setValueForClientsSyncByOrg(session, org.getIdOfOrg(), false);
             }
         }
