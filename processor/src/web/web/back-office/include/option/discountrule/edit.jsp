@@ -100,22 +100,22 @@
                 <h:selectBooleanCheckbox id="arm" value="true">
                 </h:selectBooleanCheckbox>
 
-                <h:outputText escape="true" value="Тип комплекса" styleClass="output-text"/>
-                <h:selectOneMenu id="type" value="#{ruleEditPage.complexType}" style="width:300px;"
-                                 styleClass="groupSelect">
-                    <f:selectItems value="#{ruleEditPage.complexTypes}"/>
-                </h:selectOneMenu>
+<%--                <h:outputText escape="true" value="Тип комплекса" styleClass="output-text"/>--%>
+<%--                <h:selectOneMenu id="type" value="#{ruleEditPage.complexTypes}" style="width:300px;"--%>
+<%--                                 styleClass="groupSelect">--%>
+<%--                    <f:selectItems value="#{ruleEditPage.selectedComplexType}"/>--%>
+<%--                </h:selectOneMenu>--%>
 
-                <h:outputText escape="true" value="Возрастная категория" styleClass="output-text"/>
-                <h:selectOneMenu id="age" value="#{ruleEditPage.ageGroup}" style="width:300px;"
-                                 styleClass="groupSelect">
-                    <f:selectItems value="#{ruleEditPage.ageGroups}"/>
-                </h:selectOneMenu>
+<%--                <h:outputText escape="true" value="Возрастная категория" styleClass="output-text"/>--%>
+<%--                <h:selectOneMenu id="age" value="#{ruleEditPage.ageGroups}" style="width:300px;"--%>
+<%--                                 styleClass="groupSelect">--%>
+<%--                    <f:selectItems value="#{ruleEditPage.selectedAgeGroup}"/>--%>
+<%--                </h:selectOneMenu>--%>
 
             </h:panelGrid>
 
             <h:panelGrid columns="2" styleClass="borderless-grid">
-                <a4j:commandButton value="Отобразить" action="#{ruleEditPage.updateRule}"
+                <a4j:commandButton value="Отобразить" action="#{ruleEditPage.fillWtDiscountRules()}"
                                    reRender="workspaceTogglePanel"
                                    styleClass="command-button"/>
             </h:panelGrid>
@@ -131,7 +131,7 @@
                 </f:facet>
             </a4j:status>
 
-            <rich:dataTable id="wtDiscountRules" value="#{RuleEditPage.wtRules}"
+            <rich:dataTable id="wtDiscountRules" value="#{ruleEditPage.wtDiscountRules}"
                             var="wtrule" rows="25"
                             footerClass="data-table-footer" rowKeyVar="rowItemKey">
                 <f:facet name="header">

@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.EC
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.ExternalSystemStats;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -2705,5 +2706,48 @@ public class DAOService {
         TypedQuery<WtAgeGroupItem> q = entityManager
                 .createQuery("from WtAgeGroupItem order by idOfAgeGroupItem", WtAgeGroupItem.class);
         return q.getResultList();
+    }
+
+    public List<WtDiscountRule> getWtDiscountRulesList() {
+        TypedQuery<WtDiscountRule> q = entityManager
+                .createQuery("from WtDiscountRule order by idOfRule", WtDiscountRule.class);
+        return q.getResultList();
+    }
+
+    public List<WtDiscountRule> getWtDiscountRulesList(WtComplexGroupItem selectedComplexType, WtAgeGroupItem selectedAgeGroup) {
+        Query query = entityManager.createQuery("select dr from WtDiscountRule dr inner join dr.complexes c "
+                + "where c.wtComplexGroupItem = :selectedComplexType and c.wtAgeGroupItem = :selectedAgeGroup");
+        query.setParameter("selectedComplexType", selectedComplexType);
+        query.setParameter("selectedAgeGroup", selectedAgeGroup);
+        try {
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public WtComplexGroupItem getWtComplexGroupItemByDescipt(String description) {
+        Query query = entityManager.createQuery("select cg from WtComplexGroupItem cg "
+                + "where cg.description = :description");
+        query.setParameter("description", description);
+        try {
+            return (WtComplexGroupItem) query.getResultList().get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public WtAgeGroupItem getWtAgeGroupItemByDescipt(String description) {
+        Query query = entityManager.createQuery("select ag from WtAgeGroupItem ag "
+                + "where ag.description = :description");
+        query.setParameter("description", description);
+        try {
+            return (WtAgeGroupItem) query.getResultList().get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
