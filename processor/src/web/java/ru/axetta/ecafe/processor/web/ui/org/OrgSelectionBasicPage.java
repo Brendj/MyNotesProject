@@ -22,10 +22,7 @@ import org.hibernate.criterion.*;
 import org.hibernate.transform.Transformers;
 
 import javax.faces.model.SelectItem;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -56,6 +53,28 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
            6 - доступны все фильтры для всех поставщиков
         */
     protected int filterMode = 0;
+
+
+    // По мере расширения типов ОО необходимо дополнять нижеизложенные группы
+    protected static final List<OrganizationType> ONLY_OO_GROUP = Arrays.asList(
+            OrganizationType.SCHOOL,
+            OrganizationType.KINDERGARTEN,
+            OrganizationType.PROFESSIONAL,
+            OrganizationType.ADDEDEDUCATION
+    );
+
+    protected static final List<OrganizationType> ONLY_SUPPLIERS = Collections
+            .singletonList(OrganizationType.SUPPLIER);
+
+    protected static final List<OrganizationType> ONLY_KIND_OO = Collections
+            .singletonList(OrganizationType.KINDERGARTEN);
+
+    protected static final List<OrganizationType> ONLY_SCHOOLS = Collections
+            .singletonList(OrganizationType.SCHOOL);
+
+    protected List<SelectItem> availableOrganizationTypes;
+    protected List<Integer> selectedOrganizationTypes;
+
     protected boolean allOrgFilterDisabled = false;
     protected boolean schoolFilterDisabled = false;
     protected boolean primarySchoolFilterDisabled = false;
