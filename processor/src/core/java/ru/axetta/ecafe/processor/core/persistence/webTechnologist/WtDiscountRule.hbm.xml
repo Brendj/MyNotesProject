@@ -1,0 +1,40 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+    "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+    "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule" table="cf_wt_discountrules">
+        <cache usage="transactional"/>
+        <id name="idOfRule">
+            <column name="idOfRule" sql-type="long"/>
+        </id>
+        <property name="description">
+            <column name="description" sql-type="varchar(100)" length="100" not-null="true"/>
+        </property>
+        <property name="rate">
+            <column name="rate" sql-type="integer" not-null="true"/>
+        </property>
+        <property name="priority">
+            <column name="priority" sql-type="integer" not-null="true"/>
+        </property>
+        <property name="operationOr">
+            <column name="operationOr" sql-type="boolean" not-null="true"/>
+        </property>
+        <property name="idOfSuperCategory">
+            <column name="idOfSuperCategory" sql-type="long"/>
+        </property>
+
+        <many-to-one name="categoryDiscount" class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount">
+            <column name="idOfCategoryDiscount"/>
+        </many-to-one>
+
+        <set name="complexes" lazy="false" table="cf_wt_discountrules_complexes">
+            <key column="idOfRule"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex" column="idOfComplex"/>
+        </set>
+    </class>
+</hibernate-mapping>

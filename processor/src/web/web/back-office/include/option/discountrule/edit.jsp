@@ -137,7 +137,7 @@
                 <f:facet name="header">
                     <rich:columnGroup>
                         <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="Статус"/>
+                            <h:outputText escape="true" value=""/>
                         </rich:column>
                         <rich:column headerClass="column-header">
                             <h:outputText escape="true" value="Название контрагента"/>
@@ -169,10 +169,14 @@
                            left-aligned-column, left-aligned-column, center-aligned-column, left-aligned-column,
                            center-aligned-column">
 
-                    <%--       Статус--%>
+                    <%--       Чек-боксы--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{item.contragentName}" styleClass="output-text"
-                                      converter="dateConverter"/>
+                        <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;">
+                            <h:selectManyCheckbox id="complexs" value="#{item.selectedComplexes}" layout="pageDirection"
+                                                  styleClass="output-text">
+                                <f:selectItems value="#{item.availableComplexes}"/>
+                            </h:selectManyCheckbox>
+                        </h:panelGroup>
                     </rich:column>
 
                     <%--        Название контрагента--%>

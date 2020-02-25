@@ -96,5 +96,11 @@
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexesItem"/>
         </set>
+
+        <set name="discountRules" lazy="false" table="cf_wt_discountrules_complexes">
+            <key column="idOfComplex"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule" column="idOfRule"/>
+        </set>
+
     </class>
 </hibernate-mapping>

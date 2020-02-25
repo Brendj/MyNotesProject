@@ -100,6 +100,12 @@ public class WtComplex {
             inverseJoinColumns = @JoinColumn(name = "IdOfOrg"))
     private Set<Org> orgs = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(name = "cf_wt_discountrules_complexes",
+            joinColumns = @JoinColumn(name = "idOfComplex"),
+            inverseJoinColumns = @JoinColumn(name = "idOfRule"))
+    private Set<WtDiscountRule> discountRules = new HashSet<>();
+
     @OneToMany(mappedBy = "wtComplex")
     private Set<WtComplexesItem> wtComplexesItems = new HashSet<>();
 
@@ -302,6 +308,14 @@ public class WtComplex {
 
     public void setWtComplexesItems(Set<WtComplexesItem> wtComplexesItems) {
         this.wtComplexesItems = wtComplexesItems;
+    }
+
+    public Set<WtDiscountRule> getDiscountRules() {
+        return discountRules;
+    }
+
+    public void setDiscountRules(Set<WtDiscountRule> discountRules) {
+        this.discountRules = discountRules;
     }
 
     @Override
