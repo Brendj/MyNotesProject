@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.ECafeSettings;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.SettingsIds;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -2727,10 +2728,10 @@ public class DAOService {
         }
     }
 
-    public WtComplexGroupItem getWtComplexGroupItemByDescipt(String description) {
+    public WtComplexGroupItem getWtComplexGroupItemById(Long idOfComplexType) {
         Query query = entityManager.createQuery("select cg from WtComplexGroupItem cg "
-                + "where cg.description = :description");
-        query.setParameter("description", description);
+                + "where cg.idOfComplexGroupItem = :idOfComplexType");
+        query.setParameter("idOfComplexType", idOfComplexType);
         try {
             return (WtComplexGroupItem) query.getResultList().get(0);
         } catch (Exception e) {
@@ -2739,12 +2740,31 @@ public class DAOService {
         }
     }
 
-    public WtAgeGroupItem getWtAgeGroupItemByDescipt(String description) {
+    public WtAgeGroupItem getWtAgeGroupItemById(Long idOfAgeGroup) {
         Query query = entityManager.createQuery("select ag from WtAgeGroupItem ag "
-                + "where ag.description = :description");
-        query.setParameter("description", description);
+                + "where ag.idOfAgeGroupItem = :idOfAgeGroup");
+        query.setParameter("idOfAgeGroup", idOfAgeGroup);
         try {
             return (WtAgeGroupItem) query.getResultList().get(0);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public List<WtComplex> getWtComplexesList() {
+        TypedQuery<WtComplex> q = entityManager
+                .createQuery("from WtComplex order by idOfComplex", WtComplex.class);
+        return q.getResultList();
+    }
+
+    public List<WtComplex> getWtComplexesList(WtComplexGroupItem wtComplexGroupItem, WtAgeGroupItem wtAgeGroupItem) {
+        Query query = entityManager.createQuery("select wc from WtComplex wc "
+                + "where wc.wtComplexGroupItem = :wtComplexGroupItem and wc.wtAgeGroupItem = :wtAgeGroupItem");
+        query.setParameter("wtComplexGroupItem", wtComplexGroupItem);
+        query.setParameter("wtAgeGroupItem", wtAgeGroupItem);
+        try {
+            return query.getResultList();
         } catch (Exception e) {
             e.printStackTrace();
             return null;

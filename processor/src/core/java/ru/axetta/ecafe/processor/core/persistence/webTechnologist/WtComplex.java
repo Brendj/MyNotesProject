@@ -65,11 +65,11 @@ public class WtComplex {
     @Column(name = "deleteState")
     private Integer deleteState;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfComplexGroupItem")
     private WtComplexGroupItem wtComplexGroupItem;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfAgeGroupItem")
     private WtAgeGroupItem wtAgeGroupItem;
 
@@ -77,7 +77,7 @@ public class WtComplex {
     @JoinColumn(name = "idOfDietType")
     private WtDietType wtDietType;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 

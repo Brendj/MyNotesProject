@@ -12,8 +12,8 @@ import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -66,22 +66,25 @@ public class RuleEditPage extends BasicWorkspacePage
     }
 
     // Веб-технолог
-    private int selectedComplexTypeNum;
-    private int selectedAgeGroupNum;
-    private WtComplexGroupItem selectedComplexType;
-    private WtAgeGroupItem selectedAgeGroup;
-    private List<WtDiscountRule> wtDiscountRules = new ArrayList<>();
+    private int complexType;
+    private int ageGroup;
+    private List<WtComplex> wtComplexes = new ArrayList<>();
+    private Integer[] selectedWtComplexes;
+    private Map<Integer, Long> complexTypeMap;
+    private Map<Integer, Long> ageGroupMap;
 
     // Веб-технолог
 
     public List<SelectItem> getComplexTypes() {
         List<SelectItem> res = new ArrayList<>();
         List<WtComplexGroupItem> complexGroupItems;
+        complexTypeMap = new HashMap<>();
         res.add(new SelectItem("", ""));
         complexGroupItems = daoService.getWtComplexGroupList();
         int i = 0;
         for (WtComplexGroupItem item : complexGroupItems) {
             res.add(new SelectItem(i++, item.getDescription()));
+            complexTypeMap.put(i, item.getIdOfComplexGroupItem());
         }
         return res;
     }
@@ -89,20 +92,33 @@ public class RuleEditPage extends BasicWorkspacePage
     public List<SelectItem> getAgeGroups() {
         List<SelectItem> res = new ArrayList<>();
         List<WtAgeGroupItem> ageGroupItems;
+        ageGroupMap = new HashMap<>();
         res.add(new SelectItem("", ""));
         ageGroupItems = daoService.getWtAgeGroupList();
         int i = 0;
         for (WtAgeGroupItem item : ageGroupItems) {
             res.add(new SelectItem(i++, item.getDescription()));
+            ageGroupMap.put(i, item.getIdOfAgeGroupItem());
         }
         return res;
     }
 
-    public void fillWtDiscountRules() {
-        //selectedComplexType = daoService.getWtComplexGroupItemByDescipt(selectedComplexTypeItem.getLabel());
-        //selectedAgeGroup = daoService.getWtAgeGroupItemByDescipt(selectedAgeGroupItem.getLabel());
-        //wtDiscountRules = daoService.getWtDiscountRulesList(selectedComplexType, selectedAgeGroup);
-        wtDiscountRules = daoService.getWtDiscountRulesList();
+    public void fillWtComplexes() {
+        //WtComplexGroupItem wtComplexGroupItem = daoService.getWtComplexGroupItemById(complexTypeMap.get(complexType));
+        //WtAgeGroupItem wtAgeGroupItem = daoService.getWtAgeGroupItemById(ageGroupMap.get(ageGroup));
+        //wtComplexes = daoService.getWtComplexesList(wtComplexGroupItem, wtAgeGroupItem);
+
+        wtComplexes = daoService.getWtComplexesList();
+    }
+
+    public List<SelectItem> getAvailableWtComplexes() {
+        //wtComplexes = daoService.getWtComplexesList();
+        List<SelectItem> res = new ArrayList<>();
+        //int i = 0;
+        //for (WtComplex complex : wtComplexes) {
+        //    res.add(new SelectItem(i++, complex.getName()));
+        //}
+        return res;
     }
 
 
@@ -600,28 +616,8 @@ public class RuleEditPage extends BasicWorkspacePage
         this.description = description;
     }
 
-    public int getSelectedComplexTypeNum() {
-        return selectedComplexTypeNum;
-    }
-
-    public void setSelectedComplexTypeNum(int selectedComplexTypeNum) {
-        this.selectedComplexTypeNum = selectedComplexTypeNum;
-    }
-
-    public int getSelectedAgeGroupNum() {
-        return selectedAgeGroupNum;
-    }
-
-    public void setSelectedAgeGroupNum(int selectedAgeGroupNum) {
-        this.selectedAgeGroupNum = selectedAgeGroupNum;
-    }
-
-    public List<WtDiscountRule> getWtDiscountRules() {
-        return wtDiscountRules;
-    }
-
-    public void setWtDiscountRules(List<WtDiscountRule> wtDiscountRules) {
-        this.wtDiscountRules = wtDiscountRules;
+    public void setWtComplexes(List<WtComplex> wtComplexes) {
+        this.wtComplexes = wtComplexes;
     }
 
     public int getSubCategory() {
@@ -668,19 +664,47 @@ public class RuleEditPage extends BasicWorkspacePage
         return entity.getDescription();
     }
 
-    public WtComplexGroupItem getSelectedComplexType() {
-        return selectedComplexType;
+    public int getComplexType() {
+        return complexType;
     }
 
-    public void setSelectedComplexType(WtComplexGroupItem selectedComplexType) {
-        this.selectedComplexType = selectedComplexType;
+    public void setComplexType(int complexType) {
+        this.complexType = complexType;
     }
 
-    public WtAgeGroupItem getSelectedAgeGroup() {
-        return selectedAgeGroup;
+    public int getAgeGroup() {
+        return ageGroup;
     }
 
-    public void setSelectedAgeGroup(WtAgeGroupItem selectedAgeGroup) {
-        this.selectedAgeGroup = selectedAgeGroup;
+    public void setAgeGroup(int ageGroup) {
+        this.ageGroup = ageGroup;
+    }
+
+    public List<WtComplex> getWtComplexes() {
+        return wtComplexes;
+    }
+
+    public Integer[] getSelectedWtComplexes() {
+        return selectedWtComplexes;
+    }
+
+    public void setSelectedWtComplexes(Integer[] selectedWtComplexes) {
+        this.selectedWtComplexes = selectedWtComplexes;
+    }
+
+    public Map<Integer, Long> getComplexTypeMap() {
+        return complexTypeMap;
+    }
+
+    public void setComplexTypeMap(Map<Integer, Long> complexTypeMap) {
+        this.complexTypeMap = complexTypeMap;
+    }
+
+    public Map<Integer, Long> getAgeGroupMap() {
+        return ageGroupMap;
+    }
+
+    public void setAgeGroupMap(Map<Integer, Long> ageGroupMap) {
+        this.ageGroupMap = ageGroupMap;
     }
 }

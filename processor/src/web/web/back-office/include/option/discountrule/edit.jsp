@@ -100,22 +100,22 @@
                 <h:selectBooleanCheckbox id="arm" value="true">
                 </h:selectBooleanCheckbox>
 
-<%--                <h:outputText escape="true" value="Тип комплекса" styleClass="output-text"/>--%>
-<%--                <h:selectOneMenu id="type" value="#{ruleEditPage.complexTypes}" style="width:300px;"--%>
-<%--                                 styleClass="groupSelect">--%>
-<%--                    <f:selectItems value="#{ruleEditPage.selectedComplexType}"/>--%>
-<%--                </h:selectOneMenu>--%>
+                <h:outputText escape="true" value="Тип комплекса" styleClass="output-text"/>
+                <h:selectOneMenu id="type" value="#{ruleEditPage.complexType}"
+                                 style="width:300px;" styleClass="groupSelect" >
+                    <f:selectItems value="#{ruleEditPage.complexTypes}"/>
+                </h:selectOneMenu>
 
-<%--                <h:outputText escape="true" value="Возрастная категория" styleClass="output-text"/>--%>
-<%--                <h:selectOneMenu id="age" value="#{ruleEditPage.ageGroups}" style="width:300px;"--%>
-<%--                                 styleClass="groupSelect">--%>
-<%--                    <f:selectItems value="#{ruleEditPage.selectedAgeGroup}"/>--%>
-<%--                </h:selectOneMenu>--%>
+                <h:outputText escape="true" value="Возрастная категория" styleClass="output-text"/>
+                <h:selectOneMenu id="age" value="#{ruleEditPage.ageGroup}"
+                                 style="width:300px;" styleClass="groupSelect">
+                    <f:selectItems value="#{ruleEditPage.ageGroups}"/>
+                </h:selectOneMenu>
 
             </h:panelGrid>
 
             <h:panelGrid columns="2" styleClass="borderless-grid">
-                <a4j:commandButton value="Отобразить" action="#{ruleEditPage.fillWtDiscountRules()}"
+                <a4j:commandButton value="Отобразить" action="#{ruleEditPage.fillWtComplexes()}"
                                    reRender="workspaceTogglePanel"
                                    styleClass="command-button"/>
             </h:panelGrid>
@@ -131,92 +131,98 @@
                 </f:facet>
             </a4j:status>
 
-            <rich:dataTable id="wtDiscountRules" value="#{ruleEditPage.wtDiscountRules}"
-                            var="wtrule" rows="25"
-                            footerClass="data-table-footer" rowKeyVar="rowItemKey">
-                <f:facet name="header">
-                    <rich:columnGroup>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value=""/>
-                        </rich:column>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="Название контрагента"/>
-                        </rich:column>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="ИД контрагента"/>
-                        </rich:column>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="ИД комплекса"/>
-                        </rich:column>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="Название"/>
-                        </rich:column>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="Возрастная категория"/>
-                        </rich:column>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="Цена"/>
-                        </rich:column>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="Тип"/>
-                        </rich:column>
-                    </rich:columnGroup>
-                </f:facet>
+            <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;">
+
+                <rich:dataTable id="wtComplexes" value="#{ruleEditPage.wtComplexes}"
+                                var="complex" rows="25" footerClass="data-table-footer" rowKeyVar="rowItemKey">
+                    <f:facet name="header">
+                        <rich:columnGroup>
+                            <rich:column headerClass="column-header">
+                                <h:outputText escape="true" value=""/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <h:outputText escape="true" value="Название контрагента"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <h:outputText escape="true" value="ИД контрагента"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <h:outputText escape="true" value="ИД комплекса"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <h:outputText escape="true" value="Название"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <h:outputText escape="true" value="Возрастная категория"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <h:outputText escape="true" value="Цена"/>
+                            </rich:column>
+                            <rich:column headerClass="column-header">
+                                <h:outputText escape="true" value="Тип"/>
+                            </rich:column>
+                        </rich:columnGroup>
+                    </f:facet>
 
 
-                <rich:subTable value="#{wtrule}" var="item" rowKeyVar="rowDetailKey"
-                               columnClasses="center-aligned-column, left-aligned-column, left-aligned-column,
+                    <rich:subTable value="#{complex}" var="complex" rowKeyVar="rowDetailKey"
+                                   columnClasses="center-aligned-column, left-aligned-column, left-aligned-column,
                            left-aligned-column, left-aligned-column, center-aligned-column, left-aligned-column,
                            center-aligned-column">
 
-                    <%--       Чек-боксы--%>
-                    <rich:column headerClass="column-header">
-                        <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;">
-                            <h:selectManyCheckbox id="complexs" value="#{item.selectedComplexes}" layout="pageDirection"
-                                                  styleClass="output-text">
-                                <f:selectItems value="#{item.availableComplexes}"/>
-                            </h:selectManyCheckbox>
-                        </h:panelGroup>
-                    </rich:column>
+                        <%--       Чек-боксы--%>
+                        <rich:column headerClass="column-header">
 
-                    <%--        Название контрагента--%>
-                    <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{item.contragentName}" styleClass="output-text"/>
-                    </rich:column>
+                                <h:selectManyCheckbox id="selComplexes" value="#{ruleEditPage.selectedWtComplexes}"
+                                                      layout="pageDirection" styleClass="output-text">
+                                    <f:selectItems value="#{ruleEditPage.availableWtComplexes}"/>
+                                </h:selectManyCheckbox>
 
-                    <%--        ИД контрагента--%>
-                    <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{item.contragentId}" styleClass="output-text"/>
-                    </rich:column>
+                        </rich:column>
 
-                    <%--        ИД комплекса--%>
-                    <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{item.complexId}" styleClass="output-text"/>
-                    </rich:column>
+                        <%--        Название контрагента--%>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{complex.contragent.contragentName}"
+                                          styleClass="output-text"/>
+                        </rich:column>
 
-                    <%--        Название--%>
-                    <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{item.complexName}" styleClass="output-text"/>
-                    </rich:column>
+                        <%--        ИД контрагента--%>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{complex.contragent.idOfContragent}"
+                                          styleClass="output-text"/>
+                        </rich:column>
 
-                    <%--        Возрастная категория--%>
-                    <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{item.ageCategory}" styleClass="output-text"/>
-                    </rich:column>
+                        <%--        ИД комплекса--%>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{complex.idOfComplex}" styleClass="output-text"/>
+                        </rich:column>
 
-                    <%--        Цена, руб--%>
-                    <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{item.price}" styleClass="output-text"
-                                      converter="copeckSumConverter"/>
-                    </rich:column>
+                        <%--        Название--%>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{complex.name}" styleClass="output-text"/>
+                        </rich:column>
 
-                    <%--        Тип--%>
-                    <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{item.complexType}" styleClass="output-text"/>
-                    </rich:column>
+                        <%--        Возрастная категория--%>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{complex.wtAgeGroupItem.description}"
+                                          styleClass="output-text"/>
+                        </rich:column>
 
-                </rich:subTable>
-            </rich:dataTable>
+                        <%--        Цена, руб--%>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{complex.price}" styleClass="output-text"/>
+                        </rich:column>
+
+                        <%--        Тип--%>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="#{complex.wtComplexGroupItem.description}"
+                                          styleClass="output-text"/>
+                        </rich:column>
+
+                    </rich:subTable>
+                </rich:dataTable>
+
+            </h:panelGroup>
         </rich:panel>
     </h:panelGrid>
 </h:panelGrid>
