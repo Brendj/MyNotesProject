@@ -534,7 +534,7 @@ public class SummaryCalculationService {
         //подсчет данных по предзаказам
         if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
             String preorders_query = "select distinct pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender,"
-                    + " rp.state, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname "
+                    + " rp.state as stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname "
                     + " from cf_preorder_complex pc "
                     + " join cf_regular_preorders rp on rp.idofregularpreorder = pc.idofregularpreorder "
 
@@ -545,7 +545,7 @@ public class SummaryCalculationService {
                     + "where pc1.idofclient = pc.idofclient and pc1.deletedstate = 0 and pc1.preorderdate = pc.preorderdate and pc1.amount > 0) "
                     + " union "
                     + "select distinct pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender,"
-                    + " rp.state, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname "
+                    + " rp.state as stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname "
                     + " from cf_preorder_menudetail pmd "
                     + " join cf_regular_preorders rp on rp.idofregularpreorder = pmd.idofregularpreorder "
                     + " join cf_clients c on c.idofclient = pmd.idofclient join cf_persons p on p.idofperson = c.idofperson "
@@ -555,7 +555,7 @@ public class SummaryCalculationService {
                     + "where pmd1.idofclient = pmd.idofclient and pmd1.deletedstate = 0 and pmd1.preorderdate = pmd.preorderdate and pmd1.amount > 0) "
                     + " UNION "
                     + "select distinct pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender, "
-                    + " rp.state, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname "
+                    + " rp.state as stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname "
                     + "from cf_client_guardian_notificationsettings n join cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
                     + "join cf_clients c on c.idofclient = cg.idofchildren "
                     + "join cf_preorder_complex pc on c.idofclient = pc.idofclient "
@@ -566,7 +566,7 @@ public class SummaryCalculationService {
                     + "where pc1.idofclient = pc.idofclient and pc1.deletedstate = 0 and pc1.preorderdate = pc.preorderdate and pc1.amount > 0) "
                     + "union "
                     + "select distinct pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender, "
-                    + " rp.state, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname "
+                    + " rp.state as stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname "
                     + "from cf_client_guardian_notificationsettings n join cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
                     + "join cf_clients c on c.idofclient = cg.idofchildren "
                     + "join cf_preorder_menudetail pmd on pmd.idofclient = c.idofclient "
@@ -581,19 +581,51 @@ public class SummaryCalculationService {
             pQuery.setParameter("notifyType", notifyType);
             List plist = pQuery.getResultList();
 
+            List <PreorderData> preorderData = new ArrayList<>();
+            List <PreorderRegularData> regularData = new ArrayList<>();
+
+            Long counter = 0L;
             for (Object obj : plist) {
                 Object[] row = (Object[]) obj;
-                Date date = new Date(((BigInteger)row[0]).longValue());
-                Integer state = (Integer)row[1];
-                long id = ((BigInteger)row[2]).longValue();
-                String surname = (String) row[3];
-                String firstname = (String) row[4];
-                Integer gender = (Integer) row[5];
-                Integer stateReg = (Integer)row[6];
-                Date lastUpdate = new Date(((BigInteger)row[7]).longValue());
-                Date endDateReg = new Date(((BigInteger)row[8]).longValue());
-                String itemCode = (String) row[9];
-                String itemname = (String) row[10];
+
+                PreorderRegularData currPreorderRegularData = new PreorderRegularData();
+                currPreorderRegularData.setStateReg((Integer)row[6]);
+                currPreorderRegularData.setLastUpdate(new Date(((BigInteger)row[7]).longValue()));
+                currPreorderRegularData.setEndDateReg(new Date(((BigInteger)row[8]).longValue()));
+                currPreorderRegularData.setItemCode((String) row[9]);
+                currPreorderRegularData.setItemname((String) row[10]);
+                currPreorderRegularData.setId(counter);
+                regularData.add(currPreorderRegularData);
+                counter++;
+
+                PreorderData currPreorderData = new PreorderData();
+                currPreorderData.setDate(new Date(((BigInteger)row[0]).longValue()));
+                currPreorderData.setState((Integer)row[1]);
+                currPreorderData.setId(((BigInteger)row[2]).longValue());
+                currPreorderData.setSurname((String) row[3]);
+                currPreorderData.setFirstname((String) row[4]);
+                currPreorderData.setGender((Integer) row[5]);
+
+                boolean added = false;
+                for (PreorderData preorderData1 : preorderData)
+                {
+                    if (preorderData1.getDate().equals(currPreorderData.getDate()) &&
+                            preorderData1.getState().equals(currPreorderData.getState()) &&
+                            preorderData1.getId() ==  currPreorderData.getId() &&
+                            preorderData1.getSurname().equals(currPreorderData.getSurname()) &&
+                            preorderData1.getFirstname().equals(currPreorderData.getFirstname()) &&
+                            preorderData1.getGender().equals(currPreorderData.getGender()))
+                    {
+                        preorderData1.getIds().add(currPreorderRegularData.getId());
+                        added = true;
+                        break;
+                    }
+                }
+                if (!added)
+                {
+                    currPreorderData.getIds().add(currPreorderRegularData.getId());
+                    preorderData.add(currPreorderData);
+                }
             }
 
 
@@ -622,7 +654,7 @@ public class SummaryCalculationService {
                 if (state.equals(PreorderState.OK.getCode())) {
                     clientEE.getPreorders().getDeletedPreorderDateGuardian().add(notifyPreorderDailyDetail);
                 } else {
-                    clientEE.getPreorders().getDeletedPreorderDateOther().add(date);
+                    clientEE.getPreorders().getDeletedPreorderDateOther().add(notifyPreorderDailyDetail);
                 }
             }
             attachPreorderDailyValues(clients);
@@ -720,9 +752,9 @@ public class SummaryCalculationService {
     private void attachPreorderDailyValues(List<ClientEE> clients) {
         for (ClientEE clientEE : clients) {
             clientEE.setValues(attachValue(clientEE.getValues(), VALUE_DELETED_PREORDER_DATE_GUARDIAN,
-                    clientEE.getPreorders().getDeletedPreorderDateGuardian().size() == 0 ? "" : getPreorderDates(clientEE.getPreorders().getDeletedPreorderDateGuardian())));
+                    clientEE.getPreorders().getDeletedPreorderDateGuardian().size() == 0 ? "" : getPreorderDates(clientEE.getPreorders().getDateGuardian())));
             clientEE.setValues(attachValue(clientEE.getValues(), VALUE_DELETED_PREORDER_DATE_OTHER,
-                    clientEE.getPreorders().getDeletedPreorderDateOther().size() == 0 ? "" : getPreorderDates(clientEE.getPreorders().getDeletedPreorderDateOther())));
+                    clientEE.getPreorders().getDeletedPreorderDateOther().size() == 0 ? "" : getPreorderDates(clientEE.getPreorders().getDateOther())));
         }
     }
 
@@ -1415,6 +1447,26 @@ public class SummaryCalculationService {
             this.deletedPreorderDateOther = new TreeSet<NotifyPreorderDailyDetail>();
         }
 
+        public Set<Date> getDateGuardian()
+        {
+            Set<Date> dates = new TreeSet<Date>();
+            for (NotifyPreorderDailyDetail notifyPreorderDailyDetail: deletedPreorderDateGuardian)
+            {
+                dates.add(notifyPreorderDailyDetail.getEndDate());
+            }
+            return dates;
+        }
+
+        public Set<Date> getDateOther()
+        {
+            Set<Date> dates = new TreeSet<Date>();
+            for (NotifyPreorderDailyDetail notifyPreorderDailyDetail: deletedPreorderDateOther)
+            {
+                dates.add(notifyPreorderDailyDetail.getEndDate());
+            }
+            return dates;
+        }
+
         public Set<NotifyPreorderDailyDetail> getDeletedPreorderDateGuardian() {
             return deletedPreorderDateGuardian;
         }
@@ -1506,6 +1558,134 @@ public class SummaryCalculationService {
 
         public void setBalance(Long balance) {
             this.balance = balance;
+        }
+    }
+
+    public class PreorderData{
+        private Date date;
+        private Integer state;
+        private long id;
+        private String surname;
+        private String firstname;
+        private Integer gender;
+        private List<Long> ids;
+
+        PreorderData()
+        {
+            ids = new ArrayList<>();
+        }
+
+        public Date getDate() {
+            return date;
+        }
+
+        public void setDate(Date date) {
+            this.date = date;
+        }
+
+        public Integer getState() {
+            return state;
+        }
+
+        public void setState(Integer state) {
+            this.state = state;
+        }
+
+        public long getId() {
+            return id;
+        }
+
+        public void setId(long id) {
+            this.id = id;
+        }
+
+        public String getSurname() {
+            return surname;
+        }
+
+        public void setSurname(String surname) {
+            this.surname = surname;
+        }
+
+        public String getFirstname() {
+            return firstname;
+        }
+
+        public void setFirstname(String firstname) {
+            this.firstname = firstname;
+        }
+
+        public Integer getGender() {
+            return gender;
+        }
+
+        public void setGender(Integer gender) {
+            this.gender = gender;
+        }
+
+        public List<Long> getIds() {
+            return ids;
+        }
+
+        public void setIds(List<Long> ids) {
+            this.ids = ids;
+        }
+    }
+
+    public class PreorderRegularData{
+        private Long id;
+        private Integer stateReg;
+        private Date lastUpdate;
+        private Date endDateReg;
+        private String itemCode;
+        private String itemname;
+
+        public Integer getStateReg() {
+            return stateReg;
+        }
+
+        public void setStateReg(Integer stateReg) {
+            this.stateReg = stateReg;
+        }
+
+        public Date getLastUpdate() {
+            return lastUpdate;
+        }
+
+        public void setLastUpdate(Date lastUpdate) {
+            this.lastUpdate = lastUpdate;
+        }
+
+        public Date getEndDateReg() {
+            return endDateReg;
+        }
+
+        public void setEndDateReg(Date endDateReg) {
+            this.endDateReg = endDateReg;
+        }
+
+        public String getItemCode() {
+            return itemCode;
+        }
+
+        public void setItemCode(String itemCode) {
+            this.itemCode = itemCode;
+        }
+
+        public String getItemname() {
+            return itemname;
+        }
+
+        public void setItemname(String itemname) {
+            this.itemname = itemname;
+        }
+
+        public Long getId() {
+            return id;
+        }
+
+        public void setId(Long id) {
+            this.id = id;
         }
     }
 }
