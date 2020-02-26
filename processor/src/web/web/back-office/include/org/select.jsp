@@ -61,21 +61,12 @@
                             </h:selectOneMenu>
                         </h:panelGrid>
                     </h:panelGrid>
-                    <h:selectOneRadio value="#{mainPage.orgSelectPage.supplierFilter}" converter="javax.faces.Integer"
-                                      styleClass="output-text">
-                        <a4j:support event="onclick" action="#{mainPage.updateOrgSelectPageWithItemDeselection}"
-                                     reRender="modalOrgSelectorForm" />
-                        <f:selectItem itemValue="0" itemLabel="Любые организации"
-                                      itemDisabled="#{mainPage.orgSelectPage.allOrgFilterDisabled}" />
-                        <f:selectItem itemValue="1" itemLabel="Только ОУ"
-                                      itemDisabled="#{mainPage.orgSelectPage.schoolFilterDisabled}" />
-                        <f:selectItem itemValue="4" itemLabel="Только ДОУ"
-                                      itemDisabled="#{mainPage.orgSelectPage.primarySchoolFilterDisabled}" />
-                        <f:selectItem itemValue="5" itemLabel="Только СОУ"
-                                      itemDisabled="#{mainPage.orgSelectPage.secondarySchoolFilterDisabled}" />
-                        <f:selectItem itemValue="2" itemLabel="Только поставщики"
-                                      itemDisabled="#{mainPage.orgSelectPage.supplierFilterDisabled}" />
-                    </h:selectOneRadio>
+                    <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;">
+                        <h:selectManyCheckbox id="complexs" value="#{mainPage.orgSelectPage.selectedOrganizationTypes}"
+                                              layout="pageDirection" styleClass="output-text">
+                            <f:selectItems value="#{mainPage.orgSelectPage.availableOrganizationTypes}"/>
+                        </h:selectManyCheckbox>
+                    </h:panelGroup>
                 </td>
             </tr>
             <tr>
