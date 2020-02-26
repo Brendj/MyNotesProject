@@ -46,6 +46,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         */
     protected int filterMode = 0;
 
+    protected Boolean districtFilterDisabled = false;
 
     // По мере расширения типов ОО необходимо дополнять нижеизложенные группы
     protected static final List<OrganizationType> ONLY_OO_GROUP = Arrays.asList(
@@ -64,8 +65,8 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected static final List<OrganizationType> ONLY_SCHOOLS = Collections
             .singletonList(OrganizationType.SCHOOL);
 
-    protected List<SelectItem> availableOrganizationTypes;
-    protected List<Integer> selectedOrganizationTypes;
+    protected List<SelectItem> availableOrganizationTypes = new LinkedList<>();
+    protected List<Integer> selectedOrganizationTypes = new LinkedList<>();
 
     protected List<OrgShortItem> items = Collections.emptyList();
     protected Long idOfContragent;
@@ -129,7 +130,16 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         }
 
         if(CollectionUtils.isNotEmpty(orgTypes)) {
-            orgCriteria.add(Restrictions.in("type", orgTypes));
+            List<OrganizationType> selectedTypes = new LinkedList<>();
+            for(Integer code : orgTypes){
+                OrganizationType type = OrganizationType.fromInteger(code);
+                if(type != null){
+                    selectedTypes.add(type);
+                }
+            }
+            if(!selectedTypes.isEmpty()) {
+                orgCriteria.add(Restrictions.in("type", selectedTypes));
+            }
         }
 
         orgCriteria.setProjection(
@@ -196,7 +206,15 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
        buildOrgTypesItems(filterMode);
     }
 
-    private void buildOrgTypesItems(Integer filterMode) {
+    public Boolean getDistrictFilterDisabled() {
+        return districtFilterDisabled;
+    }
+
+    public void setDistrictFilterDisabled(Boolean districtFilterDisabled) {
+        this.districtFilterDisabled = districtFilterDisabled;
+    }
+
+    protected void buildOrgTypesItems(Integer filterMode) {
         availableOrganizationTypes.clear();
         selectedOrganizationTypes.clear();
         switch (filterMode) {
@@ -207,6 +225,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
                     availableOrganizationTypes.add(item);
                     selectedOrganizationTypes.add(type.getCode());
                 }
+                districtFilterDisabled = false;
                 break;
             case 2:
                 for (OrganizationType type : ONLY_SUPPLIERS) {
@@ -214,6 +233,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
                     availableOrganizationTypes.add(item);
                     selectedOrganizationTypes.add(type.getCode());
                 }
+                districtFilterDisabled = true;
                 break;
             case 3:
                 for (OrganizationType type : ONLY_OO_GROUP) {
@@ -225,6 +245,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
                     SelectItem item = new SelectItem(type.getCode(), type.getShortType());
                     availableOrganizationTypes.add(item);
                 }
+                districtFilterDisabled = false;
                 break;
             case 4:
                 for (OrganizationType type : ONLY_KIND_OO) {
@@ -232,6 +253,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
                     availableOrganizationTypes.add(item);
                     selectedOrganizationTypes.add(type.getCode());
                 }
+                districtFilterDisabled = false;
                 break;
             case 5:
                 for (OrganizationType type : ONLY_SCHOOLS) {
@@ -239,6 +261,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
                     availableOrganizationTypes.add(item);
                     selectedOrganizationTypes.add(type.getCode());
                 }
+                districtFilterDisabled = false;
                 break;
             case 6:
             default:
@@ -249,6 +272,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
                         selectedOrganizationTypes.add(type.getCode());
                     }
                 }
+                districtFilterDisabled = false;
         }
     }
 

@@ -28,7 +28,6 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
 
     private final Stack<CompleteHandlerList> completeHandlerLists = new Stack<CompleteHandlerList>();
     private Map<Long, String> selectedOrgs = new HashMap<Long, String>();
-    private String selectedOrgsString = "";
     private List<OrgShortItem> autoCompleteOrgs = new ArrayList<OrgShortItem>();
 
     public void pushCompleteHandlerList(CompleteHandlerList handlerList) {
@@ -41,13 +40,7 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
         Map<Long, String> orgMap = null;
         if (ok) {
             updateSelectedOrgs();
-            orgMap = new HashMap<Long, String>();
-            orgMap.putAll(selectedOrgs);
-            /*for (Item item : items) {
-                if (item.getSelected()) {
-                    orgMap.put(item.getIdOfOrg(), item.getShortName());
-                }
-            }*/
+            orgMap = new HashMap<Long, String>(selectedOrgs);
         }
         if (!completeHandlerLists.empty()) {
             completeHandlerLists.peek().completeOrgListSelection(orgMap);
@@ -58,6 +51,7 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
 
     public void fill(Session session, String orgFilter, Boolean isUpdate, List<Long> idOfContragentOrgList,
         List<Long> idOfContragentList, MainPage mainPage) throws Exception {
+        buildOrgTypesItems(getFilterMode());
         if (isUpdate) {
             updateSelectedOrgs();
             mainPage.setOrgFilterOfSelectOrgListSelectPage(StringUtils.join(selectedOrgs.values(), ","));
@@ -89,6 +83,7 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
 
     public void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList, List<Long> idOfContragentList)
             throws Exception {
+        buildOrgTypesItems(getFilterMode());
         if (isUpdate) {
             updateSelectedOrgs();
         } else {
@@ -158,7 +153,7 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
     public String getSelectedOrgsString() {
         String s = "";
         for (String org : getSelectedOrgs().values()) {
-            s = s + org + ", ";
+            s += org + ", ";
         }
         if (s.length() > 2) {
             return s.substring(0, s.length() - 2);

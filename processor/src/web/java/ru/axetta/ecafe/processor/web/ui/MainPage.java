@@ -2129,7 +2129,7 @@ public class MainPage implements Serializable {
     }
 
     public Object updateOrgListSelectPageWithItemDeselection() {
-        if (orgListSelectPage.getSupplierFilter() == 2) {
+        if (orgListSelectPage.getFilterMode() == 2) {
             orgListSelectPage.setDistrictFilterDisabled(true);
         } else {
             orgListSelectPage.setDistrictFilterDisabled(false);
@@ -2140,7 +2140,7 @@ public class MainPage implements Serializable {
     }
 
     public Object updateOrgSelectPageWithItemDeselection() {
-        if (orgSelectPage.getSupplierFilter() == 2) {
+        if (orgSelectPage.getFilterMode() == 2) {
             orgSelectPage.setDistrictFilterDisabled(true);
         } else {
             orgSelectPage.setDistrictFilterDisabled(false);

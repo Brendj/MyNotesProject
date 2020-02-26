@@ -94,26 +94,12 @@
                                             </h:inputText>
                                         </h:panelGrid>
                                     </rich:simpleTogglePanel>
-
-                                <h:panelGrid id="radioButtons" columns="1" styleClass="borderless-grid">
-                                    <h:selectOneRadio value="#{mainPage.orgListSelectPage.supplierFilter}"
-                                                      converter="javax.faces.Integer" styleClass="output-text">
-                                        <a4j:support event="onclick" action="#{mainPage.updateOrgListSelectPage}"
-                                                     reRender="modalOrgListSelectorOrgTable" />
-                                        <f:selectItem itemValue="0" itemLabel="Любые организации"
-                                                      itemDisabled="#{mainPage.orgListSelectPage.allOrgFilterDisabled}" />
-                                        <f:selectItem itemValue="1" itemLabel="Только ОУ"
-                                                      itemDisabled="#{mainPage.orgListSelectPage.schoolFilterDisabled}" />
-                                        <f:selectItem itemValue="4" itemLabel="Только ДОУ"
-                                                      itemDisabled="#{mainPage.orgListSelectPage.primarySchoolFilterDisabled}" />
-                                        <f:selectItem itemValue="5" itemLabel="Только СОУ"
-                                                      itemDisabled="#{mainPage.orgListSelectPage.secondarySchoolFilterDisabled}" />
-                                        <f:selectItem itemValue="2" itemLabel="Только поставщики"
-                                                      itemDisabled="#{mainPage.orgListSelectPage.supplierFilterDisabled}" />
-                                        <f:selectItem itemValue="6" itemLabel="Показать все организации"
-                                                      itemDisabled="#{mainPage.orgListSelectPage.allOrgsFilterDisabled}" />
-                                    </h:selectOneRadio>
-                                </h:panelGrid>
+                                <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;">
+                                    <h:selectManyCheckbox id="OrganizationTypesForSelectMany" value="#{mainPage.orgSelectPage.selectedOrganizationTypes}"
+                                                          styleClass="output-text">
+                                        <f:selectItems value="#{mainPage.orgSelectPage.availableOrganizationTypes}"/>
+                                    </h:selectManyCheckbox>
+                                </h:panelGroup>
                             </h:panelGrid>
                         </h:panelGrid>
                         <a4j:commandLink action="#{mainPage.updateOrgListSelectPage}"

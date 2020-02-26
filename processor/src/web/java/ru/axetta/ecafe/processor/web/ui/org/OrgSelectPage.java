@@ -69,6 +69,7 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
     }
 
     public void fill(Session session, Long idOfOrg, List<Long> idOfMenuSourceOrgList) throws Exception {
+        buildOrgTypesItems(getFilterMode());
         List<OrgShortItem> items = retrieveOrgs(session, idOfMenuSourceOrgList);
         OrgShortItem selectedItem = new OrgShortItem();
         if (null != idOfOrg) {

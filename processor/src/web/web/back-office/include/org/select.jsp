@@ -62,8 +62,8 @@
                         </h:panelGrid>
                     </h:panelGrid>
                     <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;">
-                        <h:selectManyCheckbox id="complexs" value="#{mainPage.orgSelectPage.selectedOrganizationTypes}"
-                                              layout="pageDirection" styleClass="output-text">
+                        <h:selectManyCheckbox id="OrganizationTypesForSelectOne" value="#{mainPage.orgSelectPage.selectedOrganizationTypes}"
+                                               styleClass="output-text">
                             <f:selectItems value="#{mainPage.orgSelectPage.availableOrganizationTypes}"/>
                         </h:selectManyCheckbox>
                     </h:panelGroup>
