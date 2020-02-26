@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -528,6 +528,28 @@ public class DAOUtils {
 
     public static Card getCardReference(Session persistenceSession, long idOfCard) throws Exception {
         return (Card) persistenceSession.get(Card.class, idOfCard);
+    }
+
+    public static Card findCardByCardNoDoublesAllowed(Session session, Org cardOrg, Long cardNo, Long cardPrintedNo, Integer cardSignCertNum) throws Exception {
+        Criteria cr = session.createCriteria(Card.class);
+        cr.add(Restrictions.eq("cardNo", cardNo));
+        cr.add(Restrictions.in("org", findAllFriendlyOrgs(session, cardOrg.getIdOfOrg())));
+        cr.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        cr.setMaxResults(1);
+        Card card = (Card)cr.uniqueResult();
+        if (card != null) return card;
+
+        Criteria criteria = session.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("cardNo", cardNo));
+        criteria.add(Restrictions.eq("cardPrintedNo", cardPrintedNo));
+        if (cardSignCertNum == null) {
+            criteria.add(Restrictions.isNull("cardSignCertNum"));
+        } else {
+            criteria.add(Restrictions.eq("cardSignCertNum", cardSignCertNum));
+        }
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        criteria.setMaxResults(1);
+        return (Card) criteria.uniqueResult();
     }
 
     public static Card findCardByCardNo(Session persistenceSession, Long cardNo) {

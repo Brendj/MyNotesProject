@@ -1519,9 +1519,15 @@ public class FrontController extends HttpServlet {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Card exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+            Org org = DAOUtils.findOrg(persistenceSession, idOfOrg);
+            Card exCard = null;
+            if (VersionUtils.doublesAllowed() && org.getNeedVerifyCardSign()) {
+                exCard = DAOUtils.findCardByCardNoDoublesAllowed(persistenceSession, org, cardNo, cardPrintedNo, cardSignCertNum);
+            } else {
+                exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+            }
             if (null == exCard) {
-                card = cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
+                card = cardService.registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
                         isLongUid);
                 idOfCard = card.getIdOfCard();
                 transitionState = CardTransitionState.fromInteger(card.getTransitionState());
@@ -1551,7 +1557,7 @@ public class FrontController extends HttpServlet {
                         }
                     }
                     card = cardService
-                            .registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
+                            .registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
                                     isLongUid, CardTransitionState.BORROWED.getCode());
                     idOfCard = card.getIdOfCard();
                     transitionState = CardTransitionState.fromInteger(card.getTransitionState());
