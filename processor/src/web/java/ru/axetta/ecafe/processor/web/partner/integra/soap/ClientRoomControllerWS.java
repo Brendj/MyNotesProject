@@ -2689,7 +2689,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     if (ci.getGood() != null && !ci.getGood().getAgeGroupType().equals(GoodAgeGroupType.UNSPECIFIED)) continue;
                 }
 
-                List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, ci.getIdOfComplexInfo());
+                List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, ci.getIdOfComplexInfo(), true);
                 MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(ci);
                 menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
                 list.add(menuWithComplexesExt);
@@ -6455,7 +6455,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.getComplexInfoList().setList(list);
             ObjectFactory objectFactory = new ObjectFactory();
             for (ComplexInfo ci : complexInfoList) {
-                List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, ci.getIdOfComplexInfo());
+                List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, ci.getIdOfComplexInfo(), false);
                 ComplexInfoExt complexInfoExt = new ComplexInfoExt(ci);
                 complexInfoExt.setMenuItemExtList(menuItemExtList);
                 list.add(complexInfoExt);
@@ -6474,35 +6474,37 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, Long idOfComplexInfo) {
+    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, Long idOfComplexInfo, boolean isNotForMos) {
         List<MenuItemExt> menuItemExtList = new ArrayList<MenuItemExt>();
         List<MenuDetail> menuDetails = DAOReadExternalsService.getInstance()
                 .getMenuDetailsByIdOfComplexInfo(idOfComplexInfo);
         for (MenuDetail menuDetail : menuDetails) {
-            MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-            menuItemExt.setGroup(menuDetail.getGroupName());
-            menuItemExt.setName(menuDetail.getShortName());
-            menuItemExt.setFullName(menuDetail.getMenuDetailName());
-            menuItemExt.setPrice(menuDetail.getPrice());
-            menuItemExt.setCalories(menuDetail.getCalories());
-            menuItemExt.setVitB1(menuDetail.getVitB1());
-            menuItemExt.setVitB2(menuDetail.getVitB2());
-            menuItemExt.setVitPp(menuDetail.getVitPp());
-            menuItemExt.setVitC(menuDetail.getVitC());
-            menuItemExt.setVitA(menuDetail.getVitA());
-            menuItemExt.setVitE(menuDetail.getVitE());
-            menuItemExt.setMinCa(menuDetail.getMinCa());
-            menuItemExt.setMinP(menuDetail.getMinP());
-            menuItemExt.setMinMg(menuDetail.getMinMg());
-            menuItemExt.setMinFe(menuDetail.getMinFe());
-            menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
-            menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
-            menuItemExt.setProtein(menuDetail.getProtein());
-            menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
-            menuItemExt.setFat(menuDetail.getFat());
-            menuItemExt.setIdOfMenuDetail(menuDetail.getIdOfMenuDetail());
-
-            menuItemExtList.add(menuItemExt);
+            //Если не нужны Сотрудники и в названии группы встречается Сотрудник, то пропускаем такую запись
+            if (!isNotForMos || (menuDetail.getGroupName().toUpperCase().indexOf(groupNotForMos.toUpperCase()) == -1)) {
+                MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+                menuItemExt.setGroup(menuDetail.getGroupName());
+                menuItemExt.setName(menuDetail.getShortName());
+                menuItemExt.setFullName(menuDetail.getMenuDetailName());
+                menuItemExt.setPrice(menuDetail.getPrice());
+                menuItemExt.setCalories(menuDetail.getCalories());
+                menuItemExt.setVitB1(menuDetail.getVitB1());
+                menuItemExt.setVitB2(menuDetail.getVitB2());
+                menuItemExt.setVitPp(menuDetail.getVitPp());
+                menuItemExt.setVitC(menuDetail.getVitC());
+                menuItemExt.setVitA(menuDetail.getVitA());
+                menuItemExt.setVitE(menuDetail.getVitE());
+                menuItemExt.setMinCa(menuDetail.getMinCa());
+                menuItemExt.setMinP(menuDetail.getMinP());
+                menuItemExt.setMinMg(menuDetail.getMinMg());
+                menuItemExt.setMinFe(menuDetail.getMinFe());
+                menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
+                menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
+                menuItemExt.setProtein(menuDetail.getProtein());
+                menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
+                menuItemExt.setFat(menuDetail.getFat());
+                menuItemExt.setIdOfMenuDetail(menuDetail.getIdOfMenuDetail());
+                menuItemExtList.add(menuItemExt);
+            }
         }
         return menuItemExtList;
     }
