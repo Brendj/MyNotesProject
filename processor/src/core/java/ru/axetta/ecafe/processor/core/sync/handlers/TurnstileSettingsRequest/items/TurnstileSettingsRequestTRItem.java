@@ -67,7 +67,7 @@ public class TurnstileSettingsRequestTRItem extends TurnstileSettingsRequestItem
                 errorMessage.append("Attribute LastUpdate not found or incorrect");
             }
         } else {
-            errorMessage.append("Attribute RequestDate not found");
+            errorMessage.append("Attribute LastUpdate not found");
         }
         return new TurnstileSettingsRequestTRItem(type, errorMessage.toString(), turnstileId, controllerModel,
                 controllerFirmwareVersion, isWorkWithLongIds, lastUpdateForTurnstileSetting);

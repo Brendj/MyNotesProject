@@ -6,10 +6,8 @@ package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.it
 
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class HardwareSettingsRequestMTItem extends HardwareSettingsRequestItem {
@@ -25,9 +23,8 @@ public class HardwareSettingsRequestMTItem extends HardwareSettingsRequestItem {
     }
 
     public static HardwareSettingsRequestMTItem build(Node itemNode) {
-        Integer value = null;
-        Integer installStatus = null;
-        Date lastUpdate = null;
+        Integer value;
+        Integer installStatus;
         String type = "MT";
 
         StringBuilder errorMessage = new StringBuilder();
@@ -42,18 +39,7 @@ public class HardwareSettingsRequestMTItem extends HardwareSettingsRequestItem {
             errorMessage.append("Attribute InstallStatus not found");
         }
 
-        String requestDateString = XMLUtils.getAttributeValue(itemNode, "LastUpdate");
-        if (StringUtils.isNotEmpty(requestDateString)) {
-            try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                lastUpdate = simpleDateFormat.parse(requestDateString);
-            } catch (Exception e) {
-                errorMessage.append("Attribute LastUpdate not found or incorrect");
-            }
-        } else {
-            errorMessage.append("Attribute RequestDate not found");
-        }
-        return new HardwareSettingsRequestMTItem(value, installStatus, lastUpdate, type, errorMessage.toString());
+        return new HardwareSettingsRequestMTItem(value, installStatus, getLastUpdate(itemNode, errorMessage), type, errorMessage.toString());
     }
 
     public Integer getInstallStatus() {

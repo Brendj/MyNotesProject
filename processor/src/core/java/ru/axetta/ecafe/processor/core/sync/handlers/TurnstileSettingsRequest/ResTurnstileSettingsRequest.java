@@ -18,7 +18,6 @@ public class ResTurnstileSettingsRequest implements AbstractToElement {
     private List<ResTurnstileSettingsRequestItem> items;
 
     public ResTurnstileSettingsRequest() {
-
     }
 
     @Override

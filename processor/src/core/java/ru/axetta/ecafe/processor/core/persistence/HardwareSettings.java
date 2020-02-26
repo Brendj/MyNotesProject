@@ -233,4 +233,6 @@ public class HardwareSettings implements Serializable {
         this.version = version;
     }
 
+
+
 }

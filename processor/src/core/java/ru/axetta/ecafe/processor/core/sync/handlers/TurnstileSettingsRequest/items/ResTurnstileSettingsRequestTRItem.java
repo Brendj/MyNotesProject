@@ -25,6 +25,7 @@ public class ResTurnstileSettingsRequestTRItem extends ResTurnstileSettingsReque
         this.controllerModel = turnstileSettings.getControllerModel();
         this.controllerFirmwareVersion = turnstileSettings.getControllerFirmwareVersion();
         this.isWorkWithLongIds = turnstileSettings.getIsWorkWithLongIds();
+        setResCode(resCode);
         setLastUpdateForTurnstileSetting(turnstileSettings.getLastUpdateForTurnstile());
     }
 
@@ -35,6 +36,8 @@ public class ResTurnstileSettingsRequestTRItem extends ResTurnstileSettingsReque
     @Override
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("TR");
+        Integer resCode = getResCode();
+        String errorMessage = null;
         if (null != turnstileId) {
             XMLUtils.setAttributeIfNotNull(element, "TurnstileId", turnstileId);
         }
@@ -51,39 +54,11 @@ public class ResTurnstileSettingsRequestTRItem extends ResTurnstileSettingsReque
         if (null != lastUpdate) {
             XMLUtils.setAttributeIfNotNull(element, "LastUpdate", lastUpdateForTurnstileSetting);
         }
+        XMLUtils.setAttributeIfNotNull(element, "Res", resCode);
+        if (resCode != null && resCode != 0) {
+            XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
+        }
         return element;
-    }
-
-    public String getTurnstileId() {
-        return turnstileId;
-    }
-
-    public void setTurnstileId(String turnstileId) {
-        this.turnstileId = turnstileId;
-    }
-
-    public String getControllerModel() {
-        return controllerModel;
-    }
-
-    public void setControllerModel(String controllerModel) {
-        this.controllerModel = controllerModel;
-    }
-
-    public String getControllerFirmwareVersion() {
-        return controllerFirmwareVersion;
-    }
-
-    public void setControllerFirmwareVersion(String controllerFirmwareVersion) {
-        this.controllerFirmwareVersion = controllerFirmwareVersion;
-    }
-
-    public Integer getIsWorkWithLongIds() {
-        return isWorkWithLongIds;
-    }
-
-    public void setIsWorkWithLongIds(Integer isWorkWithLongIds) {
-        this.isWorkWithLongIds = isWorkWithLongIds;
     }
 
     public Date getLastUpdateForTurnstileSetting() {

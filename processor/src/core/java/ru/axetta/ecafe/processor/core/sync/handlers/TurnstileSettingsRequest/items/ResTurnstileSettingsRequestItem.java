@@ -12,11 +12,6 @@ public abstract class ResTurnstileSettingsRequestItem implements AbstractToEleme
     private Integer resCode;
 
     public ResTurnstileSettingsRequestItem() {
-
-    }
-
-    public ResTurnstileSettingsRequestItem(Integer resCode) {
-        this.resCode = resCode;
     }
 
     public ResTurnstileSettingsRequestItem(String errorMessage, Integer resCode) {

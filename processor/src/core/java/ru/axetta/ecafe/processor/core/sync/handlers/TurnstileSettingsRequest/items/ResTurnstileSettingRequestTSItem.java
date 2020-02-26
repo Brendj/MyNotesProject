@@ -15,7 +15,7 @@ public class ResTurnstileSettingRequestTSItem extends ResTurnstileSettingsReques
     private Integer numOfEntries;
 
     public ResTurnstileSettingRequestTSItem(TurnstileSettings turnstileSettings, Integer resCode) {
-        super(resCode);
+        setResCode(resCode);
         this.numOfEntries = turnstileSettings.getNumOfEntries();
     }
 
@@ -25,17 +25,15 @@ public class ResTurnstileSettingRequestTSItem extends ResTurnstileSettingsReques
 
     public Element toElement(Document document) {
         Element element = document.createElement("TS");
+        Integer resCode = getResCode();
+        String errorMessage = null;
         if (null != numOfEntries) {
             XMLUtils.setAttributeIfNotNull(element, "NumOfEntries", numOfEntries);
         }
+        XMLUtils.setAttributeIfNotNull(element, "Res", resCode);
+        if (resCode != null && resCode != 0) {
+            XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
+        }
         return element;
-    }
-
-    public Integer getNumOfEntries() {
-        return numOfEntries;
-    }
-
-    public void setNumOfEntries(Integer numOfEntries) {
-        this.numOfEntries = numOfEntries;
     }
 }

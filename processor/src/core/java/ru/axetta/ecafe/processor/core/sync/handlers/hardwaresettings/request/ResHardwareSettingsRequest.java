@@ -16,7 +16,7 @@ public class ResHardwareSettingsRequest implements AbstractToElement {
 
     private List<ResHardwareSettingsRequestItem> items;
 
-    public ResHardwareSettingsRequest() {
+    ResHardwareSettingsRequest() {
     }
 
     @Override

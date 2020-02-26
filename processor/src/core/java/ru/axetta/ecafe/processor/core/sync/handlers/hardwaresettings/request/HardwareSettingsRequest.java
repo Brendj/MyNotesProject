@@ -62,38 +62,38 @@ public class HardwareSettingsRequest implements SectionRequest {
 
         Node itemNode = hardwareSettingNode.getFirstChild();
         while (null != itemNode) {
+
             if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
                 ModuleType moduleType = ModuleType.fromString(itemNode.getNodeName());
+                HardwareSettingsRequestItem item = null;
+                if(moduleType == null) {
+                    itemNode.getNextSibling();
+                    continue;
+                }
                 switch (moduleType) {
                     case MT:
-                        HardwareSettingsRequestMTItem itemMT = HardwareSettingsRequestMTItem.build(itemNode);
-                        items.add(itemMT);
+                        item = HardwareSettingsRequestMTItem.build(itemNode);
                         break;
                     case IP:
-                        HardwareSettingsRequestIPItem itemIP = HardwareSettingsRequestIPItem.build(itemNode);
-                        items.add(itemIP);
+                        item = HardwareSettingsRequestIPItem.build(itemNode);
                         break;
                     case DOTNETVER:
-                        HardwareSettingsRequestDotNetVerItem itemDotNetVer = HardwareSettingsRequestDotNetVerItem.build(itemNode);
-                        items.add(itemDotNetVer);
+                        item = HardwareSettingsRequestDotNetVerItem.build(itemNode);
                         break;
                     case OSVER:
-                        HardwareSettingsRequestOsVerItem itemOsVer = HardwareSettingsRequestOsVerItem.build(itemNode);
-                        items.add(itemOsVer);
+                        item = HardwareSettingsRequestOsVerItem.build(itemNode);
                         break;
                     case RAM:
-                        HardwareSettingsRequestRAMItem itemRAM = HardwareSettingsRequestRAMItem.build(itemNode);
-                        items.add(itemRAM);
+                        item = HardwareSettingsRequestRAMItem.build(itemNode);
                         break;
                     case CPU:
-                        HardwareSettingsRequestCPUItem itemCPU = HardwareSettingsRequestCPUItem.build(itemNode);
-                        items.add(itemCPU);
+                        item = HardwareSettingsRequestCPUItem.build(itemNode);
                         break;
                     case CR:
-                        HardwareSettingsRequestCRItem itemCR = HardwareSettingsRequestCRItem.build(itemNode);
-                        items.add(itemCR);
+                        item = HardwareSettingsRequestCRItem.build(itemNode);
                         break;
                 }
+                items.add(item);
             }
             itemNode = itemNode.getNextSibling();
         }

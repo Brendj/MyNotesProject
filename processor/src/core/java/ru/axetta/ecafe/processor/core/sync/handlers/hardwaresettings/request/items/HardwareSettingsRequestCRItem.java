@@ -6,10 +6,8 @@ package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.it
 
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.w3c.dom.Node;
 
-import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class HardwareSettingsRequestCRItem extends HardwareSettingsRequestItem {
@@ -28,10 +26,9 @@ public class HardwareSettingsRequestCRItem extends HardwareSettingsRequestItem {
 
     public static HardwareSettingsRequestCRItem build(Node itemNode) {
 
-        Integer usedByModule = null;
-        String readerName = null;
-        String firmwareVer = null;
-        Date lastUpdate = null;
+        Integer usedByModule;
+        String readerName;
+        String firmwareVer;
 
         String type = "CR";
 
@@ -51,19 +48,7 @@ public class HardwareSettingsRequestCRItem extends HardwareSettingsRequestItem {
         if (null == firmwareVer) {
             errorMessage.append("Attribute FirmwareVer not found");
         }
-
-        String requestDateString = XMLUtils.getAttributeValue(itemNode, "LastUpdate");
-        if (StringUtils.isNotEmpty(requestDateString)) {
-            try {
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
-                lastUpdate = simpleDateFormat.parse(requestDateString);
-            } catch (Exception e) {
-                errorMessage.append("Attribute LastUpdate not found or incorrect");
-            }
-        } else {
-            errorMessage.append("Attribute RequestDate not found");
-        }
-        return new HardwareSettingsRequestCRItem(usedByModule, readerName, firmwareVer, lastUpdate, type,
+        return new HardwareSettingsRequestCRItem(usedByModule, readerName, firmwareVer, getLastUpdate(itemNode, errorMessage), type,
                 errorMessage.toString());
     }
 

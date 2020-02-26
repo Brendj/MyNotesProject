@@ -47,9 +47,9 @@ public class TurnstileSettingsRequestProcessor extends AbstractProcessor<ResTurn
 
             for (TurnstileSettingsRequestItem item : turnstileSettingsRequest.getItems()) {
                 String moduleType = item.getType();
+                errorFound = !item.getResCode().equals(TurnstileSettingsRequestItem.ERROR_CODE_ALL_OK);
                 switch (moduleType) {
                     case "TS":
-                        errorFound = !item.getResCode().equals(TurnstileSettingsRequestItem.ERROR_CODE_ALL_OK);
                         if (!errorFound) {
                             TurnstileSettingsRequestTSItem tsItem = (TurnstileSettingsRequestTSItem) item;
                             turnstileSettings.setNumOfEntries(tsItem.getNumOfEntries());
@@ -61,7 +61,6 @@ public class TurnstileSettingsRequestProcessor extends AbstractProcessor<ResTurn
                         items.add(resItem);
                         break;
                     case "TR":
-                        errorFound = !item.getResCode().equals(TurnstileSettingsRequestItem.ERROR_CODE_ALL_OK);
                         if (!errorFound) {
                             TurnstileSettingsRequestTRItem trItem = (TurnstileSettingsRequestTRItem) item;
                             turnstileSettings.setTurnstileId(trItem.getTurnstileId());

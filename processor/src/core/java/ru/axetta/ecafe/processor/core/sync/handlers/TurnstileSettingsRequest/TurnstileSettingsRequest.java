@@ -65,16 +65,20 @@ public class TurnstileSettingsRequest implements SectionRequest {
         while (null != itemNode) {
             if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
                 ModuleType moduleType = ModuleType.fromString(itemNode.getNodeName());
+                if (moduleType == null) {
+                    itemNode.getNextSibling();
+                    continue;
+                }
+                TurnstileSettingsRequestItem item = null;
                 switch (moduleType) {
                     case TS:
-                        TurnstileSettingsRequestTSItem itemTS = TurnstileSettingsRequestTSItem.build(itemNode);
-                        items.add(itemTS);
+                        item = TurnstileSettingsRequestTSItem.build(itemNode);
                         break;
                     case TR:
-                        TurnstileSettingsRequestTRItem itemTR = TurnstileSettingsRequestTRItem.build(itemNode);
-                        items.add(itemTR);
+                        item = TurnstileSettingsRequestTRItem.build(itemNode);
                         break;
                 }
+                items.add(item);
             }
             itemNode = itemNode.getNextSibling();
         }

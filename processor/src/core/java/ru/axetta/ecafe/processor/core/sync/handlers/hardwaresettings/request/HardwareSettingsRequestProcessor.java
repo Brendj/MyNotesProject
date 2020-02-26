@@ -32,8 +32,8 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
 
         List<ResHardwareSettingsRequestItem> items = new ArrayList<ResHardwareSettingsRequestItem>();
         try {
-            ResHardwareSettingsRequestItem resItem = null;
-            boolean errorFound = false;
+            ResHardwareSettingsRequestItem resItem;
+            boolean errorFound;
             Long orgOwner = hardwareSettingsRequest.getOrgOwner();
             Long nextVersion = DAOUtils.nextVersionByHardwareSettingsRequest(session);
 
@@ -47,9 +47,9 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
 
             for (HardwareSettingsRequestItem item : hardwareSettingsRequest.getItems()) {
                 String moduleType = item.getType();
+                errorFound = !item.getResCode().equals(HardwareSettingsRequestItem.ERROR_CODE_ALL_OK);
                 switch (moduleType) {
                     case "MT":
-                        errorFound = !item.getResCode().equals(HardwareSettingsRequestItem.ERROR_CODE_ALL_OK);
                         if (!errorFound) {
                             HardwareSettingsRequestMTItem mtItem = (HardwareSettingsRequestMTItem) item;
                             hardwareSettings.setModuleType(mtItem.getValue());
@@ -63,7 +63,6 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         items.add(resItem);
                         break;
                     case "IP":
-                        errorFound = !item.getResCode().equals(HardwareSettingsRequestItem.ERROR_CODE_ALL_OK);
                         if (!errorFound) {
                             HardwareSettingsRequestIPItem ipItem = (HardwareSettingsRequestIPItem) item;
                             hardwareSettings.setIpHost(ipItem.getValue());
@@ -77,7 +76,6 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         items.add(resItem);
                         break;
                     case "DotNetVer":
-                        errorFound = !item.getResCode().equals(HardwareSettingsRequestItem.ERROR_CODE_ALL_OK);
                         if (!errorFound) {
                             HardwareSettingsRequestDotNetVerItem dotNetVerItem = (HardwareSettingsRequestDotNetVerItem) item;
                             hardwareSettings.setDotNetVer(dotNetVerItem.getValue());
@@ -92,7 +90,6 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         items.add(resItem);
                         break;
                     case "OsVer":
-                        errorFound = !item.getResCode().equals(HardwareSettingsRequestOsVerItem.ERROR_CODE_ALL_OK);
                         if (!errorFound) {
                             HardwareSettingsRequestOsVerItem osVerItem = (HardwareSettingsRequestOsVerItem) item;
                             hardwareSettings.setoSVer(osVerItem.getValue());
@@ -107,7 +104,6 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         items.add(resItem);
                         break;
                     case "RAM":
-                        errorFound = !item.getResCode().equals(HardwareSettingsRequestRAMItem.ERROR_CODE_ALL_OK);
                         if (!errorFound) {
                             HardwareSettingsRequestRAMItem ramItem = (HardwareSettingsRequestRAMItem) item;
                             hardwareSettings.setRamSize(ramItem.getValue());
@@ -121,7 +117,6 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         items.add(resItem);
                         break;
                     case "CPU":
-                        errorFound = !item.getResCode().equals(HardwareSettingsRequestCPUItem.ERROR_CODE_ALL_OK);
                         if (!errorFound) {
                             HardwareSettingsRequestCPUItem cpuItem = (HardwareSettingsRequestCPUItem) item;
                             hardwareSettings.setCpuHost(cpuItem.getValue());
@@ -134,7 +129,6 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         items.add(resItem);
                         break;
                     case "CR":
-                        errorFound = !item.getResCode().equals(HardwareSettingsRequestCRItem.ERROR_CODE_ALL_OK);
                         if (!errorFound) {
                             HardwareSettingsRequestCRItem crItem = (HardwareSettingsRequestCRItem) item;
                             hardwareSettings.setUsedByModule(crItem.getUsedByModule());

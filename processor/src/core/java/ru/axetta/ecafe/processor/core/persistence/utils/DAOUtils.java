@@ -4511,14 +4511,6 @@ public class DAOUtils {
         return (HardwareSettings) criteria.uniqueResult();
     }
 
-    public static List<HardwareSettings> getOrgEquipmentsForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
-        Criteria criteria = session.createCriteria(HardwareSettings.class);
-        Org org = (Org) session.load(Org.class, idOfOrg);
-        criteria.add(Restrictions.eq("org", org));
-        criteria.add(Restrictions.gt("version", version));
-        return criteria.list();
-    }
-
     public static long nextVersionByTurnstileSettingsRequest(Session session) {
         long version = 0L;
         Query query = session.createSQLQuery(
