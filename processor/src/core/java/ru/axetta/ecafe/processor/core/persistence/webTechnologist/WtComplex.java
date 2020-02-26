@@ -22,92 +22,123 @@ public class WtComplex {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idOfComplex")
-    private Long idOfComplex;
+    protected Long idOfComplex;
 
     @Column(name = "name")
-    private String name;
+    protected String name;
 
     @Column(name = "price")
-    private BigDecimal price;
+    protected BigDecimal price;
 
     @Column(name = "beginDate")
-    private Date beginDate;
+    protected Date beginDate;
 
     @Column(name = "endDate")
-    private Date endDate;
+    protected Date endDate;
 
     @Column(name = "cycleMotion")
-    private Integer cycleMotion;
+    protected Integer cycleMotion;
 
     @Column(name = "dayInCycle")
-    private Integer dayInCycle;
+    protected Integer dayInCycle;
 
     @Column(name = "version")
-    private Long version;
+    protected Long version;
 
     @Column(name = "guid")
-    private String guid;
+    protected String guid;
 
     @Column(name = "createDate")
-    private Date createDate;
+    protected Date createDate;
 
     @Column(name = "lastUpdate")
-    private Date lastUpdate;
+    protected Date lastUpdate;
 
     @ManyToOne
     @JoinColumn(name = "create_by_id")
-    private User createdUser;
+    protected User createdUser;
 
     @ManyToOne
     @JoinColumn(name = "update_by_id")
-    private User updatedUser;
+    protected User updatedUser;
 
     @Column(name = "deleteState")
-    private Integer deleteState;
+    protected Integer deleteState;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfComplexGroupItem")
-    private WtComplexGroupItem wtComplexGroupItem;
+    protected WtComplexGroupItem wtComplexGroupItem;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfAgeGroupItem")
-    private WtAgeGroupItem wtAgeGroupItem;
+    protected WtAgeGroupItem wtAgeGroupItem;
 
     @ManyToOne
     @JoinColumn(name = "idOfDietType")
-    private WtDietType wtDietType;
+    protected WtDietType wtDietType;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfContragent")
-    private Contragent contragent;
+    protected Contragent contragent;
 
     @ManyToOne
     @JoinColumn(name = "idOfOrgGroup")
-    private WtOrgGroup wtOrgGroup;
+    protected WtOrgGroup wtOrgGroup;
 
     @Column(name = "composite")
-    private Boolean composite;
+    protected Boolean composite;
 
     @Column(name = "is_portal")
-    private Boolean isPortal;
+    protected Boolean isPortal;
 
     @Column(name = "start_cycle_day")
-    private Integer startCycleDay;
+    protected Integer startCycleDay;
 
     @ManyToMany
     @JoinTable(name = "cf_wt_complexes_org",
             joinColumns = @JoinColumn(name = "IdOfComplex"),
             inverseJoinColumns = @JoinColumn(name = "IdOfOrg"))
-    private Set<Org> orgs = new HashSet<>();
+    protected Set<Org> orgs = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "cf_wt_discountrules_complexes",
             joinColumns = @JoinColumn(name = "idOfComplex"),
             inverseJoinColumns = @JoinColumn(name = "idOfRule"))
-    private Set<WtDiscountRule> discountRules = new HashSet<>();
+    protected Set<WtDiscountRule> discountRules = new HashSet<>();
 
     @OneToMany(mappedBy = "wtComplex")
-    private Set<WtComplexesItem> wtComplexesItems = new HashSet<>();
+    protected Set<WtComplexesItem> wtComplexesItems = new HashSet<>();
+
+    public WtComplex(WtComplex complex) {
+        this.idOfComplex = complex.idOfComplex;
+        this.name = complex.name;
+        this.price = complex.price;
+        this.beginDate = complex.beginDate;
+        this.endDate = complex.endDate;
+        this.cycleMotion = complex.cycleMotion;
+        this.dayInCycle = complex.dayInCycle;
+        this.version = complex.version;
+        this.guid = complex.guid;
+        this.createDate = complex.createDate;
+        this.lastUpdate = complex.lastUpdate;
+        this.createdUser = complex.createdUser;
+        this.updatedUser = complex.updatedUser;
+        this.deleteState = complex.deleteState;
+        this.wtComplexGroupItem = complex.wtComplexGroupItem;
+        this.wtAgeGroupItem = complex.wtAgeGroupItem;
+        this.wtDietType = complex.wtDietType;
+        this.contragent = complex.contragent;
+        this.wtOrgGroup = complex.wtOrgGroup;
+        this.composite = complex.composite;
+        this.isPortal = complex.isPortal;
+        this.startCycleDay = complex.startCycleDay;
+        this.orgs = complex.orgs;
+        this.discountRules = complex.discountRules;
+        this.wtComplexesItems = complex.wtComplexesItems;
+    }
+
+    public WtComplex() {
+    }
 
     public Boolean getIsPortal() {
         return isPortal;

@@ -135,7 +135,7 @@
             <h:panelGroup layout="block" style="height: 505px; overflow-y: scroll;">
 
                 <rich:dataTable id="wtComplexes" value="#{ruleEditPage.wtComplexes}"
-                                var="complex" rows="25" footerClass="data-table-footer" rowKeyVar="rowItemKey">
+                                var="complex" rows="100" footerClass="data-table-footer" rowKeyVar="rowItemKey">
                     <f:facet name="header">
                         <rich:columnGroup>
                             <rich:column headerClass="column-header">
@@ -173,12 +173,7 @@
 
                         <%--       Чек-боксы--%>
                         <rich:column headerClass="column-header">
-
-                                <h:selectManyCheckbox id="selComplexes" value=""
-                                                      layout="pageDirection" styleClass="output-text">
-                                    <f:selectItems value="#{ruleEditPage.availableWtComplexes}"/>
-                                </h:selectManyCheckbox>
-
+                            <h:selectBooleanCheckbox value="#{complex.checked}"/>
                         </rich:column>
 
                         <%--        Название контрагента--%>

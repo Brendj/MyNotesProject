@@ -11,10 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -71,9 +68,7 @@ public class RuleEditPage extends BasicWorkspacePage
     private int complexType = -1;
     private int ageGroup = -1;
     WtDiscountRule wtDiscountRule;
-    WtComplex wtComplex;
-    private List<WtComplex> wtComplexes = new ArrayList<>();
-    private Integer[] selectedWtComplexes;
+    private List<WtSelectedComplex> wtComplexes = new ArrayList<>();
     private Map<Integer, Long> complexTypeMap;
     private Map<Integer, Long> ageGroupMap;
 
@@ -108,18 +103,18 @@ public class RuleEditPage extends BasicWorkspacePage
     }
 
     public void fillWtComplexes() {
-        ageGroup++;
-        complexType++;
-        if (complexType > 0 && ageGroup > 0) {
-            Long complexGroupId = complexTypeMap.get(complexType);
-            Long ageGroupId = ageGroupMap.get(ageGroup);
+        List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
+        if (complexType > -1 && ageGroup > -1) {
+            Long complexGroupId = complexTypeMap.get(complexType + 1);
+            Long ageGroupId = ageGroupMap.get(ageGroup + 1);
             if (complexGroupId == null || ageGroupId == null) {
                 resetWtForm();
             } else {
                 WtComplexGroupItem wtComplexGroupItem = daoService.getWtComplexGroupItemById(complexGroupId);
                 WtAgeGroupItem wtAgeGroupItem = daoService.getWtAgeGroupItemById(ageGroupId);
                 if (wtComplexGroupItem != null && wtAgeGroupItem != null) {
-                    wtComplexes = daoService.getWtComplexesList(wtComplexGroupItem, wtAgeGroupItem);
+                    List<WtComplex> parentComplexes = daoService.getWtComplexesList(wtComplexGroupItem, wtAgeGroupItem);
+                    formWtSelectedComplexesList(wtSelectedComplexes, parentComplexes);
                 } else {
                     resetWtForm();
                 }
@@ -129,20 +124,20 @@ public class RuleEditPage extends BasicWorkspacePage
         }
     }
 
-    private void resetWtForm() {
-        complexType = -1;
-        ageGroup = -1;
-        wtComplexes = daoService.getWtComplexesList();
+    private void formWtSelectedComplexesList(List<WtSelectedComplex> wtSelectedComplexes,
+            List<WtComplex> parentComplexes) {
+        for (WtComplex parentComplex : parentComplexes) {
+            wtSelectedComplexes.add(new WtSelectedComplex(parentComplex));
+        }
+        wtComplexes = wtSelectedComplexes;
     }
 
-    public List<SelectItem> getAvailableWtComplexes() {
-        //wtComplexes = daoService.getWtComplexesList();
-        List<SelectItem> res = new ArrayList<>();
-        //int i = 0;
-        //for (WtComplex complex : wtComplexes) {
-        //    res.add(new SelectItem(i++, complex.getName()));
-        //}
-        return res;
+    private void resetWtForm() {
+        List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
+        List<WtComplex> parentComplexes = daoService.getWtComplexesList();
+        formWtSelectedComplexesList(wtSelectedComplexes, parentComplexes);
+        complexType = -1;
+        ageGroup = -1;
     }
 
 
@@ -640,10 +635,6 @@ public class RuleEditPage extends BasicWorkspacePage
         this.description = description;
     }
 
-    public void setWtComplexes(List<WtComplex> wtComplexes) {
-        this.wtComplexes = wtComplexes;
-    }
-
     public int getSubCategory() {
         return subCategory;
     }
@@ -688,18 +679,6 @@ public class RuleEditPage extends BasicWorkspacePage
         return entity.getDescription();
     }
 
-    public List<WtComplex> getWtComplexes() {
-        return wtComplexes;
-    }
-
-    public Integer[] getSelectedWtComplexes() {
-        return selectedWtComplexes;
-    }
-
-    public void setSelectedWtComplexes(Integer[] selectedWtComplexes) {
-        this.selectedWtComplexes = selectedWtComplexes;
-    }
-
     public int getComplexType() {
         return complexType;
     }
@@ -740,12 +719,11 @@ public class RuleEditPage extends BasicWorkspacePage
         this.wtDiscountRule = wtDiscountRule;
     }
 
-    public WtComplex getWtComplex() {
-        return wtComplex;
+    public List<WtSelectedComplex> getWtComplexes() {
+        return wtComplexes;
     }
 
-    public void setWtComplex(WtComplex wtComplex) {
-        this.wtComplex = wtComplex;
+    public void setWtComplexes(List<WtSelectedComplex> wtComplexes) {
+        this.wtComplexes = wtComplexes;
     }
-
 }
