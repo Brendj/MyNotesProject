@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -61,13 +62,16 @@ public class RuleEditPage extends BasicWorkspacePage
     private String filterOrg = "Не выбрано";
     private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
     private Set<CategoryOrg> categoryOrgs;
+
     public String getPageFilename() {
         return "option/discountrule/edit";
     }
 
     // Веб-технолог
-    private int complexType;
-    private int ageGroup;
+    private int complexType = -1;
+    private int ageGroup = -1;
+    WtDiscountRule wtDiscountRule;
+    WtComplex wtComplex;
     private List<WtComplex> wtComplexes = new ArrayList<>();
     private Integer[] selectedWtComplexes;
     private Map<Integer, Long> complexTypeMap;
@@ -104,10 +108,30 @@ public class RuleEditPage extends BasicWorkspacePage
     }
 
     public void fillWtComplexes() {
-        //WtComplexGroupItem wtComplexGroupItem = daoService.getWtComplexGroupItemById(complexTypeMap.get(complexType));
-        //WtAgeGroupItem wtAgeGroupItem = daoService.getWtAgeGroupItemById(ageGroupMap.get(ageGroup));
-        //wtComplexes = daoService.getWtComplexesList(wtComplexGroupItem, wtAgeGroupItem);
+        ageGroup++;
+        complexType++;
+        if (complexType > 0 && ageGroup > 0) {
+            Long complexGroupId = complexTypeMap.get(complexType);
+            Long ageGroupId = ageGroupMap.get(ageGroup);
+            if (complexGroupId == null || ageGroupId == null) {
+                resetWtForm();
+            } else {
+                WtComplexGroupItem wtComplexGroupItem = daoService.getWtComplexGroupItemById(complexGroupId);
+                WtAgeGroupItem wtAgeGroupItem = daoService.getWtAgeGroupItemById(ageGroupId);
+                if (wtComplexGroupItem != null && wtAgeGroupItem != null) {
+                    wtComplexes = daoService.getWtComplexesList(wtComplexGroupItem, wtAgeGroupItem);
+                } else {
+                    resetWtForm();
+                }
+            }
+        } else {
+            resetWtForm();
+        }
+    }
 
+    private void resetWtForm() {
+        complexType = -1;
+        ageGroup = -1;
         wtComplexes = daoService.getWtComplexesList();
     }
 
@@ -664,6 +688,18 @@ public class RuleEditPage extends BasicWorkspacePage
         return entity.getDescription();
     }
 
+    public List<WtComplex> getWtComplexes() {
+        return wtComplexes;
+    }
+
+    public Integer[] getSelectedWtComplexes() {
+        return selectedWtComplexes;
+    }
+
+    public void setSelectedWtComplexes(Integer[] selectedWtComplexes) {
+        this.selectedWtComplexes = selectedWtComplexes;
+    }
+
     public int getComplexType() {
         return complexType;
     }
@@ -678,18 +714,6 @@ public class RuleEditPage extends BasicWorkspacePage
 
     public void setAgeGroup(int ageGroup) {
         this.ageGroup = ageGroup;
-    }
-
-    public List<WtComplex> getWtComplexes() {
-        return wtComplexes;
-    }
-
-    public Integer[] getSelectedWtComplexes() {
-        return selectedWtComplexes;
-    }
-
-    public void setSelectedWtComplexes(Integer[] selectedWtComplexes) {
-        this.selectedWtComplexes = selectedWtComplexes;
     }
 
     public Map<Integer, Long> getComplexTypeMap() {
@@ -707,4 +731,21 @@ public class RuleEditPage extends BasicWorkspacePage
     public void setAgeGroupMap(Map<Integer, Long> ageGroupMap) {
         this.ageGroupMap = ageGroupMap;
     }
+
+    public WtDiscountRule getWtDiscountRule() {
+        return wtDiscountRule;
+    }
+
+    public void setWtDiscountRule(WtDiscountRule wtDiscountRule) {
+        this.wtDiscountRule = wtDiscountRule;
+    }
+
+    public WtComplex getWtComplex() {
+        return wtComplex;
+    }
+
+    public void setWtComplex(WtComplex wtComplex) {
+        this.wtComplex = wtComplex;
+    }
+
 }

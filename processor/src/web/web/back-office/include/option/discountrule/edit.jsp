@@ -100,14 +100,15 @@
                 <h:selectBooleanCheckbox id="arm" value="true">
                 </h:selectBooleanCheckbox>
 
-                <h:outputText escape="true" value="Тип комплекса" styleClass="output-text"/>
-                <h:selectOneMenu id="type" value="#{ruleEditPage.complexType}"
-                                 style="width:300px;" styleClass="groupSelect" >
+                <h:outputText escape="true" value="Тип комплекса" styleClass="output-text required-field"/>
+
+                <h:selectOneMenu id="typeMenu" value="#{ruleEditPage.complexType}"
+                                 style="width:300px;" styleClass="groupSelect">
                     <f:selectItems value="#{ruleEditPage.complexTypes}"/>
                 </h:selectOneMenu>
 
-                <h:outputText escape="true" value="Возрастная категория" styleClass="output-text"/>
-                <h:selectOneMenu id="age" value="#{ruleEditPage.ageGroup}"
+                <h:outputText escape="true" value="Возрастная категория" styleClass="output-text required-field"/>
+                <h:selectOneMenu id="ageMenu" value="#{ruleEditPage.ageGroup}"
                                  style="width:300px;" styleClass="groupSelect">
                     <f:selectItems value="#{ruleEditPage.ageGroups}"/>
                 </h:selectOneMenu>
@@ -131,7 +132,7 @@
                 </f:facet>
             </a4j:status>
 
-            <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;">
+            <h:panelGroup layout="block" style="height: 505px; overflow-y: scroll;">
 
                 <rich:dataTable id="wtComplexes" value="#{ruleEditPage.wtComplexes}"
                                 var="complex" rows="25" footerClass="data-table-footer" rowKeyVar="rowItemKey">
@@ -166,14 +167,14 @@
 
 
                     <rich:subTable value="#{complex}" var="complex" rowKeyVar="rowDetailKey"
-                                   columnClasses="center-aligned-column, left-aligned-column, left-aligned-column,
-                           left-aligned-column, left-aligned-column, center-aligned-column, left-aligned-column,
+                                   columnClasses="center-aligned-column, left-aligned-column, center-aligned-column,
+                           center-aligned-column, left-aligned-column, center-aligned-column, left-aligned-column,
                            center-aligned-column">
 
                         <%--       Чек-боксы--%>
                         <rich:column headerClass="column-header">
 
-                                <h:selectManyCheckbox id="selComplexes" value="#{ruleEditPage.selectedWtComplexes}"
+                                <h:selectManyCheckbox id="selComplexes" value=""
                                                       layout="pageDirection" styleClass="output-text">
                                     <f:selectItems value="#{ruleEditPage.availableWtComplexes}"/>
                                 </h:selectManyCheckbox>

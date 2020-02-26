@@ -2733,7 +2733,7 @@ public class DAOService {
                 + "where cg.idOfComplexGroupItem = :idOfComplexType");
         query.setParameter("idOfComplexType", idOfComplexType);
         try {
-            return (WtComplexGroupItem) query.getResultList().get(0);
+            return (WtComplexGroupItem) query.getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -2745,7 +2745,7 @@ public class DAOService {
                 + "where ag.idOfAgeGroupItem = :idOfAgeGroup");
         query.setParameter("idOfAgeGroup", idOfAgeGroup);
         try {
-            return (WtAgeGroupItem) query.getResultList().get(0);
+            return (WtAgeGroupItem) query.getSingleResult();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
