@@ -533,33 +533,44 @@ public class SummaryCalculationService {
 
         //подсчет данных по предзаказам
         if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
-            String preorders_query = "select distinct pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender from cf_preorder_complex pc "
+            String preorders_query = "select distinct pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender,"
+                    + " rp.state, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname "
+                    + " from cf_preorder_complex pc "
+                    + " join cf_regular_preorders rp on rp.idofregularpreorder = pc.idofregularpreorder "
+
                     + " join cf_clients c on c.idofclient = pc.idofclient join cf_persons p on p.idofperson = c.idofperson "
                     + " join cf_clientsnotificationsettings n on c.idofclient = n.idofclient AND n.notifytype = :notifyType "
                     + " where pc.preorderdate > :date and pc.deletedstate = 1 "
                     + " and not exists(select pc1.idofpreordercomplex from cf_preorder_complex pc1 "
                     + "where pc1.idofclient = pc.idofclient and pc1.deletedstate = 0 and pc1.preorderdate = pc.preorderdate and pc1.amount > 0) "
                     + " union "
-                    + "select distinct pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender from cf_preorder_menudetail pmd "
+                    + "select distinct pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender,"
+                    + " rp.state, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname "
+                    + " from cf_preorder_menudetail pmd "
+                    + " join cf_regular_preorders rp on rp.idofregularpreorder = pmd.idofregularpreorder "
                     + " join cf_clients c on c.idofclient = pmd.idofclient join cf_persons p on p.idofperson = c.idofperson "
                     + " join cf_clientsnotificationsettings n on c.idofclient = n.idofclient AND n.notifytype = :notifyType "
                     + " where pmd.preorderdate > :date and pmd.deletedstate = 1 "
                     + " and not exists(select pmd1.idofpreordermenudetail from cf_preorder_menudetail pmd1 "
                     + "where pmd1.idofclient = pmd.idofclient and pmd1.deletedstate = 0 and pmd1.preorderdate = pmd.preorderdate and pmd1.amount > 0) "
                     + " UNION "
-                    + "select distinct pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender "
+                    + "select distinct pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender, "
+                    + " rp.state, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname "
                     + "from cf_client_guardian_notificationsettings n join cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
                     + "join cf_clients c on c.idofclient = cg.idofchildren "
                     + "join cf_preorder_complex pc on c.idofclient = pc.idofclient "
+                    + " join cf_regular_preorders rp on rp.idofregularpreorder = pc.idofregularpreorder "
                     + "join cf_persons p on p.idofperson = c.idofperson "
                     + "where pc.preorderdate > :date and pc.deletedstate = 1 "
                     + "and not exists(select pc1.idofpreordercomplex from cf_preorder_complex pc1 "
                     + "where pc1.idofclient = pc.idofclient and pc1.deletedstate = 0 and pc1.preorderdate = pc.preorderdate and pc1.amount > 0) "
                     + "union "
-                    + "select distinct pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender "
+                    + "select distinct pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender, "
+                    + " rp.state, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname "
                     + "from cf_client_guardian_notificationsettings n join cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
                     + "join cf_clients c on c.idofclient = cg.idofchildren "
                     + "join cf_preorder_menudetail pmd on pmd.idofclient = c.idofclient "
+                    + " join cf_regular_preorders rp on rp.idofregularpreorder = pmd.idofregularpreorder "
                     + "join cf_persons p on p.idofperson = c.idofperson "
                     + "where pmd.preorderdate > :date and pmd.deletedstate = 1 "
                     + "and not exists(select pmd1.idofpreordermenudetail from cf_preorder_menudetail pmd1 "
@@ -569,6 +580,24 @@ public class SummaryCalculationService {
             pQuery.setParameter("date", System.currentTimeMillis());
             pQuery.setParameter("notifyType", notifyType);
             List plist = pQuery.getResultList();
+
+            for (Object obj : plist) {
+                Object[] row = (Object[]) obj;
+                Date date = new Date(((BigInteger)row[0]).longValue());
+                Integer state = (Integer)row[1];
+                long id = ((BigInteger)row[2]).longValue();
+                String surname = (String) row[3];
+                String firstname = (String) row[4];
+                Integer gender = (Integer) row[5];
+                Integer stateReg = (Integer)row[6];
+                Date lastUpdate = new Date(((BigInteger)row[7]).longValue());
+                Date endDateReg = new Date(((BigInteger)row[8]).longValue());
+                String itemCode = (String) row[9];
+                String itemname = (String) row[10];
+            }
+
+
+
             for (Object obj : plist) {
                 Object[] row = (Object[]) obj;
                 Date date = new Date(((BigInteger)row[0]).longValue());
@@ -586,8 +615,12 @@ public class SummaryCalculationService {
                     clientEE.setValues(attachGenderToValues((Integer) row[5], clientEE.getValues()));
                     clients.add(clientEE);
                 }
+
+                NotifyPreorderDailyDetail notifyPreorderDailyDetail = new NotifyPreorderDailyDetail();
+
+
                 if (state.equals(PreorderState.OK.getCode())) {
-                    clientEE.getPreorders().getDeletedPreorderDateGuardian().add(date);
+                    clientEE.getPreorders().getDeletedPreorderDateGuardian().add(notifyPreorderDailyDetail);
                 } else {
                     clientEE.getPreorders().getDeletedPreorderDateOther().add(date);
                 }
@@ -1374,28 +1407,59 @@ public class SummaryCalculationService {
 
     public static class NotifyPreorderDaily {
         //private long idOfClient;
-        private Set<Date> deletedPreorderDateGuardian;
-        private Set<Date> deletedPreorderDateOther;
+        private Set<NotifyPreorderDailyDetail> deletedPreorderDateGuardian;
+        private Set<NotifyPreorderDailyDetail> deletedPreorderDateOther;
 
         public NotifyPreorderDaily() {
-            this.deletedPreorderDateGuardian = new TreeSet<Date>();
-            this.deletedPreorderDateOther = new TreeSet<Date>();
+            this.deletedPreorderDateGuardian = new TreeSet<NotifyPreorderDailyDetail>();
+            this.deletedPreorderDateOther = new TreeSet<NotifyPreorderDailyDetail>();
         }
 
-        public Set<Date> getDeletedPreorderDateGuardian() {
+        public Set<NotifyPreorderDailyDetail> getDeletedPreorderDateGuardian() {
             return deletedPreorderDateGuardian;
         }
 
-        public void setDeletedPreorderDateGuardian(Set<Date> deletedPreorderDateGuardian) {
+        public void setDeletedPreorderDateGuardian(Set<NotifyPreorderDailyDetail> deletedPreorderDateGuardian) {
             this.deletedPreorderDateGuardian = deletedPreorderDateGuardian;
         }
 
-        public Set<Date> getDeletedPreorderDateOther() {
+        public Set<NotifyPreorderDailyDetail> getDeletedPreorderDateOther() {
             return deletedPreorderDateOther;
         }
 
-        public void setDeletedPreorderDateOther(Set<Date> deletedPreorderDateOther) {
+        public void setDeletedPreorderDateOther(Set<NotifyPreorderDailyDetail> deletedPreorderDateOther) {
             this.deletedPreorderDateOther = deletedPreorderDateOther;
+        }
+    }
+
+    public static class NotifyPreorderDailyDetail {
+        private Date endDate;
+        private String complexName;
+        private String dishName;
+
+
+        public Date getEndDate() {
+            return endDate;
+        }
+
+        public void setEndDate(Date endDate) {
+            this.endDate = endDate;
+        }
+
+        public String getComplexName() {
+            return complexName;
+        }
+
+        public void setComplexName(String complexName) {
+            this.complexName = complexName;
+        }
+
+        public String getDishName() {
+            return dishName;
+        }
+
+        public void setDishName(String dishName) {
+            this.dishName = dishName;
         }
     }
 
