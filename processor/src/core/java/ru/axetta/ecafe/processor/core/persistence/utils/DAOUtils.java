@@ -4505,9 +4505,11 @@ public class DAOUtils {
         return version;
     }
 
-    public static HardwareSettings getHardwareSettingsRequestByOrg(Session session, Long idOfOrg) throws Exception {
+    public static HardwareSettings getHardwareSettingsRequestByOrgAndModuleType(Session session, Long idOfOrg, Integer moduleType)
+            throws Exception {
         Criteria criteria = session.createCriteria(HardwareSettings.class);
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("moduleType", moduleType));
         return (HardwareSettings) criteria.uniqueResult();
     }
 

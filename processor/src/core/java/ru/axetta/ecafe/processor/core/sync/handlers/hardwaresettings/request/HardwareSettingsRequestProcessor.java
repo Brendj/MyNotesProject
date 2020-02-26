@@ -35,11 +35,12 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
             ResHardwareSettingsRequestItem resItem;
             boolean errorFound;
             Long orgOwner = hardwareSettingsRequest.getOrgOwner();
+            Integer typeValue = hardwareSettingsRequest.getTypeValue();
             Long nextVersion = DAOUtils.nextVersionByHardwareSettingsRequest(session);
 
             ru.axetta.ecafe.processor.core.persistence.HardwareSettings hardwareSettings = DAOUtils
-                    .getHardwareSettingsRequestByOrg(session, orgOwner);
-            if (null == hardwareSettings) {
+                    .getHardwareSettingsRequestByOrgAndModuleType(session, orgOwner, typeValue);
+            if (null == hardwareSettings || !hardwareSettings.getModuleType().equals(typeValue)) {
                 hardwareSettings = new ru.axetta.ecafe.processor.core.persistence.HardwareSettings();
                 Org org = (Org) session.get(Org.class, orgOwner);
                 hardwareSettings.setOrg(org);

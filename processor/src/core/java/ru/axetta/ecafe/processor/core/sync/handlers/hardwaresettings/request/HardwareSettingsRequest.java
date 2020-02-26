@@ -23,6 +23,7 @@ public class HardwareSettingsRequest implements SectionRequest {
     private final Long orgOwner;
     private final List<HardwareSettingsRequestItem> items;
     private final Long maxVersion;
+    private Integer typeValue;
 
     public enum ModuleType {
         MT("MT"), IP("IP"), DOTNETVER("DotNetVer"), OSVER("OsVer"), RAM("RAM"), CPU("CPU"), CR("CR");
@@ -73,6 +74,7 @@ public class HardwareSettingsRequest implements SectionRequest {
                 switch (moduleType) {
                     case MT:
                         item = HardwareSettingsRequestMTItem.build(itemNode);
+                        typeValue = ((HardwareSettingsRequestMTItem) item).getValue();
                         break;
                     case IP:
                         item = HardwareSettingsRequestIPItem.build(itemNode);
@@ -118,5 +120,9 @@ public class HardwareSettingsRequest implements SectionRequest {
 
     public Long getMaxVersion() {
         return maxVersion;
+    }
+
+    public Integer getTypeValue() {
+        return typeValue;
     }
 }
