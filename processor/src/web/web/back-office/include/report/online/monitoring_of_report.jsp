@@ -57,7 +57,7 @@
 
     <h:panelGrid styleClass="borderless-grid" id="migrantsReportTable">
         <c:if test="${not empty mainPage.monitoringOfReportPage.htmlReport}">
-            <h:outputText escape="true" value="#{mainPage.migrantsReportPage.reportName}" styleClass="output-text" />
+            <h:outputText escape="true" value="#{mainPage.monitoringOfReportPage.reportName}" styleClass="output-text" />
             <f:verbatim>
                 <style type="text/css">
                     div.htmlReportContent :empty {
