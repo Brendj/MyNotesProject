@@ -207,7 +207,7 @@ public class PreorderDAOService {
         }
         for (PreorderComplexItemExt item : list) {
             PreorderGoodParamsContainer complexParams = getComplexParams(item, client, date);
-            if (isAcceptableComplex(item, client.getClientGroup(), hasDiscount, complexParams)) {
+            if (isAcceptableComplex(item, client.getClientGroup(), hasDiscount, complexParams, null)) {
                 String groupName = getPreorderComplexGroup(item, complexParams);
                 if (groupName.isEmpty()) continue;
                 item.setType(getPreorderComplexSubgroup(item));
@@ -1461,13 +1461,28 @@ public class PreorderDAOService {
     }
 
     public boolean isAcceptableComplex(PreorderComplexItemExt complex, ClientGroup clientGroup,
-            Boolean hasDiscount, PreorderGoodParamsContainer container) {
+            Boolean hasDiscount, PreorderGoodParamsContainer container, String ageTypeGroup) {
         if (clientGroup == null) return false;
         String clientGroupName = clientGroup.getGroupName();
+        Integer goodType = container.getGoodType();
+        Integer ageGroup = container.getAgeGroup();
+
+        //Для дошкольников
+        if (ageTypeGroup != null && ageTypeGroup.toUpperCase().contains("ДОШКОЛ"))
+        {
+            //У дошкольника есть льгота и комплекс НЕ платный
+            if (hasDiscount && complex.getDiscount()) {
+                // тип возрастной группы 1,5-3 ИЛИ 3-7
+                if (ageGroup.equals(GoodAgeGroupType.G_1_5_3.getCode()) || ageGroup.equals(GoodAgeGroupType.G_3_7.getCode())
+                     //в названии комплекса присутствует %1,5-3% ИЛИ %3-7%
+                    || complex.getComplexName().contains("1,5-3") || complex.getComplexName().contains("3-7")) {
+                        return true;
+                }
+            }
+        }
+
         if(!container.getAgeGroup().equals(GoodAgeGroupType.UNSPECIFIED.getCode())
                 && !container.getGoodType().equals(GoodType.UNSPECIFIED.getCode())){
-            Integer goodType = container.getGoodType();
-            Integer ageGroup = container.getAgeGroup();
             if (!hasDiscount) {
                 // 1.2.1.1. если навазвание группы начинается на 1-, 2-, 3-, 4-, то выводим следующие комплексы:
                 if (clientGroupName.startsWith("1-") || clientGroupName.startsWith("2-") || clientGroupName.startsWith("3-") || clientGroupName.startsWith("4-")) {
