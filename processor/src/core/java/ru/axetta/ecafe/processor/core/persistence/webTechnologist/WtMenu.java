@@ -53,7 +53,7 @@ public class WtMenu {
     @Column(name = "version")
     private Long version;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 
@@ -66,7 +66,7 @@ public class WtMenu {
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))
     private Set<WtDish> dishes = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_menu_org",
             joinColumns = @JoinColumn(name = "idOfMenu"),
             inverseJoinColumns = @JoinColumn(name = "idOfOrg"))

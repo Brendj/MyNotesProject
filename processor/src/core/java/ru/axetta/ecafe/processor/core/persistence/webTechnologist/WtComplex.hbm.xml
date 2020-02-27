@@ -55,21 +55,21 @@
             <column name="deleteState" sql-type="integer"/>
         </property>
 
-        <many-to-one name="wtComplexGroupItem" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem">
+        <many-to-one name="wtComplexGroupItem" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexGroupItem">
             <column name="idOfComplexGroupItem"/>
         </many-to-one>
 
-        <many-to-one name="wtAgeGroupItem" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem">
+        <many-to-one name="wtAgeGroupItem" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem">
             <column name="idOfAgeGroupItem"/>
         </many-to-one>
 
-        <many-to-one name="wtDietType" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType">
+        <many-to-one name="wtDietType" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType">
             <column name="idOfDietType"/>
         </many-to-one>
 
-        <one-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" cascade="all"/>
+        <one-to-one name="contragent" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contragent" cascade="all"/>
 
-        <many-to-one name="wtOrgGroup" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtOrgGroup">
+        <many-to-one name="wtOrgGroup" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtOrgGroup">
             <column name="idOfOrgGroup"/>
         </many-to-one>
 

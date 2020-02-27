@@ -49,7 +49,7 @@
             <column name="version" sql-type="long"/>
         </property>
 
-        <one-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" cascade="all"/>
+        <one-to-one name="contragent" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contragent" cascade="all"/>
 
         <property name="deleteState">
             <column name="deleteState" sql-type="integer"/>

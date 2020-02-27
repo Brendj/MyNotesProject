@@ -42,7 +42,7 @@
             <column name="deleteState" sql-type="integer"/>
         </property>
 
-        <many-to-one name="wtMenu" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu">
+        <many-to-one name="wtMenu" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu">
             <column name="menu_id"/>
         </many-to-one>
 

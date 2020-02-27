@@ -65,23 +65,23 @@ public class WtComplex {
     @Column(name = "deleteState")
     private Integer deleteState;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfComplexGroupItem")
     private WtComplexGroupItem wtComplexGroupItem;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfAgeGroupItem")
     private WtAgeGroupItem wtAgeGroupItem;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfDietType")
     private WtDietType wtDietType;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfOrgGroup")
     private WtOrgGroup wtOrgGroup;
 
@@ -94,7 +94,7 @@ public class WtComplex {
     @Column(name = "start_cycle_day")
     private Integer startCycleDay;
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_complexes_org",
             joinColumns = @JoinColumn(name = "IdOfComplex"),
             inverseJoinColumns = @JoinColumn(name = "IdOfOrg"))

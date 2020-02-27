@@ -44,7 +44,7 @@ public class WtMenuGroup {
     @Column(name = "deleteState")
     private Integer deleteState;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "menu_id")
     private WtMenu wtMenu;
 

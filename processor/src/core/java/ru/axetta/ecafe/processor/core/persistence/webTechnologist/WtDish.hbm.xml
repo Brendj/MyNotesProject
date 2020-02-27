@@ -62,11 +62,11 @@
             <column name="guid" sql-type="varchar(36)" length="36"/>
         </property>
 
-        <many-to-one name="wtAgeGroupItem" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem">
+        <many-to-one name="wtAgeGroupItem" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem">
             <column name="idOfAgeGroupItem"/>
         </many-to-one>
 
-        <many-to-one name="wtTypeProductionItem" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtTypeOfProductionItem">
+        <many-to-one name="wtTypeProductionItem" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtTypeOfProductionItem">
             <column name="idOfTypeOfProductionItem"/>
         </many-to-one>
 
@@ -94,7 +94,7 @@
             <column name="qty" sql-type="integer"/>
         </property>
 
-        <one-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" cascade="all"/>
+        <one-to-one name="contragent" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contragent" cascade="all"/>
 
         <property name="barcode">
             <column name="barcode" sql-type="varchar(16)" length="16"/>

@@ -35,7 +35,7 @@
             <column name="update_by_id"/>
         </many-to-one>
 
-        <one-to-one name="contragent" class="ru.axetta.ecafe.processor.core.persistence.Contragent" cascade="all"/>
+        <one-to-one name="contragent" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contragent" cascade="all"/>
 
         <set name="wtComplexes" inverse="true" cascade="all" lazy="true">
             <key>
@@ -53,7 +53,7 @@
 
         <set name="orgs" lazy="false" table="cf_wt_org_group_relations">
             <key column="idOfOrgGroup"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
+            <many-to-many lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         </set>
 
     </class>

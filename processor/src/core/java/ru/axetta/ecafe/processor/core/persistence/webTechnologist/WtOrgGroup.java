@@ -46,7 +46,7 @@ public class WtOrgGroup {
     @JoinColumn(name = "update_by_id")
     private User updatedUser;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 
@@ -56,7 +56,7 @@ public class WtOrgGroup {
     @OneToMany(mappedBy = "wtOrgGroup")
     private Set<WtMenu> wtMenus = new HashSet<>();
 
-    @ManyToMany
+    @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_org_group_relations",
             joinColumns = @JoinColumn(name = "idOfOrgGroup"),
             inverseJoinColumns = @JoinColumn(name = "idOfOrg"))

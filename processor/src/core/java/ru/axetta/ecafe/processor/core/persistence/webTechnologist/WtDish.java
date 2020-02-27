@@ -60,11 +60,11 @@ public class WtDish {
     @Column(name = "guid")
     private String guid;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfAgeGroupItem")
     private WtAgeGroupItem wtAgeGroupItem;
 
-    @ManyToOne
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfTypeOfProductionItem")
     private WtTypeOfProductionItem wtTypeProductionItem;
 
@@ -87,7 +87,7 @@ public class WtDish {
     @Column(name = "qty")
     private String qty;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 
