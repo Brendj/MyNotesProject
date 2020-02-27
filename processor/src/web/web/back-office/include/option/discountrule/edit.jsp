@@ -132,93 +132,104 @@
                 </f:facet>
             </a4j:status>
 
-            <h:panelGroup layout="block" style="height: 505px; overflow-y: scroll;">
+            <%--            <h:panelGroup layout="block" style="height: 505px; overflow-y: scroll;">--%>
 
-                <rich:dataTable id="wtComplexes" value="#{ruleEditPage.wtComplexes}"
-                                var="complex" rows="100" footerClass="data-table-footer" rowKeyVar="rowItemKey">
-                    <f:facet name="header">
-                        <rich:columnGroup>
-                            <rich:column headerClass="column-header">
-                                <h:outputText escape="true" value=""/>
-                            </rich:column>
-                            <rich:column headerClass="column-header">
-                                <h:outputText escape="true" value="Название контрагента"/>
-                            </rich:column>
-                            <rich:column headerClass="column-header">
-                                <h:outputText escape="true" value="ИД контрагента"/>
-                            </rich:column>
-                            <rich:column headerClass="column-header">
-                                <h:outputText escape="true" value="ИД комплекса"/>
-                            </rich:column>
-                            <rich:column headerClass="column-header">
-                                <h:outputText escape="true" value="Название"/>
-                            </rich:column>
-                            <rich:column headerClass="column-header">
-                                <h:outputText escape="true" value="Возрастная категория"/>
-                            </rich:column>
-                            <rich:column headerClass="column-header">
-                                <h:outputText escape="true" value="Цена"/>
-                            </rich:column>
-                            <rich:column headerClass="column-header">
-                                <h:outputText escape="true" value="Тип"/>
-                            </rich:column>
-                        </rich:columnGroup>
-                    </f:facet>
+            <rich:dataTable id="wtComplexesTable" value="#{ruleEditPage.wtComplexes}"
+                            var="complex" rows="15" footerClass="data-table-footer" rowKeyVar="rowItemKey">
+                <f:facet name="header">
+                    <rich:columnGroup>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value=""/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="Название контрагента"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="ИД контрагента"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="ИД комплекса"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="Название"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="Возрастная категория"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="Цена"/>
+                        </rich:column>
+                        <rich:column headerClass="column-header">
+                            <h:outputText escape="true" value="Тип"/>
+                        </rich:column>
+                    </rich:columnGroup>
+                </f:facet>
 
-
-                    <rich:subTable value="#{complex}" var="complex" rowKeyVar="rowDetailKey"
-                                   columnClasses="center-aligned-column, left-aligned-column, center-aligned-column,
+                <rich:subTable value="#{complex}" var="complex" rowKeyVar="rowDetailKey"
+                               columnClasses="center-aligned-column, left-aligned-column, center-aligned-column,
                            center-aligned-column, left-aligned-column, center-aligned-column, left-aligned-column,
                            center-aligned-column">
 
-                        <%--       Чек-боксы--%>
-                        <rich:column headerClass="column-header">
-                            <h:selectBooleanCheckbox value="#{complex.checked}"/>
-                        </rich:column>
+                    <%--       Чек-боксы--%>
+                    <rich:column headerClass="column-header">
+                        <h:selectBooleanCheckbox value="#{complex.checked}"/>
+                    </rich:column>
 
-                        <%--        Название контрагента--%>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="#{complex.contragent.contragentName}"
-                                          styleClass="output-text"/>
-                        </rich:column>
+                    <%--        Название контрагента--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{complex.contragent.contragentName}"
+                                      styleClass="output-text"/>
+                    </rich:column>
 
-                        <%--        ИД контрагента--%>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="#{complex.contragent.idOfContragent}"
-                                          styleClass="output-text"/>
-                        </rich:column>
+                    <%--        ИД контрагента--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{complex.contragent.idOfContragent}"
+                                      styleClass="output-text"/>
+                    </rich:column>
 
-                        <%--        ИД комплекса--%>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="#{complex.idOfComplex}" styleClass="output-text"/>
-                        </rich:column>
+                    <%--        ИД комплекса--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{complex.idOfComplex}" styleClass="output-text"/>
+                    </rich:column>
 
-                        <%--        Название--%>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="#{complex.name}" styleClass="output-text"/>
-                        </rich:column>
+                    <%--        Название--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{complex.name}" styleClass="output-text"/>
+                    </rich:column>
 
-                        <%--        Возрастная категория--%>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="#{complex.wtAgeGroupItem.description}"
-                                          styleClass="output-text"/>
-                        </rich:column>
+                    <%--        Возрастная категория--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{complex.wtAgeGroupItem.description}"
+                                      styleClass="output-text"/>
+                    </rich:column>
 
-                        <%--        Цена, руб--%>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="#{complex.price}" styleClass="output-text"/>
-                        </rich:column>
+                    <%--        Цена, руб--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{complex.price}" styleClass="output-text"/>
+                    </rich:column>
 
-                        <%--        Тип--%>
-                        <rich:column headerClass="column-header">
-                            <h:outputText escape="true" value="#{complex.wtComplexGroupItem.description}"
-                                          styleClass="output-text"/>
-                        </rich:column>
+                    <%--        Тип--%>
+                    <rich:column headerClass="column-header">
+                        <h:outputText escape="true" value="#{complex.wtComplexGroupItem.description}"
+                                      styleClass="output-text"/>
+                    </rich:column>
 
-                    </rich:subTable>
-                </rich:dataTable>
-
-            </h:panelGroup>
+                </rich:subTable>
+                <f:facet name="footer">
+                    <rich:datascroller for="wtComplexesTable" renderIfSinglePage="false"
+                                       maxPages="5" fastControls="hide" stepControls="auto"
+                                       boundaryControls="hide">
+                        <a4j:support event="onpagechange"/>
+                        <f:facet name="previous">
+                            <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                        </f:facet>
+                        <f:facet name="next">
+                            <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                        </f:facet>
+                    </rich:datascroller>
+                </f:facet>
+            </rich:dataTable>
+            <%--            </h:panelGroup>--%>
         </rich:panel>
     </h:panelGrid>
 </h:panelGrid>
