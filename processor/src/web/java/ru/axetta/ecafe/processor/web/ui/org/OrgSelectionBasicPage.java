@@ -65,12 +65,17 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected static final List<OrganizationType> ONLY_SCHOOLS = Collections
             .singletonList(OrganizationType.SCHOOL);
 
-    protected List<SelectItem> availableOrganizationTypes = new LinkedList<>();
+    protected List<SelectItem> availableOrganizationTypes = Collections.unmodifiableList(buildAvailableOrganizationTypes());
     protected List<Integer> selectedOrganizationTypes = new LinkedList<>();
 
     protected List<OrgShortItem> items = Collections.emptyList();
     protected Long idOfContragent;
     protected Long idOfContract;
+
+    public OrgSelectionBasicPage(){
+        super();
+        buildOrgTypesItems(filterMode);
+    }
 
     @SuppressWarnings("unchecked")
     public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter, List<Integer> orgTypes,
@@ -165,6 +170,15 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         return items;
     }
 
+    private List<SelectItem> buildAvailableOrganizationTypes(){
+        List<SelectItem> availableTypes = new LinkedList<>();
+        for (OrganizationType type : OrganizationType.values()) {
+            SelectItem item = new SelectItem(type.getCode(), type.getShortType());
+            availableTypes.add(item);
+        }
+        return availableTypes;
+    }
+
     public String getRegion() {
         return region;
     }
@@ -215,64 +229,53 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     }
 
     protected void buildOrgTypesItems(Integer filterMode) {
-        availableOrganizationTypes.clear();
         selectedOrganizationTypes.clear();
         switch (filterMode) {
             case 1:
             case 7:
-                for (OrganizationType type : ONLY_OO_GROUP) {
-                    SelectItem item = new SelectItem(type.getCode(), type.getShortType());
-                    availableOrganizationTypes.add(item);
-                    selectedOrganizationTypes.add(type.getCode());
-                }
+                disableAvailableTypesAndSetSelected(ONLY_OO_GROUP, false);
                 districtFilterDisabled = false;
                 break;
             case 2:
-                for (OrganizationType type : ONLY_SUPPLIERS) {
-                    SelectItem item = new SelectItem(type.getCode(), type.getShortType());
-                    availableOrganizationTypes.add(item);
-                    selectedOrganizationTypes.add(type.getCode());
-                }
+                disableAvailableTypesAndSetSelected(ONLY_SUPPLIERS, true);
                 districtFilterDisabled = true;
                 break;
             case 3:
-                for (OrganizationType type : ONLY_OO_GROUP) {
-                    SelectItem item = new SelectItem(type.getCode(), type.getShortType());
-                    availableOrganizationTypes.add(item);
-                    selectedOrganizationTypes.add(type.getCode());
-                }
-                for (OrganizationType type : ONLY_SUPPLIERS) {
-                    SelectItem item = new SelectItem(type.getCode(), type.getShortType());
-                    availableOrganizationTypes.add(item);
-                }
+                disableAvailableTypesAndSetSelected(CollectionUtils.union(ONLY_OO_GROUP, ONLY_SUPPLIERS), false);
                 districtFilterDisabled = false;
                 break;
             case 4:
-                for (OrganizationType type : ONLY_KIND_OO) {
-                    SelectItem item = new SelectItem(type.getCode(), type.getShortType());
-                    availableOrganizationTypes.add(item);
-                    selectedOrganizationTypes.add(type.getCode());
-                }
+                disableAvailableTypesAndSetSelected(ONLY_KIND_OO, false);
                 districtFilterDisabled = false;
                 break;
             case 5:
-                for (OrganizationType type : ONLY_SCHOOLS) {
-                    SelectItem item = new SelectItem(type.getCode(), type.getShortType());
-                    availableOrganizationTypes.add(item);
-                    selectedOrganizationTypes.add(type.getCode());
-                }
+                disableAvailableTypesAndSetSelected(ONLY_SCHOOLS, false);
                 districtFilterDisabled = false;
                 break;
             case 6:
             default:
-                for (OrganizationType type : OrganizationType.values()) {
-                    SelectItem item = new SelectItem(type.getCode(), type.getShortType());
-                    availableOrganizationTypes.add(item);
-                    if (!type.equals(OrganizationType.SUPPLIER)) {
-                        selectedOrganizationTypes.add(type.getCode());
-                    }
-                }
+                disableAvailableTypesAndSetSelected(Arrays.asList(OrganizationType.values()), false);
                 districtFilterDisabled = false;
+        }
+    }
+
+    private void disableAvailableTypesAndSetSelected(Collection<OrganizationType> targetTypes, Boolean onlySuppliers){
+        if(CollectionUtils.isEmpty(targetTypes)){
+            for(SelectItem item : availableOrganizationTypes){
+                item.setDisabled(false);
+            }
+            return;
+        }
+        for(SelectItem item : availableOrganizationTypes){
+            OrganizationType currentType = OrganizationType.fromInteger((Integer)item.getValue());
+            if(targetTypes.contains(currentType)){
+                item.setDisabled(false);
+                if(onlySuppliers || !currentType.equals(OrganizationType.SUPPLIER)){
+                    selectedOrganizationTypes.add(currentType.getCode());
+                }
+            } else {
+                item.setDisabled(true);
+            }
         }
     }
 

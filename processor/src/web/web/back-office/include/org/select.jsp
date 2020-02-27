@@ -61,12 +61,13 @@
                             </h:selectOneMenu>
                         </h:panelGrid>
                     </h:panelGrid>
-                    <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;">
+                    <h:panelGrid columns="2">
+                        <a4j:support event="onShow" reRender="OrganizationTypesForSelectOne"/>
                         <h:selectManyCheckbox id="OrganizationTypesForSelectOne" value="#{mainPage.orgSelectPage.selectedOrganizationTypes}"
                                                styleClass="output-text">
                             <f:selectItems value="#{mainPage.orgSelectPage.availableOrganizationTypes}"/>
                         </h:selectManyCheckbox>
-                    </h:panelGroup>
+                    </h:panelGrid>
                 </td>
             </tr>
             <tr>

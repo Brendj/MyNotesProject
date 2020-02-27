@@ -94,12 +94,13 @@
                                             </h:inputText>
                                         </h:panelGrid>
                                     </rich:simpleTogglePanel>
-                                <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;">
+                                <h:panelGrid columns="2">
+                                    <a4j:support event="onShow" reRender="OrganizationTypesForSelectMany"/>
                                     <h:selectManyCheckbox id="OrganizationTypesForSelectMany" value="#{mainPage.orgSelectPage.selectedOrganizationTypes}"
                                                           styleClass="output-text">
                                         <f:selectItems value="#{mainPage.orgSelectPage.availableOrganizationTypes}"/>
                                     </h:selectManyCheckbox>
-                                </h:panelGroup>
+                                </h:panelGrid>
                             </h:panelGrid>
                         </h:panelGrid>
                         <a4j:commandLink action="#{mainPage.updateOrgListSelectPage}"
