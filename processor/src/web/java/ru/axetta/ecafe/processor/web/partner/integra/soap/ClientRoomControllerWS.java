@@ -2674,6 +2674,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     .or(Restrictions.not(Restrictions.ilike("detal.groupName", groupNotForMos, MatchMode.ANYWHERE)),
                             Restrictions.isNull("detal.groupName")));
 
+            //Следующее условие - заглушка, в соответствии с https://gitlab.iteco.dev/ispp/processor/issues/438
+            criteria.add(Restrictions.or(
+                    Restrictions.and(
+                            Restrictions.and(Restrictions.not(Restrictions.ilike("complexName", "сотруд", MatchMode.ANYWHERE)),
+                            Restrictions.not(Restrictions.ilike("complexName", "воспит", MatchMode.ANYWHERE))),
+                            Restrictions.not(Restrictions.ilike("complexName", "учит", MatchMode.ANYWHERE))),
+                            Restrictions.isNull("complexName")));
+
             List<ComplexInfo> complexInfoList = criteria.list();
             PreorderDAOService preorderDAOService = RuntimeContext.getAppContext().getBean(PreorderDAOService.class);
 
