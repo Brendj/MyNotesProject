@@ -2903,6 +2903,17 @@ public class DAOUtils {
         return version;
     }
 
+    //todo Можно переделать все получения версии без for update на этот метод
+    public static long nextVersionByTableWithoutLock(Session session, String tableName) {
+        long version = 0L;
+        Query query = session.createSQLQuery(String.format("select t.version from %s as t order by t.version desc limit 1", tableName));
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
     public static long nextVersionByTaloonPreorder(Session session){
         long version = 0L;
         Query query = session.createSQLQuery("select t.version from cf_taloon_preorder as t order by t.version desc limit 1 for update");
@@ -3091,8 +3102,14 @@ public class DAOUtils {
         return version;
     }
 
-    public static List<TaloonApproval> getTaloonApprovalForOrgSinceVersion(Session session, Long idOfOrg, long version)
-            throws Exception {
+    public static List<PreorderStatus> getPreorderStatusListSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        Criteria criteria = session.createCriteria(PreorderStatus.class);
+        criteria.add(Restrictions.eq("idOfOrgOnCreate", idOfOrg));
+        criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
+
+    public static List<TaloonApproval> getTaloonApprovalForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
         //Org org = (Org)session.load(Org.class, idOfOrg);
         List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
         Criteria criteria = session.createCriteria(TaloonApproval.class);
