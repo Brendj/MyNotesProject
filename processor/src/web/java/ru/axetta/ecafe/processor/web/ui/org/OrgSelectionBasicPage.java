@@ -65,8 +65,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected static final List<OrganizationType> ONLY_SCHOOLS = Collections
             .singletonList(OrganizationType.SCHOOL);
 
-    protected List<SelectItem> availableOrganizationTypes = Collections.unmodifiableList(buildAvailableOrganizationTypes());
-    protected List<Integer> selectedOrganizationTypes = new LinkedList<>();
+    protected List<OrganizationTypeItem> availableOrganizationTypes = buildAvailableOrganizationTypes();
 
     protected List<OrgShortItem> items = Collections.emptyList();
     protected Long idOfContragent;
@@ -78,7 +77,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter, List<Integer> orgTypes,
+    public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter, List<OrganizationTypeItem> orgTypes,
             String idFilter, String region, List<Long> idOfSourceMenuOrgList, List<Long> idOfSupplierList,
             Long idOfContragent, Long idOfContract) throws Exception {
         Criteria orgCriteria = session.createCriteria(Org.class);
@@ -136,8 +135,11 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
 
         if(CollectionUtils.isNotEmpty(orgTypes)) {
             List<OrganizationType> selectedTypes = new LinkedList<>();
-            for(Integer code : orgTypes){
-                OrganizationType type = OrganizationType.fromInteger(code);
+            for(OrganizationTypeItem item : orgTypes){
+                if(!item.selected){
+                    continue;
+                }
+                OrganizationType type = OrganizationType.fromInteger(item.getCode());
                 if(type != null){
                     selectedTypes.add(type);
                 }
@@ -170,10 +172,10 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         return items;
     }
 
-    private List<SelectItem> buildAvailableOrganizationTypes(){
-        List<SelectItem> availableTypes = new LinkedList<>();
+    private List<OrganizationTypeItem> buildAvailableOrganizationTypes(){
+        List<OrganizationTypeItem> availableTypes = new LinkedList<>();
         for (OrganizationType type : OrganizationType.values()) {
-            SelectItem item = new SelectItem(type.getCode(), type.getShortType());
+            OrganizationTypeItem item = new OrganizationTypeItem(type);
             availableTypes.add(item);
         }
         return availableTypes;
@@ -217,7 +219,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
 
     public void setFilterMode(Integer filterMode) {
         this.filterMode = filterMode;
-       buildOrgTypesItems(filterMode);
+        buildOrgTypesItems(filterMode);
     }
 
     public Boolean getDistrictFilterDisabled() {
@@ -229,7 +231,6 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     }
 
     protected void buildOrgTypesItems(Integer filterMode) {
-        selectedOrganizationTypes.clear();
         switch (filterMode) {
             case 1:
             case 7:
@@ -254,24 +255,27 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
                 break;
             case 6:
             default:
-                disableAvailableTypesAndSetSelected(Arrays.asList(OrganizationType.values()), false);
+                disableAvailableTypesAndSetSelected(null, false);
                 districtFilterDisabled = false;
         }
     }
 
     private void disableAvailableTypesAndSetSelected(Collection<OrganizationType> targetTypes, Boolean onlySuppliers){
         if(CollectionUtils.isEmpty(targetTypes)){
-            for(SelectItem item : availableOrganizationTypes){
+            for(OrganizationTypeItem item : availableOrganizationTypes){
                 item.setDisabled(false);
+                item.setSelected(false);
             }
             return;
         }
-        for(SelectItem item : availableOrganizationTypes){
-            OrganizationType currentType = OrganizationType.fromInteger((Integer)item.getValue());
+        for(OrganizationTypeItem item : availableOrganizationTypes){
+            OrganizationType currentType = OrganizationType.fromInteger(item.getCode());
             if(targetTypes.contains(currentType)){
                 item.setDisabled(false);
                 if(onlySuppliers || !currentType.equals(OrganizationType.SUPPLIER)){
-                    selectedOrganizationTypes.add(currentType.getCode());
+                    item.setSelected(true);
+                } else {
+                    item.setSelected(false);
                 }
             } else {
                 item.setDisabled(true);
@@ -311,26 +315,18 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         this.idOfContract = idOfContract;
     }
 
-    public List<SelectItem> getAvailableOrganizationTypes() {
+    public List<OrganizationTypeItem> getAvailableOrganizationTypes() {
         return availableOrganizationTypes;
     }
 
-    public void setAvailableOrganizationTypes(List<SelectItem> availableOrganizationTypes) {
+    public void setAvailableOrganizationTypes(List<OrganizationTypeItem> availableOrganizationTypes) {
         this.availableOrganizationTypes = availableOrganizationTypes;
-    }
-
-    public List<Integer> getSelectedOrganizationTypes() {
-        return selectedOrganizationTypes;
-    }
-
-    public void setSelectedOrganizationTypes(List<Integer> selectedOrganizationTypes) {
-        this.selectedOrganizationTypes = selectedOrganizationTypes;
     }
 
     protected List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfSourceMenuOrgList,
             List<Long> idOfSupplierList) throws Exception {
         deselectAllItems();
-        return retrieveOrgs(session, getFilter(), getTagFilter(), getSelectedOrganizationTypes(), getIdFilter(), getRegion(),
+        return retrieveOrgs(session, getFilter(), getTagFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
                 idOfSourceMenuOrgList, idOfSupplierList, null, null);
     }
 
@@ -338,7 +334,51 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfSourceMenuOrgList)
             throws Exception {
         deselectAllItems();
-        return retrieveOrgs(session, getFilter(), getTagFilter(), getSelectedOrganizationTypes(), getIdFilter(), getRegion(),
+        return retrieveOrgs(session, getFilter(), getTagFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
                 idOfSourceMenuOrgList, Collections.EMPTY_LIST, null, null);
+    }
+
+    public static class OrganizationTypeItem {
+        private Boolean selected = false;
+        private Boolean disabled = false;
+        private String typeName;
+        private Integer code;
+
+        OrganizationTypeItem(OrganizationType type){
+            this.typeName = type.getShortType();
+            this.code = type.getCode();
+        }
+
+        public Boolean getSelected() {
+            return selected;
+        }
+
+        public void setSelected(Boolean selected) {
+            this.selected = selected;
+        }
+
+        public Boolean getDisabled() {
+            return disabled;
+        }
+
+        public void setDisabled(Boolean disabled) {
+            this.disabled = disabled;
+        }
+
+        public String getTypeName() {
+            return typeName;
+        }
+
+        public void setTypeName(String typeName) {
+            this.typeName = typeName;
+        }
+
+        public Integer getCode() {
+            return code;
+        }
+
+        public void setCode(Integer code) {
+            this.code = code;
+        }
     }
 }

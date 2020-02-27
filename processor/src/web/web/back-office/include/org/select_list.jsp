@@ -94,12 +94,17 @@
                                             </h:inputText>
                                         </h:panelGrid>
                                     </rich:simpleTogglePanel>
-                                <h:panelGrid columns="2">
-                                    <a4j:support event="onShow" reRender="OrganizationTypesForSelectMany"/>
-                                    <h:selectManyCheckbox id="OrganizationTypesForSelectMany" value="#{mainPage.orgSelectPage.selectedOrganizationTypes}"
-                                                          styleClass="output-text">
-                                        <f:selectItems value="#{mainPage.orgSelectPage.availableOrganizationTypes}"/>
-                                    </h:selectManyCheckbox>
+                                <h:panelGrid columns="1">
+                                    <a4j:repeat id="OrganizationTypesForSelectMany"
+                                                value="#{mainPage.orgListSelectPage.availableOrganizationTypes}" var="item">
+                                        <h:panelGrid columns="2">
+                                            <h:selectBooleanCheckbox value="#{item.selected}" disabled="#{item.disabled}">
+                                            <a4j:support event="onchange" action="#{mainPage.updateOrgListSelectPageWithItemDeselection}"
+                                                         reRender="modalOrgListSelectorForm"/>
+                                            </h:selectBooleanCheckbox>
+                                            <h:outputText styleClass="output-text" value="#{item.typeName}"/>
+                                        </h:panelGrid>
+                                    </a4j:repeat>
                                 </h:panelGrid>
                             </h:panelGrid>
                         </h:panelGrid>

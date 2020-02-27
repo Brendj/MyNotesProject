@@ -61,12 +61,17 @@
                             </h:selectOneMenu>
                         </h:panelGrid>
                     </h:panelGrid>
-                    <h:panelGrid columns="2">
-                        <a4j:support event="onShow" reRender="OrganizationTypesForSelectOne"/>
-                        <h:selectManyCheckbox id="OrganizationTypesForSelectOne" value="#{mainPage.orgSelectPage.selectedOrganizationTypes}"
-                                               styleClass="output-text">
-                            <f:selectItems value="#{mainPage.orgSelectPage.availableOrganizationTypes}"/>
-                        </h:selectManyCheckbox>
+                    <h:panelGrid columns="1">
+                        <a4j:repeat id="OrganizationTypesForSelectOne"
+                                    value="#{mainPage.orgSelectPage.availableOrganizationTypes}" var="item">
+                            <h:panelGrid columns="2">
+                                <h:selectBooleanCheckbox value="#{item.selected}" disabled="#{item.disabled}">
+                                <a4j:support event="onclick" action="#{mainPage.updateOrgSelectPageWithItemDeselection}"
+                                             reRender="modalOrgSelectorForm"/>
+                                </h:selectBooleanCheckbox>
+                                <h:outputText styleClass="output-text" value="#{item.typeName}"/>
+                            </h:panelGrid>
+                        </a4j:repeat>
                     </h:panelGrid>
                 </td>
             </tr>
