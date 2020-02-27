@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -2899,17 +2899,6 @@ public class DAOUtils {
         Object o = query.uniqueResult();
         if (o != null) {
             version = Long.valueOf(o.toString()) + 1;
-        }
-        return version;
-    }
-
-    //todo Можно переделать все получения версии без for update на этот метод
-    public static long nextVersionByTableWithoutLock(Session session, String tableName) {
-        long version = 0L;
-        Query query = session.createSQLQuery(String.format("select t.version from %s as t order by t.version desc limit 1", tableName));
-        Object o = query.uniqueResult();
-        if(o!=null){
-            version = Long.valueOf(o.toString())+1;
         }
         return version;
     }
