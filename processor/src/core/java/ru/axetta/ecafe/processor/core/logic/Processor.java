@@ -74,6 +74,9 @@ import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettin
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions.PlanOrdersRestrictions;
+import ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions.PlanOrdersRestrictionsProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions.PlanOrdersRestrictionsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrderFeedingProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingRequest;
@@ -344,6 +347,7 @@ public class Processor implements SyncProcessor {
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
         ResReestrTaloonPreorder resReestrTaloonPreorder = null;
         ReestrTaloonPreorderData reestrTaloonPreorderData = null;
+        PlanOrdersRestrictions planOrdersRestrictionsData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
         InteractiveReportData interactiveReportData = null;
         InteractiveReport interactiveReport = null;
@@ -1031,6 +1035,7 @@ public class Processor implements SyncProcessor {
         fullProcessingRequestFeeding(request, syncHistory, responseSections);
         fullProcessingClientDiscountDSZN(request, syncHistory, responseSections);
         fullProcessingPreorderFeedingStatus(request, responseSections);
+        fullProcessingPlanOrdersRestrictionsData(request, syncHistory, responseSections);
 
         logger.info("Full sync performance info: " + performanceLogger.toString());
 
@@ -1214,6 +1219,8 @@ public class Processor implements SyncProcessor {
 
         //process SyncSetting
         fullProcessingSyncSetting(request, syncHistory, responseSections);
+
+        fullProcessingPlanOrdersRestrictionsData(request, syncHistory, responseSections);
 
         // время окончания обработки
         Date syncEndTime = new Date();
@@ -3377,6 +3384,24 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return resTempCardsOperations;
+    }
+
+    private PlanOrdersRestrictions processPlanOrdersRestrictions(PlanOrdersRestrictionsRequest planOrdersRestrictionsRequest) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        PlanOrdersRestrictions planOrdersRestrictions = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            PlanOrdersRestrictionsProcessor processor = new PlanOrdersRestrictionsProcessor(persistenceSession, planOrdersRestrictionsRequest);
+            planOrdersRestrictions = processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return planOrdersRestrictions;
     }
 
     private ResReestrTaloonApproval processReestrTaloonApproval(ReestrTaloonApproval reestrTaloonApproval)
@@ -6908,6 +6933,22 @@ public class Processor implements SyncProcessor {
             }
         } catch (Exception e) {
             String message = String.format("fullProcessingRequestFeeding: %s", e.getMessage());
+            processorUtils
+                    .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingPlanOrdersRestrictionsData(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            PlanOrdersRestrictionsRequest planOrdersRestrictionsRequest = request.getPlanOrdersRestrictionsRequest();
+            if (null != planOrdersRestrictionsRequest) {
+                PlanOrdersRestrictions planOrdersRestrictionsData = processPlanOrdersRestrictions(planOrdersRestrictionsRequest);
+                addToResponseSections(planOrdersRestrictionsData, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("fullProcessingPlanOrdersRestrictionsData: %s", e.getMessage());
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);

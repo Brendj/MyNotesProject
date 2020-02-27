@@ -38,6 +38,7 @@ public class ClientMigrationHistoryService {
     private static final Logger logger = LoggerFactory.getLogger(ClientMigrationHistoryService.class);
     private static final String NODE_BALANCE_CHANGE_ORG = "ecafe.processor.client.balance.serviceNode";
     private static final String NODE_DISCOUNT_CHANGE_ORG = "ecafe.processor.clientMigrationHistory.discountDelete";
+    private static final String NODE_PLAN_ORDERS_RESTRICTIONS_CHANGE_ORG = "ecafe.processor.planOrdersRestrictions.serviceNode";
 
     public List<ClientMigration> findAll(Org org, Client client) {
         return repository.findAll(org, client);
@@ -113,6 +114,32 @@ public class ClientMigrationHistoryService {
             }
         }
 
+        if (isOn(NODE_PLAN_ORDERS_RESTRICTIONS_CHANGE_ORG)) {
+            Session session = null;
+            Transaction transaction = null;
+            try {
+                session = RuntimeContext.getInstance().createPersistenceSession();
+                transaction = session.beginTransaction();
+                Long nextVersion = DAOUtils.nextVersionByTableWithoutLock(session, "cf_plan_orders_restrictions");
+                for (ClientMigration clientMigration : list) {
+                    if (clientMigration.getOrg().equals(clientMigration.getOldOrg())) continue;
+                    List<PlanOrdersRestriction> planOrdersRestrictions = DAOUtils.getPlanOrdersRestrictionByClient(session, clientMigration.getClient().getIdOfClient());
+                    for (PlanOrdersRestriction planOrdersRestriction : planOrdersRestrictions) {
+                        planOrdersRestriction.setVersion(nextVersion);
+                        planOrdersRestriction.setLastUpdate(new Date());
+                        session.update(planOrdersRestriction);
+                    }
+                }
+                transaction.commit();
+                transaction = null;
+            } catch (Exception e) {
+                logger.error("Error in change org for plan orders restrictions: ", e);
+            } finally {
+                HibernateUtils.rollback(transaction, logger);
+                HibernateUtils.close(session, logger);
+            }
+        }
+
         DAOService.getInstance().updateLastProcessOrgChange(nextDate);
         logger.info(String.format("End process Org change service. Processed %s client migration records records",
                 counter));
@@ -130,6 +157,6 @@ public class ClientMigrationHistoryService {
     }
 
     private boolean isOnBalanceOrDiscount() {
-        return (isOn(NODE_BALANCE_CHANGE_ORG) || isOn(NODE_DISCOUNT_CHANGE_ORG));
+        return (isOn(NODE_BALANCE_CHANGE_ORG) || isOn(NODE_DISCOUNT_CHANGE_ORG) || isOn(NODE_PLAN_ORDERS_RESTRICTIONS_CHANGE_ORG));
     }
 }
