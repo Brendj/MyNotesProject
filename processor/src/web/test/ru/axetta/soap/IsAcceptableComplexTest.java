@@ -126,7 +126,7 @@ public class IsAcceptableComplexTest extends TestCase {
         for(int i = 0; i < this.testPreorderParamsContainer.size(); i++){
             PreorderComplexItemExt element = this.testListOfPreordes.get(i);
             PreorderGoodParamsContainer container = this.testPreorderParamsContainer.get(i);
-            Boolean result = service.isAcceptableComplex(element, this.testClientGroup, this.HAS_DISCOUNT, container);
+            Boolean result = service.isAcceptableComplex(element, this.testClientGroup, this.HAS_DISCOUNT, container, null);
 
             String outputResult = result ? this.ANSI_GREEN + result.toString() + this.ANSI_RESET : this.ANSI_RED + result.toString() + this.ANSI_RESET;
 
