@@ -33,6 +33,8 @@ public class PreorderMenuDetail {
     private Integer availableNow;
     private String shortName;
     private Long idOfGood;
+    private Long usedSum;
+    private Long usedAmount;
 
     public PreorderMenuDetail() {
 
@@ -251,5 +253,21 @@ public class PreorderMenuDetail {
 
     public void setIdOfGood(Long idOfGood) {
         this.idOfGood = idOfGood;
+    }
+
+    public Long getUsedSum() {
+        return usedSum;
+    }
+
+    public void setUsedSum(Long usedSum) {
+        this.usedSum = usedSum;
+    }
+
+    public Long getUsedAmount() {
+        return usedAmount;
+    }
+
+    public void setUsedAmount(Long usedAmount) {
+        this.usedAmount = usedAmount;
     }
 }

@@ -39,5 +39,7 @@
         <property name="protein" column="Protein" type="double" update="false"/>
         <property name="calories" column="Calories" type="double" update="false"/>
         <property name="idOfGood" column="idofgood" type="long" />
+        <property name="usedSum" column="usedsum" type="long"/>
+        <property name="usedAmount" column="usedamount" type="long"/>
     </class>
 </hibernate-mapping>
