@@ -207,7 +207,7 @@ public class PreorderDAOService {
         }
         for (PreorderComplexItemExt item : list) {
             PreorderGoodParamsContainer complexParams = getComplexParams(item, client, date);
-            if (isAcceptableComplex(item, client.getClientGroup(), hasDiscount, complexParams, null)) {
+            if (isAcceptableComplex(item, client.getClientGroup(), hasDiscount, complexParams, null, null)) {
                 String groupName = getPreorderComplexGroup(item, complexParams);
                 if (groupName.isEmpty()) continue;
                 item.setType(getPreorderComplexSubgroup(item));
@@ -1461,8 +1461,12 @@ public class PreorderDAOService {
     }
 
     public boolean isAcceptableComplex(PreorderComplexItemExt complex, ClientGroup clientGroup,
-            Boolean hasDiscount, PreorderGoodParamsContainer container, String ageTypeGroup) {
+            Boolean hasDiscount, PreorderGoodParamsContainer container, String ageTypeGroup,
+            List<CategoryDiscount> clientDiscountsList) {
         if (clientGroup == null) return false;
+        ////Если комплекс не льготный и нет централизованной видимости, то не включаем его в результат
+        //if (!complex.getDiscount() && complex.getModeVisible() != 1)
+        //    return false;
         String clientGroupName = clientGroup.getGroupName();
         Integer goodType = container.getGoodType();
         Integer ageGroup = container.getAgeGroup();
@@ -1476,7 +1480,17 @@ public class PreorderDAOService {
                 if (ageGroup.equals(GoodAgeGroupType.G_1_5_3.getCode()) || ageGroup.equals(GoodAgeGroupType.G_3_7.getCode())
                      //в названии комплекса присутствует %1,5-3% ИЛИ %3-7%
                     || complex.getComplexName().contains("1,5-3") || complex.getComplexName().contains("3-7")) {
-                        return true;
+                    //Смотрим льготы дошкольника
+                    for (CategoryDiscount categoryDiscount: clientDiscountsList)
+                    {
+                        //Если льготы указаны правильно, то...
+                        if ((categoryDiscount.getCategoryName().contains("1,5-3") && ageGroup.equals(GoodAgeGroupType.G_1_5_3.getCode()))
+                                || (categoryDiscount.getCategoryName().contains("3-7") && ageGroup.equals(GoodAgeGroupType.G_3_7.getCode())))
+                        {
+                            return true;
+                        }
+                    }
+                    return false;
                 }
             }
             return false;
