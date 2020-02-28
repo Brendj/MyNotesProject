@@ -2658,20 +2658,27 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List<ComplexInfo> complexInfoList = criteria.list();
             PreorderDAOService preorderDAOService = RuntimeContext.getAppContext().getBean(PreorderDAOService.class);
 
+            //Получаем категории льгот для клиента
+            List<Long> categoriesDiscountsIds = new LinkedList<Long>();
+            for(String cd : client.getCategoriesDiscounts().split(",")) {
+                if(StringUtils.isNotEmpty(cd)) {
+                    categoriesDiscountsIds.add(Long.valueOf(cd));
+                }
+            }
+            List<CategoryDiscount> clientDiscountsList = Collections.emptyList();
+            if (!categoriesDiscountsIds.isEmpty()) {
+                Criteria clientDiscountsCriteria = session.createCriteria(CategoryDiscount.class);
+                clientDiscountsCriteria.add(Restrictions.in("idOfCategoryDiscount", categoriesDiscountsIds));
+                clientDiscountsList = clientDiscountsCriteria.list();
+            }
+
             List<MenuWithComplexesExt> list = new ArrayList<MenuWithComplexesExt>();
             for (ComplexInfo ci : complexInfoList) {
                 if (client.getClientGroup() != null && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()) {
                     //для учеников
                     PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(ci.getIdOfComplex(), ci.getComplexName(), ci.getCurrentPrice(), ci.getModeOfAdd(), ci.getModeFree(), ci.getModeVisible());
                     PreorderGoodParamsContainer complexParams = preorderDAOService.getComplexParams(complexItemExt, client, ci.getMenuDate());
-                    //Получаем категории льгот для клиента
-                    List<String> discounts = new ArrayList(Arrays.asList(client.getCategoriesDiscounts().split(",")));
-                    List<CategoryDiscount> clientDiscountsList = Collections.emptyList();
-                    if (!discounts.isEmpty()) {
-                        Criteria clientDiscountsCriteria = session.createCriteria(CategoryDiscount.class);
-                        clientDiscountsCriteria.add(Restrictions.in("idOfCategoryDiscount", discounts));
-                        clientDiscountsList = clientDiscountsCriteria.list();
-                    }
+
                     if (!preorderDAOService.isAcceptableComplex(complexItemExt, client.getClientGroup(), client.hasDiscount(), complexParams, client.getAgeTypeGroup(), clientDiscountsList))
                         continue;
                 } else {
