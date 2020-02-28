@@ -1461,8 +1461,11 @@ public class PreorderDAOService {
     }
 
     public boolean isAcceptableComplex(PreorderComplexItemExt complex, ClientGroup clientGroup,
-            Boolean hasDiscount, PreorderGoodParamsContainer container, String ageTypeGroup) {
+            Boolean hasDiscount, PreorderGoodParamsContainer container, String ageTypeGroup, Integer modeVisible) {
         if (clientGroup == null) return false;
+        //Если комплекс не льготный и нет централизованной видимости, то не включаем его в результат
+        if (!complex.getDiscount() && modeVisible != 1)
+            return false;
         String clientGroupName = clientGroup.getGroupName();
         Integer goodType = container.getGoodType();
         Integer ageGroup = container.getAgeGroup();
