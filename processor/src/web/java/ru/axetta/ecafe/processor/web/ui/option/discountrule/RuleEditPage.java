@@ -68,11 +68,11 @@ public class RuleEditPage extends BasicWorkspacePage
     private int complexType = -1;
     private int ageGroup = -1;
     WtDiscountRule wtDiscountRule;
-    private List<WtSelectedComplex> wtComplexes = new ArrayList<>();
+    private List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
     private Map<Integer, Long> complexTypeMap;
     private Map<Integer, Long> ageGroupMap;
 
-    // Веб-технолог
+    //// Веб-технолог ////
 
     public List<SelectItem> getComplexTypes() {
         List<SelectItem> res = new ArrayList<>();
@@ -102,8 +102,7 @@ public class RuleEditPage extends BasicWorkspacePage
         return res;
     }
 
-    public void fillWtComplexes() {
-        List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
+    public void fillWtSelectedComplexes() {
         if (complexType > -1 && ageGroup > -1) {
             Long complexGroupId = complexTypeMap.get(complexType + 1);
             Long ageGroupId = ageGroupMap.get(ageGroup + 1);
@@ -113,8 +112,10 @@ public class RuleEditPage extends BasicWorkspacePage
                 WtComplexGroupItem wtComplexGroupItem = daoService.getWtComplexGroupItemById(complexGroupId);
                 WtAgeGroupItem wtAgeGroupItem = daoService.getWtAgeGroupItemById(ageGroupId);
                 if (wtComplexGroupItem != null && wtAgeGroupItem != null) {
-                    List<WtComplex> parentComplexes = daoService.getWtComplexesList(wtComplexGroupItem, wtAgeGroupItem);
-                    formWtSelectedComplexesList(wtSelectedComplexes, parentComplexes);
+                    List<WtComplex> wtComplexes = daoService.getWtComplexesList(wtComplexGroupItem, wtAgeGroupItem);
+                    for (WtComplex wtComplex : wtComplexes) {
+                        wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
+                    }
                 } else {
                     resetWtForm();
                 }
@@ -124,24 +125,19 @@ public class RuleEditPage extends BasicWorkspacePage
         }
     }
 
-    private void formWtSelectedComplexesList(List<WtSelectedComplex> wtSelectedComplexes,
-            List<WtComplex> parentComplexes) {
-        for (WtComplex parentComplex : parentComplexes) {
-            wtSelectedComplexes.add(new WtSelectedComplex(parentComplex));
-        }
-        wtComplexes = wtSelectedComplexes;
-    }
-
     private void resetWtForm() {
-        List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
-        List<WtComplex> parentComplexes = daoService.getWtComplexesList();
-        formWtSelectedComplexesList(wtSelectedComplexes, parentComplexes);
+        List<WtSelectedComplex> wtNewSelectedComplexes = new ArrayList<>();
+        List<WtComplex> wtComplexes = daoService.getWtComplexesList();
+        for (WtComplex wtComplex : wtComplexes) {
+            wtNewSelectedComplexes.add(new WtSelectedComplex(wtComplex));
+        }
+        wtSelectedComplexes = wtNewSelectedComplexes;
         complexType = -1;
         ageGroup = -1;
     }
 
 
-    // Old
+    //// Old ////
 
     public List<SelectItem> getAvailableComplexs() {
         final List<ComplexRole> complexRoles = daoService.findComplexRoles();
@@ -312,6 +308,53 @@ public class RuleEditPage extends BasicWorkspacePage
         }
         em.persist(entity);
         fill(entity);
+
+        //// Веб-технолог ////
+
+        //wtDiscountRule = (WtDiscountRule) em.merge(wtDiscountRule);
+        if (StringUtils.isNotEmpty(subCategory)) {
+            wtDiscountRule.setSubCategory(subCategory);
+        }
+
+        Set<WtComplex> wtComplexes = new HashSet<>();
+        for (WtSelectedComplex wtSelectedComplex : wtSelectedComplexes) {
+            if (wtSelectedComplex.isChecked()) {
+                wtDiscountRule.getComplexes().add(wtSelectedComplex.getWtComplex());
+            }
+        }
+
+        wtDiscountRule.setPriority(priority);
+        wtDiscountRule.setOperationOr(operationor);
+
+        //wtDiscountRule.setCategoryDiscount(categoryDiscountObject);
+
+        //if (!this.idOfCategoryList.isEmpty()) {
+        //    List categoryList = DAOUtils.getCategoryDiscountListWithIds(em, this.idOfCategoryList);
+        //    StringBuilder stringBuilder = new StringBuilder();
+        //    for (Object object : categoryList) {
+        //        this.categoryDiscountSet.add((CategoryDiscount) object);
+        //        stringBuilder.append(((CategoryDiscount) object).getIdOfCategoryDiscount());
+        //        stringBuilder.append(",");
+        //    }
+        //    entity.setCategoriesDiscounts(this.categoryDiscountSet);
+        //    entity.setCategoryDiscounts(stringBuilder.substring(0, stringBuilder.length() - 1));
+        //} else {
+        //    entity.setCategoryDiscounts("");
+        //}
+
+        //entity.getCategoryOrgs().clear();
+        //if (!this.idOfCategoryOrgList.isEmpty()) {
+        //    entity.getCategoryOrgs().clear();
+        //    List categoryOrgList = DAOUtils.getCategoryOrgWithIds(em, this.idOfCategoryOrgList);
+        //    for (Object object : categoryOrgList) {
+        //        entity.getCategoryOrgs().add((CategoryOrg) object);
+        //    }
+        //}
+
+        //em.persist(wtDiscountRule);
+        wtDiscountRule = (WtDiscountRule) em.merge(wtDiscountRule);
+        //fill(wtDiscountRule);
+
         printMessage("Данные обновлены.");
     }
 
@@ -719,11 +762,11 @@ public class RuleEditPage extends BasicWorkspacePage
         this.wtDiscountRule = wtDiscountRule;
     }
 
-    public List<WtSelectedComplex> getWtComplexes() {
-        return wtComplexes;
+    public List<WtSelectedComplex> getWtSelectedComplexes() {
+        return wtSelectedComplexes;
     }
 
-    public void setWtComplexes(List<WtSelectedComplex> wtComplexes) {
-        this.wtComplexes = wtComplexes;
+    public void setWtSelectedComplexes(List<WtSelectedComplex> wtSelectedComplexes) {
+        this.wtSelectedComplexes = wtSelectedComplexes;
     }
 }

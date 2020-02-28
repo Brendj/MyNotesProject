@@ -36,8 +36,8 @@ public class WtDiscountRule {
     @JoinColumn(name = "idOfCategoryDiscount")
     private CategoryDiscount categoryDiscount;
 
-    @Column(name = "idOfSuperCategory")
-    private Long idOfSuperCategory;
+    @Column(name = "subCategory")
+    private String subCategory;
 
     @ManyToMany
     @JoinTable(name = "cf_wt_discountrules_complexes",
@@ -93,12 +93,12 @@ public class WtDiscountRule {
         this.categoryDiscount = categoryDiscount;
     }
 
-    public Long getIdOfSuperCategory() {
-        return idOfSuperCategory;
+    public String getSubCategory() {
+        return subCategory;
     }
 
-    public void setIdOfSuperCategory(Long idOfSuperCategory) {
-        this.idOfSuperCategory = idOfSuperCategory;
+    public void setSubCategory(String subCategory) {
+        this.subCategory = subCategory;
     }
 
     public Set<WtComplex> getComplexes() {

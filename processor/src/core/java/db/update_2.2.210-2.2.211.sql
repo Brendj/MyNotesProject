@@ -36,7 +36,7 @@ CREATE TABLE cf_wt_discountrules
     rate integer NOT NULL DEFAULT 0, -- Ставка дисконтирования
     operationor boolean NOT NULL DEFAULT false, -- Объединение комплексов
     idofcategorydiscount bigint, -- Идентификатор категории клиентов
-    idofsupercategory bigint, -- Идентификатор суперкатегории
+    subcategory character varying(100) DEFAULT ''::character varying, -- Cуперкатегория
     CONSTRAINT cf_wt_discountrules_pk PRIMARY KEY (idofrule),
     CONSTRAINT cf_wt_discountrules_categorydiscount_fk FOREIGN KEY (idofcategorydiscount)
         REFERENCES cf_categorydiscounts (idofcategorydiscount) MATCH SIMPLE
@@ -45,8 +45,6 @@ CREATE TABLE cf_wt_discountrules
     WITH (
         OIDS=FALSE
     );
-ALTER TABLE cf_discountrules
-    OWNER TO postgres;
 
 -- Таблица связки льготных правил с комплексами веб-технолога
 CREATE TABLE cf_wt_discountrules_complexes
@@ -65,6 +63,4 @@ CREATE TABLE cf_wt_discountrules_complexes
     WITH (
         OIDS=FALSE
     );
-ALTER TABLE cf_discountrules
-    OWNER TO postgres;
 

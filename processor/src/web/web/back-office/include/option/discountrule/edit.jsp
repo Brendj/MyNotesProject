@@ -116,7 +116,7 @@
             </h:panelGrid>
 
             <h:panelGrid columns="2" styleClass="borderless-grid">
-                <a4j:commandButton value="Отобразить" action="#{ruleEditPage.fillWtComplexes()}"
+                <a4j:commandButton value="Отобразить" action="#{ruleEditPage.fillWtSelectedComplexes()}"
                                    reRender="workspaceTogglePanel"
                                    styleClass="command-button"/>
             </h:panelGrid>
@@ -132,9 +132,7 @@
                 </f:facet>
             </a4j:status>
 
-            <%--            <h:panelGroup layout="block" style="height: 505px; overflow-y: scroll;">--%>
-
-            <rich:dataTable id="wtComplexesTable" value="#{ruleEditPage.wtComplexes}"
+            <rich:dataTable id="wtComplexesTable" value="#{ruleEditPage.wtSelectedComplexes}"
                             var="complex" rows="15" footerClass="data-table-footer" rowKeyVar="rowItemKey">
                 <f:facet name="header">
                     <rich:columnGroup>
@@ -177,40 +175,40 @@
 
                     <%--        Название контрагента--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.contragent.contragentName}"
+                        <h:outputText escape="true" value="#{complex.wtComplex.contragent.contragentName}"
                                       styleClass="output-text"/>
                     </rich:column>
 
                     <%--        ИД контрагента--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.contragent.idOfContragent}"
+                        <h:outputText escape="true" value="#{complex.wtComplex.contragent.idOfContragent}"
                                       styleClass="output-text"/>
                     </rich:column>
 
                     <%--        ИД комплекса--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.idOfComplex}" styleClass="output-text"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.idOfComplex}" styleClass="output-text"/>
                     </rich:column>
 
                     <%--        Название--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.name}" styleClass="output-text"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.name}" styleClass="output-text"/>
                     </rich:column>
 
                     <%--        Возрастная категория--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.wtAgeGroupItem.description}"
+                        <h:outputText escape="true" value="#{complex.wtComplex.wtAgeGroupItem.description}"
                                       styleClass="output-text"/>
                     </rich:column>
 
                     <%--        Цена, руб--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.price}" styleClass="output-text"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.price}" styleClass="output-text"/>
                     </rich:column>
 
                     <%--        Тип--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.wtComplexGroupItem.description}"
+                        <h:outputText escape="true" value="#{complex.wtComplex.wtComplexGroupItem.description}"
                                       styleClass="output-text"/>
                     </rich:column>
 
@@ -229,7 +227,7 @@
                     </rich:datascroller>
                 </f:facet>
             </rich:dataTable>
-            <%--            </h:panelGroup>--%>
+
         </rich:panel>
     </h:panelGrid>
 </h:panelGrid>

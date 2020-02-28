@@ -4,17 +4,21 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
-public class WtSelectedComplex extends WtComplex {
+public class WtSelectedComplex {
+    WtComplex wtComplex;
     private boolean isChecked;
 
-    public WtSelectedComplex() {
-        super();
-        isChecked = false;
+    public WtSelectedComplex(WtComplex wtComplex) {
+        this.wtComplex = wtComplex;
+        this.isChecked = false;
     }
 
-    public WtSelectedComplex(WtComplex complex) {
-        super(complex);
-        this.isChecked = false;
+    public WtComplex getWtComplex() {
+        return wtComplex;
+    }
+
+    public void setWtComplex(WtComplex wtComplex) {
+        this.wtComplex = wtComplex;
     }
 
     public boolean isChecked() {

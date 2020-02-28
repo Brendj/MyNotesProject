@@ -24,9 +24,7 @@
         <property name="operationOr">
             <column name="operationOr" sql-type="boolean" not-null="true"/>
         </property>
-        <property name="idOfSuperCategory">
-            <column name="idOfSuperCategory" sql-type="long"/>
-        </property>
+        <property name="subCategory" column="subCategory" type="string" length="100" />
 
         <many-to-one name="categoryDiscount" class="ru.axetta.ecafe.processor.core.persistence.CategoryDiscount">
             <column name="idOfCategoryDiscount"/>
