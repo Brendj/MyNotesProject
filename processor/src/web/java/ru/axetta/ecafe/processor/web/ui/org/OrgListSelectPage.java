@@ -35,6 +35,7 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
     }
 
     public void completeOrgListSelection(boolean ok) throws Exception {
+        resetAvailableOrganizationTypes();
         setFilterMode(0);
 
         Map<Long, String> orgMap = null;

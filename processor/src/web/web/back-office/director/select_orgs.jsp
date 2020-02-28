@@ -95,12 +95,18 @@
                                         </h:panelGrid>
                                     </rich:simpleTogglePanel>
 
-                                <h:panelGroup layout="block" style="height: 150px; overflow-y: scroll;">
-                                    <h:selectManyCheckbox id="complexs" value="#{mainPage.orgSelectPage.selectedOrganizationTypes}"
-                                                          layout="pageDirection" styleClass="output-text">
-                                        <f:selectItems value="#{mainPage.orgSelectPage.availableOrganizationTypes}"/>
-                                    </h:selectManyCheckbox>
-                                </h:panelGroup>
+                                <h:panelGrid columns="1">
+                                    <a4j:repeat id="DirectorOrganizationTypesForSelectMany"
+                                                value="#{directorPage.orgListSelectPage.availableOrganizationTypes}" var="item">
+                                        <h:panelGrid columns="2">
+                                            <h:selectBooleanCheckbox value="#{item.selected}" disabled="#{item.disabled}">
+                                                <a4j:support event="onchange" action="#{directorPage.updateOrgListSelectPage}"
+                                                             reRender="modalOrgListSelectorForm" requestDelay="1000"/>
+                                            </h:selectBooleanCheckbox>
+                                            <h:outputText styleClass="output-text" value="#{item.typeName}"/>
+                                        </h:panelGrid>
+                                    </a4j:repeat>
+                                </h:panelGrid>
                             </h:panelGrid>
                         </h:panelGrid>
                         <a4j:commandLink action="#{directorPage.updateOrgListSelectPage}"

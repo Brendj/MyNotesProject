@@ -67,7 +67,7 @@
                             <h:panelGrid columns="2">
                                 <h:selectBooleanCheckbox value="#{item.selected}" disabled="#{item.disabled}">
                                 <a4j:support event="onclick" action="#{mainPage.updateOrgSelectPageWithItemDeselection}"
-                                             reRender="modalOrgSelectorForm"/>
+                                             reRender="modalOrgSelectorForm" requestDelay="1000"/>
                                 </h:selectBooleanCheckbox>
                                 <h:outputText styleClass="output-text" value="#{item.typeName}"/>
                             </h:panelGrid>

@@ -34,6 +34,8 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
 
     public void completeOrgSelection(Session session) throws Exception {
         setFilterMode(0);
+        resetAvailableOrganizationTypes();
+
         if (!completeHandlers.empty()) {
             completeHandlers.peek().completeOrgSelection(session, selectedItem.getIdOfOrg());
             completeHandlers.pop();
@@ -42,6 +44,7 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
 
     public void cancelOrgSelection() {
         setFilterMode(0);
+        resetAvailableOrganizationTypes();
         completeHandlers.clear();
     }
 
@@ -104,7 +107,6 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
     }
 
     public interface CompleteHandler {
-
         void completeOrgSelection(Session session, Long idOfOrg) throws Exception;
     }
 }

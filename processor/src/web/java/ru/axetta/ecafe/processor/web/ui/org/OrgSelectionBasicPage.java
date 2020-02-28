@@ -34,6 +34,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected String filter;
     protected String tagFilter;
     protected String idFilter;
+    protected Integer supplierFilter; // Legacy-code, but JSP not work without him
 
     /*
            0 - доступны все фильтры
@@ -44,7 +45,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
            5 - доступен только фильтр по СОШ
            6 - доступны все фильтры для всех поставщиков
         */
-    protected int filterMode = 0;
+    protected Integer filterMode = 0;
 
     protected Boolean districtFilterDisabled = false;
 
@@ -213,7 +214,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         this.idFilter = idFilter;
     }
 
-    public int getFilterMode() {
+    public Integer getFilterMode() {
         return filterMode;
     }
 
@@ -230,55 +231,68 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         this.districtFilterDisabled = districtFilterDisabled;
     }
 
+    public Integer getSupplierFilter() {
+        return supplierFilter;
+    }
+
+    public void setSupplierFilter(Integer supplierFilter) {
+        this.supplierFilter = supplierFilter;
+    }
+
     protected void buildOrgTypesItems(Integer filterMode) {
         switch (filterMode) {
-            case 1:
-            case 7:
-                disableAvailableTypesAndSetSelected(ONLY_OO_GROUP, false);
-                districtFilterDisabled = false;
-                break;
             case 2:
-                disableAvailableTypesAndSetSelected(ONLY_SUPPLIERS, true);
+                disableAvailableTypesAndSetSelected(ONLY_SUPPLIERS);
                 districtFilterDisabled = true;
                 break;
             case 3:
-                disableAvailableTypesAndSetSelected(CollectionUtils.union(ONLY_OO_GROUP, ONLY_SUPPLIERS), false);
+                disableAvailableTypesAndSetSelected(CollectionUtils.union(ONLY_OO_GROUP, ONLY_SUPPLIERS));
                 districtFilterDisabled = false;
                 break;
             case 4:
-                disableAvailableTypesAndSetSelected(ONLY_KIND_OO, false);
+                disableAvailableTypesAndSetSelected(ONLY_KIND_OO);
                 districtFilterDisabled = false;
                 break;
             case 5:
-                disableAvailableTypesAndSetSelected(ONLY_SCHOOLS, false);
+                disableAvailableTypesAndSetSelected(ONLY_SCHOOLS);
                 districtFilterDisabled = false;
                 break;
+            case 1:
             case 6:
+            case 7:
             default:
-                disableAvailableTypesAndSetSelected(null, false);
+                disableAvailableTypesAndSetSelected(null);
                 districtFilterDisabled = false;
         }
     }
 
-    private void disableAvailableTypesAndSetSelected(Collection<OrganizationType> targetTypes, Boolean onlySuppliers){
-        if(CollectionUtils.isEmpty(targetTypes)){
-            for(OrganizationTypeItem item : availableOrganizationTypes){
-                item.setDisabled(false);
-                item.setSelected(false);
-            }
-            return;
+    protected void resetAvailableOrganizationTypes() {
+        for (OrganizationTypeItem item : availableOrganizationTypes) {
+            item.setDisabled(false);
+            item.setSelected(!item.code.equals(OrganizationType.SUPPLIER.getCode()));
         }
-        for(OrganizationTypeItem item : availableOrganizationTypes){
-            OrganizationType currentType = OrganizationType.fromInteger(item.getCode());
-            if(targetTypes.contains(currentType)){
+    }
+
+    private void disableAvailableTypesAndSetSelected(Collection<OrganizationType> targetTypes) {
+        if (CollectionUtils.isEmpty(targetTypes)) {
+            for (OrganizationTypeItem item : availableOrganizationTypes) {
                 item.setDisabled(false);
-                if(onlySuppliers || !currentType.equals(OrganizationType.SUPPLIER)){
-                    item.setSelected(true);
+            }
+        } else if (targetTypes.size() == 1) {
+            for (OrganizationTypeItem item : availableOrganizationTypes) {
+                OrganizationType currentType = OrganizationType.fromInteger(item.getCode());
+                item.setSelected(targetTypes.contains(currentType));
+                item.setDisabled(true);
+            }
+        } else {
+            for (OrganizationTypeItem item : availableOrganizationTypes) {
+                OrganizationType currentType = OrganizationType.fromInteger(item.getCode());
+                if (targetTypes.contains(currentType)) {
+                    item.setDisabled(true);
                 } else {
                     item.setSelected(false);
+                    item.setDisabled(true);
                 }
-            } else {
-                item.setDisabled(true);
             }
         }
     }
@@ -339,7 +353,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     }
 
     public static class OrganizationTypeItem {
-        private Boolean selected = false;
+        private Boolean selected;
         private Boolean disabled = false;
         private String typeName;
         private Integer code;
@@ -347,6 +361,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         OrganizationTypeItem(OrganizationType type){
             this.typeName = type.getShortType();
             this.code = type.getCode();
+            selected = !type.equals(OrganizationType.SUPPLIER);
         }
 
         public Boolean getSelected() {
