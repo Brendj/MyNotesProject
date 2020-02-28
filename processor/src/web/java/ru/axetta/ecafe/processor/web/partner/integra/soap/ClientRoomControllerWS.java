@@ -2662,9 +2662,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             for (ComplexInfo ci : complexInfoList) {
                 if (client.getClientGroup() != null && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()) {
                     //для учеников
-                    PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(ci.getIdOfComplex(), ci.getComplexName(), ci.getCurrentPrice(), ci.getModeOfAdd(), ci.getModeFree());
+                    PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(ci.getIdOfComplex(), ci.getComplexName(), ci.getCurrentPrice(), ci.getModeOfAdd(), ci.getModeFree(), ci.getModeVisible());
                     PreorderGoodParamsContainer complexParams = preorderDAOService.getComplexParams(complexItemExt, client, ci.getMenuDate());
-                    if (!preorderDAOService.isAcceptableComplex(complexItemExt, client.getClientGroup(), client.hasDiscount(), complexParams, client.getAgeTypeGroup(), ci.getModeVisible()))
+                    if (!preorderDAOService.isAcceptableComplex(complexItemExt, client.getClientGroup(), client.hasDiscount(), complexParams, client.getAgeTypeGroup()))
                         continue;
                 } else {
                     //для предопределенных не включаем комплексы с какой-либо категорией
