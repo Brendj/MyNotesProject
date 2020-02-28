@@ -49,10 +49,9 @@ CREATE TABLE cf_wt_discountrules
 -- Таблица связки льготных правил с комплексами веб-технолога
 CREATE TABLE cf_wt_discountrules_complexes
 (
-    idofdiscountcomplexes bigint NOT NULL, -- Идентификатор записи
     idofrule bigint NOT NULL, -- Идентификатор льготного правила
     idofcomplex bigserial NOT NULL, -- Идентификатор комплекса
-    CONSTRAINT cf_wt_discountrules_complexes_pk PRIMARY KEY (idofdiscountcomplexes),
+    CONSTRAINT cf_wt_discountrules_complexes_pk PRIMARY KEY (idofrule, idofcomplex),
     CONSTRAINT cf_wt_discountcomplexes_rules_fk FOREIGN KEY (idofrule)
         REFERENCES cf_wt_discountrules (idofrule) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION,

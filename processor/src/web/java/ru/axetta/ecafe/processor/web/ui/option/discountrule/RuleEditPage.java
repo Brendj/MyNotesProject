@@ -67,7 +67,7 @@ public class RuleEditPage extends BasicWorkspacePage
     // Веб-технолог
     private int complexType = -1;
     private int ageGroup = -1;
-    WtDiscountRule wtDiscountRule;
+    WtDiscountRule wtDiscountRule = new WtDiscountRule();
     private List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
     private Map<Integer, Long> complexTypeMap;
     private Map<Integer, Long> ageGroupMap;
@@ -319,11 +319,14 @@ public class RuleEditPage extends BasicWorkspacePage
         Set<WtComplex> wtComplexes = new HashSet<>();
         for (WtSelectedComplex wtSelectedComplex : wtSelectedComplexes) {
             if (wtSelectedComplex.isChecked()) {
-                wtDiscountRule.getComplexes().add(wtSelectedComplex.getWtComplex());
+                WtComplex complex = wtSelectedComplex.getWtComplex();
+                wtDiscountRule.getComplexes().add(complex);
             }
         }
 
+        wtDiscountRule.setDescription(description);
         wtDiscountRule.setPriority(priority);
+        wtDiscountRule.setPriority(discountRate);
         wtDiscountRule.setOperationOr(operationor);
 
         //wtDiscountRule.setCategoryDiscount(categoryDiscountObject);

@@ -8,6 +8,11 @@ public class WtSelectedComplex {
     WtComplex wtComplex;
     private boolean isChecked;
 
+    public WtSelectedComplex() {
+        wtComplex = new WtComplex();
+        isChecked = false;
+    }
+
     public WtSelectedComplex(WtComplex wtComplex) {
         this.wtComplex = wtComplex;
         this.isChecked = false;

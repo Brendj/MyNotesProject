@@ -8,9 +8,12 @@
     "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule" table="cf_wt_discountrules">
-        <cache usage="transactional"/>
-        <id name="idOfRule">
-            <column name="idOfRule" sql-type="long"/>
+        <id name="idOfRule" column="IdOfRule" type="long">
+            <generator class="hilo">
+                <param name="table">CF_Generators</param>
+                <param name="column">IdOfRule</param>
+                <param name="max_lo">3</param>
+            </generator>
         </id>
         <property name="description">
             <column name="description" sql-type="varchar(100)" length="100" not-null="true"/>
