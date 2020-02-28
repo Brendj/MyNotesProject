@@ -74,9 +74,16 @@ import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettin
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.*;
+import ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions.PlanOrdersRestrictions;
+import ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions.PlanOrdersRestrictionsProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions.PlanOrdersRestrictionsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrderFeedingProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusData;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusProcessor;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.ResPreorderFeedingStatus;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalProcessor;
@@ -340,6 +347,7 @@ public class Processor implements SyncProcessor {
         ReestrTaloonApprovalData reestrTaloonApprovalData = null;
         ResReestrTaloonPreorder resReestrTaloonPreorder = null;
         ReestrTaloonPreorderData reestrTaloonPreorderData = null;
+        PlanOrdersRestrictions planOrdersRestrictionsData = null;
         OrganizationComplexesStructure organizationComplexesStructure = null;
         InteractiveReportData interactiveReportData = null;
         InteractiveReport interactiveReport = null;
@@ -1026,6 +1034,8 @@ public class Processor implements SyncProcessor {
 
         fullProcessingRequestFeeding(request, syncHistory, responseSections);
         fullProcessingClientDiscountDSZN(request, syncHistory, responseSections);
+        fullProcessingPreorderFeedingStatus(request, responseSections);
+        fullProcessingPlanOrdersRestrictionsData(request, syncHistory, responseSections);
 
         logger.info("Full sync performance info: " + performanceLogger.toString());
 
@@ -1058,6 +1068,12 @@ public class Processor implements SyncProcessor {
                 request.getRemoteAddr(), request.getSyncType().getValue());
         addClientVersionAndRemoteAddressByOrg(request.getIdOfOrg(), request.getClientVersion(), request.getRemoteAddr(),
                 request.getSqlServerVersion(), request.getDatabaseSize());
+
+        if(CafeteriaExchangeContentType.MENU.equals(request.getContentType())){
+            discardMenusSyncParam(request.getIdOfOrg());
+        } else if(CafeteriaExchangeContentType.CLIENTS_DATA.equals(request.getContentType())){
+            discardClientSyncParam(request.getIdOfOrg());
+        }
 
         // мигранты
         processMigrantsSectionsWithClientsData(request, syncHistory, responseSections);
@@ -1154,6 +1170,9 @@ public class Processor implements SyncProcessor {
         // обработка реестра TaloonPreorder
         fullProcessingReestrTaloonPreorder(request, syncHistory, responseSections);
 
+        //обработка стaтусов предзаказов
+        fullProcessingPreorderFeedingStatus(request, responseSections);
+
         // обработка нулевых транзакций
         fullProcessingZeroTransactions(request, syncHistory, responseSections);
 
@@ -1200,6 +1219,8 @@ public class Processor implements SyncProcessor {
 
         //process SyncSetting
         fullProcessingSyncSetting(request, syncHistory, responseSections);
+
+        fullProcessingPlanOrdersRestrictionsData(request, syncHistory, responseSections);
 
         // время окончания обработки
         Date syncEndTime = new Date();
@@ -1381,6 +1402,33 @@ public class Processor implements SyncProcessor {
             processorUtils
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
+        }
+    }
+
+    private void fullProcessingPreorderFeedingStatus(SyncRequest request, List<AbstractToElement> responseSections) {
+        PreorderFeedingStatusRequest preorderFeedingStatusRequest = request.getPreorderFeedingStatusRequest();
+        if (preorderFeedingStatusRequest != null) {
+            Session persistenceSession = null;
+            Transaction persistenceTransaction = null;
+            try {
+                persistenceSession = persistenceSessionFactory.openSession();
+                persistenceTransaction = persistenceSession.beginTransaction();
+
+                PreorderFeedingStatusProcessor processor = new PreorderFeedingStatusProcessor(persistenceSession, preorderFeedingStatusRequest);
+                ResPreorderFeedingStatus resPreorderFeedingStatus = processor.process();
+                addToResponseSections(resPreorderFeedingStatus, responseSections);
+
+                PreorderFeedingStatusData preorderFeedingStatusData = processor.processData(resPreorderFeedingStatus);
+                addToResponseSections(preorderFeedingStatusData, responseSections);
+
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+            } catch (Exception e) {
+                logger.error("Error in fullProcessingPreorderFeedingStatus: ", e);
+            } finally {
+                HibernateUtils.rollback(persistenceTransaction, logger);
+                HibernateUtils.close(persistenceSession, logger);
+            }
         }
     }
 
@@ -3195,6 +3243,54 @@ public class Processor implements SyncProcessor {
             persistenceSession = persistenceSessionFactory.openSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             falseFullSyncByOrg(persistenceSession, idOfOrg);
+            setValueForClientsSyncByOrg(persistenceSession, idOfOrg, Boolean.FALSE);
+            setValueForMenusSyncByOrg(persistenceSession, idOfOrg, Boolean.FALSE);
+            setValueForOrgSettingsSyncByOrg(persistenceSession, idOfOrg, Boolean.FALSE);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private void discardClientSyncParam(Long idOfOrg) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            setValueForClientsSyncByOrg(persistenceSession, idOfOrg, Boolean.FALSE);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private void discardMenusSyncParam(Long idOfOrg) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            setValueForMenusSyncByOrg(persistenceSession, idOfOrg, Boolean.FALSE);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    private void discardOrgSettingsSyncParam(Long idOfOrg) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            setValueForOrgSettingsSyncByOrg(persistenceSession, idOfOrg, Boolean.FALSE);
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } finally {
@@ -3288,6 +3384,24 @@ public class Processor implements SyncProcessor {
             HibernateUtils.close(persistenceSession, logger);
         }
         return resTempCardsOperations;
+    }
+
+    private PlanOrdersRestrictions processPlanOrdersRestrictions(PlanOrdersRestrictionsRequest planOrdersRestrictionsRequest) {
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        PlanOrdersRestrictions planOrdersRestrictions = null;
+        try {
+            persistenceSession = persistenceSessionFactory.openSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            PlanOrdersRestrictionsProcessor processor = new PlanOrdersRestrictionsProcessor(persistenceSession, planOrdersRestrictionsRequest);
+            planOrdersRestrictions = processor.process();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        return planOrdersRestrictions;
     }
 
     private ResReestrTaloonApproval processReestrTaloonApproval(ReestrTaloonApproval reestrTaloonApproval)
@@ -6825,6 +6939,22 @@ public class Processor implements SyncProcessor {
         }
     }
 
+    private void fullProcessingPlanOrdersRestrictionsData(SyncRequest request, SyncHistory syncHistory,
+            List<AbstractToElement> responseSections) {
+        try {
+            PlanOrdersRestrictionsRequest planOrdersRestrictionsRequest = request.getPlanOrdersRestrictionsRequest();
+            if (null != planOrdersRestrictionsRequest) {
+                PlanOrdersRestrictions planOrdersRestrictionsData = processPlanOrdersRestrictions(planOrdersRestrictionsRequest);
+                addToResponseSections(planOrdersRestrictionsData, responseSections);
+            }
+        } catch (Exception e) {
+            String message = String.format("fullProcessingPlanOrdersRestrictionsData: %s", e.getMessage());
+            processorUtils
+                    .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
+            logger.error(message, e);
+        }
+    }
+
     private ResRequestFeeding processRequestFeeding(RequestFeeding requestFeeding) throws Exception {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -6896,6 +7026,7 @@ public class Processor implements SyncProcessor {
                 orgSettingsRequest.setIdOfOrgSource(request.getIdOfOrg());
                 OrgSettingSection orgSettingSection = processOrgSettings(orgSettingsRequest);
                 addToResponseSections(orgSettingSection, responseSections);
+                discardOrgSettingsSyncParam(request.getIdOfOrg());
             }
         } catch (Exception e) {
             String message = String.format("Error when process OrgSettingSetting: %s", e.getMessage());
@@ -6939,6 +7070,7 @@ public class Processor implements SyncProcessor {
                     processor = null;
                     addToResponseSections(resSyncSettingsSection, responseSections);
                     addToResponseSections(syncSettingsSection, responseSections);
+                    discardOrgSettingsSyncParam(request.getIdOfOrg());
                 }
             }
         } catch (Exception e) {
@@ -7143,6 +7275,7 @@ public class Processor implements SyncProcessor {
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
+        discardOrgSettingsSyncParam(request.getIdOfOrg());
 
         Date syncEndTime = new Date();
 

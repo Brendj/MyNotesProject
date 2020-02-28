@@ -293,6 +293,7 @@ public class OrgSyncSettingReportPage extends OnlineReportPage implements OrgLis
                     if(item.getLibSync().getState().equals(OrgSyncSettingReportItem.CHANGED)){
                         manager.saveOrUpdateSettingFromReportPage(session, item.getLibSync().getSetting(), nextVersion);
                     }
+                    DAOUtils.setValueForOrgSettingsSyncByOrg(session, item.getOrg().getIdOfOrg(), Boolean.TRUE);
                 }
             }
             transaction.commit();

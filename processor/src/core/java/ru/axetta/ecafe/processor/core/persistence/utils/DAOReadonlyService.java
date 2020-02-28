@@ -329,6 +329,15 @@ public class DAOReadonlyService {
         }
     }
 
+    public PreorderStatus findPreorderStatus(String guid, Date date) {
+        Query query = entityManager.createQuery("select ps from PreorderStatus ps where ps.guid = :guid and ps.date = :date");
+        query.setParameter("guid", guid);
+        query.setParameter("date", date);
+        List list = query.getResultList();
+        if (list.size() == 0) return null;
+        return (PreorderStatus) list.get(0);
+    }
+
     public TaloonApproval findTaloonApproval(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid, Long price) {
         try {
             Query query = entityManager.createQuery("SELECT taloon from TaloonApproval taloon "

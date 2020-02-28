@@ -2569,29 +2569,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         generateMenuDetail(objectFactory, menus, session, data);
     }
 
-    private List<Menu> getMenuByOneDay(Session session, Date startDate, Org org) {
-        Date endDate = CalendarUtils.addOneDay(startDate);
-
-        Criteria menuByDayCriteria = session.createCriteria(Menu.class);
-        menuByDayCriteria.createAlias("menuDetailsInternal", "detal", JoinType.LEFT_OUTER_JOIN);
-        Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
-        fromCal.setTime(startDate);
-        toCal.setTime(endDate);
-        truncateToDayOfMonth(fromCal);
-        truncateToDayOfMonth(toCal);
-        fromCal.add(Calendar.HOUR, -1);
-        menuByDayCriteria.add(Restrictions.eq("org", org));
-        menuByDayCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
-        menuByDayCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
-        menuByDayCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
-        menuByDayCriteria.add(Restrictions
-                .or(Restrictions.not(Restrictions.ilike("detal.groupName", groupNotForMos, MatchMode.ANYWHERE)),
-                        Restrictions.isNull("detal.groupName")));
-
-
-        return (List<Menu>) menuByDayCriteria.list();
-    }
-
     private void generateMenuDetail(ObjectFactory objectFactory, List menus, Session session, Data data)
             throws DatatypeConfigurationException {
 
@@ -2660,19 +2637,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
 
-            Org org = client.getOrg();
-
-            DAOService daoService = DAOService.getInstance();
-
             Criteria criteria = session.createCriteria(ComplexInfo.class);
             criteria.createAlias("menuDetail", "detal", JoinType.LEFT_OUTER_JOIN);
-            criteria.add(Restrictions.eq("org", org));
+            criteria.add(Restrictions.eq("org", client.getOrg()));
             criteria.add(Restrictions.gt("menuDate", startDate));
             criteria.add(Restrictions.lt("menuDate", endDate));
             criteria.add(Restrictions.eq("modeVisible", 1));
             criteria.add(Restrictions
                     .or(Restrictions.not(Restrictions.ilike("detal.groupName", groupNotForMos, MatchMode.ANYWHERE)),
                             Restrictions.isNull("detal.groupName")));
+
+            //Следующее условие - заглушка, в соответствии с https://gitlab.iteco.dev/ispp/processor/issues/438
+            //criteria.add(Restrictions.or(
+            //        Restrictions.and(
+            //                Restrictions.and(Restrictions.not(Restrictions.ilike("complexName", "сотруд", MatchMode.ANYWHERE)),
+            //                Restrictions.not(Restrictions.ilike("complexName", "воспит", MatchMode.ANYWHERE))),
+            //                Restrictions.not(Restrictions.ilike("complexName", "учит", MatchMode.ANYWHERE))),
+            //                Restrictions.isNull("complexName")));
 
             List<ComplexInfo> complexInfoList = criteria.list();
             PreorderDAOService preorderDAOService = RuntimeContext.getAppContext().getBean(PreorderDAOService.class);
@@ -2683,13 +2664,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     //для учеников
                     PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(ci.getIdOfComplex(), ci.getComplexName(), ci.getCurrentPrice(), ci.getModeOfAdd(), ci.getModeFree());
                     PreorderGoodParamsContainer complexParams = preorderDAOService.getComplexParams(complexItemExt, client, ci.getMenuDate());
-                    if (!preorderDAOService.isAcceptableComplex(complexItemExt, client.getClientGroup(), client.hasDiscount(), complexParams)) continue;
+                    if (!preorderDAOService.isAcceptableComplex(complexItemExt, client.getClientGroup(), client.hasDiscount(), complexParams, client.getAgeTypeGroup()))
+                        continue;
                 } else {
                     //для предопределенных не включаем комплексы с какой-либо категорией
-                    if (ci.getGood() != null && !ci.getGood().getAgeGroupType().equals(GoodAgeGroupType.UNSPECIFIED)) continue;
+                    if (ci.getGood() != null && !ci.getGood().getAgeGroupType().equals(GoodAgeGroupType.UNSPECIFIED))
+                        continue;
                 }
 
-                List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, ci.getIdOfComplexInfo());
+                List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, ci.getIdOfComplexInfo(), true);
                 MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(ci);
                 menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
                 list.add(menuWithComplexesExt);
@@ -2760,74 +2743,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private void processMenuFirstDayWithProhibitions(Client client, Data data, ObjectFactory objectFactory,
             Session session, Date startDate, Date endDate) throws DatatypeConfigurationException {
-        List<Menu> menuByOneDay = getMenuByOneDay(session, startDate, client.getOrg());
-
-        if (menuByOneDay != null) {
-            if (menuByOneDay.size() > 1) {
-                List<Menu> menuList = new ArrayList<Menu>();
-                for (Menu menuItem : menuByOneDay) {
-                    if (menuItem.getMenuDetails().isEmpty() || menuItem.getMenuDetails().size() < 30) {
-                        menuList.add(menuItem);
-                    }
-                }
-                if (menuList.isEmpty()) {
-                    processMenuByMaxIdOfMenuWithProhibitions(client, data, objectFactory, session, startDate, endDate);
-                } else {
-                    if (menuList.get(0).getMenuDetails().isEmpty() || menuList.get(0).getMenuDetails().size() < 30) {
-                        processMenuByMaxIdOfMenuWithProhibitions(client, data, objectFactory, session, startDate,
-                                endDate);
-                    } else {
-                        processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
-                    }
-                }
-            } else {
-                processMenuListWithProhibitions(client, data, objectFactory, session, startDate, endDate);
-            }
-        } else {
-            processMenuByMaxIdOfMenuWithProhibitions(client, data, objectFactory, session, startDate, endDate);
-        }
-    }
-
-    private void processMenuByMaxIdOfMenuWithProhibitions(Client client, Data data, ObjectFactory objectFactory,
-            Session session, Date startDate, Date endDate) throws DatatypeConfigurationException {
-        Criteria menuMaxIdCriteria = session.createCriteria(MenuDetail.class);
-        menuMaxIdCriteria.createAlias("menu", "m", JoinType.LEFT_OUTER_JOIN);
         Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
         fromCal.setTime(startDate);
         truncateToDayOfMonth(fromCal);
         truncateToDayOfMonth(toCal);
         fromCal.add(Calendar.HOUR, -1);
-        menuMaxIdCriteria.add(Restrictions.eq("m.org", client.getOrg()));
-        menuMaxIdCriteria.add(Restrictions.eq("m.menuSource", Menu.ORG_MENU_SOURCE));
-        menuMaxIdCriteria.add(Restrictions.lt("m.menuDate", fromCal.getTime()));
-        menuMaxIdCriteria.add(Restrictions.like("menuPath", "%уфет%"));
-        menuMaxIdCriteria.setProjection(Projections.max("m.idOfMenu"));
-        menuMaxIdCriteria.add(Restrictions
-                .or(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)),
-                        Restrictions.isNull("groupName")));
-
-        Long menuMaxId = (Long) menuMaxIdCriteria.uniqueResult();
-
-        List menus = new ArrayList();
-
-        if (menuMaxId != null) {
-            Criteria menuCriteria = session.createCriteria(Menu.class);
-            menuCriteria.createAlias("menuDetailsInternal", "detal", JoinType.LEFT_OUTER_JOIN);
-            menuCriteria.add(Restrictions.eq("org", client.getOrg()));
-            menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
-            menuCriteria.add(Restrictions.eq("idOfMenu", menuMaxId));
-            menuCriteria.add(Restrictions
-                    .or(Restrictions.not(Restrictions.ilike("detal.groupName", groupNotForMos, MatchMode.ANYWHERE)),
-                            Restrictions.isNull("detal.groupName")));
-
-            Menu menu = (Menu) menuCriteria.uniqueResult();
-            menu.setMenuDate(startDate);
-
-
-            menus.add(menu);
-
-            startDate = CalendarUtils.addOneDay(startDate);
-        }
         Criteria menuByDayCriteria = session.createCriteria(Menu.class);
         menuByDayCriteria.createAlias("menuDetailsInternal", "detal", JoinType.LEFT_OUTER_JOIN);
         fromCal.setTime(startDate);
@@ -2842,9 +2762,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuByDayCriteria.add(Restrictions
                 .or(Restrictions.not(Restrictions.ilike("detal.groupName", groupNotForMos, MatchMode.ANYWHERE)),
                         Restrictions.isNull("detal.groupName")));
+        List menus =  new ArrayList<>(new HashSet(menuByDayCriteria.list()));
 
-        List menusRemaining = menuByDayCriteria.list();
-        menus.addAll(menusRemaining);
         generateMenuDetailWithProhibitions(session, client, objectFactory, menus, data);
     }
 
@@ -2874,7 +2793,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     break;
             }
         }
-
         MenuListExt menuListExt = objectFactory.createMenuListExt();
         int nRecs = 0;
         for (Object currObject : menus) {
@@ -2892,7 +2810,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             menuDetailCriteria.add(Restrictions
                     .or(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)),
                             Restrictions.isNull("groupName")));
-            //   menuDetailCriteria.add(Restrictions.sqlRestriction("{alias}.menupath !~ '^\\[\\d*\\]'"));
             HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
             HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
             List menuDetails = menuDetailCriteria.list();
@@ -2926,116 +2843,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     } else {
                         //пробегаться в цикле.
                         for (String filter : ProhibitByFilter.keySet()) {
-                            if (menuDetail.getMenuDetailName().indexOf(filter) != -1) {
-                                menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
-                            }
-                        }
-                    }
-                }
-                menuDateItemExt.getE().add(menuItemExt);
-            }
-            menuListExt.getM().add(menuDateItemExt);
-        }
-        data.setMenuListExt(menuListExt);
-    }
-
-    private void processMenuListWithProhibitions(Client client, Data data, ObjectFactory objectFactory, Session session,
-            Date startDate, Date endDate) throws DatatypeConfigurationException {
-
-        Map<String, Long> ProhibitByFilter = new HashMap<String, Long>();
-        Map<String, Long> ProhibitByName = new HashMap<String, Long>();
-        Map<String, Long> ProhibitByGroup = new HashMap<String, Long>();
-
-        Criteria prohibitionsCriteria = session.createCriteria(ProhibitionMenu.class);
-        prohibitionsCriteria.add(Restrictions.eq("client", client));
-        prohibitionsCriteria.add(Restrictions.eq("deletedState", false));
-
-        List prohibitions = prohibitionsCriteria.list();
-        for (Object prohibitObj : prohibitions) {
-            ProhibitionMenu prohibition = (ProhibitionMenu) prohibitObj;
-
-            switch (prohibition.getProhibitionFilterType()) {
-                case PROHIBITION_BY_FILTER:
-                    ProhibitByFilter.put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
-                    break;
-                case PROHIBITION_BY_GOODS_NAME:
-                    ProhibitByName.put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
-                    break;
-                case PROHIBITION_BY_GROUP_NAME:
-                    ProhibitByGroup.put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
-                    break;
-            }
-        }
-
-        Criteria menuCriteria = session.createCriteria(Menu.class);
-        menuCriteria.createAlias("menuDetailsInternal", "detal", JoinType.LEFT_OUTER_JOIN);
-        Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
-        fromCal.setTime(startDate);
-        toCal.setTime(endDate);
-        truncateToDayOfMonth(fromCal);
-        truncateToDayOfMonth(toCal);
-        fromCal.add(Calendar.HOUR, -1);
-        menuCriteria.add(Restrictions.eq("org", client.getOrg()));
-        menuCriteria.add(Restrictions.eq("menuSource", Menu.ORG_MENU_SOURCE));
-        menuCriteria.add(Restrictions.ge("menuDate", fromCal.getTime()));
-        menuCriteria.add(Restrictions.lt("menuDate", toCal.getTime()));
-        menuCriteria.add(Restrictions
-                .or(Restrictions.not(Restrictions.ilike("detal.groupName", groupNotForMos, MatchMode.ANYWHERE)),
-                        Restrictions.isNull("detal.groupName")));
-
-        List menus = menuCriteria.list();
-        MenuListExt menuListExt = objectFactory.createMenuListExt();
-        int nRecs = 0;
-        for (Object currObject : menus) {
-            if (nRecs++ > MAX_RECS) {
-                break;
-            }
-
-            Menu menu = (Menu) currObject;
-            MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
-            menuDateItemExt.setDate(toXmlDateTime(menu.getMenuDate()));
-
-            Criteria menuDetailCriteria = session.createCriteria(MenuDetail.class);
-            menuDetailCriteria.add(Restrictions.eq("availableNow", 1));
-            menuDetailCriteria.add(Restrictions.eq("menu", menu));
-            menuDetailCriteria.add(Restrictions
-                    .or(Restrictions.not(Restrictions.ilike("groupName", groupNotForMos, MatchMode.ANYWHERE)),
-                            Restrictions.isNull("groupName")));
-            //menuDetailCriteria.add(Restrictions.sqlRestriction("{alias}.menupath !~ '^\\[\\d*\\]'"));
-            HibernateUtils.addAscOrder(menuDetailCriteria, "groupName");
-            HibernateUtils.addAscOrder(menuDetailCriteria, "menuDetailName");
-            List menuDetails = menuDetailCriteria.list();
-            for (Object o : menuDetails) {
-                MenuDetail menuDetail = (MenuDetail) o;
-
-                MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-                menuItemExt.setGroup(menuDetail.getGroupName());
-                menuItemExt.setName(menuDetail.getMenuDetailName());
-                menuItemExt.setPrice(menuDetail.getPrice());
-                menuItemExt.setCalories(menuDetail.getCalories());
-                menuItemExt.setVitB1(menuDetail.getVitB1());
-                menuItemExt.setVitC(menuDetail.getVitC());
-                menuItemExt.setVitA(menuDetail.getVitA());
-                menuItemExt.setVitE(menuDetail.getVitE());
-                menuItemExt.setMinCa(menuDetail.getMinCa());
-                menuItemExt.setMinP(menuDetail.getMinP());
-                menuItemExt.setMinMg(menuDetail.getMinMg());
-                menuItemExt.setMinFe(menuDetail.getMinFe());
-                menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
-                menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
-                menuItemExt.setProtein(menuDetail.getProtein());
-                menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
-                menuItemExt.setFat(menuDetail.getFat());
-
-                if (ProhibitByGroup.containsKey(menuDetail.getGroupName())) {
-                    menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuDetail.getGroupName()));
-                } else {
-                    if (ProhibitByName.containsKey(menuDetail.getMenuDetailName())) {
-                        menuItemExt.setIdOfProhibition(ProhibitByName.get(menuDetail.getMenuDetailName()));
-                    } else {
-                        //пробегаться в цикле.
-                        for (String filter : ProhibitByFilter.keySet()) {
-                            if (menuDetail.getMenuDetailName().indexOf(filter) != -1) {
+                            if (menuDetail.getMenuDetailName().contains(filter)) {
                                 menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
                             }
                         }
@@ -6455,7 +6263,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             result.getComplexInfoList().setList(list);
             ObjectFactory objectFactory = new ObjectFactory();
             for (ComplexInfo ci : complexInfoList) {
-                List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, ci.getIdOfComplexInfo());
+                List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, ci.getIdOfComplexInfo(), false);
                 ComplexInfoExt complexInfoExt = new ComplexInfoExt(ci);
                 complexInfoExt.setMenuItemExtList(menuItemExtList);
                 list.add(complexInfoExt);
@@ -6474,35 +6282,37 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, Long idOfComplexInfo) {
+    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, Long idOfComplexInfo, boolean isNotForMos) {
         List<MenuItemExt> menuItemExtList = new ArrayList<MenuItemExt>();
         List<MenuDetail> menuDetails = DAOReadExternalsService.getInstance()
                 .getMenuDetailsByIdOfComplexInfo(idOfComplexInfo);
         for (MenuDetail menuDetail : menuDetails) {
-            MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-            menuItemExt.setGroup(menuDetail.getGroupName());
-            menuItemExt.setName(menuDetail.getShortName());
-            menuItemExt.setFullName(menuDetail.getMenuDetailName());
-            menuItemExt.setPrice(menuDetail.getPrice());
-            menuItemExt.setCalories(menuDetail.getCalories());
-            menuItemExt.setVitB1(menuDetail.getVitB1());
-            menuItemExt.setVitB2(menuDetail.getVitB2());
-            menuItemExt.setVitPp(menuDetail.getVitPp());
-            menuItemExt.setVitC(menuDetail.getVitC());
-            menuItemExt.setVitA(menuDetail.getVitA());
-            menuItemExt.setVitE(menuDetail.getVitE());
-            menuItemExt.setMinCa(menuDetail.getMinCa());
-            menuItemExt.setMinP(menuDetail.getMinP());
-            menuItemExt.setMinMg(menuDetail.getMinMg());
-            menuItemExt.setMinFe(menuDetail.getMinFe());
-            menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
-            menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
-            menuItemExt.setProtein(menuDetail.getProtein());
-            menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
-            menuItemExt.setFat(menuDetail.getFat());
-            menuItemExt.setIdOfMenuDetail(menuDetail.getIdOfMenuDetail());
-
-            menuItemExtList.add(menuItemExt);
+            //Если не нужны Сотрудники и в названии группы встречается Сотрудник, то пропускаем такую запись
+            if (!isNotForMos || (menuDetail.getGroupName().toUpperCase().indexOf(groupNotForMos.toUpperCase()) == -1)) {
+                MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+                menuItemExt.setGroup(menuDetail.getGroupName());
+                menuItemExt.setName(menuDetail.getShortName());
+                menuItemExt.setFullName(menuDetail.getMenuDetailName());
+                menuItemExt.setPrice(menuDetail.getPrice());
+                menuItemExt.setCalories(menuDetail.getCalories());
+                menuItemExt.setVitB1(menuDetail.getVitB1());
+                menuItemExt.setVitB2(menuDetail.getVitB2());
+                menuItemExt.setVitPp(menuDetail.getVitPp());
+                menuItemExt.setVitC(menuDetail.getVitC());
+                menuItemExt.setVitA(menuDetail.getVitA());
+                menuItemExt.setVitE(menuDetail.getVitE());
+                menuItemExt.setMinCa(menuDetail.getMinCa());
+                menuItemExt.setMinP(menuDetail.getMinP());
+                menuItemExt.setMinMg(menuDetail.getMinMg());
+                menuItemExt.setMinFe(menuDetail.getMinFe());
+                menuItemExt.setOutput(menuDetail.getMenuDetailOutput());
+                menuItemExt.setAvailableNow(menuDetail.getAvailableNow());
+                menuItemExt.setProtein(menuDetail.getProtein());
+                menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
+                menuItemExt.setFat(menuDetail.getFat());
+                menuItemExt.setIdOfMenuDetail(menuDetail.getIdOfMenuDetail());
+                menuItemExtList.add(menuItemExt);
+            }
         }
         return menuItemExtList;
     }

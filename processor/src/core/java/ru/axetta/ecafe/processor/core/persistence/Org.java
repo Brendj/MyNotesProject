@@ -111,6 +111,9 @@ public class Org implements Serializable {
     //private String remoteAddress;
     private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
     private Boolean fullSyncParam;
+    private Boolean menusSyncParam;
+    private Boolean orgSettingsSyncParam;
+    private Boolean clientsSyncParam;
     private Boolean usePlanOrders;
     private Boolean commodityAccounting;
     private Boolean disableEditingClientsFromAISReestr;
@@ -188,7 +191,10 @@ public class Org implements Serializable {
         this.mailingListReportsOnVisits = mailingListReportsOnVisits;
         this.mailingListReports1 = mailingListReports1;
         this.mailingListReports2 = mailingListReports2;
-        this.fullSyncParam=false;
+        this.fullSyncParam = false;
+        this.menusSyncParam = false;
+        this.clientsSyncParam = false;
+        this.orgSettingsSyncParam = false;
         this.commodityAccounting=false;
         this.usePlanOrders = true;  // плана питания включен по умолчаню
         this.disableEditingClientsFromAISReestr = false;
@@ -262,6 +268,30 @@ public class Org implements Serializable {
 
     public void setFullSyncParam(Boolean fullSyncParam) {
         this.fullSyncParam = fullSyncParam;
+    }
+
+    public Boolean getMenusSyncParam() {
+        return menusSyncParam;
+    }
+
+    public void setMenusSyncParam(Boolean menusSyncParam) {
+        this.menusSyncParam = menusSyncParam;
+    }
+
+    public Boolean getOrgSettingsSyncParam() {
+        return orgSettingsSyncParam;
+    }
+
+    public void setOrgSettingsSyncParam(Boolean orgSettingsSyncParam) {
+        this.orgSettingsSyncParam = orgSettingsSyncParam;
+    }
+
+    public Boolean getClientsSyncParam() {
+        return clientsSyncParam;
+    }
+
+    public void setClientsSyncParam(Boolean clientsSyncParam) {
+        this.clientsSyncParam = clientsSyncParam;
     }
 
     public Boolean getUsePlanOrders() {

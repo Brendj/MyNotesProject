@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -2421,6 +2421,27 @@ public class DAOUtils {
         query.executeUpdate();
     }
 
+    public static void setValueForMenusSyncByOrg(Session session, Long idOfOrg, Boolean value) {
+        Query query = session.createQuery("update Org set menusSyncParam = :value where id=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void setValueForClientsSyncByOrg(Session session, Long idOfOrg, Boolean value) {
+        Query query = session.createQuery("update Org set clientsSyncParam = :value where id=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
+    public static void setValueForOrgSettingsSyncByOrg(Session session, Long idOfOrg, Boolean value) {
+        Query query = session.createQuery("update Org set orgSettingsSyncParam = :value where id=:idOfOrg");
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameter("value", value);
+        query.executeUpdate();
+    }
+
     public static void savePreorderDirectiveWithValue(Session session, Long idOfOrg, boolean value) {
         Query query = session.createQuery("update Org set preorderSyncParam = :value where id = :idOfOrg");
         query.setParameter("idOfOrg",idOfOrg);
@@ -2882,6 +2903,17 @@ public class DAOUtils {
         return version;
     }
 
+    //todo Можно переделать все получения версии без for update на этот метод
+    public static long nextVersionByTableWithoutLock(Session session, String tableName) {
+        long version = 0L;
+        Query query = session.createSQLQuery(String.format("select t.version from %s as t order by t.version desc limit 1", tableName));
+        Object o = query.uniqueResult();
+        if(o!=null){
+            version = Long.valueOf(o.toString())+1;
+        }
+        return version;
+    }
+
     public static long nextVersionByTaloonPreorder(Session session){
         long version = 0L;
         Query query = session.createSQLQuery("select t.version from cf_taloon_preorder as t order by t.version desc limit 1 for update");
@@ -3003,6 +3035,41 @@ public class DAOUtils {
         return version;
     }
 
+    public static PlanOrdersRestriction findPlanOrdersRestriction(Session session, Long idOfClient, Long idOfOrg, Integer complexId) {
+        Query query = session.createQuery("select p from PlanOrdersRestriction p where p.idOfClient = :idOfClient "
+                + "and p.idOfOrgOnCreate = :idOfOrg and p.armComplexId = :complexId");
+        query.setParameter("idOfClient", idOfClient);
+        query.setParameter("idOfOrg", idOfOrg);
+        query.setParameter("complexId", complexId);
+        List<PlanOrdersRestriction> list = query.list();
+        if (list.size() == 0)
+            return null;
+        else
+            return list.get(0);
+    }
+
+    public static List<PlanOrdersRestriction> findPlanOrdersRestrictionSinceVersion(Session session, Long maxVersion, Long idOfOrg) {
+        List<PlanOrdersRestriction> result = new ArrayList<>();
+        Query query = session.createSQLQuery("select p.idOfPlanOrdersRestriction from cf_plan_orders_restrictions p join cf_clients c "
+                + "on p.idOfClient = c.idOfClient where p.version > :version and c.idOfOrg in (select friendlyorg from "
+                + "cf_friendly_organization fo where fo.currentOrg = :idOfOrg)");
+        query.setParameter("version", maxVersion);
+        query.setParameter("idOfOrg", idOfOrg);
+        List list = query.list();
+        for (Object obj : list) {
+            Long id = ((BigInteger) obj).longValue();
+            PlanOrdersRestriction planOrdersRestriction = (PlanOrdersRestriction)session.load(PlanOrdersRestriction.class, id);
+            result.add(planOrdersRestriction);
+        }
+        return result;
+    }
+
+    public static List<PlanOrdersRestriction> getPlanOrdersRestrictionByClient(Session session, Long idOfClient) {
+        Query query = session.createQuery("select p from PlanOrdersRestriction p where p.idOfClient = :idOfClient");
+        query.setParameter("idOfClient", idOfClient);
+        return query.list();
+    }
+
     public static boolean cardRequestExists(Session session, Client client) {
         //ищем актуальные заявки по клиенту (не удаленные, и по которым не была выдана карта)
         Query query = session.createQuery("select cr.idOfCardRequest from CardRequest cr "
@@ -3070,8 +3137,14 @@ public class DAOUtils {
         return version;
     }
 
-    public static List<TaloonApproval> getTaloonApprovalForOrgSinceVersion(Session session, Long idOfOrg, long version)
-            throws Exception {
+    public static List<PreorderStatus> getPreorderStatusListSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        Criteria criteria = session.createCriteria(PreorderStatus.class);
+        criteria.add(Restrictions.eq("idOfOrgOnCreate", idOfOrg));
+        criteria.add(Restrictions.gt("version", version));
+        return criteria.list();
+    }
+
+    public static List<TaloonApproval> getTaloonApprovalForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
         //Org org = (Org)session.load(Org.class, idOfOrg);
         List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
         Criteria criteria = session.createCriteria(TaloonApproval.class);

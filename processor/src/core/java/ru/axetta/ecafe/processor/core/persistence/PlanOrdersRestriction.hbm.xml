@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.PlanOrdersRestriction" table="cf_plan_orders_restrictions">
+        <id name="idOfPlanOrdersRestriction" column="idOfPlanOrdersRestriction" type="long">
+            <generator class="identity"/>
+        </id>
+        <property name="armComplexId" column="armComplexId" type="integer" not-null="true"/>
+        <property name="idOfOrgOnCreate" column="idOfOrgOnCreate" type="long" not-null="true" />
+        <property name="idOfClient" column="idOfClient" type="long" not-null="true" />
+        <property name="idOfConfigurationProoviderOnCreate" column="idOfConfigurationProoviderOnCreate" type="long" />
+        <property name="complexName" column="complexName" type="string" />
+        <property name="planOrdersRestrictionType" column="planType" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.PlanOrdersRestrictionType</param>
+            </type>
+        </property>
+        <property name="version" column="version" type="long" not-null="true"/>
+        <property name="createdDate" column="createdDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" />
+        <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <property name="resol" column="resol" type="integer"/>
+    </class>
+</hibernate-mapping>
+
+

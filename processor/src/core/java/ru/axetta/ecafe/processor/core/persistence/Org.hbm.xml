@@ -73,6 +73,18 @@
                   type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
 
+        <property name="menusSyncParam" column="menusSyncParam"
+                  type="boolean"
+                  not-null="true"/>
+
+        <property name="clientsSyncParam" column="clientsSyncParam"
+                  type="boolean"
+                  not-null="true"/>
+
+        <property name="orgSettingsSyncParam" column="orgSettingsSyncParam"
+                  type="boolean"
+                  not-null="true"/>
+
         <property name="preorderSyncParam" column="PreorderSyncParam" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
 
         <property name="commodityAccounting" column="CommodityAccounting"
