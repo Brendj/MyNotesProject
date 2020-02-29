@@ -66,6 +66,11 @@
                                         <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                     </h:inputText>
+                                    <h:inputText id="inputIdFilter" value="#{mainPage.orgListSelectPage.idFilter}"
+                                                 size="60" maxlength="120" styleClass="input-text">
+                                        <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
+                                                     reRender="modalOrgListSelectorOrgTable" />
+                                    </h:inputText>
                                     <h:outputText escape="true" value="Округ: " styleClass="output-text" />
                                     <h:selectOneMenu id="regionsList" value="#{mainPage.orgListSelectPage.region}"
                                                      style="width:386px;"
@@ -74,38 +79,25 @@
                                         <a4j:support event="onchange" action="#{mainPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                     </h:selectOneMenu>
+                                    <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
                                 </h:panelGrid>
                                     <rich:simpleTogglePanel label="Показать доп. фильтры" switchType="client" opened="false"
                                                             styleClass="borderNone" timeout="10"
                                                             headerClass="imageNone borderNone linkClass"
                                                             bodyClass="imageNone borderNone">
-                                        <h:panelGrid id="contentDiv22" columns="2" styleClass="borderless-grid">
-                                            <h:outputText escape="true" value="Фильтр по тэгу: " styleClass="output-text" />
-                                            <h:inputText id="inputTagFilter" value="#{mainPage.orgListSelectPage.tagFilter}"
-                                                 size="60" maxlength="120" styleClass="input-text">
-                                                <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
-                                                     reRender="modalOrgListSelectorOrgTable" />
-                                            </h:inputText>
-                                            <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
-                                            <h:inputText id="inputIdFilter" value="#{mainPage.orgListSelectPage.idFilter}"
-                                                 size="60" maxlength="120" styleClass="input-text">
-                                                <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
-                                                     reRender="modalOrgListSelectorOrgTable" />
-                                            </h:inputText>
+                                        <h:panelGrid columns="1">
+                                            <a4j:repeat id="OrganizationTypesForSelectMany"
+                                                        value="#{mainPage.orgListSelectPage.availableOrganizationTypes}" var="item" >
+                                                <h:panelGrid columns="2">
+                                                    <h:selectBooleanCheckbox value="#{item.selected}" disabled="#{item.disabled}">
+                                                        <a4j:support event="onchange" action="#{mainPage.updateOrgListSelectPageWithItemDeselection}"
+                                                                     reRender="modalOrgListSelectorForm" requestDelay="1000"/>
+                                                    </h:selectBooleanCheckbox>
+                                                    <h:outputText styleClass="output-text" value="#{item.typeName}"/>
+                                                </h:panelGrid>
+                                            </a4j:repeat>
                                         </h:panelGrid>
                                     </rich:simpleTogglePanel>
-                                <h:panelGrid columns="1">
-                                    <a4j:repeat id="OrganizationTypesForSelectMany"
-                                                value="#{mainPage.orgListSelectPage.availableOrganizationTypes}" var="item">
-                                        <h:panelGrid columns="2">
-                                            <h:selectBooleanCheckbox value="#{item.selected}" disabled="#{item.disabled}">
-                                            <a4j:support event="onchange" action="#{mainPage.updateOrgListSelectPageWithItemDeselection}"
-                                                         reRender="modalOrgListSelectorForm" requestDelay="1000"/>
-                                            </h:selectBooleanCheckbox>
-                                            <h:outputText styleClass="output-text" value="#{item.typeName}"/>
-                                        </h:panelGrid>
-                                    </a4j:repeat>
-                                </h:panelGrid>
                             </h:panelGrid>
                         </h:panelGrid>
                         <a4j:commandLink action="#{mainPage.updateOrgListSelectPage}"
