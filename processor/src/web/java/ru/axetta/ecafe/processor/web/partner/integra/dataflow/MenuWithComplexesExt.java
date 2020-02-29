@@ -43,6 +43,10 @@ public class MenuWithComplexesExt {
     private Integer goodType;
     @XmlElement(name = "MenuDetail")
     private List<MenuItemExt> menuItemExtList;
+    @XmlAttribute(name = "modevisible")
+    private Integer modevisible;
+    @XmlAttribute(name = "usedspecialmenu")
+    private Integer usedspecialmenu;
 
     public MenuWithComplexesExt() {
     }
@@ -61,6 +65,8 @@ public class MenuWithComplexesExt {
                         : 1;
         this.isDiscountComplex = complexInfo.getModeFree();
         this.goodType = getGoodType(complexInfo);
+        this.modevisible = complexInfo.getModeVisible();
+        this.usedspecialmenu = complexInfo.getUsedSpecialMenu();
     }
 
     private Integer getGoodType(ComplexInfo complexInfo) {
@@ -148,5 +154,21 @@ public class MenuWithComplexesExt {
 
     public void setGoodType(Integer goodType) {
         this.goodType = goodType;
+    }
+
+    public Integer getUsedspecialmenu() {
+        return usedspecialmenu;
+    }
+
+    public void setUsedspecialmenu(Integer usedspecialmenu) {
+        this.usedspecialmenu = usedspecialmenu;
+    }
+
+    public Integer getModevisible() {
+        return modevisible;
+    }
+
+    public void setModevisible(Integer modevisible) {
+        this.modevisible = modevisible;
     }
 }
