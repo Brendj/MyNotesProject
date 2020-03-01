@@ -298,10 +298,11 @@ public class RuleEditPage extends BasicWorkspacePage
             entity.setCategoryDiscounts("");
         }
 
+        List<CategoryOrg> categoryOrgList = new ArrayList();
         entity.getCategoryOrgs().clear();
         if (!this.idOfCategoryOrgList.isEmpty()) {
             entity.getCategoryOrgs().clear();
-            List categoryOrgList = DAOUtils.getCategoryOrgWithIds(em, this.idOfCategoryOrgList);
+            categoryOrgList = DAOUtils.getCategoryOrgWithIds(em, this.idOfCategoryOrgList);
             for (Object object : categoryOrgList) {
                 entity.getCategoryOrgs().add((CategoryOrg) object);
             }
@@ -311,7 +312,6 @@ public class RuleEditPage extends BasicWorkspacePage
 
         //// Веб-технолог ////
 
-        //wtDiscountRule = (WtDiscountRule) em.merge(wtDiscountRule);
         if (StringUtils.isNotEmpty(subCategory)) {
             wtDiscountRule.setSubCategory(subCategory);
         }
@@ -329,30 +329,11 @@ public class RuleEditPage extends BasicWorkspacePage
         wtDiscountRule.setPriority(discountRate);
         wtDiscountRule.setOperationOr(operationor);
 
-        //wtDiscountRule.setCategoryDiscount(categoryDiscountObject);
+        wtDiscountRule.setCategoryDiscounts(this.categoryDiscountSet);
 
-        //if (!this.idOfCategoryList.isEmpty()) {
-        //    List categoryList = DAOUtils.getCategoryDiscountListWithIds(em, this.idOfCategoryList);
-        //    StringBuilder stringBuilder = new StringBuilder();
-        //    for (Object object : categoryList) {
-        //        this.categoryDiscountSet.add((CategoryDiscount) object);
-        //        stringBuilder.append(((CategoryDiscount) object).getIdOfCategoryDiscount());
-        //        stringBuilder.append(",");
-        //    }
-        //    entity.setCategoriesDiscounts(this.categoryDiscountSet);
-        //    entity.setCategoryDiscounts(stringBuilder.substring(0, stringBuilder.length() - 1));
-        //} else {
-        //    entity.setCategoryDiscounts("");
-        //}
-
-        //entity.getCategoryOrgs().clear();
-        //if (!this.idOfCategoryOrgList.isEmpty()) {
-        //    entity.getCategoryOrgs().clear();
-        //    List categoryOrgList = DAOUtils.getCategoryOrgWithIds(em, this.idOfCategoryOrgList);
-        //    for (Object object : categoryOrgList) {
-        //        entity.getCategoryOrgs().add((CategoryOrg) object);
-        //    }
-        //}
+        for (CategoryOrg categoryOrg : categoryOrgList) {
+            wtDiscountRule.getCategoryOrgs().add(categoryOrg);
+        }
 
         //em.persist(wtDiscountRule);
         wtDiscountRule = (WtDiscountRule) em.merge(wtDiscountRule);
