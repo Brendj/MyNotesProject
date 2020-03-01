@@ -63,3 +63,36 @@ CREATE TABLE cf_wt_discountrules_complexes
         OIDS=FALSE
     );
 
+-- Таблица связки льготных правил с cf_categoryorg
+CREATE TABLE cf_wt_discountrules_categoryorg
+(
+    idofrule bigint NOT NULL, -- Идентификатор льготного правила
+    idofcategoryorg bigserial NOT NULL, -- Идентификатор
+    CONSTRAINT cf_wt_discountrules_categoryorg_pk PRIMARY KEY (idofrule, idofcategoryorg),
+    CONSTRAINT cf_wt_discountrules_categoryorg_rules_fk FOREIGN KEY (idofrule)
+        REFERENCES cf_wt_discountrules (idofrule) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION,
+    CONSTRAINT cf_wt_discountrules_categoryorg_categoryorg_fk FOREIGN KEY (idofcategoryorg)
+        REFERENCES cf_categoryorg (idofcategoryorg) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+    WITH (
+        OIDS=FALSE
+    );
+
+-- Таблица связки льготных правил с льготными категориями
+CREATE TABLE cf_wt_discountrules_categorydiscount
+(
+    idofrule bigint NOT NULL, -- Идентификатор льготного правила
+    idofcategorydiscount bigint NOT NULL, -- Идентификатор льготной категории
+    CONSTRAINT cf_wt_discountrules_categorydiscount_pk PRIMARY KEY (idofrule, idofcategorydiscount),
+    CONSTRAINT cf_wt_discountrules_categorydiscount_rules_fk FOREIGN KEY (idofrule)
+        REFERENCES cf_wt_discountrules (idofrule) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION,
+    CONSTRAINT cf_wt_discountrules_categorydiscount_categorydiscount_fk FOREIGN KEY (idofcategorydiscount)
+        REFERENCES cf_categorydiscounts (idofcategorydiscount) MATCH SIMPLE
+        ON UPDATE NO ACTION ON DELETE NO ACTION
+)
+    WITH (
+        OIDS=FALSE
+    );
