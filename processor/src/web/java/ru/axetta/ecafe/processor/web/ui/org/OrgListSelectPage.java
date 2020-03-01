@@ -52,7 +52,6 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
 
     public void fill(Session session, String orgFilter, Boolean isUpdate, List<Long> idOfContragentOrgList,
         List<Long> idOfContragentList, MainPage mainPage) throws Exception {
-        buildOrgTypesItems(getFilterMode());
         if (isUpdate) {
             updateSelectedOrgs();
             mainPage.setOrgFilterOfSelectOrgListSelectPage(StringUtils.join(selectedOrgs.values(), ","));
@@ -84,7 +83,6 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
 
     public void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList, List<Long> idOfContragentList)
             throws Exception {
-        buildOrgTypesItems(getFilterMode());
         if (isUpdate) {
             updateSelectedOrgs();
         } else {

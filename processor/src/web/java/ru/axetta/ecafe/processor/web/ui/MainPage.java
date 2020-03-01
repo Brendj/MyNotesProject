@@ -1838,6 +1838,7 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
+                orgSelectPage.updateOrgTypesItems();
                 orgSelectPage.fill(idOfContragent, idOfContract, persistenceSession, idOfContragentOrgList);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1890,6 +1891,7 @@ public class MainPage implements Serializable {
                 orgListSelectPage.setTagFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
+                orgListSelectPage.updateOrgTypesItems();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
@@ -1933,6 +1935,7 @@ public class MainPage implements Serializable {
                 orgListSelectPage.setTagFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
+                orgListSelectPage.updateOrgTypesItems();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
@@ -1972,6 +1975,7 @@ public class MainPage implements Serializable {
                 orgListSelectPage.setTagFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
+                orgListSelectPage.updateOrgTypesItems();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
@@ -2042,6 +2046,7 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+            orgSelectPage.updateOrgTypesItems();
             orgSelectPage.fill(persistenceSession, idOfContragentOrgList);
             persistenceTransaction.commit();
             persistenceTransaction = null;

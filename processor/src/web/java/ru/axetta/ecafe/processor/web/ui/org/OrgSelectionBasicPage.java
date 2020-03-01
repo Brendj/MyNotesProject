@@ -72,11 +72,6 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected Long idOfContragent;
     protected Long idOfContract;
 
-    public OrgSelectionBasicPage(){
-        super();
-        buildOrgTypesItems(filterMode);
-    }
-
     @SuppressWarnings("unchecked")
     public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter, List<OrganizationTypeItem> orgTypes,
             String idFilter, String region, List<Long> idOfSourceMenuOrgList, List<Long> idOfSupplierList,
@@ -220,7 +215,6 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
 
     public void setFilterMode(Integer filterMode) {
         this.filterMode = filterMode;
-        buildOrgTypesItems(filterMode);
     }
 
     public Boolean getDistrictFilterDisabled() {
@@ -239,8 +233,8 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
         this.supplierFilter = supplierFilter;
     }
 
-    protected void buildOrgTypesItems(Integer filterMode) {
-        switch (filterMode) {
+    public void updateOrgTypesItems() {
+        switch (getFilterMode()) {
             case 2:
                 disableAvailableTypesAndSetSelected(ONLY_SUPPLIERS);
                 districtFilterDisabled = true;

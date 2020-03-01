@@ -55,7 +55,6 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
     }
 
     public void fill(Session session, List<Long> idOfMenuSourceOrgList) throws Exception {
-        buildOrgTypesItems(getFilterMode());
         this.idOfContragent = null;
         this.idOfContract = null;
         this.items = retrieveOrgs(session, idOfMenuSourceOrgList);
@@ -63,7 +62,6 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
 
     public void fill(Long idOfContragent, Long idOfContract, Session session, List<Long> idOfMenuSourceOrgList)
             throws Exception {
-        buildOrgTypesItems(getFilterMode());
         this.idOfContragent = idOfContragent;
         this.idOfContract = idOfContract;
         this.filter = "";
@@ -74,7 +72,6 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
     }
 
     public void fill(Session session, Long idOfOrg, List<Long> idOfMenuSourceOrgList) throws Exception {
-        buildOrgTypesItems(getFilterMode());
         List<OrgShortItem> items = retrieveOrgs(session, idOfMenuSourceOrgList);
         OrgShortItem selectedItem = new OrgShortItem();
         if (null != idOfOrg) {

@@ -66,6 +66,7 @@
                                         <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                     </h:inputText>
+                                    <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
                                     <h:inputText id="inputIdFilter" value="#{mainPage.orgListSelectPage.idFilter}"
                                                  size="60" maxlength="120" styleClass="input-text">
                                         <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
@@ -79,7 +80,6 @@
                                         <a4j:support event="onchange" action="#{mainPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                     </h:selectOneMenu>
-                                    <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
                                 </h:panelGrid>
                                     <rich:simpleTogglePanel label="Показать доп. фильтры" switchType="client" opened="false"
                                                             styleClass="borderNone" timeout="10"
