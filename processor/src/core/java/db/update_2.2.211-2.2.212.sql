@@ -35,12 +35,8 @@ CREATE TABLE cf_wt_discountrules
     priority integer NOT NULL DEFAULT 0, -- Приоритет
     rate integer NOT NULL DEFAULT 0, -- Ставка дисконтирования
     operationor boolean NOT NULL DEFAULT false, -- Объединение комплексов
-    idofcategorydiscount bigint, -- Идентификатор категории клиентов
     subcategory character varying(100) DEFAULT ''::character varying, -- Cуперкатегория
-    CONSTRAINT cf_wt_discountrules_pk PRIMARY KEY (idofrule),
-    CONSTRAINT cf_wt_discountrules_categorydiscount_fk FOREIGN KEY (idofcategorydiscount)
-        REFERENCES cf_categorydiscounts (idofcategorydiscount) MATCH SIMPLE
-        ON UPDATE NO ACTION ON DELETE NO ACTION
+    CONSTRAINT cf_wt_discountrules_pk PRIMARY KEY (idofrule)
 )
     WITH (
         OIDS=FALSE
@@ -52,10 +48,10 @@ CREATE TABLE cf_wt_discountrules_complexes
     idofrule bigint NOT NULL, -- Идентификатор льготного правила
     idofcomplex bigserial NOT NULL, -- Идентификатор комплекса
     CONSTRAINT cf_wt_discountrules_complexes_pk PRIMARY KEY (idofrule, idofcomplex),
-    CONSTRAINT cf_wt_discountcomplexes_rules_fk FOREIGN KEY (idofrule)
+    CONSTRAINT cf_wt_discountrules_complexes_rules_fk FOREIGN KEY (idofrule)
         REFERENCES cf_wt_discountrules (idofrule) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION,
-    CONSTRAINT cf_wt_discountcomplexes_complexes_fk FOREIGN KEY (idofcomplex)
+    CONSTRAINT cf_wt_discountrules_complexes_complexes_fk FOREIGN KEY (idofcomplex)
         REFERENCES cf_wt_complexes (idofcomplex) MATCH SIMPLE
         ON UPDATE NO ACTION ON DELETE NO ACTION
 )

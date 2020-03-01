@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 
 import javax.persistence.*;
 import java.util.HashSet;
@@ -32,10 +33,6 @@ public class WtDiscountRule {
     @Column(name = "operationOr")
     private boolean operationOr;
 
-    @ManyToOne
-    @JoinColumn(name = "idOfCategoryDiscount")
-    private CategoryDiscount categoryDiscount;
-
     @Column(name = "subCategory")
     private String subCategory;
 
@@ -44,6 +41,18 @@ public class WtDiscountRule {
             joinColumns = @JoinColumn(name = "idOfRule"),
             inverseJoinColumns = @JoinColumn(name = "idOfComplex"))
     private Set<WtComplex> complexes = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "cf_wt_discountrules_categoryorg",
+            joinColumns = @JoinColumn(name = "idOfRule"),
+            inverseJoinColumns = @JoinColumn(name = "idOfCategoryOrg"))
+    private Set<CategoryOrg> categoryOrgs = new HashSet<>();
+
+    @ManyToMany
+    @JoinTable(name = "cf_wt_discountrules_categorydiscount",
+            joinColumns = @JoinColumn(name = "idOfRule"),
+            inverseJoinColumns = @JoinColumn(name = "idOfCategoryDiscount"))
+    private Set<CategoryDiscount> categoryDiscounts = new HashSet<>();
 
     public Long getIdOfRule() {
         return idOfRule;
@@ -85,14 +94,6 @@ public class WtDiscountRule {
         this.operationOr = operationOr;
     }
 
-    public CategoryDiscount getCategoryDiscount() {
-        return categoryDiscount;
-    }
-
-    public void setCategoryDiscount(CategoryDiscount categoryDiscount) {
-        this.categoryDiscount = categoryDiscount;
-    }
-
     public String getSubCategory() {
         return subCategory;
     }
@@ -107,6 +108,22 @@ public class WtDiscountRule {
 
     public void setComplexes(Set<WtComplex> complexes) {
         this.complexes = complexes;
+    }
+
+    public Set<CategoryOrg> getCategoryOrgs() {
+        return categoryOrgs;
+    }
+
+    public void setCategoryOrgs(Set<CategoryOrg> categoryOrgs) {
+        this.categoryOrgs = categoryOrgs;
+    }
+
+    public Set<CategoryDiscount> getCategoryDiscounts() {
+        return categoryDiscounts;
+    }
+
+    public void setCategoryDiscounts(Set<CategoryDiscount> categoryDiscounts) {
+        this.categoryDiscounts = categoryDiscounts;
     }
 
     @Override
