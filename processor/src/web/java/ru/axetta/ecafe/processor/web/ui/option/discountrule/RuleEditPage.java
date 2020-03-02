@@ -71,6 +71,7 @@ public class RuleEditPage extends BasicWorkspacePage
     private List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
     private Map<Integer, Long> complexTypeMap;
     private Map<Integer, Long> ageGroupMap;
+    boolean wt = false;
 
     //// Веб-технолог ////
 
@@ -82,8 +83,10 @@ public class RuleEditPage extends BasicWorkspacePage
         complexGroupItems = daoService.getWtComplexGroupList();
         int i = 0;
         for (WtComplexGroupItem item : complexGroupItems) {
-            res.add(new SelectItem(i++, item.getDescription()));
-            complexTypeMap.put(i, item.getIdOfComplexGroupItem());
+            if (item.getIdOfComplexGroupItem() != 3) { // 3 = Все виды питания
+                res.add(new SelectItem(i++, item.getDescription()));
+                complexTypeMap.put(i, item.getIdOfComplexGroupItem());
+            }
         }
         return res;
     }
@@ -96,8 +99,10 @@ public class RuleEditPage extends BasicWorkspacePage
         ageGroupItems = daoService.getWtAgeGroupList();
         int i = 0;
         for (WtAgeGroupItem item : ageGroupItems) {
-            res.add(new SelectItem(i++, item.getDescription()));
-            ageGroupMap.put(i, item.getIdOfAgeGroupItem());
+            if (item.getIdOfAgeGroupItem() < 5) { // 5 = Сотрудники, 6 = Все
+                res.add(new SelectItem(i++, item.getDescription()));
+                ageGroupMap.put(i, item.getIdOfAgeGroupItem());
+            }
         }
         return res;
     }
@@ -106,18 +111,14 @@ public class RuleEditPage extends BasicWorkspacePage
         if (complexType > -1 && ageGroup > -1) {
             Long complexGroupId = complexTypeMap.get(complexType + 1);
             Long ageGroupId = ageGroupMap.get(ageGroup + 1);
-            if (complexGroupId == null || ageGroupId == null) {
+            if (complexGroupId == null && ageGroupId == null) {
                 resetWtForm();
             } else {
                 WtComplexGroupItem wtComplexGroupItem = daoService.getWtComplexGroupItemById(complexGroupId);
                 WtAgeGroupItem wtAgeGroupItem = daoService.getWtAgeGroupItemById(ageGroupId);
-                if (wtComplexGroupItem != null && wtAgeGroupItem != null) {
-                    List<WtComplex> wtComplexes = daoService.getWtComplexesList(wtComplexGroupItem, wtAgeGroupItem);
-                    for (WtComplex wtComplex : wtComplexes) {
-                        wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
-                    }
-                } else {
-                    resetWtForm();
+                List<WtComplex> wtComplexes = daoService.getWtComplexesList(wtComplexGroupItem, wtAgeGroupItem);
+                for (WtComplex wtComplex : wtComplexes) {
+                    wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
                 }
             }
         } else {
@@ -752,5 +753,13 @@ public class RuleEditPage extends BasicWorkspacePage
 
     public void setWtSelectedComplexes(List<WtSelectedComplex> wtSelectedComplexes) {
         this.wtSelectedComplexes = wtSelectedComplexes;
+    }
+
+    public boolean isWt() {
+        return wt;
+    }
+
+    public void setWt(boolean wt) {
+        this.wt = wt;
     }
 }

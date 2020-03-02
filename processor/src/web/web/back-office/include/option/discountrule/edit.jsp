@@ -97,19 +97,19 @@
             <h:panelGrid columns="2">
 
                 <h:outputText escape="true" value="Использовать правило для Web-АРМа" styleClass="output-text"/>
-                <h:selectBooleanCheckbox id="arm" value="true">
+                <h:selectBooleanCheckbox id="arm" value="false" onselect="#{ruleEditPage.setWt(true)}">
                 </h:selectBooleanCheckbox>
 
                 <h:outputText escape="true" value="Тип комплекса" styleClass="output-text required-field"/>
 
                 <h:selectOneMenu id="typeMenu" value="#{ruleEditPage.complexType}"
-                                 style="width:300px;" styleClass="groupSelect">
+                                 style="width:300px;" styleClass="groupSelect" rendered="#{ruleEditPage.wt}">
                     <f:selectItems value="#{ruleEditPage.complexTypes}"/>
                 </h:selectOneMenu>
 
                 <h:outputText escape="true" value="Возрастная категория" styleClass="output-text required-field"/>
                 <h:selectOneMenu id="ageMenu" value="#{ruleEditPage.ageGroup}"
-                                 style="width:300px;" styleClass="groupSelect">
+                                 style="width:300px;" styleClass="groupSelect" rendered="#{ruleEditPage.wt}">
                     <f:selectItems value="#{ruleEditPage.ageGroups}"/>
                 </h:selectOneMenu>
 

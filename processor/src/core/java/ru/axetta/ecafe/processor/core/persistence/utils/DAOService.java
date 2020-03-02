@@ -2730,7 +2730,7 @@ public class DAOService {
 
     public WtComplexGroupItem getWtComplexGroupItemById(Long idOfComplexType) {
         Query query = entityManager.createQuery("select cg from WtComplexGroupItem cg "
-                + "where cg.idOfComplexGroupItem = :idOfComplexType");
+                + "where cg.idOfComplexGroupItem = :idOfComplexType or cg.idOfComplexGroupItem = 3");
         query.setParameter("idOfComplexType", idOfComplexType);
         try {
             return (WtComplexGroupItem) query.getSingleResult();
@@ -2741,8 +2741,12 @@ public class DAOService {
     }
 
     public WtAgeGroupItem getWtAgeGroupItemById(Long idOfAgeGroup) {
-        Query query = entityManager.createQuery("select ag from WtAgeGroupItem ag "
-                + "where ag.idOfAgeGroupItem = :idOfAgeGroup");
+        StringBuilder sb = new StringBuilder();
+        sb.append("select ag from WtAgeGroupItem ag where ag.idOfAgeGroupItem = :idOfAgeGroup");
+        if (idOfAgeGroup == 3) { // 1-4
+            sb.append(" or ag.idOfAgeGroupItem = 6"); // Все
+        }
+        Query query = entityManager.createQuery(sb.toString());
         query.setParameter("idOfAgeGroup", idOfAgeGroup);
         try {
             return (WtAgeGroupItem) query.getSingleResult();
@@ -2759,10 +2763,24 @@ public class DAOService {
     }
 
     public List<WtComplex> getWtComplexesList(WtComplexGroupItem wtComplexGroupItem, WtAgeGroupItem wtAgeGroupItem) {
-        Query query = entityManager.createQuery("select wc from WtComplex wc "
-                + "where wc.wtComplexGroupItem = :wtComplexGroupItem and wc.wtAgeGroupItem = :wtAgeGroupItem");
-        query.setParameter("wtComplexGroupItem", wtComplexGroupItem);
-        query.setParameter("wtAgeGroupItem", wtAgeGroupItem);
+        StringBuilder sb = new StringBuilder();
+        sb.append("select wc from WtComplex wc");
+        if (wtComplexGroupItem != null) {
+            sb.append(" where wc.wtComplexGroupItem = :wtComplexGroupItem ");
+            if (wtAgeGroupItem != null) {
+                sb.append("and wc.wtAgeGroupItem = :wtAgeGroupItem");
+            }
+        } else if (wtAgeGroupItem != null) {
+            sb.append(" where wc.wtAgeGroupItem = :wtAgeGroupItem");
+        }
+
+        Query query = entityManager.createQuery(sb.toString());
+        if (wtComplexGroupItem != null) {
+            query.setParameter("wtComplexGroupItem", wtComplexGroupItem);
+        }
+        if (wtAgeGroupItem != null) {
+            query.setParameter("wtAgeGroupItem", wtAgeGroupItem);
+        }
         try {
             return query.getResultList();
         } catch (Exception e) {
