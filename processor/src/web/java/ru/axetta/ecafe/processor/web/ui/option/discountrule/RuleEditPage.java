@@ -71,7 +71,7 @@ public class RuleEditPage extends BasicWorkspacePage
     private List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
     private Map<Integer, Long> complexTypeMap;
     private Map<Integer, Long> ageGroupMap;
-    boolean wt = false;
+    boolean wt = true;
 
     //// Веб-технолог ////
 
@@ -108,8 +108,11 @@ public class RuleEditPage extends BasicWorkspacePage
     }
 
     public void fillWtSelectedComplexes() {
-        if (wtSelectedComplexes != null) {
+        if (!wt || wtSelectedComplexes.size() != 0) {
             wtSelectedComplexes.removeAll(wtSelectedComplexes);
+        }
+        if (!wt) {
+            return;
         }
         if (complexType > -1 || ageGroup > -1) {
             Long complexGroupId = complexTypeMap.get(complexType + 1);
@@ -148,7 +151,7 @@ public class RuleEditPage extends BasicWorkspacePage
         ageGroup = -1;
     }
 
-    public void switchWt() {
+    public void switchWt() throws Exception {
         wt = !wt;
         fillWtSelectedComplexes();
     }

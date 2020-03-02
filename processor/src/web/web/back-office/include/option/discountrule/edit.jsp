@@ -97,8 +97,12 @@
             <h:panelGrid columns="2">
 
                 <h:outputText escape="true" value="Использовать правило для Web-АРМа" styleClass="output-text"/>
-                <h:selectBooleanCheckbox id="arm" value="#{ruleEditPage.wt}" onclick="#{ruleEditPage.switchWt()}">
-                </h:selectBooleanCheckbox>
+
+                <a4j:commandLink reRender="wtComplexesTable" rendered="#{ruleEditPage.wt}"
+                                 action="#{ruleEditPage.switchWt()}">
+                    <f:setPropertyActionListener value="#{ruleEditPage}" target="#{ruleEditPage.wt}"/>
+                    <h:selectBooleanCheckbox id="arm" value="#{ruleEditPage.wt}" />
+                </a4j:commandLink>
 
                 <h:outputText escape="true" value="Тип комплекса" styleClass="output-text" rendered="#{ruleEditPage.wt}"/>
 
