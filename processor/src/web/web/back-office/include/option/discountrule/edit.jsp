@@ -97,7 +97,7 @@
             <h:panelGrid columns="2">
 
                 <h:outputText escape="true" value="Использовать правило для Web-АРМа" styleClass="output-text"/>
-                <h:selectBooleanCheckbox id="arm" value="false" onselect="#{ruleEditPage.setWt(true)}">
+                <h:selectBooleanCheckbox id="arm" value="#{ruleEditPage.wt}" onselect="#{ruleEditPage.setWt(true)}">
                 </h:selectBooleanCheckbox>
 
                 <h:outputText escape="true" value="Тип комплекса" styleClass="output-text required-field"/>

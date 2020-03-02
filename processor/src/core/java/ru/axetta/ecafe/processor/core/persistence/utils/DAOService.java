@@ -2728,19 +2728,19 @@ public class DAOService {
         }
     }
 
-    public WtComplexGroupItem getWtComplexGroupItemById(Long idOfComplexType) {
+    public List<WtComplexGroupItem> getWtComplexGroupItemById(Long idOfComplexType) {
         Query query = entityManager.createQuery("select cg from WtComplexGroupItem cg "
                 + "where cg.idOfComplexGroupItem = :idOfComplexType or cg.idOfComplexGroupItem = 3");
         query.setParameter("idOfComplexType", idOfComplexType);
         try {
-            return (WtComplexGroupItem) query.getSingleResult();
+            return query.getResultList();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public WtAgeGroupItem getWtAgeGroupItemById(Long idOfAgeGroup) {
+    public List<WtAgeGroupItem> getWtAgeGroupItemById(Long idOfAgeGroup) {
         StringBuilder sb = new StringBuilder();
         sb.append("select ag from WtAgeGroupItem ag where ag.idOfAgeGroupItem = :idOfAgeGroup");
         if (idOfAgeGroup == 3) { // 1-4
@@ -2749,7 +2749,7 @@ public class DAOService {
         Query query = entityManager.createQuery(sb.toString());
         query.setParameter("idOfAgeGroup", idOfAgeGroup);
         try {
-            return (WtAgeGroupItem) query.getSingleResult();
+            return query.getResultList();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
