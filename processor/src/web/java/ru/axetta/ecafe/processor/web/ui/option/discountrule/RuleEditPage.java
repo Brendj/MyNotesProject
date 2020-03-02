@@ -108,6 +108,7 @@ public class RuleEditPage extends BasicWorkspacePage
     }
 
     public void fillWtSelectedComplexes() {
+        wtSelectedComplexes = null;
         if (complexType > -1 || ageGroup > -1) {
             Long complexGroupId = complexTypeMap.get(complexType + 1);
             Long ageGroupId = ageGroupMap.get(ageGroup + 1);
