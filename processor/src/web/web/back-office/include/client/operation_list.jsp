@@ -1204,32 +1204,41 @@
                     rowKeyVar="row" footerClass="data-table-footer" rows="25">
     <f:facet name="header">
         <rich:columnGroup columnClasses="gray">
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Номер заявления" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Дата заявления" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" colspan="2">
+                <h:outputText escape="true" value="Период действия льготы" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Статус" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Дата статуса" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Архивное" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Льгота" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="ФИО заявителя" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Телефон заявителя" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Доп. информация" />
+            </rich:column>
+            <rich:column headerClass="column-header" breakBefore="true">
+                <h:outputText escape="true" value="С" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="По" />
             </rich:column>
 
         </rich:columnGroup>
@@ -1239,6 +1248,12 @@
     </rich:column>
     <rich:column headerClass="column-header">
         <h:outputText escape="true" value="#{app.createdDate}" styleClass="output-text" converter="dateConverter" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <h:outputText escape="true" value="#{app.startDate}" styleClass="output-text" converter="dateConverter" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <h:outputText escape="true" value="#{app.endDate}" styleClass="output-text" converter="dateConverter" />
     </rich:column>
     <rich:column headerClass="column-header">
         <h:outputText escape="true" value="#{app.applicationForFoodStateString}" styleClass="output-text" title="#{app.statusTitle}" />
