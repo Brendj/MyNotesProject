@@ -108,7 +108,9 @@ public class RuleEditPage extends BasicWorkspacePage
     }
 
     public void fillWtSelectedComplexes() {
-        wtSelectedComplexes = null;
+        if (wtSelectedComplexes != null) {
+            wtSelectedComplexes.removeAll(wtSelectedComplexes);
+        }
         if (complexType > -1 || ageGroup > -1) {
             Long complexGroupId = complexTypeMap.get(complexType + 1);
             Long ageGroupId = ageGroupMap.get(ageGroup + 1);
@@ -122,13 +124,15 @@ public class RuleEditPage extends BasicWorkspacePage
                     for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
                         List<WtComplex> wtComplexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem);
                         for (WtComplex wtComplex : wtComplexes) {
-                            wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
+                            if (wtComplex != null && wtSelectedComplexes != null) {
+                                wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
+                            }
                         }
                     }
                 }
 
             }
-        } else if (complexType == -1 && ageGroup == -1){
+        } else if (complexType == -1 && ageGroup == -1) {
             resetWtForm();
         }
     }
@@ -142,6 +146,11 @@ public class RuleEditPage extends BasicWorkspacePage
         wtSelectedComplexes = wtNewSelectedComplexes;
         complexType = -1;
         ageGroup = -1;
+    }
+
+    public void switchWt() {
+        wt = !wt;
+        fillWtSelectedComplexes();
     }
 
 
@@ -343,9 +352,7 @@ public class RuleEditPage extends BasicWorkspacePage
             wtDiscountRule.getCategoryOrgs().add(categoryOrg);
         }
 
-        //em.persist(wtDiscountRule);
         wtDiscountRule = (WtDiscountRule) em.merge(wtDiscountRule);
-        //fill(wtDiscountRule);
 
         printMessage("Данные обновлены.");
     }
@@ -565,7 +572,7 @@ public class RuleEditPage extends BasicWorkspacePage
     }
 
     public void reload() throws Exception {
-        DiscountRule discountRule = em.merge(entity); ///
+        DiscountRule discountRule = em.merge(entity);
 
         StringBuilder categoryFilter = new StringBuilder();
         if (!discountRule.getCategoriesDiscounts().isEmpty()) {
