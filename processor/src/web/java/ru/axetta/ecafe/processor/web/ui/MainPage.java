@@ -1888,7 +1888,6 @@ public class MainPage implements Serializable {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setFilter("");
-                orgListSelectPage.setTagFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
                 orgListSelectPage.updateOrgTypesItems();
@@ -1932,7 +1931,6 @@ public class MainPage implements Serializable {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setFilter("");
-                orgListSelectPage.setTagFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
                 orgListSelectPage.updateOrgTypesItems();
@@ -1972,7 +1970,6 @@ public class MainPage implements Serializable {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setFilter("");
-                orgListSelectPage.setTagFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
                 orgListSelectPage.updateOrgTypesItems();
@@ -2157,6 +2154,7 @@ public class MainPage implements Serializable {
     public Object clearOrgListSelectedItemsList() {
         orgFilterOfSelectOrgListSelectPage = "";
         orgListSelectPage.deselectAllItems();
+        orgListSelectPage.clearSelectedOrgMap();
         updateOrgListSelectPage();
         return null;
     }

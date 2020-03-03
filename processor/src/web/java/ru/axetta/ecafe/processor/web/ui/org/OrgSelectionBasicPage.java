@@ -32,7 +32,6 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
 
     protected String region;
     protected String filter;
-    protected String tagFilter;
     protected String idFilter;
     protected Integer supplierFilter; // Legacy-code, but JSP not work without him
 
@@ -73,7 +72,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected Long idOfContract;
 
     @SuppressWarnings("unchecked")
-    public static List<OrgShortItem> retrieveOrgs(Session session, String filter, String tagFilter, List<OrganizationTypeItem> orgTypes,
+    public static List<OrgShortItem> retrieveOrgs(Session session, String filter, List<OrganizationTypeItem> orgTypes,
             String idFilter, String region, List<Long> idOfSourceMenuOrgList, List<Long> idOfSupplierList,
             Long idOfContragent, Long idOfContract) throws Exception {
         Criteria orgCriteria = session.createCriteria(Org.class);
@@ -91,10 +90,6 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
             Criterion shortNameInfoServiceIlike = Restrictions.ilike("shortNameInfoService", filter, MatchMode.ANYWHERE);
 
             orgCriteria.add(Restrictions.or(shortNameInfoServiceIlike, shortNameOrOfficalNameIlike));
-        }
-
-        if (StringUtils.isNotEmpty(tagFilter)) {
-            orgCriteria.add(Restrictions.ilike("tag", tagFilter, MatchMode.ANYWHERE));
         }
 
         if (StringUtils.isNotBlank(idFilter)) {
@@ -191,14 +186,6 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
 
     public void setFilter(String filter) {
         this.filter = filter;
-    }
-
-    public String getTagFilter() {
-        return tagFilter;
-    }
-
-    public void setTagFilter(String tagFilter) {
-        this.tagFilter = tagFilter;
     }
 
     public String getIdFilter() {
@@ -334,7 +321,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfSourceMenuOrgList,
             List<Long> idOfSupplierList) throws Exception {
         deselectAllItems();
-        return retrieveOrgs(session, getFilter(), getTagFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
+        return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
                 idOfSourceMenuOrgList, idOfSupplierList, null, null);
     }
 
@@ -342,7 +329,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfSourceMenuOrgList)
             throws Exception {
         deselectAllItems();
-        return retrieveOrgs(session, getFilter(), getTagFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
+        return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
                 idOfSourceMenuOrgList, Collections.EMPTY_LIST, null, null);
     }
 

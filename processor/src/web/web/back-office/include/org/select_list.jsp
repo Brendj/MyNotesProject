@@ -85,7 +85,7 @@
                                                             styleClass="borderNone" timeout="10"
                                                             headerClass="imageNone borderNone linkClass"
                                                             bodyClass="imageNone borderNone">
-                                        <h:panelGrid columns="1">
+                                        <h:panelGrid columns="3">
                                             <a4j:repeat id="OrganizationTypesForSelectMany"
                                                         value="#{mainPage.orgListSelectPage.availableOrganizationTypes}" var="item" >
                                                 <h:panelGrid columns="2">
@@ -105,7 +105,6 @@
                                          styleClass="command-link">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                             <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.filter}" />
-                            <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.tagFilter}" />
                             <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.idFilter}" />
                             <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.region}" />
                         </a4j:commandLink>

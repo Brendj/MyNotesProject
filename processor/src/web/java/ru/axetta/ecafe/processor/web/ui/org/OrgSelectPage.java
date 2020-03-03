@@ -65,7 +65,6 @@ public class OrgSelectPage extends OrgSelectionBasicPage {
         this.idOfContragent = idOfContragent;
         this.idOfContract = idOfContract;
         this.filter = "";
-        this.tagFilter = "";
         this.idFilter = "";
         this.items = retrieveOrgs(session, idOfMenuSourceOrgList);
         idFilter = "";

@@ -26,7 +26,6 @@
                             <a4j:support event="onclick" action="#{mainPage.orgSelectPage.cancelFilter}"
                                          reRender="modalOrgSelectorForm" />
                             <f:setPropertyActionListener value="" target="#{mainPage.orgSelectPage.filter}" />
-                            <f:setPropertyActionListener value="" target="#{mainPage.orgSelectPage.tagFilter}" />
                             <f:setPropertyActionListener value="" target="#{mainPage.orgSelectPage.idFilter}" />
                             <f:setPropertyActionListener value="" target="#{mainPage.orgSelectPage.region}" />
                         </a4j:commandLink>
@@ -55,18 +54,24 @@
                             </h:selectOneMenu>
                         </h:panelGrid>
                     </h:panelGrid>
+                    <rich:simpleTogglePanel label="Показать доп. фильтры" switchType="client" opened="false"
+                                                                                         styleClass="borderNone" timeout="10"
+                                                                                         headerClass="imageNone borderNone linkClass"
+                                                                                         bodyClass="imageNone borderNone">
                     <h:panelGrid columns="2">
                         <a4j:repeat id="OrganizationTypesForSelectOne"
                                     value="#{mainPage.orgSelectPage.availableOrganizationTypes}" var="item">
                             <h:panelGrid columns="2">
                                 <h:selectBooleanCheckbox value="#{item.selected}" disabled="#{item.disabled}">
-                                <a4j:support event="onclick" action="#{mainPage.updateOrgSelectPageWithItemDeselection}"
-                                             reRender="modalOrgSelectorForm" requestDelay="1000"/>
+                                    <a4j:support event="onclick"
+                                                 action="#{mainPage.updateOrgSelectPageWithItemDeselection}"
+                                                 reRender="modalOrgSelectorForm" requestDelay="1000"/>
                                 </h:selectBooleanCheckbox>
                                 <h:outputText styleClass="output-text" value="#{item.typeName}"/>
                             </h:panelGrid>
                         </a4j:repeat>
                     </h:panelGrid>
+                </rich:simpleTogglePanel>
                 </td>
             </tr>
             <tr>

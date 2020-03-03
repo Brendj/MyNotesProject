@@ -9,13 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.CacheMode;
-import org.hibernate.Criteria;
-import org.hibernate.HibernateException;
 import org.hibernate.Session;
-import org.hibernate.criterion.Order;
-import org.hibernate.criterion.Projections;
-import org.hibernate.transform.Transformers;
 
 import java.util.*;
 
@@ -28,7 +22,6 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
 
     private final Stack<CompleteHandlerList> completeHandlerLists = new Stack<CompleteHandlerList>();
     private Map<Long, String> selectedOrgs = new HashMap<Long, String>();
-    private List<OrgShortItem> autoCompleteOrgs = new ArrayList<OrgShortItem>();
 
     public void pushCompleteHandlerList(CompleteHandlerList handlerList) {
         completeHandlerLists.push(handlerList);
@@ -78,7 +71,6 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }
         this.items = items;
-        this.autoCompleteOrgs = fillAutoCompleteOrgs(session);
     }
 
     public void fill(Session session, Boolean isUpdate, List<Long> idOfContragentOrgList, List<Long> idOfContragentList)
@@ -92,22 +84,7 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
         for (OrgShortItem orgShortItem : items) {
             orgShortItem.setSelected(selectedOrgs.containsKey(orgShortItem.getIdOfOrg()));
         }
-        this.autoCompleteOrgs = fillAutoCompleteOrgs(session);
         this.items = items;
-    }
-
-    public List<OrgShortItem> fillAutoCompleteOrgs(Session session) throws HibernateException {
-        Criteria criteria = session.createCriteria(Org.class);
-        criteria.addOrder(Order.asc("idOfOrg"));
-        criteria.setProjection(
-                Projections.projectionList().add(Projections.distinct(Projections.property("idOfOrg")), "idOfOrg")
-                        .add(Projections.property("shortName"), "shortName")
-                        .add(Projections.property("officialName"), "officialName")
-                        .add(Projections.property("address"), "address"));
-        criteria.setCacheMode(CacheMode.NORMAL);
-        criteria.setCacheable(true);
-        criteria.setResultTransformer(Transformers.aliasToBean(OrgShortItem.class));
-        return (List<OrgShortItem>) criteria.list();
     }
 
     private void updateSelectedOrgs() {
@@ -120,20 +97,8 @@ public class OrgListSelectPage extends OrgSelectionBasicPage {
         }
     }
 
-    public List<OrgShortItem> autoComplete(Object suggest) {
-        String pref = (String) suggest;
-        List<OrgShortItem> result = new ArrayList<OrgShortItem>();
-        for (OrgShortItem elem : getAutoCompleteOrgs()) {
-            if ((elem.getShortName() != null && elem.getShortName().toLowerCase().contains(pref.toLowerCase())) || ""
-                    .equals(pref)) {
-                result.add(elem);
-            }
-        }
-        return result;
-    }
-
-    public List<OrgShortItem> getAutoCompleteOrgs() {
-        return autoCompleteOrgs;
+    public void clearSelectedOrgMap() {
+        selectedOrgs.clear();
     }
 
     public interface CompleteHandlerList {
