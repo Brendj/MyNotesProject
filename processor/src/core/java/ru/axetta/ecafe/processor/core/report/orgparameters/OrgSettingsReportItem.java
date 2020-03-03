@@ -64,6 +64,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
     //----------------- Other --------------------//
     private Boolean requestForVisitsToOtherOrg;
     private Boolean isWorkInSummerTime;
+    private Boolean useWebArm;
 
     //----------------- Служебные переменные --------------------//
     private Boolean mainBuilding;
@@ -122,6 +123,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
 
         this.requestForVisitsToOtherOrg = org.getRequestForVisitsToOtherOrg();
         this.isWorkInSummerTime = org.getIsWorkInSummerTime();
+        this.useWebArm = org.getUseWebArm();
 
         this.mainBuilding = org.isMainBuilding();
         this.changed = false;
@@ -301,6 +303,14 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
 
     public void setIsWorkInSummerTime(Boolean workInSummerTime) {
         isWorkInSummerTime = workInSummerTime;
+    }
+
+    public Boolean getUseWebArm() {
+        return useWebArm;
+    }
+
+    public void setUseWebArm(Boolean useWebArm) {
+        this.useWebArm = useWebArm;
     }
 
     public Boolean getMainBuilding() {
