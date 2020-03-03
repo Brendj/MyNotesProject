@@ -662,7 +662,7 @@ public class PreorderDAOService {
             if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
             if (preorderComplex.getIdOfOrgOnCreate() != null && !preorderComplex.getIdOfOrgOnCreate().equals(idOfOrg)) {
                 nextVersion = nextVersionByPreorderComplex();
-                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGE_ORG, true);
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGE_ORG, true, false);
                 continue;
             }
         }
@@ -685,16 +685,16 @@ public class PreorderDAOService {
 
         ComplexInfo complexInfo = getComplexInfo(preorderComplex.getClient(), preorderComplex.getArmComplexId(), preorderComplex.getPreorderDate());
         if (complexInfo == null) {
-            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, true);
             return null;
         }
         if (preorderComplex.getPreorderMenuDetails().size() == 0 || getMenuDetailList(complexInfo.getIdOfComplexInfo()).size() == 0) {
-            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
             return null;
         }
         if (preorderComplex.getAmount() > 0) {
             if (!preorderComplex.getComplexPrice().equals(complexInfo.getCurrentPrice())) {
-                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false);
+                testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false, false);
                 return null;
             }
         } else {
@@ -704,11 +704,11 @@ public class PreorderDAOService {
                     MenuDetail menuDetail = getMenuDetail(preorderComplex.getClient(), preorderMenuDetail.getItemCode(),
                             preorderMenuDetail.getPreorderDate(), null, complexInfo.getIdOfComplexInfo());
                     if (menuDetail == null) {
-                        testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false);
+                        testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.DELETED, false, false);
                         break;
                     } else {
                         if (!preorderMenuDetail.getMenuDetailPrice().equals(menuDetail.getPrice())) {
-                            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false);
+                            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.CHANGED_PRICE, false, false);
                             break;
                         } else if (!preorderMenuDetail.getArmIdOfMenu().equals(menuDetail.getLocalIdOfMenu())) {
                             logger.info(String.format("Change localIdOfMenu %s to %s at preorder %s adding to process list",
@@ -761,15 +761,16 @@ public class PreorderDAOService {
         for (PreorderComplex preorderComplex : list) {
             if (preorderComplex.getIdOfGoodsRequestPosition() != null) continue;
             nextVersion = nextVersionByPreorderComplex();
-            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF, true);
+            testAndDeletePreorderComplex(nextVersion, preorderComplex, PreorderState.PREORDER_OFF, true, false);
         }
 
         logger.info("End relevancePreordersToOrgFlag process");
     }
 
-    private void testAndDeletePreorderComplex(long nextVersion, PreorderComplex preorderComplex, PreorderState preorderState, boolean deleteRegular) {
+    private void testAndDeletePreorderComplex(long nextVersion, PreorderComplex preorderComplex, PreorderState preorderState,
+            boolean deleteRegular, boolean forceDelete) {
         try {
-            Boolean doDelete = null;
+            Boolean doDelete = false;
             Date today = CalendarUtils.startOfDay(new Date());
             Integer syncCountDays = PreorderComplex.getDaysOfRegularPreorders();
             Map<String, Integer[]> sd = getSpecialDates(CalendarUtils.addHours(today, 12), syncCountDays,
@@ -780,13 +781,13 @@ public class PreorderDAOService {
                     break;
                 }
             }
-            if (doDelete != null && doDelete) {
+            if (doDelete || forceDelete) {
                 deletePreorderComplex(preorderComplex, nextVersion, preorderState);
                 if (deleteRegular && preorderComplex.getRegularPreorder() != null) {
                     deleteRegularPreorderInternal((Session)em.getDelegate(), preorderComplex.getRegularPreorder(),
                             preorderState, null, RegularPreorderState.CHANGE_BY_SERVICE);
                 }
-                logger.info("Deleted preorder " + preorderComplex.toString());
+                logger.info("Deleted preorder " + preorderComplex.toString() + (forceDelete ? " (force delete = true)" : ""));
             } else {
                 logger.info("Preoder can't be deleted " + preorderComplex.toString());
             }
