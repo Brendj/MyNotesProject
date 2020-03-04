@@ -244,6 +244,8 @@ public class ImportRegisterOrgsService {
         org.setLongitude("");
         org.setLatitude("");
         org.setGuid(orgRegistryChange.getGuid());
+        org.setEkisId(orgRegistryChange.getEkisId());
+        org.setEgissoId(orgRegistryChange.getEgissoId());
         org.setPhone("");
         org.setSmsSender("");
         org.setTag("");
@@ -288,6 +290,8 @@ public class ImportRegisterOrgsService {
                     }
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_EKIS_ID)))
                         org.setEkisId(orgRegistryChange.getEkisId());
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_EGISSO_ID)))
+                        org.setEgissoId(orgRegistryChange.getEgissoId());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_UNIQUE_ADDRESS_ID))) {
                         org.setUniqueAddressId(orgRegistryChangeItem.getUniqueAddressId());
                         org.setAdditionalIdBuilding(org.getUniqueAddressId()); // ??

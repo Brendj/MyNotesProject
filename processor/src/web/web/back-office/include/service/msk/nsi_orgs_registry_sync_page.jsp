@@ -196,7 +196,7 @@
                         <f:setPropertyActionListener value="#{org}" target="#{NSIOrgsRegistrySynchPage.orgForEdit}" />
                         </a4j:commandButton>
                     </rich:column>
-                    <rich:column>
+                    <rich:column rendered="#{!NSIOrgsRegistrySynchPage.nsi3()}">
                         <f:facet name="header">
                             <h:outputText value="Guid" />
                         </f:facet>

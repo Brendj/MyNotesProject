@@ -54,7 +54,9 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
     public NSIOrgsRegistrySynchPage() {
         super();
         orgModifyChangeItems.clear();
-        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_GUID, "", ""));
+        if (!RuntimeContext.getInstance().isNSI3()) {
+            orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_GUID, "", ""));
+        }
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_EKIS_ID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_EGISSO_ID, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_UNIQUE_ADDRESS_ID, "", ""));
@@ -455,6 +457,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
 
     public WebItem getOrgForEdit() {
         return orgForEdit;
+    }
+
+    public boolean nsi3() {
+        return RuntimeContext.getInstance().isNSI3();
     }
 
     public void setOrgForEdit(WebItem orgForEdit) {
