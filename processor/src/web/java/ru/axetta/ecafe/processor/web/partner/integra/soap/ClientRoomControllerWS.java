@@ -2648,23 +2648,38 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             Restrictions.isNull("detal.groupName")));
 
             //Следующее условие - заглушка, в соответствии с https://gitlab.iteco.dev/ispp/processor/issues/438
-            //criteria.add(Restrictions.or(
-            //        Restrictions.and(
-            //                Restrictions.and(Restrictions.not(Restrictions.ilike("complexName", "сотруд", MatchMode.ANYWHERE)),
-            //                Restrictions.not(Restrictions.ilike("complexName", "воспит", MatchMode.ANYWHERE))),
-            //                Restrictions.not(Restrictions.ilike("complexName", "учит", MatchMode.ANYWHERE))),
-            //                Restrictions.isNull("complexName")));
+            criteria.add(Restrictions.or(
+                    Restrictions.and(
+                            Restrictions.and(Restrictions.not(Restrictions.ilike("complexName", "сотруд", MatchMode.ANYWHERE)),
+                                    Restrictions.not(Restrictions.ilike("complexName", "воспит", MatchMode.ANYWHERE))),
+                            Restrictions.not(Restrictions.ilike("complexName", "учит", MatchMode.ANYWHERE))),
+                    Restrictions.isNull("complexName")));
 
             List<ComplexInfo> complexInfoList = criteria.list();
             PreorderDAOService preorderDAOService = RuntimeContext.getAppContext().getBean(PreorderDAOService.class);
+
+            //Получаем категории льгот для клиента
+            List<Long> categoriesDiscountsIds = new LinkedList<Long>();
+            for(String cd : client.getCategoriesDiscounts().split(",")) {
+                if(StringUtils.isNotEmpty(cd)) {
+                    categoriesDiscountsIds.add(Long.valueOf(cd));
+                }
+            }
+            List<CategoryDiscount> clientDiscountsList = Collections.emptyList();
+            if (!categoriesDiscountsIds.isEmpty()) {
+                Criteria clientDiscountsCriteria = session.createCriteria(CategoryDiscount.class);
+                clientDiscountsCriteria.add(Restrictions.in("idOfCategoryDiscount", categoriesDiscountsIds));
+                clientDiscountsList = clientDiscountsCriteria.list();
+            }
 
             List<MenuWithComplexesExt> list = new ArrayList<MenuWithComplexesExt>();
             for (ComplexInfo ci : complexInfoList) {
                 if (client.getClientGroup() != null && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()) {
                     //для учеников
-                    PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(ci.getIdOfComplex(), ci.getComplexName(), ci.getCurrentPrice(), ci.getModeOfAdd(), ci.getModeFree());
+                    PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(ci.getIdOfComplex(), ci.getComplexName(), ci.getCurrentPrice(), ci.getModeOfAdd(), ci.getModeFree(), ci.getModeVisible());
                     PreorderGoodParamsContainer complexParams = preorderDAOService.getComplexParams(complexItemExt, client, ci.getMenuDate());
-                    if (!preorderDAOService.isAcceptableComplex(complexItemExt, client.getClientGroup(), client.hasDiscount(), complexParams, client.getAgeTypeGroup()))
+
+                    if (!preorderDAOService.isAcceptableComplex(complexItemExt, client.getClientGroup(), client.hasDiscount(), complexParams, client.getAgeTypeGroup(), clientDiscountsList))
                         continue;
                 } else {
                     //для предопределенных не включаем комплексы с какой-либо категорией
@@ -2673,6 +2688,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
 
                 List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, ci.getIdOfComplexInfo(), true);
+                //Если у комплекса нет состава, то не выводим его
+                if (menuItemExtList.isEmpty())
+                    continue;
                 MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(ci);
                 menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
                 list.add(menuWithComplexesExt);
