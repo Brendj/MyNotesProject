@@ -109,7 +109,7 @@ public class RuleEditPage extends BasicWorkspacePage
 
     public void fillWtSelectedComplexes() {
         if (!wt || wtSelectedComplexes.size() != 0) {
-            wtSelectedComplexes.removeAll(wtSelectedComplexes);
+            wtSelectedComplexes.clear();
         }
         if (!wt) {
             return;
@@ -153,7 +153,7 @@ public class RuleEditPage extends BasicWorkspacePage
 
     public void switchWt() throws Exception {
         wt = !wt;
-        fillWtSelectedComplexes();
+        //fillWtSelectedComplexes();
     }
 
 

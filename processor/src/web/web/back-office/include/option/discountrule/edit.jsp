@@ -98,11 +98,12 @@
 
                 <h:outputText escape="true" value="Использовать правило для Web-АРМа" styleClass="output-text"/>
 
-                <a4j:commandLink reRender="wtComplexesTable" rendered="#{ruleEditPage.wt}"
-                                 action="#{ruleEditPage.switchWt()}">
-                    <f:setPropertyActionListener value="#{ruleEditPage}" target="#{ruleEditPage.wt}"/>
-                    <h:selectBooleanCheckbox id="arm" value="#{ruleEditPage.wt}" />
-                </a4j:commandLink>
+<%--                <f:setPropertyActionListener value="#{ruleEditPage}" target="#{ruleEditPage.switchWt()}"/>--%>
+<%--                <a4j:commandLink reRender="wtComplexesTable" rendered="#{ruleEditPage.wt}"--%>
+<%--                                 action="#{ruleEditPage.switchWt()}">--%>
+
+                    <h:selectBooleanCheckbox id="arm" value="#{ruleEditPage.wt}" onchange="#{ruleEditPage.switchWt()}" />
+<%--                </a4j:commandLink>--%>
 
                 <h:outputText escape="true" value="Тип комплекса" styleClass="output-text" rendered="#{ruleEditPage.wt}"/>
 

@@ -22,92 +22,92 @@ public class WtComplex {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     @Column(name = "idOfComplex")
-    protected Long idOfComplex;
+    private Long idOfComplex;
 
     @Column(name = "name")
-    protected String name;
+    private String name;
 
     @Column(name = "price")
-    protected BigDecimal price;
+    private BigDecimal price;
 
     @Column(name = "beginDate")
-    protected Date beginDate;
+    private Date beginDate;
 
     @Column(name = "endDate")
-    protected Date endDate;
+    private Date endDate;
 
     @Column(name = "cycleMotion")
-    protected Integer cycleMotion;
+    private Integer cycleMotion;
 
     @Column(name = "dayInCycle")
-    protected Integer dayInCycle;
+    private Integer dayInCycle;
 
     @Column(name = "version")
-    protected Long version;
+    private Long version;
 
     @Column(name = "guid")
-    protected String guid;
+    private String guid;
 
     @Column(name = "createDate")
-    protected Date createDate;
+    private Date createDate;
 
     @Column(name = "lastUpdate")
-    protected Date lastUpdate;
+    private Date lastUpdate;
 
     @ManyToOne
     @JoinColumn(name = "create_by_id")
-    protected User createdUser;
+    private User createdUser;
 
     @ManyToOne
     @JoinColumn(name = "update_by_id")
-    protected User updatedUser;
+    private User updatedUser;
 
     @Column(name = "deleteState")
-    protected Integer deleteState;
+    private Integer deleteState;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfComplexGroupItem")
-    protected WtComplexGroupItem wtComplexGroupItem;
+    private WtComplexGroupItem wtComplexGroupItem;
 
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfAgeGroupItem")
-    protected WtAgeGroupItem wtAgeGroupItem;
+    private WtAgeGroupItem wtAgeGroupItem;
 
     @ManyToOne
     @JoinColumn(name = "idOfDietType")
-    protected WtDietType wtDietType;
+    private WtDietType wtDietType;
 
     @OneToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfContragent")
-    protected Contragent contragent;
+    private Contragent contragent;
 
     @ManyToOne
     @JoinColumn(name = "idOfOrgGroup")
-    protected WtOrgGroup wtOrgGroup;
+    private WtOrgGroup wtOrgGroup;
 
     @Column(name = "composite")
-    protected Boolean composite;
+    private Boolean composite;
 
     @Column(name = "is_portal")
-    protected Boolean isPortal;
+    private Boolean isPortal;
 
     @Column(name = "start_cycle_day")
-    protected Integer startCycleDay;
+    private Integer startCycleDay;
 
     @ManyToMany
     @JoinTable(name = "cf_wt_complexes_org",
             joinColumns = @JoinColumn(name = "IdOfComplex"),
             inverseJoinColumns = @JoinColumn(name = "IdOfOrg"))
-    protected Set<Org> orgs = new HashSet<>();
+    private Set<Org> orgs = new HashSet<>();
 
     @ManyToMany
     @JoinTable(name = "cf_wt_discountrules_complexes",
             joinColumns = @JoinColumn(name = "idOfComplex"),
             inverseJoinColumns = @JoinColumn(name = "idOfRule"))
-    protected Set<WtDiscountRule> discountRules = new HashSet<>();
+    private Set<WtDiscountRule> discountRules = new HashSet<>();
 
     @OneToMany(mappedBy = "wtComplex")
-    protected Set<WtComplexesItem> wtComplexesItems = new HashSet<>();
+    private Set<WtComplexesItem> wtComplexesItems = new HashSet<>();
 
     public WtComplex(WtComplex complex) {
         this.idOfComplex = complex.idOfComplex;
