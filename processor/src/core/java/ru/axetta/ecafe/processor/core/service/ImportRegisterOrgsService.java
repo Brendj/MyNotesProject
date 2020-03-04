@@ -282,7 +282,7 @@ public class ImportRegisterOrgsService {
                         org.setBtiUnad(orgRegistryChangeItem.getUnad());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_INN)))
                         org.setINN(orgRegistryChangeItem.getInn());
-                    if (!RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION).equals(Option.NSI3)) {
+                    if (!RuntimeContext.getInstance().isNSI3()) {
                         if ((fieldFlags == null) || (fieldFlags.contains(VALUE_GUID)))
                             org.setGuid(orgRegistryChange.getGuid());
                     }

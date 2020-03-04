@@ -466,7 +466,7 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return orgModifyChangeItems;
         }
         for (OrgModifyChangeItem item : orgModifyChangeItems) {
-            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_GUID)) {
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_GUID) && !RuntimeContext.getInstance().isNSI3()) {
                 item.setOldValue(orgForEdit.getGuidFrom());
                 item.setNewValue(orgForEdit.getGuidReestr());
             }
