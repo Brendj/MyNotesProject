@@ -931,6 +931,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return getResultString(unad, unadFrom);
         }
 
+        public String getEgissoId() {
+            return getResultString(egissoId, egissoIdFrom);
+        }
+
         public String getUnadReestrNullSafe() {
             return unad == null ? "" : unad.toString();
         }
