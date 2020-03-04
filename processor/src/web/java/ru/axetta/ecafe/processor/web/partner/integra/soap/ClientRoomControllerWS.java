@@ -2673,7 +2673,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             List<MenuWithComplexesExt> list = new ArrayList<MenuWithComplexesExt>();
+
+            List<ProductionCalendar> productionCalendars = DAOUtils.getAllDateFromProdactionCalendarDates(session, startDate, endDate);
             for (ComplexInfo ci : complexInfoList) {
+                //Проверка по КУД
+                if (!isGoodDate(session, client.getOrg().getIdOfOrg(), client.getIdOfClientGroup(), ci.getMenuDate(), productionCalendars))
+                    continue;
                 if (client.getClientGroup() != null && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()) {
                     //для учеников
                     PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(ci.getIdOfComplex(), ci.getComplexName(), ci.getCurrentPrice(), ci.getModeOfAdd(), ci.getModeFree(), ci.getModeVisible());
@@ -2711,9 +2716,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    public boolean isGoodDate(Session session, Long idOfOrg, Long idOfGroup, Date dateReq, Date startDate, Date endDate) {
+    public boolean isGoodDate(Session session, Long idOfOrg, Long idOfGroup, Date dateReq,  List<ProductionCalendar> productionCalendars) {
         try {
-            List<ProductionCalendar> productionCalendars = DAOUtils.getAllDateFromProdactionCalendarDates(session, startDate, endDate);
 
             Date currentDate  = CalendarUtils.startOfDay(dateReq);
 
@@ -2764,175 +2768,53 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                         //2.1.4 В  КУДе (cf_specialdates)  для ид орг и  ид группы (п.2.1)  отсутствует или удалены, тогда проверяем - данная дата приходится на день недели «Суббота»:,
                         if (CalendarUtils.getDayOfWeek(dateReq) == Calendar.SATURDAY) {
-                            if (DAOReadonlyService.getInstance().isSixWorkWeekOrg(idOfOrg)) {
+                            if (DAOReadonlyService.getInstance().isSixWorkWeekGroup(idOfOrg, idOfGroup)) {
                                 return true;
                             } else {
                                 return false;
                             }
                         }
-                    }
-                    ///
-                }
-            }
-
-
-
-            //1.1.1.1
-            boolean flag;
-            do {
-                flag = false;
-                for (ProductionCalendar productionCalendar : productionCalendars) {
-                    if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(currentDate)) {
-                        currentDate = CalendarUtils.addOneDay(currentDate);
-                        flag = true;
+                        return false;
                     }
                 }
-            } while (flag);
-            //1.1.2
-            //Если время больше 12:00, то прибавляем 1 день
-            if (new Date().getTime() - CalendarUtils.startOfDay(new Date()).getTime() > TIME_MAX) {
-                //1.1.3
-                currentDate = CalendarUtils.addOneDay(currentDate);
-                do {
-                    flag = false;
-                    for (ProductionCalendar productionCalendar : productionCalendars) {
-                        if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(currentDate)) {
-                            currentDate = CalendarUtils.addOneDay(currentDate);
-                            flag = true;
-                        }
-                    }
-                } while (flag);
             }
 
-            //1.2
-            //Настройка с АРМ для Org
-            Integer countBadDays = 0;
-
-            if (type == 0) {
-                countBadDays = OrgSettingDAOUtils.getSettingItemByOrgAndType(session, idOfOrg, SETTING_TYPE);
-            }
-            if (type == 1) {
-                //т.к. получаем в часах, то переводим в дни с округлением в большую сторону
-                countBadDays = OrgSettingDAOUtils
-                        .getSettingItemByOrgAndType(session, idOfOrg, SETTING_TYPE_SUBSCRIPTION);
-                countBadDays = (int) Math.ceil(((double) countBadDays / (double) 24));
-            }
-            currentDate = CalendarUtils.addDays(currentDate, countBadDays);
-
-            //1.2.1
-            do {
-                flag = false;
-                for (ProductionCalendar productionCalendar : productionCalendars) {
-                    if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(currentDate)) {
-                        currentDate = CalendarUtils.addOneDay(currentDate);
-                        flag = true;
-                    }
-                }
-            } while (flag);
-
-            //1.3.1
-            if (dateDone.getTime() < currentDate.getTime())
-                return false;
-
-            //1.4 - 1.5
-            flag = false;
-            for (ProductionCalendar productionCalendar : productionCalendars) {
-                if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(dateDone)) {
-                    flag = true;
-                    break;
-                }
+            CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(idOfOrg,
+                    CalendarUtils.addHours(dateReq, 3));
+            SpecialDate specialDateGroup;
+            try {
+                specialDateGroup = DAOUtils.findSpecialDateWithGroup(session, compositeId, idOfGroup);
+                if (specialDateGroup.getDeleted())
+                    specialDateGroup = null;
+            } catch (Exception e) {
+                specialDateGroup = null;
             }
 
-            //1.4
-            boolean flagGoto = false;
-            if (!flag)
+            if (specialDateGroup != null)
             {
-                CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(idOfOrg,
-                        CalendarUtils.addHours(dateDone, 3));
-                SpecialDate specialDate;
-                try {
-                    specialDate = DAOUtils.findSpecialDate(session, compositeId);
-                } catch (Exception e) {
-                    specialDate = null;
-                }
-                if (specialDate.getDeleted() != null && specialDate.getDeleted())
-                {
-                    //1.7
+                if (!specialDateGroup.getIsWeekend())
                     return true;
-                }
-
-                if (specialDate != null)
-                {
-                    if (specialDate.getIsWeekend())
-                        //1.6
-                        return false;
-                }
-                //1.7
-                return true;
-            }
-            else
-            {
-                //1.5.1
-                CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(idOfOrg,
-                        CalendarUtils.addHours(dateDone, 3));
-                SpecialDate specialDate;
-                try {
-                    specialDate = DAOUtils.findSpecialDateForDates(session, compositeId);
-                } catch (Exception e) {
-                    specialDate = null;
-                }
-                if (specialDate != null)
-                {
-                    if (!specialDate.getIsWeekend())
-                        //1.7
-                        return true;
-                }
-                //1.5.2
-                for (ProductionCalendar productionCalendar : productionCalendars) {
-                    if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(dateDone)) {
-                        if (productionCalendar.getFlag() == 2)
-                            //1.7
-                            return false;
-                    }
-                }
-                //1.5.3
-                compositeId = new CompositeIdOfSpecialDate(idOfOrg,
-                        CalendarUtils.addHours(dateDone, 3));
-                specialDate = null;
-                try {
-                    specialDate = DAOUtils.findSpecialDate(session, compositeId);
-                } catch (Exception e) {
-                    specialDate = null;
-                }
-                boolean flagZero = false;
-                if (specialDate.getDeleted() != null && specialDate.getDeleted())
-                {
-                    flagZero = true;
-                }
-                if (specialDate != null && !flagZero)
-                {
-                    if (specialDate.getIsWeekend())
-                        //1.6
-                        return false;
-                }
                 else
-                {
-                    //1.5.4
-                    if (CalendarUtils.getDayOfWeek(dateDone) == Calendar.SATURDAY) {
-                        if (DAOReadonlyService.getInstance().isSixWorkWeekOrg(idOfOrg)) {
-                            //1.7
-                            return true;
-                        } else {
-                            //1.6
-                            return false;
-                        }
-                    }
-                    //1.6
                     return false;
-                }
-                //1.7
-                return  true;
             }
+
+            SpecialDate specialDateOrg;
+            try {
+                specialDateOrg = DAOUtils.findSpecialDate(session, compositeId);
+                if (specialDateOrg.getDeleted())
+                    specialDateOrg = null;
+            } catch (Exception e) {
+                specialDateOrg = null;
+            }
+
+            if (specialDateOrg != null)
+            {
+                if (!specialDateOrg.getIsWeekend())
+                    return true;
+                else
+                    return false;
+            }
+            return true;
         }
         catch (Exception e)
         {

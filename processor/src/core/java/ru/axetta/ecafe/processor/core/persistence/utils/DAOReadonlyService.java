@@ -744,4 +744,16 @@ public class DAOReadonlyService {
             return new ArrayList<>();
         }
     }
+
+    public boolean isSixWorkWeekGroup(Long orgId, Long idOfClientGroup) {
+        try {
+            String groupName = getClientGroupName(orgId, idOfClientGroup);
+            return (boolean)entityManager.createQuery("select distinct gnto.isSixDaysWorkWeek from GroupNamesToOrgs gnto where gnto.idOfOrg = :idOfOrg and gnto.groupName = :groupName")
+                    .setParameter("idOfOrg", orgId)
+                    .setParameter("groupName", groupName)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return false;
+        }
+    }
 }
