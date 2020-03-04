@@ -282,8 +282,10 @@ public class ImportRegisterOrgsService {
                         org.setBtiUnad(orgRegistryChangeItem.getUnad());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_INN)))
                         org.setINN(orgRegistryChangeItem.getInn());
-                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_GUID)))
-                        org.setGuid(orgRegistryChange.getGuid());
+                    if (!RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION).equals(Option.NSI3)) {
+                        if ((fieldFlags == null) || (fieldFlags.contains(VALUE_GUID)))
+                            org.setGuid(orgRegistryChange.getGuid());
+                    }
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_EKIS_ID)))
                         org.setEkisId(orgRegistryChange.getEkisId());
                     if ((fieldFlags == null) || (fieldFlags.contains(VALUE_UNIQUE_ADDRESS_ID))) {
