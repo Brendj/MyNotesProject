@@ -2711,12 +2711,71 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
-    public boolean isGoodDate(Session session, Long idOfOrg, Long idOfGroup, Date dateReq) {
+    public boolean isGoodDate(Session session, Long idOfOrg, Long idOfGroup, Date dateReq, Date startDate, Date endDate) {
         try {
-            Date currentDate = new Date();
-            currentDate = CalendarUtils.startOfDay(currentDate);
+            List<ProductionCalendar> productionCalendars = DAOUtils.getAllDateFromProdactionCalendarDates(session, startDate, endDate);
 
-            List<ProductionCalendar> productionCalendars = DAOUtils.getAllDateFromProdactionCalendarForFutureDates(session);
+            Date currentDate  = CalendarUtils.startOfDay(dateReq);
+
+            for (ProductionCalendar productionCalendar : productionCalendars) {
+                if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(currentDate)) {
+                   ///
+                    //Идем в ПК, дата Д есть и указано что праздник (2) - то ничего не отдаем
+                    if (productionCalendar.getFlag() == 2)
+                        return false;
+                    //В ПК дата Д есть и указано  что выходной (1)
+                    if (productionCalendar.getFlag() == 1)
+                    {
+                        CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(idOfOrg,
+                                CalendarUtils.addHours(dateReq, 3));
+                        SpecialDate specialDateGroup;
+                        try {
+                            specialDateGroup = DAOUtils.findSpecialDateWithGroup(session, compositeId, idOfGroup);
+                            if (specialDateGroup.getDeleted())
+                                specialDateGroup = null;
+                        } catch (Exception e) {
+                            specialDateGroup = null;
+                        }
+
+                        if (specialDateGroup != null)
+                        {
+                            if (!specialDateGroup.getIsWeekend())
+                                return true;
+                            else
+                                return false;
+                        }
+
+                        SpecialDate specialDateOrg;
+                        try {
+                            specialDateOrg = DAOUtils.findSpecialDate(session, compositeId);
+                            if (specialDateOrg.getDeleted())
+                                specialDateOrg = null;
+                        } catch (Exception e) {
+                            specialDateOrg = null;
+                        }
+
+                        if (specialDateOrg != null)
+                        {
+                            if (!specialDateOrg.getIsWeekend())
+                                return true;
+                            else
+                                return false;
+                        }
+
+                        //2.1.4 В  КУДе (cf_specialdates)  для ид орг и  ид группы (п.2.1)  отсутствует или удалены, тогда проверяем - данная дата приходится на день недели «Суббота»:,
+                        if (CalendarUtils.getDayOfWeek(dateReq) == Calendar.SATURDAY) {
+                            if (DAOReadonlyService.getInstance().isSixWorkWeekOrg(idOfOrg)) {
+                                return true;
+                            } else {
+                                return false;
+                            }
+                        }
+                    }
+                    ///
+                }
+            }
+
+
 
             //1.1.1.1
             boolean flag;
