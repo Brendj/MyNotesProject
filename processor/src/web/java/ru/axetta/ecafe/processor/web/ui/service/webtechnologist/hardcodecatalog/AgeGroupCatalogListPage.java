@@ -6,8 +6,8 @@ package ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.hardcodecatalog.HardCodeCatalogService;
-import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.hardcodecatalog.WTAgeGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.HardCodeCatalogService;
+import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.WTAgeGroupItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
