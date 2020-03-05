@@ -94,28 +94,28 @@
     <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" id="specialDatesFileLoaderPanel">
         <rich:panel>
 
-            <h:panelGrid columns="2">
+            <h:panelGrid columns="2" id="filter">
 
                 <h:outputText escape="true" value="Использовать правило для Web-АРМа" styleClass="output-text"/>
 
-<%--                <f:setPropertyActionListener value="#{ruleEditPage}" target="#{ruleEditPage.switchWt()}"/>--%>
-<%--                <a4j:commandLink reRender="wtComplexesTable" rendered="#{ruleEditPage.wt}"--%>
-<%--                                 action="#{ruleEditPage.switchWt()}">--%>
+                <a4j:commandLink reRender="filter">
+                    <f:setPropertyActionListener value="#{ruleEditPage}" target="#{ruleEditPage.wt}"/>
+                    <h:selectBooleanCheckbox id="arm" value="#{ruleEditPage.wt}"/>
+                </a4j:commandLink>
 
-                    <h:selectBooleanCheckbox id="arm" value="#{ruleEditPage.wt}" onchange="#{ruleEditPage.switchWt()}" />
-<%--                </a4j:commandLink>--%>
-
-                <h:outputText escape="true" value="Тип комплекса" styleClass="output-text" rendered="#{ruleEditPage.wt}"/>
+                <h:outputText escape="true" value="Тип комплекса" styleClass="output-text"
+                              rendered="#{ruleEditPage.showFilter}"/>
 
                 <h:selectOneMenu id="typeMenu" value="#{ruleEditPage.complexType}"
-                                 style="width:300px;" styleClass="groupSelect" rendered="#{ruleEditPage.wt}">
+                                 style="width:300px;" styleClass="groupSelect" rendered="#{ruleEditPage.showFilter}">
                     <f:selectItems value="#{ruleEditPage.complexTypes}"/>
                 </h:selectOneMenu>
 
-                <h:outputText escape="true" value="Возрастная категория" styleClass="output-text" rendered="#{ruleEditPage.wt}"/>
+                <h:outputText escape="true" value="Возрастная категория" styleClass="output-text"
+                              rendered="#{ruleEditPage.showFilter}"/>
 
                 <h:selectOneMenu id="ageMenu" value="#{ruleEditPage.ageGroup}"
-                                 style="width:300px;" styleClass="groupSelect" rendered="#{ruleEditPage.wt}">
+                                 style="width:300px;" styleClass="groupSelect" rendered="#{ruleEditPage.showFilter}">
                     <f:selectItems value="#{ruleEditPage.ageGroups}"/>
                 </h:selectOneMenu>
 

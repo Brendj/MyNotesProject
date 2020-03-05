@@ -71,7 +71,8 @@ public class RuleEditPage extends BasicWorkspacePage
     private List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
     private Map<Integer, Long> complexTypeMap;
     private Map<Integer, Long> ageGroupMap;
-    boolean wt = true;
+    boolean wt = false;
+    boolean showFilter = false;
 
     //// Веб-технолог ////
 
@@ -150,12 +151,6 @@ public class RuleEditPage extends BasicWorkspacePage
         complexType = -1;
         ageGroup = -1;
     }
-
-    public void switchWt() throws Exception {
-        wt = !wt;
-        //fillWtSelectedComplexes();
-    }
-
 
     //// Old ////
 
@@ -778,5 +773,14 @@ public class RuleEditPage extends BasicWorkspacePage
 
     public void setWt(boolean wt) {
         this.wt = wt;
+        this.showFilter = wt;
+    }
+
+    public boolean isShowFilter() {
+        return showFilter;
+    }
+
+    public void setShowFilter(boolean showFilter) {
+        this.showFilter = showFilter;
     }
 }
