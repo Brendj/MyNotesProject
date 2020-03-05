@@ -47,7 +47,6 @@ import java.io.*;
 import java.nio.charset.Charset;
 import java.security.NoSuchAlgorithmException;
 import java.text.DateFormat;
-import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -169,6 +168,12 @@ public class OtherActionsPage extends OnlineReportPage {
         RuntimeContext.getAppContext().getBean(EventNotificationService.class).
                 sendSMS(client, null, EventNotificationService.NOTIFICATION_BALANCE_TOPUP, values, new Date()); //DEF
         printMessage("Пробное  событие успешно отправлено на ЕМП");
+    }
+
+    public void cleaningMenu() {
+        MaintenanceService maintenanceService = new MaintenanceService();
+        maintenanceService.run();
+        printMessage("Очистка выполнена. Смотри лог");
     }
 
     public void runSendEMPEventEMIAS() throws Exception {

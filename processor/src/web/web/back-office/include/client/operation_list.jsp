@@ -665,7 +665,169 @@
     </f:facet>
 </rich:dataTable>
 
+    <h:outputText value="История уведомлений Geoplaner (для владельцев Smart-часов):"/>
+    <rich:dataTable id="clientGeoplanerJournal" var="geoplanerJournal" value="#{mainPage.clientOperationListPage.geoplanerNotificationJournalList}"
+                    rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer" rows="8"
+                    columns="10">
+
+        <f:facet name="header">
+            <rich:columnGroup>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="ID OO" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Название ОО" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="ID события прохода" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="ID покупки" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="ID пополнения клиента" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Сервер отправки" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Дата создания записи" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="HTTP-код ответа сервера" styleClass="column-header"/>
+                </rich:column>
+                <rich:column headerClass="column-header">
+                    <h:outputText escape="true" value="Текст ошибки" styleClass="column-header"/>
+                </rich:column>
+            </rich:columnGroup>
+        </f:facet>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.org.idOfOrg}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.org.shortName}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.idOfEnterEvents}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.idOfOrder}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.idOfClientPayment}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.nodeName}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.createDate}" styleClass="output-text" converter="timeMinuteConverter"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.response}" styleClass="output-text"/>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <h:outputText escape="true" value="#{geoplanerJournal.errorText}" styleClass="output-text"/>
+        </rich:column>
+
+        <f:facet name="footer">
+            <rich:datascroller for="clientGeoplanerJournal" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                               stepControls="auto" boundaryControls="hide">
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png"/>
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png"/>
+                </f:facet>
+            </rich:datascroller>
+        </f:facet>
+    </rich:dataTable>
+
 <h:outputText value="Регулярные платежи:" />
+<rich:panel headerClass="workspace-panel-header">
+    <f:facet name="header">
+        <h:outputText escape="true" value="Автоплатежи" />
+    </f:facet>
+    <h:outputText value="Подписки на автопополнение баланса:" styleClass="output-text"/>
+    <rich:dataTable id="clientBankSubscriptions" value="#{mainPage.clientOperationListPage.bankSubscriptions}" var="sub" rows="8"
+                    rowKeyVar="row" columnClasses="right-aligned-column, left-aligned-column, center-aligned-column, right-aligned-column, right-aligned-column,
+                    left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column" footerClass="data-table-footer">
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="№" />
+            </f:facet>
+            <h:outputText escape="true" value="#{row + 1}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Ид подписки" />
+            </f:facet>
+            <h:outputText escape="true" value="#{sub.idOfSubscription}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Телефон представителя" />
+            </f:facet>
+            <h:outputText escape="true" value="#{sub.mobile}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата подключения" />
+            </f:facet>
+            <h:outputText escape="true" value="#{sub.activationDate}" styleClass="output-text"
+                          converter="timeConverter" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата окончания" />
+            </f:facet>
+            <h:outputText escape="true" value="#{sub.validToDate}" styleClass="output-text" converter="dateConverter" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Кол-во месяцев" />
+            </f:facet>
+            <h:outputText escape="true" value="#{sub.monthsCount}" styleClass="output-text" rendered="#{sub.showMonthsCount()}" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата отключения" />
+            </f:facet>
+            <h:outputText escape="true" value="#{sub.deactivationDate}" styleClass="output-text"
+                          converter="dateConverter" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Активная" />
+            </f:facet>
+            <h:outputText escape="true" value='#{sub.active ? "Да" : "Нет"}' styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Порог баланса" />
+            </f:facet>
+            <h:outputText escape="true" value="#{sub.thresholdAmount}" styleClass="output-text"
+                          converter="copeckSumConverter" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Сумма пополнения" />
+            </f:facet>
+            <h:outputText escape="true" value="#{sub.paymentAmount}" styleClass="output-text"
+                          converter="copeckSumConverter" />
+        </rich:column>
+        <f:facet name="footer">
+            <rich:datascroller for="clientBankSubscriptions" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                               stepControls="auto" boundaryControls="hide">
+                <f:facet name="previous">
+                    <h:graphicImage value="/images/16x16/left-arrow.png" />
+                </f:facet>
+                <f:facet name="next">
+                    <h:graphicImage value="/images/16x16/right-arrow.png" />
+                </f:facet>
+            </rich:datascroller>
+        </f:facet>
+    </rich:dataTable>
+<h:outputText value="Регулярные платежи:" styleClass="output-text"/>
 <rich:dataTable id="regularPaymentsTable" var="pay" value="#{mainPage.clientOperationListPage.regularPayments}"
                 rowKeyVar="row" footerClass="data-table-footer" rows="8"
                 columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, left-aligned-column">
@@ -677,23 +839,22 @@
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
-            <h:outputText escape="true" value="Идентификатор" />
+            <h:outputText escape="true" value="Ид подписки" />
+        </f:facet>
+        <h:outputText escape="true" value="#{pay.bankSubscription.idOfSubscription}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Ид запроса" />
         </f:facet>
         <h:outputText escape="true" value="#{pay.idOfPayment}" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
-            <h:outputText escape="true" value="Время платежа" />
+            <h:outputText escape="true" value="Время запроса" />
         </f:facet>
         <h:outputText escape="true" value="#{pay.paymentDate}" styleClass="output-text"
                       converter="timeMinuteConverter" />
-    </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Сумма" />
-        </f:facet>
-        <h:outputText escape="true" value="#{pay.paymentAmount}" styleClass="output-text"
-                      converter="copeckSumConverter" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
@@ -704,15 +865,22 @@
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
-            <h:outputText escape="true" value="Платеж успешный" />
+            <h:outputText escape="true" value="Время платежа" />
         </f:facet>
-        <h:outputText escape="true" value='#{pay.success ? "Да" : "Нет"}' styleClass="output-text" />
+        <h:outputText escape="true" value="#{pay.clientPayment.createTime}" styleClass="output-text"
+                      converter="timeMinuteConverter" />
     </rich:column>
     <rich:column headerClass="column-header">
         <f:facet name="header">
-            <h:outputText escape="true" value="RRN транзакции" />
+            <h:outputText escape="true" value="Код ошибки" />
         </f:facet>
-        <h:outputText escape="true" value="#{pay.rrn}" styleClass="output-text" />
+        <h:outputText escape="true" value="#{pay.errorCode}" styleClass="output-text" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <f:facet name="header">
+            <h:outputText escape="true" value="Описание ошибки" />
+        </f:facet>
+        <h:outputText escape="true" value="#{pay.errorDesc}" styleClass="output-text" />
     </rich:column>
     <f:facet name="footer">
         <rich:datascroller for="regularPaymentsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
@@ -726,7 +894,7 @@
         </rich:datascroller>
     </f:facet>
 </rich:dataTable>
-
+</rich:panel>
 
 <h:outputText value="Перемещения внутри ОО:" />
 <rich:dataTable id="clientGroupMigrationHistoriesTable" var="gMig"

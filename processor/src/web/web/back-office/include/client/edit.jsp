@@ -235,6 +235,12 @@
         </rich:column>
         <rich:column headerClass="column-header" width="150">
             <f:facet name="header">
+                <h:outputText escape="true" value="Самостоятельный предзаказ" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{clientGuardian.allowedPreorders}" disabled="true" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header" width="150">
+            <f:facet name="header">
                 <h:outputText escape="true" value="Законный представитель" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientGuardian.legalRepresentative}" styleClass="output-text" />
@@ -319,6 +325,12 @@
                 <h:outputText escape="true" value="Согласие на предзаказ" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientWard.informedSpecialMenu}" disabled="true" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Самостоятельный предзаказ" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{clientWard.allowedPreorders}" disabled="true" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -414,6 +426,8 @@
     <h:outputText escape="true" value="Клиент может подтверждать групповые платежи (для сотрудников школы, отвечающих за работу с системой)" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.canConfirmGroupPayment}" styleClass="output-text"
                              disabled="true"  readonly="true"/>
+    <h:outputText escape="true" value="Согласие на видеоидентификацию" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.confirmVisualRecognition}" styleClass="output-text" />
     <h:outputText escape="true" value="Пользователь ОП" styleClass="output-text"
                   rendered="#{mainPage.clientEditPage.isEligibleToViewUserOP()}" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.userOP}" styleClass="output-text" disabled="true"

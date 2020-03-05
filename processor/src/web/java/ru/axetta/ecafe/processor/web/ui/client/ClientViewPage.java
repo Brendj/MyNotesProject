@@ -8,8 +8,8 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.items.ClientDiscountItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.image.ImageUtils;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.regularPaymentSubscription.BankSubscription;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ClientBalanceHoldService;
@@ -117,6 +117,22 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.canConfirmGroupPayment = canConfirmGroupPayment;
     }
 
+    public void setConfirmVisualRecognition(Boolean confirmVisualRecognition) {
+        this.confirmVisualRecognition = confirmVisualRecognition;
+    }
+
+    public Boolean getConfirmVisualRecognition() {
+        return confirmVisualRecognition;
+    }
+
+    public Boolean getInformedSpecialMenu() {
+        return informedSpecialMenu;
+    }
+
+    public void setInformedSpecialMenu(Boolean informedSpecialMenu) {
+        this.informedSpecialMenu = informedSpecialMenu;
+    }
+
     public static class PersonData {
 
         private final String firstName;
@@ -194,7 +210,6 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String clientGUID;
     private String clientSSOID;
     private String clientIacRegId;
-    private List<BankSubscription> bankSubscriptions;
     private Integer gender;
     private Date birthDate;
     private Boolean disablePlanCreation;
@@ -205,6 +220,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Long balanceToNotify;
     private Date lastConfirmMobile;
     private Boolean specialMenu;
+    private Boolean informedSpecialMenu;
     private String passportNumber;
     private String passportSeries;
     private String cardRequest;
@@ -213,6 +229,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private Boolean visitsSections;
     private String parallel;
     private Boolean canConfirmGroupPayment;
+    private Boolean confirmVisualRecognition;
     private Boolean userOP;
     private Long idOfClientGroup;
 
@@ -407,14 +424,6 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.wasSuspended = wasSuspended;
     }
 
-    public List<BankSubscription> getBankSubscriptions() {
-        return bankSubscriptions;
-    }
-
-    public void setBankSubscriptions(List<BankSubscription> bankSubscriptions) {
-        this.bankSubscriptions = bankSubscriptions;
-    }
-
     public void setIdOfClient(Long idOfClient) {
         this.idOfClient = idOfClient;
     }
@@ -535,6 +544,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.multiCardMode = client.activeMultiCardMode();
         this.clientDiscountItems = buildClientDiscountItem(session, client);
         this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
+        this.confirmVisualRecognition = client.getConfirmVisualRecognition();
 
         // опекуны
         // (Kadyrov D) 23.12.2011
@@ -555,11 +565,6 @@ public class ClientViewPage extends BasicWorkspacePage {
 
         this.middleGroup = client.getMiddleGroup();
 
-        Criteria bankSubscriptionCriteria = session.createCriteria(BankSubscription.class);
-        bankSubscriptionCriteria.add(Restrictions.eq("client", client))
-                .add(Restrictions.isNotNull("activationDate"));
-        this.bankSubscriptions = (List<BankSubscription>) bankSubscriptionCriteria.list();
-
         this.wasSuspended = DAOUtils.wasSuspendedLastSubscriptionFeedingByClient(session, idOfClient);
 
         this.clientGuardianItems = loadGuardiansByClient(session, idOfClient);
@@ -578,6 +583,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         }
 
         this.specialMenu = client.getSpecialMenu();
+        this.informedSpecialMenu = ClientManager.getInformedSpecialMenu(session, client.getIdOfClient(), null);
         this.passportNumber = client.getPassportNumber();
         this.passportSeries = client.getPassportSeries();
         this.cardRequest = DAOUtils.getCardRequestString(session, client);

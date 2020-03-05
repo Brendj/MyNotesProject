@@ -11,7 +11,7 @@
             <generator class="hilo">
                 <param name="table">CF_Generators</param>
                 <param name="column">IdOfMenuDetail</param>
-                <param name="max_lo">256</param>
+                <param name="max_lo">512</param>
             </generator>
         </id>
         <many-to-one name="menu" class="ru.axetta.ecafe.processor.core.persistence.Menu" column="IdOfMenu"

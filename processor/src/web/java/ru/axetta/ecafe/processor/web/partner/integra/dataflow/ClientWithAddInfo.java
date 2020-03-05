@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType;
 public class ClientWithAddInfo {
     private ClientCreatedFromType clientCreatedFrom;
     private Integer informedSpecialMenu;
+    private Integer preorderAllowed;
     private boolean disabled;
 
     public ClientCreatedFromType getClientCreatedFrom() {
@@ -36,5 +37,13 @@ public class ClientWithAddInfo {
 
     public void setDisabled(boolean disabled) {
         this.disabled = disabled;
+    }
+
+    public Integer getPreorderAllowed() {
+        return preorderAllowed;
+    }
+
+    public void setPreorderAllowed(Integer preorderAllowed) {
+        this.preorderAllowed = preorderAllowed;
     }
 }

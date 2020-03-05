@@ -35,8 +35,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 @Component("PreorderRequestsReportService")
 @Scope("singleton")
@@ -196,6 +196,7 @@ public class PreorderRequestsReportService extends RecoverableService {
 
                             OrgGoodRequest orgGoodRequest = new OrgGoodRequest(idOfOrg, dateWork);
                             session.save(orgGoodRequest);
+                            DAOUtils.savePreorderDirectiveWithValue(session, idOfOrg, true);
                         } catch (Exception e) {
                             transaction.rollback();
                             logger.error(String.format("Error in generate request for orgID = %s: ", idOfOrg), e);

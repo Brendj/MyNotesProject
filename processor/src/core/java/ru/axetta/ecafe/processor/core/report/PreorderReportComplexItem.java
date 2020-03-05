@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.report;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
+import java.util.Objects;
 
 public class PreorderReportComplexItem extends PreorderReportItem {
     private List<PreorderReportItem> dishes;
@@ -66,6 +67,50 @@ public class PreorderReportComplexItem extends PreorderReportItem {
                 this.amount = 1;
         } else {
             this.preorderSum = this.preorderPrice * this.amount;
+        }
+    }
+
+    public static class HashMapCompositeKey {
+        private String complexName;
+        private Long complexPrice;
+
+        public HashMapCompositeKey(String complexName, Long complexPrice) {
+            this.complexName = complexName;
+            this.complexPrice = complexPrice;
+        }
+
+        public String getComplexName() {
+            return complexName;
+        }
+
+        public void setComplexName(String complexName) {
+            this.complexName = complexName;
+        }
+
+        public Long getComplexPrice() {
+            return complexPrice;
+        }
+
+        public void setComplexPrice(Long complexPrice) {
+            this.complexPrice = complexPrice;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) {
+                return true;
+            }
+            if (!(o instanceof HashMapCompositeKey)) {
+                return false;
+            }
+            HashMapCompositeKey that = (HashMapCompositeKey) o;
+            return Objects.equals(getComplexName(), that.getComplexName()) && Objects
+                    .equals(getComplexPrice(), that.getComplexPrice());
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(getComplexName(), getComplexPrice());
         }
     }
 }

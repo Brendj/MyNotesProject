@@ -17,6 +17,9 @@ import ru.axetta.ecafe.processor.core.service.SMSSubscriptionFeeService;
  */
 public class Option {
 
+    public static final String NSI2="НСИ-2";
+    public static final String NSI3="НСИ-3";
+
     public final static int OPTION_WITH_OPERATOR=2,
             OPTION_NOTIFY_BY_SMS_ABOUT_ENTER_EVENT=3,
             OPTION_CLEAN_MENU=4,
@@ -34,6 +37,8 @@ public class Option {
             OPTION_REQUEST_SYNC_RETRY_AFTER=16,
             OPTION_REQUEST_SYNC_LIMITFILTER=17,
             OPTION_RESTRICT_FULL_SYNC_PERIODS=18,
+            OPTION_SIMULTANEOUS_SYNC_THREADS=19,
+            OPTION_SIMULTANEOUS_SYNC_TIMEOUT=20,
 
             OPTION_CHRONOPAY_SECTION=1000,
             OPTION_CHRONOPAY_RATE=1001,
@@ -157,7 +162,8 @@ public class Option {
             OPTION_MENU_SYNC_EXPRESSION = 100203,
             OPTION_PHOTO_SYNC_EXPRESSION = 100204,
             OPTION_LIB_SYNC_EXPRESSION = 100205,
-            OPTION_PERIOD_OF_EXTENSION_CARDS = 101101;
+            OPTION_PERIOD_OF_EXTENSION_CARDS = 101101,
+            OPTION_NSI_VERSION = 100206;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -175,12 +181,14 @@ public class Option {
             OPTION_REQUEST_SYNC_RETRY_AFTER, "3600",
             OPTION_REQUEST_SYNC_LIMITFILTER, "200",
             OPTION_RESTRICT_FULL_SYNC_PERIODS, "",
+            OPTION_SIMULTANEOUS_SYNC_THREADS, "50",
+            OPTION_SIMULTANEOUS_SYNC_TIMEOUT, "20",
             OPTION_SMPP_CLIENT_STATUS, "0",
             OPTION_CHRONOPAY_SECTION, "1", 
             OPTION_RBK_SECTION, "1", 
             OPTION_CHRONOPAY_RATE, "3.3", 
             OPTION_RBK_RATE, "3",
-            OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION, "365",
+            OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION, "730",
             OPTION_SMS_PAYMENT_TYPE, String.valueOf(SMSSubscriptionFeeService.SMS_PAYMENT_BY_THE_PIECE),
             OPTION_SMS_DEFAULT_SUBSCRIPTION_FEE, "0",
             OPTION_ENABLE_BALANCE_AUTOREFILL, "",
@@ -292,7 +300,8 @@ public class Option {
             OPTION_MENU_SYNC_EXPRESSION, "04:00-13:00;13:00-22:00",
             OPTION_PHOTO_SYNC_EXPRESSION, "04:00-07:00",
             OPTION_LIB_SYNC_EXPRESSION, "16:00-22:00",
-            OPTION_PERIOD_OF_EXTENSION_CARDS, "12"
+            OPTION_PERIOD_OF_EXTENSION_CARDS, "12",
+            OPTION_NSI_VERSION, NSI2
 };
 
     private Long idOfOption;

@@ -246,6 +246,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     org.setIsWorkInSummerTime(item.getIsWorkInSummerTime());
 
                     org.setOrgStructureVersion(nextOrgVersion);
+                    org.setOrgSettingsSyncParam(Boolean.TRUE);
                     session.update(org);
 
                     logger.info("Success");

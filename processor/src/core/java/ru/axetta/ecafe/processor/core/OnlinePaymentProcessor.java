@@ -85,7 +85,8 @@ public class OnlinePaymentProcessor {
 
     public static PayResponse generateErrorResponse(PaymentProcessResult result) {
         return new OnlinePaymentProcessor.PayResponse(0, true, result.getCode(),
-            result.getDescription(), null, null, null, null, null, null, null, null, null, null);
+            result.getDescription(), null, null, null, null, null,
+                null, null, null, null, null);
     }
 
     public static class PayRequest {
@@ -218,7 +219,8 @@ public class OnlinePaymentProcessor {
         private String kpp;
 
         public PayResponse(int protoVersion, boolean bCheckOnly, int resultCode, String resultDescription, Long tspContragentId, Long clientId, String paymentId,
-                Long balance, Long subBalance1, String clientFirstName, String clientSurname, String clientSecondName, Long cardPrintedNo, HashMap<String, String> addInfo) {
+                Long balance, Long subBalance1, String clientFirstName, String clientSurname, String clientSecondName, Long cardPrintedNo,
+                HashMap<String, String> addInfo) {
             this.protoVersion = protoVersion;
             this.bCheckOnly = bCheckOnly;
             this.resultCode=resultCode;
@@ -462,6 +464,10 @@ public class OnlinePaymentProcessor {
 
         public void setKpp(String kpp) {
             this.kpp = kpp;
+        }
+
+        public String processFio() {
+            return String.format("%s %s %.1s.", clientFirstName, clientSecondName, clientSurname);
         }
     }
 

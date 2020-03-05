@@ -52,6 +52,10 @@ public class ClientSummaryBase {
     private Integer groupPredefined;
     @XmlAttribute(name = "Gender")
     private Integer gender;
+    @XmlAttribute(name = "PreorderAllowed")
+    private Integer preorderAllowed;
+    @XmlAttribute(name = "Address")
+    private String address;
     /**
      *
      * Gets the value of the contractId property.
@@ -337,5 +341,21 @@ public class ClientSummaryBase {
 
     public void setGender(Integer gender) {
         this.gender = gender;
+    }
+
+    public Integer getPreorderAllowed() {
+        return preorderAllowed;
+    }
+
+    public void setPreorderAllowed(Integer preorderAllowed) {
+        this.preorderAllowed = preorderAllowed;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

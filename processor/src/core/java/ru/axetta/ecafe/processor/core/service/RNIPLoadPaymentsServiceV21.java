@@ -630,6 +630,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         } catch (Exception e) {
             responseMessageToSave[0] = "100 - Internal Error";
             loggerGetResponse.error("Error in GetResponseRequest to rnip 2.1", e);
+            throw e;
         }
         RnipDAOService.getInstance().saveAsProcessed(rnipMessage, responseMessageToSave[0], responseMessageToSave[1], rnipMessage.getEventType());
     }

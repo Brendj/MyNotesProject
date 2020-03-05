@@ -269,8 +269,12 @@ public class PaymentProcessorImpl implements PaymentProcessor {
                 persistenceTransaction = null;
                 RuntimeContext.getAppContext().getBean(PaymentNotificator.class).sendNotification(clientPayment, client, subBalanceNum);
                 if(GeoplanerManager.isOn() && client.clientHasActiveSmartWatch()){
-                    GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
-                    manager.sendPaymentInfoToGeoplaner(clientPayment, client);
+                    try {
+                        GeoplanerManager manager = RuntimeContext.getAppContext().getBean(GeoplanerManager.class);
+                        manager.sendPaymentInfoToGeoplaner(clientPayment, client);
+                    } catch (Exception exc){
+                        logger.error("Can't send to Geoplaner JSON with Payments: ", exc);
+                    }
                 }
             } finally {
                 HibernateUtils.rollback(persistenceTransaction, logger);

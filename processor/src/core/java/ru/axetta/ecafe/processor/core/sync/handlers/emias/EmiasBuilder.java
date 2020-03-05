@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.emias;
 
-import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequestBuilder;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;

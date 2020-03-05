@@ -13,9 +13,11 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.Transaction;
+import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
@@ -250,7 +252,7 @@ public class CardManagerProcessor implements CardManager {
             persistenceTransaction = persistenceSession.beginTransaction();
 
             updateCardInSession(persistenceSession, idOfClient, idOfCard, cardType, state, validTime, lifeState,
-            lockReason, issueTime, externalId, cardOperatorUser, idOfOrg, informationAboutCard);
+            lockReason, issueTime, externalId, cardOperatorUser, idOfOrg, informationAboutCard, false);
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -261,7 +263,7 @@ public class CardManagerProcessor implements CardManager {
     }
 
     public void updateCardInSession(Session persistenceSession, Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
-            String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg, String informationAboutCard) throws Exception {
+            String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg, String informationAboutCard, boolean ignoreValidTime) throws Exception {
         String additionalInfoAboutCard = StringUtils.isBlank(informationAboutCard) ? "" : " (" + informationAboutCard + ")";
         Client newCardOwner = getClientReference(persistenceSession, idOfClient);
         Card updatedCard = getCardReference(persistenceSession, idOfCard);
@@ -269,6 +271,13 @@ public class CardManagerProcessor implements CardManager {
         if (CardTransitionState.GIVEN_AWAY.getCode().equals(updatedCard.getTransitionState()) &&
                 state != updatedCard.getState()) {
             throw new Exception("УИД карты передан в пользование другой ОО");
+        }
+
+        boolean clientHadCards = newCardOwner.getCards().size() > 0; //есть ли или были ли ранее у клиента хоть какие-то карты
+        if (!clientHadCards) {
+            Criteria criteria = persistenceSession.createCriteria(HistoryCard.class);
+            criteria.add(Restrictions.or(Restrictions.eq("formerOwner", newCardOwner), Restrictions.eq("newOwner", newCardOwner)));
+            clientHadCards = criteria.list().size() > 0;
         }
 
         if (state == Card.ACTIVE_STATE) {
@@ -316,15 +325,32 @@ public class CardManagerProcessor implements CardManager {
         updatedCard.setUpdateTime(new Date());
         updatedCard.setState(state);
         updatedCard.setLockReason(lockReason);
-        updatedCard.setValidTime(validTime);
-        updatedCard.setIssueTime(issueTime);
+        if (ignoreValidTime) {
+            Date validTo;
+            if (isSpecialSpbCard(updatedCard.getCardNo())) {
+                validTo = CalendarUtils.addYear(new Date(), 12);
+            } else {
+                validTo = clientHadCards ? CalendarUtils.addDays(new Date(), 10) : CalendarUtils.addYear(new Date(), 12);
+            }
+            if (oldClient != newClient) updatedCard.setValidTime(validTo); //дату действия меняем, если карту выдаем другому клиенту
+            updatedCard.setIssueTime(new Date());
+        } else {
+            updatedCard.setValidTime(validTime);
+            updatedCard.setIssueTime(issueTime);
+        }
         updatedCard.setLifeState(lifeState);
         updatedCard.setExternalId(externalId);
-        updatedCard.setUpdateTime(new Date());
         persistenceSession.update(updatedCard);
 
         persistenceSession.flush();
 
+    }
+
+    public static boolean isSpecialSpbCard(Long cardNo) {
+        boolean result = false;
+        String str = cardNo.toString();
+        if ((str.length() == 13 && !str.startsWith("1")) || str.length() == 15) result = true;
+        return result;
     }
 
     @Override
@@ -559,7 +585,7 @@ public class CardManagerProcessor implements CardManager {
         }
         AccountTransaction accountTransaction = null;
         accountTransaction = ClientAccountManager.processAccountTransaction(persistenceSession, client, null, -price, cardPrintedNo.toString(),
-                AccountTransaction.CUSTOMERS_CARD_REVEALING_TRANSACTION_SOURCE_TYPE, null, issueTime);
+                AccountTransaction.CUSTOMERS_CARD_REVEALING_TRANSACTION_SOURCE_TYPE, null, issueTime, null);
         createCard(persistenceSession, idOfClient, cardNo, cardType, state, validTime, lifeState,
                 lockReason, issueTime, cardPrintedNo, user, accountTransaction);
         persistenceSession.save(accountTransaction);

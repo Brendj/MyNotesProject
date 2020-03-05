@@ -89,6 +89,8 @@ public class OptionPage extends BasicWorkspacePage {
     private Boolean syncRegisterLogging;
     private Integer syncRegisterMaxAttempts;
     private Integer syncLimits;
+    private Integer simultaneousSyncThreads;
+    private Integer simultaneousSyncTimeout;
     private Integer retryAfter;
     private Integer syncLimitFilter;
     private String syncRestrictFullSyncPeriods;
@@ -145,6 +147,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String photoSyncExpressions;
     private String libSyncExpressions;
     private Integer periodOfExtensionCards;
+    private String nsiVersion;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString(), RNIPVersion.RNIP_V21.toString()};
 
@@ -842,6 +845,13 @@ public class OptionPage extends BasicWorkspacePage {
         return items;
     }
 
+    public SelectItem[] getNsiVersions() {
+        SelectItem[] items = new SelectItem[2];
+        items[0] = new SelectItem(Option.NSI2, Option.NSI2);
+        items[1] = new SelectItem(Option.NSI3, Option.NSI3);
+        return items;
+    }
+
     public Boolean getNotifyByPushNewClients() {
         return NotifyByPushNewClients;
     }
@@ -944,6 +954,8 @@ public class OptionPage extends BasicWorkspacePage {
         enableSubscriptionFeeding = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_SUBSCRIPTION_FEEDING);
         enableSubBalanceOperation = runtimeContext.getOptionValueBool(Option.OPTION_ENABLE_SUB_BALANCE_OPERATION);
         syncLimits = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITS);
+        simultaneousSyncThreads = runtimeContext.getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_THREADS);
+        simultaneousSyncTimeout = runtimeContext.getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT);
         retryAfter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_RETRY_AFTER);
         syncLimitFilter = runtimeContext.getOptionValueInt(Option.OPTION_REQUEST_SYNC_LIMITFILTER);
         arrayOfFilterText = runtimeContext.getOptionValueString(Option.OPTION_ARRAY_OF_FILTER_TEXT);
@@ -988,6 +1000,7 @@ public class OptionPage extends BasicWorkspacePage {
        menuSyncExpressions = runtimeContext.getOptionValueString(Option.OPTION_MENU_SYNC_EXPRESSION);
        photoSyncExpressions = runtimeContext.getOptionValueString(Option.OPTION_PHOTO_SYNC_EXPRESSION);
        libSyncExpressions = runtimeContext.getOptionValueString(Option.OPTION_LIB_SYNC_EXPRESSION);
+        nsiVersion = runtimeContext.getOptionValueString(Option.OPTION_NSI_VERSION);
 
         periodOfExtensionCards = runtimeContext.getOptionValueInt(Option.OPTION_PERIOD_OF_EXTENSION_CARDS);
 
@@ -1172,6 +1185,8 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_THIN_CLIENT_MIN__CLAIMS_EDITABLE_DAYS, thinClientMinClaimsEditableDays);
 
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITS, syncLimits);
+            runtimeContext.setOptionValue(Option.OPTION_SIMULTANEOUS_SYNC_THREADS, simultaneousSyncThreads);
+            runtimeContext.setOptionValue(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT, simultaneousSyncTimeout);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_RETRY_AFTER, retryAfter);
             runtimeContext.setOptionValue(Option.OPTION_REQUEST_SYNC_LIMITFILTER, syncLimitFilter);
             runtimeContext.setOptionValue(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS, syncRestrictFullSyncPeriods);
@@ -1228,6 +1243,7 @@ public class OptionPage extends BasicWorkspacePage {
             runtimeContext.setOptionValue(Option.OPTION_LIB_SYNC_EXPRESSION, libSyncExpressions);
 
             runtimeContext.setOptionValue(Option.OPTION_PERIOD_OF_EXTENSION_CARDS, periodOfExtensionCards);
+            runtimeContext.setOptionValue(Option.OPTION_NSI_VERSION, nsiVersion);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
@@ -1372,5 +1388,29 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setPeriodOfExtensionCards(Integer periodOfExtensionCards) {
         this.periodOfExtensionCards = periodOfExtensionCards;
+    }
+
+    public String getNsiVersion() {
+        return nsiVersion;
+    }
+
+    public void setNsiVersion(String nsiVersion) {
+        this.nsiVersion = nsiVersion;
+    }
+
+    public Integer getSimultaneousSyncThreads() {
+        return simultaneousSyncThreads;
+    }
+
+    public void setSimultaneousSyncThreads(Integer simultaneousSyncThreads) {
+        this.simultaneousSyncThreads = simultaneousSyncThreads;
+    }
+
+    public Integer getSimultaneousSyncTimeout() {
+        return simultaneousSyncTimeout;
+    }
+
+    public void setSimultaneousSyncTimeout(Integer simultaneousSyncTimeout) {
+        this.simultaneousSyncTimeout = simultaneousSyncTimeout;
     }
 }

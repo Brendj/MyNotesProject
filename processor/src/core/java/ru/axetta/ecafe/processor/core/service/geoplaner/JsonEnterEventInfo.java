@@ -6,11 +6,7 @@ package ru.axetta.ecafe.processor.core.service.geoplaner;
 
 import java.util.Date;
 
-public class JsonEnterEventInfo {
-    private Long cardNo;
-    private Long cardPrintedNo;
-    private String cardType;
-    private Long contractId;
+public class JsonEnterEventInfo extends GeoplanerEventInfo {
     private Date evtDateTime;
     private Integer direction;
     private String shortName;
@@ -48,38 +44,6 @@ public class JsonEnterEventInfo {
 
     public void setShortAddress(String shortAddress) {
         this.shortAddress = shortAddress;
-    }
-
-    public Long getCardNo() {
-        return cardNo;
-    }
-
-    public void setCardNo(Long cardNo) {
-        this.cardNo = cardNo;
-    }
-
-    public Long getCardPrintedNo() {
-        return cardPrintedNo;
-    }
-
-    public void setCardPrintedNo(Long cardPrintedNo) {
-        this.cardPrintedNo = cardPrintedNo;
-    }
-
-    public String getCardType() {
-        return cardType;
-    }
-
-    public void setCardType(String cardType) {
-        this.cardType = cardType;
-    }
-
-    public Long getContractId() {
-        return contractId;
-    }
-
-    public void setContractId(Long contractId) {
-        this.contractId = contractId;
     }
 
     public Long getActualBalance() {

@@ -43,6 +43,12 @@
 
         <many-to-one name="good" class="ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good" column="IdOfGood"/>
         <property name="sendToExternal" column="SendToExternal" type="ru.axetta.ecafe.processor.core.persistence.BoolType" not-null="true"/>
+        <property name="fRation" column="FRation">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.OrderDetailFRationType</param>
+                <param name="type">4</param>
+            </type>
+        </property>
 
         <set name="goodComplaintOrdersInternal" lazy="true" inverse="true">
             <key>

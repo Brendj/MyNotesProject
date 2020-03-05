@@ -264,6 +264,12 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
+                <h:outputText escape="true" value="Самостоятельный предзаказ" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{clientGuardian.allowedPreorders}" disabled="true" readonly="true" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
                 <h:outputText escape="true" value="Законный представитель" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientGuardian.legalRepresentative}" disabled="true" readonly="true" styleClass="output-text" />
@@ -329,6 +335,12 @@
                 <h:outputText escape="true" value="Согласие на предзаказ" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientWard.informedSpecialMenu}" disabled="true" readonly="true" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Самостоятельный предзаказ" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{clientWard.allowedPreorders}" disabled="true" readonly="true" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -411,12 +423,20 @@
     <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.specialMenu}" disabled="true" readonly="true"
                              styleClass="output-text" />
 
+    <h:outputText escape="true" value="Согласие на предзаказ получено" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.informedSpecialMenu}" disabled="true" readonly="true"
+                             styleClass="output-text" />
+
     <h:outputText escape="true" value="Режим выдачи нескольких активных карт" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.multiCardMode}" styleClass="output-text"
                              disabled="true"  readonly="true"/>
 
     <h:outputText escape="true" value="Клиент может подтверждать групповые платежи (для сотрудников школы, отвечающих за работу с системой)" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.canConfirmGroupPayment}" styleClass="output-text"
+                             disabled="true"  readonly="true"/>
+
+    <h:outputText escape="true" value="Согласие на видеоидентификацию" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientViewPage.confirmVisualRecognition}" styleClass="output-text"
                              disabled="true"  readonly="true"/>
 
     <h:outputText escape="true" value="Пользователь ОП" styleClass="output-text"
@@ -491,92 +511,6 @@
         </rich:column>
         <f:facet name="footer">
             <rich:datascroller for="clientCardTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
-                               stepControls="auto" boundaryControls="hide">
-                <f:facet name="previous">
-                    <h:graphicImage value="/images/16x16/left-arrow.png" />
-                </f:facet>
-                <f:facet name="next">
-                    <h:graphicImage value="/images/16x16/right-arrow.png" />
-                </f:facet>
-            </rich:datascroller>
-        </f:facet>
-    </rich:dataTable>
-</rich:panel>
-<rich:panel headerClass="workspace-panel-header" rendered="#{not empty mainPage.clientViewPage.bankSubscriptions}">
-    <f:facet name="header">
-        <h:outputText escape="true" value="Подписки на автопополнение баланса" />
-    </f:facet>
-    <rich:dataTable id="clientBankSubscriptions" value="#{mainPage.clientViewPage.bankSubscriptions}" var="sub" rows="8"
-                    rowKeyVar="row" columnClasses="right-aligned-column, left-aligned-column, center-aligned-column, right-aligned-column, right-aligned-column,
-                    left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column" footerClass="data-table-footer">
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="№" />
-            </f:facet>
-            <h:outputText escape="true" value="#{row + 1}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Дата подключения" />
-            </f:facet>
-            <h:outputText escape="true" value="#{sub.activationDate}" styleClass="output-text"
-                          converter="timeConverter" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Активная" />
-            </f:facet>
-            <h:outputText escape="true" value='#{sub.active ? "Да" : "Нет"}' styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Нижний порог баланса" />
-            </f:facet>
-            <h:outputText escape="true" value="#{sub.thresholdAmount}" styleClass="output-text"
-                          converter="copeckSumConverter" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Сумма пополнения" />
-            </f:facet>
-            <h:outputText escape="true" value="#{sub.paymentAmount}" styleClass="output-text"
-                          converter="copeckSumConverter" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Действительна до" />
-            </f:facet>
-            <h:outputText escape="true" value="#{sub.validToDate}" styleClass="output-text" converter="dateConverter" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Дата отключения" />
-            </f:facet>
-            <h:outputText escape="true" value="#{sub.deactivationDate}" styleClass="output-text"
-                          converter="dateConverter" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Последний успешный платеж" />
-            </f:facet>
-            <h:outputText escape="true" value="#{sub.lastSuccessfulPaymentDate}" styleClass="output-text"
-                          converter="timeConverter" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Последний неуспешный платеж" />
-            </f:facet>
-            <h:outputText escape="true" value="#{sub.lastUnsuccessfulPaymentDate}" styleClass="output-text"
-                          converter="timeConverter" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Номер карты" />
-            </f:facet>
-            <h:outputText escape="true" value="#{sub.maskedCardNumber}" styleClass="output-text" />
-        </rich:column>
-        <f:facet name="footer">
-            <rich:datascroller for="clientBankSubscriptions" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png" />

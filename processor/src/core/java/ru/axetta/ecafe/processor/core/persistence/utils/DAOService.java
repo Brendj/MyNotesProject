@@ -22,8 +22,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.Order;
 import org.hibernate.criterion.*;
+import org.hibernate.criterion.Order;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -892,13 +892,13 @@ public class DAOService {
         return q.getResultList();
     }
 
-    public Org findOrgByRegistryData(Long uniqueAddressId, String guid, String inn, Long unom, Long unad, Boolean skipThirdPart) {
+    public Org findOrgByRegistryDataByMainField(Long uniqueAddressId, String field_name, Object field_value, String inn, Long unom, Long unad, Boolean skipThirdPart) {
         //Новый алгоритм поиска организации в нашей БД по данным от реестров. Сраниваем в 3 этапа по разным наборам полей
         entityManager.setFlushMode(FlushModeType.COMMIT);
         javax.persistence.Query q;
         if (uniqueAddressId != null) {
-            q = entityManager.createQuery("from Org o left join fetch o.officialPerson p where o.guid=:guid and o.uniqueAddressId=:uniqueAddressId");
-            q.setParameter("guid", guid);
+            q = entityManager.createQuery(String.format("from Org o left join fetch o.officialPerson p where o.%s=:parameter and o.uniqueAddressId=:uniqueAddressId", field_name));
+            q.setParameter("parameter", field_value);
             q.setParameter("uniqueAddressId", uniqueAddressId);
             List<Org> orgs = q.getResultList();   //1 этап
             if (orgs != null && orgs.size() > 0) {
@@ -925,6 +925,17 @@ public class DAOService {
         } else {
             return null;
         }
+
+    }
+
+    public Org findOrgByRegistryData(Long uniqueAddressId, String guid, String inn, Long unom, Long unad, Boolean skipThirdPart) {
+        return findOrgByRegistryDataByMainField(uniqueAddressId, "guid", guid, inn, unom, unad, skipThirdPart);
+    }
+
+    public List<Org> findOrgsByEkisId(Long ekisId) {
+        Query q = entityManager.createQuery("select org from Org org where org.ekisId = :ekisId");
+        q.setParameter("ekisId", ekisId);
+        return q.getResultList();
     }
 
     public List<Org> findOrgsByGuidAddressINNOrNumber(String guid, String address, String inn, String number) {
@@ -2675,5 +2686,10 @@ public class DAOService {
         } catch (NoResultException e) {
             return null;
         }
+    }
+
+    public void saveNotificationOrder(NotificationOrders object) {
+        entityManager.persist(object);
+        entityManager.flush();
     }
 }

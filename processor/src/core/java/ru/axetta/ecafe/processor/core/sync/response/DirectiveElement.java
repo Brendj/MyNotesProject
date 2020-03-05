@@ -12,7 +12,6 @@ import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgReadOnlyRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.persistence.utils.OrgUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.sync.request.DirectivesRequest;
 
@@ -22,7 +21,6 @@ import org.w3c.dom.Element;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -43,6 +41,27 @@ public class DirectiveElement implements AbstractToElement{
         if(fullSync) {
             directiveItemList.add(new DirectiveItem("FullSync","1"));
             DAOUtils.falseFullSyncByOrg(session, org.getIdOfOrg());
+            DAOUtils.setValueForMenusSyncByOrg(session, org.getIdOfOrg(), false);
+            DAOUtils.setValueForOrgSettingsSyncByOrg(session, org.getIdOfOrg(), false);
+            DAOUtils.setValueForClientsSyncByOrg(session, org.getIdOfOrg(), false);
+        } else {
+            Boolean menusSyncParam = org.getMenusSyncParam();
+            if (menusSyncParam) {
+                directiveItemList.add(new DirectiveItem("DoMenusSync", "1"));
+                DAOUtils.setValueForMenusSyncByOrg(session, org.getIdOfOrg(), false);
+            }
+
+            Boolean orgSettingsSyncParam = org.getOrgSettingsSyncParam();
+            if (orgSettingsSyncParam) {
+                directiveItemList.add(new DirectiveItem("DoOrgSettingsSync", "1"));
+                DAOUtils.setValueForOrgSettingsSyncByOrg(session, org.getIdOfOrg(), false);
+            }
+
+            Boolean clientSyncParam = org.getClientsSyncParam();
+            if (clientSyncParam) {
+                directiveItemList.add(new DirectiveItem("DoClientsSync", "1"));
+                DAOUtils.setValueForClientsSyncByOrg(session, org.getIdOfOrg(), false);
+            }
         }
 
         Boolean commodityAccounting = org.getCommodityAccounting();
@@ -54,6 +73,12 @@ public class DirectiveElement implements AbstractToElement{
         }
 
         directiveItemList.add(new DirectiveItem("DoRequestsEZDSync", (org.getHaveNewLP())?"1":"0"));
+
+        Boolean preorderSync = org.getPreorderSyncParam();
+        if(preorderSync != null && preorderSync) {
+            directiveItemList.add(new DirectiveItem("PreorderSync","1"));
+            DAOUtils.savePreorderDirectiveWithValue(session, org.getIdOfOrg(), false);
+        }
     }
 
     public void processForFullSync(DirectivesRequest directivesRequest, Org org) throws Exception {

@@ -58,6 +58,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private String mailingListReports2;
     private String guid;
     private Long ekisId;
+    private String egissoId;
     private List<CategoryOrg> categoryOrg;
     private String configurationProviderName;
     private List<Long> idOfOrgList;
@@ -66,6 +67,7 @@ public class OrgViewPage extends BasicWorkspacePage {
     private boolean mainBuidling;
     private String city;
     private String district;
+    private String municipalDistrict;
     private String location;
     private String latitude;
     private String longitude;
@@ -107,6 +109,8 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Boolean payByCashier;
     private Boolean oneActiveCard;
     private Boolean changesDSZN;
+
+    private Boolean useWebArm;
 
     private SelectItem[] statusDetails = readStatusDetailsComboMenuItems();
 
@@ -163,6 +167,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.tag = org.getTag();
         this.city = org.getCity();
         this.district = org.getDistrict();
+        this.municipalDistrict = org.getMunicipalDistrict();
         this.location = org.getLocation();
         this.longitude = org.getLongitude();
         this.latitude = org.getLatitude();
@@ -191,6 +196,7 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.OGRN=org.getOGRN();
         this.guid = org.getGuid();
         this.ekisId = org.getEkisId();
+        this.egissoId = org.getEgissoId();
         this.commodityAccountingParam = org.getCommodityAccounting();
         this.disableEditingClientsFromAISReestr = org.getDisableEditingClientsFromAISReestr();
         this.usePlanOrders = org.getUsePlanOrders();
@@ -285,6 +291,8 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.multiCardModeEnabled = org.multiCardModeIsEnabled();
         this.participantOP = org.getParticipantOP();
         this.preorderlp = org.getPreorderlp();
+
+        this.useWebArm = org.getUseWebArm();
     }
 
     public String getFilterOrgs() {
@@ -789,5 +797,29 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setEkisId(Long ekisId) {
         this.ekisId = ekisId;
+    }
+
+    public String getEgissoId() {
+        return egissoId;
+    }
+
+    public void setEgissoId(String egissoId) {
+        this.egissoId = egissoId;
+    }
+
+    public String getMunicipalDistrict() {
+        return municipalDistrict;
+    }
+
+    public void setMunicipalDistrict(String municipalDistrict) {
+        this.municipalDistrict = municipalDistrict;
+    }
+
+    public Boolean getUseWebArm() {
+        return useWebArm;
+    }
+
+    public void setUseWebArm(Boolean useWebArm) {
+        this.useWebArm = useWebArm;
     }
 }

@@ -329,6 +329,15 @@ public class DAOReadonlyService {
         }
     }
 
+    public PreorderStatus findPreorderStatus(String guid, Date date) {
+        Query query = entityManager.createQuery("select ps from PreorderStatus ps where ps.guid = :guid and ps.date = :date");
+        query.setParameter("guid", guid);
+        query.setParameter("date", date);
+        List list = query.getResultList();
+        if (list.size() == 0) return null;
+        return (PreorderStatus) list.get(0);
+    }
+
     public TaloonApproval findTaloonApproval(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid, Long price) {
         try {
             Query query = entityManager.createQuery("SELECT taloon from TaloonApproval taloon "
@@ -343,6 +352,36 @@ public class DAOReadonlyService {
             query.setParameter("price", price);
             query.setParameter("goodsGuid", goodsGuid);
             return (TaloonApproval)query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public TaloonPreorder findTaloonPreorder(Long idOfOrg, Date taloonDate, Long complexId, String goodsGuid, Long price) {
+        try {
+            Query query = entityManager.createQuery("SELECT taloon from TaloonPreorder taloon "
+                    + "where taloon.idOfOrg = :idOfOrg "
+                    + "and taloon.taloonDate = :taloonDate "
+                    + "and taloon.complexId = :complexId "
+                    + "and taloon.price = :price "
+                    + "and taloon.goodsGuid = :goodsGuid");
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setParameter("taloonDate", taloonDate);
+            query.setParameter("complexId", complexId);
+            query.setParameter("price", price);
+            query.setParameter("goodsGuid", goodsGuid);
+            return (TaloonPreorder)query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public TaloonPreorder findTaloonPreorder(String guid) {
+        try {
+            Query query = entityManager.createQuery("SELECT taloon from TaloonPreorder taloon "
+                    + "where taloon.guid = :guid");
+            query.setParameter("guid", guid);
+            return (TaloonPreorder)query.getSingleResult();
         } catch (Exception e) {
             return null;
         }
@@ -383,6 +422,47 @@ public class DAOReadonlyService {
                     + goodsParam);
             query.setParameter("idOfOrg", idOfOrg);
             query.setParameter("taloonName", taloonName);
+            query.setParameter("price", price);
+            query.setParameter("complexMin", OrderDetail.TYPE_COMPLEX_MIN);
+            query.setParameter("complexMax", OrderDetail.TYPE_COMPLEX_MAX);
+            query.setParameter("taloonDate", taloonDate.getTime());
+            query.setParameter("dateEnd", dateEnd.getTime());
+            query.setParameter("state", Order.STATE_COMMITED);
+            if(StringUtils.isNotEmpty(goodsGuid)) {
+                query.setParameter("goodsGuid", goodsGuid);
+            }
+            Object result = query.getSingleResult();
+            return result != null ? ((BigInteger) result).intValue() : 0;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
+    public Integer findTaloonPreorderSoldQty(Long idOfOrg, Date taloonDate, String complexName, String goodsGuid, Long price) {
+        Date dateEnd = CalendarUtils.addOneDay(taloonDate);
+        try {
+            String goodsJoin = "";
+            String goodsParam = "";
+            if(StringUtils.isNotEmpty(goodsGuid)) {
+                goodsJoin = "inner join cf_goods g on g.idofgood = od.idofgood ";
+                goodsParam = "and g.guid =:goodsGuid ";
+            } else {
+                goodsParam = "and od.idofgood is null ";
+            }
+            Query query = entityManager.createNativeQuery("SELECT sum(od.qty) from cf_orderDetails od "
+                    + "inner join cf_orders o on od.idOfOrg = o.idOfOrg and od.idOfOrder = o.idOfOrder " + goodsJoin
+                    + "where od.socDiscount > 0 and od.rprice = 0 and od.idOfOrg= :idOfOrg "
+                    + "and od.menuDetailName = :complexName "
+                    + "and od.MenuType >= :complexMin "
+                    + "and od.MenuType <= :complexMax "
+                    + "and od.discount =:price "
+                    + "and o.createdDate >= :taloonDate "
+                    + "and o.createdDate < :dateEnd "
+                    + "and o.state = :state "
+                    + goodsParam);
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setParameter("complexName", complexName);
             query.setParameter("price", price);
             query.setParameter("complexMin", OrderDetail.TYPE_COMPLEX_MIN);
             query.setParameter("complexMax", OrderDetail.TYPE_COMPLEX_MAX);

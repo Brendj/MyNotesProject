@@ -39,8 +39,6 @@
         <property name="cityFrom" column="cityfrom" type="string" length="255"/>
         <property name="region" column="region" type="string" length="255"/>
         <property name="regionFrom" column="regionfrom" type="string" length="255"/>
-        <property name="introductionQueue" column="introductionQueue" type="string" length="64"/>
-        <property name="introductionQueueFrom" column="introductionQueueFrom" type="string" length="64"/>
         <property name="director" column="director" type="string" length="255"/>
         <property name="directorFrom" column="directorFrom" type="string" length="255"/>
 
@@ -52,6 +50,14 @@
         <property name="uniqueAddressIdFrom" column="uniqueaddressidfrom" type="long"/>
         <property name="inn" column="inn" type="string" length="32"/>
         <property name="innFrom" column="innfrom" type="string" length="32"/>
+        <property name="ekisId" column="ekisId" type="long"/>
+        <property name="ekisIdFrom" column="ekisIdFrom" type="long"/>
+        <property name="egissoId" column="egissoId" type="string" length="128"/>
+        <property name="egissoIdFrom" column="egissoIdFrom" type="string" length="128"/>
+        <property name="municipalDistrict" column="municipal_district" type="string" length="256"/>
+        <property name="municipalDistrictFrom" column="municipal_districtFrom" type="string" length="256"/>
+        <property name="shortAddress" column="short_address" type="string" length="128"/>
+        <property name="shortAddressFrom" column="short_addressFrom" type="string" length="128"/>
 
         <property name="guid" column="guid" type="string" length="255"/>
         <property name="guidFrom" column="guidfrom" type="string" length="255"/>

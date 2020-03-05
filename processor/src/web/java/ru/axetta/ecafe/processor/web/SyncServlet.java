@@ -40,6 +40,8 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.security.PublicKey;
 import java.util.*;
+import java.util.concurrent.Semaphore;
+import java.util.concurrent.TimeUnit;
 import java.util.concurrent.atomic.AtomicLong;
 import java.util.zip.GZIPInputStream;
 import java.util.zip.GZIPOutputStream;
@@ -61,6 +63,12 @@ public class SyncServlet extends HttpServlet {
     private static final List<String[]> restrictedFullSyncPeriods =
             getRestrictPeriods(RuntimeContext.getInstance().getOptionValueString(Option.OPTION_RESTRICT_FULL_SYNC_PERIODS));
     private static final AtomicLong threadCounter = new AtomicLong();
+    public static final int MAX_SYNCS = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_THREADS);
+    public static final int permitsTimeout = RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_SIMULTANEOUS_SYNC_TIMEOUT);
+    private static final Semaphore permitsForSync = new Semaphore(MAX_SYNCS, true);
+    private final static ThreadLocal<Boolean> currentSyncWasGranted = new ThreadLocal<Boolean>(){
+        @Override protected Boolean initialValue() { return false; }
+    };
 
     static class RequestData {
         public boolean isCompressed;
@@ -73,6 +81,7 @@ public class SyncServlet extends HttpServlet {
         SyncCollector.registerSyncStart(syncTime);
         long idOfOrg = -1;
         try {
+            currentSyncWasGranted.set(false);
             runtimeContext = RuntimeContext.getInstance();
 
             RequestData requestData = new RequestData();
@@ -153,10 +162,22 @@ public class SyncServlet extends HttpServlet {
                 return;
             }
             ///////
+            long currentTime = System.currentTimeMillis();
+            if (syncType != SyncType.TYPE_GET_ACC_INC) {
+                if (permitsForSync.tryAcquire(permitsTimeout, TimeUnit.MINUTES)) {
+                    currentSyncWasGranted.set(true);
+                } else {
+                    String message = "Failed to perform this sync. Wait timeout is expired. Available permits is " + permitsForSync.availablePermits();
+                    logger.error(message);
+                    sendError(response, syncTime, message, LimitFilter.SC_TOO_MANY_REQUESTS);
+                    return;
+                }
+            }
+
 
             long begin_sync = System.currentTimeMillis();
-            logger.info(String.format("-Starting synchronization with %s: id: %s, current count syncs: %s, full syncs: %s, accInc syncs: %s",
-                    request.getRemoteAddr(), idOfOrg, allSyncsCount, fullSyncsCount, accIncSyncsCount));
+            logger.info(String.format("-Starting synchronization with %s: id: %s, current count syncs: %s, full syncs: %s, accInc syncs: %s, available permits: %s, permit acquired in: %s ms",
+                    request.getRemoteAddr(), idOfOrg, allSyncsCount, fullSyncsCount, accIncSyncsCount, permitsForSync.availablePermits(), System.currentTimeMillis() - currentTime));
 
             boolean bLogPackets = (syncType==SyncType.TYPE_FULL);
 
@@ -263,9 +284,14 @@ public class SyncServlet extends HttpServlet {
             SyncCollector.setErrMessage(syncTime, e.getMessage());
             SyncCollector.registerSyncEnd(syncTime);
             throw new UnavailableException(e.getMessage());
+        } catch (InterruptedException ie) {
+            String message = "Failed to perform this sync after interrupted exception.";
+            logger.error(message);
+            sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
         } finally {
             SyncCollector.registerSyncEnd(syncTime);
             removeSyncInProgress(idOfOrg);
+            if (currentSyncWasGranted.get()) permitsForSync.release();
         }
     }
 

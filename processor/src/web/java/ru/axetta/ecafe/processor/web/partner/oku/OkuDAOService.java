@@ -35,6 +35,9 @@ public class OkuDAOService {
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager emReport;
 
+    private final int PARALLEL_5 = 5;
+    private final int PARALLEL_12 = 12;
+
     @PostConstruct
     private void init() {
         clientGroupList.add(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
@@ -47,10 +50,20 @@ public class OkuDAOService {
     public ClientData checkClient(Long contractId, String surname) {
         Query query = emReport.createQuery("select c from Client c join c.person p  join c.org o "
                 + "where c.contractId = :contractId and lower(p.surname) = :surname and o.participantOP = true "
-                + "     and c.clientGroup.compositeIdOfClientGroup.idOfClientGroup in (:clientGroupList)");
+                + "     and (c.clientGroup.compositeIdOfClientGroup.idOfClientGroup in (:clientGroupList) "
+                + "         or ((c.clientGroup.compositeIdOfClientGroup.idOfClientGroup < :clientGroupEmployees)"
+                + "             and lower(c.ageTypeGroup) not like :kindergarten and lower(c.ageTypeGroup) like :school "
+                + "             and (cast(c.parallel as integer) between :parallel5 and :parallel12)) "
+                + "         or ((c.clientGroup.compositeIdOfClientGroup.idOfClientGroup < :clientGroupEmployees) "
+                + "             and lower(c.ageTypeGroup) not like :kindergarten and lower(c.ageTypeGroup) not like :school))");
         query.setParameter("contractId", contractId);
         query.setParameter("surname", surname.toLowerCase());
         query.setParameter("clientGroupList", clientGroupList);
+        query.setParameter("clientGroupEmployees", ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue());
+        query.setParameter("parallel5", PARALLEL_5);
+        query.setParameter("parallel12", PARALLEL_12);
+        query.setParameter("school", "%школ%");
+        query.setParameter("kindergarten", "%дошкол%");
         query.setMaxResults(1);
         try {
             Client client = (Client) query.getSingleResult();
@@ -101,7 +114,8 @@ public class OkuDAOService {
                         + "    where _od.menutype between :typeComplexItemMin and :typeComplexItemMax "
                         + ") a on a.idoforder = o.idoforder and a.idoforg = o.idoforg and (a.menutype = od.menutype + 100) "
                         + "where c.contractid = :contractId and o.orderdate > :orderedFrom and c.userop = true and org.participantop = true "
-                        + "    and o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription) "
+                        + "    and o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription, "
+                        + "         :orderTypeReducedPricePlan, :orderTypeReducedPricePlanReserve) "
                         + "    and o.state = :orderCommittedState "
                         + "union all "
                         + "select distinct o.idoforder, o.idoforg, o.createddate, null as complex_name, od.menudetailname as dish_name, "
@@ -110,7 +124,8 @@ public class OkuDAOService {
                         + "join cf_clients c on c.idofclient = o.idofclient "
                         + "join cf_orgs org on org.idoforg = c.idoforg "
                         + "where c.contractid = :contractId and o.orderdate > :orderedFrom and c.userop = true and org.participantop = true and "
-                        + "    o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription) "
+                        + "    o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription, "
+                        + "         :orderTypeReducedPricePlan, :orderTypeReducedPricePlanReserve) "
                         + "    and o.state = :orderCommittedState");
         query.setParameter("typeComplexMin", OrderDetail.TYPE_COMPLEX_MIN);
         query.setParameter("typeComplexMax", OrderDetail.TYPE_COMPLEX_MAX);
@@ -124,16 +139,18 @@ public class OkuDAOService {
         query.setParameter("orderTypeVending", OrderTypeEnumType.VENDING.ordinal());
         query.setParameter("orderTypePayPlan", OrderTypeEnumType.PAY_PLAN.ordinal());
         query.setParameter("orderTypeSubscription", OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
+        query.setParameter("orderTypeReducedPricePlan", OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal());
+        query.setParameter("orderTypeReducedPricePlanReserve", OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal());
         query.setParameter("orderCommittedState", ru.axetta.ecafe.processor.core.persistence.Order.STATE_COMMITED);
 
-        List list = query.getResultList();
+        List<?> list = query.getResultList();
 
         HashMap<CompositeIdOfOrder, Order> orderHashMap = new HashMap<>();
         HashMap<CompositeIdOfOrder, HashMap<String, Complex>> complexHashMap = new HashMap<>();
         for (Object o : list) {
             Object[] row = (Object[]) o;
-            Long idOfOrder = ((BigInteger) row[0]).longValue();
-            Long idOfOrg = ((BigInteger) row[1]).longValue();
+            long idOfOrder = ((BigInteger) row[0]).longValue();
+            long idOfOrg = ((BigInteger) row[1]).longValue();
             Date orderDate = new Date(((BigInteger) row[2]).longValue());
             String complexName = (null == row[3]) ? null : ((String) row[3]).replaceAll("^\"|\"$|(?<=\")\"", "");
             String dishName = (null == row[4]) ? null : ((String) row[4]).replaceAll("^\"|\"$|(?<=\")\"", "");
@@ -175,7 +192,8 @@ public class OkuDAOService {
                         + "    select o.idoforder, o.idoforg, c.contractid, o.createddate " + "    from cf_orders o "
                         + "    join cf_clients c on o.idofclient = c.idofclient "
                         + "    where c.idofclient in (:clientIdList) and o.createddate between :orderedFrom and :orderedTo "
-                        + "        and o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription) "
+                        + "        and o.ordertype in (:orderTypeDefault,:orderTypeUnknown,:orderTypeVending,:orderTypePayPlan,:orderTypeSubscription,"
+                        + "             :orderTypeReducedPricePlan, :orderTypeReducedPricePlanReserve) "
                         + "        and o.state = :orderCommittedState "
                         + "    limit :_limit " + "    offset :_offset " + ") a "
                         + "left join cf_orderdetails od on a.idoforder = od.idoforder and a.idoforg = od.idoforg "
@@ -193,20 +211,22 @@ public class OkuDAOService {
         query.setParameter("orderTypeVending", OrderTypeEnumType.VENDING.ordinal());
         query.setParameter("orderTypePayPlan", OrderTypeEnumType.PAY_PLAN.ordinal());
         query.setParameter("orderTypeSubscription", OrderTypeEnumType.SUBSCRIPTION_FEEDING.ordinal());
+        query.setParameter("orderTypeReducedPricePlan", OrderTypeEnumType.REDUCED_PRICE_PLAN.ordinal());
+        query.setParameter("orderTypeReducedPricePlanReserve", OrderTypeEnumType.REDUCED_PRICE_PLAN_RESERVE.ordinal());
         query.setParameter("_limit", limit);
         query.setParameter("_offset", offset);
         query.setParameter("clientIdList", clientIdList);
         query.setParameter("orderCommittedState", ru.axetta.ecafe.processor.core.persistence.Order.STATE_COMMITED);
 
-        List list = query.getResultList();
+        List<?> list = query.getResultList();
 
         HashMap<CompositeIdOfOrder, Order> orderHashMap = new HashMap<>();
         HashMap<CompositeIdOfOrder, HashMap<String, Complex>> complexHashMap = new HashMap<>();
         for (Object o : list) {
             Object[] row = (Object[]) o;
             Long contractId = ((BigInteger) row[0]).longValue();
-            Long idOfOrder = ((BigInteger) row[1]).longValue();
-            Long idOfOrg = ((BigInteger) row[2]).longValue();
+            long idOfOrder = ((BigInteger) row[1]).longValue();
+            long idOfOrg = ((BigInteger) row[2]).longValue();
             Date orderDate = new Date(((BigInteger) row[3]).longValue());
             String complexName = (null == row[4]) ? null : ((String) row[4]).replaceAll("^\"|\"$|(?<=\")\"", "");
             String dishName = (null == row[5]) ? null : ((String) row[5]).replaceAll("^\"|\"$|(?<=\")\"", "");
@@ -236,6 +256,7 @@ public class OkuDAOService {
         return orderHashMap.values();
     }
 
+    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public List<Long> getClients() {
         Query query = emReport.createQuery("select c.idOfClient from Client c join c.person p "
@@ -243,6 +264,7 @@ public class OkuDAOService {
         return query.getResultList();
     }
 
+    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public List<Organization> getOrganizationInfo(Long idOfOrg) {
         List<Long> friendlyOrgsIdList = new ArrayList<>();
@@ -265,6 +287,7 @@ public class OkuDAOService {
         return resultList;
     }
 
+    @SuppressWarnings("unchecked")
     @Transactional(readOnly = true)
     public List<Organization> getOrganizationInfoList(Date updatedFrom, Integer limit, Integer offset) {
         List<Organization> organizationList = new ArrayList<>();

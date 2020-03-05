@@ -25,11 +25,10 @@ import ru.axetta.ecafe.processor.core.sync.handlers.clientphoto.ClientsPhotos;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.schedule.ListComplexSchedules;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZNBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountsDTSZNRequest;
-import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDBuilder;
-import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasRequest;
-import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSection;
+import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.groups.GroupsOrganizationRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestBuilder;
@@ -45,10 +44,16 @@ import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettin
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.PaymentRegistryBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions.PlanOrdersRestrictionsBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions.PlanOrdersRestrictionsRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeedingRequest;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.status.PreorderFeedingStatusRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApproval;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ReestrTaloonPreorder;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ReestrTaloonPreorderBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingBuilder;
@@ -109,6 +114,14 @@ public class SyncRequest {
 
     public void setDatabaseSize(Double databaseSize) {
         this.databaseSize = databaseSize;
+    }
+
+    public CafeteriaExchangeContentType getContentType() {
+        return contentType;
+    }
+
+    public void setContentType(CafeteriaExchangeContentType contentType) {
+        this.contentType = contentType;
     }
 
     public static class ClientParamRegistry implements SectionRequest {
@@ -183,6 +196,7 @@ public class SyncRequest {
                     String notifyViaPUSH = getStringValueNullSafe(namedNodeMap, "NotifyViaPush");
                     String groupName = getStringValueNullSafe(namedNodeMap, "GroupName");
                     String canConfirmGroupPayment = getStringValueNullSafe(namedNodeMap, "CanConfirmGroupPayment");
+                    String confirmVisualRecognition = getStringValueNullSafe(namedNodeMap, "IsInOutByVideo");
                     String guid = getStringValueNullSafe(namedNodeMap, "GUID");
                     Long expenditureLimit = getLongValueNullSafe(namedNodeMap, "ExpenditureLimit");
                     String isUseLastEEModeForPlan = getStringValueNullSafe(namedNodeMap, "IsUseLastEEModeForPlan");
@@ -210,7 +224,8 @@ public class SyncRequest {
                             fax, email, remarks, notifyViaEmail == null ? null : notifyViaEmail.equals("1"),
                             notifyViaSMS == null ? null : notifyViaSMS.equals("1"),
                             notifyViaPUSH == null ? null : notifyViaPUSH.equals("1"), groupName,
-                            canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"), guid,
+                            canConfirmGroupPayment == null ? null : canConfirmGroupPayment.equals("1"),
+                            confirmVisualRecognition == null ? null : confirmVisualRecognition.equals("1"), guid,
                             expenditureLimit, isUseLastEEModeForPlan == null ? null : isUseLastEEModeForPlan.equals("1"),
                             gender,birthDate, version, balanceToNotify, disablePlanCreationDate, disablePlanEndDate, orgOwner, san,
                             passportNumber, passportSeries);
@@ -229,6 +244,7 @@ public class SyncRequest {
             private final String categoriesDiscounts;
             private final Boolean notifyViaEmail, notifyViaSMS, notifyViaPUSH;
             private final Boolean canConfirmGroupPayment;
+            private final Boolean confirmVisualRecognition;
             private final String guid;
             private final Long expenditureLimit;
             private final Boolean isUseLastEEModeForPlan;
@@ -248,7 +264,7 @@ public class SyncRequest {
                     int discountMode, String categoriesDiscounts, String name, String surname, String secondName,
                     String address, String phone, String mobilePhone, String middleGroup, String fax, String email,
                     String remarks, Boolean notifyViaEmail, Boolean notifyViaSMS, Boolean notifyViaPUSH, String groupName, Boolean canConfirmGroupPayment,
-                    String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan,Integer gender,Date birthDate, Long version, Long balanceToNotify,
+                    Boolean confirmVisualRecognition, String guid, Long expenditureLimit, Boolean isUseLastEEModeForPlan,Integer gender,Date birthDate, Long version, Long balanceToNotify,
                     Date disablePlanCreationDate, Date disablePlanEndDate, Long orgOwner, String san, String passportNumber, String passportSeries) {
                 this.idOfClient = idOfClient;
                 this.freePayCount = freePayCount;
@@ -271,6 +287,7 @@ public class SyncRequest {
                 this.notifyViaPUSH = notifyViaPUSH;
                 this.groupName = groupName;
                 this.canConfirmGroupPayment = canConfirmGroupPayment;
+                this.confirmVisualRecognition = confirmVisualRecognition;
                 this.guid = guid;
                 this.expenditureLimit = expenditureLimit;
                 this.isUseLastEEModeForPlan = isUseLastEEModeForPlan;
@@ -368,6 +385,10 @@ public class SyncRequest {
 
             public Boolean getCanConfirmGroupPayment() {
                 return canConfirmGroupPayment;
+            }
+
+            public Boolean getConfirmVisualRecognition() {
+                return confirmVisualRecognition;
             }
 
             public String getGuid() {
@@ -2580,6 +2601,8 @@ public class SyncRequest {
 
         private final DateFormat dateOnlyFormat;
         private final DateFormat timeFormat;
+        private final static int CLIENT_VERSION_FOR_PLAN_ORDER_MAJOR = 93;
+        private final static int CLIENT_VERSION_FOR_PLAN_ORDER_MINOR = 1;
 
         public Builder() {
             TimeZone utcTimeZone = TimeZone.getTimeZone("UTC");
@@ -2630,10 +2653,11 @@ public class SyncRequest {
             String clientVersion = getClientVersion(namedNodeMap);
             String sqlServerVersion = getSQLServerVersion(namedNodeMap);
             Double databaseSize = getDatabaseSizeValue(namedNodeMap);
+            CafeteriaExchangeContentType contentType = getCafeterialExchangeContentType(namedNodeMap);
             Date syncTime = timeFormat.parse(idOfSync);
             Long idOfPacket = getIdOfPacket(namedNodeMap);
             List<SectionRequest> result = new ArrayList<SectionRequest>();
-            List<SectionRequestBuilder> builders = createSectionRequestBuilders(version, org.getIdOfOrg(), envelopeNode);
+            List<SectionRequestBuilder> builders = createSectionRequestBuilders(version, org.getIdOfOrg(), envelopeNode, clientVersion);
             for (SectionRequestBuilder builder : builders) {
                 SectionRequest sectionRequest = buildSeactionRequest(envelopeNode, builder);
                 if (sectionRequest != null) {
@@ -2643,7 +2667,16 @@ public class SyncRequest {
             Manager manager = createManagerSyncRO(envelopeNode, syncType, org);
             String message = getMessage(envelopeNode);
             return new SyncRequest(remoteAddr, version, syncType, clientVersion, org, syncTime, idOfPacket, message,
-                    result, manager, sqlServerVersion, databaseSize);
+                    result, manager, sqlServerVersion, databaseSize, contentType);
+        }
+
+        private CafeteriaExchangeContentType getCafeterialExchangeContentType(NamedNodeMap namedNodeMap) {
+            String contentType = namedNodeMap.getNamedItem("ContentType") == null ?
+                    null : namedNodeMap.getNamedItem("ContentType").getTextContent();
+            if(contentType != null){
+                return CafeteriaExchangeContentType.getContentTypeByCode(Integer.valueOf(contentType));
+            }
+            return null;
         }
 
         private String getSQLServerVersion(NamedNodeMap namedNodeMap) {
@@ -2672,7 +2705,34 @@ public class SyncRequest {
             return request;
         }
 
-        private List<SectionRequestBuilder> createSectionRequestBuilders(long version, long idOfOrg, Node envelopeNode) {
+        private int[] parseClientVersion(String clientVersion) throws Exception {
+            String[] arr = clientVersion.split("\\.");
+            int[] result = new int[arr.length];
+            int i = 0;
+            for (String str : arr) {
+                result[i] = Integer.parseInt(str);
+                i++;
+            }
+            return result;
+        }
+
+        private boolean addPlanOrdersBuilderByClientVersion(String clientVersion) {
+            //false если clientVersion < 93.1
+            try {
+                int[] versions = parseClientVersion(clientVersion);
+                if (versions[2] < CLIENT_VERSION_FOR_PLAN_ORDER_MAJOR) {
+                    return false;
+                } else {
+                    if (versions[2] == CLIENT_VERSION_FOR_PLAN_ORDER_MAJOR && versions[3] < CLIENT_VERSION_FOR_PLAN_ORDER_MINOR) return false; else return true;
+                }
+            } catch (Exception e) {
+                logger.error("Error in parsing client version from packet: ", e);
+                return false;
+            }
+        }
+
+        private List<SectionRequestBuilder> createSectionRequestBuilders(long version, long idOfOrg, Node envelopeNode,
+                String clientVersion) {
             MenuGroups menuGroups = new MenuGroups.Builder().build(envelopeNode);
             LoadContext loadContext = new LoadContext(menuGroups, version, timeFormat, dateOnlyFormat);
 
@@ -2695,7 +2755,12 @@ public class SyncRequest {
             builders.add(new CategoriesDiscountsAndRulesBuilder());
             builders.add(new ClientGroupManagerBuilder());
             builders.add(new AccountsRegistryRequestBuilder());
+            builders.add(new PreorderFeedingStatusBuilder(idOfOrg));
             builders.add(new ReestrTaloonApprovalBuilder(idOfOrg));
+            builders.add(new ReestrTaloonPreorderBuilder(idOfOrg));
+            if (addPlanOrdersBuilderByClientVersion(clientVersion)) {
+                builders.add(new PlanOrdersRestrictionsBuilder(idOfOrg));
+            }
             builders.add(new ZeroTransactionsBuilder(idOfOrg));
             builders.add(new SpecialDatesBuilder(idOfOrg));
             builders.add(new MigrantsBuilder(idOfOrg));
@@ -2792,9 +2857,11 @@ public class SyncRequest {
     private String sqlServerVersion;
     private Double databaseSize;
     private final List<SectionRequest> sectionRequests = new ArrayList<SectionRequest>();
+    private CafeteriaExchangeContentType contentType;
 
     public SyncRequest(String remoteAddr, long protoVersion, SyncType syncType, String clientVersion, Org org, Date syncTime, Long idOfPacket,
-            String message, List<SectionRequest> sectionRequests, Manager manager, String sqlServerVersion, Double databaseSize) {
+            String message, List<SectionRequest> sectionRequests, Manager manager, String sqlServerVersion, Double databaseSize,
+            CafeteriaExchangeContentType contentType) {
         this.remoteAddr = remoteAddr;
         this.protoVersion = protoVersion;
         this.syncType = syncType;
@@ -2808,6 +2875,7 @@ public class SyncRequest {
         this.sectionRequests.addAll(sectionRequests);
         this.sqlServerVersion = sqlServerVersion;
         this.databaseSize = databaseSize;
+        this.contentType = contentType;
     }
 
     public String getClientVersion() {
@@ -2946,8 +3014,20 @@ public class SyncRequest {
         return this.<AccountsRegistryRequest>findSection(AccountsRegistryRequest.class);
     }
 
+    public PreorderFeedingStatusRequest getPreorderFeedingStatusRequest() {
+        return this.<PreorderFeedingStatusRequest>findSection(PreorderFeedingStatusRequest.class);
+    }
+
     public ReestrTaloonApproval getReestrTaloonApproval() {
         return this.<ReestrTaloonApproval>findSection(ReestrTaloonApproval.class);
+    }
+
+    public ReestrTaloonPreorder getReestrTaloonPreorder() {
+        return this.<ReestrTaloonPreorder>findSection(ReestrTaloonPreorder.class);
+    }
+
+    public PlanOrdersRestrictionsRequest getPlanOrdersRestrictionsRequest() {
+        return this.<PlanOrdersRestrictionsRequest>findSection(PlanOrdersRestrictionsRequest.class);
     }
 
     public InteractiveReport getInteractiveReport() {

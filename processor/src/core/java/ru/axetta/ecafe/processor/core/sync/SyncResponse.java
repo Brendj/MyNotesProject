@@ -13,9 +13,9 @@ import ru.axetta.ecafe.processor.core.sync.handlers.categories.discounts.ResCate
 import ru.axetta.ecafe.processor.core.sync.handlers.client.request.TempCardOperationData;
 import ru.axetta.ecafe.processor.core.sync.handlers.complex.roles.ComplexRoles;
 import ru.axetta.ecafe.processor.core.sync.handlers.dtiszn.ClientDiscountDTSZN;
-import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.emias.EmiasSectionForARMAnswer;
+import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodRequestEZDSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.ResHelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
@@ -26,9 +26,12 @@ import ru.axetta.ecafe.processor.core.sync.handlers.migrants.ResMigrants;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwnerData;
 import ru.axetta.ecafe.processor.core.sync.handlers.orgsetting.request.OrgSettingSection;
 import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.ResPaymentRegistry;
+import ru.axetta.ecafe.processor.core.sync.handlers.planordersrestrictions.PlanOrdersRestrictions;
 import ru.axetta.ecafe.processor.core.sync.handlers.preorders.feeding.PreOrdersFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ReestrTaloonApprovalData;
 import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval.ResReestrTaloonApproval;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ReestrTaloonPreorderData;
+import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ResReestrTaloonPreorder;
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingData;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeeding;
@@ -377,6 +380,7 @@ public class SyncResponse {
             private final boolean notifyViaPUSH;
             private final String remarks;
             private final boolean canConfirmGroupPayment;
+            private final boolean confirmVisualRecognition;
             private final int discountMode;
             private final String guid;
             private boolean tempClient;
@@ -422,6 +426,7 @@ public class SyncResponse {
                 this.notifyViaPUSH=client.isNotifyViaPUSH();
                 this.remarks = client.getRemarks();
                 this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
+                this.confirmVisualRecognition = client.getConfirmVisualRecognition();
                 this.discountMode = client.getDiscountMode();
                 this.guid = client.getClientGUID();
                 this.clientType = clientType;
@@ -513,6 +518,10 @@ public class SyncResponse {
                 return canConfirmGroupPayment;
             }
 
+            public boolean isConfirmVisualRecognition() {
+                return confirmVisualRecognition;
+            }
+
             public boolean isTempClient() {
                 return tempClient;
             }
@@ -576,6 +585,8 @@ public class SyncResponse {
                 element.setAttribute("NotifyViaSMS", this.notifyViaSMS?"1":"0");
                 element.setAttribute("NotifyViaPUSH", this.notifyViaPUSH?"1":"0");
                 element.setAttribute("CanConfirmGroupPayment", this.canConfirmGroupPayment?"1":"0");
+                // отправляем как IsOnOutByVideo для обратной совместимости с АРМ
+                element.setAttribute("IsOnOutByVideo", this.confirmVisualRecognition?"1":"0");
                 element.setAttribute("Remarks", this.remarks);
                 if (null != this.email) {
                     element.setAttribute("Email", this.email);
@@ -1196,6 +1207,9 @@ public class SyncResponse {
     private  OrganizationStructure organizationStructure;
     private  ResReestrTaloonApproval resReestrTaloonApproval;
     private  ReestrTaloonApprovalData reestrTaloonApprovalData;
+    private  ResReestrTaloonPreorder resReestrTaloonPreorder;
+    private  ReestrTaloonPreorderData reestrTaloonPreorderData;
+    private  PlanOrdersRestrictions planOrdersRestrictionsData;
     private  OrganizationComplexesStructure organizationComplexesStructure;
     private  ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData interactiveReportData;
     private  ZeroTransactionData zeroTransactionData;
@@ -1237,6 +1251,7 @@ public class SyncResponse {
             ClientGuardianData clientGuardians, AccRegistryUpdate accRegistryUpdate, ProhibitionsMenu prohibitionsMenu,
             AccountsRegistry accountsRegistry,ResCardsOperationsRegistry resCardsOperationsRegistry, OrganizationStructure organizationStructure,
             ResReestrTaloonApproval resReestrTaloonApproval, ReestrTaloonApprovalData reestrTaloonApprovalData,
+            ResReestrTaloonPreorder resReestrTaloonPreorder, ReestrTaloonPreorderData reestrTaloonPreorderData,
             OrganizationComplexesStructure organizationComplexesStructure, InteractiveReportData interactiveReportData,
             ZeroTransactionData zeroTransactionData, ResZeroTransactions resZeroTransactions, SpecialDatesData specialDatesData,
             ResSpecialDates resSpecialDates, MigrantsData migrantsData, ResMigrants resMigrants, List<AbstractToElement> responseSections,
@@ -1282,6 +1297,8 @@ public class SyncResponse {
         this.organizationStructure = organizationStructure;
         this.resReestrTaloonApproval = resReestrTaloonApproval;
         this.reestrTaloonApprovalData = reestrTaloonApprovalData;
+        this.resReestrTaloonPreorder = resReestrTaloonPreorder;
+        this.reestrTaloonPreorderData = reestrTaloonPreorderData;
         this.organizationComplexesStructure = organizationComplexesStructure;
         this.interactiveReportData = interactiveReportData;
         this.zeroTransactionData = zeroTransactionData;
@@ -1509,6 +1526,18 @@ public class SyncResponse {
 
         if (reestrTaloonApprovalData != null) {
             envelopeElement.appendChild(reestrTaloonApprovalData.toElement(document));
+        }
+
+        if (resReestrTaloonPreorder != null) {
+            envelopeElement.appendChild(resReestrTaloonPreorder.toElement(document));
+        }
+
+        if (reestrTaloonPreorderData != null) {
+            envelopeElement.appendChild(reestrTaloonPreorderData.toElement(document));
+        }
+
+        if (planOrdersRestrictionsData != null) {
+            envelopeElement.appendChild(planOrdersRestrictionsData.toElement(document));
         }
 
         if (organizationComplexesStructure != null) {

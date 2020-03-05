@@ -4,12 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.emias;
 
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
-
-import java.util.Date;
 
 public class EMIASSyncFromARMPOJO {
     private Long idEventEMIAS;
