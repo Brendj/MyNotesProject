@@ -46,7 +46,7 @@ public class WtOrgGroup {
     @JoinColumn(name = "update_by_id")
     private User updatedUser;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 

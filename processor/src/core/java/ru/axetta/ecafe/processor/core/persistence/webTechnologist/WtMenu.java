@@ -53,7 +53,7 @@ public class WtMenu {
     @Column(name = "version")
     private Long version;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 

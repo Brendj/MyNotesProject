@@ -87,7 +87,7 @@ public class WtDish {
     @Column(name = "qty")
     private String qty;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 

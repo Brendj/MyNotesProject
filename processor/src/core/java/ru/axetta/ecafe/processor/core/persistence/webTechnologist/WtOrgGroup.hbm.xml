@@ -35,7 +35,9 @@
             <column name="update_by_id"/>
         </many-to-one>
 
-        <one-to-one name="contragent" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contragent" cascade="all"/>
+        <many-to-one name="contragent" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
+            <column name="idOfContragent"/>
+        </many-to-one>
 
         <set name="wtComplexes" inverse="true" cascade="all" lazy="true">
             <key>

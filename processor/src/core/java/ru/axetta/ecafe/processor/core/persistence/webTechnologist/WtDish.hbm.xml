@@ -94,7 +94,9 @@
             <column name="qty" sql-type="integer"/>
         </property>
 
-        <one-to-one name="contragent" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contragent" cascade="all"/>
+        <many-to-one name="contragent" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
+            <column name="idOfContragent"/>
+        </many-to-one>
 
         <property name="barcode">
             <column name="barcode" sql-type="varchar(16)" length="16"/>
