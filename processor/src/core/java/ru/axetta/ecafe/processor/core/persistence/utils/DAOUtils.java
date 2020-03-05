@@ -4575,6 +4575,16 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static ClientDtisznDiscountInfo getDTISZNOneDiscountInfoByClientAndCode(Session session, Client client,
+            Long code) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.eq("dtisznCode", code));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("createdDate"));
+        criteria.setMaxResults(1);
+        return (ClientDtisznDiscountInfo)criteria.uniqueResult();
+    }
+
     // код льготы иное
     public static Long getOtherDiscountCode(Session session) {
         Query query = session.createQuery(
