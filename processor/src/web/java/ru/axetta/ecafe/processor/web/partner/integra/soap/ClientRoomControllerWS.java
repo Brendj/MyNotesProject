@@ -2730,8 +2730,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     //В ПК дата Д есть и указано  что выходной (1)
                     if (productionCalendar.getFlag() == 1)
                     {
-                        CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(idOfOrg,
-                                CalendarUtils.addHours(dateReq, 3));
+                        CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(idOfOrg, dateReq);
                         SpecialDate specialDateGroup;
                         try {
                             specialDateGroup = DAOUtils.findSpecialDateWithGroup(session, compositeId, idOfGroup);
@@ -2779,8 +2778,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
 
-            CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(idOfOrg,
-                    CalendarUtils.addHours(dateReq, 3));
+            CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(idOfOrg, dateReq);
             SpecialDate specialDateGroup;
             try {
                 specialDateGroup = DAOUtils.findSpecialDateWithGroup(session, compositeId, idOfGroup);
