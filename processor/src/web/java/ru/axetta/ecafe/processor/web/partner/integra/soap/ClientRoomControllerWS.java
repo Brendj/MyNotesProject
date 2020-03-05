@@ -2673,12 +2673,24 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
 
             List<MenuWithComplexesExt> list = new ArrayList<MenuWithComplexesExt>();
+            Map<Date, Boolean> mapDatesForComplex = new HashMap<>();
 
             List<ProductionCalendar> productionCalendars = DAOUtils.getAllDateFromProdactionCalendarDates(session, startDate, endDate);
             for (ComplexInfo ci : complexInfoList) {
                 //Проверка по КУД
-                if (!isGoodDate(session, client.getOrg().getIdOfOrg(), client.getIdOfClientGroup(), ci.getMenuDate(), productionCalendars))
-                    continue;
+                Boolean goodComplex = mapDatesForComplex.get(ci.getMenuDate());
+                if (goodComplex == null) {
+                    goodComplex = isGoodDate(session, client.getOrg().getIdOfOrg(), client.getIdOfClientGroup(), ci.getMenuDate(), productionCalendars);
+                    mapDatesForComplex.put(ci.getMenuDate(), goodComplex);
+                    if (!goodComplex)
+                        continue;
+                }
+                else
+                {
+                    if (!goodComplex)
+                        continue;
+                }
+
                 if (client.getClientGroup() != null && client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()) {
                     //для учеников
                     PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(ci.getIdOfComplex(), ci.getComplexName(), ci.getCurrentPrice(), ci.getModeOfAdd(), ci.getModeFree(), ci.getModeVisible());
@@ -2730,41 +2742,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     //В ПК дата Д есть и указано  что выходной (1)
                     if (productionCalendar.getFlag() == 1)
                     {
-                        CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(idOfOrg, dateReq);
-                        SpecialDate specialDateGroup;
-                        try {
-                            specialDateGroup = DAOUtils.findSpecialDateWithGroup(session, compositeId, idOfGroup);
-                            if (specialDateGroup.getDeleted())
-                                specialDateGroup = null;
-                        } catch (Exception e) {
-                            specialDateGroup = null;
-                        }
-
-                        if (specialDateGroup != null)
+                        Boolean complete = getDateForGroupAndOrg(session, idOfOrg, idOfGroup, dateReq);
+                        if (complete!=null)
                         {
-                            if (!specialDateGroup.getIsWeekend())
-                                return true;
-                            else
-                                return false;
+                            return complete;
                         }
-
-                        SpecialDate specialDateOrg;
-                        try {
-                            specialDateOrg = DAOUtils.findSpecialDate(session, compositeId);
-                            if (specialDateOrg.getDeleted())
-                                specialDateOrg = null;
-                        } catch (Exception e) {
-                            specialDateOrg = null;
-                        }
-
-                        if (specialDateOrg != null)
-                        {
-                            if (!specialDateOrg.getIsWeekend())
-                                return true;
-                            else
-                                return false;
-                        }
-
                         //2.1.4 В  КУДе (cf_specialdates)  для ид орг и  ид группы (п.2.1)  отсутствует или удалены, тогда проверяем - данная дата приходится на день недели «Суббота»:,
                         if (CalendarUtils.getDayOfWeek(dateReq) == Calendar.SATURDAY) {
                             if (DAOReadonlyService.getInstance().isSixWorkWeekGroup(idOfOrg, idOfGroup)) {
@@ -2778,39 +2760,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
 
-            CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(idOfOrg, dateReq);
-            SpecialDate specialDateGroup;
-            try {
-                specialDateGroup = DAOUtils.findSpecialDateWithGroup(session, compositeId, idOfGroup);
-                if (specialDateGroup.getDeleted())
-                    specialDateGroup = null;
-            } catch (Exception e) {
-                specialDateGroup = null;
-            }
-
-            if (specialDateGroup != null)
+            Boolean complete = getDateForGroupAndOrg(session, idOfOrg, idOfGroup, dateReq);
+            if (complete!=null)
             {
-                if (!specialDateGroup.getIsWeekend())
-                    return true;
-                else
-                    return false;
-            }
-
-            SpecialDate specialDateOrg;
-            try {
-                specialDateOrg = DAOUtils.findSpecialDate(session, compositeId);
-                if (specialDateOrg.getDeleted())
-                    specialDateOrg = null;
-            } catch (Exception e) {
-                specialDateOrg = null;
-            }
-
-            if (specialDateOrg != null)
-            {
-                if (!specialDateOrg.getIsWeekend())
-                    return true;
-                else
-                    return false;
+                return complete;
             }
             return true;
         }
@@ -2818,6 +2771,45 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         {
             return true;
         }
+    }
+
+    private Boolean getDateForGroupAndOrg(Session session, Long idOfOrg, Long idOfGroup, Date dateReq)
+    {
+        CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(idOfOrg, dateReq);
+        SpecialDate specialDateGroup;
+        try {
+            specialDateGroup = DAOUtils.findSpecialDateWithGroup(session, compositeId, idOfGroup);
+            if (specialDateGroup.getDeleted())
+                specialDateGroup = null;
+        } catch (Exception e) {
+            specialDateGroup = null;
+        }
+
+        if (specialDateGroup != null)
+        {
+            if (!specialDateGroup.getIsWeekend())
+                return true;
+            else
+                return false;
+        }
+
+        SpecialDate specialDateOrg;
+        try {
+            specialDateOrg = DAOUtils.findSpecialDate(session, compositeId);
+            if (specialDateOrg.getDeleted())
+                specialDateOrg = null;
+        } catch (Exception e) {
+            specialDateOrg = null;
+        }
+
+        if (specialDateOrg != null)
+        {
+            if (!specialDateOrg.getIsWeekend())
+                return true;
+            else
+                return false;
+        }
+        return null;
     }
 
     @Override
