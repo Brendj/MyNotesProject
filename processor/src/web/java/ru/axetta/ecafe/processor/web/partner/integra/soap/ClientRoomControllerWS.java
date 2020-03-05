@@ -2642,7 +2642,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             criteria.add(Restrictions.eq("org", client.getOrg()));
             criteria.add(Restrictions.gt("menuDate", startDate));
             criteria.add(Restrictions.lt("menuDate", endDate));
-            //criteria.add(Restrictions.eq("modeVisible", 1));
+            criteria.add(Restrictions.eq("modeVisible", 1));
             criteria.add(Restrictions
                     .or(Restrictions.not(Restrictions.ilike("detal.groupName", groupNotForMos, MatchMode.ANYWHERE)),
                             Restrictions.isNull("detal.groupName")));
