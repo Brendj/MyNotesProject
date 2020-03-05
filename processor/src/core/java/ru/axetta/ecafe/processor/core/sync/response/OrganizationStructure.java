@@ -65,7 +65,7 @@ public class OrganizationStructure implements AbstractToElement {
                     o.getOfficialPerson().getFullName(), o.getAddress(), o.getUsePaydableSubscriptionFeeding(),
                     getConfigurationId(o), getSupplierId(o), isFriendly, o.getDistrict(), o.getState(),
                     o.getVariableFeeding(), o.getNeedVerifyCardSign(), o.getPreordersEnabled(), o.getShortAddress(),
-                    o.getOrgStructureVersion(), o.multiCardModeIsEnabled(), o.getPreorderlp());
+                    o.getOrgStructureVersion(), o.multiCardModeIsEnabled(), o.getPreorderlp(), o.getUseWebArm());
             organizationItemMap.put(o.getIdOfOrg(), item);
         }
         if (!organizationItemMap.containsKey(org.getIdOfOrg())) {
@@ -77,7 +77,7 @@ public class OrganizationStructure implements AbstractToElement {
                     getConfigurationId(org), getSupplierId(org), true, org.getDistrict(), org.getState(),
                     org.getVariableFeeding(), org.getNeedVerifyCardSign(), org.getPreordersEnabled(),
                     org.getShortAddress(), org.getOrgStructureVersion(), org.multiCardModeIsEnabled(),
-                    org.getPreorderlp());
+                    org.getPreorderlp(), org.getUseWebArm());
             organizationItemMap.put(org.getIdOfOrg(), item);
         }
     }
@@ -113,12 +113,13 @@ public class OrganizationStructure implements AbstractToElement {
         private final String shortAddress;
         private final Boolean multiCardModeEnabled;
         private final Boolean preorderlp;
+        private final Boolean useWebArm;
 
         private OrganizationStructureItem(Long idOfOrg, Integer organizationType, String shortNameInfoService,
                 String officialName, String shortName, String chief, String address, Boolean useSubscriptionFeeding,
                 Long configurationId, Long defaultSupplier, Boolean isFriendly, String nCounty, Integer state,
                 Boolean variableFeeding, Boolean needVerifyCardSign, Boolean useSpecialMenu, String shortAddress,
-                Long version, Boolean multiCardModeEnabled, Boolean preorderlp) {
+                Long version, Boolean multiCardModeEnabled, Boolean preorderlp, Boolean useWebArm) {
             this.idOfOrg = idOfOrg;
             this.organizationType = organizationType;
             this.shortNameInfoService = shortNameInfoService;
@@ -139,6 +140,7 @@ public class OrganizationStructure implements AbstractToElement {
             this.version = version;
             this.multiCardModeEnabled = multiCardModeEnabled;
             this.preorderlp = preorderlp;
+            this.useWebArm = useWebArm;
         }
 
         public Element toElement(Document document) throws Exception {
@@ -167,6 +169,7 @@ public class OrganizationStructure implements AbstractToElement {
             element.setAttribute("ShortAddress", shortAddress);
             element.setAttribute("multiCardModeEnabled", multiCardModeEnabled ? "1" : "0");
             element.setAttribute("receiveRequestsFromEZD", preorderlp ? "1" : "0");
+            element.setAttribute("UseWebArm", useWebArm ? "1" : "0");
             return element;
         }
 
