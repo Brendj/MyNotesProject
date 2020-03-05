@@ -966,6 +966,7 @@ public class PreorderDAOService {
 
             List menuDetails = getMenuDetailList(complexInfo.getIdOfComplexInfo());
             if (menuDetails.size() == 0) {
+                logger.info("No menu details found");
                 currentDate = CalendarUtils.addDays(currentDate, 1);
                 continue;
             }
@@ -1026,6 +1027,7 @@ public class PreorderDAOService {
             Set<PreorderMenuDetail> set = createPreorderMenuDetails(menuDetails, regularPreorder.getClient(),
                     complexInfo.getMenuDate(), preorderComplex);
             preorderComplex.setPreorderMenuDetails(set);
+            preorderComplex.setVersion(nextVersion);
             em.merge(preorderComplex);
             currentDate = CalendarUtils.addDays(currentDate, 1);
         }
