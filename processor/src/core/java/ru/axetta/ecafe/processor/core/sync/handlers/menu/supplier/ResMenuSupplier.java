@@ -228,15 +228,17 @@ public class ResMenuSupplier implements AbstractToElement {
         float price = dish.getPrice().floatValue() * 100;
         XMLUtils.setAttributeIfNotNull(prop, "Price", price);
 
-        Date beginDate = dish.getDateOfBeginMenuIncluding();
-        Date endDate = dish.getDateOfEndMenuIncluding();
         String pattern = "dd.mm.yyyy hh:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        String strBeginDate = simpleDateFormat.format(beginDate);
-        String strEndDate = simpleDateFormat.format(endDate);
+        Date beginDate = dish.getDateOfBeginMenuIncluding();
+        if (beginDate != null) {
+            XMLUtils.setAttributeIfNotNull(prop, "DateBeginIncludeMenu", simpleDateFormat.format(beginDate));
+        }
+        Date endDate = dish.getDateOfEndMenuIncluding();
+        if (endDate != null) {
+            XMLUtils.setAttributeIfNotNull(prop, "DateEndIncludeMenu", simpleDateFormat.format(endDate));
+        }
 
-        XMLUtils.setAttributeIfNotNull(prop, "DateBeginIncludeMenu", strBeginDate);
-        XMLUtils.setAttributeIfNotNull(prop, "DateEndIncludeMenu", strEndDate);
         XMLUtils.setAttributeIfNotNull(prop, "V", dish.getVersion());
         XMLUtils.setAttributeIfNotNull(prop, "D", dish.getDeleteState());
         XMLUtils.setAttributeIfNotNull(prop, "Guid", dish.getGuid());
@@ -306,14 +308,16 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "Id", menu.getIdOfMenu());
         XMLUtils.setAttributeIfNotNull(prop, "Name", menu.getMenuName());
 
-        Date beginDate = menu.getBeginDate();
-        Date endDate = menu.getEndDate();
         String pattern = "dd.mm.yyyy hh:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        String strBeginDate = simpleDateFormat.format(beginDate);
-        String strEndDate = simpleDateFormat.format(endDate);
-        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", strBeginDate);
-        XMLUtils.setAttributeIfNotNull(prop, "EndDate", strEndDate);
+        Date beginDate = menu.getBeginDate();
+        if (beginDate != null) {
+            XMLUtils.setAttributeIfNotNull(prop, "BeginDate", simpleDateFormat.format(beginDate));
+        }
+        Date endDate = menu.getEndDate();
+        if (endDate != null) {
+            XMLUtils.setAttributeIfNotNull(prop, "EndDate", simpleDateFormat.format(endDate));
+        }
 
         if (menu.getWtOrgGroup() != null) {
             XMLUtils.setAttributeIfNotNull(prop, "OrgGroupId", menu.getWtOrgGroup().getIdOfOrgGroup());
@@ -355,14 +359,16 @@ public class ResMenuSupplier implements AbstractToElement {
         float price = complex.getPrice().floatValue() * 100;
         XMLUtils.setAttributeIfNotNull(prop, "Price", price);
 
-        Date beginDate = complex.getBeginDate();
-        Date endDate = complex.getEndDate();
         String pattern = "dd.mm.yyyy hh:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
-        String strBeginDate = simpleDateFormat.format(beginDate);
-        String strEndDate = simpleDateFormat.format(endDate);
-        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", strBeginDate);
-        XMLUtils.setAttributeIfNotNull(prop, "EndDate", strEndDate);
+        Date beginDate = complex.getBeginDate();
+        if (beginDate != null) {
+            XMLUtils.setAttributeIfNotNull(prop, "BeginDate", simpleDateFormat.format(beginDate));
+        }
+        Date endDate = complex.getEndDate();
+        if (endDate != null) {
+            XMLUtils.setAttributeIfNotNull(prop, "EndDate", simpleDateFormat.format(endDate));
+        }
 
         XMLUtils.setAttributeIfNotNull(prop, "CycleMotion", complex.getCycleMotion());
         XMLUtils.setAttributeIfNotNull(prop, "DayInCycle", complex.getDayInCycle());
