@@ -9,10 +9,14 @@ import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.apache.commons.lang.time.DateUtils;
+import org.apache.cxf.common.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.text.ParseException;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -220,16 +224,30 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "Id", dish.getIdOfDish());
         XMLUtils.setAttributeIfNotNull(prop, "Name", dish.getDishName());
         XMLUtils.setAttributeIfNotNull(prop, "Components", dish.getComponentsOfDish());
-        XMLUtils.setAttributeIfNotNull(prop, "Code", dish.getDishName());
-        XMLUtils.setAttributeIfNotNull(prop, "Price", dish.getPrice());
-        XMLUtils.setAttributeIfNotNull(prop, "DateBeginIncludeMenu", dish.getDateOfBeginMenuIncluding());
-        XMLUtils.setAttributeIfNotNull(prop, "DateEndIncludeMenu", dish.getDateOfEndMenuIncluding());
+        XMLUtils.setAttributeIfNotNull(prop, "Code", dish.getCode());
+
+        float price = dish.getPrice().floatValue() * 100;
+        XMLUtils.setAttributeIfNotNull(prop, "Price", price);
+
+        Date beginDate = dish.getDateOfBeginMenuIncluding();
+        Date endDate = dish.getDateOfEndMenuIncluding();
+        try {
+            beginDate = DateUtils.parseDate(beginDate.toString(), new String[]{"dd.mm.yyyy hh:mm:ss"});
+            endDate = DateUtils.parseDate(endDate.toString(), new String[]{"dd.mm.yyyy hh:mm:ss"});
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+
+        XMLUtils.setAttributeIfNotNull(prop, "DateBeginIncludeMenu", beginDate);
+        XMLUtils.setAttributeIfNotNull(prop, "DateEndIncludeMenu", endDate );
         XMLUtils.setAttributeIfNotNull(prop, "V", dish.getVersion());
         XMLUtils.setAttributeIfNotNull(prop, "D", dish.getDeleteState());
         XMLUtils.setAttributeIfNotNull(prop, "Guid", dish.getGuid());
         XMLUtils.setAttributeIfNotNull(prop, "AgeGroupId", dish.getWtAgeGroupItem().getIdOfAgeGroupItem());
         XMLUtils.setAttributeIfNotNull(prop, "TypeProductionId", dish.getWtTypeProductionItem().getIdOfTypeProductionItem());
-        XMLUtils.setAttributeIfNotNull(prop, "BarCode", dish.getBarcode());
+        if (StringUtils.isEmpty(dish.getBarcode())) {
+            XMLUtils.setAttributeIfNotNull(prop, "BarCode", dish.getBarcode());
+        }
         XMLUtils.setAttributeIfNotNull(prop, "Protein", dish.getProtein());
         XMLUtils.setAttributeIfNotNull(prop, "Fat", dish.getFat());
         XMLUtils.setAttributeIfNotNull(prop, "Carbohydrates", dish.getCarbohydrates());
@@ -290,8 +308,17 @@ public class ResMenuSupplier implements AbstractToElement {
         Element prop = document.createElement("Prop");
         XMLUtils.setAttributeIfNotNull(prop, "Id", menu.getIdOfMenu());
         XMLUtils.setAttributeIfNotNull(prop, "Name", menu.getMenuName());
-        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", menu.getBeginDate());
-        XMLUtils.setAttributeIfNotNull(prop, "EndDate", menu.getEndDate());
+
+        Date beginDate = menu.getBeginDate();
+        Date endDate = menu.getEndDate();
+        try {
+            beginDate = DateUtils.parseDate(beginDate.toString(), new String[]{"dd.mm.yyyy hh:mm:ss"});
+            endDate = DateUtils.parseDate(endDate.toString(), new String[]{"dd.mm.yyyy hh:mm:ss"});
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", beginDate);
+        XMLUtils.setAttributeIfNotNull(prop, "EndDate", endDate);
         if (menu.getWtOrgGroup() != null) {
             XMLUtils.setAttributeIfNotNull(prop, "OrgGroupId", menu.getWtOrgGroup().getIdOfOrgGroup());
         }
@@ -328,9 +355,20 @@ public class ResMenuSupplier implements AbstractToElement {
         Element prop = document.createElement("Prop");
         XMLUtils.setAttributeIfNotNull(prop, "Id", complex.getIdOfComplex());
         XMLUtils.setAttributeIfNotNull(prop, "Name", complex.getName());
-        XMLUtils.setAttributeIfNotNull(prop, "Price", complex.getPrice());
-        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", complex.getBeginDate());
-        XMLUtils.setAttributeIfNotNull(prop, "EndDate", complex.getEndDate());
+
+        float price = complex.getPrice().floatValue() * 100;
+        XMLUtils.setAttributeIfNotNull(prop, "Price", price);
+
+        Date beginDate = complex.getBeginDate();
+        Date endDate = complex.getEndDate();
+        try {
+            beginDate = DateUtils.parseDate(beginDate.toString(), new String[]{"dd.mm.yyyy hh:mm:ss"});
+            endDate = DateUtils.parseDate(endDate.toString(), new String[]{"dd.mm.yyyy hh:mm:ss"});
+        } catch (ParseException e) {
+            e.printStackTrace();
+        }
+        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", beginDate);
+        XMLUtils.setAttributeIfNotNull(prop, "EndDate", endDate);
         XMLUtils.setAttributeIfNotNull(prop, "CycleMotion", complex.getCycleMotion());
         XMLUtils.setAttributeIfNotNull(prop, "DayInCycle", complex.getDayInCycle());
         XMLUtils.setAttributeIfNotNull(prop, "V", complex.getVersion());
