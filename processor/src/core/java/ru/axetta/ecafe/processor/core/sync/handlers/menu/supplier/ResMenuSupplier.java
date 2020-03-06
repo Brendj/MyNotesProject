@@ -225,8 +225,9 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "Components", dish.getComponentsOfDish());
         XMLUtils.setAttributeIfNotNull(prop, "Code", dish.getCode());
 
-        float price = dish.getPrice().floatValue() * 100;
-        XMLUtils.setAttributeIfNotNull(prop, "Price", price);
+        if (dish.getPrice() != null) {
+            XMLUtils.setAttributeIfNotNull(prop, "Price", dish.getPrice().floatValue() * 100);
+        }
 
         String pattern = "dd.mm.yyyy hh:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
@@ -356,8 +357,9 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "Id", complex.getIdOfComplex());
         XMLUtils.setAttributeIfNotNull(prop, "Name", complex.getName());
 
-        float price = complex.getPrice().floatValue() * 100;
-        XMLUtils.setAttributeIfNotNull(prop, "Price", price);
+        if (complex.getPrice() != null) {
+            XMLUtils.setAttributeIfNotNull(prop, "Price", complex.getPrice().floatValue() * 100);
+        }
 
         String pattern = "dd.mm.yyyy hh:mm:ss";
         SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
