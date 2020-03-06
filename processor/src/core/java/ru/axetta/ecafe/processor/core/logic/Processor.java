@@ -4109,6 +4109,9 @@ public class Processor implements SyncProcessor {
                 long totalPurchaseRSum = 0;
                 long totalLunchRSum = 0;
                 Set<String> rations = new HashSet<>();
+                //Проверяем, есть ли среди деталей элемент со ссылкой на предзаказ
+                String guidPreorder = findGuidPreOrderDetail(payment);
+
                 // Register order details (purchase)
                 for (Purchase purchase : payment.getPurchases()) {
                     if (null != findOrderDetail(persistenceSession,
@@ -4283,6 +4286,15 @@ public class Processor implements SyncProcessor {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    private String findGuidPreOrderDetail(Payment payment) {
+        for (Purchase purchase : payment.getPurchases()) {
+            if (purchase.getGuidPreOrderDetail() != null) {
+                return purchase.getGuidPreOrderDetail();
+            }
+        }
+        return null;
     }
 
     private boolean transactionOwnerHaveSmartWatch(AccountTransaction transaction) {
