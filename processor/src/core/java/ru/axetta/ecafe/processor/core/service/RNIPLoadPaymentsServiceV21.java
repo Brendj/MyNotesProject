@@ -278,12 +278,12 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         serviceType.setCode("AAAA" + getMacroPart(contragent, "CONTRAGENT_ID") + "0000000001");
         serviceType.setDesc("Услуги по оплате питания учеников в образовательных учреждениях");
         serviceType.setIsActive(true);
-        serviceType.setName("Услуга питания в ОУ");
+        serviceType.setName("Пополнение лицевого счета карты прохода и питания ребенка");
         serviceType.setRevisionDate(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(
                 RuntimeContext.getInstance().getDefaultLocalCalendar(null).getTime()));
         ServiceCategoryType serviceCategoryType = serviceTypeObjectFactory.createServiceCategoryType();
         serviceCategoryType.setCode("PIP0000019");
-        serviceCategoryType.setName("Недоступно для оплаты");
+        serviceCategoryType.setName("Проход и питание");
         serviceType.setServiceCategory(serviceCategoryType);
 
         DescriptionParametersType descriptionParametersType = serviceTypeObjectFactory.createDescriptionParametersType();
