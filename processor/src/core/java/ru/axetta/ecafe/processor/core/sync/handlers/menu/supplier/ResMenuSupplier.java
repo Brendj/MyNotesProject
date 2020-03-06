@@ -9,12 +9,11 @@ import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.common.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -231,15 +230,13 @@ public class ResMenuSupplier implements AbstractToElement {
 
         Date beginDate = dish.getDateOfBeginMenuIncluding();
         Date endDate = dish.getDateOfEndMenuIncluding();
-        try {
-            beginDate = DateUtils.parseDate(beginDate.toString(), new String[]{"dd.mm.yyyy hh:mm:ss"});
-            endDate = DateUtils.parseDate(endDate.toString(), new String[]{"dd.mm.yyyy hh:mm:ss"});
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
+        String pattern = "dd.mm.yyyy hh:mm:ss";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String strBeginDate = simpleDateFormat.format(beginDate);
+        String strEndDate = simpleDateFormat.format(endDate);
 
-        XMLUtils.setAttributeIfNotNull(prop, "DateBeginIncludeMenu", beginDate);
-        XMLUtils.setAttributeIfNotNull(prop, "DateEndIncludeMenu", endDate );
+        XMLUtils.setAttributeIfNotNull(prop, "DateBeginIncludeMenu", strBeginDate);
+        XMLUtils.setAttributeIfNotNull(prop, "DateEndIncludeMenu", strEndDate);
         XMLUtils.setAttributeIfNotNull(prop, "V", dish.getVersion());
         XMLUtils.setAttributeIfNotNull(prop, "D", dish.getDeleteState());
         XMLUtils.setAttributeIfNotNull(prop, "Guid", dish.getGuid());
@@ -311,14 +308,13 @@ public class ResMenuSupplier implements AbstractToElement {
 
         Date beginDate = menu.getBeginDate();
         Date endDate = menu.getEndDate();
-        try {
-            beginDate = DateUtils.parseDate(beginDate.toString(), new String[]{"dd.mm.yyyy hh:mm:ss"});
-            endDate = DateUtils.parseDate(endDate.toString(), new String[]{"dd.mm.yyyy hh:mm:ss"});
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", beginDate);
-        XMLUtils.setAttributeIfNotNull(prop, "EndDate", endDate);
+        String pattern = "dd.mm.yyyy hh:mm:ss";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String strBeginDate = simpleDateFormat.format(beginDate);
+        String strEndDate = simpleDateFormat.format(endDate);
+        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", strBeginDate);
+        XMLUtils.setAttributeIfNotNull(prop, "EndDate", strEndDate);
+
         if (menu.getWtOrgGroup() != null) {
             XMLUtils.setAttributeIfNotNull(prop, "OrgGroupId", menu.getWtOrgGroup().getIdOfOrgGroup());
         }
@@ -361,14 +357,13 @@ public class ResMenuSupplier implements AbstractToElement {
 
         Date beginDate = complex.getBeginDate();
         Date endDate = complex.getEndDate();
-        try {
-            beginDate = DateUtils.parseDate(beginDate.toString(), new String[]{"dd.mm.yyyy hh:mm:ss"});
-            endDate = DateUtils.parseDate(endDate.toString(), new String[]{"dd.mm.yyyy hh:mm:ss"});
-        } catch (ParseException e) {
-            e.printStackTrace();
-        }
-        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", beginDate);
-        XMLUtils.setAttributeIfNotNull(prop, "EndDate", endDate);
+        String pattern = "dd.mm.yyyy hh:mm:ss";
+        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
+        String strBeginDate = simpleDateFormat.format(beginDate);
+        String strEndDate = simpleDateFormat.format(endDate);
+        XMLUtils.setAttributeIfNotNull(prop, "BeginDate", strBeginDate);
+        XMLUtils.setAttributeIfNotNull(prop, "EndDate", strEndDate);
+
         XMLUtils.setAttributeIfNotNull(prop, "CycleMotion", complex.getCycleMotion());
         XMLUtils.setAttributeIfNotNull(prop, "DayInCycle", complex.getDayInCycle());
         XMLUtils.setAttributeIfNotNull(prop, "V", complex.getVersion());
