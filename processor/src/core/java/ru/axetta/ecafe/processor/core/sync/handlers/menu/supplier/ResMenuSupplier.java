@@ -28,6 +28,8 @@ import java.util.List;
 
 public class ResMenuSupplier implements AbstractToElement {
 
+    private final String datePattern = "dd.MM.yyyy hh:mm:ss";
+
     private List<WtOrgGroup> orgGroups;
     private List<WtCategoryItem> categoryItems;
     private List<WtTypeOfProductionItem> typeProductions;
@@ -39,6 +41,8 @@ public class ResMenuSupplier implements AbstractToElement {
     private List<WtMenuGroup> menuGroups;
     private List<WtMenu> menus;
     private List<WtComplex> complexes;
+
+    SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
 
     public ResMenuSupplier() {
         orgGroups = new ArrayList<>();
@@ -229,8 +233,6 @@ public class ResMenuSupplier implements AbstractToElement {
             XMLUtils.setAttributeIfNotNull(prop, "Price", dish.getPrice().floatValue() * 100);
         }
 
-        String pattern = "dd.mm.yyyy hh:mm:ss";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         Date beginDate = dish.getDateOfBeginMenuIncluding();
         if (beginDate != null) {
             XMLUtils.setAttributeIfNotNull(prop, "DateBeginIncludeMenu", simpleDateFormat.format(beginDate));
@@ -309,8 +311,6 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "Id", menu.getIdOfMenu());
         XMLUtils.setAttributeIfNotNull(prop, "Name", menu.getMenuName());
 
-        String pattern = "dd.mm.yyyy hh:mm:ss";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         Date beginDate = menu.getBeginDate();
         if (beginDate != null) {
             XMLUtils.setAttributeIfNotNull(prop, "BeginDate", simpleDateFormat.format(beginDate));
@@ -361,8 +361,6 @@ public class ResMenuSupplier implements AbstractToElement {
             XMLUtils.setAttributeIfNotNull(prop, "Price", complex.getPrice().floatValue() * 100);
         }
 
-        String pattern = "dd.mm.yyyy hh:mm:ss";
-        SimpleDateFormat simpleDateFormat = new SimpleDateFormat(pattern);
         Date beginDate = complex.getBeginDate();
         if (beginDate != null) {
             XMLUtils.setAttributeIfNotNull(prop, "BeginDate", simpleDateFormat.format(beginDate));
