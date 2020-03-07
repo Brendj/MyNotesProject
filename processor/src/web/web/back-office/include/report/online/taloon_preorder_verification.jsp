@@ -64,10 +64,13 @@
                          actionListener="#{mainPage.totalSalesPage.onEndDateSpecified}"/>
         </rich:calendar>
     </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid" columns="1">
+    <h:panelGrid styleClass="borderless-grid" columns="2">
         <a4j:commandButton value="Обновить" action="#{mainPage.taloonPreorderVerificationPage.reload}"
                            reRender="taloonPreorderVerificationPanelGrid" styleClass="command-button"
                            status="reportGenerateStatus" id="reloadButton"/>
+        <a4j:commandButton value="Подтвердить" action="#{mainPage.taloonPreorderVerificationPage.apply}"
+                           reRender="taloonPreorderVerificationTable" styleClass="command-button"
+                           status="reportGenerateStatus" id="applyButton2"/>
     </h:panelGrid>
 
     <a4j:status id="reportGenerateStatus">
@@ -92,10 +95,10 @@
                     <h:outputText escape="true" value="Цена"/>
                 </rich:column>
                 <rich:column headerClass="column-header" colspan="2">
-                    <h:outputText escape="true" value="Заказ ИСПП (шт/руб)"/>
+                    <h:outputText escape="true" value="Заказ ОО (шт/руб)"/>
                 </rich:column>
                 <rich:column headerClass="column-header" colspan="2">
-                    <h:outputText escape="true" value="Оплата ИСПП (шт/руб)"/>
+                    <h:outputText escape="true" value="Оплата ОО (шт/руб)"/>
                 </rich:column>
                 <rich:column headerClass="column-header" colspan="2">
                     <h:outputText escape="true" value="Блокировано (шт/руб)"/>
@@ -147,7 +150,7 @@
                 <%--        Комплекс--%>
                 <rich:column headerClass="column-header" rowspan="#{complex.details.size()}"
                              rendered="#{rowDetailKey eq 0}">
-                    <h:outputText value="#{detail.complexName}"/>
+                    <h:outputText value="#{detail.complexName}" styleClass="output-text"/>
                 </rich:column>
                 <%--        Товары--%>
                 <rich:column headerClass="column-header">
@@ -162,7 +165,7 @@
                     <h:outputText escape="true" value="#{detail.price}" styleClass="output-text"
                                   converter="copeckSumConverter"/>
                 </rich:column>
-                <%--        Заказ ИСПП шт--%>
+                <%--        Заказ ОО шт--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
@@ -170,7 +173,7 @@
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
-                <%--        Заказ ИСПП руб--%>
+                <%--        Заказ ОО руб--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
@@ -179,7 +182,7 @@
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
-                <%--        Оплата ИСПП шт--%>
+                <%--        Оплата ОО шт--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
@@ -187,7 +190,7 @@
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
-                <%--        Оплата ИСПП руб--%>
+                <%--        Оплата ОО руб--%>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
@@ -231,21 +234,11 @@
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
                 <%--        Отгрузка шт--%>
-                <%--                <rich:column headerClass="column-header">--%>
-                <%--                    <h:inputText value="#{detail.strShippedQty}" styleClass="output-text"--%>
-                <%--                                 rendered="#{detail.enableEditShippedQty()}">--%>
-                <%--                        <a4j:support event="onchange"/>--%>
-                <%--                    </h:inputText>--%>
-                <%--                    <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay}"/>--%>
-                <%--                    <h:outputText escape="true" value="#{detail.shippedQty}" styleClass="output-text"--%>
-                <%--                                  rendered="#{!detail.enableEditShippedQty()}"/>--%>
-                <%--                    <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay}"/>--%>
-                <%--                </rich:column>--%>
-                <rich:column headerClass="column-header">
-                    <h:inputText value="#{detail.shippedQty}" styleClass="output-text"
+                <rich:column headerClass="column-header" width="4">
+                    <h:inputTextarea value="#{detail.shippedQty}" styleClass="output-text" rows="1" cols="4"
                                  rendered="#{detail.enableEditShippedQty()}">
                         <a4j:support event="onchange"/>
-                    </h:inputText>
+                    </h:inputTextarea>
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.shippedQty}" styleClass="output-text"
@@ -367,10 +360,10 @@
 
                 <%--        Комментарий--%>
                 <rich:column headerClass="column-header">
-                    <h:inputText value="#{detail.comments}" styleClass="output-text"
+                    <h:inputTextarea value="#{detail.comments}" styleClass="output-text" cols="40" rows="2"
                                  rendered="#{!detail.summaryDay and !detail.isTotal()}">
                         <a4j:support event="onchange"/>
-                    </h:inputText>
+                    </h:inputTextarea>
                 </rich:column>
 
                 <%--        История изменений--%>

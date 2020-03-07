@@ -83,12 +83,12 @@ public class ReestrTaloonApprovalProcessor extends AbstractProcessor<ResReestrTa
                         if (taloon == null) {
                             taloon = new TaloonApproval(idOfOrg, idOfOrgCreated, date, name, goodsGuid, soldedQty, price, createdType, requestedQty, shippedQty,
                                     isppState, ppState, goodsName);
-                            taloon.setRemarks(String.format("Создано в ОО \"%s\" (ид.=%s), %3$td.%3$tm.%3$tY %3$tT",
+                            taloon.setRemarks(String.format("Создано в ОО \"%s\" (ид. %s), %3$td.%3$tm.%3$tY %3$tT",
                                     orgOwner.getShortName(), orgOwner.getIdOfOrg(), new Date()));
                         } else {
                             String rem = (taloon.getRemarks() == null ? "-" : taloon.getRemarks());
                             taloon.setRemarks(rem.concat("\n").concat(String
-                                    .format("Изменено в ОО \"%s\" (ид.=%s), %3$td.%3$tm.%3$tY %3$tT", orgOwner.getShortName(), orgOwner.getIdOfOrg(), new Date())));
+                                    .format("Изменено в ОО \"%s\" (ид. %s), %3$td.%3$tm.%3$tY %3$tT", orgOwner.getShortName(), orgOwner.getIdOfOrg(), new Date())));
                         }
                         taloon.setSoldedQty(soldedQty);
                         taloon.setRequestedQty(requestedQty);
