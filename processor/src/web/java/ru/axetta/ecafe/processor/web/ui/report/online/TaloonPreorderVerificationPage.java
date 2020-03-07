@@ -133,6 +133,8 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
                     if (detail.equals(currentTaloonPreorderVerificationDetail)) {
                         if (currentState
                                 .equals(TaloonPreorderVerificationItem.MAKE_CANCEL) && !detail.needFillShippedQty()) {
+                            detail.setShippedQty(null);
+                            detail.setShippedSum(0L);
                             detail.setPpState(TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED);
                         }
                         if (currentState.equals(TaloonPreorderVerificationItem.MAKE_CONFIRM)) {
