@@ -68,7 +68,9 @@
         <a4j:commandButton value="Обновить" action="#{mainPage.taloonPreorderVerificationPage.reload}"
                            reRender="taloonPreorderVerificationPanelGrid" styleClass="command-button"
                            status="reportGenerateStatus" id="reloadButton"/>
+
         <a4j:commandButton value="Подтвердить" action="#{mainPage.taloonPreorderVerificationPage.apply}"
+                           disabled="#{!mainPage.taloonPreorderVerificationPage.changedData}"
                            reRender="taloonPreorderVerificationTable" styleClass="command-button"
                            status="reportGenerateStatus" id="applyButton2"/>
     </h:panelGrid>
@@ -237,7 +239,8 @@
                 <rich:column headerClass="column-header" width="4">
                     <h:inputTextarea value="#{detail.shippedQty}" styleClass="output-text" rows="1" cols="4"
                                  rendered="#{detail.enableEditShippedQty()}">
-                        <a4j:support event="onchange"/>
+                        <f:validateLength maximum="4"/>
+                        <a4j:support event="onchange" action="#{mainPage.taloonPreorderVerificationPage.checkDataChanged()}"/>
                     </h:inputTextarea>
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
@@ -362,7 +365,8 @@
                 <rich:column headerClass="column-header">
                     <h:inputTextarea value="#{detail.comments}" styleClass="output-text" cols="40" rows="2"
                                  rendered="#{!detail.summaryDay and !detail.isTotal()}">
-                        <a4j:support event="onchange"/>
+                        <f:validateLength maximum="128"/>
+                        <a4j:support event="onchange" action="#{mainPage.taloonPreorderVerificationPage.checkDataChanged()}"/>
                     </h:inputTextarea>
                 </rich:column>
 

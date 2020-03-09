@@ -159,22 +159,18 @@ public class TaloonPreorderVerification {
     public void applyChanges(Session session, List<TaloonPreorderVerificationItem> items) throws Exception {
         if (items != null) {
             for (TaloonPreorderVerificationItem item : items) {
-                Date taloonDate = item.getTaloonDate();
                 for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
                     for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
                         if (detail.isSummaryDay()) {
                             continue;
                         }
                         String guid = detail.getGuid();
-                        Long complexId = detail.getComplexId();
-                        String goodsGuid = detail.getGoodsGuid();
-                        Long idOfOrg = detail.getIdOfOrg();
-                        Long price = detail.getPrice();
                         TaloonPreorder taloon = DAOReadonlyService.getInstance().findTaloonPreorder(guid);
                         if (taloon != null) {
                             if (itemChangedNullSafe(taloon.getShippedQty(), detail.getShippedQty()) ||
                                     !taloon.getPpState().equals(detail.getPpState()) ||
                                     itemChangedNullSafe(taloon.getComments(), detail.getComments())) {
+                                detail.setChangedData(true);
                                 String rem = (taloon.getRemarks() == null ? "-" : taloon.getRemarks());
                                 taloon.setRemarks(rem.concat("\n").concat(String
                                         .format("Изменено в АРМ отчетности, пользователь %s, %2$td.%2$tm.%2$tY %2$tT",
