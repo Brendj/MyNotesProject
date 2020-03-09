@@ -361,16 +361,18 @@
 
                 </rich:column>
 
+                <%--                <a4j:commandLink reRender="filter">--%>
+                <%--                    <f:setPropertyActionListener value="#{ruleEditPage}" target="#{ruleEditPage.wt}"/>--%>
+                <%--                    <h:selectBooleanCheckbox id="arm" value="#{ruleEditPage.wt}"/>--%>
+                <%--                </a4j:commandLink>--%>
+
                 <%--        Комментарий--%>
                 <rich:column headerClass="column-header">
-                    <a4j:commandLink reRender="buttons" actionListener="#{mainPage.taloonPreorderVerificationPage.checkDataChanged()}">
                         <h:inputTextarea value="#{detail.comments}" styleClass="output-text" id="comment" cols="20"
-                                         rows="2"
-                                         rendered="#{!detail.summaryDay and !detail.isTotal()}">
+                                         rows="2" rendered="#{!detail.summaryDay and !detail.isTotal()}">
                             <f:validateLength maximum="60"/>
                             <a4j:support event="onchange"/>
                         </h:inputTextarea>
-                    </a4j:commandLink>
                 </rich:column>
 
                 <%--        История изменений--%>
