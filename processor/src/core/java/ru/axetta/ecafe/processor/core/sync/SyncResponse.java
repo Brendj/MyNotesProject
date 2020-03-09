@@ -1647,9 +1647,6 @@ public class SyncResponse {
             envelopeElement.appendChild(resMenuSupplier.toElement(document));
         }
 
-        if (menuSupplierData != null) {
-            envelopeElement.appendChild(menuSupplierData.toElement(document));
-        }
     }
 
     public Long getIdOfOrg() {

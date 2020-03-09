@@ -409,7 +409,7 @@ public class ResMenuSupplier implements AbstractToElement {
         Element orgs = document.createElement("Orgs");
         for (Org item : complex.getOrgs()) {
             Element elem = document.createElement("ORI");
-            XMLUtils.setAttributeIfNotNull(elem, "MenuId", complex.getIdOfComplex());
+            XMLUtils.setAttributeIfNotNull(elem, "ComplexId", complex.getIdOfComplex());
             XMLUtils.setAttributeIfNotNull(elem, "OrgId", item.getIdOfOrg());
             orgs.appendChild(elem);
         }
