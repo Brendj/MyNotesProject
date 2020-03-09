@@ -64,7 +64,8 @@
                          actionListener="#{mainPage.totalSalesPage.onEndDateSpecified}"/>
         </rich:calendar>
     </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid" columns="2">
+    <%--    Кнопки--%>
+    <h:panelGrid styleClass="borderless-grid" columns="2" id="buttons">
         <a4j:commandButton value="Обновить" action="#{mainPage.taloonPreorderVerificationPage.reload}"
                            reRender="taloonPreorderVerificationPanelGrid" styleClass="command-button"
                            status="reportGenerateStatus" id="reloadButton"/>
@@ -171,7 +172,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.requestedQty}" styleClass="output-text" />
+                    <h:outputText escape="true" value="#{detail.requestedQty}" styleClass="output-text"/>
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
@@ -188,7 +189,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.soldQty}" styleClass="output-text" />
+                    <h:outputText escape="true" value="#{detail.soldQty}" styleClass="output-text"/>
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
@@ -205,7 +206,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.blockedQty}" styleClass="output-text" />
+                    <h:outputText escape="true" value="#{detail.blockedQty}" styleClass="output-text"/>
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
@@ -222,7 +223,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.reservedQty}" styleClass="output-text" />
+                    <h:outputText escape="true" value="#{detail.reservedQty}" styleClass="output-text"/>
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
@@ -237,15 +238,15 @@
                 </rich:column>
                 <%--        Отгрузка шт--%>
                 <rich:column headerClass="column-header" width="4">
-                    <h:inputTextarea value="#{detail.shippedQty}" styleClass="output-text" rows="1" cols="4"
-                                 rendered="#{detail.enableEditShippedQty()}">
+                    <h:inputTextarea value="#{detail.shippedQty}" styleClass="output-text" cols="4" rows="1"
+                                     rendered="#{detail.enableEditShippedQty()}">
                         <f:validateLength maximum="4"/>
-                        <a4j:support event="onchange" action="#{mainPage.taloonPreorderVerificationPage.checkDataChanged()}"/>
+                        <a4j:support event="onchange"/>
                     </h:inputTextarea>
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
                     <h:outputText escape="true" value="#{detail.shippedQty}" styleClass="output-text"
-                                  rendered="#{!detail.enableEditShippedQty()}" />
+                                  rendered="#{!detail.enableEditShippedQty()}"/>
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
@@ -262,7 +263,7 @@
                 <rich:column headerClass="column-header">
                     <h:outputText escape="false" value="<strong>"
                                   rendered="#{detail.summaryDay}"/>
-                    <h:outputText escape="true" value="#{detail.differedQty}" styleClass="output-text" />
+                    <h:outputText escape="true" value="#{detail.differedQty}" styleClass="output-text"/>
                     <h:outputText escape="false" value="</strong>"
                                   rendered="#{detail.summaryDay}"/>
                 </rich:column>
@@ -317,7 +318,7 @@
                     </a4j:commandLink>
 
                     <a4j:commandLink reRender="taloonPreorderVerificationTable" rendered="#{detail.ppStateConfirmed}"
-                                     action="#{detail.deselectPpState}"
+                                     action="#{detail.deselectPpState()}"
                                      onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
                         <f:setPropertyActionListener value="#{detail}" target="#{detail.ppState}"/>
                         <h:graphicImage value="/images/taloons/applied.png"/>
@@ -336,8 +337,7 @@
                                      rendered="#{detail.summaryDay and !detail.isTotal() and !detail.isEmptyTotal()}"
                                      action="#{item.deselectPpState()}" style="color:lightgray;"
                                      onclick="if (#{!item.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
-                        <f:setPropertyActionListener value="#{item}"
-                                                     target="#{item.getPpState()}"/>
+                        <f:setPropertyActionListener value="#{item}" target="#{item.getPpState()}"/>
                         <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
                     </a4j:commandLink>
 
@@ -363,11 +363,14 @@
 
                 <%--        Комментарий--%>
                 <rich:column headerClass="column-header">
-                    <h:inputTextarea value="#{detail.comments}" styleClass="output-text" cols="40" rows="2"
-                                 rendered="#{!detail.summaryDay and !detail.isTotal()}">
-                        <f:validateLength maximum="128"/>
-                        <a4j:support event="onchange" action="#{mainPage.taloonPreorderVerificationPage.checkDataChanged()}"/>
-                    </h:inputTextarea>
+                    <a4j:commandLink reRender="buttons" actionListener="#{mainPage.taloonPreorderVerificationPage.checkDataChanged()}">
+                        <h:inputTextarea value="#{detail.comments}" styleClass="output-text" id="comment" cols="20"
+                                         rows="2"
+                                         rendered="#{!detail.summaryDay and !detail.isTotal()}">
+                            <f:validateLength maximum="60"/>
+                            <a4j:support event="onchange"/>
+                        </h:inputTextarea>
+                    </a4j:commandLink>
                 </rich:column>
 
                 <%--        История изменений--%>
@@ -404,6 +407,7 @@
                            reRender="taloonPreorderVerificationTable" styleClass="command-button"
                            status="reportGenerateStatus" id="applyButton"/>
     </h:panelGrid>
+
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
                    warnClass="warn-messages"/>
 </h:panelGrid>
