@@ -4110,7 +4110,7 @@ public class Processor implements SyncProcessor {
                 long totalLunchRSum = 0;
                 Set<String> rations = new HashSet<>();
                 //Проверяем, есть ли среди деталей элемент со ссылкой на предзаказ
-                String guidPreorder = findGuidPreOrderDetail(payment);
+                PreorderComplex preorderComplex = findGuidPreOrderDetail(persistenceSession, payment);
 
                 // Register order details (purchase)
                 for (Purchase purchase : payment.getPurchases()) {
@@ -4141,7 +4141,7 @@ public class Processor implements SyncProcessor {
                     }
                     if (purchase.getGuidPreOrderDetail() != null) {
                         savePreorderGuidFromOrderDetail(persistenceSession, purchase.getGuidPreOrderDetail(),
-                                orderDetail, false);
+                                orderDetail, false, preorderComplex, purchase.getItemCode());
                     }
                     persistenceSession.save(orderDetail);
                     totalPurchaseDiscount += purchase.getDiscount() * Math.abs(purchase.getQty());
@@ -4288,10 +4288,12 @@ public class Processor implements SyncProcessor {
         }
     }
 
-    private String findGuidPreOrderDetail(Payment payment) {
+    private PreorderComplex findGuidPreOrderDetail(Session session, Payment payment) {
         for (Purchase purchase : payment.getPurchases()) {
             if (purchase.getGuidPreOrderDetail() != null) {
-                return purchase.getGuidPreOrderDetail();
+                Criteria criteria = session.createCriteria(PreorderComplex.class);
+                criteria.add(Restrictions.eq("guid", purchase.getGuidPreOrderDetail()));
+                return (PreorderComplex) criteria.uniqueResult();
             }
         }
         return null;

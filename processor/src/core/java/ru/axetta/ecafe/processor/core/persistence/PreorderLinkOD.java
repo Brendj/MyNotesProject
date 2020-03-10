@@ -15,6 +15,7 @@ public class PreorderLinkOD {
     private Long idOfOrderDetail;
     private Long qty;
     private Long price;
+    private String itemCode;
 
     public PreorderLinkOD() {
 
@@ -83,5 +84,13 @@ public class PreorderLinkOD {
 
     public void setIdOfPreorderLinkOD(Long idOfPreorderLinkOD) {
         this.idOfPreorderLinkOD = idOfPreorderLinkOD;
+    }
+
+    public String getItemCode() {
+        return itemCode;
+    }
+
+    public void setItemCode(String itemCode) {
+        this.itemCode = itemCode;
     }
 }

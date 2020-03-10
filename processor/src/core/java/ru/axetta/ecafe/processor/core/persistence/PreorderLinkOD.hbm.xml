@@ -16,5 +16,6 @@
         <property name="idOfOrderDetail" column="idOfOrderDetail" type="long" />
         <property name="qty" column="qty" type="long" />
         <property name="price" column="price" type="long" />
+        <property name="itemCode" column="itemcode" type="string" length="32" />
     </class>
 </hibernate-mapping>

@@ -7,3 +7,6 @@
 ALTER TABLE cf_preorder_menudetail
   ADD COLUMN usedsum BIGINT,
   ADD COLUMN usedamount BIGINT;
+
+alter table cf_preorder_linkod
+    add column itemcode character varying(32);
