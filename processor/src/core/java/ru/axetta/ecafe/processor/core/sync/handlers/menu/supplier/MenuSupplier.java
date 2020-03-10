@@ -4,7 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier;
 
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -36,6 +39,8 @@ public class MenuSupplier implements SectionRequest {
 
     private static Map<String, Long> versions = new HashMap<>();
 
+    private Long idOfOrg;
+
     private List<WtOrgGroup> orgGroups = new ArrayList<>();
     private List<WtCategoryItem> categoryItems = new ArrayList<>();
     private List<WtTypeOfProductionItem> typeProductions = new ArrayList<>();
@@ -54,7 +59,7 @@ public class MenuSupplier implements SectionRequest {
     public MenuSupplier() {
     }
 
-    public MenuSupplier(Node menuSupplierNode) {
+    public MenuSupplier build(Node menuSupplierNode, Long idOfOrg) {
 
         Node itemNode = menuSupplierNode.getFirstChild();
         int i = 0;
@@ -76,13 +81,24 @@ public class MenuSupplier implements SectionRequest {
                     err.append("Attribute Version for node ").append(itemNode.getNodeName()).append(" not found\n");
                 }
             }
-            errorMessage = err.toString();
             itemNode = itemNode.getNextSibling();
         }
-        build();
+        return new MenuSupplier(idOfOrg, err.toString());
     }
 
-    public void build() {
+    public MenuSupplier(Long idOfOrg, String errorMessage) {
+
+        this.setIdOfOrg(idOfOrg);
+        this.setErrorMessage(errorMessage);
+        if (errorMessage.equals("")) {
+            this.setResCode(ERROR_CODE_ALL_OK);
+        } else {
+            this.setResCode(ERROR_CODE_NOT_VALID_ATTRIBUTE);
+        }
+
+        Org org = DAOService.getInstance().getOrg(idOfOrg);
+        Set<Org> friendlyOrgs = DAOService.getInstance().getFriendlyOrgs(idOfOrg);
+        Contragent contragent = org.getDefaultSupplier();
 
         Iterator<Map.Entry<String, Long>> iter = versions.entrySet().iterator();
 
@@ -91,8 +107,14 @@ public class MenuSupplier implements SectionRequest {
 
             switch (entry.getKey()) {
                 case "OrgGroupsRequest": {
-                    //orgGroups = DAOService.getInstance().getOrgGroupsListFromVersion(entry.getValue());
-                    orgGroups = DAOReadonlyService.getInstance().getOrgGroupsListFromVersion(entry.getValue());
+                    orgGroups = DAOReadonlyService.getInstance()
+                            .getOrgGroupsListFromVersion(entry.getValue(), contragent, org);
+                    for (Org item : friendlyOrgs) {
+                        Contragent itemContragent = item.getDefaultSupplier();
+                        List<WtOrgGroup> friendlyItems = DAOReadonlyService.getInstance()
+                                .getOrgGroupsListFromVersion(entry.getValue(), itemContragent, item);
+                        orgGroups.addAll(friendlyItems);
+                    }
                     break;
                 }
                 case "CategoryItemsRequest": {
@@ -100,7 +122,8 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "TypeProductionsRequest": {
-                    typeProductions = DAOReadonlyService.getInstance().getTypeProductionsListFromVersion(entry.getValue());
+                    typeProductions = DAOReadonlyService.getInstance()
+                            .getTypeProductionsListFromVersion(entry.getValue());
                     break;
                 }
                 case "AgeGroupItemsRequest": {
@@ -112,7 +135,8 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "ComplexGroupItemsRequest": {
-                    complexGroupItems = DAOReadonlyService.getInstance().getComplexGroupItemsListFromVersion(entry.getValue());
+                    complexGroupItems = DAOReadonlyService.getInstance()
+                            .getComplexGroupItemsListFromVersion(entry.getValue());
                     break;
                 }
                 case "GroupItemsRequest": {
@@ -120,7 +144,14 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "DishesRequest": {
-                    dishes = DAOReadonlyService.getInstance().getDishesListFromVersion(entry.getValue());
+                    dishes = DAOReadonlyService.getInstance()
+                            .getDishesListFromVersion(entry.getValue(), contragent);
+                    for (Org item : friendlyOrgs) {
+                        Contragent itemContragent = item.getDefaultSupplier();
+                        List<WtDish> friendlyItems = DAOReadonlyService.getInstance()
+                                .getDishesListFromVersion(entry.getValue(), itemContragent);
+                        dishes.addAll(friendlyItems);
+                    }
                     break;
                 }
                 case "MenuGroupsRequest": {
@@ -128,22 +159,39 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "MenusRequest": {
-                    menus = DAOReadonlyService.getInstance().getMenusListFromVersion(entry.getValue());
+                    menus = DAOReadonlyService.getInstance()
+                            .getMenusListFromVersion(entry.getValue(), contragent, org);
                     break;
                 }
                 case "ComplexesRequest": {
-                    complexes = DAOReadonlyService.getInstance().getComplexesListFromVersion(entry.getValue());
+                    complexes = DAOReadonlyService.getInstance()
+                            .getComplexesListFromVersion(entry.getValue(), contragent, org);
+                    for (Org item : friendlyOrgs) {
+                        Contragent itemContragent = item.getDefaultSupplier();
+                        List<WtComplex> friendlyItems = DAOReadonlyService.getInstance()
+                                .getComplexesListFromVersion(entry.getValue(), itemContragent, item);
+                        complexes.addAll(friendlyItems);
+                    }
                     break;
                 }
             }
         }
+    }
 
-        this.setErrorMessage(errorMessage);
-        if (errorMessage.equals("")) {
-            this.setResCode(ERROR_CODE_ALL_OK);
-        } else {
-            this.setResCode(ERROR_CODE_NOT_VALID_ATTRIBUTE);
-        }
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
+    }
+
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
     }
 
     @Override
@@ -255,11 +303,4 @@ public class MenuSupplier implements SectionRequest {
         this.resCode = resCode;
     }
 
-    public String getErrorMessage() {
-        return errorMessage;
-    }
-
-    public void setErrorMessage(String errorMessage) {
-        this.errorMessage = errorMessage;
-    }
 }

@@ -2737,7 +2737,7 @@ public class SyncRequest {
 			builders.add(new GoodRequestEZDBuilder());
             builders.add(new SyncSettingsRequestBuilder(idOfOrg));
 			builders.add(new EmiasBuilder());
-            builders.add(new MenuSupplierBuilder());
+            builders.add(new MenuSupplierBuilder(idOfOrg));
             return builders;
         }
 

@@ -19,8 +19,10 @@ import org.w3c.dom.Node;
  */
 
 public class MenuSupplierBuilder implements SectionRequestBuilder {
+    private final long owner;
 
-    public MenuSupplierBuilder() {
+    public MenuSupplierBuilder(long owner) {
+        this.owner = owner;
     }
 
     public MenuSupplier build(Node envelopeNode) throws Exception {
@@ -32,7 +34,7 @@ public class MenuSupplierBuilder implements SectionRequestBuilder {
     public SectionRequest searchSectionNodeAndBuild(Node envelopeNode) throws Exception {
         Node sectionElement = XMLUtils.findFirstChildElement(envelopeNode, MenuSupplier.SECTION_NAME);
         if (sectionElement != null) {
-            return new MenuSupplier(sectionElement);
+            return (new MenuSupplier()).build(sectionElement, owner);
         } else
             return null;
     }

@@ -42,6 +42,8 @@ public class ResMenuSupplier implements AbstractToElement {
     private List<WtMenu> menus;
     private List<WtComplex> complexes;
 
+    private Long idOfOrg;
+
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
 
     public ResMenuSupplier() {
@@ -56,6 +58,7 @@ public class ResMenuSupplier implements AbstractToElement {
         menuGroups = new ArrayList<>();
         menus = new ArrayList<>();
         complexes = new ArrayList<>();
+        idOfOrg = null;
     }
 
     public ResMenuSupplier(MenuSupplier menuSupplier) {
@@ -70,6 +73,7 @@ public class ResMenuSupplier implements AbstractToElement {
         menuGroups = menuSupplier.getMenuGroups();
         menus = menuSupplier.getMenus();
         complexes = menuSupplier.getComplexes();
+        idOfOrg = menuSupplier.getIdOfOrg();
     }
 
     @Override
@@ -230,7 +234,7 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "Code", dish.getCode());
 
         if (dish.getPrice() != null) {
-            int price = (int) dish.getPrice().floatValue() * 100;
+            int price = (int) dish.getPrice().floatValue() * 100; // цена в копейках
             XMLUtils.setAttributeIfNotNull(prop, "Price", price);
         }
 
@@ -515,5 +519,13 @@ public class ResMenuSupplier implements AbstractToElement {
 
     public void setComplexes(List<WtComplex> complexes) {
         this.complexes = complexes;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 }
