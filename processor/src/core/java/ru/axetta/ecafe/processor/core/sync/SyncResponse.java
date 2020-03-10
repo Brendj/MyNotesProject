@@ -19,7 +19,6 @@ import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodR
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.ResHelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
-import ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier.MenuSupplierData;
 import ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier.ResMenuSupplier;
 import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendarData;
 import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.ResMenusCalendar;
@@ -1236,7 +1235,6 @@ public class SyncResponse {
     private EmiasSection emias;
     private EmiasSectionForARMAnswer emiasSectionForARMAnswer;
     private ResMenuSupplier resMenuSupplier;
-    private MenuSupplierData menuSupplierData;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1261,7 +1259,7 @@ public class SyncResponse {
             ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
             ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, GoodRequestEZDSection goodRequestEZDSection,
             ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer,
-            ResMenuSupplier resMenuSupplier, MenuSupplierData menuSupplierData) {
+            ResMenuSupplier resMenuSupplier) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1326,7 +1324,6 @@ public class SyncResponse {
 		this.emias = emias;
         this.emiasSectionForARMAnswer = emiasSectionForARMAnswer;
         this.resMenuSupplier = resMenuSupplier;
-        this.menuSupplierData = menuSupplierData;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
