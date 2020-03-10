@@ -230,7 +230,8 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "Code", dish.getCode());
 
         if (dish.getPrice() != null) {
-            XMLUtils.setAttributeIfNotNull(prop, "Price", dish.getPrice().floatValue() * 100);
+            int price = (int) dish.getPrice().floatValue() * 100;
+            XMLUtils.setAttributeIfNotNull(prop, "Price", price);
         }
 
         Date beginDate = dish.getDateOfBeginMenuIncluding();
