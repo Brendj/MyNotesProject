@@ -37,7 +37,8 @@ public class PreorderMenuDetail {
     private Long usedAmount;
 
     public PreorderMenuDetail() {
-
+        this.usedSum = 0L;
+        this.usedAmount = 0L;
     }
 
     public void deleteByReason(Long nextVersion, boolean doDelete, PreorderState reason) {
