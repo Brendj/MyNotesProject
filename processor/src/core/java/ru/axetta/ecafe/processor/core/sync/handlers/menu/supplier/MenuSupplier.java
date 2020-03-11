@@ -41,17 +41,17 @@ public class MenuSupplier implements SectionRequest {
 
     private Long idOfOrg;
 
-    private List<WtOrgGroup> orgGroups = new ArrayList<>();
-    private List<WtCategoryItem> categoryItems = new ArrayList<>();
-    private List<WtTypeOfProductionItem> typeProductions = new ArrayList<>();
-    private List<WtAgeGroupItem> ageGroupItems = new ArrayList<>();
-    private List<WtDietType> dietTypes = new ArrayList<>();
-    private List<WtComplexGroupItem> complexGroupItems = new ArrayList<>();
-    private List<WtGroupItem> groupItems = new ArrayList<>();
-    private List<WtDish> dishes = new ArrayList<>();
-    private List<WtMenuGroup> menuGroups = new ArrayList<>();
-    private List<WtMenu> menus = new ArrayList<>();
-    private List<WtComplex> complexes = new ArrayList<>();
+    private Set<WtOrgGroup> orgGroups = new HashSet<>();
+    private Set<WtCategoryItem> categoryItems = new HashSet<>();
+    private Set<WtTypeOfProductionItem> typeProductions = new HashSet<>();
+    private Set<WtAgeGroupItem> ageGroupItems = new HashSet<>();
+    private Set<WtDietType> dietTypes = new HashSet<>();
+    private Set<WtComplexGroupItem> complexGroupItems = new HashSet<>();
+    private Set<WtGroupItem> groupItems = new HashSet<>();
+    private Set<WtDish> dishes = new HashSet<>();
+    private Set<WtMenuGroup> menuGroups = new HashSet<>();
+    private Set<WtMenu> menus = new HashSet<>();
+    private Set<WtComplex> complexes = new HashSet<>();
 
     private Integer resCode;
     private String errorMessage;
@@ -97,7 +97,7 @@ public class MenuSupplier implements SectionRequest {
         }
 
         Org org = DAOService.getInstance().getOrg(idOfOrg);
-        List<Org> friendlyOrgs = DAOReadonlyService.getInstance().findFriendlyOrgs(idOfOrg);
+        Set<Org> friendlyOrgs = DAOReadonlyService.getInstance().findFriendlyOrgs(idOfOrg);
         Contragent contragent = DAOReadonlyService.getInstance().findDefaultSupplier(idOfOrg);
 
         Iterator<Map.Entry<String, Long>> iter = versions.entrySet().iterator();
@@ -108,45 +108,44 @@ public class MenuSupplier implements SectionRequest {
             switch (entry.getKey()) {
                 case "OrgGroupsRequest": {
                     orgGroups = DAOReadonlyService.getInstance()
-                            .getOrgGroupsListFromVersion(entry.getValue(), contragent, org);
+                            .getOrgGroupsSetFromVersion(entry.getValue(), contragent, org);
                     for (Org item : friendlyOrgs) {
                         Contragent itemContragent = DAOReadonlyService.getInstance().findDefaultSupplier(item.getIdOfOrg());
-                        List<WtOrgGroup> friendlyItems = DAOReadonlyService.getInstance()
-                                .getOrgGroupsListFromVersion(entry.getValue(), itemContragent, item);
+                        Set<WtOrgGroup> friendlyItems = DAOReadonlyService.getInstance()
+                                .getOrgGroupsSetFromVersion(entry.getValue(), itemContragent, item);
                         orgGroups.addAll(friendlyItems);
                     }
                     break;
                 }
                 case "CategoryItemsRequest": {
-                    categoryItems = DAOReadonlyService.getInstance().getCategoryItemsListFromVersion(entry.getValue());
+                    categoryItems = DAOReadonlyService.getInstance().getCategoryItemsSetFromVersion(entry.getValue());
                     break;
                 }
                 case "TypeProductionsRequest": {
                     typeProductions = DAOReadonlyService.getInstance()
-                            .getTypeProductionsListFromVersion(entry.getValue());
+                            .getTypeProductionsSetFromVersion(entry.getValue());
                     break;
                 }
                 case "AgeGroupItemsRequest": {
-                    ageGroupItems = DAOReadonlyService.getInstance().getAgeGroupItemsListFromVersion(entry.getValue());
+                    ageGroupItems = DAOReadonlyService.getInstance().getAgeGroupItemsSetFromVersion(entry.getValue());
                     break;
                 }
                 case "DietTypesRequest": {
-                    dietTypes = DAOReadonlyService.getInstance().getDietTypesListFromVersion(entry.getValue());
+                    dietTypes = DAOReadonlyService.getInstance().getDietTypesSetFromVersion(entry.getValue());
                     break;
                 }
                 case "ComplexGroupItemsRequest": {
                     complexGroupItems = DAOReadonlyService.getInstance()
-                            .getComplexGroupItemsListFromVersion(entry.getValue());
+                            .getComplexGroupItemsSetFromVersion(entry.getValue());
                     break;
                 }
                 case "GroupItemsRequest": {
-                    groupItems = DAOReadonlyService.getInstance().getGroupItemsListFromVersion(entry.getValue());
+                    groupItems = DAOReadonlyService.getInstance().getGroupItemsSetFromVersion(entry.getValue());
                     break;
                 }
                 case "DishesRequest": {
-                    Set<WtDish> dishesSet = DAOReadonlyService.getInstance()
+                    dishes = DAOReadonlyService.getInstance()
                             .getDishesListFromVersion(entry.getValue(), contragent);
-                    dishes.addAll(dishesSet);
                     for (Org item : friendlyOrgs) {
                         Contragent itemContragent = DAOReadonlyService.getInstance().findDefaultSupplier(item.getIdOfOrg());
                         Set<WtDish> friendlyItems = DAOReadonlyService.getInstance()
@@ -156,12 +155,12 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "MenuGroupsRequest": {
-                    menuGroups = DAOReadonlyService.getInstance().getMenuGroupsListFromVersion(entry.getValue());
+                    menuGroups = DAOReadonlyService.getInstance().getMenuGroupsSetFromVersion(entry.getValue());
                     break;
                 }
                 case "MenusRequest": {
                     menus = DAOReadonlyService.getInstance()
-                            .getMenusListFromVersion(entry.getValue(), contragent, org);
+                            .getMenusSetFromVersion(entry.getValue(), contragent, org);
                     break;
                 }
                 case "ComplexesRequest": {
@@ -169,7 +168,7 @@ public class MenuSupplier implements SectionRequest {
                             .getComplexesListFromVersion(entry.getValue(), contragent, org);
                     for (Org item : friendlyOrgs) {
                         Contragent itemContragent = DAOReadonlyService.getInstance().findDefaultSupplier(item.getIdOfOrg());
-                        List<WtComplex> friendlyItems = DAOReadonlyService.getInstance()
+                        Set<WtComplex> friendlyItems = DAOReadonlyService.getInstance()
                                 .getComplexesListFromVersion(entry.getValue(), itemContragent, item);
                         complexes.addAll(friendlyItems);
                     }
@@ -208,91 +207,91 @@ public class MenuSupplier implements SectionRequest {
         this.versions = versions;
     }
 
-    public List<WtOrgGroup> getOrgGroups() {
+    public Set<WtOrgGroup> getOrgGroups() {
         return orgGroups;
     }
 
-    public void setOrgGroups(List<WtOrgGroup> orgGroups) {
+    public void setOrgGroups(Set<WtOrgGroup> orgGroups) {
         this.orgGroups = orgGroups;
     }
 
-    public List<WtCategoryItem> getCategoryItems() {
+    public Set<WtCategoryItem> getCategoryItems() {
         return categoryItems;
     }
 
-    public void setCategoryItems(List<WtCategoryItem> categoryItems) {
+    public void setCategoryItems(Set<WtCategoryItem> categoryItems) {
         this.categoryItems = categoryItems;
     }
 
-    public List<WtTypeOfProductionItem> getTypeProductions() {
+    public Set<WtTypeOfProductionItem> getTypeProductions() {
         return typeProductions;
     }
 
-    public void setTypeProductions(List<WtTypeOfProductionItem> typeProductions) {
+    public void setTypeProductions(Set<WtTypeOfProductionItem> typeProductions) {
         this.typeProductions = typeProductions;
     }
 
-    public List<WtAgeGroupItem> getAgeGroupItems() {
+    public Set<WtAgeGroupItem> getAgeGroupItems() {
         return ageGroupItems;
     }
 
-    public void setAgeGroupItems(List<WtAgeGroupItem> ageGroupItems) {
+    public void setAgeGroupItems(Set<WtAgeGroupItem> ageGroupItems) {
         this.ageGroupItems = ageGroupItems;
     }
 
-    public List<WtDietType> getDietTypes() {
+    public Set<WtDietType> getDietTypes() {
         return dietTypes;
     }
 
-    public void setDietTypes(List<WtDietType> dietTypes) {
+    public void setDietTypes(Set<WtDietType> dietTypes) {
         this.dietTypes = dietTypes;
     }
 
-    public List<WtComplexGroupItem> getComplexGroupItems() {
+    public Set<WtComplexGroupItem> getComplexGroupItems() {
         return complexGroupItems;
     }
 
-    public void setComplexGroupItems(List<WtComplexGroupItem> complexGroupItems) {
+    public void setComplexGroupItems(Set<WtComplexGroupItem> complexGroupItems) {
         this.complexGroupItems = complexGroupItems;
     }
 
-    public List<WtGroupItem> getGroupItems() {
+    public Set<WtGroupItem> getGroupItems() {
         return groupItems;
     }
 
-    public void setGroupItems(List<WtGroupItem> groupItems) {
+    public void setGroupItems(Set<WtGroupItem> groupItems) {
         this.groupItems = groupItems;
     }
 
-    public List<WtDish> getDishes() {
+    public Set<WtDish> getDishes() {
         return dishes;
     }
 
-    public void setDishes(List<WtDish> dishes) {
+    public void setDishes(Set<WtDish> dishes) {
         this.dishes = dishes;
     }
 
-    public List<WtMenuGroup> getMenuGroups() {
+    public Set<WtMenuGroup> getMenuGroups() {
         return menuGroups;
     }
 
-    public void setMenuGroups(List<WtMenuGroup> menuGroups) {
+    public void setMenuGroups(Set<WtMenuGroup> menuGroups) {
         this.menuGroups = menuGroups;
     }
 
-    public List<WtMenu> getMenus() {
+    public Set<WtMenu> getMenus() {
         return menus;
     }
 
-    public void setMenus(List<WtMenu> menus) {
+    public void setMenus(Set<WtMenu> menus) {
         this.menus = menus;
     }
 
-    public List<WtComplex> getComplexes() {
+    public Set<WtComplex> getComplexes() {
         return complexes;
     }
 
-    public void setComplexes(List<WtComplex> complexes) {
+    public void setComplexes(Set<WtComplex> complexes) {
         this.complexes = complexes;
     }
 

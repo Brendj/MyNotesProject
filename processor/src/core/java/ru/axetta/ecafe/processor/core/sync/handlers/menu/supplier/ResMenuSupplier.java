@@ -14,9 +14,9 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
 import java.util.Date;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -30,34 +30,34 @@ public class ResMenuSupplier implements AbstractToElement {
 
     private final String datePattern = "dd.MM.yyyy hh:mm:ss";
 
-    private List<WtOrgGroup> orgGroups;
-    private List<WtCategoryItem> categoryItems;
-    private List<WtTypeOfProductionItem> typeProductions;
-    private List<WtAgeGroupItem> ageGroupItems;
-    private List<WtDietType> dietTypes;
-    private List<WtComplexGroupItem> complexGroupItems;
-    private List<WtGroupItem> groupItems;
-    private List<WtDish> dishes;
-    private List<WtMenuGroup> menuGroups;
-    private List<WtMenu> menus;
-    private List<WtComplex> complexes;
+    private Set<WtOrgGroup> orgGroups;
+    private Set<WtCategoryItem> categoryItems;
+    private Set<WtTypeOfProductionItem> typeProductions;
+    private Set<WtAgeGroupItem> ageGroupItems;
+    private Set<WtDietType> dietTypes;
+    private Set<WtComplexGroupItem> complexGroupItems;
+    private Set<WtGroupItem> groupItems;
+    private Set<WtDish> dishes;
+    private Set<WtMenuGroup> menuGroups;
+    private Set<WtMenu> menus;
+    private Set<WtComplex> complexes;
 
     private Long idOfOrg;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
 
     public ResMenuSupplier() {
-        orgGroups = new ArrayList<>();
-        categoryItems = new ArrayList<>();
-        typeProductions = new ArrayList<>();
-        ageGroupItems = new ArrayList<>();
-        dietTypes = new ArrayList<>();
-        complexGroupItems = new ArrayList<>();
-        groupItems = new ArrayList<>();
-        dishes = new ArrayList<>();
-        menuGroups = new ArrayList<>();
-        menus = new ArrayList<>();
-        complexes = new ArrayList<>();
+        orgGroups = new HashSet<>();
+        categoryItems = new HashSet<>();
+        typeProductions = new HashSet<>();
+        ageGroupItems = new HashSet<>();
+        dietTypes = new HashSet<>();
+        complexGroupItems = new HashSet<>();
+        groupItems = new HashSet<>();
+        dishes = new HashSet<>();
+        menuGroups = new HashSet<>();
+        menus = new HashSet<>();
+        complexes = new HashSet<>();
         idOfOrg = null;
     }
 
@@ -432,93 +432,95 @@ public class ResMenuSupplier implements AbstractToElement {
         return document.createElement(elementName);
     }
 
-    public List<WtOrgGroup> getOrgGroups() {
+    public String getDatePattern() {
+        return datePattern;
+    }
+
+    public Set<WtOrgGroup> getOrgGroups() {
         return orgGroups;
     }
 
-    public void setOrgGroups(List<WtOrgGroup> orgGroups) {
+    public void setOrgGroups(Set<WtOrgGroup> orgGroups) {
         this.orgGroups = orgGroups;
     }
 
-    public List<WtCategoryItem> getCategoryItems() {
+    public Set<WtCategoryItem> getCategoryItems() {
         return categoryItems;
     }
 
-    public void setCategoryItems(List<WtCategoryItem> categoryItems) {
+    public void setCategoryItems(Set<WtCategoryItem> categoryItems) {
         this.categoryItems = categoryItems;
     }
 
-    public List<WtTypeOfProductionItem> getTypeProductions() {
+    public Set<WtTypeOfProductionItem> getTypeProductions() {
         return typeProductions;
     }
 
-    public void setTypeProductions(List<WtTypeOfProductionItem> typeProductions) {
+    public void setTypeProductions(Set<WtTypeOfProductionItem> typeProductions) {
         this.typeProductions = typeProductions;
     }
 
-    public List<WtAgeGroupItem> getAgeGroupItems() {
+    public Set<WtAgeGroupItem> getAgeGroupItems() {
         return ageGroupItems;
     }
 
-    public void setAgeGroupItems(List<WtAgeGroupItem> ageGroupItems) {
+    public void setAgeGroupItems(Set<WtAgeGroupItem> ageGroupItems) {
         this.ageGroupItems = ageGroupItems;
     }
 
-    public List<WtDietType> getDietTypes() {
+    public Set<WtDietType> getDietTypes() {
         return dietTypes;
     }
 
-    public void setDietTypes(List<WtDietType> dietTypes) {
+    public void setDietTypes(Set<WtDietType> dietTypes) {
         this.dietTypes = dietTypes;
     }
 
-    public List<WtComplexGroupItem> getComplexGroupItems() {
+    public Set<WtComplexGroupItem> getComplexGroupItems() {
         return complexGroupItems;
     }
 
-    public void setComplexGroupItems(List<WtComplexGroupItem> complexGroupItems) {
+    public void setComplexGroupItems(Set<WtComplexGroupItem> complexGroupItems) {
         this.complexGroupItems = complexGroupItems;
     }
 
-    public List<WtGroupItem> getGroupItems() {
+    public Set<WtGroupItem> getGroupItems() {
         return groupItems;
     }
 
-    public void setGroupItems(List<WtGroupItem> groupItems) {
+    public void setGroupItems(Set<WtGroupItem> groupItems) {
         this.groupItems = groupItems;
     }
 
-    public List<WtDish> getDishes() {
+    public Set<WtDish> getDishes() {
         return dishes;
     }
 
-    public void setDishes(List<WtDish> dishes) {
+    public void setDishes(Set<WtDish> dishes) {
         this.dishes = dishes;
     }
 
-    public List<WtMenuGroup> getMenuGroups() {
+    public Set<WtMenuGroup> getMenuGroups() {
         return menuGroups;
     }
 
-    public void setMenuGroups(List<WtMenuGroup> menuGroups) {
+    public void setMenuGroups(Set<WtMenuGroup> menuGroups) {
         this.menuGroups = menuGroups;
     }
 
-    public List<WtMenu> getMenus() {
+    public Set<WtMenu> getMenus() {
         return menus;
     }
 
-    public void setMenus(List<WtMenu> menus) {
+    public void setMenus(Set<WtMenu> menus) {
         this.menus = menus;
     }
 
-    public List<WtComplex> getComplexes(
-
-    ) {
+    public Set<WtComplex> getComplexes() {
         return complexes;
     }
 
-    public void setComplexes(List<WtComplex> complexes) {
+    public void setComplexes(Set<WtComplex> complexes) {
         this.complexes = complexes;
     }
 

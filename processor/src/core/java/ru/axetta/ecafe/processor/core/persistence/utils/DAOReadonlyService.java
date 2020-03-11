@@ -732,7 +732,7 @@ public class DAOReadonlyService {
         }
     }
 
-    public List<WtOrgGroup> getOrgGroupsListFromVersion(Long version, Contragent contragent, Org org) {
+    public Set<WtOrgGroup> getOrgGroupsSetFromVersion(Long version, Contragent contragent, Org org) {
         try {
             Query query = entityManager.createQuery(
                     "SELECT gr FROM WtOrgGroup gr " + "WHERE gr.version > :version AND gr.contragent = :contragent AND "
@@ -740,79 +740,86 @@ public class DAOReadonlyService {
             query.setParameter("version", version);
             query.setParameter("contragent", contragent);
             query.setParameter("org", org);
-            return (List<WtOrgGroup>) query.getResultList();
+            List<WtOrgGroup> groups = query.getResultList();
+            return new HashSet<>(groups);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public List<WtCategoryItem> getCategoryItemsListFromVersion(Long version) {
+    public Set<WtCategoryItem> getCategoryItemsSetFromVersion(Long version) {
         try {
             Query query = entityManager
                     .createQuery("SELECT catItem from WtCategoryItem catItem where catItem.version > :version");
             query.setParameter("version", version);
-            return (List<WtCategoryItem>) query.getResultList();
+            List<WtCategoryItem> categories = query.getResultList();
+            return new HashSet<>(categories);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public List<WtTypeOfProductionItem> getTypeProductionsListFromVersion(Long version) {
+    public Set<WtTypeOfProductionItem> getTypeProductionsSetFromVersion(Long version) {
         try {
             Query query = entityManager.createQuery(
                     "SELECT typeProd from WtTypeOfProductionItem typeProd where typeProd.version > :version");
             query.setParameter("version", version);
-            return (List<WtTypeOfProductionItem>) query.getResultList();
+            List<WtTypeOfProductionItem> prodTypes = query.getResultList();
+            return new HashSet<>(prodTypes);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public List<WtAgeGroupItem> getAgeGroupItemsListFromVersion(Long version) {
+    public Set<WtAgeGroupItem> getAgeGroupItemsSetFromVersion(Long version) {
         try {
             Query query = entityManager
                     .createQuery("SELECT ageGroup from WtAgeGroupItem ageGroup where ageGroup.version > :version");
             query.setParameter("version", version);
-            return (List<WtAgeGroupItem>) query.getResultList();
+            List<WtAgeGroupItem> ageGroups = query.getResultList();
+            return new HashSet<>(ageGroups);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public List<WtDietType> getDietTypesListFromVersion(Long version) {
+    public Set<WtDietType> getDietTypesSetFromVersion(Long version) {
         try {
             Query query = entityManager
                     .createQuery("SELECT dietType from WtDietType dietType where dietType.version > :version");
             query.setParameter("version", version);
-            return (List<WtDietType>) query.getResultList();
+            List<WtDietType> dietTypes = query.getResultList();
+            return new HashSet<>(dietTypes);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public List<WtComplexGroupItem> getComplexGroupItemsListFromVersion(Long version) {
+    public Set<WtComplexGroupItem> getComplexGroupItemsSetFromVersion(Long version) {
         try {
             Query query = entityManager.createQuery(
                     "SELECT complexGroup from WtComplexGroupItem complexGroup where complexGroup.version > :version");
             query.setParameter("version", version);
-            return (List<WtComplexGroupItem>) query.getResultList();
+            List<WtComplexGroupItem> complexGroups = query.getResultList();
+            return new HashSet<>(complexGroups);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public List<WtGroupItem> getGroupItemsListFromVersion(Long version) {
+    public Set<WtGroupItem> getGroupItemsSetFromVersion(Long version) {
         try {
             Query query = entityManager
                     .createQuery("SELECT groupItem from WtGroupItem groupItem where groupItem.version > :version");
             query.setParameter("version", version);
-            return  query.getResultList();
+            List<WtGroupItem> groupItems = query.getResultList();
+            return new HashSet<>(groupItems);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -840,12 +847,13 @@ public class DAOReadonlyService {
         }
     }
 
-    public List<WtMenuGroup> getMenuGroupsListFromVersion(Long version) {
+    public Set<WtMenuGroup> getMenuGroupsSetFromVersion(Long version) {
         try {
             Query query = entityManager
                     .createQuery("SELECT menuGroup from WtMenuGroup menuGroup where menuGroup.version > :version");
             query.setParameter("version", version);
-            return (List<WtMenuGroup>) query.getResultList();
+            List<WtMenuGroup> menuGroups = query.getResultList();
+            return new HashSet<>(menuGroups);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -853,21 +861,22 @@ public class DAOReadonlyService {
 
     }
 
-    public List<WtMenu> getMenusListFromVersion(Long version, Contragent contragent, Org org) {
+    public Set<WtMenu> getMenusSetFromVersion(Long version, Contragent contragent, Org org) {
         try {
             Query query = entityManager.createQuery("SELECT menu from WtMenu menu where menu.version > :version "
                     + "AND menu.contragent = :contragent AND :org IN elements(menu.orgs)");
             query.setParameter("version", version);
             query.setParameter("contragent", contragent);
             query.setParameter("org", org);
-            return (List<WtMenu>) query.getResultList();
+            List<WtMenu> menus = query.getResultList();
+            return new HashSet<>(menus);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public List<WtComplex> getComplexesListFromVersion(Long version, Contragent contragent, Org org) {
+    public Set<WtComplex> getComplexesListFromVersion(Long version, Contragent contragent, Org org) {
         try {
             Query query = entityManager.createQuery(
                     "SELECT complex from WtComplex complex where complex.version > :version "
@@ -875,19 +884,18 @@ public class DAOReadonlyService {
             query.setParameter("version", version);
             query.setParameter("contragent", contragent);
             query.setParameter("org", org);
-            return (List<WtComplex>) query.getResultList();
+            List<WtComplex> complexes = query.getResultList();
+            return new HashSet<>(complexes);
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public List<Org> findFriendlyOrgs(Long idOfOrg) {
+    public Set<Org> findFriendlyOrgs(Long idOfOrg) {
         Session session = entityManager.unwrap(Session.class);
         List<Long> friendlyOrgIds = DAOUtils.findFriendlyOrgIds(session, idOfOrg);
-
-        List<Org> result = new ArrayList<>();
-
+        Set<Org> result = new HashSet<>();
         for (Long friendlyOrgId : friendlyOrgIds) {
             result.add(DAOService.getInstance().getOrg(friendlyOrgId));
         }
