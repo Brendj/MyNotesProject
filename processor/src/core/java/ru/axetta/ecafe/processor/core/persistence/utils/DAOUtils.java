@@ -2124,8 +2124,8 @@ public class DAOUtils {
             preorderComplex = (PreorderComplex) criteria.uniqueResult();
         }
         if (preorderComplex != null) {
-            Long sum = orderDetail.getQty() * orderDetail.getRPrice();
-            Long qty = orderDetail.getQty();
+            long sum = orderDetail.getQty() * orderDetail.getRPrice();
+            long qty = orderDetail.getQty();
             if (cancelOrder) {
                 sum = -sum;
                 qty = -qty;
@@ -2137,7 +2137,9 @@ public class DAOUtils {
             if (preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4) && itemCode != null) {
                 PreorderMenuDetail pmd = getPreorderMenuDetailByItemCode(preorderComplex, itemCode);
                 if (pmd != null) {
-                    pmd.setUsedSum(pmd.getUsedSum() + sum);
+                    long sum2 = qty * pmd.getMenuDetailPrice();
+                    if (cancelOrder) sum2 = -sum2;
+                    pmd.setUsedSum(pmd.getUsedSum() + sum2);
                     pmd.setUsedAmount(pmd.getUsedAmount() + qty);
                     session.update(pmd);
                 }
