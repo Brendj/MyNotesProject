@@ -97,8 +97,8 @@ public class MenuSupplier implements SectionRequest {
         }
 
         Org org = DAOService.getInstance().getOrg(idOfOrg);
-        Set<Org> friendlyOrgs = DAOService.getInstance().getFriendlyOrgs(idOfOrg);
-        Contragent contragent = org.getDefaultSupplier();
+        List<Org> friendlyOrgs = DAOReadonlyService.getInstance().findFriendlyOrgs(idOfOrg);
+        Contragent contragent = DAOReadonlyService.getInstance().findDefaultSupplier(idOfOrg);
 
         Iterator<Map.Entry<String, Long>> iter = versions.entrySet().iterator();
 
@@ -110,7 +110,7 @@ public class MenuSupplier implements SectionRequest {
                     orgGroups = DAOReadonlyService.getInstance()
                             .getOrgGroupsListFromVersion(entry.getValue(), contragent, org);
                     for (Org item : friendlyOrgs) {
-                        Contragent itemContragent = item.getDefaultSupplier();
+                        Contragent itemContragent = DAOReadonlyService.getInstance().findDefaultSupplier(item.getIdOfOrg());
                         List<WtOrgGroup> friendlyItems = DAOReadonlyService.getInstance()
                                 .getOrgGroupsListFromVersion(entry.getValue(), itemContragent, item);
                         orgGroups.addAll(friendlyItems);
@@ -144,11 +144,12 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "DishesRequest": {
-                    dishes = DAOReadonlyService.getInstance()
+                    Set<WtDish> dishesSet = DAOReadonlyService.getInstance()
                             .getDishesListFromVersion(entry.getValue(), contragent);
+                    dishes.addAll(dishesSet);
                     for (Org item : friendlyOrgs) {
-                        Contragent itemContragent = item.getDefaultSupplier();
-                        List<WtDish> friendlyItems = DAOReadonlyService.getInstance()
+                        Contragent itemContragent = DAOReadonlyService.getInstance().findDefaultSupplier(item.getIdOfOrg());
+                        Set<WtDish> friendlyItems = DAOReadonlyService.getInstance()
                                 .getDishesListFromVersion(entry.getValue(), itemContragent);
                         dishes.addAll(friendlyItems);
                     }
@@ -167,7 +168,7 @@ public class MenuSupplier implements SectionRequest {
                     complexes = DAOReadonlyService.getInstance()
                             .getComplexesListFromVersion(entry.getValue(), contragent, org);
                     for (Org item : friendlyOrgs) {
-                        Contragent itemContragent = item.getDefaultSupplier();
+                        Contragent itemContragent = DAOReadonlyService.getInstance().findDefaultSupplier(item.getIdOfOrg());
                         List<WtComplex> friendlyItems = DAOReadonlyService.getInstance()
                                 .getComplexesListFromVersion(entry.getValue(), itemContragent, item);
                         complexes.addAll(friendlyItems);

@@ -812,19 +812,28 @@ public class DAOReadonlyService {
             Query query = entityManager
                     .createQuery("SELECT groupItem from WtGroupItem groupItem where groupItem.version > :version");
             query.setParameter("version", version);
-            return (List<WtGroupItem>) query.getResultList();
+            return  query.getResultList();
         } catch (Exception e) {
             e.printStackTrace();
             return null;
         }
     }
 
-    public List<WtDish> getDishesListFromVersion(Long version, Contragent contragent) {
+    public Set<WtDish> getDishesListFromVersion(Long version, Contragent contragent) {
         try {
             Query query = entityManager.createQuery("SELECT dish FROM WtDish dish WHERE dish.version > :version "
                     + "AND dish.contragent = :contragent");
             query.setParameter("version", version);
-            return (List<WtDish>) query.getResultList();
+            query.setParameter("contragent", contragent);
+            List<WtDish> dishes = query.getResultList();
+
+            Set<WtDish> result = new HashSet<>();
+            for (WtDish dish : dishes) {
+                if (dish.getMenus() != null) {
+                    result.add(dish);
+                }
+            }
+            return result;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -871,5 +880,25 @@ public class DAOReadonlyService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public List<Org> findFriendlyOrgs(Long idOfOrg) {
+        Session session = entityManager.unwrap(Session.class);
+        List<Long> friendlyOrgIds = DAOUtils.findFriendlyOrgIds(session, idOfOrg);
+
+        List<Org> result = new ArrayList<>();
+
+        for (Long friendlyOrgId : friendlyOrgIds) {
+            result.add(DAOService.getInstance().getOrg(friendlyOrgId));
+        }
+        return result;
+    }
+
+    public Contragent findDefaultSupplier(Long idOfOrg) {
+        Session session = entityManager.unwrap(Session.class);
+        org.hibernate.Query query = session
+                .createQuery("SELECT defaultSupplier FROM Org org where org.idOfOrg = :idOfOrg");
+        query.setParameter("idOfOrg", idOfOrg);
+        return (Contragent) query.uniqueResult();
     }
 }
