@@ -5,8 +5,8 @@
 -- Пакет обновлений issue 414
 
 ALTER TABLE cf_preorder_menudetail
-  ADD COLUMN usedsum BIGINT,
-  ADD COLUMN usedamount BIGINT;
+  ADD COLUMN usedsum BIGINT not null default 0,
+  ADD COLUMN usedamount BIGINT not null default 0;
 
 alter table cf_preorder_linkod
     add column itemcode character varying(32);

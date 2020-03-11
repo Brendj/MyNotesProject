@@ -28,6 +28,7 @@ public class PreorderLinkOD {
         this.idOfOrderDetail = orderDetail.getCompositeIdOfOrderDetail().getIdOfOrderDetail();
         this.qty = orderDetail.getQty();
         this.price = orderDetail.getRPrice();
+        this.itemCode = orderDetail.getItemCode();
     }
 
     public String getPreorderGuid() {

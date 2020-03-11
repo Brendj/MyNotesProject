@@ -19,6 +19,7 @@ import java.util.Set;
 public class PreorderComplex {
     public static final Integer DEFAULT_MENU_SYNC_COUNT_DAYS = 14;
     public static final Integer DEFAULT_FORBIDDEN_DAYS = 2;
+    public static final Integer COMPLEX_MODE_4 = 4;
 
     private Long idOfPreorderComplex;
     private Integer armComplexId;

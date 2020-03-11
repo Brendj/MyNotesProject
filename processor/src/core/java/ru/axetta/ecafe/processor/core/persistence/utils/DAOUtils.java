@@ -2133,7 +2133,25 @@ public class DAOUtils {
             preorderComplex.setUsedSum(preorderComplex.getUsedSum() + sum);
             preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
             session.update(preorderComplex);
+
+            if (preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4) && itemCode != null) {
+                PreorderMenuDetail pmd = getPreorderMenuDetailByItemCode(preorderComplex, itemCode);
+                if (pmd != null) {
+                    pmd.setUsedSum(pmd.getUsedSum() + sum);
+                    pmd.setUsedAmount(pmd.getUsedAmount() + qty);
+                    session.update(pmd);
+                }
+            }
         }
+    }
+
+    private static PreorderMenuDetail getPreorderMenuDetailByItemCode(PreorderComplex preorderComplex, String itemCode) {
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getItemCode().equals(itemCode)) {
+                return pmd;
+            }
+        }
+        return null;
     }
 
     public static void changeClientGroupNotifyViaSMS(Session session, boolean notifyViaSMS, List<Long> clientsId)
