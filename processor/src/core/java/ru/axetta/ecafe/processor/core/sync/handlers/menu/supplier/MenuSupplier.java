@@ -110,7 +110,8 @@ public class MenuSupplier implements SectionRequest {
                     orgGroups = DAOReadonlyService.getInstance()
                             .getOrgGroupsSetFromVersion(entry.getValue(), contragent, org);
                     for (Org item : friendlyOrgs) {
-                        Contragent itemContragent = DAOReadonlyService.getInstance().findDefaultSupplier(item.getIdOfOrg());
+                        Contragent itemContragent = DAOReadonlyService.getInstance()
+                                .findDefaultSupplier(item.getIdOfOrg());
                         Set<WtOrgGroup> friendlyItems = DAOReadonlyService.getInstance()
                                 .getOrgGroupsSetFromVersion(entry.getValue(), itemContragent, item);
                         orgGroups.addAll(friendlyItems);
@@ -144,10 +145,10 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "DishesRequest": {
-                    dishes = DAOReadonlyService.getInstance()
-                            .getDishesListFromVersion(entry.getValue(), contragent);
+                    dishes = DAOReadonlyService.getInstance().getDishesListFromVersion(entry.getValue(), contragent);
                     for (Org item : friendlyOrgs) {
-                        Contragent itemContragent = DAOReadonlyService.getInstance().findDefaultSupplier(item.getIdOfOrg());
+                        Contragent itemContragent = DAOReadonlyService.getInstance()
+                                .findDefaultSupplier(item.getIdOfOrg());
                         Set<WtDish> friendlyItems = DAOReadonlyService.getInstance()
                                 .getDishesListFromVersion(entry.getValue(), itemContragent);
                         dishes.addAll(friendlyItems);
@@ -155,21 +156,22 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "MenuGroupsRequest": {
-                    menuGroups = DAOReadonlyService.getInstance().getMenuGroupsSetFromVersion(entry.getValue());
+                    menuGroups = DAOReadonlyService.getInstance()
+                            .getMenuGroupsSetFromVersion(entry.getValue(), contragent, org);
                     break;
                 }
                 case "MenusRequest": {
-                    menus = DAOReadonlyService.getInstance()
-                            .getMenusSetFromVersion(entry.getValue(), contragent, org);
+                    menus = DAOReadonlyService.getInstance().getMenusSetFromVersion(entry.getValue(), contragent, org);
                     break;
                 }
                 case "ComplexesRequest": {
                     complexes = DAOReadonlyService.getInstance()
-                            .getComplexesListFromVersion(entry.getValue(), contragent, org);
+                            .getComplexesSetFromVersion(entry.getValue(), contragent, org);
                     for (Org item : friendlyOrgs) {
-                        Contragent itemContragent = DAOReadonlyService.getInstance().findDefaultSupplier(item.getIdOfOrg());
+                        Contragent itemContragent = DAOReadonlyService.getInstance()
+                                .findDefaultSupplier(item.getIdOfOrg());
                         Set<WtComplex> friendlyItems = DAOReadonlyService.getInstance()
-                                .getComplexesListFromVersion(entry.getValue(), itemContragent, item);
+                                .getComplexesSetFromVersion(entry.getValue(), itemContragent, item);
                         complexes.addAll(friendlyItems);
                     }
                     break;

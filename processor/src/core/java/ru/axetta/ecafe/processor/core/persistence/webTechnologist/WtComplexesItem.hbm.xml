@@ -13,7 +13,7 @@
             <column name="idofcomplexitem" sql-type="long"/>
         </id>
 
-        <many-to-one name="wtComplex" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex">
+        <many-to-one name="wtComplex" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex">
             <column name="idOfComplex"/>
         </many-to-one>
 

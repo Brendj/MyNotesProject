@@ -251,7 +251,8 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "D", dish.getDeleteState());
         XMLUtils.setAttributeIfNotNull(prop, "Guid", dish.getGuid());
         XMLUtils.setAttributeIfNotNull(prop, "AgeGroupId", dish.getWtAgeGroupItem().getIdOfAgeGroupItem());
-        XMLUtils.setAttributeIfNotNull(prop, "TypeProductionId", dish.getWtTypeProductionItem().getIdOfTypeProductionItem());
+        XMLUtils.setAttributeIfNotNull(prop, "TypeProductionId",
+                dish.getWtTypeProductionItem().getIdOfTypeProductionItem());
         if (StringUtils.isEmpty(dish.getBarcode())) {
             XMLUtils.setAttributeIfNotNull(prop, "BarCode", dish.getBarcode());
         }
@@ -381,7 +382,8 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "V", complex.getVersion());
         XMLUtils.setAttributeIfNotNull(prop, "Guid", complex.getGuid());
         XMLUtils.setAttributeIfNotNull(prop, "D", complex.getDeleteState());
-        XMLUtils.setAttributeIfNotNull(prop, "ComplexGroupItemId", complex.getWtComplexGroupItem().getIdOfComplexGroupItem());
+        XMLUtils.setAttributeIfNotNull(prop, "ComplexGroupItemId",
+                complex.getWtComplexGroupItem().getIdOfComplexGroupItem());
         XMLUtils.setAttributeIfNotNull(prop, "AgeGroupItemId", complex.getWtAgeGroupItem().getIdOfAgeGroupItem());
         XMLUtils.setAttributeIfNotNull(prop, "DietTypeId", complex.getWtDietType().getIdOfDietType());
         XMLUtils.setAttributeIfNotNull(prop, "ContragentId", complex.getContragent().getIdOfContragent());
