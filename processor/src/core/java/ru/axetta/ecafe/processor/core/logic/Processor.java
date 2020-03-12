@@ -4110,7 +4110,7 @@ public class Processor implements SyncProcessor {
                 long totalLunchRSum = 0;
                 Set<String> rations = new HashSet<>();
                 //Проверяем, есть ли среди деталей элемент со ссылкой на предзаказ
-                PreorderComplex preorderComplex = findGuidPreOrderDetail(persistenceSession, payment);
+                PreorderComplex preorderComplex = findPreorderComplexByPayment(persistenceSession, payment);
                 boolean saveAllPreorderDetails = (preorderComplex == null ? false : preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4));
 
                 // Register order details (purchase)
@@ -4287,17 +4287,6 @@ public class Processor implements SyncProcessor {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
-    }
-
-    private PreorderComplex findGuidPreOrderDetail(Session session, Payment payment) {
-        for (Purchase purchase : payment.getPurchases()) {
-            if (purchase.getGuidPreOrderDetail() != null) {
-                Criteria criteria = session.createCriteria(PreorderComplex.class);
-                criteria.add(Restrictions.eq("guid", purchase.getGuidPreOrderDetail()));
-                return (PreorderComplex) criteria.uniqueResult();
-            }
-        }
-        return null;
     }
 
     private boolean transactionOwnerHaveSmartWatch(AccountTransaction transaction) {

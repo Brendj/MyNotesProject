@@ -32,6 +32,8 @@ import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
+import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
+import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Purchase;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -2138,13 +2140,23 @@ public class DAOUtils {
                 PreorderMenuDetail pmd = getPreorderMenuDetailByItemCode(preorderComplex, itemCode);
                 if (pmd != null) {
                     long sum2 = qty * pmd.getMenuDetailPrice();
-                    if (cancelOrder) sum2 = -sum2;
                     pmd.setUsedSum(pmd.getUsedSum() + sum2);
                     pmd.setUsedAmount(pmd.getUsedAmount() + qty);
                     session.update(pmd);
                 }
             }
         }
+    }
+
+    public static PreorderComplex findPreorderComplexByPayment(Session session, Payment payment) {
+        for (Purchase purchase : payment.getPurchases()) {
+            if (purchase.getGuidPreOrderDetail() != null) {
+                Criteria criteria = session.createCriteria(PreorderComplex.class);
+                criteria.add(Restrictions.eq("guid", purchase.getGuidPreOrderDetail()));
+                return (PreorderComplex) criteria.uniqueResult();
+            }
+        }
+        return null;
     }
 
     private static PreorderMenuDetail getPreorderMenuDetailByItemCode(PreorderComplex preorderComplex, String itemCode) {
