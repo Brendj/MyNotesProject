@@ -373,16 +373,19 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement{
             element.setAttribute("IdOfRule", Long.toString(this.idOfRule));
             element.setAttribute("Description", this.description);
             element.setAttribute("CategoriesDiscounts", this.categoryDiscounts);
-            element.setAttribute("Complex0", Integer.toString(this.complex0));
-            element.setAttribute("Complex1", Integer.toString(this.complex1));
-            element.setAttribute("Complex2", Integer.toString(this.complex2));
-            element.setAttribute("Complex3", Integer.toString(this.complex3));
-            element.setAttribute("Complex4", Integer.toString(this.complex4));
-            element.setAttribute("Complex5", Integer.toString(this.complex5));
-            element.setAttribute("Complex6", Integer.toString(this.complex6));
-            element.setAttribute("Complex7", Integer.toString(this.complex7));
-            element.setAttribute("Complex8", Integer.toString(this.complex8));
-            element.setAttribute("Complex9", Integer.toString(this.complex9));
+
+            // неактульные атрибуты (использовались для версий АРМ 60 и ниже)
+            //element.setAttribute("Complex0", Integer.toString(this.complex0));
+            //element.setAttribute("Complex1", Integer.toString(this.complex1));
+            //element.setAttribute("Complex2", Integer.toString(this.complex2));
+            //element.setAttribute("Complex3", Integer.toString(this.complex3));
+            //element.setAttribute("Complex4", Integer.toString(this.complex4));
+            //element.setAttribute("Complex5", Integer.toString(this.complex5));
+            //element.setAttribute("Complex6", Integer.toString(this.complex6));
+            //element.setAttribute("Complex7", Integer.toString(this.complex7));
+            //element.setAttribute("Complex8", Integer.toString(this.complex8));
+            //element.setAttribute("Complex9", Integer.toString(this.complex9));
+
             element.setAttribute("Priority", Integer.toString(this.priority));
             element.setAttribute("OperationOr", Boolean.toString(this.operationor));
             if (StringUtils.isNotEmpty(complexesMap)) {
