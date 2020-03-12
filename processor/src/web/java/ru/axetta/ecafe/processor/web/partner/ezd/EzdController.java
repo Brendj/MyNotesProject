@@ -160,7 +160,7 @@ public class EzdController {
                 thisOrgGuid = requestsEzdView.getOrgguid();
                 thisGroupName = requestsEzdView.getGroupname();
                 thisIdOfOrg = requestsEzdView.getIdoforg();
-                badComplex = false;
+                badComplex = true;
 
                 //Проверка на то, что данный комплекс подходит для данной группы
                 String complexname = requestsEzdView.getComplexname();
@@ -173,14 +173,14 @@ public class EzdController {
                 }
                 if (clas > 0 && clas < 5)//1-4
                 {
-                    if (complexname.contains("5-11")) {
-                        badComplex = true;
+                    if (!complexname.contains("1-4")) {
+                        badComplex = false;
                     }
 
                 } else {
                     if (clas > 4 && clas < 12)//5-11
                     {
-                        if (complexname.contains("1-4")) {
+                        if (!complexname.contains("5-")) {
                             badComplex = true;
                         }
                     }
@@ -188,7 +188,7 @@ public class EzdController {
 
 
                 //Если комплекс подходит, то ...
-                if (!badComplex) {
+                if (badComplex) {
                     //Если это новое сочетание группы + орг, то находим для них все используемые даты
                     if (curguidDATES == null || curgroupNameDATES == null || !curguidDATES.equals(thisOrgGuid)
                             || !curgroupNameDATES.equals(thisGroupName)) {
