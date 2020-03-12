@@ -36,6 +36,33 @@ public class GeneralRequestMetod {
            Date date = new SimpleDateFormat("dd.MM.yyyy").parse(dateR);
            date = CalendarUtils.startOfDay(date);
 
+           List<Org> orgs = DAOUtils.findOrgsByGuid(persistenceSession, guidOrg);
+           //Если организаций c таким guid не найдена, то ...
+           if (orgs.isEmpty()) {
+               Result result = new Result();
+               result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
+               result.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
+               return result;
+           } else {
+               //Удаляем все организации, неподходящие по фильтру и у которых нет нужной группы
+               Iterator<Org> it = orgs.iterator();
+               while (it.hasNext()) {
+                   Org org = it.next();
+                   if (org.getState() == 0 || org.getType().equals(OrganizationType.SUPPLIER)
+                           || DAOUtils.getGroupNamesToOrgsByOrgAndGroupName(persistenceSession, org, groupName) == null
+                           || !org.getPreorderlp()) {
+                       it.remove();
+                   }
+               }
+           }
+
+           //Если организаций не осталось....
+           if (orgs.isEmpty()) {
+               Result result = new Result();
+               result.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode().toString());
+               result.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
+               return result;
+           }
            Date curDate = new Date();
            //Если дата заявки сегодняшняя, но время больше 11:00...
            if (CalendarUtils.startOfDay(curDate).getTime() == date.getTime() && (curDate.getTime() - date.getTime()
@@ -53,34 +80,6 @@ public class GeneralRequestMetod {
                return result;
            }
 
-           List<Org> orgs = DAOUtils.findOrgsByGuid(persistenceSession, guidOrg);
-           //Если организаций c таким guid не найдена, то ...
-           if (orgs.isEmpty()) {
-               Result result = new Result();
-               result.setErrorCode(ResponseCodes.RC_INTERNAL_ERROR.getCode().toString());
-               result.setErrorMessage(ResponseCodes.RC_INTERNAL_ERROR.toString());
-               return result;
-           }
-
-           if (!orgs.isEmpty()) {
-               //Удаляем все организации, неподходящие по фильтру и у которых нет нужной группы
-               Iterator<Org> it = orgs.iterator();
-               while (it.hasNext()) {
-                   Org org = it.next();
-                   if (org.getState() == 0 || org.getType().equals(OrganizationType.SUPPLIER)
-                           || DAOUtils.getGroupNamesToOrgsByOrgAndGroupName(persistenceSession, org, groupName) == null
-                           || !org.getPreorderlp()) {
-                       it.remove();
-                   }
-               }
-           }
-           //Если организаций не осталось....
-           if (orgs.isEmpty()) {
-               Result result = new Result();
-               result.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode().toString());
-               result.setErrorMessage(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.toString());
-               return result;
-           }
            Integer maxVersion = DAOUtils.getMaxVersionForEZD(persistenceSession);
            for (Org org : orgs) {
                Date startDate = new Date();
