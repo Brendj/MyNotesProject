@@ -181,7 +181,7 @@ public class EzdController {
                     if (clas > 4 && clas < 12)//5-11
                     {
                         if (!complexname.contains("5-")) {
-                            badComplex = true;
+                            badComplex = false;
                         }
                     }
                 }
