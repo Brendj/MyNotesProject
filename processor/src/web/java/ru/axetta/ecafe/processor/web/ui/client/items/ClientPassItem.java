@@ -55,7 +55,7 @@ public class ClientPassItem implements Comparable {
         if(checkerId == null && guardianId == null) {
             this.chekerItemList.add(new ClientChekerPassItem(0L, null, " ", " "));
         }
-        Card card = DAOUtils.findCardByCardNoAndIdOfFriendlyOrg(session, event.getIdOfCard(), event.getOrg().getIdOfOrg());
+        Card card = DAOUtils.findCardByCardNoAndIdOfFriendlyOrgNullSafe(session, event.getIdOfCard(), event.getOrg().getIdOfOrg());
         this.cardType = getPrintedCardType(card != null ? card.getCardType() : -1);
     }
 
