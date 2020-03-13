@@ -53,6 +53,10 @@ public class PreorderComplex {
 
     }
 
+    public boolean isPayedComplex() {
+        return usedSum != null && usedSum > 0;
+    }
+
     public static void delete(Session session, Long idOfPreorderComplex, Long nextVersion, PreorderState state) {
         Query query = session.createQuery("update PreorderComplex pc set pc.deletedState = true, state = :state, amount = 0, "
                 + "version = :version, lastUpdate =:lastUpdate where pc.idOfPreorderComplex = :idOfPreorderComplex");
