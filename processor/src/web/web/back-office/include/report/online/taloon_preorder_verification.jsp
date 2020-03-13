@@ -371,8 +371,8 @@
                 <rich:column headerClass="column-header">
                     <h:inputTextarea value="#{detail.comments}" styleClass="output-text" id="comment" cols="20"
                                      rows="2" rendered="#{!detail.summaryDay and !detail.isTotal()}"
-                                     validatorMessage="Комментарий не может быть больше 40 символов">
-                        <f:validateLength maximum="60"/>
+                                     validatorMessage="Комментарий не может быть больше 128 символов">
+                        <f:validateLength maximum="128"/>
                         <a4j:support event="onchange"/>
                     </h:inputTextarea>
                 </rich:column>
