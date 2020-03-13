@@ -389,9 +389,14 @@ public class EzdController {
             if (allIdtoSetiings == null) {
                 allIdtoSetiings = new HashMap<>();
             }
-        return GeneralRequestMetod.requestsComplexForOne(persistenceSession, productionCalendars, requestsEzdSpecialDateViews,
-                allIdtoSetiings, guidOrg, groupName,dateR, userName, idOfComplex,
-                complexName,  count);
+            Result result = GeneralRequestMetod.requestsComplexForOne(persistenceSession, productionCalendars, requestsEzdSpecialDateViews,
+                    allIdtoSetiings, guidOrg, groupName,dateR, userName, idOfComplex,
+                    complexName,  count);
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        return result;
+
         } catch (Exception e) {
             Result result = new Result();
             result.setErrorCode(ResponseCodes.RC_BAD_ARGUMENTS_ERROR.getCode().toString());
