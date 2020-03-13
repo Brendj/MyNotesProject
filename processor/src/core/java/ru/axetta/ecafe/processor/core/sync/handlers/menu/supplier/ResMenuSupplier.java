@@ -233,10 +233,13 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "Components", dish.getComponentsOfDish());
         XMLUtils.setAttributeIfNotNull(prop, "Code", dish.getCode());
 
+        int price;
         if (dish.getPrice() != null) {
-            int price = (int) dish.getPrice().floatValue() * 100; // цена в копейках
-            XMLUtils.setAttributeIfNotNull(prop, "Price", price);
+            price = (int) dish.getPrice().floatValue() * 100; // цена в копейках
+        } else {
+            price = 0;
         }
+        XMLUtils.setAttributeIfNotNull(prop, "Price", price);
 
         Date beginDate = dish.getDateOfBeginMenuIncluding();
         if (beginDate != null) {
@@ -363,10 +366,13 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "Id", complex.getIdOfComplex());
         XMLUtils.setAttributeIfNotNull(prop, "Name", complex.getName());
 
+        int price;
         if (complex.getPrice() != null) {
-            int price = (int) complex.getPrice().floatValue() * 100; // цена в копейках
-            XMLUtils.setAttributeIfNotNull(prop, "Price", price);
+            price = (int) complex.getPrice().floatValue() * 100; // цена в копейках
+        } else {
+            price = 0;
         }
+        XMLUtils.setAttributeIfNotNull(prop, "Price", price);
 
         Date beginDate = complex.getBeginDate();
         if (beginDate != null) {
