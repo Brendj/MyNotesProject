@@ -1521,7 +1521,7 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = persistenceSession.beginTransaction();
             Org org = DAOUtils.findOrg(persistenceSession, idOfOrg);
             Card exCard = null;
-            if (VersionUtils.doublesAllowed() && org.getNeedVerifyCardSign()) {
+            if (VersionUtils.doublesAllowed(persistenceSession, idOfOrg) && org.getNeedVerifyCardSign()) {
                 exCard = DAOUtils.findCardByCardNoDoublesAllowed(persistenceSession, org, cardNo, cardPrintedNo, cardSignCertNum);
             } else {
                 exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
