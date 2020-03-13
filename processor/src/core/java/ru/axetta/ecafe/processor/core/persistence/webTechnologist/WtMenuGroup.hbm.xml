@@ -46,5 +46,10 @@
             <column name="menu_id"/>
         </many-to-one>
 
+        <set name="dishes" lazy="false" table="cf_wt_menu_group_dish">
+            <key column="menu_group_id"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish" column="dish_id"/>
+        </set>
+
     </class>
 </hibernate-mapping>
