@@ -122,7 +122,7 @@ public class PreordersReport extends BasicReportForOrgJob {
                      + "    SELECT distinct o.shortnameinfoservice, o.address, "
                      + "        c.contractid, p.surname || ' ' || p.firstname || ' ' || p.secondname AS clientname, cg.groupname, "
                      + "        pc.preorderdate, pc.amount AS complexAmount, "
-                     + " case when pc.usedsum > 0 then pmd.usedamount else pmd.amount end AS menudetailAmount, pc.complexname, "
+                     + " cast(case when pc.usedsum > 0 then pmd.usedamount else pmd.amount end as integer) AS menudetailAmount, pc.complexname, "
                      + "        pmd.menudetailname, pc.complexPrice, pmd.menudetailPrice, "
                      + "        pc.idofregularpreorder IS NOT NULL OR pmd.idofregularpreorder IS NOT NULL AS isRegularPreorder, "
                      + "        pc.idofpreordercomplex, pc.usedsum > 0 as isPayed "
