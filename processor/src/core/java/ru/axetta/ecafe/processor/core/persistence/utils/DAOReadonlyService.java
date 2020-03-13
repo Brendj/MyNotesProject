@@ -867,7 +867,7 @@ public class DAOReadonlyService {
     public Set<WtMenu> getMenusSetFromVersion(Long version, Contragent contragent, Org org) {
         try {
             Query query = entityManager.createQuery("SELECT menu from WtMenu menu where menu.version > :version "
-                    + "AND menu.contragent = :contragent AND :org IN elements(menu.orgs)");
+                    + "AND menu.contragent = :contragent AND :org IN elements(menu.orgs) OR :org IN elements(menu.wtOrgGroup.orgs)");
             query.setParameter("version", version);
             query.setParameter("contragent", contragent);
             query.setParameter("org", org);
@@ -883,7 +883,7 @@ public class DAOReadonlyService {
         try {
             Query query = entityManager.createQuery(
                     "SELECT complex from WtComplex complex where complex.version > :version "
-                            + "AND complex.contragent = :contragent AND :org IN elements(complex.orgs)");
+                            + "AND complex.contragent = :contragent AND :org IN elements(complex.orgs) OR :org IN elements(complex.wtOrgGroup.orgs)");
             query.setParameter("version", version);
             query.setParameter("contragent", contragent);
             query.setParameter("org", org);
