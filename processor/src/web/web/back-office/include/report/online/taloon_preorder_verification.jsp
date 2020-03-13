@@ -239,7 +239,8 @@
                 <%--        Отгрузка шт--%>
                 <rich:column headerClass="column-header" width="4">
                     <h:inputTextarea value="#{detail.shippedQty}" styleClass="output-text" cols="4" rows="1"
-                                     rendered="#{detail.enableEditShippedQty()}">
+                                     rendered="#{detail.enableEditShippedQty()}"
+                                     validatorMessage="Поле Отгрузка не может содержать более 4 символов">
                         <f:validateLength maximum="4"/>
                         <a4j:support event="onchange"/>
                     </h:inputTextarea>
@@ -368,11 +369,12 @@
 
                 <%--        Комментарий--%>
                 <rich:column headerClass="column-header">
-                        <h:inputTextarea value="#{detail.comments}" styleClass="output-text" id="comment" cols="20"
-                                         rows="2" rendered="#{!detail.summaryDay and !detail.isTotal()}">
-                            <f:validateLength maximum="60"/>
-                            <a4j:support event="onchange"/>
-                        </h:inputTextarea>
+                    <h:inputTextarea value="#{detail.comments}" styleClass="output-text" id="comment" cols="20"
+                                     rows="2" rendered="#{!detail.summaryDay and !detail.isTotal()}"
+                                     validatorMessage="Комментарий не может быть больше 40 символов">
+                        <f:validateLength maximum="60"/>
+                        <a4j:support event="onchange"/>
+                    </h:inputTextarea>
                 </rich:column>
 
                 <%--        История изменений--%>
