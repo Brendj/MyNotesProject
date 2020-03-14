@@ -52,11 +52,16 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
         existOrgWithEmptyCategoryOrgSet = false;
         for (Org org : orgs) {
             addRulesForOrgWithCategoryOrgSet(discountRules, org);
-            addWtRulesForOrgWithCategoryOrgSet(wtDiscountRules, org);
+            if (org.getUseWebArm()) {
+                addWtRulesForOrgWithCategoryOrgSet(wtDiscountRules, org);
+            }
         }
         if (existOrgWithEmptyCategoryOrgSet) {
             addRulesWithEmptyCategoryOrgSet(discountRules, idOfOrg);
-            addWtRulesWithEmptyCategoryOrgSet(wtDiscountRules, idOfOrg);
+            Org org = DAOService.getInstance().getOrg(idOfOrg);
+            if (org.getUseWebArm()) {
+                addWtRulesWithEmptyCategoryOrgSet(wtDiscountRules, idOfOrg);
+            }
         }
     }
 
@@ -488,18 +493,15 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             this.complexesMap = complexesMap;
         }
 
-        //
         public DiscountCategoryWtRuleItem(WtDiscountRule wtDiscountRule, Long idOfOrg, List<Long> fOrgs) {
             this.idOfRule = wtDiscountRule.getIdOfRule();
             this.description = wtDiscountRule.getDescription();
 
-            ///
             this.categoryDiscounts = buildCategoryDiscounts(wtDiscountRule);
 
             this.priority = wtDiscountRule.getPriority();
             this.operationOr = wtDiscountRule.isOperationOr();
 
-            ///
             this.complexesMap = buildComplexesMap(wtDiscountRule);
 
             this.subCategory = wtDiscountRule.getSubCategory();
