@@ -72,15 +72,15 @@
                 <f:selectItems value="#{ruleCreatePage.availableComplexs}"/>
             </h:selectManyCheckbox>
         </h:panelGroup>
-    </h:panelGrid>
-    
-    <h:panelGrid styleClass="borderless-grid" columns="2">
-        <a4j:commandButton value="Зарегистрировать правило" action="#{ruleCreatePage.createRule}"
-                           reRender="ruleCreatePanel" styleClass="command-button"/>
-    </h:panelGrid>
-    <h:panelGrid styleClass="borderless-grid">
-        <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                       warnClass="warn-messages"/>
+
+        <h:panelGrid styleClass="borderless-grid" columns="2">
+            <a4j:commandButton value="Зарегистрировать правило" action="#{ruleCreatePage.createRule}"
+                               reRender="ruleCreatePanel" styleClass="command-button"/>
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid">
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
+        </h:panelGrid>
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" id="specialDatesFileLoaderPanel">
