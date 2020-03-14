@@ -499,6 +499,7 @@ public class RuleCreatePage extends BasicWorkspacePage
 
     public void setWt(boolean wt) {
         this.wt = wt;
+        this.showFilter = wt;
     }
 
     public boolean isShowFilter() {
