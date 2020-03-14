@@ -9,24 +9,20 @@ import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 
-import org.hibernate.Criteria;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
-import org.hibernate.Session;
-import org.hibernate.criterion.Restrictions;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 import org.springframework.transaction.annotation.Transactional;
 
 import javax.faces.model.SelectItem;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import java.util.*;
 
 /**
@@ -75,7 +71,15 @@ public class RuleCreatePage extends BasicWorkspacePage
     @Autowired
     private DAOService daoService;
 
-
+    // Веб-технолог
+    private int complexType = -1;
+    private int ageGroup = -1;
+    WtDiscountRule wtDiscountRule = new WtDiscountRule();
+    private List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
+    private Map<Integer, Long> complexTypeMap;
+    private Map<Integer, Long> ageGroupMap;
+    boolean wt = false;
+    boolean showFilter = false;
 
     public List<SelectItem> getAvailableComplexs() {
         final List<ComplexRole> complexRoles = daoService.findComplexRoles();
@@ -101,59 +105,6 @@ public class RuleCreatePage extends BasicWorkspacePage
             res.add(new SelectItem(i, group));
         }
         return res;
-    }
-
-    public int getSubCategory() {
-        return subCategory;
-    }
-
-    public void setSubCategory(int subCategory) {
-        this.subCategory = subCategory;
-    }
-
-    public String getFilterOrg() {
-        return filterOrg;
-    }
-
-    public void setFilterOrg(String filterOrg) {
-        this.filterOrg = filterOrg;
-    }
-
-    public String getFilter() {
-        return filter;
-    }
-
-    public Boolean getOperationOr() {
-        return operationOr;
-    }
-
-    public void setOperationOr(Boolean operationOr) {
-        this.operationOr = operationOr;
-    }
-
-
-    public int getPriority() {
-        return priority;
-    }
-
-    public void setPriority(int priority) {
-        this.priority = priority;
-    }
-
-    public String getDescription() {
-        return description;
-    }
-
-    public void setDescription(String description) {
-        this.description = description;
-    }
-
-    public Integer getDiscountRate() {
-        return discountRate;
-    }
-
-    public void setDiscountRate(Integer discountRate) {
-        this.discountRate = discountRate;
     }
 
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws HibernateException {
@@ -195,6 +146,84 @@ public class RuleCreatePage extends BasicWorkspacePage
 
     public String getPageFilename() {
         return "option/discountrule/create";
+    }
+
+    //// Веб-технолог ////
+
+    public List<SelectItem> getComplexTypes() {
+        List<SelectItem> res = new ArrayList<>();
+        List<WtComplexGroupItem> complexGroupItems;
+        complexTypeMap = new HashMap<>();
+        res.add(new SelectItem("", ""));
+        complexGroupItems = daoService.getWtComplexGroupList();
+        int i = 0;
+        for (WtComplexGroupItem item : complexGroupItems) {
+            if (item.getIdOfComplexGroupItem() != 3) { // 3 = Все виды питания
+                res.add(new SelectItem(i++, item.getDescription()));
+                complexTypeMap.put(i, item.getIdOfComplexGroupItem());
+            }
+        }
+        return res;
+    }
+
+    public List<SelectItem> getAgeGroups() {
+        List<SelectItem> res = new ArrayList<>();
+        List<WtAgeGroupItem> ageGroupItems;
+        ageGroupMap = new HashMap<>();
+        res.add(new SelectItem("", ""));
+        ageGroupItems = daoService.getWtAgeGroupList();
+        int i = 0;
+        for (WtAgeGroupItem item : ageGroupItems) {
+            if (item.getIdOfAgeGroupItem() < 5) { // 5 = Сотрудники, 6 = Все
+                res.add(new SelectItem(i++, item.getDescription()));
+                ageGroupMap.put(i, item.getIdOfAgeGroupItem());
+            }
+        }
+        return res;
+    }
+
+    public void fillWtSelectedComplexes() {
+        if (!wt || wtSelectedComplexes.size() != 0) {
+            wtSelectedComplexes.clear();
+        }
+        if (!wt) {
+            return;
+        }
+        if (complexType > -1 || ageGroup > -1) {
+            Long complexGroupId = complexTypeMap.get(complexType + 1);
+            Long ageGroupId = ageGroupMap.get(ageGroup + 1);
+            if (complexGroupId == null && ageGroupId == null) {
+                resetWtForm();
+            } else {
+                List<WtComplexGroupItem> wtComplexGroupItem = daoService.getWtComplexGroupItemById(complexGroupId);
+                List<WtAgeGroupItem> wtAgeGroupItem = daoService.getWtAgeGroupItemById(ageGroupId);
+
+                for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
+                    for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
+                        List<WtComplex> wtComplexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem);
+                        for (WtComplex wtComplex : wtComplexes) {
+                            if (wtComplex != null && wtSelectedComplexes != null) {
+                                wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
+                            }
+                        }
+                    }
+                }
+
+            }
+        } else if (complexType == -1 && ageGroup == -1) {
+            resetWtForm();
+        }
+    }
+
+    private void resetWtForm() {
+        List<WtSelectedComplex> wtNewSelectedComplexes = new ArrayList<>();
+        List<WtComplex> wtComplexes = daoService.getWtComplexesList();
+        for (WtComplex wtComplex : wtComplexes) {
+            wtNewSelectedComplexes.add(new WtSelectedComplex(wtComplex));
+        }
+        wtSelectedComplexes = wtNewSelectedComplexes;
+        complexType = -1;
+        ageGroup = -1;
     }
 
     @Override
@@ -277,17 +306,44 @@ public class RuleCreatePage extends BasicWorkspacePage
         discountRule.setOperationOr(operationOr);
         discountRule.setCategoryDiscounts(categoryDiscounts);
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
+        List<CategoryOrg> categoryOrgList = new ArrayList<>();
         if (!this.idOfCategoryList.isEmpty()) {
             List<CategoryDiscount> categoryList = daoService.getCategoryDiscountListWithIds(this.idOfCategoryList);
             categoryDiscountSet.addAll(categoryList);
             discountRule.setCategoriesDiscounts(categoryDiscountSet);
         }
         if (!this.idOfCategoryOrgList.isEmpty()) {
-            List<CategoryOrg> categoryOrgList = daoService.getCategoryOrgWithIds(this.idOfCategoryOrgList);
+            categoryOrgList = daoService.getCategoryOrgWithIds(this.idOfCategoryOrgList);
             discountRule.getCategoryOrgs().addAll(categoryOrgList);
         }
         daoService.persistEntity(discountRule);
         //em.persist(discountRule);
+
+        //// Веб-технолог ////
+
+        if (StringUtils.isNotEmpty(subCategory)) {
+            wtDiscountRule.setSubCategory(subCategory);
+        }
+
+        Set<WtComplex> wtComplexes = new HashSet<>();
+        for (WtSelectedComplex wtSelectedComplex : wtSelectedComplexes) {
+            if (wtSelectedComplex.isChecked()) {
+                WtComplex complex = wtSelectedComplex.getWtComplex();
+                wtDiscountRule.getComplexes().add(complex);
+            }
+        }
+
+        wtDiscountRule.setDescription(description);
+        wtDiscountRule.setPriority(priority);
+        wtDiscountRule.setPriority(discountRate);
+        wtDiscountRule.setCategoryDiscounts(categoryDiscountSet);
+
+        for (CategoryOrg categoryOrg : categoryOrgList) {
+            wtDiscountRule.getCategoryOrgs().add(categoryOrg);
+        }
+
+        daoService.persistEntity(wtDiscountRule);
+
         printMessage("Правило зарегистрировано успешно");
     }
 
@@ -297,5 +353,159 @@ public class RuleCreatePage extends BasicWorkspacePage
 
     public void setSelectedComplexIds(Integer[] selectedComplexIds) {
         this.selectedComplexIds = selectedComplexIds;
+    }
+
+
+    public int getSubCategory() {
+        return subCategory;
+    }
+
+    public void setSubCategory(int subCategory) {
+        this.subCategory = subCategory;
+    }
+
+    public String getFilterOrg() {
+        return filterOrg;
+    }
+
+    public void setFilterOrg(String filterOrg) {
+        this.filterOrg = filterOrg;
+    }
+
+    public String getFilter() {
+        return filter;
+    }
+
+    public Boolean getOperationOr() {
+        return operationOr;
+    }
+
+    public void setOperationOr(Boolean operationOr) {
+        this.operationOr = operationOr;
+    }
+
+
+    public int getPriority() {
+        return priority;
+    }
+
+    public void setPriority(int priority) {
+        this.priority = priority;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
+    public void setDescription(String description) {
+        this.description = description;
+    }
+
+    public Integer getDiscountRate() {
+        return discountRate;
+    }
+
+    public void setDiscountRate(Integer discountRate) {
+        this.discountRate = discountRate;
+    }
+
+    public List<Long> getIdOfCategoryList() {
+        return idOfCategoryList;
+    }
+
+    public void setIdOfCategoryList(List<Long> idOfCategoryList) {
+        this.idOfCategoryList = idOfCategoryList;
+    }
+
+    public List<Long> getIdOfCategoryOrgList() {
+        return idOfCategoryOrgList;
+    }
+
+    public void setIdOfCategoryOrgList(List<Long> idOfCategoryOrgList) {
+        this.idOfCategoryOrgList = idOfCategoryOrgList;
+    }
+
+    public String getCategoryDiscounts() {
+        return categoryDiscounts;
+    }
+
+    public void setCategoryDiscounts(String categoryDiscounts) {
+        this.categoryDiscounts = categoryDiscounts;
+    }
+
+    public void setFilter(String filter) {
+        this.filter = filter;
+    }
+
+    public DAOService getDaoService() {
+        return daoService;
+    }
+
+    public void setDaoService(DAOService daoService) {
+        this.daoService = daoService;
+    }
+
+    public int getComplexType() {
+        return complexType;
+    }
+
+    public void setComplexType(int complexType) {
+        this.complexType = complexType;
+    }
+
+    public int getAgeGroup() {
+        return ageGroup;
+    }
+
+    public void setAgeGroup(int ageGroup) {
+        this.ageGroup = ageGroup;
+    }
+
+    public WtDiscountRule getWtDiscountRule() {
+        return wtDiscountRule;
+    }
+
+    public void setWtDiscountRule(WtDiscountRule wtDiscountRule) {
+        this.wtDiscountRule = wtDiscountRule;
+    }
+
+    public List<WtSelectedComplex> getWtSelectedComplexes() {
+        return wtSelectedComplexes;
+    }
+
+    public void setWtSelectedComplexes(List<WtSelectedComplex> wtSelectedComplexes) {
+        this.wtSelectedComplexes = wtSelectedComplexes;
+    }
+
+    public Map<Integer, Long> getComplexTypeMap() {
+        return complexTypeMap;
+    }
+
+    public void setComplexTypeMap(Map<Integer, Long> complexTypeMap) {
+        this.complexTypeMap = complexTypeMap;
+    }
+
+    public Map<Integer, Long> getAgeGroupMap() {
+        return ageGroupMap;
+    }
+
+    public void setAgeGroupMap(Map<Integer, Long> ageGroupMap) {
+        this.ageGroupMap = ageGroupMap;
+    }
+
+    public boolean isWt() {
+        return wt;
+    }
+
+    public void setWt(boolean wt) {
+        this.wt = wt;
+    }
+
+    public boolean isShowFilter() {
+        return showFilter;
+    }
+
+    public void setShowFilter(boolean showFilter) {
+        this.showFilter = showFilter;
     }
 }
