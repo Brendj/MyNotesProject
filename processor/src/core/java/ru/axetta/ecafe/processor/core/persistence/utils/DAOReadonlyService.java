@@ -880,17 +880,34 @@ public class DAOReadonlyService {
     }
 
     public Set<WtComplex> getComplexesSetFromVersion(Long version, Contragent contragent, Org org) {
+        Set<WtComplex> complexes = new HashSet<>();
         try {
-            Query query = entityManager.createQuery(
+            Query queryOrgs = entityManager.createQuery(
                     "SELECT complex from WtComplex complex where complex.version > :version "
-                            + "AND complex.contragent = :contragent AND :org IN elements(complex.orgs) OR :org IN elements(complex.wtOrgGroup.orgs)");
-            query.setParameter("version", version);
-            query.setParameter("contragent", contragent);
-            query.setParameter("org", org);
-            List<WtComplex> complexes = query.getResultList();
+                            + "AND complex.contragent = :contragent AND :org IN elements(complex.orgs)");
+            queryOrgs.setParameter("version", version);
+            queryOrgs.setParameter("contragent", contragent);
+            queryOrgs.setParameter("org", org);
+            List<WtComplex> complexesOrgs = queryOrgs.getResultList();
+
+            if (complexesOrgs != null) {
+                complexes.addAll(complexesOrgs);
+            }
+
+            Query queryOrgGroups = entityManager.createQuery(
+                    "SELECT complex from WtComplex complex where complex.version > :version "
+                            + "AND complex.contragent = :contragent AND :org IN elements(complex.wtOrgGroup.orgs)");
+            queryOrgGroups.setParameter("version", version);
+            queryOrgGroups.setParameter("contragent", contragent);
+            queryOrgGroups.setParameter("org", org);
+            List<WtComplex> complexesOrgGroups = queryOrgGroups.getResultList();
+
+            if (complexesOrgGroups != null) {
+                complexes.addAll(complexesOrgGroups);
+            }
 
             for (WtComplex complex : complexes) {
-                query = entityManager
+                Query query = entityManager
                         .createQuery("SELECT item from WtComplexesItem item where item.wtComplex = :complex");
                 query.setParameter("complex", complex);
                 List<WtComplexesItem> items = query.getResultList();
@@ -898,18 +915,7 @@ public class DAOReadonlyService {
                     complex.setWtComplexesItems(new HashSet<>(items));
                 }
             }
-
-            for (WtComplex complex : complexes) {
-                query = entityManager
-                        .createQuery("SELECT item from WtComplexesItem item where item.wtComplex = :complex");
-                query.setParameter("complex", complex);
-                List<WtComplexesItem> items = query.getResultList();
-                if (items != null && items.size() > 0) {
-                    complex.setWtComplexesItems(new HashSet<>(items));
-                }
-            }
-
-            return new HashSet<>(complexes);
+            return complexes;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
