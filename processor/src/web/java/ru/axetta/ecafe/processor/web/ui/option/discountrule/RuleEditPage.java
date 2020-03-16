@@ -119,7 +119,8 @@ public class RuleEditPage extends BasicWorkspacePage
             Long complexGroupId = complexTypeMap.get(complexType + 1);
             Long ageGroupId = ageGroupMap.get(ageGroup + 1);
             if (complexGroupId == null && ageGroupId == null) {
-                resetWtForm();
+                //resetWtForm();
+                fill(wtDiscountRule);
             } else {
                 List<WtComplexGroupItem> wtComplexGroupItem = daoService.getWtComplexGroupItemById(complexGroupId);
                 List<WtAgeGroupItem> wtAgeGroupItem = daoService.getWtAgeGroupItemById(ageGroupId);
@@ -137,11 +138,64 @@ public class RuleEditPage extends BasicWorkspacePage
 
             }
         } else if (complexType == -1 && ageGroup == -1) {
-            resetWtForm();
+            //resetWtForm();
+            fill(wtDiscountRule);
         }
     }
 
-    private void resetWtForm() {
+    //private void resetWtForm() {
+    //    List<WtSelectedComplex> wtNewSelectedComplexes = new ArrayList<>();
+    //    List<WtComplex> wtComplexes = daoService.getWtComplexesList();
+    //    for (WtComplex wtComplex : wtComplexes) {
+    //        wtNewSelectedComplexes.add(new WtSelectedComplex(wtComplex));
+    //    }
+    //    wtSelectedComplexes = wtNewSelectedComplexes;
+    //}
+
+    private void fill(WtDiscountRule wtDiscountRule) {
+
+        this.description = wtDiscountRule.getDescription() == null ? "" : wtDiscountRule.getDescription();
+
+        //if (description.indexOf(CategoryDiscountEditPage.DISCOUNT_START) == 0) {
+        //    String discount = description.substring(description.indexOf(CategoryDiscountEditPage.DISCOUNT_START)
+        //                    + CategoryDiscountEditPage.DISCOUNT_START.length(),
+        //            description.indexOf(CategoryDiscountEditPage.DISCOUNT_END));
+        //    discountRate = Integer.parseInt(discount);
+        //    description = "";
+        //} else {
+            discountRate = 100;
+        //}
+        subCategory = -1;
+        for (int i = 0; i < RuleCreatePage.SUB_CATEGORIES.length; i++) {
+            if (RuleCreatePage.SUB_CATEGORIES[i].equals(wtDiscountRule.getSubCategory())) {
+                subCategory = i;
+                break;
+            }
+        }
+
+        this.priority = wtDiscountRule.getPriority();
+
+        this.idOfCategoryList.clear();
+        if (!wtDiscountRule.getCategoryDiscounts().isEmpty()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (CategoryDiscount categoryDiscount : wtDiscountRule.getCategoryDiscounts()) {
+                stringBuilder.append(categoryDiscount.getCategoryName());
+                stringBuilder.append("; ");
+                this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
+            }
+            this.categoryDiscounts = stringBuilder.toString();
+        }
+        this.idOfCategoryOrgList.clear();
+        if (!wtDiscountRule.getCategoryOrgs().isEmpty()) {
+            StringBuilder stringBuilder = new StringBuilder();
+            for (CategoryOrg categoryOrg : wtDiscountRule.getCategoryOrgs()) {
+                stringBuilder.append(categoryOrg.getCategoryName());
+                stringBuilder.append("; ");
+                this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
+            }
+        }
+        this.operationor = wtDiscountRule.isOperationOr();
+
         List<WtSelectedComplex> wtNewSelectedComplexes = new ArrayList<>();
         List<WtComplex> wtComplexes = daoService.getWtComplexesList();
         for (WtComplex wtComplex : wtComplexes) {
@@ -573,33 +627,68 @@ public class RuleEditPage extends BasicWorkspacePage
     }
 
     public void reload() throws Exception {
-        DiscountRule discountRule = em.merge(entity);
 
-        StringBuilder categoryFilter = new StringBuilder();
-        if (!discountRule.getCategoriesDiscounts().isEmpty()) {
-            for (CategoryDiscount categoryDiscount : discountRule.getCategoriesDiscounts()) {
-                this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
-                categoryFilter.append(categoryDiscount.getCategoryName());
-                categoryFilter.append(";");
+        // old
+        if (entity != null) {
+            DiscountRule discountRule = em.merge(entity);
+
+            StringBuilder categoryFilter = new StringBuilder();
+            if (!discountRule.getCategoriesDiscounts().isEmpty()) {
+                for (CategoryDiscount categoryDiscount : discountRule.getCategoriesDiscounts()) {
+                    this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
+                    categoryFilter.append(categoryDiscount.getCategoryName());
+                    categoryFilter.append(";");
+                }
+                this.filter = categoryFilter.substring(0, categoryFilter.length() - 1);
+            } else {
+                this.filter = "Не выбрано";
             }
-            this.filter = categoryFilter.substring(0, categoryFilter.length() - 1);
-        } else {
-            this.filter = "Не выбрано";
+
+            StringBuilder categoryOrgFilter = new StringBuilder();
+            if (!discountRule.getCategoryOrgs().isEmpty()) {
+                for (CategoryOrg categoryOrg : discountRule.getCategoryOrgs()) {
+                    this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
+                    categoryOrgFilter.append(categoryOrg.getCategoryName());
+                    categoryOrgFilter.append("; ");
+                }
+                this.filterOrg = categoryOrgFilter.substring(0, categoryOrgFilter.length() - 1);
+            } else {
+                this.filterOrg = "Не выбрано";
+            }
+
+            fill(discountRule);
         }
 
-        StringBuilder categoryOrgFilter = new StringBuilder();
-        if (!discountRule.getCategoryOrgs().isEmpty()) {
-            for (CategoryOrg categoryOrg : discountRule.getCategoryOrgs()) {
-                this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
-                categoryOrgFilter.append(categoryOrg.getCategoryName());
-                categoryOrgFilter.append("; ");
-            }
-            this.filterOrg = categoryOrgFilter.substring(0, categoryOrgFilter.length() - 1);
-        } else {
-            this.filterOrg = "Не выбрано";
-        }
+        //wt
+        if (wtDiscountRule != null) {
+            WtDiscountRule wtdiscountRule = em.merge(wtDiscountRule);
 
-        fill(discountRule);
+            StringBuilder categoryFilter = new StringBuilder();
+            if (!wtDiscountRule.getCategoryDiscounts().isEmpty()) {
+                for (CategoryDiscount categoryDiscount : wtDiscountRule.getCategoryDiscounts()) {
+                    this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
+                    categoryFilter.append(categoryDiscount.getCategoryName());
+                    categoryFilter.append(";");
+                }
+                this.filter = categoryFilter.substring(0, categoryFilter.length() - 1);
+            } else {
+                this.filter = "Не выбрано";
+            }
+
+            StringBuilder categoryOrgFilter = new StringBuilder();
+            if (!wtDiscountRule.getCategoryOrgs().isEmpty()) {
+                for (CategoryOrg categoryOrg : wtDiscountRule.getCategoryOrgs()) {
+                    this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
+                    categoryOrgFilter.append(categoryOrg.getCategoryName());
+                    categoryOrgFilter.append("; ");
+                }
+                this.filterOrg = categoryOrgFilter.substring(0, categoryOrgFilter.length() - 1);
+            } else {
+                this.filterOrg = "Не выбрано";
+            }
+
+            fill(wtDiscountRule);
+        }
     }
 
     public Integer[] getSelectedComplexIds() {
