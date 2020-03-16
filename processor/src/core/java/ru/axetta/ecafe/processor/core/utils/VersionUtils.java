@@ -37,7 +37,11 @@ public class VersionUtils {
     }
 
     public static boolean doublesAllowed(Session session, long idOfOrg) {
-        return RuntimeContext.getInstance().getPropertiesValue(CARD_REGISTRATION_ALLOW_DOUBLES_OPTION, "false").equals("true")
+        return doublesOnlyAllowed()
                 && compareClientVersionForRegisterCardInternal(session, idOfOrg, CARD_REGISTRATION_CLIENT_VERSION_DOUBLES_ALLOWED_VALUE) >= 0;
+    }
+
+    public static boolean doublesOnlyAllowed() {
+        return RuntimeContext.getInstance().getPropertiesValue(CARD_REGISTRATION_ALLOW_DOUBLES_OPTION, "false").equals("true");
     }
 }
