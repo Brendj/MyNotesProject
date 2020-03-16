@@ -47,19 +47,19 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
         List discountRules = getAllDiscountRules(session);
 
         List<WtDiscountRule> wtDiscountRules = getAllWtDiscountRules(session);
+        Org mainOrg = DAOService.getInstance().getOrg(idOfOrg);
 
         Set<Org> orgs = getProcessedOrgs(session, idOfOrg, manyOrgs);
         existOrgWithEmptyCategoryOrgSet = false;
         for (Org org : orgs) {
             addRulesForOrgWithCategoryOrgSet(discountRules, org);
-            if (org.getUseWebArm()) {
+            if (mainOrg.getUseWebArm() && org.getUseWebArm()) {
                 addWtRulesForOrgWithCategoryOrgSet(wtDiscountRules, org);
             }
         }
         if (existOrgWithEmptyCategoryOrgSet) {
             addRulesWithEmptyCategoryOrgSet(discountRules, idOfOrg);
-            Org org = DAOService.getInstance().getOrg(idOfOrg);
-            if (org.getUseWebArm()) {
+            if (mainOrg.getUseWebArm()) {
                 addWtRulesWithEmptyCategoryOrgSet(wtDiscountRules, idOfOrg);
             }
         }
@@ -529,8 +529,13 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
         private String buildCategoryDiscounts(WtDiscountRule wtDiscountRule) {
             Set<CategoryDiscount> categoryDiscounts = wtDiscountRule.getCategoryDiscounts();
             StringBuilder sb = new StringBuilder();
+            int counter = categoryDiscounts.size();
             for (CategoryDiscount category : categoryDiscounts) {
-                sb.append(category.getIdOfCategoryDiscount()).append(",");
+                sb.append(category.getIdOfCategoryDiscount());
+                if (counter > 1) {
+                    sb.append(",");
+                    counter--;
+                }
             }
             return sb.toString();
         }
