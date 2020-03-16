@@ -148,8 +148,6 @@ public class RuleEditPage extends BasicWorkspacePage
             wtNewSelectedComplexes.add(new WtSelectedComplex(wtComplex));
         }
         wtSelectedComplexes = wtNewSelectedComplexes;
-        complexType = -1;
-        ageGroup = -1;
     }
 
     //// Old ////
@@ -259,14 +257,16 @@ public class RuleEditPage extends BasicWorkspacePage
             }
         }
 
+        if (discountRate != null && discountRate != 100) {
+            description =
+                    CategoryDiscountEditPage.DISCOUNT_START + discountRate + CategoryDiscountEditPage.DISCOUNT_END;
+        }
+
         if (!wt) {
             entity = (DiscountRule) em.merge(entity);
             //CategoryDiscount categoryDiscount = (CategoryDiscount) persistenceSession.load(CategoryDiscount.class, this.categorydiscount.getIdOfCategory());
             // entity.setCategoryDiscount(categoryDiscount);
-            if (discountRate != null && discountRate != 100) {
-                description =
-                        CategoryDiscountEditPage.DISCOUNT_START + discountRate + CategoryDiscountEditPage.DISCOUNT_END;
-            }
+
             entity.setDescription(description);
             entity.setSubCategory(strSubCategory);
 
