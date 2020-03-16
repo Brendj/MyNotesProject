@@ -294,6 +294,7 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
     public static class Item {
         DiscountRule entity;
         WtDiscountRule wtEntity;
+        private Object currentEntity = null;
         private long idOfRule;
         private String description;
         private int complex0;
@@ -312,8 +313,8 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
         private List<CategoryDiscount> categoryDiscountList;
         private List<CategoryOrg> categoryOrgList;
         private String subCategory;
+        private int priority;
         //
-
 
         public DiscountRule getEntity() {
             return entity;
@@ -387,7 +388,10 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
             this.priority = priority;
         }
 
-        private int priority;
+        public Object getCurrentEntity() {
+            return (entity == null) ? wtEntity : entity;
+        }
+
         //
 
         public Item(DiscountRule discountRule) {
@@ -439,7 +443,7 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
                 this.categoryDiscounts = stringBuilder.substring(0, stringBuilder.length()-1);
             }
 
-            this.categoryOrgList = new LinkedList<CategoryOrg>();
+            this.categoryOrgList = new LinkedList<>();
             if(!wtDiscountRule.getCategoryOrgs().isEmpty()){
                 this.categoryOrgList.addAll(wtDiscountRule.getCategoryOrgs());
             }

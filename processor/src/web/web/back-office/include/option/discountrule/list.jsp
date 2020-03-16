@@ -124,7 +124,7 @@
         <rich:column>
             <a4j:commandLink reRender="workspaceForm" action="#{ruleEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;" />
-                <f:setPropertyActionListener value="#{item.entity}" target="#{ruleEditPage.entity}" />
+                <f:setPropertyActionListener value="#{item.currentEntity}" target="#{ruleEditPage.getCurrentRule}" />
             </a4j:commandLink>
         </rich:column>
        <rich:column style="text-align:center">

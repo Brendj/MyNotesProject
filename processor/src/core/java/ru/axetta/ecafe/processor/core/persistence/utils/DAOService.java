@@ -2767,10 +2767,8 @@ public class DAOService {
         sb.append("select wc from WtComplex wc where wc.deleteState = 0");
         if (wtComplexGroupItem != null) {
             sb.append(" and wc.wtComplexGroupItem = :wtComplexGroupItem");
-            if (wtAgeGroupItem != null) {
-                sb.append(" and wc.wtAgeGroupItem = :wtAgeGroupItem");
-            }
-        } else if (wtAgeGroupItem != null) {
+        }
+        if (wtAgeGroupItem != null) {
             sb.append(" and wc.wtAgeGroupItem = :wtAgeGroupItem");
         }
 
