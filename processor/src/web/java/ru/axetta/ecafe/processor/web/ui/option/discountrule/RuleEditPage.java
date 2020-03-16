@@ -221,76 +221,12 @@ public class RuleEditPage extends BasicWorkspacePage
 
     @Transactional
     public void updateRule() throws Exception {
-        entity = (DiscountRule) em.merge(entity);
-        //CategoryDiscount categoryDiscount = (CategoryDiscount) persistenceSession.load(CategoryDiscount.class, this.categorydiscount.getIdOfCategory());
-        // entity.setCategoryDiscount(categoryDiscount);
-        if (discountRate != null && discountRate != 100) {
-            description =
-                    CategoryDiscountEditPage.DISCOUNT_START + discountRate + CategoryDiscountEditPage.DISCOUNT_END;
-        }
-        entity.setDescription(description);
-        String subCategory = "";
+
+        String strSubCategory = "";
         if (this.subCategory > 0) {
-            subCategory = RuleCreatePage.SUB_CATEGORIES[this.subCategory];
+            strSubCategory = RuleCreatePage.SUB_CATEGORIES[this.subCategory];
         }
-        entity.setSubCategory(subCategory);
 
-        List<Integer> selectedComplex = Arrays.asList(selectedComplexIds);
-        entity.setComplex0(selectedComplex.contains(0) ? 1 : 0);
-        entity.setComplex1(selectedComplex.contains(1) ? 1 : 0);
-        entity.setComplex2(selectedComplex.contains(2) ? 1 : 0);
-        entity.setComplex3(selectedComplex.contains(3) ? 1 : 0);
-        entity.setComplex4(selectedComplex.contains(4) ? 1 : 0);
-        entity.setComplex5(selectedComplex.contains(5) ? 1 : 0);
-        entity.setComplex6(selectedComplex.contains(6) ? 1 : 0);
-        entity.setComplex7(selectedComplex.contains(7) ? 1 : 0);
-        entity.setComplex8(selectedComplex.contains(8) ? 1 : 0);
-        entity.setComplex9(selectedComplex.contains(9) ? 1 : 0);
-        entity.setComplex10(selectedComplex.contains(10) ? 1 : 0);
-        entity.setComplex11(selectedComplex.contains(11) ? 1 : 0);
-        entity.setComplex12(selectedComplex.contains(12) ? 1 : 0);
-        entity.setComplex13(selectedComplex.contains(13) ? 1 : 0);
-        entity.setComplex14(selectedComplex.contains(14) ? 1 : 0);
-        entity.setComplex15(selectedComplex.contains(15) ? 1 : 0);
-        entity.setComplex16(selectedComplex.contains(16) ? 1 : 0);
-        entity.setComplex17(selectedComplex.contains(17) ? 1 : 0);
-        entity.setComplex18(selectedComplex.contains(18) ? 1 : 0);
-        entity.setComplex19(selectedComplex.contains(19) ? 1 : 0);
-        entity.setComplex20(selectedComplex.contains(20) ? 1 : 0);
-        entity.setComplex21(selectedComplex.contains(21) ? 1 : 0);
-        entity.setComplex22(selectedComplex.contains(22) ? 1 : 0);
-        entity.setComplex23(selectedComplex.contains(23) ? 1 : 0);
-        entity.setComplex24(selectedComplex.contains(24) ? 1 : 0);
-        entity.setComplex25(selectedComplex.contains(25) ? 1 : 0);
-        entity.setComplex26(selectedComplex.contains(26) ? 1 : 0);
-        entity.setComplex27(selectedComplex.contains(27) ? 1 : 0);
-        entity.setComplex28(selectedComplex.contains(28) ? 1 : 0);
-        entity.setComplex29(selectedComplex.contains(29) ? 1 : 0);
-        entity.setComplex30(selectedComplex.contains(30) ? 1 : 0);
-        entity.setComplex31(selectedComplex.contains(31) ? 1 : 0);
-        entity.setComplex32(selectedComplex.contains(32) ? 1 : 0);
-        entity.setComplex33(selectedComplex.contains(33) ? 1 : 0);
-        entity.setComplex34(selectedComplex.contains(34) ? 1 : 0);
-        entity.setComplex35(selectedComplex.contains(35) ? 1 : 0);
-        entity.setComplex36(selectedComplex.contains(36) ? 1 : 0);
-        entity.setComplex37(selectedComplex.contains(37) ? 1 : 0);
-        entity.setComplex38(selectedComplex.contains(38) ? 1 : 0);
-        entity.setComplex39(selectedComplex.contains(39) ? 1 : 0);
-        entity.setComplex40(selectedComplex.contains(40) ? 1 : 0);
-        entity.setComplex41(selectedComplex.contains(41) ? 1 : 0);
-        entity.setComplex42(selectedComplex.contains(42) ? 1 : 0);
-        entity.setComplex43(selectedComplex.contains(43) ? 1 : 0);
-        entity.setComplex44(selectedComplex.contains(44) ? 1 : 0);
-        entity.setComplex45(selectedComplex.contains(45) ? 1 : 0);
-        entity.setComplex46(selectedComplex.contains(46) ? 1 : 0);
-        entity.setComplex47(selectedComplex.contains(47) ? 1 : 0);
-        entity.setComplex48(selectedComplex.contains(48) ? 1 : 0);
-        entity.setComplex49(selectedComplex.contains(49) ? 1 : 0);
-        DiscountRule.ComplexBuilder complexBuilder = new DiscountRule.ComplexBuilder(selectedComplex);
-        entity.setComplexesMap(complexBuilder.toString());
-
-        entity.setPriority(priority);
-        entity.setOperationOr(operationor);
         //entity.setCategoryDiscounts(categoryDiscounts);
         this.categoryDiscountSet = new HashSet<CategoryDiscount>();
         entity.getCategoriesDiscounts().clear();
@@ -322,37 +258,104 @@ public class RuleEditPage extends BasicWorkspacePage
                 entity.getCategoryOrgs().add((CategoryOrg) object);
             }
         }
-        em.persist(entity);
-        fill(entity);
 
-        //// Веб-технолог ////
-
-        if (StringUtils.isNotEmpty(subCategory)) {
-            wtDiscountRule.setSubCategory(subCategory);
-        }
-
-        Set<WtComplex> wtComplexes = new HashSet<>();
-        for (WtSelectedComplex wtSelectedComplex : wtSelectedComplexes) {
-            if (wtSelectedComplex.isChecked()) {
-                WtComplex complex = wtSelectedComplex.getWtComplex();
-                wtDiscountRule.getComplexes().add(complex);
+        if (!wt) {
+            entity = (DiscountRule) em.merge(entity);
+            //CategoryDiscount categoryDiscount = (CategoryDiscount) persistenceSession.load(CategoryDiscount.class, this.categorydiscount.getIdOfCategory());
+            // entity.setCategoryDiscount(categoryDiscount);
+            if (discountRate != null && discountRate != 100) {
+                description =
+                        CategoryDiscountEditPage.DISCOUNT_START + discountRate + CategoryDiscountEditPage.DISCOUNT_END;
             }
+            entity.setDescription(description);
+            entity.setSubCategory(strSubCategory);
+
+            List<Integer> selectedComplex = Arrays.asList(selectedComplexIds);
+            entity.setComplex0(selectedComplex.contains(0) ? 1 : 0);
+            entity.setComplex1(selectedComplex.contains(1) ? 1 : 0);
+            entity.setComplex2(selectedComplex.contains(2) ? 1 : 0);
+            entity.setComplex3(selectedComplex.contains(3) ? 1 : 0);
+            entity.setComplex4(selectedComplex.contains(4) ? 1 : 0);
+            entity.setComplex5(selectedComplex.contains(5) ? 1 : 0);
+            entity.setComplex6(selectedComplex.contains(6) ? 1 : 0);
+            entity.setComplex7(selectedComplex.contains(7) ? 1 : 0);
+            entity.setComplex8(selectedComplex.contains(8) ? 1 : 0);
+            entity.setComplex9(selectedComplex.contains(9) ? 1 : 0);
+            entity.setComplex10(selectedComplex.contains(10) ? 1 : 0);
+            entity.setComplex11(selectedComplex.contains(11) ? 1 : 0);
+            entity.setComplex12(selectedComplex.contains(12) ? 1 : 0);
+            entity.setComplex13(selectedComplex.contains(13) ? 1 : 0);
+            entity.setComplex14(selectedComplex.contains(14) ? 1 : 0);
+            entity.setComplex15(selectedComplex.contains(15) ? 1 : 0);
+            entity.setComplex16(selectedComplex.contains(16) ? 1 : 0);
+            entity.setComplex17(selectedComplex.contains(17) ? 1 : 0);
+            entity.setComplex18(selectedComplex.contains(18) ? 1 : 0);
+            entity.setComplex19(selectedComplex.contains(19) ? 1 : 0);
+            entity.setComplex20(selectedComplex.contains(20) ? 1 : 0);
+            entity.setComplex21(selectedComplex.contains(21) ? 1 : 0);
+            entity.setComplex22(selectedComplex.contains(22) ? 1 : 0);
+            entity.setComplex23(selectedComplex.contains(23) ? 1 : 0);
+            entity.setComplex24(selectedComplex.contains(24) ? 1 : 0);
+            entity.setComplex25(selectedComplex.contains(25) ? 1 : 0);
+            entity.setComplex26(selectedComplex.contains(26) ? 1 : 0);
+            entity.setComplex27(selectedComplex.contains(27) ? 1 : 0);
+            entity.setComplex28(selectedComplex.contains(28) ? 1 : 0);
+            entity.setComplex29(selectedComplex.contains(29) ? 1 : 0);
+            entity.setComplex30(selectedComplex.contains(30) ? 1 : 0);
+            entity.setComplex31(selectedComplex.contains(31) ? 1 : 0);
+            entity.setComplex32(selectedComplex.contains(32) ? 1 : 0);
+            entity.setComplex33(selectedComplex.contains(33) ? 1 : 0);
+            entity.setComplex34(selectedComplex.contains(34) ? 1 : 0);
+            entity.setComplex35(selectedComplex.contains(35) ? 1 : 0);
+            entity.setComplex36(selectedComplex.contains(36) ? 1 : 0);
+            entity.setComplex37(selectedComplex.contains(37) ? 1 : 0);
+            entity.setComplex38(selectedComplex.contains(38) ? 1 : 0);
+            entity.setComplex39(selectedComplex.contains(39) ? 1 : 0);
+            entity.setComplex40(selectedComplex.contains(40) ? 1 : 0);
+            entity.setComplex41(selectedComplex.contains(41) ? 1 : 0);
+            entity.setComplex42(selectedComplex.contains(42) ? 1 : 0);
+            entity.setComplex43(selectedComplex.contains(43) ? 1 : 0);
+            entity.setComplex44(selectedComplex.contains(44) ? 1 : 0);
+            entity.setComplex45(selectedComplex.contains(45) ? 1 : 0);
+            entity.setComplex46(selectedComplex.contains(46) ? 1 : 0);
+            entity.setComplex47(selectedComplex.contains(47) ? 1 : 0);
+            entity.setComplex48(selectedComplex.contains(48) ? 1 : 0);
+            entity.setComplex49(selectedComplex.contains(49) ? 1 : 0);
+            DiscountRule.ComplexBuilder complexBuilder = new DiscountRule.ComplexBuilder(selectedComplex);
+            entity.setComplexesMap(complexBuilder.toString());
+
+            entity.setPriority(priority);
+            entity.setOperationOr(operationor);
+
+            em.persist(entity);
+            fill(entity);
+        } else {
+
+            //// Веб-технолог ////
+            wtDiscountRule.setSubCategory(strSubCategory);
+
+            for (WtSelectedComplex wtSelectedComplex : wtSelectedComplexes) {
+                if (wtSelectedComplex.isChecked()) {
+                    WtComplex complex = wtSelectedComplex.getWtComplex();
+                    wtDiscountRule.getComplexes().add(complex);
+                }
+            }
+
+            wtDiscountRule.setDescription(description);
+            wtDiscountRule.setPriority(priority);
+            wtDiscountRule.setRate(discountRate);
+            wtDiscountRule.setOperationOr(operationor);
+
+            wtDiscountRule.setCategoryDiscounts(this.categoryDiscountSet);
+
+            for (CategoryOrg categoryOrg : categoryOrgList) {
+                wtDiscountRule.getCategoryOrgs().add(categoryOrg);
+            }
+
+            wtDiscountRule = em.merge(wtDiscountRule);
         }
 
-        wtDiscountRule.setDescription(description);
-        wtDiscountRule.setPriority(priority);
-        wtDiscountRule.setPriority(discountRate);
-        wtDiscountRule.setOperationOr(operationor);
-
-        wtDiscountRule.setCategoryDiscounts(this.categoryDiscountSet);
-
-        for (CategoryOrg categoryOrg : categoryOrgList) {
-            wtDiscountRule.getCategoryOrgs().add(categoryOrg);
-        }
-
-        wtDiscountRule = (WtDiscountRule) em.merge(wtDiscountRule);
-
-        printMessage("Данные обновлены.");
+        printMessage("Данные обновлены");
     }
 
     private void fill(DiscountRule discountRule) throws Exception {

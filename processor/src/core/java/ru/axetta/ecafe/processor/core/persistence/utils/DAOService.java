@@ -2764,14 +2764,14 @@ public class DAOService {
 
     public List<WtComplex> getWtComplexesList(WtComplexGroupItem wtComplexGroupItem, WtAgeGroupItem wtAgeGroupItem) {
         StringBuilder sb = new StringBuilder();
-        sb.append("select wc from WtComplex wc");
+        sb.append("select wc from WtComplex wc where wc.deleteState = 0");
         if (wtComplexGroupItem != null) {
-            sb.append(" where wc.wtComplexGroupItem = :wtComplexGroupItem ");
+            sb.append(" and wc.wtComplexGroupItem = :wtComplexGroupItem");
             if (wtAgeGroupItem != null) {
-                sb.append("and wc.wtAgeGroupItem = :wtAgeGroupItem");
+                sb.append(" and wc.wtAgeGroupItem = :wtAgeGroupItem");
             }
         } else if (wtAgeGroupItem != null) {
-            sb.append(" where wc.wtAgeGroupItem = :wtAgeGroupItem");
+            sb.append(" and wc.wtAgeGroupItem = :wtAgeGroupItem");
         }
 
         Query query = entityManager.createQuery(sb.toString());
