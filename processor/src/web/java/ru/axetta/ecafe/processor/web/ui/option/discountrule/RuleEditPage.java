@@ -181,12 +181,21 @@ public class RuleEditPage extends BasicWorkspacePage
 
     private void fill(WtDiscountRule wtDiscountRule) {
 
-        if (wtDiscountRule != null) {
-            this.description = wtDiscountRule.getDescription();
-        }
+        this.description = (wtDiscountRule.getDescription() == null) ? "" : wtDiscountRule.getDescription();
+
+        //if (description.indexOf(CategoryDiscountEditPage.DISCOUNT_START) == 0) {
+        //    String discount = description.substring(description.indexOf(CategoryDiscountEditPage.DISCOUNT_START)
+        //                    + CategoryDiscountEditPage.DISCOUNT_START.length(),
+        //            description.indexOf(CategoryDiscountEditPage.DISCOUNT_END));
+        //    discountRate = Integer.parseInt(discount);
+        //    description = "";
+        //} else {
+        //    discountRate = 100;
+        //}
 
         discountRate = 100;
         subCategory = -1;
+
         for (int i = 0; i < RuleCreatePage.SUB_CATEGORIES.length; i++) {
             if (RuleCreatePage.SUB_CATEGORIES[i].equals(wtDiscountRule.getSubCategory())) {
                 subCategory = i;
@@ -828,7 +837,7 @@ public class RuleEditPage extends BasicWorkspacePage
         if (wtDiscountRule != null) {
             return wtDiscountRule.getDescription();
         }
-        return "";
+        return " ";
     }
 
     public int getComplexType() {
@@ -897,6 +906,10 @@ public class RuleEditPage extends BasicWorkspacePage
     }
 
     public Object getCurrentRule() {
-        return (entity == null) ? wtDiscountRule : entity;
+        if (entity != null)
+            return entity;
+        if (wtDiscountRule != null)
+            return wtDiscountRule;
+        return null;
     }
 }

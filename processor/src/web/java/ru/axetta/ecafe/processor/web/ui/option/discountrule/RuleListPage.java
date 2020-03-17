@@ -389,7 +389,11 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
         }
 
         public Object getCurrentEntity() {
-            return (entity == null) ? wtEntity : entity;
+            if (entity != null)
+                return entity;
+            if (wtEntity != null)
+                return wtEntity;
+            return null;
         }
 
         //
