@@ -77,7 +77,7 @@ public class WtComplex {
     @JoinColumn(name = "idOfDietType")
     private WtDietType wtDietType;
 
-    @OneToOne(fetch = FetchType.EAGER)
+    @ManyToOne
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 

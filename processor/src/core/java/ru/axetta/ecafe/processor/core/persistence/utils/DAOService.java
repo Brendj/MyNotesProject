@@ -68,15 +68,16 @@ public class DAOService {
     }
 
     public List<CategoryDiscount> getCategoryDiscountListByCategoryName(String categoryName) {
-        String strQuery = "from CategoryDiscount where lower(categoryName) like lower('%"+  categoryName +"%') order by idOfCategoryDiscount";
-        TypedQuery<CategoryDiscount> q = entityManager
-                .createQuery(strQuery, CategoryDiscount.class);
+        String strQuery = "from CategoryDiscount where lower(categoryName) like lower('%" + categoryName
+                + "%') order by idOfCategoryDiscount";
+        TypedQuery<CategoryDiscount> q = entityManager.createQuery(strQuery, CategoryDiscount.class);
         return q.getResultList();
     }
 
     public List<CategoryDiscountDSZN> getCategoryDiscountDSZNList() {
         TypedQuery<CategoryDiscountDSZN> q = entityManager
-                .createQuery("from CategoryDiscountDSZN where deleted = false order by code", CategoryDiscountDSZN.class);
+                .createQuery("from CategoryDiscountDSZN where deleted = false order by code",
+                        CategoryDiscountDSZN.class);
         return q.getResultList();
     }
 
@@ -128,11 +129,12 @@ public class DAOService {
         return !list.isEmpty();
     }
 
-    public List<Long> getNextFreeLastClientContractId(long divider, long idOfOrg, long lastClientContractId, int count) {
+    public List<Long> getNextFreeLastClientContractId(long divider, long idOfOrg, long lastClientContractId,
+            int count) {
         //Запрос правильный, не менять.
         String num = "";
         String end = "";
-        if(count == 1){
+        if (count == 1) {
             num = "min(num)";
         } else {
             num = "num";
@@ -151,8 +153,8 @@ public class DAOService {
         List res = nativeQuery.getResultList();
         List<Long> result = new ArrayList<Long>();
         if (res != null) {
-            for(Object o : res){
-                Long value = ((BigInteger)o).longValue();
+            for (Object o : res) {
+                Long value = ((BigInteger) o).longValue();
                 result.add(value);
             }
         }
@@ -423,11 +425,13 @@ public class DAOService {
     }
 
     public boolean setClientMobilePhone(Long contractId, String mobile, Date dateConfirm) {
-        Query q = entityManager.createQuery("update Client set mobile=:mobile, lastConfirmMobile = :lastConfirmMobile where contractId=:contractId");
+        Query q = entityManager.createQuery(
+                "update Client set mobile=:mobile, lastConfirmMobile = :lastConfirmMobile where contractId=:contractId");
         q.setParameter("mobile", mobile);
         q.setParameter("contractId", contractId);
         q.setParameter("lastConfirmMobile", dateConfirm);
-        logger.info("class : DAOService, method : setClientMobilePhone line : 382, contractId : " + contractId + " mobile : " + mobile);
+        logger.info("class : DAOService, method : setClientMobilePhone line : 382, contractId : " + contractId
+                + " mobile : " + mobile);
         return q.executeUpdate() != 0;
     }
 
@@ -435,7 +439,8 @@ public class DAOService {
         Query q = entityManager.createQuery("update Client set phone=:phone where contractId=:contractId");
         q.setParameter("phone", phone);
         q.setParameter("contractId", contractId);
-        logger.info("class : DAOService, method : setClientPhone line : 390, contractId : " + contractId + " phone : " + phone);
+        logger.info("class : DAOService, method : setClientPhone line : 390, contractId : " + contractId + " phone : "
+                + phone);
         return q.executeUpdate() != 0;
     }
 
@@ -529,7 +534,7 @@ public class DAOService {
         List<Long> ids = new ArrayList<Long>();
         Session session = entityManager.unwrap(Session.class);
         Org org = (Org) session.load(Org.class, idOfOrg);
-        for(Org org1 : org.getFriendlyOrg()) {
+        for (Org org1 : org.getFriendlyOrg()) {
             ids.add(org1.getIdOfOrg());
         }
         return ids;
@@ -666,7 +671,8 @@ public class DAOService {
             disabledClause = " where os.state <> 0 ";
         }
         TypedQuery<Org> query = entityManager
-                .createQuery("select os.org from OrgSync os " + disabledClause + " order by lastSuccessfulBalanceSync", Org.class);
+                .createQuery("select os.org from OrgSync os " + disabledClause + " order by lastSuccessfulBalanceSync",
+                        Org.class);
         return query.getResultList();
     }
 
@@ -896,19 +902,23 @@ public class DAOService {
         return q.getResultList();
     }
 
-    public Org findOrgByRegistryDataByMainField(Long uniqueAddressId, String field_name, Object field_value, String inn, Long unom, Long unad, Boolean skipThirdPart) {
+    public Org findOrgByRegistryDataByMainField(Long uniqueAddressId, String field_name, Object field_value, String inn,
+            Long unom, Long unad, Boolean skipThirdPart) {
         //Новый алгоритм поиска организации в нашей БД по данным от реестров. Сраниваем в 3 этапа по разным наборам полей
         entityManager.setFlushMode(FlushModeType.COMMIT);
         javax.persistence.Query q;
         if (uniqueAddressId != null) {
-            q = entityManager.createQuery(String.format("from Org o left join fetch o.officialPerson p where o.%s=:parameter and o.uniqueAddressId=:uniqueAddressId", field_name));
+            q = entityManager.createQuery(String.format(
+                    "from Org o left join fetch o.officialPerson p where o.%s=:parameter and o.uniqueAddressId=:uniqueAddressId",
+                    field_name));
             q.setParameter("parameter", field_value);
             q.setParameter("uniqueAddressId", uniqueAddressId);
             List<Org> orgs = q.getResultList();   //1 этап
             if (orgs != null && orgs.size() > 0) {
                 return orgs.get(0);
             } else {
-                q = entityManager.createQuery("from Org o left join fetch o.officialPerson p where o.INN=:inn and o.uniqueAddressId=:uniqueAddressId");
+                q = entityManager.createQuery(
+                        "from Org o left join fetch o.officialPerson p where o.INN=:inn and o.uniqueAddressId=:uniqueAddressId");
                 q.setParameter("inn", inn);
                 q.setParameter("uniqueAddressId", uniqueAddressId);
                 List<Org> orgs2 = q.getResultList();  //2 этап
@@ -920,7 +930,8 @@ public class DAOService {
         if (null != skipThirdPart && skipThirdPart && (null == unom || null == unad)) {
             return null;
         }
-        q = entityManager.createQuery("from Org o left join fetch o.officialPerson p where o.btiUnom=:unom and o.btiUnad=:unad");
+        q = entityManager
+                .createQuery("from Org o left join fetch o.officialPerson p where o.btiUnom=:unom and o.btiUnad=:unad");
         q.setParameter("unom", unom);
         q.setParameter("unad", unad);
         List<Org> orgs3 = q.getResultList();   //3 этап
@@ -932,7 +943,8 @@ public class DAOService {
 
     }
 
-    public Org findOrgByRegistryData(Long uniqueAddressId, String guid, String inn, Long unom, Long unad, Boolean skipThirdPart) {
+    public Org findOrgByRegistryData(Long uniqueAddressId, String guid, String inn, Long unom, Long unad,
+            Boolean skipThirdPart) {
         return findOrgByRegistryDataByMainField(uniqueAddressId, "guid", guid, inn, unom, unad, skipThirdPart);
     }
 
@@ -1547,7 +1559,8 @@ public class DAOService {
     }
 
 
-    public boolean updateBasicGood(Long idOfBasicGood, String nameOfGood, UnitScale unitsScale, Long netWeight, List<Long> idOfProviders) {
+    public boolean updateBasicGood(Long idOfBasicGood, String nameOfGood, UnitScale unitsScale, Long netWeight,
+            List<Long> idOfProviders) {
         GoodsBasicBasket goodsBasicBasket = entityManager.find(GoodsBasicBasket.class, idOfBasicGood);
         Set<ConfigurationProvider> set = new HashSet<ConfigurationProvider>();
         for (Long id : idOfProviders) {
@@ -1563,12 +1576,15 @@ public class DAOService {
         return true;
     }
 
-    public boolean createBasicGood(String nameOfGood, UnitScale unitsScale, Long netWeight, List<Long> idOfProviders) throws Exception {
+    public boolean createBasicGood(String nameOfGood, UnitScale unitsScale, Long netWeight, List<Long> idOfProviders)
+            throws Exception {
         GoodsBasicBasket goodsBasicBasket = new GoodsBasicBasket(UUID.randomUUID().toString());
         Set<ConfigurationProvider> set = new HashSet<ConfigurationProvider>();
         for (Long id : idOfProviders) {
             ConfigurationProvider provider = entityManager.find(ConfigurationProvider.class, id);
-            if (provider == null) throw new Exception("Не найдена производственная конфигурация с ид.=" + id);
+            if (provider == null) {
+                throw new Exception("Не найдена производственная конфигурация с ид.=" + id);
+            }
             set.add(provider);
         }
         goodsBasicBasket.setNameOfGood(nameOfGood);
@@ -1740,8 +1756,8 @@ public class DAOService {
     }
 
     public List getRegistryChangeRevisions(long idOfOrg, String className) throws Exception {
-        Query query = entityManager.createQuery(
-                "select distinct createDate, type from " + className + " where idOfOrg=:idOfOrg order by createDate desc");
+        Query query = entityManager.createQuery("select distinct createDate, type from " + className
+                + " where idOfOrg=:idOfOrg order by createDate desc");
         query.setParameter("idOfOrg", idOfOrg);
         return query.getResultList();
     }
@@ -1785,9 +1801,9 @@ public class DAOService {
     public Long getMainRegistryByItemId(Long idOfItem) {
         Session session = (Session) entityManager.getDelegate();
         try {
-            OrgRegistryChangeItem item = (OrgRegistryChangeItem)session.load(OrgRegistryChangeItem.class, idOfItem);
+            OrgRegistryChangeItem item = (OrgRegistryChangeItem) session.load(OrgRegistryChangeItem.class, idOfItem);
             return item.getOrgRegistryChange().getIdOfOrgRegistryChange();
-        } catch(Exception e) {
+        } catch (Exception e) {
             logger.error("Error retrieving MainRegistryChange by OrgRegistryChangeItem ID", e);
             return null;
         }
@@ -1888,9 +1904,11 @@ public class DAOService {
 
     public ReportInfo registerReport(String ruleName, int documentFormat, String reportName, Date createdDate,
             Long generationTime, Date startDate, Date endDate, String reportFile, String orgNum, Long idOfOrg,
-            String tag, Long idOfContragentReceiver, String contragentReceiver, Long idOfContragent,
-            String contragent, Integer createState) {
-        if (endDate == null) endDate = startDate;
+            String tag, Long idOfContragentReceiver, String contragentReceiver, Long idOfContragent, String contragent,
+            Integer createState) {
+        if (endDate == null) {
+            endDate = startDate;
+        }
         ReportInfo ri = new ReportInfo(ruleName, documentFormat, reportName, createdDate, generationTime, startDate,
                 endDate, reportFile, orgNum, idOfOrg, tag, idOfContragent, contragent, idOfContragentReceiver,
                 contragentReceiver, createState);
@@ -2071,8 +2089,8 @@ public class DAOService {
 
     @Transactional
     public ExternalSystemStats saveStatsForExtermalSystem(ExternalSystemStats stats) {
-        if (stats == null || stats.getCreateDate() == null || stats.getName() == null ||
-                StringUtils.isBlank(stats.getName()) || stats == null || stats.getValues().size() < 1) {
+        if (stats == null || stats.getCreateDate() == null || stats.getName() == null || StringUtils
+                .isBlank(stats.getName()) || stats == null || stats.getValues().size() < 1) {
             return null;
         }
 
@@ -2100,8 +2118,8 @@ public class DAOService {
     }
 
     public boolean deleteStatsFromExternalSystem(ExternalSystemStats stats, long date) {
-        if (stats == null || stats.getCreateDate() == null || stats.getName() == null ||
-                StringUtils.isBlank(stats.getName()) || stats == null || stats.getValues().size() < 1) {
+        if (stats == null || stats.getCreateDate() == null || stats.getName() == null || StringUtils
+                .isBlank(stats.getName()) || stats == null || stats.getValues().size() < 1) {
             return false;
         }
         try {
@@ -2127,7 +2145,7 @@ public class DAOService {
     }
 
     public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter) throws Exception {
-        return getOrgRegistryChanges(nameFilter,"",-1L,0L,false);
+        return getOrgRegistryChanges(nameFilter, "", -1L, 0L, false);
     }
 
     public List<OrgRegistryChange> getOrgRegistryChangeByDate(long revisionDate) throws Exception {
@@ -2144,8 +2162,8 @@ public class DAOService {
         return query.getSingleResult();
     }
 
-    public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter, String regionFilter, long revisionDate, long operationType,
-            boolean hideApplied) throws Exception{
+    public List<OrgRegistryChange> getOrgRegistryChanges(String nameFilter, String regionFilter, long revisionDate,
+            long operationType, boolean hideApplied) throws Exception {
         if (revisionDate < 1L) {
             revisionDate = getLastOrgRegistryChangeRevision();
         }
@@ -2154,8 +2172,8 @@ public class DAOService {
         }
         String nameStatement = "";
         if (nameFilter != null && nameFilter.length() > 0) {
-            nameStatement = " and (lower(shortName||officialName) like lower('%" + nameFilter + "%')" +
-                    " or lower(shortNameFrom||officialNameFrom) like lower('%%" + nameFilter + "%'))";
+            nameStatement = " and (lower(shortName||officialName) like lower('%" + nameFilter + "%')"
+                    + " or lower(shortNameFrom||officialNameFrom) like lower('%%" + nameFilter + "%'))";
         }
         if (!StringUtils.isEmpty(regionFilter)) {
             nameStatement += String.format(" and region like '%s%s%s'", regionFilter, "%", "%");
@@ -2172,8 +2190,9 @@ public class DAOService {
         return query.getResultList();
     }
 
-    public List<OrgRegistryChange> getOrgRegistryChangesThroughOrgRegistryChangeItems(String nameFilter, long revisionDate,
-            String regionFilter, long operationType, boolean hideApplied, List<OrgRegistryChange> orgRegistryChangeList) throws Exception {
+    public List<OrgRegistryChange> getOrgRegistryChangesThroughOrgRegistryChangeItems(String nameFilter,
+            long revisionDate, String regionFilter, long operationType, boolean hideApplied,
+            List<OrgRegistryChange> orgRegistryChangeList) throws Exception {
         boolean isEmptyRegionFilter = StringUtils.isEmpty(regionFilter);
         boolean isAllOperations = operationType <= 0;
         if (revisionDate < 1L) {
@@ -2184,30 +2203,31 @@ public class DAOService {
         }
         String nameStatement = "";
         if (nameFilter != null && nameFilter.length() > 0) {
-            nameStatement = " and (lower(rci.shortName||rci.officialName) like lower('%" + nameFilter + "%')" +
-                    " or lower(rci.shortNameFrom||rci.officialNameFrom) like lower('%%" + nameFilter + "%'))";
+            nameStatement = " and (lower(rci.shortName||rci.officialName) like lower('%" + nameFilter + "%')"
+                    + " or lower(rci.shortNameFrom||rci.officialNameFrom) like lower('%%" + nameFilter + "%'))";
         }
         String q = "select rci, rc from OrgRegistryChangeItem rci join rci.orgRegistryChange rc"
                 + " where rci.createDate=:lastUpdate " + nameStatement + "order by rci.officialName";
 
-        TypedQuery<Object[]> query = entityManager.createQuery(q, Object[].class); //JPA has no tool to get 2 or more objects
+        TypedQuery<Object[]> query = entityManager
+                .createQuery(q, Object[].class); //JPA has no tool to get 2 or more objects
         query.setParameter("lastUpdate", revisionDate);
         List<Object[]> bufObjectList = query.getResultList();
         List<OrgRegistryChangeItem> resultOfQuery = new LinkedList<OrgRegistryChangeItem>();
-        for(Object[] bufElm : bufObjectList){
+        for (Object[] bufElm : bufObjectList) {
             OrgRegistryChangeItem item = (OrgRegistryChangeItem) bufElm[0];
             item.setOrgRegistryChange((OrgRegistryChange) bufElm[1]);
             resultOfQuery.add(item);
         }
 
-        for(OrgRegistryChangeItem item : resultOfQuery){
+        for (OrgRegistryChangeItem item : resultOfQuery) {
             OrgRegistryChange orgRegistryChange = item.getOrgRegistryChange();
-            if(orgRegistryChange == null){
+            if (orgRegistryChange == null) {
                 continue;
             }
-            if(orgRegistryChangeList.indexOf(orgRegistryChange) == -1){
-                if((orgRegistryChange.getRegion().equals(regionFilter) || isEmptyRegionFilter)
-                        && (orgRegistryChange.getOperationType() == operationType  || isAllOperations)){
+            if (orgRegistryChangeList.indexOf(orgRegistryChange) == -1) {
+                if ((orgRegistryChange.getRegion().equals(regionFilter) || isEmptyRegionFilter) && (
+                        orgRegistryChange.getOperationType() == operationType || isAllOperations)) {
                     orgRegistryChangeList.add(orgRegistryChange);
                 }
             }
@@ -2298,25 +2318,27 @@ public class DAOService {
     }
 
     public List getClientBalanceInfos(String where, String where2, Date begDate, Date endDate, String clientWhere) {
-        String str_query = "SELECT c.idofclient, o.shortname as shortname, g.groupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, " +
-                "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate), 0), " +
-                "(SELECT min(t.transactiondate) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate), " +
-                "o.idoforg as idoforg " +
-                "FROM cf_clients c INNER JOIN cf_orgs o ON c.idoforg = o.idoforg INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg " + where2 +
-                " JOIN cf_persons p ON c.idofperson = p.idofperson WHERE c.idoforg in(" + where + ") " + clientWhere +
-                " and c.idofclient not in (select idofclient from cf_clientmigrationhistory where registrationdate between :begDate and :endDate and idoforg in(" + where + ")) " +
-                "union " +
-                "SELECT c.idofclient, shortname as shortname, h.oldgroupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, "
-                + "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = h.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate), 0), "
-                + "(SELECT min(t.transactiondate) FROM cf_transactions t "
-                + "WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate), "
-                + "h.idofoldorg as idoforg "
-                + "FROM cf_clients c INNER JOIN cf_clientmigrationhistory h ON c.idofclient = h.idofclient "
-                + "JOIN cf_persons p ON c.idofperson = p.idofperson JOIN cf_orgs o ON h.idofoldorg = o.idoforg "
-                + "WHERE h.idofoldorg in(" + where + ") " + clientWhere + " and h.registrationdate between :begDate and :endDate " +
-                "ORDER BY shortname, groupname, surname";
-        Query q = entityManager
-                .createNativeQuery(str_query);
+        String str_query =
+                "SELECT c.idofclient, o.shortname as shortname, g.groupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, "
+                        + "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate), 0), "
+                        + "(SELECT min(t.transactiondate) FROM cf_transactions t WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate), "
+                        + "o.idoforg as idoforg "
+                        + "FROM cf_clients c INNER JOIN cf_orgs o ON c.idoforg = o.idoforg INNER JOIN cf_clientgroups g ON c.idofclientgroup = g.idofclientgroup AND c.idoforg = g.idoforg "
+                        + where2 + " JOIN cf_persons p ON c.idofperson = p.idofperson WHERE c.idoforg in(" + where
+                        + ") " + clientWhere
+                        + " and c.idofclient not in (select idofclient from cf_clientmigrationhistory where registrationdate between :begDate and :endDate and idoforg in("
+                        + where + ")) " + "union "
+                        + "SELECT c.idofclient, shortname as shortname, h.oldgroupname as groupname, c.contractId, p.surname as surname, p.firstname, p.secondname, c.limits, c.balance, "
+                        + "coalesce((SELECT sum(t.transactionsum) FROM cf_transactions t WHERE t.idofclient = h.idofclient AND t.transactionDate >= :begDate AND t.transactionDate <= :endDate), 0), "
+                        + "(SELECT min(t.transactiondate) FROM cf_transactions t "
+                        + "WHERE t.idofclient = c.idofclient AND t.transactionDate > :begDate), "
+                        + "h.idofoldorg as idoforg "
+                        + "FROM cf_clients c INNER JOIN cf_clientmigrationhistory h ON c.idofclient = h.idofclient "
+                        + "JOIN cf_persons p ON c.idofperson = p.idofperson JOIN cf_orgs o ON h.idofoldorg = o.idoforg "
+                        + "WHERE h.idofoldorg in(" + where + ") " + clientWhere
+                        + " and h.registrationdate between :begDate and :endDate "
+                        + "ORDER BY shortname, groupname, surname";
+        Query q = entityManager.createNativeQuery(str_query);
         q.setParameter("begDate", begDate.getTime());
         q.setParameter("endDate", endDate.getTime());
         return q.getResultList();
@@ -2326,7 +2348,7 @@ public class DAOService {
         Session session = (Session) entityManager.unwrap(Session.class);
         Long id = DAOUtils.findMenuExchangeSourceOrg(session, idOfOrg);
         if (id != null) {
-            Org org = (Org)session.load(Org.class, id);
+            Org org = (Org) session.load(Org.class, id);
             return org.getOfficialName();
         }
         return null;
@@ -2351,7 +2373,7 @@ public class DAOService {
 
     public boolean isContractFromHistory(Long idOfOrg, Long idOfContract) {
         Session session = (Session) entityManager.unwrap(Session.class);
-        Org org = (Org)session.load(Org.class, idOfOrg);
+        Org org = (Org) session.load(Org.class, idOfOrg);
         if (org.getContract() == null) {
             return true;
         }
@@ -2384,15 +2406,14 @@ public class DAOService {
         try {
             transaction = session.beginTransaction();
             org.hibernate.Query query = session.createQuery("update Org set fullSyncParam=:value where id=:idOfOrg");
-            query.setParameter("idOfOrg",idOfOrg);
+            query.setParameter("idOfOrg", idOfOrg);
             query.setParameter("value", value);
             query.executeUpdate();
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
             logger.error("e", e);
-        }
-        finally {
+        } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
@@ -2451,8 +2472,10 @@ public class DAOService {
         Query q = entityManager.createNativeQuery(str_query);
         q.setParameter("idofoption", option);
         List list = q.getResultList();
-        if (list.size() == 0) throw new Exception(String.format("Option id=%s not found", option));
-        return (String)list.get(0);
+        if (list.size() == 0) {
+            throw new Exception(String.format("Option id=%s not found", option));
+        }
+        return (String) list.get(0);
     }
 
     @Transactional
@@ -2499,15 +2522,19 @@ public class DAOService {
     }
 
     public void saveTradeAccountConfigChangeDirective(Long idOfOrg) {
-        Query q = entityManager.createNativeQuery("update cf_orgs set tradeconfigchanged = :value where idOfOrg = :idOfOrg");
+        Query q = entityManager
+                .createNativeQuery("update cf_orgs set tradeconfigchanged = :value where idOfOrg = :idOfOrg");
         q.setParameter("value", TradeAccountConfigChange.NOT_CHANGED.getCode());
         q.setParameter("idOfOrg", idOfOrg);
         q.executeUpdate();
     }
 
     public void saveDirective(Long idOfOrg, String directiveName, Integer directiveValue) {
-        if (directiveValue == null) return;
-        String query_str = String.format("update Org set %s=:value, updateTime = :lastUpdate where idOfOrg = :idOfOrg", directiveName);
+        if (directiveValue == null) {
+            return;
+        }
+        String query_str = String
+                .format("update Org set %s=:value, updateTime = :lastUpdate where idOfOrg = :idOfOrg", directiveName);
         Query q = entityManager.createQuery(query_str);
         q.setParameter("value", directiveValue == 1);
         q.setParameter("lastUpdate", new Date());
@@ -2522,7 +2549,7 @@ public class DAOService {
     //Загружаем производственный календарь из файла
     public void loadProductionCalendar(InputStream inputStream) throws Exception {
         Query query = entityManager.createQuery("select max(pc.version) from ProductionCalendar pc");
-        Long version = (Long)query.getSingleResult();
+        Long version = (Long) query.getSingleResult();
         version = (version == null) ? 0L : (version + 1L);
         BufferedReader reader = new BufferedReader(new InputStreamReader(inputStream, "UTF-8"));
         int lineNo = 0;
@@ -2548,7 +2575,9 @@ public class DAOService {
                     Calendar calendar = new GregorianCalendar(Integer.parseInt(sYear), i - 1, 1);
                     int daysInMonth = calendar.getActualMaximum(Calendar.DAY_OF_MONTH);
                     for (int j = 1; j <= daysInMonth; j++) { //по всем дням месяца
-                        Date date = CalendarUtils.parseDate(getStrForDate(new Integer(j).toString()) + "." + getStrForDate(new Integer(i).toString()) + "." + sYear);
+                        Date date = CalendarUtils.parseDate(
+                                getStrForDate(new Integer(j).toString()) + "." + getStrForDate(
+                                        new Integer(i).toString()) + "." + sYear);
                         if (!days.contains(j)) {
                             deleteProductionCalendarDay(date);
                             continue;
@@ -2608,7 +2637,8 @@ public class DAOService {
     }
 
     public String generateLinkingTokenForSmartWatch(Session session, String phone) throws Exception {
-        org.hibernate.Query query = session.createQuery("delete from LinkingTokenForSmartWatch where phoneNumber like :phoneNumber");
+        org.hibernate.Query query = session
+                .createQuery("delete from LinkingTokenForSmartWatch where phoneNumber like :phoneNumber");
         query.setParameter("phoneNumber", phone);
         query.executeUpdate();
 
@@ -2640,8 +2670,7 @@ public class DAOService {
     public void updateLastProcessOrgChange(Date date) {
         entityManager.createQuery("update Option set optionText = :value where idOfOption = :idOfOption")
                 .setParameter("value", new Long(date.getTime()).toString())
-                .setParameter("idOfOption", new Long(Option.OPTION_LAST_ORG_CHANGE_PROCESS))
-                .executeUpdate();
+                .setParameter("idOfOption", new Long(Option.OPTION_LAST_ORG_CHANGE_PROCESS)).executeUpdate();
     }
 
     public void saveLogServiceMessage(String message, LogServiceType type) {
@@ -2649,10 +2678,10 @@ public class DAOService {
         entityManager.merge(logService);
     }
 
-    public List findCardsignByManufactureCodeForNewTypeProvider (Integer manufactureCode)
-    {
-        Query query = entityManager.createQuery("select cs from CardSign cs where cs.manufacturerCode = :manufactureCode "
-                + "and cs.newtypeprovider = true and (cs.deleted = false or cs.deleted is null)");
+    public List findCardsignByManufactureCodeForNewTypeProvider(Integer manufactureCode) {
+        Query query = entityManager.createQuery(
+                "select cs from CardSign cs where cs.manufacturerCode = :manufactureCode "
+                        + "and cs.newtypeprovider = true and (cs.deleted = false or cs.deleted is null)");
         query.setParameter("manufactureCode", manufactureCode);
         try {
             return query.getResultList();
@@ -2660,8 +2689,8 @@ public class DAOService {
             return null;
         }
     }
-    public List findEMIASbyClientandBeetwenDates (Client client, Date startDate, Date endDate)
-    {
+
+    public List findEMIASbyClientandBeetwenDates(Client client, Date startDate, Date endDate) {
         Query query = entityManager.createQuery("select em from EMIAS em where em.guid = :guid "
                 + "and em.dateLiberate between :begDate and :endDate ");
         query.setParameter("guid", client.getClientGUID());
@@ -2673,9 +2702,9 @@ public class DAOService {
             return null;
         }
     }
-    public ExternalEvent getExternalEvent (Client client, String orgCode, String orgName, ExternalEventType evtType,
-            Date evtDateTime, ExternalEventStatus evtStatus)
-    {
+
+    public ExternalEvent getExternalEvent(Client client, String orgCode, String orgName, ExternalEventType evtType,
+            Date evtDateTime, ExternalEventStatus evtStatus) {
         Query query = entityManager.createQuery("select ee from ExternalEvent ee where ee.client = :client "
                 + "and ee.evtType = :evtType and ee.evtDateTime = :evtDateTime and ee.evtStatus = :evtStatus "
                 + "and ee.orgCode = :orgCode and ee.orgName = :orgName");
@@ -2686,7 +2715,7 @@ public class DAOService {
         query.setParameter("orgCode", orgCode);
         query.setParameter("orgName", orgName);
         try {
-            return (ExternalEvent)query.getResultList().get(0);
+            return (ExternalEvent) query.getResultList().get(0);
         } catch (NoResultException e) {
             return null;
         }
@@ -2721,7 +2750,8 @@ public class DAOService {
         return q.getResultList();
     }
 
-    public List<WtDiscountRule> getWtDiscountRulesList(WtComplexGroupItem selectedComplexType, WtAgeGroupItem selectedAgeGroup) {
+    public List<WtDiscountRule> getWtDiscountRulesList(WtComplexGroupItem selectedComplexType,
+            WtAgeGroupItem selectedAgeGroup) {
         Query query = entityManager.createQuery("select dr from WtDiscountRule dr inner join dr.complexes c "
                 + "where c.wtComplexGroupItem = :selectedComplexType and c.wtAgeGroupItem = :selectedAgeGroup");
         query.setParameter("selectedComplexType", selectedComplexType);
@@ -2776,12 +2806,12 @@ public class DAOService {
     }
 
     public List<WtComplex> getWtComplexesList() {
-        TypedQuery<WtComplex> q = entityManager
-                .createQuery("from WtComplex order by idOfComplex", WtComplex.class);
+        TypedQuery<WtComplex> q = entityManager.createQuery("from WtComplex order by idOfComplex", WtComplex.class);
         return q.getResultList();
     }
 
-    public List<WtComplex> getWtComplexesList(WtComplexGroupItem wtComplexGroupItem, WtAgeGroupItem wtAgeGroupItem, Contragent supplier) {
+    public List<WtComplex> getWtComplexesList(WtComplexGroupItem wtComplexGroupItem, WtAgeGroupItem wtAgeGroupItem,
+            Contragent supplier) {
         StringBuilder sb = new StringBuilder();
         sb.append("select wc from WtComplex wc where wc.deleteState = 0");
         if (wtComplexGroupItem != null) {
@@ -2791,7 +2821,7 @@ public class DAOService {
             sb.append(" and wc.wtAgeGroupItem = :wtAgeGroupItem");
         }
         if (supplier != null) {
-            sb.append(" and wc.Contragent = :supplier");
+            sb.append(" and wc.contragent = :supplier");
         }
 
         Query query = entityManager.createQuery(sb.toString());
@@ -2810,5 +2840,21 @@ public class DAOService {
             e.printStackTrace();
             return null;
         }
+    }
+
+    public String getSupplierName(WtComplex wtComplex) {
+        Query query = entityManager.createQuery(
+                "select c.contragentName from WtComplex complex left join complex.contragent c "
+                        + "where complex = :complex");
+        query.setParameter("complex", wtComplex);
+        return (String) query.getSingleResult();
+    }
+
+    public Long getIdOfSupplier(WtComplex wtComplex) {
+        Query query = entityManager.createQuery(
+                "select c.idOfContragent from WtComplex complex left join complex.contragent c "
+                        + "where complex = :complex");
+        query.setParameter("complex", wtComplex);
+        return (Long) query.getSingleResult();
     }
 }

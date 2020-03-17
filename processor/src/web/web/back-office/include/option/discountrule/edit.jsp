@@ -189,13 +189,13 @@
 
                     <%--        Название контрагента--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.wtComplex.contragent.contragentName}"
+                        <h:outputText escape="true" value="#{complex.supplierName}"
                                       styleClass="output-text"/>
                     </rich:column>
 
                     <%--        ИД контрагента--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.wtComplex.contragent.idOfContragent}"
+                        <h:outputText escape="true" value="#{complex.idOfSupplier}"
                                       styleClass="output-text"/>
                     </rich:column>
 
