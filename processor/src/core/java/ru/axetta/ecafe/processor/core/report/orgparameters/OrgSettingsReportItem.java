@@ -49,6 +49,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
     private Boolean preordersEnabled;
     private Boolean reverseMonthOfSale;
     private Boolean denyPayPlanForTimeDifference;
+    private Boolean useWebArm;
 
     //FeedingSetting Info
     private Long idOfSetting = -1L;
@@ -114,6 +115,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
             this.settingName = StringUtils.isEmpty(setting.getSettingName()) ? "Название отсуствует" : setting.getSettingName();
             this.limit = setting.getLimit();
         }
+        this.useWebArm = org.getUseWebArm();
 
         this.oneActiveCard = org.getOneActiveCard();
         this.enableDuplicateCard = (Boolean) manager.getSettingValueFromOrg(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED);
@@ -375,6 +377,14 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
 
     public void setTypeInternal(String typeInternal) {
         this.typeInternal = typeInternal;
+    }
+
+    public Boolean getUseWebArm() {
+        return useWebArm;
+    }
+
+    public void setUseWebArm(Boolean useWebArm) {
+        this.useWebArm = useWebArm;
     }
 
     @Override

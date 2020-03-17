@@ -232,6 +232,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.REVERSE_MONTH_OF_SALE, item.getReverseMonthOfSale(),
                             session, lastVersionOfOrgSetting, lastVersionOfOrgSettingItem);
                     org.setDenyPayPlanForTimeDifference(item.getDenyPayPlanForTimeDifference());
+                    org.setUseWebArm(item.getUseWebArm());
 
                     org.setOneActiveCard(item.getOneActiveCard());
                     manager.createOrUpdateOrgSettingValue(org, ARMsSettingsType.CARD_DUPLICATE_ENABLED, item.getEnableDuplicateCard(), session,
