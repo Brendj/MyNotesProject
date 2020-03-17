@@ -2709,6 +2709,12 @@ public class DAOService {
         return q.getResultList();
     }
 
+    public List<Contragent> getSupplierList() {
+        TypedQuery<Contragent> q = entityManager
+                .createQuery("from Contragent where classId = 2 order by idOfContragent", Contragent.class);
+        return q.getResultList();
+    }
+
     public List<WtDiscountRule> getWtDiscountRulesList() {
         TypedQuery<WtDiscountRule> q = entityManager
                 .createQuery("from WtDiscountRule order by idOfRule", WtDiscountRule.class);
@@ -2756,13 +2762,26 @@ public class DAOService {
         }
     }
 
+    public List<Contragent> getSupplierItemById(Long idOfSupplier) {
+        StringBuilder sb = new StringBuilder();
+        sb.append("select c from Contragent c where c.idOfContragent = :idOfSupplier");
+        Query query = entityManager.createQuery(sb.toString());
+        query.setParameter("idOfSupplier", idOfSupplier);
+        try {
+            return query.getResultList();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public List<WtComplex> getWtComplexesList() {
         TypedQuery<WtComplex> q = entityManager
                 .createQuery("from WtComplex order by idOfComplex", WtComplex.class);
         return q.getResultList();
     }
 
-    public List<WtComplex> getWtComplexesList(WtComplexGroupItem wtComplexGroupItem, WtAgeGroupItem wtAgeGroupItem) {
+    public List<WtComplex> getWtComplexesList(WtComplexGroupItem wtComplexGroupItem, WtAgeGroupItem wtAgeGroupItem, Contragent supplier) {
         StringBuilder sb = new StringBuilder();
         sb.append("select wc from WtComplex wc where wc.deleteState = 0");
         if (wtComplexGroupItem != null) {
@@ -2771,6 +2790,9 @@ public class DAOService {
         if (wtAgeGroupItem != null) {
             sb.append(" and wc.wtAgeGroupItem = :wtAgeGroupItem");
         }
+        if (supplier != null) {
+            sb.append(" and wc.Contragent = :supplier");
+        }
 
         Query query = entityManager.createQuery(sb.toString());
         if (wtComplexGroupItem != null) {
@@ -2778,6 +2800,9 @@ public class DAOService {
         }
         if (wtAgeGroupItem != null) {
             query.setParameter("wtAgeGroupItem", wtAgeGroupItem);
+        }
+        if (supplier != null) {
+            query.setParameter("supplier", supplier);
         }
         try {
             return query.getResultList();
