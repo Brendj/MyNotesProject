@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.discountrule;
 
-import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
-import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
-import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
-import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
@@ -74,10 +71,12 @@ public class RuleCreatePage extends BasicWorkspacePage
     // Веб-технолог
     private int complexType = -1;
     private int ageGroup = -1;
+    private int supplier = -1;
     WtDiscountRule wtDiscountRule = new WtDiscountRule();
     private List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
     private Map<Integer, Long> complexTypeMap;
     private Map<Integer, Long> ageGroupMap;
+    private Map<Integer, Long> supplierMap;
     boolean wt = false;
     boolean showFilter = false;
 
@@ -183,6 +182,20 @@ public class RuleCreatePage extends BasicWorkspacePage
         return res;
     }
 
+    public List<SelectItem> getSuppliers() {
+        List<SelectItem> res = new ArrayList<>();
+        List<Contragent> suppliers;
+        supplierMap = new HashMap<>();
+        res.add(new SelectItem(0, " "));
+        suppliers = daoService.getSupplierList();
+        int i = 0;
+        for (Contragent item : suppliers) {
+            res.add(new SelectItem(++i, item.getContragentName()));
+            supplierMap.put(i, item.getIdOfContragent());
+        }
+        return res;
+    }
+
     public void fillWtSelectedComplexes() {
         if (!wt || wtSelectedComplexes.size() != 0) {
             wtSelectedComplexes.clear();
@@ -190,55 +203,77 @@ public class RuleCreatePage extends BasicWorkspacePage
         if (!wt) {
             return;
         }
-        if (complexType > -1 || ageGroup > -1) {
+        if (complexType > -1 || ageGroup > -1 || supplier > -1) {
             Long complexGroupId = complexTypeMap.get(complexType);
             Long ageGroupId = ageGroupMap.get(ageGroup);
+            Long supplierId = supplierMap.get(supplier);
 
-            if (complexGroupId == null && ageGroupId == null) {
+            if (complexGroupId == null && ageGroupId == null && supplierId == null) {
                 fill(wtDiscountRule);
             } else {
                 List<WtComplexGroupItem> wtComplexGroupItem = null;
                 List<WtAgeGroupItem> wtAgeGroupItem = null;
+                List<Contragent> supplierItem = null;
                 if (complexGroupId != null) {
                     wtComplexGroupItem = daoService.getWtComplexGroupItemById(complexGroupId);
                 }
                 if (ageGroupId != null) {
                     wtAgeGroupItem = daoService.getWtAgeGroupItemById(ageGroupId);
                 }
-
-                if (wtComplexGroupItem != null && wtAgeGroupItem != null) {
+                if (supplierId != null) {
+                    supplierItem = daoService.getSupplierItemById(supplierId);
+                }
+                if (wtComplexGroupItem != null && wtAgeGroupItem != null && supplierItem != null) {
                     for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
                         for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
-                            List<WtComplex> wtComplexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem);
-                            for (WtComplex wtComplex : wtComplexes) {
-                                if (wtComplex != null && wtSelectedComplexes != null) {
-                                    wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
-                                }
+                            for (Contragent supplier : supplierItem) {
+                                addWtComplex(complexGroupItem, ageGroupItem, supplier);
                             }
                         }
                     }
-                } else if (wtComplexGroupItem == null) {
+                } else if (wtComplexGroupItem == null && wtAgeGroupItem != null && supplierItem != null) {
                     for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
-                        List<WtComplex> wtComplexes = daoService.getWtComplexesList(null, ageGroupItem);
-                        for (WtComplex wtComplex : wtComplexes) {
-                            if (wtComplex != null && wtSelectedComplexes != null) {
-                                wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
-                            }
+                        for (Contragent supplier : supplierItem) {
+                            addWtComplex(null, ageGroupItem, supplier);
                         }
                     }
-                } else if (wtAgeGroupItem == null) {
+                } else if (wtComplexGroupItem != null && wtAgeGroupItem == null && supplierItem != null) {
                     for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
-                        List<WtComplex> wtComplexes = daoService.getWtComplexesList(complexGroupItem, null);
-                        for (WtComplex wtComplex : wtComplexes) {
-                            if (wtComplex != null && wtSelectedComplexes != null) {
-                                wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
-                            }
+                        for (Contragent supplier : supplierItem) {
+                            addWtComplex(complexGroupItem, null, supplier);
                         }
+                    }
+                } else if (wtComplexGroupItem != null && wtAgeGroupItem != null && supplierItem == null) {
+                    for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
+                        for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
+                            addWtComplex(complexGroupItem, ageGroupItem, null);
+                        }
+                    }
+                } else if (wtComplexGroupItem == null && wtAgeGroupItem == null && supplierItem != null) {
+                    for (Contragent supplier : supplierItem) {
+                        addWtComplex(null, null, supplier);
+                    }
+                } else if (wtComplexGroupItem != null && wtAgeGroupItem == null && supplierItem == null) {
+                    for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
+                        addWtComplex(complexGroupItem, null, null);
+                    }
+                } else if (wtComplexGroupItem == null && wtAgeGroupItem != null && supplierItem == null) {
+                    for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
+                        addWtComplex(null, ageGroupItem, null);
                     }
                 }
             }
-        } else if (complexType == -1 && ageGroup == -1) {
+        } else if (complexType == -1 && ageGroup == -1 && supplier == -1) {
             fill(wtDiscountRule);
+        }
+    }
+
+    private void addWtComplex(WtComplexGroupItem complexGroupItem, WtAgeGroupItem ageGroupItem, Contragent supplier) {
+        List<WtComplex> wtComplexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem, supplier);
+        for (WtComplex wtComplex : wtComplexes) {
+            if (wtComplex != null && wtSelectedComplexes != null) {
+                wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
+            }
         }
     }
 
@@ -587,5 +622,21 @@ public class RuleCreatePage extends BasicWorkspacePage
 
     public void setShowFilter(boolean showFilter) {
         this.showFilter = showFilter;
+    }
+
+    public int getSupplier() {
+        return supplier;
+    }
+
+    public void setSupplier(int supplier) {
+        this.supplier = supplier;
+    }
+
+    public Map<Integer, Long> getSupplierMap() {
+        return supplierMap;
+    }
+
+    public void setSupplierMap(Map<Integer, Long> supplierMap) {
+        this.supplierMap = supplierMap;
     }
 }

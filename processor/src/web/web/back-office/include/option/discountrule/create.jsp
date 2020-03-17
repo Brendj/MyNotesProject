@@ -111,6 +111,14 @@
                     <f:selectItems value="#{ruleCreatePage.ageGroups}"/>
                 </h:selectOneMenu>
 
+                <h:outputText escape="true" value="Поставщик" styleClass="output-text"
+                              rendered="#{ruleCreatePage.showFilter}"/>
+
+                <h:selectOneMenu id="supplierMenu" value="#{ruleCreatePage.supplier}"
+                                 style="width:300px;" styleClass="groupSelect" rendered="#{ruleCreatePage.showFilter}">
+                    <f:selectItems value="#{ruleCreatePage.suppliers}"/>
+                </h:selectOneMenu>
+
             </h:panelGrid>
 
             <h:panelGrid columns="2" styleClass="borderless-grid">
