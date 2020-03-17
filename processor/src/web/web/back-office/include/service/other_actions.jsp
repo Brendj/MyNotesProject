@@ -98,7 +98,7 @@
     <rich:panel>
         <a4j:commandButton value="Генерировать представителей" action="#{otherActionsPage.runGenerateGuardians}" id="generateGuardiansByOrgs"
                          title="Принудительное создание представителя клиентам из не предопределенных групп."
-                         styleClass="command-button" onclick="disableButtons(true);" oncomplete="disableButtons(false)" /><br/>
+                         styleClass="command-button" /><br/>
         <h:outputText value="Список ид. организаций:"/>
         <h:inputText value="#{otherActionsPage.orgsForGenerateGuardians}" size="50"/>
     </rich:panel>
