@@ -72,7 +72,7 @@ public class RuleCreatePage extends BasicWorkspacePage
     private int complexType = -1;
     private int ageGroup = -1;
     private int supplier = -1;
-    WtDiscountRule wtDiscountRule = new WtDiscountRule();
+    WtDiscountRule wtEntity;
     private List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
     private Map<Integer, Long> complexTypeMap;
     private Map<Integer, Long> ageGroupMap;
@@ -209,7 +209,7 @@ public class RuleCreatePage extends BasicWorkspacePage
             Long supplierId = supplierMap.get(supplier);
 
             if (complexGroupId == null && ageGroupId == null && supplierId == null) {
-                fill(wtDiscountRule);
+                fill(wtEntity);
             } else {
                 List<WtComplexGroupItem> wtComplexGroupItem = null;
                 List<WtAgeGroupItem> wtAgeGroupItem = null;
@@ -264,7 +264,7 @@ public class RuleCreatePage extends BasicWorkspacePage
                 }
             }
         } else if (complexType == -1 && ageGroup == -1 && supplier == -1) {
-            fill(wtDiscountRule);
+            fill(wtEntity);
         }
     }
 
@@ -427,35 +427,35 @@ public class RuleCreatePage extends BasicWorkspacePage
 
             //// Веб-технолог ////
             if (StringUtils.isNotEmpty(strSubCategory)) {
-                wtDiscountRule.setSubCategory(strSubCategory);
+                wtEntity.setSubCategory(strSubCategory);
             }
 
             for (WtSelectedComplex wtSelectedComplex : wtSelectedComplexes) {
                 if (wtSelectedComplex.isChecked()) {
                     WtComplex complex = wtSelectedComplex.getWtComplex();
-                    wtDiscountRule.getComplexes().add(complex);
+                    wtEntity.getComplexes().add(complex);
                 }
             }
 
-            wtDiscountRule.setOperationOr(operationOr);
-            wtDiscountRule.setDescription(description);
-            wtDiscountRule.setPriority(priority);
-            wtDiscountRule.setPriority(discountRate);
-            wtDiscountRule.setCategoryDiscounts(categoryDiscountSet);
+            wtEntity.setOperationOr(operationOr);
+            wtEntity.setDescription(description);
+            wtEntity.setPriority(priority);
+            wtEntity.setPriority(discountRate);
+            wtEntity.setCategoryDiscounts(categoryDiscountSet);
 
             if (!this.idOfCategoryList.isEmpty()) {
-                wtDiscountRule.setCategoryDiscounts(categoryDiscountSet);
+                wtEntity.setCategoryDiscounts(categoryDiscountSet);
             }
 
             if (!this.idOfCategoryOrgList.isEmpty()) {
-                wtDiscountRule.getCategoryOrgs().addAll(categoryOrgList);
+                wtEntity.getCategoryOrgs().addAll(categoryOrgList);
             }
 
             //for (CategoryOrg categoryOrg : categoryOrgList) {
             //    wtDiscountRule.getCategoryOrgs().add(categoryOrg);
             //}
 
-            daoService.persistEntity(wtDiscountRule);
+            daoService.persistEntity(wtEntity);
         }
 
         printMessage("Правило зарегистрировано успешно");
@@ -575,12 +575,12 @@ public class RuleCreatePage extends BasicWorkspacePage
         this.ageGroup = ageGroup;
     }
 
-    public WtDiscountRule getWtDiscountRule() {
-        return wtDiscountRule;
+    public WtDiscountRule getWtEntity() {
+        return wtEntity;
     }
 
-    public void setWtDiscountRule(WtDiscountRule wtDiscountRule) {
-        this.wtDiscountRule = wtDiscountRule;
+    public void setWtEntity(WtDiscountRule wtEntity) {
+        this.wtEntity = wtEntity;
     }
 
     public List<WtSelectedComplex> getWtSelectedComplexes() {

@@ -294,7 +294,6 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
     public static class Item {
         DiscountRule entity;
         WtDiscountRule wtEntity;
-        private Object currentEntity = null;
         private long idOfRule;
         private String description;
         private int complex0;

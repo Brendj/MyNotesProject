@@ -65,7 +65,7 @@ public class RuleEditPage extends BasicWorkspacePage
     private int complexType = -1;
     private int ageGroup = -1;
     private int supplier = -1;
-    WtDiscountRule wtDiscountRule = new WtDiscountRule();
+    WtDiscountRule wtEntity;
     private List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
     private Map<Integer, Long> complexTypeMap;
     private Map<Integer, Long> ageGroupMap;
@@ -137,7 +137,7 @@ public class RuleEditPage extends BasicWorkspacePage
             Long supplierId = supplierMap.get(supplier);
 
             if (complexGroupId == null && ageGroupId == null && supplierId == null) {
-                fill(wtDiscountRule);
+                fill(wtEntity);
             } else {
                 List<WtComplexGroupItem> wtComplexGroupItem = null;
                 List<WtAgeGroupItem> wtAgeGroupItem = null;
@@ -192,7 +192,7 @@ public class RuleEditPage extends BasicWorkspacePage
                 }
             }
         } else if (complexType == -1 && ageGroup == -1 && supplier == -1) {
-            fill(wtDiscountRule);
+            fill(wtEntity);
         }
     }
 
@@ -332,54 +332,21 @@ public class RuleEditPage extends BasicWorkspacePage
     @Transactional
     public void updateRule() throws Exception {
 
-        String strSubCategory = "";
-        if (this.subCategory > 0) {
-            strSubCategory = RuleCreatePage.SUB_CATEGORIES[this.subCategory];
-        }
-
-        //entity.setCategoryDiscounts(categoryDiscounts);
-        this.categoryDiscountSet = new HashSet<CategoryDiscount>();
-        entity.getCategoriesDiscounts().clear();
-        //if (this.idOfCategoryList.isEmpty()) {
-        //    for (CategoryDiscount categoryDiscount: entity.getCategoriesDiscounts()){
-        //        this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
-        //    }
-        //}
-        if (!this.idOfCategoryList.isEmpty()) {
-            List categoryList = DAOUtils.getCategoryDiscountListWithIds(em, this.idOfCategoryList);
-            StringBuilder stringBuilder = new StringBuilder();
-            for (Object object : categoryList) {
-                this.categoryDiscountSet.add((CategoryDiscount) object);
-                stringBuilder.append(((CategoryDiscount) object).getIdOfCategoryDiscount());
-                stringBuilder.append(",");
-            }
-            entity.setCategoriesDiscounts(this.categoryDiscountSet);
-            entity.setCategoryDiscounts(stringBuilder.substring(0, stringBuilder.length() - 1));
-        } else {
-            entity.setCategoryDiscounts("");
-        }
-
-        List<CategoryOrg> categoryOrgList = new ArrayList();
-        entity.getCategoryOrgs().clear();
-        if (!this.idOfCategoryOrgList.isEmpty()) {
-            entity.getCategoryOrgs().clear();
-            categoryOrgList = DAOUtils.getCategoryOrgWithIds(em, this.idOfCategoryOrgList);
-            for (Object object : categoryOrgList) {
-                entity.getCategoryOrgs().add((CategoryOrg) object);
-            }
-        }
-
-        if (discountRate != null && discountRate != 100) {
-            description =
-                    CategoryDiscountEditPage.DISCOUNT_START + discountRate + CategoryDiscountEditPage.DISCOUNT_END;
-        }
-
-        if (!wt) {
-            entity = (DiscountRule) em.merge(entity);
+        if (entity != null) {
+            entity = em.merge(entity);
             //CategoryDiscount categoryDiscount = (CategoryDiscount) persistenceSession.load(CategoryDiscount.class, this.categorydiscount.getIdOfCategory());
             // entity.setCategoryDiscount(categoryDiscount);
 
+            if (discountRate != null && discountRate != 100) {
+                description =
+                        CategoryDiscountEditPage.DISCOUNT_START + discountRate + CategoryDiscountEditPage.DISCOUNT_END;
+            }
+
             entity.setDescription(description);
+            String strSubCategory = "";
+            if (this.subCategory > 0) {
+                strSubCategory = RuleCreatePage.SUB_CATEGORIES[this.subCategory];
+            }
             entity.setSubCategory(strSubCategory);
 
             List<Integer> selectedComplex = Arrays.asList(selectedComplexIds);
@@ -438,33 +405,90 @@ public class RuleEditPage extends BasicWorkspacePage
 
             entity.setPriority(priority);
             entity.setOperationOr(operationor);
+            //entity.setCategoryDiscounts(categoryDiscounts);
+            this.categoryDiscountSet = new HashSet<CategoryDiscount>();
+            entity.getCategoriesDiscounts().clear();
+            //if (this.idOfCategoryList.isEmpty()) {
+            //    for (CategoryDiscount categoryDiscount: entity.getCategoriesDiscounts()){
+            //        this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
+            //    }
+            //}
+            if (!this.idOfCategoryList.isEmpty()) {
+                List categoryList = DAOUtils.getCategoryDiscountListWithIds(em, this.idOfCategoryList);
+                StringBuilder stringBuilder = new StringBuilder();
+                for (Object object : categoryList) {
+                    this.categoryDiscountSet.add((CategoryDiscount) object);
+                    stringBuilder.append(((CategoryDiscount) object).getIdOfCategoryDiscount());
+                    stringBuilder.append(",");
+                }
+                entity.setCategoriesDiscounts(this.categoryDiscountSet);
+                entity.setCategoryDiscounts(stringBuilder.substring(0, stringBuilder.length() - 1));
+            } else {
+                entity.setCategoryDiscounts("");
+            }
 
+            entity.getCategoryOrgs().clear();
+            if (!this.idOfCategoryOrgList.isEmpty()) {
+                entity.getCategoryOrgs().clear();
+                List<CategoryOrg> categoryOrgList = DAOUtils.getCategoryOrgWithIds(em, this.idOfCategoryOrgList);
+                for (Object object : categoryOrgList) {
+                    entity.getCategoryOrgs().add((CategoryOrg) object);
+                }
+            }
             em.persist(entity);
             fill(entity);
-        } else {
+        }
 
+        if (wtEntity != null) {
             //// Веб-технолог ////
-            wtDiscountRule.setSubCategory(strSubCategory);
+            wtEntity = em.merge(wtEntity);
+
+            String strSubCategory = "";
+            if (this.subCategory > 0) {
+                strSubCategory = RuleCreatePage.SUB_CATEGORIES[this.subCategory];
+            }
+            wtEntity.setSubCategory(strSubCategory);
+
+            wtEntity.setPriority(priority);
+            wtEntity.setOperationOr(operationor);
+
+            this.categoryDiscountSet = new HashSet<CategoryDiscount>();
+            wtEntity.getCategoryDiscounts().clear();
+
+            List categoryList = DAOUtils.getCategoryDiscountListWithIds(em, this.idOfCategoryList);
+            StringBuilder stringBuilder = new StringBuilder();
+            for (Object object : categoryList) {
+                this.categoryDiscountSet.add((CategoryDiscount) object);
+                stringBuilder.append(((CategoryDiscount) object).getIdOfCategoryDiscount());
+                stringBuilder.append(",");
+            }
+            wtEntity.setCategoryDiscounts(this.categoryDiscountSet);
+
+            wtEntity.getCategoryOrgs().clear();
+            if (!this.idOfCategoryOrgList.isEmpty()) {
+                wtEntity.getCategoryOrgs().clear();
+                List<CategoryOrg> categoryOrgList = DAOUtils.getCategoryOrgWithIds(em, this.idOfCategoryOrgList);
+                for (Object object : categoryOrgList) {
+                    wtEntity.getCategoryOrgs().add((CategoryOrg) object);
+                }
+            }
 
             for (WtSelectedComplex wtSelectedComplex : wtSelectedComplexes) {
                 if (wtSelectedComplex.isChecked()) {
                     WtComplex complex = wtSelectedComplex.getWtComplex();
-                    wtDiscountRule.getComplexes().add(complex);
+                    wtEntity.getComplexes().add(complex);
                 }
             }
 
-            wtDiscountRule.setDescription(description);
-            wtDiscountRule.setPriority(priority);
-            wtDiscountRule.setRate(discountRate);
-            wtDiscountRule.setOperationOr(operationor);
+            wtEntity.setDescription(description);
+            wtEntity.setPriority(priority);
+            wtEntity.setRate(discountRate);
+            wtEntity.setOperationOr(operationor);
 
-            wtDiscountRule.setCategoryDiscounts(this.categoryDiscountSet);
+            wtEntity.setCategoryDiscounts(this.categoryDiscountSet);
 
-            for (CategoryOrg categoryOrg : categoryOrgList) {
-                wtDiscountRule.getCategoryOrgs().add(categoryOrg);
-            }
-
-            wtDiscountRule = em.merge(wtDiscountRule);
+            em.persist(wtEntity);
+            fill(wtEntity);
         }
 
         printMessage("Данные обновлены");
@@ -718,12 +742,12 @@ public class RuleEditPage extends BasicWorkspacePage
         }
 
         //wt
-        if (wtDiscountRule != null) {
-            WtDiscountRule wtdiscountRule = em.merge(wtDiscountRule);
+        if (wtEntity != null) {
+            WtDiscountRule wtEntity = em.merge(this.wtEntity);
 
             StringBuilder categoryFilter = new StringBuilder();
-            if (!wtDiscountRule.getCategoryDiscounts().isEmpty()) {
-                for (CategoryDiscount categoryDiscount : wtDiscountRule.getCategoryDiscounts()) {
+            if (!this.wtEntity.getCategoryDiscounts().isEmpty()) {
+                for (CategoryDiscount categoryDiscount : this.wtEntity.getCategoryDiscounts()) {
                     this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
                     categoryFilter.append(categoryDiscount.getCategoryName());
                     categoryFilter.append(";");
@@ -734,8 +758,8 @@ public class RuleEditPage extends BasicWorkspacePage
             }
 
             StringBuilder categoryOrgFilter = new StringBuilder();
-            if (!wtDiscountRule.getCategoryOrgs().isEmpty()) {
-                for (CategoryOrg categoryOrg : wtDiscountRule.getCategoryOrgs()) {
+            if (!this.wtEntity.getCategoryOrgs().isEmpty()) {
+                for (CategoryOrg categoryOrg : this.wtEntity.getCategoryOrgs()) {
                     this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
                     categoryOrgFilter.append(categoryOrg.getCategoryName());
                     categoryOrgFilter.append("; ");
@@ -745,7 +769,7 @@ public class RuleEditPage extends BasicWorkspacePage
                 this.filterOrg = "Не выбрано";
             }
 
-            fill(wtDiscountRule);
+            fill(this.wtEntity);
         }
     }
 
@@ -869,8 +893,8 @@ public class RuleEditPage extends BasicWorkspacePage
         if (entity != null) {
             return entity.getDescription();
         }
-        if (wtDiscountRule != null) {
-            return wtDiscountRule.getDescription();
+        if (wtEntity != null) {
+            return wtEntity.getDescription();
         }
         return " ";
     }
@@ -907,12 +931,12 @@ public class RuleEditPage extends BasicWorkspacePage
         this.ageGroupMap = ageGroupMap;
     }
 
-    public WtDiscountRule getWtDiscountRule() {
-        return wtDiscountRule;
+    public WtDiscountRule getWtEntity() {
+        return wtEntity;
     }
 
-    public void setWtDiscountRule(WtDiscountRule wtDiscountRule) {
-        this.wtDiscountRule = wtDiscountRule;
+    public void setWtEntity(WtDiscountRule wtDiscountRule) {
+        this.wtEntity = wtDiscountRule;
     }
 
     public List<WtSelectedComplex> getWtSelectedComplexes() {
@@ -944,8 +968,8 @@ public class RuleEditPage extends BasicWorkspacePage
         if (entity != null) {
             return entity;
         }
-        if (wtDiscountRule != null) {
-            return wtDiscountRule;
+        if (wtEntity != null) {
+            return wtEntity;
         }
         return null;
     }
