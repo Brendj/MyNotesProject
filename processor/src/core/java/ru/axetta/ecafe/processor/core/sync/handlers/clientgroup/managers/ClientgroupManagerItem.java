@@ -4,6 +4,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.clientgroup.managers;
 
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
+
 import org.w3c.dom.Node;
 
 /**
@@ -22,6 +23,10 @@ public class ClientgroupManagerItem {
         this.clientGroupName = clientGroupName;
         this.orgOwner = orgOwner;
         this.deleteState = delete;
+    }
+
+    public boolean wrongItem() {
+        return idOfClient == null || clientGroupName == null || orgOwner == null;
     }
 
     public Integer getDeleteState() {
