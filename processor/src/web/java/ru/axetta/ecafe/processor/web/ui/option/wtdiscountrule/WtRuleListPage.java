@@ -1,8 +1,8 @@
 /*
- * Copyright (c) 2011. Axetta LLC. All Rights Reserved.
+ * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.option.discountrule;
+package ru.axetta.ecafe.processor.web.ui.option.wtdiscountrule;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
@@ -33,17 +34,20 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener,
+public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener,
         CategoryListSelectPage.CompleteHandlerList, CategoryOrgListSelectPage.CompleteHandlerList {
     private List<Item> items = Collections.emptyList();
     private String categoryDiscounts;
-    private List<Long> idOfCategoryList = new ArrayList<Long>();
+    private List<Long> idOfCategoryList = new ArrayList<>();
     private String filter = "Не выбрано";
     private Set<CategoryDiscount> categoryDiscountSet;
     private int subCategory;
     private String filterOrg = "Не выбрано";
-    private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
+    private List<Long> idOfCategoryOrgList = new ArrayList<>();
     private Set<CategoryOrg> categoryOrgs;
+
+    @PersistenceContext(unitName = "processorPU")
+    private EntityManager em;
 
     @Override
     public void onConfirmDelete(ConfirmDeletePage confirmDeletePage) {
@@ -51,16 +55,12 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
         RuntimeContext.getAppContext().getBean(getClass()).reload();
     }
 
-    public String getPageTitle() {
-        return super.getPageTitle() + String.format(" (%d)", items.size());
-    }
-
-    public List<Item> getItems() {
-        return items;
-    }
-
     public String getPageFilename() {
         return "option/discountrule/list";
+    }
+
+    public String getPageTitle() {
+        return super.getPageTitle() + String.format(" (%d)", items.size());
     }
 
     @Override
@@ -83,17 +83,15 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
         return this;
     }
 
-    @PersistenceContext(unitName = "processorPU")
-    private EntityManager em;
-
     @Transactional
     public void reload() {
-        List<Item> items = new ArrayList<Item>();
+        List<Item> items = new ArrayList<>();
+
         List<DiscountRule> discountRuleList = DAOUtils.listDiscountRules(em);
 
         for (DiscountRule discountRule : discountRuleList) {
 
-            List<Long> categoriesDiscountsIds = new ArrayList<Long>();
+            List<Long> categoriesDiscountsIds = new ArrayList<>();
             for(CategoryDiscount categoryDiscount : discountRule.getCategoriesDiscounts()){
                 categoriesDiscountsIds.add(categoryDiscount.getIdOfCategoryDiscount());
             }
@@ -101,15 +99,16 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
                 continue;
             }
 
-            List<Long> categoriesDiscountsOrgIds = new ArrayList<Long>();
+            List<Long> categoriesDiscountsOrgIds = new ArrayList<>();
             for(CategoryOrg categoryOrg : discountRule.getCategoryOrgs()){
                 categoriesDiscountsOrgIds.add(categoryOrg.getIdOfCategoryOrg());
             }
+
             if(!idOfCategoryOrgList.isEmpty() && Collections.disjoint(idOfCategoryOrgList, categoriesDiscountsOrgIds)){
                 continue;
             }
 
-            if(subCategory != 0 && !discountRule.getSubCategory().equals(RuleCreatePage.SUB_CATEGORIES[subCategory])){
+            if(subCategory != 0 && !discountRule.getSubCategory().equals(WtRuleCreatePage.SUB_CATEGORIES[subCategory])){
                 continue;
             }
 
@@ -134,10 +133,63 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
                 item.setCategoryOrgs(stringBuilder.substring(0, stringBuilder.length()-1));
             }
 
+            item.setWt(false);
+
             items.add(item);
         }
-        this.items = items;
 
+        List<WtDiscountRule> wtDiscountRuleList = DAOUtils.listWtDiscountRules(em);
+
+        for (WtDiscountRule wtDiscountRule : wtDiscountRuleList) {
+
+            List<Long> categoriesDiscountsIds = new ArrayList<>();
+            for(CategoryDiscount categoryDiscount : wtDiscountRule.getCategoryDiscounts()){
+                categoriesDiscountsIds.add(categoryDiscount.getIdOfCategoryDiscount());
+            }
+            if(!idOfCategoryList.isEmpty() && Collections.disjoint(idOfCategoryList, categoriesDiscountsIds)){
+                continue;
+            }
+
+            List<Long> categoriesDiscountsOrgIds = new ArrayList<>();
+            for(CategoryOrg categoryOrg : wtDiscountRule.getCategoryOrgs()){
+                categoriesDiscountsOrgIds.add(categoryOrg.getIdOfCategoryOrg());
+            }
+
+            if(!idOfCategoryOrgList.isEmpty() && Collections.disjoint(idOfCategoryOrgList, categoriesDiscountsOrgIds)){
+                continue;
+            }
+
+            //if(subCategory != 0 && !wtDiscountRule.getSubCategory().equals(RuleCreatePage.SUB_CATEGORIES[subCategory])){
+            //    continue;
+            //}
+
+            Item item = new Item(wtDiscountRule);
+
+            if (!wtDiscountRule.getCategoryDiscounts().isEmpty()) {
+                StringBuilder stringBuilder = new StringBuilder();
+                for (CategoryDiscount categoryDiscount: wtDiscountRule.getCategoryDiscounts()){
+                    stringBuilder.append(categoryDiscount.getCategoryName());
+                    stringBuilder.append("; ");
+                }
+                item.setCategoryDiscounts(stringBuilder.substring(0, stringBuilder.length()-1));
+            }
+            item.setWtEntity(wtDiscountRule);
+
+            if(!wtDiscountRule.getCategoryOrgs().isEmpty()){
+                StringBuilder stringBuilder = new StringBuilder();
+                for(CategoryOrg categoryOrg: wtDiscountRule.getCategoryOrgs()){
+                    stringBuilder.append(categoryOrg.getCategoryName());
+                    stringBuilder.append(";");
+                }
+                item.setCategoryOrgs(stringBuilder.substring(0, stringBuilder.length()-1));
+            }
+
+            item.setWt(true);
+
+            items.add(item);
+        }
+
+        this.items = items;
     }
 
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws Exception {
@@ -182,11 +234,15 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
     public List<SelectItem> getSubCategories() throws Exception {
         List<SelectItem> res = new ArrayList<SelectItem>();
         res.add(new SelectItem("", ""));
-        for (int i=0; i<RuleCreatePage.SUB_CATEGORIES.length; i++) {
-            String group = RuleCreatePage.SUB_CATEGORIES[i];
+        for (int i=0; i< WtRuleCreatePage.SUB_CATEGORIES.length; i++) {
+            String group = WtRuleCreatePage.SUB_CATEGORIES[i];
             res.add(new SelectItem(i, group));
         }
         return res;
+    }
+
+    public List<Item> getItems() {
+        return items;
     }
 
     public int getSubCategory() {
@@ -237,8 +293,12 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
         return idOfCategoryList.toString().replaceAll("[^(0-9-),]","");
     }
 
+
+    /// class Item ///
     public static class Item {
         DiscountRule entity;
+        WtDiscountRule wtEntity;
+
         private long idOfRule;
         private String description;
         private int complex0;
@@ -257,8 +317,8 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
         private List<CategoryDiscount> categoryDiscountList;
         private List<CategoryOrg> categoryOrgList;
         private String subCategory;
-        //
-
+        private int priority;
+        boolean wt = false;
 
         public DiscountRule getEntity() {
             return entity;
@@ -268,12 +328,12 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
             this.entity = entity;
         }
 
-        public String getSubCategory() {
-            return subCategory;
+        public long getIdOfRule() {
+            return idOfRule;
         }
 
-        public void setSubCategory(String subCategory) {
-            this.subCategory = subCategory;
+        public String getDescription() {
+            return description;
         }
 
         public String getCategoryOrgs() {
@@ -308,12 +368,28 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
             this.categoryDiscounts = categoryDiscounts;
         }
 
+        public void setIdOfRule(long idOfRule) {
+            this.idOfRule = idOfRule;
+        }
+
+        public void setDescription(String description) {
+            this.description = description;
+        }
+
         public boolean isOperationor() {
             return operationor;
         }
 
         public void setOperationor(boolean operationor) {
             this.operationor = operationor;
+        }
+
+        public String getSubCategory() {
+            return subCategory;
+        }
+
+        public void setSubCategory(String subCategory) {
+            this.subCategory = subCategory;
         }
 
         public int getPriority() {
@@ -324,10 +400,24 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
             this.priority = priority;
         }
 
-        private int priority;
-        //
+        public boolean isWt() {
+            return wt;
+        }
+
+        public void setWt(boolean wt) {
+            this.wt = wt;
+        }
+
+        public WtDiscountRule getWtEntity() {
+            return wtEntity;
+        }
+
+        public void setWtEntity(WtDiscountRule wtEntity) {
+            this.wtEntity = wtEntity;
+        }
 
         public Item(DiscountRule discountRule) {
+
             this.idOfRule = discountRule.getIdOfRule();
             this.description = discountRule.getDescription();
             this.complex0 = discountRule.getComplex0();
@@ -342,7 +432,9 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
             this.complex9 = discountRule.getComplex9();
             this.priority = discountRule.getPriority();
             this.operationor = discountRule.getOperationOr();
-            this.categoryDiscountList = new LinkedList<CategoryDiscount>();
+            this.wt = false;
+
+            this.categoryDiscountList = new LinkedList<>();
             if(!discountRule.getCategoriesDiscounts().isEmpty()){
                 StringBuilder stringBuilder = new StringBuilder();
                 for (CategoryDiscount categoryDiscount: discountRule.getCategoriesDiscounts()){
@@ -353,60 +445,37 @@ public class RuleListPage extends BasicWorkspacePage implements ConfirmDeletePag
                 this.categoryDiscounts = stringBuilder.substring(0, stringBuilder.length()-1);
             }
 
-            this.categoryOrgList = new LinkedList<CategoryOrg>();
+            this.categoryOrgList = new LinkedList<>();
             if(!discountRule.getCategoryOrgs().isEmpty()){
                 this.categoryOrgList.addAll(discountRule.getCategoryOrgs());
             }
             subCategory = discountRule.getSubCategory();
         }
 
-        public long getIdOfRule() {
-            return idOfRule;
-        }
+        public Item(WtDiscountRule wtDiscountRule) {
 
-        public String getDescription() {
-            return description;
-        }
+            this.idOfRule = wtDiscountRule.getIdOfRule();
+            this.description = wtDiscountRule.getDescription();
+            this.priority = wtDiscountRule.getPriority();
+            this.operationor = wtDiscountRule.isOperationOr();
+            this.wt = true;
 
-        public int getComplex0() {
-            return complex0;
-        }
+            this.categoryDiscountList = new LinkedList<>();
+            if(!wtDiscountRule.getCategoryDiscounts().isEmpty()){
+                StringBuilder stringBuilder = new StringBuilder();
+                for (CategoryDiscount categoryDiscount: wtDiscountRule.getCategoryDiscounts()){
+                    this.categoryDiscountList.add(categoryDiscount);
+                    stringBuilder.append(categoryDiscount.getCategoryName());
+                    stringBuilder.append(",");
+                }
+                this.categoryDiscounts = stringBuilder.substring(0, stringBuilder.length()-1);
+            }
 
-        public int getComplex1() {
-            return complex1;
+            this.categoryOrgList = new LinkedList<>();
+            if(!wtDiscountRule.getCategoryOrgs().isEmpty()){
+                this.categoryOrgList.addAll(wtDiscountRule.getCategoryOrgs());
+            }
+            subCategory = wtDiscountRule.getSubCategory();
         }
-
-        public int getComplex2() {
-            return complex2;
-        }
-
-        public int getComplex3() {
-            return complex3;
-        }
-
-        public int getComplex4() {
-            return complex4;
-        }
-
-        public int getComplex5() {
-            return complex5;
-        }
-
-        public int getComplex6() {
-            return complex6;
-        }
-
-        public int getComplex7() {
-            return complex7;
-        }
-
-        public int getComplex8() {
-            return complex8;
-        }
-
-        public int getComplex9() {
-            return complex9;
-        }
-
     }
 }
