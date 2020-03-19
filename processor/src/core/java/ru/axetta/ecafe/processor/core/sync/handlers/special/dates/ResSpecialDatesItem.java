@@ -63,7 +63,7 @@ public class ResSpecialDatesItem {
         XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.dateShortToStringFullYear(date));
         XMLUtils.setAttributeIfNotNull(element, "Res", resCode);
         XMLUtils.setAttributeIfNotNull(element, "IsWeekend", isWeekend);
-        if(!comment.isEmpty()) {
+        if(comment != null && !comment.isEmpty()) {
             XMLUtils.setAttributeIfNotNull(element, "Comment", comment);
         }
         XMLUtils.setAttributeIfNotNull(element, "GroupName", groupName);
