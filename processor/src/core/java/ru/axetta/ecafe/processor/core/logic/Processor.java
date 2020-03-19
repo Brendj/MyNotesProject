@@ -4055,19 +4055,6 @@ public class Processor implements SyncProcessor {
                         client = card.getClient();
                     }
                 }
-                if (null != client && card != null) {
-                    if (Card.ACTIVE_STATE != card.getState()) {
-                        Card newCard = client.findActiveCard(persistenceSession, card);
-                        if (logger.isWarnEnabled()) {
-                            if (!newCard.getIdOfCard().equals(card.getIdOfCard())) {
-                                logger.warn(String.format(
-                                        "Specified card is inactive. Client: %s, Card: %s. Will use card: %s",
-                                        "" + client.getIdOfClient(), card.getIdOfCard(), newCard.getIdOfCard()));
-                            }
-                        }
-                        card = newCard;
-                    }
-                }
                 // If client is specified - check if client is registered for the specified organization
                 // or for one of friendly organizations of specified one
                 Set<Long> idOfFriendlyOrgSet = getIdOfFriendlyOrg(persistenceSession, idOfOrg);
