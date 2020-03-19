@@ -95,6 +95,10 @@ public class ExternalEventNotificationService {
             transaction = persistenceSession.beginTransaction();
             String[] values = generateNotificationParams(client, event);
             values = EventNotificationService.attachGenderToValues(client.getGender(), values);
+            if (type.equals(EventNotificationService.NOTIFICATION_ENTER_CULTURE))
+                values = EventNotificationService.attachTargetIdToValues((long) ClientSms.TYPE_ENTER_CULTURE_NOTIFICATION, values);
+            if (type.equals(EventNotificationService.NOTIFICATION_EXIT_CULTURE))
+                values = EventNotificationService.attachTargetIdToValues((long) ClientSms.TYPE_EXIT_CULTURE_NOTIFICATION, values);
             final EventNotificationService notificationService = RuntimeContext.getAppContext()
                     .getBean(EventNotificationService.class);
             List<Client> guardians = ClientManager
