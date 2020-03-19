@@ -15,7 +15,7 @@
     return;
 } %>
 <%--@elvariable id="wtRuleListPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleListPage"--%>
-<%--@elvariable id="ruleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.RuleEditPage"--%>
+<%--@elvariable id="wtRuleListPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleListPage"--%>
 <h:panelGrid id="ruleListPanel" binding="#{wtRuleListPage.pageComponent}" styleClass="borderless-grid">
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -125,16 +125,14 @@
         </rich:column>
 
         <rich:column>
-            <a4j:commandLink reRender="workspaceForm" action="#{ruleEditPage.show}" styleClass="command-link"
-                             rendered="#{!item.wt}">
+            <a4j:commandLink reRender="workspaceForm" action="#{wtRuleListPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;"/>
-                <f:setPropertyActionListener value="#{item.entity}" target="#{ruleEditPage.entity}"/>
+                <f:setPropertyActionListener value="#{item.entity}" target="#{wtRuleListPage.entity}"/>
             </a4j:commandLink>
 
-            <a4j:commandLink reRender="workspaceForm" action="#{ruleEditPage.show}" styleClass="command-link"
-                             rendered="#{item.wt}">
+            <a4j:commandLink reRender="workspaceForm" action="#{wtRuleListPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;"/>
-                <f:setPropertyActionListener value="#{item.wtEntity}" target="#{ruleEditPage.wtEntity}"/>
+                <f:setPropertyActionListener value="#{item.wtEntity}" target="#{wtRuleListPage.wtEntity}"/>
             </a4j:commandLink>
 
         </rich:column>

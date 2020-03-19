@@ -1848,17 +1848,17 @@
     <rich:panelMenuItem id="complexRoleEditMenuItem" binding="#{complexRuleEditPage.mainMenuComponent}"
                         label="Роли комплексов" action="#{complexRuleEditPage.show}" reRender="workspaceForm" />
 
-    <rich:panelMenuItem id="ruleListMenuItem" label="Список (веб-технолог)" binding="#{wtRuleListPage.mainMenuComponent}"
+    <rich:panelMenuItem id="wtRuleListMenuItem" label="Список (веб-технолог)" binding="#{wtRuleListPage.mainMenuComponent}"
                         action="#{wtRuleListPage.show}" reRender="workspaceForm" />
 
-    <rich:panelMenuGroup id="selectedRuleGroupMenu" label="#{wtRuleEditPage.entityName}" rendered="false">
+    <rich:panelMenuGroup id="wtSelectedRuleGroupMenu" label="#{wtRuleEditPage.entityName}" rendered="false">
 
-        <rich:panelMenuItem id="editRuleMenuItem" binding="#{wtRuleEditPage.mainMenuComponent}" label="Редактирование (веб-технолог)"
+        <rich:panelMenuItem id="wtEditRuleMenuItem" binding="#{wtRuleEditPage.mainMenuComponent}" label="Редактирование (веб-технолог)"
                             action="#{wtRuleEditPage.show}" reRender="workspaceForm" />
 
     </rich:panelMenuGroup>
 
-    <rich:panelMenuItem id="ruleCreateMenuItem" binding="#{wtRuleCreatePage.mainMenuComponent}" label="Регистрация (веб-технолог)"
+    <rich:panelMenuItem id="wtRuleCreateMenuItem" binding="#{wtRuleCreatePage.mainMenuComponent}" label="Регистрация (веб-технолог)"
                         action="#{wtRuleCreatePage.show}" reRender="workspaceForm" />
 
 
