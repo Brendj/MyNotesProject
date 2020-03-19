@@ -111,13 +111,34 @@
                     <f:selectItems value="#{ruleCreatePage.ageGroups}"/>
                 </h:selectOneMenu>
 
-                <h:outputText escape="true" value="Поставщик" styleClass="output-text"
-                              rendered="#{ruleCreatePage.showFilter}"/>
+<%--                <h:outputText escape="true" value="Поставщик" styleClass="output-text"--%>
+<%--                              rendered="#{ruleCreatePage.showFilter}"/>--%>
 
-                <h:selectOneMenu id="supplierMenu" value="#{ruleCreatePage.supplier}"
-                                 style="width:300px;" styleClass="groupSelect" rendered="#{ruleCreatePage.showFilter}">
-                    <f:selectItems value="#{ruleCreatePage.suppliers}"/>
-                </h:selectOneMenu>
+<%--                <h:selectOneMenu id="supplierMenu" value="#{ruleCreatePage.supplier}"--%>
+<%--                                 style="width:300px;" styleClass="groupSelect" rendered="#{ruleCreatePage.showFilter}">--%>
+<%--                    <f:selectItems value="#{ruleCreatePage.suppliers}"/>--%>
+<%--                </h:selectOneMenu>--%>
+
+                <a4j:outputPanel ajaxRendered="#{ruleEditPage.showFilter}" rendered="#{ruleCreatePage.showFilter}">
+                    <h:panelGrid styleClass="borderless-grid" columns="2">
+                        <h:outputText escape="true" value="Список контрагентов" styleClass="output-text"/>
+                        <h:panelGroup styleClass="borderless-div">
+
+                            <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
+                                               reRender="modalContragentListSelectorPanel"
+                                               oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
+                                               styleClass="command-link" style="width: 25px;">
+                                <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}"/>
+                                <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}"/>
+                                <f:setPropertyActionListener value="#{ruleCreatePage.contragentIds}"
+                                                             target="#{mainPage.contragentListSelectPage.selectedIds}"/>
+                            </a4j:commandButton>
+
+                            <h:outputText value=" {#{ruleCreatePage.contragentFilter}}" escape="true"
+                                          styleClass="output-text"/>
+                        </h:panelGroup>
+                    </h:panelGrid>
+                </a4j:outputPanel>
 
             </h:panelGrid>
 

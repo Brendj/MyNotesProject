@@ -8,12 +8,14 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.HibernateException;
+import org.hibernate.Session;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -31,29 +33,30 @@ import java.util.*;
  */
 @Component
 @Scope("session")
-public class RuleCreatePage extends BasicWorkspacePage
-        implements CategoryListSelectPage.CompleteHandlerList, CategoryOrgListSelectPage.CompleteHandlerList {
-    public static final String SUB_CATEGORIES [] = new String []
-            { "",
-              "Обучающиеся из многодетных семей 5-9 кл. (завтрак+обед)",
-              "Обучающиеся из многодетных семей 10-11 кл. (завтрак+обед)",
-              "Обучающиеся 5-9 кл.(завтрак+обед)",
-              "Обучающиеся 10-11 кл.(завтрак+обед)",
-              "Обучающиеся 1-4 кл. (завтрак)",
-              "Обучающиеся из соц. незащищ. семей 1-4 кл. (завтрак+обед)",            //  Если измениться, необходимо поменять DailyReferReort.getReportData : 353
-              "Обучающиеся из соц. незащищ. семей 5-9 кл. (завтрак+обед)",            //  Если измениться, необходимо поменять DailyReferReort.getReportData : 354
-              "Обучающиеся из соц. незащищ. семей 10-11 кл. (завтрак+обед)",          //  Если измениться, необходимо поменять DailyReferReort.getReportData : 354
-              "Обучающиеся из многодетных семей 1-4 кл. (завтрак+обед)",
-              "Обучающиеся 1-4 кл.(завтрак+обед)",
+public class RuleCreatePage extends BasicWorkspacePage implements CategoryListSelectPage.CompleteHandlerList,
+        CategoryOrgListSelectPage.CompleteHandlerList,
+        ContragentListSelectPage.CompleteHandler {
 
-              "Обучающиеся 1,5-3 лет (завтрак 1+завтрак 2+обед+упл. полдник)",
-              "Обучающиеся 3-7 лет (завтрак 1+завтрак 2+обед+упл. полдник)",
-              "Обучающиеся 1,5-3 лет (завтрак 1+завтрак 2+обед+полдник+ужин 1+ужин 2)",
-              "Обучающиеся 3-7 лет (завтрак 1+завтрак 2+обед+полдник+ужин 1+ужин 2)",
+    public static final String SUB_CATEGORIES[] = new String[]{
+            "", "Обучающиеся из многодетных семей 5-9 кл. (завтрак+обед)",
+            "Обучающиеся из многодетных семей 10-11 кл. (завтрак+обед)", "Обучающиеся 5-9 кл.(завтрак+обед)",
+            "Обучающиеся 10-11 кл.(завтрак+обед)", "Обучающиеся 1-4 кл. (завтрак)",
+            "Обучающиеся из соц. незащищ. семей 1-4 кл. (завтрак+обед)",
+            //  Если измениться, необходимо поменять DailyReferReort.getReportData : 353
+            "Обучающиеся из соц. незащищ. семей 5-9 кл. (завтрак+обед)",
+            //  Если измениться, необходимо поменять DailyReferReort.getReportData : 354
+            "Обучающиеся из соц. незащищ. семей 10-11 кл. (завтрак+обед)",
+            //  Если измениться, необходимо поменять DailyReferReort.getReportData : 354
+            "Обучающиеся из многодетных семей 1-4 кл. (завтрак+обед)", "Обучающиеся 1-4 кл.(завтрак+обед)",
 
-              "Начальные классы 1-4 (завтрак + обед + полдник)",
-              "Средние и  старшие классы 5-9 (завтрак + обед + полдник)",
-              "Средние и  старшие классы 10-11 (завтрак + обед + полдник)"};
+            "Обучающиеся 1,5-3 лет (завтрак 1+завтрак 2+обед+упл. полдник)",
+            "Обучающиеся 3-7 лет (завтрак 1+завтрак 2+обед+упл. полдник)",
+            "Обучающиеся 1,5-3 лет (завтрак 1+завтрак 2+обед+полдник+ужин 1+ужин 2)",
+            "Обучающиеся 3-7 лет (завтрак 1+завтрак 2+обед+полдник+ужин 1+ужин 2)",
+
+            "Начальные классы 1-4 (завтрак + обед + полдник)",
+            "Средние и  старшие классы 5-9 (завтрак + обед + полдник)",
+            "Средние и  старшие классы 10-11 (завтрак + обед + полдник)"};
     private List<Long> idOfCategoryList = new ArrayList<Long>();
     private List<Long> idOfCategoryOrgList = new ArrayList<Long>();
     private String description;
@@ -80,17 +83,21 @@ public class RuleCreatePage extends BasicWorkspacePage
     boolean wt = false;
     boolean showFilter = false;
 
+    private String contragentFilter = "Не выбрано";
+    private String contragentIds;
+    private List<ContragentItem> contragentItems = new ArrayList<>();
+
     public List<SelectItem> getAvailableComplexs() {
         final List<ComplexRole> complexRoles = daoService.findComplexRoles();
         final int size = complexRoles.size();
         List<SelectItem> list = new ArrayList<SelectItem>(size);
-        for (int i=0;i<size;i++) {
+        for (int i = 0; i < size; i++) {
             ComplexRole complexRole = complexRoles.get(i);
             String complexName = String.format("Комплекс %d", i);
-            if(!complexName.equals(complexRole.getRoleName())){
+            if (!complexName.equals(complexRole.getRoleName())) {
                 complexName = String.format("Комплекс %d - %s", i, complexRole.getRoleName());
             }
-            SelectItem selectItem = new SelectItem(i,complexName);
+            SelectItem selectItem = new SelectItem(i, complexName);
             list.add(selectItem);
         }
         return list;
@@ -99,7 +106,7 @@ public class RuleCreatePage extends BasicWorkspacePage
     public List<SelectItem> getSubCategories() throws Exception {
         List<SelectItem> res = new ArrayList<SelectItem>();
         res.add(new SelectItem("", ""));
-        for (int i=0; i<SUB_CATEGORIES.length; i++) {
+        for (int i = 0; i < SUB_CATEGORIES.length; i++) {
             String group = SUB_CATEGORIES[i];
             res.add(new SelectItem(i, group));
         }
@@ -107,37 +114,37 @@ public class RuleCreatePage extends BasicWorkspacePage
     }
 
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws HibernateException {
-         if(null != categoryMap) {
-             idOfCategoryList = new ArrayList<Long>();
-             if(categoryMap.isEmpty()){
-                  filter = "Не выбрано";
-             } else {
-                 filter="";
-                 for(Long idOfCategory: categoryMap.keySet()){
-                     idOfCategoryList.add(idOfCategory);
-                     filter=filter.concat(categoryMap.get(idOfCategory)+ "; ");
-                 }
-                 filter = filter.substring(0,filter.length()-2);
-                 categoryDiscounts=idOfCategoryList.toString();
-                 categoryDiscounts=categoryDiscounts.substring(1,categoryDiscounts.length()-1);
+        if (null != categoryMap) {
+            idOfCategoryList = new ArrayList<Long>();
+            if (categoryMap.isEmpty()) {
+                filter = "Не выбрано";
+            } else {
+                filter = "";
+                for (Long idOfCategory : categoryMap.keySet()) {
+                    idOfCategoryList.add(idOfCategory);
+                    filter = filter.concat(categoryMap.get(idOfCategory) + "; ");
+                }
+                filter = filter.substring(0, filter.length() - 2);
+                categoryDiscounts = idOfCategoryList.toString();
+                categoryDiscounts = categoryDiscounts.substring(1, categoryDiscounts.length() - 1);
 
-             }
+            }
 
-         }
+        }
     }
 
     public void completeCategoryOrgListSelection(Map<Long, String> categoryOrgMap) throws Exception {
-        if(null != categoryOrgMap) {
+        if (null != categoryOrgMap) {
             idOfCategoryOrgList = new ArrayList<Long>();
-            if(categoryOrgMap.isEmpty()){
+            if (categoryOrgMap.isEmpty()) {
                 filterOrg = "Не выбрано";
             } else {
-                filterOrg="";
-                for(Long idOfCategoryOrg: categoryOrgMap.keySet()){
+                filterOrg = "";
+                for (Long idOfCategoryOrg : categoryOrgMap.keySet()) {
                     idOfCategoryOrgList.add(idOfCategoryOrg);
-                    filterOrg=filterOrg.concat(categoryOrgMap.get(idOfCategoryOrg)+ "; ");
+                    filterOrg = filterOrg.concat(categoryOrgMap.get(idOfCategoryOrg) + "; ");
                 }
-                filterOrg = filterOrg.substring(0,filterOrg.length()-1);
+                filterOrg = filterOrg.substring(0, filterOrg.length() - 1);
             }
 
         }
@@ -196,6 +203,37 @@ public class RuleCreatePage extends BasicWorkspacePage
         return res;
     }
 
+    @Override
+    public void completeContragentListSelection(Session session, List<Long> idOfContragentList, int multiContrFlag,
+            String classTypes) throws Exception {
+        contragentItems.clear();
+        for (Long idOfContragent : idOfContragentList) {
+            Contragent currentContragent = (Contragent) session.load(Contragent.class, idOfContragent);
+            ContragentItem contragentItem = new ContragentItem(currentContragent);
+            contragentItems.add(contragentItem);
+        }
+        setContragentFilterInfo(contragentItems);
+    }
+
+    private void setContragentFilterInfo(List<ContragentItem> contragentItems) {
+        StringBuilder str = new StringBuilder();
+        StringBuilder ids = new StringBuilder();
+        if (contragentItems.isEmpty()) {
+            contragentFilter = "Не выбрано";
+        } else {
+            for (ContragentItem it : contragentItems) {
+                if (str.length() > 0) {
+                    str.append("; ");
+                    ids.append(",");
+                }
+                str.append(it.getContragentName());
+                ids.append(it.getIdOfContragent());
+            }
+            contragentFilter = str.toString();
+        }
+        contragentIds = ids.toString();
+    }
+
     public void fillWtSelectedComplexes() {
         if (!wt || wtSelectedComplexes.size() != 0) {
             wtSelectedComplexes.clear();
@@ -203,73 +241,61 @@ public class RuleCreatePage extends BasicWorkspacePage
         if (!wt) {
             return;
         }
-        if (complexType > -1 || ageGroup > -1 || supplier > -1) {
+
+        if (complexType > -1 || ageGroup > -1 || !contragentItems.isEmpty()) {
             Long complexGroupId = complexTypeMap.get(complexType);
             Long ageGroupId = ageGroupMap.get(ageGroup);
-            Long supplierId = supplierMap.get(supplier);
 
-            if (complexGroupId == null && ageGroupId == null && supplierId == null) {
+            if (complexGroupId == null && ageGroupId == null && contragentItems.isEmpty()) {
                 fill(wtEntity);
             } else {
                 List<WtComplexGroupItem> wtComplexGroupItem = null;
                 List<WtAgeGroupItem> wtAgeGroupItem = null;
-                List<Contragent> supplierItem = null;
+
                 if (complexGroupId != null) {
                     wtComplexGroupItem = daoService.getWtComplexGroupItemById(complexGroupId);
                 }
                 if (ageGroupId != null) {
                     wtAgeGroupItem = daoService.getWtAgeGroupItemById(ageGroupId);
                 }
-                if (supplierId != null) {
-                    supplierItem = daoService.getSupplierItemById(supplierId);
-                }
-                if (wtComplexGroupItem != null && wtAgeGroupItem != null && supplierItem != null) {
+
+                if (wtComplexGroupItem != null && wtAgeGroupItem != null) {
                     for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
                         for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
-                            for (Contragent supplier : supplierItem) {
-                                addWtComplex(complexGroupItem, ageGroupItem, supplier);
-                            }
+                            addWtComplex(complexGroupItem, ageGroupItem, contragentItems);
                         }
                     }
-                } else if (wtComplexGroupItem == null && wtAgeGroupItem != null && supplierItem != null) {
+                } else if (wtComplexGroupItem == null && wtAgeGroupItem != null) {
                     for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
-                        for (Contragent supplier : supplierItem) {
-                            addWtComplex(null, ageGroupItem, supplier);
-                        }
+                        addWtComplex(null, ageGroupItem, contragentItems);
                     }
-                } else if (wtComplexGroupItem != null && wtAgeGroupItem == null && supplierItem != null) {
+                } else if (wtComplexGroupItem != null && wtAgeGroupItem == null) {
                     for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
-                        for (Contragent supplier : supplierItem) {
-                            addWtComplex(complexGroupItem, null, supplier);
-                        }
+                        addWtComplex(complexGroupItem, null, contragentItems);
                     }
-                } else if (wtComplexGroupItem != null && wtAgeGroupItem != null && supplierItem == null) {
-                    for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
-                        for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
-                            addWtComplex(complexGroupItem, ageGroupItem, null);
-                        }
-                    }
-                } else if (wtComplexGroupItem == null && wtAgeGroupItem == null && supplierItem != null) {
-                    for (Contragent supplier : supplierItem) {
-                        addWtComplex(null, null, supplier);
-                    }
-                } else if (wtComplexGroupItem != null && wtAgeGroupItem == null && supplierItem == null) {
-                    for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
-                        addWtComplex(complexGroupItem, null, null);
-                    }
-                } else if (wtComplexGroupItem == null && wtAgeGroupItem != null && supplierItem == null) {
-                    for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
-                        addWtComplex(null, ageGroupItem, null);
-                    }
+                } else if (wtComplexGroupItem == null && wtAgeGroupItem == null) {
+                    addWtComplex(null, null, contragentItems);
                 }
             }
-        } else if (complexType == -1 && ageGroup == -1 && supplier == -1) {
+        } else if (complexType == -1 && ageGroup == -1 && contragentItems.isEmpty()) {
             fill(wtEntity);
         }
     }
 
-    private void addWtComplex(WtComplexGroupItem complexGroupItem, WtAgeGroupItem ageGroupItem, Contragent supplier) {
-        List<WtComplex> wtComplexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem, supplier);
+    private void addWtComplex(WtComplexGroupItem complexGroupItem, WtAgeGroupItem ageGroupItem,
+            List<ContragentItem> contragentItems) {
+
+        List<Contragent> contragentList = new ArrayList<>();
+        try {
+            for (ContragentItem contragentItem : contragentItems) {
+                Contragent contragent = daoService.getContragentById(contragentItem.idOfContragent);
+                contragentList.add(contragent);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        List<WtComplex> wtComplexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem, contragentList);
         for (WtComplex wtComplex : wtComplexes) {
             if (wtComplex != null && wtSelectedComplexes != null) {
                 wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
@@ -320,16 +346,17 @@ public class RuleCreatePage extends BasicWorkspacePage
         this.description = "";
         this.priority = 0;
         this.categoryDiscounts = "";
-        this.operationOr=false;
-        this.filter="Не выбрано";
-        this.filterOrg="Не выбрано";
+        this.operationOr = false;
+        this.filter = "Не выбрано";
+        this.filterOrg = "Не выбрано";
     }
 
     @Transactional
     public void createRule() throws Exception {
 
         if (discountRate != null && discountRate != 100) {
-            description = CategoryDiscountEditPage.DISCOUNT_START + discountRate + CategoryDiscountEditPage.DISCOUNT_END;
+            description =
+                    CategoryDiscountEditPage.DISCOUNT_START + discountRate + CategoryDiscountEditPage.DISCOUNT_END;
         }
 
         String strSubCategory = "";
@@ -638,5 +665,54 @@ public class RuleCreatePage extends BasicWorkspacePage
 
     public void setSupplierMap(Map<Integer, Long> supplierMap) {
         this.supplierMap = supplierMap;
+    }
+
+    public String getContragentFilter() {
+        return contragentFilter;
+    }
+
+    public void setContragentFilter(String contragentFilter) {
+        this.contragentFilter = contragentFilter;
+    }
+
+    public String getContragentIds() {
+        return contragentIds;
+    }
+
+    public void setContragentIds(String contragentIds) {
+        this.contragentIds = contragentIds;
+    }
+
+    public List<ContragentItem> getContragentItems() {
+        return contragentItems;
+    }
+
+    public void setContragentItems(List<ContragentItem> contragentItems) {
+        this.contragentItems = contragentItems;
+    }
+
+    /// class ContragentItem ///
+    public static class ContragentItem {
+
+        private final Long idOfContragent;
+        private final String contragentName;
+
+        public ContragentItem(Contragent contragent) {
+            this.idOfContragent = contragent.getIdOfContragent();
+            this.contragentName = contragent.getContragentName();
+        }
+
+        public ContragentItem() {
+            this.idOfContragent = null;
+            this.contragentName = null;
+        }
+
+        public Long getIdOfContragent() {
+            return idOfContragent;
+        }
+
+        public String getContragentName() {
+            return contragentName;
+        }
     }
 }

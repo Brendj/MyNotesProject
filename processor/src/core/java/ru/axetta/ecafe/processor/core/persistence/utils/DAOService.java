@@ -2811,7 +2811,7 @@ public class DAOService {
     }
 
     public List<WtComplex> getWtComplexesList(WtComplexGroupItem wtComplexGroupItem, WtAgeGroupItem wtAgeGroupItem,
-            Contragent supplier) {
+            List<Contragent> contragentList) {
         StringBuilder sb = new StringBuilder();
         sb.append("select wc from WtComplex wc where wc.deleteState = 0");
         if (wtComplexGroupItem != null) {
@@ -2820,8 +2820,8 @@ public class DAOService {
         if (wtAgeGroupItem != null) {
             sb.append(" and wc.wtAgeGroupItem = :wtAgeGroupItem");
         }
-        if (supplier != null) {
-            sb.append(" and wc.contragent = :supplier");
+        if (!contragentList.isEmpty()) {
+            sb.append(" and wc.contragent in elements (:contragentList)");
         }
 
         Query query = entityManager.createQuery(sb.toString());
@@ -2831,8 +2831,8 @@ public class DAOService {
         if (wtAgeGroupItem != null) {
             query.setParameter("wtAgeGroupItem", wtAgeGroupItem);
         }
-        if (supplier != null) {
-            query.setParameter("supplier", supplier);
+        if (!contragentList.isEmpty()) {
+            query.setParameter("contragentList", contragentList);
         }
         try {
             return query.getResultList();

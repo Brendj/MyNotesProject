@@ -119,29 +119,31 @@
                     <f:selectItems value="#{ruleEditPage.ageGroups}"/>
                 </h:selectOneMenu>
 
-                <h:outputText escape="true" value="Поставщик" styleClass="output-text"
-                              rendered="#{ruleEditPage.showFilter}"/>
+<%--                <h:outputText escape="true" value="Поставщик" styleClass="output-text"--%>
+<%--                              rendered="#{ruleEditPage.showFilter}"/>--%>
 
-                <h:selectOneMenu id="supplierMenu" value="#{ruleEditPage.supplier}"
-                                 style="width:300px;" styleClass="groupSelect" rendered="#{ruleEditPage.showFilter}">
-                    <f:selectItems value="#{ruleEditPage.suppliers}"/>
-                </h:selectOneMenu>
+<%--                <h:selectOneMenu id="supplierMenu" value="#{ruleEditPage.supplier}"--%>
+<%--                                 style="width:300px;" styleClass="groupSelect" rendered="#{ruleEditPage.showFilter}">--%>
+<%--                    <f:selectItems value="#{ruleEditPage.suppliers}"/>--%>
+<%--                </h:selectOneMenu>--%>
 
-                <a4j:outputPanel ajaxRendered="#{ruleEditPage.showFilter}">
+                <a4j:outputPanel ajaxRendered="#{ruleEditPage.showFilter}" rendered="#{ruleEditPage.showFilter}">
                     <h:panelGrid styleClass="borderless-grid" columns="2">
-                        <h:outputText escape="true" value="Список контрагентов" styleClass="output-text" />
+                        <h:outputText escape="true" value="Список контрагентов" styleClass="output-text"/>
                         <h:panelGroup styleClass="borderless-div">
+
                             <a4j:commandButton value="..." action="#{mainPage.showContragentListSelectPage}"
                                                reRender="modalContragentListSelectorPanel"
                                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalContragentListSelectorPanel')}.show();"
                                                styleClass="command-link" style="width: 25px;">
-                                <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}" />
-                                <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}" />
-                                <f:setPropertyActionListener value="#{mainPage.clientReportPage.contragentIds}"
-                                                             target="#{mainPage.contragentListSelectPage.selectedIds}" />
+                                <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}"/>
+                                <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}"/>
+                                <f:setPropertyActionListener value="#{ruleEditPage.contragentIds}"
+                                                             target="#{mainPage.contragentListSelectPage.selectedIds}"/>
                             </a4j:commandButton>
-                            <h:outputText value=" {#{mainPage.clientReportPage.contragentFilter}}" escape="true"
-                                          styleClass="output-text" />
+
+                            <h:outputText value=" {#{ruleEditPage.contragentFilter}}" escape="true"
+                                          styleClass="output-text"/>
                         </h:panelGroup>
                     </h:panelGrid>
                 </a4j:outputPanel>
