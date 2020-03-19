@@ -177,6 +177,20 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             } else {
                 List<WtComplexGroupItem> wtComplexGroupItem = null;
                 List<WtAgeGroupItem> wtAgeGroupItem = null;
+                List<Contragent> contragents = new ArrayList<>();
+
+                if (!contragentItems.isEmpty()) {
+                    for (ContragentItem contragentItem : contragentItems) {
+                        try {
+                            Contragent contragent = daoService.getContragentById(contragentItem.idOfContragent);
+                            if (contragent != null) {
+                                contragents.add(contragent);
+                            }
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                }
 
                 if (complexGroupId != null) {
                     wtComplexGroupItem = daoService.getWtComplexGroupItemById(complexGroupId);
@@ -185,22 +199,44 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
                     wtAgeGroupItem = daoService.getWtAgeGroupItemById(ageGroupId);
                 }
 
-                if (wtComplexGroupItem != null && wtAgeGroupItem != null) {
+                if (wtComplexGroupItem != null && wtAgeGroupItem != null && !contragents.isEmpty()) {
                     for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
                         for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
-                            addWtComplex(complexGroupItem, ageGroupItem, contragentItems);
+                            for (Contragent contragent : contragents) {
+                                addWtComplex(complexGroupItem, ageGroupItem, contragent);
+                            }
                         }
                     }
-                } else if (wtComplexGroupItem == null && wtAgeGroupItem != null) {
+                } else if (wtComplexGroupItem == null && wtAgeGroupItem != null && !contragents.isEmpty()) {
                     for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
-                        addWtComplex(null, ageGroupItem, contragentItems);
+                        for (Contragent contragent : contragents) {
+                            addWtComplex(null, ageGroupItem, contragent);
+                        }
                     }
-                } else if (wtComplexGroupItem != null && wtAgeGroupItem == null) {
+                } else if (wtComplexGroupItem != null && wtAgeGroupItem == null && !contragents.isEmpty()) {
                     for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
-                        addWtComplex(complexGroupItem, null, contragentItems);
+                        for (Contragent contragent : contragents) {
+                            addWtComplex(complexGroupItem, null, contragent);
+                        }
                     }
-                } else if (wtComplexGroupItem == null && wtAgeGroupItem == null) {
-                    addWtComplex(null, null, contragentItems);
+                } else if (wtComplexGroupItem != null && wtAgeGroupItem != null && contragents.isEmpty()) {
+                    for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
+                        for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
+                            addWtComplex(complexGroupItem, ageGroupItem, null);
+                        }
+                    }
+                } else if (wtComplexGroupItem == null && wtAgeGroupItem == null  && !contragents.isEmpty()) {
+                    for (Contragent contragent : contragents) {
+                        addWtComplex(null, null, contragent);
+                    }
+                } else if (wtComplexGroupItem != null && wtAgeGroupItem == null  && contragents.isEmpty()) {
+                    for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
+                        addWtComplex(complexGroupItem, null, null);
+                    }
+                } else if (wtComplexGroupItem == null && wtAgeGroupItem != null  && contragents.isEmpty()) {
+                    for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
+                        addWtComplex(null, ageGroupItem, null);
+                    }
                 }
             }
         } else if (complexType == -1 && ageGroup == -1 && contragentItems.isEmpty()) {
@@ -208,19 +244,11 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
         }
     }
 
-    private void addWtComplex(WtComplexGroupItem complexGroupItem, WtAgeGroupItem ageGroupItem, List<ContragentItem> contragentItems) {
+    private void addWtComplex(WtComplexGroupItem complexGroupItem, WtAgeGroupItem ageGroupItem, Contragent contragent) {
+        List<WtComplex> wtComplexes = new ArrayList<>();
+        List<WtComplex> complexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem, contragent);
+        wtComplexes.addAll(complexes);
 
-        List<Contragent> contragentList = new ArrayList<>();
-        try {
-            for (ContragentItem contragentItem : contragentItems) {
-                Contragent contragent = daoService.getContragentById(contragentItem.idOfContragent);
-                contragentList.add(contragent);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-
-        List<WtComplex> wtComplexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem, contragentList);
         for (WtComplex wtComplex : wtComplexes) {
             if (wtComplex != null && wtSelectedComplexes != null) {
                 wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
@@ -283,6 +311,12 @@ public class RuleEditPage extends BasicWorkspacePage implements CategoryListSele
             }
         }
         this.operationor = wtDiscountRule.isOperationOr();
+        for (WtComplex wtComplex : wtDiscountRule.getComplexes()) {
+            if (wtComplex != null && wtSelectedComplexes != null) {
+                wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
+            }
+        }
+
         this.wt = true;
     }
 
