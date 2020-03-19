@@ -137,7 +137,7 @@
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;"/>
                 <f:setPropertyActionListener value="#{wtRuleListPage}"
                                              target="#{confirmDeletePage.listener}"/>
-                <f:setPropertyActionListener value="#{item.entity}"
+                <f:setPropertyActionListener value="#{item.wtEntity}"
                                              target="#{confirmDeletePage.entity}"/>
             </a4j:commandLink>
         </rich:column>

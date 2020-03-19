@@ -65,14 +65,6 @@
             <f:selectItem itemLabel="ИЛИ" itemValue="true"/>
         </h:selectOneListbox>
 
-        <h:outputText value="Комплексы" styleClass="output-text"/>
-        <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;">
-            <h:selectManyCheckbox id="complexs" value="#{wtRuleCreatePag.selectedComplexIds}"
-                                  layout="pageDirection" styleClass="output-text">
-                <f:selectItems value="#{wtRuleCreatePag.availableComplexs}"/>
-            </h:selectManyCheckbox>
-        </h:panelGroup>
-
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="Зарегистрировать правило" action="#{wtRuleCreatePag.createRule}"
                                reRender="ruleCreatePanel" styleClass="command-button"/>

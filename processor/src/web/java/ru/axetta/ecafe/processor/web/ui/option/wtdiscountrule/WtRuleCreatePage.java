@@ -4,12 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.ui.option.wtdiscountrule;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
+import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
-import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryDiscountEditPage;
 import ru.axetta.ecafe.processor.web.ui.option.categorydiscount.CategoryListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.option.categoryorg.CategoryOrgListSelectPage;
 
@@ -337,146 +339,53 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
 
     @Transactional
     public void createRule() throws Exception {
-        if (!wt) {
-            DiscountRule discountRule = new DiscountRule();
 
-            if (discountRate != null && discountRate != 100) {
-                description =
-                        CategoryDiscountEditPage.DISCOUNT_START + discountRate + CategoryDiscountEditPage.DISCOUNT_END;
-            }
+        //// Веб-технолог ////
 
-            String strSubCategory = "";
-            if (this.subCategory > 0) {
-                strSubCategory = SUB_CATEGORIES[this.subCategory];
-            }
-
-            discountRule.setSubCategory(strSubCategory);
-            discountRule.setDescription(description);
-
-            List<Integer> selectedComplex = Arrays.asList(selectedComplexIds);
-            discountRule.setComplex0(selectedComplex.contains(0) ? 1 : 0);
-            discountRule.setComplex1(selectedComplex.contains(1) ? 1 : 0);
-            discountRule.setComplex2(selectedComplex.contains(2) ? 1 : 0);
-            discountRule.setComplex3(selectedComplex.contains(3) ? 1 : 0);
-            discountRule.setComplex4(selectedComplex.contains(4) ? 1 : 0);
-            discountRule.setComplex5(selectedComplex.contains(5) ? 1 : 0);
-            discountRule.setComplex6(selectedComplex.contains(6) ? 1 : 0);
-            discountRule.setComplex7(selectedComplex.contains(7) ? 1 : 0);
-            discountRule.setComplex8(selectedComplex.contains(8) ? 1 : 0);
-            discountRule.setComplex9(selectedComplex.contains(9) ? 1 : 0);
-            discountRule.setComplex10(selectedComplex.contains(10) ? 1 : 0);
-            discountRule.setComplex11(selectedComplex.contains(11) ? 1 : 0);
-            discountRule.setComplex12(selectedComplex.contains(12) ? 1 : 0);
-            discountRule.setComplex13(selectedComplex.contains(13) ? 1 : 0);
-            discountRule.setComplex14(selectedComplex.contains(14) ? 1 : 0);
-            discountRule.setComplex15(selectedComplex.contains(15) ? 1 : 0);
-            discountRule.setComplex16(selectedComplex.contains(16) ? 1 : 0);
-            discountRule.setComplex17(selectedComplex.contains(17) ? 1 : 0);
-            discountRule.setComplex18(selectedComplex.contains(18) ? 1 : 0);
-            discountRule.setComplex19(selectedComplex.contains(19) ? 1 : 0);
-            discountRule.setComplex20(selectedComplex.contains(20) ? 1 : 0);
-            discountRule.setComplex21(selectedComplex.contains(21) ? 1 : 0);
-            discountRule.setComplex22(selectedComplex.contains(22) ? 1 : 0);
-            discountRule.setComplex23(selectedComplex.contains(23) ? 1 : 0);
-            discountRule.setComplex24(selectedComplex.contains(24) ? 1 : 0);
-            discountRule.setComplex25(selectedComplex.contains(25) ? 1 : 0);
-            discountRule.setComplex26(selectedComplex.contains(26) ? 1 : 0);
-            discountRule.setComplex27(selectedComplex.contains(27) ? 1 : 0);
-            discountRule.setComplex28(selectedComplex.contains(28) ? 1 : 0);
-            discountRule.setComplex29(selectedComplex.contains(29) ? 1 : 0);
-            discountRule.setComplex30(selectedComplex.contains(30) ? 1 : 0);
-            discountRule.setComplex31(selectedComplex.contains(31) ? 1 : 0);
-            discountRule.setComplex32(selectedComplex.contains(32) ? 1 : 0);
-            discountRule.setComplex33(selectedComplex.contains(33) ? 1 : 0);
-            discountRule.setComplex34(selectedComplex.contains(34) ? 1 : 0);
-            discountRule.setComplex35(selectedComplex.contains(35) ? 1 : 0);
-            discountRule.setComplex36(selectedComplex.contains(36) ? 1 : 0);
-            discountRule.setComplex37(selectedComplex.contains(37) ? 1 : 0);
-            discountRule.setComplex38(selectedComplex.contains(38) ? 1 : 0);
-            discountRule.setComplex39(selectedComplex.contains(39) ? 1 : 0);
-            discountRule.setComplex40(selectedComplex.contains(40) ? 1 : 0);
-            discountRule.setComplex41(selectedComplex.contains(41) ? 1 : 0);
-            discountRule.setComplex42(selectedComplex.contains(42) ? 1 : 0);
-            discountRule.setComplex43(selectedComplex.contains(43) ? 1 : 0);
-            discountRule.setComplex44(selectedComplex.contains(44) ? 1 : 0);
-            discountRule.setComplex45(selectedComplex.contains(45) ? 1 : 0);
-            discountRule.setComplex46(selectedComplex.contains(46) ? 1 : 0);
-            discountRule.setComplex47(selectedComplex.contains(47) ? 1 : 0);
-            discountRule.setComplex48(selectedComplex.contains(48) ? 1 : 0);
-            discountRule.setComplex49(selectedComplex.contains(49) ? 1 : 0);
-
-            DiscountRule.ComplexBuilder complexBuilder = new DiscountRule.ComplexBuilder(selectedComplex);
-            discountRule.setComplexesMap(complexBuilder.toString());
-
-            discountRule.setPriority(priority);
-            discountRule.setOperationOr(operationOr);
-            discountRule.setCategoryDiscounts(categoryDiscounts);
-
-            Set<CategoryDiscount> categoryDiscountSet = new HashSet<>();
-
-            if (!this.idOfCategoryList.isEmpty()) {
-                List<CategoryDiscount> categoryList = daoService.getCategoryDiscountListWithIds(this.idOfCategoryList);
-                categoryDiscountSet.addAll(categoryList);
-                discountRule.setCategoriesDiscounts(categoryDiscountSet);
-            }
-
-            if (!this.idOfCategoryOrgList.isEmpty()) {
-                List<CategoryOrg> categoryOrgList = daoService.getCategoryOrgWithIds(this.idOfCategoryOrgList);
-                discountRule.getCategoryOrgs().addAll(categoryOrgList);
-            }
-
-            daoService.persistEntity(discountRule);
-            //em.persist(discountRule);
-
-        } else {
-
-            //// Веб-технолог ////
-
-            WtDiscountRule wtDiscountRule = new WtDiscountRule();
-            String strSubCategory = "";
-            if (this.subCategory > 0) {
-                strSubCategory = SUB_CATEGORIES[this.subCategory];
-            }
-
-            if (StringUtils.isNotEmpty(strSubCategory)) {
-                wtDiscountRule.setSubCategory(strSubCategory);
-            }
-
-            wtDiscountRule.setSubCategory(strSubCategory);
-            wtDiscountRule.setDescription(description);
-
-            for (WtSelectedComplex wtSelectedComplex : wtSelectedComplexes) {
-                if (wtSelectedComplex.isChecked()) {
-                    WtComplex complex = wtSelectedComplex.getWtComplex();
-                    wtDiscountRule.getComplexes().add(complex);
-                }
-            }
-
-            wtDiscountRule.setOperationOr(operationOr);
-            wtDiscountRule.setPriority(priority);
-            wtDiscountRule.setPriority(discountRate);
-
-            Set<CategoryDiscount> categoryDiscountSet = new HashSet<>();
-
-            if (!this.idOfCategoryList.isEmpty()) {
-                List<CategoryDiscount> categoryList = daoService.getCategoryDiscountListWithIds(this.idOfCategoryList);
-                categoryDiscountSet.addAll(categoryList);
-                wtDiscountRule.setCategoryDiscounts(categoryDiscountSet);
-            }
-
-            if (!this.idOfCategoryOrgList.isEmpty()) {
-                List<CategoryOrg> categoryOrgList = daoService.getCategoryOrgWithIds(this.idOfCategoryOrgList);
-                wtDiscountRule.getCategoryOrgs().addAll(categoryOrgList);
-            }
-
-            wtDiscountRule.setCategoryDiscounts(categoryDiscountSet);
-
-            //for (CategoryOrg categoryOrg : categoryOrgList) {
-            //    wtDiscountRule.getCategoryOrgs().add(categoryOrg);
-            //}
-
-            daoService.persistEntity(wtDiscountRule);
+        WtDiscountRule wtDiscountRule = new WtDiscountRule();
+        String strSubCategory = "";
+        if (this.subCategory > 0) {
+            strSubCategory = SUB_CATEGORIES[this.subCategory];
         }
+
+        if (StringUtils.isNotEmpty(strSubCategory)) {
+            wtDiscountRule.setSubCategory(strSubCategory);
+        }
+
+        wtDiscountRule.setSubCategory(strSubCategory);
+        wtDiscountRule.setDescription(description);
+
+        for (WtSelectedComplex wtSelectedComplex : wtSelectedComplexes) {
+            if (wtSelectedComplex.isChecked()) {
+                WtComplex complex = wtSelectedComplex.getWtComplex();
+                wtDiscountRule.getComplexes().add(complex);
+            }
+        }
+
+        wtDiscountRule.setOperationOr(operationOr);
+        wtDiscountRule.setPriority(priority);
+        wtDiscountRule.setPriority(discountRate);
+
+        Set<CategoryDiscount> categoryDiscountSet = new HashSet<>();
+
+        if (!this.idOfCategoryList.isEmpty()) {
+            List<CategoryDiscount> categoryList = daoService.getCategoryDiscountListWithIds(this.idOfCategoryList);
+            categoryDiscountSet.addAll(categoryList);
+            wtDiscountRule.setCategoryDiscounts(categoryDiscountSet);
+        }
+
+        if (!this.idOfCategoryOrgList.isEmpty()) {
+            List<CategoryOrg> categoryOrgList = daoService.getCategoryOrgWithIds(this.idOfCategoryOrgList);
+            wtDiscountRule.getCategoryOrgs().addAll(categoryOrgList);
+        }
+
+        wtDiscountRule.setCategoryDiscounts(categoryDiscountSet);
+
+        //for (CategoryOrg categoryOrg : categoryOrgList) {
+        //    wtDiscountRule.getCategoryOrgs().add(categoryOrg);
+        //}
+
+        daoService.persistEntity(wtDiscountRule);
 
         printMessage("Правило зарегистрировано успешно");
     }
