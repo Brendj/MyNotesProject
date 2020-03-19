@@ -73,8 +73,6 @@ public class RuleEditPage extends BasicWorkspacePage
     boolean wt = false;
     boolean showFilter = false;
 
-    private Object currentRule;
-
     //// Веб-технолог ////
 
     public List<SelectItem> getComplexTypes() {
@@ -260,6 +258,7 @@ public class RuleEditPage extends BasicWorkspacePage
             }
         }
         this.operationor = wtDiscountRule.isOperationOr();
+        this.wt = true;
     }
 
     //// Old ////
@@ -332,7 +331,7 @@ public class RuleEditPage extends BasicWorkspacePage
     @Transactional
     public void updateRule() throws Exception {
 
-        if (entity != null) {
+        if (!wt && entity != null) {
             entity = em.merge(entity);
             //CategoryDiscount categoryDiscount = (CategoryDiscount) persistenceSession.load(CategoryDiscount.class, this.categorydiscount.getIdOfCategory());
             // entity.setCategoryDiscount(categoryDiscount);
@@ -400,14 +399,17 @@ public class RuleEditPage extends BasicWorkspacePage
             entity.setComplex47(selectedComplex.contains(47) ? 1 : 0);
             entity.setComplex48(selectedComplex.contains(48) ? 1 : 0);
             entity.setComplex49(selectedComplex.contains(49) ? 1 : 0);
+
             DiscountRule.ComplexBuilder complexBuilder = new DiscountRule.ComplexBuilder(selectedComplex);
             entity.setComplexesMap(complexBuilder.toString());
 
             entity.setPriority(priority);
             entity.setOperationOr(operationor);
             //entity.setCategoryDiscounts(categoryDiscounts);
+
             this.categoryDiscountSet = new HashSet<CategoryDiscount>();
             entity.getCategoriesDiscounts().clear();
+
             //if (this.idOfCategoryList.isEmpty()) {
             //    for (CategoryDiscount categoryDiscount: entity.getCategoriesDiscounts()){
             //        this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
@@ -439,7 +441,7 @@ public class RuleEditPage extends BasicWorkspacePage
             fill(entity);
         }
 
-        if (wtEntity != null) {
+        if (wt && wtEntity != null) {
             //// Веб-технолог ////
             wtEntity = em.merge(wtEntity);
 
@@ -682,7 +684,7 @@ public class RuleEditPage extends BasicWorkspacePage
         this.priority = discountRule.getPriority();
 
         this.idOfCategoryList.clear();
-        if (!discountRule.getCategoriesDiscounts().isEmpty()) {
+        if (!discountRule.getCategoryDiscounts().isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
             for (CategoryDiscount categoryDiscount : discountRule.getCategoriesDiscounts()) {
                 stringBuilder.append(categoryDiscount.getCategoryName());
@@ -692,6 +694,7 @@ public class RuleEditPage extends BasicWorkspacePage
             this.categoryDiscounts = stringBuilder.toString();
         }
         this.idOfCategoryOrgList.clear();
+
         if (!discountRule.getCategoryOrgs().isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
             for (CategoryOrg categoryOrg : discountRule.getCategoryOrgs()) {
@@ -715,7 +718,7 @@ public class RuleEditPage extends BasicWorkspacePage
             DiscountRule discountRule = em.merge(entity);
 
             StringBuilder categoryFilter = new StringBuilder();
-            if (!discountRule.getCategoriesDiscounts().isEmpty()) {
+            if (!discountRule.getCategoryDiscounts().isEmpty()) {
                 for (CategoryDiscount categoryDiscount : discountRule.getCategoriesDiscounts()) {
                     this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
                     categoryFilter.append(categoryDiscount.getCategoryName());
@@ -962,16 +965,6 @@ public class RuleEditPage extends BasicWorkspacePage
 
     public void setShowFilter(boolean showFilter) {
         this.showFilter = showFilter;
-    }
-
-    public Object getCurrentRule() {
-        if (entity != null) {
-            return entity;
-        }
-        if (wtEntity != null) {
-            return wtEntity;
-        }
-        return null;
     }
 
     public int getSupplier() {
