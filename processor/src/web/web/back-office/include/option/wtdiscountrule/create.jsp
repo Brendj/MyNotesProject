@@ -14,8 +14,8 @@
 } %>
 
 <%-- Панель создания правила --%>
-<%--@elvariable id="wtRuleCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleCreatePage"--%>
-<h:panelGrid id="ruleCreatePanel" binding="#{wtRuleCreatePage.pageComponent}"
+<%--@elvariable id="wtRuleCreatePag" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleCreatePag"--%>
+<h:panelGrid id="ruleCreatePanel" binding="#{wtRuleCreatePag.pageComponent}"
              styleClass="borderless-grid borderless-grid-align-top" columns="2">
 
     <h:panelGrid styleClass="borderless-grid">
@@ -27,7 +27,7 @@
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;"/>
             <h:outputText styleClass="output-text" id="categoryListFilter" escape="true"
-                          value=" {#{wtRuleCreatePage.filter}}"/>
+                          value=" {#{wtRuleCreatePag.filter}}"/>
         </h:panelGroup>
 
         <h:outputText escape="true" value="Категории организаций" styleClass="output-text"/>
@@ -38,43 +38,43 @@
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;"/>
             <h:outputText styleClass="output-text" id="categoryOrgListFilter" escape="true"
-                          value=" {#{wtRuleCreatePage.filterOrg}}"/>
+                          value=" {#{wtRuleCreatePag.filterOrg}}"/>
         </h:panelGroup>
 
 
         <h:outputText escape="true" value="Супер-категория" styleClass="output-text required-field"/>
-        <h:selectOneMenu id="group" value="#{wtRuleCreatePage.subCategory}" style="width:300px;" styleClass="groupSelect">
-            <f:selectItems value="#{wtRuleCreatePage.subCategories}"/>
+        <h:selectOneMenu id="group" value="#{wtRuleCreatePag.subCategory}" style="width:300px;" styleClass="groupSelect">
+            <f:selectItems value="#{wtRuleCreatePag.subCategories}"/>
         </h:selectOneMenu>
         
         <h:outputText escape="true" value="Описание" styleClass="output-text required-field"/>
-        <h:inputText value="#{wtRuleCreatePage.description}" maxlength="32" styleClass="input-text"/>
+        <h:inputText value="#{wtRuleCreatePag.description}" maxlength="32" styleClass="input-text"/>
         
         <h:outputText escape="true" value="Ставка дисконтирования" styleClass="output-text"/>
         <h:panelGrid columns="2">
-            <h:inputText value="#{wtRuleCreatePage.discountRate}" maxlength="3" styleClass="input-text"/>
+            <h:inputText value="#{wtRuleCreatePag.discountRate}" maxlength="3" styleClass="input-text"/>
             <h:outputText escape="true" value="%" styleClass="output-text"/>
         </h:panelGrid>
         
         <h:outputText escape="true" value="Приоритет" styleClass="output-text required-field"/>
-        <h:inputText value="#{wtRuleCreatePage.priority}" maxlength="11" styleClass="input-text"/>
+        <h:inputText value="#{wtRuleCreatePag.priority}" maxlength="11" styleClass="input-text"/>
         
         <h:outputText escape="true" value="Тип условия" styleClass="output-text"/>
-        <h:selectOneListbox value="#{wtRuleCreatePage.operationOr}" size="1">
+        <h:selectOneListbox value="#{wtRuleCreatePag.operationOr}" size="1">
             <f:selectItem itemLabel="И" itemValue="false"/>
             <f:selectItem itemLabel="ИЛИ" itemValue="true"/>
         </h:selectOneListbox>
 
         <h:outputText value="Комплексы" styleClass="output-text"/>
         <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;">
-            <h:selectManyCheckbox id="complexs" value="#{wtRuleCreatePage.selectedComplexIds}"
+            <h:selectManyCheckbox id="complexs" value="#{wtRuleCreatePag.selectedComplexIds}"
                                   layout="pageDirection" styleClass="output-text">
-                <f:selectItems value="#{wtRuleCreatePage.availableComplexs}"/>
+                <f:selectItems value="#{wtRuleCreatePag.availableComplexs}"/>
             </h:selectManyCheckbox>
         </h:panelGroup>
 
         <h:panelGrid styleClass="borderless-grid" columns="2">
-            <a4j:commandButton value="Зарегистрировать правило" action="#{wtRuleCreatePage.createRule}"
+            <a4j:commandButton value="Зарегистрировать правило" action="#{wtRuleCreatePag.createRule}"
                                reRender="ruleCreatePanel" styleClass="command-button"/>
         </h:panelGrid>
         <h:panelGrid styleClass="borderless-grid">
@@ -91,35 +91,35 @@
                 <h:outputText escape="true" value="Использовать правило для Web-АРМа" styleClass="output-text"/>
 
                 <a4j:commandLink reRender="filter">
-                    <f:setPropertyActionListener value="#{wtRuleCreatePage}" target="#{wtRuleCreatePage.wt}"/>
-                    <h:selectBooleanCheckbox id="arm" value="#{wtRuleCreatePage.wt}"/>
+                    <f:setPropertyActionListener value="#{wtRuleCreatePag}" target="#{wtRuleCreatePag.wt}"/>
+                    <h:selectBooleanCheckbox id="arm" value="#{wtRuleCreatePag.wt}"/>
                 </a4j:commandLink>
 
                 <h:outputText escape="true" value="Тип комплекса" styleClass="output-text"
-                              rendered="#{wtRuleCreatePage.showFilter}"/>
+                              rendered="#{wtRuleCreatePag.showFilter}"/>
 
-                <h:selectOneMenu id="typeMenu" value="#{wtRuleCreatePage.complexType}"
-                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleCreatePage.showFilter}">
-                    <f:selectItems value="#{wtRuleCreatePage.complexTypes}"/>
+                <h:selectOneMenu id="typeMenu" value="#{wtRuleCreatePag.complexType}"
+                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleCreatePag.showFilter}">
+                    <f:selectItems value="#{wtRuleCreatePag.complexTypes}"/>
                 </h:selectOneMenu>
 
                 <h:outputText escape="true" value="Возрастная категория" styleClass="output-text"
-                              rendered="#{wtRuleCreatePage.showFilter}"/>
+                              rendered="#{wtRuleCreatePag.showFilter}"/>
 
-                <h:selectOneMenu id="ageMenu" value="#{wtRuleCreatePage.ageGroup}"
-                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleCreatePage.showFilter}">
-                    <f:selectItems value="#{wtRuleCreatePage.ageGroups}"/>
+                <h:selectOneMenu id="ageMenu" value="#{wtRuleCreatePag.ageGroup}"
+                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleCreatePag.showFilter}">
+                    <f:selectItems value="#{wtRuleCreatePag.ageGroups}"/>
                 </h:selectOneMenu>
 
 <%--                <h:outputText escape="true" value="Поставщик" styleClass="output-text"--%>
-<%--                              rendered="#{wtRuleCreatePage.showFilter}"/>--%>
+<%--                              rendered="#{wtRuleCreatePag.showFilter}"/>--%>
 
-<%--                <h:selectOneMenu id="supplierMenu" value="#{wtRuleCreatePage.supplier}"--%>
-<%--                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleCreatePage.showFilter}">--%>
-<%--                    <f:selectItems value="#{wtRuleCreatePage.suppliers}"/>--%>
+<%--                <h:selectOneMenu id="supplierMenu" value="#{wtRuleCreatePag.supplier}"--%>
+<%--                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleCreatePag.showFilter}">--%>
+<%--                    <f:selectItems value="#{wtRuleCreatePag.suppliers}"/>--%>
 <%--                </h:selectOneMenu>--%>
 
-                <a4j:outputPanel ajaxRendered="#{wtRuleEditPage.showFilter}" rendered="#{wtRuleCreatePage.showFilter}">
+                <a4j:outputPanel ajaxRendered="#{wtRuleEditPag.showFilter}" rendered="#{wtRuleCreatePag.showFilter}">
                     <h:panelGrid styleClass="borderless-grid" columns="2">
                         <h:outputText escape="true" value="Список контрагентов" styleClass="output-text"/>
                         <h:panelGroup styleClass="borderless-div">
@@ -130,11 +130,11 @@
                                                styleClass="command-link" style="width: 25px;">
                                 <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}"/>
                                 <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}"/>
-                                <f:setPropertyActionListener value="#{wtRuleCreatePage.contragentIds}"
+                                <f:setPropertyActionListener value="#{wtRuleCreatePag.contragentIds}"
                                                              target="#{mainPage.contragentListSelectPage.selectedIds}"/>
                             </a4j:commandButton>
 
-                            <h:outputText value=" {#{wtRuleCreatePage.contragentFilter}}" escape="true"
+                            <h:outputText value=" {#{wtRuleCreatePag.contragentFilter}}" escape="true"
                                           styleClass="output-text"/>
                         </h:panelGroup>
                     </h:panelGrid>
@@ -143,7 +143,7 @@
             </h:panelGrid>
 
             <h:panelGrid columns="2" styleClass="borderless-grid">
-                <a4j:commandButton value="Отобразить" action="#{wtRuleCreatePage.fillWtSelectedComplexes()}"
+                <a4j:commandButton value="Отобразить" action="#{wtRuleCreatePag.fillWtSelectedComplexes()}"
                                    reRender="workspaceTogglePanel"
                                    styleClass="command-button"/>
             </h:panelGrid>
@@ -159,7 +159,7 @@
                 </f:facet>
             </a4j:status>
 
-            <rich:dataTable id="wtComplexesTable" value="#{wtRuleCreatePage.wtSelectedComplexes}"
+            <rich:dataTable id="wtComplexesTable" value="#{wtRuleCreatePag.wtSelectedComplexes}"
                             var="complex" rows="15" footerClass="data-table-footer" rowKeyVar="rowItemKey">
                 <f:facet name="header">
                     <rich:columnGroup>

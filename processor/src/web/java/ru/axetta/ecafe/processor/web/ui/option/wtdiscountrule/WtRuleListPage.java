@@ -56,7 +56,7 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
     }
 
     public String getPageFilename() {
-        return "option/discountrule/list";
+        return "option/wtdiscountrule/list";
     }
 
     public String getPageTitle() {

@@ -1,7 +1,6 @@
-
 <%@ page contentType="text/html; charset=UTF-8" language="java" pageEncoding="UTF-8" %>
 <%--
-  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  ~ Copyright (c) 2011. Axetta LLC. All Rights Reserved.
   --%>
 
 <%@ taglib prefix="f" uri="http://java.sun.com/jsf/core" %>
@@ -15,7 +14,7 @@
     return;
 } %>
 <%--@elvariable id="wtRuleListPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleListPage"--%>
-<%--@elvariable id="wtRuleListPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleListPage"--%>
+<%--@elvariable id="wtRuleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleEditPage"--%>
 <h:panelGrid id="ruleListPanel" binding="#{wtRuleListPage.pageComponent}" styleClass="borderless-grid">
 
     <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -125,14 +124,9 @@
         </rich:column>
 
         <rich:column>
-            <a4j:commandLink reRender="workspaceForm" action="#{wtRuleListPage.show}" styleClass="command-link">
+            <a4j:commandLink reRender="workspaceForm" action="#{wtRuleEditPage.show}" styleClass="command-link">
                 <h:graphicImage value="/images/16x16/edit.png" style="border: 0;"/>
-                <f:setPropertyActionListener value="#{item.entity}" target="#{wtRuleListPage.entity}"/>
-            </a4j:commandLink>
-
-            <a4j:commandLink reRender="workspaceForm" action="#{wtRuleListPage.show}" styleClass="command-link">
-                <h:graphicImage value="/images/16x16/edit.png" style="border: 0;"/>
-                <f:setPropertyActionListener value="#{item.wtEntity}" target="#{wtRuleListPage.wtEntity}"/>
+                <f:setPropertyActionListener value="#{item.wtEntity}" target="#{wtRuleEditPage.wtEntity}"/>
             </a4j:commandLink>
 
         </rich:column>

@@ -148,7 +148,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     }
 
     public String getPageFilename() {
-        return "option/discountrule/create";
+        return "option/wtdiscountrule/create";
     }
 
     //// Веб-технолог ////

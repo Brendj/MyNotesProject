@@ -15,8 +15,8 @@
 } %>
 
 <%-- Панель редактирования правила --%>
-<%--@elvariable id="wtRuleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleEditPage"--%>
-<h:panelGrid id="ruleEditPanel" binding="#{wtRuleEditPage.pageComponent}"
+<%--@elvariable id="wtRuleEditPag" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleEditPag"--%>
+<h:panelGrid id="ruleEditPanel" binding="#{wtRuleEditPag.pageComponent}"
              styleClass="borderless-grid borderless-grid-align-top" columns="2">
 
     <h:panelGrid styleClass="borderless-grid">
@@ -26,11 +26,11 @@
                                reRender="modalCategoryListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="#{wtRuleEditPage.idOfCategoryListString}"
+                <f:setPropertyActionListener value="#{wtRuleEditPag.idOfCategoryListString}"
                                              target="#{mainPage.categoryFilterOfSelectCategoryListSelectPage}"/>
             </a4j:commandButton>
             <h:outputText styleClass="output-text" id="categoryListFilter" escape="true"
-                          value=" {#{wtRuleEditPage.filter}}"/>
+                          value=" {#{wtRuleEditPag.filter}}"/>
         </h:panelGroup>
 
         <h:outputText escape="true" value="Категории организаций" styleClass="output-text"/>
@@ -40,48 +40,48 @@
                                reRender="modalCategoryOrgListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
-                <f:setPropertyActionListener value="#{wtRuleEditPage.idOfCategoryOrgListString}"
+                <f:setPropertyActionListener value="#{wtRuleEditPag.idOfCategoryOrgListString}"
                                              target="#{mainPage.categoryOrgFilterOfSelectCategoryOrgListSelectPage}"/>
             </a4j:commandButton>
             <h:outputText styleClass="output-text" id="categoryOrgListFilter" escape="true"
-                          value=" {#{wtRuleEditPage.filterOrg}}"/>
+                          value=" {#{wtRuleEditPag.filterOrg}}"/>
         </h:panelGroup>
 
         <h:outputText escape="true" value="Супер-категория" styleClass="output-text required-field"/>
-        <h:selectOneMenu id="group" value="#{wtRuleEditPage.subCategory}" style="width:300px;" styleClass="groupSelect">
-            <f:selectItems value="#{wtRuleEditPage.subCategories}"/>
+        <h:selectOneMenu id="group" value="#{wtRuleEditPag.subCategory}" style="width:300px;" styleClass="groupSelect">
+            <f:selectItems value="#{wtRuleEditPag.subCategories}"/>
         </h:selectOneMenu>
 
         <h:outputText escape="true" value="Описание" styleClass="output-text required-field"/>
-        <h:inputText value="#{wtRuleEditPage.description}" maxlength="99" size="40" styleClass="input-text"/>
+        <h:inputText value="#{wtRuleEditPag.description}" maxlength="99" size="40" styleClass="input-text"/>
 
         <h:outputText escape="true" value="Ставка дисконтирования" styleClass="output-text"/>
         <h:panelGrid columns="2">
-            <h:inputText value="#{wtRuleEditPage.discountRate}" maxlength="3" styleClass="input-text"/>
+            <h:inputText value="#{wtRuleEditPag.discountRate}" maxlength="3" styleClass="input-text"/>
             <h:outputText escape="true" value="%" styleClass="output-text"/>
         </h:panelGrid>
 
         <h:outputText escape="true" value="Приоритет" styleClass="output-text required-field"/>
-        <h:inputText value="#{wtRuleEditPage.priority}" maxlength="11" styleClass="input-text"/>
+        <h:inputText value="#{wtRuleEditPag.priority}" maxlength="11" styleClass="input-text"/>
         <h:outputText escape="true" value="Объединение комплексов" styleClass="output-text"/>
-        <h:selectOneListbox value="#{wtRuleEditPage.operationor}" size="1">
+        <h:selectOneListbox value="#{wtRuleEditPag.operationor}" size="1">
             <f:selectItem itemLabel="И" itemValue="false"/>
             <f:selectItem itemLabel="ИЛИ" itemValue="true"/>
         </h:selectOneListbox>
 
         <h:outputText value="Комплексы" styleClass="output-text"/>
         <h:panelGroup layout="block" style="height: 300px; overflow-y: scroll;">
-            <h:selectManyCheckbox id="complexs" value="#{wtRuleEditPage.selectedComplexIds}" layout="pageDirection"
+            <h:selectManyCheckbox id="complexs" value="#{wtRuleEditPag.selectedComplexIds}" layout="pageDirection"
                                   styleClass="output-text">
-                <f:selectItems value="#{wtRuleEditPage.availableComplexs}"/>
+                <f:selectItems value="#{wtRuleEditPag.availableComplexs}"/>
             </h:selectManyCheckbox>
         </h:panelGroup>
 
 
         <h:panelGrid columns="4" styleClass="borderless-grid">
-            <a4j:commandButton value="Сохранить" action="#{wtRuleEditPage.updateRule}" reRender="workspaceTogglePanel"
+            <a4j:commandButton value="Сохранить" action="#{wtRuleEditPag.updateRule}" reRender="workspaceTogglePanel"
                                styleClass="command-button"/>
-            <a4j:commandButton value="Восстановить" action="#{wtRuleEditPage.reload}" reRender="workspaceTogglePanel"
+            <a4j:commandButton value="Восстановить" action="#{wtRuleEditPag.reload}" reRender="workspaceTogglePanel"
                                ajaxSingle="true" styleClass="command-button"/>
         </h:panelGrid>
 
@@ -99,35 +99,35 @@
                 <h:outputText escape="true" value="Использовать правило для Web-АРМа" styleClass="output-text"/>
 
                 <a4j:commandLink reRender="filter">
-                    <f:setPropertyActionListener value="#{wtRuleEditPage}" target="#{wtRuleEditPage.wt}"/>
-                    <h:selectBooleanCheckbox id="arm" value="#{wtRuleEditPage.wt}"/>
+                    <f:setPropertyActionListener value="#{wtRuleEditPag}" target="#{wtRuleEditPag.wt}"/>
+                    <h:selectBooleanCheckbox id="arm" value="#{wtRuleEditPag.wt}"/>
                 </a4j:commandLink>
 
                 <h:outputText escape="true" value="Тип комплекса" styleClass="output-text"
-                              rendered="#{wtRuleEditPage.showFilter}"/>
+                              rendered="#{wtRuleEditPag.showFilter}"/>
 
-                <h:selectOneMenu id="typeMenu" value="#{wtRuleEditPage.complexType}"
-                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleEditPage.showFilter}">
-                    <f:selectItems value="#{wtRuleEditPage.complexTypes}"/>
+                <h:selectOneMenu id="typeMenu" value="#{wtRuleEditPag.complexType}"
+                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleEditPag.showFilter}">
+                    <f:selectItems value="#{wtRuleEditPag.complexTypes}"/>
                 </h:selectOneMenu>
 
                 <h:outputText escape="true" value="Возрастная категория" styleClass="output-text"
-                              rendered="#{wtRuleEditPage.showFilter}"/>
+                              rendered="#{wtRuleEditPag.showFilter}"/>
 
-                <h:selectOneMenu id="ageMenu" value="#{wtRuleEditPage.ageGroup}"
-                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleEditPage.showFilter}">
-                    <f:selectItems value="#{wtRuleEditPage.ageGroups}"/>
+                <h:selectOneMenu id="ageMenu" value="#{wtRuleEditPag.ageGroup}"
+                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleEditPag.showFilter}">
+                    <f:selectItems value="#{wtRuleEditPag.ageGroups}"/>
                 </h:selectOneMenu>
 
 <%--                <h:outputText escape="true" value="Поставщик" styleClass="output-text"--%>
-<%--                              rendered="#{wtRuleEditPage.showFilter}"/>--%>
+<%--                              rendered="#{wtRuleEditPag.showFilter}"/>--%>
 
-<%--                <h:selectOneMenu id="supplierMenu" value="#{wtRuleEditPage.supplier}"--%>
-<%--                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleEditPage.showFilter}">--%>
-<%--                    <f:selectItems value="#{wtRuleEditPage.suppliers}"/>--%>
+<%--                <h:selectOneMenu id="supplierMenu" value="#{wtRuleEditPag.supplier}"--%>
+<%--                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleEditPag.showFilter}">--%>
+<%--                    <f:selectItems value="#{wtRuleEditPag.suppliers}"/>--%>
 <%--                </h:selectOneMenu>--%>
 
-                <a4j:outputPanel ajaxRendered="#{wtRuleEditPage.showFilter}" rendered="#{wtRuleEditPage.showFilter}">
+                <a4j:outputPanel ajaxRendered="#{wtRuleEditPag.showFilter}" rendered="#{wtRuleEditPag.showFilter}">
                     <h:panelGrid styleClass="borderless-grid" columns="2">
                         <h:outputText escape="true" value="Список контрагентов" styleClass="output-text"/>
                         <h:panelGroup styleClass="borderless-div">
@@ -138,11 +138,11 @@
                                                styleClass="command-link" style="width: 25px;">
                                 <f:setPropertyActionListener value="0" target="#{mainPage.multiContrFlag}"/>
                                 <f:setPropertyActionListener value="2" target="#{mainPage.classTypes}"/>
-                                <f:setPropertyActionListener value="#{wtRuleEditPage.contragentIds}"
+                                <f:setPropertyActionListener value="#{wtRuleEditPag.contragentIds}"
                                                              target="#{mainPage.contragentListSelectPage.selectedIds}"/>
                             </a4j:commandButton>
 
-                            <h:outputText value=" {#{wtRuleEditPage.contragentFilter}}" escape="true"
+                            <h:outputText value=" {#{wtRuleEditPag.contragentFilter}}" escape="true"
                                           styleClass="output-text"/>
                         </h:panelGroup>
                     </h:panelGrid>
@@ -151,7 +151,7 @@
             </h:panelGrid>
 
             <h:panelGrid columns="2" styleClass="borderless-grid">
-                <a4j:commandButton value="Отобразить" action="#{wtRuleEditPage.fillWtSelectedComplexes()}"
+                <a4j:commandButton value="Отобразить" action="#{wtRuleEditPag.fillWtSelectedComplexes()}"
                                    reRender="workspaceTogglePanel"
                                    styleClass="command-button"/>
             </h:panelGrid>
@@ -167,7 +167,7 @@
                 </f:facet>
             </a4j:status>
 
-            <rich:dataTable id="wtComplexesTable" value="#{wtRuleEditPage.wtSelectedComplexes}"
+            <rich:dataTable id="wtComplexesTable" value="#{wtRuleEditPag.wtSelectedComplexes}"
                             var="complex" rows="15" footerClass="data-table-footer" rowKeyVar="rowItemKey">
                 <f:facet name="header">
                     <rich:columnGroup>

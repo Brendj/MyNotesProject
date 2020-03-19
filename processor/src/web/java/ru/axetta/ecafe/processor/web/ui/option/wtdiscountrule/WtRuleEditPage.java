@@ -61,7 +61,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
     private Set<CategoryOrg> categoryOrgs;
 
     public String getPageFilename() {
-        return "option/discountrule/edit";
+        return "option/wtdiscountrule/edit";
     }
 
     // Веб-технолог
