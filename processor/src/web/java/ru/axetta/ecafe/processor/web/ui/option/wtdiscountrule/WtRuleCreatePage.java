@@ -79,8 +79,8 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     private Map<Integer, Long> complexTypeMap;
     private Map<Integer, Long> ageGroupMap;
     private Map<Integer, Long> supplierMap;
-    boolean wt = false;
-    boolean showFilter = false;
+    private boolean wt = true;
+    private boolean showFilter = true;
 
     private String contragentFilter = "Не выбрано";
     private String contragentIds;
@@ -316,10 +316,8 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     }
 
     private void addWtComplex(WtComplexGroupItem complexGroupItem, WtAgeGroupItem ageGroupItem, Contragent contragent) {
-        List<WtComplex> wtComplexes = new ArrayList<>();
         List<WtComplex> complexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem, contragent);
-        wtComplexes.addAll(complexes);
-
+        List<WtComplex> wtComplexes = new ArrayList<>(complexes);
         for (WtComplex wtComplex : wtComplexes) {
             if (wtComplex != null && wtSelectedComplexes != null) {
                 wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));

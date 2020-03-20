@@ -34,7 +34,9 @@ import java.util.*;
 @Component
 @Scope("session")
 public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeletePage.Listener,
-        CategoryListSelectPage.CompleteHandlerList, CategoryOrgListSelectPage.CompleteHandlerList {
+        CategoryListSelectPage.CompleteHandlerList,
+        CategoryOrgListSelectPage.CompleteHandlerList {
+
     private List<Item> items = Collections.emptyList();
     private String categoryDiscounts;
     private List<Long> idOfCategoryList = new ArrayList<>();
@@ -90,68 +92,70 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
         for (WtDiscountRule wtDiscountRule : wtDiscountRuleList) {
 
             List<Long> categoriesDiscountsIds = new ArrayList<>();
-            for(CategoryDiscount categoryDiscount : wtDiscountRule.getCategoryDiscounts()){
+            for (CategoryDiscount categoryDiscount : wtDiscountRule.getCategoryDiscounts()) {
                 categoriesDiscountsIds.add(categoryDiscount.getIdOfCategoryDiscount());
             }
-            if(!idOfCategoryList.isEmpty() && Collections.disjoint(idOfCategoryList, categoriesDiscountsIds)){
+            if (!idOfCategoryList.isEmpty() && Collections.disjoint(idOfCategoryList, categoriesDiscountsIds)) {
                 continue;
             }
 
             List<Long> categoriesDiscountsOrgIds = new ArrayList<>();
-            for(CategoryOrg categoryOrg : wtDiscountRule.getCategoryOrgs()){
+            for (CategoryOrg categoryOrg : wtDiscountRule.getCategoryOrgs()) {
                 categoriesDiscountsOrgIds.add(categoryOrg.getIdOfCategoryOrg());
             }
 
-            if(!idOfCategoryOrgList.isEmpty() && Collections.disjoint(idOfCategoryOrgList, categoriesDiscountsOrgIds)){
+            if (!idOfCategoryOrgList.isEmpty() && Collections
+                    .disjoint(idOfCategoryOrgList, categoriesDiscountsOrgIds)) {
                 continue;
             }
 
-            //if(subCategory != 0 && !wtDiscountRule.getSubCategory().equals(RuleCreatePage.SUB_CATEGORIES[subCategory])){
-            //    continue;
-            //}
+            if (wtDiscountRule.getSubCategory() != null && WtRuleCreatePage.SUB_CATEGORIES[subCategory] != null){
+                if (subCategory != 0 && !wtDiscountRule.getSubCategory()
+                        .equals(WtRuleCreatePage.SUB_CATEGORIES[subCategory])) {
+                    continue;
+                }
+            }
 
             Item item = new Item(wtDiscountRule);
 
             if (!wtDiscountRule.getCategoryDiscounts().isEmpty()) {
                 StringBuilder stringBuilder = new StringBuilder();
-                for (CategoryDiscount categoryDiscount: wtDiscountRule.getCategoryDiscounts()){
+                for (CategoryDiscount categoryDiscount : wtDiscountRule.getCategoryDiscounts()) {
                     stringBuilder.append(categoryDiscount.getCategoryName());
                     stringBuilder.append("; ");
                 }
-                item.setCategoryDiscounts(stringBuilder.substring(0, stringBuilder.length()-1));
+                item.setCategoryDiscounts(stringBuilder.substring(0, stringBuilder.length() - 1));
             }
             item.setWtEntity(wtDiscountRule);
 
-            if(!wtDiscountRule.getCategoryOrgs().isEmpty()){
+            if (!wtDiscountRule.getCategoryOrgs().isEmpty()) {
                 StringBuilder stringBuilder = new StringBuilder();
-                for(CategoryOrg categoryOrg: wtDiscountRule.getCategoryOrgs()){
+                for (CategoryOrg categoryOrg : wtDiscountRule.getCategoryOrgs()) {
                     stringBuilder.append(categoryOrg.getCategoryName());
                     stringBuilder.append(";");
                 }
-                item.setCategoryOrgs(stringBuilder.substring(0, stringBuilder.length()-1));
+                item.setCategoryOrgs(stringBuilder.substring(0, stringBuilder.length() - 1));
             }
-
             items.add(item);
-        }
-
+        } this.items.clear();
         this.items = items;
     }
 
     public void completeCategoryListSelection(Map<Long, String> categoryMap) throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
-        if(null != categoryMap) {
+        if (null != categoryMap) {
             idOfCategoryList = new ArrayList<Long>();
-            if(categoryMap.isEmpty()){
+            if (categoryMap.isEmpty()) {
                 filter = "Не выбрано";
             } else {
-                filter="";
-                for(Long idOfCategory: categoryMap.keySet()){
+                filter = "";
+                for (Long idOfCategory : categoryMap.keySet()) {
                     idOfCategoryList.add(idOfCategory);
-                    filter=filter.concat(categoryMap.get(idOfCategory)+ "; ");
+                    filter = filter.concat(categoryMap.get(idOfCategory) + "; ");
                 }
-                filter = filter.substring(0,filter.length()-1);
-                categoryDiscounts=idOfCategoryList.toString();
-                categoryDiscounts=categoryDiscounts.substring(1,categoryDiscounts.length()-1);
+                filter = filter.substring(0, filter.length() - 1);
+                categoryDiscounts = idOfCategoryList.toString();
+                categoryDiscounts = categoryDiscounts.substring(1, categoryDiscounts.length() - 1);
             }
 
         }
@@ -159,27 +163,26 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
 
     public void completeCategoryOrgListSelection(Map<Long, String> categoryOrgMap) throws Exception {
         //To change body of implemented methods use File | Settings | File Templates.
-        if(null != categoryOrgMap) {
+        if (null != categoryOrgMap) {
             idOfCategoryOrgList = new ArrayList<Long>();
-            if(categoryOrgMap.isEmpty()){
+            if (categoryOrgMap.isEmpty()) {
                 filterOrg = "Не выбрано";
 
             } else {
-                filterOrg="";
-                for(Long idOfCategoryOrg: categoryOrgMap.keySet()){
+                filterOrg = "";
+                for (Long idOfCategoryOrg : categoryOrgMap.keySet()) {
                     idOfCategoryOrgList.add(idOfCategoryOrg);
-                    filterOrg=filterOrg.concat(categoryOrgMap.get(idOfCategoryOrg)+ "; ");
+                    filterOrg = filterOrg.concat(categoryOrgMap.get(idOfCategoryOrg) + "; ");
                 }
-                filterOrg = filterOrg.substring(0,filterOrg.length()-1);
+                filterOrg = filterOrg.substring(0, filterOrg.length() - 1);
             }
-
         }
     }
 
     public List<SelectItem> getSubCategories() throws Exception {
         List<SelectItem> res = new ArrayList<SelectItem>();
         res.add(new SelectItem("", ""));
-        for (int i=0; i< WtRuleCreatePage.SUB_CATEGORIES.length; i++) {
+        for (int i = 0; i < WtRuleCreatePage.SUB_CATEGORIES.length; i++) {
             String group = WtRuleCreatePage.SUB_CATEGORIES[i];
             res.add(new SelectItem(i, group));
         }
@@ -231,16 +234,17 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
     }
 
     public String getIdOfCategoryOrgListString() {
-        return idOfCategoryOrgList.toString().replaceAll("[^(0-9-),]","");
+        return idOfCategoryOrgList.toString().replaceAll("[^(0-9-),]", "");
     }
 
     public String getIdOfCategoryListString() {
-        return idOfCategoryList.toString().replaceAll("[^(0-9-),]","");
+        return idOfCategoryList.toString().replaceAll("[^(0-9-),]", "");
     }
 
 
     /// class Item ///
     public static class Item {
+
         WtDiscountRule wtEntity;
 
         private long idOfRule;
@@ -252,6 +256,14 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
         private List<CategoryOrg> categoryOrgList;
         private String subCategory;
         private int priority;
+
+        public WtDiscountRule getWtEntity() {
+            return wtEntity;
+        }
+
+        public void setWtEntity(WtDiscountRule wtEntity) {
+            this.wtEntity = wtEntity;
+        }
 
         public long getIdOfRule() {
             return idOfRule;
@@ -325,14 +337,6 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
             this.priority = priority;
         }
 
-        public WtDiscountRule getWtEntity() {
-            return wtEntity;
-        }
-
-        public void setWtEntity(WtDiscountRule wtEntity) {
-            this.wtEntity = wtEntity;
-        }
-
         public Item(WtDiscountRule wtDiscountRule) {
 
             this.idOfRule = wtDiscountRule.getIdOfRule();
@@ -341,18 +345,17 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
             this.operationor = wtDiscountRule.isOperationOr();
 
             this.categoryDiscountList = new LinkedList<>();
-            if(!wtDiscountRule.getCategoryDiscounts().isEmpty()){
+            if (!wtDiscountRule.getCategoryDiscounts().isEmpty()) {
                 StringBuilder stringBuilder = new StringBuilder();
-                for (CategoryDiscount categoryDiscount: wtDiscountRule.getCategoryDiscounts()){
+                for (CategoryDiscount categoryDiscount : wtDiscountRule.getCategoryDiscounts()) {
                     this.categoryDiscountList.add(categoryDiscount);
                     stringBuilder.append(categoryDiscount.getCategoryName());
                     stringBuilder.append(",");
                 }
-                this.categoryDiscounts = stringBuilder.substring(0, stringBuilder.length()-1);
+                this.categoryDiscounts = stringBuilder.substring(0, stringBuilder.length() - 1);
             }
-
             this.categoryOrgList = new LinkedList<>();
-            if(!wtDiscountRule.getCategoryOrgs().isEmpty()){
+            if (!wtDiscountRule.getCategoryOrgs().isEmpty()) {
                 this.categoryOrgList.addAll(wtDiscountRule.getCategoryOrgs());
             }
             subCategory = wtDiscountRule.getSubCategory();
