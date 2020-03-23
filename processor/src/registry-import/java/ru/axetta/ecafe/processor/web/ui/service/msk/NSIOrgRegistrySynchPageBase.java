@@ -632,10 +632,12 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         protected String genderFrom;
         protected String birthDate;
         protected String birthDateFrom;
+        /**/
         protected String benefitDSZN;
         protected String benefitDSZNFrom;
         protected String newDiscounts;
         protected String oldDiscounts;
+        /**/
         protected String guardiansCount;
 
         protected String ageTypeGroup;
@@ -689,12 +691,12 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             } else {
                 birthDate = parent.getList().get(19).getFieldValueParam().substring(0, 10);
             }
-
+            /**/
             benefitDSZN = getCategoriesDSZNString(parent.getList().get(27).getFieldValueParam());
             benefitDSZNFrom = getCategoriesDSZNString(parent.getList().get(28).getFieldValueParam());
             newDiscounts = getCategoriesString(parent.getList().get(20).getFieldValueParam());
             oldDiscounts = getCategoriesString(parent.getList().get(23).getFieldValueParam());
-
+            /**/
             if (parent.getList().get(21).getFieldValueParam().equals("")) {
                 genderFrom = "";
             } else {
