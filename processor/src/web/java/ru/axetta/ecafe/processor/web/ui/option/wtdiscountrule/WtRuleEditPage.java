@@ -67,7 +67,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
     // Веб-технолог
     private int complexType = -1;
     private int ageGroup = -1;
-    private int supplier = -1;
+
     WtDiscountRule wtEntity;
     private List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
     private Map<Integer, Long> complexTypeMap;
@@ -111,20 +111,6 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
                 res.add(new SelectItem(++i, item.getDescription()));
                 ageGroupMap.put(i, item.getIdOfAgeGroupItem());
             }
-        }
-        return res;
-    }
-
-    public List<SelectItem> getSuppliers() {
-        List<SelectItem> res = new ArrayList<>();
-        List<Contragent> suppliers;
-        supplierMap = new HashMap<>();
-        res.add(new SelectItem(0, " "));
-        suppliers = daoService.getSupplierList();
-        int i = 0;
-        for (Contragent item : suppliers) {
-            res.add(new SelectItem(++i, item.getContragentName()));
-            supplierMap.put(i, item.getIdOfContragent());
         }
         return res;
     }
@@ -256,15 +242,6 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
         }
     }
 
-    //private void resetWtForm() {
-    //    List<WtSelectedComplex> wtNewSelectedComplexes = new ArrayList<>();
-    //    List<WtComplex> wtComplexes = daoService.getWtComplexesList();
-    //    for (WtComplex wtComplex : wtComplexes) {
-    //        wtNewSelectedComplexes.add(new WtSelectedComplex(wtComplex));
-    //    }
-    //    wtSelectedComplexes = wtNewSelectedComplexes;
-    //}
-
     private void fill(WtDiscountRule wtDiscountRule) {
         this.description = wtDiscountRule.getDescription();
 
@@ -308,11 +285,46 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
                 this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
             }
         }
+
         this.operationor = wtDiscountRule.isOperationOr();
 
+        wtSelectedComplexes.clear();
         for (WtComplex wtComplex : wtDiscountRule.getComplexes()) {
             if (wtComplex != null) {
                 wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
+            }
+        }
+
+        complexType = -1;
+        ageGroup = -1;
+
+        if (!wtSelectedComplexes.isEmpty()) {
+
+            StringBuilder sb = new StringBuilder();
+            for (WtSelectedComplex wtSelectedComplex : wtSelectedComplexes) {
+                wtSelectedComplex.setChecked(true);
+                String name = DAOService.getInstance().getSupplierName(wtSelectedComplex.getWtComplex());
+                if (name != null) {
+                    sb.append(name).append("; ");
+                }
+            }
+            contragentFilter = sb.toString();
+
+            getComplexTypes();
+            for (Map.Entry<Integer, Long> entry : complexTypeMap.entrySet()) {
+                if (entry.getValue().equals(wtSelectedComplexes.get(0).getIdOfSupplier())) {
+                    complexType = entry.getKey();
+                    break;
+                }
+            }
+
+            getAgeGroups();
+            for (Map.Entry<Integer, Long> entry : ageGroupMap.entrySet()) {
+                if (entry.getValue()
+                        .equals(wtSelectedComplexes.get(0).getWtComplex().getWtAgeGroupItem().getIdOfAgeGroupItem())) {
+                    ageGroup = entry.getKey();
+                    break;
+                }
             }
         }
     }
@@ -365,7 +377,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
 
     @Transactional
     public void updateRule() throws Exception {
-        if (wt) {
+        if (wtEntity != null) {
             wtEntity = em.merge(wtEntity);
 
             if (discountRate != null && discountRate != 100) {
@@ -423,32 +435,35 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
     }
 
     public void reload() throws Exception {
-        WtDiscountRule wtEntity = em.merge(this.wtEntity);
+        if (this.wtEntity != null) {
 
-        StringBuilder categoryFilter = new StringBuilder();
-        if (!wtEntity.getCategoryDiscounts().isEmpty()) {
-            for (CategoryDiscount categoryDiscount : wtEntity.getCategoryDiscounts()) {
-                this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
-                categoryFilter.append(categoryDiscount.getCategoryName());
-                categoryFilter.append(";");
-            }
-            this.filter = categoryFilter.substring(0, categoryFilter.length() - 1);
-        } else {
-            this.filter = "Не выбрано";
-        }
+            WtDiscountRule wtEntity = em.merge(this.wtEntity);
 
-        StringBuilder categoryOrgFilter = new StringBuilder();
-        if (!wtEntity.getCategoryOrgs().isEmpty()) {
-            for (CategoryOrg categoryOrg : wtEntity.getCategoryOrgs()) {
-                this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
-                categoryOrgFilter.append(categoryOrg.getCategoryName());
-                categoryOrgFilter.append("; ");
+            StringBuilder categoryFilter = new StringBuilder();
+            if (!wtEntity.getCategoryDiscounts().isEmpty()) {
+                for (CategoryDiscount categoryDiscount : wtEntity.getCategoryDiscounts()) {
+                    this.idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
+                    categoryFilter.append(categoryDiscount.getCategoryName());
+                    categoryFilter.append(";");
+                }
+                this.filter = categoryFilter.substring(0, categoryFilter.length() - 1);
+            } else {
+                this.filter = "Не выбрано";
             }
-            this.filterOrg = categoryOrgFilter.substring(0, categoryOrgFilter.length() - 1);
-        } else {
-            this.filterOrg = "Не выбрано";
+
+            StringBuilder categoryOrgFilter = new StringBuilder();
+            if (!wtEntity.getCategoryOrgs().isEmpty()) {
+                for (CategoryOrg categoryOrg : wtEntity.getCategoryOrgs()) {
+                    this.idOfCategoryOrgList.add(categoryOrg.getIdOfCategoryOrg());
+                    categoryOrgFilter.append(categoryOrg.getCategoryName());
+                    categoryOrgFilter.append("; ");
+                }
+                this.filterOrg = categoryOrgFilter.substring(0, categoryOrgFilter.length() - 1);
+            } else {
+                this.filterOrg = "Не выбрано";
+            }
+            fill(wtEntity);
         }
-        fill(wtEntity);
     }
 
     public Integer[] getSelectedComplexIds() {
@@ -628,14 +643,6 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
         this.showFilter = showFilter;
     }
 
-    public int getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(int supplier) {
-        this.supplier = supplier;
-    }
-
     public Map<Integer, Long> getSupplierMap() {
         return supplierMap;
     }
@@ -682,6 +689,11 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
         public ContragentItem() {
             this.idOfContragent = null;
             this.contragentName = null;
+        }
+
+        public ContragentItem(Long idOfContragent, String contragentName) {
+            this.idOfContragent = idOfContragent;
+            this.contragentName = contragentName;
         }
 
         public Long getIdOfContragent() {

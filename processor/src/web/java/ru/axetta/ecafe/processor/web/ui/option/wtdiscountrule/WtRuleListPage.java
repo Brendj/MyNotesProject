@@ -53,7 +53,7 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
     @Override
     public void onConfirmDelete(ConfirmDeletePage confirmDeletePage) {
         DAOService.getInstance().deleteEntity(confirmDeletePage.getEntity());
-        RuntimeContext.getAppContext().getBean(getClass()).reload();
+        onShow();
     }
 
     public String getPageFilename() {
@@ -65,27 +65,23 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
     }
 
     @Override
-    public void onShow() throws Exception {
+    public void onShow() {
         RuntimeContext.getAppContext().getBean(getClass()).reload();
+        clearPageFilter();
     }
 
-    public Object updatePage() throws Exception {
-        RuntimeContext.getAppContext().getBean(getClass()).reload();
-        return this;
-    }
-
-    public Object clearPageFilter() throws Exception {
+    public Object clearPageFilter(){
         idOfCategoryList = new ArrayList<Long>();
         filter = "Не выбрано";
         subCategory = 0;
         filterOrg = "Не выбрано";
-        idOfCategoryOrgList = new ArrayList<Long>();
-        RuntimeContext.getAppContext().getBean(getClass()).reload();
+        idOfCategoryOrgList = new ArrayList<>();
         return this;
     }
 
     @Transactional
     public void reload() {
+
         List<Item> items = new ArrayList<>();
         List<WtDiscountRule> wtDiscountRuleList = DAOUtils.listWtDiscountRules(em);
 
@@ -137,7 +133,8 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
                 item.setCategoryOrgs(stringBuilder.substring(0, stringBuilder.length() - 1));
             }
             items.add(item);
-        } this.items.clear();
+        }
+
         this.items = items;
     }
 
@@ -179,7 +176,7 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
         }
     }
 
-    public List<SelectItem> getSubCategories() throws Exception {
+    public List<SelectItem> getSubCategories() {
         List<SelectItem> res = new ArrayList<SelectItem>();
         res.add(new SelectItem("", ""));
         for (int i = 0; i < WtRuleCreatePage.SUB_CATEGORIES.length; i++) {
