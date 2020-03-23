@@ -312,7 +312,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     }
 
     private void addWtComplex(WtComplexGroupItem complexGroupItem, WtAgeGroupItem ageGroupItem, Contragent contragent) {
-        List<WtComplex> complexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem, contragent);
+        List<WtComplex> complexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem, contragent, null);
         List<WtComplex> wtComplexes = new ArrayList<>(complexes);
         for (WtComplex wtComplex : wtComplexes) {
             if (wtComplex != null && wtSelectedComplexes != null) {

@@ -76,10 +76,10 @@
                                ajaxSingle="true" styleClass="command-button"/>
         </h:panelGrid>
 
-<%--        <h:panelGrid styleClass="borderless-grid">--%>
-<%--            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"--%>
-<%--                           warnClass="warn-messages"/>--%>
-<%--        </h:panelGrid>--%>
+        <%--        <h:panelGrid styleClass="borderless-grid">--%>
+        <%--            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"--%>
+        <%--                           warnClass="warn-messages"/>--%>
+        <%--        </h:panelGrid>--%>
 
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" id="specialDatesFileLoaderPanel">
@@ -110,13 +110,13 @@
                     <f:selectItems value="#{wtRuleEditPage.ageGroups}"/>
                 </h:selectOneMenu>
 
-<%--                <h:outputText escape="true" value="Поставщик" styleClass="output-text"--%>
-<%--                              rendered="#{wtRuleEditPage.showFilter}"/>--%>
+                <%--                <h:outputText escape="true" value="Поставщик" styleClass="output-text"--%>
+                <%--                              rendered="#{wtRuleEditPage.showFilter}"/>--%>
 
-<%--                <h:selectOneMenu id="supplierMenu" value="#{wtRuleEditPage.supplier}"--%>
-<%--                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleEditPage.showFilter}">--%>
-<%--                    <f:selectItems value="#{wtRuleEditPage.suppliers}"/>--%>
-<%--                </h:selectOneMenu>--%>
+                <%--                <h:selectOneMenu id="supplierMenu" value="#{wtRuleEditPage.supplier}"--%>
+                <%--                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleEditPage.showFilter}">--%>
+                <%--                    <f:selectItems value="#{wtRuleEditPage.suppliers}"/>--%>
+                <%--                </h:selectOneMenu>--%>
 
                 <a4j:outputPanel ajaxRendered="#{wtRuleEditPage.showFilter}" rendered="#{wtRuleEditPage.showFilter}">
                     <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -196,46 +196,52 @@
 
                     <%--       Чек-боксы--%>
                     <rich:column headerClass="column-header">
-                        <h:selectBooleanCheckbox value="#{complex.checked}"/>
+                        <h:selectBooleanCheckbox value="#{complex.checked}" styleClass="output-text" rendered="#{complex.wtComplex.deleteState == 0}"/>
+                        <h:selectBooleanCheckbox value="#{complex.checked}" styleClass="output-disabled-text" rendered="#{complex.wtComplex.deleteState == 1}"/>
                     </rich:column>
 
                     <%--        Название контрагента--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.supplierName}"
-                                      styleClass="output-text"/>
+                        <h:outputText escape="true" value="#{complex.supplierName}" styleClass="output-text"
+                                      rendered="#{complex.wtComplex.deleteState == 0}"/>
+                        <h:outputText escape="false" value="#{complex.supplierName}" styleClass="output-disabled-text"
+                                      rendered="#{complex.wtComplex.deleteState == 1}"/>
                     </rich:column>
 
                     <%--        ИД контрагента--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.idOfSupplier}"
-                                      styleClass="output-text"/>
+                        <h:outputText escape="true" value="#{complex.idOfSupplier}" styleClass="output-text" rendered="#{complex.wtComplex.deleteState == 0}"/>
+                        <h:outputText escape="true" value="#{complex.idOfSupplier}" styleClass="output-disabled-text" rendered="#{complex.wtComplex.deleteState == 1}"/>
                     </rich:column>
 
                     <%--        ИД комплекса--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.wtComplex.idOfComplex}" styleClass="output-text"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.idOfComplex}" styleClass="output-text" rendered="#{complex.wtComplex.deleteState == 0}"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.idOfComplex}" styleClass="output-disabled-text" rendered="#{complex.wtComplex.deleteState == 1}"/>
                     </rich:column>
 
                     <%--        Название--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.wtComplex.name}" styleClass="output-text"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.name}" styleClass="output-text" rendered="#{complex.wtComplex.deleteState == 0}"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.name}" styleClass="output-disabled-text" rendered="#{complex.wtComplex.deleteState == 1}"/>
                     </rich:column>
 
                     <%--        Возрастная категория--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.wtComplex.wtAgeGroupItem.description}"
-                                      styleClass="output-text"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.wtAgeGroupItem.description}" styleClass="output-text" rendered="#{complex.wtComplex.deleteState == 0}"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.wtAgeGroupItem.description}" styleClass="output-disabled-text" rendered="#{complex.wtComplex.deleteState == 1}"/>
                     </rich:column>
 
                     <%--        Цена, руб--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.wtComplex.price}" styleClass="output-text"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.price}" styleClass="output-text" rendered="#{complex.wtComplex.deleteState == 0}"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.price}" styleClass="output-disabled-text" rendered="#{complex.wtComplex.deleteState == 1}"/>
                     </rich:column>
 
                     <%--        Тип--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="true" value="#{complex.wtComplex.wtComplexGroupItem.description}"
-                                      styleClass="output-text"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.wtComplexGroupItem.description}" styleClass="output-text" rendered="#{complex.wtComplex.deleteState == 0}"/>
+                        <h:outputText escape="true" value="#{complex.wtComplex.wtComplexGroupItem.description}" styleClass="output-disabled-text" rendered="#{complex.wtComplex.deleteState == 1}"/>
                     </rich:column>
 
                 </rich:subTable>

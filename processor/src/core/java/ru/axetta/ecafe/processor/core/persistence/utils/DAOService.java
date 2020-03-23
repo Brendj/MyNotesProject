@@ -2811,8 +2811,10 @@ public class DAOService {
     }
 
     public List<WtComplex> getWtComplexesList(WtComplexGroupItem wtComplexGroupItem, WtAgeGroupItem wtAgeGroupItem,
-            Contragent contragent) {
+            Contragent contragent, WtDiscountRule rule) {
         StringBuilder sb = new StringBuilder();
+        List<WtComplex> results = new ArrayList<>();
+
         sb.append("select wc from WtComplex wc where wc.deleteState = 0");
         if (wtComplexGroupItem != null) {
             sb.append(" and wc.wtComplexGroupItem = :wtComplexGroupItem");
@@ -2835,7 +2837,11 @@ public class DAOService {
             query.setParameter("contragent", contragent);
         }
         try {
-            return query.getResultList();
+            results = query.getResultList();
+            if (rule != null) {
+                results.addAll(rule.getComplexes());
+            }
+            return results;
         } catch (Exception e) {
             e.printStackTrace();
             return null;

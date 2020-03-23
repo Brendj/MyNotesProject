@@ -232,7 +232,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
 
     private void addWtComplex(WtComplexGroupItem complexGroupItem, WtAgeGroupItem ageGroupItem, Contragent contragent) {
         List<WtComplex> wtComplexes = new ArrayList<>();
-        List<WtComplex> complexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem, contragent);
+        List<WtComplex> complexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem, contragent, wtEntity);
         wtComplexes.addAll(complexes);
 
         for (WtComplex wtComplex : wtComplexes) {
