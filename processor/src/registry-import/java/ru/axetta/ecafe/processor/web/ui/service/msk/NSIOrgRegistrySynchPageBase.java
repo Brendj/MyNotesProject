@@ -632,12 +632,6 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
         protected String genderFrom;
         protected String birthDate;
         protected String birthDateFrom;
-        /**/
-        protected String benefitDSZN;
-        protected String benefitDSZNFrom;
-        protected String newDiscounts;
-        protected String oldDiscounts;
-        /**/
         protected String guardiansCount;
 
         protected String ageTypeGroup;
@@ -691,12 +685,6 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             } else {
                 birthDate = parent.getList().get(19).getFieldValueParam().substring(0, 10);
             }
-            /**/
-            benefitDSZN = getCategoriesDSZNString(parent.getList().get(27).getFieldValueParam());
-            benefitDSZNFrom = getCategoriesDSZNString(parent.getList().get(28).getFieldValueParam());
-            newDiscounts = getCategoriesString(parent.getList().get(20).getFieldValueParam());
-            oldDiscounts = getCategoriesString(parent.getList().get(23).getFieldValueParam());
-            /**/
             if (parent.getList().get(21).getFieldValueParam().equals("")) {
                 genderFrom = "";
             } else {
@@ -968,37 +956,6 @@ public class NSIOrgRegistrySynchPageBase extends BasicWorkspacePage/* implements
             this.ageTypeGroupFrom = ageTypeGroupFrom;
         }
 
-        public String getNewDiscounts() {
-            return newDiscounts;
-        }
-
-        public void setNewDiscounts(String newDiscounts) {
-            this.newDiscounts = newDiscounts;
-        }
-
-        public String getBenefitDSZNFrom() {
-            return benefitDSZNFrom;
-        }
-
-        public void setBenefitDSZNFrom(String benefitDSZNFrom) {
-            this.benefitDSZNFrom = benefitDSZNFrom;
-        }
-
-        public String getBenefitDSZN() {
-            return benefitDSZN;
-        }
-
-        public void setBenefitDSZN(String benefitDSZN) {
-            this.benefitDSZN = benefitDSZN;
-        }
-
-        public String getOldDiscounts() {
-            return oldDiscounts;
-        }
-
-        public void setOldDiscounts(String oldDiscounts) {
-            this.oldDiscounts = oldDiscounts;
-        }
     }
 
     public long getRevisionCreateDate() {
