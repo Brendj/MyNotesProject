@@ -2857,4 +2857,20 @@ public class DAOService {
         query.setParameter("complex", wtComplex);
         return (Long) query.getSingleResult();
     }
+
+    public Long getIdOfComplexGroupItem(WtComplex wtComplex) {
+        Query query = entityManager.createQuery(
+                "select cg.idOfComplexGroupItem from WtComplex complex left join complex.wtComplexGroupItem cg "
+                        + "where complex = :complex");
+        query.setParameter("complex", wtComplex);
+        return (Long) query.getSingleResult();
+    }
+
+    public Long getIdOfAgeGroup(WtComplex wtComplex) {
+        Query query = entityManager.createQuery(
+                "select ag.idOfAgeGroupItem from WtComplex complex left join complex.wtAgeGroupItem ag "
+                        + "where complex = :complex");
+        query.setParameter("complex", wtComplex);
+        return (Long) query.getSingleResult();
+    }
 }

@@ -107,7 +107,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
         ageGroupItems = daoService.getWtAgeGroupList();
         int i = 0;
         for (WtAgeGroupItem item : ageGroupItems) {
-            if (item.getIdOfAgeGroupItem() < 5) { // 5 = Сотрудники, 6 = Все
+            if (item.getIdOfAgeGroupItem() != 5 || item.getIdOfAgeGroupItem() != 6) { // 5 = Сотрудники, 6 = Все
                 res.add(new SelectItem(++i, item.getDescription()));
                 ageGroupMap.put(i, item.getIdOfAgeGroupItem());
             }
@@ -276,6 +276,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
             }
             this.categoryDiscounts = stringBuilder.toString();
         }
+
         this.idOfCategoryOrgList.clear();
         if (!wtDiscountRule.getCategoryOrgs().isEmpty()) {
             StringBuilder stringBuilder = new StringBuilder();
@@ -300,30 +301,48 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
 
         if (!wtSelectedComplexes.isEmpty()) {
 
-            StringBuilder sb = new StringBuilder();
+            Set<String> names = new HashSet<>();
             for (WtSelectedComplex wtSelectedComplex : wtSelectedComplexes) {
                 wtSelectedComplex.setChecked(true);
                 String name = DAOService.getInstance().getSupplierName(wtSelectedComplex.getWtComplex());
                 if (name != null) {
-                    sb.append(name).append("; ");
+                    names.add(name);
                 }
             }
+
+            StringBuilder sb = new StringBuilder();
+            for (String name : names) {
+                sb.append(name).append("; ");
+            }
             contragentFilter = sb.toString();
+            contragentFilter = contragentFilter.substring(0, contragentFilter.length() - 2);
 
             getComplexTypes();
-            for (Map.Entry<Integer, Long> entry : complexTypeMap.entrySet()) {
-                if (entry.getValue().equals(wtSelectedComplexes.get(0).getIdOfSupplier())) {
-                    complexType = entry.getKey();
-                    break;
+            Long idOfComplexGroup = DAOService.getInstance()
+                    .getIdOfComplexGroupItem(wtSelectedComplexes.get(0).getWtComplex());
+            if (idOfComplexGroup == 3L) { // Все
+                idOfComplexGroup = 1L;
+            }
+            if (idOfComplexGroup != null) {
+                for (Map.Entry<Integer, Long> entry : complexTypeMap.entrySet()) {
+                    if (entry.getValue().equals(idOfComplexGroup)) {
+                        complexType = entry.getKey();
+                        break;
+                    }
                 }
             }
 
             getAgeGroups();
-            for (Map.Entry<Integer, Long> entry : ageGroupMap.entrySet()) {
-                if (entry.getValue()
-                        .equals(wtSelectedComplexes.get(0).getWtComplex().getWtAgeGroupItem().getIdOfAgeGroupItem())) {
-                    ageGroup = entry.getKey();
-                    break;
+            Long idOfAgeGroup = DAOService.getInstance().getIdOfAgeGroup(wtSelectedComplexes.get(0).getWtComplex());
+            if (idOfAgeGroup == 6L) { // Все
+                idOfAgeGroup = 1L;
+            }
+            if (idOfAgeGroup != null) {
+                for (Map.Entry<Integer, Long> entry : ageGroupMap.entrySet()) {
+                    if (entry.getValue().equals(idOfAgeGroup)) {
+                        ageGroup = entry.getKey();
+                        break;
+                    }
                 }
             }
         }
