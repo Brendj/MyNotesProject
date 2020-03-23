@@ -126,9 +126,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
                 filter = filter.substring(0, filter.length() - 2);
                 categoryDiscounts = idOfCategoryList.toString();
                 categoryDiscounts = categoryDiscounts.substring(1, categoryDiscounts.length() - 1);
-
             }
-
         }
     }
 
@@ -152,8 +150,6 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     public String getPageFilename() {
         return "option/wtdiscountrule/create";
     }
-
-    //// Веб-технолог ////
 
     public List<SelectItem> getComplexTypes() {
         List<SelectItem> res = new ArrayList<>();
@@ -180,7 +176,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         ageGroupItems = daoService.getWtAgeGroupList();
         int i = 0;
         for (WtAgeGroupItem item : ageGroupItems) {
-            if (item.getIdOfAgeGroupItem() < 5) { // 5 = Сотрудники, 6 = Все
+            if (item.getIdOfAgeGroupItem() != 5 || item.getIdOfAgeGroupItem() != 6) { // 5 = Сотрудники, 6 = Все
                 res.add(new SelectItem(++i, item.getDescription()));
                 ageGroupMap.put(i, item.getIdOfAgeGroupItem());
             }
@@ -338,8 +334,6 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     @Transactional
     public void createRule() throws Exception {
 
-        //// Веб-технолог ////
-
         WtDiscountRule wtDiscountRule = new WtDiscountRule();
         String strSubCategory = "";
         if (this.subCategory > 0) {
@@ -378,10 +372,6 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         }
 
         wtDiscountRule.setCategoryDiscounts(categoryDiscountSet);
-
-        //for (CategoryOrg categoryOrg : categoryOrgList) {
-        //    wtDiscountRule.getCategoryOrgs().add(categoryOrg);
-        //}
 
         daoService.persistEntity(wtDiscountRule);
 
