@@ -186,7 +186,6 @@ public class EzdController {
             for (int i = 0; i < realCountPart; i++)
             {
                 logger.info(String.format("Свободно памяти перед партией %s - %s", String.valueOf(i), Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()));
-                long usedBytes = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
                 if (maxcountParts != 0)
                 {
                     if (i > (maxcountParts-1))
