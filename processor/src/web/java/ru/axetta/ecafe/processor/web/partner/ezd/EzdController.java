@@ -159,6 +159,7 @@ public class EzdController {
             List<Org> idOfOrgs = DAOUtils.getAllOrgWithGuid(persistenceSession);
             logger.info(String.format("Общее колличество школ - %s", String.valueOf(idOfOrgs.size())));
 
+            logger.info(String.format("Максимальный размер памяти - %s", String.valueOf(Runtime.getRuntime().maxMemory())));
             Integer count = idOfOrgs.size();
             Integer sizeofPart = count/countParts;
 
@@ -184,6 +185,8 @@ public class EzdController {
 
             for (int i = 0; i < realCountPart; i++)
             {
+                logger.info(String.format("Свободно памяти перед партией %s - %s", String.valueOf(i), Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()));
+                long usedBytes = Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory();
                 if (maxcountParts != 0)
                 {
                     if (i > (maxcountParts-1))
@@ -360,6 +363,7 @@ public class EzdController {
                     }
                 }
                 logger.info(String.format("Ответ для ЭЖД успешно сформирован - %s", String.valueOf(i)));
+                logger.info(String.format("Свободно памяти после партии %s - %s", String.valueOf(i), Runtime.getRuntime().totalMemory()-Runtime.getRuntime().freeMemory()));
             }
 
             persistenceSession.flush();
