@@ -69,7 +69,7 @@
 
     <rich:dataTable id="ruleTable" width="700" var="item" value="#{wtRuleListPage.items}" rows="15"
                     columnClasses="center-aligned-column"
-                    footerClass="data-table-footer">
+                    footerClass="data-table-footer" rendered="true">
         <f:facet name="header">
             <rich:columnGroup>
                 <rich:column headerClass="center-aligned-column">

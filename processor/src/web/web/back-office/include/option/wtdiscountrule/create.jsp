@@ -69,10 +69,6 @@
             <a4j:commandButton value="Зарегистрировать правило" action="#{wtRuleCreatePage.createRule}"
                                reRender="ruleCreatePanel" styleClass="command-button"/>
         </h:panelGrid>
-<%--        <h:panelGrid styleClass="borderless-grid">--%>
-<%--            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"--%>
-<%--                           warnClass="warn-messages"/>--%>
-<%--        </h:panelGrid>--%>
     </h:panelGrid>
 
     <h:panelGrid styleClass="borderless-grid borderless-grid-align-top" id="specialDatesFileLoaderPanel">
@@ -102,14 +98,6 @@
                                  style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleCreatePage.showFilter}">
                     <f:selectItems value="#{wtRuleCreatePage.ageGroups}"/>
                 </h:selectOneMenu>
-
-<%--                <h:outputText escape="true" value="Поставщик" styleClass="output-text"--%>
-<%--                              rendered="#{wtRuleCreatePage.showFilter}"/>--%>
-
-<%--                <h:selectOneMenu id="supplierMenu" value="#{wtRuleCreatePage.supplier}"--%>
-<%--                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleCreatePage.showFilter}">--%>
-<%--                    <f:selectItems value="#{wtRuleCreatePage.suppliers}"/>--%>
-<%--                </h:selectOneMenu>--%>
 
                 <a4j:outputPanel ajaxRendered="#{wtRuleEditPage.showFilter}" rendered="#{wtRuleCreatePage.showFilter}">
                     <h:panelGrid styleClass="borderless-grid" columns="2">
