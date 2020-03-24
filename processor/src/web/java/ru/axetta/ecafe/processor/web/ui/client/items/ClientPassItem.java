@@ -113,7 +113,7 @@ public class ClientPassItem implements Comparable {
                 this.direction = getDirection(EnterEvent.PASSAGE_RUFUSAL);
             }
         }
-
+        this.chekerItemList.add(new ClientChekerPassItem(0L, null, " ", " ")); // empty row for JSP
     }
 
     @Override

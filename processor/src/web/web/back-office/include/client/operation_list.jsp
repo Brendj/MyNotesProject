@@ -575,7 +575,7 @@
 
 <h:outputText value="Проходы:" />
 <rich:dataTable id="clientPassesTable" var="pass" value="#{mainPage.clientOperationListPage.clientPasses}"
-                rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer" rows="8" columns="10">
+                rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer" rows="8" columns="11">
 
     <f:facet name="header">
         <rich:columnGroup>
