@@ -76,30 +76,23 @@
 
             <h:panelGrid columns="2" id="filter">
 
-                <h:outputText escape="true" value="Использовать правило для Web-АРМа" styleClass="output-text"/>
-
-                <a4j:commandLink reRender="filter">
-                    <f:setPropertyActionListener value="#{wtRuleCreatePage}" target="#{wtRuleCreatePage.wt}"/>
-                    <h:selectBooleanCheckbox id="arm" value="#{wtRuleCreatePage.wt}"/>
-                </a4j:commandLink>
-
                 <h:outputText escape="true" value="Тип комплекса" styleClass="output-text"
-                              rendered="#{wtRuleCreatePage.showFilter}"/>
+                              rendered="true"/>
 
                 <h:selectOneMenu id="typeMenu" value="#{wtRuleCreatePage.complexType}"
-                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleCreatePage.showFilter}">
+                                 style="width:300px;" styleClass="groupSelect" rendered="true">
                     <f:selectItems value="#{wtRuleCreatePage.complexTypes}"/>
                 </h:selectOneMenu>
 
                 <h:outputText escape="true" value="Возрастная категория" styleClass="output-text"
-                              rendered="#{wtRuleCreatePage.showFilter}"/>
+                              rendered="true"/>
 
                 <h:selectOneMenu id="ageMenu" value="#{wtRuleCreatePage.ageGroup}"
-                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleCreatePage.showFilter}">
+                                 style="width:300px;" styleClass="groupSelect" rendered="true">
                     <f:selectItems value="#{wtRuleCreatePage.ageGroups}"/>
                 </h:selectOneMenu>
 
-                <a4j:outputPanel ajaxRendered="#{wtRuleEditPage.showFilter}" rendered="#{wtRuleCreatePage.showFilter}">
+                <a4j:outputPanel ajaxRendered="true" rendered="true">
                     <h:panelGrid styleClass="borderless-grid" columns="2">
                         <h:outputText escape="true" value="Список контрагентов" styleClass="output-text"/>
                         <h:panelGroup styleClass="borderless-div">

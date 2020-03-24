@@ -82,38 +82,21 @@
 
             <h:panelGrid columns="2" id="filter">
 
-                <h:outputText escape="true" value="Использовать правило для Web-АРМа" styleClass="output-text"/>
-
-                <a4j:commandLink reRender="filter">
-                    <f:setPropertyActionListener value="#{wtRuleEditPage}" target="#{wtRuleEditPage.wt}"/>
-                    <h:selectBooleanCheckbox id="arm" value="#{wtRuleEditPage.wt}"/>
-                </a4j:commandLink>
-
-                <h:outputText escape="true" value="Тип комплекса" styleClass="output-text"
-                              rendered="#{wtRuleEditPage.showFilter}"/>
+                <h:outputText escape="true" value="Тип комплекса" styleClass="output-text" rendered="true"/>
 
                 <h:selectOneMenu id="typeMenu" value="#{wtRuleEditPage.complexType}"
-                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleEditPage.showFilter}">
+                                 style="width:300px;" styleClass="groupSelect" rendered="true">
                     <f:selectItems value="#{wtRuleEditPage.complexTypes}"/>
                 </h:selectOneMenu>
 
-                <h:outputText escape="true" value="Возрастная категория" styleClass="output-text"
-                              rendered="#{wtRuleEditPage.showFilter}"/>
+                <h:outputText escape="true" value="Возрастная категория" styleClass="output-text" rendered="true"/>
 
                 <h:selectOneMenu id="ageMenu" value="#{wtRuleEditPage.ageGroup}"
-                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleEditPage.showFilter}">
+                                 style="width:300px;" styleClass="groupSelect" rendered="true">
                     <f:selectItems value="#{wtRuleEditPage.ageGroups}"/>
                 </h:selectOneMenu>
 
-                <%--                <h:outputText escape="true" value="Поставщик" styleClass="output-text"--%>
-                <%--                              rendered="#{wtRuleEditPage.showFilter}"/>--%>
-
-                <%--                <h:selectOneMenu id="supplierMenu" value="#{wtRuleEditPage.supplier}"--%>
-                <%--                                 style="width:300px;" styleClass="groupSelect" rendered="#{wtRuleEditPage.showFilter}">--%>
-                <%--                    <f:selectItems value="#{wtRuleEditPage.suppliers}"/>--%>
-                <%--                </h:selectOneMenu>--%>
-
-                <a4j:outputPanel ajaxRendered="#{wtRuleEditPage.showFilter}" rendered="#{wtRuleEditPage.showFilter}">
+                <a4j:outputPanel ajaxRendered="true" rendered="true">
                     <h:panelGrid styleClass="borderless-grid" columns="2">
                         <h:outputText escape="true" value="Список контрагентов" styleClass="output-text"/>
                         <h:panelGroup styleClass="borderless-div">

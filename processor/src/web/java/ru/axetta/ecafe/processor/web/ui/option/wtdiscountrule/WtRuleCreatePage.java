@@ -73,14 +73,11 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     // Веб-технолог
     private int complexType = -1;
     private int ageGroup = -1;
-    private int supplier = -1;
+
     WtDiscountRule wtEntity;
     private List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
     private Map<Integer, Long> complexTypeMap;
     private Map<Integer, Long> ageGroupMap;
-    private Map<Integer, Long> supplierMap;
-    private boolean wt = true;
-    private boolean showFilter = true;
 
     private String contragentFilter = "Не выбрано";
     private String contragentIds;
@@ -176,24 +173,10 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         ageGroupItems = daoService.getWtAgeGroupList();
         int i = 0;
         for (WtAgeGroupItem item : ageGroupItems) {
-            if (item.getIdOfAgeGroupItem() != 5 || item.getIdOfAgeGroupItem() != 6) { // 5 = Сотрудники, 6 = Все
+            if (item.getIdOfAgeGroupItem() != 5 && item.getIdOfAgeGroupItem() != 6) { // 5 = Сотрудники, 6 = Все
                 res.add(new SelectItem(++i, item.getDescription()));
                 ageGroupMap.put(i, item.getIdOfAgeGroupItem());
             }
-        }
-        return res;
-    }
-
-    public List<SelectItem> getSuppliers() {
-        List<SelectItem> res = new ArrayList<>();
-        List<Contragent> suppliers;
-        supplierMap = new HashMap<>();
-        res.add(new SelectItem(0, " "));
-        suppliers = daoService.getSupplierList();
-        int i = 0;
-        for (Contragent item : suppliers) {
-            res.add(new SelectItem(++i, item.getContragentName()));
-            supplierMap.put(i, item.getIdOfContragent());
         }
         return res;
     }
@@ -230,10 +213,8 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     }
 
     public void fillWtSelectedComplexes() {
-        if (!wt) {
-            wtSelectedComplexes.clear();
-            return;
-        }
+
+        wtSelectedComplexes.clear();
 
         if (complexType > -1 || ageGroup > -1 || !contragentItems.isEmpty()) {
             Long complexGroupId = complexTypeMap.get(complexType);
@@ -266,44 +247,49 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
                     wtAgeGroupItem = daoService.getWtAgeGroupItemById(ageGroupId);
                 }
 
+                Set<WtComplex> wtComplexes = new HashSet<>();
+
                 if (wtComplexGroupItem != null && wtAgeGroupItem != null && !contragents.isEmpty()) {
                     for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
                         for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
                             for (Contragent contragent : contragents) {
-                                addWtComplex(complexGroupItem, ageGroupItem, contragent);
+                                wtComplexes.addAll(addWtComplex(complexGroupItem, ageGroupItem, contragent));
                             }
                         }
                     }
                 } else if (wtComplexGroupItem == null && wtAgeGroupItem != null && !contragents.isEmpty()) {
                     for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
                         for (Contragent contragent : contragents) {
-                            addWtComplex(null, ageGroupItem, contragent);
+                            wtComplexes.addAll(addWtComplex(null, ageGroupItem, contragent));
                         }
                     }
                 } else if (wtComplexGroupItem != null && wtAgeGroupItem == null && !contragents.isEmpty()) {
                     for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
                         for (Contragent contragent : contragents) {
-                            addWtComplex(complexGroupItem, null, contragent);
+                            wtComplexes.addAll(addWtComplex(complexGroupItem, null, contragent));
                         }
                     }
                 } else if (wtComplexGroupItem != null && wtAgeGroupItem != null && contragents.isEmpty()) {
                     for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
                         for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
-                            addWtComplex(complexGroupItem, ageGroupItem, null);
+                            wtComplexes.addAll(addWtComplex(complexGroupItem, ageGroupItem, null));
                         }
                     }
                 } else if (wtComplexGroupItem == null && wtAgeGroupItem == null && !contragents.isEmpty()) {
                     for (Contragent contragent : contragents) {
-                        addWtComplex(null, null, contragent);
+                        wtComplexes.addAll(addWtComplex(null, null, contragent));
                     }
                 } else if (wtComplexGroupItem != null && wtAgeGroupItem == null && contragents.isEmpty()) {
                     for (WtComplexGroupItem complexGroupItem : wtComplexGroupItem) {
-                        addWtComplex(complexGroupItem, null, null);
+                        wtComplexes.addAll(addWtComplex(complexGroupItem, null, null));
                     }
                 } else if (wtComplexGroupItem == null && wtAgeGroupItem != null && contragents.isEmpty()) {
                     for (WtAgeGroupItem ageGroupItem : wtAgeGroupItem) {
-                        addWtComplex(null, ageGroupItem, null);
+                        wtComplexes.addAll(addWtComplex(null, ageGroupItem, null));
                     }
+                }
+                for (WtComplex wtComplex : wtComplexes) {
+                    wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
                 }
             }
         } else if (complexType == -1 && ageGroup == -1 && contragentItems.isEmpty()) {
@@ -311,14 +297,12 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         }
     }
 
-    private void addWtComplex(WtComplexGroupItem complexGroupItem, WtAgeGroupItem ageGroupItem, Contragent contragent) {
+    private Set<WtComplex> addWtComplex(WtComplexGroupItem complexGroupItem, WtAgeGroupItem ageGroupItem,
+            Contragent contragent) {
+        Set<WtComplex> wtComplexes = new HashSet<>();
         List<WtComplex> complexes = daoService.getWtComplexesList(complexGroupItem, ageGroupItem, contragent, null);
-        List<WtComplex> wtComplexes = new ArrayList<>(complexes);
-        for (WtComplex wtComplex : wtComplexes) {
-            if (wtComplex != null && wtSelectedComplexes != null) {
-                wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
-            }
-        }
+        wtComplexes.addAll(complexes);
+        return wtComplexes;
     }
 
     @Override
@@ -372,6 +356,11 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         }
 
         wtDiscountRule.setCategoryDiscounts(categoryDiscountSet);
+
+        wtSelectedComplexes.clear();
+        complexType = -1;
+        ageGroup = -1;
+        contragentFilter = "Не выбрано";
 
         daoService.persistEntity(wtDiscountRule);
 
@@ -522,39 +511,6 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
 
     public void setAgeGroupMap(Map<Integer, Long> ageGroupMap) {
         this.ageGroupMap = ageGroupMap;
-    }
-
-    public boolean isWt() {
-        return wt;
-    }
-
-    public void setWt(boolean wt) {
-        this.wt = wt;
-        this.showFilter = wt;
-    }
-
-    public boolean isShowFilter() {
-        return showFilter;
-    }
-
-    public void setShowFilter(boolean showFilter) {
-        this.showFilter = showFilter;
-    }
-
-    public int getSupplier() {
-        return supplier;
-    }
-
-    public void setSupplier(int supplier) {
-        this.supplier = supplier;
-    }
-
-    public Map<Integer, Long> getSupplierMap() {
-        return supplierMap;
-    }
-
-    public void setSupplierMap(Map<Integer, Long> supplierMap) {
-        this.supplierMap = supplierMap;
     }
 
     public String getContragentFilter() {
