@@ -67,7 +67,7 @@
         </a4j:status>
     </h:panelGrid>
 
-    <rich:dataTable id="ruleTable" width="700" var="item" value="#{wtRuleListPage.items}" rows="15"
+    <rich:dataTable id="wtRuleTable" width="700" var="item" value="#{wtRuleListPage.items}" rows="15"
                     columnClasses="center-aligned-column"
                     footerClass="data-table-footer" rendered="true">
         <f:facet name="header">
@@ -143,7 +143,7 @@
         </rich:column>
 
         <f:facet name="footer">
-            <rich:datascroller for="ruleTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+            <rich:datascroller for="wtRuleTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
                                stepControls="auto" boundaryControls="hide">
                 <f:facet name="previous">
                     <h:graphicImage value="/images/16x16/left-arrow.png"/>

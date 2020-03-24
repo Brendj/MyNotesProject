@@ -67,7 +67,11 @@ public class WtRuleListPage extends BasicWorkspacePage implements ConfirmDeleteP
     @Override
     public void onShow() {
         RuntimeContext.getAppContext().getBean(getClass()).reload();
-        clearPageFilter();
+    }
+
+    public Object updatePage() throws Exception {
+        onShow();
+        return this;
     }
 
     public Object clearPageFilter(){
