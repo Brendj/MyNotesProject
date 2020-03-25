@@ -222,7 +222,11 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
                 wtSelectedComplexes.addAll(getNativeComplexes(wtEntity));
 
                 for (WtComplex wtComplex : wtComplexes) {
-                    wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
+                    WtSelectedComplex wtSelectedComplex = new WtSelectedComplex(wtComplex);
+                    wtSelectedComplex.setChecked(true);
+                    if (!wtSelectedComplexes.contains(wtSelectedComplex)) {
+                        wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
+                    }
                 }
             }
         } else if (complexType == -1 && ageGroup == -1 && contragentItems.isEmpty()) {
