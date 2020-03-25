@@ -61,7 +61,7 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
                 + "FROM "
                 + "cf_kf_organization_registry org "
                 + "INNER JOIN cf_kf_eo_address addr ON addr.global_object_id = org.global_id "
-                + "WHERE org.arhiv = false "
+                + "WHERE org.arhiv = false and org.xaIsActive = 1 "
                 + (StringUtils.isEmpty(orgName) ? "" : " and org.short_name like '%" + orgName + "%'")
                 + (StringUtils.isEmpty(region) ? "" : " and a.title like '%" + region + "%'"));
         List list = query.getResultList();

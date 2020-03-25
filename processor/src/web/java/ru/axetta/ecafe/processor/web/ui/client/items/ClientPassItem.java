@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.client.items;
 
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.hibernate.Session;
 
@@ -27,6 +28,7 @@ public class ClientPassItem implements Comparable {
     private String direction;
     private Long idOfOrg;
     private String shortAddress;
+    private String cardType;
     private List<ClientChekerPassItem> chekerItemList = new ArrayList<ClientChekerPassItem>();
 
     public ClientPassItem(Session session, EnterEvent event) {
@@ -52,6 +54,47 @@ public class ClientPassItem implements Comparable {
         }
         if(checkerId == null && guardianId == null) {
             this.chekerItemList.add(new ClientChekerPassItem(0L, null, " ", " "));
+        }
+        Card card = DAOUtils.findCardByCardNoAndIdOfFriendlyOrgNullSafe(session, event.getIdOfCard(), event.getOrg().getIdOfOrg());
+        this.cardType = getPrintedCardType(card != null ? card.getCardType() : -1);
+    }
+
+    private String getPrintedCardType(Integer cardType) {
+        switch (cardType){
+            case 1:
+                return "Mifare";
+            case 2:
+                return "EM-Marine";
+            case 3:
+                return "СК";
+            case 4:
+                return "УЭК";
+            case 5:
+                return "Транспортная карта";
+            case 6:
+                return "Банковская карта";
+            case 7:
+                return "СКМ";
+            case 8:
+                return "СКУ";
+            case 9:
+                return"Браслет";
+            case 10:
+                return"Часы";
+            case 11:
+                return"Брелок";
+            case 12:
+                return"ТМ-карта";
+            case 13:
+                return"ТМ-браслет";
+            case 14:
+                return"ТМ-брелок";
+            case 15:
+                return"Фитнес-браслет";
+            case 16:
+                return"Смарт-кольцо";
+            default:
+                return "Неизвестно";
         }
     }
 
@@ -191,5 +234,13 @@ public class ClientPassItem implements Comparable {
         public void setGroupName(String groupName) {
             this.groupName = groupName;
         }
+    }
+
+    public String getCardType() {
+        return cardType;
+    }
+
+    public void setCardType(String cardType) {
+        this.cardType = cardType;
     }
 }

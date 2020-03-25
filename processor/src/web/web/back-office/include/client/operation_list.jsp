@@ -598,6 +598,9 @@
                 <h:outputText escape="true" value="Дата и время" styleClass="column-header" />
             </rich:column>
             <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                <h:outputText escape="true" value="Тип карты" styleClass="column-header" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
                 <h:outputText escape="true" value="Направление" styleClass="column-header" />
             </rich:column>
             <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
@@ -630,6 +633,9 @@
     <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
         <h:outputText escape="true" value="#{pass.enterTime}" styleClass="output-text"
                       converter="timeMinuteConverter" />
+    </rich:column>
+    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+        <h:outputText escape="true" value="#{pass.cardType}" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
         <h:outputText escape="true" value="#{pass.direction}" styleClass="output-text" />

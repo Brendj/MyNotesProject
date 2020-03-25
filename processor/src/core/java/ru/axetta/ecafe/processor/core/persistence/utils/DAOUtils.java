@@ -4915,4 +4915,11 @@ public class DAOUtils {
         q.setParameter("guidOfPosition", guidOfPosition);
         return (Integer) q.uniqueResult();
     }
+
+    public static List getAllDateFromProdactionCalendarDates(Session persistenceSession, Date startDate, Date endDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
+        criteria.add(Restrictions.ge("day", startDate));
+        criteria.add(Restrictions.le("day", endDate));
+        return criteria.list();
+    }
 }
