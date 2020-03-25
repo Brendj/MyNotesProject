@@ -852,7 +852,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                      + "INNER JOIN cf_preorder_linkod pl ON pl.idoforder = o.idoforder "
                      + "INNER JOIN cf_preorder_complex pc ON pl.preorderguid = pc.guid "
                      + "LEFT JOIN "
-                     + "    (SELECT pmd.idofpreordercomplex, pmd.menudetailname, pmd.menudetailprice, pmd.amount, pmd.itemcode "
+                     + "    (SELECT pmd.idofpreordercomplex, pmd.menudetailname, pmd.menudetailprice, pmd.usedamount as amount, pmd.itemcode "
                      + "        FROM cf_preorder_menudetail pmd "
                      + "        WHERE pmd.amount > 0 "
                      + "    ) pmd ON pmd.idofpreordercomplex = pc.idofpreordercomplex "
