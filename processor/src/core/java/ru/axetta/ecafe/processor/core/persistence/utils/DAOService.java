@@ -1859,6 +1859,20 @@ public class DAOService {
         return 0L;
     }
 
+    public ComplexInfo getComplexInfo(Long idOfComplexInfo) {
+        if (idOfComplexInfo == null)
+            return null;
+        TypedQuery<ComplexInfo> q = entityManager
+                .createQuery("from ComplexInfo where idOfComplexInfo = :idOfComplexInfo",
+                        ComplexInfo.class);
+        q.setParameter("idOfComplexInfo", idOfComplexInfo);
+        List <ComplexInfo> complexInfos = q.getResultList();
+        if (complexInfos.isEmpty())
+            return null;
+        else
+            return q.getResultList().get(0);
+    }
+
     public long getNextIdOfOrder(Org org) {
         Session session = (Session) entityManager.getDelegate();
         org.hibernate.Query q = session.createSQLQuery("SELECT max(idoforder) FROM cf_orders WHERE idoforg=:idoforg");
