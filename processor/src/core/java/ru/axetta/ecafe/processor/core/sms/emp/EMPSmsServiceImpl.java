@@ -210,8 +210,9 @@ public class EMPSmsServiceImpl extends ISmsService {
                 + client.getMobile());
 
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sms.service.test", "false")
-                .equals("true") && event.getParameters().get("TEST") != null) {
+        if ((RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sms.service.test", "false")
+                .equals("true") && event.getParameters().get("TEST") != null) || RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sms.service.allcopytotest", "false")
+                .equals("true")) {
             //  Отправка запроса на тестовый контур
             SubscriptionPortType subscription = createEventController(true);
             if (subscription != null) {
