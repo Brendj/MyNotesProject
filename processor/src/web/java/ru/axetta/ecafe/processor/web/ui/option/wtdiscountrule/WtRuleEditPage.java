@@ -217,6 +217,10 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
                         wtComplexes.addAll(addWtComplex(null, ageGroupItem, null));
                     }
                 }
+
+                wtSelectedComplexes.clear();
+                wtSelectedComplexes.addAll(getNativeComplexes(wtEntity));
+
                 for (WtComplex wtComplex : wtComplexes) {
                     wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
                 }
@@ -282,16 +286,24 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
         this.operationor = wtDiscountRule.isOperationOr();
 
         wtSelectedComplexes.clear();
-        for (WtComplex wtComplex : wtDiscountRule.getComplexes()) {
-            if (wtComplex != null) {
-                wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
-            }
-        }
+        wtSelectedComplexes.addAll(getNativeComplexes(wtDiscountRule));
 
         complexType = -1;
         ageGroup = -1;
         contragentFilter = "Не выбрано";
 
+    }
+
+    private List<WtSelectedComplex> getNativeComplexes(WtDiscountRule wtDiscountRule) {
+        List<WtSelectedComplex> complexes = new ArrayList<>();
+        if (!wtDiscountRule.getComplexes().isEmpty()) {
+            for (WtComplex wtComplex : wtDiscountRule.getComplexes()) {
+                WtSelectedComplex wtSelectedComplex = new WtSelectedComplex(wtComplex);
+                wtSelectedComplex.setChecked(true);
+                complexes.add(wtSelectedComplex);
+            }
+        }
+        return complexes;
     }
 
     public List<SelectItem> getSubCategories() throws Exception {
