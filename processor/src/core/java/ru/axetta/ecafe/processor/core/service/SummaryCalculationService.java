@@ -193,6 +193,7 @@ public class SummaryCalculationService {
                     Thread.sleep(pause);
                 }
             }
+
             if (clients == null) {
                 return;
             }
@@ -201,6 +202,8 @@ public class SummaryCalculationService {
                 if (clientEE.getNotInform()) {
                     continue;
                 }
+                if (clickedOnButton)
+                    clientEE.setValues(attachValue(clientEE.getValues(), "TEST", "true"));
                 try {
                     String type = "";
                     int notificationType = 0;
