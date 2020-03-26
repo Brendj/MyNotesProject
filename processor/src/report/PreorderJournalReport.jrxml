@@ -372,7 +372,7 @@
 					<rightPen lineWidth="1.0"/>
 				</box>
 				<textElement textAlignment="Right"/>
-				<textFieldExpression><![CDATA[java.math.BigDecimal.valueOf($F{usedSum}).movePointLeft(2)]]></textFieldExpression>
+				<textFieldExpression><![CDATA[$F{usedSum} == null ? "" : String.format("%.2f", $F{usedSum}/100.0)]]></textFieldExpression>
 			</textField>
 		</band>
 	</detail>

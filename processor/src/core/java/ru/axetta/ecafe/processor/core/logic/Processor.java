@@ -4109,6 +4109,10 @@ public class Processor implements SyncProcessor {
                 long totalPurchaseRSum = 0;
                 long totalLunchRSum = 0;
                 Set<String> rations = new HashSet<>();
+                //Проверяем, есть ли среди деталей элемент со ссылкой на предзаказ
+                PreorderComplex preorderComplex = findPreorderComplexByPayment(persistenceSession, payment);
+                boolean saveAllPreorderDetails = (preorderComplex == null ? false : preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4));
+
                 // Register order details (purchase)
                 for (Purchase purchase : payment.getPurchases()) {
                     if (null != findOrderDetail(persistenceSession,
@@ -4136,9 +4140,9 @@ public class Processor implements SyncProcessor {
                             orderDetail.setGood(good);
                         }
                     }
-                    if (purchase.getGuidPreOrderDetail() != null) {
+                    if (saveAllPreorderDetails || purchase.getGuidPreOrderDetail() != null) {
                         savePreorderGuidFromOrderDetail(persistenceSession, purchase.getGuidPreOrderDetail(),
-                                orderDetail, false);
+                                orderDetail, false, preorderComplex, purchase.getItemCode());
                     }
                     persistenceSession.save(orderDetail);
                     totalPurchaseDiscount += purchase.getDiscount() * Math.abs(purchase.getQty());

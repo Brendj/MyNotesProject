@@ -32,6 +32,8 @@ import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
+import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
+import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Purchase;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -2114,17 +2116,19 @@ public class DAOUtils {
     }
 
     public static void savePreorderGuidFromOrderDetail(Session session, String guid, OrderDetail orderDetail,
-            boolean cancelOrder) {
+            boolean cancelOrder, PreorderComplex preorderComplex, String itemCode) {
         if (!cancelOrder) {
             PreorderLinkOD linkOD = new PreorderLinkOD(guid, orderDetail);
             session.save(linkOD);
         }
-        Criteria criteria = session.createCriteria(PreorderComplex.class);
-        criteria.add(Restrictions.eq("guid", guid));
-        PreorderComplex preorderComplex = (PreorderComplex) criteria.uniqueResult();
+        if (preorderComplex == null) {
+            Criteria criteria = session.createCriteria(PreorderComplex.class);
+            criteria.add(Restrictions.eq("guid", guid));
+            preorderComplex = (PreorderComplex) criteria.uniqueResult();
+        }
         if (preorderComplex != null) {
-            Long sum = orderDetail.getQty() * orderDetail.getRPrice();
-            Long qty = orderDetail.getQty();
+            long sum = orderDetail.getQty() * orderDetail.getRPrice();
+            long qty = orderDetail.getQty();
             if (cancelOrder) {
                 sum = -sum;
                 qty = -qty;
@@ -2132,7 +2136,37 @@ public class DAOUtils {
             preorderComplex.setUsedSum(preorderComplex.getUsedSum() + sum);
             preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
             session.update(preorderComplex);
+
+            if (preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4) && itemCode != null) {
+                PreorderMenuDetail pmd = getPreorderMenuDetailByItemCode(preorderComplex, itemCode);
+                if (pmd != null) {
+                    long sum2 = qty * pmd.getMenuDetailPrice();
+                    pmd.setUsedSum(pmd.getUsedSum() + sum2);
+                    pmd.setUsedAmount(pmd.getUsedAmount() + qty);
+                    session.update(pmd);
+                }
+            }
         }
+    }
+
+    public static PreorderComplex findPreorderComplexByPayment(Session session, Payment payment) {
+        for (Purchase purchase : payment.getPurchases()) {
+            if (purchase.getGuidPreOrderDetail() != null) {
+                Criteria criteria = session.createCriteria(PreorderComplex.class);
+                criteria.add(Restrictions.eq("guid", purchase.getGuidPreOrderDetail()));
+                return (PreorderComplex) criteria.uniqueResult();
+            }
+        }
+        return null;
+    }
+
+    private static PreorderMenuDetail getPreorderMenuDetailByItemCode(PreorderComplex preorderComplex, String itemCode) {
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getItemCode().equals(itemCode)) {
+                return pmd;
+            }
+        }
+        return null;
     }
 
     public static void changeClientGroupNotifyViaSMS(Session session, boolean notifyViaSMS, List<Long> clientsId)
