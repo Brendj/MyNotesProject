@@ -444,7 +444,7 @@ public class ImportRegisterClientsService {
                                 emptyIfNull(dbClient.getClientGroup() == null ? ""
                                         : dbClient.getClientGroup().getGroupName()), logBuffer);
                         addClientChange(ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
-                                RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                                RegistryChange.FULL_COMPARISON, false);
                     }
                 } catch (Exception e) {
                     logError("Failed to delete client " + dbClient, e, logBuffer);
@@ -466,13 +466,10 @@ public class ImportRegisterClientsService {
                                     dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()),
                             logBuffer);
                     addClientChange(ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
-                            RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                            RegistryChange.FULL_COMPARISON, false);
                 }
             }
         }
-
-        Map<Long, CategoryDiscount> categoryMap = getCategoriesMap(session);
-        Map<Integer, CategoryDiscountDSZN> categoryDSZNMap = getCategoriesDSZNMap(session);
 
         //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
         for (ExpandedPupilInfo pupil : pupils) {
@@ -549,7 +546,7 @@ public class ImportRegisterClientsService {
                         emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName())
                         + " из школы " + cl.getOrg().getIdOfOrg() + " в школу " + org.getIdOfOrg(), logBuffer);
                 addClientChange(ts, org.getIdOfOrg(), org.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION,
-                        RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                        RegistryChange.FULL_COMPARISON, false);
                 continue;
             }
             if (!updateClient) {
@@ -571,7 +568,7 @@ public class ImportRegisterClientsService {
                                 pupil.getFamilyName() + " " + pupil.getFirstName() + " " +
                                 pupil.getSecondName() + ", " + pupil.getGroup(), logBuffer);
                         addClientChange(ts, org.getIdOfOrg(), fieldConfig, CREATE_OPERATION,
-                                RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                                RegistryChange.FULL_COMPARISON, false);
                     } catch (Exception e) {
                         // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
                         logError("Ошибка добавления клиента", e, logBuffer);
@@ -588,7 +585,7 @@ public class ImportRegisterClientsService {
                             + emptyIfNull(pupil.getFirstName()) + " " +
                             emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()), logBuffer);
                     addClientChange(ts, org.getIdOfOrg(), fieldConfig, cl, MODIFY_OPERATION,
-                            RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                            RegistryChange.FULL_COMPARISON, false);
                 }
             } catch (Exception e) {
                 logError("Failed to add client for " + org.getIdOfOrg() + " org", e, logBuffer);
@@ -1366,11 +1363,7 @@ public class ImportRegisterClientsService {
                     }
                     Date createDateBirth = new Date(change.getBirthDate());
                     createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
-                    createConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefitsSafe());
-                    if(change.getCheckBenefitsSafe()) {
-                        createConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
-                        createConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
-                    }
+                    createConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, false);
                     createConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, change.getGuardiansCount());
                     createConfig.setValueSet(ClientManager.FieldId.GUARDIANS_COUNT_LIST, change.getRegistryChangeGuardiansSet());
                     createConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
@@ -1447,11 +1440,7 @@ public class ImportRegisterClientsService {
                     modifyConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
                     Date modifyDateBirth = new Date(change.getBirthDate());
                     modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
-                    modifyConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefitsSafe());
-                    if(change.getCheckBenefitsSafe()) {
-                        modifyConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
-                        modifyConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
-                    }
+                    modifyConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, false);
                     modifyConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
 
                     ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
