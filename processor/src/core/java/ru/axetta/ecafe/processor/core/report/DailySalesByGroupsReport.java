@@ -988,7 +988,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                             + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) AND pl.idofpreorderlinkod IS NOT NULL THEN 'pmixed' "
                             + "ELSE 'other' END AS flag FROM CF_ORDERS o "
                             + "INNER JOIN CF_ORDERDETAILS od ON o.IdOfOrder=od.IdOfOrder AND o.idoforg = od.idoforg "
-                            + "LEFT JOIN cf_preorder_linkod pl ON pl.idoforder = o.idoforder "
+                            + "LEFT JOIN cf_preorder_linkod pl ON pl.idoforder = od.idoforder and pl.idoforderdetail = od.idoforderdetail "
                             + "LEFT JOIN cf_preorder_complex pc ON pc.guid = pl.preorderguid "
                             + "LEFT JOIN cf_preorder_menudetail pmd ON pmd.idofpreordercomplex = pc.idofpreordercomplex AND pc.amount = 0"
                             + String.format("WHERE %s AND (o.IdOfOrder = od.IdOfOrder) ", orgAdditionalCondition)
