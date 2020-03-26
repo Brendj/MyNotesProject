@@ -858,7 +858,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 String payType = (String) vals[8];
                 String menuDetailName = (String) vals[9];
                 Long menuDetailPrice = null == vals[10] ? null : ((BigInteger) vals[10]).longValue();
-                Integer amount = (Integer) vals[11];
+                Integer amount = null == vals[11] ? null : ((BigInteger) vals[11]).intValue();
                 Integer modeOfAdd = (Integer) vals[12];
                 Integer armComplexId = (Integer) vals[13];
                 String itemCode = (String) vals[14];
