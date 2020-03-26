@@ -65,6 +65,11 @@
             <f:selectItem itemLabel="ИЛИ" itemValue="true"/>
         </h:selectOneListbox>
 
+        <h:panelGrid styleClass="borderless-grid">
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
+        </h:panelGrid>
+
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="Зарегистрировать правило" action="#{wtRuleCreatePage.createRule}"
                                reRender="ruleCreatePanel" styleClass="command-button"/>
@@ -119,11 +124,6 @@
                 <a4j:commandButton value="Отобразить" action="#{wtRuleCreatePage.fillWtSelectedComplexes()}"
                                    reRender="workspaceTogglePanel"
                                    styleClass="command-button"/>
-            </h:panelGrid>
-
-            <h:panelGrid styleClass="borderless-grid">
-                <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
-                               warnClass="warn-messages"/>
             </h:panelGrid>
 
             <a4j:status id="reportGenerateStatus">

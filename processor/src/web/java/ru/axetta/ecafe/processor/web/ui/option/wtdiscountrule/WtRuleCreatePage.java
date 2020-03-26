@@ -73,7 +73,6 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     private int complexType = -1;
     private int ageGroup = -1;
 
-    WtDiscountRule wtEntity;
     private List<WtSelectedComplex> wtSelectedComplexes = new ArrayList<>();
     private Map<Integer, Long> complexTypeMap;
     private Map<Integer, Long> ageGroupMap;
@@ -299,6 +298,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         this.operationOr = false;
         this.filter = "Не выбрано";
         this.filterOrg = "Не выбрано";
+        this.subCategory = -1;
     }
 
     @Transactional
@@ -351,6 +351,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         daoService.persistEntity(wtDiscountRule);
 
         printMessage("Правило зарегистрировано успешно");
+        onShow();
     }
 
     public Integer[] getSelectedComplexIds() {
@@ -465,14 +466,6 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
 
     public void setAgeGroup(int ageGroup) {
         this.ageGroup = ageGroup;
-    }
-
-    public WtDiscountRule getWtEntity() {
-        return wtEntity;
-    }
-
-    public void setWtEntity(WtDiscountRule wtEntity) {
-        this.wtEntity = wtEntity;
     }
 
     public List<WtSelectedComplex> getWtSelectedComplexes() {
