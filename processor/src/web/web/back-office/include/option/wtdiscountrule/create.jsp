@@ -15,7 +15,7 @@
 
 <%-- Панель создания правила --%>
 <%--@elvariable id="wtRuleCreatePage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.wtRuleCreatePage"--%>
-<h:panelGrid id="ruleCreatePanel" binding="#{wtRuleCreatePage.pageComponent}"
+<h:panelGrid id="wtRuleCreatePanel" binding="#{wtRuleCreatePage.pageComponent}"
              styleClass="borderless-grid borderless-grid-align-top" columns="2">
 
     <h:panelGrid styleClass="borderless-grid">
@@ -72,7 +72,7 @@
 
         <h:panelGrid styleClass="borderless-grid" columns="2">
             <a4j:commandButton value="Зарегистрировать правило" action="#{wtRuleCreatePage.createRule}"
-                               reRender="ruleCreatePanel" styleClass="command-button"/>
+                               reRender="wtRuleCreatePanel" styleClass="command-button"/>
         </h:panelGrid>
     </h:panelGrid>
 
