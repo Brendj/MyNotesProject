@@ -14,9 +14,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -292,23 +290,14 @@ public class ResMenuSupplier implements AbstractToElement {
     private Element menuGroupToElement(Document document, WtMenuGroup menuGroup) {
         Element element = document.createElement("MGI");
 
-        Element prop = document.createElement("Prop");
-        XMLUtils.setAttributeIfNotNull(prop, "Id", menuGroup.getId());
-        XMLUtils.setAttributeIfNotNull(prop, "Name", menuGroup.getName());
-        //XMLUtils.setAttributeIfNotNull(prop, "MenuId", menuGroup.getWtMenu().getIdOfMenu());
-        XMLUtils.setAttributeIfNotNull(prop, "V", menuGroup.getVersion());
-        XMLUtils.setAttributeIfNotNull(prop, "D", menuGroup.getDeleteState());
-
-        Element dishes = document.createElement("Dishes");
-        for (WtDish item : menuGroup.getDishes()) {
-            Element elem = document.createElement("DSI");
-            XMLUtils.setAttributeIfNotNull(elem, "MenuGroupId", menuGroup.getId());
-            XMLUtils.setAttributeIfNotNull(elem, "DishId", item.getIdOfDish());
-            dishes.appendChild(elem);
+        XMLUtils.setAttributeIfNotNull(element, "Id", menuGroup.getId());
+        XMLUtils.setAttributeIfNotNull(element, "Name", menuGroup.getName());
+        if (!menuGroup.getMenus().isEmpty()) {
+            List<WtMenu> menuGroups = new ArrayList<>(menuGroup.getMenus());
+            XMLUtils.setAttributeIfNotNull(element, "MenuGroupId", menuGroups.get(0));
         }
-
-        element.appendChild(prop);
-        element.appendChild(dishes);
+        XMLUtils.setAttributeIfNotNull(element, "V", menuGroup.getVersion());
+        XMLUtils.setAttributeIfNotNull(element, "D", menuGroup.getDeleteState());
 
         return element;
     }
@@ -341,6 +330,10 @@ public class ResMenuSupplier implements AbstractToElement {
             Element elem = document.createElement("DSI");
             XMLUtils.setAttributeIfNotNull(elem, "MenuId", menu.getIdOfMenu());
             XMLUtils.setAttributeIfNotNull(elem, "DishId", item.getIdOfDish());
+            if (!item.getMenuGroups().isEmpty()) {
+                List<WtMenuGroup> menuGroups = new ArrayList<>(item.getMenuGroups());
+                XMLUtils.setAttributeIfNotNull(elem, "MenuGroupId", menuGroups.get(0));
+            }
             dishes.appendChild(elem);
         }
 

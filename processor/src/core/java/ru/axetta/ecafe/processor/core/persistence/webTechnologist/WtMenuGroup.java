@@ -55,6 +55,12 @@ public class WtMenuGroup {
             inverseJoinColumns = @JoinColumn(name = "idOfDish"))
     private Set<WtDish> dishes = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(name = "cf_wt_dishes_menu_relationships",
+            joinColumns = @JoinColumn(name = "idOfMenuGroup"),
+            inverseJoinColumns = @JoinColumn(name = "idOfMenu"))
+    private Set<WtMenu> menus = new HashSet<>();
+
     public Long getId() {
         return id;
     }
@@ -133,6 +139,14 @@ public class WtMenuGroup {
 
     public void setUpdatedUser(User updatedUser) {
         this.updatedUser = updatedUser;
+    }
+
+    public Set<WtMenu> getMenus() {
+        return menus;
+    }
+
+    public void setMenus(Set<WtMenu> menus) {
+        this.menus = menus;
     }
 
     @Override

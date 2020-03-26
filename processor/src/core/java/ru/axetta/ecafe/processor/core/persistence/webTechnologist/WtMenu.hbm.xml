@@ -67,11 +67,9 @@
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         </set>
 
-        <set name="menuGroups" inverse="true" cascade="all" lazy="false">
-            <key>
-                <column name="id"/>
-            </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup"/>
+        <set name="menuGroups" lazy="false" table="cf_wt_dishes_menu_relationships">
+            <key column="idOfMenu"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup" column="idOfMenuGroup"/>
         </set>
 
     </class>

@@ -72,8 +72,11 @@ public class WtMenu {
             inverseJoinColumns = @JoinColumn(name = "idOfOrg"))
     private Set<Org> orgs = new HashSet<>();
 
-    @OneToMany(mappedBy = "wtMenu")
-    private Set<WtMenuGroup> menuGroups;
+    @ManyToMany
+    @JoinTable(name = "cf_wt_dishes_menu_relationships",
+            joinColumns = @JoinColumn(name = "idOfMenu"),
+            inverseJoinColumns = @JoinColumn(name = "idOfMenuGroup"))
+    private Set<WtMenuGroup> menuGroups = new HashSet<>();
 
     public Long getIdOfMenu() {
         return idOfMenu;
