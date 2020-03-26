@@ -1318,7 +1318,8 @@ public class DAOUtils {
     {
         Criteria criteria = session.createCriteria(NotificationOrders.class);
         criteria.add(Restrictions.eq("idOfOrder", orderId));
-        criteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+        if (client != null)
+            criteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
         criteria.add(Restrictions.eq("sended", sended)); //Сообщение уже было отослано
         NotificationOrders notificationOrder = null;
         try {
