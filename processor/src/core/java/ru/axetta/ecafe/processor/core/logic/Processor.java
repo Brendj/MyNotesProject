@@ -2028,10 +2028,12 @@ public class Processor implements SyncProcessor {
             return;
         }
         processMigrantsSections(request, syncHistory, responseSections, null);
-        processClientRegistrySectionsForMigrants(request, syncHistory, responseSections);
+        if (request.getClientRegistryRequest() == null)
+            processClientRegistrySectionsForMigrants(request, syncHistory, responseSections);
         processAccRegistrySectionsForMigrants(request, syncHistory, responseSections);
         processAccountRegistrySectionsForMigrants(request, syncHistory, responseSections);
-        processClientGuardianDataSectionsForMigrants(request, syncHistory, responseSections);
+        if (request.getClientGuardianRequest() == null)
+            processClientGuardianDataSectionsForMigrants(request, syncHistory, responseSections);
     }
 
     private void processClientGuardianDataSectionsForMigrants(SyncRequest request, SyncHistory syncHistory,
