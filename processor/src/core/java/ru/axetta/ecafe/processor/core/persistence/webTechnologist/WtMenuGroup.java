@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.User;
 
 import javax.persistence.*;
@@ -45,13 +46,13 @@ public class WtMenuGroup {
     private Integer deleteState;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @JoinColumn(name = "menu_id")
-    private WtMenu wtMenu;
+    @JoinColumn(name = "idOfContragent")
+    private Contragent contragent;
 
     @ManyToMany
-    @JoinTable(name = "cf_wt_menu_group_dish",
-            joinColumns = @JoinColumn(name = "menu_group_id"),
-            inverseJoinColumns = @JoinColumn(name = "dish_id"))
+    @JoinTable(name = "cf_wt_dishes_menu_relationships",
+            joinColumns = @JoinColumn(name = "idOfMenuGroup"),
+            inverseJoinColumns = @JoinColumn(name = "idOfDish"))
     private Set<WtDish> dishes = new HashSet<>();
 
     public Long getId() {
@@ -102,12 +103,12 @@ public class WtMenuGroup {
         this.deleteState = deleteState;
     }
 
-    public WtMenu getWtMenu() {
-        return wtMenu;
+    public Contragent getContragent() {
+        return contragent;
     }
 
-    public void setWtMenu(WtMenu wtMenu) {
-        this.wtMenu = wtMenu;
+    public void setContragent(Contragent contragent) {
+        this.contragent = contragent;
     }
 
     public Set<WtDish> getDishes() {

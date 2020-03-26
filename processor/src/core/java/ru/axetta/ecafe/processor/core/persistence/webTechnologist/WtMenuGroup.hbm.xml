@@ -42,13 +42,13 @@
             <column name="deleteState" sql-type="integer"/>
         </property>
 
-        <many-to-one name="wtMenu" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu">
-            <column name="menu_id"/>
+        <many-to-one name="contragent" lazy="false" class="ru.axetta.ecafe.processor.core.persistence.Contragent">
+            <column name="idOfContragent"/>
         </many-to-one>
 
-        <set name="dishes" lazy="false" table="cf_wt_menu_group_dish">
-            <key column="menu_group_id"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish" column="dish_id"/>
+        <set name="dishes" lazy="false" table="cf_wt_dishes_menu_relationships">
+            <key column="idOfMenuGroup"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish" column="idOfDish"/>
         </set>
 
     </class>

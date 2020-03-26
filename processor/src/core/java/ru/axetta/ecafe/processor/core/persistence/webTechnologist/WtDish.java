@@ -119,9 +119,9 @@ public class WtDish {
     private Set<WtGroupItem> groupItems = new HashSet<>();
 
     @ManyToMany
-    @JoinTable(name = "cf_wt_menu_group_dish",
-            joinColumns = @JoinColumn(name = "dish_id"),
-            inverseJoinColumns = @JoinColumn(name = "menu_group_id"))
+    @JoinTable(name = "cf_wt_dishes_menu_relationships",
+            joinColumns = @JoinColumn(name = "idOfDish"),
+            inverseJoinColumns = @JoinColumn(name = "idOfMenuGroup"))
     private Set<WtMenuGroup> menuGroups = new HashSet<>();
 
     public Long getIdOfDish() {
