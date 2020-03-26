@@ -140,10 +140,10 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         complexGroupItems = daoService.getWtComplexGroupList();
         int i = 0;
         for (WtComplexGroupItem item : complexGroupItems) {
-            //if (item.getIdOfComplexGroupItem() != 3) { // 3 = Все виды питания
+            if (item.getIdOfComplexGroupItem() != 3) { // 3 = Все виды питания
                 res.add(new SelectItem(++i, item.getDescription()));
                 complexTypeMap.put(i, item.getIdOfComplexGroupItem());
-            //}
+            }
         }
         return res;
     }
