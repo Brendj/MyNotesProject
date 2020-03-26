@@ -2187,9 +2187,9 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Org> getAllOrgWithGuid(EntityManager em) {
-        javax.persistence.Query q = em.createQuery("from Org where guid is not null");
-        return (List<Org>) q.getResultList();
+    public static List<Org> getAllOrgWithGuid(Session session) {
+        org.hibernate.Query q = session.createQuery("from Org where guid is not null");
+        return (List<Org>) q.list();
     }
 
     public static List<Org> findOrgsWithContract(EntityManager entityManager, Contract contract) {
