@@ -977,9 +977,9 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
             Query payComplexQueryTotal = session.createSQLQuery(
                     "SELECT CASE WHEN pc.modeofadd = 2 or pc.idofpreordercomplex is null THEN SUM(od.Qty) "
-                            + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.amount) ELSE 0 END AS amount, "
+                            + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.usedamount) ELSE 0 END AS amount, "
                             + "CASE WHEN pc.modeofadd = 2 or pc.idofpreordercomplex is null THEN SUM(od.Qty * od.RPrice) "
-                            + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.amount * pmd.menudetailprice) ELSE 0 END AS price, "
+                            + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.usedamount * pmd.menudetailprice) ELSE 0 END AS price, "
                             + "CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) AND pl.idofpreorderlinkod IS NULL THEN 'cash' "
                             + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) AND pl.idofpreorderlinkod IS NULL THEN 'card' "
                             + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) AND pl.idofpreorderlinkod IS NULL THEN 'mixed' "
