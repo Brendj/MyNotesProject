@@ -12,3 +12,5 @@ alter table cf_preorder_linkod
   add column itemcode character varying(32);
 
 ALTER TABLE cf_kf_organization_registry ADD COLUMN xaIsActive INTEGER DEFAULT 1;
+
+--! ФИНАЛИЗИРОВАН 26.03.2020, НЕ МЕНЯТЬ
