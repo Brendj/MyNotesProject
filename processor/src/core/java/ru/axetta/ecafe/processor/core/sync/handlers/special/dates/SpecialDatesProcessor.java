@@ -44,18 +44,25 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
         try{
             ResSpecialDatesItem resItem;
             Long nextVersion = DAOUtils.nextVersionBySpecialDate(session);
-            for(SpecialDatesItem item : specialDates.getItems()){
-                if(item.getResCode().equals(SpecialDatesItem.ERROR_CODE_ALL_OK)){
-                    CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(item.getIdOfOrg(), item.getDate());
-                    SpecialDate specialDate = null;
-                    String groupName = item.getGroupName();
-                    Long idOfClientGroup = null;
+            for (SpecialDatesItem item : specialDates.getItems()) {
+                String groupName = item.getGroupName();
+                Long idOfClientGroup = null;
+                if (item.getResCode().equals(SpecialDatesItem.ERROR_CODE_ALL_OK)) {
                     if (!StringUtils.isEmpty(groupName)) {
                         ClientGroup clientGroup = DAOUtils
                                 .findClientGroupByGroupNameAndIdOfOrg(session, item.getIdOfOrg(), groupName);
                         if (clientGroup != null)
                             idOfClientGroup = clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup();
+                        else {
+                            item.setResCode(SpecialDatesItem.ERROR_CODE_NOT_FOUND_GROUPNAME);
+                            item.setErrorMessage("Not found groupName");
+                        }
                     }
+                }
+                if (item.getResCode().equals(SpecialDatesItem.ERROR_CODE_ALL_OK)) {
+                    CompositeIdOfSpecialDate compositeId = new CompositeIdOfSpecialDate(item.getIdOfOrg(), item.getDate());
+                    SpecialDate specialDate = null;
+
                     if (StringUtils.isEmpty(groupName)) {
                         specialDate = DAOUtils.findSpecialDate(session, compositeId);
                     } else {
@@ -89,6 +96,7 @@ public class SpecialDatesProcessor extends AbstractProcessor<ResSpecialDates>{
                     resItem.setDate(item.getDate());
                     resItem.setIsWeekend(item.getIsWeekend());
                     resItem.setComment(item.getComment());
+                    resItem.setGroupName(item.getGroupName());
                     resItem.setDeleted(item.getDelete());
                     resItem.setResCode(item.getResCode());
                     resItem.setErrorMessage(item.getErrorMessage());
