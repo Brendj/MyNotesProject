@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.web.ui.option.wtdiscountrule;
 
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.CategoryOrg;
-import ru.axetta.ecafe.processor.core.persistence.ComplexRole;
 import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
@@ -83,22 +82,6 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     private String contragentIds;
     private List<ContragentItem> contragentItems = new ArrayList<>();
 
-    public List<SelectItem> getAvailableComplexs() {
-        final List<ComplexRole> complexRoles = daoService.findComplexRoles();
-        final int size = complexRoles.size();
-        List<SelectItem> list = new ArrayList<SelectItem>(size);
-        for (int i = 0; i < size; i++) {
-            ComplexRole complexRole = complexRoles.get(i);
-            String complexName = String.format("Комплекс %d", i);
-            if (!complexName.equals(complexRole.getRoleName())) {
-                complexName = String.format("Комплекс %d - %s", i, complexRole.getRoleName());
-            }
-            SelectItem selectItem = new SelectItem(i, complexName);
-            list.add(selectItem);
-        }
-        return list;
-    }
-
     public List<SelectItem> getSubCategories() throws Exception {
         List<SelectItem> res = new ArrayList<SelectItem>();
         res.add(new SelectItem("", ""));
@@ -157,10 +140,10 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         complexGroupItems = daoService.getWtComplexGroupList();
         int i = 0;
         for (WtComplexGroupItem item : complexGroupItems) {
-            if (item.getIdOfComplexGroupItem() != 3) { // 3 = Все виды питания
+            //if (item.getIdOfComplexGroupItem() != 3) { // 3 = Все виды питания
                 res.add(new SelectItem(++i, item.getDescription()));
                 complexTypeMap.put(i, item.getIdOfComplexGroupItem());
-            }
+            //}
         }
         return res;
     }
@@ -216,7 +199,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
 
         wtSelectedComplexes.clear();
 
-        if (complexType > -1 || ageGroup > -1 || !contragentItems.isEmpty()) {
+        if (complexType > 0 || ageGroup > 0 || !contragentItems.isEmpty()) {
             Long complexGroupId = complexTypeMap.get(complexType);
             Long ageGroupId = ageGroupMap.get(ageGroup);
 
@@ -292,8 +275,11 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
                     wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
                 }
             }
-        } else if (complexType == -1 && ageGroup == -1 && contragentItems.isEmpty()) {
-            return;
+        } else {
+            List<WtComplex> wtComplexes = daoService.getWtComplexesList();
+            for (WtComplex wtComplex : wtComplexes) {
+                wtSelectedComplexes.add(new WtSelectedComplex(wtComplex));
+            }
         }
     }
 

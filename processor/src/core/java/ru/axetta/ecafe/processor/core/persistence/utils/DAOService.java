@@ -2806,7 +2806,9 @@ public class DAOService {
     }
 
     public List<WtComplex> getWtComplexesList() {
-        TypedQuery<WtComplex> q = entityManager.createQuery("from WtComplex order by idOfComplex", WtComplex.class);
+        TypedQuery<WtComplex> q = entityManager
+                .createQuery("select wc from WtComplex wc where wc.deleteState = 0 order by wc.idOfComplex",
+                        WtComplex.class);
         return q.getResultList();
     }
 
