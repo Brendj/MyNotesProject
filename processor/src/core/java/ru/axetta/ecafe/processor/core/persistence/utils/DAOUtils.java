@@ -532,6 +532,28 @@ public class DAOUtils {
         return (Card) persistenceSession.get(Card.class, idOfCard);
     }
 
+    public static Card findCardByCardNoDoublesAllowed(Session session, Org cardOrg, Long cardNo, Long cardPrintedNo, Integer cardSignCertNum) throws Exception {
+        Criteria cr = session.createCriteria(Card.class);
+        cr.add(Restrictions.eq("cardNo", cardNo));
+        cr.add(Restrictions.in("org", findAllFriendlyOrgs(session, cardOrg.getIdOfOrg())));
+        cr.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        cr.setMaxResults(1);
+        Card card = (Card)cr.uniqueResult();
+        if (card != null) return card;
+
+        Criteria criteria = session.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("cardNo", cardNo));
+        criteria.add(Restrictions.eq("cardPrintedNo", cardPrintedNo));
+        if (cardSignCertNum == null) {
+            criteria.add(Restrictions.isNull("cardSignCertNum"));
+        } else {
+            criteria.add(Restrictions.eq("cardSignCertNum", cardSignCertNum));
+        }
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        criteria.setMaxResults(1);
+        return (Card) criteria.uniqueResult();
+    }
+
     public static Card findCardByCardNo(Session persistenceSession, Long cardNo) {
         Criteria criteria = persistenceSession.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));

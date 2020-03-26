@@ -59,15 +59,13 @@ public class CardService {
 
 
     //1. Регистрация карты
-    public Card registerNew(long idOfOrg, long cardNo, long cardPrintedNo, int type,
+    public Card registerNew(Org org, long cardNo, long cardPrintedNo, int type,
             Integer cardSignVerifyRes, Integer cardSignCertNum, Boolean isLongUid) throws Exception {
-        Org org = orgRepository.findOne(idOfOrg);
         return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid);
     }
 
-    public Card registerNew(long idOfOrg, long cardNo, long cardPrintedNo, int type, Integer cardSignVerifyRes,
+    public Card registerNew(Org org, long cardNo, long cardPrintedNo, int type, Integer cardSignVerifyRes,
             Integer cardSignCertNum, Boolean isLongUid, Integer cardTransitionState) throws Exception {
-        Org org = orgRepository.findOne(idOfOrg);
         return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
                 isLongUid, cardTransitionState);
     }
