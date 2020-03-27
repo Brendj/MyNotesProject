@@ -400,14 +400,15 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
                 }
             }
 
+            //wtEntity.setComplexes(Collections.EMPTY_SET);
+            Set<WtComplex> newComplexes = new HashSet<>();
             for (WtSelectedComplex wtSelectedComplex : wtSelectedComplexes) {
                 if (wtSelectedComplex.isChecked()) {
-                    WtComplex complex = wtSelectedComplex.getWtComplex();
-                    wtEntity.getComplexes().add(complex);
+                    newComplexes.add(wtSelectedComplex.getWtComplex());
                 }
             }
+            wtEntity.setComplexes(newComplexes);
 
-            //wtEntity.setDescription(description);
             em.persist(wtEntity);
             fill(wtEntity);
         }
