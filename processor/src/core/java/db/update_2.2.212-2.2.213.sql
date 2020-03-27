@@ -1,27 +1,16 @@
-/*
- * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
- */
-
 --! Пока скрипт не финализирован рекомендовано писать очистку добавляемых колонок таблиц.
 --! после финализации они уберутся
 --! Информация для разработчика -- информация для пользователя
 
 -- Пакет обновлений 213
 
--- 395: добавление версий справочникам веб-технолога
+ALTER TABLE cf_preorder_menudetail
+  ADD COLUMN usedsum BIGINT not null default 0,
+  ADD COLUMN usedamount BIGINT not null default 0;
 
-ALTER TABLE cf_wt_typeofproduction_items add column version bigint NOT NULL DEFAULT 0; -- Версия (для АРМ)
-COMMENT ON COLUMN cf_wt_typeofproduction_items.version IS 'Версия (для АРМ)';
+alter table cf_preorder_linkod
+  add column itemcode character varying(32);
 
-ALTER TABLE cf_wt_agegroup_items add column version bigint NOT NULL DEFAULT 0; -- Версия (для АРМ)
-COMMENT ON COLUMN cf_wt_agegroup_items.version IS 'Версия (для АРМ)';
+ALTER TABLE cf_kf_organization_registry ADD COLUMN xaIsActive INTEGER DEFAULT 1;
 
-ALTER TABLE cf_wt_diet_type add column version bigint NOT NULL DEFAULT 0; -- Версия (для АРМ)
-COMMENT ON COLUMN cf_wt_diet_type.version IS 'Версия (для АРМ)';
-
-ALTER TABLE cf_wt_complex_group_items add column version bigint NOT NULL DEFAULT 0; -- Версия (для АРМ)
-COMMENT ON COLUMN cf_wt_complex_group_items.version IS 'Версия (для АРМ)';
-
-ALTER TABLE cf_wt_group_items add column version bigint NOT NULL DEFAULT 0; -- Версия (для АРМ)
-COMMENT ON COLUMN cf_wt_group_items.version IS 'Версия (для АРМ)';
-
+--! ФИНАЛИЗИРОВАН 26.03.2020, НЕ МЕНЯТЬ
