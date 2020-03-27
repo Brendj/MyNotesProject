@@ -199,10 +199,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
         wtSelectedComplexes.clear();
 
         if (complexType > 0 || ageGroup > 0 || !contragentItems.isEmpty()) {
-            Long complexGroupId = complexTypeMap.get(complexType);
-            Long ageGroupId = ageGroupMap.get(ageGroup);
-
-            if (complexGroupId == null && ageGroupId == null && contragentItems.isEmpty()) {
+            if (complexType == 0 && ageGroup == 0 && contragentItems.isEmpty()) {
                 return;
             } else {
                 List<WtComplexGroupItem> wtComplexGroupItem = null;
@@ -222,11 +219,11 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
                     }
                 }
 
-                if (complexGroupId != null) {
-                    wtComplexGroupItem = daoService.getWtComplexGroupItemById(complexGroupId);
+                if (complexType != 0) {
+                    wtComplexGroupItem = daoService.getWtComplexGroupItemById((long) complexType);
                 }
-                if (ageGroupId != null) {
-                    wtAgeGroupItem = daoService.getWtAgeGroupItemById(ageGroupId);
+                if (ageGroup != 0) {
+                    wtAgeGroupItem = daoService.getWtAgeGroupItemById((long) ageGroup);
                 }
 
                 Set<WtComplex> wtComplexes = new HashSet<>();
