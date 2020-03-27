@@ -103,6 +103,9 @@ public class WtComplex {
     @OneToMany(mappedBy = "wtComplex")
     private Set<WtComplexesItem> wtComplexesItems = new HashSet<>();
 
+    @OneToMany(mappedBy = "complex")
+    private Set<WtComplexExcludeDays> wtExcludeDays = new HashSet<>();
+
     public Boolean getIsPortal() {
         return isPortal;
     }
@@ -302,6 +305,14 @@ public class WtComplex {
 
     public void setWtComplexesItems(Set<WtComplexesItem> wtComplexesItems) {
         this.wtComplexesItems = wtComplexesItems;
+    }
+
+    public Set<WtComplexExcludeDays> getWtExcludeDays() {
+        return wtExcludeDays;
+    }
+
+    public void setWtExcludeDays(Set<WtComplexExcludeDays> wtExcludeDays) {
+        this.wtExcludeDays = wtExcludeDays;
     }
 
     @Override
