@@ -413,6 +413,16 @@ public class ResMenuSupplier implements AbstractToElement {
             }
         }
 
+        // Исключенные дни //
+        Element excludeDays = document.createElement("ExcludeDays");
+        for (WtComplexExcludeDays item : complex.getWtExcludeDays()) {
+            Element elem = document.createElement("ED");
+            XMLUtils.setAttributeIfNotNull(elem, "ExcludeDaysId", item.getId());
+            XMLUtils.setAttributeIfNotNull(elem, "ComplexId", complex.getIdOfComplex());
+            XMLUtils.setAttributeIfNotNull(prop, "Date", simpleDateFormat.format(item.getDate()));
+            excludeDays.appendChild(elem);
+        }
+
         Element orgs = document.createElement("Orgs");
         for (Org item : complex.getOrgs()) {
             Element elem = document.createElement("ORI");
