@@ -291,6 +291,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     public void onShow() throws Exception {
         this.description = "";
         this.priority = 0;
+        this.discountRate = 100;
         this.categoryDiscounts = "";
         this.operationOr = false;
         this.filter = "Не выбрано";
@@ -323,7 +324,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
 
         wtDiscountRule.setOperationOr(operationOr);
         wtDiscountRule.setPriority(priority);
-        wtDiscountRule.setPriority(discountRate);
+        wtDiscountRule.setRate(discountRate);
 
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<>();
 
