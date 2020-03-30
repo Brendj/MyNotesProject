@@ -382,17 +382,19 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
             this.categoryDiscountSet = new HashSet<CategoryDiscount>();
             wtEntity.getCategoryDiscounts().clear();
 
-            List categoryList = DAOUtils.getCategoryDiscountListWithIds(em, this.idOfCategoryList);
-            StringBuilder stringBuilder = new StringBuilder();
-            for (Object object : categoryList) {
-                this.categoryDiscountSet.add((CategoryDiscount) object);
-                stringBuilder.append(((CategoryDiscount) object).getIdOfCategoryDiscount());
-                stringBuilder.append(",");
+            if (!this.idOfCategoryList.isEmpty() && this.idOfCategoryList.size() != 0) {
+                List categoryList = DAOUtils.getCategoryDiscountListWithIds(em, this.idOfCategoryList);
+                StringBuilder stringBuilder = new StringBuilder();
+                for (Object object : categoryList) {
+                    this.categoryDiscountSet.add((CategoryDiscount) object);
+                    stringBuilder.append(((CategoryDiscount) object).getIdOfCategoryDiscount());
+                    stringBuilder.append(",");
+                }
+                wtEntity.setCategoryDiscounts(this.categoryDiscountSet);
             }
-            wtEntity.setCategoryDiscounts(this.categoryDiscountSet);
 
             wtEntity.getCategoryOrgs().clear();
-            if (!this.idOfCategoryOrgList.isEmpty()) {
+            if (!this.idOfCategoryOrgList.isEmpty() && this.idOfCategoryOrgList.size() != 0) {
                 wtEntity.getCategoryOrgs().clear();
                 List<CategoryOrg> categoryOrgList = DAOUtils.getCategoryOrgWithIds(em, this.idOfCategoryOrgList);
                 for (Object object : categoryOrgList) {
