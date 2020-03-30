@@ -138,7 +138,7 @@
                 <f:setPropertyActionListener value="#{wtRuleListPage}"
                                              target="#{confirmDeletePage.listener}"/>
                 <f:setPropertyActionListener value="#{item.wtEntity}"
-                                             target="#{confirmDeletePage.wtEntity}"/>
+                                             target="#{confirmDeletePage.entity}"/>
             </a4j:commandLink>
         </rich:column>
 
