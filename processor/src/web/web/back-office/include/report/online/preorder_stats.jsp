@@ -26,6 +26,9 @@
                           value=" {#{preorderStatsReportPage.filter}}" />
         </h:panelGroup>
 
+        <h:outputText escape="true" value="Все организации с функционалом \"Предзаказ\"" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{preorderStatsReportPage.preorderOrgs}" styleClass="output-text" />
+
         <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
         <rich:calendar value="#{preorderStatsReportPage.startDate}" datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text"
@@ -36,7 +39,7 @@
 
         <h:outputText styleClass="output-text" escape="true" value="Интервал выборки" />
         <h:selectOneMenu id="endDatePeriodSelect"
-                         value="#preorderStatsReportPage.periodTypeMenu.periodType}"
+                         value="#{preorderStatsReportPage.periodTypeMenu.periodType}"
                          styleClass="input-text" style="width: 250px;">
             <f:converter converterId="periodTypeConverter" />
             <f:selectItems value="#{preorderStatsReportPage.periodTypeMenu.items}" />

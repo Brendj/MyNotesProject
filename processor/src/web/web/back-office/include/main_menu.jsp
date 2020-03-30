@@ -1249,7 +1249,7 @@
                             label="Общая статистика" action="#{commonStatsPage.show}" reRender="workspaceForm" />
         <%--@elvariable id="preorderStatsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreorderStatsReportPage"--%>
         <rich:panelMenuItem id="preorderStatsMenuItem" binding="#{preorderStatsReportPage.mainMenuComponent}"
-                            label="Статистика по количеству заказанного питания по предзаказу)" action="#{preorderStatsReportPage.show}" reRender="workspaceForm" />
+                            label="Статистика по количеству заказанного питания по предзаказу" action="#{preorderStatsReportPage.show}" reRender="workspaceForm" />
         <%--@elvariable id="activeDiscountClientsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ActiveDiscountClientsReportPage"--%>
         <rich:panelMenuItem id="activeDiscountClientsMenuItem"
                             binding="#{activeDiscountClientsReportPage.mainMenuComponent}"
