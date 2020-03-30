@@ -84,7 +84,7 @@ public class GeneralRequestMetod {
            Integer maxVersion = DAOUtils.getMaxVersionForEZD(persistenceSession);
            for (Org org : orgs) {
                Date startDate = new Date();
-               startDate = CalendarUtils.addOneDay(startDate);
+               //startDate = CalendarUtils.addOneDay(startDate);
                startDate = CalendarUtils.startOfDay(startDate);
 
                Integer countBadday = allIdtoSetiings.get(org.getIdOfOrg());

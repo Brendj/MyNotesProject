@@ -14,7 +14,8 @@
         <property name="idOfOrg" column="idOfOrg" type="long" />
         <property name="idOfOrder" column="idOfOrder" type="long" />
         <property name="idOfOrderDetail" column="idOfOrderDetail" type="long" />
-        <property name="qty" column="qty" type="long" />
-        <property name="price" column="price" type="long" />
+        <property name="qty" column="qty" type="long" not-null="true "/>
+        <property name="price" column="price" type="long" not-null="true" />
+        <property name="itemCode" column="itemcode" type="string" length="32" />
     </class>
 </hibernate-mapping>

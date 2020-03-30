@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.sync.request.DirectivesRequest;
+import ru.axetta.ecafe.processor.core.utils.VersionUtils;
 
 import org.hibernate.Session;
 import org.w3c.dom.Document;
@@ -126,6 +127,9 @@ public class DirectiveElement implements AbstractToElement{
         if (feedingSettingLimit != null) {
             directiveItemList.add(new DirectiveItem("FeedingSettingLimit", feedingSettingLimit.toString()));
         }
+
+        boolean cardDoublesAllowed = VersionUtils.doublesOnlyAllowed();
+        directiveItemList.add(new DirectiveItem("ALLOW_NON_UNIQUE_CARDNO", cardDoublesAllowed ? "1" : "0"));
 
         if(directivesRequest.getTradeConfigChangedSuccess() != null && directivesRequest.getTradeConfigChangedSuccess()) {
             //org.setTradeAccountConfigChangeDirective(TradeAccountConfigChange.NOT_CHANGED);

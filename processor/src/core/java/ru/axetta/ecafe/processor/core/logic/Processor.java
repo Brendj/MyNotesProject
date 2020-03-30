@@ -2028,10 +2028,12 @@ public class Processor implements SyncProcessor {
             return;
         }
         processMigrantsSections(request, syncHistory, responseSections, null);
-        processClientRegistrySectionsForMigrants(request, syncHistory, responseSections);
+        if (request.getClientRegistryRequest() == null)
+            processClientRegistrySectionsForMigrants(request, syncHistory, responseSections);
         processAccRegistrySectionsForMigrants(request, syncHistory, responseSections);
         processAccountRegistrySectionsForMigrants(request, syncHistory, responseSections);
-        processClientGuardianDataSectionsForMigrants(request, syncHistory, responseSections);
+        if (request.getClientGuardianRequest() == null)
+            processClientGuardianDataSectionsForMigrants(request, syncHistory, responseSections);
     }
 
     private void processClientGuardianDataSectionsForMigrants(SyncRequest request, SyncHistory syncHistory,
@@ -4055,19 +4057,6 @@ public class Processor implements SyncProcessor {
                         client = card.getClient();
                     }
                 }
-                if (null != client && card != null) {
-                    if (Card.ACTIVE_STATE != card.getState()) {
-                        Card newCard = client.findActiveCard(persistenceSession, card);
-                        if (logger.isWarnEnabled()) {
-                            if (!newCard.getIdOfCard().equals(card.getIdOfCard())) {
-                                logger.warn(String.format(
-                                        "Specified card is inactive. Client: %s, Card: %s. Will use card: %s",
-                                        "" + client.getIdOfClient(), card.getIdOfCard(), newCard.getIdOfCard()));
-                            }
-                        }
-                        card = newCard;
-                    }
-                }
                 // If client is specified - check if client is registered for the specified organization
                 // or for one of friendly organizations of specified one
                 Set<Long> idOfFriendlyOrgSet = getIdOfFriendlyOrg(persistenceSession, idOfOrg);
@@ -4109,6 +4098,10 @@ public class Processor implements SyncProcessor {
                 long totalPurchaseRSum = 0;
                 long totalLunchRSum = 0;
                 Set<String> rations = new HashSet<>();
+                //Проверяем, есть ли среди деталей элемент со ссылкой на предзаказ
+                PreorderComplex preorderComplex = findPreorderComplexByPayment(persistenceSession, payment);
+                boolean saveAllPreorderDetails = (preorderComplex == null ? false : preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4));
+
                 // Register order details (purchase)
                 for (Purchase purchase : payment.getPurchases()) {
                     if (null != findOrderDetail(persistenceSession,
@@ -4136,9 +4129,9 @@ public class Processor implements SyncProcessor {
                             orderDetail.setGood(good);
                         }
                     }
-                    if (purchase.getGuidPreOrderDetail() != null) {
+                    if (saveAllPreorderDetails || purchase.getGuidPreOrderDetail() != null) {
                         savePreorderGuidFromOrderDetail(persistenceSession, purchase.getGuidPreOrderDetail(),
-                                orderDetail, false);
+                                orderDetail, false, preorderComplex, purchase.getItemCode());
                     }
                     persistenceSession.save(orderDetail);
                     totalPurchaseDiscount += purchase.getDiscount() * Math.abs(purchase.getQty());

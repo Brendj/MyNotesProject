@@ -815,7 +815,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                      + "INNER JOIN cf_preorder_linkod pl ON pl.idoforder = o.idoforder "
                      + "INNER JOIN cf_preorder_complex pc ON pl.preorderguid = pc.guid "
                      + "LEFT JOIN "
-                     + "    (SELECT pmd.idofpreordercomplex, pmd.menudetailname, pmd.menudetailprice, pmd.amount, pmd.itemcode "
+                     + "    (SELECT pmd.idofpreordercomplex, pmd.menudetailname, pmd.menudetailprice, pmd.usedamount as amount, pmd.itemcode "
                      + "        FROM cf_preorder_menudetail pmd "
                      + "        WHERE pmd.amount > 0 "
                      + "    ) pmd ON pmd.idofpreordercomplex = pc.idofpreordercomplex "
@@ -858,7 +858,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                 String payType = (String) vals[8];
                 String menuDetailName = (String) vals[9];
                 Long menuDetailPrice = null == vals[10] ? null : ((BigInteger) vals[10]).longValue();
-                Integer amount = (Integer) vals[11];
+                Integer amount = null == vals[11] ? null : ((BigInteger) vals[11]).intValue();
                 Integer modeOfAdd = (Integer) vals[12];
                 Integer armComplexId = (Integer) vals[13];
                 String itemCode = (String) vals[14];
@@ -977,9 +977,9 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
 
             Query payComplexQueryTotal = session.createSQLQuery(
                     "SELECT CASE WHEN pc.modeofadd = 2 or pc.idofpreordercomplex is null THEN SUM(od.Qty) "
-                            + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.amount) ELSE 0 END AS amount, "
+                            + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.usedamount) ELSE 0 END AS amount, "
                             + "CASE WHEN pc.modeofadd = 2 or pc.idofpreordercomplex is null THEN SUM(od.Qty * od.RPrice) "
-                            + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.amount * pmd.menudetailprice) ELSE 0 END AS price, "
+                            + "     WHEN pc.modeofadd = 4 THEN SUM(pmd.usedamount * pmd.menudetailprice) ELSE 0 END AS price, "
                             + "CASE WHEN (o.sumbycash <> 0) AND (o.sumbycard = 0) AND pl.idofpreorderlinkod IS NULL THEN 'cash' "
                             + "WHEN (o.sumbycard <> 0) AND (o.sumbycash = 0) AND pl.idofpreorderlinkod IS NULL THEN 'card' "
                             + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) AND pl.idofpreorderlinkod IS NULL THEN 'mixed' "
@@ -988,7 +988,7 @@ public class DailySalesByGroupsReport extends BasicReportForOrgJob {
                             + "WHEN (o.sumbycard <> 0) AND (o.sumbycash <> 0) AND pl.idofpreorderlinkod IS NOT NULL THEN 'pmixed' "
                             + "ELSE 'other' END AS flag FROM CF_ORDERS o "
                             + "INNER JOIN CF_ORDERDETAILS od ON o.IdOfOrder=od.IdOfOrder AND o.idoforg = od.idoforg "
-                            + "LEFT JOIN cf_preorder_linkod pl ON pl.idoforder = o.idoforder "
+                            + "LEFT JOIN cf_preorder_linkod pl ON pl.idoforder = od.idoforder and pl.idoforderdetail = od.idoforderdetail "
                             + "LEFT JOIN cf_preorder_complex pc ON pc.guid = pl.preorderguid "
                             + "LEFT JOIN cf_preorder_menudetail pmd ON pmd.idofpreordercomplex = pc.idofpreordercomplex AND pc.amount = 0"
                             + String.format("WHERE %s AND (o.IdOfOrder = od.IdOfOrder) ", orgAdditionalCondition)

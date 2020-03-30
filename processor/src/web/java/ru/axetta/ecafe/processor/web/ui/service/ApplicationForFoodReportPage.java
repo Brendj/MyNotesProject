@@ -131,7 +131,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
             List<ApplicationForFood> list = DAOUtils.getApplicationForFoodListByOrgs(session, idOfOrgList, statusCondition,
                     benefitCondition, idOfClientList, number, CalendarUtils.startOfDay(startDate), CalendarUtils.endOfDay(endDate), showPeriod);
             for (ApplicationForFood applicationForFood : list) {
-                ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(applicationForFood);
+                ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(session, applicationForFood);
                 ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, applicationForFood.getClient().getIdOfClient(),
                         Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE));
                 if (info != null) {

@@ -69,6 +69,7 @@ public class OtherActionsPage extends OnlineReportPage {
     private Date startDateEMP;
     private Date endDateEMP;
     private Long contractId;
+    private boolean allowGenerateGuardians = true;
 
     private static final Logger logger = LoggerFactory.getLogger(OtherActionsPage.class);
 
@@ -294,18 +295,24 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void runGenerateGuardians() {
-        List<Long> orgs;
-
-        int count = 0;
+        if (!allowGenerateGuardians) return;
         try {
-            orgs = getOrgsForGenGuardians();
-            count = ClientService.getInstance().generateGuardians(orgs);
-        } catch (Exception e) {
-            printError(String.format("Операция завершилась с ошибкой: %s", e.getMessage()));
-            return;
-        }
+            allowGenerateGuardians = false;
+            List<Long> orgs;
 
-        printMessage(String.format("Операция выполнена успешно. Сгенерированы представители для %s клиентов", count));
+            int count = 0;
+            try {
+                orgs = getOrgsForGenGuardians();
+                count = ClientService.getInstance().generateGuardians(orgs);
+            } catch (Exception e) {
+                printError(String.format("Операция завершилась с ошибкой: %s", e.getMessage()));
+                return;
+            }
+
+            printMessage(String.format("Операция выполнена успешно. Сгенерированы представители для %s клиентов", count));
+        } finally {
+            allowGenerateGuardians = true;
+        }
     }
 
     public void runMealTest() {
