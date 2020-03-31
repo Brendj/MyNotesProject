@@ -110,17 +110,17 @@ public class PreorderStatsReportBuilder extends BasicReportJob.Builder {
                 + orgCondition);
 
 
-        query.setParameter("startDate", CalendarUtils.startOfDay(startDate));
-        query.setParameter("endDate", CalendarUtils.endOfDay(endDate));
+        query.setParameter("startDate", CalendarUtils.startOfDay(startDate).getTime());
+        query.setParameter("endDate", CalendarUtils.endOfDay(endDate).getTime());
         if (getReportProperties().getProperty(PreorderStatsReport.PREORDER_ORGS_PARAM) == null) {
-            query.setParameter("orgs", orgs);
+            query.setParameterList("orgs", orgs);
         }
         List<PreorderComplex> list = query.list();
         for (Object o : list) {
             Object[] row = (Object[]) o;
             Integer mobileGroup = HibernateUtils.getDbInt(row[0]);
             PreorderMobileGroupOnCreateType mobileGroupOnCreate = mobileGroup == null ? null : PreorderMobileGroupOnCreateType.fromInteger(mobileGroup);
-            Date date = new Date(((BigInteger)row[0]).longValue());
+            Date date = new Date(((BigInteger)row[1]).longValue());
             PreorderStatsReportItem item = new PreorderStatsReportItem(date, mobileGroupOnCreate);
             PreorderStatsReportItem mapItem = map.get(date);
             if (mapItem == null) {

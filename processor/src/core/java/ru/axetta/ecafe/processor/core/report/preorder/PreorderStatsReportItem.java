@@ -24,18 +24,20 @@ public class PreorderStatsReportItem {
         this.parents = 0;
         this.students = 0;
         this.others = 0;
-        switch (mobileGroupOnCreate) {
-            case EMPLOYEE:
-                this.employee = 1;
-                break;
-            case PARENT:
-                this.parents = 1;
-                break;
-            case STUDENT:
-                this.students = 1;
-                break;
-            default:
-                this.others = 1;
+        if (mobileGroupOnCreate != null) {
+            switch (mobileGroupOnCreate) {
+                case EMPLOYEE:
+                    this.employee = 1;
+                    break;
+                case PARENT:
+                    this.parents = 1;
+                    break;
+                case STUDENT:
+                    this.students = 1;
+                    break;
+                default:
+                    this.others = 1;
+            }
         }
     }
 
