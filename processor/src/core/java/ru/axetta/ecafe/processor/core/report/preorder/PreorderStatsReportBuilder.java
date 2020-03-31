@@ -101,10 +101,12 @@ public class PreorderStatsReportBuilder extends BasicReportJob.Builder {
 
         Query query = session.createSQLQuery("select pc.mobileGroupOnCreate, pc.preorderDate, "
                 + "(select string_agg(mobileGroupOnCreate, ',') from "
-                + "(select distinct cast(mobileGroupOnCreate as text) from cf_preorder_menudetail pmd where pmd.idofpreordercomplex = pc.idofpreordercomplex) q) as qq "
+                + "(select distinct cast(mobileGroupOnCreate as text) from cf_preorder_menudetail pmd "
+                + "where pmd.idofpreordercomplex = pc.idofpreordercomplex and pmd.deletedState = 0) q) as qq "
                 + "from cf_preorder_complex pc "
                 + "join cf_orgs org on pc.idOfOrgOnCreate = org.IdOfOrg "
                 + "where pc.preorderdate between :startDate and :endDate "
+                + "and pc.deletedState = 0 "
                 + orgCondition);
 
 

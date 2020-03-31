@@ -84,8 +84,8 @@ public class PreorderUtils {
     }
 
     public static List<Client> getClientsByMobile(Session session, Long idOfClient, String mobile) {
-        Query query = session.createQuery("select c from Client c where (c.mobile = :mobile and c.idOfClient = :idOfClient) "
-                + "or exists (select c2 from Client g, ClientGuardian cg where g.mobile = :mobile and g.idOfClient = cg.idOfGuardian and cg.idOfChildren = :idOfClient)");
+        Query query = session.createQuery("select c from Client c where c.mobile = :mobile and (c.idOfClient = :idOfClient "
+                + "or exists (select g.idOfClient from Client g, ClientGuardian cg where g.mobile = :mobile and g.idOfClient = cg.idOfGuardian and cg.idOfChildren = :idOfClient))");
         query.setParameter("mobile", mobile);
         query.setParameter("idOfClient", idOfClient);
         return query.list();
