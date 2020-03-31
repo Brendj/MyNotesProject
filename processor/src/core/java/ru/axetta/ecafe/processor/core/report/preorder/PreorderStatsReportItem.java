@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.report.preorder;
 
+import ru.axetta.ecafe.processor.core.persistence.PreorderMobileGroupOnCreateType;
+
 import java.util.Date;
 
 /**
@@ -15,6 +17,27 @@ public class PreorderStatsReportItem {
     private Integer employee;
     private Integer students;
     private Integer others;
+
+    public PreorderStatsReportItem(Date date, PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
+        this.date = date;
+        this.employee = 0;
+        this.parents = 0;
+        this.students = 0;
+        this.others = 0;
+        switch (mobileGroupOnCreate) {
+            case EMPLOYEE:
+                this.employee = 1;
+                break;
+            case PARENT:
+                this.parents = 1;
+                break;
+            case STUDENT:
+                this.students = 1;
+                break;
+            default:
+                this.others = 1;
+        }
+    }
 
     public PreorderStatsReportItem(Date date, Integer parents, Integer employee, Integer students, Integer others) {
         this.date = date;

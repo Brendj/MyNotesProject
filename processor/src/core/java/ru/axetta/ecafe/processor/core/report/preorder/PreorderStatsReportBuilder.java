@@ -13,14 +13,21 @@ import net.sf.jasperreports.engine.export.JRHtmlExporter;
 import net.sf.jasperreports.engine.export.JRHtmlExporterParameter;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.PreorderComplex;
+import ru.axetta.ecafe.processor.core.persistence.PreorderMobileGroupOnCreateType;
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
 import java.io.ByteArrayOutputStream;
 import java.io.File;
+import java.math.BigInteger;
 import java.util.*;
 
 /**
@@ -72,15 +79,62 @@ public class PreorderStatsReportBuilder extends BasicReportJob.Builder {
     }
 
     private JRDataSource buildDataSource(Session session, Date startDate, Date endDate) throws Exception {
-        List<PreorderStatsReportItem> items = new ArrayList<PreorderStatsReportItem>();
+        Map<Date, PreorderStatsReportItem> map = new TreeMap<>();
         String orgCondition = "";
-        if (getReportProperties().getProperty(PreorderStatsReport.PREORDER_ORGS_PARAM) != null) {
-
+        List<Long> orgs = new ArrayList<>();
+        if (reportProperties.getProperty(PreorderStatsReport.PREORDER_ORGS_PARAM) != null) {
+            orgCondition = " and org.preordersenabled = 1";
+        } else {
+            orgCondition = " and org.idOfOrg in :orgs";
+            String idOfOrgs = StringUtils.trimToEmpty(reportProperties.getProperty(ReportPropertiesUtils.P_ID_OF_ORG));
+            List<String> stringOrgList = Arrays.asList(StringUtils.split(idOfOrgs, ','));
+            for (String idOfOrg : stringOrgList) {
+                orgs.add(Long.parseLong(idOfOrg));
+            }
         }
 
-        Query query = session.createSQLQuery("select pc.idofpreordercomplex, pc.mobile from cf_preorder_complex pc "
-                + "join cf_clients c on pc.idofclient = c.idofclient "
-                + "where pc.preorderdate between :startDate and :endDate and pc.deletedstate = 0");
+        /*Query query = session.createQuery("select pc from PreorderComplex pc, Org org "
+                + "where pc.idOfOrgOnCreate = org.idOfOrg "
+                + "and pc.preorderDate between :startDate and :endDate and pc.deletedState = false "
+                + orgCondition
+                + " order by pc.idOfOrgOnCreate");*/
+
+        Query query = session.createSQLQuery("select pc.mobileGroupOnCreate, pc.preorderDate, "
+                + "(select string_agg(mobileGroupOnCreate, ',') from "
+                + "(select distinct cast(mobileGroupOnCreate as text) from cf_preorder_menudetail pmd where pmd.idofpreordercomplex = pc.idofpreordercomplex) q) as qq "
+                + "from cf_preorder_complex pc "
+                + "join cf_orgs org on pc.idOfOrgOnCreate = org.IdOfOrg "
+                + "where pc.preorderdate between :startDate and :endDate "
+                + orgCondition);
+
+
+        query.setParameter("startDate", CalendarUtils.startOfDay(startDate));
+        query.setParameter("endDate", CalendarUtils.endOfDay(endDate));
+        if (getReportProperties().getProperty(PreorderStatsReport.PREORDER_ORGS_PARAM) == null) {
+            query.setParameter("orgs", orgs);
+        }
+        List<PreorderComplex> list = query.list();
+        for (Object o : list) {
+            Object[] row = (Object[]) o;
+            Integer mobileGroup = HibernateUtils.getDbInt(row[0]);
+            PreorderMobileGroupOnCreateType mobileGroupOnCreate = mobileGroup == null ? null : PreorderMobileGroupOnCreateType.fromInteger(mobileGroup);
+            Date date = new Date(((BigInteger)row[0]).longValue());
+            PreorderStatsReportItem item = new PreorderStatsReportItem(date, mobileGroupOnCreate);
+            PreorderStatsReportItem mapItem = map.get(date);
+            if (mapItem == null) {
+                map.put(date, item);
+            } else {
+                mapItem.setEmployee(mapItem.getEmployee() + item.getEmployee());
+                mapItem.setParents(mapItem.getParents() + item.getParents());
+                mapItem.setStudents(mapItem.getStudents() + item.getStudents());
+                mapItem.setOthers(mapItem.getOthers() + item.getOthers());
+            }
+        }
+
+        List<PreorderStatsReportItem> items = new ArrayList<>();
+        for (Date date : map.keySet()) {
+            items.add(map.get(date));
+        }
 
         return new JRBeanCollectionDataSource(items);
     }
