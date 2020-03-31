@@ -4505,11 +4505,11 @@ public class DAOUtils {
         return version;
     }
 
-    public static HardwareSettings getHardwareSettingsRequestByOrgAndModuleType(Session session, Long idOfOrg, Integer moduleType)
-            throws Exception {
+    public static HardwareSettings getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(Session session, Long idOfOrg,
+            Long idOfHardwareSetting) throws Exception {
         Criteria criteria = session.createCriteria(HardwareSettings.class);
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
-        criteria.add(Restrictions.eq("moduleType", moduleType));
+        criteria.add(Restrictions.eq("idOfHardwareSetting", idOfHardwareSetting));
         return (HardwareSettings) criteria.uniqueResult();
     }
 
@@ -4524,9 +4524,34 @@ public class DAOUtils {
         return version;
     }
 
-    public static TurnstileSettings getTurnstileSettingsRequestByOrg(Session session, Long idOfOrg) throws Exception {
+    public static TurnstileSettings getTurnstileSettingsRequestByOrgAndId(Session session, Long idOfOrg, String turnstileId) throws Exception {
         Criteria criteria = session.createCriteria(TurnstileSettings.class);
         criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("turnstileId", turnstileId));
         return (TurnstileSettings) criteria.uniqueResult();
     }
+
+    public static HardwareSettingsMT getHardwareSettingsMTByIdAndModuleType(Session session, Long idOfHardwareSetting,
+            Integer moduleType) throws Exception {
+        Criteria criteria = session.createCriteria(HardwareSettingsMT.class);
+        criteria.add(Restrictions.eq("hardwareSettings.idOfHardwareSetting", idOfHardwareSetting));
+        criteria.add(Restrictions.eq("moduleType", moduleType));
+        return (HardwareSettingsMT) criteria.uniqueResult();
+    }
+
+    public static HardwareSettingsReaders getHardwareSettingsReadersByIdAndUsedByModule(Session session, Long idOfHardwareSetting, Integer usedByModule)
+            throws Exception {
+        Criteria criteria = session.createCriteria(HardwareSettingsReaders.class);
+        criteria.add(Restrictions.eq("hardwareSettings.idOfHardwareSetting", idOfHardwareSetting));
+        criteria.add(Restrictions.eq("usedByModule", usedByModule));
+        return (HardwareSettingsReaders) criteria.uniqueResult();
+    }
+
+    public static TurnstileSettings getTurnstileSettingsById(Session session, String turnstileId) throws Exception {
+        Criteria criteria = session.createCriteria(TurnstileSettings.class);
+        criteria.add(Restrictions.eq("turnstileId", turnstileId));
+        return (TurnstileSettings) criteria.uniqueResult();
+    }
+
+
 }

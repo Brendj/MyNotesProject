@@ -21,12 +21,13 @@ public class HardwareSettingsRequest implements SectionRequest {
     public static final String SECTION_NAME = "HardwareSettings";
 
     private final Long orgOwner;
-    private final List<HardwareSettingsRequestItem> items;
     private final Long maxVersion;
-    private Integer typeValue;
+    private final List<List<HardwareSettingsRequestItem>> sectionItem;
+    private Long idOfHardwareSetting;
 
     public enum ModuleType {
-        MT("MT"), IP("IP"), DOTNETVER("DotNetVer"), OSVER("OsVer"), RAM("RAM"), CPU("CPU"), CR("CR");
+        HS("HS"), MT("MT"), IP("IP"), DOTNETVER("DotNetVer"), OSVER("OsVer"), RAM("RAM"), CPU("CPU"), READERS(
+                "Readers");
 
         private final String section;
         static Map<Integer, ModuleType> map = new HashMap<>();
@@ -57,52 +58,64 @@ public class HardwareSettingsRequest implements SectionRequest {
 
     public HardwareSettingsRequest(Node hardwareSettingNode, Long orgOwner) {
 
-        this.items = new ArrayList<HardwareSettingsRequestItem>();
         this.orgOwner = orgOwner;
         maxVersion = XMLUtils.getLongAttributeValue(hardwareSettingNode, "V");
+        this.sectionItem = new ArrayList<List<HardwareSettingsRequestItem>>();
+        List<HardwareSettingsRequestItem> items;
 
-        Node itemNode = hardwareSettingNode.getFirstChild();
-        while (null != itemNode) {
 
-            if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-                ModuleType moduleType = ModuleType.fromString(itemNode.getNodeName());
-                HardwareSettingsRequestItem item = null;
-                if(moduleType == null) {
-                    itemNode.getNextSibling();
-                    continue;
+        Node hsNode = hardwareSettingNode.getFirstChild();
+
+        while (null != hsNode) {
+            HardwareSettingsRequestHSItem hsItem = null;
+            items = new ArrayList<HardwareSettingsRequestItem>();
+            hsItem = HardwareSettingsRequestHSItem.build(hsNode);
+            idOfHardwareSetting = hsItem.getIdOfHardwareSetting();
+            items.add(hsItem);
+            Node itemNode = hsNode.getFirstChild();
+            while (null != itemNode) {
+                if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
+                    ModuleType moduleType = ModuleType.fromString(itemNode.getNodeName());
+                    HardwareSettingsRequestItem item = null;
+                    if (moduleType == null) {
+                        itemNode = itemNode.getNextSibling();
+                        continue;
+                    }
+                    switch (moduleType) {
+                        case MT:
+                            item = HardwareSettingsRequestMTItem.build(itemNode);
+                            break;
+                        case IP:
+                            item = HardwareSettingsRequestIPItem.build(itemNode);
+                            break;
+                        case DOTNETVER:
+                            item = HardwareSettingsRequestDotNetVerItem.build(itemNode);
+                            break;
+                        case OSVER:
+                            item = HardwareSettingsRequestOsVerItem.build(itemNode);
+                            break;
+                        case RAM:
+                            item = HardwareSettingsRequestRAMItem.build(itemNode);
+                            break;
+                        case CPU:
+                            item = HardwareSettingsRequestCPUItem.build(itemNode);
+                            break;
+                        case READERS:
+                            Node readersNode = itemNode.getFirstChild();
+                            while (null != readersNode) {
+                                item = HardwareSettingsRequestCRItem.build(readersNode);
+                                readersNode = readersNode.getNextSibling();
+                            }
+
+                            break;
+                    }
+                    items.add(item);
                 }
-                switch (moduleType) {
-                    case MT:
-                        item = HardwareSettingsRequestMTItem.build(itemNode);
-                        typeValue = ((HardwareSettingsRequestMTItem) item).getValue();
-                        break;
-                    case IP:
-                        item = HardwareSettingsRequestIPItem.build(itemNode);
-                        break;
-                    case DOTNETVER:
-                        item = HardwareSettingsRequestDotNetVerItem.build(itemNode);
-                        break;
-                    case OSVER:
-                        item = HardwareSettingsRequestOsVerItem.build(itemNode);
-                        break;
-                    case RAM:
-                        item = HardwareSettingsRequestRAMItem.build(itemNode);
-                        break;
-                    case CPU:
-                        item = HardwareSettingsRequestCPUItem.build(itemNode);
-                        break;
-                    case CR:
-                        item = HardwareSettingsRequestCRItem.build(itemNode);
-                        break;
-                }
-                items.add(item);
+                itemNode = itemNode.getNextSibling();
             }
-            itemNode = itemNode.getNextSibling();
+            sectionItem.add(items);
+            hsNode = hsNode.getNextSibling();
         }
-    }
-
-    public List<HardwareSettingsRequestItem> getItems() {
-        return items;
     }
 
     public static String getSectionName() {
@@ -122,7 +135,11 @@ public class HardwareSettingsRequest implements SectionRequest {
         return maxVersion;
     }
 
-    public Integer getTypeValue() {
-        return typeValue;
+    public List<List<HardwareSettingsRequestItem>> getSectionItem() {
+        return sectionItem;
+    }
+
+    public Long getIdOfHardwareSetting() {
+        return idOfHardwareSetting;
     }
 }

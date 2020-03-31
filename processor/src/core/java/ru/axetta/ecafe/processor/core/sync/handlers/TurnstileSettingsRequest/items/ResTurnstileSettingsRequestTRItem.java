@@ -17,14 +17,14 @@ public class ResTurnstileSettingsRequestTRItem extends ResTurnstileSettingsReque
     private String turnstileId;
     private String controllerModel;
     private String controllerFirmwareVersion;
-    private Integer isWorkWithLongIds;
+    private Integer isReadsLongIdsIncorrectly;
     private Date lastUpdateForTurnstileSetting;
 
     public ResTurnstileSettingsRequestTRItem(TurnstileSettings turnstileSettings, Integer resCode) {
         this.turnstileId = turnstileSettings.getTurnstileId();
         this.controllerModel = turnstileSettings.getControllerModel();
         this.controllerFirmwareVersion = turnstileSettings.getControllerFirmwareVersion();
-        this.isWorkWithLongIds = turnstileSettings.getIsWorkWithLongIds();
+        this.isReadsLongIdsIncorrectly = turnstileSettings.getIsReadsLongIdsIncorrectly();
         setResCode(resCode);
         setLastUpdateForTurnstileSetting(turnstileSettings.getLastUpdateForTurnstile());
     }
@@ -47,8 +47,8 @@ public class ResTurnstileSettingsRequestTRItem extends ResTurnstileSettingsReque
         if (null != controllerFirmwareVersion) {
             XMLUtils.setAttributeIfNotNull(element, "ControllerFirmwareVersion", controllerFirmwareVersion);
         }
-        if (null != isWorkWithLongIds) {
-            XMLUtils.setAttributeIfNotNull(element, "IsWorkWithLongIds", isWorkWithLongIds);
+        if (null != isReadsLongIdsIncorrectly) {
+            XMLUtils.setAttributeIfNotNull(element, "IsReadsLongIdsIncorrectly", isReadsLongIdsIncorrectly);
         }
         Date lastUpdate = getLastUpdateForTurnstileSetting();
         if (null != lastUpdate) {

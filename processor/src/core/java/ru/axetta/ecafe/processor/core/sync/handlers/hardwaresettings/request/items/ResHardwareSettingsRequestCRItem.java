@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.items;
 
-import ru.axetta.ecafe.processor.core.persistence.HardwareSettings;
+import ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Document;
@@ -16,12 +16,12 @@ public class ResHardwareSettingsRequestCRItem extends ResHardwareSettingsRequest
     private String readerName;
     private String firmwareVer;
 
-    public ResHardwareSettingsRequestCRItem(HardwareSettings hardwareSettings, Integer resCode) {
-        this.readerUsedByModule = hardwareSettings.getUsedByModule();
-        this.readerName = hardwareSettings.getReaderName();
-        this.firmwareVer = hardwareSettings.getFirmwareVer();
+    public ResHardwareSettingsRequestCRItem(HardwareSettingsReaders hardwareSettingsReaders, Integer resCode) {
+        this.readerUsedByModule = hardwareSettingsReaders.getUsedByModule();
+        this.readerName = hardwareSettingsReaders.getReaderName();
+        this.firmwareVer = hardwareSettingsReaders.getFirmwareVer();
         setResCode(resCode);
-        setLastUpdate(hardwareSettings.getLastUpdateForReader());
+        setLastUpdate(hardwareSettingsReaders.getLastUpdateForReader());
     }
 
     public ResHardwareSettingsRequestCRItem(Integer resCode, String errorMessage) {

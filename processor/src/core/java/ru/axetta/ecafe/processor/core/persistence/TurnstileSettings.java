@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class TurnstileSettings implements Serializable {
 
@@ -16,22 +18,24 @@ public class TurnstileSettings implements Serializable {
     private String turnstileId;
     private String controllerModel;
     private String controllerFirmwareVersion;
-    private Integer isWorkWithLongIds;
+    private Integer isReadsLongIdsIncorrectly;
     private Date lastUpdateForTurnstile;
+    private Set<Org> orgsInternal = new HashSet<>();
 
     public TurnstileSettings() {
 
     }
 
-    public TurnstileSettings(Long idOfTurnstileSetting, Org org, Integer numOfEntries, String turnstileId, String controllerModel,
-            String controllerFirmwareVersion, Integer isWorkWithLongIds, Date lastUpdateForTurnstile, Long version) {
+    public TurnstileSettings(Long idOfTurnstileSetting, Org org, Integer numOfEntries, String turnstileId,
+            String controllerModel, String controllerFirmwareVersion, Integer isReadsLongIdsIncorrectly,
+            Date lastUpdateForTurnstile, Long version) {
         this.idOfTurnstileSetting = idOfTurnstileSetting;
         this.org = org;
         this.numOfEntries = numOfEntries;
         this.turnstileId = turnstileId;
         this.controllerModel = controllerModel;
         this.controllerFirmwareVersion = controllerFirmwareVersion;
-        this.isWorkWithLongIds = isWorkWithLongIds;
+        this.isReadsLongIdsIncorrectly = isReadsLongIdsIncorrectly;
         this.lastUpdateForTurnstile = lastUpdateForTurnstile;
         this.version = version;
     }
@@ -76,12 +80,12 @@ public class TurnstileSettings implements Serializable {
         this.controllerFirmwareVersion = controllerFirmwareVersion;
     }
 
-    public Integer getIsWorkWithLongIds() {
-        return isWorkWithLongIds;
+    public Integer getIsReadsLongIdsIncorrectly() {
+        return isReadsLongIdsIncorrectly;
     }
 
-    public void setIsWorkWithLongIds(Integer isWorkWithLongIds) {
-        this.isWorkWithLongIds = isWorkWithLongIds;
+    public void setIsReadsLongIdsIncorrectly(Integer isReadsLongIdsIncorrectly) {
+        this.isReadsLongIdsIncorrectly = isReadsLongIdsIncorrectly;
     }
 
     public Date getLastUpdateForTurnstile() {
@@ -106,5 +110,13 @@ public class TurnstileSettings implements Serializable {
 
     public void setNumOfEntries(Integer numOfEntries) {
         this.numOfEntries = numOfEntries;
+    }
+
+    public Set<Org> getOrgsInternal() {
+        return orgsInternal;
+    }
+
+    public void setOrgsInternal(Set<Org> orgsInternal) {
+        this.orgsInternal = orgsInternal;
     }
 }

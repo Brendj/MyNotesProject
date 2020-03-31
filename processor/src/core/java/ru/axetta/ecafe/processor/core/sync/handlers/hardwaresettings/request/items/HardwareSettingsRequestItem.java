@@ -33,6 +33,16 @@ public abstract class HardwareSettingsRequestItem {
         }
     }
 
+    public HardwareSettingsRequestItem(String type, String errorMessage) {
+        this.type = type;
+        this.errorMessage = errorMessage;
+        if(errorMessage.equals("")) {
+            this.setResCode(ERROR_CODE_ALL_OK);
+        } else {
+            this.setResCode(ERROR_CODE_NOT_VALID_ATTRIBUTE);
+        }
+    }
+
     public static Date getLastUpdate(Node itemNode, StringBuilder errorMessage) {
         Date lastUpdate = null;
         String requestDateString = XMLUtils.getAttributeValue(itemNode, "LastUpdate");

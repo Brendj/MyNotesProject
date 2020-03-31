@@ -17,16 +17,16 @@ public class TurnstileSettingsRequestTRItem extends TurnstileSettingsRequestItem
     private String turnstileId;
     private String controllerModel;
     private String controllerFirmwareVersion;
-    private Integer isWorkWithLongIds;
+    private Integer IsReadsLongIdsIncorrectly;
     private Date lastUpdateForTurnstileSetting;
 
     public TurnstileSettingsRequestTRItem(String type, String errorMessage, String turnstileId, String controllerModel,
-            String controllerFirmwareVersion, Integer isWorkWithLongIds, Date lastUpdateForTurnstile) {
+            String controllerFirmwareVersion, Integer IsReadsLongIdsIncorrectly, Date lastUpdateForTurnstile) {
         super(type, errorMessage);
         this.turnstileId = turnstileId;
         this.controllerModel = controllerModel;
         this.controllerFirmwareVersion = controllerFirmwareVersion;
-        this.isWorkWithLongIds = isWorkWithLongIds;
+        this.IsReadsLongIdsIncorrectly = IsReadsLongIdsIncorrectly;
         this.lastUpdateForTurnstileSetting = lastUpdateForTurnstile;
     }
 
@@ -53,9 +53,9 @@ public class TurnstileSettingsRequestTRItem extends TurnstileSettingsRequestItem
             errorMessage.append("Attribute controllerFirmwareVersion not found");
         }
 
-        isWorkWithLongIds = XMLUtils.getIntegerAttributeValue(itemNode, "IsWorkWithLongIds");
+        isWorkWithLongIds = XMLUtils.getIntegerAttributeValue(itemNode, "IsReadsLongIdsIncorrectly");
         if (null == isWorkWithLongIds) {
-            errorMessage.append("Attribute IsWorkWithLongIds not found");
+            errorMessage.append("Attribute IsReadsLongIdsIncorrectly not found");
         }
 
         String requestDateString = XMLUtils.getAttributeValue(itemNode, "LastUpdate");
@@ -97,12 +97,12 @@ public class TurnstileSettingsRequestTRItem extends TurnstileSettingsRequestItem
         this.controllerFirmwareVersion = controllerFirmwareVersion;
     }
 
-    public Integer getIsWorkWithLongIds() {
-        return isWorkWithLongIds;
+    public Integer getIsReadsLongIdsIncorrectly() {
+        return IsReadsLongIdsIncorrectly;
     }
 
-    public void setIsWorkWithLongIds(Integer isWorkWithLongIds) {
-        this.isWorkWithLongIds = isWorkWithLongIds;
+    public void setIsReadsLongIdsIncorrectly(Integer isReadsLongIdsIncorrectly) {
+        this.IsReadsLongIdsIncorrectly = isReadsLongIdsIncorrectly;
     }
 
     public Date getLastUpdateForTurnstileSetting() {

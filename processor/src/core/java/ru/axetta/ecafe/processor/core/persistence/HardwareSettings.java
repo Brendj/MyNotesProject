@@ -6,14 +6,14 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import java.io.Serializable;
 import java.util.Date;
+import java.util.HashSet;
+import java.util.Set;
 
 public class HardwareSettings implements Serializable {
 
     private Long idOfHardwareSetting;
+    private Set<HardwareSettingsMT> moduleType = new HashSet<HardwareSettingsMT>();
     private Org org;
-    private Integer moduleType;
-    private Integer installStatus;
-    private Date lastUpdateForModuleType;
     private String ipHost;
     private Date lastUpdateForIPHost;
     private String dotNetVer;
@@ -24,25 +24,21 @@ public class HardwareSettings implements Serializable {
     private Date lastUpdateForRAMSize;
     private String cpuHost;
     private Date lastUpdateForCPUHost;
-    private Integer usedByModule;
-    private String readerName;
-    private String firmwareVer;
-    private Date lastUpdateForReader;
     private Long version;
+    private Set<Org> orgsInternal = new HashSet<>();
 
     public HardwareSettings() {
-
     }
 
-    public HardwareSettings(Long idOfHardwareSetting, Org org, Integer moduleType, Integer installStatus,
-            Date lastUpdateForModuleType, String ipHost, Date lastUpdateForIPHost, String dotNetVer,
-            Date lastUpdateForDotNetVer, String oSVer, Date lastUpdateForOSVer, String ramSize,
-            Date lastUpdateForRAMSize, String cpuHost, Date lastUpdateForCPUHost, Integer usedByModule,
-            String readerName, String firmwareVer, Date lastUpdateForReader, Long version) {
+    public HardwareSettings(Long idOfHardwareSetting, Set<Org> orgs) {
         this.idOfHardwareSetting = idOfHardwareSetting;
-        this.moduleType = moduleType;
-        this.installStatus = installStatus;
-        this.lastUpdateForModuleType = lastUpdateForModuleType;
+        this.orgsInternal = orgs;
+    }
+
+    public HardwareSettings(Long idOfHardwareSetting, Org org, String ipHost, Date lastUpdateForIPHost,
+            String dotNetVer, Date lastUpdateForDotNetVer, String oSVer, Date lastUpdateForOSVer, String ramSize,
+            Date lastUpdateForRAMSize, String cpuHost, Date lastUpdateForCPUHost, Long version, Set<Org> orgs) {
+        this.idOfHardwareSetting = idOfHardwareSetting;
         this.ipHost = ipHost;
         this.lastUpdateForIPHost = lastUpdateForIPHost;
         this.dotNetVer = dotNetVer;
@@ -53,24 +49,18 @@ public class HardwareSettings implements Serializable {
         this.lastUpdateForRAMSize = lastUpdateForRAMSize;
         this.cpuHost = cpuHost;
         this.lastUpdateForCPUHost = lastUpdateForCPUHost;
-        this.usedByModule = usedByModule;
-        this.readerName = readerName;
-        this.firmwareVer = firmwareVer;
-        this.lastUpdateForReader = lastUpdateForReader;
         this.version = version;
+        this.orgsInternal = orgs;
     }
 
-    @Override
-    public String toString() {
-        return "HardwareSettingsRequest{" + "idOfHardwareSetting=" + idOfHardwareSetting + ", moduleType" + moduleType
-                + ", installStatus" + installStatus + ", lastUpdateForModuleType" + lastUpdateForModuleType + ", ipHost"
-                + ipHost + ", lastUpdateForIpHost" + lastUpdateForIPHost + ", dotNetVer" + dotNetVer
-                + ", lastUpdateForDotNetVer" + ", oSVer" + oSVer + ", lastUpdateForOSVer" + lastUpdateForOSVer
-                + ", ramSize" + ramSize + ", lastUpdateForRamSize" + lastUpdateForRAMSize + ", cpuHost" + cpuHost
-                + ", lastUpdateForCPUHost+ " + lastUpdateForCPUHost + ", usedByModule" + usedByModule + ", readerName"
-                + readerName + ", firmwareVer" + firmwareVer + ", lastUpdateForReader" + lastUpdateForReader
-                + ",version" + version + ", idOfOrg='" + org.getIdOfOrg() + '}';
-    }
+    //@Override
+    //public String toString() {
+    //    return "HardwareSettingsRequest{" + "idOfHardwareSetting=" + idOfHardwareSetting + ", ipHost" + ipHost
+    //            + ", lastUpdateForIpHost" + lastUpdateForIPHost + ", dotNetVer" + dotNetVer + ", lastUpdateForDotNetVer"
+    //            + ", oSVer" + oSVer + ", lastUpdateForOSVer" + lastUpdateForOSVer + ", ramSize" + ramSize
+    //            + ", lastUpdateForRamSize" + lastUpdateForRAMSize + ", cpuHost" + cpuHost + ", lastUpdateForCPUHost+ "
+    //            + lastUpdateForCPUHost + ",version" + version + ", idOfOrg='" + org.getIdOfOrg() + '}';
+    //}
 
     public Org getOrg() {
         return org;
@@ -78,31 +68,6 @@ public class HardwareSettings implements Serializable {
 
     public void setOrg(Org org) {
         this.org = org;
-    }
-
-    public Integer getModuleType() {
-        return moduleType;
-    }
-
-    public void setModuleType(Integer moduleType) {
-        this.moduleType = moduleType;
-    }
-
-
-    public Integer getInstallStatus() {
-        return installStatus;
-    }
-
-    public void setInstallStatus(Integer installStatus) {
-        this.installStatus = installStatus;
-    }
-
-    public Date getLastUpdateForModuleType() {
-        return lastUpdateForModuleType;
-    }
-
-    public void setLastUpdateForModuleType(Date lastUpdateForModuleType) {
-        this.lastUpdateForModuleType = lastUpdateForModuleType;
     }
 
     public String getIpHost() {
@@ -185,36 +150,12 @@ public class HardwareSettings implements Serializable {
         this.lastUpdateForCPUHost = lastUpdateForCPUHost;
     }
 
-    public Integer getUsedByModule() {
-        return usedByModule;
+    public Long getVersion() {
+        return version;
     }
 
-    public void setUsedByModule(Integer usedByModule) {
-        this.usedByModule = usedByModule;
-    }
-
-    public String getReaderName() {
-        return readerName;
-    }
-
-    public void setReaderName(String readerName) {
-        this.readerName = readerName;
-    }
-
-    public String getFirmwareVer() {
-        return firmwareVer;
-    }
-
-    public void setFirmwareVer(String firmwareVer) {
-        this.firmwareVer = firmwareVer;
-    }
-
-    public Date getLastUpdateForReader() {
-        return lastUpdateForReader;
-    }
-
-    public void setLastUpdateForReader(Date lastUpdateForReader) {
-        this.lastUpdateForReader = lastUpdateForReader;
+    public void setVersion(Long version) {
+        this.version = version;
     }
 
     public Long getIdOfHardwareSetting() {
@@ -225,14 +166,19 @@ public class HardwareSettings implements Serializable {
         this.idOfHardwareSetting = idOfHardwareSetting;
     }
 
-    public Long getVersion() {
-        return version;
+    public Set<HardwareSettingsMT> getModuleType() {
+        return moduleType;
     }
 
-    public void setVersion(Long version) {
-        this.version = version;
+    public void setModuleType(Set<HardwareSettingsMT> moduleType) {
+        this.moduleType = moduleType;
     }
 
+    public Set<Org> getOrgsInternal() {
+        return orgsInternal;
+    }
 
-
+    public void setOrgsInternal(Set<Org> orgsInternal) {
+        this.orgsInternal = orgsInternal;
+    }
 }

@@ -975,9 +975,9 @@
         <%--@elvariable id="orgSyncSettingReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncSettingReportPage"--%>
         <rich:panelMenuItem id="orgSyncSettingsReport" binding="#{orgSyncSettingReportPage.mainMenuComponent}"
                             label="Расписание синхронизации" action="#{orgSyncSettingReportPage.show}" reRender="workspaceForm" />
-        <%--@elvariable id="orgEquipmentReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgEquipmentReportPage"--%>
-        <%--<rich:panelMenuItem id="" binding="#{orgEquipmentReportPage.mainMenuComponent}"
-                            label="Отчет по оборудованию" action="#{orgEquipmentReportPage.show}" reRender="workspaceForm" />--%>
+        <%--@elvariable id="hardwareSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.HardwareSettingsReportPage"--%>
+        <rich:panelMenuItem id="orgHardwareSettingsReport" binding="#{hardwareSettingsReportPage.mainMenuComponent}"
+                            label="Отчет по оборудованию" action="#{hardwareSettingsReportPage.show}" reRender="workspaceForm"/>
     </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 

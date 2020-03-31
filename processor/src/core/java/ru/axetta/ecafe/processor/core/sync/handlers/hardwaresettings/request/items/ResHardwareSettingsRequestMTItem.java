@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.items;
 
-import ru.axetta.ecafe.processor.core.persistence.HardwareSettings;
+import ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Document;
@@ -15,10 +15,12 @@ public class ResHardwareSettingsRequestMTItem extends ResHardwareSettingsRequest
     private Integer installStatus;
     private Integer moduleType;
 
-    public ResHardwareSettingsRequestMTItem(HardwareSettings hardwareSettings, Integer resCode) {
-        this.moduleType = hardwareSettings.getModuleType();
-        this.installStatus = hardwareSettings.getInstallStatus();
-        setLastUpdate(hardwareSettings.getLastUpdateForModuleType());
+    public ResHardwareSettingsRequestMTItem(HardwareSettingsMT hardwareSettingsMT, Integer resCode) {
+        this.moduleType = hardwareSettingsMT.getModuleType();
+        this.installStatus = hardwareSettingsMT.getInstallStatus();
+        hardwareSettingsMT.getHardwareSettings().getIdOfHardwareSetting();
+
+        setLastUpdate(hardwareSettingsMT.getLastUpdate());
         setResCode(resCode);
     }
 

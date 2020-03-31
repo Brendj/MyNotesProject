@@ -937,6 +937,9 @@ public class Processor implements SyncProcessor {
         fullProcessingRequestFeeding(request, syncHistory, responseSections);
         fullProcessingClientDiscountDSZN(request, syncHistory, responseSections);
 
+        ProcessingHardwareSettingsRequest(request, syncHistory, responseSections);
+        ProcessingTurnstileSettingsRequest(request, syncHistory, responseSections);
+
         logger.info("Full sync performance info: " + performanceLogger.toString());
 
         return new SyncResponse(request.getSyncType(), request.getIdOfOrg(), request.getOrg().getShortName(),
@@ -6658,9 +6661,6 @@ public class Processor implements SyncProcessor {
                     .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
             logger.error(message, e);
         }
-
-        ProcessingHardwareSettingsRequest(request, syncHistory, responseSections);
-        ProcessingTurnstileSettingsRequest(request, syncHistory, responseSections);
 
         Date syncEndTime = new Date();
 

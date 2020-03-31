@@ -19,7 +19,7 @@
         <property name="turnstileId" column="TurnstileId" type="string" length="64" not-null="true"/>
         <property name="controllerModel" column="ControllerModel" type="string" length="64"/>
         <property name="controllerFirmwareVersion" column="ControllerFirmwareVersion" type="string" length="64"/>
-        <property name="isWorkWithLongIds" column="IsWorkWithLongIds" type="integer" not-null="true"/>
+        <property name="isReadsLongIdsIncorrectly" column="IsReadsLongIdsIncorrectly" type="integer" not-null="true"/>
         <property name="lastUpdateForTurnstile" column="LastUpdateForTurnstile"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
     </class>
