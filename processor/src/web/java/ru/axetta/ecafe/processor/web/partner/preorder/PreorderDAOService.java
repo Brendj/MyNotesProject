@@ -498,11 +498,14 @@ public class PreorderDAOService {
                 queryComplexSelect.setParameter("idOfComplexInfo", idOfComplex);
                 try {
                     preorderComplex = (PreorderComplex) queryComplexSelect.getSingleResult();
+                    if (!preorderComplex.getAmount().equals(complex.getAmount())) {
+                        preorderComplex.setMobile(guardianMobile);
+                        preorderComplex.setMobileGroupOnCreate(mobileGroupOnCreate);
+                    }
                     preorderComplex.setAmount(complex.getAmount());
                     preorderComplex.setLastUpdate(new Date());
                     preorderComplex.setDeletedState(!complexSelected);
                     preorderComplex.setVersion(nextVersion);
-                    preorderComplex.setMobile(guardianMobile);
                 } catch (NoResultException e) {
                     if (complexSelected) {
                         preorderComplex = createPreorderComplex(idOfComplex, client, date, complexAmount, null,
@@ -541,6 +544,10 @@ public class PreorderDAOService {
                     PreorderMenuDetail preorderMenuDetail;
                     try {
                         preorderMenuDetail = (PreorderMenuDetail) queryMenuSelect.getSingleResult();
+                        if (!preorderMenuDetail.getAmount().equals(menuItem.getAmount())) {
+                            preorderMenuDetail.setMobile(guardianMobile);
+                            preorderMenuDetail.setMobileGroupOnCreate(mobileGroupOnCreate);
+                        }
                         preorderMenuDetail.setAmount(menuItem.getAmount());
                         preorderMenuDetail.setDeletedState(!menuSelected);
                         em.merge(preorderMenuDetail);
