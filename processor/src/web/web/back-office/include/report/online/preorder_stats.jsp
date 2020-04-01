@@ -27,7 +27,9 @@
         </h:panelGroup>
 
         <h:outputText escape="true" value="Все организации с функционалом \"Предзаказ\"" styleClass="output-text" />
-        <h:selectBooleanCheckbox value="#{preorderStatsReportPage.preorderOrgs}" styleClass="output-text" />
+        <h:selectBooleanCheckbox value="#{preorderStatsReportPage.preorderOrgs}" styleClass="output-text">
+            <a4j:support event="onchange" reRender="preorderStatsReportPanelGrid" action="#{preorderStatsReportPage.preorderOrgsChange}" />
+        </h:selectBooleanCheckbox>
 
         <h:outputText escape="true" value="Дата выборки от" styleClass="output-text" />
         <rich:calendar value="#{preorderStatsReportPage.startDate}" datePattern="dd.MM.yyyy"

@@ -47,6 +47,8 @@ public class PreorderStatsReportPage extends OnlineReportPage {
     public PreorderStatsReportPage() {
         super();
         periodTypeMenu = new PeriodTypeMenu(PeriodTypeMenu.PeriodTypeEnum.ONE_WEEK);
+        startDate = CalendarUtils.startOfDay(new Date());
+        onReportPeriodChanged(null);
     }
 
     @Override
@@ -72,7 +74,7 @@ public class PreorderStatsReportPage extends OnlineReportPage {
             printError("Не указана дата");
             return true;
         }
-        if (CollectionUtils.isEmpty(idOfOrgList)) {
+        if (CollectionUtils.isEmpty(idOfOrgList) && !preorderOrgs) {
             printError("Выберите одну или несколько организаций для построения отчета");
             return true;
         }
@@ -157,6 +159,15 @@ public class PreorderStatsReportPage extends OnlineReportPage {
         String reportDistinctText = basicReportJob.getReportDistinctText();
         String format = timeFormat.format(generateTime);
         return String.format("%s-%s-%s", "PreorderStatsReport", reportDistinctText, format);
+    }
+
+    public void preorderOrgsChange() {
+        if (preorderOrgs)
+            filter = "Все организации с функционалом \"Предзаказ\"";
+        else {
+            filter = "Не выбрано";
+            idOfOrgList.clear();
+        }
     }
 
     public boolean isPreorderOrgs() {
