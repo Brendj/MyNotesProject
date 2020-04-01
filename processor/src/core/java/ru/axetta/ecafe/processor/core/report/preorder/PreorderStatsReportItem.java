@@ -23,7 +23,7 @@ public class PreorderStatsReportItem {
         this.employee = 0;
         this.parents = 0;
         this.students = 0;
-        this.others = 0;
+        this.others = mobileGroupOnCreate == null ? 1 : 0;
         if (mobileGroupOnCreate != null) {
             switch (mobileGroupOnCreate) {
                 case EMPLOYEE:

@@ -18,7 +18,6 @@ import ru.axetta.ecafe.processor.core.persistence.PreorderMobileGroupOnCreateTyp
 import ru.axetta.ecafe.processor.core.report.AutoReportGenerator;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
-import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -99,7 +98,7 @@ public class PreorderStatsReportBuilder extends BasicReportJob.Builder {
                 + orgCondition
                 + " order by pc.idOfOrgOnCreate");*/
 
-        Query query = session.createSQLQuery("select pc.mobileGroupOnCreate, pc.preorderDate, "
+        Query query = session.createSQLQuery("select pc.preorderDate, "
                 + "(select string_agg(mobileGroupOnCreate, ',') from "
                 + "(select distinct cast(mobileGroupOnCreate as text) from cf_preorder_menudetail pmd "
                 + "where pmd.idofpreordercomplex = pc.idofpreordercomplex and pmd.deletedState = 0) q) as qq "
@@ -118,18 +117,18 @@ public class PreorderStatsReportBuilder extends BasicReportJob.Builder {
         List<PreorderComplex> list = query.list();
         for (Object o : list) {
             Object[] row = (Object[]) o;
-            Integer mobileGroup = HibernateUtils.getDbInt(row[0]);
-            PreorderMobileGroupOnCreateType mobileGroupOnCreate = mobileGroup == null ? null : PreorderMobileGroupOnCreateType.fromInteger(mobileGroup);
-            Date date = new Date(((BigInteger)row[1]).longValue());
-            PreorderStatsReportItem item = new PreorderStatsReportItem(date, mobileGroupOnCreate);
-            PreorderStatsReportItem mapItem = map.get(date);
-            if (mapItem == null) {
-                map.put(date, item);
-            } else {
-                mapItem.setEmployee(mapItem.getEmployee() + item.getEmployee());
-                mapItem.setParents(mapItem.getParents() + item.getParents());
-                mapItem.setStudents(mapItem.getStudents() + item.getStudents());
-                mapItem.setOthers(mapItem.getOthers() + item.getOthers());
+            Date date = new Date(((BigInteger)row[0]).longValue());
+            String flags = (String) row[1];
+            String[] arr = flags.split(",");
+            if (arr.length == 0) {
+                PreorderStatsReportItem item = new PreorderStatsReportItem(date, null);
+                addToMap(map, date, item);
+            }
+            for (String str : arr) {
+                Integer mobileGroup = new Integer(str);
+                PreorderMobileGroupOnCreateType mobileGroupOnCreate = mobileGroup == null ? null : PreorderMobileGroupOnCreateType.fromInteger(mobileGroup);
+                PreorderStatsReportItem item = new PreorderStatsReportItem(date, mobileGroupOnCreate);
+                addToMap(map, date, item);
             }
         }
 
@@ -139,5 +138,17 @@ public class PreorderStatsReportBuilder extends BasicReportJob.Builder {
         }
 
         return new JRBeanCollectionDataSource(items);
+    }
+
+    private void addToMap(Map<Date, PreorderStatsReportItem> map, Date date, PreorderStatsReportItem item) {
+        PreorderStatsReportItem mapItem = map.get(date);
+        if (mapItem == null) {
+            map.put(date, item);
+        } else {
+            mapItem.setEmployee(mapItem.getEmployee() + item.getEmployee());
+            mapItem.setParents(mapItem.getParents() + item.getParents());
+            mapItem.setStudents(mapItem.getStudents() + item.getStudents());
+            mapItem.setOthers(mapItem.getOthers() + item.getOthers());
+        }
     }
 }
