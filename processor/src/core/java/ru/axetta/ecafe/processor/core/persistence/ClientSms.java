@@ -36,6 +36,8 @@ public class ClientSms {
             "Вход в музей", //14 - TYPE_ENTER_MUSEUM_NOTIFICATION
             "Возврат билета в музей", //15 - TYPE_NOENTER_MUSEUM_NOTIFICATION
             "Генерация нового пароля", //16 - TYPE_CLIENT_NEWPASSWORD_NOTIFICATION
+            "Посещение здания культуры", //17 - TYPE_ENTER_CULTURE_NOTIFICATION
+            "Выход из здания культуры", //18 - TYPE_EXIT_CULTURE_NOTIFICATION
             "Уведомление об окончании подписки на автопополнение л/с" //TYPE_EXPIRED_REGULAR_PAYMENT_SUBSCRIPTION_NOTIFICATION
     };
     public static final int TYPE_NEGATIVE_BALANCE = 1;
@@ -56,6 +58,10 @@ public class ClientSms {
     public static final int TYPE_CLIENT_NEWPASSWORD_NOTIFICATION = 16;
     public static final int TYPE_ENTER_CULTURE_NOTIFICATION = 17;
     public static final int TYPE_EXIT_CULTURE_NOTIFICATION = 18;
+    public static final int TYPE_NOTIFICATION_START_SICK = 19;
+    public static final int TYPE_NOTIFICATION_CANCEL_START_SICK = 20;
+    public static final int TYPE_NOTIFICATION_END_SICK = 21;
+    public static final int TYPE_NOTIFICATION_CANCEL_END_SICK = 22;
     public static final int TYPE_EXPIRED_REGULAR_PAYMENT_SUBSCRIPTION_NOTIFICATION = 17;
 
     public static final int SENT_TO_SERVICE = 0;

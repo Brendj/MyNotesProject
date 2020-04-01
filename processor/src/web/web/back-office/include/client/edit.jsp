@@ -140,7 +140,7 @@
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.notifyViaEmail}" styleClass="output-text" />
     <h:outputText escape="true" value="Правила оповещения" styleClass="output-text" rendered="#{mainPage.clientEditPage.oldFlagsShow}" />
     <rich:dataTable id="clientNotificationSetting" value="#{mainPage.clientEditPage.notificationSettings}" var="it"
-                    rows="8"
+                    rows="11"
                     columnClasses="left-aligned-column, center-aligned-column"
                     footerClass="data-table-footer"
                     rendered="#{mainPage.clientEditPage.oldFlagsShow}">
@@ -180,6 +180,8 @@
     <h:inputText value="#{mainPage.clientEditPage.externalId}" maxlength="64" styleClass="input-text"/>
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientEditPage.clientGUID}" maxlength="64" styleClass="input-text long-field"/>
+    <h:outputText escape="true" value="Идентификатор REGID" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientEditPage.clientIacRegId}" maxlength="40" styleClass="input-text long-field"/>
 
     <h:outputText escape="true" value="Пол" styleClass="output-text" />
     <h:selectOneMenu value="#{mainPage.clientEditPage.gender}" styleClass="input-text">
@@ -233,6 +235,12 @@
         </rich:column>
         <rich:column headerClass="column-header" width="150">
             <f:facet name="header">
+                <h:outputText escape="true" value="Самостоятельный предзаказ" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{clientGuardian.allowedPreorders}" disabled="true" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header" width="150">
+            <f:facet name="header">
                 <h:outputText escape="true" value="Законный представитель" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{clientGuardian.legalRepresentative}" styleClass="output-text" />
@@ -250,7 +258,7 @@
                 <h:outputText escape="true" value="Правила оповещения" />
             </f:facet>
             <rich:dataTable id="clientNotificationSetting" value="#{clientGuardian.notificationItems}" var="it"
-                            rows="9" columnClasses="left-aligned-column, center-aligned-column"  styleClass="borderless-grid-all-client">
+                            rows="11" columnClasses="left-aligned-column, center-aligned-column"  styleClass="borderless-grid-all-client">
                 <rich:column styleClass="borderless-grid-all-client">
                     <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text" />
                 </rich:column>
@@ -320,6 +328,12 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
+                <h:outputText escape="true" value="Самостоятельный предзаказ" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{clientWard.allowedPreorders}" disabled="true" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
                 <h:outputText escape="true" value="Кем приходится опекун" />
             </f:facet>
             <h:selectOneMenu value="#{clientWard.relation}" styleClass="input-text">
@@ -331,7 +345,7 @@
                 <h:outputText escape="true" value="Правила оповещения" />
             </f:facet>
             <rich:dataTable id="clientNotificationSetting" value="#{clientWard.notificationItems}" var="it"
-                            rows="9" columnClasses="left-aligned-column, center-aligned-column"  styleClass="borderless-grid-all-client">
+                            rows="11" columnClasses="left-aligned-column, center-aligned-column"  styleClass="borderless-grid-all-client">
                 <rich:column styleClass="borderless-grid-all-client">
                     <h:outputText escape="true" value="#{it.notifyName}" styleClass="output-text" />
                 </rich:column>
@@ -412,6 +426,8 @@
     <h:outputText escape="true" value="Клиент может подтверждать групповые платежи (для сотрудников школы, отвечающих за работу с системой)" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.canConfirmGroupPayment}" styleClass="output-text"
                              disabled="true"  readonly="true"/>
+    <h:outputText escape="true" value="Согласие на видеоидентификацию" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.confirmVisualRecognition}" styleClass="output-text" />
     <h:outputText escape="true" value="Пользователь ОП" styleClass="output-text"
                   rendered="#{mainPage.clientEditPage.isEligibleToViewUserOP()}" />
     <h:selectBooleanCheckbox value="#{mainPage.clientEditPage.userOP}" styleClass="output-text" disabled="true"

@@ -13,7 +13,6 @@
             String mainPage;
             if (User.isSuccessfullySendEMP()) {
                 mainPage = ServletUtils.getHostRelativeResourceUri(request, "back-office/confirm-sms.faces");
-
             }
             else
             {

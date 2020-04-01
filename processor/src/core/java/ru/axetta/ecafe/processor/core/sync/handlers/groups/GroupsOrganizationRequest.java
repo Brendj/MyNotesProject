@@ -59,9 +59,9 @@ public class GroupsOrganizationRequest implements SectionRequest {
                         }
                         childNodeOfCg = childNodeOfCg.getNextSibling();
                     }
-                    if (itemsCmg.isEmpty()) {
-                        items.add(item);
-                    } else {
+                    //Сохраняем и главную группу и подргуппы к ней
+                    items.add(item);
+                    if (!itemsCmg.isEmpty()) {
                         items.addAll(itemsCmg);
                     }
                 } catch (Exception e) {

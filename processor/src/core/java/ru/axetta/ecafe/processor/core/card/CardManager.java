@@ -48,7 +48,7 @@ public interface CardManager {
             , String informationAboutCard) throws Exception;
 
     void updateCardInSession(Session persistenceSession, Long idOfClient, Long idOfCard, int cardType, int state, Date validTime, int lifeState,
-            String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg, String informationAboutCard) throws Exception;
+            String lockReason, Date issueTime, String externalId, User cardOperatorUser, Long idOfOrg, String informationAboutCard, boolean ignoreValidTime) throws Exception;
 
     void changeCardOwner(Long idOfClient, Long cardNo, Date changeTime, Date validTime) throws Exception;
 

@@ -35,8 +35,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.Calendar;
+import java.util.*;
 
 @Component("PreorderRequestsReportService")
 @Scope("singleton")
@@ -83,11 +83,13 @@ public class PreorderRequestsReportService extends RecoverableService {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String instance = runtimeContext.getNodeName();
         String reqInstance = runtimeContext.getConfigProperties().getProperty(PreorderRequestsReportService.NODE_PROPERTY, "1");
-        if (StringUtils.isBlank(instance) || StringUtils.isBlank(reqInstance) || !instance.trim().equals(
-                reqInstance.trim())) {
-            return false;
+        String[] nodes = reqInstance.split(",");
+        for (String node : nodes) {
+            if (!StringUtils.isBlank(instance) && !StringUtils.isBlank(reqInstance) && instance.trim().equals(node.trim())) {
+                return true;
+            }
         }
-        return true;
+        return false;
     }
 
     private void deletePreorderForNotEnoughMoney(Session session, PreorderItem item) {
@@ -194,6 +196,7 @@ public class PreorderRequestsReportService extends RecoverableService {
 
                             OrgGoodRequest orgGoodRequest = new OrgGoodRequest(idOfOrg, dateWork);
                             session.save(orgGoodRequest);
+                            DAOUtils.savePreorderDirectiveWithValue(session, idOfOrg, true);
                         } catch (Exception e) {
                             transaction.rollback();
                             logger.error(String.format("Error in generate request for orgID = %s: ", idOfOrg), e);
@@ -201,7 +204,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                             if (transaction.isActive()) transaction.commit();
                             transaction = null;
                         }
-                        if (guids.size() > 0) {
+                        /*if (guids.size() > 0) {
                             logger.info(String.format("Sending requests to orgID=%s, count=%s", idOfOrg, guids.size()));
                             Calendar calendarEnd = RuntimeContext.getInstance().getDefaultLocalCalendar(null);
                             final Date lastCreateOrUpdateDate = calendarEnd.getTime();
@@ -209,7 +212,7 @@ public class PreorderRequestsReportService extends RecoverableService {
                             final Date endGenerateTime = calendarEnd.getTime();
                             RuntimeContext.getAppContext().getBean(GoodRequestsChangeAsyncNotificationService.class)
                                     .notifyOrg(orgItem, fireTime, endGenerateTime, lastCreateOrUpdateDate, dateWork);
-                        }
+                        }*/
                     }
 
                 }
@@ -378,7 +381,19 @@ public class PreorderRequestsReportService extends RecoverableService {
     }
 
     public void runTask() throws Exception {
-        runTask(new PreorderRequestsReportServiceParam(new Date()));
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        String instance = runtimeContext.getNodeName();
+        String reqInstance = runtimeContext.getConfigProperties().getProperty(PreorderRequestsReportService.NODE_PROPERTY, "1");
+        String[] nodes = reqInstance.split(",");
+        PreorderRequestsReportServiceParam params = new PreorderRequestsReportServiceParam(new Date());
+        for (int i = 0; i < nodes.length; i++) {
+            if (instance.equals(nodes[i])) {
+                params.setModBy(i);
+                params.setServersAmount(nodes.length);
+                break;
+            }
+        }
+        runTask(params);
     }
 
     public void runTask(PreorderRequestsReportServiceParam params) throws Exception {

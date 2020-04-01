@@ -278,12 +278,12 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         serviceType.setCode("AAAA" + getMacroPart(contragent, "CONTRAGENT_ID") + "0000000001");
         serviceType.setDesc("Услуги по оплате питания учеников в образовательных учреждениях");
         serviceType.setIsActive(true);
-        serviceType.setName("Услуга питания в ОУ");
+        serviceType.setName("Пополнение лицевого счета карты прохода и питания ребенка");
         serviceType.setRevisionDate(RNIPSecuritySOAPHandler.toXmlGregorianCalendar(
                 RuntimeContext.getInstance().getDefaultLocalCalendar(null).getTime()));
         ServiceCategoryType serviceCategoryType = serviceTypeObjectFactory.createServiceCategoryType();
         serviceCategoryType.setCode("PIP0000019");
-        serviceCategoryType.setName("Недоступно для оплаты");
+        serviceCategoryType.setName("Проход и питание");
         serviceType.setServiceCategory(serviceCategoryType);
 
         DescriptionParametersType descriptionParametersType = serviceTypeObjectFactory.createDescriptionParametersType();
@@ -343,7 +343,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         descriptionSimpleParameter6.setForPayment(true);
         descriptionSimpleParameter6.setForSearch(false);
         descriptionSimpleParameter6.setLabel("Основание платежа");
-        descriptionSimpleParameter6.setName("paytReason");
+        descriptionSimpleParameter6.setName("PAYTREASON");
         descriptionSimpleParameter6.setReadonly(true);
         descriptionSimpleParameter6.setRequired(true);
         descriptionSimpleParameter6.setVisible(false);
@@ -404,9 +404,9 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         descriptionSimpleParameter12.setForSearch(false);
         descriptionSimpleParameter12.setLabel("Назначение платежа");
         descriptionSimpleParameter12.setName("PURPOSE");
-        descriptionSimpleParameter12.setReadonly(false);
+        descriptionSimpleParameter12.setReadonly(true);
         descriptionSimpleParameter12.setRequired(true);
-        descriptionSimpleParameter12.setVisible(true);
+        descriptionSimpleParameter12.setVisible(false);
         descriptionSimpleParameter12.setDefaultValue("Оплата услуг питания в образовательном учреждении");
 
         DescriptionSimpleParameter descriptionSimpleParameter13 = serviceTypeObjectFactory.createDescriptionSimpleParameter();
@@ -630,6 +630,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         } catch (Exception e) {
             responseMessageToSave[0] = "100 - Internal Error";
             loggerGetResponse.error("Error in GetResponseRequest to rnip 2.1", e);
+            throw e;
         }
         RnipDAOService.getInstance().saveAsProcessed(rnipMessage, responseMessageToSave[0], responseMessageToSave[1], rnipMessage.getEventType());
     }

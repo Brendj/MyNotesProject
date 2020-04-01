@@ -128,6 +128,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.canConfirmGroupPayment = canConfirmGroupPayment;
     }
 
+    public Boolean getConfirmVisualRecognition() {
+        return confirmVisualRecognition;
+    }
+
+    public void setConfirmVisualRecognition(Boolean confirmVisualRecognition) {
+        this.confirmVisualRecognition = confirmVisualRecognition;
+    }
+
     public static class OrgItem {
 
         private final Long idOfOrg;
@@ -300,6 +308,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Long idOfClientGroup;
     private Long externalId;
     private String clientGUID;
+    private String clientIacRegId;
     private Integer discountMode;
     private List<SelectItem> selectItemList = new ArrayList<SelectItem>();
     private String san;
@@ -324,6 +333,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Boolean inOrgEnabledMultiCardMode;
     private String parallel;
     private Boolean canConfirmGroupPayment;
+    private Boolean confirmVisualRecognition;
     private Boolean userOP;
 
     private final ClientGenderMenu clientGenderMenu = new ClientGenderMenu();
@@ -673,6 +683,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.clientGUID = clientGUID;
     }
 
+    public String getClientIacRegId() {
+        return clientIacRegId;
+    }
+
+    public void setClientIacRegId(String clientIacRegId) {
+        this.clientIacRegId =  clientIacRegId;
+    }
+
     public Boolean getSpecialMenu() {
         return specialMenu;
     }
@@ -810,13 +828,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 if (!guardianExists(idOfClient))
                     clientGuardianItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, false));
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, false, false));
             }
             if (typeAddClient.equals("ward")) {
                 if (!wardExists(idOfClient))
                     clientWardItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, false));
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, false, false));
             }
         }
     }
@@ -958,6 +976,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         client.setNotifyViaSMS(this.notifyViaSMS);
         client.setNotifyViaPUSH(this.notifyViaPUSH);
         client.setDontShowToExternal(this.dontShowToExternal);
+        client.setConfirmVisualRecognition(this.confirmVisualRecognition);
         client.setUseLastEEModeForPlan(this.useLastEEModeForPlan);
         client.setRemarks(this.remarks);
         client.setUpdateTime(new Date());
@@ -980,6 +999,11 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             client.setClientGUID(null);
         } else {
             client.setClientGUID(this.clientGUID);
+        }
+        if (this.clientIacRegId == null || this.clientIacRegId.isEmpty()) {
+            client.setIacRegId(null);
+        } else {
+            client.setIacRegId(this.clientIacRegId);
         }
         if (this.changePassword) {
             client.setPassword(this.plainPassword);
@@ -1235,6 +1259,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         this.externalId = client.getExternalId();
         this.clientGUID = client.getClientGUID();
+        this.clientIacRegId = client.getIacRegId();
         this.discountMode = client.getDiscountMode();
         /* filter fill*/
         this.useLastEEModeForPlan = client.isUseLastEEModeForPlan();
@@ -1257,6 +1282,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.parallel = StringUtils.defaultString(client.getParallel());
         this.clientDiscountItems = ClientViewPage.buildClientDiscountItem(session, client);
         this.canConfirmGroupPayment = client.getCanConfirmGroupPayment();
+        this.confirmVisualRecognition = client.getConfirmVisualRecognition();
         this.userOP = client.getUserOP();
     }
 

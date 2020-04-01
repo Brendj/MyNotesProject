@@ -123,7 +123,7 @@ public class ImportRegisterEmployeeService extends ImportRegisterClientsService 
         return "";
     }
 
-    protected ClientMskNSIService getNSIService() {
+    public ClientMskNSIService getNSIService() {
         return RuntimeContext.getAppContext().getBean("ImportRegisterEmployeeFileService", ImportRegisterEmployeeFileService.class);
     }
 

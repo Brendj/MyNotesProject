@@ -14,7 +14,10 @@
 <%-- Панель загрузки клиентов из файла --%>
 <h:panelGrid id="clientFileLoaderPanel" binding="#{mainPage.clientFileLoadPage.pageComponent}"
              styleClass="borderless-grid">
-
+    <h:panelGrid columns="1">
+        <h:outputText value="Файл для загрузки" styleClass="output-text"/>
+        <h:commandLink action="#{mainPage.clientFileLoadPage.downloadSample}" id="downloadSample" value="Скачать образец" styleClass="command-link" />
+    </h:panelGrid>
     <h:panelGrid columns="2" styleClass="borderless-grid">
 
         <h:outputText escape="true" value="Организация" styleClass="output-text" />

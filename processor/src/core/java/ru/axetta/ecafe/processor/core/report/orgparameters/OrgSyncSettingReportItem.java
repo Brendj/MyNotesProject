@@ -406,5 +406,25 @@ public class OrgSyncSettingReportItem implements Comparable<OrgSyncSettingReport
         public String toString(){
             return fullInf;
         }
+
+        @Override
+        public int hashCode(){
+            return setting.getIdOfSyncSetting() == null ? setting.getContentType().hashCode() : setting.getIdOfSyncSetting().hashCode();
+        }
+
+        @Override
+        public boolean equals(Object o){
+            if (o == null){
+                return false;
+            }
+            if(o instanceof Boolean){ // For JasperReport
+                return setting.getDeleteState().equals(o);
+            } else if(!(o instanceof SyncInfo)){
+                return false;
+            }
+            SyncInfo i  = (SyncInfo) o;
+
+            return i.getSetting().equals(this.setting);
+        }
     }
 }

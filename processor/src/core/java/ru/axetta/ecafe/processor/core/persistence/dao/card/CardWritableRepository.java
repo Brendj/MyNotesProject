@@ -84,10 +84,6 @@ public class CardWritableRepository extends WritableJpaDao {
         entityManager.merge(card);
     }
 
-    private boolean isSocial(int type) {
-        return (type == 6 || type == 7 || type == 8);
-    }
-
     private void checkVerifyCardSign(Org org, Integer cardSignVerifyRes, Integer cardSignCertNum, int type, long cardNo) throws Exception {
         if (!org.getNeedVerifyCardSign()) {
             return;
@@ -98,7 +94,7 @@ public class CardWritableRepository extends WritableJpaDao {
         if (cardSignVerifyRes == null || cardSignCertNum == null) throw new IllegalStateException("Ошибка регистрации");
         switch (CardSignVerifyType.fromInteger(cardSignVerifyRes)) {
             case NOT_PROCESSED:
-                if (isSocial(type)) {
+                if (Card.isSocial(type)) {
                     return;
                 } else {
                     throw new IllegalStateException("Ошибка регистрации");
@@ -153,7 +149,7 @@ public class CardWritableRepository extends WritableJpaDao {
         card.setTransitionState(cardTransitionState);
         if (null != isLongUid)
             card.setIsLongUid(isLongUid);
-        if (org.getNeedVerifyCardSign() && !(cardSignCertNum == null || cardSignCertNum == 0) && !isSocial(type))
+        if (org.getNeedVerifyCardSign() && !(cardSignCertNum == null || cardSignCertNum == 0) && !Card.isSocial(type))
             card.setCardSignCertNum(cardSignCertNum);
 
         entityManager.persist(card);

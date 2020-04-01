@@ -155,6 +155,14 @@ public class RuntimeContext implements ApplicationContextAware {
         this.methodsInfoService = methodsInfoService;
     }
 
+    public String getExtendCardServiceApiKey() {
+        return extendCardServiceApiKey;
+    }
+
+    public void setExtendCardServiceApiKey(String extendCardServiceApiKey) {
+        this.extendCardServiceApiKey = extendCardServiceApiKey;
+    }
+
     public static class NotInitializedException extends RuntimeException {
 
         public NotInitializedException() {
@@ -176,7 +184,6 @@ public class RuntimeContext implements ApplicationContextAware {
     private static ApplicationContext applicationContext;
 
     public static final String PROCESSOR_PARAM_BASE = "ecafe.processor";
-    public static final String PARAM_NAME_DB_MAINTANANCE_HOUR = PROCESSOR_PARAM_BASE + ".dbmaintanance.hour";
     public static final String PARAM_NAME_TIME_ZONE = PROCESSOR_PARAM_BASE + ".time.zone";
     public static final String PARAM_NAME_HIDDEN_PAGES_IN_CLIENT_ROOM = PROCESSOR_PARAM_BASE + ".processor.hiddenPages";
     private static final String AUTO_REPORT_PARAM_BASE = PROCESSOR_PARAM_BASE + ".autoreport";
@@ -206,6 +213,7 @@ public class RuntimeContext implements ApplicationContextAware {
     public static final String SCUD_LOGIN = SCUD + ".login";
     public static final String SCUD_PASSWORD = SCUD + ".password";
     private static final String OKU_API_KEY = PROCESSOR_PARAM_BASE + ".oku.api.key";
+    private static final String EXTEND_CARD_SERVICE_API_KEY = PROCESSOR_PARAM_BASE + ".extendCardService.api.key";
 
     public final static int NODE_ROLE_MAIN = 1, NODE_ROLE_PROCESSOR = 2;
     // Logger
@@ -264,6 +272,7 @@ public class RuntimeContext implements ApplicationContextAware {
     private String geoplanerApiKey;
 
     private String okuApiKey;
+    private String extendCardServiceApiKey;
 
     private RBKMoneyConfig partnerRbkMoneyConfig;
     ////////////////////////////////////////////
@@ -665,6 +674,7 @@ public class RuntimeContext implements ApplicationContextAware {
             this.geoplanerApiKey = properties.getProperty(PROCESSOR_PARAM_BASE + ".geoplaner.apikey");
 
             this.okuApiKey = properties.getProperty(OKU_API_KEY);
+            this.extendCardServiceApiKey = properties.getProperty(EXTEND_CARD_SERVICE_API_KEY);
 
             ruleProcessor = createRuleHandler(properties, sessionFactory, postman, postman);
             this.autoReportProcessor = ruleProcessor;
@@ -1586,6 +1596,9 @@ public class RuntimeContext implements ApplicationContextAware {
             return false;
     }
 
+    public boolean isNSI3() {
+        return getOptionValueString(Option.OPTION_NSI_VERSION).equals(Option.NSI3);
+    }
     public boolean getOptionValueBool(int optionId) {
         return getOptionValueString(optionId).equals("1");
     }

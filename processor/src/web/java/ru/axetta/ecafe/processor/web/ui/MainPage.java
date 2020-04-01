@@ -462,6 +462,7 @@ public class MainPage implements Serializable {
     private final AdjustmentPaymentReportPage adjustmentPaymentReportPage = new AdjustmentPaymentReportPage();
     private final SalesReportGroupPage salesReportGroupPage = new SalesReportGroupPage();
     private final TaloonApprovalVerificationPage taloonApprovalVerificationPage = new TaloonApprovalVerificationPage();
+    private final TaloonPreorderVerificationPage taloonPreorderVerificationPage = new TaloonPreorderVerificationPage();
     private final ElectronicReconciliationStatisticsPage electronicReconciliationStatisticsPage = new ElectronicReconciliationStatisticsPage();
     private final BasicWorkspacePage electronicReconciliationReportGroupMenu = new BasicWorkspacePage();
     private final CardOperatorListPage cardOperatorListPage = new CardOperatorListPage();
@@ -6748,6 +6749,20 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showTaloonPreorderVerificationPage() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        try {
+            currentWorkspacePage = taloonPreorderVerificationPage;
+            currentWorkspacePage.show();
+        } catch (Exception e) {
+            logger.error("Failed to set taloon preorder verification page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы сверки реестров талонов (предзаказ): " + e.getMessage(), null));
+        }
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public Object showElectronicReconciliationStatisticsPage() {
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
@@ -9947,6 +9962,10 @@ public class MainPage implements Serializable {
         return taloonApprovalVerificationPage;
     }
 
+    public TaloonPreorderVerificationPage getTaloonPreorderVerificationPage() {
+        return taloonPreorderVerificationPage;
+    }
+
     public ElectronicReconciliationStatisticsPage getElectronicReconciliationStatisticsPage() {
         return electronicReconciliationStatisticsPage;
     }
@@ -10593,5 +10612,35 @@ public class MainPage implements Serializable {
 
     public void setCanSendAgain(Boolean canSendAgain) {
         this.canSendAgain = canSendAgain;
+    }
+
+    public Object showClientOperationListPageWithOrgView() {
+        FacesContext facesContext = FacesContext.getCurrentInstance();
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            selectedClientGroupPage.fill(persistenceSession, selectedIdOfClient);
+            clientOperationListPage.fill(persistenceSession, selectedIdOfClient);
+            clientViewPage.fill(persistenceSession, selectedIdOfClient);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            selectedClientGroupPage.showAndExpandMenuGroup();
+            currentWorkspacePage = clientOperationListPage;
+        } catch (Exception e) {
+            logger.error("Failed to show client operation list page", e);
+            facesContext.addMessage(null, new FacesMessage(FacesMessage.SEVERITY_ERROR,
+                    "Ошибка при подготовке страницы просмотра списка операций по клиенту: " + e.getMessage(), null));
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+
+
+        }
+        updateSelectedMainMenu();
+        return null;
     }
 }

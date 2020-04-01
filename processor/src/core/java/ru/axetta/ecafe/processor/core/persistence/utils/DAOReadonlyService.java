@@ -49,6 +49,9 @@ import java.util.*;
 public class DAOReadonlyService {
     private final static Logger logger = LoggerFactory.getLogger(DAOReadonlyService.class);
 
+    public static final String CARD_NOT_FOUND = "Карта не найдена";
+    public static final String SEVERAL_CARDS_FOUND = "Найдено более одной карты";
+
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
 
@@ -326,6 +329,15 @@ public class DAOReadonlyService {
         }
     }
 
+    public PreorderStatus findPreorderStatus(String guid, Date date) {
+        Query query = entityManager.createQuery("select ps from PreorderStatus ps where ps.guid = :guid and ps.date = :date");
+        query.setParameter("guid", guid);
+        query.setParameter("date", date);
+        List list = query.getResultList();
+        if (list.size() == 0) return null;
+        return (PreorderStatus) list.get(0);
+    }
+
     public TaloonApproval findTaloonApproval(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid, Long price) {
         try {
             Query query = entityManager.createQuery("SELECT taloon from TaloonApproval taloon "
@@ -340,6 +352,36 @@ public class DAOReadonlyService {
             query.setParameter("price", price);
             query.setParameter("goodsGuid", goodsGuid);
             return (TaloonApproval)query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public TaloonPreorder findTaloonPreorder(Long idOfOrg, Date taloonDate, Long complexId, String goodsGuid, Long price) {
+        try {
+            Query query = entityManager.createQuery("SELECT taloon from TaloonPreorder taloon "
+                    + "where taloon.idOfOrg = :idOfOrg "
+                    + "and taloon.taloonDate = :taloonDate "
+                    + "and taloon.complexId = :complexId "
+                    + "and taloon.price = :price "
+                    + "and taloon.goodsGuid = :goodsGuid");
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setParameter("taloonDate", taloonDate);
+            query.setParameter("complexId", complexId);
+            query.setParameter("price", price);
+            query.setParameter("goodsGuid", goodsGuid);
+            return (TaloonPreorder)query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
+    public TaloonPreorder findTaloonPreorder(String guid) {
+        try {
+            Query query = entityManager.createQuery("SELECT taloon from TaloonPreorder taloon "
+                    + "where taloon.guid = :guid");
+            query.setParameter("guid", guid);
+            return (TaloonPreorder)query.getSingleResult();
         } catch (Exception e) {
             return null;
         }
@@ -397,6 +439,47 @@ public class DAOReadonlyService {
         }
     }
 
+    public Integer findTaloonPreorderSoldQty(Long idOfOrg, Date taloonDate, String complexName, String goodsGuid, Long price) {
+        Date dateEnd = CalendarUtils.addOneDay(taloonDate);
+        try {
+            String goodsJoin = "";
+            String goodsParam = "";
+            if(StringUtils.isNotEmpty(goodsGuid)) {
+                goodsJoin = "inner join cf_goods g on g.idofgood = od.idofgood ";
+                goodsParam = "and g.guid =:goodsGuid ";
+            } else {
+                goodsParam = "and od.idofgood is null ";
+            }
+            Query query = entityManager.createNativeQuery("SELECT sum(od.qty) from cf_orderDetails od "
+                    + "inner join cf_orders o on od.idOfOrg = o.idOfOrg and od.idOfOrder = o.idOfOrder " + goodsJoin
+                    + "where od.socDiscount > 0 and od.rprice = 0 and od.idOfOrg= :idOfOrg "
+                    + "and od.menuDetailName = :complexName "
+                    + "and od.MenuType >= :complexMin "
+                    + "and od.MenuType <= :complexMax "
+                    + "and od.discount =:price "
+                    + "and o.createdDate >= :taloonDate "
+                    + "and o.createdDate < :dateEnd "
+                    + "and o.state = :state "
+                    + goodsParam);
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setParameter("complexName", complexName);
+            query.setParameter("price", price);
+            query.setParameter("complexMin", OrderDetail.TYPE_COMPLEX_MIN);
+            query.setParameter("complexMax", OrderDetail.TYPE_COMPLEX_MAX);
+            query.setParameter("taloonDate", taloonDate.getTime());
+            query.setParameter("dateEnd", dateEnd.getTime());
+            query.setParameter("state", Order.STATE_COMMITED);
+            if(StringUtils.isNotEmpty(goodsGuid)) {
+                query.setParameter("goodsGuid", goodsGuid);
+            }
+            Object result = query.getSingleResult();
+            return result != null ? ((BigInteger) result).intValue() : 0;
+        } catch (Exception e) {
+            logger.error(e.getMessage(), e);
+            return null;
+        }
+    }
+
     public List getInfoMessageDetails(Long idOfInfoMessage) {
         //Query query = entityManager.createQuery("select d from InfoMessageDetail d where d.compositeIdOfInfoMessageDetail.idOfInfoMessage = :idOfInfoMessage");
         Session session = entityManager.unwrap(Session.class);
@@ -433,9 +516,15 @@ public class DAOReadonlyService {
         return result != null && ((BigInteger) result).longValue() > 0 ? true : false;
     }
 
-    public byte[] getCardSignData(Integer idOfCardSign, Integer signType) {
+    public byte[] getCardSignVerifyData(Integer idOfCardSign, Integer signType, boolean isNewType) {
         try {
-            Query query = entityManager.createQuery("select cs.signData from CardSign cs " + "where cs.idOfCardSign = :idOfCardSign and cs.signType = :signType  and (cs.deleted = false or cs.deleted is null)");
+            Query query;
+            if (signType == 0 && isNewType)
+                query = entityManager.createQuery("select cs.privatekeycard from CardSign cs " +
+                        "where cs.idOfCardSign = :idOfCardSign and cs.signType = :signType  and (cs.deleted = false or cs.deleted is null)");
+            else
+                query = entityManager.createQuery("select cs.signData from CardSign cs " +
+                        "where cs.idOfCardSign = :idOfCardSign and cs.signType = :signType  and (cs.deleted = false or cs.deleted is null)");
             query.setParameter("idOfCardSign", idOfCardSign);
             query.setParameter("signType", signType);
             return (byte[]) query.getSingleResult();
@@ -562,6 +651,20 @@ public class DAOReadonlyService {
         return "";
     }
 
+    public Client getClientByCardPrintedNo(Long cardPrintedNo) throws Exception {
+        Query query = entityManager.createQuery("select card from Card card join fetch card.client c join fetch c.person p "
+                + "where card.cardPrintedNo = :cardPrintedNo and card.state = :state and card.client is not null");
+        query.setParameter("cardPrintedNo", cardPrintedNo);
+        query.setParameter("state", Card.ACTIVE_STATE);
+        List<Card> list = query.getResultList();
+        if (list.size() == 0) {
+            throw new Exception(CARD_NOT_FOUND);
+        } else if (list.size() > 1) {
+            throw new Exception(SEVERAL_CARDS_FOUND);
+        }
+        return list.get(0).getClient();
+    }
+
     public List<SpecialDate> getSpecialDates(Date startDate, Date endDate, Long idOfOrg) {
         try {
             Query query = entityManager.createQuery(
@@ -617,5 +720,40 @@ public class DAOReadonlyService {
             resultMap.put(year, monthMap);
         }
         return resultMap;
+    }
+    public List<EMIAS> getEmiasForMaxVersionAndIdOrg(Long maxVersion, List<Long> orgs){
+        try {
+            Query query = entityManager.createQuery(
+                    "select ce from EMIAS ce where ce.version > :vers");
+            query.setParameter("vers", maxVersion);
+            List<EMIAS> emias = query.getResultList();
+            //Фильтрация по орг
+            Iterator<EMIAS> emiasIterator = emias.iterator();
+            while(emiasIterator.hasNext()) {
+                EMIAS emias1 = emiasIterator.next();//получаем следующий элемент
+                Client cl = DAOUtils.findClientByGuid(entityManager, emias1.getGuid());
+                if (orgs.indexOf(cl.getOrg().getIdOfOrg()) == -1) {
+                    //Удаляем "чужих" клиентов
+                    emiasIterator.remove();
+                }
+            }
+            return emias;
+        }
+        catch (Exception e)
+        {
+            return new ArrayList<>();
+        }
+    }
+
+    public boolean isSixWorkWeekGroup(Long orgId, Long idOfClientGroup) {
+        try {
+            String groupName = getClientGroupName(orgId, idOfClientGroup);
+            return (boolean)entityManager.createQuery("select distinct gnto.isSixDaysWorkWeek from GroupNamesToOrgs gnto where gnto.idOfOrg = :idOfOrg and gnto.groupName = :groupName")
+                    .setParameter("idOfOrg", orgId)
+                    .setParameter("groupName", groupName)
+                    .getSingleResult();
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

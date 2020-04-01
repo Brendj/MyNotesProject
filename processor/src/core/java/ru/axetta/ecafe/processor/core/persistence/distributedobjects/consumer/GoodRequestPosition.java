@@ -54,6 +54,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     private String guidOfG;
     private Boolean notified;
     private InformationContents informationContent = InformationContents.ONLY_CURRENT_ORG;
+    private Integer complexId;
 
     @Override
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
@@ -86,6 +87,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         projectionList.add(Projections.property("lastTotalCount"), "lastTotalCount");
         projectionList.add(Projections.property("lastDailySampleCount"), "lastDailySampleCount");
         projectionList.add(Projections.property("lastTempClientsCount"), "lastTempClientsCount");
+        projectionList.add(Projections.property("complexId"), "complexId");
 
         projectionList.add(Projections.property("gr.guid"), "guidOfGR");
         projectionList.add(Projections.property("g.guid"), "guidOfG");
@@ -101,33 +103,42 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "TotalCount", totalCount);
         XMLUtils.setAttributeIfNotNull(element, "DailySampleCount", dailySampleCount);  // суточная проба
         XMLUtils.setAttributeIfNotNull(element, "TempClientsCount", tempClientsCount);
+        if (complexId != 0) {
+            element.setAttribute("ComplexId", complexId.toString());
+        }
         XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
-        if (!StringUtils.isEmpty(guidOfGR))
+        if (!StringUtils.isEmpty(guidOfGR)) {
             XMLUtils.setAttributeIfNotNull(element, "GuidOfGoodsRequest", guidOfGR);
-        else {
+        } else {
             System.out.println(guid + ": guidOfGR " + guidOfGR);
         }
-        if (!StringUtils.isEmpty(guidOfG))
+        if (!StringUtils.isEmpty(guidOfG)) {
             XMLUtils.setAttributeIfNotNull(element, "GuidOfGoods", guidOfG);
-        if (!StringUtils.isEmpty(guidOfP))
+        }
+        if (!StringUtils.isEmpty(guidOfP)) {
             XMLUtils.setAttributeIfNotNull(element, "GuidOfBaseProduct", guidOfP);
+        }
     }
 
     @Override
     public void preProcess(Session session, Long idOfOrg) throws DistributedObjectException {
         GoodRequest gr = DAOUtils.findDistributedObjectByRefGUID(GoodRequest.class, session, guidOfGR);
-        if (gr == null)
+        complexId = DAOUtils.getComplexIdForGoodRequestPosition(session, guid);
+        if (gr == null) {
             throw new DistributedObjectException("NOT_FOUND_VALUE GOOD_REQUEST");
+        }
         setGoodRequest(gr);
         Good g = DAOUtils.findDistributedObjectByRefGUID(Good.class, session, guidOfG);
         Product p = DAOUtils.findDistributedObjectByRefGUID(Product.class, session, guidOfP);
         if (g == null && p == null) {
             throw new DistributedObjectException("NOT_FOUND_VALUE PRODUCT OR GOOD");
         }
-        if (g != null)
+        if (g != null) {
             setGood(g);
-        if (p != null)
+        }
+        if (p != null) {
             setProduct(p);
+        }
         if (!gr.getOrgOwner().equals(orgOwner)) {
             orgOwner = gr.getOrgOwner();
         }
@@ -136,26 +147,35 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     @Override
     protected GoodRequestPosition parseAttributes(Node node) throws Exception {
         Long longOrgOwner = XMLUtils.getLongAttributeValue(node, "OrgOwner");
-        if (longOrgOwner != null)
+        if (longOrgOwner != null) {
             setOrgOwner(longOrgOwner);
-        else {
+        } else {
             throw new DistributedObjectException("OrgOwner is empty");
         }
         Integer integerUnitsScale = XMLUtils.getIntegerAttributeValue(node, "UnitsScale");
-        if (integerUnitsScale != null)
+        if (integerUnitsScale != null) {
             setUnitsScale(UnitScale.fromInteger(integerUnitsScale));
+        }
         Long longTotalCount = XMLUtils.getLongAttributeValue(node, "TotalCount");
-        if (longTotalCount != null)
+        if (longTotalCount != null) {
             setTotalCount(longTotalCount);
+        }
+        Integer intComplexId = XMLUtils.getIntegerAttributeValue(node, "ComplexId");
+        if (intComplexId != null) {
+            setComplexId(intComplexId);
+        }
         Long longDailySampleCount = XMLUtils.getLongAttributeValue(node, "DailySampleCount"); // суточная проба
-        if (longDailySampleCount != null)
+        if (longDailySampleCount != null) {
             setDailySampleCount(longDailySampleCount);
+        }
         Long longTempClientsCount = XMLUtils.getLongAttributeValue(node, "TempClientsCount");
-        if (longTempClientsCount != null)
+        if (longTempClientsCount != null) {
             setTempClientsCount(longTempClientsCount);
+        }
         Long longNetWeight = XMLUtils.getLongAttributeValue(node, "NetWeight");
-        if (longNetWeight != null)
+        if (longNetWeight != null) {
             setNetWeight(longNetWeight);
+        }
         guidOfGR = XMLUtils.getStringAttributeValue(node, "GuidOfGoodsRequest", 36);
         guidOfG = XMLUtils.getStringAttributeValue(node, "GuidOfGoods", 36);
         guidOfP = XMLUtils.getStringAttributeValue(node, "GuidOfBaseProduct", 36);
@@ -177,6 +197,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         setTotalCount(((GoodRequestPosition) distributedObject).getTotalCount());
         setDailySampleCount(((GoodRequestPosition) distributedObject).getDailySampleCount()); // суточная проба
         setTempClientsCount(((GoodRequestPosition) distributedObject).getTempClientsCount());
+        setComplexId(((GoodRequestPosition) distributedObject).getComplexId());
         /* старые значения всего и суточной пробы */
         setLastTotalCount(lastTotalCount);
         setLastDailySampleCount(lastDailySampleCount); // суточная проба
@@ -327,5 +348,13 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
 
     public void setLastTempClientsCount(Long lastTempClientsCount) {
         this.lastTempClientsCount = lastTempClientsCount;
+    }
+
+    public Integer getComplexId() {
+        return complexId;
+    }
+
+    public void setComplexId(Integer complexId) {
+        this.complexId = complexId;
     }
 }

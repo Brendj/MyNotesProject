@@ -47,7 +47,6 @@
             <h:outputText escape="true" value="Поиск по GUID" styleClass="output-text" />
             <h:inputText value="#{mainPage.clientListPage.clientFilter.filterClientGUID}" size="40"
                          styleClass="input-text" />
-
             <h:outputText escape="true" value="Группа" styleClass="output-text" />
             <h:selectOneMenu value="#{mainPage.clientListPage.clientFilter.clientGroupId}" styleClass="input-text"
                              style="width: 145px;">
@@ -57,44 +56,25 @@
 
         </h:panelGrid>
 
-        <h:panelGrid columns="2" styleClass="borderless-grid" columnClasses="column-width-500,column-width-500">
-
+        <h:panelGrid columns="1" styleClass="borderless-grid" columnClasses="column-width-500">
             <h:outputText escape="true" value="Обслуживается:" styleClass="output-text" style="text-decoration: underline;" />
-
-            <h:outputText escape="true" value="Договор:" styleClass="output-text" style="text-decoration: underline;" />
-
         </h:panelGrid>
-        <h:panelGrid columns="4" styleClass="borderless-grid" columnClasses="column-width-250,column-width-250,column-width-250,column-width-250">
+        <h:panelGrid columns="2" styleClass="borderless-grid" columnClasses="column-width-250,column-width-250">
 
             <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
             <h:inputText value="#{mainPage.clientListPage.clientFilter.person.surname}" maxlength="128"
                          styleClass="input-text" />
 
-            <h:outputText escape="true" value="Фамилия" styleClass="output-text"/>
-            <h:inputText value="#{mainPage.clientListPage.clientFilter.contractPerson.surname}"
-                         maxlength="128" styleClass="input-text" />
-
             <h:outputText escape="true" value="Имя" styleClass="output-text" />
             <h:inputText value="#{mainPage.clientListPage.clientFilter.person.firstName}" maxlength="64"
                          styleClass="input-text" />
-            <h:outputText escape="true" value="Имя" styleClass="output-text"/>
-            <h:inputText value="#{mainPage.clientListPage.clientFilter.contractPerson.firstName}"
-                         maxlength="64" styleClass="input-text" />
 
             <h:outputText escape="true" value="Отчество" styleClass="output-text" />
             <h:inputText value="#{mainPage.clientListPage.clientFilter.person.secondName}"
                          maxlength="128" styleClass="input-text" />
 
-            <h:outputText escape="true" value="Отчество" styleClass="output-text"/>
-            <h:inputText value="#{mainPage.clientListPage.clientFilter.contractPerson.secondName}"
-                         maxlength="128" styleClass="input-text" />
-
             <h:outputText escape="true" value="Номер документа" styleClass="output-text" />
             <h:inputText value="#{mainPage.clientListPage.clientFilter.person.idDocument}"
-                         maxlength="128" styleClass="input-text" />
-
-            <h:outputText escape="true" value="Номер документа" styleClass="output-text"/>
-            <h:inputText value="#{mainPage.clientListPage.clientFilter.contractPerson.idDocument}"
                          maxlength="128" styleClass="input-text" />
 
         </h:panelGrid>
@@ -138,11 +118,11 @@
     </a4j:status>
 
     <rich:dataTable id="clientListTable" value="#{mainPage.clientListPage.items}" var="item" rows="20"
-                    columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, right-aligned-column, left-aligned-column, right-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,  center-aligned-column"
+                    columnClasses="right-aligned-column, right-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, right-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,  center-aligned-column, center-aligned-column, center-aligned-column"
                     footerClass="data-table-footer">
         <rich:column headerClass="column-header" sortBy="#{item.idOfClient}">
             <f:facet name="header">
-                <h:outputText escape="true" value="Ид." />
+                <h:outputText escape="true" value="ИД" />
             </f:facet>
             <a4j:commandLink action="#{mainPage.showClientViewPage}" styleClass="command-link" reRender="mainMenu, workspaceForm">
                 <h:outputText escape="true" value="#{item.idOfClient}" converter="contractIdConverter"
@@ -162,15 +142,13 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Договор оформлен" />
+                <h:outputText escape="true" value="Внешний ИД" />
             </f:facet>
-            <h:outputText escape="true"
-                          value="#{item.contractPerson.surname} #{item.contractPerson.firstName} #{item.contractPerson.secondName}"
-                          styleClass="output-text" />
+            <h:outputText escape="true" value="#{item.externalId}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Обслуживается" />
+                <h:outputText escape="true" value="ФИО" />
             </f:facet>
             <h:outputText escape="true"
                           value="#{item.person.surname} #{item.person.firstName} #{item.person.secondName}"
@@ -185,48 +163,62 @@
         </rich:column>
         <rich:column headerClass="column-header" sortBy="#{item.clientGroupName}">
             <f:facet name="header">
-                <h:outputText escape="true" value="Промежуточная группа" />
+                <h:outputText escape="true" value="Подгруппа" />
             </f:facet>
             <h:outputText escape="true" value="#{item.middleGroup}"
                           styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" sortBy="#{item.clientGroupName}">
             <f:facet name="header">
-               <h:outputText escape="true" value="Организация" />
+                <h:outputText escape="true" value="ИД ОО" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.org.shortName}"
-                          styleClass="output-text" />
+            <h:outputText escape="true" value="#{item.org.idOfOrg}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Текущий баланс" />
+                <h:outputText escape="true" value="Название ОО" />
+            </f:facet>
+            <a4j:commandLink action="#{mainPage.showOrgViewPage}" styleClass="command-link"
+                             reRender="mainMenu, workspaceForm">
+                <h:outputText escape="true" value="#{item.org.shortName}" styleClass="output-text" />
+                <f:setPropertyActionListener value="#{item.org.idOfOrg}" target="#{mainPage.selectedIdOfOrg}" />
+            </a4j:commandLink>
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Баланс" />
             </f:facet>
             <h:outputText escape="true" value="#{item.balance}" converter="copeckSumConverter"
                           styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Лимит овердрафта" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.limit}" converter="copeckSumConverter" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Лимит расходов" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.expenditureLimit}" converter="copeckSumConverter" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
                 <h:outputText escape="true" value="Льгота" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.discountMode}" converter="clientDiscountModeConverter" styleClass="output-text" />
+            <h:outputText escape="true" value="#{item.categoriesDiscounts}" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Дата создания" />
+            </f:facet>
+            <h:outputText escape="true" value="#{item.contractTime}" converter="dateTimeConverter"
+                          styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
                 <h:outputText escape="true" value="Последние изменения" />
             </f:facet>
             <h:outputText escape="true" value="#{item.updateTime}" converter="timeConverter" styleClass="output-text" />
+        </rich:column>
+        <rich:column headerClass="column-header">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Операции" />
+            </f:facet>
+            <a4j:commandLink action="#{mainPage.showClientOperationListPageWithOrgView}" styleClass="command-link"
+                             reRender="mainMenu, workspaceForm">
+                <h:outputText escape="true" value="Операции" styleClass="output-text" />
+                <f:setPropertyActionListener value="#{item.idOfClient}" target="#{mainPage.selectedIdOfClient}" />
+            </a4j:commandLink>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -239,7 +231,7 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Исключить" />
+                <h:outputText escape="true" value="Удалить" />
             </f:facet>
             <!-- TODO -->
             <a4j:commandLink ajaxSingle="true" styleClass="command-link"

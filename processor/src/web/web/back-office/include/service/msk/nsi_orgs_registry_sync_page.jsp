@@ -196,11 +196,17 @@
                         <f:setPropertyActionListener value="#{org}" target="#{NSIOrgsRegistrySynchPage.orgForEdit}" />
                         </a4j:commandButton>
                     </rich:column>
-                    <rich:column>
+                    <rich:column rendered="#{!NSIOrgsRegistrySynchPage.nsi3()}">
                         <f:facet name="header">
                             <h:outputText value="Guid" />
                         </f:facet>
                         <h:outputText value="#{org.guid}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
+                            <h:outputText value="ЕКИС ид" />
+                        </f:facet>
+                        <h:outputText value="#{org.ekisId}" escape="false" />
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
@@ -228,9 +234,21 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
+                            <h:outputText value="ЕГИССО ид" />
+                        </f:facet>
+                        <h:outputText value="#{org.egissoId}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
                             <h:outputText value="Адрес корпуса" />
                         </f:facet>
                         <h:outputText value="#{org.address}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
+                            <h:outputText value="Короткий адрес" />
+                        </f:facet>
+                        <h:outputText value="#{org.shortAddress}" escape="false" />
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
@@ -243,12 +261,6 @@
                             <h:outputText value="Краткое наименование" />
                         </f:facet>
                         <h:outputText value="#{org.shortName}" escape="false" />
-                    </rich:column>
-                    <rich:column>
-                        <f:facet name="header">
-                            <h:outputText value="Очередь внедрения" />
-                        </f:facet>
-                        <h:outputText value="#{org.introductionQueue}" escape="false" />
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">

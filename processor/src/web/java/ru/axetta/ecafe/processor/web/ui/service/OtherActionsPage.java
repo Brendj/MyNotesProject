@@ -7,11 +7,11 @@ package ru.axetta.ecafe.processor.web.ui.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentAdditionalTasksProcessor;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGuardianNotificationSetting;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.service.clients.ClientService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.ProjectStateReportService;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.service.finoperator.FinManagerService;
@@ -23,6 +23,7 @@ import ru.axetta.ecafe.processor.core.service.spb.CardsUidUpdateService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.SyncStatsManager;
 import ru.axetta.ecafe.processor.web.partner.nsi.NSIRepairService;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
@@ -30,8 +31,12 @@ import ru.axetta.ecafe.processor.web.partner.preorder.PreorderOperationsService;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
+import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.richfaces.event.UploadEvent;
 import org.richfaces.model.UploadItem;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
@@ -61,6 +66,12 @@ public class OtherActionsPage extends OnlineReportPage {
     private String orgsForSpbCardsUidUpdate;
     private String guidForDiscountsUpdate;
     private String updateSpbClientDoubles;
+    private Date startDateEMP;
+    private Date endDateEMP;
+    private Long contractId;
+    private boolean allowGenerateGuardians = true;
+
+    private static final Logger logger = LoggerFactory.getLogger(OtherActionsPage.class);
 
     private static void close(Closeable resource) {
         if (resource != null) {
@@ -77,6 +88,8 @@ public class OtherActionsPage extends OnlineReportPage {
         summaryDate = new Date();
         summaryFinOperatorDate = new Date();
         startDate = CalendarUtils.addDays(new Date(), 2);
+        endDateEMP = new Date();
+        startDateEMP = CalendarUtils.addDays(endDateEMP, -7);
     }
 
     public void rubBIExport() throws Exception {
@@ -93,7 +106,8 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void runImportRegisterClients() throws Exception {
-        RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).run(); //DEF
+        RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
+                .run(); //DEF
         printMessage("Импорт клиентов из Реестров выполнен");
     }
 
@@ -157,6 +171,70 @@ public class OtherActionsPage extends OnlineReportPage {
         printMessage("Пробное  событие успешно отправлено на ЕМП");
     }
 
+    public void cleaningMenu() {
+        MaintenanceService maintenanceService = new MaintenanceService();
+        maintenanceService.run();
+        printMessage("Очистка выполнена. Смотри лог");
+    }
+
+    public void runSendEMPEventEMIAS() throws Exception {
+        RuntimeContext runtimeContext = null;
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        try {
+            runtimeContext = RuntimeContext.getInstance();
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+
+            Client client = DAOUtils.findClientByContractId(persistenceSession, getContractId());
+            if (client == null)
+            {
+                printMessage("Клиент не найден");
+                return;
+            }
+            List<EMIAS> emias = DAOService.getInstance()
+                    .findEMIASbyClientandBeetwenDates(client, getStartDateEMP(), getEndDateEMP());
+            for (EMIAS emias1 : emias) {
+                Integer eventsStatus = -1;
+                switch (emias1.getTypeEventEMIAS().intValue()) {
+                    case 1:
+                        eventsStatus = 2;
+                        break;
+                    case 2:
+                        eventsStatus = 3;
+                        break;
+                    case 3:
+                        eventsStatus = 4;
+                        break;
+                    case 4:
+                        eventsStatus = 5;
+                        break;
+                }
+
+                ExternalEvent event = DAOService.getInstance()
+                        .getExternalEvent(client, client.getOrg().getShortNameInfoService(), client.getOrg().getOfficialName(),
+                                ExternalEventType.SPECIAL, emias1.getDateLiberate(),
+                                ExternalEventStatus.fromInteger(eventsStatus));
+                event.setForTest(true);
+                ExternalEventNotificationService notificationService = RuntimeContext.getAppContext()
+                        .getBean(ExternalEventNotificationService.class);
+                notificationService.setSTART_DATE(emias1.getStartDateLiberate());
+                notificationService.setEND_DATE(emias1.getEndDateLiberate());
+                notificationService.sendNotification(client, event);
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            printMessage("События клиента отправлены (" + emias.size() + ")");
+        } catch (Exception e) {
+            logger.error("Ошибка при отправке тестового события", e);
+            printMessage("Ошибка при отправке тестового события");
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+
+    }
+
     public void runRecalculateEMPStatistics() throws Exception {
         RuntimeContext.getAppContext().getBean(EMPProcessor.class).recalculateEMPClientsCount(); //DEF
         printMessage("Статистика ЕМП обновлена");
@@ -217,18 +295,24 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void runGenerateGuardians() {
-        List<Long> orgs;
-
-        int count = 0;
+        if (!allowGenerateGuardians) return;
         try {
-            orgs = getOrgsForGenGuardians();
-            count = ClientService.getInstance().generateGuardians(orgs);
-        } catch (Exception e) {
-            printError(String.format("Операция завершилась с ошибкой: %s", e.getMessage()));
-            return;
-        }
+            allowGenerateGuardians = false;
+            List<Long> orgs;
 
-        printMessage(String.format("Операция выполнена успешно. Сгенерированы представители для %s клиентов", count));
+            int count = 0;
+            try {
+                orgs = getOrgsForGenGuardians();
+                count = ClientService.getInstance().generateGuardians(orgs);
+            } catch (Exception e) {
+                printError(String.format("Операция завершилась с ошибкой: %s", e.getMessage()));
+                return;
+            }
+
+            printMessage(String.format("Операция выполнена успешно. Сгенерированы представители для %s клиентов", count));
+        } finally {
+            allowGenerateGuardians = true;
+        }
     }
 
     public void runMealTest() {
@@ -259,10 +343,13 @@ public class OtherActionsPage extends OnlineReportPage {
         try {
             String mode = RuntimeContext.getInstance().getPropertiesValue(MODE_PROPERTY, null);
             if (mode.equals(MODE_FILE)) {
-                RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class).loadNSIFile();
+                RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class)
+                        .loadNSIFile();
             }
             if (mode.equals(MODE_SYMMETRIC)) {
-                RuntimeContext.getAppContext().getBean("ImportRegisterSymmetricService", ImportRegisterSymmetricService.class).loadClientsFromSymmetric();
+                RuntimeContext.getAppContext()
+                        .getBean("ImportRegisterSymmetricService", ImportRegisterSymmetricService.class)
+                        .loadClientsFromSymmetric();
             }
             printMessage("Файл загружен");
         } catch (Exception e) {
@@ -273,7 +360,9 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void loadNSIEmployeeFile() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean("ImportRegisterEmployeeFileService", ImportRegisterEmployeeFileService.class).loadNSIFile();
+            RuntimeContext.getAppContext()
+                    .getBean("ImportRegisterEmployeeFileService", ImportRegisterEmployeeFileService.class)
+                    .loadNSIFile();
             printMessage("Файл загружен");
         } catch (Exception e) {
             getLogger().error("Error run load NSI file: ", e);
@@ -403,7 +492,8 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void loadESZMigrantsFile() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean("ImportMigrantsFileService", ImportMigrantsFileService.class).loadMigrantsFile();
+            RuntimeContext.getAppContext().getBean("ImportMigrantsFileService", ImportMigrantsFileService.class)
+                    .loadMigrantsFile();
             printMessage("Файл загружен");
         } catch (Exception e) {
             getLogger().error("Error run load ESZ migrants file: ", e);
@@ -451,14 +541,13 @@ public class OtherActionsPage extends OnlineReportPage {
             for (Map.Entry<String, String> entry2 : entry.getValue().entrySet()) {
                 str += "\"" + entry2.getValue() + "\",";
             }
-            result += str.substring(0, str.length()-1) + "\n";
+            result += str.substring(0, str.length() - 1) + "\n";
         }
-        result = result.substring(0, result.length()-1);
+        result = result.substring(0, result.length() - 1);
 
         FacesContext facesContext = FacesContext.getCurrentInstance();
         try {
-            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
-                    .getResponse();
+            HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
 
             ServletOutputStream servletOutputStream = response.getOutputStream();
 
@@ -477,8 +566,8 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void sendGoodRequestsNewReports() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean("PreorderRequestsReportService",
-                    PreorderRequestsReportService.class).runGeneratePreorderRequests(new PreorderRequestsReportServiceParam(new Date()));
+            RuntimeContext.getAppContext().getBean("PreorderRequestsReportService", PreorderRequestsReportService.class)
+                    .runGeneratePreorderRequests(new PreorderRequestsReportServiceParam(new Date()));
             printMessage("Отправка отчетов завершена");
         } catch (Exception e) {
             getLogger().error("Error send PreorderRequestsReport: ", e);
@@ -488,7 +577,8 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void createRegularPreorders() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().generatePreordersBySchedule(new PreorderRequestsReportServiceParam(new Date()));
+            RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl()
+                    .generatePreordersBySchedule(new PreorderRequestsReportServiceParam(new Date()));
             printMessage("Создание регулярных предзаказов завершено");
         } catch (Exception e) {
             getLogger().error("Error create RegularPreorders: ", e);
@@ -498,17 +588,20 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void relevancePreordersToOrgs() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgs(new PreorderRequestsReportServiceParam(new Date()));
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .relevancePreordersToOrgs(new PreorderRequestsReportServiceParam(new Date()));
             printMessage("Проверка соответствия ОО клиента и предзаказа завершена");
         } catch (Exception e) {
             getLogger().error("Error create relevancePreordersToOrgs: ", e);
-            printError("Во время проверки соответствия ОО клиента и предзаказа произошла ошибка с текстом " + e.getMessage());
+            printError("Во время проверки соответствия ОО клиента и предзаказа произошла ошибка с текстом " + e
+                    .getMessage());
         }
     }
 
     public void relevancePreordersToMenu() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).runRelevancePreordersToMenu(new PreorderRequestsReportServiceParam(new Date()));
+            RuntimeContext.getAppContext().getBean(PreorderOperationsService.class)
+                    .runRelevancePreordersToMenu(new PreorderRequestsReportServiceParam(new Date()));
             printMessage("Проверка соответствия меню и предзаказа завершена");
         } catch (Exception e) {
             getLogger().error("Error create relevancePreordersToMenu: ", e);
@@ -518,11 +611,14 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void relevancePreordersToOrgFlag() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).relevancePreordersToOrgFlag(new PreorderRequestsReportServiceParam(new Date()));
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .relevancePreordersToOrgFlag(new PreorderRequestsReportServiceParam(new Date()));
             printMessage("Проверка соответствия флага включения функционала предзаказа ОО завершена");
         } catch (Exception e) {
             getLogger().error("Error create relevancePreordersToOrgFlag: ", e);
-            printError("Во время проверки соответствия флага включения функционала предзаказа ОО произошла ошибка с текстом " + e.getMessage());
+            printError(
+                    "Во время проверки соответствия флага включения функционала предзаказа ОО произошла ошибка с текстом "
+                            + e.getMessage());
         }
     }
 
@@ -533,7 +629,9 @@ public class OtherActionsPage extends OnlineReportPage {
     public void preorderRequestsManualGenerate() throws Exception {
         PreorderRequestsReportServiceParam params = new PreorderRequestsReportServiceParam(startDate);
         params.getIdOfOrgList().clear();
-        if (idOfOrgList != null) params.getIdOfOrgList().addAll(idOfOrgList);
+        if (idOfOrgList != null) {
+            params.getIdOfOrgList().addAll(idOfOrgList);
+        }
         params.getIdOfClientList().clear();
         if (getClientList() != null) {
             for (ClientSelectListPage.Item item : getClientList()) {
@@ -600,7 +698,8 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void runUpdateDiscounts() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateDiscountsForGUID(guidForDiscountsUpdate);
+            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class)
+                    .updateDiscountsForGUID(guidForDiscountsUpdate);
             printMessage("Обновление льгот завершено");
         } catch (Exception e) {
             getLogger().error("Error in runUpdateDiscounts: ", e);
@@ -655,23 +754,23 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
-    public void runEventNotificationServiceForDaily(){
+    public void runEventNotificationServiceForDaily() {
         SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
         Date today = new Date(System.currentTimeMillis());
         Date endDate = CalendarUtils.endOfDay(today);
         Date startDate = CalendarUtils.truncateToDayOfMonth(today);
-        service.run(startDate, endDate,
-                ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue(), true);
+        service.run(startDate, endDate, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue(),
+                true);
     }
 
-    public void runEventNotificationServiceForWeekly(){
+    public void runEventNotificationServiceForWeekly() {
         SummaryCalculationService service = RuntimeContext.getAppContext().getBean(SummaryCalculationService.class);
         Date today = new Date(System.currentTimeMillis());
         Date[] dates = CalendarUtils.getCurrentWeekBeginAndEnd(today);
         Date startDate = CalendarUtils.truncateToDayOfMonth(dates[0]);
         Date endDate = CalendarUtils.endOfDay(dates[1]);
-        service.run(startDate, endDate,
-                ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue(), true);
+        service.run(startDate, endDate, ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_WEEK.getValue(),
+                true);
     }
 
     public void runMSRToFTP() {
@@ -684,7 +783,8 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void updateESZMigrants() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean("ESZMigrantsUpdateService", ESZMigrantsUpdateService.class).updateMigrants();
+            RuntimeContext.getAppContext().getBean("ESZMigrantsUpdateService", ESZMigrantsUpdateService.class)
+                    .updateMigrants();
             printMessage("Обработка мигрантов завершена");
         } catch (Exception e) {
             getLogger().error("Error run update ESZ migrants: ", e);
@@ -698,5 +798,29 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void setUpdateSpbClientDoubles(String updateSpbClientDoubles) {
         this.updateSpbClientDoubles = updateSpbClientDoubles;
+    }
+
+    public Date getStartDateEMP() {
+        return startDateEMP;
+    }
+
+    public void setStartDateEMP(Date startDateEMP) {
+        this.startDateEMP = startDateEMP;
+    }
+
+    public Date getEndDateEMP() {
+        return endDateEMP;
+    }
+
+    public void setEndDateEMP(Date endDateEMP) {
+        this.endDateEMP = endDateEMP;
+    }
+
+    public Long getContractId() {
+        return contractId;
+    }
+
+    public void setContractId(Long contractId) {
+        this.contractId = contractId;
     }
 }

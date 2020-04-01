@@ -444,7 +444,7 @@ public class ImportRegisterClientsService {
                                 emptyIfNull(dbClient.getClientGroup() == null ? ""
                                         : dbClient.getClientGroup().getGroupName()), logBuffer);
                         addClientChange(ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
-                                RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                                RegistryChange.FULL_COMPARISON, false);
                     }
                 } catch (Exception e) {
                     logError("Failed to delete client " + dbClient, e, logBuffer);
@@ -466,13 +466,10 @@ public class ImportRegisterClientsService {
                                     dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()),
                             logBuffer);
                     addClientChange(ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
-                            RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                            RegistryChange.FULL_COMPARISON, false);
                 }
             }
         }
-
-        Map<Long, CategoryDiscount> categoryMap = getCategoriesMap(session);
-        Map<Integer, CategoryDiscountDSZN> categoryDSZNMap = getCategoriesDSZNMap(session);
 
         //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
         for (ExpandedPupilInfo pupil : pupils) {
@@ -549,7 +546,7 @@ public class ImportRegisterClientsService {
                         emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName())
                         + " из школы " + cl.getOrg().getIdOfOrg() + " в школу " + org.getIdOfOrg(), logBuffer);
                 addClientChange(ts, org.getIdOfOrg(), org.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION,
-                        RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                        RegistryChange.FULL_COMPARISON, false);
                 continue;
             }
             if (!updateClient) {
@@ -571,7 +568,7 @@ public class ImportRegisterClientsService {
                                 pupil.getFamilyName() + " " + pupil.getFirstName() + " " +
                                 pupil.getSecondName() + ", " + pupil.getGroup(), logBuffer);
                         addClientChange(ts, org.getIdOfOrg(), fieldConfig, CREATE_OPERATION,
-                                RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                                RegistryChange.FULL_COMPARISON, false);
                     } catch (Exception e) {
                         // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
                         logError("Ошибка добавления клиента", e, logBuffer);
@@ -588,7 +585,7 @@ public class ImportRegisterClientsService {
                             + emptyIfNull(pupil.getFirstName()) + " " +
                             emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()), logBuffer);
                     addClientChange(ts, org.getIdOfOrg(), fieldConfig, cl, MODIFY_OPERATION,
-                            RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                            RegistryChange.FULL_COMPARISON, false);
                 }
             } catch (Exception e) {
                 logError("Failed to add client for " + org.getIdOfOrg() + " org", e, logBuffer);
@@ -1191,11 +1188,15 @@ public class ImportRegisterClientsService {
 
         Set<String> orgGuids;
         String guidInfo;
+        private Set<String> orgEkisIds;
+        private String ekisInfo;
 
         public OrgRegistryGUIDInfo(Org org) {
             Set<Org> orgs = DAOService.getInstance().getFriendlyOrgs(org.getIdOfOrg());
             orgGuids = new HashSet<String>();
             guidInfo = "";
+            orgEkisIds = new HashSet<>();
+            ekisInfo = "";
             for (Org o : orgs) {
                 if (StringUtils.isEmpty(o.getGuid())) {
                     continue;
@@ -1206,6 +1207,12 @@ public class ImportRegisterClientsService {
                 guidInfo += o.getOrgNumberInName() + ": " + o.getGuid();
                 orgGuids.add(o.getGuid());
             }
+            for (Org o : orgs) {
+                if (o.getEkisId() == null) continue;
+                if (ekisInfo.length() > 0) ekisInfo += ", ";
+                ekisInfo += o.getOrgNumberInName() + ": " + o.getEkisId().toString();
+                orgEkisIds.add(o.getEkisId().toString());
+            }
         }
 
         public Set<String> getOrgGuids() {
@@ -1214,6 +1221,14 @@ public class ImportRegisterClientsService {
 
         public String getGuidInfo() {
             return guidInfo;
+        }
+
+        public Set<String> getOrgEkisIds() {
+            return orgEkisIds;
+        }
+
+        public String getEkisInfo() {
+            return ekisInfo;
         }
     }
 
@@ -1348,11 +1363,7 @@ public class ImportRegisterClientsService {
                     }
                     Date createDateBirth = new Date(change.getBirthDate());
                     createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
-                    createConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefitsSafe());
-                    if(change.getCheckBenefitsSafe()) {
-                        createConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
-                        createConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
-                    }
+                    createConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, false);
                     createConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, change.getGuardiansCount());
                     createConfig.setValueSet(ClientManager.FieldId.GUARDIANS_COUNT_LIST, change.getRegistryChangeGuardiansSet());
                     createConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
@@ -1429,11 +1440,7 @@ public class ImportRegisterClientsService {
                     modifyConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
                     Date modifyDateBirth = new Date(change.getBirthDate());
                     modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
-                    modifyConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefitsSafe());
-                    if(change.getCheckBenefitsSafe()) {
-                        modifyConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
-                        modifyConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
-                    }
+                    modifyConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, false);
                     modifyConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
 
                     ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
@@ -1604,13 +1611,21 @@ public class ImportRegisterClientsService {
         }
     }
 
-    private ClientMskNSIService getNSIService() {
+    public ClientMskNSIService getNSIService() {
+        switch (RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION)) {
+            case Option.NSI3 :
+                //Не смотрим на настройку из MODE_PROPERTY. Pабота с файлом НСИ-3 по екис ид
+                return RuntimeContext.getAppContext().getBean("ImportRegisterNSI3Service", ImportRegisterNSI3Service.class);
+        }
         String mode = RuntimeContext.getInstance().getPropertiesValue(ImportRegisterFileService.MODE_PROPERTY, null);
         if (mode.equals(ImportRegisterFileService.MODE_SYMMETRIC)) {
+            //забор клиентов из таблиц симметрика
             return RuntimeContext.getAppContext().getBean("ImportRegisterSymmetricService", ImportRegisterSymmetricService.class);
         } else if (mode.equals(ImportRegisterFileService.MODE_FILE)) {
+            //клиенты из файла НСИ-2
             return RuntimeContext.getAppContext().getBean("ImportRegisterFileService", ImportRegisterFileService.class);
         } else {
+            //запросы в апи НСИ-1
             return RuntimeContext.getAppContext().getBean("ClientMskNSIService", ClientMskNSIService.class);
         }
     }
@@ -1630,7 +1645,7 @@ public class ImportRegisterClientsService {
         String synchDate = "[Синхронизация с Реестрами от " + date + " для " + org.getIdOfOrg() + "]: ";
         OrgRegistryGUIDInfo orgGuids = new OrgRegistryGUIDInfo(org);
         log(synchDate + "Производится синхронизация для " + org.getOfficialName() + " GUID [" + orgGuids.getGuidInfo()
-                + "]", logBuffer);
+                + "] + EKIS Id [" + orgGuids.getEkisInfo() + "]", logBuffer);
 
         SecurityJournalProcess process = SecurityJournalProcess.createJournalRecordStart(
                 SecurityJournalProcess.EventType.NSI_CLIENTS, new Date());
@@ -1641,18 +1656,14 @@ public class ImportRegisterClientsService {
             //DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 1);
             //Проверка на устаревшие гуиды организаций
             ClientMskNSIService service = getNSIService();
-            List<String> list = service.getBadGuids(orgGuids.orgGuids);
-            if (list != null && !list.isEmpty()) {
-                String badGuids = "Найдены следующие неактуальные GUIDы организаций:\n";
-                for (String g : list) {
-                    badGuids += g;
-                }
+            String badGuids = service.getBadGuids(orgGuids);
+            if (!StringUtils.isEmpty(badGuids)) {
                 isSuccessEnd = false;
                 throw new BadOrgGuidsException(badGuids);
             }
 
             //  Итеративно загружаем клиентов, используя ограничения
-            List<ExpandedPupilInfo> pupils = service.getPupilsByOrgGUID(orgGuids.orgGuids, null, null, null);
+            List<ExpandedPupilInfo> pupils = service.getPupilsByOrgGUID(orgGuids, null, null, null);
             log(synchDate + "Получено " + pupils.size() + " записей", logBuffer);
             //  !!!!!!!!!!
             //  !!!!!!!!!!

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodType;
 
 import javax.xml.bind.annotation.*;
 import java.util.Date;
@@ -38,8 +39,14 @@ public class MenuWithComplexesExt {
     private int usedVariableFeeding;
     @XmlAttribute(name = "isDiscountComplex")
     private int isDiscountComplex;
+    @XmlAttribute(name = "goodType")
+    private Integer goodType;
     @XmlElement(name = "MenuDetail")
     private List<MenuItemExt> menuItemExtList;
+    @XmlAttribute(name = "modevisible")
+    private Integer modevisible;
+    @XmlAttribute(name = "usedspecialmenu")
+    private Integer usedspecialmenu;
 
     public MenuWithComplexesExt() {
     }
@@ -57,6 +64,16 @@ public class MenuWithComplexesExt {
                 complexInfo.getUsedVariableFeeding() == null || complexInfo.getUsedVariableFeeding() == 0 ? 0
                         : 1;
         this.isDiscountComplex = complexInfo.getModeFree();
+        this.goodType = getGoodType(complexInfo);
+        this.modevisible = complexInfo.getModeVisible();
+        this.usedspecialmenu = complexInfo.getUsedSpecialMenu();
+    }
+
+    private Integer getGoodType(ComplexInfo complexInfo) {
+        if (complexInfo.getGood() == null || complexInfo.getGood().getGoodType() == null || complexInfo.getGood().getGoodType() == GoodType.UNSPECIFIED) {
+            return null;
+        }
+        return complexInfo.getGood().getGoodType().getCode();
     }
 
     public Long getIdOfComplexInfo() {
@@ -129,5 +146,29 @@ public class MenuWithComplexesExt {
 
     public void setIsDiscountComplex(int isDiscountComplex) {
         this.isDiscountComplex = isDiscountComplex;
+    }
+
+    public Integer getGoodType() {
+        return goodType;
+    }
+
+    public void setGoodType(Integer goodType) {
+        this.goodType = goodType;
+    }
+
+    public Integer getUsedspecialmenu() {
+        return usedspecialmenu;
+    }
+
+    public void setUsedspecialmenu(Integer usedspecialmenu) {
+        this.usedspecialmenu = usedspecialmenu;
+    }
+
+    public Integer getModevisible() {
+        return modevisible;
+    }
+
+    public void setModevisible(Integer modevisible) {
+        this.modevisible = modevisible;
     }
 }

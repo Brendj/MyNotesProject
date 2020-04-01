@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2019. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.PreorderFlag" table="cf_preorder_flags">
+        <id name="idOfPreorderFlag" column="IdOfPreorderFlag" type="long">
+            <generator class="identity"/>
+        </id>
+        <many-to-one name="client" class="ru.axetta.ecafe.processor.core.persistence.Client"
+                     column="IdOfClient" not-null="true" fetch="select"/>
+        <property name="informedSpecialMenu" column="informedSpecialMenu" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <many-to-one name="guardianInformedSpecialMenu" class="ru.axetta.ecafe.processor.core.persistence.Client"
+                     column="idofguardianspecialmenu" fetch="select"/>
+        <property name="allowedPreorder" column="allowedPreorder" type="ru.axetta.ecafe.processor.core.persistence.BoolType"/>
+        <many-to-one name="guardianAllowedPreorder" class="ru.axetta.ecafe.processor.core.persistence.Client"
+                     column="idofguardianallowedpreorder" fetch="select"/>
+
+        <property name="createdDate" column="createddate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        <property name="lastUpdate" column="lastupdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+    </class>
+</hibernate-mapping>

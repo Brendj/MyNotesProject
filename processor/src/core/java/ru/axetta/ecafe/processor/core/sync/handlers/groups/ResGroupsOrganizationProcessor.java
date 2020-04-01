@@ -16,7 +16,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
@@ -66,17 +65,6 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
         ArrayList<ResProcessGroupsOrganizationItem> resultItems = new ArrayList<ResProcessGroupsOrganizationItem>();
         if (sectionRequest.getItems().size() > 0) {
             List<GroupNamesToOrgs> groupsFromMainBuilding = loadGroupsFromMainBuilding();
-
-            Set<String> uniqueParentGroupNames = new HashSet<String>();
-
-            for (GroupOrganizationItem groupOrganizationItem : sectionRequest.getItems()) {
-                if (groupOrganizationItem.getMiddleGroup() != null) {
-                    if (groupOrganizationItem.getMiddleGroup() == true) {
-                        uniqueParentGroupNames.add(groupOrganizationItem.getParentGroupName());
-                    }
-                }
-            }
-
             for (GroupOrganizationItem groupItem : sectionRequest.getItems()) {
                 ResultOperation resultOperation = processResultGroupOrganizationItem(groupsFromMainBuilding, groupItem,
                         nextVersion);
@@ -85,13 +73,6 @@ public class ResGroupsOrganizationProcessor extends AbstractProcessor<ResProcess
                             nextVersion, resultOperation);
                     resultItems.add(item);
                 }
-            }
-
-            for (String unique : uniqueParentGroupNames) {
-                GroupNamesToOrgs groupNamesToOrg = loadGroupFromMainBuilding(unique);
-                ResProcessGroupsOrganizationItem item = new ResProcessGroupsOrganizationItem(
-                        groupNamesToOrg.getParentGroupName(), groupNamesToOrg.getVersion(), null);
-                resultItems.add(item);
             }
         }
         result.setItems(resultItems);

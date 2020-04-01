@@ -70,11 +70,11 @@
         </h:selectBooleanCheckbox>
     </h:panelGrid>
     <h:panelGrid styleClass="borderless-grid" columns="2">
-        <a4j:commandButton value="Генерировать отчет" action="#{orgSettingsReportPage.buildHTML}"
+        <a4j:commandButton value="Генерировать отчет" action="#{orgSettingsReportPage.buildHTML()}"
                            reRender="orgSettingsTable" styleClass="command-button"
                            status="reportGenerateStatus" id="buildHTMLButton" />
 
-        <h:commandButton value="Выгрузить в Excel" action="#{orgSettingsReportPage.buildXLS}"
+        <h:commandButton value="Выгрузить в Excel" action="#{orgSettingsReportPage.buildXLS()}"
                          styleClass="command-button"  id="buildXLSButton" disabled="false">
             <a4j:support status="reportGenerateStatus" id="buildXLSButtonSupport"/>
         </h:commandButton>
@@ -218,6 +218,14 @@
         </rich:column>
         <!-- Feeding Settings -->
         <!--id="orgSettingsFeedingPart" rendered="orgSettingsReportPage.showFeedingSettings"-->
+        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Использовать Web-АРМ" rendered="#{orgSettingsReportPage.showFeedingSettings}">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Использовать Web-АРМ" />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{item.useWebArm}" styleClass="checkboxes">
+                <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
+            </h:selectBooleanCheckbox>
+        </rich:column>
         <rich:column headerClass="column-header" styleClass="#{item.style}" label="Абонементное питание" rendered="#{orgSettingsReportPage.showFeedingSettings}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Абонементное питание" />
@@ -352,7 +360,7 @@
         </f:facet>
     </rich:dataTable>
     <h:panelGrid styleClass="borderless-grid" columns="1">
-        <a4j:commandButton value="Применить изменения" action="#{orgSettingsReportPage.applyChanges}"
+        <a4j:commandButton value="Применить изменения" action="#{orgSettingsReportPage.applyChanges()}"
                            reRender="orgSettingsTable" styleClass="command-button"
                            status="reportGenerateStatus" id="applyChangesButton" />
     </h:panelGrid>

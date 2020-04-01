@@ -812,10 +812,6 @@
     <rich:panelMenuItem id="showJournal" label="Очередь выгрузки транзакций"
                         binding="#{journalViewPage.mainMenuComponent}" action="#{journalViewPage.show}"
                         rendered="#{mainPage.eligibleToServiceAdmin}" reRender="workspaceForm" />
-    <%--@elvariable id="fullSyncRequestPage" type="ru.axetta.ecafe.processor.web.ui.service.FullSyncRequestPage"--%>
-    <rich:panelMenuItem id="fullSyncRequestItem" label="Запрос полной синхронизации"
-                        binding="#{fullSyncRequestPage.mainMenuComponent}" action="#{fullSyncRequestPage.show}"
-                        reRender="workspaceForm" />
 
     <%--@elvariable id="usePlanOrdersRequestPage" type="ru.axetta.ecafe.processor.web.ui.service.UsePlanOrdersRequestPage"--%>
     <rich:panelMenuItem id="usePlanOrdersRequestItem" label="Запрос использования плана питания"
@@ -975,6 +971,9 @@
         <%--@elvariable id="orgSyncSettingReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncSettingReportPage"--%>
         <rich:panelMenuItem id="orgSyncSettingsReport" binding="#{orgSyncSettingReportPage.mainMenuComponent}"
                             label="Расписание синхронизации" action="#{orgSyncSettingReportPage.show}" reRender="workspaceForm" />
+        <%--@elvariable id="orgSyncRequestPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSyncRequestPage"--%>
+        <rich:panelMenuItem id="orgSyncRequest" binding="#{orgSyncRequestPage.mainMenuComponent}" reRender="workspaceForm"
+                            label="Запрос проведения синхронизации" action="#{orgSyncRequestPage.show}"/>
         <%--@elvariable id="hardwareSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.HardwareSettingsReportPage"--%>
         <rich:panelMenuItem id="orgHardwareSettingsReport" binding="#{hardwareSettingsReportPage.mainMenuComponent}"
                             label="Отчет по оборудованию" action="#{hardwareSettingsReportPage.show}" reRender="workspaceForm"/>
@@ -1093,22 +1092,6 @@
                             label="Отчет по предзаказам" action="#{preordersReportPage.show}"
                             reRender="workspaceForm" />
     </rich:panelMenuGroup>
-
-    <rich:panelMenuGroup id="electronicReconciliationStatisticsReportGroupMenu"
-                         binding="#{mainPage.electronicReconciliationReportGroupMenu.mainMenuComponent}"
-                         label="Электронная сверка" rendered="#{mainPage.eligibleToViewElectronicReconciliationReport}">
-        <a4j:support event="onclick" action="#{mainPage.showElectronicReconciliationReportGroupMenu}"
-                     reRender="workspaceForm" />
-        <rich:panelMenuItem id="taloonApprovalVerificationMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
-                            binding="#{mainPage.taloonApprovalVerificationPage.mainMenuComponent}"
-                            label="Электронная сверка" action="#{mainPage.showTaloonApprovalVerificationPage}"
-                            reRender="workspaceForm" />
-        <rich:panelMenuItem id="electronicReconciliationStatisticsMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
-                            binding="#{mainPage.electronicReconciliationStatisticsPage.mainMenuComponent}"
-                            label="Статистика электронной сверки"
-                            action="#{mainPage.showElectronicReconciliationStatisticsPage}" reRender="workspaceForm" />
-    </rich:panelMenuGroup>
-
     <rich:panelMenuGroup id="budgetReportGroupMenu" binding="#{mainPage.budgetFoodGroupMenu.mainMenuComponent}"
                          label="Льготное питание" rendered="#{mainPage.eligibleToViewMealsReports}">
         <a4j:support event="onclick" action="#{mainPage.showBudgetFoodGroupMenu}" reRender="workspaceForm" />
@@ -1154,6 +1137,14 @@
         <rich:panelMenuItem id="referReportMenuItem" binding="#{referReportPage.mainMenuComponent}"
                             label="Справки расходования средств" action="#{referReportPage.show}"
                             reRender="workspaceForm" />
+        <rich:panelMenuItem id="taloonApprovalVerificationMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
+                            binding="#{mainPage.taloonApprovalVerificationPage.mainMenuComponent}"
+                            label="Электронная сверка" action="#{mainPage.showTaloonApprovalVerificationPage}"
+                            reRender="workspaceForm" />
+        <rich:panelMenuItem id="electronicReconciliationStatisticsMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
+                            binding="#{mainPage.electronicReconciliationStatisticsPage.mainMenuComponent}"
+                            label="Статистика электронной сверки"
+                            action="#{mainPage.showElectronicReconciliationStatisticsPage}" reRender="workspaceForm" />
 
 
         <%--@elvariable id="totalBenefFeedReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.TotalBenefFeedReportPage"--%>
@@ -1167,6 +1158,11 @@
         <%--@elvariable id="registerStampPaidPage" type="ru.axetta.ecafe.processor.web.ui.report.online.RegisterStampPaidPage"--%>
         <rich:panelMenuItem id="registerStampPaidReportMenuItem" binding="#{registerStampPaidPage.mainMenuComponent}"
                             label="Реестр талонов" action="#{registerStampPaidPage.show}" reRender="workspaceForm" />
+
+        <rich:panelMenuItem id="taloonPreorderVerificationMenuItem" rendered="#{mainPage.isSupplier() || mainPage.eligibleToWorkOnlineReport}"
+                            binding="#{mainPage.taloonPreorderVerificationPage.mainMenuComponent}"
+                            label="Электронная сверка" action="#{mainPage.showTaloonPreorderVerificationPage}"
+                            reRender="workspaceForm" />
 
         <rich:panelMenuGroup id="feedingSettingsGroupMenu" label="Настройки платного питания" rendered="#{mainPage.eligibleToViewOrEditFeedingSettings}">
             <rich:panelMenuItem id="feedingSettingsListMenuItem" binding="#{mainPage.feedingSettingsListPage.mainMenuComponent}"

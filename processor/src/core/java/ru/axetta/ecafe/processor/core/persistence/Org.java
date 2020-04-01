@@ -4,7 +4,6 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.org.Contract;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.questionary.Questionary;
@@ -112,6 +111,9 @@ public class Org implements Serializable {
     //private String remoteAddress;
     private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
     private Boolean fullSyncParam;
+    private Boolean menusSyncParam;
+    private Boolean orgSettingsSyncParam;
+    private Boolean clientsSyncParam;
     private Boolean usePlanOrders;
     private Boolean commodityAccounting;
     private Boolean disableEditingClientsFromAISReestr;
@@ -154,6 +156,11 @@ public class Org implements Serializable {
     private Boolean participantOP;
     private Boolean preorderlp;
     private Boolean haveNewLP;
+    private Long ekisId;
+    private Boolean preorderSyncParam;
+    private Boolean useWebArm;
+    private String egissoId;
+    private String municipalDistrict;
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -184,7 +191,10 @@ public class Org implements Serializable {
         this.mailingListReportsOnVisits = mailingListReportsOnVisits;
         this.mailingListReports1 = mailingListReports1;
         this.mailingListReports2 = mailingListReports2;
-        this.fullSyncParam=false;
+        this.fullSyncParam = false;
+        this.menusSyncParam = false;
+        this.clientsSyncParam = false;
+        this.orgSettingsSyncParam = false;
         this.commodityAccounting=false;
         this.usePlanOrders = true;  // плана питания включен по умолчаню
         this.disableEditingClientsFromAISReestr = false;
@@ -216,6 +226,7 @@ public class Org implements Serializable {
         this.helpdeskEnabled = false;
         this.requestForVisitsToOtherOrg = false;
         this.preordersEnabled = false;
+        this.useWebArm = false;
     }
 
     static Pattern patterNumber = Pattern.compile("\\d+");
@@ -257,6 +268,30 @@ public class Org implements Serializable {
 
     public void setFullSyncParam(Boolean fullSyncParam) {
         this.fullSyncParam = fullSyncParam;
+    }
+
+    public Boolean getMenusSyncParam() {
+        return menusSyncParam;
+    }
+
+    public void setMenusSyncParam(Boolean menusSyncParam) {
+        this.menusSyncParam = menusSyncParam;
+    }
+
+    public Boolean getOrgSettingsSyncParam() {
+        return orgSettingsSyncParam;
+    }
+
+    public void setOrgSettingsSyncParam(Boolean orgSettingsSyncParam) {
+        this.orgSettingsSyncParam = orgSettingsSyncParam;
+    }
+
+    public Boolean getClientsSyncParam() {
+        return clientsSyncParam;
+    }
+
+    public void setClientsSyncParam(Boolean clientsSyncParam) {
+        this.clientsSyncParam = clientsSyncParam;
     }
 
     public Boolean getUsePlanOrders() {
@@ -1212,5 +1247,49 @@ public class Org implements Serializable {
 
     public void setHaveNewLP(Boolean haveNewLP) {
         this.haveNewLP = haveNewLP;
+    }
+
+    public Long getEkisId() {
+        return ekisId;
+    }
+
+    public void setEkisId(Long ekisId) {
+        this.ekisId = ekisId;
+    }
+
+    public String getEgissoId() {
+        return egissoId;
+    }
+
+    public void setEgissoId(String egissoId) {
+        this.egissoId = egissoId;
+    }
+
+    public String getMunicipalDistrict() {
+        return municipalDistrict;
+    }
+
+    public void setMunicipalDistrict(String municipalDistrict) {
+        this.municipalDistrict = municipalDistrict;
+    }
+
+    public Boolean getPreorderSyncParam() {
+        return preorderSyncParam;
+    }
+
+    public void setPreorderSyncParam(Boolean preorderSyncParam) {
+        this.preorderSyncParam = preorderSyncParam;
+    }
+
+    public Boolean getMainBuilding() {
+        return mainBuilding;
+    }
+
+    public Boolean getUseWebArm() {
+        return useWebArm;
+    }
+
+    public void setUseWebArm(Boolean useWebArm) {
+        this.useWebArm = useWebArm;
     }
 }

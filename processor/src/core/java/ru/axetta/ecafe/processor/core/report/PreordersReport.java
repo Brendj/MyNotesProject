@@ -11,7 +11,9 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.report.PreorderReportComplexItem.HashMapCompositeKey;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -91,7 +93,8 @@ public class PreordersReport extends BasicReportForOrgJob {
                 List<Long> idOfClientList, Map<String, Object> parameterMap) throws Exception {
             HashMap<Long, PreorderReportClientItem> result = new HashMap<Long, PreorderReportClientItem>();
             PreorderReportTotalItem preorderReportTotalItem = new PreorderReportTotalItem();
-            HashMap<String, PreorderReportComplexItem> preorderReportTotalItems = new HashMap<String, PreorderReportComplexItem>();
+            HashMap<HashMapCompositeKey, PreorderReportComplexItem> preorderReportTotalItems
+                    = new HashMap<HashMapCompositeKey, PreorderReportComplexItem>();
             PreorderReportComplexItem complexItem = null;
             String conditions = "";
             if (idOfClientList.size() > 0) {
@@ -118,7 +121,8 @@ public class PreordersReport extends BasicReportForOrgJob {
                      + "    UNION ALL "
                      + "    SELECT distinct o.shortnameinfoservice, o.address, "
                      + "        c.contractid, p.surname || ' ' || p.firstname || ' ' || p.secondname AS clientname, cg.groupname, "
-                     + "        pc.preorderdate, pc.amount AS complexAmount, pmd.amount AS menudetailAmount, pc.complexname, "
+                     + "        pc.preorderdate, pc.amount AS complexAmount, "
+                     + " cast(case when pc.usedsum > 0 then pmd.usedamount else pmd.amount end as integer) AS menudetailAmount, pc.complexname, "
                      + "        pmd.menudetailname, pc.complexPrice, pmd.menudetailPrice, "
                      + "        pc.idofregularpreorder IS NOT NULL OR pmd.idofregularpreorder IS NOT NULL AS isRegularPreorder, "
                      + "        pc.idofpreordercomplex, pc.usedsum > 0 as isPayed "
@@ -147,13 +151,13 @@ public class PreordersReport extends BasicReportForOrgJob {
                 Long contractId = ((BigInteger) row[2]).longValue();
                 String clientName = (String) row[3];
                 String clientGroup = (String) row[4];
-                Date preorderDate = new Date(((BigInteger) row[5]).longValue());
+                Date preorderDate = new Date(HibernateUtils.getDbLong(row[5]));
                 Integer complexAmount = (Integer) row[6];
                 Integer menudetailAmount = (Integer) row[7];
                 String complexName = (String) row[8];
                 String menudetailName = (String) row[9];
                 Long complexPrice = ((BigInteger) row[10]).longValue();
-                Long menudetailPrice = (null != row[11]) ? ((BigInteger) row[11]).longValue() : null;
+                Long menudetailPrice = HibernateUtils.getDbLong( row[11]);
                 Boolean isRegularPreorder = (Boolean) row[12];
 
                 Boolean isPayed = (Boolean) row[14];
@@ -162,16 +166,18 @@ public class PreordersReport extends BasicReportForOrgJob {
                             clientName, clientGroup));
                 }
 
-                if (!preorderReportTotalItems.containsKey(complexName)) {
+                HashMapCompositeKey currentKey = new HashMapCompositeKey(complexName, complexPrice);
+
+                if (!preorderReportTotalItems.containsKey(currentKey)) {
                     PreorderReportComplexItem preorderReportComplexItem = new PreorderReportComplexItem(complexName);
                     if (0 != complexAmount) {
                         preorderReportComplexItem.setPreorderPrice(complexPrice);
                         preorderReportComplexItem.calculateTotalPrice();
                     }
-                    preorderReportTotalItems.put(complexName, preorderReportComplexItem);
+                    preorderReportTotalItems.put(currentKey, preorderReportComplexItem);
                 }
 
-                PreorderReportComplexItem item = preorderReportTotalItems.get(complexName);
+                PreorderReportComplexItem item = preorderReportTotalItems.get(currentKey);
                 if (!result.get(contractId).isComplexExists(preorderDate, complexName)) {
                     complexItem = new PreorderReportComplexItem(preorderDate, complexAmount, complexName,
                             complexAmount == 0 ? null : complexPrice, isRegularPreorder, isPayed);

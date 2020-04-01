@@ -16,6 +16,10 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.idOfOrg}" styleClass="input-text" />
     <h:outputText escape="true" value="GUID" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.guid}" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="ЕКИС Id" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.ekisId}" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="ЕГИССО Id" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.egissoId}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Официальное наименование" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.officialName}" styleClass="input-text" size="150" />
     <h:outputText escape="true" value="Краткое наименование" styleClass="output-text" />
@@ -86,8 +90,10 @@
 <h:panelGrid id="orgViewGrid_placement" styleClass="borderless-grid" columns="2">
     <h:outputText escape="true" value="Город" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.city}" maxlength="128" styleClass="input-text long-field" />
-    <h:outputText escape="true" value="Район" styleClass="output-text" />
+    <h:outputText escape="true" value="Округ" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.district}" maxlength="128" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="Район" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.municipalDistrict}" maxlength="128" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Локация" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.location}" maxlength="128" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Широта" styleClass="output-text" />
@@ -217,6 +223,8 @@
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.requestForVisitsToOtherOrg}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Использование обучающимися нескольких идентификаторов в ОО" styleClass="output-text" />
     <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.multiCardModeEnabled}" styleClass="input-text" disabled="true" />
+    <h:outputText escape="true" value="Использовать Web-АРМ" styleClass="output-text" />
+    <h:selectBooleanCheckbox value="#{mainPage.orgViewPage.useWebArm}" styleClass="input-text" disabled="true" />
     <h:outputText escape="true" value="Адрес сервиса проведения сверки" styleClass="output-text" rendered="#{mainPage.spbRegistry}"/>
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.registryUrl}" maxlength="256" styleClass="input-text" rendered="#{mainPage.spbRegistry}"/>
     <h:outputText escape="true" value="Автоматическое создание карты для клиентов с суидом" styleClass="output-text" rendered="#{mainPage.isSpb}" />

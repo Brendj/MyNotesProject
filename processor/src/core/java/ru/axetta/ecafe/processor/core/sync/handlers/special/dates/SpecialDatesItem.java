@@ -23,6 +23,7 @@ import java.util.Date;
 public class SpecialDatesItem {
     public static final Integer ERROR_CODE_ALL_OK = 0;
     public static final Integer ERROR_CODE_NOT_VALID_ATTRIBUTE = 100;
+    public static final Integer ERROR_CODE_NOT_FOUND_GROUPNAME = 101;
 
     private Long idOfOrg;
     private Date date;

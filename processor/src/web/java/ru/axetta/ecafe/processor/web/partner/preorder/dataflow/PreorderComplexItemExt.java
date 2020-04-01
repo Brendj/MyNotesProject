@@ -38,6 +38,8 @@ public class PreorderComplexItemExt implements Comparable {
     @XmlElement(name = "menuItem")
     private List<PreorderMenuItemExt> menuItemExtList;
 
+    private Integer modeVisible;
+
     public PreorderComplexItemExt() {
 
     }
@@ -48,6 +50,15 @@ public class PreorderComplexItemExt implements Comparable {
         this.setCurrentPrice(ci.getCurrentPrice());
         this.setComplexType(ci.getModeOfAdd());
         this.setDiscount(ci.getModeFree() == 1 ? true : false);
+    }
+
+    public PreorderComplexItemExt(Integer idOfComplex, String complexName, Long currentPrice, Integer modeOfAdd, Integer modeFree, Integer modeVisible) {
+        this.setIdOfComplexInfo(idOfComplex);
+        this.setComplexName(complexName);
+        this.setCurrentPrice(currentPrice);
+        this.setComplexType(modeOfAdd);
+        this.setDiscount(modeFree == 1 ? true : false);
+        this.setModeVisible(modeVisible);
     }
 
     public PreorderComplexItemExt(Integer idOfComplex, String complexName, Long currentPrice, Integer modeOfAdd, Integer modeFree) {
@@ -161,5 +172,13 @@ public class PreorderComplexItemExt implements Comparable {
 
     public void setIsRegular(Boolean regular) {
         isRegular = regular;
+    }
+
+    public Integer getModeVisible() {
+        return modeVisible;
+    }
+
+    public void setModeVisible(Integer modeVisible) {
+        this.modeVisible = modeVisible;
     }
 }

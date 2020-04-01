@@ -40,8 +40,9 @@ public class PreorderJournalReportItem {
         if (preorderComplex.getAmount().equals(0)) {
             this.complexName += ": " + lineSeparator;
             for (PreorderMenuDetail preorderMenuDetail : preorderComplex.getPreorderMenuDetails()) {
-                if (preorderMenuDetail.getAmount() > 0)
-                    this.complexName += preorderMenuDetail.getMenuDetailName() + " - " + preorderMenuDetail.getAmount() + lineSeparator;
+                long amount = preorderComplex.isPayedComplex() ? preorderMenuDetail.getUsedAmount() : preorderMenuDetail.getAmount();
+                if (amount > 0)
+                    this.complexName += preorderMenuDetail.getMenuDetailName() + " - " + amount + lineSeparator;
             }
             this.complexName = this.complexName.substring(0, this.complexName.length()-1);
         }

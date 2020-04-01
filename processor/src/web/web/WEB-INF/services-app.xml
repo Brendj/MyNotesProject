@@ -93,7 +93,7 @@
     <context:component-scan base-package="ru.axetta.ecafe.processor"/>
 
     <task:scheduled-tasks scheduler="myScheduler">
-        <task:scheduled ref="maintenanceService" method="run" fixed-delay="600000"/>
+        <task:scheduled ref="maintenanceService" method="run" cron="0 0 4 ? * SAT"/>
         <task:scheduled ref="orgSyncLockService" method="clean" fixed-delay="1800000"/>
         <task:scheduled ref="SMSService" method="logQueue" fixed-delay="60000"/>
         <task:scheduled ref="ETPMVService" method="resendStatuses" fixed-delay="3600000"/>
@@ -184,7 +184,7 @@
     <task:scheduler id="regularPaymentSchedule"/>
     <task:scheduled-tasks scheduler="regularPaymentSchedule">
         <task:scheduled ref="regularPaymentSubscriptionService" method="checkClientBalances"
-                        cron="0 0 11,17 * * ?"/>
+                        cron="0 10 11,17 * * ?"/>
     </task:scheduled-tasks>
 
     <task:scheduler id="regularPaymentExpireNotificationSchedule"/>

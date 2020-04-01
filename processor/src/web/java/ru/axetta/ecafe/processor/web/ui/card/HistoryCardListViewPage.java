@@ -101,7 +101,21 @@ public class HistoryCardListViewPage {
 
     public void fill(Card card) throws Exception {
         List<Item> items = new LinkedList<Item>();
-        Set<HistoryCard> historyCards = card.getHistoryCards();
+        LinkedList<HistoryCard> historyCards = new LinkedList<>(card.getHistoryCards());
+
+        Collections.sort(historyCards, new Comparator<HistoryCard>() {
+            @Override
+            public int compare(HistoryCard o1, HistoryCard o2) {
+                if(o1.getUpDatetime().equals(o2.getUpDatetime())){
+                    return 0;
+                } else if(o1.getUpDatetime().before(o2.getUpDatetime())){
+                    return 1;
+                } else {
+                    return -1;
+                }
+            }
+        });
+
         for (HistoryCard historyCard : historyCards) {
             items.add(new Item(historyCard));
         }

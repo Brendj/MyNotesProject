@@ -113,6 +113,11 @@
     </servlet>
 
     <servlet>
+        <servlet-name>SpbCardServiceServlet</servlet-name>
+        <servlet-class>ru.axetta.ecafe.processor.web.partner.spb.ExtendCardServiceServlet</servlet-class>
+    </servlet>
+
+    <servlet>
         <servlet-name>ImageServlet</servlet-name>
         <servlet-class>ru.axetta.ecafe.processor.web.ImageServlet</servlet-class>
     </servlet>
@@ -221,6 +226,11 @@
     <servlet-mapping>
         <servlet-name>CommonTaskServlet</servlet-name>
         <url-pattern>/commontask</url-pattern>
+    </servlet-mapping>
+
+    <servlet-mapping>
+        <servlet-name>SpbCardServiceServlet</servlet-name>
+        <url-pattern>/cardservice</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>

@@ -37,7 +37,8 @@ public enum  SectionType {
     MIGRANTS(21),
     RO(22),
     LAST_TRANSACTION(23),
-    INFO_MESSAGE(24);
+    INFO_MESSAGE(24),
+    REESTR_TALOON_PREORDER(25);
 
     private int type;
 

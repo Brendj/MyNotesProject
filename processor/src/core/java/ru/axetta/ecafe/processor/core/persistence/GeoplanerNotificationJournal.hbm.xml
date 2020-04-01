@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.GeoplanerNotificationJournal" table="cf_geoplaner_notifications_journal">
+        <id name="idOfNotification" type="long" column="idOfNotification">
+            <generator class="identity"/>
+        </id>
+        <property name="createDate" column="createDate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="eventType" column="eventType" type="integer"/>
+        <property name="response" column="response" type="integer"/>
+        <property name="isSend" column="isSend" type="boolean"/>
+        <property name="idOfEnterEvents" column="idOfEnterEvents" type="long"/>
+        <property name="idOfOrder" column="idOfOrder" type="long"/>
+        <property name="idOfClientPayment" column="idOfClientPayment" type="long"/>
+        <property name="errorText" column="errortext" type="string"/>
+        <property name="nodeName" column="nodeName" type="string"/>
+        <many-to-one name="org" column="idOfOrg" class="ru.axetta.ecafe.processor.core.persistence.Org" not-null="true"/>
+        <many-to-one name="client" column="idOfClient" class="ru.axetta.ecafe.processor.core.persistence.Client" not-null="true"/>
+    </class>
+</hibernate-mapping>

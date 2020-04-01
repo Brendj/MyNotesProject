@@ -121,6 +121,7 @@ public class Client {
     private Set<CategoryDiscount> categoriesInternal = new HashSet<CategoryDiscount>();
     private String fax;
     private Boolean canConfirmGroupPayment;
+    private Boolean confirmVisualRecognition;
     private Set<ClientAnswerByQuestionary> clientAnswerByQuestionary;
     private Set<ClientMigration> clientMigration = new HashSet<ClientMigration>();
     private Set<ClientNotificationSetting> notificationSettings = new HashSet<ClientNotificationSetting>();
@@ -183,9 +184,12 @@ public class Client {
         this.categoriesDiscounts = categoriesDiscounts;
         this.categoriesDiscountsDSZN = categoriesDiscountsDSZN;
         this.canConfirmGroupPayment = false;
+        this.confirmVisualRecognition = false;
         this.disablePlanCreationDate = null;
         this.disablePlanEndDate = null;
         this.createdFrom = ClientCreatedFromType.DEFAULT;
+        this.gender = 1; //set default as male
+
         /*// При создании клиента проставляем ему настройки оповещений по умолчанию.
         for (ClientNotificationSetting.Predefined predefined : ClientNotificationSetting.Predefined.values()) {
             if (predefined.isEnabledAtDefault()) {
@@ -205,6 +209,17 @@ public class Client {
         } else {
             notificationSettings.add(new ClientNotificationSetting(this, ClientNotificationSetting.Predefined.SMS_SETTING_CHANGED.getValue()));
         }
+    }
+
+    public boolean hasDiscount() {
+        Set<CategoryDiscount> clientDiscounts = this.getCategories();
+        Boolean hasDiscount = false;
+        for (CategoryDiscount categoryDiscount : clientDiscounts) {
+            if(!categoryDiscount.getCategoryName().toLowerCase().contains("резерв")){
+                hasDiscount |= (categoryDiscount.getCategoryType() == CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
+            }
+        }
+        return hasDiscount;
     }
 
     public boolean isDeletedOrLeaving() {
@@ -238,8 +253,21 @@ public class Client {
         return null;
     }
 
-    public boolean isParentGroup() {
-        return idOfClientGroup != null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+    public boolean isParentMsk() {
+        return !isStudent() && !isSotrudnikMsk();
+        //return idOfClientGroup != null && idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+    }
+
+    public boolean isStudent() {
+        return idOfClientGroup != null && idOfClientGroup < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue();
+    }
+
+    public boolean isSotrudnikMsk() {
+        return idOfClientGroup != null && (idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue())
+            || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue())
+            || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue())
+            || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_OTHERS.getValue())
+            || idOfClientGroup.equals(ClientGroup.Predefined.CLIENT_EMPLOYEE_OTHER_ORG.getValue()));
     }
 
     public static String encryptPassword(String plainPassword) throws NoSuchAlgorithmException, IOException {
@@ -937,6 +965,14 @@ public class Client {
 
     public void setCanConfirmGroupPayment(Boolean canConfirmGroupPayment) {
         this.canConfirmGroupPayment = canConfirmGroupPayment;
+    }
+
+    public Boolean getConfirmVisualRecognition() {
+        return confirmVisualRecognition;
+    }
+
+    public void setConfirmVisualRecognition(Boolean confirmVisualRecognition) {
+        this.confirmVisualRecognition = confirmVisualRecognition;
     }
 
     public String getFax() {
