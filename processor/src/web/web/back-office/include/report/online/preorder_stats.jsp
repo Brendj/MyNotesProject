@@ -16,7 +16,7 @@
         <h:outputText styleClass="output-text" escape="true" value="Организации" />
         <h:panelGroup>
             <a4j:commandButton value="..." action="#{preorderStatsReportPage.showOrgListSelectPage}"
-                               reRender="modalOrgListSelectorPanel"
+                               reRender="modalOrgListSelectorPanel" disabled="#{preorderStatsReportPage.preorderOrgs}"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;">
                 <f:setPropertyActionListener value="#{preorderStatsReportPage.getStringIdOfOrgList}"
