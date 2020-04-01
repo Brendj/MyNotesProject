@@ -1262,8 +1262,7 @@ public class SyncResponse {
             ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData,
             ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
             ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, GoodRequestEZDSection goodRequestEZDSection,
-            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer) {
-            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection,
+            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer,
             ResHardwareSettingsRequest resHardwareSettingsRequest,
             ResTurnstileSettingsRequest resTurnstileSettingsRequest) {
         this.syncType = syncType;

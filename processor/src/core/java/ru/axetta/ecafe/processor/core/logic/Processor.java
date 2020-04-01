@@ -1062,9 +1062,7 @@ public class Processor implements SyncProcessor {
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding,
                 cardRequestsData, resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
-                cardRequestsData, resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection,goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer,resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private SyncResponse buildUniversalConstructedSectionsSyncResponse(SyncRequest request, Date syncStartTime,
@@ -2315,9 +2313,7 @@ public class Processor implements SyncProcessor {
                 organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions, specialDatesData,
                 resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest, helpRequestData, preOrdersFeeding, cardRequestsData,
 				resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
-                resMenusCalendar, menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private SyncResponse buildReestrTaloonsApprovalSyncResponse(SyncRequest request) throws Exception {
@@ -2410,7 +2406,7 @@ public class Processor implements SyncProcessor {
                  specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
 				clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private SyncResponse buildReestrTaloonsPreorderSyncResponse(SyncRequest request) throws Exception {
@@ -2469,6 +2465,8 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -2499,8 +2497,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
-                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private SyncResponse buildZeroTransactionsSyncResponse(SyncRequest request) throws Exception {
@@ -2559,7 +2556,6 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
-
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
@@ -2593,8 +2589,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
-                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private SyncResponse buildMigrantsSyncResponse(SyncRequest request) throws Exception {
@@ -2653,7 +2648,6 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
-
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
@@ -2725,8 +2719,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
-                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private void processInfoMessageSections(SyncRequest request, List<AbstractToElement> responseSections) {
@@ -2809,7 +2802,6 @@ public class Processor implements SyncProcessor {
         GoodRequestEZDSection goodRequestEZDSection = null;
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
-
         ResHardwareSettingsRequest resHardwareSettingsRequest = null;
         ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
@@ -2901,8 +2893,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
-                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     /* Do process short synchronization for update AccRegisgtryUpdate parameters */
@@ -3052,8 +3043,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
-                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     /* Do process short synchronization for update payment register and account inc register */
@@ -3256,13 +3246,13 @@ public class Processor implements SyncProcessor {
                 resCategoriesDiscountsAndRules, complexRoles, correctingNumbersOrdersRegistry, manager, orgOwnerData,
                 questionaryData, goodsBasicBasketData, directiveElement, resultClientGuardian, clientGuardianData,
                 accRegistryUpdate, prohibitionsMenu, accountsRegistry, resCardsOperationsRegistry,
-                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder, reestrTaloonPreorderData,
-                organizationComplexesStructure, interactiveReportData, zeroTransactionData, resZeroTransactions,
-                specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
-                helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
-                clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
-                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                organizationStructure, resReestrTaloonApproval, reestrTaloonApprovalData, resReestrTaloonPreorder,
+                reestrTaloonPreorderData, organizationComplexesStructure, interactiveReportData, zeroTransactionData,
+                resZeroTransactions, specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections,
+                resHelpRequest, helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar,
+                menusCalendarData, clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection,
+                goodRequestEZDSection, resSyncSettingsSection, syncSettingsSection, emiasSection,
+                emiasSectionForARMAnswer, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -6818,8 +6808,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
-                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private void fullProcessingHelpRequests(SyncRequest request, SyncHistory syncHistory,
@@ -7325,8 +7314,7 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSetting, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer);
-                resSyncSettingsSection, syncSettingsSection, resHardwareSettingsRequest, resTurnstileSettingsRequest);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private OrgSettingSection processOrgSettings(OrgSettingsRequest orgSettingsRequest) throws Exception {
