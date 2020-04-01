@@ -118,17 +118,18 @@ public class PreorderStatsReportBuilder extends BasicReportJob.Builder {
         for (Object o : list) {
             Object[] row = (Object[]) o;
             Date date = new Date(((BigInteger)row[0]).longValue());
-            String flags = (String) row[1];
-            String[] arr = flags.split(",");
-            if (arr.length == 0) {
+            if (row[1] == null) {
                 PreorderStatsReportItem item = new PreorderStatsReportItem(date, null);
                 addToMap(map, date, item);
-            }
-            for (String str : arr) {
-                Integer mobileGroup = new Integer(str);
-                PreorderMobileGroupOnCreateType mobileGroupOnCreate = mobileGroup == null ? null : PreorderMobileGroupOnCreateType.fromInteger(mobileGroup);
-                PreorderStatsReportItem item = new PreorderStatsReportItem(date, mobileGroupOnCreate);
-                addToMap(map, date, item);
+            } else {
+                String flags = (String) row[1];
+                String[] arr = flags.split(",");
+                for (String str : arr) {
+                    Integer mobileGroup = new Integer(str);
+                    PreorderMobileGroupOnCreateType mobileGroupOnCreate = mobileGroup == null ? null : PreorderMobileGroupOnCreateType.fromInteger(mobileGroup);
+                    PreorderStatsReportItem item = new PreorderStatsReportItem(date, mobileGroupOnCreate);
+                    addToMap(map, date, item);
+                }
             }
         }
 
