@@ -25,19 +25,13 @@ public class HardwareSettings implements Serializable {
     private String cpuHost;
     private Date lastUpdateForCPUHost;
     private Long version;
-    private Set<Org> orgsInternal = new HashSet<>();
 
     public HardwareSettings() {
     }
 
-    public HardwareSettings(Long idOfHardwareSetting, Set<Org> orgs) {
-        this.idOfHardwareSetting = idOfHardwareSetting;
-        this.orgsInternal = orgs;
-    }
-
     public HardwareSettings(Long idOfHardwareSetting, Org org, String ipHost, Date lastUpdateForIPHost,
             String dotNetVer, Date lastUpdateForDotNetVer, String oSVer, Date lastUpdateForOSVer, String ramSize,
-            Date lastUpdateForRAMSize, String cpuHost, Date lastUpdateForCPUHost, Long version, Set<Org> orgs) {
+            Date lastUpdateForRAMSize, String cpuHost, Date lastUpdateForCPUHost, Long version) {
         this.idOfHardwareSetting = idOfHardwareSetting;
         this.ipHost = ipHost;
         this.lastUpdateForIPHost = lastUpdateForIPHost;
@@ -50,7 +44,6 @@ public class HardwareSettings implements Serializable {
         this.cpuHost = cpuHost;
         this.lastUpdateForCPUHost = lastUpdateForCPUHost;
         this.version = version;
-        this.orgsInternal = orgs;
     }
 
     //@Override
@@ -172,13 +165,5 @@ public class HardwareSettings implements Serializable {
 
     public void setModuleType(Set<HardwareSettingsMT> moduleType) {
         this.moduleType = moduleType;
-    }
-
-    public Set<Org> getOrgsInternal() {
-        return orgsInternal;
-    }
-
-    public void setOrgsInternal(Set<Org> orgsInternal) {
-        this.orgsInternal = orgsInternal;
     }
 }

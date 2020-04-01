@@ -140,46 +140,43 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
             orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
             List<OrgSync> listOfOrgSync = orgSyncCriteria.list();
 
-
-
             for (Org org : orgs) {
                 OrgSync orgSync = getOrgSyncByOrg(listOfOrgSync, org);
-                HardwareSettings hardwareSettings = getSettingByOrg(listOfSettings, org);
+                //HardwareSettings hardwareSettings = getSettingByOrg(listOfSettings, org);
 
-                Criteria hardwareSettingsReadersCriteria = persistenceSession.createCriteria(HardwareSettingsReaders.class);
-                hardwareSettingsReadersCriteria.add(Restrictions.in("org.idOfOrg", idOfOrgList));
-                List<HardwareSettingsReaders> listOfReaders = hardwareSettingsReadersCriteria.list();
+                for (HardwareSettings settings : listOfSettings) {
+                    Criteria readersCriteria = persistenceSession.createCriteria(HardwareSettingsReaders.class);
+                    readersCriteria
+                            .add(Restrictions.eq("hardwareSettings.idOfHardwareSetting", settings.getIdOfHardwareSetting()));
+                    HardwareSettingsReaders hardwareSettingsReaders = (HardwareSettingsReaders) readersCriteria
+                            .uniqueResult();
 
-                Criteria turnstileSettingsCriteria = persistenceSession.createCriteria(TurnstileSettings.class);
-                turnstileSettingsCriteria.add(Restrictions.in("org.idOfOrg", idOfOrgList));
-                List<TurnstileSettings> listOfTurnstileSettings = turnstileSettingsCriteria.list();
+                    Criteria turnstileCriteria = persistenceSession.createCriteria(TurnstileSettings.class);
+                    turnstileCriteria
+                            .add(Restrictions.eq("org.idOfOrg", settings.getOrg().getIdOfOrg()));
+                    TurnstileSettings turnstileSettings = (TurnstileSettings) turnstileCriteria.uniqueResult();
 
-                Criteria hardwareSettingsMTCriteria = persistenceSession.createCriteria(HardwareSettingsMT.class);
-                hardwareSettingsMTCriteria.add(Restrictions.in("org.idOfOrg", idOfOrgList));
-                List<HardwareSettingsMT> listOfMT = hardwareSettingsMTCriteria.list();
-                HardwareSettingsReaders hardwareSettingsReaders = getReadersByOrg(listOfReaders, org);
-                TurnstileSettings turnstileSettings = getTurnstilesByOrg(listOfTurnstileSettings, org);
-                HardwareSettingsMT hardwareSettingsMT = getHardwareSettingsMT(listOfMT, org);
+                    Criteria settingsMTCriteria = persistenceSession.createCriteria(HardwareSettingsMT.class);
+                    settingsMTCriteria
+                            .add(Restrictions.eq("hardwareSettings.idOfHardwareSetting", settings.getIdOfHardwareSetting()));
+                    HardwareSettingsMT hardwareSettingsMT = (HardwareSettingsMT) settingsMTCriteria.uniqueResult();
 
-                HardwareSettingsReportItem item = new HardwareSettingsReportItem(org, hardwareSettings, hardwareSettingsReaders,
-                        orgSync, turnstileSettings, hardwareSettingsMT);
-
-                if (orgSync != null) {
-                    item.setDataBaseSize(orgSync.getDatabaseSize());
-                    item.setClientVersion(orgSync.getClientVersion());
-
+                    HardwareSettingsReportItem item = new HardwareSettingsReportItem(org, settings,
+                            hardwareSettingsReaders, orgSync, turnstileSettings, hardwareSettingsMT);
+                    result.add(item);
                 }
-                result.add(item);
             }
             return result;
         }
+
 
         private static HardwareSettings getSettingByOrg(List<HardwareSettings> settings, Org org) {
             if (CollectionUtils.isEmpty(settings)) {
                 return null;
             }
-            for(HardwareSettings setting : settings){
-                if(setting.getOrgsInternal().contains(org)){
+            for (HardwareSettings setting : settings) {
+                Set<Org> setOrg = setting.getOrg().getFriendlyOrg();
+                if (setOrg.contains(org)) {
                     return setting;
                 }
             }

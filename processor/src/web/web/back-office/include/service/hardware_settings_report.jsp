@@ -79,11 +79,11 @@
                     <rich:column headerClass="center-aligned-column" colspan="10">
                         <h:outputText styleClass="column-header" escape="true" value="ПК. АРМ администратора ОУ" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" colspan="7">
+                    <rich:column headerClass="center-aligned-column" colspan="8">
                         <h:outputText styleClass="column-header" escape="true"
                                       value="ПК. АРМ оператора питания(кассира)" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" colspan="7">
+                    <rich:column headerClass="center-aligned-column" colspan="8">
                         <h:outputText styleClass="column-header" escape="true"
                                       value="ПК. АРМ контролера входа(охранника)" />
                     </rich:column>
