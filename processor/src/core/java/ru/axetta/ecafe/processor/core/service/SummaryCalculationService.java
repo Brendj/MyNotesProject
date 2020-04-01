@@ -202,8 +202,9 @@ public class SummaryCalculationService {
                 if (clientEE.getNotInform()) {
                     continue;
                 }
-                if (clickedOnButton)
+                if (clickedOnButton) {
                     clientEE.setValues(attachValue(clientEE.getValues(), "TEST", "true"));
+                }
                 try {
                     String type = "";
                     int notificationType = 0;
@@ -633,7 +634,7 @@ public class SummaryCalculationService {
                 currPreorderRegularData.setEndDateReg(new Date(((BigInteger) row[8]).longValue()));
                 currPreorderRegularData.setItemCode((String) row[9]);
                 currPreorderRegularData.setItemname((String) row[10]);
-                currPreorderRegularData.setComplexId((Long) row[11]);
+                currPreorderRegularData.setComplexId(((Integer) row[11]).longValue());
                 currPreorderRegularData.setId(counter);
                 regularData.add(currPreorderRegularData);
                 counter++;
@@ -665,8 +666,6 @@ public class SummaryCalculationService {
             }
 
             for (PreorderData preorderData1 : preorderData) {
-                Date date = preorderData1.getDate();
-                Integer state = preorderData1.getState();
                 long id = preorderData1.getId();
                 String surname = preorderData1.getSurname();
                 String firstname = preorderData1.getFirstname();
@@ -681,38 +680,34 @@ public class SummaryCalculationService {
                     clients.add(clientEE);
                 }
 
-                if (preorderData1.getDate().equals(date) && preorderData1.getState().equals(state)
-                        && preorderData1.getId() == id && preorderData1.getSurname().equals(surname) && preorderData1
-                        .getFirstname().equals(firstname) && preorderData1.getGender()
-                        .equals(preorderData1.getGender())) {
-                    for (Long idReg : preorderData1.getIds()) {
-                        PreorderRegularData currPreorderRegularData = regularData.get(idReg.intValue());
-                        Integer stateReq = currPreorderRegularData.getStateReg();
+                for (Long idReg : preorderData1.getIds()) {
+                    PreorderRegularData currPreorderRegularData = regularData.get(idReg.intValue());
+                    Integer stateReq = currPreorderRegularData.getStateReg();
 
-                        NotifyPreorderDailyDetail notifyPreorderDailyDetail = new NotifyPreorderDailyDetail();
-                        notifyPreorderDailyDetail.setDeleteDate(currPreorderRegularData.lastUpdate);
-                        notifyPreorderDailyDetail.setEndDate(currPreorderRegularData.endDateReg);
-                        if (currPreorderRegularData.getItemCode() == null) {
-                            notifyPreorderDailyDetail.setComplexName(currPreorderRegularData.itemname);
-                        } else {
-                            try {
-                                ComplexInfo complexInfo = DAOService.getInstance()
-                                        .getComplexInfo(currPreorderRegularData.getComplexId());
-                                notifyPreorderDailyDetail.setComplexName(complexInfo.getComplexName());
-                            } catch (Exception e) {
-                                notifyPreorderDailyDetail.setComplexName(null);
-                            }
-                        }
-
-                        if (stateReq.equals(PreorderState.OK.getCode())) {
-                            clientEE.getPreorders().getDeletedPreorderDateGuardian().add(notifyPreorderDailyDetail);
-                        } else {
-                            notifyPreorderDailyDetail.setDishName(currPreorderRegularData.itemname);
-                            clientEE.getPreorders().getDeletedPreorderDateOther().add(notifyPreorderDailyDetail);
+                    NotifyPreorderDailyDetail notifyPreorderDailyDetail = new NotifyPreorderDailyDetail();
+                    notifyPreorderDailyDetail.setDeleteDate(currPreorderRegularData.lastUpdate);
+                    notifyPreorderDailyDetail.setEndDate(currPreorderRegularData.endDateReg);
+                    if (currPreorderRegularData.getItemCode() == null) {
+                        notifyPreorderDailyDetail.setComplexName(currPreorderRegularData.itemname);
+                    } else {
+                        try {
+                            ComplexInfo complexInfo = DAOService.getInstance()
+                                    .getComplexInfo(currPreorderRegularData.getComplexId());
+                            notifyPreorderDailyDetail.setComplexName(complexInfo.getComplexName());
+                        } catch (Exception e) {
+                            notifyPreorderDailyDetail.setComplexName(null);
                         }
                     }
-                    break;
+
+                    if (stateReq.equals(PreorderState.OK.getCode())) {
+                        clientEE.getPreorders().getDeletedPreorderDateGuardian().add(notifyPreorderDailyDetail);
+                    } else {
+                        notifyPreorderDailyDetail.setDishName(currPreorderRegularData.itemname);
+                        clientEE.getPreorders().getDeletedPreorderDateOther().add(notifyPreorderDailyDetail);
+                    }
                 }
+                break;
+
             }
             attachPreorderDailyValues(clients);
         }
@@ -817,15 +812,7 @@ public class SummaryCalculationService {
                 for (NotifyPreorderDailyDetail notifyPreorderDailyDetail : clientEE.getPreorders()
                         .getDeletedPreorderDateGuardian()) {
                     clientEE.setValues(
-                            attachValue(clientEE.getValues(), DELETED_PREORDER_DATE + GUARDIAN + REGULAR + count,
-                                    CalendarUtils.dateToString(notifyPreorderDailyDetail.getDeleteDate())));
-                    clientEE.setValues(attachValue(clientEE.getValues(), END_DATE_PREORDER + GUARDIAN + REGULAR + count,
-                            CalendarUtils.dateToString(notifyPreorderDailyDetail.getEndDate())));
-                    clientEE.setValues(
-                            attachValue(clientEE.getValues(), COMPLEX_NAME_PREORDER + GUARDIAN + REGULAR + count,
-                                    notifyPreorderDailyDetail.getComplexName()));
-                    clientEE.setValues(attachValue(clientEE.getValues(), DISH_NAME_PREORDER + GUARDIAN + REGULAR + count,
-                            notifyPreorderDailyDetail.getDishName()));
+                            setDeletedPreorderDate(clientEE.getValues(), GUARDIAN, notifyPreorderDailyDetail, count));
                     count++;
                 }
             }
@@ -835,19 +822,24 @@ public class SummaryCalculationService {
                 for (NotifyPreorderDailyDetail notifyPreorderDailyDetail : clientEE.getPreorders()
                         .getDeletedPreorderDateOther()) {
                     clientEE.setValues(
-                            attachValue(clientEE.getValues(), DELETED_PREORDER_DATE + OTHER + REGULAR + count,
-                                    CalendarUtils.dateToString(notifyPreorderDailyDetail.getDeleteDate())));
-                    clientEE.setValues(attachValue(clientEE.getValues(), END_DATE_PREORDER + OTHER + REGULAR + count,
-                            CalendarUtils.dateToString(notifyPreorderDailyDetail.getEndDate())));
-                    clientEE.setValues(
-                            attachValue(clientEE.getValues(), COMPLEX_NAME_PREORDER + OTHER + REGULAR + count,
-                                    notifyPreorderDailyDetail.getComplexName()));
-                    clientEE.setValues(attachValue(clientEE.getValues(), DISH_NAME_PREORDER + OTHER + REGULAR + count,
-                            notifyPreorderDailyDetail.getDishName()));
+                            setDeletedPreorderDate(clientEE.getValues(), OTHER, notifyPreorderDailyDetail, count));
                     count++;
                 }
             }
         }
+    }
+
+    private String[] setDeletedPreorderDate(String[] values, String type,
+            NotifyPreorderDailyDetail notifyPreorderDailyDetail, int count) {
+        values = attachValue(values, DELETED_PREORDER_DATE + type + REGULAR + count,
+                CalendarUtils.dateToString(notifyPreorderDailyDetail.getDeleteDate()));
+        values = attachValue(values, END_DATE_PREORDER + type + REGULAR + count,
+                CalendarUtils.dateToString(notifyPreorderDailyDetail.getEndDate()));
+        values = attachValue(values, COMPLEX_NAME_PREORDER + type + REGULAR + count,
+                notifyPreorderDailyDetail.getComplexName() == null ? "" : notifyPreorderDailyDetail.getComplexName());
+        values = attachValue(values, DISH_NAME_PREORDER + type + REGULAR + count,
+                notifyPreorderDailyDetail.getDishName() == null ? "" : notifyPreorderDailyDetail.getDishName());
+        return values;
     }
 
     private String getPreorderDates(Set<Date> dates) {
@@ -1574,8 +1566,8 @@ public class SummaryCalculationService {
         private Set<NotifyPreorderDailyDetail> deletedPreorderDateOther;
 
         public NotifyPreorderDaily() {
-            this.deletedPreorderDateGuardian = new TreeSet<NotifyPreorderDailyDetail>();
-            this.deletedPreorderDateOther = new TreeSet<NotifyPreorderDailyDetail>();
+            this.deletedPreorderDateGuardian = new HashSet<>();
+            this.deletedPreorderDateOther = new HashSet<>();
         }
 
         public Set<Date> getDateGuardian() {
