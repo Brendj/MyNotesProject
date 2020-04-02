@@ -468,6 +468,7 @@ public class PreorderDAOService {
         queryMenuSelect.setParameter("idOfClient", client.getIdOfClient());
 
         for (ComplexListParam complex : list.getComplexes()) {
+            boolean complexAmountChanged = false;
             Integer complexAmount = complex.getAmount();
             Integer idOfComplex = complex.getIdOfComplex();
             boolean complexSelected = (complexAmount > 0);
@@ -501,6 +502,7 @@ public class PreorderDAOService {
                     if (!preorderComplex.getAmount().equals(complex.getAmount())) {
                         preorderComplex.setMobile(guardianMobile);
                         preorderComplex.setMobileGroupOnCreate(mobileGroupOnCreate);
+                        complexAmountChanged = true;
                     }
                     preorderComplex.setAmount(complex.getAmount());
                     preorderComplex.setLastUpdate(new Date());
@@ -544,7 +546,7 @@ public class PreorderDAOService {
                     PreorderMenuDetail preorderMenuDetail;
                     try {
                         preorderMenuDetail = (PreorderMenuDetail) queryMenuSelect.getSingleResult();
-                        if (!preorderMenuDetail.getAmount().equals(menuItem.getAmount())) {
+                        if (!preorderMenuDetail.getAmount().equals(menuItem.getAmount()) || complexAmountChanged) {
                             preorderMenuDetail.setMobile(guardianMobile);
                             preorderMenuDetail.setMobileGroupOnCreate(mobileGroupOnCreate);
                         }
