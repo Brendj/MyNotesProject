@@ -468,7 +468,6 @@ public class PreorderDAOService {
         queryMenuSelect.setParameter("idOfClient", client.getIdOfClient());
 
         for (ComplexListParam complex : list.getComplexes()) {
-            boolean complexAmountChanged = false;
             Integer complexAmount = complex.getAmount();
             Integer idOfComplex = complex.getIdOfComplex();
             boolean complexSelected = (complexAmount > 0);
@@ -502,7 +501,7 @@ public class PreorderDAOService {
                     if (!preorderComplex.getAmount().equals(complex.getAmount())) {
                         preorderComplex.setMobile(guardianMobile);
                         preorderComplex.setMobileGroupOnCreate(mobileGroupOnCreate);
-                        complexAmountChanged = true;
+                        updateMobileGroupOnCreateOnMenuDetails(preorderComplex, guardianMobile, mobileGroupOnCreate);
                     }
                     preorderComplex.setAmount(complex.getAmount());
                     preorderComplex.setLastUpdate(new Date());
@@ -546,7 +545,7 @@ public class PreorderDAOService {
                     PreorderMenuDetail preorderMenuDetail;
                     try {
                         preorderMenuDetail = (PreorderMenuDetail) queryMenuSelect.getSingleResult();
-                        if (!preorderMenuDetail.getAmount().equals(menuItem.getAmount()) || complexAmountChanged) {
+                        if (!preorderMenuDetail.getAmount().equals(menuItem.getAmount())) {
                             preorderMenuDetail.setMobile(guardianMobile);
                             preorderMenuDetail.setMobileGroupOnCreate(mobileGroupOnCreate);
                         }
@@ -572,6 +571,17 @@ public class PreorderDAOService {
                 em.merge(preorderComplex);
             }
         }
+    }
+
+    @Transactional(propagation = Propagation.SUPPORTS)
+    private void updateMobileGroupOnCreateOnMenuDetails(PreorderComplex preorderComplex, String mobile,
+            PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
+        Query query = em.createQuery("update PreorderMenuDetail pmd set pmd.mobile = :mobile, pmd.mobileGroupOnCreate = :mobileGroupOnCreate "
+                + "where pmd.preorderComplex = :preorderComplex");
+        query.setParameter("mobile", mobile);
+        query.setParameter("mobileGroupOnCreate", mobileGroupOnCreate);
+        query.setParameter("preorderComplex", preorderComplex);
+        query.executeUpdate();
     }
 
     private boolean regularEquals(RegularPreorderParam regularComplex, RegularPreorder regularPreorder) {
