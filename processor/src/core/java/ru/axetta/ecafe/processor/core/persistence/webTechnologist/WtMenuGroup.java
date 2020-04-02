@@ -49,17 +49,8 @@ public class WtMenuGroup {
     @JoinColumn(name = "idOfContragent")
     private Contragent contragent;
 
-    @ManyToMany
-    @JoinTable(name = "cf_wt_dishes_menu_relationships",
-            joinColumns = @JoinColumn(name = "idOfMenuGroup"),
-            inverseJoinColumns = @JoinColumn(name = "idOfDish"))
-    private Set<WtDish> dishes = new HashSet<>();
-
-    @ManyToMany
-    @JoinTable(name = "cf_wt_dishes_menu_relationships",
-            joinColumns = @JoinColumn(name = "idOfMenuGroup"),
-            inverseJoinColumns = @JoinColumn(name = "idOfMenu"))
-    private Set<WtMenu> menus = new HashSet<>();
+    @OneToMany(mappedBy = "menuGroup")
+    private Set<WtMenuGroupMenu> menuGroupMenus = new HashSet<>();
 
     public Long getId() {
         return id;
@@ -117,12 +108,12 @@ public class WtMenuGroup {
         this.contragent = contragent;
     }
 
-    public Set<WtDish> getDishes() {
-        return dishes;
+    public Set<WtMenuGroupMenu> getMenuGroupMenus() {
+        return menuGroupMenus;
     }
 
-    public void setDishes(Set<WtDish> dishes) {
-        this.dishes = dishes;
+    public void setMenuGroupMenus(Set<WtMenuGroupMenu> menuGroupMenus) {
+        this.menuGroupMenus = menuGroupMenus;
     }
 
     public User getCreatedUser() {
@@ -139,14 +130,6 @@ public class WtMenuGroup {
 
     public void setUpdatedUser(User updatedUser) {
         this.updatedUser = updatedUser;
-    }
-
-    public Set<WtMenu> getMenus() {
-        return menus;
-    }
-
-    public void setMenus(Set<WtMenu> menus) {
-        this.menus = menus;
     }
 
     @Override

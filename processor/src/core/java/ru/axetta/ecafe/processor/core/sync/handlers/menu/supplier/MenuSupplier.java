@@ -163,11 +163,11 @@ public class MenuSupplier implements SectionRequest {
                 case "MenusRequest": {
                     menus = DAOReadonlyService.getInstance().getMenusSetFromVersion(entry.getValue(), contragent, org);
                     // добавление блюд, не имеющих непосредственной связки с меню
-                    for (WtMenu menu : menus) {
-                        for (WtMenuGroup menuGroup : menu.getMenuGroups()) {
-                            menu.getDishes().addAll(menuGroup.getDishes());
-                        }
-                    }
+                    //for (WtMenu menu : menus) {
+                    //    for (WtMenuGroup menuGroup : menu.getMenuGroups()) {
+                    //        menu.getDishes().addAll(menuGroup.getDishes());
+                    //    }
+                    //}
                     break;
                 }
                 case "ComplexesRequest": {

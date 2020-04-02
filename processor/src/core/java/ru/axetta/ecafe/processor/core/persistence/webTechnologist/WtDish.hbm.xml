@@ -112,19 +112,14 @@
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem" column="idOfCategoryItem"/>
         </set>
 
-        <set name="menus" lazy="false" table="cf_wt_dishes_menu_relationships">
+        <set name="menuGroupMenus" lazy="false" table="cf_wt_menu_group_dish_relationships">
             <key column="idOfDish"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu" column="idOfMenu"/>
+            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroupMenu" column="idOfMenuMenuGroupRelation"/>
         </set>
 
         <set name="groupItems" lazy="false" table="cf_wt_dish_groupitem_relationships">
             <key column="idOfDish"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtGroupItem" column="idOfGroupItem"/>
-        </set>
-
-        <set name="menuGroups" lazy="false" table="cf_wt_dishes_menu_relationships">
-            <key column="idOfDish"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup" column="idOfMenuGroup"/>
         </set>
 
     </class>

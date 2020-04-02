@@ -60,23 +60,14 @@ public class WtMenu {
     @Column(name = "deleteState")
     private Integer deleteState;
 
-    @ManyToMany
-    @JoinTable(name = "cf_wt_dishes_menu_relationships",
-            joinColumns = @JoinColumn(name = "idOfMenu"),
-            inverseJoinColumns = @JoinColumn(name = "idOfDish"))
-    private Set<WtDish> dishes = new HashSet<>();
+    @OneToMany(mappedBy = "menu")
+    private Set<WtMenuGroupMenu> menuGroupMenus = new HashSet<>();
 
     @ManyToMany(fetch = FetchType.EAGER)
     @JoinTable(name = "cf_wt_menu_org",
             joinColumns = @JoinColumn(name = "idOfMenu"),
             inverseJoinColumns = @JoinColumn(name = "idOfOrg"))
     private Set<Org> orgs = new HashSet<>();
-
-    @ManyToMany
-    @JoinTable(name = "cf_wt_dishes_menu_relationships",
-            joinColumns = @JoinColumn(name = "idOfMenu"),
-            inverseJoinColumns = @JoinColumn(name = "idOfMenuGroup"))
-    private Set<WtMenuGroup> menuGroups = new HashSet<>();
 
     public Long getIdOfMenu() {
         return idOfMenu;
@@ -142,12 +133,12 @@ public class WtMenu {
         this.deleteState = deleteState;
     }
 
-    public Set<WtDish> getDishes() {
-        return dishes;
+    public Set<WtMenuGroupMenu> getMenuGroupMenus() {
+        return menuGroupMenus;
     }
 
-    public void setDishes(Set<WtDish> dishes) {
-        this.dishes = dishes;
+    public void setMenuGroupMenus(Set<WtMenuGroupMenu> menuGroupMenus) {
+        this.menuGroupMenus = menuGroupMenus;
     }
 
     public Set<Org> getOrgs() {
@@ -156,14 +147,6 @@ public class WtMenu {
 
     public void setOrgs(Set<Org> orgs) {
         this.orgs = orgs;
-    }
-
-    public Set<WtMenuGroup> getMenuGroups() {
-        return menuGroups;
-    }
-
-    public void setMenuGroups(Set<WtMenuGroup> menuGroups) {
-        this.menuGroups = menuGroups;
     }
 
     public WtOrgGroup getWtOrgGroup() {

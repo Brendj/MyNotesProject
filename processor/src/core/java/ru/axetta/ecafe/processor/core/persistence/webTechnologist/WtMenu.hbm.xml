@@ -57,19 +57,16 @@
             <column name="deleteState" sql-type="integer"/>
         </property>
 
-        <set name="dishes" lazy="false" table="cf_wt_dishes_menu_relationships">
-            <key column="idOfMenu"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish" column="idOfDish"/>
+        <set name="menuGroupMenus" inverse="true" cascade="all" lazy="true">
+            <key>
+                <column name="id"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroupMenu"/>
         </set>
 
         <set name="orgs" lazy="false" table="cf_wt_menu_org">
             <key column="idOfMenu"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
-        </set>
-
-        <set name="menuGroups" lazy="false" table="cf_wt_dishes_menu_relationships">
-            <key column="idOfMenu"/>
-            <many-to-many class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup" column="idOfMenuGroup"/>
         </set>
 
     </class>
