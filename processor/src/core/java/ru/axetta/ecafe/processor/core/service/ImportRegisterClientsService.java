@@ -1615,7 +1615,7 @@ public class ImportRegisterClientsService {
         switch (RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION)) {
             case Option.NSI3 :
                 //Не смотрим на настройку из MODE_PROPERTY. Pабота с файлом НСИ-3 по екис ид
-                return RuntimeContext.getAppContext().getBean("ImportRegisterNSI3Service", ImportRegisterNSI3Service.class);
+                return RuntimeContext.getAppContext().getBean("ImportRegisterNSI3ServiceKafkaWrapper", ImportRegisterNSI3ServiceKafkaWrapper.class);
         }
         String mode = RuntimeContext.getInstance().getPropertiesValue(ImportRegisterFileService.MODE_PROPERTY, null);
         if (mode.equals(ImportRegisterFileService.MODE_SYMMETRIC)) {

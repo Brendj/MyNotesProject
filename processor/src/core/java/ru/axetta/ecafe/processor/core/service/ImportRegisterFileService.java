@@ -42,6 +42,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
     public static final String MODE_PROPERTY = "ecafe.processor.nsi.registry.mode"; //допустимые значения: "file, service, symmetric" или отсутствие настройки
     public static final String MODE_FILE = "file";
     public static final String MODE_SYMMETRIC = "symmetric";
+    public static final String MODE_KAFKA = "kafka";
     public static final String LEGAL_REPRESENTATIVE = "Законный представитель";
 
     protected final String INITIAL_INSERT_STATEMENT = "insert into cf_registry_file(guidofclient, "
