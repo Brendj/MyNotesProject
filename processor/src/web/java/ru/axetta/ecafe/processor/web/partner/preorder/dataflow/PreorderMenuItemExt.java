@@ -51,6 +51,8 @@ public class PreorderMenuItemExt {
     private String itemCode;
     @XmlAttribute(name = "availableForRegular")
     private Boolean availableForRegular;
+    @XmlAttribute(name = "creatorRole")
+    private Integer creatorRole;
 
     public PreorderMenuItemExt() {
 
@@ -220,5 +222,13 @@ public class PreorderMenuItemExt {
 
     public void setAvailableForRegular(Boolean availableForRegular) {
         this.availableForRegular = availableForRegular;
+    }
+
+    public Integer getCreatorRole() {
+        return creatorRole;
+    }
+
+    public void setCreatorRole(Integer creatorRole) {
+        this.creatorRole = creatorRole;
     }
 }
