@@ -14,9 +14,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.text.SimpleDateFormat;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -294,10 +292,10 @@ public class ResMenuSupplier implements AbstractToElement {
 
         XMLUtils.setAttributeIfNotNull(element, "Id", menuGroup.getId());
         XMLUtils.setAttributeIfNotNull(element, "Name", menuGroup.getName());
-        //if (!menuGroup.getMenus().isEmpty()) {
-        //    List<WtMenu> menuGroups = new ArrayList<>(menuGroup.getMenus());
-        //    XMLUtils.setAttributeIfNotNull(element, "MenuGroupId", menuGroups.get(0));
-        //}
+        if (!menuGroup.getMenuGroupMenus().isEmpty()) {
+            List<WtMenuGroupMenu> menuGroupMenus = new ArrayList<>(menuGroup.getMenuGroupMenus());
+            XMLUtils.setAttributeIfNotNull(element, "MenuId", menuGroupMenus.get(0));
+        }
         XMLUtils.setAttributeIfNotNull(element, "V", menuGroup.getVersion());
         XMLUtils.setAttributeIfNotNull(element, "D", menuGroup.getDeleteState());
 
@@ -328,16 +326,18 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "D", menu.getDeleteState());
 
         Element dishes = document.createElement("Dishes");
-        //for (WtDish item : menu.getDishes()) {
-        //    Element elem = document.createElement("DSI");
-        //    XMLUtils.setAttributeIfNotNull(elem, "MenuId", menu.getIdOfMenu());
-        //    XMLUtils.setAttributeIfNotNull(elem, "DishId", item.getIdOfDish());
-        //    if (!item.getMenuGroups().isEmpty()) {
-        //        List<WtMenuGroup> menuGroups = new ArrayList<>(item.getMenuGroups());
-        //        XMLUtils.setAttributeIfNotNull(elem, "MenuGroupId", menuGroups.get(0));
-        //    }
-        //    dishes.appendChild(elem);
-        //}
+        for (WtMenuGroupMenu item : menu.getMenuGroupMenus()) {
+            Element elem = document.createElement("DSI");
+            XMLUtils.setAttributeIfNotNull(elem, "MenuId", menu.getIdOfMenu());
+            if (!item.getDishes().isEmpty()) {
+                List<WtDish> wtDishes = new ArrayList<>(item.getDishes());
+                XMLUtils.setAttributeIfNotNull(element, "DishId", wtDishes.get(0));
+            }
+            if (item.getMenuGroup() != null) {
+                XMLUtils.setAttributeIfNotNull(element, "MenuGroupId", item.getMenuGroup());
+            }
+            dishes.appendChild(elem);
+        }
 
         Element orgs = document.createElement("Orgs");
         for (Org item : menu.getOrgs()) {

@@ -835,11 +835,11 @@ public class DAOReadonlyService {
             List<WtDish> dishes = query.getResultList();
 
             Set<WtDish> result = new HashSet<>();
-            //for (WtDish dish : dishes) {
-            //    if (dish.getMenus() != null) {
-            //        result.add(dish);
-            //    }
-            //}
+            for (WtDish dish : dishes) {
+                if (dish.getMenuGroupMenus() != null) {
+                    result.add(dish);
+                }
+            }
             return result;
         } catch (Exception e) {
             e.printStackTrace();
