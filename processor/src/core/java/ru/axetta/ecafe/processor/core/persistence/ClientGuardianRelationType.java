@@ -12,23 +12,34 @@ import java.util.Map;
  */
 public enum ClientGuardianRelationType {
 
-    /*0*/ MOTHER("Мать"),
-    /*1*/ FATHER("Отец"),
-    /*2*/ REPRESENTATIVE("Представитель"),
-    /*3*/ GUARDIAN("Опекун/попечитель"),
-    /*4*/ ADOPTIVE_PARENT("Приемный родитель"),
-    /*5*/ ADOPTIVE_FATHER("Усыновитель"),
-    /*6*/ FOSTER_PARENT("Патронатный воспитатель"),
-    /*7*/ OTHER("Иное");
+    MOTHER(0, "Мать"),
+    FATHER(1, "Отец"),
+    REPRESENTATIVE(2, "Доверенный представитель"),
+    GUARDIAN(3, "Опекун"),
+    UNCLE(8, "Дядя"),
+    AUNT(9, "Тётя"),
+    BROTHER(10, "Брат"),
+    SISTER(11, "Сестра"),
+    GRANDMOTHER(12, "Бабушка"),
+    GRANDFATHER(13, "Дедушка");
+
+    //Старые типы представителей, значения конвертируем в новые
+    private static final int ADOPTIVE_PARENT = 4;
+    private static final int ADOPTIVE_FATHER = 5;
+    private static final int FOSTER_PARENT = 6;
+    private static final int OTHER = 7;
 
     private final String description;
+    private final int code;
     static Map<Integer,ClientGuardianRelationType> map = new HashMap<Integer,ClientGuardianRelationType>();
     static {
         for (ClientGuardianRelationType questionaryStatus : ClientGuardianRelationType.values()) {
-            map.put(questionaryStatus.ordinal(), questionaryStatus);
+            map.put(questionaryStatus.code, questionaryStatus);
         }
     }
-    private ClientGuardianRelationType(String description){
+
+    private ClientGuardianRelationType(int code, String description){
+        this.code = code;
         this.description = description;
     }
 
@@ -38,15 +49,26 @@ public enum ClientGuardianRelationType {
     }
 
     public static ClientGuardianRelationType fromInteger(Integer value){
-        return map.get(value);
+        ClientGuardianRelationType relType = map.get(value);
+        if (relType != null) return relType;
+        if (value.equals(ADOPTIVE_PARENT)) return GUARDIAN;
+        if (value.equals(ADOPTIVE_FATHER)) return GUARDIAN;
+        if (value.equals(FOSTER_PARENT)) return REPRESENTATIVE;
+        if (value.equals(OTHER)) return REPRESENTATIVE;
+        return REPRESENTATIVE;
     }
 
+    //todo Использовался в сверке с реестрами, удалить.
     public static String getRelationshipExtended(String relation) {
-        for (ClientGuardianRelationType value : ClientGuardianRelationType.values()) {
-            if (value.toString().toUpperCase().contains(relation.toUpperCase()) || relation.toUpperCase().contains(value.toString().toUpperCase())) {
-                return value.toString();
-            }
-        }
-        return OTHER.toString();
+        return "";
     }
+
+    public int getCode() {
+        return code;
+    }
+
+    public String getDescription() {
+        return description;
+    }
+
 }

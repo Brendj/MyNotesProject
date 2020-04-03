@@ -51,7 +51,7 @@ public class ClientGuardianItem {
         this.personName = client.getPerson().getSurnameAndFirstLetters();
         this.disabled = disabled;
         this.mobile = client.getMobile();
-        this.relation = relation == null ? null : relation.ordinal();
+        this.relation = relation == null ? null : relation.getCode();
         this.notificationItems = notificationSettings;
         isNew = false;
         this.createdWhereClientGuardian = createdWhereClientGuardian;
