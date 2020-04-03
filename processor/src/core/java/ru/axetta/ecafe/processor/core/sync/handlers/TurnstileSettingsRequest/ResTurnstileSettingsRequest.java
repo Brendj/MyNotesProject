@@ -24,7 +24,7 @@ public class ResTurnstileSettingsRequest implements AbstractToElement {
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("ResTurnstileSettingsRequest");
         for (ResTurnstileSettingsRequestItem item : this.getItems()) {
-            element.appendChild(item.toElement(document));
+            element.appendChild(item.toElement(document,"TurnstileSettings"));
         }
         return element;
     }

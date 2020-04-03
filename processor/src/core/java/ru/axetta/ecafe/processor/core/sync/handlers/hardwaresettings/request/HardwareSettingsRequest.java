@@ -23,7 +23,6 @@ public class HardwareSettingsRequest implements SectionRequest {
     private final Long orgOwner;
     private final Long maxVersion;
     private final List<List<HardwareSettingsRequestItem>> sectionItem;
-    private Long idOfHardwareSetting;
 
     public enum ModuleType {
         HS("HS"), MT("MT"), IP("IP"), DOTNETVER("DotNetVer"), OSVER("OsVer"), RAM("RAM"), CPU("CPU"), READERS(
@@ -70,7 +69,6 @@ public class HardwareSettingsRequest implements SectionRequest {
             HardwareSettingsRequestHSItem hsItem = null;
             items = new ArrayList<HardwareSettingsRequestItem>();
             hsItem = HardwareSettingsRequestHSItem.build(hsNode);
-            idOfHardwareSetting = hsItem.getIdOfHardwareSetting();
             items.add(hsItem);
             Node itemNode = hsNode.getFirstChild();
             while (null != itemNode) {
@@ -139,7 +137,4 @@ public class HardwareSettingsRequest implements SectionRequest {
         return sectionItem;
     }
 
-    public Long getIdOfHardwareSetting() {
-        return idOfHardwareSetting;
-    }
 }

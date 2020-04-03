@@ -22,8 +22,8 @@ public class TurnstileSettingsRequest implements SectionRequest {
     public static final String SECTION_NAME = "TurnstileSettings";
 
     private final Long orgOwner;
-    private final List<TurnstileSettingsRequestItem> items;
     private final Long maxVersion;
+    private final List<List<TurnstileSettingsRequestItem>> sectionItem;
 
     public enum ModuleType {
         TS("TS"), TR("TR");
@@ -56,30 +56,26 @@ public class TurnstileSettingsRequest implements SectionRequest {
     }
 
     public TurnstileSettingsRequest(Node turnstileSettingNode, Long orgOwner) {
-        this.items = new ArrayList<TurnstileSettingsRequestItem>();
+        List<TurnstileSettingsRequestItem> items;
         this.orgOwner = orgOwner;
         maxVersion = XMLUtils.getLongAttributeValue(turnstileSettingNode, "V");
+        this.sectionItem = new ArrayList<List<TurnstileSettingsRequestItem>>();
 
-        Node itemNode = turnstileSettingNode.getFirstChild();
+        Node tsNode = turnstileSettingNode.getFirstChild();
 
-        while (null != itemNode) {
-            if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-                TurnstileSettingsRequestItem item = null;
-                item = TurnstileSettingsRequestTSItem.build(itemNode);
-                items.add(item);
-                Node turnstilesNode = itemNode.getFirstChild();
-                while (null != turnstilesNode) {
-                    Node trNode = turnstilesNode.getFirstChild();
-                    while(null != trNode) {
-                        item = TurnstileSettingsRequestTRItem.build(trNode);
-                        items.add(item);
-                        trNode = trNode.getNextSibling();
-                    }
-                    turnstilesNode = turnstilesNode.getNextSibling();
-                }
-                //items.add(item);
+        while (null != tsNode) {
+            items = new ArrayList<TurnstileSettingsRequestItem>();
+            TurnstileSettingsRequestTSItem tsItem = TurnstileSettingsRequestTSItem.build(tsNode);
+            items.add(tsItem);
+            Node turnstilesNode = tsNode.getFirstChild();
+            Node trNode = turnstilesNode.getFirstChild();
+            while (null != trNode) {
+                TurnstileSettingsRequestTRItem trItem = TurnstileSettingsRequestTRItem.build(trNode);
+                items.add(trItem);
+                trNode = trNode.getNextSibling();
             }
-            itemNode = itemNode.getNextSibling();
+            sectionItem.add(items);
+            tsNode = tsNode.getNextSibling();
         }
     }
 
@@ -96,11 +92,11 @@ public class TurnstileSettingsRequest implements SectionRequest {
         return orgOwner;
     }
 
-    public List<TurnstileSettingsRequestItem> getItems() {
-        return items;
-    }
-
     public Long getMaxVersion() {
         return maxVersion;
+    }
+
+    public List<List<TurnstileSettingsRequestItem>> getSectionItem() {
+        return sectionItem;
     }
 }

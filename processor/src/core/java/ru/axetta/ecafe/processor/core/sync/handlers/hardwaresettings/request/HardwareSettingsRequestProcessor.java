@@ -36,19 +36,13 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
             boolean errorFound;
             Long orgOwner = hardwareSettingsRequest.getOrgOwner();
             Long nextVersion = DAOUtils.nextVersionByHardwareSettingsRequest(session);
-            Long id = hardwareSettingsRequest.getIdOfHardwareSetting();
+            StringBuilder errorMessage = new StringBuilder();
+            int status = 1;
 
             for (List<HardwareSettingsRequestItem> sectionItem : hardwareSettingsRequest.getSectionItem()) {
-                ru.axetta.ecafe.processor.core.persistence.HardwareSettings hardwareSettings = DAOUtils
-                        .getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(session, orgOwner, id);
+                ru.axetta.ecafe.processor.core.persistence.HardwareSettings hardwareSettings = null;
                 ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT hardwareSettingsMT = null;
                 ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders hardwareSettingsReaders = null;
-
-                if (null == hardwareSettings) {
-                    hardwareSettings = new ru.axetta.ecafe.processor.core.persistence.HardwareSettings();
-                    Org org = (Org) session.get(Org.class, orgOwner);
-                    hardwareSettings.setOrg(org);
-                }
 
                 for (HardwareSettingsRequestItem item : sectionItem) {
                     String moduleType = item.getType();
@@ -57,19 +51,26 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         case "HS":
                             if (!errorFound) {
                                 HardwareSettingsRequestHSItem hsItem = (HardwareSettingsRequestHSItem) item;
+                                hardwareSettings = DAOUtils
+                                        .getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(session,
+                                                hsItem.getIdOfHardwareSetting());
+                                if (null == hardwareSettings) {
+                                    hardwareSettings = new ru.axetta.ecafe.processor.core.persistence.HardwareSettings();
+                                    Org org = (Org) session.get(Org.class, orgOwner);
+                                    hardwareSettings.setOrg(org);
+                                }
                                 hardwareSettings.setIdOfHardwareSetting(hsItem.getIdOfHardwareSetting());
-                                resItem = new ResHardwareSettingsRequestHSItem(hardwareSettings, item.getResCode());
                             } else {
-                                resItem = new ResHardwareSettingsRequestHSItem(item.getResCode(),
-                                        item.getErrorMessage());
+                                errorMessage.append("Section HS not found ");
+                                status = 0;
                             }
-                            items.add(resItem);
                             break;
                         case "MT":
-                            if (!errorFound) {
+                            if (!errorFound && hardwareSettings != null) {
                                 HardwareSettingsRequestMTItem mtItem = (HardwareSettingsRequestMTItem) item;
-                                hardwareSettingsMT = DAOUtils
-                                        .getHardwareSettingsMTByIdAndModuleType(session, id, mtItem.getValue());
+                                hardwareSettingsMT = DAOUtils.getHardwareSettingsMTByIdAndModuleType(session,
+                                        hardwareSettings.getIdOfHardwareSetting(), mtItem.getValue());
+
                                 if (null == hardwareSettingsMT) {
                                     hardwareSettingsMT = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT();
                                 }
@@ -77,85 +78,66 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                                 hardwareSettingsMT.setInstallStatus(mtItem.getInstallStatus());
                                 hardwareSettingsMT.setLastUpdate(mtItem.getLastUpdate());
                                 hardwareSettingsMT.setHardwareSettings(hardwareSettings);
-
-                                resItem = new ResHardwareSettingsRequestMTItem(hardwareSettingsMT, mtItem.getResCode());
+                                session.save(hardwareSettingsMT);
                             } else {
-                                resItem = new ResHardwareSettingsRequestMTItem(item.getResCode(),
-                                        item.getErrorMessage());
+                                errorMessage.append("Section MT not found ");
+                                status = 0;
                             }
-                            items.add(resItem);
+
                             break;
                         case "IP":
-                            if (!errorFound) {
-
+                            if (!errorFound && hardwareSettings != null) {
                                 HardwareSettingsRequestIPItem ipItem = (HardwareSettingsRequestIPItem) item;
                                 hardwareSettings.setIpHost(ipItem.getValue());
                                 hardwareSettings.setLastUpdateForIPHost(ipItem.getLastUpdate());
 
-                                resItem = new ResHardwareSettingsRequestIPItem(hardwareSettings, ipItem.getResCode());
-
                             } else {
-                                resItem = new ResHardwareSettingsRequestIPItem(item.getResCode(),
-                                        item.getErrorMessage());
+                                errorMessage.append("Section IP not found ");
+                                status = 0;
                             }
-                            items.add(resItem);
                             break;
                         case "DotNetVer":
-                            if (!errorFound) {
+                            if (!errorFound && hardwareSettings != null) {
                                 HardwareSettingsRequestDotNetVerItem dotNetVerItem = (HardwareSettingsRequestDotNetVerItem) item;
                                 hardwareSettings.setDotNetVer(dotNetVerItem.getValue());
                                 hardwareSettings.setLastUpdateForDotNetVer(dotNetVerItem.getLastUpdate());
-
-                                resItem = new ResHardwareSettingsRequestDotNetVerItem(hardwareSettings,
-                                        dotNetVerItem.getResCode());
                             } else {
-                                resItem = new ResHardwareSettingsRequestDotNetVerItem(item.getResCode(),
-                                        item.getErrorMessage());
+                                errorMessage.append("Section DotNetVer not found ");
+                                status = 0;
                             }
-                            items.add(resItem);
                             break;
                         case "OsVer":
-                            if (!errorFound) {
+                            if (!errorFound && hardwareSettings != null) {
                                 HardwareSettingsRequestOsVerItem osVerItem = (HardwareSettingsRequestOsVerItem) item;
                                 hardwareSettings.setoSVer(osVerItem.getValue());
                                 hardwareSettings.setLastUpdateForOSVer(osVerItem.getLastUpdate());
-
-                                resItem = new ResHardwareSettingsRequestOsVerItem(hardwareSettings,
-                                        osVerItem.getResCode());
                             } else {
-                                resItem = new ResHardwareSettingsRequestOsVerItem(item.getResCode(),
-                                        item.getErrorMessage());
+                                errorMessage.append("Section OsVer not found ");
+                                status = 0;
                             }
-                            items.add(resItem);
                             break;
                         case "RAM":
-                            if (!errorFound) {
+                            if (!errorFound && hardwareSettings != null) {
                                 HardwareSettingsRequestRAMItem ramItem = (HardwareSettingsRequestRAMItem) item;
                                 hardwareSettings.setRamSize(ramItem.getValue());
                                 hardwareSettings.setLastUpdateForRAMSize(ramItem.getLastUpdate());
-
-                                resItem = new ResHardwareSettingsRequestRAMItem(hardwareSettings, ramItem.getResCode());
                             } else {
-                                resItem = new ResHardwareSettingsRequestRAMItem(item.getResCode(),
-                                        item.getErrorMessage());
+                                errorMessage.append("Section RAM not found ");
+                                status = 0;
                             }
-                            items.add(resItem);
                             break;
                         case "CPU":
-                            if (!errorFound) {
+                            if (!errorFound && hardwareSettings != null) {
                                 HardwareSettingsRequestCPUItem cpuItem = (HardwareSettingsRequestCPUItem) item;
                                 hardwareSettings.setCpuHost(cpuItem.getValue());
                                 hardwareSettings.setLastUpdateForCPUHost(cpuItem.getLastUpdate());
-
-                                resItem = new ResHardwareSettingsRequestCPUItem(hardwareSettings, cpuItem.getResCode());
                             } else {
-                                resItem = new ResHardwareSettingsRequestCPUItem(item.getResCode(),
-                                        item.getErrorMessage());
+                                errorMessage.append("Section CPU not found ");
+                                status = 0;
                             }
-                            items.add(resItem);
                             break;
                         case "CR":
-                            if (!errorFound) {
+                            if (!errorFound && hardwareSettings != null) {
                                 HardwareSettingsRequestCRItem crItem = (HardwareSettingsRequestCRItem) item;
                                 hardwareSettingsReaders = DAOUtils
                                         .getHardwareSettingsReadersByIdAndUsedByModule(session,
@@ -168,17 +150,14 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                                 hardwareSettingsReaders.setFirmwareVer(crItem.getFirmwareVer());
                                 hardwareSettingsReaders.setLastUpdateForReader(crItem.getLastUpdate());
                                 hardwareSettingsReaders.setHardwareSettings(hardwareSettings);
-
-                                resItem = new ResHardwareSettingsRequestCRItem(hardwareSettingsReaders,
-                                        crItem.getResCode());
                             } else {
-                                resItem = new ResHardwareSettingsRequestCRItem(item.getResCode(),
-                                        item.getErrorMessage());
+                                errorMessage.append("Section CR not found ");
+                                status = 0;
                             }
-                            items.add(resItem);
                             break;
                     }
                 }
+                items.add(new ResHardwareSettingsRequestItem(status, errorMessage.toString()));
                 hardwareSettings.setVersion(nextVersion);
                 session.save(hardwareSettings);
                 session.save(hardwareSettingsMT);

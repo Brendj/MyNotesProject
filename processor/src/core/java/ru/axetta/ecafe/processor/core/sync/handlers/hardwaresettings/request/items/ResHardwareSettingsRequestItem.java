@@ -4,64 +4,39 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.items;
 
-import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
+import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import java.util.Date;
+public class ResHardwareSettingsRequestItem {
 
-public abstract class ResHardwareSettingsRequestItem implements AbstractToElement {
-
-    private Date lastUpdate;
-    private String type;
-    private Integer resCode;
+    private Integer status;
     private String errorMessage;
 
     public ResHardwareSettingsRequestItem() {
     }
 
-    public ResHardwareSettingsRequestItem(Integer resCode, String errorMessage) {
-        this.resCode = resCode;
+    public ResHardwareSettingsRequestItem(Integer status, String errorMessage) {
+        this.status = status;
         this.errorMessage = errorMessage;
     }
 
-    public void setAttributes(Element element) {
-        Integer resCode = getResCode();
-        String errorMessage = null;
-        Date lastUpdate = getLastUpdate();
-
-        if(null != lastUpdate) {
-            XMLUtils.setAttributeIfNotNull(element, "LastUpdate", lastUpdate);
+    public Element toElement(Document document, String elementName) throws Exception {
+        Element element = document.createElement(elementName);
+        XMLUtils.setAttributeIfNotNull(element, "Status", status);
+        if (status != null && status != 0) {
+            XMLUtils.setAttributeIfNotNull(element, "ErrorMessage", errorMessage);
         }
-        XMLUtils.setAttributeIfNotNull(element, "Res", resCode);
-        if (resCode != null && resCode != 0) {
-            XMLUtils.setAttributeIfNotNull(element, "Error", errorMessage);
-        }
+        return element;
     }
 
-    public Date getLastUpdate() {
-        return lastUpdate;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setLastUpdate(Date lastUpdate) {
-        this.lastUpdate = lastUpdate;
-    }
-
-    public String getType() {
-        return type;
-    }
-
-    public void setType(String type) {
-        this.type = type;
-    }
-
-    public Integer getResCode() {
-        return resCode;
-    }
-
-    public void setResCode(Integer resCode) {
-        this.resCode = resCode;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 
     public String getErrorMessage() {

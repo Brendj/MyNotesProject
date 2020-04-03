@@ -4,21 +4,31 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.items;
 
-import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
+import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
-public abstract class ResTurnstileSettingsRequestItem implements AbstractToElement {
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+
+public class ResTurnstileSettingsRequestItem {
 
     private String errorMessage;
-    private Integer resCode;
+    private Integer status;
 
     public ResTurnstileSettingsRequestItem() {
     }
 
-    public ResTurnstileSettingsRequestItem(String errorMessage, Integer resCode) {
+    public ResTurnstileSettingsRequestItem(Integer status, String errorMessage) {
         this.errorMessage = errorMessage;
-        this.resCode = resCode;
+        this.status = status;
     }
-
+    public Element toElement(Document document, String elementName) throws Exception {
+        Element element = document.createElement(elementName);
+        XMLUtils.setAttributeIfNotNull(element, "Status", status);
+        if (status != null && status != 0) {
+            XMLUtils.setAttributeIfNotNull(element, "ErrorMessage", errorMessage);
+        }
+        return element;
+    }
 
     public String getErrorMessage() {
         return errorMessage;
@@ -28,11 +38,11 @@ public abstract class ResTurnstileSettingsRequestItem implements AbstractToEleme
         this.errorMessage = errorMessage;
     }
 
-    public Integer getResCode() {
-        return resCode;
+    public Integer getStatus() {
+        return status;
     }
 
-    public void setResCode(Integer resCode) {
-        this.resCode = resCode;
+    public void setStatus(Integer status) {
+        this.status = status;
     }
 }

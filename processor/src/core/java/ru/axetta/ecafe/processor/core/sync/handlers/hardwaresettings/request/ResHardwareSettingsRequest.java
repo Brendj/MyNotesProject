@@ -22,8 +22,8 @@ public class ResHardwareSettingsRequest implements AbstractToElement {
     @Override
     public Element toElement(Document document) throws Exception {
         Element element = document.createElement("ResHardwareSettingsRequest");
-        for(ResHardwareSettingsRequestItem item : items) {
-            element.appendChild(item.toElement(document));
+        for(ResHardwareSettingsRequestItem item : this.getItems()) {
+            element.appendChild(item.toElement(document,"HardwareSettings"));
         }
         return element;
     }
