@@ -944,4 +944,13 @@ public class DAOReadonlyService {
         query.setParameter("idOfOrg", idOfOrg);
         return (Contragent) query.uniqueResult();
     }
+
+    public List<WtDish> getMenuDishes(WtMenu menu) {
+        Session session = entityManager.unwrap(Session.class);
+        org.hibernate.Query query = session
+                .createQuery("SELECT dish FROM WtDish dish LEFT JOIN dish.menuGroupMenus mgm "
+                        + "LEFT JOIN mgm.menu menu where menu = :menu");
+        query.setParameter("menu", menu);
+        return query.list();
+    }
 }

@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -326,8 +327,10 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "D", menu.getDeleteState());
 
         Element dishes = document.createElement("Dishes");
-        if (menu.getMenuDishes() != null && menu.getMenuDishes().size() > 0) {
-            for (WtDish dish : menu.getMenuDishes()) {
+        List<WtDish> menuDishesList = DAOReadonlyService.getInstance().getMenuDishes(menu);
+        if (menuDishesList != null && menuDishesList.size() > 0) {
+            Set<WtDish> menuDishesSet = new HashSet<>(menuDishesList);
+            for (WtDish dish : menuDishesSet) {
                 Element elem = document.createElement("DSI");
                 XMLUtils.setAttributeIfNotNull(elem, "MenuId", menu.getIdOfMenu());
                 XMLUtils.setAttributeIfNotNull(element, "DishId", dish.getIdOfDish());

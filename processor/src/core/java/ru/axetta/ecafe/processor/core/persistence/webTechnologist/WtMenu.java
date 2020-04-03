@@ -67,18 +67,6 @@ public class WtMenu {
     @JoinTable(name = "cf_wt_menu_org", joinColumns = @JoinColumn(name = "idOfMenu"), inverseJoinColumns = @JoinColumn(name = "idOfOrg"))
     private Set<Org> orgs = new HashSet<>();
 
-    // метод возвращает блюда, связанные с меню
-    public Set<WtDish> getMenuDishes() {
-        Set<WtDish> menuDishes = new HashSet<>();
-        Set<WtMenuGroupMenu> wtMenuGroupMenuSet = this.getMenuGroupMenus();
-        for (WtMenuGroupMenu wtMenuGroupMenu : wtMenuGroupMenuSet) {
-            if (wtMenuGroupMenu.getDishes() != null && wtMenuGroupMenu.getDishes().size() > 0) {
-                menuDishes.addAll(wtMenuGroupMenu.getDishes());
-            }
-        }
-        return menuDishes;
-    }
-
     public Long getIdOfMenu() {
         return idOfMenu;
     }
