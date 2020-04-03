@@ -326,17 +326,21 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "D", menu.getDeleteState());
 
         Element dishes = document.createElement("Dishes");
-        for (WtMenuGroupMenu item : menu.getMenuGroupMenus()) {
-            Element elem = document.createElement("DSI");
-            XMLUtils.setAttributeIfNotNull(elem, "MenuId", menu.getIdOfMenu());
-            if (!item.getDishes().isEmpty()) {
-                List<WtDish> wtDishes = new ArrayList<>(item.getDishes());
-                XMLUtils.setAttributeIfNotNull(element, "DishId", wtDishes.get(0));
+        if (menu.getMenuDishes() != null && menu.getMenuDishes().size() > 0) {
+            for (WtDish dish : menu.getMenuDishes()) {
+                Element elem = document.createElement("DSI");
+                XMLUtils.setAttributeIfNotNull(elem, "MenuId", menu.getIdOfMenu());
+                XMLUtils.setAttributeIfNotNull(element, "DishId", dish.getIdOfDish());
+                if (dish.getMenuGroupMenus() != null && dish.getMenuGroupMenus().size() > 0) {
+                    for (WtMenuGroupMenu wtMenuGroupMenu: dish.getMenuGroupMenus()) {
+                        if (wtMenuGroupMenu.getMenu() != null) {
+                            XMLUtils.setAttributeIfNotNull(element, "MenuGroupId", wtMenuGroupMenu.getMenu());
+                            break;
+                        }
+                    }
+                }
+                dishes.appendChild(elem);
             }
-            if (item.getMenuGroup() != null) {
-                XMLUtils.setAttributeIfNotNull(element, "MenuGroupId", item.getMenuGroup());
-            }
-            dishes.appendChild(elem);
         }
 
         Element orgs = document.createElement("Orgs");
