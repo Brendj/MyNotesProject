@@ -57,7 +57,7 @@
             <column name="deleteState" sql-type="integer"/>
         </property>
 
-        <set name="menuGroupMenus" inverse="true" cascade="all" lazy="true">
+        <set name="menuGroupMenus" inverse="true" cascade="all" lazy="false">
             <key>
                 <column name="id"/>
             </key>
