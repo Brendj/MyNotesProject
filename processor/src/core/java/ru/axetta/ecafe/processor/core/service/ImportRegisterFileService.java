@@ -39,7 +39,7 @@ public class ImportRegisterFileService extends ClientMskNSIService {
 
     public final String FILENAME_PROPERTY = "ecafe.processor.nsi.registry.filename";
     public final String NODE_PROPERTY = "ecafe.processor.nsi.registry.node";
-    public static final String MODE_PROPERTY = "ecafe.processor.nsi.registry.mode"; //допустимые значения: "file, service, symmetric" или отсутствие настройки
+    public static final String MODE_PROPERTY = "ecafe.processor.nsi.registry.mode"; //допустимые значения: "file, service, symmetric, kafka" или отсутствие настройки
     public static final String MODE_FILE = "file";
     public static final String MODE_SYMMETRIC = "symmetric";
     public static final String MODE_KAFKA = "kafka";
