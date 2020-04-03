@@ -847,14 +847,19 @@ public class DAOReadonlyService {
         }
     }
 
-    public Set<WtMenuGroup> getMenuGroupsSetFromVersion(Long version, Contragent contragent, Org org) {
+    public Set<WtMenuGroup> getMenuGroupsSetFromVersion(Long version, Contragent contragent) {
         try {
+            //Query query = entityManager.createQuery(
+            //        "SELECT menuGroup from WtMenuGroup menuGroup left join menuGroup.menuGroupMenus menuGroupMenus "
+            //                + "left join menuGroupMenus.menu menu left join menu.orgs orgs "
+            //                + "where menuGroup.version > :version AND "
+            //                + "menuGroup.contragent = :contragent AND :org IN elements(orgs)");
             Query query = entityManager.createQuery(
                     "SELECT menuGroup from WtMenuGroup menuGroup where menuGroup.version > :version AND "
-                            + "menuGroup.wtMenu.contragent = :contragent AND :org IN elements(menuGroup.wtMenu.orgs)");
+                            + "menuGroup.contragent = :contragent");
             query.setParameter("version", version);
             query.setParameter("contragent", contragent);
-            query.setParameter("org", org);
+            //query.setParameter("org", org);
             List<WtMenuGroup> menuGroups = query.getResultList();
             return new HashSet<>(menuGroups);
         } catch (Exception e) {

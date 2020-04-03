@@ -156,8 +156,10 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "MenuGroupsRequest": {
+                    //menuGroups = DAOReadonlyService.getInstance()
+                    //        .getMenuGroupsSetFromVersion(entry.getValue(), contragent, org);
                     menuGroups = DAOReadonlyService.getInstance()
-                            .getMenuGroupsSetFromVersion(entry.getValue(), contragent, org);
+                            .getMenuGroupsSetFromVersion(entry.getValue(), contragent);
                     break;
                 }
                 case "MenusRequest": {
