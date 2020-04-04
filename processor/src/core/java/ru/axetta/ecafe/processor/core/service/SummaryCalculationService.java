@@ -706,8 +706,6 @@ public class SummaryCalculationService {
                         clientEE.getPreorders().getDeletedPreorderDateOther().add(notifyPreorderDailyDetail);
                     }
                 }
-                break;
-
             }
             attachPreorderDailyValues(clients);
         }
