@@ -369,6 +369,8 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
                         CategoryDiscountEditPage.DISCOUNT_START + discountRate + CategoryDiscountEditPage.DISCOUNT_END;
             }
 
+            wtEntity.setDescription(description);
+
             String strSubCategory = "";
             if (this.subCategory > 0) {
                 strSubCategory = WtRuleCreatePage.SUB_CATEGORIES[this.subCategory];
