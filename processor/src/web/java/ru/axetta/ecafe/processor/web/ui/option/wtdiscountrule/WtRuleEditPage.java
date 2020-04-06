@@ -41,9 +41,8 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
         CategoryOrgListSelectPage.CompleteHandlerList,
         ContragentListSelectPage.CompleteHandler {
 
-    // Old
     private String description;
-    private Integer discountRate = 100;
+    private Integer discountRate;
     private int priority;
     private boolean operationor;
     private String categoryDiscounts;
@@ -256,7 +255,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
             discountRate = Integer.parseInt(discount);
             description = "";
         } else {
-            discountRate = 100;
+            discountRate = wtDiscountRule.getRate();
         }
 
         subCategory = -1;
@@ -377,6 +376,7 @@ public class WtRuleEditPage extends BasicWorkspacePage implements CategoryListSe
             wtEntity.setSubCategory(strSubCategory);
 
             wtEntity.setPriority(priority);
+            wtEntity.setRate(discountRate);
             wtEntity.setOperationOr(operationor);
 
             this.categoryDiscountSet = new HashSet<CategoryDiscount>();

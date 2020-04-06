@@ -63,7 +63,7 @@ public class WtRuleCreatePage extends BasicWorkspacePage implements CategoryList
     private String filter = "Не выбрано";
     private String filterOrg = "Не выбрано";
     private int priority;
-    private Integer discountRate = 100;
+    private Integer discountRate;
     private Integer[] selectedComplexIds;
     private int subCategory = -1;
     @Autowired
