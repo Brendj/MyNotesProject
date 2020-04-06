@@ -784,10 +784,10 @@ public class Manager implements AbstractToElement {
                     distributedObject.setGlobalVersion(0L);
                     processDistributedObject(persistenceSession, distributedObject,
                             currentMaxVersion, currentDO);
-                    distributedObject.setGlobalVersion(temp);
                     persistenceSession.flush();
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
+                    distributedObject.setGlobalVersion(temp);
                 } catch (Exception er) {
                 }
             }
@@ -846,10 +846,10 @@ public class Manager implements AbstractToElement {
                     distributedObject.setGlobalVersion(0L);
                     processDistributedObject(persistenceSession, distributedObject,
                             currentMaxVersion, currentDO);
-                    distributedObject.setGlobalVersion(temp);
                     persistenceSession.flush();
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
+                    distributedObject.setGlobalVersion(temp);
                 } catch (Exception er) {
                 }
             }
@@ -930,7 +930,9 @@ public class Manager implements AbstractToElement {
         final Class<? extends DistributedObject> aClass = distributedObject.getClass();
         // Создание в БД нового экземпляра РО.
         if (distributedObject.getTagName().equals("C")) {
-            distributedObject.setGlobalVersion(currentMaxVersion);
+            if (distributedObject.getGlobalVersion() == null || distributedObject.getGlobalVersion() != 0L) {
+                distributedObject.setGlobalVersion(currentMaxVersion);
+            }
             distributedObject.setGlobalVersionOnCreate(currentMaxVersion);
             distributedObject.setCreatedDate(new Date());
             if (distributedObject instanceof GoodRequestPosition) {
