@@ -333,11 +333,11 @@ public class ResMenuSupplier implements AbstractToElement {
             for (WtDish dish : menuDishesSet) {
                 Element elem = document.createElement("DSI");
                 XMLUtils.setAttributeIfNotNull(elem, "MenuId", menu.getIdOfMenu());
-                XMLUtils.setAttributeIfNotNull(element, "DishId", dish.getIdOfDish());
+                XMLUtils.setAttributeIfNotNull(elem, "DishId", dish.getIdOfDish());
                 if (dish.getMenuGroupMenus() != null && dish.getMenuGroupMenus().size() > 0) {
                     for (WtMenuGroupMenu wtMenuGroupMenu: dish.getMenuGroupMenus()) {
                         if (wtMenuGroupMenu.getMenu() != null) {
-                            XMLUtils.setAttributeIfNotNull(element, "MenuGroupId", wtMenuGroupMenu.getMenu());
+                            XMLUtils.setAttributeIfNotNull(elem, "MenuGroupId", wtMenuGroupMenu.getMenu());
                             break;
                         }
                     }
