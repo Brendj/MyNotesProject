@@ -17,6 +17,7 @@ public class ClientGroupMigrationHistory {
     public static final String MODIFY_IN_ARM = "Изменено в АРМ.";
     public static final String MODIFY_IN_REGISTRY = "Изменено в Реестрах.";
     public static final String MODIFY_IN_ISPP = "Изменено сервером.";
+    public static final String MODIFY_AUTO_MODE = "Изменено на сервере автоматически.";
 
     private long idOfGroupClientMigration;
     private Date registrationDate;

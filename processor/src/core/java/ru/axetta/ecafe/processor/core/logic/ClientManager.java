@@ -2226,6 +2226,48 @@ public class ClientManager {
         clientGroupMigrationHistory.setComment(comment);
 
         session.save(clientGroupMigrationHistory);
+        disableGuardianshipIfClientLeaving(session, client, idOfClientGroup);
+    }
+
+    private static void disableGuardianshipIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
+        if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
+        try {
+            List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient());
+            for (Client guardian : guardians) {
+                boolean otherChildrenExist = false;
+                List<Client> children = findChildsByClient(session, guardian.getIdOfClient());
+                for (Client child : children) {
+                    if (!child.equals(client) && (child.isStudent() || child.getClientGroup() == null)) {
+                        otherChildrenExist = true;
+                        break;
+                    }
+                }
+                boolean deactivateGuardianship = guardian.isParent() || guardian.isSotrudnikMsk() || guardian.isEmployee();
+                if (deactivateGuardianship) {
+                    Long version = generateNewClientGuardianVersion(session);
+                    ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
+
+                    if (guardian.isParent() && !otherChildrenExist) {
+                        removeGuardianByClient(session, client.getIdOfClient(), guardian.getIdOfClient(), version);
+
+                        ClientManager.createClientGroupMigrationHistory(session, guardian, guardian.getOrg(),
+                                ClientGroup.Predefined.CLIENT_LEAVING.getValue(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(),
+                                ClientGroupMigrationHistory.MODIFY_AUTO_MODE
+                                        .concat(String.format(" (ид. опекаемого=%s)", client.getIdOfClient())));
+                        guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+                        guardian.setClientRegistryVersion(clientRegistryVersion);
+                        session.update(guardian);
+                    } else {
+                        clientGuardian.disable(version);
+                        session.update(clientGuardian);
+                    }
+
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error in disableGuardianshipIfClientLeaving: ", e);
+        }
     }
 
     public static void checkUserOPFlag(Session session, Org oldOrg, Org newOrg, Long idOfClientGroup, Client client) {

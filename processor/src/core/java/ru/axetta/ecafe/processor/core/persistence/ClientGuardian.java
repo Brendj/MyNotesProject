@@ -85,6 +85,12 @@ public class ClientGuardian {
         this.guardianType = guardianType;
     }
 
+    public void disable(Long version) {
+        this.setDisabled(true);
+        this.setVersion(version);
+        this.setLastUpdate(new Date());
+    }
+
     public void delete(Long version) {
         this.setDeletedState(true);
         this.setDisabled(true);
