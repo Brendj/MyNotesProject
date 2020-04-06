@@ -4955,4 +4955,19 @@ public class DAOUtils {
         criteria.add(Restrictions.le("day", endDate));
         return criteria.list();
     }
+
+    public static List getAllDateFromProdactionCalendarForFutureDates(Session persistenceSession) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
+        criteria.add(Restrictions.gt("day", new Date()));
+        return criteria.list();
+    }
+
+    public static List<SpecialDate> findSpecialDateForDates(Session persistenceSession, CompositeIdOfSpecialDate compositeIdOfSpecialDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(SpecialDate.class);
+        criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
+        criteria.add(Restrictions.ge("date", CalendarUtils.startOfDay(compositeIdOfSpecialDate.getDate())));
+        criteria.add(Restrictions.le("date", CalendarUtils.endOfDay(compositeIdOfSpecialDate.getDate())));
+        criteria.add(Restrictions.not(Restrictions.eq("deleted", true)));
+        return criteria.list();
+    }
 }

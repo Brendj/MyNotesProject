@@ -31,6 +31,11 @@ import java.util.List;
  */
 public abstract class ConsumerRequestDistributedObject extends DistributedObject {
 
+    private static final int SETTING_TYPE = 11001;
+    private static final int SETTING_TYPE_SUBSCRIPTION = 10104;
+
+    private static final long TIME_MAX = 43200000; //12:00
+
     @Override
     @SuppressWarnings("unchecked")
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
