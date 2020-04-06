@@ -87,6 +87,11 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
         Staff st  = DAOUtils.findDistributedObjectByRefGUID(Staff.class, session, guidOfStaff);
         if(st==null) throw new DistributedObjectException("NOT_FOUND_VALUE");
         setStaff(st);
+        if (!isGoodDate(session, idOfOrg, doneDate, requestType))
+        {
+            DistributedObjectException distributedObjectException = new DistributedObjectException("CANT_CHANGE_GRP_ON_DATE");
+            throw distributedObjectException;
+        }
     }
 
     @Override

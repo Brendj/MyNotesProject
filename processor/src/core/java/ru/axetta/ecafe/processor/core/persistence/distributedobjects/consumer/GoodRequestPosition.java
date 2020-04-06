@@ -142,6 +142,14 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         if (!gr.getOrgOwner().equals(orgOwner)) {
             orgOwner = gr.getOrgOwner();
         }
+        if (!isGoodDate(session, idOfOrg, gr.getDoneDate(), gr.getRequestType()))
+        {
+            GoodRequestPosition grp = DAOUtils.findDistributedObjectByRefGUID(GoodRequestPosition.class, session, guid);
+            DistributedObjectException distributedObjectException = new DistributedObjectException("CANT_CHANGE_GRP_ON_DATE");
+            if (grp != null)
+                distributedObjectException.setData("TC="+ grp.getTotalCount() + ", DSC=" + grp.getDailySampleCount() + ", TCC=" + grp.getTempClientsCount());
+            throw distributedObjectException;
+        }
     }
 
     @Override

@@ -777,6 +777,20 @@ public class Manager implements AbstractToElement {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (DistributedObjectException e) {
+            //Была попытка создания записи с неверной датой
+            if (e.getMessage().equals("CANT_CHANGE_GRP_ON_DATE") && distributedObject.getTagName().equals("C")) {
+                try {
+                    Long temp = distributedObject.getGlobalVersion();
+                    distributedObject.setGlobalVersion(0L);
+                    processDistributedObject(persistenceSession, distributedObject,
+                            currentMaxVersion, currentDO);
+                    distributedObject.setGlobalVersion(temp);
+                    persistenceSession.flush();
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                } catch (Exception er) {
+                }
+            }
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
             distributedObject.setDistributedObjectException(e);
             errorMessage = "Error processCurrentObject: " + e.getMessage();
@@ -825,6 +839,20 @@ public class Manager implements AbstractToElement {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (DistributedObjectException e) {
+            //Была попытка создания записи с неверной датой
+            if (e.getMessage().equals("CANT_CHANGE_GRP_ON_DATE") && distributedObject.getTagName().equals("C")) {
+                try {
+                    Long temp = distributedObject.getGlobalVersion();
+                    distributedObject.setGlobalVersion(0L);
+                    processDistributedObject(persistenceSession, distributedObject,
+                            currentMaxVersion, currentDO);
+                    distributedObject.setGlobalVersion(temp);
+                    persistenceSession.flush();
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                } catch (Exception er) {
+                }
+            }
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
             distributedObject.setDistributedObjectException(e);
             errorMessage = "Error processCurrentObject: " + e.getMessage();
