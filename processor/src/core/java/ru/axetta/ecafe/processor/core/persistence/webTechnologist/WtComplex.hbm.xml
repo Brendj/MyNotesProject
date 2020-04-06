@@ -87,6 +87,10 @@
             <column name="start_cycle_day" sql-type="integer"/>
         </property>
 
+        <property name="barcode">
+            <column name="barcode" sql-type="varchar(16)" length="16"/>
+        </property>
+
         <set name="orgs" lazy="false" table="cf_wt_complexes_org">
             <key column="IdOfComplex"/>
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>

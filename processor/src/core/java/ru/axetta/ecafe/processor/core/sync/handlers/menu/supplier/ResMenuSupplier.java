@@ -255,7 +255,7 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "AgeGroupId", dish.getWtAgeGroupItem().getIdOfAgeGroupItem());
         XMLUtils.setAttributeIfNotNull(prop, "TypeProductionId",
                 dish.getWtTypeProductionItem().getIdOfTypeProductionItem());
-        if (StringUtils.isEmpty(dish.getBarcode())) {
+        if (!StringUtils.isEmpty(dish.getBarcode())) {
             XMLUtils.setAttributeIfNotNull(prop, "BarCode", dish.getBarcode());
         }
         XMLUtils.setAttributeIfNotNull(prop, "Protein", dish.getProtein());
@@ -375,6 +375,10 @@ public class ResMenuSupplier implements AbstractToElement {
             price = 0;
         }
         XMLUtils.setAttributeIfNotNull(prop, "Price", price);
+
+        if (!StringUtils.isEmpty(complex.getBarcode())) {
+            XMLUtils.setAttributeIfNotNull(prop, "BarCode", complex.getBarcode());
+        }
 
         Date beginDate = complex.getBeginDate();
         if (beginDate != null) {

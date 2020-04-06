@@ -65,6 +65,9 @@ public class WtComplex {
     @Column(name = "deleteState")
     private Integer deleteState;
 
+    @Column(name = "barcode")
+    private String barcode;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfComplexGroupItem")
     private WtComplexGroupItem wtComplexGroupItem;
@@ -302,6 +305,14 @@ public class WtComplex {
 
     public void setWtComplexesItems(Set<WtComplexesItem> wtComplexesItems) {
         this.wtComplexesItems = wtComplexesItems;
+    }
+
+    public String getBarcode() {
+        return barcode;
+    }
+
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
     }
 
     @Override
