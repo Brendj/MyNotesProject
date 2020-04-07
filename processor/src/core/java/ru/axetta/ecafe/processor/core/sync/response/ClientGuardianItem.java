@@ -34,7 +34,7 @@ public class ClientGuardianItem {
         this.version = clientGuardian.getVersion();
         this.disabled = clientGuardian.isDisabled();
         this.deleteState = clientGuardian.getDeletedState() ? 1 : 0;
-        this.relation = clientGuardian.getRelation() == null ? null : clientGuardian.getRelation().ordinal();
+        this.relation = clientGuardian.getRelation() == null ? null : clientGuardian.getRelation().getCode();
         if (clientGuardian.getCardRequest() != null) {
             this.guidRequest = clientGuardian.getCardRequest().getGuid();
         }
