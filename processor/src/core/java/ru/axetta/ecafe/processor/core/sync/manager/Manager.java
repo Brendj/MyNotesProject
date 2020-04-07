@@ -760,6 +760,9 @@ public class Manager implements AbstractToElement {
                 String tagName = distributedObject.getTagName();
                 if (!(distributedObject.getDeletedState() == null || distributedObject.getDeletedState())) {
                     distributedObject.preProcess(persistenceSession, idOfOrg);
+                    //Если заявка бала неправильной, а затем стала правильной (при модификации)
+                    if (distributedObject.getGlobalVersion() != null && distributedObject.getGlobalVersion() == 0L)
+                        distributedObject.setGlobalVersion(currentMaxVersion);
                     distributedObject = processDistributedObject(persistenceSession, distributedObject,
                             currentMaxVersion, currentDO);
                 } else {
@@ -821,6 +824,9 @@ public class Manager implements AbstractToElement {
                 if (!(distributedObject.getDeletedState() == null || distributedObject.getDeletedState())) {
                     distributedObject.mergedDistributedObject = null;
                     distributedObject.preProcess(persistenceSession, idOfOrg);
+                    //Если заявка бала неправильной, а затем стала правильной (при модификации)
+                    if (distributedObject.getGlobalVersion() != null && distributedObject.getGlobalVersion() == 0L)
+                        distributedObject.setGlobalVersion(1L);
                     distributedObject = (LibraryDistributedObject) processDistributedObject(persistenceSession,
                             distributedObject, currentMaxVersion, currentDO);
                 } else {

@@ -103,7 +103,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "TotalCount", totalCount);
         XMLUtils.setAttributeIfNotNull(element, "DailySampleCount", dailySampleCount);  // суточная проба
         XMLUtils.setAttributeIfNotNull(element, "TempClientsCount", tempClientsCount);
-        if (complexId != 0) {
+        if (complexId != null && complexId != 0) {
             element.setAttribute("ComplexId", complexId.toString());
         }
         XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
