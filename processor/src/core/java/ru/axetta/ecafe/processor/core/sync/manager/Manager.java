@@ -957,9 +957,14 @@ public class Manager implements AbstractToElement {
         }
         // Изменение существующего в БД экземпляра РО.
         if (distributedObject.getTagName().equals("M")) {
-            DistributedObjectModifier modifier = ModifierTypeFactory.createModifier(distributedObject);
-            modifier.modifyDO(persistenceSession, distributedObject, currentMaxVersion, currentDO, idOfOrg,
-                    conflictDocument);
+            //Никаких изменений в БД не вносить, если там заявка была отклонена по неверной дате
+            if (distributedObject.getGlobalVersion() == null || distributedObject.getGlobalVersion() != 0L) {
+                DistributedObjectModifier modifier = ModifierTypeFactory.createModifier(distributedObject);
+                modifier.modifyDO(persistenceSession, distributedObject, currentMaxVersion, currentDO, idOfOrg,
+                        conflictDocument);
+            }
+
+
             /*Long currentVersion = currentDO.getGlobalVersion();
             Long objectVersion = distributedObject.getGlobalVersion();
             currentDO.fill(distributedObject);
