@@ -2268,11 +2268,8 @@ public class ClientManager {
                         long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
                         guardian.setClientRegistryVersion(clientRegistryVersion);
                         session.update(guardian);
-                    } else {
-
-                        session.update(clientGuardian);
                     }
-
+                    session.update(clientGuardian);
                 }
             }
         } catch (Exception e) {
