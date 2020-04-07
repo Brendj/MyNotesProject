@@ -1703,11 +1703,17 @@ public class ClientManager {
 
     /* получить список опекунов по опекаемому */
     public static List<Client> findGuardiansByClient(Session session, Long idOfChildren) throws Exception {
+        return findGuardiansByClient(session, idOfChildren, false);
+    }
+
+    public static List<Client> findGuardiansByClient(Session session, Long idOfChildren, boolean includeDisabled) throws Exception {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
-        idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        if (!includeDisabled) {
+            idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        }
         idOfGuardianCriteria.setProjection(Property.forName("idOfGuardian"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
@@ -1721,11 +1727,17 @@ public class ClientManager {
 
     /* получить список опекаемых по опекуну */
     public static List<Client> findChildsByClient(Session session, Long idOfGuardian) throws Exception {
+        return findChildsByClient(session, idOfGuardian, false);
+    }
+
+    public static List<Client> findChildsByClient(Session session, Long idOfGuardian, boolean includeDisabled) throws Exception {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
         idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
-        idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        if (!includeDisabled) {
+            idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        }
         idOfGuardianCriteria.setProjection(Property.forName("idOfChildren"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
@@ -2232,7 +2244,7 @@ public class ClientManager {
     private static void disableGuardianshipIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
         if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
         try {
-            List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient());
+            List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), true);
             for (Client guardian : guardians) {
                 boolean otherChildrenExist = false;
                 List<Client> children = findChildsByClient(session, guardian.getIdOfClient());
