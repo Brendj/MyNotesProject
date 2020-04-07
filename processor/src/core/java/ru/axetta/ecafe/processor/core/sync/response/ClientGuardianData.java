@@ -30,7 +30,9 @@ public class ClientGuardianData implements AbstractToElement {
 
     public void addItem(ClientGuardian clientGuardian) {
         final ClientGuardianItem e = new ClientGuardianItem(clientGuardian);
-        clientGuardianResponseItems.add(e);
+        if (!clientGuardianResponseItems.contains(e)) {
+            clientGuardianResponseItems.add(e);
+        }
     }
 
     @Override
