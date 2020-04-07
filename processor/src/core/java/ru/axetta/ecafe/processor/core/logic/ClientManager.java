@@ -2249,7 +2249,7 @@ public class ClientManager {
                 boolean otherChildrenExist = false;
                 List<Client> children = findChildsByClient(session, guardian.getIdOfClient());
                 for (Client child : children) {
-                    if (!child.equals(client) && (child.isStudent() || child.getClientGroup() == null)) {
+                    if (!child.equals(client) && (child.isStudent() || child.getClientGroup() == null) && !child.isLeaving()) {
                         otherChildrenExist = true;
                         break;
                     }
@@ -2258,10 +2258,8 @@ public class ClientManager {
                 if (deactivateGuardianship) {
                     Long version = generateNewClientGuardianVersion(session);
                     ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
-
+                    clientGuardian.disable(version);
                     if (guardian.isParent() && !otherChildrenExist) {
-                        removeGuardianByClient(session, client.getIdOfClient(), guardian.getIdOfClient(), version);
-
                         ClientManager.createClientGroupMigrationHistory(session, guardian, guardian.getOrg(),
                                 ClientGroup.Predefined.CLIENT_LEAVING.getValue(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(),
                                 ClientGroupMigrationHistory.MODIFY_AUTO_MODE
@@ -2271,7 +2269,7 @@ public class ClientManager {
                         guardian.setClientRegistryVersion(clientRegistryVersion);
                         session.update(guardian);
                     } else {
-                        clientGuardian.disable(version);
+
                         session.update(clientGuardian);
                     }
 
