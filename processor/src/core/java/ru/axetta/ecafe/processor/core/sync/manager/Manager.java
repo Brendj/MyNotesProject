@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.SyncHistoryException;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConfirm;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodAgeGroupType;
@@ -850,8 +851,15 @@ public class Manager implements AbstractToElement {
                 try {
                     Long temp = distributedObject.getGlobalVersion();
                     distributedObject.setGlobalVersion(0L);
+                    Long count = 0L;
+                    if ((DistributedObject)distributedObject instanceof GoodRequestPosition) {
+                        count = ((GoodRequestPosition) ((DistributedObject) distributedObject)).getTotalCount();
+                        ((GoodRequestPosition) ((DistributedObject) distributedObject)).setTotalCount(0L);
+                    }
                     processDistributedObject(persistenceSession, distributedObject,
                             currentMaxVersion, currentDO);
+                    if ((DistributedObject)distributedObject instanceof GoodRequestPosition)
+                        ((GoodRequestPosition)((DistributedObject)distributedObject)).setTotalCount(count);
                     persistenceSession.flush();
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
