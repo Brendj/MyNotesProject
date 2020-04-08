@@ -74,7 +74,7 @@
         <f:facet name="header">
             <rich:columnGroup>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Дата оказания услуг" />
+                    <h:outputText escape="true" value="Дата" />
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Ид ОО" />
@@ -83,22 +83,22 @@
                     <h:outputText escape="true" value="Название" />
                 </rich:column>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Заказ ИС ПП" />
+                    <h:outputText escape="true" value="Заказ ОО" />
                 </rich:column>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Оплата ИС ПП" />
+                    <h:outputText escape="true" value="Оплата ОО" />
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Отгрузка ПП" />
                 </rich:column>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Цена ИС ПП" />
+                    <h:outputText escape="true" value="Цена" />
                 </rich:column>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Сумма ИС ПП" />
+                    <h:outputText escape="true" value="Сумма" />
                 </rich:column>
                 <rich:column headerClass="column-header">
-                    <h:outputText escape="true" value="Статус ИС ПП" />
+                    <h:outputText escape="true" value="Статус ОО" />
                 </rich:column>
                 <rich:column headerClass="column-header">
                     <h:outputText escape="true" value="Статус ПП - согласие" />
