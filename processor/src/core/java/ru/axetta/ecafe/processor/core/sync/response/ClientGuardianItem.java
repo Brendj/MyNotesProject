@@ -1,6 +1,7 @@
 package ru.axetta.ecafe.processor.core.sync.response;
 
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
+import ru.axetta.ecafe.processor.core.persistence.ClientGuardianRepresentType;
 import ru.axetta.ecafe.processor.core.sync.ResultOperation;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -26,7 +27,7 @@ public class ClientGuardianItem {
     private Integer relation;
     private String guidRequest;
     private Boolean informedSpecialMenu; //ConsentToPreOrder
-    private Boolean isLegalRepresent;
+    private ClientGuardianRepresentType representType;
 
     public ClientGuardianItem(ClientGuardian clientGuardian) {
         this.idOfGuardian = clientGuardian.getIdOfGuardian();
@@ -40,7 +41,7 @@ public class ClientGuardianItem {
         }
         this.informedSpecialMenu = clientGuardian.getInformedSpecialMenu();
         this.result = null;
-        this.isLegalRepresent = clientGuardian.getIsLegalRepresent();
+        this.representType = clientGuardian.getRepresentType();
     }
 
     public ClientGuardianItem(ClientGuardian clientGuardian, Integer resCode, String resultMessage) {
@@ -79,8 +80,8 @@ public class ClientGuardianItem {
         XMLUtils.setAttributeIfNotNull(element, "Relation", relation);
         XMLUtils.setAttributeIfNotNull(element, "GuidRequest", guidRequest);
         XMLUtils.setAttributeIfNotNull(element, "ConsentToPreOrder", informedSpecialMenu ? "1" : "0"); //По протоколу поле ConsentToPreOrder == informedSpecialMenu
-        if(isLegalRepresent != null) {
-            XMLUtils.setAttributeIfNotNull(element, "IsLegalRepresent", isLegalRepresent ? "1" : "0");
+        if(representType != null) {
+            XMLUtils.setAttributeIfNotNull(element, "IsLegalRepresent", representType.getCode());
         }
         if(this.result!=null){
             XMLUtils.setAttributeIfNotNull(element, "ResCode", result.getCode());
@@ -93,20 +94,20 @@ public class ClientGuardianItem {
         Long idOfGuardian = XMLUtils.getLongAttributeValue(itemNode, "IdOfGuardian");
         Long idOfChildren = XMLUtils.getLongAttributeValue(itemNode, "IdOfChildren");
         Boolean disabled = (1 == XMLUtils.getIntegerValueZeroSafe(itemNode, "Disabled"));
-        Boolean isLegalRepresent = (1 == XMLUtils.getIntegerValueZeroSafe(itemNode, "IsLegalRepresent"));
+        Integer representType = XMLUtils.getIntegerAttributeValue(itemNode, "IsLegalRepresent");
         Integer delete = XMLUtils.getIntegerValueZeroSafe(itemNode, "D");
         Integer relation = XMLUtils.getIntegerAttributeValue(itemNode, "Relation");
-        return new ClientGuardianItem(idOfGuardian, idOfChildren, disabled, delete, relation, isLegalRepresent);
+        return new ClientGuardianItem(idOfGuardian, idOfChildren, disabled, delete, relation, representType);
     }
 
     private ClientGuardianItem(Long idOfGuardian, Long idOfChildren, Boolean disabled, Integer deleteSate,
-            Integer relation, Boolean isLegalRepresent) {
+            Integer relation, Integer representType) {
         this.idOfGuardian = idOfGuardian;
         this.idOfChildren = idOfChildren;
         this.disabled = disabled;
         this.deleteState = deleteSate;
         this.relation = relation;
-        this.isLegalRepresent = isLegalRepresent;
+        this.representType = ClientGuardianRepresentType.fromInteger(representType);
     }
 
 
@@ -134,11 +135,11 @@ public class ClientGuardianItem {
         this.informedSpecialMenu = informedSpecialMenu;
     }
 
-    public Boolean getLegalRepresent() {
-        return isLegalRepresent;
+    public ClientGuardianRepresentType getRepresentType() {
+        return representType;
     }
 
-    public void setLegalRepresent(Boolean legalRepresent) {
-        isLegalRepresent = legalRepresent;
+    public void setRepresentType(ClientGuardianRepresentType representType) {
+        this.representType = representType;
     }
 }

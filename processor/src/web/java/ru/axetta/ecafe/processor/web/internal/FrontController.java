@@ -2141,7 +2141,7 @@ public class FrontController extends HttpServlet {
                             GuardianDesc.FIELD_LEGALITY));
         }
 
-        Boolean legality = Boolean.parseBoolean(legalityStr);
+        Integer legality = convertLegality(legalityStr);
 
         String gender = FrontControllerProcessor
                 .getFindClientFieldValueByName(GuardianDesc.FIELD_GENDER, guardianDescList);
@@ -2283,7 +2283,7 @@ public class FrontController extends HttpServlet {
                     .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
                             clientId, ClientCreatedFromType.ARM, null);
 
-            clientGuardian.setIsLegalRepresent(legality);
+            clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
             persistenceSession.merge(clientGuardian);
 
             persistenceTransaction.commit();
@@ -2296,6 +2296,12 @@ public class FrontController extends HttpServlet {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    private Integer convertLegality(String legality_str) {
+        if (legality_str.equals("true")) return 1;
+        if (legality_str.equals("false")) return 0;
+        return Integer.parseInt(legality_str);
     }
 
     @WebMethod(operationName = "registerGuardianMigrantRequest")
@@ -2362,7 +2368,7 @@ public class FrontController extends HttpServlet {
             return result;
         }
 
-        Boolean legality = Boolean.parseBoolean(legalityStr);
+        Integer legality = convertLegality(legalityStr);
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -2399,7 +2405,7 @@ public class FrontController extends HttpServlet {
                         .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
                                 clientId, ClientCreatedFromType.ARM, null);
 
-                clientGuardian.setIsLegalRepresent(legality);
+                clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
                 persistenceSession.merge(clientGuardian);
             } else {
                 logger.warn(String.format(

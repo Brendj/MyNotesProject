@@ -828,13 +828,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 if (!guardianExists(idOfClient))
                     clientGuardianItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, false, false));
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, ClientGuardianRepresentType.UNKNOWN, false));
             }
             if (typeAddClient.equals("ward")) {
                 if (!wardExists(idOfClient))
                     clientWardItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, false, false));
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, ClientGuardianRepresentType.UNKNOWN, false));
             }
         }
     }
@@ -1371,6 +1371,16 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         result[0] = new SelectItem(-1, "");
         for (int i = 0; i < ClientGuardianRelationType.values().length; i++) {
             result[i+1] = new SelectItem(i, ClientGuardianRelationType.fromInteger(i).toString());
+        }
+        return result;
+    }
+
+    public SelectItem[] getRepresentativeList() {
+        SelectItem[] result = new SelectItem[ClientGuardianRepresentType.values().length];
+        int i = 0;
+        for (ClientGuardianRepresentType type : ClientGuardianRepresentType.values()) {
+            result[i] = new SelectItem(type.getCode(), type.getDescription());
+            i++;
         }
         return result;
     }
