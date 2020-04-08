@@ -76,6 +76,8 @@ public class TurnstileSettingsRequestProcessor extends AbstractProcessor<ResTurn
                                 turnstileSettings.setIsReadsLongIdsIncorrectly(trItem.getIsReadsLongIdsIncorrectly());
                                 turnstileSettings.setLastUpdateForTurnstile(trItem.getLastUpdateForTurnstileSetting());
                                 turnstileSettings.setNumOfEntries(numOfEntries);
+                                turnstileSettings.setVersion(nextVersion);
+                                session.save(turnstileSettings);
                             } else {
                                 errorMessage.append("Section TR not found ");
                                 status = 0;
@@ -86,8 +88,6 @@ public class TurnstileSettingsRequestProcessor extends AbstractProcessor<ResTurn
             }
 
             items.add(new ResTurnstileSettingsRequestItem(status, errorMessage.toString()));
-            turnstileSettings.setVersion(nextVersion);
-            session.save(turnstileSettings);
         } catch (Exception e) {
             logger.error("Error saving TurnstileSettingRequest", e);
             return null;

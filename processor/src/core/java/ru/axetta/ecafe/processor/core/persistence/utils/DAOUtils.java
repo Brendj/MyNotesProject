@@ -5007,12 +5007,4 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("usedByModule", usedByModule));
         return (HardwareSettingsReaders) criteria.uniqueResult();
     }
-
-    public static TurnstileSettings getTurnstileSettingsById(Session session, String turnstileId) throws Exception {
-        Criteria criteria = session.createCriteria(TurnstileSettings.class);
-        criteria.add(Restrictions.eq("turnstileId", turnstileId));
-        return (TurnstileSettings) criteria.uniqueResult();
-    }
-
-
 }

@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request;
 
+import ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT;
+import ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
@@ -41,8 +43,10 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
 
             for (List<HardwareSettingsRequestItem> sectionItem : hardwareSettingsRequest.getSectionItem()) {
                 ru.axetta.ecafe.processor.core.persistence.HardwareSettings hardwareSettings = null;
-                ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT hardwareSettingsMT = null;
-                ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders hardwareSettingsReaders = null;
+                ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT hardwareSettingsMT = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT();
+                ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders hardwareSettingsReaders = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders();
+                List<HardwareSettingsMT> tempMT = new ArrayList<>();
+                List<HardwareSettingsReaders> tempReaders = new ArrayList<>();
 
                 for (HardwareSettingsRequestItem item : sectionItem) {
                     String moduleType = item.getType();
@@ -68,17 +72,10 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         case "MT":
                             if (!errorFound && hardwareSettings != null) {
                                 HardwareSettingsRequestMTItem mtItem = (HardwareSettingsRequestMTItem) item;
-                                hardwareSettingsMT = DAOUtils.getHardwareSettingsMTByIdAndModuleType(session,
-                                        hardwareSettings.getIdOfHardwareSetting(), mtItem.getValue());
-
-                                if (null == hardwareSettingsMT) {
-                                    hardwareSettingsMT = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT();
-                                }
                                 hardwareSettingsMT.setModuleType(mtItem.getValue());
                                 hardwareSettingsMT.setInstallStatus(mtItem.getInstallStatus());
                                 hardwareSettingsMT.setLastUpdate(mtItem.getLastUpdate());
-                                hardwareSettingsMT.setHardwareSettings(hardwareSettings);
-                                session.save(hardwareSettingsMT);
+                                tempMT.add(hardwareSettingsMT);
                             } else {
                                 errorMessage.append("Section MT not found ");
                                 status = 0;
@@ -139,17 +136,11 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         case "CR":
                             if (!errorFound && hardwareSettings != null) {
                                 HardwareSettingsRequestCRItem crItem = (HardwareSettingsRequestCRItem) item;
-                                hardwareSettingsReaders = DAOUtils
-                                        .getHardwareSettingsReadersByIdAndUsedByModule(session,
-                                                hardwareSettings.getIdOfHardwareSetting(), crItem.getUsedByModule());
-                                if (null == hardwareSettingsReaders) {
-                                    hardwareSettingsReaders = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders();
-                                }
                                 hardwareSettingsReaders.setUsedByModule(crItem.getUsedByModule());
                                 hardwareSettingsReaders.setReaderName(crItem.getReaderName());
                                 hardwareSettingsReaders.setFirmwareVer(crItem.getFirmwareVer());
                                 hardwareSettingsReaders.setLastUpdateForReader(crItem.getLastUpdate());
-                                hardwareSettingsReaders.setHardwareSettings(hardwareSettings);
+                                tempReaders.add(hardwareSettingsReaders);
                             } else {
                                 errorMessage.append("Section CR not found ");
                                 status = 0;
@@ -157,11 +148,37 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                             break;
                     }
                 }
-                items.add(new ResHardwareSettingsRequestItem(status, errorMessage.toString()));
                 hardwareSettings.setVersion(nextVersion);
                 session.save(hardwareSettings);
-                session.save(hardwareSettingsMT);
-                session.save(hardwareSettingsReaders);
+                for (HardwareSettingsMT mt : tempMT) {
+                    hardwareSettingsMT = DAOUtils
+                            .getHardwareSettingsMTByIdAndModuleType(session, hardwareSettings.getIdOfHardwareSetting(),
+                                    mt.getModuleType());
+
+                    if (null == hardwareSettingsMT) {
+                        hardwareSettingsMT = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT();
+                    }
+                    hardwareSettingsMT.setHardwareSettings(hardwareSettings);
+                    hardwareSettingsMT.setModuleType(mt.getModuleType());
+                    hardwareSettingsMT.setInstallStatus(mt.getInstallStatus());
+                    hardwareSettingsMT.setLastUpdate(mt.getLastUpdate());
+                    session.save(hardwareSettingsMT);
+                }
+
+                for (HardwareSettingsReaders readers : tempReaders) {
+                    hardwareSettingsReaders = DAOUtils.getHardwareSettingsReadersByIdAndUsedByModule(session,
+                            hardwareSettings.getIdOfHardwareSetting(), readers.getUsedByModule());
+                    if (null == hardwareSettingsReaders) {
+                        hardwareSettingsReaders = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders();
+                    }
+                    hardwareSettingsReaders.setHardwareSettings(hardwareSettings);
+                    hardwareSettingsReaders.setUsedByModule(readers.getUsedByModule());
+                    hardwareSettingsReaders.setReaderName(readers.getReaderName());
+                    hardwareSettingsReaders.setFirmwareVer(readers.getFirmwareVer());
+                    hardwareSettingsReaders.setLastUpdateForReader(readers.getLastUpdateForReader());
+                    session.save(hardwareSettingsReaders);
+                }
+                items.add(new ResHardwareSettingsRequestItem(status, errorMessage.toString()));
             }
         } catch (Exception e) {
             logger.error("Error saving HardwareSettingsRequest", e);
