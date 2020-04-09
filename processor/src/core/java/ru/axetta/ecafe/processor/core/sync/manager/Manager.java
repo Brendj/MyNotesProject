@@ -786,15 +786,11 @@ public class Manager implements AbstractToElement {
                 try {
                     Long temp = distributedObject.getGlobalVersion();
                     distributedObject.setGlobalVersion(0L);
-                    Long count = 0L;
                     if ((DistributedObject)distributedObject instanceof GoodRequestPosition) {
-                        count = ((GoodRequestPosition) ((DistributedObject) distributedObject)).getTotalCount();
                         ((GoodRequestPosition) ((DistributedObject) distributedObject)).setTotalCount(0L);
                     }
                     processDistributedObject(persistenceSession, distributedObject,
                             currentMaxVersion, currentDO);
-                    if ((DistributedObject)distributedObject instanceof GoodRequestPosition)
-                        ((GoodRequestPosition)((DistributedObject)distributedObject)).setTotalCount(count);
                     persistenceSession.flush();
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
@@ -858,15 +854,11 @@ public class Manager implements AbstractToElement {
                 try {
                     Long temp = distributedObject.getGlobalVersion();
                     distributedObject.setGlobalVersion(0L);
-                    Long count = 0L;
                     if ((DistributedObject)distributedObject instanceof GoodRequestPosition) {
-                        count = ((GoodRequestPosition) ((DistributedObject) distributedObject)).getTotalCount();
                         ((GoodRequestPosition) ((DistributedObject) distributedObject)).setTotalCount(0L);
                     }
                     processDistributedObject(persistenceSession, distributedObject,
                             currentMaxVersion, currentDO);
-                    if ((DistributedObject)distributedObject instanceof GoodRequestPosition)
-                        ((GoodRequestPosition)((DistributedObject)distributedObject)).setTotalCount(count);
                     persistenceSession.flush();
                     persistenceTransaction.commit();
                     persistenceTransaction = null;
