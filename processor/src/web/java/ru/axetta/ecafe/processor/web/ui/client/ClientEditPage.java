@@ -1167,15 +1167,20 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             return;
         }
         StringBuilder notValidGuardianSB = new StringBuilder();
+        StringBuilder notValidRepresentative = new StringBuilder();
         for(ClientGuardianItem item : clientGuardianItems){
             if(item.getRelation().equals(-1)){
-                notValidGuardianSB.append(item.getPersonName());
-                notValidGuardianSB.append(" ");
+                notValidGuardianSB.append(item.getPersonName()).append(" ");
+            }
+            if (item.getRepresentativeType() <= ClientGuardianRepresentType.UNKNOWN.getCode()) {
+                notValidRepresentative.append(item.getPersonName()).append(" ");
             }
         }
-        if(notValidGuardianSB.length() != 0){
-            throw new Exception("У следующих опекунов не указан степень родства: "
-                    + notValidGuardianSB.toString());
+        if(notValidGuardianSB.length() > 0){
+            throw new Exception("У следующих опекунов не указана степень родства: " + notValidGuardianSB.toString());
+        }
+        if (notValidRepresentative.length() > 0) {
+            throw new Exception("У следующих опекунов не указаны полномочия: " + notValidRepresentative.toString());
         }
     }
 
