@@ -137,16 +137,16 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
 
                 if (!specialDate.isEmpty()) {
                     //1.5.2 - 1.5.3
-                    currentDate = CalendarUtils.addOneDay(currentDate);
-                    boolean flag1 = false;
+                    boolean flag1 = true;
                     for (SpecialDate specialDate1 : specialDate) {
-                        if (specialDate1.getIsWeekend())
-                        //1.6
+                        if (!specialDate1.getIsWeekend())
+                        //Если работает хотя бы одна группа, то орг работает
                         {
-                            flag1 = true;
+                            flag1 = false;
+                            break;
                         }
                     }
-                    //1.7
+                    currentDate = CalendarUtils.addOneDay(currentDate);
                     if (!flag1)
                         countBadDaysCurrent++;
                 } else {
@@ -201,13 +201,13 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
                 }
                 //1.4.1
                 for (SpecialDate specialDate1 : specialDate) {
-                    if (specialDate1.getIsWeekend())
+                    if (!specialDate1.getIsWeekend())
                     //1.7
                     {
-                        return false;
+                        return true;
                     }
                 }
-                return true;
+                return false;
 
                 //1.4.2
                 //boolean groupWeekend = true;
@@ -264,14 +264,14 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
                 if (!specialDate.isEmpty()) {
                     //1.5.2 - 1.5.3
                     for (SpecialDate specialDate1 : specialDate) {
-                        if (specialDate1.getIsWeekend())
-                        //1.6
+                        if (!specialDate1.getIsWeekend())
+                        //1.7
                         {
-                            return false;
+                            return true;
                         }
                     }
-                    //1.7
-                    return true;
+                    //1.6
+                    return false;
                 } else {
                     //1.5.4
                     if (CalendarUtils.getDayOfWeek(dateDone) == Calendar.SATURDAY) {
