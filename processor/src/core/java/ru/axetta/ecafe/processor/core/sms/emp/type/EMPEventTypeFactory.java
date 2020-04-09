@@ -37,6 +37,8 @@ public class EMPEventTypeFactory {
     public static final int INFO_MAILING_EVENT        = 901240056;
     public static final int CLIENT_NEWPASSWORD_EVENT  = 901240057;
     public static final int SPECIAL_TYPE_EVENT        = 901240018;
+    public static final int END_BENEFIT               = 901240019;
+    public static final int REFUSAL_PREFERENTIAL_FOOD = 901240020;
 
 
     //Параметр modifired введен для определения: точно ли произошедшее событие соответствует коду события по умолчанию
