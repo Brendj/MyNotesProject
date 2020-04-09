@@ -4968,9 +4968,10 @@ public class DAOUtils {
     }
 
     public static HardwareSettings getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(Session session,
-            Long idOfHardwareSetting) throws Exception {
+            Long idOfHardwareSetting, Long idOfOrg) throws Exception {
         Criteria criteria = session.createCriteria(HardwareSettings.class);
         criteria.add(Restrictions.eq("idOfHardwareSetting", idOfHardwareSetting));
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
         return (HardwareSettings) criteria.uniqueResult();
     }
 

@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request;
 
 import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.items.*;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
-import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
 
@@ -21,7 +20,6 @@ public class HardwareSettingsRequest implements SectionRequest {
     public static final String SECTION_NAME = "HardwareSettings";
 
     private final Long orgOwner;
-    private final Long maxVersion;
     private final List<List<HardwareSettingsRequestItem>> sectionItem;
 
     public enum ModuleType {
@@ -58,7 +56,6 @@ public class HardwareSettingsRequest implements SectionRequest {
     public HardwareSettingsRequest(Node hardwareSettingNode, Long orgOwner) {
 
         this.orgOwner = orgOwner;
-        maxVersion = XMLUtils.getLongAttributeValue(hardwareSettingNode, "V");
         this.sectionItem = new ArrayList<List<HardwareSettingsRequestItem>>();
         List<HardwareSettingsRequestItem> items;
 
@@ -127,10 +124,6 @@ public class HardwareSettingsRequest implements SectionRequest {
 
     public Long getOrgOwner() {
         return orgOwner;
-    }
-
-    public Long getMaxVersion() {
-        return maxVersion;
     }
 
     public List<List<HardwareSettingsRequestItem>> getSectionItem() {

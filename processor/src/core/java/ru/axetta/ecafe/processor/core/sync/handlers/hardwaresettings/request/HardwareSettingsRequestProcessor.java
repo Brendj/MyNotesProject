@@ -57,7 +57,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                                 HardwareSettingsRequestHSItem hsItem = (HardwareSettingsRequestHSItem) item;
                                 hardwareSettings = DAOUtils
                                         .getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(session,
-                                                hsItem.getIdOfHardwareSetting());
+                                                hsItem.getIdOfHardwareSetting(), orgOwner);
                                 if (null == hardwareSettings) {
                                     hardwareSettings = new ru.axetta.ecafe.processor.core.persistence.HardwareSettings();
                                     Org org = (Org) session.get(Org.class, orgOwner);
