@@ -1716,7 +1716,7 @@ public class ClientManager {
     }
 
     public static void createMigrationForGuardianWithConfirm(Session session, Client guardian, Date fireTime, Org orgVisit,
-            MigrantInitiatorEnum initiator) {
+            MigrantInitiatorEnum initiator, int years) {
         Long idOfProcessorMigrantRequest = MigrantsUtils
                 .nextIdOfProcessorMigrantRequest(session, guardian.getOrg().getIdOfOrg());
         CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
@@ -1726,7 +1726,7 @@ public class ClientManager {
                         fireTime);
 
         Migrant migrantNew = new Migrant(compositeIdOfMigrant, guardian.getOrg().getDefaultSupplier(),
-                requestNumber, guardian, orgVisit, fireTime, CalendarUtils.addYear(fireTime, 10),
+                requestNumber, guardian, orgVisit, fireTime, CalendarUtils.addYear(fireTime, years),
                 Migrant.NOT_SYNCHRONIZED);
         migrantNew.setInitiator(initiator);
         session.save(migrantNew);

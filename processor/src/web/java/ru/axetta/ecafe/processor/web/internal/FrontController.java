@@ -2407,7 +2407,8 @@ public class FrontController extends HttpServlet {
             }
 
             if (!DAOUtils.isFriendlyOrganizations(persistenceSession, guardian.getOrg(), child.getOrg())) {
-                ClientManager.createMigrationForGuardianWithConfirm(persistenceSession, guardian, fireTime, org, MigrantInitiatorEnum.INITIATOR_ORG);
+                ClientManager.createMigrationForGuardianWithConfirm(persistenceSession, guardian, fireTime, org,
+                        MigrantInitiatorEnum.INITIATOR_ORG, 10);
                 result.code = ResponseItem.OK;
                 result.message = ResponseItem.OK_MESSAGE;
             }
