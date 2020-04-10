@@ -110,8 +110,8 @@ public class HardwareSettingsRequest implements SectionRequest {
                     itemNode = itemNode.getNextSibling();
                 }
                 sectionItem.add(items);
-                hsNode = hsNode.getNextSibling();
             }
+            hsNode = hsNode.getNextSibling();
         }
     }
 
