@@ -174,25 +174,23 @@ public class ClientMigrationHistoryService {
                     boolean hasChildrenInOtherOrg = false;
                     List<Client> children = ClientManager.findChildsByClient(session, guardian.getIdOfClient(), true);
                     for (Client child : children) {
-                        if (!child.equals(clientMigration.getClient()) && !DAOUtils.isFriendlyOrganizations(session, child.getOrg(), guardian.getOrg())) {
+                        if (!child.equals(clientMigration.getClient()) && !DAOUtils.isFriendlyOrganizations(session, child.getOrg(), clientMigration.getOrg())) {
                             hasChildrenInOtherOrg = true;
                             break;
                         }
                     }
-                    if (!hasChildrenInOtherOrg) {
+                    if (!hasChildrenInOtherOrg && guardian.isParent()) {
                         //нет детей в других организациях. Можно перевести родителя в ОО ребенка
-                        if (guardian.isParent()) {
-                            //перевод в оргу клиента
-                            guardian.setOrg(clientMigration.getOrg());
-                            guardian.setUpdateTime(new Date());
-                            long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
-                            guardian.setClientRegistryVersion(clientRegistryVersion);
-                            session.update(guardian);
+                        guardian.setOrg(clientMigration.getOrg());
+                        guardian.setUpdateTime(new Date());
+                        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+                        guardian.setClientRegistryVersion(clientRegistryVersion);
+                        session.update(guardian);
 
-                            ClientManager.addClientMigrationEntry(session, clientMigration.getOldOrg(), clientMigration.getOrg(),
-                                    guardian, ClientGroupMigrationHistory.MODIFY_AUTO_MODE, guardian.getClientGroup().getGroupName());
-                        }
-                    } else if (guardian.isSotrudnikMsk()) {
+                        ClientManager.addClientMigrationEntry(session, clientMigration.getOldOrg(), clientMigration.getOrg(),
+                                guardian, ClientGroupMigrationHistory.MODIFY_AUTO_MODE, guardian.getClientGroup().getGroupName());
+                    }
+                    if (guardian.isSotrudnikMsk() || hasChildrenInOtherOrg) {
                         //есть дети в других ОО, создаем заявку на посещение
                         ClientManager.createMigrationForGuardianWithConfirm(session, guardian, new Date(), clientMigration.getOrg(), MigrantInitiatorEnum.INITIATOR_PROCESSING);
                     }
