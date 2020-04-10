@@ -15,7 +15,7 @@ public class EMPExitCultureEventType extends EMPAbstractEventType {
 
     public EMPExitCultureEventType() {
         stream = STREAM;
-        type = EMPEventTypeFactory.LEAVE_EVENT;
+        type = EMPEventTypeFactory.LEAVE_CULTURE;
         name = NAME;
         text = TEXT;
     }

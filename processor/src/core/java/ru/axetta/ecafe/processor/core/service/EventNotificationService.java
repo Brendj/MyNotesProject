@@ -973,9 +973,9 @@ public class EventNotificationService {
                 }
             } else if (type.equals(NOTIFICATION_ENTER_CULTURE)) {
                 if (dataClient != null) {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_EVENT, dataClient, destClient, 1);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_CULTURE, dataClient, destClient, 0);
                 } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_EVENT, destClient, 1);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_CULTURE, destClient, 0);
                 }
             } else if (type.equals(NOTIFICATION_EXIT_CULTURE)) {
                 if (dataClient != null) {

@@ -39,6 +39,8 @@ public class EMPEventTypeFactory {
     public static final int SPECIAL_TYPE_EVENT        = 901240018;
     public static final int END_BENEFIT               = 901240019;
     public static final int REFUSAL_PREFERENTIAL_FOOD = 901240020;
+    public static final int ENTER_CULTURE             = 901240021;
+    public static final int LEAVE_CULTURE              = 901240022;
 
 
     //Параметр modifired введен для определения: точно ли произошедшее событие соответствует коду события по умолчанию
@@ -68,16 +70,16 @@ public class EMPEventTypeFactory {
         EMPEventType event;
         switch (type) {
             case ENTER_EVENT:
-                if (modifired == 1)
-                    event = new EMPEnterCultureEventType();
-                else
-                    event = new EMPEnterEventType();
+                event = new EMPEnterEventType();
                 break;
             case LEAVE_EVENT:
-                if (modifired == 1)
-                    event = new EMPExitCultureEventType();
-                else
-                    event = new EMPLeaveEventType();
+                event = new EMPLeaveEventType();
+                break;
+            case ENTER_CULTURE:
+                event = new EMPEnterCultureEventType();
+                break;
+            case LEAVE_CULTURE:
+                event = new EMPExitCultureEventType();
                 break;
             case ENTER_WITH_GUARDIAN_EVENT:
                 event = new EMPEnterWithGuardianEventType();

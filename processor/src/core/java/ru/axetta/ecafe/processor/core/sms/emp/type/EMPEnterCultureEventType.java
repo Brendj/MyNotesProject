@@ -15,7 +15,7 @@ public class EMPEnterCultureEventType extends EMPAbstractEventType {
 
     public EMPEnterCultureEventType() {
         stream = STREAM;
-        type = EMPEventTypeFactory.ENTER_EVENT;
+        type = EMPEventTypeFactory.ENTER_CULTURE;
         name = NAME;
         text = TEXT;
     }
