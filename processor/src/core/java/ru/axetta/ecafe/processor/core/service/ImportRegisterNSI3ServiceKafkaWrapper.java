@@ -68,13 +68,16 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                     + "              prll.title AS parallel,\n"
                     + "              p.classname,\n"
                     + "              p.deletestate,\n"
-                    + "              ag.title AS agegroup,\n"
+                    + "              ag.title AS agegroup,"
+                    + "              p.organizationid\n"
                     + "       FROM cf_mh_persons AS p\n"
-                    + "                   JOIN cf_orgs AS o ON p.ekisid = o.ekisid\n"
+                    + "                   JOIN cf_orgs AS o ON p.organizationid = o.organizationIdFromNSI\n"
                     + "                   JOIN cf_kf_ct_age_group AS ag ON p.agegroupid = ag.id\n"
                     + "                   LEFT JOIN cf_kf_ct_gender AS g ON p.genderid = g.id\n"
                     + "                   LEFT JOIN cf_kf_ct_parallel AS prll ON p.parallelid = prll.id\n"
-                    + ") SELECT * FROM pupils_info as pi WHERE p.ekisId in :guids ";
+                    + ") SELECT * FROM pupils_info as pi "
+                    + " JOIN cf_orgs AS o ON pi.organizationid = o.organizationIdFromNSI "
+                    + " WHERE o.ekisId in :guids ";
         }
     }
 
