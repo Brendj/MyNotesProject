@@ -63,53 +63,55 @@ public class HardwareSettingsRequest implements SectionRequest {
         Node hsNode = hardwareSettingNode.getFirstChild();
 
         while (null != hsNode) {
-            HardwareSettingsRequestHSItem hsItem = null;
-            items = new ArrayList<HardwareSettingsRequestItem>();
-            hsItem = HardwareSettingsRequestHSItem.build(hsNode);
-            items.add(hsItem);
-            Node itemNode = hsNode.getFirstChild();
-            while (null != itemNode) {
-                if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
-                    ModuleType moduleType = ModuleType.fromString(itemNode.getNodeName());
-                    HardwareSettingsRequestItem item = null;
-                    if (moduleType == null) {
-                        itemNode = itemNode.getNextSibling();
-                        continue;
-                    }
-                    switch (moduleType) {
-                        case MT:
-                            item = HardwareSettingsRequestMTItem.build(itemNode);
-                            break;
-                        case IP:
-                            item = HardwareSettingsRequestIPItem.build(itemNode);
-                            break;
-                        case DOTNETVER:
-                            item = HardwareSettingsRequestDotNetVerItem.build(itemNode);
-                            break;
-                        case OSVER:
-                            item = HardwareSettingsRequestOsVerItem.build(itemNode);
-                            break;
-                        case RAM:
-                            item = HardwareSettingsRequestRAMItem.build(itemNode);
-                            break;
-                        case CPU:
-                            item = HardwareSettingsRequestCPUItem.build(itemNode);
-                            break;
-                        case READERS:
-                            Node readersNode = itemNode.getFirstChild();
-                            while (null != readersNode) {
-                                item = HardwareSettingsRequestCRItem.build(readersNode);
-                                readersNode = readersNode.getNextSibling();
-                            }
+            if (Node.ELEMENT_NODE == hsNode.getNodeType() && hsNode.getNodeName().equals("HS")) {
+                HardwareSettingsRequestHSItem hsItem = null;
+                items = new ArrayList<HardwareSettingsRequestItem>();
+                hsItem = HardwareSettingsRequestHSItem.build(hsNode);
+                items.add(hsItem);
+                Node itemNode = hsNode.getFirstChild();
+                while (null != itemNode) {
+                    if (Node.ELEMENT_NODE == itemNode.getNodeType()) {
+                        ModuleType moduleType = ModuleType.fromString(itemNode.getNodeName());
+                        HardwareSettingsRequestItem item = null;
+                        if (moduleType == null) {
+                            itemNode = itemNode.getNextSibling();
+                            continue;
+                        }
+                        switch (moduleType) {
+                            case MT:
+                                item = HardwareSettingsRequestMTItem.build(itemNode);
+                                break;
+                            case IP:
+                                item = HardwareSettingsRequestIPItem.build(itemNode);
+                                break;
+                            case DOTNETVER:
+                                item = HardwareSettingsRequestDotNetVerItem.build(itemNode);
+                                break;
+                            case OSVER:
+                                item = HardwareSettingsRequestOsVerItem.build(itemNode);
+                                break;
+                            case RAM:
+                                item = HardwareSettingsRequestRAMItem.build(itemNode);
+                                break;
+                            case CPU:
+                                item = HardwareSettingsRequestCPUItem.build(itemNode);
+                                break;
+                            case READERS:
+                                Node readersNode = itemNode.getFirstChild();
+                                while (null != readersNode) {
+                                    item = HardwareSettingsRequestCRItem.build(readersNode);
+                                    readersNode = readersNode.getNextSibling();
+                                }
 
-                            break;
+                                break;
+                        }
+                        items.add(item);
                     }
-                    items.add(item);
+                    itemNode = itemNode.getNextSibling();
                 }
-                itemNode = itemNode.getNextSibling();
+                sectionItem.add(items);
+                hsNode = hsNode.getNextSibling();
             }
-            sectionItem.add(items);
-            hsNode = hsNode.getNextSibling();
         }
     }
 

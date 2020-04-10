@@ -67,19 +67,7 @@ public class XMLUtils {
     }
 
     public static String getAttributeValue(Node node, String attributeName) {
-        Node attribute = null;
-        try {
-            attribute = node.getAttributes().getNamedItem(attributeName);
-        } catch (NullPointerException e) {
-            System.out.print("node = ");
-            System.out.println(node);
-            System.out.print("node.getAttributes = ");
-            System.out.println(node.getAttributes());
-            System.out.print("getNamedItem = ");
-            System.out.println(node.getAttributes().getNamedItem(attributeName));
-            System.out.print("attributeName = ");
-            System.out.println(attributeName);
-        }
+        Node attribute = node.getAttributes().getNamedItem(attributeName);
         return attribute == null ? null : attribute.getTextContent().trim();
     }
 
