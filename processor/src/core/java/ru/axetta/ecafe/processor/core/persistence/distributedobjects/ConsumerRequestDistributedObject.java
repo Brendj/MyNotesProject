@@ -207,7 +207,12 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
                         return true;
                     }
                 }
-                return false;
+                //Если не найдены даты, то день хороший
+                if (specialDate.isEmpty())
+                    return true;
+                else
+                    //Значит у всех групп в ОО выходной
+                    return false;
 
                 //1.4.2
                 //boolean groupWeekend = true;
