@@ -148,6 +148,9 @@ public class EMPEventTypeFactory {
             case LEAVE_WITH_CHECKER:
                 event = new EMPLeaveWithCheckerEventType();
                 break;
+            case END_BENEFIT:
+                event = new EMPEndBenefitType(values);
+                break;
             case SPECIAL_TYPE_EVENT:
                 switch (modifired)
                 {

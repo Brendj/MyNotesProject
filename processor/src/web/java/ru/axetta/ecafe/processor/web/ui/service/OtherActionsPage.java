@@ -177,6 +177,12 @@ public class OtherActionsPage extends OnlineReportPage {
         printMessage("Очистка выполнена. Смотри лог");
     }
 
+    public void endBenefitNotification() {
+        BenefitService service = RuntimeContext.getAppContext().getBean(BenefitService.class);
+        service.runEndBenefit(true);
+        printMessage("Оповещения об окончании срока действия льготы отправлены. Смотри лог");
+    }
+
     public void runSendEMPEventEMIAS() throws Exception {
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;

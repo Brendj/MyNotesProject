@@ -58,13 +58,17 @@ public class BenefitService {
     @PersistenceContext(unitName = "reportsPU")
     private EntityManager entityManager;
 
-    final String JOB_NAME_END_BENEFIT="NotificationEndBenefit";
-    final String JOB_NAME_PREFERENTIAL_FOOD="NotificationPreferentialFood";
+    final static String JOB_NAME_END_BENEFIT="NotificationEndBenefit";
+    final static String JOB_NAME_PREFERENTIAL_FOOD="NotificationPreferentialFood";
+    public final static String ORG_NAME="OrgName";
+    public final static String DATE_END_DISCOUNT="DateEndDiscount";
+    public final static String DTISZN_CODE="DtisznCode";
+    public final static String DTISZN_DESCRIPTION="OrgName";
 
     public class NotificationEndBenefit implements Job {
         @Override
         public void execute(JobExecutionContext arg0) throws JobExecutionException {
-            RuntimeContext.getAppContext().getBean(BenefitService.class).runEndBenefit();
+            RuntimeContext.getAppContext().getBean(BenefitService.class).runEndBenefit(false);
         }
     }
     public class NotificationPreferentialFood implements Job {
@@ -108,9 +112,9 @@ public class BenefitService {
         }
     }
 
-    public void runEndBenefit() {
-        Date startDate = new Date(System.currentTimeMillis());
-        Date endDate = DateUtils.addDays(startDate, -1);
+    public void runEndBenefit(boolean forTest) {
+        Date endDate = new Date(System.currentTimeMillis());
+        Date startDate = DateUtils.addDays(endDate, -7);
 
         Session session = null;
         Transaction transaction = null;
@@ -124,16 +128,13 @@ public class BenefitService {
                 Client client = clientDtisznDiscountInfo.getClient();
 
                 String[] values = new String[]{
-                        "surname", client.getPerson().getSurname(),
-                        "name", client.getPerson().getFirstName(),
-                        "surname", client.getPerson().getSurname(),
-                        "OrgName", client.getOrg().getShortName(),
-                        "account", client.getContractId().toString(),
-                        "DateEndDiscount",  CalendarUtils.dateToString(clientDtisznDiscountInfo.getDateEnd()),
-                        "DtisznCode", clientDtisznDiscountInfo.getDtisznCode().toString(),
-                        "DtisznDescription", clientDtisznDiscountInfo.getDtisznDescription()};
+                        ORG_NAME, client.getOrg().getShortName(),
+                        DATE_END_DISCOUNT,  CalendarUtils.dateToString(clientDtisznDiscountInfo.getDateEnd()),
+                        DTISZN_CODE, clientDtisznDiscountInfo.getDtisznCode().toString(),
+                        DTISZN_DESCRIPTION, clientDtisznDiscountInfo.getDtisznDescription()};
                 values = EventNotificationService.attachGenderToValues(client.getGender(), values);
-
+                if (forTest)
+                    values = attachValue(values, "TEST", "true");
                 RuntimeContext.getAppContext().getBean(EventNotificationService.class)
                         .sendNotification(client, null,
                                 EventNotificationService.NOTIFICATION_END_BENEFIT, values, startDate);
@@ -148,6 +149,14 @@ public class BenefitService {
             HibernateUtils.close(session, logger);
         }
 
+    }
+
+    private String[] attachValue(String[] values, String name, String value) {
+        String[] newValues = new String[values.length + 2];
+        System.arraycopy(values, 0, newValues, 0, values.length);
+        newValues[newValues.length-2] = name;
+        newValues[newValues.length-1] = value;
+        return newValues;
     }
 
     public void runPreferentialFood() {

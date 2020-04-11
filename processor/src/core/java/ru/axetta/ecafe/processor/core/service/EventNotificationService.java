@@ -499,14 +499,20 @@ public class EventNotificationService {
             return false;
         }
         String text = getNotificationText(type, TYPE_SMS);
-        if (text == null) {
-            logger.warn("No notification SMS text is specified for type '" + type + "'. SMS is not sent");
-            return false;
-        }
-        text = formatMessage(text, values);
+        if (type != NOTIFICATION_END_BENEFIT && type != NOTIFICATION_PREFERENTIAL_FOOD) {
+            if (text == null) {
+                logger.warn("No notification SMS text is specified for type '" + type + "'. SMS is not sent");
+                return false;
+            }
+            text = formatMessage(text, values);
 
-        if (text.length() > 68) {
-            text = text.substring(0, 67) + "..";
+            if (text.length() > 68) {
+                text = text.substring(0, 67) + "..";
+            }
+        }
+        else
+        {
+            text = "Новый тип уведомлений";
         }
         boolean result = false;
         try {
@@ -977,6 +983,13 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.NOENTER_MUSEUM_EVENT, dataClient, destClient, values);
                 } else {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.NOENTER_MUSEUM_EVENT, destClient, values);
+                }
+                putGenderParams(empType, values);
+            } else if (type.equals(NOTIFICATION_END_BENEFIT)) {
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.END_BENEFIT, dataClient, destClient, values);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.END_BENEFIT, destClient, values);
                 }
                 putGenderParams(empType, values);
             } else if (type.equals(NOTIFICATION_ENTER_CULTURE)) {
