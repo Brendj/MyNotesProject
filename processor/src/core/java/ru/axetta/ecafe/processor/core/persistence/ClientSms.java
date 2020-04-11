@@ -56,6 +56,8 @@ public class ClientSms {
     public static final int TYPE_ENTER_MUSEUM_NOTIFICATION = 14;
     public static final int TYPE_NOENTER_MUSEUM_NOTIFICATION = 15;
     public static final int TYPE_CLIENT_NEWPASSWORD_NOTIFICATION = 16;
+    public static final int TYPE_CLIENT_END_BENEFIT_NOTIFICATION = 19;
+    public static final int TYPE_CLIENT_PREFERENTIAL_FOOD_NOTIFICATION = 20;
     public static final int TYPE_ENTER_CULTURE_NOTIFICATION = 21;
     public static final int TYPE_EXIT_CULTURE_NOTIFICATION = 22;
     public static final int TYPE_NOTIFICATION_START_SICK = 23;

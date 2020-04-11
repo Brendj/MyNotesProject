@@ -5,6 +5,8 @@
 package ru.axetta.ecafe.processor.core.sms.emp.type;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
+import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
 
 import java.util.Map;
 
@@ -13,11 +15,19 @@ public class EMPEnterCultureEventType extends EMPAbstractEventType {
     protected static final String TEXT = "%empDate% в %empTimeH% %surname% %name% зашел в здание культуры по адресу: %address%(%shortnameinfoservice%)";
 
 
-    public EMPEnterCultureEventType() {
+    public EMPEnterCultureEventType(String [] values) {
         stream = STREAM;
         type = EMPEventTypeFactory.ENTER_CULTURE;
         name = NAME;
         text = TEXT;
+        String eventAdress = findValueInParams(new String[]{ExternalEventNotificationService.ADDRESS}, values);
+        this.getParameters().put(ExternalEventNotificationService.ADDRESS, eventAdress);
+        String eventShortName = findValueInParams(new String[]{ExternalEventNotificationService.SHORTNAMEINFOSERVICE}, values);
+        this.getParameters().put(ExternalEventNotificationService.SHORTNAMEINFOSERVICE, eventShortName);
+        String eventDate = findValueInParams(new String[]{ExternalEventNotificationService.EMP_DATE}, values);
+        this.getParameters().put(ExternalEventNotificationService.EMP_DATE, eventDate);
+        String eventTime = findValueInParams(new String[]{ExternalEventNotificationService.EMP_TIME_H}, values);
+        this.getParameters().put(ExternalEventNotificationService.EMP_TIME_H, eventTime);
     }
 
     @Override
