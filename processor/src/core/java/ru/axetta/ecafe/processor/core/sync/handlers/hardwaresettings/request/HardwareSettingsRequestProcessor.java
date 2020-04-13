@@ -43,7 +43,9 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
 
             for (List<HardwareSettingsRequestItem> sectionItem : hardwareSettingsRequest.getSectionItem()) {
                 ru.axetta.ecafe.processor.core.persistence.HardwareSettings hardwareSettings = null;
-
+                if(sectionItem.isEmpty()) {
+                    System.out.println("sectionItem empty");
+                }
 
                 List<HardwareSettingsMT> tempMT = new ArrayList<>();
                 List<HardwareSettingsReaders> tempReaders = new ArrayList<>();

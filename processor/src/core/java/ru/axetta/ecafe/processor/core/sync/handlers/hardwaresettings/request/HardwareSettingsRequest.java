@@ -100,6 +100,12 @@ public class HardwareSettingsRequest implements SectionRequest {
                                 break;
                             case IP:
                                 item = HardwareSettingsRequestIPItem.build(itemNode);
+                                if (item.getLastUpdate() == null) {
+                                    System.out.println("lastUpdate null");
+                                }
+                                if (((HardwareSettingsRequestIPItem) item).getValue() == null) {
+                                    System.out.println("value null");
+                                }
                                 break;
                             case DOTNETVER:
                                 item = HardwareSettingsRequestDotNetVerItem.build(itemNode);
@@ -132,6 +138,12 @@ public class HardwareSettingsRequest implements SectionRequest {
                     itemNode = itemNode.getNextSibling();
                 }
                 sectionItem.add(items);
+                if(items.isEmpty()) {
+                    System.out.println("empty items");
+                }
+                if(sectionItem.isEmpty()){
+                    System.out.println("empty sectionItem");
+                }
             }
             hsNode = hsNode.getNextSibling();
         }
