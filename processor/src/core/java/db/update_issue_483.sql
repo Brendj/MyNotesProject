@@ -10,7 +10,7 @@ ALTER TABLE cf_kf_organization_registry
   DROP COLUMN subordination_id;
 
 ALTER TABLE cf_orgs
-  ADD COLUMN subordination_value VARCHAR(512),
+  ADD COLUMN subordination VARCHAR(512),
   ADD COLUMN founder VARCHAR(512),
   ADD COLUMN organizationIdFromNSI BIGINT;
 
@@ -25,9 +25,13 @@ FROM ids
 WHERE o.ekisid = ids.ekisID;
 
 ALTER TABLE cf_orgregistrychange
-  ADD COLUMN subordination_value VARCHAR(512),
-  ADD COLUMN founder VARCHAR(512);
+  ADD COLUMN subordination VARCHAR(512),
+  ADD COLUMN founder VARCHAR(512),
+  ADD COLUMN subordinationFrom VARCHAR(512),
+  ADD COLUMN founderFrom VARCHAR(512);
 
 ALTER TABLE cf_orgregistrychange_item
-  ADD COLUMN subordination_value VARCHAR(512),
-  ADD COLUMN founder VARCHAR(512);
+  ADD COLUMN subordination VARCHAR(512),
+  ADD COLUMN founder VARCHAR(512),
+  ADD COLUMN subordinationFrom VARCHAR(512),
+  ADD COLUMN founderFrom VARCHAR(512);

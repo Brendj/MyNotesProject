@@ -69,6 +69,8 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_OFFICIAL_NAME, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_SHORT_NAME, "", ""));
         orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_DIRECTOR, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_FOUNDER, "", ""));
+        orgModifyChangeItems.add(new OrgModifyChangeItem(ImportRegisterOrgsService.VALUE_SUBORDINATION, "", ""));
     }
 
     public String getPageFilename() {
@@ -524,6 +526,14 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
                 item.setOldValue(orgForEdit.getDirectorFrom());
                 item.setNewValue(orgForEdit.getDirectorReestr());
             }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_FOUNDER)) {
+                item.setOldValue(orgForEdit.getFounderFrom());
+                item.setNewValue(orgForEdit.getFounderReestr());
+            }
+            if (item.getValueName().equals(ImportRegisterOrgsService.VALUE_SUBORDINATION)) {
+                item.setOldValue(orgForEdit.getSubordinationFrom());
+                item.setNewValue(orgForEdit.getSubordinationReestr());
+            }
         }
         return orgModifyChangeItems;
     }
@@ -588,6 +598,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
         protected String shortAddressFrom;
         protected String municipalDistrict;
         protected String municipalDistrictFrom;
+        protected String founder;
+        protected String founderFrom;
+        protected String subordination;
+        protected String subordinationFrom;
 
         private boolean selected = false;
 
@@ -1111,5 +1125,36 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return egissoId;
         }
 
+        public String getFounderReestr() {
+            return founder;
+        }
+
+        public void setFounder(String founder) {
+            this.founder = founder;
+        }
+
+        public String getFounderFrom() {
+            return founderFrom;
+        }
+
+        public void setFounderFrom(String founderFrom) {
+            this.founderFrom = founderFrom;
+        }
+
+        public String getSubordinationReestr() {
+            return subordination;
+        }
+
+        public void setSubordination(String subordination) {
+            this.subordination = subordination;
+        }
+
+        public String getSubordinationFrom() {
+            return subordinationFrom;
+        }
+
+        public void setSubordinationFrom(String subordinationFrom) {
+            this.subordinationFrom = subordinationFrom;
+        }
     }
 }
