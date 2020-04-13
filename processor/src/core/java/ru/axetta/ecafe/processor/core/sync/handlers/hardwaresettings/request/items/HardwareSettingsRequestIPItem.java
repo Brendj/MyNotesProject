@@ -19,7 +19,6 @@ public class HardwareSettingsRequestIPItem extends HardwareSettingsRequestItem {
 
     public static HardwareSettingsRequestIPItem build(Node itemNode) {
         String type = "IP";
-
         StringBuilder errorMessage = new StringBuilder();
 
         return new HardwareSettingsRequestIPItem(getValue(itemNode, errorMessage),

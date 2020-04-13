@@ -58,8 +58,6 @@ public class HardwareSettingsRequest implements SectionRequest {
         this.orgOwner = orgOwner;
         this.sectionItem = new ArrayList<List<HardwareSettingsRequestItem>>();
         List<HardwareSettingsRequestItem> items;
-
-
         Node hsNode = hardwareSettingNode.getFirstChild();
 
         while (null != hsNode) {
@@ -67,6 +65,13 @@ public class HardwareSettingsRequest implements SectionRequest {
                 HardwareSettingsRequestHSItem hsItem = null;
                 items = new ArrayList<HardwareSettingsRequestItem>();
                 hsItem = HardwareSettingsRequestHSItem.build(hsNode);
+
+                if (hsItem.getIdOfHardwareSetting() == null) {
+                    System.out.println("hsId null");
+                }
+                if (hsItem.getType() == null) {
+                    System.out.println("hsType null");
+                }
                 items.add(hsItem);
                 Node itemNode = hsNode.getFirstChild();
                 while (null != itemNode) {
@@ -80,6 +85,18 @@ public class HardwareSettingsRequest implements SectionRequest {
                         switch (moduleType) {
                             case MT:
                                 item = HardwareSettingsRequestMTItem.build(itemNode);
+                                if (item.getType() == null) {
+                                    System.out.println("mtType null");
+                                }
+                                if (((HardwareSettingsRequestMTItem) item).getInstallStatus() == null) {
+                                    System.out.println("mtInstallStatus null");
+                                }
+                                if (((HardwareSettingsRequestMTItem) item).getValue() == null) {
+                                    System.out.println("mtValue null");
+                                }
+                                if (item.getLastUpdate() == null) {
+                                    System.out.println("mtLastUpdate");
+                                }
                                 break;
                             case IP:
                                 item = HardwareSettingsRequestIPItem.build(itemNode);
@@ -102,7 +119,7 @@ public class HardwareSettingsRequest implements SectionRequest {
                                     if (Node.ELEMENT_NODE == readersNode.getNodeType()) {
                                         item = HardwareSettingsRequestCRItem.build(readersNode);
                                     }
-                                    if(readersNode.getNextSibling()!=null) {
+                                    if (readersNode.getNextSibling() != null) {
                                         items.add(item);
                                     }
                                     readersNode = readersNode.getNextSibling();

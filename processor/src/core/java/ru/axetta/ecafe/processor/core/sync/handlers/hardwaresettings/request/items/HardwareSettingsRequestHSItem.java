@@ -27,7 +27,7 @@ public class HardwareSettingsRequestHSItem extends HardwareSettingsRequestItem {
         if (null == idOfHardwareSetting) {
             errorMessage.append("Attribute HostId not found");
         }
-        return new HardwareSettingsRequestHSItem(idOfHardwareSetting, type,errorMessage.toString());
+        return new HardwareSettingsRequestHSItem(idOfHardwareSetting, type, errorMessage.toString());
     }
 
     public Long getIdOfHardwareSetting() {
