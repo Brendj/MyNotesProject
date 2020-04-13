@@ -43,8 +43,8 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
 
             for (List<HardwareSettingsRequestItem> sectionItem : hardwareSettingsRequest.getSectionItem()) {
                 ru.axetta.ecafe.processor.core.persistence.HardwareSettings hardwareSettings = null;
-                ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT hardwareSettingsMT = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT();
-                ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders hardwareSettingsReaders = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders();
+
+
                 List<HardwareSettingsMT> tempMT = new ArrayList<>();
                 List<HardwareSettingsReaders> tempReaders = new ArrayList<>();
 
@@ -54,6 +54,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                     switch (moduleType) {
                         case "HS":
                             if (!errorFound) {
+
                                 HardwareSettingsRequestHSItem hsItem = (HardwareSettingsRequestHSItem) item;
                                 hardwareSettings = DAOUtils
                                         .getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(session,
@@ -72,10 +73,11 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         case "MT":
                             if (!errorFound && hardwareSettings != null) {
                                 HardwareSettingsRequestMTItem mtItem = (HardwareSettingsRequestMTItem) item;
-                                hardwareSettingsMT.setModuleType(mtItem.getValue());
-                                hardwareSettingsMT.setInstallStatus(mtItem.getInstallStatus());
-                                hardwareSettingsMT.setLastUpdate(mtItem.getLastUpdate());
-                                tempMT.add(hardwareSettingsMT);
+                                HardwareSettingsMT settingsMT = new HardwareSettingsMT();
+                                settingsMT.setModuleType(mtItem.getValue());
+                                settingsMT.setInstallStatus(mtItem.getInstallStatus());
+                                settingsMT.setLastUpdate(mtItem.getLastUpdate());
+                                tempMT.add(settingsMT);
                             } else {
                                 errorMessage.append("Section MT not found ");
                                 status = 0;
@@ -136,11 +138,12 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         case "CR":
                             if (!errorFound && hardwareSettings != null) {
                                 HardwareSettingsRequestCRItem crItem = (HardwareSettingsRequestCRItem) item;
-                                hardwareSettingsReaders.setUsedByModule(crItem.getUsedByModule());
-                                hardwareSettingsReaders.setReaderName(crItem.getReaderName());
-                                hardwareSettingsReaders.setFirmwareVer(crItem.getFirmwareVer());
-                                hardwareSettingsReaders.setLastUpdateForReader(crItem.getLastUpdate());
-                                tempReaders.add(hardwareSettingsReaders);
+                                HardwareSettingsReaders settingsReaders = new HardwareSettingsReaders();
+                                settingsReaders.setUsedByModule(crItem.getUsedByModule());
+                                settingsReaders.setReaderName(crItem.getReaderName());
+                                settingsReaders.setFirmwareVer(crItem.getFirmwareVer());
+                                settingsReaders.setLastUpdateForReader(crItem.getLastUpdate());
+                                tempReaders.add(settingsReaders);
                             } else {
                                 errorMessage.append("Section CR not found ");
                                 status = 0;
@@ -151,6 +154,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                 hardwareSettings.setVersion(nextVersion);
                 session.save(hardwareSettings);
                 for (HardwareSettingsMT mt : tempMT) {
+                    ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT hardwareSettingsMT;
                     hardwareSettingsMT = DAOUtils
                             .getHardwareSettingsMTByIdAndModuleType(session, hardwareSettings.getIdOfHardwareSetting(),
                                     mt.getModuleType());
@@ -166,6 +170,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                 }
 
                 for (HardwareSettingsReaders readers : tempReaders) {
+                    ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders hardwareSettingsReaders;
                     hardwareSettingsReaders = DAOUtils.getHardwareSettingsReadersByIdAndUsedByModule(session,
                             hardwareSettings.getIdOfHardwareSetting(), readers.getUsedByModule());
                     if (null == hardwareSettingsReaders) {

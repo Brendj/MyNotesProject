@@ -102,9 +102,12 @@ public class HardwareSettingsRequest implements SectionRequest {
                                     if (Node.ELEMENT_NODE == readersNode.getNodeType()) {
                                         item = HardwareSettingsRequestCRItem.build(readersNode);
                                     }
+                                    if(readersNode.getNextSibling()!=null) {
+                                        items.add(item);
+                                    }
                                     readersNode = readersNode.getNextSibling();
-                                }
 
+                                }
                                 break;
                         }
                         items.add(item);
