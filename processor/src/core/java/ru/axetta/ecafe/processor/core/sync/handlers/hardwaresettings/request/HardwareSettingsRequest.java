@@ -99,7 +99,9 @@ public class HardwareSettingsRequest implements SectionRequest {
                             case READERS:
                                 Node readersNode = itemNode.getFirstChild();
                                 while (null != readersNode) {
-                                    item = HardwareSettingsRequestCRItem.build(readersNode);
+                                    if (Node.ELEMENT_NODE == readersNode.getNodeType()) {
+                                        item = HardwareSettingsRequestCRItem.build(readersNode);
+                                    }
                                     readersNode = readersNode.getNextSibling();
                                 }
 

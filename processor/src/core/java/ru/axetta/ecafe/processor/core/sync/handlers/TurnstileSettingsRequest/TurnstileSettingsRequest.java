@@ -71,8 +71,10 @@ public class TurnstileSettingsRequest implements SectionRequest {
                 Node turnstilesNode = tsNode.getFirstChild();
                 Node trNode = turnstilesNode.getFirstChild();
                 while (null != trNode) {
-                    TurnstileSettingsRequestTRItem trItem = TurnstileSettingsRequestTRItem.build(trNode);
-                    items.add(trItem);
+                    if (Node.ELEMENT_NODE == trNode.getNodeType()) {
+                        TurnstileSettingsRequestTRItem trItem = TurnstileSettingsRequestTRItem.build(trNode);
+                        items.add(trItem);
+                    }
                     trNode = trNode.getNextSibling();
                 }
                 sectionItem.add(items);
