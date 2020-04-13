@@ -697,6 +697,10 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             this.shortAddressFrom = registryChangeItem.getShortAddressFrom();
             this.municipalDistrict = registryChangeItem.getMunicipalDistrict();
             this.municipalDistrictFrom = registryChangeItem.getMunicipalDistrictFrom();
+            this.founder = registryChangeItem.getFounder();
+            this.founderFrom = registryChangeItem.getFounderFrom();
+            this.subordination = registryChangeItem.getSubordination();
+            this.subordinationFrom = registryChangeItem.getSubordinationFrom();
 
             this.selected = registryChangeItem.getOperationType().equals(OrgRegistryChange.CREATE_OPERATION) ? false : true;
         }
