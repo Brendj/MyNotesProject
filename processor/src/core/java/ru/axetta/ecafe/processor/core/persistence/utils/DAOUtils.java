@@ -4636,6 +4636,7 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         criteria.add(Restrictions.gt("dateEnd", startDate));
         criteria.add(Restrictions.lt("dateEnd", endDate));
+        criteria.add(Restrictions.not(Restrictions.eq("sendnotification", true)));
         return (List<ClientDtisznDiscountInfo>) criteria.list();
     }
 

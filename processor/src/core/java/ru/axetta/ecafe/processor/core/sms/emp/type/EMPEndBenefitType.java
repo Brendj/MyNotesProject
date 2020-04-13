@@ -21,6 +21,8 @@ public class EMPEndBenefitType extends EMPAbstractEventType {
                 findValueInParams(new String[]{BenefitService.DTISZN_CODE}, values));
         this.getParameters().put(BenefitService.DTISZN_DESCRIPTION,
                 findValueInParams(new String[]{BenefitService.DTISZN_DESCRIPTION}, values));
+        this.getParameters().put(BenefitService.ID_DISCOUNT_INFO,
+                findValueInParams(new String[]{BenefitService.ID_DISCOUNT_INFO}, values));
     }
 
     @Override

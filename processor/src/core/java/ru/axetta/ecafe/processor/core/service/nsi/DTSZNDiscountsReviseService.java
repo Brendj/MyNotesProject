@@ -880,7 +880,7 @@ public class DTSZNDiscountsReviseService {
             Long nextVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
 
             Query query = session.createSQLQuery(
-                    "update cf_client_dtiszn_discount_info set archived = 1, version = :version, lastupdate = :lastUpdate "
+                    "update cf_client_dtiszn_discount_info set archived = 1, sendnotification = false, version = :version, lastupdate = :lastUpdate "
                    + "where (lastreceiveddate not between :start and :end or lastreceiveddate is null) and dtiszncode <> :otherDiscountCode");
             query.setParameter("start", CalendarUtils.startOfDay(fireTime).getTime());
             query.setParameter("end", CalendarUtils.endOfDay(fireTime).getTime());

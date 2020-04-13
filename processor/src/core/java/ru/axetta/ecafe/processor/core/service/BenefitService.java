@@ -54,6 +54,7 @@ public class BenefitService {
     public final static String DTISZN_DESCRIPTION="DtisznDescription";
     public final static String DATE="date";
     public final static String SERVICE_NUMBER="ServiceNumber";
+    public final static String ID_DISCOUNT_INFO="idDiscountInfo";
 
 
     public class NotificationEndBenefit implements Job {
@@ -104,8 +105,16 @@ public class BenefitService {
     }
 
     public void runEndBenefit(boolean forTest) {
-        Date endDate = new Date(System.currentTimeMillis());
-        Date startDate = DateUtils.addDays(endDate, -7);
+        Date startDate = new Date(System.currentTimeMillis());
+        Integer days;
+        String dayss = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.notification.client.endBenefitdays", "1");
+        try
+        {
+            days = Integer.getInteger(dayss);
+        } catch (Exception e){
+            days = 1;
+        }
+        Date endDate = DateUtils.addDays(startDate, days);
 
         Session session = null;
         Transaction transaction = null;
@@ -121,7 +130,8 @@ public class BenefitService {
                 String[] values = new String[]{
                         DATE_END_DISCOUNT,  CalendarUtils.dateToString(clientDtisznDiscountInfo.getDateEnd()),
                         DTISZN_CODE, clientDtisznDiscountInfo.getDtisznCode().toString(),
-                        DTISZN_DESCRIPTION, clientDtisznDiscountInfo.getDtisznDescription()};
+                        DTISZN_DESCRIPTION, clientDtisznDiscountInfo.getDtisznDescription(),
+                        ID_DISCOUNT_INFO, clientDtisznDiscountInfo.getIdOfClientDTISZNDiscountInfo().toString()};
                 values = EventNotificationService.attachGenderToValues(client.getGender(), values);
                 if (forTest)
                     values = attachValue(values, "TEST", "true");

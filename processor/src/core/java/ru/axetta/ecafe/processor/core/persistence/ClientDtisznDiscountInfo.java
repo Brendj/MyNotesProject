@@ -21,6 +21,7 @@ public class ClientDtisznDiscountInfo {
     private Date createdDateInternal;
     private Date lastReceivedDate;
     private String source;
+    private Boolean sendnotification;
 
     public ClientDtisznDiscountInfo(Client client, Long dtisznCode, String dtisznDescription, ClientDTISZNDiscountStatus status,
             Date dateStart, Date dateEnd, Date createdDate, String source, Long version) {
@@ -153,5 +154,15 @@ public class ClientDtisznDiscountInfo {
 
     public void setSource(String source) {
         this.source = source;
+    }
+
+    public Boolean getSendnotification() {
+        if (sendnotification == null)
+            return false;
+        return sendnotification;
+    }
+
+    public void setSendnotification(Boolean sendnotification) {
+        this.sendnotification = sendnotification;
     }
 }
