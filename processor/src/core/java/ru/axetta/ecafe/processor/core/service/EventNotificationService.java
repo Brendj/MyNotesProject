@@ -390,7 +390,12 @@ public class EventNotificationService {
         if (type.equals(EventNotificationService.MESSAGE_PAYMENT)) {
             type = getOrderNotificationType(values);
         }
-        ClientNotificationSetting.Predefined predefined = ClientNotificationSetting.Predefined.parseByBinding(type);
+        ClientNotificationSetting.Predefined predefined;
+        //Сообщения об окончинии срока льгот имеет тип Служебные
+        if (type.equals(EventNotificationService.NOTIFICATION_END_BENEFIT))
+            predefined = ClientNotificationSetting.Predefined.SMS_NOTIFY_SPECIAL;
+        else
+            predefined = ClientNotificationSetting.Predefined.parseByBinding(type);
         if (predefined == null) {
             return true;
         }

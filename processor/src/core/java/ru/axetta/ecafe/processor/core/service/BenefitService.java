@@ -110,7 +110,7 @@ public class BenefitService {
         String dayss = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.notification.client.endBenefitdays", "1");
         try
         {
-            days = Integer.getInteger(dayss);
+            days = Integer.parseInt(dayss);
         } catch (Exception e){
             days = 1;
         }
