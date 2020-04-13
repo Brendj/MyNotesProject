@@ -992,6 +992,13 @@ public class EventNotificationService {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.END_BENEFIT, destClient, values);
                 }
                 putGenderParams(empType, values);
+            } else if (type.equals(NOTIFICATION_PREFERENTIAL_FOOD)) {
+                if (dataClient != null) {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.REFUSAL_PREFERENTIAL_FOOD, dataClient, destClient, values);
+                } else {
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.REFUSAL_PREFERENTIAL_FOOD, destClient, values);
+                }
+                putGenderParams(empType, values);
             } else if (type.equals(NOTIFICATION_ENTER_CULTURE)) {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_CULTURE, dataClient, destClient, values);

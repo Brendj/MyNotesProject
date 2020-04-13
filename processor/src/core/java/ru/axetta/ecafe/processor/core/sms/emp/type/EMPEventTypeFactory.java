@@ -151,6 +151,9 @@ public class EMPEventTypeFactory {
             case END_BENEFIT:
                 event = new EMPEndBenefitType(values);
                 break;
+            case REFUSAL_PREFERENTIAL_FOOD:
+                event = new EMPRefusalPreferentialFoodType(values);
+                break;
             case SPECIAL_TYPE_EVENT:
                 switch (modifired)
                 {

@@ -43,27 +43,18 @@ import java.util.*;
 @Scope("singleton")
 public class BenefitService {
     Logger logger = LoggerFactory.getLogger(BenefitService.class);
-    private boolean checkFirst;
-    private boolean firstEnterFound;
-    private Long enterTime;
-    //private String enterMethod;
-    private Long enterGuardianId;
-    private Long enterEmployeeId;
-    private Integer enterPassDirection;
-    private Long exitTime;
-    //private String exitMethod;
-    private Long exitEmployeeId;
-    private Long exitGuardianId;
 
-    @PersistenceContext(unitName = "reportsPU")
-    private EntityManager entityManager;
+    //@PersistenceContext(unitName = "reportsPU")
+    //private EntityManager entityManager;
 
     final static String JOB_NAME_END_BENEFIT="NotificationEndBenefit";
-    final static String JOB_NAME_PREFERENTIAL_FOOD="NotificationPreferentialFood";
-    public final static String ORG_NAME="OrgName";
+    //final static String JOB_NAME_PREFERENTIAL_FOOD="NotificationPreferentialFood";
     public final static String DATE_END_DISCOUNT="DateEndDiscount";
     public final static String DTISZN_CODE="DtisznCode";
-    public final static String DTISZN_DESCRIPTION="OrgName";
+    public final static String DTISZN_DESCRIPTION="DtisznDescription";
+    public final static String DATE="date";
+    public final static String SERVICE_NUMBER="ServiceNumber";
+
 
     public class NotificationEndBenefit implements Job {
         @Override
@@ -71,22 +62,22 @@ public class BenefitService {
             RuntimeContext.getAppContext().getBean(BenefitService.class).runEndBenefit(false);
         }
     }
-    public class NotificationPreferentialFood implements Job {
-        @Override
-        public void execute(JobExecutionContext arg0) throws JobExecutionException {
-            RuntimeContext.getAppContext().getBean(BenefitService.class).runPreferentialFood();
-        }
-    }
+    //public class NotificationPreferentialFood implements Job {
+    //    @Override
+    //    public void execute(JobExecutionContext arg0) throws JobExecutionException {
+    //        RuntimeContext.getAppContext().getBean(BenefitService.class).runPreferentialFood();
+    //    }
+    //}
 
     public void scheduleSync() throws Exception {
         String syncScheduleEndBenefit = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.notification.client.endBenefit", "");
-        String syncSchedulePreferentialFood = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.notification.client.preferentialFood", "");
-        if (syncScheduleEndBenefit.equals("") && syncSchedulePreferentialFood.equals("")) {
-            return;
-        }
+        //String syncSchedulePreferentialFood = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.notification.client.preferentialFood", "");
+        //if (syncScheduleEndBenefit.equals("") && syncSchedulePreferentialFood.equals("")) {
+        //    return;
+        //}
         try {
             JobDetail jobDetailEndBenefit = new JobDetail(JOB_NAME_END_BENEFIT, Scheduler.DEFAULT_GROUP, NotificationEndBenefit.class);
-            JobDetail jobDetailPreferentialFood = new JobDetail(JOB_NAME_PREFERENTIAL_FOOD, Scheduler.DEFAULT_GROUP, NotificationPreferentialFood.class);
+            //JobDetail jobDetailPreferentialFood = new JobDetail(JOB_NAME_PREFERENTIAL_FOOD, Scheduler.DEFAULT_GROUP, NotificationPreferentialFood.class);
 
             SchedulerFactory sfb = new StdSchedulerFactory();
             Scheduler scheduler = sfb.getScheduler();
@@ -98,17 +89,17 @@ public class BenefitService {
                 }
                 scheduler.scheduleJob(jobDetailEndBenefit, triggerEndBenefit);
             }
-            if (!syncSchedulePreferentialFood.equals("")) {
-                CronTrigger triggerPreferentialFood = new CronTrigger(JOB_NAME_PREFERENTIAL_FOOD, Scheduler.DEFAULT_GROUP);
-                triggerPreferentialFood.setCronExpression(syncSchedulePreferentialFood);
-                if (scheduler.getTrigger(JOB_NAME_PREFERENTIAL_FOOD, Scheduler.DEFAULT_GROUP)!=null) {
-                    scheduler.deleteJob(JOB_NAME_PREFERENTIAL_FOOD, Scheduler.DEFAULT_GROUP);
-                }
-                scheduler.scheduleJob(jobDetailPreferentialFood, triggerPreferentialFood);
-            }
+            //if (!syncSchedulePreferentialFood.equals("")) {
+            //    CronTrigger triggerPreferentialFood = new CronTrigger(JOB_NAME_PREFERENTIAL_FOOD, Scheduler.DEFAULT_GROUP);
+            //    triggerPreferentialFood.setCronExpression(syncSchedulePreferentialFood);
+            //    if (scheduler.getTrigger(JOB_NAME_PREFERENTIAL_FOOD, Scheduler.DEFAULT_GROUP)!=null) {
+            //        scheduler.deleteJob(JOB_NAME_PREFERENTIAL_FOOD, Scheduler.DEFAULT_GROUP);
+            //    }
+            //    scheduler.scheduleJob(jobDetailPreferentialFood, triggerPreferentialFood);
+            //}
             scheduler.start();
         } catch(Exception e) {
-            //logger.error("Failed to schedule notification summary calculation service job:", e);
+            logger.error("Failed to schedule notification end benefit service job:", e);
         }
     }
 
@@ -128,7 +119,6 @@ public class BenefitService {
                 Client client = clientDtisznDiscountInfo.getClient();
 
                 String[] values = new String[]{
-                        ORG_NAME, client.getOrg().getShortName(),
                         DATE_END_DISCOUNT,  CalendarUtils.dateToString(clientDtisznDiscountInfo.getDateEnd()),
                         DTISZN_CODE, clientDtisznDiscountInfo.getDtisznCode().toString(),
                         DTISZN_DESCRIPTION, clientDtisznDiscountInfo.getDtisznDescription()};
@@ -139,11 +129,8 @@ public class BenefitService {
                         .sendNotification(client, null,
                                 EventNotificationService.NOTIFICATION_END_BENEFIT, values, startDate);
             }
-
-
-
         } catch (Exception e) {
-            logger.error("Error  ", e);
+            logger.error("Error notificatin end benefit", e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -159,11 +146,11 @@ public class BenefitService {
         return newValues;
     }
 
-    public void runPreferentialFood() {
-        Date today = new Date(System.currentTimeMillis());
-        Date[] dates = CalendarUtils.getCurrentWeekBeginAndEnd(today);
-        Date startDate = CalendarUtils.truncateToDayOfMonth(dates[0]);
-        Date endDate = CalendarUtils.endOfDay(dates[1]);
-    }
+    //public void runPreferentialFood() {
+    //    Date today = new Date(System.currentTimeMillis());
+    //    Date[] dates = CalendarUtils.getCurrentWeekBeginAndEnd(today);
+    //    Date startDate = CalendarUtils.truncateToDayOfMonth(dates[0]);
+    //    Date endDate = CalendarUtils.endOfDay(dates[1]);
+    //}
 
 }

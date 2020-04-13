@@ -12,6 +12,8 @@ import ru.axetta.ecafe.processor.core.partner.revise.ReviseDAOService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.BenefitService;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ssl.EasySSLProtocolSocketFactory;
@@ -318,7 +320,7 @@ public class DTSZNDiscountsReviseService {
             }
             updateArchivedFlagForDiscountsDB();
             runTaskPart2(fireTime);
-            updateApplicationsForFoodTask();
+            updateApplicationsForFoodTask(false);
         }
     }
 
@@ -556,7 +558,7 @@ public class DTSZNDiscountsReviseService {
         return entityIds;
     }
 
-    public void updateApplicationsForFoodTask() throws Exception {
+    public void updateApplicationsForFoodTask(boolean forTest) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -640,6 +642,21 @@ public class DTSZNDiscountsReviseService {
                                         status, applicationVersion, historyVersion, true);
                         statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
                                 status.getApplicationForFoodState(), status.getDeclineReason()));
+                        //Отправка уведомления клтенту
+                        Client client = applicationForFood.getClient();
+                        ClientDtisznDiscountInfo clientDtisznDiscountInfo = DAOUtils
+                                .getDTISZNDiscountInfoByClientAndCode(session, client, applicationForFood.getDtisznCode());
+                        String[] values = new String[]{
+                                BenefitService.SERVICE_NUMBER, applicationForFood.getServiceNumber(),
+                                BenefitService.DATE, CalendarUtils.dateToString(applicationForFood.getCreatedDate()),
+                                BenefitService.DTISZN_CODE, clientDtisznDiscountInfo.getDtisznCode().toString(),
+                                BenefitService.DTISZN_DESCRIPTION, clientDtisznDiscountInfo.getDtisznDescription()};
+                        values = EventNotificationService.attachGenderToValues(client.getGender(), values);
+                        if (forTest)
+                            values = attachValue(values, "TEST", "true");
+                        RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                .sendNotification(client, null,
+                                        EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values, new Date());
                     }
                     logger.info(String.format("Application with number updated to %s ClientDtisznDiscountInfo{status = %s, dateStart = %s, dateEnd = %s}",
                             isDiscountOk ? "ok" : "denied", info.getStatus().toString(), info.getDateStart().toString(), info.getDateEnd().toString()));
@@ -672,6 +689,13 @@ public class DTSZNDiscountsReviseService {
         }
     }
 
+    private String[] attachValue(String[] values, String name, String value) {
+        String[] newValues = new String[values.length + 2];
+        System.arraycopy(values, 0, newValues, 0, values.length);
+        newValues[newValues.length-2] = name;
+        newValues[newValues.length-1] = value;
+        return newValues;
+    }
 
     public void updateApplicationForFood(Session session, Client client, List<ClientDtisznDiscountInfo> infoList) {
         ApplicationForFood application = DAOUtils.findActiveApplicationForFoodByClient(session, client);
@@ -1044,7 +1068,7 @@ public class DTSZNDiscountsReviseService {
 
         updateArchivedFlagForDiscountsDB();
         runTaskPart2(fireTime);
-        updateApplicationsForFoodTask();
+        updateApplicationsForFoodTask(false);
         if (StringUtils.isEmpty(guid) && discountItemList != null && discountItemList.getDate() != null) {
             DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(discountItemList.getDate()), Option.OPTION_REVISE_LAST_DATE);
         }
