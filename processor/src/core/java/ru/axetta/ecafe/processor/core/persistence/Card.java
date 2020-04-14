@@ -117,6 +117,10 @@ public class Card {
         return (type == 6 || type == 7 || type == 8);
     }
 
+    public static boolean isServiceType(int type) {
+        return type == 1;
+    }
+
     public Long getIdOfCard() {
         return idOfCard;
     }

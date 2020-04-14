@@ -214,37 +214,41 @@ public class CardWritableRepository extends WritableJpaDao {
                 .executeUpdate();
     }
 
-    public int blockAndReset(long cardNo, long idOfOrg) {
+    public int blockAndReset(long cardNo, long idOfOrg, String lockReason) {
         return entityManager.createQuery("update Card set "
                 + " state = :state, "
                 + " validTime = :validTime,"
                 + " issueTime = :issueTime ,"
-                + " updateTime = :updateTime "
+                + " updateTime = :updateTime,"
+                + " lockReason = :lockReason "
                 + " where cardNo = :cardNo"
                 + "     and org.idOfOrg = :idOfOrg")
                 .setParameter("state", CardState.BLOCKED.getValue())
                 .setParameter("validTime", new Date())
                 .setParameter("issueTime", new Date())
                 .setParameter("updateTime", new Date())
+                .setParameter("lockReason", lockReason)
                 .setParameter("cardNo", cardNo)
                 .setParameter("idOfOrg", idOfOrg)
                 .executeUpdate();
     }
 
-    public int blockAndReset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm) {
-        if (!isOldArm) return blockAndReset(cardNo, idOfOrg);
+    public int blockAndReset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm, String lockReason) {
+        if (!isOldArm) return blockAndReset(cardNo, idOfOrg, lockReason);
         String condition = (idOfClient == null) ? " and org.idOfOrg in :idOfOrgs" : " and client.idOfClient = :idOfClient";
         Query query = entityManager.createQuery("update Card set "
                 + " state = :state, "
                 + " validTime = :validTime,"
                 + " issueTime = :issueTime ,"
-                + " updateTime = :updateTime "
+                + " updateTime = :updateTime,"
+                + " lockReason = :lockReason "
                 + " where cardNo = :cardNo"
                 + condition);
         query.setParameter("state", CardState.BLOCKED.getValue());
         query.setParameter("validTime", new Date());
         query.setParameter("issueTime", new Date());
         query.setParameter("updateTime", new Date());
+        query.setParameter("lockReason", lockReason);
         query.setParameter("cardNo", cardNo);
         if (idOfClient == null) {
             query.setParameter("idOfOrgs", DAOUtils.findFriendlyOrgIds((Session)entityManager.getDelegate(), idOfOrg));

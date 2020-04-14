@@ -70,6 +70,11 @@ public class CardService {
                 isLongUid, cardTransitionState);
     }
 
+    public void updateTransitionState(Card card, Integer transitionState) {
+        card.setTransitionState(transitionState);
+        card.setUpdateTime(new Date());
+    }
+
     public Card registerNewSpecial(long idOfOrg, long cardNo, long cardPrintedNo, int type,
             Integer cardSignCertNum) throws Exception {
         Org org = orgRepository.findOne(idOfOrg);
@@ -161,12 +166,12 @@ public class CardService {
 
 
     //7.	Блокировка карты со сбросом
-    public int blockAndReset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm) {
-        return cardWritableRepository.blockAndReset(cardNo, idOfOrg, idOfClient, isOldArm);
+    public int blockAndReset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm, String lockReason) {
+        return cardWritableRepository.blockAndReset(cardNo, idOfOrg, idOfClient, isOldArm, lockReason);
     }
 
     public ResCardsOperationsRegistryItem block(CardsOperationsRegistryItem o, long idOfOrg, Boolean isOldArm) {
-        return cardUpdateResult(o, blockAndReset(o.getCardNo(), idOfOrg, o.getIdOfClient(), isOldArm));
+        return cardUpdateResult(o, blockAndReset(o.getCardNo(), idOfOrg, o.getIdOfClient(), isOldArm, ""));
     }
     //8.	Разблокировка карты
     public void unblock(Card card, CardsOperationsRegistryItem o){
