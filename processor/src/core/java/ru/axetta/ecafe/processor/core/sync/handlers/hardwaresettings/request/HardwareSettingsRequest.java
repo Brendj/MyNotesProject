@@ -147,6 +147,75 @@ public class HardwareSettingsRequest implements SectionRequest {
             }
             hsNode = hsNode.getNextSibling();
         }
+        for (List<HardwareSettingsRequestItem> item : sectionItem) {
+            for (HardwareSettingsRequestItem requestItem : item) {
+                if (requestItem.getType() == "HS") {
+                    HardwareSettingsRequestHSItem hsItem = (HardwareSettingsRequestHSItem) requestItem;
+                    System.out.println(requestItem.getType());
+                    System.out.println(hsItem.getIdOfHardwareSetting());
+                    System.out.println(requestItem.getResCode());
+                    System.out.println("");
+                }
+                if (requestItem.getType() == "MT") {
+                    HardwareSettingsRequestMTItem mtItem = (HardwareSettingsRequestMTItem) requestItem;
+                    System.out.println(requestItem.getType());
+                    System.out.println(mtItem.getValue());
+                    System.out.println(requestItem.getLastUpdate());
+                    System.out.println(requestItem.getResCode());
+                    System.out.println("");
+                }
+                if (requestItem.getType() == "IP") {
+                    HardwareSettingsRequestIPItem ipItem = (HardwareSettingsRequestIPItem) requestItem;
+                    System.out.println(requestItem.getType());
+                    System.out.println(ipItem.getValue());
+                    System.out.println(requestItem.getLastUpdate());
+                    System.out.println(requestItem.getResCode());
+                    System.out.println("");
+                }
+                if (requestItem.getType() == "DotNetVer") {
+                    HardwareSettingsRequestDotNetVerItem dotNetVerItem = (HardwareSettingsRequestDotNetVerItem) requestItem;
+                    System.out.println(requestItem.getType());
+                    System.out.println(dotNetVerItem.getValue());
+                    System.out.println(requestItem.getLastUpdate());
+                    System.out.println(requestItem.getResCode());
+                    System.out.println("");
+                }
+                if (requestItem.getType() == "OsVer") {
+                    HardwareSettingsRequestOsVerItem osVerItem = (HardwareSettingsRequestOsVerItem) requestItem;
+                    System.out.println(osVerItem.getValue());
+                    System.out.println(requestItem.getType());
+                    System.out.println(requestItem.getLastUpdate());
+                    System.out.println(requestItem.getResCode());
+                    System.out.println("");
+                }
+                if (requestItem.getType() == "RAM") {
+                    HardwareSettingsRequestRAMItem ramItem = (HardwareSettingsRequestRAMItem) requestItem;
+                    System.out.println(requestItem.getType());
+                    System.out.println(ramItem.getValue());
+                    System.out.println(requestItem.getLastUpdate());
+                    System.out.println(requestItem.getResCode());
+                    System.out.println("");
+                }
+                if (requestItem.getType() == "CPU") {
+                    HardwareSettingsRequestCPUItem cpuItem = (HardwareSettingsRequestCPUItem) requestItem;
+                    System.out.println(requestItem.getType());
+                    System.out.println(cpuItem.getValue());
+                    System.out.println(requestItem.getLastUpdate());
+                    System.out.println(requestItem.getResCode());
+                    System.out.println("");
+                }
+                if (requestItem.getType() == "Readers") {
+                    HardwareSettingsRequestCRItem crItem = (HardwareSettingsRequestCRItem) requestItem;
+                    System.out.println(requestItem.getType());
+                    System.out.println(crItem.getFirmwareVer());
+                    System.out.println(crItem.getReaderName());
+                    System.out.println(crItem.getUsedByModule());
+                    System.out.println(requestItem.getLastUpdate());
+                    System.out.println(requestItem.getResCode());
+                    System.out.println("");
+                }
+            }
+        }
     }
 
     public static String getSectionName() {
