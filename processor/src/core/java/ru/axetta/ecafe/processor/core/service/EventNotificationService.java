@@ -1008,14 +1008,14 @@ public class EventNotificationService {
                 if (dataClient != null) {
                     empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_CULTURE, dataClient, destClient, values);
                 } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_CULTURE, destClient, values);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.ENTER_CULTURE, destClient, values);
                 }
                 putGenderParams(empType, values);
             } else if (type.equals(NOTIFICATION_EXIT_CULTURE)) {
                 if (dataClient != null) {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, dataClient, destClient, values);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_CULTURE, dataClient, destClient, values);
                 } else {
-                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_EVENT, destClient, values);
+                    empType = EMPEventTypeFactory.buildEvent(EMPEventTypeFactory.LEAVE_CULTURE, destClient, values);
                 }
                 putGenderParams(empType, values);
             }
