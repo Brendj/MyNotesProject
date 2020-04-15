@@ -14,7 +14,7 @@ import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.apache.commons.lang.StringUtils;
@@ -421,7 +421,7 @@ public class ClientManager {
             if (fieldConfig.getValue(FieldId.COMMENTS) != null) {
                 client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
             }
-            ImportRegisterClientsService.commentsAddsDelete(client, registerCommentsAdds);
+            ImportRegisterMSKClientsService.commentsAddsDelete(client, registerCommentsAdds);
 
             /* проверяется есть ли в загрузочном файле параметр для группы клиента (класс для ученика)*/
             if (fieldConfig.getValue(ClientManager.FieldId.GROUP) != null) {
@@ -434,7 +434,7 @@ public class ClientManager {
                                     clientGroupName);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
-                        ImportRegisterClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
+                        ImportRegisterMSKClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
                     } else {
                         ClientGroup clientGroup = DAOUtils
                                 .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(persistenceSession,
@@ -839,7 +839,7 @@ public class ClientManager {
                                     clientGroupName);
 
                     if (groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != null) {
-                        ImportRegisterClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
+                        ImportRegisterMSKClientsService.clientGroupProcess(persistenceSession, client, groupNamesToOrgs);
                     } else {
                         ClientGroup clientGroup = DAOUtils
                                 .findClientGroupByGroupNameAndIdOfOrg(persistenceSession, idOfOrg, clientGroupName);

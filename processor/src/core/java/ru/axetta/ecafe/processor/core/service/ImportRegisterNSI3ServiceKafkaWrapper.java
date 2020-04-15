@@ -43,12 +43,12 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
     }
 
     @Override
-    protected void fillOrgGuids(Query query, ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) {
+    protected void fillOrgGuids(Query query, ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids) {
         innerServices.fillOrgGuids(query, orgGuids);
     }
 
     @Override
-    public String getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
+    public String getBadGuids(ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
         return innerServices.getBadGuids(orgGuids);
     }
 
@@ -98,14 +98,14 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
     }
 
     @Override
-    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids,
+    public List<ImportRegisterMSKClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids,
             String familyName, String firstName, String secondName) throws Exception {
         if(!workWithKafka){
             return innerServices.getPupilsByOrgGUID(orgGuids, familyName, firstName, secondName);
         }
         Session session = null;
         Transaction transaction = null;
-        List<ImportRegisterClientsService.ExpandedPupilInfo> pupils = new LinkedList<>();
+        List<ImportRegisterMSKClientsService.ExpandedPupilInfo> pupils = new LinkedList<>();
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
@@ -127,7 +127,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
             transaction = null;
 
             for (Object[] row : list) {
-                ImportRegisterClientsService.ExpandedPupilInfo pupil = new ImportRegisterClientsService.ExpandedPupilInfo();
+                ImportRegisterMSKClientsService.ExpandedPupilInfo pupil = new ImportRegisterMSKClientsService.ExpandedPupilInfo();
                 pupil.guid = StringUtils.trim((String) row[0]);
                 pupil.guidOfOrg = (String) row[1];
                 pupil.firstName = StringUtils.trim((String) row[2]);
@@ -143,9 +143,9 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                 pupils.add(pupil);
             }
             /// удалить неимпортируемые группы
-            for (Iterator<ImportRegisterClientsService.ExpandedPupilInfo> i = pupils.iterator(); i.hasNext(); ) {
-                ImportRegisterClientsService.ExpandedPupilInfo p = i.next();
-                if (ImportRegisterClientsService.isPupilIgnoredFromImport(p.getGuid(), p.getGroup())) {
+            for (Iterator<ImportRegisterMSKClientsService.ExpandedPupilInfo> i = pupils.iterator(); i.hasNext(); ) {
+                ImportRegisterMSKClientsService.ExpandedPupilInfo p = i.next();
+                if (ImportRegisterMSKClientsService.isPupilIgnoredFromImport(p.getGuid(), p.getGroup())) {
                     i.remove();
                 }
             }

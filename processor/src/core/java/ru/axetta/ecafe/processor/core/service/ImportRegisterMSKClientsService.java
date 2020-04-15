@@ -48,9 +48,9 @@ import java.util.concurrent.Executors;
  * To change this template use File | Settings | File Templates.
  */
 @Primary
-@Component("importRegisterClientsService")
+@Component("importRegisterMSKClientsService")
 @Scope("singleton")
-public class ImportRegisterClientsService {
+public class ImportRegisterMSKClientsService implements ImportClientRegisterService {
 
     public static final int CREATE_OPERATION = 1;
     public static final int DELETE_OPERATION = 2;
@@ -65,7 +65,7 @@ public class ImportRegisterClientsService {
 
     @Autowired
     ClientMskNSIService nsiService;
-    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterClientsService.class);
+    private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterMSKClientsService.class);
     private DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
     private static final String ORG_SYNC_MARKER = "СИНХРОНИЗАЦИЯ_РЕЕСТРЫ";
     private static final long MILLISECONDS_IN_DAY = 86400000L;
@@ -120,7 +120,7 @@ public class ImportRegisterClientsService {
         }
 
         StringBuffer logBuffer = new StringBuffer();
-        return RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
+        return RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class)
                 .syncClientsWithRegistry(idOfOrg, performChanges, logBuffer, true);
     }
 
@@ -136,9 +136,7 @@ public class ImportRegisterClientsService {
 
         @Override
         public void run() {
-            //System.out.println(Thread.currentThread().getName()+" Start. Command = "+command);
             processCommand();
-            //System.out.println(Thread.currentThread().getName()+" End.");
         }
 
         public List<Org> getOrgs() {
@@ -160,9 +158,9 @@ public class ImportRegisterClientsService {
                     int attempt = 0;
                     while (attempt < maxAttempts) {
                         try {
-                            RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
+                            RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class)
                                     .syncClientsWithRegistry(org.getIdOfOrg(), true, null, false);
-                        } catch (SocketTimeoutException ste) {
+                        } catch (SocketTimeoutException ignored) {
                         } catch (Exception e) {
                             logError("Ошибка при синхронизации с Реестрами для организации: " + org.getIdOfOrg(), e,
                                     null);
@@ -191,10 +189,10 @@ public class ImportRegisterClientsService {
     protected List<List<Org>> buildOrgsPack(List<Org> orgs, int threadsCount) {
         List<List<Org>> result = new ArrayList<List<Org>>();
 
-        int count = (int) Math.ceil((double) orgs.size() / (double) threadsCount);
         int l = 0;
         int i = 0;
         Org o = orgs.get(i);
+
         while (o != null) {
             List<Org> list = null;
             if (result.size() > l) {
@@ -211,7 +209,6 @@ public class ImportRegisterClientsService {
             }
             i++;
 
-
             if (orgs.size() > i) {
                 o = orgs.get(i);
             } else {
@@ -227,7 +224,7 @@ public class ImportRegisterClientsService {
             return;
         }
 
-        RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class).checkRegistryChangesValidity();
+        RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class).checkRegistryChangesValidity();
 
         if (!isOn()) {
             return;
@@ -340,8 +337,7 @@ public class ImportRegisterClientsService {
             query.setParameter("org" + (i + 1), orgs.get(i));
         }
         if (query.getResultList().isEmpty()) return Collections.emptyList();
-        List <Client> cls = (List <Client>)query.getResultList();
-        return cls;
+        return query.getResultList();
     }
 
     public List<Client> findClientsByGuids(List<String> guids) {
@@ -350,7 +346,7 @@ public class ImportRegisterClientsService {
         }
         javax.persistence.Query q = em.createQuery("from Client where clientGUID in :guids");
         q.setParameter("guids", guids);
-        List<Client> result = (List<Client>) q.getResultList();
+        List<Client> result = q.getResultList();
         return result != null ? result : new ArrayList<Client>();
     }
 
@@ -363,17 +359,13 @@ public class ImportRegisterClientsService {
     }
 
     protected Boolean belongToProperGroup(Client cl) {
-        return cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >= ClientGroup
-                .Predefined.CLIENT_EMPLOYEES.getValue().longValue()
-                && cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup().longValue()
-                < ClientGroup.Predefined.CLIENT_LEAVING.getValue().longValue();
+        return cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                && cl.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_LEAVING.getValue();
     }
 
     protected Boolean isProperGroup(ClientGroup currGroup) {
-        return currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() >= ClientGroup
-                .Predefined.CLIENT_EMPLOYEES.getValue().longValue() &&
-                currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() < ClientGroup
-                        .Predefined.CLIENT_LEAVING.getValue().longValue();
+        return currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup() >= ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                && currGroup.getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.Predefined.CLIENT_LEAVING.getValue();
     }
 
     @Transactional
@@ -386,7 +378,6 @@ public class ImportRegisterClientsService {
     public void saveClients(String synchDate, String date, long ts, Org org, List<ExpandedPupilInfo> pupils,
             StringBuffer logBuffer, boolean deleteClientsIfNotFound) throws Exception {
         log(synchDate + "Начато сохранение списка клиентов для " + org.getOfficialName() + " в БД", logBuffer);
-
 
         //  Открываем сессию и загружаем клиентов, которые сейчас находятся в БД
         Session session = (Session) em.getDelegate();
@@ -497,22 +488,12 @@ public class ImportRegisterClientsService {
                         cl == null || cl.getGender() == null ? null : cl.getGender() == 0 ? "Женский" : "Мужской", updateClient);
             }
 
-            //if(org.getChangesDSZN()) {
-            //    updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BENEFIT_DSZN,
-            //            pupil.getBenefitDSZN(), cl == null ? null : cl.getCategoriesDiscountsDSZN() == null ? null : cl.getCategoriesDiscountsDSZN(),
-            //            updateClient);
-            //    if(!updateClient) {
-            //        updateClient = doCategoriesUpdate(getCategoriesString(pupil.getBenefitDSZN(), cl == null ? null : cl.getCategoriesDiscounts(),
-            //                        categoryMap, categoryDSZNMap), cl == null ? null : cl.getCategoriesDiscounts());
-            //    }
-            //}
-
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BIRTH_DATE, pupil.getBirthDate(),
                     cl == null ? null : cl.getBirthDate() == null ? null : timeFormat.format(cl.getBirthDate()), updateClient);
 
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.AGE_TYPE_GROUP, pupil.getAgeTypeGroup(),
-                    cl == null ? null : cl.getAgeTypeGroup() == null ? null : cl.getAgeTypeGroup(), updateClient);
+                    cl == null ? null : cl.getAgeTypeGroup(), updateClient);
 
             if (pupil.getGroup() != null) {
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
@@ -554,7 +535,7 @@ public class ImportRegisterClientsService {
             }
 
             doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT, pupil.getGuardiansCount(),
-                    cl == null ? null : cl.getGuardiansCount() == null ? null : cl.getGuardiansCount(), updateClient);
+                    cl == null ? null : cl.getGuardiansCount(), updateClient);
 
             if (!pupil.getGuardianInfoList().isEmpty()) {
                 doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT_LIST, pupil.getGuardianInfoList());
@@ -757,14 +738,12 @@ public class ImportRegisterClientsService {
         String surname = trim(fieldConfig.getValue(ClientManager.FieldId.SURNAME), 128, clientGuid, "Фамилия ученика");
         String registryGroupName = trim(fieldConfig.getValue(ClientManager.FieldId.GROUP), 256, clientGuid, "Наименование группы");
         String clientGender = trim(fieldConfig.getValue(ClientManager.FieldId.GENDER), 64, clientGuid, "Пол");
-        String clientBenefitDSZN = trim(fieldConfig.getValue(ClientManager.FieldId.BENEFIT_DSZN), 128, clientGuid, "Льгота учащегося");
         String clientBirthDate = trim(fieldConfig.getValue(ClientManager.FieldId.BIRTH_DATE), 64, clientGuid, "Дата рождения");
         String guardiansCount = trim(fieldConfig.getValue(ClientManager.FieldId.GUARDIANS_COUNT), 64, clientGuid, "Количество представителей");
         List<GuardianInfo> guardianInfoList = fieldConfig.getValueList(ClientManager.FieldId.GUARDIANS_COUNT_LIST);
         String ageTypeGroup = trim(fieldConfig.getValue(ClientManager.FieldId.AGE_TYPE_GROUP), 128, clientGuid, "Тип возрастной группы");
         String parallel = trim(fieldConfig.getValue(ClientManager.FieldId.PARALLEL), 255, clientGuid, "Параллель");
 
-        //RegistryChange ch = new RegistryChange();
         RegistryChange ch = getRegistryChangeClassInstance();
         ch.setClientGUID(clientGuid);
         ch.setFirstName(name);
@@ -791,16 +770,6 @@ public class ImportRegisterClientsService {
         }
 
         ch.setCheckBenefits(checkBenefits);
-        //if(checkBenefits) {
-        //    ch.setBenefitDSZN(clientBenefitDSZN);
-        //    ch.setNewDiscounts(StringUtils.join(getCategoriesByDSZNCodes(sess, clientBenefitDSZN,
-        //            currentClient != null ? currentClient.getCategoriesDiscounts() : ""), ","));
-        //    if(currentClient != null) {
-        //        ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
-        //        ch.setOldDiscounts(StringUtils.isEmpty(currentClient.getCategoriesDiscounts()) ? "" :
-        //                StringUtils.join(new TreeSet<String>(Arrays.asList(currentClient.getCategoriesDiscounts().split(","))), ","));
-        //    }
-        //}
 
         if (operation == CREATE_OPERATION) {
             if (!StringUtils.isEmpty(guardiansCount)) {
@@ -936,7 +905,6 @@ public class ImportRegisterClientsService {
             return;
         }
 
-        //RegistryChange ch = new RegistryChange();
         RegistryChange ch = getRegistryChangeClassInstance();
         ch.setClientGUID(emptyIfNull(currentClient.getClientGUID()));
         ch.setFirstName(currentClient.getPerson().getFirstName());
@@ -957,10 +925,6 @@ public class ImportRegisterClientsService {
         }
 
         ch.setCheckBenefits(checkBenefits);
-        //if(checkBenefits) {
-        //    ch.setBenefitDSZN(currentClient.getCategoriesDiscountsDSZN());
-        //    ch.setNewDiscounts(currentClient.getCategoriesDiscounts());
-        //}
         ch.setAgeTypeGroup(currentClient.getAgeTypeGroup());
         sess.save(ch);
     }
@@ -1240,6 +1204,7 @@ public class ImportRegisterClientsService {
         return change;
     }
 
+    @Override
     public RegistryChangeError getRegistryChangeError(Long idOfRegistryChangeError) {
         if (idOfRegistryChangeError == null) {
             return null;
@@ -1248,6 +1213,7 @@ public class ImportRegisterClientsService {
         return e;
     }
 
+    @Override
     public List<RegistryChangeCallback> applyRegistryChangeBatch(List<Long> changesList, boolean fullNameValidation, String groupName) throws Exception {
         Session session = null;
         Transaction transaction = null;
@@ -1630,6 +1596,7 @@ public class ImportRegisterClientsService {
         }
     }
 
+    @Override
     @Transactional
     public StringBuffer syncClientsWithRegistry(long idOfOrg, boolean performChanges, StringBuffer logBuffer,
             boolean manualCheckout) throws Exception {

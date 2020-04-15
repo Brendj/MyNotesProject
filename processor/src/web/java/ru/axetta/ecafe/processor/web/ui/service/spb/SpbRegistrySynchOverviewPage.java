@@ -6,7 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.service.spb;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 
 import org.hibernate.Query;
@@ -41,7 +41,7 @@ import java.util.*;
 @Scope("session")
 public class SpbRegistrySynchOverviewPage extends BasicWorkspacePage {
     protected List<Item> list;
-    Logger logger = LoggerFactory.getLogger(SpbRegistrySynchPageBase.class);
+    Logger logger = LoggerFactory.getLogger(SpbRegistrySyncPageBase.class);
     protected String orgFilter = "";
     protected boolean showOnlyUnsynch = false;
     protected static final DateFormat dateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -236,19 +236,19 @@ public class SpbRegistrySynchOverviewPage extends BasicWorkspacePage {
                     res.put(idoforg, i);
                 }
                 switch (operation) {
-                    case ImportRegisterClientsService.CREATE_OPERATION:
+                    case ImportRegisterMSKClientsService.CREATE_OPERATION:
                         i.setCreated(count);
                         i.addTotal(count);
                         break;
-                    case ImportRegisterClientsService.DELETE_OPERATION:
+                    case ImportRegisterMSKClientsService.DELETE_OPERATION:
                         i.setDeleted(count);
                         i.addTotal(count);
                         break;
-                    case ImportRegisterClientsService.MODIFY_OPERATION:
+                    case ImportRegisterMSKClientsService.MODIFY_OPERATION:
                         i.setModified(count);
                         i.addTotal(count);
                         break;
-                    case ImportRegisterClientsService.MOVE_OPERATION:
+                    case ImportRegisterMSKClientsService.MOVE_OPERATION:
                         i.setMoved(count);
                         i.addTotal(count);
                         break;

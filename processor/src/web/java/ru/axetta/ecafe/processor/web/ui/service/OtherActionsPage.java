@@ -106,7 +106,7 @@ public class OtherActionsPage extends OnlineReportPage {
     }
 
     public void runImportRegisterClients() throws Exception {
-        RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class)
+        RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class)
                 .run(); //DEF
         printMessage("Импорт клиентов из Реестров выполнен");
     }

@@ -22,8 +22,8 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.criterion.*;
 import org.hibernate.criterion.Order;
+import org.hibernate.criterion.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -1735,7 +1735,7 @@ public class DAOService {
         return Long.parseLong("" + (res == null || res.toString().length() < 1 ? 0 : res.toString()));
     }
 
-    public List getRegistryChangeRevisions(long idOfOrg, String className) throws Exception {
+    public List<Object[]> getRegistryChangeRevisions(long idOfOrg, String className) throws Exception {
         Query query = entityManager.createQuery(
                 "select distinct createDate, type from " + className + " where idOfOrg=:idOfOrg order by createDate desc");
         query.setParameter("idOfOrg", idOfOrg);

@@ -34,7 +34,7 @@
 </style>
 
 
-<%--@elvariable id="spbRegistrySynchPage" type="ru.axetta.ecafe.processor.web.ui.service.spb.SpbRegistrySynchPage"--%>
+<%--@elvariable id="spbRegistrySynchPage" type="ru.axetta.ecafe.processor.web.ui.service.spb.SpbRegistrySyncPage"--%>
 <h:panelGrid id="SpbRegistrySynchPage" styleClass="borderless-grid" binding="#{spbRegistrySynchPage.pageComponent}">
 
     <h:panelGrid styleClass="borderless-grid" id="synchTableInfoPanel" style="padding-bottom: 5px;">

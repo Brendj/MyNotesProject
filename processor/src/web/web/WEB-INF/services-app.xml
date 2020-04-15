@@ -149,7 +149,7 @@
 
     <task:scheduler id="importRegisterClientsSchedule" pool-size="5"/>
     <task:scheduled-tasks scheduler="importRegisterClientsSchedule">
-        <task:scheduled ref="importRegisterClientsService" method="run" cron="0 11 0 ? * *"/>
+        <task:scheduled ref="importRegisterMSKClientsService" method="run" cron="0 11 0 ? * *"/>
     </task:scheduled-tasks>
 
     <task:scheduler id="importRegisterSpbClientsSchedule" pool-size="5"/>

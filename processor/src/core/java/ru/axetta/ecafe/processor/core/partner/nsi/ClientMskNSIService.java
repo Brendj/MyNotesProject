@@ -13,7 +13,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrgSync;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -52,7 +52,7 @@ public class ClientMskNSIService extends MskNSIService {
         //stub
     }
 
-    public String getBadGuids(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
+    public String getBadGuids(ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids) throws Exception {
         List<String> list = new ArrayList<String>();
         SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
         searchPredicateInfo.setCatalogName("Реестр образовательных учреждений");
@@ -79,7 +79,7 @@ public class ClientMskNSIService extends MskNSIService {
             searchPredicateInfo.addSearchPredicate(search);
 
             List<Item> queryResults = executeQuery(searchPredicateInfo, -1);
-            ImportRegisterClientsService service = RuntimeContext.getAppContext().getBean("importRegisterClientsService", ImportRegisterClientsService.class);
+            ImportRegisterMSKClientsService service = RuntimeContext.getAppContext().getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class);
             for (Item i : queryResults) {
                 for(Attribute attr : i.getAttribute()) {
                     if (attr.getName().equals("GUID Образовательного учреждения")) {
@@ -110,12 +110,12 @@ public class ClientMskNSIService extends MskNSIService {
         return badGuids;
     }
 
-    public List<ImportRegisterClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(ImportRegisterClientsService.OrgRegistryGUIDInfo orgGuids,
+    public List<ImportRegisterMSKClientsService.ExpandedPupilInfo> getPupilsByOrgGUID(ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids,
             String familyName, String firstName, String secondName) throws Exception {
-        List<ImportRegisterClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterClientsService.ExpandedPupilInfo>();
+        List<ImportRegisterMSKClientsService.ExpandedPupilInfo> pupils = new ArrayList<ImportRegisterMSKClientsService.ExpandedPupilInfo>();
         int importIteration = 1;
         while (true) {
-            List<ImportRegisterClientsService.ExpandedPupilInfo> iterationPupils = null;
+            List<ImportRegisterMSKClientsService.ExpandedPupilInfo> iterationPupils = null;
             iterationPupils = getClientsForOrgs(orgGuids.getOrgGuids(), familyName, firstName, secondName, importIteration);
             if (iterationPupils == null) continue;
             if (iterationPupils.size() > 0) {
@@ -126,16 +126,16 @@ public class ClientMskNSIService extends MskNSIService {
             importIteration++;
         }
         /// удалить неимпортируемые группы
-        for (Iterator<ImportRegisterClientsService.ExpandedPupilInfo> i = pupils.iterator(); i.hasNext(); ) {
-            ImportRegisterClientsService.ExpandedPupilInfo p = i.next();
-            if (ImportRegisterClientsService.isPupilIgnoredFromImport(p.getGuid(), p.getGroup())) {
+        for (Iterator<ImportRegisterMSKClientsService.ExpandedPupilInfo> i = pupils.iterator(); i.hasNext(); ) {
+            ImportRegisterMSKClientsService.ExpandedPupilInfo p = i.next();
+            if (ImportRegisterMSKClientsService.isPupilIgnoredFromImport(p.getGuid(), p.getGroup())) {
                 i.remove();
             }
         }
         return pupils;
     }
 
-    public List<ImportRegisterClientsService.ExpandedPupilInfo> getClientsForOrgs(Set<String> guids, String familyName,
+    public List<ImportRegisterMSKClientsService.ExpandedPupilInfo> getClientsForOrgs(Set<String> guids, String familyName,
             String firstName, String secondName, int importIteration) throws Exception {
         /*
         От Козлова
@@ -276,9 +276,9 @@ public class ClientMskNSIService extends MskNSIService {
 
         List<Item> queryResults = executeQuery(searchPredicateInfo, importIteration);
         if (queryResults == null) return null;
-        LinkedList<ImportRegisterClientsService.ExpandedPupilInfo> list = new LinkedList<ImportRegisterClientsService.ExpandedPupilInfo>();
+        LinkedList<ImportRegisterMSKClientsService.ExpandedPupilInfo> list = new LinkedList<ImportRegisterMSKClientsService.ExpandedPupilInfo>();
         for(Item i : queryResults) {
-            ImportRegisterClientsService.ExpandedPupilInfo pupilInfo = new ImportRegisterClientsService.ExpandedPupilInfo();
+            ImportRegisterMSKClientsService.ExpandedPupilInfo pupilInfo = new ImportRegisterMSKClientsService.ExpandedPupilInfo();
             for(Attribute attr : i.getAttribute()) {
                 if (attr.getName().equals("Фамилия")) {
                     pupilInfo.familyName = attr.getValue().get(0).getValue();
@@ -329,7 +329,7 @@ public class ClientMskNSIService extends MskNSIService {
 
                 if (attr.getName().equals("Представители")) {
                     for (GroupValue groupValue : attr.getGroupValue()) {
-                        ImportRegisterClientsService.GuardianInfo guardianInfo = new ImportRegisterClientsService.GuardianInfo();
+                        ImportRegisterMSKClientsService.GuardianInfo guardianInfo = new ImportRegisterMSKClientsService.GuardianInfo();
 
                         for (Attribute attr1 : groupValue.getAttribute()) {
                             if (attr1.getName().equals("Фамилия представителя")) {

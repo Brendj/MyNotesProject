@@ -22,7 +22,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
 import ru.axetta.ecafe.processor.core.utils.Base64;
@@ -105,10 +105,10 @@ public class FrontController extends HttpServlet {
         }
         Integer af = actionFilter;
         if (RuntimeContext.RegistryType.isMsk()) {
-            if (actionFilter != ImportRegisterClientsService.CREATE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.DELETE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MODIFY_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+            if (actionFilter != ImportRegisterMSKClientsService.CREATE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.DELETE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MODIFY_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MOVE_OPERATION) {
                 af = null;
             }
         } else if (RuntimeContext.RegistryType.isSpb()) {
@@ -135,10 +135,10 @@ public class FrontController extends HttpServlet {
         }
         Integer af = actionFilter;
         if (RuntimeContext.RegistryType.isMsk()) {
-            if (actionFilter != ImportRegisterClientsService.CREATE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.DELETE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MODIFY_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+            if (actionFilter != ImportRegisterMSKClientsService.CREATE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.DELETE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MODIFY_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MOVE_OPERATION) {
                 af = null;
             }
         } else if (RuntimeContext.RegistryType.isSpb()) {
@@ -163,10 +163,10 @@ public class FrontController extends HttpServlet {
             return Collections.EMPTY_LIST;
         }
         Integer af = actionFilter;
-        if (actionFilter != ImportRegisterClientsService.CREATE_OPERATION
-                && actionFilter != ImportRegisterClientsService.DELETE_OPERATION
-                && actionFilter != ImportRegisterClientsService.MODIFY_OPERATION
-                && actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+        if (actionFilter != ImportRegisterMSKClientsService.CREATE_OPERATION
+                && actionFilter != ImportRegisterMSKClientsService.DELETE_OPERATION
+                && actionFilter != ImportRegisterMSKClientsService.MODIFY_OPERATION
+                && actionFilter != ImportRegisterMSKClientsService.MOVE_OPERATION) {
             af = null;
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
@@ -184,10 +184,10 @@ public class FrontController extends HttpServlet {
         }
         Integer af = actionFilter;
         if (RuntimeContext.RegistryType.isMsk()) {
-            if (actionFilter != ImportRegisterClientsService.CREATE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.DELETE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MODIFY_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+            if (actionFilter != ImportRegisterMSKClientsService.CREATE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.DELETE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MODIFY_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MOVE_OPERATION) {
                 af = null;
             }
         } else if (RuntimeContext.RegistryType.isSpb()) {
@@ -213,10 +213,10 @@ public class FrontController extends HttpServlet {
         }
         Integer af = actionFilter;
         if (RuntimeContext.RegistryType.isMsk()) {
-            if (actionFilter != ImportRegisterClientsService.CREATE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.DELETE_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MODIFY_OPERATION
-                    && actionFilter != ImportRegisterClientsService.MOVE_OPERATION) {
+            if (actionFilter != ImportRegisterMSKClientsService.CREATE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.DELETE_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MODIFY_OPERATION
+                    && actionFilter != ImportRegisterMSKClientsService.MOVE_OPERATION) {
                 af = null;
             }
         } else if (RuntimeContext.RegistryType.isSpb()) {
@@ -309,7 +309,7 @@ public class FrontController extends HttpServlet {
             if (changesList != null && changesList.size() > 0) {
                 if (RuntimeContext.RegistryType.isMsk()) {
                     RegistryChange change = RuntimeContext.getAppContext()
-                            .getBean("importRegisterClientsService", ImportRegisterClientsService.class)
+                            .getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class)
                             .getRegistryChange(changesList.get(0));
                     checkRequestValidity(change.getIdOfOrg());
                 } else if (RuntimeContext.RegistryType.isSpb()) {
@@ -324,7 +324,7 @@ public class FrontController extends HttpServlet {
         }
 
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegitryChangeItem(changesList, operation, fullNameValidation);
+                proceedRegistryChangeItem(changesList, operation, fullNameValidation);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeItemInternal")
@@ -341,7 +341,7 @@ public class FrontController extends HttpServlet {
             //return "При подтверждении изменения из Реестров, произошла ошибка: " + fce.getMessage();
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegitryChangeItem(changesList, operation, fullNameValidation);
+                proceedRegistryChangeItem(changesList, operation, fullNameValidation);
     }
 
     @WebMethod(operationName = "proceedRegitryChangeEmployeeItem")
@@ -358,7 +358,7 @@ public class FrontController extends HttpServlet {
             logger.error("Failed to pass ip check", fce);
         }
         return RuntimeContext.getAppContext().getBean(FrontControllerProcessor.class).
-                proceedRegitryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName);
+                proceedRegistryEmployeeChangeItem(changesList, operation, fullNameValidation, groupName);
     }
 
     @WebMethod(operationName = "loadRegistryChangeRevisions")
@@ -471,7 +471,7 @@ public class FrontController extends HttpServlet {
         RegistryChangeError e = null;
         if (RuntimeContext.RegistryType.isMsk()) {
             e = RuntimeContext.getAppContext()
-                    .getBean("importRegisterClientsService", ImportRegisterClientsService.class)
+                    .getBean("importRegisterMSKClientsService", ImportRegisterMSKClientsService.class)
                     .getRegistryChangeError(idOfRegistryChangeError);
         } else if (RuntimeContext.RegistryType.isSpb()) {
             e = RuntimeContext.getAppContext().getBean(ImportRegisterSpbClientsService.class)
