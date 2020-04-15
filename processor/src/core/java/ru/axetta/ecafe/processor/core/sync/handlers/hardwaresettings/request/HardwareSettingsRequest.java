@@ -121,27 +121,29 @@ public class HardwareSettingsRequest implements SectionRequest {
                                 break;
                             case READERS:
                                 Node readersNode = itemNode.getFirstChild();
+                                HardwareSettingsRequestItem crItem;
+                                List<HardwareSettingsRequestItem> crItemList = new ArrayList<>();
                                 while (null != readersNode) {
                                     if (Node.ELEMENT_NODE == readersNode.getNodeType()) {
-                                        item = HardwareSettingsRequestCRItem.build(readersNode);
-                                    }
-                                    if (readersNode.getNextSibling() != null) {
-                                        items.add(item);
+                                        crItem = HardwareSettingsRequestCRItem.build(readersNode);
+                                        crItemList.add(crItem);
                                     }
                                     readersNode = readersNode.getNextSibling();
-
                                 }
+                                items.addAll(crItemList);
                                 break;
                         }
-                        items.add(item);
+                        if (item != null) {
+                            items.add(item);
+                        }
                     }
                     itemNode = itemNode.getNextSibling();
                 }
                 sectionItem.add(items);
-                if(items.isEmpty()) {
+                if (items.isEmpty()) {
                     System.out.println("empty items");
                 }
-                if(sectionItem.isEmpty()){
+                if (sectionItem.isEmpty()) {
                     System.out.println("empty sectionItem");
                 }
             }
@@ -204,7 +206,7 @@ public class HardwareSettingsRequest implements SectionRequest {
                     System.out.println(requestItem.getResCode());
                     System.out.println("");
                 }
-                if (requestItem.getType() == "Readers") {
+                if (requestItem.getType() == "CR") {
                     HardwareSettingsRequestCRItem crItem = (HardwareSettingsRequestCRItem) requestItem;
                     System.out.println(requestItem.getType());
                     System.out.println(crItem.getFirmwareVer());
