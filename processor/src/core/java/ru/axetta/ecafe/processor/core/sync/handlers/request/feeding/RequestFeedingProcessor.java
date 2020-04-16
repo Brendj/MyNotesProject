@@ -4,9 +4,11 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.request.feeding;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 
@@ -110,6 +112,11 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                 etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood,
                                         new ApplicationForFoodStatus(status.getApplicationForFoodState(),
                                                 status.getDeclineReason())));
+                                if (status.getApplicationForFoodState().equals(ApplicationForFoodState.DENIED))
+                                    //Отправка уведомления клиенту
+                                    RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                            .sendNotificationPreferentialFood(session, applicationForFood, null);
+
                             }
                         } catch (Exception e) {
                             resItem = new ResRequestFeedingItem();

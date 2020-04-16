@@ -12,6 +12,8 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.report.ApplicationForFoodHistoryReportItem;
 import ru.axetta.ecafe.processor.core.report.ApplicationForFoodReportItem;
+import ru.axetta.ecafe.processor.core.service.BenefitService;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.client.ClientSelectListPage;
@@ -54,6 +56,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     private Boolean showPeriod = false;
     private static final String ARCHIEVE_COMMENT = "ЗЛП заархивировано";
     private Boolean needAction = false;
+    private Boolean needSendClient = false;
     private Date benefitStartDate;
     private Date benefitEndDate;
     private Boolean noErrorsOnValidate;
@@ -104,6 +107,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
 
     public void reload() {
         needAction = false;
+        needSendClient = false;
         items.clear();
         deletedItems.clear();
         changeDatesItems.clear();
@@ -164,6 +168,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
     public void makeDenied() {
         setStatus(new ApplicationForFoodStatus(ApplicationForFoodState.DENIED, ApplicationForFoodDeclineReason.NO_DOCS));
         needAction = true;
+        needSendClient = true;
     }
 
     public void makeArchieved() {
@@ -258,6 +263,11 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                             }
                             ClientManager.addOtherDiscountForClient(session, item.getApplicationForFood().getClient(), otherDiscountCode);
                         }
+                    }
+                    if (needSendClient) {
+                        //Отправка уведомления клиенту
+                        RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                .sendNotificationPreferentialFood(session, item.getApplicationForFood(), null);
                     }
                 }
             }
@@ -484,5 +494,13 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public Boolean getNeedSendClient() {
+        return needSendClient;
+    }
+
+    public void setNeedSendClient(Boolean needSendClient) {
+        this.needSendClient = needSendClient;
     }
 }

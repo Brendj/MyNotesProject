@@ -642,21 +642,9 @@ public class DTSZNDiscountsReviseService {
                                         status, applicationVersion, historyVersion, true);
                         statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
                                 status.getApplicationForFoodState(), status.getDeclineReason()));
-                        //Отправка уведомления клтенту
-                        Client client = applicationForFood.getClient();
-                        ClientDtisznDiscountInfo clientDtisznDiscountInfo = DAOUtils
-                                .getDTISZNDiscountInfoByClientAndCode(session, client, applicationForFood.getDtisznCode());
-                        String[] values = new String[]{
-                                BenefitService.SERVICE_NUMBER, applicationForFood.getServiceNumber(),
-                                BenefitService.DATE, CalendarUtils.dateToString(applicationForFood.getCreatedDate()),
-                                BenefitService.DTISZN_CODE, clientDtisznDiscountInfo.getDtisznCode().toString(),
-                                BenefitService.DTISZN_DESCRIPTION, clientDtisznDiscountInfo.getDtisznDescription()};
-                        values = EventNotificationService.attachGenderToValues(client.getGender(), values);
-                        if (forTest)
-                            values = attachValue(values, "TEST", "true");
+                        //Отправка уведомления клиенту
                         RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                                .sendNotification(client, null,
-                                        EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values, new Date());
+                                .sendNotificationPreferentialFood(session, applicationForFood, forTest);
                     }
                     logger.info(String.format("Application with number updated to %s ClientDtisznDiscountInfo{status = %s, dateStart = %s, dateEnd = %s}",
                             isDiscountOk ? "ok" : "denied", info.getStatus().toString(), info.getDateStart().toString(), info.getDateEnd().toString()));
@@ -687,14 +675,6 @@ public class DTSZNDiscountsReviseService {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
-    }
-
-    private String[] attachValue(String[] values, String name, String value) {
-        String[] newValues = new String[values.length + 2];
-        System.arraycopy(values, 0, newValues, 0, values.length);
-        newValues[newValues.length-2] = name;
-        newValues[newValues.length-1] = value;
-        return newValues;
     }
 
     public void updateApplicationForFood(Session session, Client client, List<ClientDtisznDiscountInfo> infoList) {
