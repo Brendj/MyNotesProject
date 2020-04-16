@@ -44,6 +44,7 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_CLIENT_NOT_FOUND_MESSAGE_EMIAS = "Клиент не найден";
     public static final String ERROR_ID_EVENT_EMIAS = "Некорректные данные";
     public static final String ERROR_DUPLICATE_CARD_MESSAGE = "Данная карта уже зарегистрирована.";
+    public static final String ERROR_DUPLICATE_CARD_SECOND_REGISTER_MESSAGE = "Карта прикреплена к организации ";
     public static final String ERROR_INTERNAL_MESSAGE = "Внутренняя ошибка приложения.";
     public static final String ERROR_INTERNAL_MESSAGE_EMIAS = "Внутренняя ошибка";
     public static final String ERROR_SIGN_VERIFY_MESSAGE = "Не пройдена проверка цифровой подписи";

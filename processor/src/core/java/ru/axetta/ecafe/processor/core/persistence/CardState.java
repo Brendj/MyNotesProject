@@ -1,5 +1,8 @@
 package ru.axetta.ecafe.processor.core.persistence;
 
+import java.util.HashMap;
+import java.util.Map;
+
 /**
  * User: shamil
  * Date: 27.04.15
@@ -16,6 +19,13 @@ public enum CardState {
     private final int value;
     private final String description;
 
+    static Map<Integer,CardState> map = new HashMap<Integer,CardState>();
+    static {
+        for (CardState state : CardState.values()) {
+            map.put(state.getValue(), state);
+        }
+    }
+
     private CardState(int value, String description) {
         this.value = value;
         this.description = description;
@@ -27,5 +37,9 @@ public enum CardState {
 
     public String getDescription() {
         return description;
+    }
+
+    public static String fromInteger(Integer value) {
+        return map.get(value).getDescription();
     }
 }

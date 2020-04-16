@@ -1544,8 +1544,8 @@ public class FrontController extends HttpServlet {
                     testForRegisterConditions(persistenceSession, exCard, idOfOrg, secondRegisterAllowed);
                 }
                 if (secondRegisterAllowed && (forceRegister == null || forceRegister != 1))
-                    throw new CardResponseItem.CardAlreadyExistSecondRegisterAllowed(CardResponseItem.ERROR_DUPLICATE_CARD_MESSAGE
-                    + " Организация владелец карты: " + exCard.getOrg().getShortNameInfoService());
+                    throw new CardResponseItem.CardAlreadyExistSecondRegisterAllowed(CardResponseItem.ERROR_DUPLICATE_CARD_SECOND_REGISTER_MESSAGE
+                    + exCard.getOrg().getShortNameInfoService() + ". Статус: " + CardState.fromInteger(exCard.getState()));
 
                 card = cardService
                         .registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
