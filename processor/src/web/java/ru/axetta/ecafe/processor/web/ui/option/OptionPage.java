@@ -150,6 +150,7 @@ public class OptionPage extends BasicWorkspacePage {
     private String nsiVersion;
     private String cardAutoBlockCron;
     private String cardAutoBlockNode;
+    private Integer cardAutoBlockDays;
 
     private String[] rnipVersions = new String[] {RNIPVersion.RNIP_V115.toString(), RNIPVersion.RNIP_V116.toString(), RNIPVersion.RNIP_V21.toString()};
 
@@ -1052,6 +1053,7 @@ public class OptionPage extends BasicWorkspacePage {
 
         cardAutoBlockCron = runtimeContext.getOptionValueString(Option.OPTION_CARD_AUTOBLOCK);
         cardAutoBlockNode = runtimeContext.getOptionValueString(Option.OPTION_CARD_AUTOBLOCK_NODE);
+        cardAutoBlockDays = runtimeContext.getOptionValueInt(Option.OPTION_CARD_AUTOBLOCK_DAYS);
     }
 
     private void validateSyncExpressions() throws Exception {
@@ -1252,6 +1254,7 @@ public class OptionPage extends BasicWorkspacePage {
 
             runtimeContext.setOptionValue(Option.OPTION_CARD_AUTOBLOCK, cardAutoBlockCron);
             runtimeContext.setOptionValue(Option.OPTION_CARD_AUTOBLOCK_NODE, cardAutoBlockNode);
+            runtimeContext.setOptionValue(Option.OPTION_CARD_AUTOBLOCK_DAYS, cardAutoBlockDays);
 
             runtimeContext.saveOptionValues();
             printMessage("Настройки сохранены. Для применения необходим перезапуск");
@@ -1436,5 +1439,13 @@ public class OptionPage extends BasicWorkspacePage {
 
     public void setCardAutoBlockNode(String cardAutoBlockNode) {
         this.cardAutoBlockNode = cardAutoBlockNode;
+    }
+
+    public Integer getCardAutoBlockDays() {
+        return cardAutoBlockDays;
+    }
+
+    public void setCardAutoBlockDays(Integer cardAutoBlockDays) {
+        this.cardAutoBlockDays = cardAutoBlockDays;
     }
 }

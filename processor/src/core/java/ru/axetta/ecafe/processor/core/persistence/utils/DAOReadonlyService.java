@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.dao.org.OrgRepository;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -90,6 +91,22 @@ public class DAOReadonlyService {
                 .addScalar("discountsum", StandardBasicTypes.BIG_DECIMAL).addScalar("ordertype")
                 .addScalar("idofclient");
         return q.list();
+    }
+
+    public List<Card> getCardsToBlock(Integer daysInactivity) {
+        Date date = CalendarUtils.addDays(new Date(), -daysInactivity);
+        Query query = entityManager.createNativeQuery("select ca.idofcard from cf_cards ca where ca.state = 0 and ca.issuedate < :date and ca.idofclient is not null "
+                + "and not exists (select idofenterevent from cf_enterevents ee where ee.idofclient = ca.idofclient and ee.idofcard = ca.idofcard and ee.evtdatetime > :date) "
+                + "and not exists (select idoforder from cf_orders o where o.idofclient = ca.idofclient and o.idofcard = ca.idofcard and o.createddate > :date)");
+        query.setParameter("date", date);
+        List list = query.getResultList();
+        List<Card> result = new ArrayList<Card>();
+        for (Object obj : list) {
+            Long idOfCard = HibernateUtils.getDbLong(obj);
+            Card card = entityManager.find(Card.class, idOfCard);
+            result.add(card);
+        }
+        return result;
     }
 
     public Org findOrg(Long idOfOrg) throws Exception {

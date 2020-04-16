@@ -162,6 +162,8 @@
         <h:panelGrid styleClass="borderless-grid" columns="2" bgcolor="#CCCCCC">
             <h:outputText escape="true" value="CRON-выражение для сервиса блокировки неиспользуемых карт" styleClass="output-text" />
             <h:inputText value="#{optionPage.cardAutoBlockCron}" styleClass="input-text"  />
+            <h:outputText escape="true" value="Сколько дней отсутствия активности по карте до блокировки" styleClass="output-text" />
+            <h:inputText value="#{optionPage.cardAutoBlockDays}" styleClass="input-text"  />
             <h:outputText escape="true" value="Сервер для запуска операции блокировки" styleClass="output-text" />
             <h:inputText value="#{optionPage.cardAutoBlockNode}" styleClass="input-text"  />
         </h:panelGrid>
