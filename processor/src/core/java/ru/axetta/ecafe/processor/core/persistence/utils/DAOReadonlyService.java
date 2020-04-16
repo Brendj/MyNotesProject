@@ -953,4 +953,19 @@ public class DAOReadonlyService {
         query.setParameter("menu", menu);
         return query.list();
     }
+
+    public Long getMenuGroupIdByMenuAndDishIds (Long menuId, Long dishId) {
+        Query query = entityManager.createNativeQuery("SELECT mg.id FROM cf_wt_menu_groups mg "
+                + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgr.idofmenugroup = mg.id "
+                + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
+                + "LEFT JOIN cf_wt_dishes d ON mgd.idofdish = d.idofdish "
+                + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
+                + "WHERE m.idofmenu = :idOfMenu AND d.idofdish = :idOfDish");
+
+        query.setParameter("idOfMenu", menuId);
+        query.setParameter("idOfDish", dishId);
+
+        Object result = query.getSingleResult();
+        return result != null ? ((BigInteger) result).longValue() : 0L;
+    }
 }
