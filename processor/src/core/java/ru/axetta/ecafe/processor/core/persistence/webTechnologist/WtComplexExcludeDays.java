@@ -27,8 +27,8 @@ public class WtComplexExcludeDays {
     @Column(name = "version")
     private Long version;
 
-    @Column(name = "deleteState")
-    private Integer deleteState;
+    //@Column(name = "deleteState")
+    //private Integer deleteState;
 
     public Long getId() {
         return id;
