@@ -922,6 +922,19 @@ public class DAOReadonlyService {
         }
     }
 
+    public Set<WtComplexExcludeDays> getExcludeDaysSetFromVersion(Long version) {
+        try {
+            Query query = entityManager.createQuery(
+                    "SELECT excludeDays from WtComplexExcludeDays excludeDays where excludeDays.version > :version");
+            query.setParameter("version", version);
+            List<WtComplexExcludeDays> excludeDays = query.getResultList();
+            return new HashSet<>(excludeDays);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
     public Set<Org> findFriendlyOrgs(Long idOfOrg) {
         Session session = entityManager.unwrap(Session.class);
         List<Long> friendlyOrgIds = DAOUtils.findFriendlyOrgIds(session, idOfOrg);
