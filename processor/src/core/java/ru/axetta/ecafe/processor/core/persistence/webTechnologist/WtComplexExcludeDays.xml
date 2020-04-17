@@ -19,9 +19,9 @@
         <property name="version">
             <column name="version" sql-type="long"/>
         </property>
-        <property name="deleteState">
-            <column name="deleteState" sql-type="integer"/>
-        </property>
+<!--        <property name="deleteState">-->
+<!--            <column name="deleteState" sql-type="integer"/>-->
+<!--        </property>-->
 
         <many-to-one name="complex" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex">
             <column name="idofcomplex"/>

@@ -447,9 +447,9 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(element, "ComplexId", excludeDays.getComplex().getIdOfComplex());
         XMLUtils.setAttributeIfNotNull(element, "Date", dateWithoutTimeFormat.format(excludeDays.getDate()));
         XMLUtils.setAttributeIfNotNull(element, "V", excludeDays.getVersion());
-        if (excludeDays.getDeleteState() != null) {
-            XMLUtils.setAttributeIfNotNull(element, "D", excludeDays.getDeleteState());
-        }
+        //if (excludeDays.getDeleteState() != null) {
+        //    XMLUtils.setAttributeIfNotNull(element, "D", excludeDays.getDeleteState());
+        //}
 
         return element;
     }

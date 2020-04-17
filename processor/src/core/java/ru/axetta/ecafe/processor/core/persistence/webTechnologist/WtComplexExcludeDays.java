@@ -62,13 +62,14 @@ public class WtComplexExcludeDays {
         this.version = version;
     }
 
-    public Integer getDeleteState() {
-        return deleteState;
-    }
+    //public Integer getDeleteState() {
+    //    return deleteState;
+    //}
+    //
+    //public void setDeleteState(Integer deleteState) {
+    //    this.deleteState = deleteState;
+    //}
 
-    public void setDeleteState(Integer deleteState) {
-        this.deleteState = deleteState;
-    }
 
     @Override
     public boolean equals(Object o) {
@@ -80,17 +81,17 @@ public class WtComplexExcludeDays {
         }
         WtComplexExcludeDays that = (WtComplexExcludeDays) o;
         return id.equals(that.id) && date.equals(that.date) && complex.equals(that.complex) && version
-                .equals(that.version) && deleteState.equals(that.deleteState);
+                .equals(that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, date, complex, version, deleteState);
+        return Objects.hash(id, date, complex, version);
     }
 
     @Override
     public String toString() {
         return "WtComplexExcludeDays{" + "id=" + id + ", date=" + date + ", complex=" + complex + ", version=" + version
-                + ", deleteState=" + deleteState + '}';
+                + '}';
     }
 }
