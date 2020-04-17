@@ -230,7 +230,9 @@ public class Processor implements SyncProcessor {
                 }
                 case TYPE_MENU_SUPPLIER: {
                     //обработка синхронизации веб-технолога
-                    response = buildMenuSupplierSyncResponse(request);
+                    if (request.getOrg().getUseWebArm()) {
+                        response = buildMenuSupplierSyncResponse(request);
+                    }
                     break;
                 }
             }
@@ -829,7 +831,7 @@ public class Processor implements SyncProcessor {
 
         // Process MenuSupplier
         try {
-            if (request.getMenuSupplier() != null) {
+            if (request.getMenuSupplier() != null && request.getOrg().getUseWebArm()) {
                 resMenuSupplier = processMenuSupplier(request.getMenuSupplier());
             }
         } catch (Exception e) {
