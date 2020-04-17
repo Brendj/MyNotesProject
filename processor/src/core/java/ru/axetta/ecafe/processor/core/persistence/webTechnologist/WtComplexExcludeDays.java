@@ -27,6 +27,9 @@ public class WtComplexExcludeDays {
     @Column(name = "version")
     private Long version;
 
+    @Column(name = "deleteState")
+    private Integer deleteState;
+
     public Long getId() {
         return id;
     }
@@ -59,6 +62,14 @@ public class WtComplexExcludeDays {
         this.version = version;
     }
 
+    public Integer getDeleteState() {
+        return deleteState;
+    }
+
+    public void setDeleteState(Integer deleteState) {
+        this.deleteState = deleteState;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -68,11 +79,18 @@ public class WtComplexExcludeDays {
             return false;
         }
         WtComplexExcludeDays that = (WtComplexExcludeDays) o;
-        return id.equals(that.id) && Objects.equals(date, that.date) && Objects.equals(version, that.version);
+        return id.equals(that.id) && date.equals(that.date) && complex.equals(that.complex) && version
+                .equals(that.version) && deleteState.equals(that.deleteState);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, date, version);
+        return Objects.hash(id, date, complex, version, deleteState);
+    }
+
+    @Override
+    public String toString() {
+        return "WtComplexExcludeDays{" + "id=" + id + ", date=" + date + ", complex=" + complex + ", version=" + version
+                + ", deleteState=" + deleteState + '}';
     }
 }

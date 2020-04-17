@@ -184,7 +184,8 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "ExcludeDaysRequest": {
-                    excludeDays = DAOReadonlyService.getInstance().getExcludeDaysSetFromVersion(entry.getValue());
+                    excludeDays = DAOReadonlyService.getInstance().getExcludeDaysSetFromVersion(entry.getValue(),
+                            contragent, org);
                     break;
                 }
             }

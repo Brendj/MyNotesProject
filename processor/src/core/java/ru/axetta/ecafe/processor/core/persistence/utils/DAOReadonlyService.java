@@ -922,11 +922,16 @@ public class DAOReadonlyService {
         }
     }
 
-    public Set<WtComplexExcludeDays> getExcludeDaysSetFromVersion(Long version) {
+    public Set<WtComplexExcludeDays> getExcludeDaysSetFromVersion(Long version, Contragent contragent, Org org) {
         try {
             Query query = entityManager.createQuery(
-                    "SELECT excludeDays from WtComplexExcludeDays excludeDays where excludeDays.version > :version");
+                    "SELECT excludeDays from WtComplexExcludeDays excludeDays "
+                    + "LEFT JOIN FETCH excludeDays.complex complex "
+                    + "WHERE excludeDays.version > :version "
+                    + "AND complex.contragent = :contragent AND :org IN elements(complex.orgs) ");
             query.setParameter("version", version);
+            query.setParameter("contragent", contragent);
+            query.setParameter("org", org);
             List<WtComplexExcludeDays> excludeDays = query.getResultList();
             return new HashSet<>(excludeDays);
         } catch (Exception e) {

@@ -27,6 +27,7 @@ import java.util.*;
 public class ResMenuSupplier implements AbstractToElement {
 
     private final String datePattern = "dd.MM.yyyy hh:mm:ss";
+    private final String dateWithoutTimePattern = "dd.MM.yyyy";
 
     private Set<WtOrgGroup> orgGroups;
     private Set<WtCategoryItem> categoryItems;
@@ -44,6 +45,7 @@ public class ResMenuSupplier implements AbstractToElement {
     private Long idOfOrg;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
+    SimpleDateFormat dateWithoutTimeFormat = new SimpleDateFormat(dateWithoutTimePattern);
 
     public ResMenuSupplier() {
         orgGroups = new HashSet<>();
@@ -443,9 +445,11 @@ public class ResMenuSupplier implements AbstractToElement {
 
         XMLUtils.setAttributeIfNotNull(element, "ExcludeDaysId", excludeDays.getId());
         XMLUtils.setAttributeIfNotNull(element, "ComplexId", excludeDays.getComplex().getIdOfComplex());
-        XMLUtils.setAttributeIfNotNull(element, "Date", simpleDateFormat.format(excludeDays.getDate()));
+        XMLUtils.setAttributeIfNotNull(element, "Date", dateWithoutTimeFormat.format(excludeDays.getDate()));
         XMLUtils.setAttributeIfNotNull(element, "V", excludeDays.getVersion());
-        //XMLUtils.setAttributeIfNotNull(element, "D", excludeDays.getDeleteState()); // нет поля в БД
+        if (excludeDays.getDeleteState() != null) {
+            XMLUtils.setAttributeIfNotNull(element, "D", excludeDays.getDeleteState());
+        }
 
         return element;
     }
