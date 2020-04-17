@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sync.AbstractToElement;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
@@ -265,7 +266,7 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "AgeGroupId", dish.getWtAgeGroupItem().getIdOfAgeGroupItem());
         XMLUtils.setAttributeIfNotNull(prop, "TypeProductionId",
                 dish.getWtTypeProductionItem().getIdOfTypeProductionItem());
-        if (StringUtils.isEmpty(dish.getBarcode())) {
+        if (!StringUtils.isEmpty(dish.getBarcode())) {
             XMLUtils.setAttributeIfNotNull(prop, "BarCode", dish.getBarcode());
         }
         XMLUtils.setAttributeIfNotNull(prop, "Protein", dish.getProtein());
@@ -303,9 +304,9 @@ public class ResMenuSupplier implements AbstractToElement {
 
         XMLUtils.setAttributeIfNotNull(element, "Id", menuGroup.getId());
         XMLUtils.setAttributeIfNotNull(element, "Name", menuGroup.getName());
-        if (!menuGroup.getMenus().isEmpty()) {
-            List<WtMenu> menuGroups = new ArrayList<>(menuGroup.getMenus());
-            XMLUtils.setAttributeIfNotNull(element, "MenuGroupId", menuGroups.get(0));
+        if (!menuGroup.getMenuGroupMenus().isEmpty()) {
+            List<WtMenuGroupMenu> menuGroupMenus = new ArrayList<>(menuGroup.getMenuGroupMenus());
+            XMLUtils.setAttributeIfNotNull(element, "MenuId", menuGroupMenus.get(0));
         }
         XMLUtils.setAttributeIfNotNull(element, "V", menuGroup.getVersion());
         XMLUtils.setAttributeIfNotNull(element, "D", menuGroup.getDeleteState());
@@ -337,15 +338,20 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(prop, "D", menu.getDeleteState());
 
         Element dishes = document.createElement("Dishes");
-        for (WtDish item : menu.getDishes()) {
-            Element elem = document.createElement("DSI");
-            XMLUtils.setAttributeIfNotNull(elem, "MenuId", menu.getIdOfMenu());
-            XMLUtils.setAttributeIfNotNull(elem, "DishId", item.getIdOfDish());
-            if (!item.getMenuGroups().isEmpty()) {
-                List<WtMenuGroup> menuGroups = new ArrayList<>(item.getMenuGroups());
-                XMLUtils.setAttributeIfNotNull(elem, "MenuGroupId", menuGroups.get(0));
+        List<WtDish> menuDishesList = DAOReadonlyService.getInstance().getMenuDishes(menu);
+        if (menuDishesList != null && menuDishesList.size() > 0) {
+            Set<WtDish> menuDishesSet = new HashSet<>(menuDishesList);
+            for (WtDish dish : menuDishesSet) {
+                Element elem = document.createElement("DSI");
+                XMLUtils.setAttributeIfNotNull(elem, "MenuId", menu.getIdOfMenu());
+                XMLUtils.setAttributeIfNotNull(elem, "DishId", dish.getIdOfDish());
+                Long idOfMenuGroup = DAOReadonlyService.getInstance()
+                        .getMenuGroupIdByMenuAndDishIds (menu.getIdOfMenu(), dish.getIdOfDish());
+                if (idOfMenuGroup != null) {
+                    XMLUtils.setAttributeIfNotNull(elem, "MenuGroupId", idOfMenuGroup);
+                }
+                dishes.appendChild(elem);
             }
-            dishes.appendChild(elem);
         }
 
         Element orgs = document.createElement("Orgs");
@@ -377,6 +383,10 @@ public class ResMenuSupplier implements AbstractToElement {
             price = 0;
         }
         XMLUtils.setAttributeIfNotNull(prop, "Price", price);
+
+        if (!StringUtils.isEmpty(complex.getBarcode())) {
+            XMLUtils.setAttributeIfNotNull(prop, "BarCode", complex.getBarcode());
+        }
 
         Date beginDate = complex.getBeginDate();
         if (beginDate != null) {

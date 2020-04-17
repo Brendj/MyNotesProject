@@ -157,18 +157,14 @@ public class MenuSupplier implements SectionRequest {
                     break;
                 }
                 case "MenuGroupsRequest": {
+                    //menuGroups = DAOReadonlyService.getInstance()
+                    //        .getMenuGroupsSetFromVersion(entry.getValue(), contragent, org);
                     menuGroups = DAOReadonlyService.getInstance()
-                            .getMenuGroupsSetFromVersion(entry.getValue(), contragent, org);
+                            .getMenuGroupsSetFromVersion(entry.getValue(), contragent);
                     break;
                 }
                 case "MenusRequest": {
                     menus = DAOReadonlyService.getInstance().getMenusSetFromVersion(entry.getValue(), contragent, org);
-                    // добавление блюд, не имеющих непосредственной связки с меню
-                    for (WtMenu menu : menus) {
-                        for (WtMenuGroup menuGroup : menu.getMenuGroups()) {
-                            menu.getDishes().addAll(menuGroup.getDishes());
-                        }
-                    }
                     break;
                 }
                 case "ComplexesRequest": {
