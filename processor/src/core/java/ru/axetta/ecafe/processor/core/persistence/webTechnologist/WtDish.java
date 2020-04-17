@@ -107,22 +107,17 @@ public class WtDish {
     private Set<WtCategoryItem> categoryItems = new HashSet<>();
 
     @ManyToMany
-    @JoinTable(name = "cf_wt_dishes_menu_relationships",
-            joinColumns = @JoinColumn(name = "idOfDish"),
-            inverseJoinColumns = @JoinColumn(name = "idOfMenu"))
-    private Set<WtMenu> menus = new HashSet<>();
-
-    @ManyToMany
     @JoinTable(name = "cf_wt_dish_groupitem_relationships",
             joinColumns = @JoinColumn(name = "idOfDish"),
             inverseJoinColumns = @JoinColumn(name = "idOfGroupItem"))
     private Set<WtGroupItem> groupItems = new HashSet<>();
 
     @ManyToMany
-    @JoinTable(name = "cf_wt_dishes_menu_relationships",
+    @JoinTable(name = "cf_wt_menu_group_dish_relationships",
             joinColumns = @JoinColumn(name = "idOfDish"),
-            inverseJoinColumns = @JoinColumn(name = "idOfMenuGroup"))
-    private Set<WtMenuGroup> menuGroups = new HashSet<>();
+            inverseJoinColumns = @JoinColumn(name = "idOfMenuMenuGroupRelation"))
+    private Set<WtMenuGroupMenu> menuGroupMenus = new HashSet<>();
+
 
     public Long getIdOfDish() {
         return idOfDish;
@@ -324,12 +319,12 @@ public class WtDish {
         this.categoryItems = categoryItems;
     }
 
-    public Set<WtMenu> getMenus() {
-        return menus;
+    public Set<WtMenuGroupMenu> getMenuGroupMenus() {
+        return menuGroupMenus;
     }
 
-    public void setMenus(Set<WtMenu> menus) {
-        this.menus = menus;
+    public void setMenuGroupMenus(Set<WtMenuGroupMenu> menuGroupMenus) {
+        this.menuGroupMenus = menuGroupMenus;
     }
 
     public Set<WtGroupItem> getGroupItems() {
@@ -338,14 +333,6 @@ public class WtDish {
 
     public void setGroupItems(Set<WtGroupItem> groupItems) {
         this.groupItems = groupItems;
-    }
-
-    public Set<WtMenuGroup> getMenuGroups() {
-        return menuGroups;
-    }
-
-    public void setMenuGroups(Set<WtMenuGroup> menuGroups) {
-        this.menuGroups = menuGroups;
     }
 
     @Override

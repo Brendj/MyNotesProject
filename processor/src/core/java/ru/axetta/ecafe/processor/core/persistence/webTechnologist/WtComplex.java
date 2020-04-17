@@ -65,6 +65,9 @@ public class WtComplex {
     @Column(name = "deleteState")
     private Integer deleteState;
 
+    @Column(name = "barcode")
+    private String barcode;
+
     @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfComplexGroupItem")
     private WtComplexGroupItem wtComplexGroupItem;
@@ -102,9 +105,6 @@ public class WtComplex {
 
     @OneToMany(mappedBy = "wtComplex")
     private Set<WtComplexesItem> wtComplexesItems = new HashSet<>();
-
-    @OneToMany(mappedBy = "complex")
-    private Set<WtComplexExcludeDays> wtExcludeDays = new HashSet<>();
 
     public Boolean getIsPortal() {
         return isPortal;
@@ -307,12 +307,12 @@ public class WtComplex {
         this.wtComplexesItems = wtComplexesItems;
     }
 
-    public Set<WtComplexExcludeDays> getWtExcludeDays() {
-        return wtExcludeDays;
+    public String getBarcode() {
+        return barcode;
     }
 
-    public void setWtExcludeDays(Set<WtComplexExcludeDays> wtExcludeDays) {
-        this.wtExcludeDays = wtExcludeDays;
+    public void setBarcode(String barcode) {
+        this.barcode = barcode;
     }
 
     @Override
