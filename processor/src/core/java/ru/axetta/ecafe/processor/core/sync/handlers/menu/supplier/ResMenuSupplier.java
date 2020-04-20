@@ -15,7 +15,10 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /**
  * Created with IntelliJ IDEA.
@@ -304,10 +307,10 @@ public class ResMenuSupplier implements AbstractToElement {
 
         XMLUtils.setAttributeIfNotNull(element, "Id", menuGroup.getId());
         XMLUtils.setAttributeIfNotNull(element, "Name", menuGroup.getName());
-        if (!menuGroup.getMenuGroupMenus().isEmpty()) {
-            List<WtMenuGroupMenu> menuGroupMenus = new ArrayList<>(menuGroup.getMenuGroupMenus());
-            XMLUtils.setAttributeIfNotNull(element, "MenuId", menuGroupMenus.get(0));
-        }
+        //if (!menuGroup.getMenuGroupMenus().isEmpty()) {
+        //    List<WtMenuGroupMenu> menuGroupMenus = new ArrayList<>(menuGroup.getMenuGroupMenus());
+        //    XMLUtils.setAttributeIfNotNull(element, "MenuId", menuGroupMenus.get(0));
+        //}
         XMLUtils.setAttributeIfNotNull(element, "V", menuGroup.getVersion());
         XMLUtils.setAttributeIfNotNull(element, "D", menuGroup.getDeleteState());
 
