@@ -809,19 +809,8 @@ public class ImportRegisterSpbClientsService implements ImportClientRegisterServ
 
     //@Transactional
     private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change){
-        ClientGroupMigrationHistory migration = new ClientGroupMigrationHistory(org,client);
-        migration.setComment(ClientGroupMigrationHistory.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
-        migration.setNewGroupName(change.getGroupName());
-        if(client.getIdOfClientGroup() != null) {
-            // в методе ClientManager.modifyClientTransactionFree в этом поле сохранен новый ИД группы
-            migration.setNewGroupId(client.getIdOfClientGroup());
-        }
-        if (client.getClientGroup() != null) {
-            // так как сущность client еще не обновлена, то в поле clientGroup хранятся данные старой группы
-            migration.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
-            migration.setOldGroupName(client.getClientGroup().getGroupName());
-        }
-        session.save(migration);
+        ClientManager.createClientGroupMigrationHistory(session, client, org, client.getIdOfClientGroup(),
+                change.getGroupName(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
     }
 
     @Transactional

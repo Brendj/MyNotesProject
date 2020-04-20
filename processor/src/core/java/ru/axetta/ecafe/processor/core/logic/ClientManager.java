@@ -1703,11 +1703,17 @@ public class ClientManager {
 
     /* получить список опекунов по опекаемому */
     public static List<Client> findGuardiansByClient(Session session, Long idOfChildren) throws Exception {
+        return findGuardiansByClient(session, idOfChildren, false);
+    }
+
+    public static List<Client> findGuardiansByClient(Session session, Long idOfChildren, boolean includeDisabled) throws Exception {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
-        idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        if (!includeDisabled) {
+            idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        }
         idOfGuardianCriteria.setProjection(Property.forName("idOfGuardian"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
@@ -1721,11 +1727,17 @@ public class ClientManager {
 
     /* получить список опекаемых по опекуну */
     public static List<Client> findChildsByClient(Session session, Long idOfGuardian) throws Exception {
+        return findChildsByClient(session, idOfGuardian, false);
+    }
+
+    public static List<Client> findChildsByClient(Session session, Long idOfGuardian, boolean includeDisabled) throws Exception {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
         idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
-        idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        if (!includeDisabled) {
+            idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        }
         idOfGuardianCriteria.setProjection(Property.forName("idOfChildren"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
@@ -2226,6 +2238,43 @@ public class ClientManager {
         clientGroupMigrationHistory.setComment(comment);
 
         session.save(clientGroupMigrationHistory);
+        disableGuardianshipIfClientLeaving(session, client, idOfClientGroup);
+    }
+
+    private static void disableGuardianshipIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
+        if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
+        try {
+            List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), true);
+            for (Client guardian : guardians) {
+                boolean otherChildrenExist = false;
+                List<Client> children = findChildsByClient(session, guardian.getIdOfClient());
+                for (Client child : children) {
+                    if (!child.equals(client) && (child.isStudent() || child.getClientGroup() == null) && !child.isLeaving()) {
+                        otherChildrenExist = true;
+                        break;
+                    }
+                }
+                boolean deactivateGuardianship = guardian.isParent() || guardian.isSotrudnikMsk() || guardian.isEmployee();
+                if (deactivateGuardianship) {
+                    Long version = generateNewClientGuardianVersion(session);
+                    ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
+                    clientGuardian.disable(version);
+                    if (guardian.isParent() && !otherChildrenExist) {
+                        ClientManager.createClientGroupMigrationHistory(session, guardian, guardian.getOrg(),
+                                ClientGroup.Predefined.CLIENT_LEAVING.getValue(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(),
+                                ClientGroupMigrationHistory.MODIFY_AUTO_MODE
+                                        .concat(String.format(" (ид. опекаемого=%s)", client.getIdOfClient())));
+                        guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+                        guardian.setClientRegistryVersion(clientRegistryVersion);
+                        session.update(guardian);
+                    }
+                    session.update(clientGuardian);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error in disableGuardianshipIfClientLeaving: ", e);
+        }
     }
 
     public static void checkUserOPFlag(Session session, Org oldOrg, Org newOrg, Long idOfClientGroup, Client client) {

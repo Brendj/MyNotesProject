@@ -1071,6 +1071,21 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 client.getNotificationSettings().remove(newSetting);
             }
         }
+
+        if (clientGuardianItems != null && !clientGuardianItems.isEmpty()) {
+            addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems);
+        }
+        if (removeListGuardianItems != null && !removeListGuardianItems.isEmpty()) {
+            removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
+        }
+
+        if (clientWardItems != null && !clientWardItems.isEmpty()) {
+            addWardsByClient(persistenceSession, idOfClient, clientWardItems);
+        }
+        if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
+            removeWardsByClient(persistenceSession, idOfClient, removeListWardItems);
+        }
+
         if (isReplaceOrg) {
             if (client.getClientGroup() != null) {
                 clientMigration.setOldGroupName(client.getClientGroup().getGroupName());
@@ -1126,20 +1141,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
             }
             client.setIdOfClientGroup(this.idOfClientGroup);
-        }
-
-        if (clientGuardianItems != null && !clientGuardianItems.isEmpty()) {
-            addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems);
-        }
-        if (removeListGuardianItems != null && !removeListGuardianItems.isEmpty()) {
-            removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
-        }
-
-        if (clientWardItems != null && !clientWardItems.isEmpty()) {
-            addWardsByClient(persistenceSession, idOfClient, clientWardItems);
-        }
-        if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
-            removeWardsByClient(persistenceSession, idOfClient, removeListWardItems);
         }
 
         resetNewFlags();
