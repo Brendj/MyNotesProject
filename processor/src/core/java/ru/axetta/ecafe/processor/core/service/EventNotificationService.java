@@ -7,14 +7,12 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sms.ISmsService;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPSmsServiceImpl;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPAbstractEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventType;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPEventTypeFactory;
 import ru.axetta.ecafe.processor.core.sms.emp.type.EMPLeaveWithGuardianEventType;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.math.NumberUtils;
@@ -1226,30 +1224,5 @@ public class EventNotificationService {
     public String beautifyAmount(long amt) {
         String balanceStr = NumberFormat.getCurrencyInstance().format((double) amt / 100) + "р.";
         return balanceStr;
-    }
-
-    public void sendNotificationPreferentialFood(Session session, ApplicationForFood applicationForFood, Boolean forTest)
-    {
-        Client client = applicationForFood.getClient();
-        ClientDtisznDiscountInfo clientDtisznDiscountInfo = DAOUtils
-                .getDTISZNDiscountInfoByClientAndCode(session, client, applicationForFood.getDtisznCode());
-        String[] values = new String[]{
-                BenefitService.SERVICE_NUMBER, applicationForFood.getServiceNumber(),
-                BenefitService.DATE, CalendarUtils.dateToString(applicationForFood.getCreatedDate()),
-                BenefitService.DTISZN_CODE, clientDtisznDiscountInfo.getDtisznCode().toString(),
-                BenefitService.DTISZN_DESCRIPTION, clientDtisznDiscountInfo.getDtisznDescription()};
-        values = attachGenderToValues(client.getGender(), values);
-        if (forTest != null && forTest)
-            values = attachValue(values, "TEST", "true");
-        sendNotification(client, null,
-                        EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values, new Date());
-    }
-
-    private String[] attachValue(String[] values, String name, String value) {
-        String[] newValues = new String[values.length + 2];
-        System.arraycopy(values, 0, newValues, 0, values.length);
-        newValues[newValues.length-2] = name;
-        newValues[newValues.length-1] = value;
-        return newValues;
     }
 }

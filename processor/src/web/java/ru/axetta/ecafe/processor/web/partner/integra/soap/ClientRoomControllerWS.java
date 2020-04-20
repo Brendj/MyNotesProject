@@ -9872,12 +9872,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new Exception(
                         "Result of update ApplicationForFood serviceNumber = " + serviceNumber + " is null");
             }
-            if (ApplicationForFoodState.fromCode(declineReasonCode) == ApplicationForFoodState.DENIED) {
-                //Отправка уведомления клиенту
-                RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                        .sendNotificationPreferentialFood(persistenceSession, updatedApplicationForFood, null);
-                //
-            }
             RuntimeContext.getAppContext().getBean(ETPMVService.class)
                     .sendStatus(System.currentTimeMillis() - 1000, serviceNumber, status.getApplicationForFoodState(),
                             status.getDeclineReason());

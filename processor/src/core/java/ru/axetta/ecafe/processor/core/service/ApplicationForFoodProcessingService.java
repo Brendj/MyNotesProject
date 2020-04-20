@@ -122,11 +122,6 @@ public class ApplicationForFoodProcessingService {
                             application.getStatus().getDeclineReason());
                     application = DAOUtils.updateApplicationForFoodWithVersion(session, application, deniedStatus, applicationVersion,
                             historyVersion);
-                    //
-                    //Отправка уведомления клиенту
-                    RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                            .sendNotificationPreferentialFood(session, application, null);
-                    //
                     service.sendStatusAsync(System.currentTimeMillis(), application.getServiceNumber(),
                             application.getStatus().getApplicationForFoodState(),
                             application.getStatus().getDeclineReason());
