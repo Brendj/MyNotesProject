@@ -95,10 +95,9 @@ public class DAOReadonlyService {
 
     public List<Card> getCardsToBlock(Integer daysInactivity) {
         Date date = CalendarUtils.addDays(new Date(), -daysInactivity);
-        Query query = entityManager.createNativeQuery("select ca.idofcard from cf_cards ca where ca.state = 0 and ca.issuedate < :date and ca.idofclient is not null "
-                + "and not exists (select idofenterevent from cf_enterevents ee where ee.idofclient = ca.idofclient and ee.idofcard = ca.idofcard and ee.evtdatetime > :date) "
-                + "and not exists (select idoforder from cf_orders o where o.idofclient = ca.idofclient and o.idofcard = ca.idofcard and o.createddate > :date)");
-        query.setParameter("date", date);
+        Query query = entityManager.createNativeQuery("select ca.IdOfCard from cf_cards ca where ca.state = 0 and ca.issuedate < :date and ca.idofclient is not null "
+                + "and not exists (select idofcard from cf_card_activity caa where caa.idofcard = ca.idofcard and caa.lastupdate > :date)");
+        query.setParameter("date", date.getTime());
         List list = query.getResultList();
         List<Card> result = new ArrayList<Card>();
         for (Object obj : list) {

@@ -306,7 +306,7 @@ public class Option {
             OPTION_PERIOD_OF_EXTENSION_CARDS, "12",
             OPTION_NSI_VERSION, NSI2,
             OPTION_CARD_AUTOBLOCK, "0 0 3 ? * 1",
-            OPTION_CARD_AUTOBLOCK_NODE, "1",
+            OPTION_CARD_AUTOBLOCK_NODE, "1001",
             OPTION_CARD_AUTOBLOCK_DAYS, "180"
 };
 

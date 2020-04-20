@@ -562,6 +562,28 @@ public class DAOUtils {
         return (Card) criteria.uniqueResult();
     }
 
+    public static Card findCardByCardNoExtended(Session session, Long cardNo, Long idOfClient, Long idOfGuardian, Long idOfVisitor) {
+        if (cardNo == null) return null;
+        try {
+            Criteria criteria = session.createCriteria(Card.class);
+            criteria.add(Restrictions.eq("cardNo", cardNo));
+            if (idOfClient != null || idOfGuardian != null || idOfVisitor != null) {
+                List<Long> ids = new ArrayList<>();
+                if (idOfClient != null) ids.add(idOfClient);
+                if (idOfGuardian != null) ids.add(idOfGuardian);
+                if (idOfVisitor != null) ids.add(idOfVisitor);
+                if (ids.size() > 0)
+                    criteria.add(Restrictions.in("client.idOfClient", ids));
+            }
+            criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+            criteria.setMaxResults(1);
+            return (Card) criteria.uniqueResult();
+        } catch (Exception e) {
+            logger.error("Error in findCardByCardNoExtended", e);
+            return null;
+        }
+    }
+
     public static NewCard findNewCardByCardNo(Session persistenceSession, long cardNo) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(NewCard.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
