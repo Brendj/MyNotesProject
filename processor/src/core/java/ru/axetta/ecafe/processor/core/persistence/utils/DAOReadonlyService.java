@@ -974,8 +974,11 @@ public class DAOReadonlyService {
             Query query = entityManager.createQuery(
                     "SELECT excludeDays from WtComplexExcludeDays excludeDays "
                             + "LEFT JOIN FETCH excludeDays.complex complex "
+                            + "LEFT JOIN FETCH complex.wtOrgGroup orgGroup "
                             + "WHERE excludeDays.version > :version "
-                            + "AND complex.contragent = :contragent AND :org IN elements(complex.orgs) ");
+                            + "AND complex.contragent = :contragent "
+                            + "AND :org IN elements(complex.orgs) "
+                            + "OR :org IN elements(orgGroup.orgs)");
             query.setParameter("version", version);
             query.setParameter("contragent", contragent);
             query.setParameter("org", org);
