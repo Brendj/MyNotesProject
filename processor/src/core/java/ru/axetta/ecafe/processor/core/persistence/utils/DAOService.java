@@ -1859,20 +1859,20 @@ public class DAOService {
         return 0L;
     }
 
-    public ComplexInfo getComplexInfo(Long idOfComplexInfo) {
-        if (idOfComplexInfo == null)
+    public ComplexInfo getComplexInfo(Client client, Integer idOfComplex, Date date) {
+        Query query = entityManager.createQuery("select ci from ComplexInfo ci where ci.org.idOfOrg = :idOfOrg "
+                + "and ci.idOfComplex = :idOfComplex and ci.menuDate between :startDate and :endDate");
+        query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
+        query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("startDate", CalendarUtils.startOfDay(date));
+        query.setParameter("endDate", CalendarUtils.endOfDay(date));
+        try {
+            return (ComplexInfo)query.getSingleResult();
+        } catch (Exception e) {
+            logger.error(String.format("Cant find complexInfo idOfComplex=%s, date=%s, idOfClient=%s", idOfComplex, date.getTime(), client.getIdOfClient()), e);
             return null;
-        TypedQuery<ComplexInfo> q = entityManager
-                .createQuery("from ComplexInfo where idOfComplexInfo = :idOfComplexInfo",
-                        ComplexInfo.class);
-        q.setParameter("idOfComplexInfo", idOfComplexInfo);
-        List <ComplexInfo> complexInfos = q.getResultList();
-        if (complexInfos.isEmpty())
-            return null;
-        else
-            return q.getResultList().get(0);
+        }
     }
-
     public long getNextIdOfOrder(Org org) {
         Session session = (Session) entityManager.getDelegate();
         org.hibernate.Query q = session.createSQLQuery("SELECT max(idoforder) FROM cf_orders WHERE idoforg=:idoforg");

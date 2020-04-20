@@ -572,7 +572,7 @@ public class SummaryCalculationService {
         if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
             String preorders_query =
                     "SELECT DISTINCT pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender,"
-                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex "
+                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate "
                             + " FROM cf_preorder_complex pc "
                             + " JOIN cf_regular_preorders rp ON rp.idofregularpreorder = pc.idofregularpreorder "
 
@@ -583,7 +583,7 @@ public class SummaryCalculationService {
                             + "WHERE pc1.idofclient = pc.idofclient AND pc1.deletedstate = 0 AND pc1.preorderdate = pc.preorderdate AND pc1.amount > 0) "
                             + " UNION "
                             + "SELECT DISTINCT pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender,"
-                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex "
+                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate "
                             + " FROM cf_preorder_menudetail pmd "
                             + " JOIN cf_regular_preorders rp ON rp.idofregularpreorder = pmd.idofregularpreorder "
                             + " JOIN cf_clients c ON c.idofclient = pmd.idofclient JOIN cf_persons p ON p.idofperson = c.idofperson "
@@ -593,7 +593,7 @@ public class SummaryCalculationService {
                             + "WHERE pmd1.idofclient = pmd.idofclient AND pmd1.deletedstate = 0 AND pmd1.preorderdate = pmd.preorderdate AND pmd1.amount > 0) "
                             + " UNION "
                             + "SELECT DISTINCT pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender, "
-                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex "
+                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate "
                             + "FROM cf_client_guardian_notificationsettings n JOIN cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
                             + "JOIN cf_clients c ON c.idofclient = cg.idofchildren "
                             + "JOIN cf_preorder_complex pc ON c.idofclient = pc.idofclient "
@@ -606,7 +606,7 @@ public class SummaryCalculationService {
 
 
                             + "SELECT DISTINCT pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender, "
-                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex "
+                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate "
                             + "FROM cf_client_guardian_notificationsettings n JOIN cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
                             + "JOIN cf_clients c ON c.idofclient = cg.idofchildren "
                             + "JOIN cf_preorder_menudetail pmd ON pmd.idofclient = c.idofclient "
@@ -635,6 +635,7 @@ public class SummaryCalculationService {
                 currPreorderRegularData.setItemCode((String) row[9]);
                 currPreorderRegularData.setItemname((String) row[10]);
                 currPreorderRegularData.setComplexId(((Integer) row[11]).longValue());
+                currPreorderRegularData.setCreateDate(new Date(((BigInteger) row[12]).longValue()));
                 currPreorderRegularData.setId(counter);
                 regularData.add(currPreorderRegularData);
                 counter++;
@@ -692,7 +693,8 @@ public class SummaryCalculationService {
                     } else {
                         try {
                             ComplexInfo complexInfo = DAOService.getInstance()
-                                    .getComplexInfo(currPreorderRegularData.getComplexId());
+                                    .getComplexInfo(entityManager.find(Client.class, clientEE.getIdOfClient()),
+                                            currPreorderRegularData.getComplexId().intValue(), currPreorderRegularData.getCreateDate());
                             notifyPreorderDailyDetail.setComplexName(complexInfo.getComplexName());
                         } catch (Exception e) {
                             notifyPreorderDailyDetail.setComplexName(null);
@@ -1769,6 +1771,7 @@ public class SummaryCalculationService {
         private String itemCode;
         private String itemname;
         private Long complexId;
+        private Date createDate;
 
         public Integer getStateReg() {
             return stateReg;
@@ -1824,6 +1827,14 @@ public class SummaryCalculationService {
 
         public void setComplexId(Long complexId) {
             this.complexId = complexId;
+        }
+
+        public Date getCreateDate() {
+            return createDate;
+        }
+
+        public void setCreateDate(Date createDate) {
+            this.createDate = createDate;
         }
     }
 }
