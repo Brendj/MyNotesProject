@@ -46,6 +46,8 @@ import java.nio.charset.Charset;
 import java.util.*;
 import java.util.Calendar;
 
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
+
 @Component
 public class DTSZNDiscountsReviseService {
 
@@ -654,9 +656,23 @@ public class DTSZNDiscountsReviseService {
                         values = EventNotificationService.attachGenderToValues(client.getGender(), values);
                         if (forTest)
                             values = attachValue(values, "TEST", "true");
-                        RuntimeContext.getAppContext().getBean(EventNotificationService.class)
-                                .sendNotification(client, null,
-                                        EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values, new Date());
+
+                        List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
+                        if (!(guardians == null || guardians.isEmpty())) {
+                            //Оправка всем представителям
+                            for (Client destGuardian : guardians) {
+                                RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                        .sendNotification(destGuardian, client,
+                                                EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values, new Date());
+                            }
+                        }
+                        else
+                        {
+                            //Отправка только клиенту
+                            RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                    .sendNotification(client, null,
+                                            EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values, new Date());
+                        }
                     }
                     logger.info(String.format("Application with number updated to %s ClientDtisznDiscountInfo{status = %s, dateStart = %s, dateEnd = %s}",
                             isDiscountOk ? "ok" : "denied", info.getStatus().toString(), info.getDateStart().toString(), info.getDateEnd().toString()));
