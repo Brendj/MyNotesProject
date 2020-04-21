@@ -869,8 +869,8 @@ public class DAOReadonlyService {
                     + "LEFT JOIN FETCH menu.wtOrgGroup orgGroup "
                     + "where menu.version > :version "
                     + "AND menu.contragent = :contragent "
-                    + "AND :org IN elements(menu.orgs) "
-                    + "OR :org IN elements(orgGroup.orgs)");
+                    + "AND (:org IN elements(menu.orgs) "
+                    + "OR :org IN elements(orgGroup.orgs))");
             query.setParameter("version", version);
             query.setParameter("contragent", contragent);
             query.setParameter("org", org);
@@ -975,8 +975,8 @@ public class DAOReadonlyService {
                             + "LEFT JOIN FETCH complex.wtOrgGroup orgGroup "
                             + "WHERE excludeDays.version > :version "
                             + "AND complex.contragent = :contragent "
-                            + "AND :org IN elements(complex.orgs) "
-                            + "OR :org IN elements(orgGroup.orgs)");
+                            + "AND (:org IN elements(complex.orgs) "
+                            + "OR :org IN elements(orgGroup.orgs))");
             query.setParameter("version", version);
             query.setParameter("contragent", contragent);
             query.setParameter("org", org);
