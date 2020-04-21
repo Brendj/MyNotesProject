@@ -47,7 +47,7 @@ public class BenefitService {
     public final static String ID_DISCOUNT_INFO="idDiscountInfo";
 
 
-    public class NotificationEndBenefit implements Job {
+    public static class NotificationEndBenefit implements Job {
         @Override
         public void execute(JobExecutionContext arg0) throws JobExecutionException {
             RuntimeContext.getAppContext().getBean(BenefitService.class).runEndBenefit(false);
