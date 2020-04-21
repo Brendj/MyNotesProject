@@ -43,10 +43,6 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
 
             for (List<HardwareSettingsRequestItem> sectionItem : hardwareSettingsRequest.getSectionItem()) {
                 ru.axetta.ecafe.processor.core.persistence.HardwareSettings hardwareSettings = null;
-                if(sectionItem.isEmpty()) {
-                    System.out.println("sectionItem empty");
-                }
-
                 List<HardwareSettingsMT> tempMT = new ArrayList<>();
                 List<HardwareSettingsReaders> tempReaders = new ArrayList<>();
 
@@ -161,8 +157,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                 for (HardwareSettingsMT mt : tempMT) {
                     ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT hardwareSettingsMT;
                     hardwareSettingsMT = DAOUtils
-                            .getHardwareSettingsMTByIdAndModuleType(session, hardwareSettings.getIdOfHardwareSetting(),
-                                    mt.getModuleType());
+                            .getHardwareSettingsMTByIdAndModuleType(session, hardwareSettings.getCompositeIdOfHardwareSettings(),mt.getModuleType());
 
                     if (null == hardwareSettingsMT) {
                         hardwareSettingsMT = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT();
@@ -177,7 +172,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                 for (HardwareSettingsReaders readers : tempReaders) {
                     ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders hardwareSettingsReaders;
                     hardwareSettingsReaders = DAOUtils.getHardwareSettingsReadersByIdAndUsedByModule(session,
-                            hardwareSettings.getIdOfHardwareSetting(), readers.getUsedByModule());
+                            hardwareSettings.getCompositeIdOfHardwareSettings(), readers.getUsedByModule());
                     if (null == hardwareSettingsReaders) {
                         hardwareSettingsReaders = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders();
                     }

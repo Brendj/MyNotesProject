@@ -17,7 +17,8 @@ public class HardwareSettingsMT implements Serializable {
     private HardwareSettings hardwareSettings;
     private Long idOfModuleType;
     private Set<HardwareSettingsMT> orgsInternal = new HashSet<HardwareSettingsMT>();
-    private Org org;
+    private Long idOfHardwareSetting;
+    private Long idOfOrg;
 
     public HardwareSettingsMT() {
     }
@@ -79,11 +80,19 @@ public class HardwareSettingsMT implements Serializable {
         this.orgsInternal = orgsInternal;
     }
 
-    public Org getOrg() {
-        return org;
+    public Long getIdOfHardwareSetting() {
+        return idOfHardwareSetting;
     }
 
-    public void setOrg(Org org) {
-        this.org = org;
+    public void setIdOfHardwareSetting(Long idOfHardwareSetting) {
+        this.idOfHardwareSetting = idOfHardwareSetting;
+    }
+
+    public Long getIdOfOrg() {
+        return idOfOrg;
+    }
+
+    public void setIdOfOrg(Long idOfOrg) {
+        this.idOfOrg = idOfOrg;
     }
 }

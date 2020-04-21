@@ -14,12 +14,19 @@
         </composite-id>
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
                      update="false" insert="false"/>
-        <set name="moduleType" cascade="none" mutable="false">
+        <set name="moduleTypes" cascade="none" mutable="false">
             <key>
                 <column name="IdOfOrg"/>
                 <column name="IdOfHardwareSetting"/>
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT"/>
+        </set>
+        <set name="readers" cascade="none" mutable="false">
+            <key>
+                <column name="IdOfOrg"/>
+                <column name="IdOfHardwareSetting"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders"/>
         </set>
         <property name="ipHost" column="ipHost" type="string" length="64" not-null="true"/>
         <property name="lastUpdateForIPHost" column="LastUpdateForIPHost"

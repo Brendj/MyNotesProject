@@ -12,7 +12,7 @@ import java.util.Set;
 public class HardwareSettings implements Serializable {
 
     private Long idOfHardwareSetting;
-    private Set<HardwareSettingsMT> moduleType = new HashSet<HardwareSettingsMT>();
+    private Set<HardwareSettingsMT> moduleTypes = new HashSet<HardwareSettingsMT>();
     private Set<HardwareSettingsReaders> readers = new HashSet<HardwareSettingsReaders>();
     private Org org;
     private String ipHost;
@@ -161,12 +161,12 @@ public class HardwareSettings implements Serializable {
         this.idOfHardwareSetting = idOfHardwareSetting;
     }
 
-    public Set<HardwareSettingsMT> getModuleType() {
-        return moduleType;
+    public Set<HardwareSettingsMT> getModuleTypes() {
+        return moduleTypes;
     }
 
-    public void setModuleType(Set<HardwareSettingsMT> moduleType) {
-        this.moduleType = moduleType;
+    public void setModuleTypes(Set<HardwareSettingsMT> moduleTypes) {
+        this.moduleTypes = moduleTypes;
     }
 
     public Set<HardwareSettingsReaders> getReaders() {

@@ -65,13 +65,6 @@ public class HardwareSettingsRequest implements SectionRequest {
                 HardwareSettingsRequestHSItem hsItem = null;
                 items = new ArrayList<HardwareSettingsRequestItem>();
                 hsItem = HardwareSettingsRequestHSItem.build(hsNode);
-
-                if (hsItem.getIdOfHardwareSetting() == null) {
-                    System.out.println("hsId null");
-                }
-                if (hsItem.getType() == null) {
-                    System.out.println("hsType null");
-                }
                 items.add(hsItem);
                 Node itemNode = hsNode.getFirstChild();
                 while (null != itemNode) {
@@ -85,27 +78,8 @@ public class HardwareSettingsRequest implements SectionRequest {
                         switch (moduleType) {
                             case MT:
                                 item = HardwareSettingsRequestMTItem.build(itemNode);
-                                if (item.getType() == null) {
-                                    System.out.println("mtType null");
-                                }
-                                if (((HardwareSettingsRequestMTItem) item).getInstallStatus() == null) {
-                                    System.out.println("mtInstallStatus null");
-                                }
-                                if (((HardwareSettingsRequestMTItem) item).getValue() == null) {
-                                    System.out.println("mtValue null");
-                                }
-                                if (item.getLastUpdate() == null) {
-                                    System.out.println("mtLastUpdate");
-                                }
                                 break;
                             case IP:
-                                item = HardwareSettingsRequestIPItem.build(itemNode);
-                                if (item.getLastUpdate() == null) {
-                                    System.out.println("lastUpdate null");
-                                }
-                                if (((HardwareSettingsRequestIPItem) item).getValue() == null) {
-                                    System.out.println("value null");
-                                }
                                 break;
                             case DOTNETVER:
                                 item = HardwareSettingsRequestDotNetVerItem.build(itemNode);
@@ -140,83 +114,8 @@ public class HardwareSettingsRequest implements SectionRequest {
                     itemNode = itemNode.getNextSibling();
                 }
                 sectionItem.add(items);
-                if (items.isEmpty()) {
-                    System.out.println("empty items");
-                }
-                if (sectionItem.isEmpty()) {
-                    System.out.println("empty sectionItem");
-                }
             }
             hsNode = hsNode.getNextSibling();
-        }
-        for (List<HardwareSettingsRequestItem> item : sectionItem) {
-            for (HardwareSettingsRequestItem requestItem : item) {
-                if (requestItem.getType() == "HS") {
-                    HardwareSettingsRequestHSItem hsItem = (HardwareSettingsRequestHSItem) requestItem;
-                    System.out.println(requestItem.getType());
-                    System.out.println(hsItem.getIdOfHardwareSetting());
-                    System.out.println(requestItem.getResCode());
-                    System.out.println("");
-                }
-                if (requestItem.getType() == "MT") {
-                    HardwareSettingsRequestMTItem mtItem = (HardwareSettingsRequestMTItem) requestItem;
-                    System.out.println(requestItem.getType());
-                    System.out.println(mtItem.getValue());
-                    System.out.println(requestItem.getLastUpdate());
-                    System.out.println(requestItem.getResCode());
-                    System.out.println("");
-                }
-                if (requestItem.getType() == "IP") {
-                    HardwareSettingsRequestIPItem ipItem = (HardwareSettingsRequestIPItem) requestItem;
-                    System.out.println(requestItem.getType());
-                    System.out.println(ipItem.getValue());
-                    System.out.println(requestItem.getLastUpdate());
-                    System.out.println(requestItem.getResCode());
-                    System.out.println("");
-                }
-                if (requestItem.getType() == "DotNetVer") {
-                    HardwareSettingsRequestDotNetVerItem dotNetVerItem = (HardwareSettingsRequestDotNetVerItem) requestItem;
-                    System.out.println(requestItem.getType());
-                    System.out.println(dotNetVerItem.getValue());
-                    System.out.println(requestItem.getLastUpdate());
-                    System.out.println(requestItem.getResCode());
-                    System.out.println("");
-                }
-                if (requestItem.getType() == "OsVer") {
-                    HardwareSettingsRequestOsVerItem osVerItem = (HardwareSettingsRequestOsVerItem) requestItem;
-                    System.out.println(osVerItem.getValue());
-                    System.out.println(requestItem.getType());
-                    System.out.println(requestItem.getLastUpdate());
-                    System.out.println(requestItem.getResCode());
-                    System.out.println("");
-                }
-                if (requestItem.getType() == "RAM") {
-                    HardwareSettingsRequestRAMItem ramItem = (HardwareSettingsRequestRAMItem) requestItem;
-                    System.out.println(requestItem.getType());
-                    System.out.println(ramItem.getValue());
-                    System.out.println(requestItem.getLastUpdate());
-                    System.out.println(requestItem.getResCode());
-                    System.out.println("");
-                }
-                if (requestItem.getType() == "CPU") {
-                    HardwareSettingsRequestCPUItem cpuItem = (HardwareSettingsRequestCPUItem) requestItem;
-                    System.out.println(requestItem.getType());
-                    System.out.println(cpuItem.getValue());
-                    System.out.println(requestItem.getLastUpdate());
-                    System.out.println(requestItem.getResCode());
-                    System.out.println("");
-                }
-                if (requestItem.getType() == "CR") {
-                    HardwareSettingsRequestCRItem crItem = (HardwareSettingsRequestCRItem) requestItem;
-                    System.out.println(requestItem.getType());
-                    System.out.println(crItem.getFirmwareVer());
-                    System.out.println(crItem.getReaderName());
-                    System.out.println(crItem.getUsedByModule());
-                    System.out.println(requestItem.getLastUpdate());
-                    System.out.println(requestItem.getResCode());
-                    System.out.println("");
-                }
-            }
         }
     }
 

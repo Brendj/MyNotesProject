@@ -4999,18 +4999,18 @@ public class DAOUtils {
         return (TurnstileSettings) criteria.uniqueResult();
     }
 
-    public static HardwareSettingsMT getHardwareSettingsMTByIdAndModuleType(Session session, Long idOfHardwareSetting,
+    public static HardwareSettingsMT getHardwareSettingsMTByIdAndModuleType(Session session, CompositeIdOfHardwareSettings compositeIdOfHardwareSettings,
             Integer moduleType) throws Exception {
-        Criteria criteria = session.createCriteria(HardwareSettingsMT.class);
-        criteria.add(Restrictions.eq("hardwareSettings.idOfHardwareSetting", idOfHardwareSetting));
+        Criteria criteria = session.createCriteria(HardwareSettingsMT.class).createAlias("hardwareSettings","hs", JoinType.FULL_JOIN);
+        criteria.add(Restrictions.eq("hs.compositeIdOfHardwareSettings",compositeIdOfHardwareSettings));
         criteria.add(Restrictions.eq("moduleType", moduleType));
         return (HardwareSettingsMT) criteria.uniqueResult();
     }
 
-    public static HardwareSettingsReaders getHardwareSettingsReadersByIdAndUsedByModule(Session session, Long idOfHardwareSetting, Integer usedByModule)
+    public static HardwareSettingsReaders getHardwareSettingsReadersByIdAndUsedByModule(Session session, CompositeIdOfHardwareSettings compositeIdOfHardwareSettings, Integer usedByModule)
             throws Exception {
-        Criteria criteria = session.createCriteria(HardwareSettingsReaders.class);
-        criteria.add(Restrictions.eq("hardwareSettings.idOfHardwareSetting", idOfHardwareSetting));
+        Criteria criteria = session.createCriteria(HardwareSettingsReaders.class).createAlias("hardwareSettings","hs", JoinType.FULL_JOIN);
+        criteria.add(Restrictions.eq("hs.compositeIdOfHardwareSettings",compositeIdOfHardwareSettings));
         criteria.add(Restrictions.eq("usedByModule", usedByModule));
         return (HardwareSettingsReaders) criteria.uniqueResult();
     }
