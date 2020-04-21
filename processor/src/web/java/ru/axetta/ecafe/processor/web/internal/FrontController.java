@@ -1553,7 +1553,8 @@ public class FrontController extends HttpServlet {
 
                 if (secondRegisterAllowed && exCard.getState() != CardState.BLOCKED.getValue()) {
                     cardService.blockAndReset(exCard.getCardNo(), exCard.getOrg().getIdOfOrg(),
-                            exCard.getClient() == null ? null : exCard.getClient().getIdOfClient(), false, CardResponseItem.USED_IN_ANOTHER_ORG);
+                            exCard.getClient() == null ? null : exCard.getClient().getIdOfClient(), false,
+                            CardResponseItem.USED_IN_ANOTHER_ORG, CardTransitionState.GIVEN_AWAY.getCode());
                 } else {
                     cardService.updateTransitionState(exCard, CardTransitionState.GIVEN_AWAY.getCode());
                     persistenceSession.update(exCard);

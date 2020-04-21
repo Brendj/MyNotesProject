@@ -166,12 +166,13 @@ public class CardService {
 
 
     //7.	Блокировка карты со сбросом
-    public int blockAndReset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm, String lockReason) {
-        return cardWritableRepository.blockAndReset(cardNo, idOfOrg, idOfClient, isOldArm, lockReason);
+    public int blockAndReset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm, String lockReason,
+            Integer transitionState) {
+        return cardWritableRepository.blockAndReset(cardNo, idOfOrg, idOfClient, isOldArm, lockReason, transitionState);
     }
 
     public ResCardsOperationsRegistryItem block(CardsOperationsRegistryItem o, long idOfOrg, Boolean isOldArm) {
-        return cardUpdateResult(o, blockAndReset(o.getCardNo(), idOfOrg, o.getIdOfClient(), isOldArm, ""));
+        return cardUpdateResult(o, blockAndReset(o.getCardNo(), idOfOrg, o.getIdOfClient(), isOldArm, "", null));
     }
     //8.	Разблокировка карты
     public void unblock(Card card, CardsOperationsRegistryItem o){
