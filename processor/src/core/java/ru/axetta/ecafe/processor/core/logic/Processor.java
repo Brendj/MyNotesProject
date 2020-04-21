@@ -4039,7 +4039,7 @@ public class Processor implements SyncProcessor {
                                         payment.getIdOfOrder(), cardNo));
                     }
                     RuntimeContext.getAppContext().getBean(CardBlockService.class)
-                            .saveLastCardActivity(persistenceSession, card.getIdOfCard(), CardBlockService.TYPE_ORDER);
+                            .saveLastCardActivity(persistenceSession, card.getIdOfCard(), CardActivityType.ORDER);
                 }
                 // If client specified - load client from data model
                 Client client = null;
@@ -5903,7 +5903,7 @@ public class Processor implements SyncProcessor {
                     Card card = DAOUtils.findCardByCardNoExtended(persistenceSession, e.getIdOfCard(), idOfClient, guardianId, e.getIdOfVisitor());
                     if (card != null) {
                         RuntimeContext.getAppContext().getBean(CardBlockService.class)
-                                .saveLastCardActivity(persistenceSession, card.getIdOfCard(), CardBlockService.TYPE_ENTEREVENT);
+                                .saveLastCardActivity(persistenceSession, card.getIdOfCard(), CardActivityType.ENTER_EVENT);
                     }
 
                     if (RuntimeContext.RegistryType.isSpb() && ScudManager.serviceIsWork) {

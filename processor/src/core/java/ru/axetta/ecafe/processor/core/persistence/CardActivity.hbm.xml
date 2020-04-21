@@ -11,9 +11,13 @@
             <generator class="identity"/>
         </id>
         <property name="idOfCard" column="idOfCard" type="long" not-null="true"/>
-        <property name="lastEnterEvent" column="lastEnterEvent" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
-        <property name="lastOrder" column="lastOrder" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="lastUpdate" column="lastUpdate" type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="type" column="type" not-null="true">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.CardActivityType</param>
+                <param name="type">4</param>
+            </type>
+        </property>
     </class>
 </hibernate-mapping>
 

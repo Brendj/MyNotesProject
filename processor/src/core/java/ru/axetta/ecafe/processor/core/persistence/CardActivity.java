@@ -12,9 +12,8 @@ import java.util.Date;
 public class CardActivity {
     private Long idOfCardActivity;
     private Long idOfCard;
-    private Date lastEnterEvent;
-    private Date lastOrder;
     private Date lastUpdate;
+    private CardActivityType type;
 
     public CardActivity() {
 
@@ -24,9 +23,9 @@ public class CardActivity {
         return idOfCard.toString();
     }
 
-    public CardActivity(long idOfCard) {
+    public CardActivity(long idOfCard, CardActivityType type) {
         this.idOfCard = idOfCard;
-        this.lastUpdate = new Date();
+        this.type = type;
     }
 
     public Date getLastUpdate() {
@@ -53,19 +52,11 @@ public class CardActivity {
         this.idOfCardActivity = idOfCardActivity;
     }
 
-    public Date getLastEnterEvent() {
-        return lastEnterEvent;
+    public CardActivityType getType() {
+        return type;
     }
 
-    public void setLastEnterEvent(Date lastEnterEvent) {
-        this.lastEnterEvent = lastEnterEvent;
-    }
-
-    public Date getLastOrder() {
-        return lastOrder;
-    }
-
-    public void setLastOrder(Date lastOrder) {
-        this.lastOrder = lastOrder;
+    public void setType(CardActivityType type) {
+        this.type = type;
     }
 }

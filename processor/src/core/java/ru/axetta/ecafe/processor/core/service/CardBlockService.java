@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Card;
 import ru.axetta.ecafe.processor.core.persistence.CardActivity;
+import ru.axetta.ecafe.processor.core.persistence.CardActivityType;
 import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
@@ -37,6 +38,7 @@ public class CardBlockService {
     public static final String LOCK_REASON = "Заблокировано на сервере по причине длительного неиспользования";
     public static final int TYPE_ENTEREVENT = 0;
     public static final int TYPE_ORDER = 1;
+    public static final int TYPE_MUSEUM_CULTURE = 2;
 
     @Autowired
     RuntimeContext runtimeContext;
@@ -88,16 +90,15 @@ public class CardBlockService {
         logger.info(String.format("End auto block cards service. Processed %s cards", counter));
     }
 
-    public void saveLastCardActivity(Session session, Long idOfCard, int type) {
+    public void saveLastCardActivity(Session session, Long idOfCard, CardActivityType type) {
         if (idOfCard == null) return;
         Criteria criteria = session.createCriteria(CardActivity.class);
         criteria.add(Restrictions.eq("idOfCard", idOfCard));
+        criteria.add(Restrictions.eq("type", type));
         CardActivity cardActivity = (CardActivity)criteria.uniqueResult();
         if (cardActivity == null) {
-            cardActivity = new CardActivity(idOfCard);
+            cardActivity = new CardActivity(idOfCard, type);
         }
-        if (type == TYPE_ENTEREVENT) cardActivity.setLastEnterEvent(new Date());
-        if (type == TYPE_ORDER) cardActivity.setLastOrder(new Date());
         cardActivity.setLastUpdate(new Date());
         session.saveOrUpdate(cardActivity);
     }
