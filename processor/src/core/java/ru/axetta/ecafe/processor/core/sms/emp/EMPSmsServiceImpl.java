@@ -214,7 +214,7 @@ public class EMPSmsServiceImpl extends ISmsService {
         if (event.getType() == EMPEventTypeFactory.END_BENEFIT) {
             for (String k : event.getParameters().keySet()) {
                 if (k.equals(BenefitService.ID_DISCOUNT_INFO)) {
-                    idofclientdtiszndiscountinfo = Long.getLong(event.getParameters().get(k));
+                    idofclientdtiszndiscountinfo = Long.valueOf(event.getParameters().get(k));
                 }
             }
             //Удаляем значение идентификатора из списка параметров
