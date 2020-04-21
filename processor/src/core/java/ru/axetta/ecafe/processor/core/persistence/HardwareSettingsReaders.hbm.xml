@@ -5,13 +5,18 @@
 <!DOCTYPE hibernate-mapping PUBLIC "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
-    <class name="ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders" table="CF_Hardware_Settings_Readers">
+    <class name="ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders"
+           table="CF_Hardware_Settings_Readers">
         <id name="idOfReader" column="IdOfReader" type="long">
             <generator class="sequence">
                 <param name="sequence">cf_hardwaresettings_idofhardwaresetting_readers_seq</param>
             </generator>
         </id>
-        <many-to-one name="hardwareSettings" class="ru.axetta.ecafe.processor.core.persistence.HardwareSettings" fetch="select" lazy="false" column ="IdOfHardwareSetting"/>
+        <many-to-one name="hardwareSettings" class="ru.axetta.ecafe.processor.core.persistence.HardwareSettings" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="IdOfHardwareSettings"/>
+        </many-to-one>
         <property name="usedByModule" column="UsedByModule" type="integer" not-null="true"/>
         <property name="readerName" column="ReaderName" type="string" not-null="true" length="64"/>
         <property name="firmwareVer" column="FirmwareVer" type="string" length="64"/>

@@ -11,7 +11,13 @@
                 <param name="sequence">cf_hardwaresettings_idofhardwaresetting_mt_seq</param>
             </generator>
         </id>
-        <many-to-one name="hardwareSettings" class="ru.axetta.ecafe.processor.core.persistence.HardwareSettings" cascade="all" fetch="select" lazy="false" column ="IdOfHardwareSetting"/>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"
+                     not-null="true"/>
+        <many-to-one name="hardwareSettings" class="ru.axetta.ecafe.processor.core.persistence.HardwareSettings" insert="false"
+                     update="false">
+            <column name="IdOfOrg"/>
+            <column name="IdOfHardwareSetting"/>
+        </many-to-one>
         <property name="moduleType" column="ModuleType" type="integer" not-null="true"/>
         <property name="installStatus" column="InstallStatus" type="integer" not-null="true"/>
         <property name="lastUpdate" column="LastUpdate"

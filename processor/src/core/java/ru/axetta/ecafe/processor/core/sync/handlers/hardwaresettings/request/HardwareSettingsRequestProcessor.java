@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request;
 
+import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfHardwareSettings;
 import ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT;
 import ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -34,7 +35,6 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
 
         List<ResHardwareSettingsRequestItem> items = new ArrayList<ResHardwareSettingsRequestItem>();
         try {
-            ResHardwareSettingsRequestItem resItem;
             boolean errorFound;
             Long orgOwner = hardwareSettingsRequest.getOrgOwner();
             Long nextVersion = DAOUtils.nextVersionByHardwareSettingsRequest(session);
@@ -65,6 +65,9 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                                     hardwareSettings = new ru.axetta.ecafe.processor.core.persistence.HardwareSettings();
                                     Org org = (Org) session.get(Org.class, orgOwner);
                                     hardwareSettings.setOrg(org);
+                                    CompositeIdOfHardwareSettings compositeIdOfHardwareSettings = new ru.axetta.ecafe.processor.core.persistence.CompositeIdOfHardwareSettings(orgOwner, hsItem.getIdOfHardwareSetting());
+                                    hardwareSettings.setCompositeIdOfHardwareSettings(compositeIdOfHardwareSettings);
+
                                 }
                                 hardwareSettings.setIdOfHardwareSetting(hsItem.getIdOfHardwareSetting());
                             } else {

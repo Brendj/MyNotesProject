@@ -7,7 +7,20 @@
         "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
 <hibernate-mapping>
     <class name="ru.axetta.ecafe.processor.core.persistence.HardwareSettings" table="CF_Hardware_Settings">
-        <id name="idOfHardwareSetting" column="IdOfHardwareSetting" type="long"/>
+        <composite-id name="compositeIdOfHardwareSettings"
+                      class="ru.axetta.ecafe.processor.core.persistence.CompositeIdOfHardwareSettings">
+            <key-property name="idOfOrg" type="long" column="IdOfOrg"/>
+            <key-property name="idOfHardwareSetting" type="long" column="IdOfHardwareSetting"/>
+        </composite-id>
+        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
+                     update="false" insert="false"/>
+        <set name="moduleType" cascade="none" mutable="false">
+            <key>
+                <column name="IdOfOrg"/>
+                <column name="IdOfHardwareSetting"/>
+            </key>
+            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT"/>
+        </set>
         <property name="ipHost" column="ipHost" type="string" length="64" not-null="true"/>
         <property name="lastUpdateForIPHost" column="LastUpdateForIPHost"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
@@ -28,12 +41,9 @@
         <property name="lastUpdateForCPUHost" column="LastUpdateForCPUHost"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="version" column="Version" type="long"/>
-        <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" fetch="select" lazy="proxy">
-            <column name="idOfOrg"/>
-        </many-to-one>
-        <set name="moduleType" lazy="true" inverse="true" cascade="all">
-            <key column="IdOfModuleType"/>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT"/>
-        </set>
+        <!--<set name="readers" lazy="true" inverse="true" cascade="all">-->
+        <!--<key column="IdOfReader"/>-->
+        <!--<one-to-many class="ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders"/>-->
+        <!--</set>-->
     </class>
 </hibernate-mapping>

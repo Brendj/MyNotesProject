@@ -4966,14 +4966,20 @@ public class DAOUtils {
         }
         return version;
     }
-
+    //public static List getClientGroupsByIdOfOrg(Session session, Long idOfOrg) {
+    //    Criteria criteria = session.createCriteria(ClientGroup.class);
+    //    criteria.add(Restrictions.eq("compositeIdOfClientGroup.idOfOrg", idOfOrg));
+    //    return criteria.list();
+    //}
     public static HardwareSettings getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(Session session,
             Long idOfHardwareSetting, Long idOfOrg) throws Exception {
         Criteria criteria = session.createCriteria(HardwareSettings.class);
-        criteria.add(Restrictions.eq("idOfHardwareSetting", idOfHardwareSetting));
-        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfHardwareSetting", idOfHardwareSetting));
+        criteria.add(Restrictions.eq("compositeIdOfHardwareSettings.idOfOrg", idOfOrg));
         return (HardwareSettings) criteria.uniqueResult();
     }
+
+
 
     public static long nextVersionByTurnstileSettingsRequest(Session session) {
         long version = 0L;

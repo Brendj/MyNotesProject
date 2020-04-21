@@ -18,6 +18,7 @@ public class HardwareSettingsReaders implements Serializable {
     private Date lastUpdateForReader;
     private HardwareSettings hardwareSettings;
     private Set<Org> orgsInternal = new HashSet<>();
+    private Org org;
 
     public HardwareSettingsReaders() {
     }
@@ -86,5 +87,13 @@ public class HardwareSettingsReaders implements Serializable {
 
     public void setOrgsInternal(Set<Org> orgsInternal) {
         this.orgsInternal = orgsInternal;
+    }
+
+    public Org getOrg() {
+        return org;
+    }
+
+    public void setOrg(Org org) {
+        this.org = org;
     }
 }
