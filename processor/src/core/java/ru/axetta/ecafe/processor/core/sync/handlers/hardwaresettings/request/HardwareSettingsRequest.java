@@ -80,6 +80,7 @@ public class HardwareSettingsRequest implements SectionRequest {
                                 item = HardwareSettingsRequestMTItem.build(itemNode);
                                 break;
                             case IP:
+                                item = HardwareSettingsRequestIPItem.build(itemNode);
                                 break;
                             case DOTNETVER:
                                 item = HardwareSettingsRequestDotNetVerItem.build(itemNode);
