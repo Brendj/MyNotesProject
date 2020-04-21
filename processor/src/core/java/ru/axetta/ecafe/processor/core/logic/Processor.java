@@ -517,32 +517,31 @@ public class Processor implements SyncProcessor {
                 timeForDelta);
 
         // Process menu from Org
-        try {
-            if (!request.getOrg().getUseWebArm()) {
+        if (!request.getOrg().getUseWebArm()) {
+            try {
                 processSyncMenu(request.getIdOfOrg(), request.getReqMenu());
+            } catch (Exception e) {
+                String message = String.format("Failed to process menu, IdOfOrg == %s", request.getIdOfOrg());
+                processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory,
+                        message);
+                logger.error(message, e);
             }
-        } catch (Exception e) {
-            String message = String.format("Failed to process menu, IdOfOrg == %s", request.getIdOfOrg());
-            processorUtils
-                    .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
-            logger.error(message, e);
-        }
-        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSyncMenu", timeForDelta);
+            timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "processSyncMenu", timeForDelta);
 
-        try {
-            int daysToAdd = request.getOrganizationComplexesStructureRequest() == null
-                    || request.getOrganizationComplexesStructureRequest().getMenuSyncCountDays() == null
-                    ? getMenuSyncCountDays(request)
-                    : request.getOrganizationComplexesStructureRequest().getMenuSyncCountDays();
-            resMenuExchange = getMenuExchangeData(request.getIdOfOrg(), syncStartTime,
-                    DateUtils.addDays(syncStartTime, daysToAdd));
-        } catch (Exception e) {
-            String message = String.format("Failed to build menu, IdOfOrg == %s", request.getIdOfOrg());
-            processorUtils
-                    .createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory, message);
-            logger.error(message, e);
+            try {
+                int daysToAdd = request.getOrganizationComplexesStructureRequest() == null
+                        || request.getOrganizationComplexesStructureRequest().getMenuSyncCountDays() == null ? getMenuSyncCountDays(request)
+                        : request.getOrganizationComplexesStructureRequest().getMenuSyncCountDays();
+                resMenuExchange = getMenuExchangeData(request.getIdOfOrg(), syncStartTime,
+                        DateUtils.addDays(syncStartTime, daysToAdd));
+            } catch (Exception e) {
+                String message = String.format("Failed to build menu, IdOfOrg == %s", request.getIdOfOrg());
+                processorUtils.createSyncHistoryException(persistenceSessionFactory, request.getIdOfOrg(), syncHistory,
+                        message);
+                logger.error(message, e);
+            }
+            timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "getMenuExchangeData", timeForDelta);
         }
-        timeForDelta = addPerformanceInfoAndResetDeltaTime(performanceLogger, "getMenuExchangeData", timeForDelta);
 
         // Process prohibitions menu from Org
         try {
