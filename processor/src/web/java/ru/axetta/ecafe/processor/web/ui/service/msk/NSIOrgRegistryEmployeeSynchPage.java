@@ -15,9 +15,6 @@ import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-;
-
-
 /**
  * Created by IntelliJ IDEA.
  * User: chirikov
@@ -105,5 +102,4 @@ public class NSIOrgRegistryEmployeeSynchPage extends NSIOrgRegistrySyncPageBase 
     public void setOrgName(String orgName) {
         this.orgName = orgName;
     }
-
 }

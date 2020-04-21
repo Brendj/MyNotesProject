@@ -16,7 +16,6 @@ import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.DependsOn;
 import org.springframework.stereotype.Component;
 
-import java.util.Iterator;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Objects;
@@ -67,7 +66,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                     + "              g.title AS gender,\n"
                     + "              prll.title AS parallel,\n"
                     + "              p.classname,\n"
-                    + "              p.deletestate,\n"
+                    + "              (p.deletestate OR p.noDataAboutEducation) AS deletestate,\n"
                     + "              ag.title AS agegroup,"
                     + "              p.organizationid\n"
                     + "       FROM cf_mh_persons AS p\n"
@@ -141,13 +140,6 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                 pupil.ageTypeGroup = (String) row[10];
 
                 pupils.add(pupil);
-            }
-            /// удалить неимпортируемые группы
-            for (Iterator<ImportRegisterMSKClientsService.ExpandedPupilInfo> i = pupils.iterator(); i.hasNext(); ) {
-                ImportRegisterMSKClientsService.ExpandedPupilInfo p = i.next();
-                if (ImportRegisterMSKClientsService.isPupilIgnoredFromImport(p.getGuid(), p.getGroup())) {
-                    i.remove();
-                }
             }
 
             return pupils;

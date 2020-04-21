@@ -240,7 +240,7 @@ public class FrontControllerProcessor {
     private List<RegistryChangeRevisionItem> loadRegistryChangeRevisionsByClassName(long idOfOrg, String className) {
         try {
             List<Object[]> queryResult = DAOService.getInstance().getRegistryChangeRevisions(idOfOrg, className);
-            if(queryResult == null || queryResult.size() < 1) {
+            if(CollectionUtils.isEmpty(queryResult)) {
                 return Collections.EMPTY_LIST;
             }
             List<RegistryChangeRevisionItem> result = new ArrayList<>();
