@@ -340,7 +340,6 @@ public class DAOReadonlyService {
         return (PreorderStatus) list.get(0);
     }
 
-    public TaloonApproval findTaloonApproval(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid, Long price) {
     public TaloonApproval findTaloonApproval(Long idOfOrg, Date taloonDate, String taloonName, String goodsGuid,
             Long price) {
         try {
