@@ -510,7 +510,9 @@ public class Processor implements SyncProcessor {
 
         // Process menu from Org
         try {
-            processSyncMenu(request.getIdOfOrg(), request.getReqMenu());
+            if (!request.getOrg().getUseWebArm()) {
+                processSyncMenu(request.getIdOfOrg(), request.getReqMenu());
+            }
         } catch (Exception e) {
             String message = String.format("Failed to process menu, IdOfOrg == %s", request.getIdOfOrg());
             processorUtils
