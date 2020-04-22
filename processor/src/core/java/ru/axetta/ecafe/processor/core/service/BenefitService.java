@@ -77,6 +77,8 @@ public class BenefitService {
 
     public void runEndBenefit(boolean forTest) {
         Date startDate = new Date(System.currentTimeMillis());
+        startDate = CalendarUtils.addOneDay(startDate);
+        startDate = CalendarUtils.startOfDay(startDate);
         Integer days;
         String dayss = RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.notification.client.endBenefitdays", "1");
         try
@@ -86,7 +88,8 @@ public class BenefitService {
             days = 1;
         }
         Date endDate = DateUtils.addDays(startDate, days);
-
+        endDate = CalendarUtils.addDays(endDate, -1);
+        endDate = CalendarUtils.endOfDay(endDate);
         Session session = null;
         Transaction transaction = null;
         try {
@@ -97,7 +100,10 @@ public class BenefitService {
             for (ClientDtisznDiscountInfo clientDtisznDiscountInfo: clientDtisznDiscountInfoList) {
 
                 Client client = clientDtisznDiscountInfo.getClient();
-
+                if (client.getIdOfClient().equals(239892L))
+                {
+                    System.out.println("test");
+                }
                 String[] values = new String[]{
                         DATE_END_DISCOUNT,  CalendarUtils.dateToString(clientDtisznDiscountInfo.getDateEnd()),
                         DTISZN_CODE, clientDtisznDiscountInfo.getDtisznCode().toString(),
