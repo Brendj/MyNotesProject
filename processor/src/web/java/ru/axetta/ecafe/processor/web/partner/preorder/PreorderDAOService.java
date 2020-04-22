@@ -154,7 +154,7 @@ public class PreorderDAOService {
         query.setParameter("idOfClient", client.getIdOfClient());
         query.setParameter("startDate", CalendarUtils.startOfDay(date).getTime());
         Map<Date, List<PreorderComplexItemExt>> map = new TreeMap<>();
-        List<PreorderComplexItemExt> list = getPreorderComplexItemExtList(query, client, date, true);
+        List<PreorderComplexItemExt> list = getPreorderComplexItemExtList(query, client, date, true, false);
         for (PreorderComplexItemExt item : list) {
             Date dt = item.getPreorderDate();
             List<PreorderComplexItemExt> items = map.get(dt);
@@ -164,15 +164,18 @@ public class PreorderDAOService {
             items.add(item);
             map.put(dt, items);
         }
+        List<PreorderAllComplexesOnDateResult> list2 = new ArrayList<>();
         for (Date dateResult : map.keySet()) {
             PreorderAllComplexesOnDateResult qqq = new PreorderAllComplexesOnDateResult();
             qqq.setDate(CalendarUtils.getXMLGregorianCalendarByDate(dateResult));
             qqq.setItems(map.get(dateResult));
+            list2.add(qqq);
         }
+        result.setList(list2);
         return result;
     }
 
-    private List<PreorderComplexItemExt> getPreorderComplexItemExtList(Query query, Client client, Date date, boolean withPreorderDate) {
+    private List<PreorderComplexItemExt> getPreorderComplexItemExtList(Query query, Client client, Date date, boolean withPreorderDate, boolean includeZeroAmount) {
         List res = query.getResultList();
         List<PreorderComplexItemExt> list = new ArrayList<PreorderComplexItemExt>();
         for (Object o : res) {
@@ -197,7 +200,7 @@ public class PreorderDAOService {
             complexItemExt.setIsRegular(idOfRegularPreorder == null ? false : true);
             complexItemExt.setPreorderDate(preorderDate == null ? null : new Date(preorderDate));
 
-            List<PreorderMenuItemExt> menuItemExtList = getMenuItemsExt(id, client.getIdOfClient(), date, idOfPreorderComplex);
+            List<PreorderMenuItemExt> menuItemExtList = getMenuItemsExt(id, client.getIdOfClient(), date, idOfPreorderComplex, includeZeroAmount);
             if (menuItemExtList.size() > 0) {
                 complexItemExt.setMenuItemExtList(menuItemExtList);
                 list.add(complexItemExt);
@@ -247,7 +250,7 @@ public class PreorderDAOService {
         query.setParameter("school", OrganizationType.SCHOOL.getCode());
         query.setParameter("professional", OrganizationType.PROFESSIONAL.getCode());
         Map<String, PreorderComplexGroup> groupMap = new HashMap<String, PreorderComplexGroup>();
-        List<PreorderComplexItemExt> list = getPreorderComplexItemExtList(query, client, date, false);
+        List<PreorderComplexItemExt> list = getPreorderComplexItemExtList(query, client, date, false, true);
         for (PreorderComplexItemExt item : list) {
             PreorderGoodParamsContainer complexParams = getComplexParams(item, client, date);
             if (isAcceptableComplex(item, client.getClientGroup(), hasDiscount, complexParams, null, null)) {
@@ -351,7 +354,8 @@ public class PreorderDAOService {
         return item.getComplexName().toLowerCase().indexOf(str) > -1;
     }
 
-    private List<PreorderMenuItemExt> getMenuItemsExt (Long idOfComplexInfo, Long idOfClient, Date date, Long idOfPreorderComplex) {
+    private List<PreorderMenuItemExt> getMenuItemsExt (Long idOfComplexInfo, Long idOfClient, Date date, Long idOfPreorderComplex,
+            boolean includeZeroAmount) {
         List<PreorderMenuItemExt> menuItemExtList = new ArrayList<PreorderMenuItemExt>();
         Query query = null;
         if (idOfPreorderComplex == null) {
@@ -389,6 +393,7 @@ public class PreorderDAOService {
             Object[] row = (Object[]) o;
             Long id = ((BigInteger)row[0]).longValue();
             Integer amount = (Integer) row[1];
+            if (amount == 0 && !includeZeroAmount) continue;
             Long idOfRegularPreorder = row[2] == null ? null : ((BigInteger)row[2]).longValue();
             Integer state = (Integer) row[3];
             Boolean isAvailableForRegular = (Integer) row[4] == 1;
