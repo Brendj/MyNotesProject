@@ -69,7 +69,6 @@ public class WtComplex {
     private String barcode;
 
     @ManyToOne(fetch = FetchType.EAGER)
-    @ManyToOne(fetch = FetchType.EAGER)
     @JoinColumn(name = "idOfComplexGroupItem")
     private WtComplexGroupItem wtComplexGroupItem;
 

@@ -99,7 +99,7 @@
             <many-to-many class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg"/>
         </set>
 
-        <set name="wtComplexesItems" inverse="true" cascade="all" lazy="true">
+        <set name="wtComplexesItems" inverse="true" cascade="all" lazy="false">
             <key>
                 <column name="idOfComplexItem"/>
             </key>
