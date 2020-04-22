@@ -395,7 +395,7 @@ public class PreorderDAOService {
         for (Object o : res) {
             Object[] row = (Object[]) o;
             Long id = ((BigInteger)row[0]).longValue();
-            Integer amount = (Integer) row[1];
+            Integer amount = (row[1] == null ? 0 : (Integer) row[1]);
             if (amount == 0 && !includeZeroAmount) continue;
             Long idOfRegularPreorder = row[2] == null ? null : ((BigInteger)row[2]).longValue();
             Integer state = (Integer) row[3];
@@ -410,7 +410,7 @@ public class PreorderDAOService {
                 PreorderMenuDetail pmd = em.find(PreorderMenuDetail.class, idOfPreorderMenuDetail);
                 menuItemExt = new PreorderMenuItemExt(pmd);
             }
-            menuItemExt.setAmount(amount == null ? 0 : amount);
+            menuItemExt.setAmount(amount);
             menuItemExt.setState(state == null ? 0 : state);
             menuItemExt.setIsRegular(idOfRegularPreorder == null ? false : true);
             menuItemExt.setAvailableForRegular(isAvailableForRegular);
