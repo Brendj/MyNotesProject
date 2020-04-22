@@ -148,7 +148,7 @@ public class PreorderDAOService {
 
         Query query = emReport.createNativeQuery("select cast(-1 as bigint) as idofcomplexinfo, pc.amount, pc.deletedState, pc.state, pc.idofregularpreorder, "
                 + "pc.modeofadd, pc.modefree, "
-                + "pc.armcomplexid, pc.complexname, pc.complexprice, pc.idofpreordercomplex, pc.preorderdate "
+                + "pc.armcomplexid, pc.complexname, pc.complexprice, pc.idofpreordercomplex,  pc.mobileGroupOnCreate, pc.preorderdate "
                 + "from cf_preorder_complex pc where pc.idofclient = :idOfClient and pc.preorderdate >= :startDate and pc.deletedstate = 0 "
                 + "order by modeOfAdd");
         query.setParameter("idOfClient", client.getIdOfClient());
@@ -190,14 +190,16 @@ public class PreorderDAOService {
             String complexName = (String) row[8];
             Long complexPrice = ((BigInteger)row[9]).longValue();
             Long idOfPreorderComplex = (row[10] == null ? null : ((BigInteger)row[10]).longValue());
+            Integer mobileGroupOnCreate = (row[11] == null ? null : (Integer)row[11]);
             Long preorderDate = null;
             if (withPreorderDate) {
-                preorderDate = (row[11] == null ? null : ((BigInteger)row[11]).longValue());
+                preorderDate = (row[12] == null ? null : ((BigInteger)row[11]).longValue());
             }
             PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, modeOfAdd, modeFree);
             complexItemExt.setAmount(amount == null ? 0 : amount);
             complexItemExt.setState(state == null ? 0 : state);
             complexItemExt.setIsRegular(idOfRegularPreorder == null ? false : true);
+            complexItemExt.setCreatorRole(mobileGroupOnCreate);
             complexItemExt.setPreorderDate(preorderDate == null ? null : new Date(preorderDate));
 
             List<PreorderMenuItemExt> menuItemExtList = getMenuItemsExt(id, client.getIdOfClient(), date, idOfPreorderComplex, includeZeroAmount);
