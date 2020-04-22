@@ -49,6 +49,12 @@
     font-weight: bold;
 }
 
+.output-disabled-text {
+    font-family: Tahoma, Arial, Sans-Serif;
+    font-size: 10pt;
+    color: #a0a0a0;
+}
+
 .output-text-org {
     font-family: Tahoma, Arial, Sans-Serif;
     font-size: 10pt;
