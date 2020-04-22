@@ -307,10 +307,6 @@ public class ResMenuSupplier implements AbstractToElement {
 
         XMLUtils.setAttributeIfNotNull(element, "Id", menuGroup.getId());
         XMLUtils.setAttributeIfNotNull(element, "Name", menuGroup.getName());
-        //if (!menuGroup.getMenuGroupMenus().isEmpty()) {
-        //    List<WtMenuGroupMenu> menuGroupMenus = new ArrayList<>(menuGroup.getMenuGroupMenus());
-        //    XMLUtils.setAttributeIfNotNull(element, "MenuId", menuGroupMenus.get(0));
-        //}
         XMLUtils.setAttributeIfNotNull(element, "V", menuGroup.getVersion());
         XMLUtils.setAttributeIfNotNull(element, "D", menuGroup.getDeleteState());
 
@@ -460,9 +456,9 @@ public class ResMenuSupplier implements AbstractToElement {
         XMLUtils.setAttributeIfNotNull(element, "ComplexId", excludeDays.getComplex().getIdOfComplex());
         XMLUtils.setAttributeIfNotNull(element, "Date", dateWithoutTimeFormat.format(excludeDays.getDate()));
         XMLUtils.setAttributeIfNotNull(element, "V", excludeDays.getVersion());
-        //if (excludeDays.getDeleteState() != null) {
-        //    XMLUtils.setAttributeIfNotNull(element, "D", excludeDays.getDeleteState());
-        //}
+        if (excludeDays.getDeleteState() != null) {
+            XMLUtils.setAttributeIfNotNull(element, "D", excludeDays.getDeleteState());
+        }
 
         return element;
     }

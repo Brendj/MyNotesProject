@@ -4,6 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.persistence.webTechnologist;
 
+import ru.axetta.ecafe.processor.core.persistence.User;
+
 import javax.persistence.*;
 import java.util.Date;
 import java.util.Objects;
@@ -24,11 +26,25 @@ public class WtComplexExcludeDays {
     @JoinColumn(name = "idofcomplex")
     private WtComplex complex;
 
+    @Column(name = "deleteState")
+    private Integer deleteState;
+
     @Column(name = "version")
     private Long version;
 
-    //@Column(name = "deleteState")
-    //private Integer deleteState;
+    @Column(name = "createDate")
+    private Date createDate;
+
+    @Column(name = "lastUpdate")
+    private Date lastUpdate;
+
+    @ManyToOne
+    @JoinColumn(name = "create_by_id")
+    private User createdUser;
+
+    @ManyToOne
+    @JoinColumn(name = "update_by_id")
+    private User updatedUser;
 
     public Long getId() {
         return id;
@@ -62,14 +78,45 @@ public class WtComplexExcludeDays {
         this.version = version;
     }
 
-    //public Integer getDeleteState() {
-    //    return deleteState;
-    //}
-    //
-    //public void setDeleteState(Integer deleteState) {
-    //    this.deleteState = deleteState;
-    //}
+    public Integer getDeleteState() {
+        return deleteState;
+    }
 
+    public void setDeleteState(Integer deleteState) {
+        this.deleteState = deleteState;
+    }
+
+    public Date getCreateDate() {
+        return createDate;
+    }
+
+    public void setCreateDate(Date createDate) {
+        this.createDate = createDate;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
+    public User getCreatedUser() {
+        return createdUser;
+    }
+
+    public void setCreatedUser(User createdUser) {
+        this.createdUser = createdUser;
+    }
+
+    public User getUpdatedUser() {
+        return updatedUser;
+    }
+
+    public void setUpdatedUser(User updatedUser) {
+        this.updatedUser = updatedUser;
+    }
 
     @Override
     public boolean equals(Object o) {
@@ -80,18 +127,12 @@ public class WtComplexExcludeDays {
             return false;
         }
         WtComplexExcludeDays that = (WtComplexExcludeDays) o;
-        return id.equals(that.id) && date.equals(that.date) && complex.equals(that.complex) && version
-                .equals(that.version);
+        return id.equals(that.id) && date.equals(that.date) && complex.equals(that.complex) && Objects
+                .equals(deleteState, that.deleteState) && version.equals(that.version);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(id, date, complex, version);
-    }
-
-    @Override
-    public String toString() {
-        return "WtComplexExcludeDays{" + "id=" + id + ", date=" + date + ", complex=" + complex + ", version=" + version
-                + '}';
+        return Objects.hash(id, date, complex, deleteState, version);
     }
 }
