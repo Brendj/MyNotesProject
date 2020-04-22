@@ -696,6 +696,7 @@ public class SummaryCalculationService {
                                     .getComplexInfo(entityManager.find(Client.class, clientEE.getIdOfClient()),
                                             currPreorderRegularData.getComplexId().intValue(), currPreorderRegularData.getCreateDate());
                             notifyPreorderDailyDetail.setComplexName(complexInfo.getComplexName());
+                            notifyPreorderDailyDetail.setDishName(currPreorderRegularData.itemname);
                         } catch (Exception e) {
                             notifyPreorderDailyDetail.setComplexName(null);
                         }
@@ -704,7 +705,6 @@ public class SummaryCalculationService {
                     if (stateReq.equals(PreorderState.OK.getCode())) {
                         clientEE.getPreorders().getDeletedPreorderDateGuardian().add(notifyPreorderDailyDetail);
                     } else {
-                        notifyPreorderDailyDetail.setDishName(currPreorderRegularData.itemname);
                         clientEE.getPreorders().getDeletedPreorderDateOther().add(notifyPreorderDailyDetail);
                     }
                 }
