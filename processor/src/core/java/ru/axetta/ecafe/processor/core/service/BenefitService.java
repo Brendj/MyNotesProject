@@ -100,10 +100,6 @@ public class BenefitService {
             for (ClientDtisznDiscountInfo clientDtisznDiscountInfo: clientDtisznDiscountInfoList) {
 
                 Client client = clientDtisznDiscountInfo.getClient();
-                if (client.getIdOfClient().equals(239892L))
-                {
-                    System.out.println("test");
-                }
                 String[] values = new String[]{
                         DATE_END_DISCOUNT,  CalendarUtils.dateToString(clientDtisznDiscountInfo.getDateEnd()),
                         DTISZN_CODE, clientDtisznDiscountInfo.getDtisznCode().toString(),
