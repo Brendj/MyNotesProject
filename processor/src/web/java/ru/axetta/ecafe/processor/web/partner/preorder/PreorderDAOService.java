@@ -193,7 +193,7 @@ public class PreorderDAOService {
             Integer mobileGroupOnCreate = (row[11] == null ? null : (Integer)row[11]);
             Long preorderDate = null;
             if (withPreorderDate) {
-                preorderDate = (row[12] == null ? null : ((BigInteger)row[11]).longValue());
+                preorderDate = (row[12] == null ? null : ((BigInteger)row[12]).longValue());
             }
             PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, modeOfAdd, modeFree);
             complexItemExt.setAmount(amount == null ? 0 : amount);
