@@ -9256,6 +9256,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
+    public PreorderAllComplexesResult getPreorderAllComplexes(@WebParam(name = "contractId") Long contractId) {
+        authenticateRequest(contractId);
+        PreorderAllComplexesResult result = new PreorderAllComplexesResult();
+        try {
+            result = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getPreordersWithMenuListSinceDate(contractId, CalendarUtils.startOfDay(new Date()));
+            RegularPreordersList regularPreordersList = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getRegularPreordersList(contractId);
+            result.setRegularPreorders(regularPreordersList);
+            result.resultCode = RC_OK;
+            result.description = RC_OK_DESC;
+        } catch (Exception e) {
+            logger.error("Error in getPreorderAllComplexes", e);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        return result;
+    }
+
+    @Override
     public PreorderComplexesResult getPreorderComplexes(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "date") Date date) {
         authenticateRequest(contractId);
