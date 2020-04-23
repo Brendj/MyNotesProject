@@ -129,3 +129,6 @@ update cf_client_guardian
 set version = (select max(version) + 1 from cf_client_guardian),
     relation = 2
 where relation in (6, 7);
+
+--475 Добавление колонки, которая показывает, отправлено ли клиенту уведомление об окончании данной льготы
+ALTER TABLE public.cf_client_dtiszn_discount_info ADD sendnotification bool NULL;
