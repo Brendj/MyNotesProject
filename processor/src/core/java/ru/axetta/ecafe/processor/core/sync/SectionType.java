@@ -38,7 +38,8 @@ public enum  SectionType {
     RO(22),
     LAST_TRANSACTION(23),
     INFO_MESSAGE(24),
-    REESTR_TALOON_PREORDER(25);
+    REESTR_TALOON_PREORDER(25),
+    MENU_SUPPLIER(26);
 
     private int type;
 
