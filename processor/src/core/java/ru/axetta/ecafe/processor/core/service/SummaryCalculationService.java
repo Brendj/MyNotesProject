@@ -636,8 +636,10 @@ public class SummaryCalculationService {
                 Long idRegPreor =  ((BigInteger) row[13]).longValue();
                 Long idClient = ((BigInteger) row[2]).longValue();
                 List <Long> idPre = idRegularPreorerSending.get(idClient);
-                if (!idPre.contains(idRegPreor)) {
+                if (idPre == null || !idPre.contains(idRegPreor)) {
                     DAOService.getInstance().setFlagSendedNotification(idRegPreor, true);
+                    if (idPre == null)
+                        idPre = new ArrayList<>();
                     idPre.add(idRegPreor);
                     idRegularPreorerSending.put(idClient, idPre);
                 }
