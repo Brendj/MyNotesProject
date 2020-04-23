@@ -161,6 +161,7 @@ public class PreorderDAOService {
             if (items == null) {
                 items = new ArrayList<>();
             }
+            item.setPreorderDate(null);
             items.add(item);
             map.put(dt, items);
         }
@@ -202,7 +203,8 @@ public class PreorderDAOService {
             complexItemExt.setCreatorRole(mobileGroupOnCreate);
             complexItemExt.setPreorderDate(preorderDate == null ? null : new Date(preorderDate));
 
-            List<PreorderMenuItemExt> menuItemExtList = getMenuItemsExt(id, client.getIdOfClient(), date, idOfPreorderComplex, includeZeroAmount);
+            List<PreorderMenuItemExt> menuItemExtList = getMenuItemsExt(id, client.getIdOfClient(), date, idOfPreorderComplex,
+                    modeOfAdd == ComplexInfo.SET_DISHES_COMPLEX ? includeZeroAmount : true);
             if (menuItemExtList.size() > 0) {
                 complexItemExt.setMenuItemExtList(menuItemExtList);
                 list.add(complexItemExt);
