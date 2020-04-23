@@ -118,3 +118,14 @@ alter table cf_preorder_complex
 
 alter table cf_regular_preorders
     add column mobileGroupOnCreate integer;
+
+--Новые значения справочника степени родства представителей
+update cf_client_guardian
+set version = (select max(version) + 1 from cf_client_guardian),
+    relation = 3
+where relation in (4, 5);
+
+update cf_client_guardian
+set version = (select max(version) + 1 from cf_client_guardian),
+    relation = 2
+where relation in (6, 7);
