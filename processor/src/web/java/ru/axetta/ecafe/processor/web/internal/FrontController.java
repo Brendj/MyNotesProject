@@ -21,7 +21,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
-import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
@@ -2408,30 +2407,8 @@ public class FrontController extends HttpServlet {
             }
 
             if (!DAOUtils.isFriendlyOrganizations(persistenceSession, guardian.getOrg(), child.getOrg())) {
-                Long idOfProcessorMigrantRequest = MigrantsUtils
-                        .nextIdOfProcessorMigrantRequest(persistenceSession, guardian.getOrg().getIdOfOrg());
-                CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
-                        guardian.getOrg().getIdOfOrg());
-                String requestNumber = ImportMigrantsService
-                        .formRequestNumber(guardian.getOrg().getIdOfOrg(), orgId, idOfProcessorMigrantRequest,
-                                fireTime);
-
-                Migrant migrantNew = new Migrant(compositeIdOfMigrant, guardian.getOrg().getDefaultSupplier(),
-                        requestNumber, guardian, org, fireTime, CalendarUtils.addYear(fireTime, 10),
-                        Migrant.NOT_SYNCHRONIZED);
-                migrantNew.setInitiator(MigrantInitiatorEnum.INITIATOR_ORG);
-                //migrantNew.setSection(request.getGroupName());
-                //migrantNew.setResolutionCodeGroup(request.getIdOfServiceClass());
-                persistenceSession.save(migrantNew);
-
-                persistenceSession.save(ImportMigrantsService
-                        .createResolutionHistory(persistenceSession, guardian, compositeIdOfMigrant.getIdOfRequest(),
-                                VisitReqResolutionHist.RES_CREATED, fireTime));
-                persistenceSession.flush();
-                persistenceSession.save(ImportMigrantsService
-                        .createResolutionHistory(persistenceSession, guardian, compositeIdOfMigrant.getIdOfRequest(),
-                                VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(fireTime, 1)));
-
+                ClientManager.createMigrationForGuardianWithConfirm(persistenceSession, guardian, fireTime, org,
+                        MigrantInitiatorEnum.INITIATOR_ORG, 10);
                 result.code = ResponseItem.OK;
                 result.message = ResponseItem.OK_MESSAGE;
             }

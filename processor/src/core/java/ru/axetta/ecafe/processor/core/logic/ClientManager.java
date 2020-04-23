@@ -14,6 +14,8 @@ import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.*;
 
@@ -1699,6 +1701,43 @@ public class ClientManager {
         clients = clientCriteria.list();
 
         return clients;
+    }
+
+    public static void addClientMigrationEntry(Session session,Org oldOrg, Org newOrg, Client client, String comment, String newGroupName){
+        ClientManager.checkUserOPFlag(session, oldOrg, newOrg, client.getIdOfClientGroup(), client);
+        ClientMigration migration = new ClientMigration(client, newOrg, oldOrg);
+        migration.setComment(comment);
+        if(client.getClientGroup() != null) {
+            ClientGroup clientGroup = (ClientGroup)session.load(ClientGroup.class, new CompositeIdOfClientGroup(client.getOrg().getIdOfOrg(), client.getIdOfClientGroup()));
+            migration.setOldGroupName(clientGroup.getGroupName());
+        }
+        migration.setNewGroupName(newGroupName);
+        session.save(migration);
+    }
+
+    public static void createMigrationForGuardianWithConfirm(Session session, Client guardian, Date fireTime, Org orgVisit,
+            MigrantInitiatorEnum initiator, int years) {
+        Long idOfProcessorMigrantRequest = MigrantsUtils
+                .nextIdOfProcessorMigrantRequest(session, guardian.getOrg().getIdOfOrg());
+        CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
+                guardian.getOrg().getIdOfOrg());
+        String requestNumber = ImportMigrantsService
+                .formRequestNumber(guardian.getOrg().getIdOfOrg(), orgVisit.getIdOfOrg(), idOfProcessorMigrantRequest,
+                        fireTime);
+
+        Migrant migrantNew = new Migrant(compositeIdOfMigrant, guardian.getOrg().getDefaultSupplier(),
+                requestNumber, guardian, orgVisit, fireTime, CalendarUtils.addYear(fireTime, years),
+                Migrant.NOT_SYNCHRONIZED);
+        migrantNew.setInitiator(initiator);
+        session.save(migrantNew);
+
+        session.save(ImportMigrantsService
+                .createResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                        VisitReqResolutionHist.RES_CREATED, fireTime));
+        session.flush();
+        session.save(ImportMigrantsService
+                .createResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                        VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(fireTime, 1)));
     }
 
     /* получить список опекунов по опекаемому */
