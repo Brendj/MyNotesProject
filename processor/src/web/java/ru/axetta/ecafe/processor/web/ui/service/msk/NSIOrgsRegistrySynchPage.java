@@ -1097,6 +1097,14 @@ public class NSIOrgsRegistrySynchPage extends BasicWorkspacePage {
             return getResultString(director, directorFrom);
         }
 
+        public String getFounder() {
+            return getResultString(founder, founderFrom);
+        }
+
+        public String getSubordination() {
+            return getResultString(subordination, subordinationFrom);
+        }
+
         public String getDirectorReestr() {
             return director;
         }
