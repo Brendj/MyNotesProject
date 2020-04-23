@@ -4638,6 +4638,14 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<ClientDtisznDiscountInfo> getCategoryDiscountListWithEndBenefitBeetwenDates(Session session, Date startDate, Date endDate) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.gt("dateEnd", startDate));
+        criteria.add(Restrictions.lt("dateEnd", endDate));
+        criteria.add(Restrictions.not(Restrictions.eq("sendnotification", true)));
+        return (List<ClientDtisznDiscountInfo>) criteria.list();
+    }
+
     public static ClientDtisznDiscountInfo getDTISZNOneDiscountInfoByClientAndCode(Session session, Client client,
             Long code) {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);

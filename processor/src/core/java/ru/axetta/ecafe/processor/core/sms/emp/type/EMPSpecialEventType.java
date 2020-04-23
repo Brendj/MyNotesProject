@@ -5,43 +5,42 @@
 package ru.axetta.ecafe.processor.core.sms.emp.type;
 
 import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
 
 import java.util.Map;
 
 public class EMPSpecialEventType extends EMPAbstractEventType {
-    protected static final String NOTIFICATION_START_SICK_NAME = "Рекомендация об освобождении";
-    protected static final String NOTIFICATION_START_SICK_TEXT = "%surname% %name% получил рекомендацию об освобождении с %empDate% по %empTimeH%";
-    protected static final String NOTIFICATION_CANCEL_START_SICK_NAME = "Аннулирование рекомендаций об освобождении";
-    protected static final String NOTIFICATION_CANCEL_START_SICK_TEXT = "%surname% %name% получил аннулирование рекомендаций об освобождении с %empDate% по %empTimeH%";
-    protected static final String NOTIFICATION_END_SICK_NAME = "Рекомендация о возможности посещать ОО";
-    protected static final String NOTIFICATION_END_SICK_TEXT = "%surname% %name% получил рекомендация о возможности посещать ОО с %empTime%";
-    protected static final String NOTIFICATION_CANCEL_END_SICK_NAME = "Аннулирование рекомендаций о возможности посещать ОО";
-    protected static final String NOTIFICATION_CANCEL_END_SICK_TEXT = "%surname% %name% получил аннулирование рекомендаций о возможности посещать ОО %empTime%";
+    protected static final String NOTIFICATION_START_OR_CANCEL_SICK_NAME = "Рекомендация или аннултрование освобождения";
+    protected static final String NOTIFICATION_START_OR_CANCEL_SICK_TEXT = "%surname% %name% получил рекомендацию (аннулирование) об освобождении с %empDate% по %empTimeH%";
+    protected static final String NOTIFICATION_END_OR_CANCEL_END_SICK_NAME = "Рекомендация (отмена рекомендации) о возможности посещать ОО";
+    protected static final String NOTIFICATION_END_OR_CANCEL_END_SICK_TEXT = "%surname% %name% получил рекомендация (отмену рекомендации) о возможности посещать ОО с %empTime%";
 
-    public EMPSpecialEventType(Integer typeE) {
+    public EMPSpecialEventType(Integer typeE, String[] values) {
         stream = STREAM;
         type = EMPEventTypeFactory.SPECIAL_TYPE_EVENT;
         switch (typeE)
         {
             case 1:
-                name = NOTIFICATION_START_SICK_NAME;
-                text = NOTIFICATION_START_SICK_TEXT;
+                name = NOTIFICATION_START_OR_CANCEL_SICK_NAME;
+                text = NOTIFICATION_START_OR_CANCEL_SICK_TEXT;
+                this.getParameters().put(ExternalEventNotificationService.EMP_DATE,
+                        findValueInParams(new String[]{ExternalEventNotificationService.EMP_DATE}, values));
+                this.getParameters().put(ExternalEventNotificationService.EMP_TIME_H,
+                        findValueInParams(new String[]{ExternalEventNotificationService.EMP_TIME_H}, values));
                 break;
             case 2:
-                name = NOTIFICATION_CANCEL_START_SICK_NAME;
-                text = NOTIFICATION_CANCEL_START_SICK_TEXT;
-                break;
-            case 3:
-                name = NOTIFICATION_END_SICK_NAME;
-                text = NOTIFICATION_END_SICK_TEXT;
-                break;
-            case 4:
-                name = NOTIFICATION_CANCEL_END_SICK_NAME;
-                text = NOTIFICATION_CANCEL_END_SICK_TEXT;
+                name = NOTIFICATION_END_OR_CANCEL_END_SICK_NAME;
+                text = NOTIFICATION_END_OR_CANCEL_END_SICK_TEXT;
+                this.getParameters().put(ExternalEventNotificationService.EMP_TIME,
+                        findValueInParams(new String[]{ExternalEventNotificationService.EMP_TIME}, values));
                 break;
             default:
-                name = NOTIFICATION_START_SICK_NAME;
-                text = NOTIFICATION_START_SICK_TEXT;
+                name = NOTIFICATION_START_OR_CANCEL_SICK_NAME;
+                text = NOTIFICATION_START_OR_CANCEL_SICK_TEXT;
+                this.getParameters().put(ExternalEventNotificationService.EMP_DATE,
+                        findValueInParams(new String[]{ExternalEventNotificationService.EMP_DATE}, values));
+                this.getParameters().put(ExternalEventNotificationService.EMP_TIME_H,
+                        findValueInParams(new String[]{ExternalEventNotificationService.EMP_TIME_H}, values));
                 break;
         }
     }

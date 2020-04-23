@@ -2881,4 +2881,12 @@ public class DAOService {
         query.setParameter("complex", wtComplex);
         return (Long) query.getSingleResult();
     }
+	
+    public void setSendedNotificationforDTISZNDiscount(Long idofclientdtiszndiscountinfo, Boolean sendnotification) {
+        Session session = (Session) entityManager.getDelegate();
+        ClientDtisznDiscountInfo clientDtisznDiscountInfo = entityManager.find(ClientDtisznDiscountInfo.class, idofclientdtiszndiscountinfo);
+        clientDtisznDiscountInfo.setSendnotification(sendnotification);
+        session.update(clientDtisznDiscountInfo);
+    }
+
 }
