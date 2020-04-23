@@ -828,13 +828,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 if (!guardianExists(idOfClient))
                     clientGuardianItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, false, false));
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, ClientGuardianRepresentType.UNKNOWN, false));
             }
             if (typeAddClient.equals("ward")) {
                 if (!wardExists(idOfClient))
                     clientWardItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, false, false));
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, ClientGuardianRepresentType.UNKNOWN, false));
             }
         }
     }
@@ -1168,15 +1168,20 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             return;
         }
         StringBuilder notValidGuardianSB = new StringBuilder();
+        StringBuilder notValidRepresentative = new StringBuilder();
         for(ClientGuardianItem item : clientGuardianItems){
             if(item.getRelation().equals(-1)){
-                notValidGuardianSB.append(item.getPersonName());
-                notValidGuardianSB.append(" ");
+                notValidGuardianSB.append(item.getPersonName()).append(" ");
+            }
+            if (item.getRepresentativeType() <= ClientGuardianRepresentType.UNKNOWN.getCode()) {
+                notValidRepresentative.append(item.getPersonName()).append(" ");
             }
         }
-        if(notValidGuardianSB.length() != 0){
-            throw new Exception("У следующих опекунов не указан степень родства: "
-                    + notValidGuardianSB.toString());
+        if(notValidGuardianSB.length() > 0){
+            throw new Exception("У следующих опекунов не указана степень родства: " + notValidGuardianSB.toString());
+        }
+        if (notValidRepresentative.length() > 0) {
+            throw new Exception("У следующих опекунов не указаны полномочия: " + notValidRepresentative.toString());
         }
     }
 
@@ -1376,6 +1381,16 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             i++;
         }
 
+        return result;
+    }
+
+    public SelectItem[] getRepresentativeList() {
+        SelectItem[] result = new SelectItem[ClientGuardianRepresentType.values().length];
+        int i = 0;
+        for (ClientGuardianRepresentType type : ClientGuardianRepresentType.values()) {
+            result[i] = new SelectItem(type.getCode(), type.getDescription());
+            i++;
+        }
         return result;
     }
 

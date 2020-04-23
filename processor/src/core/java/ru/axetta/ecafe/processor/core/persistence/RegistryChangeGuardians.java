@@ -135,6 +135,14 @@ public class RegistryChangeGuardians {
         return legal_representative;
     }
 
+    public Integer getIntegerRepresentative() {
+        if (legal_representative == null) {
+            return ClientGuardianRepresentType.UNKNOWN.getCode();
+        } else {
+            return legal_representative ? 1 : 0;
+        }
+    }
+
     public void setLegal_representative(Boolean legal_representative) {
         this.legal_representative = legal_representative;
     }

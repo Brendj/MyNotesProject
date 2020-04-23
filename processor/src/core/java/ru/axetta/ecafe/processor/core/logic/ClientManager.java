@@ -1030,7 +1030,7 @@ public class ClientManager {
                                 clientGuardian.setDisabled(true);
                                 clientGuardian.setDeletedState(false);
                                 clientGuardian.setRelation(relationType);
-                                clientGuardian.setIsLegalRepresent(registryChangeGuardians.getLegal_representative());
+                                clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(registryChangeGuardians.getIntegerRepresentative()));
                                 clientGuardian.setLastUpdate(new Date());
                                 persistenceSession.persist(clientGuardian);
                                 persistenceSession.flush();
@@ -1122,7 +1122,7 @@ public class ClientManager {
     }
 
     public static ClientGuardian createClientGuardianInfoTransactionFree(Session session, Client guardian, String relation, Boolean disabled,
-            Long idOfClientChild, ClientCreatedFromType createdFrom, Boolean legal_representative) {
+            Long idOfClientChild, ClientCreatedFromType createdFrom, Integer legal_representative) {
         ClientGuardianRelationType relationType = null;
         if (relation != null) {
             for (ClientGuardianRelationType type : ClientGuardianRelationType.values()) {
@@ -1139,7 +1139,7 @@ public class ClientManager {
         clientGuardian.setDisabled(disabled);
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(relationType);
-        clientGuardian.setIsLegalRepresent(legal_representative);
+        clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legal_representative));
         Boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
         if (enableNotifications) {
             Set<ClientGuardianNotificationSetting> settings = new HashSet<ClientGuardianNotificationSetting>();
@@ -1163,7 +1163,7 @@ public class ClientManager {
 
         persistenceSession.persist(guardian);
         createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(),
-                true, idOfClientChild, ClientCreatedFromType.REGISTRY, registryChangeGuardians.getLegal_representative());
+                true, idOfClientChild, ClientCreatedFromType.REGISTRY, registryChangeGuardians.getIntegerRepresentative());
 
         setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
     }
@@ -1555,7 +1555,7 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getIsLegalRepresent(),
+                        getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getRepresentType(),
                         getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient())));
             }
         }
@@ -1637,7 +1637,7 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
                 wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
                         notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getIsLegalRepresent(),
+                        getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getRepresentType(),
                         getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient)));
             }
         }
@@ -1858,14 +1858,14 @@ public class ClientManager {
         for (ClientGuardianItem item : clientGuardians) {
             addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
-                    item.getCreatedWhereGuardian(), item.getLegalRepresentative());
+                    item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()));
         }
     }
 
     /* Добавить опекуна клиенту */
     public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled,
             ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems,
-            ClientCreatedFromType createdWhere, Boolean isLegalRepresentative) {
+            ClientCreatedFromType createdWhere, ClientGuardianRepresentType representType) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -1877,7 +1877,7 @@ public class ClientManager {
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
             clientGuardian.setCreatedFrom(createdWhere);
-            clientGuardian.setIsLegalRepresent(isLegalRepresentative);
+            clientGuardian.setRepresentType(representType);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.persist(clientGuardian);
@@ -1895,7 +1895,7 @@ public class ClientManager {
             clientGuardian.setDisabled(disabled);
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
-            clientGuardian.setIsLegalRepresent(isLegalRepresentative);
+            clientGuardian.setRepresentType(representType);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.update(clientGuardian);
@@ -1998,7 +1998,7 @@ public class ClientManager {
         for (ClientGuardianItem item : clientWards) {
             addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
-                    item.getCreatedWhereGuardian(), item.getLegalRepresentative());
+                    item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()));
         }
     }
 
