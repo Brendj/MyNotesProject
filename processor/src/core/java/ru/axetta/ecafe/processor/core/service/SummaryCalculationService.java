@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.service;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.CurrencyStringUtils;
 
@@ -119,8 +118,6 @@ public class SummaryCalculationService {
 
     final static Integer MILLIS_IN_DAY = 60 * 60 * 24 * 1000;
 
-    private HashMap<Long, List<Long>> idRegularPreorerSending = new HashMap<>();
-
     public static class NotificationJobDaily implements Job {
 
         @Override
@@ -189,7 +186,6 @@ public class SummaryCalculationService {
             for (int attempt = 0; attempt < 3; attempt++) {
                 try {
                     logger.info(String.format("SummaryCalculationService attempt %s generate params", attempt));
-                    idRegularPreorerSending.clear();
                     clients = generateNotificationParams(startDate, endDate, notyfyType);
                     break;
                 } catch (Exception e) {
@@ -246,12 +242,6 @@ public class SummaryCalculationService {
                 } catch (Exception e) {
                     //если ошибка по одному клиенту, не прерываем весь процесс
                     logger.error("Error sending summary notification for client: ", e);
-
-                    List <Long> idPre = idRegularPreorerSending.get(clientEE.idOfClient);
-                    for (Long id: idPre)
-                    {
-                        DAOService.getInstance().setFlagSendedNotification(id, false);
-                    }
                 }
             }
             logger.info("End summary calculation notification");
@@ -582,46 +572,47 @@ public class SummaryCalculationService {
         if (notifyType.equals(ClientGuardianNotificationSetting.Predefined.SMS_NOTIFY_SUMMARY_DAY.getValue())) {
             String preorders_query =
                     "SELECT DISTINCT pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender,"
-                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate, rp.idofregularpreorder "
+                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate "
                             + " FROM cf_preorder_complex pc "
                             + " JOIN cf_regular_preorders rp ON rp.idofregularpreorder = pc.idofregularpreorder "
+
                             + " JOIN cf_clients c ON c.idofclient = pc.idofclient JOIN cf_persons p ON p.idofperson = c.idofperson "
                             + " JOIN cf_clientsnotificationsettings n ON c.idofclient = n.idofclient AND n.notifytype = :notifyType "
-                            + " WHERE pc.preorderdate > :date AND pc.deletedstate = 1 AND rp.sendeddailynotification is not TRUE "
+                            + " WHERE pc.preorderdate > :date AND pc.deletedstate = 1 "
                             + " AND NOT exists(SELECT pc1.idofpreordercomplex FROM cf_preorder_complex pc1 "
                             + "WHERE pc1.idofclient = pc.idofclient AND pc1.deletedstate = 0 AND pc1.preorderdate = pc.preorderdate AND pc1.amount > 0) "
                             + " UNION "
                             + "SELECT DISTINCT pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender,"
-                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate, rp.idofregularpreorder "
+                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate "
                             + " FROM cf_preorder_menudetail pmd "
                             + " JOIN cf_regular_preorders rp ON rp.idofregularpreorder = pmd.idofregularpreorder "
                             + " JOIN cf_clients c ON c.idofclient = pmd.idofclient JOIN cf_persons p ON p.idofperson = c.idofperson "
                             + " JOIN cf_clientsnotificationsettings n ON c.idofclient = n.idofclient AND n.notifytype = :notifyType "
-                            + " WHERE pmd.preorderdate > :date AND pmd.deletedstate = 1 AND rp.sendeddailynotification is not TRUE "
+                            + " WHERE pmd.preorderdate > :date AND pmd.deletedstate = 1 "
                             + " AND NOT exists(SELECT pmd1.idofpreordermenudetail FROM cf_preorder_menudetail pmd1 "
                             + "WHERE pmd1.idofclient = pmd.idofclient AND pmd1.deletedstate = 0 AND pmd1.preorderdate = pmd.preorderdate AND pmd1.amount > 0) "
                             + " UNION "
                             + "SELECT DISTINCT pc.preorderdate, pc.state, pc.idofclient, p.surname, p.firstname, c.gender, "
-                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate, rp.idofregularpreorder "
+                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate "
                             + "FROM cf_client_guardian_notificationsettings n JOIN cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
                             + "JOIN cf_clients c ON c.idofclient = cg.idofchildren "
                             + "JOIN cf_preorder_complex pc ON c.idofclient = pc.idofclient "
                             + " JOIN cf_regular_preorders rp ON rp.idofregularpreorder = pc.idofregularpreorder "
                             + "JOIN cf_persons p ON p.idofperson = c.idofperson "
-                            + "WHERE pc.preorderdate > :date AND pc.deletedstate = 1 AND rp.sendeddailynotification is not TRUE "
+                            + "WHERE pc.preorderdate > :date AND pc.deletedstate = 1 "
                             + "AND NOT exists(SELECT pc1.idofpreordercomplex FROM cf_preorder_complex pc1 "
                             + "WHERE pc1.idofclient = pc.idofclient AND pc1.deletedstate = 0 AND pc1.preorderdate = pc.preorderdate AND pc1.amount > 0) "
                             + "UNION "
 
 
                             + "SELECT DISTINCT pmd.preorderdate, pmd.state, pmd.idofclient, p.surname, p.firstname, c.gender, "
-                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate, rp.idofregularpreorder "
+                            + " rp.state AS stateReg, rp.lastupdate, rp.enddate, rp.itemcode, rp.itemname, rp.idofcomplex, rp.createddate "
                             + "FROM cf_client_guardian_notificationsettings n JOIN cf_client_guardian cg ON n.idofclientguardian = cg.idofclientguardian AND n.notifytype = :notifyType "
                             + "JOIN cf_clients c ON c.idofclient = cg.idofchildren "
                             + "JOIN cf_preorder_menudetail pmd ON pmd.idofclient = c.idofclient "
                             + " JOIN cf_regular_preorders rp ON rp.idofregularpreorder = pmd.idofregularpreorder "
                             + "JOIN cf_persons p ON p.idofperson = c.idofperson "
-                            + "WHERE pmd.preorderdate > :date AND pmd.deletedstate = 1 AND rp.sendeddailynotification is not TRUE "
+                            + "WHERE pmd.preorderdate > :date AND pmd.deletedstate = 1 "
                             + "AND NOT exists(SELECT pmd1.idofpreordermenudetail FROM cf_preorder_menudetail pmd1 "
                             + "WHERE pmd1.idofclient = pmd.idofclient AND pmd1.deletedstate = 0 AND pmd1.preorderdate = pmd.preorderdate AND pmd1.amount > 0) "
                             + "ORDER BY 3,1";
@@ -633,16 +624,10 @@ public class SummaryCalculationService {
             List<PreorderData> preorderData = new ArrayList<>();
             List<PreorderRegularData> regularData = new ArrayList<>();
 
+            Long counter = 0L;
             for (Object obj : plist) {
                 Object[] row = (Object[]) obj;
-                Long idRegPreor =  ((BigInteger) row[13]).longValue();
-                Long idClient = ((BigInteger) row[2]).longValue();
-                List <Long> idPre = idRegularPreorerSending.get(idClient);
-                if (!idPre.contains(idRegPreor)) {
-                    DAOService.getInstance().setFlagSendedNotification(idRegPreor, true);
-                    idPre.add(idRegPreor);
-                    idRegularPreorerSending.put(idClient, idPre);
-                }
+
                 PreorderRegularData currPreorderRegularData = new PreorderRegularData();
                 currPreorderRegularData.setStateReg((Integer) row[6]);
                 currPreorderRegularData.setLastUpdate(new Date(((BigInteger) row[7]).longValue()));
@@ -652,11 +637,12 @@ public class SummaryCalculationService {
                 currPreorderRegularData.setComplexId(((Integer) row[11]).longValue());
                 currPreorderRegularData.setCreateDate(new Date(((BigInteger) row[12]).longValue()));
                 regularData.add(currPreorderRegularData);
+                counter++;
 
                 PreorderData currPreorderData = new PreorderData();
                 currPreorderData.setDate(new Date(((BigInteger) row[0]).longValue()));
                 currPreorderData.setState((Integer) row[1]);
-                currPreorderData.setId(idClient);
+                currPreorderData.setId(((BigInteger) row[2]).longValue());
                 currPreorderData.setSurname((String) row[3]);
                 currPreorderData.setFirstname((String) row[4]);
                 currPreorderData.setGender((Integer) row[5]);
@@ -737,7 +723,7 @@ public class SummaryCalculationService {
                         }
                     }
 
-                    if (stateReq.equals(PreorderState.OK.getCode())) {
+7                    if (stateReq.equals(PreorderState.OK.getCode())) {
                         clientEE.getPreorders().getDeletedPreorderDateGuardian().add(notifyPreorderDailyDetail);
                     } else {
                         clientEE.getPreorders().getDeletedPreorderDateOther().add(notifyPreorderDailyDetail);
