@@ -30,6 +30,11 @@ public class RegularPreorder {
     private Boolean deletedState;
     private String mobile;
     private RegularPreorderState state;
+<<<<<<< Updated upstream
+=======
+    private PreorderMobileGroupOnCreateType mobileGroupOnCreate;
+    private Boolean sendeddailynotification;
+>>>>>>> Stashed changes
 
     public RegularPreorder() {
 
@@ -228,4 +233,23 @@ public class RegularPreorder {
     public void setState(RegularPreorderState state) {
         this.state = state;
     }
+<<<<<<< Updated upstream
+=======
+
+    public PreorderMobileGroupOnCreateType getMobileGroupOnCreate() {
+        return mobileGroupOnCreate;
+    }
+
+    public void setMobileGroupOnCreate(PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
+        this.mobileGroupOnCreate = mobileGroupOnCreate;
+    }
+
+    public Boolean getSendeddailynotification() {
+        return sendeddailynotification;
+    }
+
+    public void setSendeddailynotification(Boolean sendeddailynotification) {
+        this.sendeddailynotification = sendeddailynotification;
+    }
+>>>>>>> Stashed changes
 }
