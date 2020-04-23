@@ -92,3 +92,18 @@ CREATE TABLE cf_wt_discountrules_categorydiscount
     WITH (
         OIDS=FALSE
     );
+
+-- Создание таблицы для каталога Education Level
+CREATE TABLE cf_kf_ct_EducationLevel
+(
+    global_id BIGINT NOT NULL
+        CONSTRAINT cf_kf_ct_EducationLevel_pkey
+            PRIMARY KEY,
+    createdate TIMESTAMP NOT NULL,
+    lastupdate TIMESTAMP NOT NULL,
+    is_deleted INTEGER DEFAULT 0,
+    system_object_id BIGINT,
+    title varchar(255),
+    id INTEGER,
+    shortname varchar(36)
+);
