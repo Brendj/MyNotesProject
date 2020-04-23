@@ -945,6 +945,19 @@
                             action="#{mainPage.cancelCategoryBenefitsPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <rich:panelMenuGroup id="preorderGroup" binding="#{mainPage.preorderPage.mainMenuComponent}" label="Предзаказ"
+                         rendered="#{mainPage.eligibleToServiceAdmin}">
+        <a4j:support event="onclick" action="#{mainPage.showPreorderGroupPage}" reRender="workspaceForm" />
+
+        <%--@elvariable id="preorderJournalReportPage" type="ru.axetta.ecafe.processor.web.ui.service.PreorderJournalReportPage"--%>
+        <rich:panelMenuItem id="preorderJournalReport" binding="#{preorderJournalReportPage.mainMenuComponent}"
+                            label="Журнал операций ВП" action="#{preorderJournalReportPage.show}" reRender="workspaceForm" />
+
+        <%--@elvariable id="preorderStatsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreorderStatsReportPage"--%>
+        <rich:panelMenuItem id="preorderStatsMenuItem" binding="#{preorderStatsReportPage.mainMenuComponent}"
+                            label="Статистика по количеству заказанного питания по предзаказу" action="#{preorderStatsReportPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
     <rich:panelMenuItem id="empInfo" binding="#{mainPage.empInfoPage.mainMenuComponent}"
                         label="Просмотр записей в ЕМП" action="#{mainPage.empInfoPage.show}" reRender="workspaceForm" />
 
@@ -957,10 +970,6 @@
     <%--@elvariable id="applicationForFoodReportPage" type="ru.axetta.ecafe.processor.web.ui.service.ApplicationForFoodReportPage"--%>
     <rich:panelMenuItem id="serviceApplicationForFoodReport" binding="#{applicationForFoodReportPage.mainMenuComponent}"
                         label="Заявления на льготное питание" action="#{applicationForFoodReportPage.show}" reRender="workspaceForm" />
-
-    <%--@elvariable id="preorderJournalReportPage" type="ru.axetta.ecafe.processor.web.ui.service.PreorderJournalReportPage"--%>
-    <rich:panelMenuItem id="preorderJournalReport" binding="#{preorderJournalReportPage.mainMenuComponent}"
-                        label="Журнал операций ВП" action="#{preorderJournalReportPage.show}" reRender="workspaceForm" />
 
     <rich:panelMenuGroup id="orgParameters" binding="#{mainPage.orgParametersGroup.mainMenuComponent}" label="Параметры ОО"
                          rendered="#{mainPage.eligibleToServiceAdmin}">
@@ -1247,9 +1256,6 @@
         <%--@elvariable id="commonStatsPage" type="ru.axetta.ecafe.processor.web.ui.report.online.CommonStatsPage"--%>
         <rich:panelMenuItem id="commonStatsMenuItem" binding="#{commonStatsPage.mainMenuComponent}"
                             label="Общая статистика" action="#{commonStatsPage.show}" reRender="workspaceForm" />
-        <%--@elvariable id="preorderStatsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreorderStatsReportPage"--%>
-        <rich:panelMenuItem id="preorderStatsMenuItem" binding="#{preorderStatsReportPage.mainMenuComponent}"
-                            label="Статистика по количеству заказанного питания по предзаказу" action="#{preorderStatsReportPage.show}" reRender="workspaceForm" />
         <%--@elvariable id="activeDiscountClientsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.ActiveDiscountClientsReportPage"--%>
         <rich:panelMenuItem id="activeDiscountClientsMenuItem"
                             binding="#{activeDiscountClientsReportPage.mainMenuComponent}"
