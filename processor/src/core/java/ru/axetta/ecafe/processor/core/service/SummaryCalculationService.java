@@ -636,7 +636,6 @@ public class SummaryCalculationService {
                 currPreorderRegularData.setItemname((String) row[10]);
                 currPreorderRegularData.setComplexId(((Integer) row[11]).longValue());
                 currPreorderRegularData.setCreateDate(new Date(((BigInteger) row[12]).longValue()));
-                currPreorderRegularData.setId(counter);
                 regularData.add(currPreorderRegularData);
                 counter++;
 
@@ -649,19 +648,27 @@ public class SummaryCalculationService {
                 currPreorderData.setGender((Integer) row[5]);
 
                 boolean added = false;
+                String addedId;
+                if (currPreorderRegularData.getItemCode() == null)
+                    addedId = currPreorderRegularData.getComplexId().toString() + "_Complex";
+                else
+                    addedId = currPreorderRegularData.getItemCode() + "_Regular";
+
+
                 for (PreorderData preorderData1 : preorderData) {
-                    if (preorderData1.getDate().equals(currPreorderData.getDate()) && preorderData1.getState()
-                            .equals(currPreorderData.getState()) && preorderData1.getId() == currPreorderData.getId()
-                            && preorderData1.getSurname().equals(currPreorderData.getSurname()) && preorderData1
-                            .getFirstname().equals(currPreorderData.getFirstname()) && preorderData1.getGender()
-                            .equals(currPreorderData.getGender())) {
-                        preorderData1.getIds().add(currPreorderRegularData.getId());
+                    //Если такой клиент уже есть
+                    if (preorderData1.getId() == currPreorderData.getId()) {
+                        //Если такого блюда у клиента не было
+                        if (!preorderData1.getIds().contains(addedId))
+                        {
+                            preorderData1.getIds().add(addedId);
+                        }
                         added = true;
                         break;
                     }
                 }
                 if (!added) {
-                    currPreorderData.getIds().add(currPreorderRegularData.getId());
+                    currPreorderData.getIds().add(addedId);
                     preorderData.add(currPreorderData);
                 }
             }
@@ -681,8 +688,22 @@ public class SummaryCalculationService {
                     clients.add(clientEE);
                 }
 
-                for (Long idReg : preorderData1.getIds()) {
-                    PreorderRegularData currPreorderRegularData = regularData.get(idReg.intValue());
+                for (String idReg : preorderData1.getIds()) {
+                    PreorderRegularData currPreorderRegularData = new PreorderRegularData();
+                    for (PreorderRegularData preorderRegularData: regularData)
+                    {
+                        String addedId;
+                        if (preorderRegularData.getItemCode() == null)
+                            addedId = preorderRegularData.getComplexId().toString() + "_Complex";
+                        else
+                            addedId = preorderRegularData.getItemCode() + "_Regular";
+                        if (addedId.equals(idReg))
+                        {
+                            currPreorderRegularData = preorderRegularData;
+                            break;
+                        }
+                    }
+                   //PreorderRegularData currPreorderRegularData = regularData.get(idReg.intValue());
                     Integer stateReq = currPreorderRegularData.getStateReg();
 
                     NotifyPreorderDailyDetail notifyPreorderDailyDetail = new NotifyPreorderDailyDetail();
@@ -702,7 +723,7 @@ public class SummaryCalculationService {
                         }
                     }
 
-                    if (stateReq.equals(PreorderState.OK.getCode())) {
+7                    if (stateReq.equals(PreorderState.OK.getCode())) {
                         clientEE.getPreorders().getDeletedPreorderDateGuardian().add(notifyPreorderDailyDetail);
                     } else {
                         clientEE.getPreorders().getDeletedPreorderDateOther().add(notifyPreorderDailyDetail);
@@ -1699,7 +1720,7 @@ public class SummaryCalculationService {
         private String surname;
         private String firstname;
         private Integer gender;
-        private List<Long> ids;
+        private List<String> ids;
 
         PreorderData() {
             ids = new ArrayList<>();
@@ -1753,18 +1774,16 @@ public class SummaryCalculationService {
             this.gender = gender;
         }
 
-        public List<Long> getIds() {
+        public List<String> getIds() {
             return ids;
         }
 
-        public void setIds(List<Long> ids) {
+        public void setIds(List<String> ids) {
             this.ids = ids;
         }
     }
 
     public class PreorderRegularData {
-
-        private Long id;
         private Integer stateReg;
         private Date lastUpdate;
         private Date endDateReg;
@@ -1811,14 +1830,6 @@ public class SummaryCalculationService {
 
         public void setItemname(String itemname) {
             this.itemname = itemname;
-        }
-
-        public Long getId() {
-            return id;
-        }
-
-        public void setId(Long id) {
-            this.id = id;
         }
 
         public Long getComplexId() {
