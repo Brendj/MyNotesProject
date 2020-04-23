@@ -107,3 +107,14 @@ CREATE TABLE cf_kf_ct_EducationLevel
     id INTEGER,
     shortname varchar(36)
 );
+
+--Расширение таблиц предзаказа новыми колонками
+ALTER TABLE cf_preorder_menudetail
+    ADD COLUMN mobile character varying(32),
+    ADD COLUMN mobileGroupOnCreate integer;
+
+alter table cf_preorder_complex
+    add column mobileGroupOnCreate integer;
+
+alter table cf_regular_preorders
+    add column mobileGroupOnCreate integer;
