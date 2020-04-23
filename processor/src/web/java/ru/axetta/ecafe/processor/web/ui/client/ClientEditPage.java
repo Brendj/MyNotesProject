@@ -1370,9 +1370,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     public SelectItem[] getRelations() {
         SelectItem[] result = new SelectItem[ClientGuardianRelationType.values().length + 1];
         result[0] = new SelectItem(-1, "");
-        for (int i = 0; i < ClientGuardianRelationType.values().length; i++) {
-            result[i+1] = new SelectItem(i, ClientGuardianRelationType.fromInteger(i).toString());
+        int i = 0;
+        for (ClientGuardianRelationType relType : ClientGuardianRelationType.values()) {
+            result[i+1] = new SelectItem(relType.getCode(), relType.getDescription());
+            i++;
         }
+
         return result;
     }
 

@@ -34,7 +34,7 @@ public class ClientGuardianItem {
         this.version = clientGuardian.getVersion();
         this.disabled = clientGuardian.isDisabled();
         this.deleteState = clientGuardian.getDeletedState() ? 1 : 0;
-        this.relation = clientGuardian.getRelation() == null ? null : clientGuardian.getRelation().ordinal();
+        this.relation = clientGuardian.getRelation() == null ? null : clientGuardian.getRelation().getCode();
         if (clientGuardian.getCardRequest() != null) {
             this.guidRequest = clientGuardian.getCardRequest().getGuid();
         }
@@ -68,6 +68,19 @@ public class ClientGuardianItem {
         return idOfChildren;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+
+        ClientGuardianItem item = (ClientGuardianItem) o;
+
+        return idOfChildren.equals(item.getIdOfChildren()) && idOfGuardian.equals(item.getIdOfGuardian());
+    }
 
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
