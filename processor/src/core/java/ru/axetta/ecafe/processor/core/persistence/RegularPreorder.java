@@ -30,6 +30,7 @@ public class RegularPreorder {
     private Boolean deletedState;
     private String mobile;
     private RegularPreorderState state;
+    private Boolean sendeddailynotification;
 
     public RegularPreorder() {
 
@@ -227,5 +228,13 @@ public class RegularPreorder {
 
     public void setState(RegularPreorderState state) {
         this.state = state;
+    }
+
+    public Boolean getSendeddailynotification() {
+        return sendeddailynotification;
+    }
+
+    public void setSendeddailynotification(Boolean sendeddailynotification) {
+        this.sendeddailynotification = sendeddailynotification;
     }
 }

@@ -2706,4 +2706,12 @@ public class DAOService {
         entityManager.persist(object);
         entityManager.flush();
     }
+
+    public boolean setFlagSendedNotification(Long idofregularpreorder, Boolean valuec) {
+        Query q = entityManager
+                .createNativeQuery("update cf_regular_preorders set sendeddailynotification = :valuec where idofregularpreorder = :idofregularpreorder");
+        q.setParameter("valuec", valuec);
+        q.setParameter("idofregularpreorder", idofregularpreorder);
+        return q.executeUpdate() > 0;
+    }
 }
