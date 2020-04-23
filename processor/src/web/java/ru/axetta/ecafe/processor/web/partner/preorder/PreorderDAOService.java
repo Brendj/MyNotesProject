@@ -159,7 +159,7 @@ public class PreorderDAOService {
         Query query = emReport.createNativeQuery("select ci.idofcomplexinfo, pc.amount, pc.deletedState, pc.state, pc.idofregularpreorder, "
                 + "coalesce(pc.modeofadd, ci.modeofadd) as modeofadd, coalesce(pc.modefree, ci.modefree) as modefree, ci.idofcomplex, "
                 + "coalesce(pc.complexname, ci.complexname) as complexname, "
-                + "coalesce(pc.complexprice, ci.currentprice) as currentprice, pc.idofpreordercomplex "
+                + "coalesce(pc.complexprice, ci.currentprice) as currentprice, pc.idofpreordercomplex, pc.mobileGroupOnCreate "
                 + " from cf_complexinfo ci join cf_orgs o on o.idoforg = ci.idoforg "
                 + " left outer join (select * from cf_preorder_complex pc where pc.idofclient = :idOfClient "
                 + " and pc.preorderdate between :startDate and :endDate and pc.deletedstate = 0) as pc on (ci.idoforg = :idOfOrg and ci.menudate = pc.preorderdate and ci.idofcomplex = pc.armcomplexid) "
@@ -168,7 +168,7 @@ public class PreorderDAOService {
                 + " and (o.OrganizationType = :school or o.OrganizationType = :professional) and ci.modevisible = 1 and (pc.deletedstate is null or pc.deletedstate = 0) "
                 + "union "
                 + "select cast(-1 as bigint) as idofcomplexinfo, pc.amount, pc.deletedState, pc.state, pc.idofregularpreorder, pc.modeofadd, pc.modefree, "
-                + "pc.armcomplexid, pc.complexname, pc.complexprice, pc.idofpreordercomplex "
+                + "pc.armcomplexid, pc.complexname, pc.complexprice, pc.idofpreordercomplex, pc.mobileGroupOnCreate "
                 + "from cf_preorder_complex pc where pc.idofclient = :idOfClient and pc.preorderdate between :startDate and :endDate and pc.deletedstate = 0 "
                 + "and not exists (select idofcomplexinfo from cf_complexinfo ci2 where ci2.idoforg = :idOfOrg and ci2.menudate = pc.preorderdate and ci2.idofcomplex = pc.armcomplexid "
                 + " and ci2.modevisible = 1 and (ci2.usedspecialmenu = 1 or ci2.modefree = 1)) "
@@ -195,10 +195,13 @@ public class PreorderDAOService {
             String complexName = (String) row[8];
             Long complexPrice = ((BigInteger)row[9]).longValue();
             Long idOfPreorderComplex = (row[10] == null ? null : ((BigInteger)row[10]).longValue());
+            Integer mobileGroupOnCreate = (row[11] == null ? null : (Integer)row[11]);
             PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, modeOfAdd, modeFree);
             complexItemExt.setAmount(amount == null ? 0 : amount);
             complexItemExt.setState(state == null ? 0 : state);
             complexItemExt.setIsRegular(idOfRegularPreorder == null ? false : true);
+
+            complexItemExt.setCreatorRole(mobileGroupOnCreate);
 
             List<PreorderMenuItemExt> menuItemExtList = getMenuItemsExt(id, client.getIdOfClient(), date, idOfPreorderComplex);
             if (menuItemExtList.size() > 0) {
@@ -313,10 +316,11 @@ public class PreorderDAOService {
         List<PreorderMenuItemExt> menuItemExtList = new ArrayList<PreorderMenuItemExt>();
         Query query = null;
         if (idOfPreorderComplex == null) {
-            query = emReport.createNativeQuery("SELECT md.idofmenudetail, pmd.amount, pmd.idofregularpreorder, pmd.state, g.dailysale, pmd.idofpreordermenudetail "
+            query = emReport.createNativeQuery("SELECT md.idofmenudetail, pmd.amount, pmd.idofregularpreorder, pmd.state, g.dailysale, pmd.idofpreordermenudetail, "
+                    + "pmd.mobileGroupOnCreate "
                     + "FROM CF_MenuDetails md INNER JOIN CF_ComplexInfoDetail cid ON cid.IdOfMenuDetail = md.IdOfMenuDetail "
                     + "JOIN CF_Goods g ON md.IdOfGood = g.IdOfGood "
-                    + "left join (SELECT pmd.amount, pmd.idofregularpreorder, pmd.state, pmd.armidofmenu, pmd.idofpreordermenudetail "
+                    + "left join (SELECT pmd.amount, pmd.idofregularpreorder, pmd.state, pmd.armidofmenu, pmd.idofpreordermenudetail, pmd.mobileGroupOnCreate "
                     + "FROM cf_preorder_menudetail pmd WHERE pmd.idofclient = :idOfClient "
                     + "AND pmd.preorderdate BETWEEN :startDate AND :endDate AND pmd.deletedstate = 0) as pmd on pmd.armidofmenu = md.localidofmenu "
                     + "WHERE cid.IdOfComplexInfo = :idOfComplexInfo and md.itemcode is not null and md.itemcode <> ''");
@@ -326,10 +330,10 @@ public class PreorderDAOService {
             query.setParameter("endDate", CalendarUtils.endOfDay(date).getTime());
         } else {
             query = emReport.createNativeQuery("select cast(-1 as bigint) as idofmenudetail, pmd.amount, pmd.idofregularpreorder, pmd.state, "
-                    + "cast(0 as integer) as dailysale, pmd.idofpreordermenudetail "
+                    + "cast(0 as integer) as dailysale, pmd.idofpreordermenudetail, pmd.mobileGroupOnCreate "
                     + "from cf_preorder_menudetail pmd where pmd.idofpreordercomplex = :idOfPreorderComplex and pmd.deletedState = 0 " //and pmd.amount > 0 "
                     + "union "
-                    + "select md.idofmenudetail, null, null, null, g.dailysale, null from cf_menudetails md INNER JOIN CF_ComplexInfoDetail cid ON cid.IdOfMenuDetail = md.IdOfMenuDetail "
+                    + "select md.idofmenudetail, null, null, null, g.dailysale, null, null from cf_menudetails md INNER JOIN CF_ComplexInfoDetail cid ON cid.IdOfMenuDetail = md.IdOfMenuDetail "
                     + "JOIN CF_Goods g ON md.IdOfGood = g.IdOfGood "
                     + "WHERE cid.IdOfComplexInfo = :idOfComplexInfo and md.itemcode is not null and md.itemcode <> ''"
                     + "and not exists (select idofpreordermenudetail from cf_preorder_menudetail pmd2 "
@@ -351,6 +355,7 @@ public class PreorderDAOService {
             Integer state = (Integer) row[3];
             Boolean isAvailableForRegular = (Integer) row[4] == 1;
             Long idOfPreorderMenuDetail = (row[5] == null ? null : ((BigInteger)row[5]).longValue());
+            Integer mobileGroupOnCreate = (row[6] == null ? null : (Integer)row[6]);
             PreorderMenuItemExt menuItemExt = null;
             if (idOfPreorderMenuDetail == null) {
                 MenuDetail menuDetail = emReport.find(MenuDetail.class, id);
@@ -363,6 +368,7 @@ public class PreorderDAOService {
             menuItemExt.setState(state == null ? 0 : state);
             menuItemExt.setIsRegular(idOfRegularPreorder == null ? false : true);
             menuItemExt.setAvailableForRegular(isAvailableForRegular);
+            menuItemExt.setCreatorRole(mobileGroupOnCreate);
             if (!set.contains(menuItemExt.getIdOfMenuDetail())) {
                 menuItemExtList.add(menuItemExt);
                 set.add(menuItemExt.getIdOfMenuDetail());

@@ -35,6 +35,8 @@ public class PreorderComplexItemExt implements Comparable {
     private Integer state;
     @XmlAttribute(name = "isRegular")
     private Boolean isRegular;
+    @XmlAttribute(name = "creatorRole")
+    private Integer creatorRole;
     @XmlElement(name = "menuItem")
     private List<PreorderMenuItemExt> menuItemExtList;
 
@@ -180,5 +182,13 @@ public class PreorderComplexItemExt implements Comparable {
 
     public void setModeVisible(Integer modeVisible) {
         this.modeVisible = modeVisible;
+    }
+
+    public Integer getCreatorRole() {
+        return creatorRole;
+    }
+
+    public void setCreatorRole(Integer creatorRole) {
+        this.creatorRole = creatorRole;
     }
 }
