@@ -28,6 +28,8 @@ public class OrgCreatePage extends BasicWorkspacePage
     implements OrgSelectPage.CompleteHandler, ContragentSelectPage.CompleteHandler {
     private String shortName;
     private String shortNameInfoService;
+    private String founder;
+    private String subordination;
     private String officialName;
     private String address;
     private String shortAddress;
@@ -324,6 +326,22 @@ public class OrgCreatePage extends BasicWorkspacePage
 
     public void setMunicipalDistrict(String municipalDistrict) {
         this.municipalDistrict = municipalDistrict;
+    }
+
+    public String getFounder() {
+        return founder;
+    }
+
+    public void setFounder(String founder) {
+        this.founder = founder;
+    }
+
+    public String getSubordination() {
+        return subordination;
+    }
+
+    public void setSubordination(String subordination) {
+        this.subordination = subordination;
     }
 
     public static class ContragentItem {
@@ -639,6 +657,8 @@ public class OrgCreatePage extends BasicWorkspacePage
         org.setCity(city);
         org.setDistrict(district);
         org.setMunicipalDistrict(municipalDistrict);
+        org.setFounder(founder);
+        org.setSubordination(subordination);
         org.setLocation(location);
         org.setLongitude(longitude);
         org.setLatitude(latitude);

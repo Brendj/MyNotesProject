@@ -57,7 +57,9 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
                 + "addr.area, "                                  //16
                 + "org.egisso_id, "                              //17
                 + "addr.address_asur, "                          //18
-                + "addr.district "                               //19
+                + "addr.district, "                               //19
+                + "org.founder, "                                 //20
+                + "org.subordination_value "                      //21
                 + "FROM "
                 + "cf_kf_organization_registry org "
                 + "INNER JOIN cf_kf_eo_address addr ON addr.global_object_id = org.global_id "
@@ -93,6 +95,8 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
             item.setEgissoId((String)row[17]);
             item.setShortAddress((String)row[18]);
             item.setMunicipalDistrict((String)row[19]);
+            item.setFounder((String)row[20]);
+            item.setSubordination((String)row[21]);
 
             ImportRegisterOrgsService.OrgInfo info;
 

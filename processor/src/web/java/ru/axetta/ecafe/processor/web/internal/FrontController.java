@@ -2141,7 +2141,7 @@ public class FrontController extends HttpServlet {
                             GuardianDesc.FIELD_LEGALITY));
         }
 
-        Boolean legality = Boolean.parseBoolean(legalityStr);
+        Integer legality = convertLegality(legalityStr);
 
         String gender = FrontControllerProcessor
                 .getFindClientFieldValueByName(GuardianDesc.FIELD_GENDER, guardianDescList);
@@ -2283,7 +2283,7 @@ public class FrontController extends HttpServlet {
                     .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
                             clientId, ClientCreatedFromType.ARM, null);
 
-            clientGuardian.setIsLegalRepresent(legality);
+            clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
             persistenceSession.merge(clientGuardian);
 
             persistenceTransaction.commit();
@@ -2296,6 +2296,12 @@ public class FrontController extends HttpServlet {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    private Integer convertLegality(String legality_str) {
+        if (legality_str.equals("true")) return 1;
+        if (legality_str.equals("false")) return 0;
+        return Integer.parseInt(legality_str);
     }
 
     @WebMethod(operationName = "registerGuardianMigrantRequest")
@@ -2362,7 +2368,7 @@ public class FrontController extends HttpServlet {
             return result;
         }
 
-        Boolean legality = Boolean.parseBoolean(legalityStr);
+        Integer legality = convertLegality(legalityStr);
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -2399,7 +2405,7 @@ public class FrontController extends HttpServlet {
                         .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
                                 clientId, ClientCreatedFromType.ARM, null);
 
-                clientGuardian.setIsLegalRepresent(legality);
+                clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
                 persistenceSession.merge(clientGuardian);
             } else {
                 logger.warn(String.format(
@@ -2408,30 +2414,8 @@ public class FrontController extends HttpServlet {
             }
 
             if (!DAOUtils.isFriendlyOrganizations(persistenceSession, guardian.getOrg(), child.getOrg())) {
-                Long idOfProcessorMigrantRequest = MigrantsUtils
-                        .nextIdOfProcessorMigrantRequest(persistenceSession, guardian.getOrg().getIdOfOrg());
-                CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
-                        guardian.getOrg().getIdOfOrg());
-                String requestNumber = ImportMigrantsService
-                        .formRequestNumber(guardian.getOrg().getIdOfOrg(), orgId, idOfProcessorMigrantRequest,
-                                fireTime);
-
-                Migrant migrantNew = new Migrant(compositeIdOfMigrant, guardian.getOrg().getDefaultSupplier(),
-                        requestNumber, guardian, org, fireTime, CalendarUtils.addYear(fireTime, 10),
-                        Migrant.NOT_SYNCHRONIZED);
-                migrantNew.setInitiator(MigrantInitiatorEnum.INITIATOR_ORG);
-                //migrantNew.setSection(request.getGroupName());
-                //migrantNew.setResolutionCodeGroup(request.getIdOfServiceClass());
-                persistenceSession.save(migrantNew);
-
-                persistenceSession.save(ImportMigrantsService
-                        .createResolutionHistory(persistenceSession, guardian, compositeIdOfMigrant.getIdOfRequest(),
-                                VisitReqResolutionHist.RES_CREATED, fireTime));
-                persistenceSession.flush();
-                persistenceSession.save(ImportMigrantsService
-                        .createResolutionHistory(persistenceSession, guardian, compositeIdOfMigrant.getIdOfRequest(),
-                                VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(fireTime, 1)));
-
+                ClientManager.createMigrationForGuardianWithConfirm(persistenceSession, guardian, fireTime, org,
+                        MigrantInitiatorEnum.INITIATOR_ORG, 10);
                 result.code = ResponseItem.OK;
                 result.message = ResponseItem.OK_MESSAGE;
             }

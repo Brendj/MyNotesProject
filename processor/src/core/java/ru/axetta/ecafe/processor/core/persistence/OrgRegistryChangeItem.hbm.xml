@@ -65,7 +65,10 @@
         <property name="mainRegistry" column="mainRegistry" type="long" insert="false" update="false"/>
         <many-to-one name="orgRegistryChange" class="ru.axetta.ecafe.processor.core.persistence.OrgRegistryChange"
                      column="mainRegistry" />
-
+        <property name="founder" column="founder" type="string" length="512"/>
+        <property name="founderFrom" column="founderFrom" type="string" length="512"/>
+        <property name="subordination" column="subordination" type="string" length="512"/>
+        <property name="subordinationFrom" column="subordinationFrom" type="string" length="512"/>
 
     </class>
 </hibernate-mapping>

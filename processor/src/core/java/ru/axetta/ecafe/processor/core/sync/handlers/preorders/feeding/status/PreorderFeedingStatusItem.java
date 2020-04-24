@@ -11,6 +11,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 
+import java.text.SimpleDateFormat;
 import java.util.Date;
 
 public class PreorderFeedingStatusItem {
@@ -48,7 +49,7 @@ public class PreorderFeedingStatusItem {
 
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
-        XMLUtils.setAttributeIfNotNull(element, "Date", date);
+        XMLUtils.setAttributeIfNotNull(element, "Date", new SimpleDateFormat("dd.MM.yyyy").format(date));
         XMLUtils.setAttributeIfNotNull(element, "Guid", guid);
         XMLUtils.setAttributeIfNotNull(element, "Status", status);
         XMLUtils.setAttributeIfNotNull(element, "Storno", storno);

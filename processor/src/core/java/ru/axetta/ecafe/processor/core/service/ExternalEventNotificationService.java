@@ -142,12 +142,17 @@ public class ExternalEventNotificationService {
                                 notificationService.sendNotificationAsync(destGuardian, client, type, values,
                                         event.getEvtDateTime());
                             }
+                            else
+                            {
+                                logger.info("Отправка уведомления невозможна по причине отсутствия социальной льготы");
+                            }
                         }
                     }
                 }
             }
             //отправка клиенту
             if (event.getEvtType().equals(ExternalEventType.SPECIAL)) { //Если тип = Служебные сообщения, то ....
+                logger.info("Отправка уведомления клиенту л/с" + client.getContractId());
                 if (clas > 0 && clas < 5)//1-4
                 {
                     //Если учащийся с 1-4 класс
@@ -161,6 +166,10 @@ public class ExternalEventNotificationService {
                         if (ClientHaveDiscount(persistenceSession, client)) {
                             notificationService
                                     .sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
+                        }
+                        else
+                        {
+                            logger.info("Отправка уведомления невозможна по причине отсутствия социальной льготы");
                         }
                     }
                 }

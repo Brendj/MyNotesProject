@@ -58,6 +58,8 @@ public class ImportRegisterOrgsService {
     public static final String VALUE_UNAD = "УНАД";
     public static final String VALUE_INN = "ИНН";
     public static final String VALUE_DIRECTOR = "Руководитель ОО";
+    public static final String VALUE_FOUNDER = "Учредитель";
+    public static final String VALUE_SUBORDINATION = "Подчиненность";
 
     private static final org.slf4j.Logger logger = LoggerFactory.getLogger(ImportRegisterOrgsService.class);
 
@@ -312,6 +314,10 @@ public class ImportRegisterOrgsService {
                         org.setOfficialPerson(getPersonFromFullName(orgRegistryChangeItem.getDirector()));
                         session.persist(org.getOfficialPerson());
                     }
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_FOUNDER)))
+                        org.setFounder(orgRegistryChange.getFounder());
+                    if ((fieldFlags == null) || (fieldFlags.contains(VALUE_SUBORDINATION)))
+                        org.setSubordination(orgRegistryChange.getSubordination());
 
                     orgRegistryChangeItem.setApplied(true);
                 }
@@ -391,7 +397,8 @@ public class ImportRegisterOrgsService {
                         safeCompare(orgInfo.officialName, orgInfo.officialNameFrom) && safeCompare(orgInfo.unom, orgInfo.unomFrom) &&
                         safeCompare(orgInfo.unad, orgInfo.unadFrom) && safeCompare(orgInfo.inn, orgInfo.innFrom) &&
                         safeCompare(orgInfo.director, orgInfo.directorFrom) && safeCompare(orgInfo.egissoId, orgInfo.egissoIdFrom) &&
-                        safeCompare(orgInfo.shortAddress, orgInfo.shortAddressFrom) && safeCompare(orgInfo.municipalDistrict, orgInfo.municipalDistrictFrom)) {
+                        safeCompare(orgInfo.shortAddress, orgInfo.shortAddressFrom) && safeCompare(orgInfo.municipalDistrict, orgInfo.municipalDistrictFrom) &&
+                        safeCompare(orgInfo.getFounder(), orgInfo.founderFrom) && safeCompare(orgInfo.getSubordination(), orgInfo.getSubordinationFrom())) {
                     //если полное совпадение по сверяемым полям, то запись не включаем в таблицу сверки
                 } else {
                     if(orgRegistryChange.getOrgs() == null){
@@ -455,7 +462,9 @@ public class ImportRegisterOrgsService {
                         oi.getEkisId(), oi.getEkisIdFrom(),
                         solveString(oi.getEgissoId()), solveString(oi.getEgissoIdFrom()),
                         solveString(oi.getShortAddress()), solveString(oi.getShortAddressFrom()),
-                        solveString(oi.getMunicipalDistrict()), solveString(oi.getMunicipalDistrictFrom())
+                        solveString(oi.getMunicipalDistrict()), solveString(oi.getMunicipalDistrictFrom()),
+                        solveString(oi.getFounder()), solveString(oi.getFounderFrom()),
+                        solveString(oi.getSubordination()), solveString(oi.getSubordinationFrom())
                 );
     }
 
@@ -487,7 +496,9 @@ public class ImportRegisterOrgsService {
                         oi.getEkisId(), oi.getEkisIdFrom(),
                         solveString(oi.getEgissoId()), solveString(oi.getEgissoIdFrom()),
                         solveString(oi.getShortAddress()), solveString(oi.getShortAddressFrom()),
-                        solveString(oi.getMunicipalDistrict()), solveString(oi.getMunicipalDistrictFrom())
+                        solveString(oi.getMunicipalDistrict()), solveString(oi.getMunicipalDistrictFrom()),
+                        solveString(oi.getFounder()), solveString(oi.getFounderFrom()),
+                        solveString(oi.getSubordination()), solveString(oi.getSubordinationFrom())
                 );
     }
 
@@ -561,6 +572,10 @@ public class ImportRegisterOrgsService {
         private String shortAddressFrom;
         private String municipalDistrict;
         private String municipalDistrictFrom;
+        private String founder;
+        private String founderFrom;
+        private String subordination;
+        private String subordinationFrom;
 
         private List<OrgInfo> orgInfos = new LinkedList<OrgInfo>();
         private Boolean mainBuilding;
@@ -932,6 +947,38 @@ public class ImportRegisterOrgsService {
 
         public void setMunicipalDistrictFrom(String municipalDistrictFrom) {
             this.municipalDistrictFrom = municipalDistrictFrom;
+        }
+
+        public String getFounder() {
+            return founder;
+        }
+
+        public void setFounder(String founder) {
+            this.founder = founder;
+        }
+
+        public String getFounderFrom() {
+            return founderFrom;
+        }
+
+        public void setFounderFrom(String founderFrom) {
+            this.founderFrom = founderFrom;
+        }
+
+        public String getSubordination() {
+            return subordination;
+        }
+
+        public void setSubordination(String subordination) {
+            this.subordination = subordination;
+        }
+
+        public String getSubordinationFrom() {
+            return subordinationFrom;
+        }
+
+        public void setSubordinationFrom(String subordinationFrom) {
+            this.subordinationFrom = subordinationFrom;
         }
     }
 }
