@@ -668,4 +668,34 @@ ALTER TABLE ONLY cf_wt_org_groups
 ALTER TABLE ONLY cf_wt_refresh_token
     ADD CONSTRAINT cf_wt_refresh_token_user_id_fkey FOREIGN KEY (user_id) REFERENCES cf_users(idofuser) ON UPDATE CASCADE ON DELETE CASCADE;
 
---! ФИНАЛИЗИРОВАН 26.03.2020, НЕ МЕНЯТЬ
+INSERT INTO cf_wt_agegroup_items (idofagegroupitem, description, version) VALUES (1, '1,5-3', 0);
+INSERT INTO cf_wt_agegroup_items (idofagegroupitem, description, version) VALUES (2, '3-7', 0);
+INSERT INTO cf_wt_agegroup_items (idofagegroupitem, description, version) VALUES (3, '1-4', 0);
+INSERT INTO cf_wt_agegroup_items (idofagegroupitem, description, version) VALUES (4, '5-11', 0);
+INSERT INTO cf_wt_agegroup_items (idofagegroupitem, description, version) VALUES (5, 'Колледж', 0);
+INSERT INTO cf_wt_agegroup_items (idofagegroupitem, description, version) VALUES (6, 'Сотрудники', 0);
+INSERT INTO cf_wt_agegroup_items (idofagegroupitem, description, version) VALUES (7, 'Все', 0);
+
+
+INSERT INTO cf_wt_complex_group_items (idofcomplexgroupitem, description, version) VALUES (1, 'Льготное питание', 0);
+INSERT INTO cf_wt_complex_group_items (idofcomplexgroupitem, description, version) VALUES (2, 'Платное питание', 0);
+INSERT INTO cf_wt_complex_group_items (idofcomplexgroupitem, description, version) VALUES (3, 'Все виды питания', 0);
+
+
+INSERT INTO cf_wt_diet_type (idofdiettype, description, version) VALUES (1, 'Завтрак', 0);
+INSERT INTO cf_wt_diet_type (idofdiettype, description, version) VALUES (2, 'Обед', 0);
+INSERT INTO cf_wt_diet_type (idofdiettype, description, version) VALUES (4, 'Ужин', 0);
+INSERT INTO cf_wt_diet_type (idofdiettype, description, version) VALUES (3, 'Полдник', 0);
+
+
+INSERT INTO cf_wt_typeofproduction_items (idoftypeproductionitem, description, version) VALUES (1, 'Собственное', 0);
+INSERT INTO cf_wt_typeofproduction_items (idoftypeproductionitem, description, version) VALUES (2, 'Закупленное', 0);
+
+
+INSERT INTO cf_wt_group_items (idofgroupitem, description, version) VALUES (1, 'Льготное питание', 0);
+INSERT INTO cf_wt_group_items (idofgroupitem, description, version) VALUES (2, 'Платное питание', 0);
+INSERT INTO cf_wt_group_items (idofgroupitem, description, version) VALUES (3, 'Буфет', 0);
+INSERT INTO cf_wt_group_items (idofgroupitem, description, version) VALUES (4, 'Коммерческое питание', 0);
+INSERT INTO cf_wt_group_items (idofgroupitem, description, version) VALUES (5, 'Все', 0);
+
+--! ФИНАЛИЗИРОВАН 24.04.2020, НЕ МЕНЯТЬ
