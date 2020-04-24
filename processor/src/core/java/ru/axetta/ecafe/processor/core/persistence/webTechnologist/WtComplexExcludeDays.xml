@@ -1,0 +1,46 @@
+<?xml version='1.0' encoding='utf-8'?>
+<!--
+  ~ Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+  -->
+
+<!DOCTYPE hibernate-mapping PUBLIC
+        "-//Hibernate/Hibernate Mapping DTD 3.0//EN"
+        "http://www.hibernate.org/dtd/hibernate-mapping-3.0.dtd">
+<hibernate-mapping>
+    <class name="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexExcludeDays"
+           table="cf_wt_complex_exclude_days">
+        <cache usage="transactional"/>
+        <id name="id">
+            <column name="id" sql-type="long"/>
+        </id>
+        <property name="date">
+            <column name="date" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        </property>
+        <property name="version">
+            <column name="version" sql-type="long"/>
+        </property>
+        <property name="deleteState">
+            <column name="deleteState" sql-type="integer"/>
+        </property>
+
+        <property name="createDate">
+            <column name="createDate" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
+        </property>
+        <property name="lastUpdate">
+            <column name="lastUpdate" sql-type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        </property>
+
+        <many-to-one name="createdUser" class="ru.axetta.ecafe.processor.core.persistence.User">
+            <column name="create_by_id"/>
+        </many-to-one>
+
+        <many-to-one name="updatedUser" class="ru.axetta.ecafe.processor.core.persistence.User">
+            <column name="update_by_id"/>
+        </many-to-one>
+
+        <many-to-one name="complex" class="ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex">
+            <column name="idofcomplex"/>
+        </many-to-one>
+
+    </class>
+</hibernate-mapping>

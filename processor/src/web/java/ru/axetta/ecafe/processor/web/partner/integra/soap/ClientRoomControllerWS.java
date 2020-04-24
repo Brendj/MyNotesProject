@@ -50,10 +50,7 @@ import ru.axetta.ecafe.processor.core.persistence.service.card.CardNotFoundExcep
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardWrongStateException;
 import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.*;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroupMenu;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.service.finoperator.FinManager;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
@@ -2625,7 +2622,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             final Date endDate) {
         authenticateRequest(null);
         ObjectFactory objectFactory = new ObjectFactory();
-        return processMenuListWithComplexes(contractId, startDate, endDate, objectFactory);
+        Client client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).
+                getClientByContractId(contractId);
+        if (!client.getOrg().getUseWebArm()) {
+            return processMenuListWithComplexes(contractId, startDate, endDate, objectFactory);
+        } else {
+            return processWtMenuListWithComplexes(contractId, startDate, endDate, objectFactory);
+        }
     }
 
     private MenuListWithComplexesResult processMenuListWithComplexes(Long contractId, Date startDate, Date endDate,
@@ -2715,6 +2718,70 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 if (menuItemExtList.isEmpty())
                     continue;
                 MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(ci);
+                menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
+                list.add(menuWithComplexesExt);
+            }
+            result.getMenuWithComplexesList().setList(list);
+
+        } catch (Exception ex) {
+            HibernateUtils.rollback(transaction, logger);
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+
+        return result;
+    }
+
+    private MenuListWithComplexesResult processWtMenuListWithComplexes(Long contractId, Date startDate, Date endDate,
+            ObjectFactory objectFactory) {
+        Session session = null;
+        Transaction transaction = null;
+        MenuListWithComplexesResult result = new MenuListWithComplexesResult();
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+
+            Client client = findClientByContractId(session, contractId, result);
+            if (client == null) {
+                return result;
+            }
+
+            Org org = client.getOrg();
+
+            // Категории скидок
+            Set<CategoryDiscount> categoriesDiscount = client.getCategories();
+
+            // Льготные правила
+            Set<WtDiscountRule> wtDiscountRuleSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getWtDiscountRules(categoriesDiscount);
+
+            // Типы комплексов
+            List<WtComplexGroupItem> complexGroupList = RuntimeContext.getAppContext()
+                    .getBean(PreorderDAOService.class).getWtComplexGroupItems(categoriesDiscount);
+
+            // Возрастные группы и параллели
+            List<WtAgeGroupItem> ageGroupList = RuntimeContext.getAppContext()
+                    .getBean(PreorderDAOService.class).getWtAgeGroupItems(client, categoriesDiscount);
+
+            // Комплексы
+            Set<WtComplex> wtComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getWtComplexes(startDate, endDate, wtDiscountRuleSet, complexGroupList, ageGroupList);
+
+            // Исключение из комплексов составов, не соответствующим датам цикла
+            for (WtComplex wtComplex : wtComplexes) {
+                wtComplex = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getWtComplexInCycleDates(client, org, wtComplex);
+            }
+
+            List<MenuWithComplexesExt> list = new ArrayList<>();
+            for (WtComplex wtComplex : wtComplexes) {
+                List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtComplex);
+                MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(wtComplex, org);
                 menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
                 list.add(menuWithComplexesExt);
             }
