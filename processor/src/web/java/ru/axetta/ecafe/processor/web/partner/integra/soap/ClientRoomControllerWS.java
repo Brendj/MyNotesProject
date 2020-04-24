@@ -23,8 +23,8 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.integra.IntegraPartnerConfig;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcessor;
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
-import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Menu;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -50,6 +50,10 @@ import ru.axetta.ecafe.processor.core.persistence.service.card.CardNotFoundExcep
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardWrongStateException;
 import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.*;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroupMenu;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.service.finoperator.FinManager;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
@@ -111,8 +115,8 @@ import java.security.cert.X509Certificate;
 import java.sql.Timestamp;
 import java.text.DateFormat;
 import java.text.SimpleDateFormat;
-import java.util.*;
 import java.util.List;
+import java.util.*;
 
 import static ru.axetta.ecafe.processor.core.utils.CalendarUtils.truncateToDayOfMonth;
 
@@ -2888,6 +2892,20 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         generateMenuDetailWithProhibitions(session, client, objectFactory, menus, data);
     }
 
+    private void processWtMenuFirstDayWithProhibitions(Client client, Data data, ObjectFactory objectFactory,
+            Session session, Date startDate, Date endDate) throws DatatypeConfigurationException {
+        Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
+        fromCal.setTime(startDate);
+        truncateToDayOfMonth(fromCal);
+        truncateToDayOfMonth(toCal);
+        fromCal.add(Calendar.HOUR, -1);
+
+        List<WtMenu> menus = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                .getWtMenuByDates(fromCal.getTime(), toCal.getTime(), client.getOrg());
+
+        generateWtMenuDetailWithProhibitions(session, client, objectFactory, menus, data);
+    }
+
     private void generateMenuDetailWithProhibitions(Session session, Client client, ObjectFactory objectFactory,
             List menus, Data data) throws DatatypeConfigurationException {
         Map<String, Long> ProhibitByFilter = new HashMap<String, Long>();
@@ -2965,6 +2983,91 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         //пробегаться в цикле.
                         for (String filter : ProhibitByFilter.keySet()) {
                             if (menuDetail.getMenuDetailName().contains(filter)) {
+                                menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
+                            }
+                        }
+                    }
+                }
+                menuDateItemExt.getE().add(menuItemExt);
+            }
+            menuListExt.getM().add(menuDateItemExt);
+        }
+        data.setMenuListExt(menuListExt);
+    }
+
+    private void generateWtMenuDetailWithProhibitions(Session session, Client client, ObjectFactory objectFactory,
+            List<WtMenu> menus, Data data) throws DatatypeConfigurationException {
+        Map<String, Long> ProhibitByFilter = new HashMap<>();
+        Map<String, Long> ProhibitByName = new HashMap<>();
+        Map<String, Long> ProhibitByGroup = new HashMap<>();
+
+        Criteria prohibitionsCriteria = session.createCriteria(ProhibitionMenu.class);
+        prohibitionsCriteria.add(Restrictions.eq("client", client));
+        prohibitionsCriteria.add(Restrictions.eq("deletedState", false));
+
+        List prohibitions = prohibitionsCriteria.list();
+        for (Object prohibitObj : prohibitions) {
+            ProhibitionMenu prohibition = (ProhibitionMenu) prohibitObj;
+
+            switch (prohibition.getProhibitionFilterType()) {
+                case PROHIBITION_BY_FILTER:
+                    ProhibitByFilter.put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
+                    break;
+                case PROHIBITION_BY_GOODS_NAME:
+                    ProhibitByName.put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
+                    break;
+                case PROHIBITION_BY_GROUP_NAME:
+                    ProhibitByGroup.put(prohibition.getFilterText(), prohibition.getIdOfProhibitions());
+                    break;
+            }
+        }
+
+        MenuListExt menuListExt = objectFactory.createMenuListExt();
+        int nRecs = 0;
+        for (Object currObject : menus) {
+            if (nRecs++ > MAX_RECS) {
+                break;
+            }
+
+            WtMenu menu = (WtMenu) currObject;
+            MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
+            menuDateItemExt.setDate(toXmlDateTime(menu.getBeginDate()));
+
+            List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getWtDishesByMenu(menu);
+
+            for (WtDish wtDish : wtDishes) {
+                MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+
+                WtMenuGroup menuGroup = new WtMenuGroup();
+                if (wtDish.getMenuGroupMenus() != null && wtDish.getMenuGroupMenus().size() > 0) {
+                    for (WtMenuGroupMenu menuGroupMenu : wtDish.getMenuGroupMenus()) {
+                        if (menuGroupMenu.getMenuGroup() != null) {
+                            menuGroup = menuGroupMenu.getMenuGroup();
+                            break;
+                        }
+                    }
+                }
+
+                menuItemExt.setGroup(menuGroup.getName());
+                menuItemExt.setName(wtDish.getDishName());
+                menuItemExt.setPrice(wtDish.getPrice().longValue());
+                menuItemExt.setCalories(wtDish.getCalories().doubleValue());
+                menuItemExt.setOutput(wtDish.getQty());
+                menuItemExt.setAvailableNow(1); // доступно для продажи
+                menuItemExt.setProtein(wtDish.getProtein().doubleValue());
+                menuItemExt.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
+                menuItemExt.setFat(wtDish.getFat().doubleValue());
+
+                if (ProhibitByGroup.containsKey(menuGroup.getName())) {
+                    menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuGroup.getName()));
+                } else {
+                    if (ProhibitByName.containsKey(wtDish.getDishName())) {
+                        menuItemExt.setIdOfProhibition(ProhibitByName.get(wtDish.getDishName()));
+                    } else {
+                        //пробегаться в цикле.
+                        for (String filter : ProhibitByFilter.keySet()) {
+                            if (wtDish.getDishName().indexOf(filter) != -1) {
                                 menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
                             }
                         }
@@ -7690,7 +7793,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                     Session session, Transaction transaction) throws Exception {
-                processMenuFirstDayWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+                if (!client.getOrg().getUseWebArm()) {
+                    processMenuFirstDayWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+                } else {
+                    processWtMenuFirstDayWithProhibitions(client, data, objectFactory, session, startDate, endDate);
+                }
             }
         });
         MenuListWithProhibitionsResult menuListWithProhibitionsResult = new MenuListWithProhibitionsResult();

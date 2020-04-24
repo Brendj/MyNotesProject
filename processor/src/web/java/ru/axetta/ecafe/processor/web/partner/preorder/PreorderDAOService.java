@@ -14,6 +14,8 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.PreorderUtils;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportServiceParam;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
@@ -1912,5 +1914,21 @@ public class PreorderDAOService {
 
     public Org findOrg(long idOfOrg) {
         return emReport.find(Org.class, idOfOrg);
+    }
+
+    public List<WtMenu> getWtMenuByDates(Date beginDate, Date endDate, Org org) {
+        Query query = emReport.createQuery("SELECT menu FROM WtMenu menu WHERE menu.beginDate >= :beginDate "
+                + "AND menu.endDate <= :endDate AND :org IN elements(menu.orgs)");
+        query.setParameter("beginDate", beginDate);
+        query.setParameter("endDate", endDate);
+        query.setParameter("org", org);
+        return query.getResultList();
+    }
+
+    public List<WtDish> getWtDishesByMenu(WtMenu menu) {
+        Query query = emReport.createQuery("SELECT dish FROM WtDish dish LEFT JOIN dish.menuGroupMenus mgm "
+                + "LEFT JOIN mgm.menu menu where menu = :menu");
+        query.setParameter("menu", menu);
+        return query.getResultList();
     }
 }
