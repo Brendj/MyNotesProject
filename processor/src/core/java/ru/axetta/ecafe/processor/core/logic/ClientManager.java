@@ -14,10 +14,9 @@ import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
 import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
-import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
+import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 import ru.axetta.ecafe.processor.core.utils.*;
 
 import org.apache.commons.lang.StringUtils;
