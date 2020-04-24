@@ -5,7 +5,9 @@
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodType;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 
 import javax.xml.bind.annotation.*;
 import java.util.Date;
@@ -67,6 +69,17 @@ public class MenuWithComplexesExt {
         this.goodType = getGoodType(complexInfo);
         this.modevisible = complexInfo.getModeVisible();
         this.usedspecialmenu = complexInfo.getUsedSpecialMenu();
+    }
+
+    public MenuWithComplexesExt(WtComplex wtComplex, Org org) {
+        this.idOfComplexInfo = wtComplex.getIdOfComplex();
+        this.idOfComplex = wtComplex.getIdOfComplex().intValue();
+        this.complexName = wtComplex.getName();
+        this.menuDate = wtComplex.getLastUpdate();
+        this.currentPrice = wtComplex.getPrice().longValue();
+        this.usedSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding() ? 0 : 1;
+        this.usedVariableFeeding = org.getVariableFeeding() ? 1 : 0;
+        this.isDiscountComplex = (wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 1L) ? 1 : 0;
     }
 
     private Integer getGoodType(ComplexInfo complexInfo) {

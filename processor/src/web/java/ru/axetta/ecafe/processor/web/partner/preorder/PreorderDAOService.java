@@ -14,9 +14,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.PreorderUtils;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexesItem;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportServiceParam;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
@@ -58,6 +56,8 @@ public class PreorderDAOService {
     private static final Logger logger = LoggerFactory.getLogger(PreorderDAOService.class);
     private final String NEW_LINE_DELIMITER = ";";
     public static final long BASE_ID_MENU_VALUE_FOR_MODIFY = 7700000;
+    public static final String ELEMENTARY_SCHOOL = "1,2,3,4,";
+    public static final String MIDDLE_SCHOOL = "5,6,7,8,9,10,11,";
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;

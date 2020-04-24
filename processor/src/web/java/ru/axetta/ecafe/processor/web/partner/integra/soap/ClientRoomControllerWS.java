@@ -6608,6 +6608,29 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return menuItemExtList;
     }
 
+    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, WtComplex wtComplex) {
+        List<MenuItemExt> menuItemExtList = new ArrayList<>();
+        List<WtDish> wtDishes = DAOReadExternalsService.getInstance()
+                .getWtDishesByWtComplex(wtComplex);
+        for (WtDish wtDish : wtDishes) {
+            MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+            menuItemExt.setGroup(DAOReadExternalsService.getInstance().getWtMenuGroupByWtDish(wtDish).getName());
+            menuItemExt.setName(wtDish.getDishName());
+            menuItemExt.setFullName(wtDish.getDishName());
+            menuItemExt.setPrice(wtDish.getPrice().longValue());
+            menuItemExt.setCalories(wtDish.getCalories().doubleValue());
+            menuItemExt.setOutput(wtDish.getQty());
+            menuItemExt.setAvailableNow(1); // включение блюда в меню
+            menuItemExt.setProtein(wtDish.getProtein().doubleValue());
+            menuItemExt.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
+            menuItemExt.setFat(wtDish.getFat().doubleValue());
+            menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
+            menuItemExtList.add(menuItemExt);
+        }
+        return menuItemExtList;
+    }
+
+
     private <T extends Result> Client findClient(Session session, Long contractId, String san, final T res)
             throws Exception {
         if (contractId != null) {

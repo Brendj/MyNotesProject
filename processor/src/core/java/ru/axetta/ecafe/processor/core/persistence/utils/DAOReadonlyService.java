@@ -989,4 +989,72 @@ public class DAOReadonlyService {
         Object result = query.getSingleResult();
         return result != null ? ((BigInteger) result).longValue() : 0L;
     }
+
+    public Boolean checkExcludeDays(Date date, Contragent contragent, Org org) {
+        try {
+            Query query = entityManager.createQuery(
+                    "SELECT excludeDays from WtComplexExcludeDays excludeDays "
+                            + "LEFT JOIN FETCH excludeDays.complex complex "
+                            + "LEFT JOIN FETCH complex.wtOrgGroup orgGroup "
+                            + "WHERE complex.contragent = :contragent "
+                            + "AND :org IN elements(complex.orgs) "
+                            + "OR :org IN elements(orgGroup.orgs)");
+            query.setParameter("contragent", contragent);
+            query.setParameter("org", org);
+            List<WtComplexExcludeDays> excludeDays = query.getResultList();
+
+            if (excludeDays != null) {
+                for (WtComplexExcludeDays wtExcludeDays : excludeDays) {
+                    if (wtExcludeDays.getDate().getTime() == date.getTime())
+                        return true;
+                }
+            }
+            return false;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Boolean checkWorkingDay(Date date) {
+        try {
+            Query query = entityManager.createQuery(
+                    "SELECT calend.flag from ProductionCalendar calend WHERE calend.day = :date ");
+            query.setParameter("date", date);
+            Integer flag = (Integer) query.getSingleResult();
+            return flag == 1;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Boolean checkLearningDayByOrgAndClientGroup(Date date, Org org, ClientGroup clientGroup) {
+        try {
+            Query query = entityManager.createQuery(
+                    "SELECT sd.isWeekend from SpecialDate sd "
+                            + "WHERE sd.date = :date AND sd.deleted = false AND sd.org = :org "
+                            + "AND sd.idOfClientGroup = :idOfClientGroup OR sd.idOfClientGroup IS NULL");
+            query.setParameter("date", date);
+            query.setParameter("org", org);
+            query.setParameter("idOfClientGroup", clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+            return (Boolean) query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+
+    public Boolean isSixDaysWorkingWeek(Org org, String groupName) {
+        try {
+            Query query = entityManager.createQuery("SELECT gno.isSixDaysWorkWeek FROM GroupNamesToOrgs gno " +
+                    "WHERE gno.idOfOrg = :idOfOrg AND gno.groupName = :groupName");
+            query.setParameter("idOfOrg", org.getIdOfOrg());
+            query.setParameter("groupName", groupName);
+            return (Boolean) query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

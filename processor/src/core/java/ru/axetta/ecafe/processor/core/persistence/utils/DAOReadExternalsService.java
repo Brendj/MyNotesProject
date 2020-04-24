@@ -8,6 +8,10 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroupMenu;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -269,5 +273,31 @@ public class DAOReadExternalsService {
             if (passDirections.contains(pd)) result = 1;
         }
         return result; //0 - по событиям проходов нет в ОО, 1 - находится в ОО
+    }
+
+    public List<WtDish> getWtDishesByWtComplex(WtComplex wtComplex) {
+        Query query = entityManager.createQuery(
+                "SELECT dish FROM WtDish dish LEFT JOIN dish.complexItems complexItems "
+                        + "LEFT JOIN complexItems.wtComplex complex "
+                        + "WHERE complex = :complex");
+        query.setParameter("complex", wtComplex);
+        return query.getResultList();
+    }
+
+    public WtMenuGroup getWtMenuGroupByWtDish(WtDish wtDish) {
+        Query query = entityManager.createQuery(
+                "SELECT menuGroupMenus FROM WtDish wtDish LEFT JOIN wtDish.menuGroupMenus menuGroupMenus "
+                        + "WHERE wtDish = :wtDish");
+        query.setParameter("wtDish", wtDish);
+        List<WtMenuGroupMenu> wtMenuGroupMenus = query.getResultList();
+
+        if (wtMenuGroupMenus != null && wtMenuGroupMenus.size() > 0) {
+            for (WtMenuGroupMenu wtMenuGroupMenu : wtMenuGroupMenus) {
+                if (wtMenuGroupMenu.getMenuGroup() != null) {
+                    return wtMenuGroupMenu.getMenuGroup();
+                }
+            }
+        }
+        return null;
     }
 }
