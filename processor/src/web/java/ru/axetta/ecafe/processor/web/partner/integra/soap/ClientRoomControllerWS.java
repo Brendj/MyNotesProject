@@ -9457,9 +9457,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "date") Date date) {
         authenticateRequest(contractId);
         PreorderComplexesResult result = new PreorderComplexesResult();
+        Client client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                .getClientByContractId(contractId);
         try {
-            PreorderListWithComplexesGroupResult res = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getPreorderComplexesWithMenuList(contractId, date);
+            PreorderListWithComplexesGroupResult res;
+            if (!client.getOrg().getUseWebArm()) {
+                res = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getPreorderComplexesWithMenuList(contractId, date);
+            } else {
+                res = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getPreorderComplexesWithWtMenuList(contractId, date);
+            }
             ComplexGroup complexGroup = new ComplexGroup();
             complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
             result.setComplexGroup(complexGroup);
