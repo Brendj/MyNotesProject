@@ -7,6 +7,8 @@ package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -86,6 +88,21 @@ public class PreorderMenuItemExt {
         this.setFat(pmd.getFat());
         this.setIdOfMenuDetail(pmd.getArmIdOfMenu());
         this.setItemCode(pmd.getItemCode());
+    }
+
+    public PreorderMenuItemExt(WtDish wtDish) {
+        this.setGroup(DAOReadExternalsService.getInstance().getWtMenuGroupByWtDish(wtDish).getName());
+        this.setName(wtDish.getDishName());
+        this.setFullName(wtDish.getDishName());
+        this.setPrice(wtDish.getPrice().longValue());
+        this.setCalories(wtDish.getCalories().doubleValue());
+        this.setOutput(wtDish.getQty());
+        this.setAvailableNow(1); // включение блюда в меню
+        this.setProtein(wtDish.getProtein().doubleValue());
+        this.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
+        this.setFat(wtDish.getFat().doubleValue());
+        this.setIdOfMenuDetail(wtDish.getIdOfDish());
+        this.setItemCode(wtDish.getCode().toString());
     }
 
     public String getGroup() {

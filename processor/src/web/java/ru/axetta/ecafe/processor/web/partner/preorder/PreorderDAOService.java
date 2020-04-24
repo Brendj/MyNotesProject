@@ -310,7 +310,7 @@ public class PreorderDAOService {
         }
         for (PreorderComplexItemExt item : list) {
             PreorderGoodParamsContainer complexParams = getComplexParams(item, client, date);
-            if (isAcceptableComplex(item, client.getClientGroup(), hasDiscount, complexParams)) {
+            if (isAcceptableComplex(item, client.getClientGroup(), hasDiscount, complexParams, null, null)) {
                 String groupName = getPreorderComplexGroup(item, complexParams);
                 if (groupName.isEmpty()) continue;
                 item.setType(getPreorderComplexSubgroup(item));
