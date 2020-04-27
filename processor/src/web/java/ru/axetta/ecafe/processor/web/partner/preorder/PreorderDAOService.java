@@ -2296,10 +2296,12 @@ public class PreorderDAOService {
     }
 
     public List<WtMenu> getWtMenuByDates(Date beginDate, Date endDate, Org org) {
-        Query query = emReport.createQuery("SELECT menu FROM WtMenu menu WHERE menu.beginDate >= :beginDate "
-                + "AND menu.endDate <= :endDate AND :org IN elements(menu.orgs)");
+        Query query = emReport.createQuery("SELECT menu FROM WtMenu menu "
+                + "LEFT JOIN FETCH menu.wtOrgGroup orgGroup "
+                + "WHERE menu.beginDate >= :beginDate AND menu.endDate <= :endDate "
+                + "AND (:org IN elements(menu.orgs) OR :org IN elements(orgGroup.orgs))");
         query.setParameter("beginDate", beginDate);
-        query.setParameter("endDate", endDate);
+        query.setParameter("endDate", beginDate);
         query.setParameter("org", org);
         return query.getResultList();
     }

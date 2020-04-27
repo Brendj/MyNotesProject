@@ -2624,11 +2624,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         ObjectFactory objectFactory = new ObjectFactory();
         Client client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).
                 getClientByContractId(contractId);
-        if (!client.getOrg().getUseWebArm()) {
+        //if (!client.getOrg().getUseWebArm()) {
             return processMenuListWithComplexes(contractId, startDate, endDate, objectFactory);
-        } else {
-            return processWtMenuListWithComplexes(contractId, startDate, endDate, objectFactory);
-        }
+        //} else {
+        //    return processWtMenuListWithComplexes(contractId, startDate, endDate, objectFactory);
+        //}
     }
 
     private MenuListWithComplexesResult processMenuListWithComplexes(Long contractId, Date startDate, Date endDate,
@@ -9461,13 +9461,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 .getClientByContractId(contractId);
         try {
             PreorderListWithComplexesGroupResult res;
-            if (!client.getOrg().getUseWebArm()) {
+            //if (!client.getOrg().getUseWebArm()) {
                 res = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                         .getPreorderComplexesWithMenuList(contractId, date);
-            } else {
-                res = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .getPreorderComplexesWithWtMenuList(contractId, date);
-            }
+            //} else {
+            //    res = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+            //            .getPreorderComplexesWithWtMenuList(contractId, date);
+            //}
             ComplexGroup complexGroup = new ComplexGroup();
             complexGroup.setComplexesWithGroups(res.getComplexesWithGroups());
             result.setComplexGroup(complexGroup);
@@ -9493,13 +9493,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             PreorderSaveListParam preorderSaveListParam = new PreorderSaveListParam(preorders);
             Client client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).
                     getClientByContractId(preorders.getContractId());
-            if (!client.getOrg().getUseWebArm()) {
+            //if (!client.getOrg().getUseWebArm()) {
                 RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                         .savePreorderComplexes(preorderSaveListParam, guardianMobile);
-            } else {
-                RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .savePreorderWtComplexes(preorderSaveListParam, guardianMobile);
-            }
+            //} else {
+            //    RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+            //            .savePreorderWtComplexes(preorderSaveListParam, guardianMobile);
+            //}
             result.resultCode = RC_OK;
             result.description = RC_OK_DESC;
         } catch (MenuDetailNotExistsException e) {
