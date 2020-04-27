@@ -276,6 +276,18 @@
                     </rich:column>
                     <rich:column>
                         <f:facet name="header">
+                            <h:outputText value="Учредитель" />
+                        </f:facet>
+                        <h:outputText value="#{org.founder}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
+                            <h:outputText value="Подчиненность" />
+                        </f:facet>
+                        <h:outputText value="#{org.subordination}" escape="false" />
+                    </rich:column>
+                    <rich:column>
+                        <f:facet name="header">
                             <h:outputText value="Ид. орг." />
                         </f:facet>
                         <h:outputText value="#{org.idOfOrg}" escape="false" />

@@ -21,6 +21,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request.Res
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.ResHelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
+import ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier.ResMenuSupplier;
 import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendarData;
 import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.ResMenusCalendar;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsData;
@@ -1237,6 +1238,7 @@ public class SyncResponse {
     private SyncSettingsSection syncSettingsSection;
     private EmiasSection emias;
     private EmiasSectionForARMAnswer emiasSectionForARMAnswer;
+    private ResMenuSupplier resMenuSupplier;
     private ResHardwareSettingsRequest resHardwareSettingsRequest;
     private ResTurnstileSettingsRequest resTurnstileSettingsRequest;
 
@@ -1262,7 +1264,8 @@ public class SyncResponse {
             ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData,
             ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
             ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, GoodRequestEZDSection goodRequestEZDSection,
-            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer,
+            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias,
+            EmiasSectionForARMAnswer emiasSectionForARMAnswer, ResMenuSupplier resMenuSupplier,
             ResHardwareSettingsRequest resHardwareSettingsRequest,
             ResTurnstileSettingsRequest resTurnstileSettingsRequest) {
         this.syncType = syncType;
@@ -1328,6 +1331,7 @@ public class SyncResponse {
         this.syncSettingsSection = syncSettingsSection;
 		this.emias = emias;
         this.emiasSectionForARMAnswer = emiasSectionForARMAnswer;
+        this.resMenuSupplier = resMenuSupplier;
         this.resHardwareSettingsRequest = resHardwareSettingsRequest;
         this.resTurnstileSettingsRequest = resTurnstileSettingsRequest;
     }
@@ -1649,6 +1653,11 @@ public class SyncResponse {
         if(emias != null){
             envelopeElement.appendChild(emias.toElement(document));
         }
+
+        if (resMenuSupplier != null) {
+            envelopeElement.appendChild(resMenuSupplier.toElement(document));
+        }
+
         if (resHardwareSettingsRequest != null) {
             envelopeElement.appendChild(resHardwareSettingsRequest.toElement(document));
         }

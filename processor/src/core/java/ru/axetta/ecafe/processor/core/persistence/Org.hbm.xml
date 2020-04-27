@@ -282,6 +282,8 @@
         <property name="useWebArm" column="useWebArm" type="boolean"/>
         <property name="egissoId" column="egissoId" type="string" length="128"/>
         <property name="municipalDistrict" column="municipal_district" type="string" length="256"/>
+        <property name="founder" column="founder" type="string" length="512"/>
+        <property name="subordination" column="subordination" type="string" length="512"/>
     </class>
 </hibernate-mapping>
 

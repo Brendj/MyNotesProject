@@ -29,7 +29,7 @@ public class ClientGuardian {
     private Date lastUpdate;
     private CardRequest cardRequest;
     private Boolean informedSpecialMenu;
-    private Boolean isLegalRepresent;
+    private ClientGuardianRepresentType representType;
 
     protected ClientGuardian() {}
 
@@ -83,6 +83,12 @@ public class ClientGuardian {
 
     public void setGuardianType(Integer guardianType) {
         this.guardianType = guardianType;
+    }
+
+    public void disable(Long version) {
+        this.setDisabled(true);
+        this.setVersion(version);
+        this.setLastUpdate(new Date());
     }
 
     public void delete(Long version) {
@@ -186,16 +192,12 @@ public class ClientGuardian {
         this.informedSpecialMenu = informedSpecialMenu;
     }
 
-    public Boolean getIsLegalRepresent() {
-        return isLegalRepresent;
+    public ClientGuardianRepresentType getRepresentType() {
+        return representType;
     }
 
-    public void setIsLegalRepresent(Boolean legalRepresent) {
-        isLegalRepresent = legalRepresent;
-    }
-
-    public Boolean isLegalRepresent(){
-        return isLegalRepresent == null ? false : isLegalRepresent;
+    public void setRepresentType(ClientGuardianRepresentType representType) {
+        this.representType = representType;
     }
 
 }

@@ -25,7 +25,6 @@ import ru.axetta.ecafe.processor.core.partner.rbkmoney.ClientPaymentOrderProcess
 import ru.axetta.ecafe.processor.core.partner.rbkmoney.RBKMoneyConfig;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.Menu;
-import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientDao;
 import ru.axetta.ecafe.processor.core.persistence.dao.enterevents.EnterEventsRepository;
 import ru.axetta.ecafe.processor.core.persistence.dao.model.enterevent.DAOEnterEventSummaryModel;
@@ -83,7 +82,10 @@ import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.time.DateUtils;
 import org.apache.cxf.configuration.security.AuthorizationPolicy;
 import org.hibernate.*;
-import org.hibernate.criterion.*;
+import org.hibernate.criterion.DetachedCriteria;
+import org.hibernate.criterion.MatchMode;
+import org.hibernate.criterion.Property;
+import org.hibernate.criterion.Restrictions;
 import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -9104,7 +9106,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private ClientGroupResult getClientGroupResult(Session session, List<Client> clients) {
-        Map<Integer, Integer> map = new HashMap<>();
+        Integer value = PreorderUtils.getClientGroupResult(session, clients);
+        if (value >= PreorderUtils.SOAP_RC_CLIENT_NOT_FOUND) {
+            if (value.equals(PreorderUtils.SOAP_RC_CLIENT_NOT_FOUND)) {
+                return new ClientGroupResult(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
+            } else if (value.equals(PreorderUtils.SOAP_RC_SEVERAL_CLIENTS_WERE_FOUND)) {
+                return new ClientGroupResult(RC_SEVERAL_CLIENTS_WERE_FOUND, RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
+            } else if (value.equals(PreorderUtils.SOAP_RC_PREORDERS_NOT_UNIQUE_CLIENT)) {
+                return new ClientGroupResult(RC_PREORDERS_NOT_UNIQUE_CLIENT, RC_PREORDERS_NOT_UNIQUE_CLIENT_DESC);
+            } else if (value.equals(PreorderUtils.SOAP_RC_WRONG_GROUP)) {
+                return new ClientGroupResult(RC_WRONG_GROUP, RC_WRONG_GROUP_DESC);
+            } else if (value.equals(PreorderUtils.SOAP_RC_MOBILE_DIFFERENT_GROUPS)) {
+                return new ClientGroupResult(RC_MOBILE_DIFFERENT_GROUPS, RC_MOBILE_DIFFERENT_GROUPS_DESC);
+            }
+        }
+        ClientGroupResult result = new ClientGroupResult(RC_OK, RC_OK_DESC);
+        result.setValue(value);
+        return result;
+
+
+        /*Map<Integer, Integer> map = new HashMap<>();
         boolean isStudent = false;
         boolean isParent = false;
         boolean isTrueParent = false;
@@ -9161,7 +9182,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         ClientGroupResult result = new ClientGroupResult(RC_OK, RC_OK_DESC);
         result.setValue(value);
 
-        return result;
+        return result;*/
     }
 
     @Override

@@ -293,6 +293,9 @@ public class OrgMskNSIService extends MskNSIService {
         info.setShortAddressFrom(existingOrg.getShortAddress());
         info.setMunicipalDistrictFrom(existingOrg.getMunicipalDistrict());
 
+        info.setFounderFrom(existingOrg.getFounder());
+        info.setSubordinationFrom(existingOrg.getSubordination());
+
         info.setOperationType(OrgRegistryChange.MODIFY_OPERATION);
     }
 

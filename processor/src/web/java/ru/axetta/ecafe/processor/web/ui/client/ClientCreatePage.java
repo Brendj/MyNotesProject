@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.client.ContractIdFormat;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -661,12 +662,9 @@ public class ClientCreatePage extends BasicWorkspacePage implements OrgSelectPag
         persistenceSession.save(clientMigration);
 
         if(client.getClientGroup() != null) {
-            ClientGroupMigrationHistory clientGroupMigrationHistory = new ClientGroupMigrationHistory(org, client);
-            clientGroupMigrationHistory.setNewGroupId(client.getIdOfClientGroup());
-            clientGroupMigrationHistory.setNewGroupName(ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup());
-            clientGroupMigrationHistory.setComment(
+            ClientManager.createClientGroupMigrationHistory(persistenceSession, client, org, client.getIdOfClientGroup(),
+                    ClientGroup.Predefined.CLIENT_OTHERS.getNameOfGroup(),
                     ClientGroupMigrationHistory.MODIFY_IN_WEBAPP + FacesContext.getCurrentInstance().getExternalContext().getRemoteUser());
-            persistenceSession.save(clientGroupMigrationHistory);
         }
 
         clean();

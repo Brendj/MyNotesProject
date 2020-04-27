@@ -3,6 +3,7 @@ package ru.axetta.ecafe.processor.core.client.items;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianRelationType;
+import ru.axetta.ecafe.processor.core.persistence.ClientGuardianRepresentType;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -28,7 +29,7 @@ public class ClientGuardianItem {
     private String createdWhereGuardianDesc;
     private Boolean informedSpecialMenu;
     private Boolean allowedPreorders;
-    private Boolean isLegalRepresentative;
+    private Integer representativeType;
 
     public ClientGuardianItem(Client client) {
         this.idOfClient = client.getIdOfClient();
@@ -39,26 +40,26 @@ public class ClientGuardianItem {
         isNew = true;
         informedSpecialMenu = false;
         allowedPreorders = false;
-        isLegalRepresentative = false;
+        representativeType = ClientGuardianRepresentType.UNKNOWN.getCode();
     }
 
     public ClientGuardianItem(Client client, Boolean disabled, ClientGuardianRelationType relation,
             List notificationSettings, ClientCreatedFromType createdWhereClientGuardian,
             ClientCreatedFromType createdWhereGuardian, String createdWhereGuardianDesc,
-            Boolean informedSpecialMenu, Boolean isLegalRepresentative, Boolean allowedPreorders) {
+            Boolean informedSpecialMenu, ClientGuardianRepresentType representativeType, Boolean allowedPreorders) {
         this.idOfClient = client.getIdOfClient();
         this.contractId = client.getContractId();
         this.personName = client.getPerson().getSurnameAndFirstLetters();
         this.disabled = disabled;
         this.mobile = client.getMobile();
-        this.relation = relation == null ? null : relation.ordinal();
+        this.relation = relation == null ? null : relation.getCode();
         this.notificationItems = notificationSettings;
         isNew = false;
         this.createdWhereClientGuardian = createdWhereClientGuardian;
         this.createdWhereGuardian = createdWhereGuardian;
         this.createdWhereGuardianDesc = createdWhereGuardianDesc;
         this.informedSpecialMenu = informedSpecialMenu;
-        this.isLegalRepresentative = isLegalRepresentative;
+        this.representativeType = representativeType == null ? ClientGuardianRepresentType.UNKNOWN.getCode() : representativeType.getCode();
         this.allowedPreorders = allowedPreorders;
     }
 
@@ -142,6 +143,10 @@ public class ClientGuardianItem {
         return relation == null ? "" : ClientGuardianRelationType.fromInteger(relation).toString();
     }
 
+    public String getRepresentativeStr() {
+        return representativeType == null ? ClientGuardianRepresentType.UNKNOWN.toString() : ClientGuardianRepresentType.fromInteger(representativeType).toString();
+    }
+
     public List<NotificationSettingItem> getNotificationItems() {
         return notificationItems;
     }
@@ -174,19 +179,19 @@ public class ClientGuardianItem {
         this.informedSpecialMenu = informedSpecialMenu;
     }
 
-    public Boolean getLegalRepresentative() {
-        return isLegalRepresentative;
-    }
-
-    public void setLegalRepresentative(Boolean legalRepresentative) {
-        isLegalRepresentative = legalRepresentative;
-    }
-
     public Boolean getAllowedPreorders() {
         return allowedPreorders;
     }
 
     public void setAllowedPreorders(Boolean allowedPreorders) {
         this.allowedPreorders = allowedPreorders;
+    }
+
+    public Integer getRepresentativeType() {
+        return representativeType;
+    }
+
+    public void setRepresentativeType(Integer representativeType) {
+        this.representativeType = representativeType;
     }
 }

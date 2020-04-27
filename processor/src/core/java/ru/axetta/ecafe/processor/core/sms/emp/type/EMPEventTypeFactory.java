@@ -37,45 +37,65 @@ public class EMPEventTypeFactory {
     public static final int INFO_MAILING_EVENT        = 901240056;
     public static final int CLIENT_NEWPASSWORD_EVENT  = 901240057;
     public static final int SPECIAL_TYPE_EVENT        = 901240018;
+    public static final int END_BENEFIT               = 901240019;
+    public static final int REFUSAL_PREFERENTIAL_FOOD = 901240020;
+    public static final int ENTER_CULTURE             = 901240021;
+    public static final int LEAVE_CULTURE              = 901240022;
 
 
     //Параметр modifired введен для определения: точно ли произошедшее событие соответствует коду события по умолчанию
     //Например для события прохода код только один (901240001), а могут произойти 2 события: проход в школу и проход в здание культуры
 
-    public static final EMPEventType buildEvent(int type, Client client, int modifired) {
-        return buildEvent(type, client, Collections.EMPTY_MAP, modifired);
+    public static final EMPEventType buildEvent(int type, Client client, int modifired, String[] values) {
+        return buildEvent(type, client, Collections.EMPTY_MAP, modifired, values);
     }
 
-    public static final EMPEventType buildEvent(int type, Client child, Client guardian, int modifired) {
-        return buildEvent(type, child, guardian, Collections.EMPTY_MAP, modifired);
+    public static final EMPEventType buildEvent(int type, Client client, String[] values) {
+        return buildEvent(type, client, Collections.EMPTY_MAP, 0, values);
     }
 
-    public static final EMPEventType buildEvent(int type, Client client, Map<String, Object> additionalParams, int modifired) {
-        EMPEventType event = getEmpEventType(type, modifired);
+    public static final EMPEventType buildEvent(int type, Client client) {
+        return buildEvent(type, client, Collections.EMPTY_MAP, 0, null);
+    }
+
+    public static final EMPEventType buildEvent(int type, Client child, Client guardian, int modifired, String[] values) {
+        return buildEvent(type, child, guardian, Collections.EMPTY_MAP, modifired, values);
+    }
+
+    public static final EMPEventType buildEvent(int type, Client child, Client guardian, String[] values) {
+        return buildEvent(type, child, guardian, Collections.EMPTY_MAP, 0, values);
+    }
+
+    public static final EMPEventType buildEvent(int type, Client child, Client guardian) {
+        return buildEvent(type, child, guardian, Collections.EMPTY_MAP, 0,  null);
+    }
+
+    public static final EMPEventType buildEvent(int type, Client client, Map<String, Object> additionalParams, int modifired, String[] values) {
+        EMPEventType event = getEmpEventType(type, modifired, values);
         event.parse(client, additionalParams);
         return event;
     }
 
-    public static final EMPEventType buildEvent(int type, Client child, Client guardian, Map<String, Object> additionalParams, int modifired) {
-        EMPEventType event = getEmpEventType(type, modifired);
+    public static final EMPEventType buildEvent(int type, Client child, Client guardian, Map<String, Object> additionalParams, int modifired, String[] values) {
+        EMPEventType event = getEmpEventType(type, modifired, values);
         event.parse(child, guardian, additionalParams);
         return event;
     }
 
-    private static EMPEventType getEmpEventType(int type, int modifired) {
+    private static EMPEventType getEmpEventType(int type, int modifired, String values[]) {
         EMPEventType event;
         switch (type) {
             case ENTER_EVENT:
-                if (modifired == 1)
-                    event = new EMPEnterCultureEventType();
-                else
-                    event = new EMPEnterEventType();
+                event = new EMPEnterEventType();
                 break;
             case LEAVE_EVENT:
-                if (modifired == 1)
-                    event = new EMPExitCultureEventType();
-                else
-                    event = new EMPLeaveEventType();
+                event = new EMPLeaveEventType();
+                break;
+            case ENTER_CULTURE:
+                event = new EMPEnterCultureEventType(values);
+                break;
+            case LEAVE_CULTURE:
+                event = new EMPExitCultureEventType(values);
                 break;
             case ENTER_WITH_GUARDIAN_EVENT:
                 event = new EMPEnterWithGuardianEventType();
@@ -111,10 +131,10 @@ public class EMPEventTypeFactory {
                 event = new EMPLowBalanceEventType();
                 break;
             case ENTER_MUSEUM_EVENT:
-                event = new EMPEnterMuseumEventType();
+                event = new EMPEnterMuseumEventType(values);
                 break;
             case NOENTER_MUSEUM_EVENT:
-                event = new EMPNoEnterMuseumEventType();
+                event = new EMPNoEnterMuseumEventType(values);
                 break;
             case CLIENT_NEWPASSWORD_EVENT:
                 event = new EMPClientNewPasswordEventType();
@@ -128,23 +148,23 @@ public class EMPEventTypeFactory {
             case LEAVE_WITH_CHECKER:
                 event = new EMPLeaveWithCheckerEventType();
                 break;
+            case END_BENEFIT:
+                event = new EMPEndBenefitType(values);
+                break;
+            case REFUSAL_PREFERENTIAL_FOOD:
+                event = new EMPRefusalPreferentialFoodType(values);
+                break;
             case SPECIAL_TYPE_EVENT:
                 switch (modifired)
                 {
                     case 2:
-                        event = new EMPSpecialEventType(1);
+                        event = new EMPSpecialEventType(1, values);
                         break;
                     case 3:
-                        event = new EMPSpecialEventType(2);
-                        break;
-                    case 4:
-                        event = new EMPSpecialEventType(3);
-                        break;
-                    case 5:
-                        event = new EMPSpecialEventType(4);
+                        event = new EMPSpecialEventType(2, values);
                         break;
                     default:
-                        event = new EMPSpecialEventType(1);
+                        event = new EMPSpecialEventType(1, values);
                         break;
                 }
                 break;

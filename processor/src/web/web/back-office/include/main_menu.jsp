@@ -945,6 +945,19 @@
                             action="#{mainPage.cancelCategoryBenefitsPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
+    <rich:panelMenuGroup id="preorderGroup" binding="#{mainPage.preorderPage.mainMenuComponent}" label="Предзаказ"
+                         rendered="#{mainPage.eligibleToServiceAdmin}">
+        <a4j:support event="onclick" action="#{mainPage.showPreorderGroupPage}" reRender="workspaceForm" />
+
+        <%--@elvariable id="preorderJournalReportPage" type="ru.axetta.ecafe.processor.web.ui.service.PreorderJournalReportPage"--%>
+        <rich:panelMenuItem id="preorderJournalReport" binding="#{preorderJournalReportPage.mainMenuComponent}"
+                            label="Журнал операций ВП" action="#{preorderJournalReportPage.show}" reRender="workspaceForm" />
+
+        <%--@elvariable id="preorderStatsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreorderStatsReportPage"--%>
+        <rich:panelMenuItem id="preorderStatsMenuItem" binding="#{preorderStatsReportPage.mainMenuComponent}"
+                            label="Статистика по количеству заказанного питания по предзаказу" action="#{preorderStatsReportPage.show}" reRender="workspaceForm" />
+    </rich:panelMenuGroup>
+
     <rich:panelMenuItem id="empInfo" binding="#{mainPage.empInfoPage.mainMenuComponent}"
                         label="Просмотр записей в ЕМП" action="#{mainPage.empInfoPage.show}" reRender="workspaceForm" />
 
@@ -957,10 +970,6 @@
     <%--@elvariable id="applicationForFoodReportPage" type="ru.axetta.ecafe.processor.web.ui.service.ApplicationForFoodReportPage"--%>
     <rich:panelMenuItem id="serviceApplicationForFoodReport" binding="#{applicationForFoodReportPage.mainMenuComponent}"
                         label="Заявления на льготное питание" action="#{applicationForFoodReportPage.show}" reRender="workspaceForm" />
-
-    <%--@elvariable id="preorderJournalReportPage" type="ru.axetta.ecafe.processor.web.ui.service.PreorderJournalReportPage"--%>
-    <rich:panelMenuItem id="preorderJournalReport" binding="#{preorderJournalReportPage.mainMenuComponent}"
-                        label="Журнал операций ВП" action="#{preorderJournalReportPage.show}" reRender="workspaceForm" />
 
     <rich:panelMenuGroup id="orgParameters" binding="#{mainPage.orgParametersGroup.mainMenuComponent}" label="Параметры ОО"
                          rendered="#{mainPage.eligibleToServiceAdmin}">
@@ -1849,6 +1858,20 @@
     <%--@elvariable id="complexRuleEditPage" type="ru.axetta.ecafe.processor.web.ui.option.discountrule.ComplexRuleEditPage"--%>
     <rich:panelMenuItem id="complexRoleEditMenuItem" binding="#{complexRuleEditPage.mainMenuComponent}"
                         label="Роли комплексов" action="#{complexRuleEditPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuItem id="wtRuleListMenuItem" label="Список (веб-технолог)" binding="#{wtRuleListPage.mainMenuComponent}"
+                        action="#{wtRuleListPage.show}" reRender="workspaceForm" />
+
+    <rich:panelMenuGroup id="wtSelectedRuleGroupMenu" label="#{wtRuleEditPage.entityName}" rendered="false">
+
+        <rich:panelMenuItem id="wtEditRuleMenuItem" binding="#{wtRuleEditPage.mainMenuComponent}" label="Редактирование (веб-технолог)"
+                            action="#{wtRuleEditPage.show}" reRender="workspaceForm" />
+
+    </rich:panelMenuGroup>
+
+    <rich:panelMenuItem id="wtRuleCreateMenuItem" binding="#{wtRuleCreatePage.mainMenuComponent}" label="Регистрация (веб-технолог)"
+                        action="#{wtRuleCreatePage.show}" reRender="workspaceForm" />
+
 
 </rich:panelMenuGroup>
 

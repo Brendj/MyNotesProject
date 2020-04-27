@@ -232,6 +232,27 @@ public class Client {
         }
     }
 
+    public boolean isLeaving() {
+        return isSomeGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+    }
+
+    public boolean isParent() {
+        return isSomeGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+    }
+
+    public boolean isEmployee() {
+        return isSomeGroup(ClientGroup.Predefined.CLIENT_PARENTS.getValue());
+    }
+
+    private boolean isSomeGroup(Long idOfGroup) {
+        if (getIdOfClientGroup() == null) return false;
+        if (getIdOfClientGroup().equals(idOfGroup)) {
+            return true;
+        } else {
+            return false;
+        }
+    }
+
     public Card findActiveCard(Session session, Card failCard) throws Exception {
         // Ищем активную карту
         Criteria activeClientCardCriteria = session.createCriteria(Card.class);

@@ -36,6 +36,8 @@ public class OrgEditPage extends BasicWorkspacePage
     private Long idOfOrg;
     private String shortName;
     private String shortNameInfoService;
+    private String founder;
+    private String subordination;
     private String officialName;
     private String tag;
     private String address;
@@ -199,6 +201,8 @@ public class OrgEditPage extends BasicWorkspacePage
         org.setRefectoryType(refectoryType);
         org.setShortName(shortName);
         org.setShortNameInfoService(shortNameInfoService);
+        org.setFounder(founder);
+        org.setSubordination(subordination);
         org.setOfficialName(officialName);
         org.setTag(tag);
         org.setCity(city);
@@ -428,6 +432,8 @@ public class OrgEditPage extends BasicWorkspacePage
         this.idOfOrg = org.getIdOfOrg();
         this.shortName = org.getShortName();
         this.shortNameInfoService = org.getShortNameInfoService();
+        this.founder = org.getFounder();
+        this.subordination = org.getSubordination();
         this.officialName = org.getOfficialName();
         this.tag = org.getTag();
         this.city = org.getCity();
@@ -1220,6 +1226,22 @@ public class OrgEditPage extends BasicWorkspacePage
 
     public void setMunicipalDistrict(String municipalDistrict) {
         this.municipalDistrict = municipalDistrict;
+    }
+
+    public String getFounder() {
+        return founder;
+    }
+
+    public void setFounder(String founder) {
+        this.founder = founder;
+    }
+
+    public String getSubordination() {
+        return subordination;
+    }
+
+    public void setSubordination(String subordination) {
+        this.subordination = subordination;
     }
 
     public static class ContragentItem {

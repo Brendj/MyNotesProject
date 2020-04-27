@@ -27,6 +27,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Se
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
@@ -2034,6 +2035,11 @@ public class DAOUtils {
 
     public static List<DiscountRule> listDiscountRules(EntityManager em) {
         javax.persistence.Query q = em.createQuery("from DiscountRule order by priority, idOfRule asc");
+        return q.getResultList();
+    }
+
+    public static List<WtDiscountRule> listWtDiscountRules(EntityManager em) {
+        javax.persistence.Query q = em.createQuery("from WtDiscountRule order by priority, idOfRule asc");
         return q.getResultList();
     }
 
@@ -4630,6 +4636,14 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.in("dtisznCode", codeList));
         return criteria.list();
+    }
+
+    public static List<ClientDtisznDiscountInfo> getCategoryDiscountListWithEndBenefitBeetwenDates(Session session, Date startDate, Date endDate) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.gt("dateEnd", startDate));
+        criteria.add(Restrictions.lt("dateEnd", endDate));
+        criteria.add(Restrictions.not(Restrictions.eq("sendnotification", true)));
+        return (List<ClientDtisznDiscountInfo>) criteria.list();
     }
 
     public static ClientDtisznDiscountInfo getDTISZNOneDiscountInfoByClientAndCode(Session session, Client client,

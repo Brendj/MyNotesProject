@@ -24,6 +24,10 @@
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.officialName}" styleClass="input-text" size="150" />
     <h:outputText escape="true" value="Краткое наименование" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.shortNameInfoService}" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="Учредитель" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.founder}" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="Подчиненность" styleClass="output-text" />
+    <h:inputText readonly="true" value="#{mainPage.orgViewPage.subordination}" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Адрес" styleClass="output-text" />
     <h:inputText readonly="true" value="#{mainPage.orgViewPage.address}" styleClass="input-text" size="150" />
     <h:outputText escape="true" value="Короткий адрес" styleClass="output-text" />

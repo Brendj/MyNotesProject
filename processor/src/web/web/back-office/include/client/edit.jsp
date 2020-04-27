@@ -219,39 +219,36 @@
             </f:facet>
             <h:outputText escape="true" value="#{clientGuardian.mobile}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header" width="150">
+        <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Опекунство активировано" />
+                <h:outputText escape="true" value="Опции" />
             </f:facet>
-            <h:selectBooleanCheckbox value="#{clientGuardian.enabled}" styleClass="output-text" />
-            <br/>
-            <h:outputText escape="true" value="#{clientGuardian.createdWhereClientGuardianStr}" rendered="#{!clientGuardian.isCreatedWhereDefault}"/>
-        </rich:column>
-        <rich:column headerClass="column-header" width="150">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Согласие на предзаказ" />
-            </f:facet>
-            <h:selectBooleanCheckbox value="#{clientGuardian.informedSpecialMenu}" disabled="true" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header" width="150">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Самостоятельный предзаказ" />
-            </f:facet>
-            <h:selectBooleanCheckbox value="#{clientGuardian.allowedPreorders}" disabled="true" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header" width="150">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Законный представитель" />
-            </f:facet>
-            <h:selectBooleanCheckbox value="#{clientGuardian.legalRepresentative}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header" width="150">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Степень родства" />
-            </f:facet>
-            <h:selectOneMenu value="#{clientGuardian.relation}" styleClass="input-text">
-                <f:selectItems value="#{mainPage.clientEditPage.relations}" />
-            </h:selectOneMenu>
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Опекунство активировано" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{clientGuardian.enabled}" styleClass="output-text" />
+
+                <h:outputText escape="true" value="#{clientGuardian.createdWhereClientGuardianStr}" style="font-size: 8pt;" rendered="#{!clientGuardian.isCreatedWhereDefault}"/>
+                <h:outputText value="" rendered="#{!clientGuardian.isCreatedWhereDefault}"/>
+
+                <h:outputText escape="true" value="Согласие на предзаказ" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{clientGuardian.informedSpecialMenu}" disabled="true" styleClass="output-text" />
+
+                <h:outputText escape="true" value="Самостоятельный предзаказ" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{clientGuardian.allowedPreorders}" disabled="true" styleClass="output-text" />
+            </h:panelGrid>
+            <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
+                <h:outputText escape="true" value="Полномочия:" styleClass="output-text" />
+                <h:selectOneMenu value="#{clientGuardian.representativeType}" styleClass="input-text">
+                    <f:selectItems value="#{mainPage.clientEditPage.representativeList}" />
+                </h:selectOneMenu>
+            </h:panelGrid>
+            <rich:spacer/>
+            <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
+                <h:outputText escape="true" value="Степень родства:" styleClass="output-text" />
+                <h:selectOneMenu value="#{clientGuardian.relation}" styleClass="input-text">
+                    <f:selectItems value="#{mainPage.clientEditPage.relations}" />
+                </h:selectOneMenu>
+            </h:panelGrid>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
@@ -314,31 +311,27 @@
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
-                <h:outputText escape="true" value="Опекунство активировано" />
+                <h:outputText escape="true" value="Опции" />
             </f:facet>
-            <h:selectBooleanCheckbox value="#{clientWard.enabled}" styleClass="output-text" />
-            <br/>
-            <h:outputText escape="true" value="#{clientWard.createdWhereClientGuardianStr}" rendered="#{!clientWard.isCreatedWhereDefault}"/>
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Согласие на предзаказ" />
-            </f:facet>
-            <h:selectBooleanCheckbox value="#{clientWard.informedSpecialMenu}" disabled="true" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Самостоятельный предзаказ" />
-            </f:facet>
-            <h:selectBooleanCheckbox value="#{clientWard.allowedPreorders}" disabled="true" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Кем приходится опекун" />
-            </f:facet>
-            <h:selectOneMenu value="#{clientWard.relation}" styleClass="input-text">
-                <f:selectItems value="#{mainPage.clientEditPage.relations}" />
-            </h:selectOneMenu>
+            <h:panelGrid styleClass="borderless-grid" columns="2">
+                <h:outputText escape="true" value="Опекунство активировано" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{clientWard.enabled}" styleClass="output-text" />
+
+                <h:outputText escape="true" value="#{clientWard.createdWhereClientGuardianStr}" style="font-size: 8pt;" rendered="#{!clientWard.isCreatedWhereDefault}"/>
+                <h:outputText value="" rendered="#{!clientWard.isCreatedWhereDefault}"/>
+
+                <h:outputText escape="true" value="Согласие на предзаказ" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{clientWard.informedSpecialMenu}" disabled="true" styleClass="output-text" />
+
+                <h:outputText escape="true" value="Самостоятельный предзаказ" styleClass="output-text" />
+                <h:selectBooleanCheckbox value="#{clientWard.allowedPreorders}" disabled="true" styleClass="output-text" />
+            </h:panelGrid>
+            <h:panelGrid styleClass="borderless-grid" columns="1" bgcolor="#eeeeee">
+                <h:outputText escape="true" value="Кем приходится опекун:" styleClass="output-text" />
+                <h:selectOneMenu value="#{clientWard.relation}" styleClass="input-text">
+                    <f:selectItems value="#{mainPage.clientEditPage.relations}" />
+                </h:selectOneMenu>
+            </h:panelGrid>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">
