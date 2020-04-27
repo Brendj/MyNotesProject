@@ -3374,6 +3374,8 @@ public class Processor implements SyncProcessor {
         EmiasSection emiasSection = null;
         EmiasSectionForARMAnswer emiasSectionForARMAnswer = null;
         ResMenuSupplier resMenuSupplier = null;
+        ResHardwareSettingsRequest resHardwareSettingsRequest = null;
+        ResTurnstileSettingsRequest resTurnstileSettingsRequest = null;
 
         List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -3403,7 +3405,8 @@ public class Processor implements SyncProcessor {
                 specialDatesData, resSpecialDates, migrantsData, resMigrants, responseSections, resHelpRequest,
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSettingSection, goodRequestEZDSection,
-                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resMenuSupplier);
+                resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer, resMenuSupplier,
+                resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private void updateOrgSyncDate(long idOfOrg) {
@@ -7479,7 +7482,7 @@ public class Processor implements SyncProcessor {
                 helpRequestData, preOrdersFeeding, cardRequestsData, resMenusCalendar, menusCalendarData,
                 clientBalanceHoldFeeding, resClientBalanceHoldData, orgSetting, goodRequestEZDSection,
                 resSyncSettingsSection, syncSettingsSection, emiasSection, emiasSectionForARMAnswer,
-                resMenuSupplier, resHardwareSettingsRequest, resTurnstileSettingsRequest););
+                resMenuSupplier, resHardwareSettingsRequest, resTurnstileSettingsRequest);
     }
 
     private OrgSettingSection processOrgSettings(OrgSettingsRequest orgSettingsRequest) throws Exception {
