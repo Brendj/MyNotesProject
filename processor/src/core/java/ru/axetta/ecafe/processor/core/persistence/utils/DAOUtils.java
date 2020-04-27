@@ -3397,11 +3397,19 @@ public class DAOUtils {
         session.flush();
     }
 
-    public static List<GroupNamesToOrgs> getAllGroupnamesToOrgsByIdOfOrg(Session session, Long idOfOrg) {
+    public static List<GroupNamesToOrgs> getAllGroupnamesToOrgsByIdOfOrgAndMain(Session session, Long idOfOrg) {
         Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
         criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         criteria.add(Restrictions.eq("idOfMainOrg", idOfOrg));
 
+        List<GroupNamesToOrgs> result = criteria.list();
+
+        return result;
+    }
+
+    public static List<GroupNamesToOrgs> getAllGroupnamesToOrgsByIdOfOrg(Session session, Long idOfOrg) {
+        Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
+        criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         List<GroupNamesToOrgs> result = criteria.list();
 
         return result;
@@ -3417,7 +3425,7 @@ public class DAOUtils {
     }
 
     public static void setMainBuildingGroupnamesToOrgs(Session session, Long idOfOrg) {
-        List<GroupNamesToOrgs> groupNamesToOrgsList = getAllGroupnamesToOrgsByIdOfOrg(session, idOfOrg);
+        List<GroupNamesToOrgs> groupNamesToOrgsList = getAllGroupnamesToOrgsByIdOfOrgAndMain(session, idOfOrg);
 
         if (!groupNamesToOrgsList.isEmpty()) {
             for (GroupNamesToOrgs groupNamesToOrg : groupNamesToOrgsList) {

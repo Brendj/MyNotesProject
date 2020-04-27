@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.persistence.distributedobjects;
 
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfSpecialDate;
+import ru.axetta.ecafe.processor.core.persistence.GroupNamesToOrgs;
 import ru.axetta.ecafe.processor.core.persistence.ProductionCalendar;
 import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
@@ -18,9 +19,7 @@ import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
 import org.hibernate.transform.Transformers;
 
-import java.util.Calendar;
-import java.util.Date;
-import java.util.List;
+import java.util.*;
 
 /**
  * Created with IntelliJ IDEA.
@@ -113,6 +112,7 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
                 countBadDays = (int) Math.ceil(((double) countBadDays / (double) 24));
             }
             //currentDate = CalendarUtils.addDays(currentDate, countBadDays);
+            List<GroupNamesToOrgs> groupNamesToOrgs = DAOUtils.getAllGroupnamesToOrgsByIdOfOrg(session, idOfOrg);
             ///////////////////////////////////////////////
             Integer countBadDaysCurrent = 0;
             while (countBadDaysCurrent < countBadDays) {
@@ -138,6 +138,7 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
                 if (!specialDate.isEmpty()) {
                     //1.5.2 - 1.5.3
                     boolean flag1 = true;
+                    List<String> groupNames = new ArrayList<>();
                     for (SpecialDate specialDate1 : specialDate) {
                         if (!specialDate1.getIsWeekend())
                         //Если работает хотя бы одна группа, то орг работает
@@ -145,6 +146,20 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
                             flag1 = false;
                             break;
                         }
+                        groupNames.add(DAOReadonlyService.getInstance().getClientGroupName(idOfOrg, specialDate1.getIdOfClientGroup()));
+                    }
+                    Iterator<GroupNamesToOrgs> groupNamesToOrgsIterator = groupNamesToOrgs.iterator();
+                    while(groupNamesToOrgsIterator.hasNext()) {
+                        GroupNamesToOrgs groupNamesToOrgs1 = groupNamesToOrgsIterator.next();//получаем следующий элемент
+                        if (groupNames.contains(groupNamesToOrgs1.getGroupName())) {
+                            //Удаляем группы, для которых есть SpecialDate
+                            groupNamesToOrgsIterator.remove();
+                        }
+                    }
+                    if (!groupNamesToOrgs.isEmpty()) {
+                        //Значит не все группы есть в SpecialDate
+                        flag1 = false;
+                        break;
                     }
                     currentDate = CalendarUtils.addOneDay(currentDate);
                     if (!flag1)
@@ -200,19 +215,37 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
                     specialDate = null;
                 }
                 //1.4.1
+                List<String> groupNames = new ArrayList<>();
                 for (SpecialDate specialDate1 : specialDate) {
                     if (!specialDate1.getIsWeekend())
                     //1.7
                     {
                         return true;
                     }
+                    groupNames.add(DAOReadonlyService.getInstance().getClientGroupName(idOfOrg, specialDate1.getIdOfClientGroup()));
                 }
                 //Если не найдены даты, то день хороший
                 if (specialDate.isEmpty())
                     return true;
                 else
-                    //Значит у всех групп в ОО выходной
-                    return false;
+                {
+                    Iterator<GroupNamesToOrgs> groupNamesToOrgsIterator = groupNamesToOrgs.iterator();
+                    while(groupNamesToOrgsIterator.hasNext()) {
+                        GroupNamesToOrgs groupNamesToOrgs1 = groupNamesToOrgsIterator.next();//получаем следующий элемент
+                        if (groupNames.contains(groupNamesToOrgs1.getGroupName())) {
+                            //Удаляем группы, для которых есть SpecialDate
+                            groupNamesToOrgsIterator.remove();
+                        }
+                    }
+                    if (groupNamesToOrgs.isEmpty()) {
+                        //Значит у всех групп в ОО выходной
+                        return false;
+                    }
+                    else{
+                        //Значит не все группы есть в SpecialDate
+                        return true;
+                    }
+                }
 
                 //1.4.2
                 //boolean groupWeekend = true;
@@ -265,7 +298,7 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
                 } catch (Exception e) {
                     specialDate = null;
                 }
-
+                List<String> groupNames = new ArrayList<>();
                 if (!specialDate.isEmpty()) {
                     //1.5.2 - 1.5.3
                     for (SpecialDate specialDate1 : specialDate) {
@@ -274,9 +307,24 @@ public abstract class ConsumerRequestDistributedObject extends DistributedObject
                         {
                             return true;
                         }
+                        groupNames.add(DAOReadonlyService.getInstance().getClientGroupName(idOfOrg, specialDate1.getIdOfClientGroup()));
                     }
-                    //1.6
-                    return false;
+                    Iterator<GroupNamesToOrgs> groupNamesToOrgsIterator = groupNamesToOrgs.iterator();
+                    while(groupNamesToOrgsIterator.hasNext()) {
+                        GroupNamesToOrgs groupNamesToOrgs1 = groupNamesToOrgsIterator.next();//получаем следующий элемент
+                        if (groupNames.contains(groupNamesToOrgs1.getGroupName())) {
+                            //Удаляем группы, для которых есть SpecialDate
+                            groupNamesToOrgsIterator.remove();
+                        }
+                    }
+                    if (groupNamesToOrgs.isEmpty()) {
+                        //Значит у всех групп в ОО выходной
+                        return false;
+                    }
+                    else{
+                        //Значит не все группы есть в SpecialDate
+                        return true;
+                    }
                 } else {
                     //1.5.4
                     if (CalendarUtils.getDayOfWeek(dateDone) == Calendar.SATURDAY) {
