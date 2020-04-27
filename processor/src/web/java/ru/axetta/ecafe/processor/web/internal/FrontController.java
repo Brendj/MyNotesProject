@@ -1968,7 +1968,8 @@ public class FrontController extends HttpServlet {
     }
 
     @WebMethod(operationName = "getBalancesForPayPlan")
-    public PayPlanBalanceListResponse getBalancesForPayPlan(@WebParam(name = "orgId") Long orgId, PayPlanBalanceList payPlanBalanceList)
+    public PayPlanBalanceListResponse getBalancesForPayPlan(@WebParam(name = "orgId") Long orgId,
+            @WebParam(name = "balanceList") PayPlanBalanceList payPlanBalanceList)
             throws FrontControllerException {
         checkRequestValidity(orgId);
         PayPlanBalanceListResponse result = new PayPlanBalanceListResponse();
