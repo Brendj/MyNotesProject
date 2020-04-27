@@ -1449,7 +1449,11 @@ public class PreorderDAOService {
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
         List<PreorderComplex> list = query.getResultList();
-        Long sum = 0L;
+        return getPreorderSumFromList(list);
+    }
+
+    private long getPreorderSumFromList(List<PreorderComplex> list) {
+        long sum = 0L;
         Set<Long> set = new HashSet<Long>();
         for (PreorderComplex complex : list) {
             if (!set.contains(complex.getIdOfPreorderComplex())) {
@@ -1460,7 +1464,20 @@ public class PreorderDAOService {
                 }
             }
         }
-        return sum; // client.getBalance() - sum;
+        return sum;
+    }
+
+    @Transactional
+    public long getNotPaidPreordersSum(Client client, Date dateFrom) {
+        Query query = emReport.createQuery("select pc from PreorderComplex pc join fetch pc.preorderMenuDetails pmd "
+                + "where pc.client.idOfClient = :idOfClient and pc.preorderDate > :startDate "
+                + "and pc.deletedState = false and pmd.deletedState = false and (pc.idOfGoodsRequestPosition is not null "
+                + "or pmd.idOfGoodsRequestPosition is not null) "
+                + "and not exists (select pod from PreorderLinkOD pod where pod.preorderGuid = pc.guid)");
+        query.setParameter("idOfClient", client.getIdOfClient());
+        query.setParameter("startDate", dateFrom);
+        List<PreorderComplex> list = query.getResultList();
+        return getPreorderSumFromList(list);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)
