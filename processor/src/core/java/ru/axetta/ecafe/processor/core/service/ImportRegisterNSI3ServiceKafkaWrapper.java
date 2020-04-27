@@ -57,7 +57,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
             return innerServices.getQueryString();
         } else {
             return "WITH pupils_info AS (\n"
-                    + "       SELECT p.personguid,\n"
+                    + "       SELECT DISTINCT ON (p.personguid) p.personguid,\n"
                     + "              o.guid,\n"
                     + "              p.firstname,\n"
                     + "              p.patronymic,\n"
@@ -66,17 +66,18 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                     + "              g.title AS gender,\n"
                     + "              prll.title AS parallel,\n"
                     + "              p.classname,\n"
-                    + "              (p.deletestate OR p.noDataAboutEducation) AS deletestate,\n"
-                    + "              ag.title AS agegroup,"
+                    + "              p.deletestate,\n"
+                    + "              el.title AS agegroup,\n"
                     + "              p.organizationid\n"
                     + "       FROM cf_mh_persons AS p\n"
                     + "                   JOIN cf_orgs AS o ON p.organizationid = o.organizationIdFromNSI\n"
-                    + "                   JOIN cf_kf_ct_age_group AS ag ON p.agegroupid = ag.id\n"
+                    + "                   JOIN cf_kf_ct_educationlevel AS el ON p.educationstageid = el.id\n"
                     + "                   LEFT JOIN cf_kf_ct_gender AS g ON p.genderid = g.id\n"
                     + "                   LEFT JOIN cf_kf_ct_parallel AS prll ON p.parallelid = prll.id\n"
-                    + ") SELECT * FROM pupils_info as pi "
-                    + " JOIN cf_orgs AS o ON pi.organizationid = o.organizationIdFromNSI "
-                    + " WHERE o.ekisId in :guids ";
+                    + "  WHERE p.invaliddata IS FALSE\n"
+                    + ") SELECT distinct(pi.*) FROM pupils_info AS pi\n"
+                    + " JOIN cf_orgs AS o ON pi.organizationid = o.organizationIdFromNSI\n"
+                    + " WHERE o.ekisId IN :guids ";
         }
     }
 
