@@ -9509,7 +9509,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             PreorderSaveListParam preorderSaveListParam = new PreorderSaveListParam(preorders);
             Org org = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).
-                    getOrgByContractId(contractId);
+                    getOrgByContractId(preorders.getContractId());
             if (!org.getUseWebArm()) {
                 RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                         .savePreorderComplexes(preorderSaveListParam, guardianMobile);

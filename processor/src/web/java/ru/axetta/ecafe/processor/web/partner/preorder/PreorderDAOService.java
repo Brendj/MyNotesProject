@@ -482,10 +482,10 @@ public class PreorderDAOService {
         Query query = emReport.createQuery("SELECT dish FROM WtDish dish LEFT JOIN dish.complexItems complexItems "
                 + "LEFT JOIN complexItems.wtComplex complex "
                 + "WHERE complex = :complex AND "
-                + "dish.dateOfBeginMenuIncluding >= :startDate AND dish.dateOfEndMenuIncluding <= :endDate");
+                + "dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding > :endDate");
         query.setParameter("complex", complex);
-        query.setParameter("startDate", CalendarUtils.startOfDay(date).getTime());
-        query.setParameter("endDate", CalendarUtils.endOfDay(date).getTime());
+        query.setParameter("startDate", CalendarUtils.startOfDay(date), TemporalType.TIMESTAMP);
+        query.setParameter("endDate", CalendarUtils.endOfDay(date), TemporalType.TIMESTAMP);
         List<WtDish> res = query.getResultList();
 
         Set<Long> set = new HashSet<>();
