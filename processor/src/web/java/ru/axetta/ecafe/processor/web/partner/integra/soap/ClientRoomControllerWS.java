@@ -2961,14 +2961,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private void processWtMenuFirstDayWithProhibitions(Client client, Data data, ObjectFactory objectFactory,
             Session session, Date startDate, Date endDate) throws DatatypeConfigurationException {
-        Calendar fromCal = Calendar.getInstance(), toCal = Calendar.getInstance();
-        fromCal.setTime(startDate);
-        truncateToDayOfMonth(fromCal);
-        truncateToDayOfMonth(toCal);
-        fromCal.add(Calendar.HOUR, -1);
 
         List<WtMenu> menus = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                .getWtMenuByDates(fromCal.getTime(), toCal.getTime(), client.getOrg());
+                .getWtMenuByDates(startDate, endDate, client.getOrg());
 
         generateWtMenuDetailWithProhibitions(session, client, objectFactory, menus, data);
     }
@@ -3116,15 +3111,37 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     }
                 }
 
-                menuItemExt.setGroup(menuGroup.getName());
+                if (menuGroup != null) {
+                    menuItemExt.setGroup(menuGroup.getName());
+                }
                 menuItemExt.setName(wtDish.getDishName());
                 menuItemExt.setPrice(wtDish.getPrice().longValue());
-                menuItemExt.setCalories(wtDish.getCalories().doubleValue());
-                menuItemExt.setOutput(wtDish.getQty());
+                if (wtDish.getCalories() == null) {
+                    menuItemExt.setCalories((double) 0);
+                } else {
+                    menuItemExt.setCalories(wtDish.getCalories().doubleValue());
+                }
+                if (wtDish.getQty() == null) {
+                    menuItemExt.setOutput("");
+                } else{
+                    menuItemExt.setOutput(wtDish.getQty());
+                }
                 menuItemExt.setAvailableNow(1); // доступно для продажи
-                menuItemExt.setProtein(wtDish.getProtein().doubleValue());
-                menuItemExt.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
-                menuItemExt.setFat(wtDish.getFat().doubleValue());
+                if (wtDish.getProtein() == null) {
+                    menuItemExt.setProtein((double) 0) ;
+                } else{
+                    menuItemExt.setProtein(wtDish.getProtein().doubleValue());
+                }
+                if (wtDish.getCarbohydrates() == null) {
+                    menuItemExt.setCarbohydrates((double) 0) ;
+                } else{
+                    menuItemExt.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
+                }
+                if (wtDish.getFat() == null) {
+                    menuItemExt.setFat((double) 0) ;
+                } else{
+                    menuItemExt.setFat(wtDish.getFat().doubleValue());
+                }
 
                 if (ProhibitByGroup.containsKey(menuGroup.getName())) {
                     menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuGroup.getName()));
@@ -3134,7 +3151,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     } else {
                         //пробегаться в цикле.
                         for (String filter : ProhibitByFilter.keySet()) {
-                            if (wtDish.getDishName().indexOf(filter) != -1) {
+                            if (wtDish.getDishName().contains(filter)) {
                                 menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
                             }
                         }
