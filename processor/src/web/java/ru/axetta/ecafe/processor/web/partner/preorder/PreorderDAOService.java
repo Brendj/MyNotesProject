@@ -782,13 +782,13 @@ public class PreorderDAOService {
             }
         }
 
-        if (!isEditedDay(date, client)) throw new NotEditedDayException("День недоступен для редактирования предзаказа");
+        if (!isEditedDay(date, client)) throw new NotEditedDayException("День не доступен для редактирования предзаказа");
 
         Query queryComplexSelect = em.createQuery("SELECT complex FROM WtComplex complex "
                 + "WHERE complex.beginDate >= :startDate AND complex.endDate <= :endDate "
                 + "AND :org IN elements(complex.orgs) AND complex.deleteState = 0");
-        queryComplexSelect.setParameter("startDate", startDate);
-        queryComplexSelect.setParameter("endDate", endDate);
+        queryComplexSelect.setParameter("startDate", CalendarUtils.startOfDay(date).getTime());
+        queryComplexSelect.setParameter("endDate", CalendarUtils.endOfDay(date).getTime());
         queryComplexSelect.setParameter("org", client.getOrg());
 
         for (ComplexListParam complex : list.getComplexes()) {
@@ -847,8 +847,8 @@ public class PreorderDAOService {
                     + "dish.dateOfBeginMenuIncluding >= :startDate AND dish.dateOfEndMenuIncluding <= :endDate AND "
                     + ":org IN elements(complex.orgs)");
             queryMenuSelect.setParameter("idOfComplex", preorderComplex.getIdOfPreorderComplex());
-            queryMenuSelect.setParameter("startDate", startDate);
-            queryMenuSelect.setParameter("endDate", endDate);
+            queryMenuSelect.setParameter("startDate", CalendarUtils.startOfDay(date).getTime());
+            queryMenuSelect.setParameter("endDate", CalendarUtils.endOfDay(date).getTime());
             queryMenuSelect.setParameter("org", client.getOrg());
             List<WtDish> dishes = queryMenuSelect.getResultList();
 
@@ -1702,7 +1702,7 @@ public class PreorderDAOService {
                 + ":date BETWEEN dish.dateOfBeginMenuIncluding AND dish.dateOfEndMenuIncluding AND "
                 + ":org IN elements(complex.orgs)");
         query.setParameter("idOfComplex", preorderComplex.getIdOfPreorderComplex());
-        query.setParameter("date", date);
+        query.setParameter("date", date, TemporalType.TIMESTAMP);
         query.setParameter("org", client.getOrg());
         List<WtDish> dishes = query.getResultList();
 
