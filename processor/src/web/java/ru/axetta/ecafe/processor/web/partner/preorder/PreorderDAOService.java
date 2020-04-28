@@ -497,7 +497,6 @@ public class PreorderDAOService {
                 }
             }
             Integer state = wtDish.getDeleteState();
-            Long idOfPreorderMenuDetail = wtDish.getIdOfDish();
 
             PreorderMenuItemExt menuItemExt = new PreorderMenuItemExt(wtDish);
 
