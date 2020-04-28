@@ -2622,13 +2622,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             final Date endDate) {
         authenticateRequest(null);
         ObjectFactory objectFactory = new ObjectFactory();
-        Client client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).
-                getClientByContractId(contractId);
-        //if (!client.getOrg().getUseWebArm()) {
+        Org org = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).
+                getOrgByContractId(contractId);
+        if (!org.getUseWebArm()) {
             return processMenuListWithComplexes(contractId, startDate, endDate, objectFactory);
-        //} else {
-        //    return processWtMenuListWithComplexes(contractId, startDate, endDate, objectFactory);
-        //}
+        } else {
+            return processWtMenuListWithComplexes(contractId, startDate, endDate, objectFactory);
+        }
     }
 
     private MenuListWithComplexesResult processMenuListWithComplexes(Long contractId, Date startDate, Date endDate,

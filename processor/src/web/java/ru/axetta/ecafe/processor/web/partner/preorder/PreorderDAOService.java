@@ -523,6 +523,16 @@ public class PreorderDAOService {
         }
     }
 
+    public Org getOrgByContractId(Long contractId) {
+        try {
+            Query query = emReport.createQuery("select c.org from Client c where c.contractId = :contractId");
+            query.setParameter("contractId", contractId);
+            return (Org) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
+    }
+
     private boolean isEditedDay(Date date, Client client) throws Exception {
         boolean result = false;
         Date today = CalendarUtils.startOfDay(new Date());
@@ -2337,12 +2347,17 @@ public class PreorderDAOService {
             complexGroupIds.addAll(Arrays.asList(1L, 2L, 3L)); // льготное + платное + все
         }
         List<WtComplexGroupItem> complexGroupList = new ArrayList<>();
-        if (complexGroupIds != null && complexGroupIds.size() > 0) {
+
+        for (Long id : complexGroupIds) {
             Query query = emReport.createQuery("SELECT complexGroup FROM WtComplexGroupItem complexGroup "
-                    + "WHERE complexGroup.idOfComplexGroupItem IN ELEMENTS(:complexGroupIds)");
-            query.setParameter("complexGroupIds", complexGroupIds);
-            complexGroupList = query.getResultList();
+                    + "WHERE complexGroup.idOfComplexGroupItem = :id");
+            query.setParameter("id", id);
+            WtComplexGroupItem res = (WtComplexGroupItem) query.getSingleResult();
+            if (res != null) {
+                complexGroupList.add(res);
+            }
         }
+
         return complexGroupList;
     }
 
@@ -2365,10 +2380,15 @@ public class PreorderDAOService {
             }
         }
         if (ageGroupIds != null && ageGroupIds.size() > 0) {
-            Query query = emReport.createQuery("SELECT ageGroup FROM WtAgeGroupItem ageGroup "
-                    + "WHERE ageGroup.idOfAgeGroupItem IN ELEMENTS(:ageGroupIds)");
-            query.setParameter("ageGroupIds", ageGroupIds);
-            ageGroupList = query.getResultList();
+            for (Long id : ageGroupIds) {
+                Query query = emReport.createQuery("SELECT ageGroup FROM WtAgeGroupItem ageGroup "
+                        + "WHERE ageGroup.idOfAgeGroupItem = :id");
+                query.setParameter("id", id);
+                WtAgeGroupItem res = (WtAgeGroupItem) query.getSingleResult();
+                if (res != null) {
+                    ageGroupList.add(res);
+                }
+            }
         }
         return ageGroupList;
     }
@@ -2379,8 +2399,8 @@ public class PreorderDAOService {
 
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT complex FROM WtComplex complex LEFT JOIN complex.discountRules rules ");
-        sb.append("WHERE :rule IN ELEMENTS(rules) AND complex.beginDate >= :startDate AND ");
-        sb.append("complex.endDate <= :endDate");
+        sb.append("WHERE :rule IN ELEMENTS(rules) AND complex.beginDate < :startDate AND ");
+        sb.append("complex.endDate > :endDate");
         if (complexGroupList != null && complexGroupList.size() > 0) {
             sb.append(" AND complex.wtComplexGroupItem IN ELEMENTS(:complexGroupList)");
         }
@@ -2397,8 +2417,8 @@ public class PreorderDAOService {
                 query.setParameter("ageGroupList", ageGroupList);
             }
             query.setParameter("rule", rule);
-            query.setParameter("startDate", startDate);
-            query.setParameter("endDate", endDate);
+            query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+            query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
             List<WtComplex> res = query.getResultList();
             if (res != null && res.size() > 0) {
                 wtComplexes.addAll(res);

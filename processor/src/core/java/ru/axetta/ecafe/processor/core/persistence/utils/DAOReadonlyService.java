@@ -32,6 +32,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
+import javax.persistence.TemporalType;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
@@ -997,8 +998,8 @@ public class DAOReadonlyService {
                             + "LEFT JOIN FETCH excludeDays.complex complex "
                             + "LEFT JOIN FETCH complex.wtOrgGroup orgGroup "
                             + "WHERE complex.contragent = :contragent "
-                            + "AND :org IN elements(complex.orgs) "
-                            + "OR :org IN elements(orgGroup.orgs)");
+                            + "AND (:org IN elements(complex.orgs) "
+                            + "OR :org IN elements(orgGroup.orgs))");
             query.setParameter("contragent", contragent);
             query.setParameter("org", org);
             List<WtComplexExcludeDays> excludeDays = query.getResultList();
@@ -1020,7 +1021,7 @@ public class DAOReadonlyService {
         try {
             Query query = entityManager.createQuery(
                     "SELECT calend.flag from ProductionCalendar calend WHERE calend.day = :date ");
-            query.setParameter("date", date);
+            query.setParameter("date", date, TemporalType.TIMESTAMP);
             Integer flag = (Integer) query.getSingleResult();
             return flag == 1;
         } catch (Exception e) {
@@ -1035,7 +1036,7 @@ public class DAOReadonlyService {
                     "SELECT sd.isWeekend from SpecialDate sd "
                             + "WHERE sd.date = :date AND sd.deleted = false AND sd.org = :org "
                             + "AND sd.idOfClientGroup = :idOfClientGroup OR sd.idOfClientGroup IS NULL");
-            query.setParameter("date", date);
+            query.setParameter("date", date, TemporalType.TIMESTAMP);
             query.setParameter("org", org);
             query.setParameter("idOfClientGroup", clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             return (Boolean) query.getSingleResult();
