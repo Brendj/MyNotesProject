@@ -2386,6 +2386,9 @@ public class ClientManager {
                     if (null == clientDTISZNDiscountVersion) {
                         clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
                     }
+                    if (info.isInoe()) {
+                        info.setDateEnd(new Date());
+                    }
                     info.setVersion(clientDTISZNDiscountVersion);
                     info.setLastUpdate(new Date());
                     session.update(info);
