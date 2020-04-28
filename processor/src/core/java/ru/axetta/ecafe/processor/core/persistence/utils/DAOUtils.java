@@ -3408,9 +3408,45 @@ public class DAOUtils {
     }
 
     public static List<GroupNamesToOrgs> getAllGroupnamesToOrgsByIdOfOrg(Session session, Long idOfOrg) {
-        Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
-        criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
-        List<GroupNamesToOrgs> result = criteria.list();
+        Query query = session.createSQLQuery(
+                "select distinct cg.* from cf_groupnames_to_orgs cg \n"
+                        + "join cf_clientgroups ccg on cg.groupname = ccg.groupname and cg.idoforg = ccg.idoforg\n"
+                        + "join cf_clients cc on cc.idofclientgroup = ccg.idofclientgroup and cc.idoforg=cg.idoforg\n"
+                        + "where cc.idofclient is not null and cg.idoforg=:idOfOrg");
+
+        query.setParameter("idOfOrg", idOfOrg);
+        List list = (List<GroupNamesToOrgs>) query.list();
+        List<GroupNamesToOrgs> result = new ArrayList<>();
+        for (Object o : list) {
+            Object[] row = (Object[]) o;
+            GroupNamesToOrgs groupNamesToOrgs = new GroupNamesToOrgs();
+            groupNamesToOrgs.setIdOfGroupNameToOrg(((BigInteger)row[0]).longValue());
+            groupNamesToOrgs.setIdOfOrg(((BigInteger)row[1]).longValue());
+            groupNamesToOrgs.setIdOfMainOrg(((BigInteger)row[2]).longValue());
+            groupNamesToOrgs.setMainBuilding((Integer) row[3]);
+            groupNamesToOrgs.setVersion(((BigInteger)row[4]).longValue());
+            groupNamesToOrgs.setGroupName((String) row[5]);
+            groupNamesToOrgs.setParentGroupName((String) row[6]);
+            Integer midl = (Integer) row[7];
+            if (midl != null && midl == 1)
+            {
+                groupNamesToOrgs.setIsMiddleGroup(true);
+            }
+            else
+            {
+                groupNamesToOrgs.setIsMiddleGroup(false);
+            }
+            Integer six = (Integer) row[8];
+            if (six != null && six == 1)
+            {
+                groupNamesToOrgs.setIsSixDaysWorkWeek(true);
+            }
+            else
+            {
+                groupNamesToOrgs.setIsSixDaysWorkWeek(false);
+            }
+            result.add(groupNamesToOrgs);
+        }
 
         return result;
     }
