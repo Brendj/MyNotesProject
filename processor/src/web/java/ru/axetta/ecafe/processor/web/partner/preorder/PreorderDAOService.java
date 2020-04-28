@@ -2400,27 +2400,60 @@ public class PreorderDAOService {
         sb.append("SELECT complex FROM WtComplex complex LEFT JOIN complex.discountRules rules ");
         sb.append("WHERE :rule IN ELEMENTS(rules) AND complex.beginDate < :startDate AND ");
         sb.append("complex.endDate > :endDate");
+
         if (complexGroupList != null && complexGroupList.size() > 0) {
-            sb.append(" AND complex.wtComplexGroupItem IN ELEMENTS(:complexGroupList)");
+            sb.append(" AND complex.wtComplexGroupItem = :complexGroup");
         }
         if (ageGroupList != null && ageGroupList.size() > 0) {
-            sb.append(" AND complex.wtAgeGroupItem IN ELEMENTS(:ageGroupList)");
+            sb.append(" AND complex.wtAgeGroupItem = :ageGroup)");
         }
 
         for (WtDiscountRule rule : wtDiscountRuleSet) {
             Query query = emReport.createQuery(sb.toString());
-            if (complexGroupList != null && complexGroupList.size() > 0) {
-                query.setParameter("complexGroupList", complexGroupList);
+
+            if (complexGroupList != null && complexGroupList.size() > 0
+                    && ageGroupList != null && ageGroupList.size() > 0) {
+                for (WtComplexGroupItem complexGroup : complexGroupList) {
+                    for (WtAgeGroupItem ageGroup : ageGroupList) {
+                        query.setParameter("complexGroupList", complexGroup);
+                        query.setParameter("ageGroupList", ageGroup);
+                        query.setParameter("rule", rule);
+                        query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+                        query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+                        List<WtComplex> res = query.getResultList();
+                        if (res != null && res.size() > 0) {
+                            wtComplexes.addAll(res);
+                        }
+                    }
+                }
             }
-            if (ageGroupList != null && ageGroupList.size() > 0) {
-                query.setParameter("ageGroupList", ageGroupList);
+
+            if (complexGroupList != null && complexGroupList.size() > 0
+                    && (ageGroupList == null || ageGroupList.size() == 0)) {
+                for (WtComplexGroupItem complexGroup : complexGroupList) {
+                    query.setParameter("complexGroupList", complexGroup);
+                    query.setParameter("rule", rule);
+                    query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+                    query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+                    List<WtComplex> res = query.getResultList();
+                    if (res != null && res.size() > 0) {
+                        wtComplexes.addAll(res);
+                    }
+                }
             }
-            query.setParameter("rule", rule);
-            query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-            query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
-            List<WtComplex> res = query.getResultList();
-            if (res != null && res.size() > 0) {
-                wtComplexes.addAll(res);
+
+            if (ageGroupList != null && ageGroupList.size() > 0
+                    && (complexGroupList == null || complexGroupList.size() == 0)) {
+                for (WtAgeGroupItem ageGroup : ageGroupList) {
+                    query.setParameter("ageGroupList", ageGroup);
+                    query.setParameter("rule", rule);
+                    query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+                    query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+                    List<WtComplex> res = query.getResultList();
+                    if (res != null && res.size() > 0) {
+                        wtComplexes.addAll(res);
+                    }
+                }
             }
         }
         return wtComplexes;
