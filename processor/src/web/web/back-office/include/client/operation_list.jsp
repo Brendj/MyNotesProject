@@ -547,13 +547,13 @@
         </f:facet>
         <h:outputText escape="true" value="#{item.price}" converter="copeckSumConverter" styleClass="output-text" />
     </rich:column>
-    <rich:column headerClass="column-header">
-        <f:facet name="header">
-            <h:outputText escape="true" value="Тип события" />
-        </f:facet>
-        <h:outputText escape="true" value="#{item.eventType}" converter="smsContentsTypeConverter"
-                      styleClass="output-text" />
-    </rich:column>
+    <%--<rich:column headerClass="column-header">--%>
+        <%--<f:facet name="header">--%>
+            <%--<h:outputText escape="true" value="Тип события" />--%>
+        <%--</f:facet>--%>
+        <%--<h:outputText escape="true" value="#{item.eventType}" converter="smsContentsTypeConverter"--%>
+                      <%--styleClass="output-text" />--%>
+    <%--</rich:column>--%>
     <rich:column headerClass="column-header">
         <f:facet name="header">
             <h:outputText escape="true" value="Идентификатор события" />
@@ -575,7 +575,7 @@
 
 <h:outputText value="Проходы:" />
 <rich:dataTable id="clientPassesTable" var="pass" value="#{mainPage.clientOperationListPage.clientPasses}"
-                rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer" rows="8" columns="10">
+                rowKeyVar="row" columnClasses="center-aligned-column" footerClass="data-table-footer" rows="8" columns="11">
 
     <f:facet name="header">
         <rich:columnGroup>
@@ -596,6 +596,9 @@
             </rich:column>
             <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
                 <h:outputText escape="true" value="Дата и время" styleClass="column-header" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+                <h:outputText escape="true" value="Тип карты" styleClass="column-header" />
             </rich:column>
             <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
                 <h:outputText escape="true" value="Направление" styleClass="column-header" />
@@ -630,6 +633,9 @@
     <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
         <h:outputText escape="true" value="#{pass.enterTime}" styleClass="output-text"
                       converter="timeMinuteConverter" />
+    </rich:column>
+    <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
+        <h:outputText escape="true" value="#{pass.cardType}" styleClass="output-text" />
     </rich:column>
     <rich:column headerClass="column-header" rowspan="#{pass.chekerItemListCount}">
         <h:outputText escape="true" value="#{pass.direction}" styleClass="output-text" />
@@ -1204,32 +1210,41 @@
                     rowKeyVar="row" footerClass="data-table-footer" rows="25">
     <f:facet name="header">
         <rich:columnGroup columnClasses="gray">
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Номер заявления" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Дата заявления" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" colspan="2">
+                <h:outputText escape="true" value="Период действия льготы" />
+            </rich:column>
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Статус" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Дата статуса" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Архивное" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Льгота" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="ФИО заявителя" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Телефон заявителя" />
             </rich:column>
-            <rich:column headerClass="column-header">
+            <rich:column headerClass="column-header" rowspan="2">
                 <h:outputText escape="true" value="Доп. информация" />
+            </rich:column>
+            <rich:column headerClass="column-header" breakBefore="true">
+                <h:outputText escape="true" value="С" />
+            </rich:column>
+            <rich:column headerClass="column-header">
+                <h:outputText escape="true" value="По" />
             </rich:column>
 
         </rich:columnGroup>
@@ -1239,6 +1254,12 @@
     </rich:column>
     <rich:column headerClass="column-header">
         <h:outputText escape="true" value="#{app.createdDate}" styleClass="output-text" converter="dateConverter" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <h:outputText escape="true" value="#{app.startDate}" styleClass="output-text" converter="dateConverter" />
+    </rich:column>
+    <rich:column headerClass="column-header">
+        <h:outputText escape="true" value="#{app.endDate}" styleClass="output-text" converter="dateConverter" />
     </rich:column>
     <rich:column headerClass="column-header">
         <h:outputText escape="true" value="#{app.applicationForFoodStateString}" styleClass="output-text" title="#{app.statusTitle}" />

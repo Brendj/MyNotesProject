@@ -161,6 +161,8 @@ public class Org implements Serializable {
     private Boolean useWebArm;
     private String egissoId;
     private String municipalDistrict;
+    private String founder;
+    private String subordination;
 
     public Org(String shortName, String shortNameInfoService, String officialName, String address, String shortAddress, Person officialPerson, String officialPosition,
             String contractId, Date contractTime, OrganizationType type, int state, long cardLimit, String publicKey, Long priceOfSms,
@@ -1291,5 +1293,21 @@ public class Org implements Serializable {
 
     public void setUseWebArm(Boolean useWebArm) {
         this.useWebArm = useWebArm;
+    }
+
+    public String getFounder() {
+        return founder;
+    }
+
+    public void setFounder(String founder) {
+        this.founder = founder;
+    }
+
+    public String getSubordination() {
+        return subordination;
+    }
+
+    public void setSubordination(String subordination) {
+        this.subordination = subordination;
     }
 }

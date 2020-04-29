@@ -33,9 +33,14 @@ public class PreorderMenuDetail {
     private Integer availableNow;
     private String shortName;
     private Long idOfGood;
+    private Long usedSum;
+    private Long usedAmount;
+    private String mobile;
+    private PreorderMobileGroupOnCreateType mobileGroupOnCreate;
 
     public PreorderMenuDetail() {
-
+        this.usedSum = 0L;
+        this.usedAmount = 0L;
     }
 
     public void deleteByReason(Long nextVersion, boolean doDelete, PreorderState reason) {
@@ -251,5 +256,37 @@ public class PreorderMenuDetail {
 
     public void setIdOfGood(Long idOfGood) {
         this.idOfGood = idOfGood;
+    }
+
+    public Long getUsedSum() {
+        return usedSum;
+    }
+
+    public void setUsedSum(Long usedSum) {
+        this.usedSum = usedSum;
+    }
+
+    public Long getUsedAmount() {
+        return usedAmount;
+    }
+
+    public void setUsedAmount(Long usedAmount) {
+        this.usedAmount = usedAmount;
+    }
+
+    public String getMobile() {
+        return mobile;
+    }
+
+    public void setMobile(String mobile) {
+        this.mobile = mobile;
+    }
+
+    public PreorderMobileGroupOnCreateType getMobileGroupOnCreate() {
+        return mobileGroupOnCreate;
+    }
+
+    public void setMobileGroupOnCreate(PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
+        this.mobileGroupOnCreate = mobileGroupOnCreate;
     }
 }

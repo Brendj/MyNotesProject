@@ -4,7 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.sync.response.registry.accounts;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Card;
+import ru.axetta.ecafe.processor.core.persistence.CardState;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.Visitor;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.w3c.dom.Document;
@@ -36,6 +39,7 @@ public class CardsItem {
     private Boolean isLongUid;    //Признак длинного идентификатора карты - опционально
     private Long idOfCard;        //Идентификатор карты в БД процессинга
     private Integer transitionState;    //Состояние перехода
+    private Integer cardSignCertNum; //номер сертификата эцп
 
 
     public CardsItem(long cardNo, int cardType, int state, long idOfClient, String lockReason, Date validDate,
@@ -86,6 +90,7 @@ public class CardsItem {
         }
         this.idOfCard = card.getIdOfCard();
         this.transitionState = card.getTransitionState();
+        this.cardSignCertNum = card.getCardSignCertNum();
     }
 
     public CardsItem(Card card, Visitor visitor){
@@ -245,7 +250,18 @@ public class CardsItem {
         if (null != transitionState) {
             element.setAttribute("Trn_State", this.transitionState.toString());
         }
+        if (null != cardSignCertNum) {
+            element.setAttribute("CardSignCertNum", this.getCardSignCertNum().toString());
+        }
 
         return element;
+    }
+
+    public Integer getCardSignCertNum() {
+        return cardSignCertNum;
+    }
+
+    public void setCardSignCertNum(Integer cardSignCertNum) {
+        this.cardSignCertNum = cardSignCertNum;
     }
 }

@@ -50,7 +50,9 @@
     <a4j:commandButton value="Отправить пробное событие на ЕМП" action="#{otherActionsPage.runSendEMPEvent}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Очистить таблицу меню" action="#{otherActionsPage.cleaningMenu}"
-                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+    <a4j:commandButton value="Оповещение об окончании срока действия льготы" action="#{otherActionsPage.endBenefitNotification}"
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
         <rich:panel>
             <h:panelGrid columns="2">
                 <h:outputText escape="true" value="Отправить все события ЕМИАС по клиенту на тестовый сервис ЕМП"
@@ -98,7 +100,7 @@
     <rich:panel>
         <a4j:commandButton value="Генерировать представителей" action="#{otherActionsPage.runGenerateGuardians}" id="generateGuardiansByOrgs"
                          title="Принудительное создание представителя клиентам из не предопределенных групп."
-                         styleClass="command-button" onclick="disableButtons(true);" oncomplete="disableButtons(false)" /><br/>
+                         styleClass="command-button" /><br/>
         <h:outputText value="Список ид. организаций:"/>
         <h:inputText value="#{otherActionsPage.orgsForGenerateGuardians}" size="50"/>
     </rich:panel>

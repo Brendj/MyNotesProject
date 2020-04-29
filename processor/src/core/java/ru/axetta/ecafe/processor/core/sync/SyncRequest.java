@@ -34,6 +34,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReport;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier.MenuSupplier;
+import ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier.MenuSupplierBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendarBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendarRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendarSupplierBuilder;
@@ -2790,6 +2792,7 @@ public class SyncRequest {
 			builders.add(new GoodRequestEZDBuilder());
             builders.add(new SyncSettingsRequestBuilder(idOfOrg));
 			builders.add(new EmiasBuilder());
+            builders.add(new MenuSupplierBuilder(idOfOrg));
             return builders;
         }
 
@@ -3096,6 +3099,10 @@ public class SyncRequest {
 	
 	public EmiasRequest getEmiasRequest(){
         return this.<EmiasRequest>findSection(EmiasRequest.class);
+    }
+
+    public MenuSupplier getMenuSupplier() {
+        return this.findSection(MenuSupplier.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {

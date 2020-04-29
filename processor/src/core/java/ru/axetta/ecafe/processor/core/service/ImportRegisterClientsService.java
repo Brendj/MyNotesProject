@@ -444,7 +444,7 @@ public class ImportRegisterClientsService {
                                 emptyIfNull(dbClient.getClientGroup() == null ? ""
                                         : dbClient.getClientGroup().getGroupName()), logBuffer);
                         addClientChange(ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
-                                RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                                RegistryChange.FULL_COMPARISON, false);
                     }
                 } catch (Exception e) {
                     logError("Failed to delete client " + dbClient, e, logBuffer);
@@ -466,13 +466,10 @@ public class ImportRegisterClientsService {
                                     dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()),
                             logBuffer);
                     addClientChange(ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
-                            RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                            RegistryChange.FULL_COMPARISON, false);
                 }
             }
         }
-
-        Map<Long, CategoryDiscount> categoryMap = getCategoriesMap(session);
-        Map<Integer, CategoryDiscountDSZN> categoryDSZNMap = getCategoriesDSZNMap(session);
 
         //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
         for (ExpandedPupilInfo pupil : pupils) {
@@ -549,7 +546,7 @@ public class ImportRegisterClientsService {
                         emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName())
                         + " из школы " + cl.getOrg().getIdOfOrg() + " в школу " + org.getIdOfOrg(), logBuffer);
                 addClientChange(ts, org.getIdOfOrg(), org.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION,
-                        RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                        RegistryChange.FULL_COMPARISON, false);
                 continue;
             }
             if (!updateClient) {
@@ -571,7 +568,7 @@ public class ImportRegisterClientsService {
                                 pupil.getFamilyName() + " " + pupil.getFirstName() + " " +
                                 pupil.getSecondName() + ", " + pupil.getGroup(), logBuffer);
                         addClientChange(ts, org.getIdOfOrg(), fieldConfig, CREATE_OPERATION,
-                                RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                                RegistryChange.FULL_COMPARISON, false);
                     } catch (Exception e) {
                         // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
                         logError("Ошибка добавления клиента", e, logBuffer);
@@ -588,7 +585,7 @@ public class ImportRegisterClientsService {
                             + emptyIfNull(pupil.getFirstName()) + " " +
                             emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()), logBuffer);
                     addClientChange(ts, org.getIdOfOrg(), fieldConfig, cl, MODIFY_OPERATION,
-                            RegistryChange.FULL_COMPARISON, org.getChangesDSZN());
+                            RegistryChange.FULL_COMPARISON, false);
                 }
             } catch (Exception e) {
                 logError("Failed to add client for " + org.getIdOfOrg() + " org", e, logBuffer);
@@ -1366,11 +1363,7 @@ public class ImportRegisterClientsService {
                     }
                     Date createDateBirth = new Date(change.getBirthDate());
                     createConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(createDateBirth));
-                    createConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefitsSafe());
-                    if(change.getCheckBenefitsSafe()) {
-                        createConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
-                        createConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
-                    }
+                    createConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, false);
                     createConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, change.getGuardiansCount());
                     createConfig.setValueSet(ClientManager.FieldId.GUARDIANS_COUNT_LIST, change.getRegistryChangeGuardiansSet());
                     createConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
@@ -1389,13 +1382,14 @@ public class ImportRegisterClientsService {
                         deletedClientGroup = DAOUtils.createClientGroup(session, change.getIdOfOrg(),
                                 ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
                     }
+                    addClientMigrationLeaving(session, dbClient, change);
+
                     dbClient.setIdOfClientGroup(deletedClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
 
                     String dateDelete = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
                     String deleteCommentsAdds = String.format(MskNSIService.COMMENT_AUTO_DELETED, dateDelete);
                     commentsAddsDelete(dbClient, deleteCommentsAdds);
                     session.save(dbClient);
-                    addClientMigrationLeaving(session, dbClient, change);
                     break;
                 case MOVE_OPERATION:
                     migration = true;
@@ -1447,11 +1441,7 @@ public class ImportRegisterClientsService {
                     modifyConfig.setValue(ClientManager.FieldId.GENDER, change.getGender());
                     Date modifyDateBirth = new Date(change.getBirthDate());
                     modifyConfig.setValue(ClientManager.FieldId.BIRTH_DATE, format.format(modifyDateBirth));
-                    modifyConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, change.getCheckBenefitsSafe());
-                    if(change.getCheckBenefitsSafe()) {
-                        modifyConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, change.getBenefitDSZN());
-                        modifyConfig.setValue(ClientManager.FieldId.BENEFIT, change.getNewDiscounts());
-                    }
+                    modifyConfig.setValue(ClientManager.FieldId.CHECKBENEFITS, false);
                     modifyConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, change.getAgeTypeGroup());
 
                     ClientManager.modifyClientTransactionFree((ClientManager.ClientFieldConfigForUpdate) modifyConfig,
@@ -1556,49 +1546,21 @@ public class ImportRegisterClientsService {
 
     //@Transactional
     private void addClientMigrationEntry(Session session,Org oldOrg, Org newOrg, Client client, RegistryChange change){
-        ClientManager.checkUserOPFlag(session, oldOrg, newOrg, client.getIdOfClientGroup(), client);
-        ClientMigration migration = new ClientMigration(client, newOrg, oldOrg);
-        migration.setComment(ClientMigration.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
-        if(client.getClientGroup() != null) {
-            migration.setOldGroupName(client.getClientGroup().getGroupName());
-        }
-        migration.setNewGroupName(change.getGroupName());
-        session.save(migration);
+        ClientManager.addClientMigrationEntry(session, oldOrg, newOrg, client,
+                ClientMigration.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())), change.getGroupName());
     }
 
     //@Transactional
     private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change){
-        ClientGroupMigrationHistory migration = new ClientGroupMigrationHistory(org,client);
-        migration.setComment(ClientGroupMigrationHistory.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
-        migration.setNewGroupName(change.getGroupName());
-        if(client.getIdOfClientGroup() != null) {
-            // в методе ClientManager.modifyClientTransactionFree в этом поле сохранен новый ИД группы
-            migration.setNewGroupId(client.getIdOfClientGroup());
-        }
-        if (client.getClientGroup() != null) {
-            // так как сущность client еще не обновлена, то в поле clientGroup хранятся данные старой группы
-            migration.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
-            migration.setOldGroupName(client.getClientGroup().getGroupName());
-        }
-        session.save(migration);
+        ClientManager.createClientGroupMigrationHistory(session, client, org, client.getIdOfClientGroup(),
+                change.getGroupName(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
     }
 
-    private void addClientMigrationLeaving(Session session, Client client, RegistryChange change) throws Exception{
-        Org org = (Org) session.get(Org.class, change.getIdOfOrg());
-        ClientGroupMigrationHistory migration = new ClientGroupMigrationHistory(org, client);
-        migration.setComment(ClientGroupMigrationHistory.MODIFY_IN_REGISTRY
-                .concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
-        migration.setNewGroupName(ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup());
-        ClientGroup oldClientGroup = DAOUtils
-                .findClientGroupByGroupNameAndIdOfOrgNotIgnoreCase(session, org.getIdOfOrg(), change.getGroupName());
-        if (client.getIdOfClientGroup() != null) {
-            migration.setNewGroupId(client.getIdOfClientGroup());
-        }
-        if (oldClientGroup != null && oldClientGroup.getCompositeIdOfClientGroup() != null) {
-            migration.setOldGroupId(oldClientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-            migration.setOldGroupName(oldClientGroup.getGroupName());
-        }
-        session.save(migration);
+    private void addClientMigrationLeaving(Session session, Client client, RegistryChange change) throws Exception {
+        Org org = (Org)session.get(Org.class, change.getIdOfOrg());
+        ClientManager.createClientGroupMigrationHistory(session, client, org, ClientGroup.Predefined.CLIENT_LEAVING.getValue(),
+                ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY
+                        .concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
     }
 
     public void setChangeError(long idOfRegistryChange, Exception e) throws Exception {

@@ -39,5 +39,13 @@
         <property name="protein" column="Protein" type="double" update="false"/>
         <property name="calories" column="Calories" type="double" update="false"/>
         <property name="idOfGood" column="idofgood" type="long" />
+        <property name="usedSum" column="usedsum" type="long"/>
+        <property name="usedAmount" column="usedamount" type="long"/>
+        <property name="mobile" column="mobile" type="string" length="32" />
+        <property name="mobileGroupOnCreate" column="mobileGroupOnCreate">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.PreorderMobileGroupOnCreateType</param>
+            </type>
+        </property>
     </class>
 </hibernate-mapping>

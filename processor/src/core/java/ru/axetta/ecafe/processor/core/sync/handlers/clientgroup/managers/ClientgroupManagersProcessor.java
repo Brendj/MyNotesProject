@@ -45,7 +45,9 @@ public class ClientgroupManagersProcessor extends AbstractGroupProcessor<ResClie
         if (clientGroupManagerRequest.getItems().size() == 0) return resClientgroupManagers;
         Long nextVersion = generateNextVersion();
         for (ClientgroupManagerItem item : clientGroupManagerRequest.getItems()) {
-            addResClientgroupManagerItem(resClientgroupManagers, nextVersion, item);
+            if (!item.wrongItem()) {
+                addResClientgroupManagerItem(resClientgroupManagers, nextVersion, item);
+            }
         }
         return resClientgroupManagers;
     }

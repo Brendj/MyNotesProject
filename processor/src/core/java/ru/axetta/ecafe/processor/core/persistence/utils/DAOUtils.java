@@ -27,11 +27,14 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Se
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
+import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Payment;
+import ru.axetta.ecafe.processor.core.sync.handlers.payment.registry.Purchase;
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.sync.response.OrgFilesItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -528,6 +531,28 @@ public class DAOUtils {
 
     public static Card getCardReference(Session persistenceSession, long idOfCard) throws Exception {
         return (Card) persistenceSession.get(Card.class, idOfCard);
+    }
+
+    public static Card findCardByCardNoDoublesAllowed(Session session, Org cardOrg, Long cardNo, Long cardPrintedNo, Integer cardSignCertNum) throws Exception {
+        Criteria cr = session.createCriteria(Card.class);
+        cr.add(Restrictions.eq("cardNo", cardNo));
+        cr.add(Restrictions.in("org", findAllFriendlyOrgs(session, cardOrg.getIdOfOrg())));
+        cr.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        cr.setMaxResults(1);
+        Card card = (Card)cr.uniqueResult();
+        if (card != null) return card;
+
+        Criteria criteria = session.createCriteria(Card.class);
+        criteria.add(Restrictions.eq("cardNo", cardNo));
+        criteria.add(Restrictions.eq("cardPrintedNo", cardPrintedNo));
+        if (cardSignCertNum == null) {
+            criteria.add(Restrictions.isNull("cardSignCertNum"));
+        } else {
+            criteria.add(Restrictions.eq("cardSignCertNum", cardSignCertNum));
+        }
+        criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+        criteria.setMaxResults(1);
+        return (Card) criteria.uniqueResult();
     }
 
     public static Card findCardByCardNo(Session persistenceSession, Long cardNo) {
@@ -1318,7 +1343,8 @@ public class DAOUtils {
     {
         Criteria criteria = session.createCriteria(NotificationOrders.class);
         criteria.add(Restrictions.eq("idOfOrder", orderId));
-        criteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+        if (client != null)
+            criteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
         criteria.add(Restrictions.eq("sended", sended)); //Сообщение уже было отослано
         NotificationOrders notificationOrder = null;
         try {
@@ -2012,6 +2038,11 @@ public class DAOUtils {
         return q.getResultList();
     }
 
+    public static List<WtDiscountRule> listWtDiscountRules(EntityManager em) {
+        javax.persistence.Query q = em.createQuery("from WtDiscountRule order by priority, idOfRule asc");
+        return q.getResultList();
+    }
+
     public static List getCategoryDiscountListWithIds(EntityManager em, List<Long> idOfCategoryList) {
         javax.persistence.Query q = em
                 .createQuery("from CategoryDiscount where idOfCategoryDiscount in (:idOfCategoryList)");
@@ -2113,17 +2144,19 @@ public class DAOUtils {
     }
 
     public static void savePreorderGuidFromOrderDetail(Session session, String guid, OrderDetail orderDetail,
-            boolean cancelOrder) {
+            boolean cancelOrder, PreorderComplex preorderComplex, String itemCode) {
         if (!cancelOrder) {
             PreorderLinkOD linkOD = new PreorderLinkOD(guid, orderDetail);
             session.save(linkOD);
         }
-        Criteria criteria = session.createCriteria(PreorderComplex.class);
-        criteria.add(Restrictions.eq("guid", guid));
-        PreorderComplex preorderComplex = (PreorderComplex) criteria.uniqueResult();
+        if (preorderComplex == null) {
+            Criteria criteria = session.createCriteria(PreorderComplex.class);
+            criteria.add(Restrictions.eq("guid", guid));
+            preorderComplex = (PreorderComplex) criteria.uniqueResult();
+        }
         if (preorderComplex != null) {
-            Long sum = orderDetail.getQty() * orderDetail.getRPrice();
-            Long qty = orderDetail.getQty();
+            long sum = orderDetail.getQty() * orderDetail.getRPrice();
+            long qty = orderDetail.getQty();
             if (cancelOrder) {
                 sum = -sum;
                 qty = -qty;
@@ -2131,7 +2164,37 @@ public class DAOUtils {
             preorderComplex.setUsedSum(preorderComplex.getUsedSum() + sum);
             preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
             session.update(preorderComplex);
+
+            if (preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4) && itemCode != null) {
+                PreorderMenuDetail pmd = getPreorderMenuDetailByItemCode(preorderComplex, itemCode);
+                if (pmd != null) {
+                    long sum2 = qty * pmd.getMenuDetailPrice();
+                    pmd.setUsedSum(pmd.getUsedSum() + sum2);
+                    pmd.setUsedAmount(pmd.getUsedAmount() + qty);
+                    session.update(pmd);
+                }
+            }
         }
+    }
+
+    public static PreorderComplex findPreorderComplexByPayment(Session session, Payment payment) {
+        for (Purchase purchase : payment.getPurchases()) {
+            if (purchase.getGuidPreOrderDetail() != null) {
+                Criteria criteria = session.createCriteria(PreorderComplex.class);
+                criteria.add(Restrictions.eq("guid", purchase.getGuidPreOrderDetail()));
+                return (PreorderComplex) criteria.uniqueResult();
+            }
+        }
+        return null;
+    }
+
+    private static PreorderMenuDetail getPreorderMenuDetailByItemCode(PreorderComplex preorderComplex, String itemCode) {
+        for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
+            if (pmd.getItemCode().equals(itemCode)) {
+                return pmd;
+            }
+        }
+        return null;
     }
 
     public static void changeClientGroupNotifyViaSMS(Session session, boolean notifyViaSMS, List<Long> clientsId)
@@ -2186,9 +2249,9 @@ public class DAOUtils {
     }
 
     @SuppressWarnings("unchecked")
-    public static List<Org> getAllOrgWithGuid(EntityManager em) {
-        javax.persistence.Query q = em.createQuery("from Org where guid is not null");
-        return (List<Org>) q.getResultList();
+    public static List<Org> getAllOrgWithGuid(Session session) {
+        org.hibernate.Query q = session.createQuery("from Org where guid is not null");
+        return (List<Org>) q.list();
     }
 
     public static List<Org> findOrgsWithContract(EntityManager entityManager, Contract contract) {
@@ -4573,6 +4636,24 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.in("dtisznCode", codeList));
         return criteria.list();
+    }
+
+    public static List<ClientDtisznDiscountInfo> getCategoryDiscountListWithEndBenefitBeetwenDates(Session session, Date startDate, Date endDate) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.gt("dateEnd", startDate));
+        criteria.add(Restrictions.lt("dateEnd", endDate));
+        criteria.add(Restrictions.not(Restrictions.eq("sendnotification", true)));
+        return (List<ClientDtisznDiscountInfo>) criteria.list();
+    }
+
+    public static ClientDtisznDiscountInfo getDTISZNOneDiscountInfoByClientAndCode(Session session, Client client,
+            Long code) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.eq("dtisznCode", code));
+        criteria.addOrder(org.hibernate.criterion.Order.desc("createdDate"));
+        criteria.setMaxResults(1);
+        return (ClientDtisznDiscountInfo)criteria.uniqueResult();
     }
 
     // код льготы иное

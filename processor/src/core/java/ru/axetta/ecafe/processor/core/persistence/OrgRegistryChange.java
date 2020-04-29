@@ -59,6 +59,10 @@ public class OrgRegistryChange {
     protected String municipalDistrictFrom;
     protected String shortAddress;
     protected String shortAddressFrom;
+    protected String founder;
+    protected String founderFrom;
+    protected String subordination;
+    protected String subordinationFrom;
 
     private Set<OrgRegistryChangeItem> orgs;
 
@@ -91,7 +95,9 @@ public class OrgRegistryChange {
                              Long ekisId, Long ekisIdFrom,
                              String egissoId, String egissoIdFrom,
                              String shortAddress, String shortAddressFrom,
-                             String municipalDistrict, String municipalDistrictFrom
+                             String municipalDistrict, String municipalDistrictFrom,
+                             String founder, String founderFrom,
+                             String subordination, String subordinationFrom
             ) {
         this.idOfOrg = idOfOrg;
 
@@ -134,6 +140,10 @@ public class OrgRegistryChange {
         this.shortAddressFrom = shortAddressFrom;
         this.municipalDistrict = municipalDistrict;
         this.municipalDistrictFrom = municipalDistrictFrom;
+        this.founder = founder;
+        this.founderFrom = founderFrom;
+        this.subordination = subordination;
+        this.subordinationFrom = subordinationFrom;
     }
 
     public Long getAdditionalId() {
@@ -439,5 +449,37 @@ public class OrgRegistryChange {
 
     public void setShortAddressFrom(String shortAddressFrom) {
         this.shortAddressFrom = shortAddressFrom;
+    }
+
+    public String getFounder() {
+        return founder;
+    }
+
+    public void setFounder(String founder) {
+        this.founder = founder;
+    }
+
+    public String getFounderFrom() {
+        return founderFrom;
+    }
+
+    public void setFounderFrom(String founderFrom) {
+        this.founderFrom = founderFrom;
+    }
+
+    public String getSubordination() {
+        return subordination;
+    }
+
+    public void setSubordination(String subordination) {
+        this.subordination = subordination;
+    }
+
+    public String getSubordinationFrom() {
+        return subordinationFrom;
+    }
+
+    public void setSubordinationFrom(String subordinationFrom) {
+        this.subordinationFrom = subordinationFrom;
     }
 }

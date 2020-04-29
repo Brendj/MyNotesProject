@@ -14,11 +14,18 @@ public class VersionUtils {
 
     private static final String CARD_REGISTRATION_CLIENT_VERSION_OPTION = "ecafe.processor.card.registration.client.version";
     private static final String CARD_REGISTRATION_CLIENT_VERSION_OPTION_DEFAULT_VALUE = "2.7.86.1";
+    private static final String CARD_REGISTRATION_CLIENT_VERSION_DOUBLES_ALLOWED_VALUE = "2.7.93.1";
+
+    private static final String CARD_REGISTRATION_ALLOW_DOUBLES_OPTION = "ecafe.processor.card.registration.allow.doubles";
 
     public static int compareClientVersionForRegisterCard(Session session, Long idOfOrg) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         String clientVersionProperty =
                 runtimeContext.getPropertiesValue(CARD_REGISTRATION_CLIENT_VERSION_OPTION, CARD_REGISTRATION_CLIENT_VERSION_OPTION_DEFAULT_VALUE);
+        return compareClientVersionForRegisterCardInternal(session, idOfOrg, clientVersionProperty);
+    }
+
+    public static int compareClientVersionForRegisterCardInternal(Session session, Long idOfOrg, String clientVersionProperty) {
         OrgSync orgSync = DAOUtils.getOrgSyncForOrg(session, idOfOrg);
         if (null == orgSync) {
             return -1;
@@ -27,5 +34,14 @@ public class VersionUtils {
         VersionV2 propVersion = new VersionV2(clientVersionProperty);
         VersionV2 clVersion = new VersionV2(clientVersion);
         return clVersion.compareTo(propVersion);
+    }
+
+    public static boolean doublesAllowed(Session session, long idOfOrg) {
+        return doublesOnlyAllowed()
+                && compareClientVersionForRegisterCardInternal(session, idOfOrg, CARD_REGISTRATION_CLIENT_VERSION_DOUBLES_ALLOWED_VALUE) >= 0;
+    }
+
+    public static boolean doublesOnlyAllowed() {
+        return RuntimeContext.getInstance().getPropertiesValue(CARD_REGISTRATION_ALLOW_DOUBLES_OPTION, "false").equals("true");
     }
 }

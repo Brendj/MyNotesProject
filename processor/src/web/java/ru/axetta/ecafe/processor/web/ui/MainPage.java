@@ -301,6 +301,7 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage uosGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage autorechargePage = new BasicWorkspacePage();
     private final BasicWorkspacePage benefitPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage preorderPage = new BasicWorkspacePage();
     private final BasicWorkspacePage nsiGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage nsiGroupContingentPage = new BasicWorkspacePage();
     private final BasicWorkspacePage nsiGroupOrgPage = new BasicWorkspacePage();
@@ -6426,6 +6427,12 @@ public class MainPage implements Serializable {
         return null;
     }
 
+    public Object showPreorderGroupPage() {
+        currentWorkspacePage = preorderPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
     public Object showOrgParametersGroupPage(){
         currentWorkspacePage = orgParametersGroup;
         updateSelectedMainMenu();
@@ -10664,5 +10671,9 @@ public class MainPage implements Serializable {
         }
         updateSelectedMainMenu();
         return null;
+    }
+
+    public BasicWorkspacePage getPreorderPage() {
+        return preorderPage;
     }
 }

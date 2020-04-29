@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.sync.handlers.goodrequestezd.request.GoodR
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.HelpRequestData;
 import ru.axetta.ecafe.processor.core.sync.handlers.help.request.ResHelpRequest;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportData;
+import ru.axetta.ecafe.processor.core.sync.handlers.menu.supplier.ResMenuSupplier;
 import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.MenusCalendarData;
 import ru.axetta.ecafe.processor.core.sync.handlers.menus.calendar.ResMenusCalendar;
 import ru.axetta.ecafe.processor.core.sync.handlers.migrants.MigrantsData;
@@ -1235,6 +1236,7 @@ public class SyncResponse {
     private SyncSettingsSection syncSettingsSection;
     private EmiasSection emias;
     private EmiasSectionForARMAnswer emiasSectionForARMAnswer;
+    private ResMenuSupplier resMenuSupplier;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1258,7 +1260,8 @@ public class SyncResponse {
             ResHelpRequest resHelpRequest, HelpRequestData helpRequestData, PreOrdersFeeding preOrdersFeeding, CardRequestsData cardRequestsData,
             ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
             ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, GoodRequestEZDSection goodRequestEZDSection,
-            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer) {
+            ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer,
+            ResMenuSupplier resMenuSupplier) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1322,6 +1325,7 @@ public class SyncResponse {
         this.syncSettingsSection = syncSettingsSection;
 		this.emias = emias;
         this.emiasSectionForARMAnswer = emiasSectionForARMAnswer;
+        this.resMenuSupplier = resMenuSupplier;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1641,6 +1645,11 @@ public class SyncResponse {
         if(emias != null){
             envelopeElement.appendChild(emias.toElement(document));
         }
+
+        if (resMenuSupplier != null) {
+            envelopeElement.appendChild(resMenuSupplier.toElement(document));
+        }
+
     }
 
     public Long getIdOfOrg() {

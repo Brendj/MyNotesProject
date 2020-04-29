@@ -202,6 +202,7 @@ public class SyncServlet extends HttpServlet {
                 org = DAOReadonlyService.getInstance().findOrg(idOfOrg);
                 publicKey = DigitalSignatureUtils.convertToPublicKey(org.getPublicKey());
             } catch (Exception e) {
+                logger.error("Error convert org public key: ", e);
                 String message = ((Integer) HttpServletResponse.SC_BAD_REQUEST).toString() + ": " + e.getMessage();
                 sendError(response, syncTime, message, HttpServletResponse.SC_BAD_REQUEST);
                 return;

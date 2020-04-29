@@ -29,6 +29,8 @@ public class OrgViewPage extends BasicWorkspacePage {
     private Long idOfOrg;
     private String shortName;
     private String shortNameInfoService;
+    private String founder;
+    private String subordination;
     private String officialName;
     private String tag;
     private String address;
@@ -163,6 +165,8 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.idOfOrg = org.getIdOfOrg();
         this.shortName = org.getShortName();
         this.shortNameInfoService = org.getShortNameInfoService();
+        this.founder = org.getFounder();
+        this.subordination = org.getSubordination();
         this.officialName = org.getOfficialName();
         this.tag = org.getTag();
         this.city = org.getCity();
@@ -821,5 +825,21 @@ public class OrgViewPage extends BasicWorkspacePage {
 
     public void setUseWebArm(Boolean useWebArm) {
         this.useWebArm = useWebArm;
+    }
+
+    public String getFounder() {
+        return founder;
+    }
+
+    public void setFounder(String founder) {
+        this.founder = founder;
+    }
+
+    public String getSubordination() {
+        return subordination;
+    }
+
+    public void setSubordination(String subordination) {
+        this.subordination = subordination;
     }
 }

@@ -30,6 +30,7 @@ public class RegularPreorder {
     private Boolean deletedState;
     private String mobile;
     private RegularPreorderState state;
+    private PreorderMobileGroupOnCreateType mobileGroupOnCreate;
 
     public RegularPreorder() {
 
@@ -37,7 +38,8 @@ public class RegularPreorder {
 
     public RegularPreorder(Client client, Date startDate, Date endDate, String itemCode, Integer idOfComplex,
             Integer amount, String itemName, Boolean monday, Boolean tuesday, Boolean wednesday, Boolean thursday,
-            Boolean friday, Boolean saturday, Long price, String guardianMobile, RegularPreorderState state) {
+            Boolean friday, Boolean saturday, Long price, String guardianMobile, RegularPreorderState state,
+            PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
         this.client = client;
         this.startDate = startDate;
         this.endDate = endDate;
@@ -57,6 +59,7 @@ public class RegularPreorder {
         this.deletedState = false;
         this.mobile = guardianMobile;
         this.state = state;
+        this.mobileGroupOnCreate = mobileGroupOnCreate;
     }
 
     @Override
@@ -227,5 +230,13 @@ public class RegularPreorder {
 
     public void setState(RegularPreorderState state) {
         this.state = state;
+    }
+
+    public PreorderMobileGroupOnCreateType getMobileGroupOnCreate() {
+        return mobileGroupOnCreate;
+    }
+
+    public void setMobileGroupOnCreate(PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
+        this.mobileGroupOnCreate = mobileGroupOnCreate;
     }
 }
