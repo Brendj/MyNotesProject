@@ -870,17 +870,11 @@ public class DAOReadonlyService {
 
     public Set<WtMenuGroup> getMenuGroupsSetFromVersion(Long version, Contragent contragent) {
         try {
-            //Query query = entityManager.createQuery(
-            //        "SELECT menuGroup from WtMenuGroup menuGroup left join menuGroup.menuGroupMenus menuGroupMenus "
-            //                + "left join menuGroupMenus.menu menu left join menu.orgs orgs "
-            //                + "where menuGroup.version > :version AND "
-            //                + "menuGroup.contragent = :contragent AND :org IN elements(orgs)");
             Query query = entityManager.createQuery(
                     "SELECT menuGroup from WtMenuGroup menuGroup where menuGroup.version > :version AND "
                             + "menuGroup.contragent = :contragent");
             query.setParameter("version", version);
             query.setParameter("contragent", contragent);
-            //query.setParameter("org", org);
             List<WtMenuGroup> menuGroups = query.getResultList();
             return new HashSet<>(menuGroups);
         } catch (Exception e) {
@@ -892,8 +886,12 @@ public class DAOReadonlyService {
 
     public Set<WtMenu> getMenusSetFromVersion(Long version, Contragent contragent, Org org) {
         try {
-            Query query = entityManager.createQuery("SELECT menu from WtMenu menu where menu.version > :version "
-                    + "AND menu.contragent = :contragent AND :org IN elements(menu.orgs)");
+            Query query = entityManager.createQuery("SELECT menu from WtMenu menu "
+                    + "LEFT JOIN FETCH menu.wtOrgGroup orgGroup "
+                    + "where menu.version > :version "
+                    + "AND menu.contragent = :contragent "
+                    + "AND (:org IN elements(menu.orgs) "
+                    + "OR :org IN elements(orgGroup.orgs))");
             query.setParameter("version", version);
             query.setParameter("contragent", contragent);
             query.setParameter("org", org);
@@ -988,5 +986,50 @@ public class DAOReadonlyService {
 
         Object result = query.getSingleResult();
         return result != null ? ((BigInteger) result).longValue() : 0L;
+    }
+
+    public List<WtDish> getMenuDishes(WtMenu menu) {
+        Session session = entityManager.unwrap(Session.class);
+        org.hibernate.Query query = session
+                .createQuery("SELECT dish FROM WtDish dish LEFT JOIN dish.menuGroupMenus mgm "
+                        + "LEFT JOIN mgm.menu menu where menu = :menu");
+        query.setParameter("menu", menu);
+        return query.list();
+    }
+
+    public Long getMenuGroupIdByMenuAndDishIds (Long menuId, Long dishId) {
+        Query query = entityManager.createNativeQuery("SELECT mg.id FROM cf_wt_menu_groups mg "
+                + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgr.idofmenugroup = mg.id "
+                + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
+                + "LEFT JOIN cf_wt_dishes d ON mgd.idofdish = d.idofdish "
+                + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
+                + "WHERE m.idofmenu = :idOfMenu AND d.idofdish = :idOfDish");
+
+        query.setParameter("idOfMenu", menuId);
+        query.setParameter("idOfDish", dishId);
+
+        Object result = query.getSingleResult();
+        return result != null ? ((BigInteger) result).longValue() : 0L;
+    }
+
+    public Set<WtComplexExcludeDays> getExcludeDaysSetFromVersion(Long version, Contragent contragent, Org org) {
+        try {
+            Query query = entityManager.createQuery(
+                    "SELECT excludeDays from WtComplexExcludeDays excludeDays "
+                            + "LEFT JOIN FETCH excludeDays.complex complex "
+                            + "LEFT JOIN FETCH complex.wtOrgGroup orgGroup "
+                            + "WHERE excludeDays.version > :version "
+                            + "AND complex.contragent = :contragent "
+                            + "AND (:org IN elements(complex.orgs) "
+                            + "OR :org IN elements(orgGroup.orgs))");
+            query.setParameter("version", version);
+            query.setParameter("contragent", contragent);
+            query.setParameter("org", org);
+            List<WtComplexExcludeDays> excludeDays = query.getResultList();
+            return new HashSet<>(excludeDays);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
     }
 }
