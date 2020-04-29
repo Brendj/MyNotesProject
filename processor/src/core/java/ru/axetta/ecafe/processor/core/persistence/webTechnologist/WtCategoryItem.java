@@ -15,23 +15,22 @@ import java.util.Set;
 @Entity
 @Table(name = "cf_wt_category_items")
 public class WtCategoryItem {
-
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idOfCategoryItem")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cf_wt_category_items_idofcategoryitem_seq")
+    @Column(name = "idofcategoryitem")
     private Long idOfCategoryItem;
 
-    @Column(name = "createDate")
+    @Column(name = "createdate")
     private Date createDate;
 
-    @Column(name = "lastUpdate")
+    @Column(name = "lastupdate")
     private Date lastUpdate;
 
     @Column(name = "version")
     private Long version;
 
     @ManyToOne
-    @JoinColumn(name = "idOfUser")
+    @JoinColumn(name = "idofuser")
     private User user;
 
     @Column(name = "guid")

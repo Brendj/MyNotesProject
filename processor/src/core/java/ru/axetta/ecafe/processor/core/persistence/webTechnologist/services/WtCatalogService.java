@@ -27,6 +27,7 @@ import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
+import java.util.UUID;
 
 ;
 
@@ -37,25 +38,19 @@ public class WtCatalogService {
 
     public List<WtAgeGroupItem> getAllAgeGroupItems() {
         Session session = null;
-        Transaction transaction = null;
         List<ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
-            transaction = session.beginTransaction();
 
             Criteria criteria = session.createCriteria(WtAgeGroupItem.class);
             criteria.addOrder(Order.asc("createDate"));
             result = criteria.list();
-
-            transaction.commit();
-            transaction = null;
 
             return result;
         } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
-            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
     }
@@ -65,11 +60,10 @@ public class WtCatalogService {
             return getAllAgeGroupItems();
         }
         Session session = null;
-        Transaction transaction = null;
+
         List<WtAgeGroupItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
-            transaction = session.beginTransaction();
 
             Criteria criteria = session.createCriteria(WtAgeGroupItem.class);
             criteria.add(Restrictions.ilike("description", description, MatchMode.ANYWHERE));
@@ -77,15 +71,11 @@ public class WtCatalogService {
 
             result = criteria.list();
 
-            transaction.commit();
-            transaction = null;
-
             return result;
         } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
-            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
     }
@@ -127,25 +117,18 @@ public class WtCatalogService {
 
     public List<WtTypeOfProductionItem> getAllTypeOfProductionItems() {
         Session session = null;
-        Transaction transaction = null;
         List<WtTypeOfProductionItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
-            transaction = session.beginTransaction();
 
             Criteria criteria = session.createCriteria(WtTypeOfProductionItem.class);
             criteria.addOrder(Order.asc("createDate"));
             result = criteria.list();
-
-            transaction.commit();
-            transaction = null;
-
             return result;
         } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
-            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
     }
@@ -155,11 +138,9 @@ public class WtCatalogService {
             return getAllTypeOfProductionItems();
         }
         Session session = null;
-        Transaction transaction = null;
         List<WtTypeOfProductionItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
-            transaction = session.beginTransaction();
 
             Criteria criteria = session.createCriteria(WtTypeOfProductionItem.class);
             criteria.add(Restrictions.ilike("description", description, MatchMode.ANYWHERE));
@@ -167,15 +148,11 @@ public class WtCatalogService {
 
             result = criteria.list();
 
-            transaction.commit();
-            transaction = null;
-
             return result;
         } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
-            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
     }
@@ -238,11 +215,9 @@ public class WtCatalogService {
             return getAllCategoryItem();
         }
         Session session = null;
-        Transaction transaction = null;
         List<WtCategoryItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
-            transaction = session.beginTransaction();
 
             Criteria criteria = session.createCriteria(WtCategoryItem.class);
             criteria.add(Restrictions.ilike("description", description, MatchMode.ANYWHERE));
@@ -250,15 +225,11 @@ public class WtCatalogService {
 
             result = criteria.list();
 
-            transaction.commit();
-            transaction = null;
-
             return result;
         } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
-            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
     }
@@ -285,6 +256,7 @@ public class WtCatalogService {
             item.setUser(user);
             item.setDescription(description);
             item.setVersion(nextVersion);
+            item.setGuid(UUID.randomUUID().toString());
 
             session.save(item);
             transaction.commit();
@@ -302,36 +274,28 @@ public class WtCatalogService {
 
     public List<WtGroupItem> getAllGroupItems() {
         Session session = null;
-        Transaction transaction = null;
         List<WtGroupItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
-            transaction = session.beginTransaction();
 
             Criteria criteria = session.createCriteria(WtGroupItem.class);
             criteria.addOrder(Order.asc("createDate"));
             result = criteria.list();
-
-            transaction.commit();
-            transaction = null;
 
             return result;
         } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
-            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
     }
 
     public List<WtGroupItem> findGroupItemsByDescription(String description) {
         Session session = null;
-        Transaction transaction = null;
         List<WtGroupItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
-            transaction = session.beginTransaction();
 
             Criteria criteria = session.createCriteria(WtGroupItem.class);
             criteria.add(Restrictions.ilike("description", description, MatchMode.ANYWHERE));
@@ -339,15 +303,11 @@ public class WtCatalogService {
 
             result = criteria.list();
 
-            transaction.commit();
-            transaction = null;
-
             return result;
         } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
-            HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
         }
     }
