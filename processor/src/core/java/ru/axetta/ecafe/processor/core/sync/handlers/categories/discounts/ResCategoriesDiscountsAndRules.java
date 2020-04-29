@@ -52,15 +52,18 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
         Set<Org> orgs = getProcessedOrgs(session, idOfOrg, manyOrgs);
         existOrgWithEmptyCategoryOrgSet = false;
         for (Org org : orgs) {
-            addRulesForOrgWithCategoryOrgSet(discountRules, org);
             if (mainOrg.getUseWebArm() && org.getUseWebArm()) {
                 addWtRulesForOrgWithCategoryOrgSet(wtDiscountRules, org);
             }
+            else {
+                addRulesForOrgWithCategoryOrgSet(discountRules, org);
+            }
         }
         if (existOrgWithEmptyCategoryOrgSet) {
-            addRulesWithEmptyCategoryOrgSet(discountRules, idOfOrg);
             if (mainOrg.getUseWebArm()) {
                 addWtRulesWithEmptyCategoryOrgSet(wtDiscountRules, idOfOrg);
+            } else {
+                addRulesWithEmptyCategoryOrgSet(discountRules, idOfOrg);
             }
         }
     }
@@ -521,7 +524,7 @@ public class ResCategoriesDiscountsAndRules implements AbstractToElement {
             Set<WtComplex> complexes = wtDiscountRule.getComplexes();
             StringBuilder sb = new StringBuilder();
             for (WtComplex complex : complexes) {
-                sb.append(complex.getIdOfComplex()).append("=").append(complexes.size()).append(";");
+                sb.append(complex.getIdOfComplex()).append("=1;");
             }
             return sb.toString();
         }
