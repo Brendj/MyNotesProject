@@ -25,7 +25,7 @@ import java.util.Objects;
 public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileService {
     private static final Logger logger = LoggerFactory.getLogger(ImportRegisterNSI3ServiceKafkaWrapper.class);
 
-    private final ImportRegisterFileService innerServices = RuntimeContext.getAppContext().getBean("ImportRegisterNSI3Service", ImportRegisterNSI3Service.class);
+    private final ImportRegisterNSI3Service innerServices = RuntimeContext.getAppContext().getBean("ImportRegisterNSI3Service", ImportRegisterNSI3Service.class);
 
     private final boolean workWithKafka = workWithKafka();
     protected final String DROP_INDEX = "drop index if exists cf_mh_persons_ekisid_idx";
@@ -43,7 +43,11 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
 
     @Override
     protected void fillOrgGuids(Query query, ImportRegisterMSKClientsService.OrgRegistryGUIDInfo orgGuids) {
-        innerServices.fillOrgGuids(query, orgGuids);
+        if(!workWithKafka) {
+            innerServices.fillOrgGuids(query, orgGuids);
+        } else {
+            query.setParameterList("guids", orgGuids.getOrgEkisIdsLong());
+        }
     }
 
     @Override
@@ -57,17 +61,17 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
             return innerServices.getQueryString();
         } else {
             return "WITH pupils_info AS (\n"
-                    + "       SELECT DISTINCT ON (p.personguid) p.personguid,\n"
-                    + "              o.guid,\n"
+                    + "       SELECT DISTINCT ON (p.personguid) p.personguid AS guid,\n"
+                    + "              o.guid AS guidOfOrg,\n"
                     + "              p.firstname,\n"
-                    + "              p.patronymic,\n"
-                    + "              p.lastname,\n"
-                    + "              extract(EPOCH FROM p.birthdate) * 1000 AS birthdate,\n"
+                    + "              p.patronymic AS secondname,\n"
+                    + "              p.lastname AS familyName,\n"
+                    + "              to_char(p.birthdate, 'DD.MM.YYYY') AS birthdate,\n"
                     + "              g.title AS gender,\n"
                     + "              prll.title AS parallel,\n"
-                    + "              p.classname,\n"
-                    + "              p.deletestate,\n"
-                    + "              el.title AS agegroup,\n"
+                    + "              p.classname AS group,\n"
+                    + "              p.deletestate AS deleted,\n"
+                    + "              el.title AS ageTypeGroup,\n"
                     + "              p.organizationid\n"
                     + "       FROM cf_mh_persons AS p\n"
                     + "                   JOIN cf_orgs AS o ON p.organizationid = o.organizationIdFromNSI\n"
@@ -110,17 +114,20 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            String fioCondition = (StringUtils.isNotBlank(familyName) ? " and pi.patronymic like :surname" : "") +
-                    (StringUtils.isNotBlank(firstName) ? " and pi.firstname like :firstname" : "") +
-                    (StringUtils.isNotBlank(secondName) ? " and pi.lastname like :secondname" : "");
+            String fioCondition = (StringUtils.isNotBlank(familyName) ? " and pi.patronymic like :surname" : "") + (
+                    StringUtils.isNotBlank(firstName) ? " and pi.firstname like :firstname" : "") + (StringUtils.isNotBlank(secondName) ? " and pi.lastname like :secondname" : "");
             String str_query = getQueryString() + fioCondition;
 
             Query query = session.createSQLQuery(str_query);
             fillOrgGuids(query, orgGuids);
 
-            if (StringUtils.isNotBlank(familyName)) query.setParameter("surname", familyName);
-            if (StringUtils.isNotBlank(firstName)) query.setParameter("firstname", firstName);
-            if (StringUtils.isNotBlank(secondName)) query.setParameter("secondname", secondName);
+            if (StringUtils.isNotBlank(familyName))
+                query.setParameter("surname", familyName);
+            if (StringUtils.isNotBlank(firstName))
+                query.setParameter("firstname", firstName);
+            if (StringUtils.isNotBlank(secondName))
+                query.setParameter("secondname", secondName);
+
             List<Object[]> list = query.list();
 
             transaction.commit();
@@ -128,22 +135,25 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
 
             for (Object[] row : list) {
                 ImportRegisterMSKClientsService.ExpandedPupilInfo pupil = new ImportRegisterMSKClientsService.ExpandedPupilInfo();
-                pupil.guid = StringUtils.trim((String) row[0]);
-                pupil.guidOfOrg = (String) row[1];
-                pupil.firstName = StringUtils.trim((String) row[2]);
-                pupil.secondName = StringUtils.trim((String) row[3]);
-                pupil.familyName = StringUtils.trim((String) row[4]);
-                pupil.birthDate = (String) row[5];
-                pupil.gender = (String) row[6];
-                pupil.parallel = (String) row[7];
-                pupil.group = StringUtils.trim((String) row[8]);
-                pupil.deleted = Boolean.parseBoolean((String) row[9]);
-                pupil.ageTypeGroup = (String) row[10];
+                pupil.guid = HibernateUtils.getDbString(row[0]);
+                pupil.guidOfOrg = HibernateUtils.getDbString(row[1]);
+                pupil.firstName = HibernateUtils.getDbString(row[2]);
+                pupil.secondName = HibernateUtils.getDbString(row[3]);
+                pupil.familyName = HibernateUtils.getDbString(row[4]);
+                pupil.birthDate = HibernateUtils.getDbString(row[5]);
+                pupil.gender =  HibernateUtils.getDbString(row[6]);
+                pupil.parallel = HibernateUtils.getDbString(row[7]);
+                pupil.group = HibernateUtils.getDbString(row[8]);
+                pupil.deleted = Boolean.parseBoolean(HibernateUtils.getDbString(row[9]));
+                pupil.ageTypeGroup = HibernateUtils.getDbString(row[10]);
 
                 pupils.add(pupil);
             }
 
             return pupils;
+        } catch (Exception e) {
+            logger.error("Error when process data about client GUID from external source: ", e);
+            throw e;
         } finally {
             HibernateUtils.rollback(transaction, getLogger());
             HibernateUtils.close(session, getLogger());

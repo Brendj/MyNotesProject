@@ -483,10 +483,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     cl == null ? null : cl.getPerson().getFirstName(), updateClient);
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SECONDNAME, pupil.getSecondName(),
                     cl == null ? null : cl.getPerson().getSecondName(), updateClient);
-            if (pupil.getGender() != null) {
-                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GENDER, pupil.getGender(),
-                        cl == null || cl.getGender() == null ? null : cl.getGender() == 0 ? "Женский" : "Мужской", updateClient);
-            }
+            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GENDER, pupil.getGender() == null ?  "Мужской" : pupil.getGender(),
+                        cl == null || cl.getGender() == null ? "Мужской" : cl.getGender() == 0 ? "Женский" : "Мужской", updateClient);
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
             updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BIRTH_DATE, pupil.getBirthDate(),
@@ -1149,10 +1147,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     }
 
     public static class OrgRegistryGUIDInfo {
-
         Set<String> orgGuids;
         String guidInfo;
         private Set<String> orgEkisIds;
+        private Set<Long> orgEkisIdsLong; // TODO: пересмотреть необходимость держать 2 одинаковых по сути поля, но с разными типами данных
         private String ekisInfo;
 
         public OrgRegistryGUIDInfo(Org org) {
@@ -1160,6 +1158,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             orgGuids = new HashSet<String>();
             guidInfo = "";
             orgEkisIds = new HashSet<>();
+            orgEkisIdsLong = new HashSet<>();
             ekisInfo = "";
             for (Org o : orgs) {
                 if (StringUtils.isEmpty(o.getGuid())) {
@@ -1176,7 +1175,16 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                 if (ekisInfo.length() > 0) ekisInfo += ", ";
                 ekisInfo += o.getOrgNumberInName() + ": " + o.getEkisId().toString();
                 orgEkisIds.add(o.getEkisId().toString());
+                orgEkisIdsLong.add(o.getEkisId());
             }
+        }
+
+        public Set<Long> getOrgEkisIdsLong() {
+            return orgEkisIdsLong;
+        }
+
+        public void setOrgEkisIdsLong(Set<Long> orgEkisIdsLong) {
+            this.orgEkisIdsLong = orgEkisIdsLong;
         }
 
         public Set<String> getOrgGuids() {
@@ -1610,7 +1618,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             //  parseClients(synchDate, date, org, pupils, performChanges, logBuffer, manualCheckout);
             //  !!!!!!!!!!
             //  !!!!!!!!!!
-            saveClients(synchDate, date, System.currentTimeMillis(), org, pupils, logBuffer);
+            saveClients(synchDate, date, System.currentTimeMillis(), org, pupils, logBuffer, false);
             //DAOService.getInstance().updateOrgRegistrySync(idOfOrg, new Date().getTime());
             return logBuffer;
         } catch (Exception e) {
