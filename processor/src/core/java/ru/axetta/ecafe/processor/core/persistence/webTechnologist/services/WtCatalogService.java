@@ -2,10 +2,14 @@
  * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs;
+package ru.axetta.ecafe.processor.core.persistence.webTechnologist.services;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.User;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtTypeOfProductionItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -16,27 +20,30 @@ import org.hibernate.criterion.MatchMode;
 import org.hibernate.criterion.Order;
 import org.hibernate.criterion.Projections;
 import org.hibernate.criterion.Restrictions;
+import org.hibernate.sql.JoinType;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Component;
 
 import java.util.Date;
 import java.util.List;
-import java.util.UUID;
+
+;
 
 @Component
-public class HardCodeCatalogService {
-    private static Logger logger = LoggerFactory.getLogger(HardCodeCatalogService.class);
+public class WtCatalogService {
+    // TODO проверить код на повторы в DAOService и DAOUtils
+    private static Logger logger = LoggerFactory.getLogger(WtCatalogService.class);
 
-    public List<WTAgeGroupItem> getAllAgeGroupItems() {
+    public List<WtAgeGroupItem> getAllAgeGroupItems() {
         Session session = null;
         Transaction transaction = null;
-        List<WTAgeGroupItem> result;
+        List<ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            Criteria criteria = session.createCriteria(WTAgeGroupItem.class);
+            Criteria criteria = session.createCriteria(WtAgeGroupItem.class);
             criteria.addOrder(Order.asc("createDate"));
             result = criteria.list();
 
@@ -44,7 +51,7 @@ public class HardCodeCatalogService {
             transaction = null;
 
             return result;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
@@ -53,30 +60,28 @@ public class HardCodeCatalogService {
         }
     }
 
-    public List<WTAgeGroupItem> findAgeGroupItemsByDescriptionOrGUID(String description, String guid) {
+    public List<WtAgeGroupItem> findAgeGroupItemsByDescription(String description) {
+        if(StringUtils.isEmpty(description)){
+            return getAllAgeGroupItems();
+        }
         Session session = null;
         Transaction transaction = null;
-        List<WTAgeGroupItem> result;
+        List<WtAgeGroupItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            Criteria criteria = session.createCriteria(WTAgeGroupItem.class);
-            if(!StringUtils.isEmpty(guid)) {
-                criteria.add(Restrictions.ilike("GUID", guid, MatchMode.ANYWHERE));
-            }
-            if(!StringUtils.isEmpty(description)){
-                criteria.add(Restrictions.ilike("description", description, MatchMode.ANYWHERE));
-            }
-
+            Criteria criteria = session.createCriteria(WtAgeGroupItem.class);
+            criteria.add(Restrictions.ilike("description", description, MatchMode.ANYWHERE));
             criteria.addOrder(Order.asc("createDate"));
+
             result = criteria.list();
 
             transaction.commit();
             transaction = null;
 
             return result;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
@@ -85,10 +90,11 @@ public class HardCodeCatalogService {
         }
     }
 
-    public WTAgeGroupItem createAgeGroupItem(String description, User user) throws Exception {
-        if(StringUtils.isBlank(description)){
+    public WtAgeGroupItem createAgeGroupItem(
+            String description, User user) throws Exception {
+        if (StringUtils.isBlank(description)) {
             throw new IllegalArgumentException("Invalid description (NULL or is empty)");
-        } else if(user == null){
+        } else if (user == null) {
             throw new IllegalArgumentException("User is NULL");
         }
 
@@ -98,9 +104,11 @@ public class HardCodeCatalogService {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            WTAgeGroupItem item = new WTAgeGroupItem();
-            Long nextVersion =  getLastVersionAgeGroup(session) + 1L;
-            fillItem(item, description, user, nextVersion);
+            WtAgeGroupItem item = new WtAgeGroupItem();
+            Long nextVersion = getLastVersionAgeGroup(session) + 1L;
+
+            item.setDescription(description);
+            item.setVersion(nextVersion);
 
             session.save(item);
 
@@ -117,28 +125,15 @@ public class HardCodeCatalogService {
         }
     }
 
-    private AbstractHardCodeCatalogItem fillItem(AbstractHardCodeCatalogItem item, String description, User user, Long version) {
-        Date createdDate = new Date();
-
-        item.setCreateDate(createdDate);
-        item.setLastUpdate(createdDate);
-        item.setUser(user);
-        item.setDescription(description);
-        item.setGUID(UUID.randomUUID().toString());
-        item.setVersion(version);
-
-        return item;
-    }
-
-    public List<WTTypeOfProductionItem> getAllTypeOfProductionItems() {
+    public List<WtTypeOfProductionItem> getAllTypeOfProductionItems() {
         Session session = null;
         Transaction transaction = null;
-        List<WTTypeOfProductionItem> result;
+        List<WtTypeOfProductionItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            Criteria criteria = session.createCriteria(WTTypeOfProductionItem.class);
+            Criteria criteria = session.createCriteria(WtTypeOfProductionItem.class);
             criteria.addOrder(Order.asc("createDate"));
             result = criteria.list();
 
@@ -146,7 +141,7 @@ public class HardCodeCatalogService {
             transaction = null;
 
             return result;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
@@ -155,30 +150,28 @@ public class HardCodeCatalogService {
         }
     }
 
-    public List<WTTypeOfProductionItem> findProductionTypeItemsByDescriptionOrGUID(String description, String guid) {
+    public List<WtTypeOfProductionItem> findProductionTypeItemsByDescription(String description) {
+        if(StringUtils.isEmpty(description)){
+            return getAllTypeOfProductionItems();
+        }
         Session session = null;
         Transaction transaction = null;
-        List<WTTypeOfProductionItem> result;
+        List<WtTypeOfProductionItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            Criteria criteria = session.createCriteria(WTTypeOfProductionItem.class);
-            if(!StringUtils.isEmpty(guid)) {
-                criteria.add(Restrictions.ilike("GUID", guid, MatchMode.ANYWHERE));
-            }
-            if(!StringUtils.isEmpty(description)){
-                criteria.add(Restrictions.ilike("description", description, MatchMode.ANYWHERE));
-            }
-
+            Criteria criteria = session.createCriteria(WtTypeOfProductionItem.class);
+            criteria.add(Restrictions.ilike("description", description, MatchMode.ANYWHERE));
             criteria.addOrder(Order.asc("createDate"));
+
             result = criteria.list();
 
             transaction.commit();
             transaction = null;
 
             return result;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
@@ -187,10 +180,10 @@ public class HardCodeCatalogService {
         }
     }
 
-    public WTTypeOfProductionItem createProductTypeItem(String description, User user) throws Exception {
-        if(StringUtils.isBlank(description)){
+    public WtTypeOfProductionItem createProductTypeItem(String description, User user) throws Exception {
+        if (StringUtils.isBlank(description)) {
             throw new IllegalArgumentException("Invalid description (NULL or is empty)");
-        } else if(user == null){
+        } else if (user == null) {
             throw new IllegalArgumentException("User is NULL");
         }
 
@@ -200,9 +193,11 @@ public class HardCodeCatalogService {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            WTTypeOfProductionItem item = new WTTypeOfProductionItem();
+            WtTypeOfProductionItem item = new WtTypeOfProductionItem();
             Long nextVersion = getLastVersionProductionType(session) + 1L;
-            fillItem(item, description, user, nextVersion);
+
+            item.setDescription(description);
+            item.setVersion(nextVersion);
 
             session.save(item);
             transaction.commit();
@@ -218,23 +213,48 @@ public class HardCodeCatalogService {
         }
     }
 
-    public List<WTCategoryItem> getAllCategoryItem() {
+    public List<WtCategoryItem> getAllCategoryItem() {
+        Session session = null;
+        List<WtCategoryItem> result;
+        try {
+            session = RuntimeContext.getInstance().createReportPersistenceSession();
+
+            Criteria criteria = session.createCriteria(WtCategoryItem.class);
+            criteria.createAlias("user", "u", JoinType.INNER_JOIN);
+            criteria.addOrder(Order.asc("createDate"));
+            result = criteria.list();
+
+            return result;
+        } catch (Exception e) {
+            logger.error("", e);
+            throw e;
+        } finally {
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    public List<WtCategoryItem> findCategoryItemByDescription(String description) {
+        if(StringUtils.isEmpty(description)){
+            return getAllCategoryItem();
+        }
         Session session = null;
         Transaction transaction = null;
-        List<WTCategoryItem> result;
+        List<WtCategoryItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            Criteria criteria = session.createCriteria(WTCategoryItem.class);
+            Criteria criteria = session.createCriteria(WtCategoryItem.class);
+            criteria.add(Restrictions.ilike("description", description, MatchMode.ANYWHERE));
             criteria.addOrder(Order.asc("createDate"));
+
             result = criteria.list();
 
             transaction.commit();
             transaction = null;
 
             return result;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
@@ -243,42 +263,10 @@ public class HardCodeCatalogService {
         }
     }
 
-    public List<WTCategoryItem> findCategoryItemByDescriptionOrGUID(String description, String guid) {
-        Session session = null;
-        Transaction transaction = null;
-        List<WTCategoryItem> result;
-        try {
-            session = RuntimeContext.getInstance().createReportPersistenceSession();
-            transaction = session.beginTransaction();
-
-            Criteria criteria = session.createCriteria(WTCategoryItem.class);
-            if(!StringUtils.isEmpty(guid)) {
-                criteria.add(Restrictions.ilike("GUID", guid, MatchMode.ANYWHERE));
-            }
-            if(!StringUtils.isEmpty(description)){
-                criteria.add(Restrictions.ilike("description", description, MatchMode.ANYWHERE));
-            }
-
-            criteria.addOrder(Order.asc("createDate"));
-            result = criteria.list();
-
-            transaction.commit();
-            transaction = null;
-
-            return result;
-        } catch (Exception e){
-            logger.error("", e);
-            throw e;
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
-        }
-    }
-
-    public WTCategoryItem createCategoryItem(String description, User user) throws Exception {
-        if(StringUtils.isBlank(description)){
+    public WtCategoryItem createCategoryItem(String description, User user) throws Exception {
+        if (StringUtils.isBlank(description)) {
             throw new IllegalArgumentException("Invalid description (NULL or is empty)");
-        } else if(user == null){
+        } else if (user == null) {
             throw new IllegalArgumentException("User is NULL");
         }
 
@@ -288,9 +276,15 @@ public class HardCodeCatalogService {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            WTCategoryItem item = new WTCategoryItem();
+            WtCategoryItem item = new WtCategoryItem();
             Long nextVersion = getLastVersionCategoryItem(session) + 1L;
-            fillItem(item, description, user, nextVersion);
+            Date createdDate = new Date();
+
+            item.setCreateDate(createdDate);
+            item.setLastUpdate(createdDate);
+            item.setUser(user);
+            item.setDescription(description);
+            item.setVersion(nextVersion);
 
             session.save(item);
             transaction.commit();
@@ -306,15 +300,15 @@ public class HardCodeCatalogService {
         }
     }
 
-    public List<WTGroupItem> getAllGroupItems() {
+    public List<WtGroupItem> getAllGroupItems() {
         Session session = null;
         Transaction transaction = null;
-        List<WTGroupItem> result;
+        List<WtGroupItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            Criteria criteria = session.createCriteria(WTGroupItem.class);
+            Criteria criteria = session.createCriteria(WtGroupItem.class);
             criteria.addOrder(Order.asc("createDate"));
             result = criteria.list();
 
@@ -322,7 +316,7 @@ public class HardCodeCatalogService {
             transaction = null;
 
             return result;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
@@ -331,30 +325,25 @@ public class HardCodeCatalogService {
         }
     }
 
-    public List<WTGroupItem> findGroupItemsByDescriptionOrGUID(String description, String guid) {
+    public List<WtGroupItem> findGroupItemsByDescription(String description) {
         Session session = null;
         Transaction transaction = null;
-        List<WTGroupItem> result;
+        List<WtGroupItem> result;
         try {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            Criteria criteria = session.createCriteria(WTGroupItem.class);
-            if(!StringUtils.isEmpty(guid)) {
-                criteria.add(Restrictions.ilike("GUID", guid, MatchMode.ANYWHERE));
-            }
-            if(!StringUtils.isEmpty(description)){
-                criteria.add(Restrictions.ilike("description", description, MatchMode.ANYWHERE));
-            }
-
+            Criteria criteria = session.createCriteria(WtGroupItem.class);
+            criteria.add(Restrictions.ilike("description", description, MatchMode.ANYWHERE));
             criteria.addOrder(Order.asc("createDate"));
+
             result = criteria.list();
 
             transaction.commit();
             transaction = null;
 
             return result;
-        } catch (Exception e){
+        } catch (Exception e) {
             logger.error("", e);
             throw e;
         } finally {
@@ -363,10 +352,10 @@ public class HardCodeCatalogService {
         }
     }
 
-    public WTGroupItem createGroupItem(String description, User user) throws Exception {
-        if(StringUtils.isBlank(description)){
+    public WtGroupItem createGroupItem(String description, User user) throws Exception {
+        if (StringUtils.isBlank(description)) {
             throw new IllegalArgumentException("Invalid description (NULL or is empty)");
-        } else if(user == null){
+        } else if (user == null) {
             throw new IllegalArgumentException("User is NULL");
         }
 
@@ -376,9 +365,11 @@ public class HardCodeCatalogService {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            WTGroupItem item = new WTGroupItem();
+            WtGroupItem item = new WtGroupItem();
             Long nextVersion = getLastVersionGroupItem(session) + 1L;
-            fillItem(item, description, user, nextVersion);
+
+            item.setDescription(description);
+            item.setVersion(nextVersion);
 
             session.save(item);
             transaction.commit();
@@ -395,28 +386,28 @@ public class HardCodeCatalogService {
     }
 
     public Long getLastVersionAgeGroup(Session session) {
-        Criteria criteria = session.createCriteria(WTAgeGroupItem.class);
+        Criteria criteria = session.createCriteria(WtAgeGroupItem.class);
         criteria.setProjection(Projections.max("version"));
         Long result = (Long) criteria.uniqueResult();
         return result == null ? 0L : result;
     }
 
     private Long getLastVersionProductionType(Session session) {
-        Criteria criteria = session.createCriteria(WTTypeOfProductionItem.class);
+        Criteria criteria = session.createCriteria(WtTypeOfProductionItem.class);
         criteria.setProjection(Projections.max("version"));
         Long result = (Long) criteria.uniqueResult();
         return result == null ? 0L : result;
     }
 
     private Long getLastVersionCategoryItem(Session session) {
-        Criteria criteria = session.createCriteria(WTCategoryItem.class);
+        Criteria criteria = session.createCriteria(WtCategoryItem.class);
         criteria.setProjection(Projections.max("version"));
         Long result = (Long) criteria.uniqueResult();
         return result == null ? 0L : result;
     }
 
-    private Long getLastVersionGroupItem(Session session){
-        Criteria criteria = session.createCriteria(WTGroupItem.class);
+    private Long getLastVersionGroupItem(Session session) {
+        Criteria criteria = session.createCriteria(WtGroupItem.class);
         criteria.setProjection(Projections.max("version"));
         Long result = (Long) criteria.uniqueResult();
         return result == null ? 0L : result;

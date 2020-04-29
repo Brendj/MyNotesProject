@@ -8,7 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="categoryItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.CategoryItemCatalogListPage"--%>
+<%--@elvariable id="categoryItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.catalog.CategoryItemCatalogListPage"--%>
 <h:panelGrid id="webTechnologistcategoryItemCatalogItemListPagePanelGrid" binding="#{categoryItemCatalogListPage.pageComponent}"
              styleClass="borderless-grid">
     <rich:simpleTogglePanel label="Фильтр " switchType="client" eventsQueue="mainFormEventsQueue" opened="false"
@@ -16,8 +16,6 @@
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Название элемента" styleClass="output-text" />
             <h:inputText value="#{categoryItemCatalogListPage.descriptionFilter}" styleClass="input-text" />
-            <h:outputText escape="true" value="GUID элемента" styleClass="output-text" />
-            <h:inputText value="#{categoryItemCatalogListPage.GUIDfilter}" maxlength="36" styleClass="input-text" size="50" />
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <a4j:commandButton value="Применить" action="#{categoryItemCatalogListPage.updateCatalogList()}"
@@ -66,12 +64,6 @@
                 <h:outputText escape="true" value="Описание" />
             </f:facet>
             <h:inputText value="#{item.description}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="GUID" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.GUID}" styleClass="output-text" />
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

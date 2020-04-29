@@ -8,7 +8,7 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
-<%--@elvariable id="ageGroupCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog.AgeGroupCatalogListPage"--%>
+<%--@elvariable id="ageGroupCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.catalog.AgeGroupCatalogListPage"--%>
 <h:panelGrid id="webTechnologistAgeGroupCatalogItemListPagePanelGrid" binding="#{ageGroupCatalogListPage.pageComponent}"
              styleClass="borderless-grid">
     <rich:simpleTogglePanel label="Фильтр " switchType="client" eventsQueue="mainFormEventsQueue" opened="false"
@@ -16,8 +16,6 @@
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <h:outputText escape="true" value="Название элемента" styleClass="output-text" />
             <h:inputText value="#{ageGroupCatalogListPage.descriptionFilter}" styleClass="input-text" />
-            <h:outputText escape="true" value="GUID элемента" styleClass="output-text" />
-            <h:inputText value="#{ageGroupCatalogListPage.GUIDfilter}" maxlength="36" styleClass="input-text" size="50" />
         </h:panelGrid>
         <h:panelGrid columns="2" styleClass="borderless-grid">
             <a4j:commandButton value="Применить" action="#{ageGroupCatalogListPage.updateCatalogList()}"
@@ -66,34 +64,6 @@
                 <h:outputText escape="true" value="Описание" />
             </f:facet>
             <h:inputText value="#{item.description}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="GUID" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.GUID}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Создал пользователь" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.user.userName}" styleClass="output-text" />
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Дата создания" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.createDate}" styleClass="output-text">
-                <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
-            </h:outputText>
-        </rich:column>
-        <rich:column headerClass="column-header">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Последнее обновление" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.lastUpdate}" styleClass="output-text">
-                <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
-            </h:outputText>
         </rich:column>
         <rich:column headerClass="column-header">
             <f:facet name="header">

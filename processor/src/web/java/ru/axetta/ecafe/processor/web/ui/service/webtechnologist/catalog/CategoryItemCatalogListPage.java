@@ -2,12 +2,12 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog;
+package ru.axetta.ecafe.processor.web.ui.service.webtechnologist.catalog;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.HardCodeCatalogService;
-import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.WTCategoryItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtCategoryItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.services.WtCatalogService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -34,17 +34,20 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
     private static final Logger logger = LoggerFactory.getLogger(CategoryItemCatalogListPage.class);
 
     private String descriptionFilter;
-    private String GUIDfilter;
     private String descriptionForNewItem;
-    private List<WTCategoryItem> catalogListItem;
-    private WTCategoryItem selectedItem;
+    private List<WtCategoryItem> catalogListItem;
+    private WtCategoryItem selectedItem;
 
-    private HardCodeCatalogService service;
+    private WtCatalogService service;
+
+    @Autowired
+    public void setService(WtCatalogService service) {
+        this.service = service;
+    }
 
     @Override
     public void onShow() throws Exception {
         catalogListItem = service.getAllCategoryItem();
-        GUIDfilter = "";
         descriptionForNewItem = "";
         descriptionFilter = "";
     }
@@ -59,7 +62,7 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
         }
         try {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
-            WTCategoryItem item =  service.createCategoryItem(descriptionForNewItem, currentUser);
+            WtCategoryItem item =  service.createCategoryItem(descriptionForNewItem, currentUser);
             catalogListItem.add(item);
         } catch (Exception e){
             logger.error("Can't create new element: ", e);
@@ -82,7 +85,7 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
             Long nextVersion = service.getLastVersionAgeGroup(session) + 1L;
             Date updateDate = new Date();
 
-            for (WTCategoryItem item : catalogListItem) {
+            for (WtCategoryItem item : catalogListItem) {
                 item.setLastUpdate(updateDate);
                 item.setVersion(nextVersion);
                 session.merge(item);
@@ -109,7 +112,7 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            for (WTCategoryItem item : catalogListItem) {
+            for (WtCategoryItem item : catalogListItem) {
                 session.refresh(item);
             }
 
@@ -134,7 +137,7 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Query query = session.createQuery("DELETE WTCategoryItem WHERE idOfCategoryItem = :idOfCategoryItem");
+            Query query = session.createQuery("DELETE WtCategoryItem WHERE idOfCategoryItem = :idOfCategoryItem");
             query.setParameter("idOfCategoryItem", selectedItem.getIdOfCategoryItem());
             query.executeUpdate();
             catalogListItem.remove(selectedItem);
@@ -151,11 +154,11 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
         }
     }
 
-    public List<WTCategoryItem> getCatalogListItem() {
+    public List<WtCategoryItem> getCatalogListItem() {
         return catalogListItem;
     }
 
-    public void setCatalogListItem(List<WTCategoryItem> catalogListItem) {
+    public void setCatalogListItem(List<WtCategoryItem> catalogListItem) {
         this.catalogListItem = catalogListItem;
     }
 
@@ -167,17 +170,9 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
         this.descriptionFilter = descriptionFilter;
     }
 
-    public String getGUIDfilter() {
-        return GUIDfilter;
-    }
-
-    public void setGUIDfilter(String GUIDfilter) {
-        this.GUIDfilter = GUIDfilter;
-    }
-
     public void updateCatalogList() {
         try{
-            catalogListItem = service.findCategoryItemByDescriptionOrGUID(descriptionFilter, GUIDfilter);
+            catalogListItem = service.findCategoryItemByDescription(descriptionFilter);
         }catch (Exception e){
             printError("Не удалось найти элементы: " + e.getMessage());
             logger.error("", e);
@@ -186,7 +181,6 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
 
     public void dropAndReloadCatalogList() {
         descriptionFilter = "";
-        GUIDfilter = "";
         catalogListItem = service.getAllCategoryItem();
     }
 
@@ -203,20 +197,11 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
         return "service/webtechnologist/catalog_category_item_page";
     }
 
-    public HardCodeCatalogService getService() {
-        return service;
-    }
-
-    @Autowired
-    public void setService(HardCodeCatalogService service) {
-        this.service = service;
-    }
-
-    public WTCategoryItem getSelectedItem() {
+    public WtCategoryItem getSelectedItem() {
         return selectedItem;
     }
 
-    public void setSelectedItem(WTCategoryItem selectedItem) {
+    public void setSelectedItem(WtCategoryItem selectedItem) {
         this.selectedItem = selectedItem;
     }
 }

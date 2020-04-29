@@ -2,12 +2,12 @@
  * Copyright (c) 2019. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.ui.service.webtechnologist.hardcodecatalog;
+package ru.axetta.ecafe.processor.web.ui.service.webtechnologist.catalog;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.User;
-import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.HardCodeCatalogService;
-import ru.axetta.ecafe.processor.core.persistence.webtechnologist.catalogs.WTAgeGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.services.WtCatalogService;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
@@ -24,27 +24,30 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import java.util.Date;
 import java.util.List;
 
 @Component
 @Scope("session")
 @DependsOn("runtimeContext")
-public class AgeGroupCatalogListPage extends BasicWorkspacePage {
-    private static final Logger logger = LoggerFactory.getLogger(AgeGroupCatalogListPage.class);
+public class GroupItemCatalogListPage extends BasicWorkspacePage {
+
+    private static final Logger logger = LoggerFactory.getLogger(GroupItemCatalogListPage.class);
 
     private String descriptionFilter;
-    private String GUIDfilter;
     private String descriptionForNewItem;
-    private List<WTAgeGroupItem> catalogListItem;
-    private WTAgeGroupItem selectedItem;
+    private List<WtGroupItem> catalogListItem;
+    private WtGroupItem selectedItem;
 
-    private HardCodeCatalogService service;
+    private WtCatalogService service;
+
+    @Autowired
+    public void setService(WtCatalogService service) {
+        this.service = service;
+    }
 
     @Override
     public void onShow() throws Exception {
-        catalogListItem = service.getAllAgeGroupItems();
-        GUIDfilter = "";
+        catalogListItem = service.getAllGroupItems();
         descriptionForNewItem = "";
         descriptionFilter = "";
     }
@@ -55,50 +58,17 @@ public class AgeGroupCatalogListPage extends BasicWorkspacePage {
 
     public void createNewItem() {
         if (StringUtils.isBlank(descriptionForNewItem)) {
-            printError("ВВедите описание элемента");
+            printError("Введите описание элемента");
         }
         try {
             User currentUser = MainPage.getSessionInstance().getCurrentUser();
-            WTAgeGroupItem item = service.createAgeGroupItem(descriptionForNewItem, currentUser);
+            WtGroupItem item = service.createGroupItem(descriptionForNewItem, currentUser);
             catalogListItem.add(item);
         } catch (Exception e) {
             logger.error("Can't create new element: ", e);
             printError("Ошибка при попытке создать элемент: " + e.getMessage());
         } finally {
             descriptionForNewItem = "";
-        }
-    }
-
-    public List<WTAgeGroupItem> getCatalogListItem() {
-        return catalogListItem;
-    }
-
-    public void setCatalogListItem(List<WTAgeGroupItem> catalogListItem) {
-        this.catalogListItem = catalogListItem;
-    }
-
-    public String getDescriptionFilter() {
-        return descriptionFilter;
-    }
-
-    public void setDescriptionFilter(String descriptionFilter) {
-        this.descriptionFilter = descriptionFilter;
-    }
-
-    public String getGUIDfilter() {
-        return GUIDfilter;
-    }
-
-    public void setGUIDfilter(String GUIDfilter) {
-        this.GUIDfilter = GUIDfilter;
-    }
-
-    public void updateCatalogList() {
-        try {
-            catalogListItem = service.findAgeGroupItemsByDescriptionOrGUID(descriptionFilter, GUIDfilter);
-        } catch (Exception e){
-            printError("Не удалось нати элементы: " + e.getMessage());
-            logger.error("", e);
         }
     }
 
@@ -112,8 +82,8 @@ public class AgeGroupCatalogListPage extends BasicWorkspacePage {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Query query = session.createQuery("DELETE WTAgeGroupItem WHERE idOfAgeGroupItem = :idOfAgeGroupItem");
-            query.setParameter("idOfAgeGroupItem", selectedItem.getIdOfAgeGroupItem());
+            Query query = session.createQuery("DELETE WtGroupItem WHERE idOfGroupItem = :idOfGroupItem");
+            query.setParameter("idOfGroupItem", selectedItem.getIdOfGroupItem());
             query.executeUpdate();
             catalogListItem.remove(selectedItem);
 
@@ -140,10 +110,8 @@ public class AgeGroupCatalogListPage extends BasicWorkspacePage {
             transaction = session.beginTransaction();
 
             Long nextVersion = service.getLastVersionAgeGroup(session) + 1L;
-            Date updateDate = new Date();
 
-            for (WTAgeGroupItem item : catalogListItem) {
-                item.setLastUpdate(updateDate);
+            for (WtGroupItem item : catalogListItem) {
                 item.setVersion(nextVersion);
                 session.merge(item);
             }
@@ -169,7 +137,7 @@ public class AgeGroupCatalogListPage extends BasicWorkspacePage {
             session = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = session.beginTransaction();
 
-            for (WTAgeGroupItem item : catalogListItem) {
+            for (WtGroupItem item : catalogListItem) {
                 session.refresh(item);
             }
 
@@ -184,10 +152,34 @@ public class AgeGroupCatalogListPage extends BasicWorkspacePage {
         }
     }
 
+    public List<WtGroupItem> getCatalogListItem() {
+        return catalogListItem;
+    }
+
+    public void setCatalogListItem(List<WtGroupItem> catalogListItem) {
+        this.catalogListItem = catalogListItem;
+    }
+
+    public String getDescriptionFilter() {
+        return descriptionFilter;
+    }
+
+    public void setDescriptionFilter(String descriptionFilter) {
+        this.descriptionFilter = descriptionFilter;
+    }
+
+    public void updateCatalogList() {
+        try {
+            catalogListItem = service.findGroupItemsByDescription(descriptionFilter);
+        } catch (Exception e) {
+            printError("Не удалось найти элементы: " + e.getMessage());
+            logger.error("", e);
+        }
+    }
+
     public void dropAndReloadCatalogList() {
         descriptionFilter = "";
-        GUIDfilter = "";
-        catalogListItem = service.getAllAgeGroupItems();
+        catalogListItem = service.getAllGroupItems();
     }
 
     public String getDescriptionForNewItem() {
@@ -200,23 +192,14 @@ public class AgeGroupCatalogListPage extends BasicWorkspacePage {
 
     @Override
     public String getPageFilename() {
-        return "service/webtechnologist/catalog_age_group_page";
+        return "service/webtechnologist/catalog_group_item_page";
     }
 
-    public WTAgeGroupItem getSelectedItem() {
+    public WtGroupItem getSelectedItem() {
         return selectedItem;
     }
 
-    public void setSelectedItem(WTAgeGroupItem selectedItem) {
+    public void setSelectedItem(WtGroupItem selectedItem) {
         this.selectedItem = selectedItem;
-    }
-
-    public HardCodeCatalogService getService() {
-        return service;
-    }
-
-    @Autowired
-    public void setService(HardCodeCatalogService service) {
-        this.service = service;
     }
 }
