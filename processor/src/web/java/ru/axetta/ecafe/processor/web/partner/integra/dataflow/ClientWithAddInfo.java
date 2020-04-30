@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.integra.dataflow;
 
 import ru.axetta.ecafe.processor.core.persistence.ClientCreatedFromType;
+import ru.axetta.ecafe.processor.core.persistence.ClientGuardianRepresentType;
 
 /**
  * Created by i.semenov on 06.08.2018.
@@ -14,6 +15,7 @@ public class ClientWithAddInfo {
     private Integer informedSpecialMenu;
     private Integer preorderAllowed;
     private boolean disabled;
+    private ClientGuardianRepresentType representType;
 
     public ClientCreatedFromType getClientCreatedFrom() {
         return clientCreatedFrom;
@@ -45,5 +47,13 @@ public class ClientWithAddInfo {
 
     public void setPreorderAllowed(Integer preorderAllowed) {
         this.preorderAllowed = preorderAllowed;
+    }
+
+    public ClientGuardianRepresentType getRepresentType() {
+        return representType;
+    }
+
+    public void setRepresentType(ClientGuardianRepresentType representType) {
+        this.representType = representType;
     }
 }

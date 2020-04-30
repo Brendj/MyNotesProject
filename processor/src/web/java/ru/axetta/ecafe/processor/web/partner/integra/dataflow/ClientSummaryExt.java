@@ -131,6 +131,9 @@ public class ClientSummaryExt {
     private Integer groupPredefined;
     @XmlAttribute(name = "Gender")
     private Integer gender;
+
+    @XmlAttribute(name = "RoleRepresentative")
+    private String roleRepresentative;
     /**
      *
      * Gets the value of the contractId property.
@@ -768,5 +771,13 @@ public class ClientSummaryExt {
 
     public void setGender(Integer gender) {
         this.gender = gender;
+    }
+
+    public String getRoleRepresentative() {
+        return roleRepresentative;
+    }
+
+    public void setRoleRepresentative(String roleRepresentative) {
+        this.roleRepresentative = roleRepresentative;
     }
 }

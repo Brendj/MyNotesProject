@@ -3569,6 +3569,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             addInfo.setPreorderAllowed(ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient(), cg.getIdOfGuardian()) ? 1 : null);
                             addInfo.setClientCreatedFrom(cg.isDisabled() ? null : cg.getCreatedFrom());
                             addInfo.setDisabled(cg.isDisabled());
+                            addInfo.setRepresentType(cg.getRepresentType());
                             result.put(child, addInfo);
                         }
                     }
@@ -3949,6 +3950,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         dataProcess.getClientSummaryExt()
                                 .setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
                     }
+                    dataProcess.getClientSummaryExt().setRoleRepresentative(entry.getValue().getRepresentType().getDescription());
                     cs.clientSummary = dataProcess.getClientSummaryExt();
                     cs.resultCode = dataProcess.getResultCode();
                     cs.description = dataProcess.getDescription();
