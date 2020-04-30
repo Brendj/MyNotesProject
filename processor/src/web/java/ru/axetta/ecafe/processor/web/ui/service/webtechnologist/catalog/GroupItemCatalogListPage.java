@@ -109,7 +109,7 @@ public class GroupItemCatalogListPage extends BasicWorkspacePage {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Long nextVersion = service.getLastVersionAgeGroup(session) + 1L;
+            Long nextVersion = service.getLastVersionGroupItem(session) + 1L;
 
             for (WtGroupItem item : catalogListItem) {
                 item.setVersion(nextVersion);

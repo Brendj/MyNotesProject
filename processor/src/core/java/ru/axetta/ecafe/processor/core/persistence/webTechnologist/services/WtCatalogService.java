@@ -352,21 +352,21 @@ public class WtCatalogService {
         return result == null ? 0L : result;
     }
 
-    private Long getLastVersionProductionType(Session session) {
+    public Long getLastVersionProductionType(Session session) {
         Criteria criteria = session.createCriteria(WtTypeOfProductionItem.class);
         criteria.setProjection(Projections.max("version"));
         Long result = (Long) criteria.uniqueResult();
         return result == null ? 0L : result;
     }
 
-    private Long getLastVersionCategoryItem(Session session) {
+    public Long getLastVersionCategoryItem(Session session) {
         Criteria criteria = session.createCriteria(WtCategoryItem.class);
         criteria.setProjection(Projections.max("version"));
         Long result = (Long) criteria.uniqueResult();
         return result == null ? 0L : result;
     }
 
-    private Long getLastVersionGroupItem(Session session) {
+    public Long getLastVersionGroupItem(Session session) {
         Criteria criteria = session.createCriteria(WtGroupItem.class);
         criteria.setProjection(Projections.max("version"));
         Long result = (Long) criteria.uniqueResult();

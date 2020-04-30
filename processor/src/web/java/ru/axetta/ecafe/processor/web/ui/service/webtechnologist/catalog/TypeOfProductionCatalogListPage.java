@@ -133,7 +133,7 @@ public class TypeOfProductionCatalogListPage extends BasicWorkspacePage {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Long nextVersion = service.getLastVersionAgeGroup(session) + 1L;
+            Long nextVersion = service.getLastVersionProductionType(session) + 1L;
 
             for (WtTypeOfProductionItem item : catalogListItem) {
                 item.setVersion(nextVersion);

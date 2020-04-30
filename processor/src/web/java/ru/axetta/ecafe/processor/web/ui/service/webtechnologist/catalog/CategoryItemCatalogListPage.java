@@ -82,7 +82,7 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Long nextVersion = service.getLastVersionAgeGroup(session) + 1L;
+            Long nextVersion = service.getLastVersionCategoryItem(session) + 1L;;
             Date updateDate = new Date();
 
             for (WtCategoryItem item : catalogListItem) {
