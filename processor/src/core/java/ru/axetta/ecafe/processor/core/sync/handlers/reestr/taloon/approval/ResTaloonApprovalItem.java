@@ -4,10 +4,8 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval;
 
-import ru.axetta.ecafe.processor.core.persistence.TaloonApproval;
-import ru.axetta.ecafe.processor.core.persistence.TaloonCreatedTypeEnum;
-import ru.axetta.ecafe.processor.core.persistence.TaloonISPPStatesEnum;
-import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -44,6 +42,8 @@ public class ResTaloonApprovalItem {
     private Integer resultCode;
     private String errorMessage;
     private Long taloonNumber;
+    private Long complexId;
+    private Boolean byWebSupplier;
 
     public ResTaloonApprovalItem() {
 
@@ -66,6 +66,12 @@ public class ResTaloonApprovalItem {
         this.taloonNumber = taloon.getTaloonNumber();
         this.version = taloon.getVersion();
         this.deletedState = taloon.getDeletedState();
+        this.byWebSupplier = false;
+        Org org = DAOService.getInstance().getOrg(orgId);
+        if (org != null) {
+            this.byWebSupplier = org.getUseWebArm();
+        }
+        this.complexId = null; // откуда брать значение?
     }
 
     public ResTaloonApprovalItem(TaloonApproval taloon, Integer ordersCount, Integer resCode) {
@@ -102,6 +108,10 @@ public class ResTaloonApprovalItem {
         if (createdType != null) {
             XMLUtils.setAttributeIfNotNull(element, "CreatedType", createdType.ordinal());
         }
+        if (complexId != null) {
+            XMLUtils.setAttributeIfNotNull(element, "ComplexId", complexId);
+        }
+        XMLUtils.setAttributeIfNotNull(element, "ByWebSupplier", byWebSupplier);
         XMLUtils.setAttributeIfNotNull(element,"GoodsName",this.goodsName);
         XMLUtils.setAttributeIfNotNull(element,"GoodsGuid",this.goodsGuid == null ? "" : this.goodsGuid);
         if(isppState != null) XMLUtils.setAttributeIfNotNull(element, "ISPP_State", isppState.ordinal());
@@ -264,5 +274,21 @@ public class ResTaloonApprovalItem {
 
     public void setPpState(TaloonPPStatesEnum ppState) {
         this.ppState = ppState;
+    }
+
+    public Long getComplexId() {
+        return complexId;
+    }
+
+    public void setComplexId(Long complexId) {
+        this.complexId = complexId;
+    }
+
+    public Boolean getByWebSupplier() {
+        return byWebSupplier;
+    }
+
+    public void setByWebSupplier(Boolean byWebSupplier) {
+        this.byWebSupplier = byWebSupplier;
     }
 }
