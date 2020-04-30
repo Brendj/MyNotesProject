@@ -81,7 +81,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                     + "  WHERE p.invaliddata IS FALSE\n"
                     + ") SELECT distinct(pi.*) FROM pupils_info AS pi\n"
                     + " JOIN cf_orgs AS o ON pi.organizationid = o.organizationIdFromNSI\n"
-                    + " join cf_clients as c on pi.guid = c.clientguid " //for tests
+                    //+ " join cf_clients as c on pi.guid = c.clientguid " //for tests
                     + " WHERE o.ekisId IN :guids ";
         }
     }
