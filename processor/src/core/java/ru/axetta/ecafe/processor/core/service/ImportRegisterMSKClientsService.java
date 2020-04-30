@@ -1583,6 +1583,9 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             boolean manualCheckout) throws Exception {
         if (!DAOService.getInstance().isSverkaEnabled()) {
             throw new ServiceTemporaryUnavailableException("Service temporary unavailable");
+        } else if(!RuntimeContext.getInstance().getOptionValueString(Option.OPTION_NSI_VERSION).equals(Option.NSI3)
+                && !ImportRegisterNSI3ServiceKafkaWrapper.workWithKafka()){
+            throw new ServiceTemporaryUnavailableException("Set wrong data source");
         }
         /*Убираем ограничение на выполнение сверки не чаще, чем раз в час
         if (!DAOService.getInstance().isSverkaEnabledByOrg(idOfOrg)) {

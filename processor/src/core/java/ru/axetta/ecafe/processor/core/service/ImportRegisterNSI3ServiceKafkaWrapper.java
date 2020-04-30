@@ -31,7 +31,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
     protected final String DROP_INDEX = "drop index if exists cf_mh_persons_ekisid_idx";
     protected final String CREATE_INDEX = "create index cf_mh_persons_ekisid_idx on cf_mh_persons using btree (ekisId)";
 
-    private boolean workWithKafka(){
+    public static boolean workWithKafka(){
         String mode = RuntimeContext.getInstance().getPropertiesValue(ImportRegisterFileService.MODE_PROPERTY, null);
         return Objects.equals(mode, ImportRegisterFileService.MODE_KAFKA);
     }
@@ -81,6 +81,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                     + "  WHERE p.invaliddata IS FALSE\n"
                     + ") SELECT distinct(pi.*) FROM pupils_info AS pi\n"
                     + " JOIN cf_orgs AS o ON pi.organizationid = o.organizationIdFromNSI\n"
+                    + " join cf_clients as c on pi.guid = c.clientguid " //for tests
                     + " WHERE o.ekisId IN :guids ";
         }
     }
