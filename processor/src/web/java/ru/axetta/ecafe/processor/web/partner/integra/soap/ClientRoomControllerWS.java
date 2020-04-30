@@ -4789,12 +4789,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result setGuardianshipDisabled(@WebParam(name = "contractId") Long contractId,
-            @WebParam(name = "guardMobile") String guardMobile, @WebParam(name = "value") Boolean value) {
+            @WebParam(name = "guardMobile") String guardMobile, @WebParam(name = "value") Boolean value,
+            @WebParam(name = "roleRepresentative") String roleRepresentative) {
         authenticateRequest(contractId);
-        return processSetGuardianship(contractId, guardMobile, value);
+        return processSetGuardianship(contractId, guardMobile, value, roleRepresentative);
     }
 
-    private Result processSetGuardianship(Long contractId, String guardMobile, Boolean value) {
+    private Result processSetGuardianship(Long contractId, String guardMobile, Boolean value, String roleRepresentative) {
         Result result = new Result();
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -4805,6 +4806,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new InvalidDataException("Не заполнен номер телефона опекуна");
             }
 
+            ClientGuardianRepresentType clientGuardianRelationType = ClientGuardianRepresentType.UNKNOWN;
+            for (ClientGuardianRepresentType type : ClientGuardianRepresentType.values()) {
+                if (roleRepresentative.equalsIgnoreCase(type.toString())) {
+                    clientGuardianRelationType = type;
+                }
+            }
             session = runtimeContext.createPersistenceSession();
             persistenceTransaction = session.beginTransaction();
 
@@ -4830,6 +4837,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         cg.setDisabled(value);
                         cg.setVersion(getClientGuardiansResultVersion(session));
                         cg.setLastUpdate(new Date());
+                        cg.setRepresentType(clientGuardianRelationType);
                         session.persist(cg);
                     }
                 }
@@ -8021,7 +8029,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "passportNumber") String passportNumber,
             @WebParam(name = "passportSeries") String passportSeries,
             @WebParam(name = "typeCard") Integer typeCard,
-            @WebParam(name = "roleRepresentative ") Integer roleRepresentative,
+            @WebParam(name = "roleRepresentative") String roleRepresentative,
             @WebParam(name = "degree") String relation) {
 
         authenticateRequest(null);
@@ -8096,9 +8104,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ClientGuardian clientGuardian = DAOUtils
                     .findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
             if (clientGuardian == null) {
+                ClientGuardianRepresentType clientGuardianRelationType = ClientGuardianRepresentType.UNKNOWN;
+                if (roleRepresentative != null) {
+                    for (ClientGuardianRepresentType type : ClientGuardianRepresentType.values()) {
+                        if (relation.equalsIgnoreCase(type.toString())) {
+                            clientGuardianRelationType = type;
+                        }
+                    }
+                }
                 clientGuardian = ClientManager
                         .createClientGuardianInfoTransactionFree(session, guardian, relation, false, client.getIdOfClient(),
-                                ClientCreatedFromType.MPGU, roleRepresentative);
+                                ClientCreatedFromType.MPGU, clientGuardianRelationType.getCode());
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
                 clientGuardian.restore(newGuardiansVersions);

@@ -279,7 +279,8 @@ public interface ClientRoomController {
 
     @WebMethod Result setGuardianshipDisabled(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "guardMobile") String guardMobile,
-            @WebParam(name = "value") Boolean value);
+            @WebParam(name = "value") Boolean value,
+            @WebParam(name = "roleRepresentative") String roleRepresentative);
 
     @WebMethod EnterEventStatusListResult getEnterEventStatusListByGUID(@WebParam(name = "guid") List<String> guids);
 
@@ -505,7 +506,7 @@ public interface ClientRoomController {
             @WebParam(name = "childContractId") Long childContractId, @WebParam(name = "creatorMobile") String creatorMobile,
             @WebParam(name = "passportNumber") String passportNumber, @WebParam(name = "passportSeries") String passportSeries,
             @WebParam(name = "typeCard") Integer typeCard,
-            @WebParam(name = "roleRepresentative ") Integer roleRepresentative,
+            @WebParam(name = "roleRepresentative") String roleRepresentative,
             @WebParam(name = "degree") String relation);
 
     /*@WebMethod Result changeGuardian(@WebParam(name = "contractId") Long contractId, @WebParam(name = "firstName") String firstName,
