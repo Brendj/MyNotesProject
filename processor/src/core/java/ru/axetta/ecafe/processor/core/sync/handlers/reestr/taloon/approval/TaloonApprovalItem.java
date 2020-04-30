@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.persistence.TaloonCreatedTypeEnum;
 import ru.axetta.ecafe.processor.core.persistence.TaloonISPPStatesEnum;
 import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -215,12 +214,6 @@ public class TaloonApprovalItem {
         if(StringUtils.isNotEmpty(strComplexId)){
             try {
                 complexId =  Long.parseLong(strComplexId);
-                if (byWebSupplier) {
-                    WtComplex complex = DAOService.getInstance().getWtComplexById(complexId);
-                    if (complex == null) {
-                        errorMessage.append(String.format("ComplexId with id=%s not found", complexId));
-                    }
-                }
             } catch (NumberFormatException e){
                 errorMessage.append("NumberFormatException ComplexId is not parsed");
             }

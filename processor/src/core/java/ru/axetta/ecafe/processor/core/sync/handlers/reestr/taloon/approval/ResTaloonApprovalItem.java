@@ -4,8 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.approval;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.TaloonApproval;
+import ru.axetta.ecafe.processor.core.persistence.TaloonCreatedTypeEnum;
+import ru.axetta.ecafe.processor.core.persistence.TaloonISPPStatesEnum;
+import ru.axetta.ecafe.processor.core.persistence.TaloonPPStatesEnum;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
@@ -67,11 +69,10 @@ public class ResTaloonApprovalItem {
         this.version = taloon.getVersion();
         this.deletedState = taloon.getDeletedState();
         this.byWebSupplier = false;
-        Org org = DAOService.getInstance().getOrg(orgId);
-        if (org != null) {
-            this.byWebSupplier = org.getUseWebArm();
+        if (taloon.getComplexId() != null) {
+            this.complexId = taloon.getComplexId();
         }
-        this.complexId = null; // откуда брать значение?
+        this.byWebSupplier = taloon.getByWebSupplier();
     }
 
     public ResTaloonApprovalItem(TaloonApproval taloon, Integer ordersCount, Integer resCode) {

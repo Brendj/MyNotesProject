@@ -36,6 +36,8 @@ public class TaloonApproval {
     private Boolean deletedState;
     private String goodsName;
     private String remarks;
+    private Long complexId;
+    private Boolean byWebSupplier;
 
     public TaloonApproval() {
         //for Hibernate only
@@ -239,5 +241,21 @@ public class TaloonApproval {
 
     public void setRemarks(String remarks) {
         this.remarks = remarks;
+    }
+
+    public Long getComplexId() {
+        return complexId;
+    }
+
+    public void setComplexId(Long complexId) {
+        this.complexId = complexId;
+    }
+
+    public Boolean getByWebSupplier() {
+        return byWebSupplier;
+    }
+
+    public void setByWebSupplier(Boolean byWebSupplier) {
+        this.byWebSupplier = byWebSupplier;
     }
 }
