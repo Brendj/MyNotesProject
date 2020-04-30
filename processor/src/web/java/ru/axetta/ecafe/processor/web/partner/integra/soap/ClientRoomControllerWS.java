@@ -8019,7 +8019,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "childContractId") Long childContractId,
             @WebParam(name = "creatorMobile") String creatorMobile,
             @WebParam(name = "passportNumber") String passportNumber,
-            @WebParam(name = "passportSeries") String passportSeries, @WebParam(name = "typeCard") Integer typeCard) {
+            @WebParam(name = "passportSeries") String passportSeries,
+            @WebParam(name = "typeCard") Integer typeCard,
+            @WebParam(name = "roleRepresentative ") Integer roleRepresentative,
+            @WebParam(name = "degree") String relation) {
 
         authenticateRequest(null);
 
@@ -8094,8 +8097,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     .findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
             if (clientGuardian == null) {
                 clientGuardian = ClientManager
-                        .createClientGuardianInfoTransactionFree(session, guardian, null, false, client.getIdOfClient(),
-                                ClientCreatedFromType.MPGU, null);
+                        .createClientGuardianInfoTransactionFree(session, guardian, relation, false, client.getIdOfClient(),
+                                ClientCreatedFromType.MPGU, roleRepresentative);
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
                 clientGuardian.restore(newGuardiansVersions);
