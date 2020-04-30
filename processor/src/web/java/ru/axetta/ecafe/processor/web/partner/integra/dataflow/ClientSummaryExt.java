@@ -133,7 +133,7 @@ public class ClientSummaryExt {
     private Integer gender;
 
     @XmlAttribute(name = "RoleRepresentative")
-    private String roleRepresentative;
+    private Integer roleRepresentative;
     /**
      *
      * Gets the value of the contractId property.
@@ -773,11 +773,11 @@ public class ClientSummaryExt {
         this.gender = gender;
     }
 
-    public String getRoleRepresentative() {
+    public Integer getRoleRepresentative() {
         return roleRepresentative;
     }
 
-    public void setRoleRepresentative(String roleRepresentative) {
+    public void setRoleRepresentative(Integer roleRepresentative) {
         this.roleRepresentative = roleRepresentative;
     }
 }

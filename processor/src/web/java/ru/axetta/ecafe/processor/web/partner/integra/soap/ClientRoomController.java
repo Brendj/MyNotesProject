@@ -245,7 +245,7 @@ public interface ClientRoomController {
     Result changeEmail(@WebParam(name = "contractId") Long contractId, @WebParam(name = "email") String email);
 
     @WebMethod
-    Result changeExpenditureLimit(@WebParam(name = "contractId") Long contractId, @WebParam(name = "limit") long limit);
+    Result changeExpenditureLimit(@WebParam(name = "contractId") Long contractId, @WebParam(name = "roleRepresentative") Long roleRepresentative,  @WebParam(name = "limit") long limit);
 
     @WebMethod
     Result changeThresholdBalanceNotify(@WebParam(name = "contractId") Long contractId, @WebParam(name = "threshold") long threshold);

@@ -3950,7 +3950,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         dataProcess.getClientSummaryExt()
                                 .setGuardianCreatedWhere(entry.getValue().getClientCreatedFrom().getValue());
                     }
-                    dataProcess.getClientSummaryExt().setRoleRepresentative(entry.getValue().getRepresentType().getDescription());
+                    dataProcess.getClientSummaryExt().setRoleRepresentative(entry.getValue().getRepresentType().getCode());
                     cs.clientSummary = dataProcess.getClientSummaryExt();
                     cs.resultCode = dataProcess.getResultCode();
                     cs.description = dataProcess.getDescription();
@@ -4017,9 +4017,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     clientRepresentative.setNotifyviaemail(cl.isNotifyViaEmail());
                     clientRepresentative.setNotifyviapush(cl.isNotifyViaPUSH());
                     if (clientGuardian.getRepresentType() == null)
-                        clientRepresentative.setRoleRepresentative(ClientGuardianRepresentType.UNKNOWN.getDescription());
+                        clientRepresentative.setRoleRepresentative(ClientGuardianRepresentType.UNKNOWN.getCode());
                     else
-                        clientRepresentative.setRoleRepresentative(clientGuardian.getRepresentType().getDescription());
+                        clientRepresentative.setRoleRepresentative(clientGuardian.getRepresentType().getCode());
                     if (!clientGuardian.getCreatedFrom().equals(ClientCreatedFromType.DEFAULT)) {
                         clientRepresentative.setCreatedWhere(clientGuardian.getCreatedFrom().getValue());
                         clientRepresentative.setIdOfOrg(cl.getOrg().getIdOfOrg());
@@ -4157,6 +4157,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     @Override
     public Result changeExpenditureLimit(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "roleRepresentative") Long roleRepresentative,
             @WebParam(name = "limit") long limit) {
         HTTPData data = new HTTPData();
         HTTPDataHandler handler = new HTTPDataHandler(data);
@@ -4167,6 +4168,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Result r = new Result(RC_OK, RC_OK_DESC);
         if (limit < 0) {
             r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
+            return r;
+        }
+        if (roleRepresentative == 1 || roleRepresentative == 2)
+        {
+            r = new Result(RC_INVALID_DATA, "Лимит может быть установлен только законным представителем");
             return r;
         }
         if (!DAOService.getInstance().setClientExpenditureLimit(contractId, limit)) {
@@ -4810,12 +4816,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new InvalidDataException("Не заполнен номер телефона опекуна");
             }
 
-            //ClientGuardianRepresentType clientGuardianRelationType = ClientGuardianRepresentType.UNKNOWN;
-            //for (ClientGuardianRepresentType type : ClientGuardianRepresentType.values()) {
-            //    if (roleRepresentative.equalsIgnoreCase(type.toString())) {
-            //        clientGuardianRelationType = type;
-            //    }
-            //}
             session = runtimeContext.createPersistenceSession();
             persistenceTransaction = session.beginTransaction();
 
@@ -8108,14 +8108,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             ClientGuardian clientGuardian = DAOUtils
                     .findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
             if (clientGuardian == null) {
-                //ClientGuardianRepresentType clientGuardianRelationType = ClientGuardianRepresentType.UNKNOWN;
-                //if (roleRepresentative != null) {
-                //    for (ClientGuardianRepresentType type : ClientGuardianRepresentType.values()) {
-                //        if (relation.equalsIgnoreCase(type.toString())) {
-                //            clientGuardianRelationType = type;
-                //        }
-                //    }
-                //}
                 clientGuardian = ClientManager
                         .createClientGuardianInfoTransactionFree(session, guardian, relation, false, client.getIdOfClient(),
                                 ClientCreatedFromType.MPGU, roleRepresentative);

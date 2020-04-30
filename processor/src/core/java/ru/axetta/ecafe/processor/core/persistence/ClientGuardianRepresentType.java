@@ -36,6 +36,8 @@ public enum ClientGuardianRepresentType {
     }
 
     public static ClientGuardianRepresentType fromInteger(Integer value){
+        if (value == null)
+            return map.get(-1);
         return map.get(value);
     }
 
