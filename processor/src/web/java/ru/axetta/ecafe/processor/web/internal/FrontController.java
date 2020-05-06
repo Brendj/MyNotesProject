@@ -1982,7 +1982,8 @@ public class FrontController extends HttpServlet {
                 PayPlanBalanceItem resultItem = new PayPlanBalanceItem(item.getIdOfClient());
                 Client client = DAOReadonlyService.getInstance().findClientById(item.getIdOfClient());
                 if (client == null) throw new Exception("Client not found in getBalancesForPayPlan. IdOfClient = " + item.getIdOfClient());
-                long preorderSum = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getNotPaidPreordersSum(client, new Date());
+                long preorderSum = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getNotPaidPreordersSum(client, CalendarUtils.startOfDay(new Date()));
                 long resultSum = client.getBalance() - item.getSumma() - preorderSum;
                 resultItem.setSumma(resultSum);
                 result.addItem(resultItem);

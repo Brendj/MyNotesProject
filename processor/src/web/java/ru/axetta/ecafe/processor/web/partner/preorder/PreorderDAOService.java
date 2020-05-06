@@ -1460,7 +1460,7 @@ public class PreorderDAOService {
                 sum += complex.getComplexPrice() * complex.getAmount() - complex.getUsedSum();
                 set.add(complex.getIdOfPreorderComplex());
                 for (PreorderMenuDetail pmd : complex.getPreorderMenuDetails()) {
-                    sum += pmd.getMenuDetailPrice() * pmd.getAmount();
+                    sum += (pmd.getMenuDetailPrice() * pmd.getAmount()) - pmd.getUsedSum();
                 }
             }
         }
@@ -1470,10 +1470,9 @@ public class PreorderDAOService {
     @Transactional
     public long getNotPaidPreordersSum(Client client, Date dateFrom) {
         Query query = emReport.createQuery("select pc from PreorderComplex pc join fetch pc.preorderMenuDetails pmd "
-                + "where pc.client.idOfClient = :idOfClient and pc.preorderDate > :startDate "
+                + "where pc.client.idOfClient = :idOfClient and pc.preorderDate >= :startDate "
                 + "and pc.deletedState = false and pmd.deletedState = false and (pc.idOfGoodsRequestPosition is not null "
-                + "or pmd.idOfGoodsRequestPosition is not null) "
-                + "and not exists (select pod from PreorderLinkOD pod where pod.preorderGuid = pc.guid)");
+                + "or pmd.idOfGoodsRequestPosition is not null) ");
         query.setParameter("idOfClient", client.getIdOfClient());
         query.setParameter("startDate", dateFrom);
         List<PreorderComplex> list = query.getResultList();
