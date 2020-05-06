@@ -2775,7 +2775,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                 // Исключение из комплексов составов, не соответствующим датам цикла
                 for (WtComplex wtComplex : wtComplexes) {
-                    wtComplex = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                             .getWtComplexInCycleDates(client, org, wtComplex);
                 }
 
@@ -6634,20 +6634,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<MenuItemExt> menuItemExtList = new ArrayList<>();
         List<WtDish> wtDishes = DAOReadExternalsService.getInstance()
                 .getWtDishesByWtComplex(wtComplex);
-        for (WtDish wtDish : wtDishes) {
-            MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-            menuItemExt.setGroup(DAOReadExternalsService.getInstance().getWtMenuGroupByWtDish(wtDish).getName());
-            menuItemExt.setName(wtDish.getDishName());
-            menuItemExt.setFullName(wtDish.getDishName());
-            menuItemExt.setPrice(wtDish.getPrice().longValue());
-            menuItemExt.setCalories(wtDish.getCalories().doubleValue());
-            menuItemExt.setOutput(wtDish.getQty());
-            menuItemExt.setAvailableNow(1); // включение блюда в меню
-            menuItemExt.setProtein(wtDish.getProtein().doubleValue());
-            menuItemExt.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
-            menuItemExt.setFat(wtDish.getFat().doubleValue());
-            menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
-            menuItemExtList.add(menuItemExt);
+        if (wtDishes != null && wtDishes.size() > 0) {
+            for (WtDish wtDish : wtDishes) {
+                MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+                menuItemExt.setGroup(DAOReadExternalsService.getInstance().getWtMenuGroupByWtDish(wtDish).getName());
+                menuItemExt.setName(wtDish.getDishName());
+                menuItemExt.setFullName(wtDish.getDishName());
+                menuItemExt.setPrice(wtDish.getPrice().longValue());
+                menuItemExt.setCalories(wtDish.getCalories().doubleValue());
+                menuItemExt.setOutput(wtDish.getQty());
+                menuItemExt.setAvailableNow(1); // включение блюда в меню
+                menuItemExt.setProtein(wtDish.getProtein().doubleValue());
+                menuItemExt.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
+                menuItemExt.setFat(wtDish.getFat().doubleValue());
+                menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
+                menuItemExtList.add(menuItemExt);
+            }
         }
         return menuItemExtList;
     }

@@ -263,71 +263,77 @@ public class PreorderDAOService {
         List<WtAgeGroupItem> ageGroupList = RuntimeContext.getAppContext()
                 .getBean(PreorderDAOService.class).getWtAgeGroupItems(client, categoriesDiscount);
 
-        // Комплексы
-        Set<WtComplex> wtComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                .getWtComplexes(date, date, wtDiscountRuleSet, complexGroupList, ageGroupList);
+        if (wtDiscountRuleSet.size() > 0) {
+            // Комплексы
+            Set<WtComplex> wtComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getWtComplexes(date, date, wtDiscountRuleSet, complexGroupList, ageGroupList);
 
-        // Исключение из комплексов составов, не соответствующим датам цикла
-        for (WtComplex wtComplex : wtComplexes) {
-            wtComplex = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getWtComplexInCycleDates(client, org, wtComplex);
-        }
-
-        Map<String, PreorderComplexGroup> groupMap = new HashMap<>();
-        List<PreorderComplexItemExt> list = new ArrayList<>();
-
-        for (WtComplex wtComplex : wtComplexes) {
-            Integer idOfComplex = wtComplex.getIdOfComplex().intValue();
-            String complexName = wtComplex.getName();
-            // Режим добавления блюд: если комплекс составной - режим составного комплекса,
-            // если нет - режим фиксированной цены
-            Integer complexType = wtComplex.getComposite() ? 4 : 2;
-            // Режим бесплатного питания
-            Integer discount = 0;
-            if (wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 1 || // льготное питание
-                    wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 5) { // все
-                discount = 1;
+            // Исключение из комплексов составов, не соответствующим датам цикла
+            for (WtComplex wtComplex : wtComplexes) {
+                RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getWtComplexInCycleDates(client, org, wtComplex);
             }
-            Long complexPrice = wtComplex.getPrice().longValue();
-            Integer amount = 0;
-            if (wtComplex.getWtComplexesItems() != null && wtComplex.getWtComplexesItems().size() > 0) {
-                for (WtComplexesItem wtComplexesItem : wtComplex.getWtComplexesItems()) {
-                    amount += wtComplexesItem.getCountDishes();
+
+            Map<String, PreorderComplexGroup> groupMap = new HashMap<>();
+            List<PreorderComplexItemExt> list = new ArrayList<>();
+
+            for (WtComplex wtComplex : wtComplexes) {
+                Integer idOfComplex = wtComplex.getIdOfComplex().intValue();
+                String complexName = wtComplex.getName();
+                // Режим добавления блюд: если комплекс составной - режим составного комплекса,
+                // если нет - режим фиксированной цены
+                Integer complexType = wtComplex.getComposite() ? 4 : 2;
+                // Режим бесплатного питания
+                Integer discount = 0;
+                if (wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 1 || // льготное питание
+                        wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 5) { // все
+                    discount = 1;
+                }
+                Long complexPrice = wtComplex.getPrice().longValue();
+                Integer amount = 0;
+                if (wtComplex.getWtComplexesItems() != null && wtComplex.getWtComplexesItems().size() > 0) {
+                    for (WtComplexesItem wtComplexesItem : wtComplex.getWtComplexesItems()) {
+                        amount += wtComplexesItem.getCountDishes();
+                    }
+                }
+
+                PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName,
+                        complexPrice, complexType, discount);
+                complexItemExt.setAmount(amount);
+                complexItemExt.setState(wtComplex.getDeleteState());
+                complexItemExt.setIsRegular(false);
+
+                List<PreorderMenuItemExt> menuItemExtList = getWtMenuItemsExt(wtComplex, date);
+                if (menuItemExtList.size() > 0) {
+                    complexItemExt.setMenuItemExtList(menuItemExtList);
+                    list.add(complexItemExt);
                 }
             }
-
-            PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice,
-                    complexType, discount);
-            complexItemExt.setAmount(amount);
-            complexItemExt.setState(wtComplex.getDeleteState());
-            complexItemExt.setIsRegular(false);
-
-            List<PreorderMenuItemExt> menuItemExtList = getWtMenuItemsExt(wtComplex, date);
-            if (menuItemExtList.size() > 0) {
-                complexItemExt.setMenuItemExtList(menuItemExtList);
-                list.add(complexItemExt);
-            }
-        }
-        for (PreorderComplexItemExt item : list) {
-            PreorderGoodParamsContainer complexParams = getComplexParams(item, client, date);
-            if (isAcceptableComplex(item, client.getClientGroup(), hasDiscount, complexParams, null, null)) {
-                String groupName = getPreorderComplexGroup(item, complexParams);
-                if (groupName.isEmpty()) continue;
-                item.setType(getPreorderComplexSubgroup(item));
-                PreorderComplexGroup group = groupMap.get(groupName);
-                if (group == null) {
-                    group = new PreorderComplexGroup(groupName);
-                    groupMap.put(groupName, group);
+            for (PreorderComplexItemExt item : list) {
+                PreorderGoodParamsContainer complexParams = getComplexParams(item, client, date);
+                if (isAcceptableComplex(item, client.getClientGroup(), hasDiscount, complexParams, null, null)) {
+                    String groupName = getPreorderComplexGroup(item, complexParams);
+                    if (groupName.isEmpty()) {
+                        continue;
+                    }
+                    item.setType(getPreorderComplexSubgroup(item));
+                    PreorderComplexGroup group = groupMap.get(groupName);
+                    if (group == null) {
+                        group = new PreorderComplexGroup(groupName);
+                        groupMap.put(groupName, group);
+                    }
+                    group.addItem(item);
                 }
-                group.addItem(item);
             }
+            List<PreorderComplexGroup> groupList = new ArrayList<>(groupMap.values());
+            for (PreorderComplexGroup group : groupList) {
+                Collections.sort(group.getItems());
+            }
+            Collections.sort(groupList);
+            groupResult.setComplexesWithGroups(groupList);
+        } else {
+            logger.warn("Льготные правила для данных категорий отсутствуют: " + categoriesDiscount);
         }
-        List<PreorderComplexGroup> groupList = new ArrayList<>(groupMap.values());
-        for (PreorderComplexGroup group : groupList) {
-            Collections.sort(group.getItems());
-        }
-        Collections.sort(groupList);
-        groupResult.setComplexesWithGroups(groupList);
 
         return groupResult;
     }
@@ -1750,6 +1756,7 @@ public class PreorderDAOService {
             WtDish wtDish, Date date, Integer amount) {
         PreorderMenuDetail preorderMenuDetail = new PreorderMenuDetail();
         preorderMenuDetail.setPreorderComplex(preorderComplex);
+        preorderMenuDetail.setArmIdOfMenu(wtDish.getCode().longValue());
         preorderMenuDetail.setClient(client);
         preorderMenuDetail.setPreorderDate(date);
         preorderMenuDetail.setAmount(amount);
@@ -2397,26 +2404,22 @@ public class PreorderDAOService {
         Set<WtComplex> wtComplexes = new HashSet<>();
 
         StringBuilder sb = new StringBuilder();
-        sb.append("SELECT complex FROM WtComplex complex LEFT JOIN complex.discountRules rules ");
-        sb.append("WHERE :rule IN ELEMENTS(rules) AND complex.beginDate < :startDate AND ");
-        sb.append("complex.endDate > :endDate");
+        sb.append("SELECT complex FROM WtComplex complex ");
+        sb.append("WHERE :rule IN ELEMENTS(complex.discountRules) ");
+        sb.append(" AND complex.beginDate < :startDate AND complex.endDate > :endDate");
 
-        if (complexGroupList != null && complexGroupList.size() > 0) {
+        if (complexGroupList != null && complexGroupList.size() > 0
+                && ageGroupList != null && ageGroupList.size() > 0) {
+
             sb.append(" AND complex.wtComplexGroupItem = :complexGroup");
-        }
-        if (ageGroupList != null && ageGroupList.size() > 0) {
             sb.append(" AND complex.wtAgeGroupItem = :ageGroup");
-        }
 
-        for (WtDiscountRule rule : wtDiscountRuleSet) {
-            Query query = emReport.createQuery(sb.toString());
-
-            if (complexGroupList != null && complexGroupList.size() > 0
-                    && ageGroupList != null && ageGroupList.size() > 0) {
+            for (WtDiscountRule rule : wtDiscountRuleSet) {
                 for (WtComplexGroupItem complexGroup : complexGroupList) {
                     for (WtAgeGroupItem ageGroup : ageGroupList) {
-                        query.setParameter("complexGroupList", complexGroup);
-                        query.setParameter("ageGroupList", ageGroup);
+                        Query query = emReport.createQuery(sb.toString());
+                        query.setParameter("complexGroup", complexGroup);
+                        query.setParameter("ageGroup", ageGroup);
                         query.setParameter("rule", rule);
                         query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
                         query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
@@ -2427,25 +2430,17 @@ public class PreorderDAOService {
                     }
                 }
             }
+        }
 
-            if (complexGroupList != null && complexGroupList.size() > 0
-                    && (ageGroupList == null || ageGroupList.size() == 0)) {
+        if (complexGroupList != null && complexGroupList.size() > 0 && (ageGroupList == null
+                || ageGroupList.size() == 0)) {
+
+            sb.append(" AND complex.wtAgeGroupItem = :ageGroup");
+
+            for (WtDiscountRule rule : wtDiscountRuleSet) {
                 for (WtComplexGroupItem complexGroup : complexGroupList) {
-                    query.setParameter("complexGroupList", complexGroup);
-                    query.setParameter("rule", rule);
-                    query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-                    query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
-                    List<WtComplex> res = query.getResultList();
-                    if (res != null && res.size() > 0) {
-                        wtComplexes.addAll(res);
-                    }
-                }
-            }
-
-            if (ageGroupList != null && ageGroupList.size() > 0
-                    && (complexGroupList == null || complexGroupList.size() == 0)) {
-                for (WtAgeGroupItem ageGroup : ageGroupList) {
-                    query.setParameter("ageGroupList", ageGroup);
+                    Query query = emReport.createQuery(sb.toString());
+                    query.setParameter("complexGroup", complexGroup);
                     query.setParameter("rule", rule);
                     query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
                     query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
@@ -2456,10 +2451,31 @@ public class PreorderDAOService {
                 }
             }
         }
+
+        if (ageGroupList != null && ageGroupList.size() > 0 && (complexGroupList == null
+                || complexGroupList.size() == 0)) {
+
+            sb.append(" AND complex.wtAgeGroupItem = :ageGroup");
+
+            for (WtDiscountRule rule : wtDiscountRuleSet) {
+                for (WtAgeGroupItem ageGroup : ageGroupList) {
+                    Query query = emReport.createQuery(sb.toString());
+                    query.setParameter("ageGroup", ageGroup);
+                    query.setParameter("rule", rule);
+                    query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+                    query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+                    List<WtComplex> res = query.getResultList();
+                    if (res != null && res.size() > 0) {
+                        wtComplexes.addAll(res);
+                    }
+                }
+            }
+        }
+
         return wtComplexes;
     }
 
-    public WtComplex getWtComplexInCycleDates(Client client, Org org, WtComplex wtComplex) {
+    public void getWtComplexInCycleDates(Client client, Org org, WtComplex wtComplex) {
         Set<Date> cycleDates = new HashSet<>();
         Date startComplexDate = wtComplex.getBeginDate();
         Date endComplexDate = wtComplex.getEndDate();
@@ -2467,73 +2483,76 @@ public class PreorderDAOService {
         Calendar calendar = Calendar.getInstance();
         Date currentDate = startComplexDate;
 
-        while (currentDate.getTime() <= endComplexDate.getTime()) {
+        if (wtComplex.getCycleMotion() != null) {   // компекс настроен
 
-            calendar.setTime(currentDate);
-            // смотрим рабочую неделю
-            if ((wtComplex.getCycleMotion() == 0 &&     // 5-дневная рабочая неделя
-                    calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY
-                    && calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) || (wtComplex.getCycleMotion() == 1 &&
-                    // 6-дневная рабочая неделя
-                    calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
+            while (currentDate.getTime() <= endComplexDate.getTime()) {
 
-                // проверка, выпадает ли день на выходные
-                Contragent contragent = DAOReadonlyService.getInstance().findDefaultSupplier(org.getIdOfOrg());
-                Boolean isHoliday = DAOReadonlyService.getInstance().checkExcludeDays(currentDate, contragent, org);
-                if (!isHoliday) {
-                    cycleDates.add(currentDate);
+                calendar.setTime(currentDate);
+                // смотрим рабочую неделю
+                if ((wtComplex.getCycleMotion() == 0 &&     // 5-дневная рабочая неделя
+                        calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY &&
+                        calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) ||
+                        (wtComplex.getCycleMotion() == 1 &&
+                        // 6-дневная рабочая неделя
+                        calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
+
+                    // проверка, выпадает ли день на выходные
+                    Contragent contragent = DAOReadonlyService.getInstance().findDefaultSupplier(org.getIdOfOrg());
+                    Boolean isHoliday = DAOReadonlyService.getInstance().checkExcludeDays(currentDate, contragent, org);
+                    if (!isHoliday) {
+                        cycleDates.add(currentDate);
+                    }
                 }
+
+                calendar.add(Calendar.DATE, 1);
+                currentDate = calendar.getTime();
             }
 
-            calendar.add(Calendar.DATE, 1);
-            currentDate = calendar.getTime();
-        }
+            List<Date> cycleDatesList = new ArrayList<>(cycleDates);
+            ClientGroup clientGroup = client.getClientGroup();
 
-        List<Date> cycleDatesList = new ArrayList<>(cycleDates);
-        ClientGroup clientGroup = client.getClientGroup();
+            if (wtComplex.getWtComplexesItems() != null && wtComplex.getWtComplexesItems().size() > 0) {
+                for (WtComplexesItem item : wtComplex.getWtComplexesItems()) {
+                    int index = item.getCycleDay() - startComplexDay;
+                    Date itemDate = cycleDatesList.get(index);
+                    // проверка по производственному календарю
+                    Boolean isWorkingDay = DAOReadonlyService.getInstance().checkWorkingDay(itemDate);
+                    if (isWorkingDay != null) {
+                        if (isWorkingDay) {
+                            // проверка по календарю учебных дней
+                            Boolean isLearningDay = DAOReadonlyService.getInstance()
+                                    .checkLearningDayByOrgAndClientGroup(itemDate, org, clientGroup);
+                            if (isLearningDay != null && !isLearningDay) {
+                                // исключаем из меню
+                                wtComplex.getWtComplexesItems().remove(item);
+                            }
+                            if (isLearningDay == null) {
+                                // проверка на субботу + 6-дневную рабочую неделю
+                                calendar.setTime(itemDate);
+                                if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
+                                    Boolean isSixDaysWorkingWeek = DAOReadonlyService.getInstance()
+                                            .isSixDaysWorkingWeek(org, clientGroup.getGroupName());
+                                    if (isSixDaysWorkingWeek != null && !isSixDaysWorkingWeek) {
+                                        // исключаем из меню
+                                        wtComplex.getWtComplexesItems().remove(item);
+                                    }
+                                }
+                            }
 
-        if (wtComplex.getWtComplexesItems() != null && wtComplex.getWtComplexesItems().size() > 0) {
-            for (WtComplexesItem item : wtComplex.getWtComplexesItems()) {
-                int index = item.getCycleDay() - startComplexDay;
-                Date itemDate = cycleDatesList.get(index);
-                // проверка по производственному календарю
-                Boolean isWorkingDay = DAOReadonlyService.getInstance().checkWorkingDay(itemDate);
-                if (isWorkingDay != null) {
-                    if (isWorkingDay) {
-                        // проверка по календарю учебных дней
+                        } else {
+                            // исключаем из меню
+                            wtComplex.getWtComplexesItems().remove(item);
+                        }
+                    } else {
                         Boolean isLearningDay = DAOReadonlyService.getInstance()
                                 .checkLearningDayByOrgAndClientGroup(itemDate, org, clientGroup);
                         if (isLearningDay != null && !isLearningDay) {
                             // исключаем из меню
                             wtComplex.getWtComplexesItems().remove(item);
                         }
-                        if (isLearningDay == null) {
-                            // проверка на субботу + 6-дневную рабочую неделю
-                            calendar.setTime(itemDate);
-                            if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
-                                Boolean isSixDaysWorkingWeek = DAOReadonlyService.getInstance()
-                                        .isSixDaysWorkingWeek(org, clientGroup.getGroupName());
-                                if (isSixDaysWorkingWeek != null && !isSixDaysWorkingWeek) {
-                                    // исключаем из меню
-                                    wtComplex.getWtComplexesItems().remove(item);
-                                }
-                            }
-                        }
-
-                    } else {
-                        // исключаем из меню
-                        wtComplex.getWtComplexesItems().remove(item);
-                    }
-                } else {
-                    Boolean isLearningDay = DAOReadonlyService.getInstance()
-                            .checkLearningDayByOrgAndClientGroup(itemDate, org, clientGroup);
-                    if (isLearningDay != null && !isLearningDay) {
-                        // исключаем из меню
-                        wtComplex.getWtComplexesItems().remove(item);
                     }
                 }
             }
         }
-        return wtComplex;
     }
 }

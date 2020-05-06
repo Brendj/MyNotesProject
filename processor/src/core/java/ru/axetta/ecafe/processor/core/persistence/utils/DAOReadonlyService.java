@@ -1035,7 +1035,7 @@ public class DAOReadonlyService {
             Query query = entityManager.createQuery(
                     "SELECT sd.isWeekend from SpecialDate sd "
                             + "WHERE sd.date = :date AND sd.deleted = false AND sd.org = :org "
-                            + "AND sd.idOfClientGroup = :idOfClientGroup OR sd.idOfClientGroup IS NULL");
+                            + "AND (sd.idOfClientGroup = :idOfClientGroup OR sd.idOfClientGroup IS NULL)");
             query.setParameter("date", date, TemporalType.TIMESTAMP);
             query.setParameter("org", org);
             query.setParameter("idOfClientGroup", clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());

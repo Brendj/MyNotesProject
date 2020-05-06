@@ -103,8 +103,45 @@ public class WtComplex {
             inverseJoinColumns = @JoinColumn(name = "IdOfOrg"))
     private Set<Org> orgs = new HashSet<>();
 
+    @ManyToMany
+    @JoinTable(name = "cf_wt_discountrules_complexes",
+            joinColumns = @JoinColumn(name = "idOfComplex"),
+            inverseJoinColumns = @JoinColumn(name = "idOfRule"))
+    private Set<WtDiscountRule> discountRules = new HashSet<>();
+
     @OneToMany(mappedBy = "wtComplex")
     private Set<WtComplexesItem> wtComplexesItems = new HashSet<>();
+
+    public WtComplex(WtComplex complex) {
+        this.idOfComplex = complex.idOfComplex;
+        this.name = complex.name;
+        this.price = complex.price;
+        this.beginDate = complex.beginDate;
+        this.endDate = complex.endDate;
+        this.cycleMotion = complex.cycleMotion;
+        this.dayInCycle = complex.dayInCycle;
+        this.version = complex.version;
+        this.guid = complex.guid;
+        this.createDate = complex.createDate;
+        this.lastUpdate = complex.lastUpdate;
+        this.createdUser = complex.createdUser;
+        this.updatedUser = complex.updatedUser;
+        this.deleteState = complex.deleteState;
+        this.wtComplexGroupItem = complex.wtComplexGroupItem;
+        this.wtAgeGroupItem = complex.wtAgeGroupItem;
+        this.wtDietType = complex.wtDietType;
+        this.contragent = complex.contragent;
+        this.wtOrgGroup = complex.wtOrgGroup;
+        this.composite = complex.composite;
+        this.isPortal = complex.isPortal;
+        this.startCycleDay = complex.startCycleDay;
+        this.orgs = complex.orgs;
+        this.discountRules = complex.discountRules;
+        this.wtComplexesItems = complex.wtComplexesItems;
+    }
+
+    public WtComplex() {
+    }
 
     public Boolean getIsPortal() {
         return isPortal;
@@ -313,6 +350,14 @@ public class WtComplex {
 
     public void setBarcode(String barcode) {
         this.barcode = barcode;
+    }
+
+    public Set<WtDiscountRule> getDiscountRules() {
+        return discountRules;
+    }
+
+    public void setDiscountRules(Set<WtDiscountRule> discountRules) {
+        this.discountRules = discountRules;
     }
 
     @Override
