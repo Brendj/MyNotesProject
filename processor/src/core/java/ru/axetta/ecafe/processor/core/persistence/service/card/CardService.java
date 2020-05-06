@@ -151,12 +151,12 @@ public class CardService {
         return cardUpdateResult(o, reset(o.getCardNo(), idOfOrg, o.getIdOfClient(), isOldArm));
     }
     //6.	Блокировка карты
-    public int block(long cardNo, long idOfOrg, long idOfClient, Boolean isOldArm, String lockReason) {
-        return cardWritableRepository.block(cardNo, idOfOrg, idOfClient, isOldArm, lockReason);
+    public int block(long cardNo, long idOfOrg, long idOfClient, Boolean isOldArm, String lockReason, CardState blockState) {
+        return cardWritableRepository.block(cardNo, idOfOrg, idOfClient, isOldArm, lockReason, blockState);
     }
 
     public ResCardsOperationsRegistryItem tempblock(CardsOperationsRegistryItem o, long idOfOrg, Boolean isOldArm) {
-        return cardUpdateResult(o, block(o.getCardNo(), idOfOrg, o.getIdOfClient(), isOldArm, ""));
+        return cardUpdateResult(o, block(o.getCardNo(), idOfOrg, o.getIdOfClient(), isOldArm, "", CardState.TEMPBLOCKED));
     }
 
 

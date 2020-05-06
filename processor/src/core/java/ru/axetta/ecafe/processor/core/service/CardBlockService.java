@@ -5,10 +5,7 @@
 package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.Card;
-import ru.axetta.ecafe.processor.core.persistence.CardActivity;
-import ru.axetta.ecafe.processor.core.persistence.CardActivityType;
-import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 
@@ -80,7 +77,8 @@ public class CardBlockService {
         for (Card card : cards) {
             try {
                 RuntimeContext.getAppContext().getBean(CardService.class)
-                        .block(card.getCardNo(), card.getOrg().getIdOfOrg(), card.getClient().getIdOfClient(), false, LOCK_REASON);
+                        .block(card.getCardNo(), card.getOrg().getIdOfOrg(), card.getClient().getIdOfClient(), false,
+                                LOCK_REASON, CardState.BLOCKED);
                 counter++;
             } catch (Exception e) {
                 logger.error("Error in CardBlockService. CardNo = " + card.getCardNo(), e);
