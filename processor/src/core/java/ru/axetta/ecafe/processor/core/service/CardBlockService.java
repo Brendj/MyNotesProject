@@ -80,7 +80,7 @@ public class CardBlockService {
         for (Card card : cards) {
             try {
                 RuntimeContext.getAppContext().getBean(CardService.class)
-                        .blockAndReset(card.getCardNo(), card.getOrg().getIdOfOrg(), card.getClient().getIdOfClient(), false,
+                        .block(card.getCardNo(), card.getOrg().getIdOfOrg(), card.getClient().getIdOfClient(), false,
                                 LOCK_REASON);
                 counter++;
             } catch (Exception e) {

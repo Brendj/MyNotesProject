@@ -187,30 +187,34 @@ public class CardWritableRepository extends WritableJpaDao {
         }
     }*/
 
-    public int block(long cardNo, long idOfOrg) {
+    public int block(long cardNo, long idOfOrg, String lockReason) {
         return entityManager.createQuery("update Card set "
                 + " state = :state, "
-                + " updateTime = :updateTime "
+                + " updateTime = :updateTime, "
+                + " lockReason = :lockReason "
                 + " where cardNo = :cardNo"
                 + "     and org.idOfOrg = :idOfOrg")
                 .setParameter("state", CardState.TEMPBLOCKED.getValue())
                 .setParameter("updateTime", new Date())
                 .setParameter("cardNo", cardNo)
                 .setParameter("idOfOrg", idOfOrg)
+                .setParameter("lockReason", lockReason)
                 .executeUpdate();
     }
 
-    public int block(long cardNo, long idOfOrg, long idOfClient, Boolean isOldArm) {
-        if (!isOldArm) return block(cardNo, idOfOrg);
+    public int block(long cardNo, long idOfOrg, long idOfClient, Boolean isOldArm, String lockReason) {
+        if (!isOldArm) return block(cardNo, idOfOrg, lockReason);
         return entityManager.createQuery("update Card set "
                 + " state = :state, "
-                + " updateTime = :updateTime "
+                + " updateTime = :updateTime, "
+                + " lockReason = :lockReason "
                 + " where cardNo = :cardNo"
                 + "     and client.idOfClient = :idOfClient")
                 .setParameter("state", CardState.TEMPBLOCKED.getValue())
                 .setParameter("updateTime", new Date())
                 .setParameter("cardNo", cardNo)
                 .setParameter("idOfClient", idOfClient)
+                .setParameter("lockReason", lockReason)
                 .executeUpdate();
     }
 
