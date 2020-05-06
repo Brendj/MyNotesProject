@@ -136,7 +136,7 @@ public class EzdController {
             Integer clas;
             Date curDateDates;
             Integer countwait;
-            boolean goodProd;
+            boolean goodSub;
             boolean goodSpec;
             Date curDate;
             String curDatesString;
@@ -256,60 +256,58 @@ public class EzdController {
                             int countGoodday = 0;
 
                             do {
-                                goodProd = false;
+                                goodSub = false;
                                 goodSpec = false;
-
-                                //Проверка по производственному календарю
-                                for (ProductionCalendar productionCalendar : productionCalendars) {
-                                    if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(curDateDates)) {
-                                        goodProd = true;
-                                        boolean findDate = false;
-                                        //Проверка не является ли эта дата рабочей субботой....
-                                        for (RequestsEzdSpecialDateView requestsEzdSpecialDateView : requestsEzdSpecialDateViews) {
-                                            if (CalendarUtils.startOfDay(requestsEzdSpecialDateView.getSpecDate())
-                                                    .equals(curDateDates) && requestsEzdSpecialDateView.getIdoforg()
-                                                    .equals(thisIdOfOrg) && requestsEzdSpecialDateView.getGroupname()
-                                                    .equals(thisGroupName)) {
-                                                findDate = true;
-                                                if (requestsEzdSpecialDateView.getIsweekend() == 0) {
-                                                    goodProd = false;
-                                                } else {
-                                                    goodSpec = true;
-                                                }
-                                                break;
-                                            }
+                                boolean flag;
+                                do {
+                                    flag = false;
+                                    for (ProductionCalendar productionCalendar : productionCalendars) {
+                                        if (CalendarUtils.startOfDay(productionCalendar.getDay()).equals(curDateDates)) {
+                                            curDateDates = CalendarUtils.addOneDay(curDateDates);
+                                            flag = true;
                                         }
-                                        if (!findDate) {
-                                            int day = CalendarUtils.getDayOfWeek(curDateDates);
-                                            if (day == Calendar.SATURDAY) {
-                                                boolean flag = DAOReadonlyService.getInstance()
-                                                        .isSixWorkWeek(thisIdOfOrg, thisGroupName);
-                                                if (flag) {
-                                                    goodProd = false;
-                                                }
-                                            }
-
-                                        }
-                                        break;
                                     }
-                                }
-                                //Проверка по учебному календарю
-                                if (!goodProd) {
-                                    for (Integer k = currentCountSpecDate; k < requestsEzdSpecialDateViews.size(); k++) {
-                                        if (CalendarUtils.startOfDay(requestsEzdSpecialDateViews.get(k).getSpecDate())
-                                                .equals(curDateDates) && requestsEzdSpecialDateViews.get(k).getIdoforg()
-                                                .equals(thisIdOfOrg) && requestsEzdSpecialDateViews.get(k).getGroupname()
-                                                .equals(thisGroupName)
-                                                && requestsEzdSpecialDateViews.get(k).getIsweekend() == 1) {
-                                            goodSpec = true;
-                                            currentCountSpecDate = k;
+                                } while (flag);
+
+                                boolean findDate = false;
+                                for (Integer k = currentCountSpecDate; k < requestsEzdSpecialDateViews.size(); k++) {
+                                    if (CalendarUtils.startOfDay(requestsEzdSpecialDateViews.get(k).getSpecDate())
+                                            .equals(curDateDates) && requestsEzdSpecialDateViews.get(k).getIdoforg()
+                                            .equals(thisIdOfOrg)) {
+                                        //Нашли запись с такой датой и орг
+                                        if (requestsEzdSpecialDateViews.get(k).getGroupname() == null)
+                                        {
+                                            //Действует на всю огр
+                                            if (requestsEzdSpecialDateViews.get(k).getIsweekend() == 0) {
+                                                goodSpec = false;
+                                            } else {
+                                                goodSpec = true;
+                                            }
+                                        }
+                                        if (requestsEzdSpecialDateViews.get(k).getGroupname().equals(thisGroupName))
+                                        {
+                                            //Действует только на данную
+                                            findDate = true;
+                                            if (requestsEzdSpecialDateViews.get(k).getIsweekend() == 0) {
+                                                goodSpec = false;
+                                            } else {
+                                                goodSpec = true;
+                                            }
                                             break;
                                         }
-                                        currentCountSpecDate = requestsEzdSpecialDateViews.size();
+                                    }
+                                }
+                                if (!findDate) {
+                                    int day = CalendarUtils.getDayOfWeek(curDateDates);
+                                    if (day == Calendar.SATURDAY) {
+                                        goodSub = DAOReadonlyService.getInstance()
+                                                .isSixWorkWeek(thisIdOfOrg, thisGroupName);
+
                                     }
                                 }
 
-                                if (!goodSpec && !goodProd) {
+                                if (goodSpec && !goodSub)
+                                {
                                     if (countwait == null || countwait == 0) {
                                         datesForThis.add(curDateDates);
                                         countGoodday++;
