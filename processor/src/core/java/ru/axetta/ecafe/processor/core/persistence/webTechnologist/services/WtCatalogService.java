@@ -14,6 +14,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.hibernate.criterion.MatchMode;
@@ -190,7 +191,7 @@ public class WtCatalogService {
         }
     }
 
-    public List<WtCategoryItem> getAllCategoryItem() {
+    public List<WtCategoryItem> getAllActiveCategoryItem() {
         Session session = null;
         List<WtCategoryItem> result;
         try {
@@ -212,7 +213,7 @@ public class WtCatalogService {
 
     public List<WtCategoryItem> findCategoryItemByDescription(String description) {
         if(StringUtils.isEmpty(description)){
-            return getAllCategoryItem();
+            return getAllActiveCategoryItem();
         }
         Session session = null;
         List<WtCategoryItem> result;
@@ -257,6 +258,7 @@ public class WtCatalogService {
             item.setDescription(description);
             item.setVersion(nextVersion);
             item.setGuid(UUID.randomUUID().toString());
+            item.setDeleteState(WtCategoryItem.ACTIVE);
 
             session.save(item);
             transaction.commit();
@@ -371,5 +373,20 @@ public class WtCatalogService {
         criteria.setProjection(Projections.max("version"));
         Long result = (Long) criteria.uniqueResult();
         return result == null ? 0L : result;
+    }
+
+    public Boolean catalogItemIsChange(WtCategoryItem item, Session session) {
+        if(item == null){
+            return false;
+        }
+        Query query = session.createSQLQuery(
+                "SELECT description NOT LIKE :newDescription OR deletestate != :deleteState \n"
+                + "FROM cf_wt_category_items\n"
+                + "WHERE idofcategoryitem = :idOfItem"
+        );
+        query.setParameter("newDescription", item.getDescription());
+        query.setParameter("idOfItem", item.getIdOfCategoryItem());
+        query.setParameter("deleteState", item.getDeleteState());
+        return (Boolean) query.uniqueResult();
     }
 }

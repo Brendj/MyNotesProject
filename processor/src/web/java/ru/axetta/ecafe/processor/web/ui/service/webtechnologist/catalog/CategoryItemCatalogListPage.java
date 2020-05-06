@@ -14,7 +14,6 @@ import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -47,7 +46,7 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
 
     @Override
     public void onShow() throws Exception {
-        catalogListItem = service.getAllCategoryItem();
+        catalogListItem = service.getAllActiveCategoryItem();
         descriptionForNewItem = "";
         descriptionFilter = "";
     }
@@ -82,13 +81,15 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
 
-            Long nextVersion = service.getLastVersionCategoryItem(session) + 1L;;
+            Long nextVersion = service.getLastVersionCategoryItem(session) + 1L;
             Date updateDate = new Date();
 
             for (WtCategoryItem item : catalogListItem) {
-                item.setLastUpdate(updateDate);
-                item.setVersion(nextVersion);
-                session.merge(item);
+                if(service.catalogItemIsChange(item, session)) {
+                    item.setLastUpdate(updateDate);
+                    item.setVersion(nextVersion);
+                    session.merge(item);
+                }
             }
 
             transaction.commit();
@@ -128,29 +129,26 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
     }
 
     public void deleteItem() {
-        Session session = null;
-        Transaction transaction = null;
         try {
             if(selectedItem == null){
                 throw new IllegalArgumentException("Selected item is null");
             }
-            session = RuntimeContext.getInstance().createPersistenceSession();
-            transaction = session.beginTransaction();
-
-            Query query = session.createQuery("DELETE WtCategoryItem WHERE idOfCategoryItem = :idOfCategoryItem");
-            query.setParameter("idOfCategoryItem", selectedItem.getIdOfCategoryItem());
-            query.executeUpdate();
-            catalogListItem.remove(selectedItem);
-
-            transaction.commit();
-            transaction = null;
-
+            selectedItem.setDeleteState(WtCategoryItem.DELETE);
         } catch (Exception e){
             printError("Не удалось удалить элемент: " + e.getMessage());
             logger.error("Can't delete element", e);
-        } finally {
-            HibernateUtils.rollback(transaction, logger);
-            HibernateUtils.close(session, logger);
+        }
+    }
+
+    public void reestablishItem(){
+        try {
+            if(selectedItem == null){
+                throw new IllegalArgumentException("Selected item is null");
+            }
+            selectedItem.setDeleteState(WtCategoryItem.ACTIVE);
+        } catch (Exception e){
+            printError("Не удалось удалить элемент: " + e.getMessage());
+            logger.error("Can't delete element", e);
         }
     }
 
@@ -181,7 +179,7 @@ public class CategoryItemCatalogListPage extends BasicWorkspacePage {
 
     public void dropAndReloadCatalogList() {
         descriptionFilter = "";
-        catalogListItem = service.getAllCategoryItem();
+        catalogListItem = service.getAllActiveCategoryItem();
     }
 
     public String getDescriptionForNewItem() {

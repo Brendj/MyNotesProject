@@ -31,6 +31,10 @@
             <column name="description" sql-type="varchar(255)" length="255"/>
         </property>
 
+        <property name="deleteState">
+            <column name="deletestate" sql-type="integer"/>
+        </property>
+
         <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User">
             <column name="idOfUser"/>
         </many-to-one>

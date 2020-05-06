@@ -8,6 +8,12 @@
 <%@ taglib prefix="rich" uri="http://richfaces.org/rich" %>
 <%@ taglib prefix="a4j" uri="http://richfaces.org/a4j" %>
 
+<style>
+    .isDelete {
+        background-color: #8d8d8d;
+    }
+</style>
+
 <%--@elvariable id="categoryItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.catalog.CategoryItemCatalogListPage"--%>
 <h:panelGrid id="webTechnologistcategoryItemCatalogItemListPagePanelGrid" binding="#{categoryItemCatalogListPage.pageComponent}"
              styleClass="borderless-grid">
@@ -59,27 +65,27 @@
     <rich:dataTable id="webtechnologistcategoryItemCatalogItemListTable" value="#{categoryItemCatalogListPage.catalogListItem}" var="item" rows="30"
                     footerClass="data-table-footer"
                     columnClasses="center-aligned-column, left-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column, left-aligned-column, center-aligned-column, center-aligned-column">
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass=" #{item.deleteState == 1 ? 'isDelete' : ''}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Описание" />
             </f:facet>
             <h:inputText value="#{item.description}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass=" #{item.deleteState == 1 ? 'isDelete' : ''}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Создал пользователь" />
             </f:facet>
             <h:outputText escape="true" value="#{item.user.userName}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass=" #{item.deleteState == 1 ? 'isDelete' : ''}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Дата создания" />
             </f:facet>
-            <h:outputText escape="true" value="#{item.createDate}" styleClass="output-text">
+            <h:outputText escape="true" value="#{item.createDate}">
                 <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
             </h:outputText>
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass="#{item.deleteState == 1 ? 'isDelete' : ''}">
             <f:facet name="header">
                 <h:outputText escape="true" value="Последнее обновление" />
             </f:facet>
@@ -87,14 +93,21 @@
                 <f:convertDateTime pattern="dd.MM.yyyy HH:mm" />
             </h:outputText>
         </rich:column>
-        <rich:column headerClass="column-header">
+        <rich:column headerClass="column-header" styleClass=" #{item.deleteState == 1 ? 'isDelete' : ''}">
             <f:facet name="header">
-                <h:outputText value="Удалить" escape="true" />
+                <h:outputText value="Удалить/Восстановить" escape="true" />
             </f:facet>
-            <a4j:commandLink  styleClass="command-link"
+            <a4j:commandLink  styleClass="command-link" rendered="#{item.deleteState == 0}"
                               action="#{categoryItemCatalogListPage.deleteItem()}"
                               reRender="webtechnologistcategoryItemCatalogItemListTable">
                 <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
+                <f:setPropertyActionListener value="#{item}"
+                                             target="#{categoryItemCatalogListPage.selectedItem}" />
+            </a4j:commandLink>
+            <a4j:commandLink  styleClass="command-link" rendered="#{item.deleteState == 1}"
+                              action="#{categoryItemCatalogListPage.reestablishItem()}"
+                              reRender="webtechnologistcategoryItemCatalogItemListTable">
+                <h:graphicImage value="/images/16x16/true.png" style="border: 0;" />
                 <f:setPropertyActionListener value="#{item}"
                                              target="#{categoryItemCatalogListPage.selectedItem}" />
             </a4j:commandLink>
