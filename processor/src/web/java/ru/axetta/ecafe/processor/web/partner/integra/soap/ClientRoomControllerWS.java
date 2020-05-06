@@ -3569,7 +3569,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             addInfo.setPreorderAllowed(ClientManager.getAllowedPreorderByClient(session, child.getIdOfClient(), cg.getIdOfGuardian()) ? 1 : null);
                             addInfo.setClientCreatedFrom(cg.isDisabled() ? null : cg.getCreatedFrom());
                             addInfo.setDisabled(cg.isDisabled());
-                            addInfo.setRepresentType(cg.getRepresentType());
+                            if (cg.getRepresentType() == null)
+                                addInfo.setRepresentType(ClientGuardianRepresentType.UNKNOWN);
+                            else
+                                addInfo.setRepresentType(cg.getRepresentType());
                             result.put(child, addInfo);
                         }
                     }
@@ -3577,6 +3580,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     ClientWithAddInfo addInfo = new ClientWithAddInfo();
                     addInfo.setInformedSpecialMenu(null);
                     addInfo.setClientCreatedFrom(ClientCreatedFromType.DEFAULT);
+                    addInfo.setRepresentType(ClientGuardianRepresentType.UNKNOWN);
                     result.put(DAOUtils.findClient(session, londId), addInfo);
                 }
             }
@@ -4170,7 +4174,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
             return r;
         }
-        if (roleRepresentative == 1 || roleRepresentative == 2)
+        if (roleRepresentative < 0 || roleRepresentative > 2)
         {
             r = new Result(RC_INVALID_DATA, "Лимит может быть установлен только законным представителем");
             return r;
@@ -4816,6 +4820,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new InvalidDataException("Не заполнен номер телефона опекуна");
             }
 
+            if (roleRepresentative < 0 || roleRepresentative > 2) {
+                throw new InvalidDataException("Возможно только законным представителем");
+            }
             session = runtimeContext.createPersistenceSession();
             persistenceTransaction = session.beginTransaction();
 
@@ -8034,7 +8041,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "passportSeries") String passportSeries,
             @WebParam(name = "typeCard") Integer typeCard,
             @WebParam(name = "roleRepresentative") Integer roleRepresentative,
-            @WebParam(name = "degree") String relation) {
+            @WebParam(name = "degree") Integer relation) {
 
         authenticateRequest(null);
 
@@ -8109,7 +8116,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     .findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
             if (clientGuardian == null) {
                 clientGuardian = ClientManager
-                        .createClientGuardianInfoTransactionFree(session, guardian, relation, false, client.getIdOfClient(),
+                        .createClientGuardianInfoTransactionFree(session, guardian, ClientGuardianRelationType.fromInteger(relation).getDescription(), false, client.getIdOfClient(),
                                 ClientCreatedFromType.MPGU, roleRepresentative);
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
