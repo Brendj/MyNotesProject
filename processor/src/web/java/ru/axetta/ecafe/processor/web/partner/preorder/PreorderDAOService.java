@@ -2405,7 +2405,7 @@ public class PreorderDAOService {
             sb.append(" AND complex.wtComplexGroupItem = :complexGroup");
         }
         if (ageGroupList != null && ageGroupList.size() > 0) {
-            sb.append(" AND complex.wtAgeGroupItem = :ageGroup)");
+            sb.append(" AND complex.wtAgeGroupItem = :ageGroup");
         }
 
         for (WtDiscountRule rule : wtDiscountRuleSet) {

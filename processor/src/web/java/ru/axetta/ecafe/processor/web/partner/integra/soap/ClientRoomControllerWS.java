@@ -2768,24 +2768,29 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List<WtAgeGroupItem> ageGroupList = RuntimeContext.getAppContext()
                     .getBean(PreorderDAOService.class).getWtAgeGroupItems(client, categoriesDiscount);
 
-            // Комплексы
-            Set<WtComplex> wtComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getWtComplexes(startDate, endDate, wtDiscountRuleSet, complexGroupList, ageGroupList);
+            if (wtDiscountRuleSet.size() > 0) {
+                // Комплексы
+                Set<WtComplex> wtComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getWtComplexes(startDate, endDate, wtDiscountRuleSet, complexGroupList, ageGroupList);
 
-            // Исключение из комплексов составов, не соответствующим датам цикла
-            for (WtComplex wtComplex : wtComplexes) {
-                wtComplex = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .getWtComplexInCycleDates(client, org, wtComplex);
-            }
+                // Исключение из комплексов составов, не соответствующим датам цикла
+                for (WtComplex wtComplex : wtComplexes) {
+                    wtComplex = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                            .getWtComplexInCycleDates(client, org, wtComplex);
+                }
 
-            List<MenuWithComplexesExt> list = new ArrayList<>();
-            for (WtComplex wtComplex : wtComplexes) {
-                List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtComplex);
-                MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(wtComplex, org);
-                menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
-                list.add(menuWithComplexesExt);
+                List<MenuWithComplexesExt> list = new ArrayList<>();
+                for (WtComplex wtComplex : wtComplexes) {
+                    List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtComplex);
+                    MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(wtComplex, org);
+                    menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
+                    list.add(menuWithComplexesExt);
+                }
+                result.getMenuWithComplexesList().setList(list);
+            } else {
+                logger.warn("Льготные правила для данных категорий отсутствуют: " + categoriesDiscount);
+                throw new Exception();
             }
-            result.getMenuWithComplexesList().setList(list);
 
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);
