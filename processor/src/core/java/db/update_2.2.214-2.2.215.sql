@@ -10,3 +10,9 @@ ALTER TABLE cf_taloon_approval
     ADD COLUMN complexid bigint,
     ADD COLUMN bywebsupplier boolean NOT NULL DEFAULT false;
 
+
+-- 499: добавление нового поля в таблицу детализации комплексов предзаказа
+
+ALTER TABLE cf_preorder_menudetail
+    ADD COLUMN idofdish bigint;
+

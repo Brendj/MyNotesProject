@@ -21,6 +21,7 @@ public class PreOrderFeedingDetail {
     private final Long price;
     private final String itemCode;
     private String goodsGuid;
+    private Long idOfDish;
 
     public PreOrderFeedingDetail(Session session, PreorderMenuDetail menuDetail, Integer complexId, String guid) {
         this.idOfMenu = menuDetail.getArmIdOfMenu();
@@ -35,6 +36,9 @@ public class PreOrderFeedingDetail {
             query.setParameter("id", menuDetail.getIdOfGood());
             String goodsGuid = (String)query.uniqueResult();
             this.goodsGuid = goodsGuid;
+        }
+        if (menuDetail.getIdOfDish() != null) {
+            this.idOfDish = menuDetail.getIdOfDish();
         }
     }
 
@@ -72,6 +76,14 @@ public class PreOrderFeedingDetail {
         return price;
     }
 
+    public Long getIdOfDish() {
+        return idOfDish;
+    }
+
+    public void setIdOfDish(Long idOfDish) {
+        this.idOfDish = idOfDish;
+    }
+
     public Element toElement(Document document) throws Exception{
         Element element = document.createElement("POD");
 
@@ -98,6 +110,9 @@ public class PreOrderFeedingDetail {
         }
         if (null != goodsGuid) {
             element.setAttribute("GoodsGuid", goodsGuid);
+        }
+        if (null != idOfDish) {
+            element.setAttribute("idOfDish", idOfDish.toString());
         }
 
         return element;
