@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.partner.preorder;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.logic.IPreorderDAOOperations;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
@@ -1772,7 +1773,8 @@ public class PreorderDAOService {
                         ClientWithAddInfo addInfo = new ClientWithAddInfo();
                         if (!cg.isDisabled()) {
                             addInfo.setClientCreatedFrom(cg.getCreatedFrom());
-                            addInfo.setInformedSpecialMenu(cg.getInformedSpecialMenu() ? 1 : 0);
+                            addInfo.setInformedSpecialMenu(ClientManager.getInformedSpecialMenu((Session) emReport.getDelegate(), cg.getIdOfChildren(),
+                                    cg.getIdOfGuardian()) ? 1 : 0);
                             //result.put((Client) row[0], cg.getCreatedFrom());
                         }
                         result.put((Client) row[0], addInfo);
