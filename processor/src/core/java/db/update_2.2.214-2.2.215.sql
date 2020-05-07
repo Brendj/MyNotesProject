@@ -16,3 +16,9 @@ ALTER TABLE cf_taloon_approval
 ALTER TABLE cf_preorder_menudetail
     ADD COLUMN idofdish bigint;
 
+
+-- 499: добавление новых полей в реестр талонов
+
+ALTER TABLE cf_taloon_preorder
+    ADD COLUMN idofdish bigint,
+    ADD COLUMN bywebsupplier boolean NOT NULL DEFAULT false;
