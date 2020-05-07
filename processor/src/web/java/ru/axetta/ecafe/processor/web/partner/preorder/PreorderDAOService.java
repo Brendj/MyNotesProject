@@ -856,7 +856,6 @@ public class PreorderDAOService {
             queryMenuSelect.setParameter("startDate", CalendarUtils.startOfDay(date).getTime());
             queryMenuSelect.setParameter("endDate", CalendarUtils.endOfDay(date).getTime());
             queryMenuSelect.setParameter("org", client.getOrg());
-            List<WtDish> dishes = queryMenuSelect.getResultList();
 
             Set<PreorderMenuDetail> set = new HashSet<>();
             if (complex.getMenuItems() != null) {
@@ -1668,6 +1667,24 @@ public class PreorderDAOService {
         }
     }
 
+    private boolean preorderWtMenuDetailExists(PreorderComplex preorderComplex, Client client, Date date, Long idOfDish) {
+        Query query = em.createQuery("select pmd.idOfPreorderMenuDetail from PreorderMenuDetail pmd where pmd.preorderComplex.idOfPreorderComplex = :preorderComplex "
+                + "and pmd.client = :client and pmd.preorderDate = :preorderDate and pmd.idOfDish = :idOfDish and pmd.deletedState = false");
+        query.setParameter("preorderComplex", preorderComplex.getIdOfPreorderComplex());
+        query.setParameter("client", client);
+        query.setParameter("preorderDate", date);
+        query.setParameter("idOfDish", idOfDish);
+        try {
+            query.getSingleResult();
+            return true;
+        } catch (NoResultException e) {
+            return false;
+        } catch (NonUniqueResultException e) {
+            logger.error("Error in preorderWtMenuDetailExists: ", e);
+            return true;
+        }
+    }
+
     private List getMenuDetailList(Long idOfComplexInfo) {
         Query query = emReport.createNativeQuery("SELECT md.idofmenudetail, md.LocalIdOfMenu "
                 + "FROM CF_MenuDetails md INNER JOIN CF_ComplexInfoDetail cid ON cid.IdOfMenuDetail = md.IdOfMenuDetail "
@@ -1713,7 +1730,7 @@ public class PreorderDAOService {
         List<WtDish> dishes = query.getResultList();
 
         for (WtDish wtDish : dishes) {
-            if (!preorderMenuDetailExists(preorderComplex, client, date, wtDish.getIdOfDish())) {
+            if (!preorderWtMenuDetailExists(preorderComplex, client, date, wtDish.getIdOfDish())) {
                 PreorderMenuDetail pmd = createPreorderWtMenuDetail(client, preorderComplex, wtDish, date, 0);
                 result.add(pmd);
             }
@@ -1756,7 +1773,6 @@ public class PreorderDAOService {
             WtDish wtDish, Date date, Integer amount) {
         PreorderMenuDetail preorderMenuDetail = new PreorderMenuDetail();
         preorderMenuDetail.setPreorderComplex(preorderComplex);
-        preorderMenuDetail.setArmIdOfMenu(wtDish.getCode().longValue());
         preorderMenuDetail.setClient(client);
         preorderMenuDetail.setPreorderDate(date);
         preorderMenuDetail.setAmount(amount);
@@ -1781,6 +1797,7 @@ public class PreorderDAOService {
         preorderMenuDetail.setProtein(wtDish.getProtein().doubleValue());
         preorderMenuDetail.setShortName(wtDish.getDishName());
         preorderMenuDetail.setIdOfGood(wtDish.getIdOfDish());
+        preorderMenuDetail.setIdOfDish(wtDish.getIdOfDish());
         return preorderMenuDetail;
     }
 
