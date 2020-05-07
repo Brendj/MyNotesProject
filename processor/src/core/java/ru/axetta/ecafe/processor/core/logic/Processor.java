@@ -4008,7 +4008,9 @@ public class Processor implements SyncProcessor {
                             MigrantsUtils
                                     .disableMigrantRequestIfExists(persistenceSession, idOfOrg, item.getIdOfGuardian());
                         }
-                        dbClientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        if (item.getRelation() != null) {
+                            dbClientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        }
                         dbClientGuardian.setVersion(resultClientGuardianVersion);
                         dbClientGuardian.setDisabled(item.getDisabled());
                         dbClientGuardian.setRepresentType(item.getRepresentType());
