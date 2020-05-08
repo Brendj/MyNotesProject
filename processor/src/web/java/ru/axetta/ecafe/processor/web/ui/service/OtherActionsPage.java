@@ -632,6 +632,11 @@ public class OtherActionsPage extends OnlineReportPage {
         RuntimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).runNotifications();
     }
 
+    public void autoBlockCards() {
+        RuntimeContext.getAppContext().getBean(CardBlockService.class).run();
+        printMessage("Операция блокировки ЭИ завершена");
+    }
+
     public void preorderRequestsManualGenerate() throws Exception {
         PreorderRequestsReportServiceParam params = new PreorderRequestsReportServiceParam(startDate);
         params.getIdOfOrgList().clear();

@@ -163,7 +163,10 @@ public class Option {
             OPTION_PHOTO_SYNC_EXPRESSION = 100204,
             OPTION_LIB_SYNC_EXPRESSION = 100205,
             OPTION_PERIOD_OF_EXTENSION_CARDS = 101101,
-            OPTION_NSI_VERSION = 100206;
+            OPTION_NSI_VERSION = 100206,
+            OPTION_CARD_AUTOBLOCK = 100210,
+            OPTION_CARD_AUTOBLOCK_NODE = 100211,
+            OPTION_CARD_AUTOBLOCK_DAYS = 100212;
 
     public final static Object[] OPTIONS_INITIALIZER = new Object[]{
             OPTION_WITH_OPERATOR, "0",
@@ -301,7 +304,10 @@ public class Option {
             OPTION_PHOTO_SYNC_EXPRESSION, "04:00-07:00",
             OPTION_LIB_SYNC_EXPRESSION, "16:00-22:00",
             OPTION_PERIOD_OF_EXTENSION_CARDS, "12",
-            OPTION_NSI_VERSION, NSI2
+            OPTION_NSI_VERSION, NSI2,
+            OPTION_CARD_AUTOBLOCK, "0 0 3 ? * 1",
+            OPTION_CARD_AUTOBLOCK_NODE, "1001",
+            OPTION_CARD_AUTOBLOCK_DAYS, "180"
 };
 
     private Long idOfOption;

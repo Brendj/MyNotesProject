@@ -8486,6 +8486,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 museumName = museumName.substring(0, 255);
             }
             Card card = cl.findActiveCard(session, null);
+            if (card != null) {
+                RuntimeContext.getAppContext().getBean(CardBlockService.class)
+                        .saveLastCardActivity(session, card.getIdOfCard(), CardActivityType.ENTER_MUSEUM);
+            }
             ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
             ExternalEvent event = new ExternalEvent(cl, museumCode, museumName, ExternalEventType.MUSEUM, accessTime,
                     ExternalEventStatus.fromInteger(ticketStatus), card == null ? null : card.getCardNo(),
@@ -8536,6 +8540,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Client cl = DAOUtils.findClientByGuid(session, guid);
             if (cl == null) {
                 return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
+            }
+            Card card = cl.findActiveCard(session, null);
+            if (card != null) {
+                RuntimeContext.getAppContext().getBean(CardBlockService.class)
+                        .saveLastCardActivity(session, card.getIdOfCard(), CardActivityType.ENTER_MUSEUM);
             }
             //здесь сохранение события в таблицу и отправка уведомления
             if (CultureName != null && CultureName.length() > 255) {
