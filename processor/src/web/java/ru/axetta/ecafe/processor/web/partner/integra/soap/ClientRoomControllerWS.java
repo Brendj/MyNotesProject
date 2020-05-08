@@ -2511,7 +2511,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
                     public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                             Session session, Transaction transaction) throws Exception {
-                        processMenuFirstDay(client.getOrg(), data, objectFactory, session, startDate, endDate);
+                        if (!client.getOrg().getUseWebArm()) {
+                            processMenuFirstDay(client.getOrg(), data, objectFactory, session, startDate, endDate);
+                        } else {
+                            processWtMenuFirstDay(client.getOrg(), data, objectFactory, session, startDate, endDate);
+                        }
                     }
                 }, null);
 
@@ -2572,6 +2576,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         generateMenuDetail(objectFactory, menus, session, data);
     }
 
+    private void processWtMenuFirstDay(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
+            Date endDate) throws DatatypeConfigurationException {
+
+        List<WtMenu> menus = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                .getWtMenuByDates(startDate, endDate, org);
+
+        generateWtMenuDetail(objectFactory, menus, session, data);
+    }
+
     private void generateMenuDetail(ObjectFactory objectFactory, List menus, Session session, Data data)
             throws DatatypeConfigurationException {
 
@@ -2609,6 +2622,78 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 menuItemExt.setProtein(menuDetail.getProtein());
                 menuItemExt.setCarbohydrates(menuDetail.getCarbohydrates());
                 menuItemExt.setFat(menuDetail.getFat());
+                menuDateItemExt.getE().add(menuItemExt);
+            }
+
+            menuListExt.getM().add(menuDateItemExt);
+        }
+        data.setMenuListExt(menuListExt);
+    }
+
+    private void generateWtMenuDetail(ObjectFactory objectFactory, List menus, Session session, Data data)
+            throws DatatypeConfigurationException {
+
+        MenuListExt menuListExt = objectFactory.createMenuListExt();
+        int nRecs = 0;
+        for (Object currObject : menus) {
+            if (nRecs++ > MAX_RECS) {
+                break;
+            }
+
+            WtMenu menu = (WtMenu) currObject;
+            MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
+            menuDateItemExt.setDate(toXmlDateTime(menu.getBeginDate()));
+
+            List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getWtDishesByMenu(menu);
+
+            //Получаем детализацию для одного Menu
+            for (WtDish wtDish : wtDishes) {
+                MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+
+                WtMenuGroup menuGroup = new WtMenuGroup();
+                if (wtDish.getMenuGroupMenus() != null && wtDish.getMenuGroupMenus().size() > 0) {
+                    for (WtMenuGroupMenu menuGroupMenu : wtDish.getMenuGroupMenus()) {
+                        if (menuGroupMenu.getMenuGroup() != null) {
+                            menuGroup = menuGroupMenu.getMenuGroup();
+                            break;
+                        }
+                    }
+                }
+                if (menuGroup != null) {
+                    menuItemExt.setGroup(menuGroup.getName());
+                }
+
+                menuItemExt.setName(wtDish.getDishName());
+                menuItemExt.setPrice(wtDish.getPrice().longValue());
+                if (wtDish.getCalories() == null) {
+                    menuItemExt.setCalories((double) 0);
+                } else {
+                    menuItemExt.setCalories(wtDish.getCalories().doubleValue());
+                }
+                if (wtDish.getQty() == null) {
+                    menuItemExt.setOutput("");
+                } else{
+                    menuItemExt.setOutput(wtDish.getQty());
+                }
+
+                menuItemExt.setAvailableNow(1); // доступно для продажи
+                if (wtDish.getProtein() == null) {
+                    menuItemExt.setProtein((double) 0) ;
+                } else{
+                    menuItemExt.setProtein(wtDish.getProtein().doubleValue());
+                }
+                if (wtDish.getCarbohydrates() == null) {
+                    menuItemExt.setCarbohydrates((double) 0) ;
+                } else{
+                    menuItemExt.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
+                }
+                if (wtDish.getFat() == null) {
+                    menuItemExt.setFat((double) 0) ;
+                } else{
+                    menuItemExt.setFat(wtDish.getFat().doubleValue());
+                }
+
                 menuDateItemExt.getE().add(menuItemExt);
             }
 
