@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service.nsi;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVScheduledStatus;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.revise.ReviseDAOService;
@@ -755,20 +756,13 @@ public class DTSZNDiscountsReviseService {
 
         Date fireTime = new Date();
 
-        String oldDiscounts = client.getCategoriesDiscounts();
-        String newDiscounts;
+        Set<CategoryDiscount> oldDiscounts = client.getCategories();
+        Set<CategoryDiscount> newDiscounts;
 
-        String[] discounts = StringUtils.split(client.getCategoriesDiscounts(), ',');
-        List<Long> categoryDiscountsList = new ArrayList<Long>(discounts.length);
-        for (String discount : discounts) {
-            Long discountCode;
-            try {
-                discountCode = Long.parseLong(discount);
-            } catch (NumberFormatException e) {
-                logger.warn(String.format("Unable to parse discount code=%s for client with id=%d", discount,
-                        client.getIdOfClient()));
-                continue;
-            }
+        //String[] discounts = StringUtils.split(client.getCategoriesDiscounts(), ',');
+        List<Long> categoryDiscountsList = new ArrayList<Long>(oldDiscounts.size());
+        for (CategoryDiscount categoryDiscount : oldDiscounts) {
+            Long discountCode = categoryDiscount.getIdOfCategoryDiscount();
 
             List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOUtils
                     .getCategoryDiscountDSZNByCategoryDiscountCode(session, discountCode);
@@ -812,14 +806,14 @@ public class DTSZNDiscountsReviseService {
                 }
             }
         }
-        newDiscounts = StringUtils.join(discountCodes, ",");
+        newDiscounts = ClientManager.getCategoriesSet(session, StringUtils.join(discountCodes, ","));
         Integer oldDiscountMode = client.getDiscountMode();
         Integer newDiscountMode =
-                StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+                newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 
         if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
             try {
-                ClientManager
+                DiscountManager
                         .renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode,
                                 DiscountChangeHistory.MODIFY_IN_REGISTRY);
             } catch (Exception e) {
@@ -1122,30 +1116,30 @@ public class DTSZNDiscountsReviseService {
                     List<ClientDtisznDiscountInfo> infoList = new ArrayList<>();
                     infoList.add(info);
                     updateApplicationForFood(session, client, infoList);
-                    if (StringUtils.isEmpty(client.getCategoriesDiscounts())) {
+                    if (client.getCategories().size() == 0) {
                         transaction.commit();
                         transaction = null;
                         continue;
                     }
 
                     CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, info.getDtisznCode());
-                    String isppCode = Long.toString(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount()); //код льготы ИСПП для льготы из Инфо
-                    List<String> discounts = new ArrayList(Arrays.asList(client.getCategoriesDiscounts().split(",")));
-                    String oldDiscounts = client.getCategoriesDiscounts();
+                    Long isppCode = categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount(); //код льготы ИСПП для льготы из Инфо
+                    Set<CategoryDiscount> discounts = client.getCategories();
+                    Set oldDiscounts = client.getCategories();
                     Integer oldDiscountMode = client.getDiscountMode();
 
-                    for (Iterator<String> iterator = discounts.iterator(); iterator.hasNext(); ) {
-                        String s = iterator.next();
-                        if (s.equals(isppCode)) {
+                    for (Iterator<CategoryDiscount> iterator = discounts.iterator(); iterator.hasNext(); ) {
+                        CategoryDiscount s = iterator.next();
+                        if (s.getIdOfCategoryDiscount() == isppCode) {
                             iterator.remove();
                         }
                     }
-                    String newDiscounts = StringUtils.join(discounts, ",");
-                    Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+                    //String newDiscounts = StringUtils.join(discounts, ",");
+                    Integer newDiscountMode = discounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 
-                    if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
+                    if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(discounts)) {
                         try {
-                            ClientManager.renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode,
+                            DiscountManager.renewDiscounts(session, client, discounts, oldDiscounts, newDiscountMode,
                                     oldDiscountMode, DiscountChangeHistory.MODIFY_IN_REGISTRY);
                         } catch (Exception e) {
                             transaction.rollback();

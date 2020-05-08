@@ -4735,7 +4735,6 @@ public class Processor implements SyncProcessor {
             }
 
             String categoriesFromPacket = getCanonicalDiscounts(clientParamItem.getCategoriesDiscounts());
-            String categoriesFromClient = getCanonicalDiscounts(client.getCategoriesDiscounts());
 
             Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
             Set<CategoryDiscount> categoryDiscountOfClient = client.getCategories();
@@ -4754,8 +4753,7 @@ public class Processor implements SyncProcessor {
                     for (Object object : categoryDiscountCriteria.list()) {
                         categoryDiscountSet.add((CategoryDiscount) object);
                     }
-                    if (!categoriesFromPacket.equals(categoriesFromClient)) {
-                        client.setCategoriesDiscounts(categoriesFromPacket);
+                    if (!categoryDiscountSet.equals(categoryDiscountOfClient)) {
                         if (!categoriesFromPacket.equals("")) {
                             client.setCategories(categoryDiscountSet);
                         }
@@ -4763,8 +4761,7 @@ public class Processor implements SyncProcessor {
                 }
             } else {
                 /* Льгота по категориями то очищаем */
-                if (!categoriesFromClient.equals("")) {
-                    client.setCategoriesDiscounts("");
+                if (!client.getCategories().isEmpty()) {
                     client.setCategories(new HashSet<CategoryDiscount>());
                 }
             }
@@ -4773,10 +4770,8 @@ public class Processor implements SyncProcessor {
             if (!(newClientDiscountMode == oldClientDiscountMode) || !(categoryDiscountSet
                     .equals(categoryDiscountOfClient))) {
                 Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
-                DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, org,
-                        newClientDiscountMode, oldClientDiscountMode, categoriesFromPacket, categoriesFromClient);
-                discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_ARM);
-                persistenceSession.save(discountChangeHistory);
+                DiscountManager.saveDiscountHistory(persistenceSession, client, org, categoryDiscountOfClient, categoryDiscountSet,
+                        oldClientDiscountMode, newClientDiscountMode, DiscountChangeHistory.MODIFY_IN_ARM);
                 client.setLastDiscountsUpdate(new Date());
             }
             client.setDiscountMode(clientParamItem.getDiscountMode());
@@ -7294,7 +7289,7 @@ public class Processor implements SyncProcessor {
         }
         //Если новая организация не совпадает ни со старой, ни с дружественными старой, то удаляем льготы
         if (isReplaceOrg(client, oldOrgs, newIdOfOrg)) {
-            ClientManager.deleteDiscount(client, session);
+            DiscountManager.deleteDiscount(client, session);
             return true;
         }
         return false;

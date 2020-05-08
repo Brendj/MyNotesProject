@@ -98,8 +98,6 @@ public class Client {
 
     private Long limit;
     private Long expenditureLimit;
-    private String categoriesDiscounts;
-    private String categoriesDiscountsDSZN;
     private Date lastDiscountsUpdate;
     private Date disablePlanCreationDate;
     private Date disablePlanEndDate;
@@ -119,6 +117,7 @@ public class Client {
     //private Set<Circulation> circulations = new HashSet<Circulation>();
     private Set<EnterEvent> enterEvents = new HashSet<EnterEvent>();
     private Set<CategoryDiscount> categoriesInternal = new HashSet<CategoryDiscount>();
+    private Set<ClientDtisznDiscountInfo> categoriesDSZNInternal = new HashSet<>();
     private String fax;
     private Boolean canConfirmGroupPayment;
     private Boolean confirmVisualRecognition;
@@ -158,8 +157,7 @@ public class Client {
 
     public Client(Org org, Person person, Person contractPerson, int flags, boolean notifyViaEmail,
             boolean notifyViaSMS, boolean notifyViaPUSH, long contractId, Date contractTime, int contractState,
-            String plainPassword, int payForSMS, long clientRegistryVersion, long limit, long expenditureLimit,
-            String categoriesDiscounts, String categoriesDiscountsDSZN) throws Exception {
+            String plainPassword, int payForSMS, long clientRegistryVersion, long limit, long expenditureLimit) throws Exception {
         this.org = org;
         this.person = person;
         this.contractPerson = contractPerson;
@@ -181,8 +179,6 @@ public class Client {
         this.subBalance1 = 0L;
         this.limit = limit;
         this.expenditureLimit = expenditureLimit;
-        this.categoriesDiscounts = categoriesDiscounts;
-        this.categoriesDiscountsDSZN = categoriesDiscountsDSZN;
         this.canConfirmGroupPayment = false;
         this.confirmVisualRecognition = false;
         this.disablePlanCreationDate = null;
@@ -478,14 +474,6 @@ public class Client {
 
     public void setExpenditureLimit(Long expenditureLimit) {
         this.expenditureLimit = expenditureLimit;
-    }
-
-    public String getCategoriesDiscounts() {
-        return categoriesDiscounts;
-    }
-
-    public void setCategoriesDiscounts(String categoriesDiscounts) {
-        this.categoriesDiscounts = categoriesDiscounts;
     }
 
     public Long getIdOfClient() {
@@ -891,6 +879,15 @@ public class Client {
         return clientSms;
     }
 
+    public Set<ClientDtisznDiscountInfo> getCategoriesDSZN() {
+        return Collections.unmodifiableSet(getCategoriesDSZNInternal());
+    }
+
+    private Set<ClientDtisznDiscountInfo> getCategoriesDSZNInternal() {
+        // For Hibernate only
+        return categoriesDSZNInternal;
+    }
+
     private void setClientSmsInternal(Set<ClientSms> clientSms) {
         // For Hibernate only
         this.clientSms = clientSms;
@@ -1044,14 +1041,6 @@ public class Client {
         this.birthDate = birthDate;
     }
 
-    public String getCategoriesDiscountsDSZN() {
-        return categoriesDiscountsDSZN;
-    }
-
-    public void setCategoriesDiscountsDSZN(String benefitDSZN) {
-        this.categoriesDiscountsDSZN = benefitDSZN;
-    }
-
     public Date getLastDiscountsUpdate() {
         return lastDiscountsUpdate;
     }
@@ -1113,7 +1102,7 @@ public class Client {
                 + ", cypheredPassword='" + cypheredPassword + '\'' + ", payForSMS=" + payForSMS + ", freePayMaxCount="
                 + freePayMaxCount + ", freePayCount=" + freePayCount + ", lastFreePayTime=" + lastFreePayTime
                 + ", discountMode=" + discountMode + ", balance=" + balance + ", limit=" + limit + ", expenditureLimit="
-                + expenditureLimit + ", categoriesDiscounts=" + categoriesDiscounts + '}';
+                + expenditureLimit + '}';
     }
 
     public Long getBalanceToNotify() {

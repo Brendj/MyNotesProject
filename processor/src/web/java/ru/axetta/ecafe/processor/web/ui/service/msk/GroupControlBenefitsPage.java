@@ -204,7 +204,6 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
                                         client.setLastDiscountsUpdate(new Date());
                                         client.setDiscountMode(3);
                                         client.setCategories(clientCategoryDiscounts);
-                                        client.setCategoriesDiscounts(categoryDiscounts);
                                         client.setClientRegistryVersion(clientRegistryVersion);
                                         persistenceSession.update(client);
                                         groupControlBenefitsItems
@@ -224,7 +223,6 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
                                         saveClientDiscountChange(persistenceSession, client, 3, categoriesDiscounts);
                                         client.setLastDiscountsUpdate(new Date());
                                         client.setDiscountMode(3);
-                                        client.setCategoriesDiscounts(categoriesDiscounts);
                                         client.setCategories(categoryDiscountSet);
                                         client.setClientRegistryVersion(clientRegistryVersion);
                                         persistenceSession.update(client);

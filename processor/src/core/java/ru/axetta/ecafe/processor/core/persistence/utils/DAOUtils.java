@@ -1887,40 +1887,6 @@ public class DAOUtils {
         return version;
     }
 
-    public static void deleteCategoryDiscount(Session session, long id) {
-        //TODO: разобораться надо ли это с учетом ввода таблицы связи
-        CategoryDiscount categoryDiscount = (CategoryDiscount) session.load(CategoryDiscount.class, id);
-        Criteria clientCriteria = session.createCriteria(Client.class);
-        Criterion exp1 = Restrictions.or(Restrictions
-                        .like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + "", MatchMode.EXACT),
-                Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + ",",
-                        MatchMode.START));
-        Criterion exp2 = Restrictions.or(Restrictions
-                        .like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount(), MatchMode.END),
-                Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount() + ",",
-                        MatchMode.ANYWHERE));
-        Criterion expression = Restrictions.or(exp1, exp2);
-        clientCriteria.add(expression);
-        List<Client> clients = clientCriteria.list();
-        for (Client client : clients) {
-            String categoriesDiscounts = client.getCategoriesDiscounts();
-            if (categoriesDiscounts.contains("," + id + ",")) {
-                categoriesDiscounts = categoriesDiscounts.replace("," + id + ",", ",");
-            } else if (categoriesDiscounts.startsWith(id + ",")) {
-                categoriesDiscounts = categoriesDiscounts.substring((id + ",").length());
-            } else if (categoriesDiscounts.endsWith("," + id)) {
-                categoriesDiscounts = categoriesDiscounts
-                        .substring(0, categoriesDiscounts.length() - ("," + id).length());
-            } else {
-                categoriesDiscounts = categoriesDiscounts.replace("" + id, "");
-            }
-            client.setCategoriesDiscounts(categoriesDiscounts);
-            session.save(client);
-        }
-
-        session.delete(categoryDiscount);
-    }
-
     public static void deleteCategoryDiscountDSZN(Session session, Long id, Long nextVersion) {
         CategoryDiscountDSZN categoryDiscountDSZN = (CategoryDiscountDSZN) session
                 .load(CategoryDiscountDSZN.class, id.intValue());
