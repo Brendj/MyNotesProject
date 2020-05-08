@@ -3428,12 +3428,56 @@ public class DAOUtils {
         session.flush();
     }
 
-    public static List<GroupNamesToOrgs> getAllGroupnamesToOrgsByIdOfOrg(Session session, Long idOfOrg) {
+    public static List<GroupNamesToOrgs> getAllGroupnamesToOrgsByIdOfOrgAndMain(Session session, Long idOfOrg) {
         Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
         criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         criteria.add(Restrictions.eq("idOfMainOrg", idOfOrg));
 
         List<GroupNamesToOrgs> result = criteria.list();
+
+        return result;
+    }
+
+    public static List<GroupNamesToOrgs> getAllGroupnamesToOrgsByIdOfOrg(Session session, Long idOfOrg) {
+        Query query = session.createSQLQuery(
+                "select distinct cg.* from cf_groupnames_to_orgs cg \n"
+                        + "join cf_clientgroups ccg on cg.groupname = ccg.groupname and cg.idoforg = ccg.idoforg\n"
+                        + "join cf_clients cc on cc.idofclientgroup = ccg.idofclientgroup and cc.idoforg=cg.idoforg\n"
+                        + "where cc.idofclient is not null and cg.idoforg=:idOfOrg");
+
+        query.setParameter("idOfOrg", idOfOrg);
+        List list = (List<GroupNamesToOrgs>) query.list();
+        List<GroupNamesToOrgs> result = new ArrayList<>();
+        for (Object o : list) {
+            Object[] row = (Object[]) o;
+            GroupNamesToOrgs groupNamesToOrgs = new GroupNamesToOrgs();
+            groupNamesToOrgs.setIdOfGroupNameToOrg(((BigInteger)row[0]).longValue());
+            groupNamesToOrgs.setIdOfOrg(((BigInteger)row[1]).longValue());
+            groupNamesToOrgs.setIdOfMainOrg(((BigInteger)row[2]).longValue());
+            groupNamesToOrgs.setMainBuilding((Integer) row[3]);
+            groupNamesToOrgs.setVersion(((BigInteger)row[4]).longValue());
+            groupNamesToOrgs.setGroupName((String) row[5]);
+            groupNamesToOrgs.setParentGroupName((String) row[6]);
+            Integer midl = (Integer) row[7];
+            if (midl != null && midl == 1)
+            {
+                groupNamesToOrgs.setIsMiddleGroup(true);
+            }
+            else
+            {
+                groupNamesToOrgs.setIsMiddleGroup(false);
+            }
+            Integer six = (Integer) row[8];
+            if (six != null && six == 1)
+            {
+                groupNamesToOrgs.setIsSixDaysWorkWeek(true);
+            }
+            else
+            {
+                groupNamesToOrgs.setIsSixDaysWorkWeek(false);
+            }
+            result.add(groupNamesToOrgs);
+        }
 
         return result;
     }
@@ -3448,7 +3492,7 @@ public class DAOUtils {
     }
 
     public static void setMainBuildingGroupnamesToOrgs(Session session, Long idOfOrg) {
-        List<GroupNamesToOrgs> groupNamesToOrgsList = getAllGroupnamesToOrgsByIdOfOrg(session, idOfOrg);
+        List<GroupNamesToOrgs> groupNamesToOrgsList = getAllGroupnamesToOrgsByIdOfOrgAndMain(session, idOfOrg);
 
         if (!groupNamesToOrgsList.isEmpty()) {
             for (GroupNamesToOrgs groupNamesToOrg : groupNamesToOrgsList) {
@@ -4992,6 +5036,21 @@ public class DAOUtils {
         Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
         criteria.add(Restrictions.ge("day", startDate));
         criteria.add(Restrictions.le("day", endDate));
+        return criteria.list();
+    }
+
+    public static List getAllDateFromProdactionCalendarForFutureDates(Session persistenceSession) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
+        criteria.add(Restrictions.gt("day", new Date()));
+        return criteria.list();
+    }
+
+    public static List<SpecialDate> findSpecialDateForDates(Session persistenceSession, CompositeIdOfSpecialDate compositeIdOfSpecialDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(SpecialDate.class);
+        criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
+        criteria.add(Restrictions.ge("date", CalendarUtils.startOfDay(compositeIdOfSpecialDate.getDate())));
+        criteria.add(Restrictions.le("date", CalendarUtils.endOfDay(compositeIdOfSpecialDate.getDate())));
+        criteria.add(Restrictions.not(Restrictions.eq("deleted", true)));
         return criteria.list();
     }
 }
