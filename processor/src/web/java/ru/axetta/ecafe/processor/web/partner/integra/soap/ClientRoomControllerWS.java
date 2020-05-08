@@ -3012,7 +3012,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                     Session session, Transaction transaction) throws Exception {
-                processComplexList(client.getOrg(), data, objectFactory, session, startDate, endDate);
+                if (!client.getOrg().getUseWebArm()) {
+                    processComplexList(client.getOrg(), data, objectFactory, session, startDate, endDate);
+                } else {
+                    processWtComplexList(client.getOrg(), data, objectFactory, session, startDate, endDate);
+                }
             }
         });
 
@@ -3376,6 +3380,74 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     }
 
+    private void processWtComplexList(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
+            Date endDate) throws DatatypeConfigurationException {
+
+        List<WtComplex> complexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                .getWtComplexesByDates(startDate, endDate, org);
+
+        List<List<WtComplex>> sortedComplexes = new ArrayList<>();
+
+        Date currDate = null;
+        ArrayList<WtComplex> currComplexListWithSameDate = new ArrayList<>();
+
+        for (WtComplex currComplex : complexes) {
+
+            if (currDate == null) {
+                currComplexListWithSameDate.add(currComplex);
+                currDate = currComplex.getBeginDate();
+                continue;
+            }
+
+            if (currComplex.getBeginDate().equals(currDate)) {
+                currComplexListWithSameDate.add(currComplex);
+
+            } else {
+                ArrayList<WtComplex> newComplexes = new ArrayList<>(currComplexListWithSameDate);
+
+                sortedComplexes.add(newComplexes);
+
+                currComplexListWithSameDate = new ArrayList<>();
+                currComplexListWithSameDate.add(currComplex);
+                currDate = currComplex.getBeginDate();
+            }
+        }
+
+        currDate = null;
+        ComplexDateList complexDateList = new ComplexDateList();
+
+        for (List<WtComplex> complexesWithSameDate : sortedComplexes) {
+
+            ComplexDate complexDate = new ComplexDate();
+
+            for (WtComplex wtComplex : complexesWithSameDate) {
+
+                Complex complex = new Complex();
+
+                List<WtDish> dishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getWtDishesByComplex(wtComplex);
+
+                if (!dishes.isEmpty()) {
+                    for (WtDish dish : dishes) {
+                        ComplexDetail complexDetail = new ComplexDetail();
+                        complexDetail.setName(dish.getDishName());
+                        complex.getE().add(complexDetail);
+                        complex.setName(wtComplex.getName());
+                    }
+
+                    complexDate.getE().add(complex);
+                    complexDate.setDate(toXmlDateTime(wtComplex.getBeginDate()));
+
+                    logger.info("complexName: " + wtComplex.getName());
+                }
+            }
+
+            if (!complexDate.getE().isEmpty()) {
+                complexDateList.getE().add(complexDate);
+            }
+        }
+        data.setComplexDateList(complexDateList);
+    }
 
     @Override
     public CardListResult getCardList(Long contractId) {

@@ -2574,4 +2574,22 @@ public class PreorderDAOService {
             }
         }
     }
+
+    public List<WtComplex> getWtComplexesByDates(Date beginDate, Date endDate, Org org) {
+        Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
+                + "WHERE complex.beginDate < :beginDate AND complex.endDate > :endDate "
+                + "AND :org IN elements(complex.orgs)");
+        query.setParameter("beginDate", beginDate, TemporalType.TIMESTAMP);
+        query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+        query.setParameter("org", org);
+        return query.getResultList();
+    }
+
+    public List<WtDish> getWtDishesByComplex(WtComplex complex) {
+        Query query = emReport.createQuery("SELECT dish FROM WtDish dish LEFT JOIN dish.complexItems items "
+                + "where items.wtComplex = :complex");
+        query.setParameter("complex", complex);
+        return query.getResultList();
+    }
+
 }
