@@ -2387,29 +2387,31 @@ public class PreorderDAOService {
     public List<WtAgeGroupItem> getWtAgeGroupItems(Client client, Set<CategoryDiscount> categoriesDiscount) {
         List<WtAgeGroupItem> ageGroupList = new ArrayList<>();
         Set<Long> ageGroupIds = new HashSet<>();
-        String ageGroupDesc = client.getAgeTypeGroup().toLowerCase();
-        String parallelDesc = client.getParallel().toLowerCase();
-        if (ageGroupDesc.startsWith("средн") && ELEMENTARY_SCHOOL.contains(parallelDesc)) {
-            ageGroupIds.add(3L); // 1-4
-            ageGroupIds.add(7L); // Все
-        }
-        if (ageGroupDesc.startsWith("средн") && MIDDLE_SCHOOL.contains(parallelDesc)) {
-            ageGroupIds.add(4L); // 5-11
-        }
-        if (ageGroupDesc.startsWith("npo") || ageGroupDesc.startsWith("spo")) {
-            ageGroupIds.add(5L); // Колледж
-            if (categoriesDiscount != null) {
+        if (client.getAgeTypeGroup() != null && client.getParallel() != null) {
+            String ageGroupDesc = client.getAgeTypeGroup().toLowerCase();
+            String parallelDesc = client.getParallel().toLowerCase();
+            if (ageGroupDesc.startsWith("средн") && ELEMENTARY_SCHOOL.contains(parallelDesc)) {
+                ageGroupIds.add(3L); // 1-4
                 ageGroupIds.add(7L); // Все
             }
-        }
-        if (ageGroupIds != null && ageGroupIds.size() > 0) {
-            for (Long id : ageGroupIds) {
-                Query query = emReport.createQuery("SELECT ageGroup FROM WtAgeGroupItem ageGroup "
-                        + "WHERE ageGroup.idOfAgeGroupItem = :id");
-                query.setParameter("id", id);
-                WtAgeGroupItem res = (WtAgeGroupItem) query.getSingleResult();
-                if (res != null) {
-                    ageGroupList.add(res);
+            if (ageGroupDesc.startsWith("средн") && MIDDLE_SCHOOL.contains(parallelDesc)) {
+                ageGroupIds.add(4L); // 5-11
+            }
+            if (ageGroupDesc.startsWith("npo") || ageGroupDesc.startsWith("spo")) {
+                ageGroupIds.add(5L); // Колледж
+                if (categoriesDiscount != null) {
+                    ageGroupIds.add(7L); // Все
+                }
+            }
+            if (ageGroupIds != null && ageGroupIds.size() > 0) {
+                for (Long id : ageGroupIds) {
+                    Query query = emReport.createQuery("SELECT ageGroup FROM WtAgeGroupItem ageGroup " +
+                            "WHERE ageGroup.idOfAgeGroupItem = :id");
+                    query.setParameter("id", id);
+                    WtAgeGroupItem res = (WtAgeGroupItem) query.getSingleResult();
+                    if (res != null) {
+                        ageGroupList.add(res);
+                    }
                 }
             }
         }
