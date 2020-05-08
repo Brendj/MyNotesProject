@@ -3986,7 +3986,9 @@ public class Processor implements SyncProcessor {
                         clientGuardian.setVersion(resultClientGuardianVersion);
                         clientGuardian.setDeletedState(item.isDeleted());
                         clientGuardian.setRepresentType(item.getRepresentType());
-                        clientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        if (item.getRelation() != null) {
+                            clientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        }
                         if (item.isDeleted()) {
                             clientGuardian.delete(resultClientGuardianVersion);
                         }
@@ -4007,7 +4009,9 @@ public class Processor implements SyncProcessor {
                             MigrantsUtils
                                     .disableMigrantRequestIfExists(persistenceSession, idOfOrg, item.getIdOfGuardian());
                         }
-                        dbClientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        if (item.getRelation() != null) {
+                            dbClientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        }
                         dbClientGuardian.setVersion(resultClientGuardianVersion);
                         dbClientGuardian.setDisabled(item.getDisabled());
                         dbClientGuardian.setRepresentType(item.getRepresentType());
@@ -4017,6 +4021,7 @@ public class Processor implements SyncProcessor {
                     }
                 } catch (Exception e) {
                     resultClientGuardian.addItem(item, 100, e.getMessage());
+                    logger.error("Error in process ClientGuardian section: ", e);
                 }
             }
             persistenceTransaction.commit();
