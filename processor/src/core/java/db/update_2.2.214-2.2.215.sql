@@ -5,7 +5,7 @@
 -- Пакет обновлений 215
 
 --329 Флаг, что пользователю отправлено оповещение об удалении регуляра
-ALTER TABLE public.cf_regular_preorders ADD sendeddailynotification bool NULL;
+ALTER TABLE cf_regular_preorders ADD sendeddailynotification bool NULL;
 
 --Таблица активности карт
 CREATE TABLE cf_card_activity (
@@ -26,3 +26,5 @@ CREATE INDEX cf_card_activity_idofcard_idx ON cf_card_activity USING btree (idOf
 
 --Удаляем колонку informedspecialmenu, т.к. флаг перенесен в таблицу cf_preorder_flags
 alter table cf_client_guardian drop column informedspecialmenu;
+
+--! ФИНАЛИЗИРОВАН 08.05.2020, НЕ МЕНЯТЬ
