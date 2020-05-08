@@ -103,7 +103,7 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         XMLUtils.setAttributeIfNotNull(element, "TotalCount", totalCount);
         XMLUtils.setAttributeIfNotNull(element, "DailySampleCount", dailySampleCount);  // суточная проба
         XMLUtils.setAttributeIfNotNull(element, "TempClientsCount", tempClientsCount);
-        if (complexId != 0) {
+        if (complexId != null && complexId != 0) {
             element.setAttribute("ComplexId", complexId.toString());
         }
         XMLUtils.setAttributeIfNotNull(element, "NetWeight", netWeight);
@@ -141,6 +141,14 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
         }
         if (!gr.getOrgOwner().equals(orgOwner)) {
             orgOwner = gr.getOrgOwner();
+        }
+        if (!isGoodDate(session, idOfOrg, gr.getDoneDate(), gr.getRequestType()))
+        {
+            GoodRequestPosition grp = DAOUtils.findDistributedObjectByRefGUID(GoodRequestPosition.class, session, guid);
+            DistributedObjectException distributedObjectException = new DistributedObjectException("CANT_CHANGE_GRP_ON_DATE");
+            if (grp != null)
+                distributedObjectException.setData("TC="+ grp.getTotalCount() + ", DSC=" + grp.getDailySampleCount() + ", TCC=" + grp.getTempClientsCount());
+            throw distributedObjectException;
         }
     }
 

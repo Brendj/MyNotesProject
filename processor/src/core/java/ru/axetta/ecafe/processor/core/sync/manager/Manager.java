@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.persistence.SyncHistoryException;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOConfirm;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.LibraryDistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Good;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodAgeGroupType;
@@ -760,6 +761,9 @@ public class Manager implements AbstractToElement {
                 String tagName = distributedObject.getTagName();
                 if (!(distributedObject.getDeletedState() == null || distributedObject.getDeletedState())) {
                     distributedObject.preProcess(persistenceSession, idOfOrg);
+                    //Если заявка бала неправильной, а затем стала правильной (при модификации)
+                    if (distributedObject.getGlobalVersion() != null && distributedObject.getGlobalVersion() == 0L)
+                        distributedObject.setGlobalVersion(currentMaxVersion);
                     distributedObject = processDistributedObject(persistenceSession, distributedObject,
                             currentMaxVersion, currentDO);
                 } else {
@@ -777,6 +781,23 @@ public class Manager implements AbstractToElement {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (DistributedObjectException e) {
+            //Была попытка создания записи с неверной датой
+            if (e.getMessage().equals("CANT_CHANGE_GRP_ON_DATE") && distributedObject.getTagName().equals("C")) {
+                try {
+                    Long temp = distributedObject.getGlobalVersion();
+                    distributedObject.setGlobalVersion(0L);
+                    if ((DistributedObject)distributedObject instanceof GoodRequestPosition) {
+                        ((GoodRequestPosition) ((DistributedObject) distributedObject)).setTotalCount(0L);
+                    }
+                    processDistributedObject(persistenceSession, distributedObject,
+                            currentMaxVersion, currentDO);
+                    persistenceSession.flush();
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                    distributedObject.setGlobalVersion(temp);
+                } catch (Exception er) {
+                }
+            }
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
             distributedObject.setDistributedObjectException(e);
             errorMessage = "Error processCurrentObject: " + e.getMessage();
@@ -807,6 +828,9 @@ public class Manager implements AbstractToElement {
                 if (!(distributedObject.getDeletedState() == null || distributedObject.getDeletedState())) {
                     distributedObject.mergedDistributedObject = null;
                     distributedObject.preProcess(persistenceSession, idOfOrg);
+                    //Если заявка бала неправильной, а затем стала правильной (при модификации)
+                    if (distributedObject.getGlobalVersion() != null && distributedObject.getGlobalVersion() == 0L)
+                        distributedObject.setGlobalVersion(1L);
                     distributedObject = (LibraryDistributedObject) processDistributedObject(persistenceSession,
                             distributedObject, currentMaxVersion, currentDO);
                 } else {
@@ -825,6 +849,23 @@ public class Manager implements AbstractToElement {
             persistenceTransaction.commit();
             persistenceTransaction = null;
         } catch (DistributedObjectException e) {
+            //Была попытка создания записи с неверной датой
+            if (e.getMessage().equals("CANT_CHANGE_GRP_ON_DATE") && distributedObject.getTagName().equals("C")) {
+                try {
+                    Long temp = distributedObject.getGlobalVersion();
+                    distributedObject.setGlobalVersion(0L);
+                    if ((DistributedObject)distributedObject instanceof GoodRequestPosition) {
+                        ((GoodRequestPosition) ((DistributedObject) distributedObject)).setTotalCount(0L);
+                    }
+                    processDistributedObject(persistenceSession, distributedObject,
+                            currentMaxVersion, currentDO);
+                    persistenceSession.flush();
+                    persistenceTransaction.commit();
+                    persistenceTransaction = null;
+                    distributedObject.setGlobalVersion(temp);
+                } catch (Exception er) {
+                }
+            }
             // Произошла ошибка при обрабоке одного объекта - нужно как то сообщить об этом пользователю
             distributedObject.setDistributedObjectException(e);
             errorMessage = "Error processCurrentObject: " + e.getMessage();
@@ -902,7 +943,9 @@ public class Manager implements AbstractToElement {
         final Class<? extends DistributedObject> aClass = distributedObject.getClass();
         // Создание в БД нового экземпляра РО.
         if (distributedObject.getTagName().equals("C")) {
-            distributedObject.setGlobalVersion(currentMaxVersion);
+            if (distributedObject.getGlobalVersion() == null || distributedObject.getGlobalVersion() != 0L) {
+                distributedObject.setGlobalVersion(currentMaxVersion);
+            }
             distributedObject.setGlobalVersionOnCreate(currentMaxVersion);
             distributedObject.setCreatedDate(new Date());
             if (distributedObject instanceof GoodRequestPosition) {
@@ -927,9 +970,14 @@ public class Manager implements AbstractToElement {
         }
         // Изменение существующего в БД экземпляра РО.
         if (distributedObject.getTagName().equals("M")) {
-            DistributedObjectModifier modifier = ModifierTypeFactory.createModifier(distributedObject);
-            modifier.modifyDO(persistenceSession, distributedObject, currentMaxVersion, currentDO, idOfOrg,
-                    conflictDocument);
+            //Никаких изменений в БД не вносить, если там заявка была отклонена по неверной дате
+            if (distributedObject.getGlobalVersion() == null || distributedObject.getGlobalVersion() != 0L) {
+                DistributedObjectModifier modifier = ModifierTypeFactory.createModifier(distributedObject);
+                modifier.modifyDO(persistenceSession, distributedObject, currentMaxVersion, currentDO, idOfOrg,
+                        conflictDocument);
+            }
+
+
             /*Long currentVersion = currentDO.getGlobalVersion();
             Long objectVersion = distributedObject.getGlobalVersion();
             currentDO.fill(distributedObject);

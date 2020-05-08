@@ -753,7 +753,7 @@ public class DAOReadonlyService {
         }
     }
 
-    public Set<WtOrgGroup> getOrgGroupsSetFromVersion(Long version, Contragent contragent, Org org) {
+public Set<WtOrgGroup> getOrgGroupsSetFromVersion(Long version, Contragent contragent, Org org) {
         try {
             Query query = entityManager.createQuery(
                     "SELECT gr FROM WtOrgGroup gr " + "WHERE gr.version > :version AND gr.contragent = :contragent AND "
@@ -1006,6 +1006,21 @@ public class DAOReadonlyService {
         } catch (Exception e) {
             e.printStackTrace();
             return null;
+        }
+    }
+	
+	public boolean isSixWorkWeekOrg(Long orgId) {
+        boolean resultByOrg = false; //isSixWorkWeek(orgId);
+        try {
+            List<Boolean> list = entityManager.createQuery("select distinct gnto.isSixDaysWorkWeek from GroupNamesToOrgs gnto where gnto.idOfOrg = :idOfOrg")
+                    .setParameter("idOfOrg", orgId)
+                    .getResultList();
+            if (list.contains(Boolean.TRUE))
+                return true;
+            else
+                return false;
+        } catch (Exception e) {
+            return false;
         }
     }
 }
