@@ -615,7 +615,8 @@ public class EventNotificationService {
         return empType;
     }
 
-    public boolean sendNotificationSummary(Client destClient, Client dataClient, String type, String[] values, Date eventTime, int notificationType) {
+    public boolean sendNotificationSummary(Client destClient, Client dataClient, String type, String[] values,
+            Date eventTime, int notificationType) {
         boolean result = false;
         int clientSMSType = notificationType; //ClientSms.TYPE_SUMMARY_DAILY_NOTIFICATION;
         try {
