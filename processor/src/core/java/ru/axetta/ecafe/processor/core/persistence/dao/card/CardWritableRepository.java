@@ -261,6 +261,7 @@ public class CardWritableRepository extends WritableJpaDao {
         query.setParameter("issueTime", new Date());
         query.setParameter("updateTime", new Date());
         query.setParameter("cardNo", cardNo);
+        query.setParameter("lockReason", lockReason);
         if (idOfClient == null) {
             query.setParameter("idOfOrgs", DAOUtils.findFriendlyOrgIds((Session)entityManager.getDelegate(), idOfOrg));
         } else {
