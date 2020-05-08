@@ -8,10 +8,7 @@ import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
-import ru.axetta.ecafe.processor.web.partner.preorder.soap.AddRegistrationCardResult;
-import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderClientSummaryResult;
-import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderComplexesResult;
-import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderParam;
+import ru.axetta.ecafe.processor.web.partner.preorder.soap.*;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -562,6 +559,9 @@ public interface ClientRoomController {
 
     @WebMethod(operationName = "getPreorderComplexes")
     PreorderComplexesResult getPreorderComplexes(@WebParam(name = "contractId") Long contractId, @WebParam(name = "date") Date date);
+
+    @WebMethod(operationName = "getPreorderAllComplexes")
+    PreorderAllComplexesResult getPreorderAllComplexes(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName = "getPeopleQuantityByOrg")
     public PeopleQuantityInOrgResult getPeopleQuantityByOrg(@WebParam(name = "organizationUid") String ogrn);
