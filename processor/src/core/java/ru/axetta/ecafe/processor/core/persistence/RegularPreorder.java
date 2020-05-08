@@ -240,7 +240,7 @@ public class RegularPreorder {
     public void setMobileGroupOnCreate(PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
         this.mobileGroupOnCreate = mobileGroupOnCreate;
     }
-	s
+
     public Boolean getSendeddailynotification() {
         return sendeddailynotification;
     }
