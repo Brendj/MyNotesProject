@@ -35,7 +35,7 @@
             <column name="deletestate" sql-type="integer"/>
         </property>
 
-        <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User">
+        <many-to-one name="user" class="ru.axetta.ecafe.processor.core.persistence.User" lazy="false">
             <column name="idOfUser"/>
         </many-to-one>
 
