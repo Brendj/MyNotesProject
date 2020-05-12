@@ -2278,6 +2278,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             Set<Long> orderOrgIds = getOrgsByOrders(ordersList);
             Set<Long> menuIds = getIdOfMenusByOrderDetails(detailsList);
+            if (orderOrgIds.size() == 0 || menuIds.size() == 0) {
+                result.resultCode = RC_OK;
+                result.description = RC_OK_DESC;
+                result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
+                return result;
+            }
             List<MenuDetail> menuDetails = DAOReadExternalsService.getInstance()
                     .getMenuDetailsByOrderDetails(orderOrgIds, menuIds, startDate, endDate);
 
