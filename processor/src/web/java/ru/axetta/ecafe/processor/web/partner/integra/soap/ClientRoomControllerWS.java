@@ -2661,16 +2661,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             PreorderDAOService preorderDAOService = RuntimeContext.getAppContext().getBean(PreorderDAOService.class);
 
             //Получаем категории льгот для клиента
-            List<Long> categoriesDiscountsIds = new LinkedList<Long>();
-            for(String cd : client.getCategoriesDiscounts().split(",")) {
-                if(StringUtils.isNotEmpty(cd)) {
-                    categoriesDiscountsIds.add(Long.valueOf(cd));
-                }
-            }
             List<CategoryDiscount> clientDiscountsList = Collections.emptyList();
-            if (!categoriesDiscountsIds.isEmpty()) {
+            if (client.getCategories().size() != 0) {
                 Criteria clientDiscountsCriteria = session.createCriteria(CategoryDiscount.class);
-                clientDiscountsCriteria.add(Restrictions.in("idOfCategoryDiscount", categoriesDiscountsIds));
+                clientDiscountsCriteria.add(Restrictions.in("idOfCategoryDiscount", client.getCategories()));
                 clientDiscountsList = clientDiscountsCriteria.list();
             }
 

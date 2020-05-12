@@ -888,6 +888,10 @@ public class Client {
         return categoriesDSZNInternal;
     }
 
+    private void setCategoriesDSZNInternal(Set<ClientDtisznDiscountInfo> categoriesDSZNInternal) {
+        this.categoriesDSZNInternal = categoriesDSZNInternal;
+    }
+
     private void setClientSmsInternal(Set<ClientSms> clientSms) {
         // For Hibernate only
         this.clientSms = clientSms;

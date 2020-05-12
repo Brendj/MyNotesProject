@@ -597,7 +597,7 @@ public class RegistryLoadPage extends BasicWorkspacePage {
         Client guardian = new Client(org, person, contractPerson, 0, clientItem.getClientData().isNotifyViaEmail(),
                 clientItem.getClientData().isNotifyViaSMS(), clientItem.getClientData().isNotifyViaPUSH(), contractId,
                 date, 0, "" + contractId, 0, clientRegistryVersion, limit,
-                RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "", "");
+                RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT));
 
         if (clientGroup != null) {
             guardian.setIdOfClientGroup(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
