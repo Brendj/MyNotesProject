@@ -28,6 +28,7 @@ import java.util.*;
 public class ResMenuSupplier implements AbstractToElement {
 
     private final String datePattern = "dd.MM.yyyy hh:mm:ss";
+    private final String dateWithoutTimePattern = "dd.MM.yyyy";
 
     private Set<WtOrgGroup> orgGroups;
     private Set<WtCategoryItem> categoryItems;
@@ -40,10 +41,12 @@ public class ResMenuSupplier implements AbstractToElement {
     private Set<WtMenuGroup> menuGroups;
     private Set<WtMenu> menus;
     private Set<WtComplex> complexes;
+    private Set<WtComplexExcludeDays> excludeDays;
 
     private Long idOfOrg;
 
     SimpleDateFormat simpleDateFormat = new SimpleDateFormat(datePattern);
+    SimpleDateFormat dateWithoutTimeFormat = new SimpleDateFormat(dateWithoutTimePattern);
 
     public ResMenuSupplier() {
         orgGroups = new HashSet<>();
@@ -57,6 +60,7 @@ public class ResMenuSupplier implements AbstractToElement {
         menuGroups = new HashSet<>();
         menus = new HashSet<>();
         complexes = new HashSet<>();
+        excludeDays = new HashSet<>();
         idOfOrg = null;
     }
 
@@ -72,6 +76,7 @@ public class ResMenuSupplier implements AbstractToElement {
         menuGroups = menuSupplier.getMenuGroups();
         menus = menuSupplier.getMenus();
         complexes = menuSupplier.getComplexes();
+        excludeDays = menuSupplier.getExcludeDays();
         idOfOrg = menuSupplier.getIdOfOrg();
     }
 
@@ -135,6 +140,11 @@ public class ResMenuSupplier implements AbstractToElement {
             complexesElem.appendChild(complexToElement(document, complex));
         }
 
+        Element excludeDaysElem = document.createElement("ExcludeDays");
+        for (WtComplexExcludeDays excludeDay : excludeDays) {
+            excludeDaysElem.appendChild(excludeDayToElement(document, excludeDay));
+        }
+
         element.appendChild(orgGroupsElem);
         element.appendChild(categoryItemsElem);
         element.appendChild(typeProductionsElem);
@@ -146,6 +156,7 @@ public class ResMenuSupplier implements AbstractToElement {
         element.appendChild(menuGroupsElem);
         element.appendChild(menusElem);
         element.appendChild(complexesElem);
+        element.appendChild(excludeDaysElem);
 
         return element;
     }
@@ -439,6 +450,20 @@ public class ResMenuSupplier implements AbstractToElement {
         return element;
     }
 
+    private Element excludeDayToElement(Document document, WtComplexExcludeDays excludeDays) {
+        Element element = document.createElement("ED");
+
+        XMLUtils.setAttributeIfNotNull(element, "ExcludeDaysId", excludeDays.getId());
+        XMLUtils.setAttributeIfNotNull(element, "ComplexId", excludeDays.getComplex().getIdOfComplex());
+        XMLUtils.setAttributeIfNotNull(element, "Date", dateWithoutTimeFormat.format(excludeDays.getDate()));
+        XMLUtils.setAttributeIfNotNull(element, "V", excludeDays.getVersion());
+        if (excludeDays.getDeleteState() != null) {
+            XMLUtils.setAttributeIfNotNull(element, "D", excludeDays.getDeleteState());
+        }
+
+        return element;
+    }
+
     public Element toElement(Document document, String elementName) throws Exception {
         return document.createElement(elementName);
     }
@@ -533,6 +558,14 @@ public class ResMenuSupplier implements AbstractToElement {
 
     public void setComplexes(Set<WtComplex> complexes) {
         this.complexes = complexes;
+    }
+
+    public Set<WtComplexExcludeDays> getExcludeDays() {
+        return excludeDays;
+    }
+
+    public void setExcludeDays(Set<WtComplexExcludeDays> excludeDays) {
+        this.excludeDays = excludeDays;
     }
 
     public Long getIdOfOrg() {

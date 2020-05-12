@@ -1,5 +1,6 @@
 package ru.axetta.ecafe.processor.core.sync.response;
 
+import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardian;
 import ru.axetta.ecafe.processor.core.persistence.ClientGuardianRepresentType;
 import ru.axetta.ecafe.processor.core.sync.ResultOperation;
@@ -39,7 +40,8 @@ public class ClientGuardianItem {
         if (clientGuardian.getCardRequest() != null) {
             this.guidRequest = clientGuardian.getCardRequest().getGuid();
         }
-        this.informedSpecialMenu = clientGuardian.getInformedSpecialMenu();
+        this.informedSpecialMenu = ClientManager.getInformedSpecialMenuWithoutSession(clientGuardian.getIdOfChildren(),
+                clientGuardian.getIdOfGuardian());
         this.result = null;
         this.representType = clientGuardian.getRepresentType();
     }
@@ -121,6 +123,7 @@ public class ClientGuardianItem {
         this.deleteState = deleteSate;
         this.relation = relation;
         this.representType = ClientGuardianRepresentType.fromInteger(representType);
+        this.informedSpecialMenu = ClientManager.getInformedSpecialMenuWithoutSession(idOfChildren, idOfGuardian);
     }
 
 

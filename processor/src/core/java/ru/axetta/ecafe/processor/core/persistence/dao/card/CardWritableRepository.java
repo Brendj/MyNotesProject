@@ -187,58 +187,73 @@ public class CardWritableRepository extends WritableJpaDao {
         }
     }*/
 
-    public int block(long cardNo, long idOfOrg) {
+    public int block(long cardNo, long idOfOrg, String lockReason, CardState blockState) {
         return entityManager.createQuery("update Card set "
                 + " state = :state, "
-                + " updateTime = :updateTime "
+                + " updateTime = :updateTime, "
+                + " lockReason = :lockReason "
                 + " where cardNo = :cardNo"
                 + "     and org.idOfOrg = :idOfOrg")
-                .setParameter("state", CardState.TEMPBLOCKED.getValue())
+                .setParameter("state", blockState.getValue())
                 .setParameter("updateTime", new Date())
                 .setParameter("cardNo", cardNo)
                 .setParameter("idOfOrg", idOfOrg)
+                .setParameter("lockReason", lockReason)
                 .executeUpdate();
     }
 
-    public int block(long cardNo, long idOfOrg, long idOfClient, Boolean isOldArm) {
-        if (!isOldArm) return block(cardNo, idOfOrg);
+    public int block(long cardNo, long idOfOrg, long idOfClient, Boolean isOldArm, String lockReason, CardState blockState) {
+        if (!isOldArm) return block(cardNo, idOfOrg, lockReason, blockState);
         return entityManager.createQuery("update Card set "
                 + " state = :state, "
-                + " updateTime = :updateTime "
+                + " updateTime = :updateTime, "
+                + " lockReason = :lockReason "
                 + " where cardNo = :cardNo"
                 + "     and client.idOfClient = :idOfClient")
-                .setParameter("state", CardState.TEMPBLOCKED.getValue())
+                .setParameter("state", blockState.getValue())
                 .setParameter("updateTime", new Date())
                 .setParameter("cardNo", cardNo)
                 .setParameter("idOfClient", idOfClient)
+                .setParameter("lockReason", lockReason)
                 .executeUpdate();
     }
 
-    public int blockAndReset(long cardNo, long idOfOrg) {
-        return entityManager.createQuery("update Card set "
-                + " state = :state, "
-                + " validTime = :validTime,"
-                + " issueTime = :issueTime ,"
-                + " updateTime = :updateTime "
-                + " where cardNo = :cardNo"
-                + "     and org.idOfOrg = :idOfOrg")
-                .setParameter("state", CardState.BLOCKED.getValue())
-                .setParameter("validTime", new Date())
-                .setParameter("issueTime", new Date())
-                .setParameter("updateTime", new Date())
-                .setParameter("cardNo", cardNo)
-                .setParameter("idOfOrg", idOfOrg)
-                .executeUpdate();
-    }
-
-    public int blockAndReset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm) {
-        if (!isOldArm) return blockAndReset(cardNo, idOfOrg);
-        String condition = (idOfClient == null) ? " and org.idOfOrg in :idOfOrgs" : " and client.idOfClient = :idOfClient";
+    public int blockAndReset(long cardNo, long idOfOrg, String lockReason, Integer transitionState) {
+        String condition = (transitionState == null ? "" : ", transitionState = :transitionState");
         Query query = entityManager.createQuery("update Card set "
                 + " state = :state, "
                 + " validTime = :validTime,"
                 + " issueTime = :issueTime ,"
-                + " updateTime = :updateTime "
+                + " updateTime = :updateTime,"
+                + " lockReason = :lockReason "
+                + condition
+                + " where cardNo = :cardNo"
+                + "     and org.idOfOrg = :idOfOrg");
+        query.setParameter("state", CardState.BLOCKED.getValue());
+        query.setParameter("validTime", new Date());
+        query.setParameter("issueTime", new Date());
+        query.setParameter("updateTime", new Date());
+        query.setParameter("lockReason", lockReason);
+        query.setParameter("cardNo", cardNo);
+        query.setParameter("idOfOrg", idOfOrg);
+        if (transitionState != null) {
+            query.setParameter("transitionState", transitionState);
+        }
+        return query.executeUpdate();
+    }
+
+    public int blockAndReset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm, String lockReason,
+            Integer transitionState) {
+        if (!isOldArm) return blockAndReset(cardNo, idOfOrg, lockReason, transitionState);
+        String condition = (idOfClient == null) ? " and org.idOfOrg in :idOfOrgs" : " and client.idOfClient = :idOfClient";
+        String conditionTransition = (transitionState == null ? "" : ", transitionState = :transitionState ");
+        Query query = entityManager.createQuery("update Card set "
+                + " state = :state, "
+                + " validTime = :validTime,"
+                + " issueTime = :issueTime ,"
+                + " updateTime = :updateTime,"
+                + " lockReason = :lockReason "
+                + conditionTransition
                 + " where cardNo = :cardNo"
                 + condition);
         query.setParameter("state", CardState.BLOCKED.getValue());
@@ -246,10 +261,14 @@ public class CardWritableRepository extends WritableJpaDao {
         query.setParameter("issueTime", new Date());
         query.setParameter("updateTime", new Date());
         query.setParameter("cardNo", cardNo);
+        query.setParameter("lockReason", lockReason);
         if (idOfClient == null) {
             query.setParameter("idOfOrgs", DAOUtils.findFriendlyOrgIds((Session)entityManager.getDelegate(), idOfOrg));
         } else {
             query.setParameter("idOfClient", idOfClient);
+        }
+        if (transitionState != null) {
+            query.setParameter("transitionState", transitionState);
         }
         return query.executeUpdate();
     }

@@ -111,7 +111,12 @@ public class GoodRequestsChangeAsyncNotificationService {
                     requestCriteria.add(Restrictions.in("guid", guids));  // where
                     requestCriteria.setProjection(Projections.projectionList()  // внутри селекта
                             .add(Projections.max("gr.doneDate")).add(Projections.min("gr.doneDate")));
+                    //Не показываем заявки, которые сохранены, но были отклонены по причине неверной даты (у них GlobalVersion = 0)
+                    requestCriteria.add(Restrictions.not(Restrictions.eq("globalVersion", 0L)));
+                    requestCriteria.add(Restrictions.not(Restrictions.eq("gr.globalVersion", 0L)));
+
                     List list = requestCriteria.list();
+
 
                     if (list != null && !list.isEmpty()) {
                         Object[] objects = (Object[]) list.get(0);

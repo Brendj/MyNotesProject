@@ -21,6 +21,7 @@ public class ResponseItem implements Serializable {
     public static final int ERROR_ARGUMENT_NOT_FOUND = 150;
     public static final int ERROR_EVENT_NOT_FOUND = 160;
     public static final int ERROR_DUPLICATE = 160;
+    public static final int ERROR_DUPLICATE_FOR_SECOND_REGISTER = 161;
     public static final int ERROR_INTERNAL = 170;
     public static final int ERROR_SIGN_VERIFY = 180;
     public static final int ERROR_INVALID_TYPE = 190;
@@ -43,6 +44,7 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_CLIENT_NOT_FOUND_MESSAGE_EMIAS = "Клиент не найден";
     public static final String ERROR_ID_EVENT_EMIAS = "Некорректные данные";
     public static final String ERROR_DUPLICATE_CARD_MESSAGE = "Данная карта уже зарегистрирована.";
+    public static final String ERROR_DUPLICATE_CARD_SECOND_REGISTER_MESSAGE = "Карта прикреплена к организации ";
     public static final String ERROR_INTERNAL_MESSAGE = "Внутренняя ошибка приложения.";
     public static final String ERROR_INTERNAL_MESSAGE_EMIAS = "Внутренняя ошибка";
     public static final String ERROR_SIGN_VERIFY_MESSAGE = "Не пройдена проверка цифровой подписи";
@@ -59,6 +61,7 @@ public class ResponseItem implements Serializable {
     public static final String ERROR_ORGANIZATION_NOT_FOUND_MESSAGE = "Организация не найдена";
     public static final String ERROR_CLIENT_ALREADY_EXIST_MESSAGE = "Клиент уже существует";
     public static final String ERROR_INCORRECT_FORMAT = "Некорректный формат";
+    public static final String USED_IN_ANOTHER_ORG = "Используется в другой ОО";
     public int code;
     public String message;
 
