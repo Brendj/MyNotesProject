@@ -4174,7 +4174,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             r = new Result(RC_INVALID_DATA, "Лимит не может быть меньше нуля");
             return r;
         }
-        if (roleRepresentative < 0 || roleRepresentative > 2)
+        if (roleRepresentative != null && (roleRepresentative < 0 || roleRepresentative > 2))
         {
             r = new Result(RC_INVALID_DATA, "Лимит может быть установлен только законным представителем");
             return r;
@@ -4820,7 +4820,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new InvalidDataException("Не заполнен номер телефона опекуна");
             }
 
-            if (roleRepresentative < 0 || roleRepresentative > 2) {
+            if (roleRepresentative != null && (roleRepresentative < 0 || roleRepresentative > 2)) {
                 throw new InvalidDataException("Возможно только законным представителем");
             }
             session = runtimeContext.createPersistenceSession();
