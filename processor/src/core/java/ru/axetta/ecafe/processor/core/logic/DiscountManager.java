@@ -70,7 +70,6 @@ public class DiscountManager {
         }
     }
 
-    //todo перенесим сюда метод из ClientManager
     public static void deleteDiscount(Client client, Session session) throws Exception {
         Integer oldDiscountMode = client.getDiscountMode();
         Set<CategoryDiscount> discountsAfterRemove = new HashSet<>();
@@ -127,17 +126,42 @@ public class DiscountManager {
             ApplicationForFood food = DAOUtils
                     .getApplicationForFoodByClientAndCode(session, client, dsznCode.longValue());
             if (null != food) {
-                if (!food.getArchived()) {
-                    food.setArchived(true);
-                    if (null == applicationForFoodVersion) {
-                        applicationForFoodVersion = DAOUtils.nextVersionByApplicationForFood(session);
-                    }
-                    food.setVersion(applicationForFoodVersion);
-                    food.setLastUpdate(new Date());
-                    session.update(food);
-                }
+                archiveApplicationForFood(session, food, applicationForFoodVersion);
             }
         }
+    }
+
+    public static void archiveApplicationForFood(Session session, ApplicationForFood applicationForFood, Long newVersion) {
+        if (!applicationForFood.getArchived() && isEligibleToDelete(session, applicationForFood)) {
+            applicationForFood.setArchived(true);
+            if (null == newVersion) {
+                newVersion = DAOUtils.nextVersionByApplicationForFood(session);
+            }
+            applicationForFood.setVersion(newVersion);
+            applicationForFood.setLastUpdate(new Date());
+            session.update(applicationForFood);
+        }
+    }
+
+    public static boolean isEligibleToDelete(Session session, ApplicationForFood item) {
+        CategoryDiscountDSZN categoryDiscountDSZN;
+        if (item.getDtisznCode() == null) {
+            ///для льготы Иное
+            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, 0L);
+        } else {
+            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, item.getDtisznCode());
+        }
+        return categoryDiscountDSZN.getCategoryDiscount().getEligibleToDelete();
+    }
+
+    public static boolean atLeastOneDiscountEligibleToDelete (Client client) {
+        Set<CategoryDiscount> discounts = client.getCategories();
+        for (CategoryDiscount discount : discounts) {
+            if (discount.getEligibleToDelete()) {
+                return true;
+            }
+        }
+        return false;
     }
 
     public static void renewDiscounts(Session session, Client client,

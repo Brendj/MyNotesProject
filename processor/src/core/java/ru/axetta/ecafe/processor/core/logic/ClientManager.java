@@ -2263,36 +2263,8 @@ public class ClientManager {
         Long applicationForFoodVersion = null;
 
         for (ApplicationForFood item : list) {
-            if (!item.getArchived() && isEligibleToDelete(session, item)) {
-                item.setArchived(true);
-                if (null == applicationForFoodVersion) {
-                    applicationForFoodVersion = DAOUtils.nextVersionByApplicationForFood(session);
-                }
-                item.setVersion(applicationForFoodVersion);
-                item.setLastUpdate(new Date());
-                session.update(item);
-            }
+            DiscountManager.archiveApplicationForFood(session, item, applicationForFoodVersion);
         }
     }
 
-    public static boolean atLeastOneDiscountEligibleToDelete (Client client) {
-        Set<CategoryDiscount> discounts = client.getCategories();
-        for (CategoryDiscount discount : discounts) {
-            if (discount.getEligibleToDelete()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isEligibleToDelete(Session session, ApplicationForFood item) {
-        CategoryDiscountDSZN categoryDiscountDSZN;
-        if (item.getDtisznCode() == null) {
-            ///для льготы Иное
-            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, 0L);
-        } else {
-            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, item.getDtisznCode());
-        }
-        return categoryDiscountDSZN.getCategoryDiscount().getEligibleToDelete();
-    }
 }

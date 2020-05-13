@@ -119,7 +119,7 @@ public class ClientMigrationHistoryService {
                     }
                 }
                 Client client = DAOUtils.findClient(session, clientMigration.getClient().getIdOfClient());
-                if (ClientManager.atLeastOneDiscountEligibleToDelete(client)) {
+                if (DiscountManager.atLeastOneDiscountEligibleToDelete(client)) {
                     DiscountManager.deleteDiscount(client, session);
                 }
                 ClientManager.archiveApplicationForFoodWithoutDiscount(client, session);
