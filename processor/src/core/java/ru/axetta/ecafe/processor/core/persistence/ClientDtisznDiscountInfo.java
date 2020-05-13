@@ -4,6 +4,9 @@
 
 package ru.axetta.ecafe.processor.core.persistence;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
+
 import java.util.Date;
 
 public class ClientDtisznDiscountInfo {
@@ -42,6 +45,11 @@ public class ClientDtisznDiscountInfo {
 
     public ClientDtisznDiscountInfo() {
 
+    }
+
+    public boolean isInoe() {
+        if (dtisznCode == null) return false;
+        return dtisznCode.equals(Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE));
     }
 
     public Long getIdOfClientDTISZNDiscountInfo() {
