@@ -801,7 +801,6 @@ public class ClientManager {
 
             client.setAddress(fieldConfig.getValue(ClientManager.FieldId.ADDRESS)); //tokens[12]);
             client.setPhone(fieldConfig.getValue(ClientManager.FieldId.PHONE));//tokens[13]);
-            logger.info("class : ClientManager, method : registerClientTransactionFree line : 724, idOfClient : " + client.getIdOfClient() + " phone : " + client.getPhone());
             String mobilePhone = fieldConfig.getValue(ClientManager.FieldId.MOBILE_PHONE);
             String fax = fieldConfig.getValue(FieldId.FAX);
             if (mobilePhone != null) {
@@ -817,7 +816,6 @@ public class ClientManager {
                 }
             }
             client.setMobile(mobilePhone);//tokens[14]);
-            logger.info("class : ClientManager, method : registerClientTransactionFree line : 740, idOfClient : " + client.getIdOfClient() + " mobile : " + client.getMobile());
             client.setFax(fax);//tokens[14]);
             client.setEmail(fieldConfig.getValue(ClientManager.FieldId.EMAIL));//tokens[15]);
             client.setRemarks(fieldConfig.getValue(ClientManager.FieldId.COMMENTS));
