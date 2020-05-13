@@ -1902,14 +1902,13 @@ public class ClientManager {
 
     /* Установить флаг информирования об условиях предоставления услуг по предзаказам */
     public static void setInformSpecialMenu(Session session, Client client, Client guardian, Long newVersion) {
-        /*Criteria criteria = session.createCriteria(ClientGuardian.class);
-        criteria.add(Restrictions.eq("idOfChildren", idOfClient));
-        criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
-        ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
-        cg.setInformedSpecialMenu(true);
+        Criteria cr = session.createCriteria(ClientGuardian.class);
+        cr.add(Restrictions.eq("idOfChildren", client.getIdOfClient()));
+        cr.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
+        ClientGuardian cg = (ClientGuardian)cr.uniqueResult();
         cg.setVersion(newVersion);
         cg.setLastUpdate(new Date());
-        session.update(cg);*/
+        session.update(cg);
 
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client", client));
@@ -2383,6 +2382,9 @@ public class ClientManager {
                     info.setArchived(true);
                     if (null == clientDTISZNDiscountVersion) {
                         clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+                    }
+                    if (info.isInoe()) {
+                        info.setDateEnd(new Date());
                     }
                     info.setVersion(clientDTISZNDiscountVersion);
                     info.setLastUpdate(new Date());

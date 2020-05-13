@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.service.CardBlockService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.geoplaner.GeoplanerManager;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
@@ -3985,7 +3986,9 @@ public class Processor implements SyncProcessor {
                         clientGuardian.setVersion(resultClientGuardianVersion);
                         clientGuardian.setDeletedState(item.isDeleted());
                         clientGuardian.setRepresentType(item.getRepresentType());
-                        clientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        if (item.getRelation() != null) {
+                            clientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        }
                         if (item.isDeleted()) {
                             clientGuardian.delete(resultClientGuardianVersion);
                         }
@@ -4006,7 +4009,9 @@ public class Processor implements SyncProcessor {
                             MigrantsUtils
                                     .disableMigrantRequestIfExists(persistenceSession, idOfOrg, item.getIdOfGuardian());
                         }
-                        dbClientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        if (item.getRelation() != null) {
+                            dbClientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        }
                         dbClientGuardian.setVersion(resultClientGuardianVersion);
                         dbClientGuardian.setDisabled(item.getDisabled());
                         dbClientGuardian.setRepresentType(item.getRepresentType());
@@ -4016,6 +4021,7 @@ public class Processor implements SyncProcessor {
                     }
                 } catch (Exception e) {
                     resultClientGuardian.addItem(item, 100, e.getMessage());
+                    logger.error("Error in process ClientGuardian section: ", e);
                 }
             }
             persistenceTransaction.commit();
@@ -4176,12 +4182,14 @@ public class Processor implements SyncProcessor {
                 Card card = null;
                 Long cardNo = payment.getCardNo();
                 if (null != cardNo) {
-                    card = findCardByCardNo(persistenceSession, cardNo);
+                    card = findCardByCardNoExtended(persistenceSession, cardNo, payment.getIdOfClient(), null, null);
                     if (null == card) {
                         return new ResPaymentRegistryItem(payment.getIdOfOrder(), 200,
                                 String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
                                         payment.getIdOfOrder(), cardNo));
                     }
+                    RuntimeContext.getAppContext().getBean(CardBlockService.class)
+                            .saveLastCardActivity(persistenceSession, card.getIdOfCard(), CardActivityType.ORDER);
                 }
                 // If client specified - load client from data model
                 Client client = null;
@@ -6057,10 +6065,15 @@ public class Processor implements SyncProcessor {
                     enterEvent.setGuardianId(guardianId);
                     enterEvent.setChildPassChecker(e.getChildPassChecker());
                     enterEvent.setChildPassCheckerId(e.getChildPassCheckerId());
-                    //enterEvent.setIdOfClientGroup(e.getIdOfClientGroup());
                     enterEvent.setIdOfClientGroup(
                             clientFromEnterEvent == null ? null : clientFromEnterEvent.getIdOfClientGroup());
                     persistenceSession.save(enterEvent);
+
+                    Card card = DAOUtils.findCardByCardNoExtended(persistenceSession, e.getIdOfCard(), idOfClient, guardianId, e.getIdOfVisitor());
+                    if (card != null) {
+                        RuntimeContext.getAppContext().getBean(CardBlockService.class)
+                                .saveLastCardActivity(persistenceSession, card.getIdOfCard(), CardActivityType.ENTER_EVENT);
+                    }
 
                     if (RuntimeContext.RegistryType.isSpb() && ScudManager.serviceIsWork) {
                         DAOUtils.createEnterEventsSendInfo(enterEvent, persistenceSession);
@@ -6165,7 +6178,7 @@ public class Processor implements SyncProcessor {
                             e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT
                                     || e.getPassDirection() == EnterEvent.RE_ENTRY
                                     || e.getPassDirection() == EnterEvent.RE_EXIT) && e.getIdOfCard() != null) {
-                        Card card = findCardByCardNo(persistenceSession, e.getIdOfCard());
+
                         final CompositeIdOfEnterEvent compositeIdOfEnterEvent = enterEvent.getCompositeIdOfEnterEvent();
                         if (card == null) {
                             final String message = "Не найдена карта по событию прохода: idOfOrg=%d, idOfEnterEvent=%d, idOfCard=%d";
