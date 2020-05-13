@@ -223,7 +223,7 @@ public class DiscountManager {
         }
 
         public ClientDtisznDiscountInfoBuilder withDateEnd(Date dateEnd) {
-            info.setDateStart(dateEnd);
+            info.setDateEnd(dateEnd);
             return this;
         }
 
