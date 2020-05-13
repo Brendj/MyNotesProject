@@ -1102,10 +1102,9 @@ public class DTSZNDiscountsReviseService {
             for (ClientDtisznDiscountInfo info : list) {
                 try {
                     transaction = session.beginTransaction();
-                    info.setArchived(true);
-                    info.setVersion(nextVersion);
-                    info.setLastUpdate(fireTime);
-                    session.update(info);
+                    DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
+                    builder.withArchived(true);
+                    builder.save(session, nextVersion);
 
                     if (!info.getDtisznCode().equals(0L)) {
                         transaction.commit();

@@ -114,13 +114,12 @@ public class DiscountManager {
                     .getDTISZNDiscountInfoByClientAndCode(session, client, dsznCode.longValue());
             if (null != info) {
                 if (!info.getArchived()) {
-                    info.setArchived(true);
+                    DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
+                    builder.withArchived(true);
                     if (null == clientDTISZNDiscountVersion) {
                         clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
                     }
-                    info.setVersion(clientDTISZNDiscountVersion);
-                    info.setLastUpdate(new Date());
-                    session.update(info);
+                    builder.save(session, clientDTISZNDiscountVersion);
                 }
             }
             ApplicationForFood food = DAOUtils
@@ -202,4 +201,46 @@ public class DiscountManager {
         return result;
     }
 
+    public static class ClientDtisznDiscountInfoBuilder {
+        private final ClientDtisznDiscountInfo info;
+
+        public ClientDtisznDiscountInfoBuilder(ClientDtisznDiscountInfo info) {
+            this.info = info;
+        }
+
+        public static ClientDtisznDiscountInfoBuilder createBuilder(ClientDtisznDiscountInfo info) {
+            return new ClientDtisznDiscountInfoBuilder(info);
+        }
+
+        public ClientDtisznDiscountInfoBuilder withArchived(Boolean archived) {
+            info.setArchived(archived);
+            return this;
+        }
+
+        public ClientDtisznDiscountInfoBuilder withDateStart(Date dateStart) {
+            info.setDateStart(dateStart);
+            return this;
+        }
+
+        public ClientDtisznDiscountInfoBuilder withDateEnd(Date dateEnd) {
+            info.setDateStart(dateEnd);
+            return this;
+        }
+
+        public ClientDtisznDiscountInfoBuilder withStatus(ClientDTISZNDiscountStatus status) {
+            info.setStatus(status);
+            return this;
+        }
+
+        public void save(Session session, Long version) {
+            info.setLastUpdate(new Date());
+            info.setVersion(version);
+            session.update(info);
+        }
+
+        public void save(Session session) {
+            Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+            save(session, clientDTISZNDiscountVersion);
+        }
+    }
 }

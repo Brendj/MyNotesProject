@@ -2202,6 +2202,25 @@ public class ClientManager {
 
         session.save(clientGroupMigrationHistory);
         disableGuardianshipIfClientLeaving(session, client, idOfClientGroup);
+        archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
+    }
+
+    private static void archiveApplicationForFoodIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
+        if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
+        try {
+            List<ApplicationForFood> list = DAOUtils.getApplicationForFoodInoeByClient(session, client);
+            Long version = null;
+            for (ApplicationForFood applicationForFood : list) {
+                DiscountManager.archiveApplicationForFood(session, applicationForFood, version);
+            }
+            ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, client.getIdOfClient());
+            if (info == null) return;
+            DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
+            builder.withDateEnd(new Date());
+            builder.save(session);
+        } catch (Exception e) {
+            logger.error("Error in archiveApplicationForFoodIfClientLeaving: ", e);
+        }
     }
 
     private static void disableGuardianshipIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {

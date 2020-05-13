@@ -4548,12 +4548,11 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static ClientDtisznDiscountInfo getActualDTISZNDiscountsInfoInoeByClient(Session session, Long idOfClient,
-            Long code) {
+    public static ClientDtisznDiscountInfo getActualDTISZNDiscountsInfoInoeByClient(Session session, Long idOfClient) {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
         criteria.add(Restrictions.eq("archived", false));
-        criteria.add(Restrictions.eq("dtisznCode", code));
+        criteria.add(Restrictions.eq("dtisznCode", Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE)));
         List list = criteria.list();
         if (list.size() == 0 || list.size() > 1) {
             return null;
@@ -4861,6 +4860,14 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
         criteria.add(Restrictions.eq("categoryDiscount.idOfCategoryDiscount", idOfCategoryDiscount));
         criteria.setProjection(Projections.property("code"));
+        return criteria.list();
+    }
+
+    public static List<ApplicationForFood> getApplicationForFoodInoeByClient(Session session, Client client) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.isNull("dtisznCode"));
+        criteria.add(Restrictions.eq("archived", false));
         return criteria.list();
     }
 
