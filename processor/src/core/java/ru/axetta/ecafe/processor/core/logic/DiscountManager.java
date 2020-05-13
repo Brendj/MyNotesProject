@@ -7,7 +7,6 @@ package ru.axetta.ecafe.processor.core.logic;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -27,10 +26,18 @@ public class DiscountManager {
             Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts,
             Integer oldDiscountMode, Integer newDiscountMode, String comment) {
         DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, org, newDiscountMode, oldDiscountMode,
-                StringUtils.join(newDiscounts, ','), StringUtils.join(oldDiscounts, ','));
+                extractCategoryIdsFromDiscountSet(newDiscounts), extractCategoryIdsFromDiscountSet(oldDiscounts));
         discountChangeHistory.setComment(comment);
         session.save(discountChangeHistory);
+    }
 
+    private static String extractCategoryIdsFromDiscountSet(Set<CategoryDiscount> categoryDiscounts) {
+        StringBuilder sb = new StringBuilder();
+        for (CategoryDiscount cd : categoryDiscounts) {
+            if (sb.length() != 0) sb.append(",");
+            sb.append(cd.getIdOfCategoryDiscount());
+        }
+        return sb.toString();
     }
 
     public static void addOtherDiscountForClient(Session session, Client client) throws Exception {

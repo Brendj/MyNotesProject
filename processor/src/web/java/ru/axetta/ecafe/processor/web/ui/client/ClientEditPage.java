@@ -1034,7 +1034,8 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
         if (isDiscountsChanged(client, categoryDiscountSet)) {
             DiscountManager.saveDiscountHistory(persistenceSession, client, null, client.getCategories(), categoryDiscountSet,
-                    client.getDiscountMode(), discountMode, DiscountChangeHistory.MODIFY_BY_TRANSITION);
+                    client.getDiscountMode(), discountMode,
+                    DiscountChangeHistory.MODIFY_IN_WEBAPP + DAOReadonlyService.getInstance().getUserFromSession().getUserName());
             client.setLastDiscountsUpdate(new Date());
         }
 
