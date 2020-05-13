@@ -128,8 +128,7 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                     benefitCondition, idOfClientList, number, CalendarUtils.startOfDay(startDate), CalendarUtils.endOfDay(endDate), showPeriod);
             for (ApplicationForFood applicationForFood : list) {
                 ApplicationForFoodReportItem item = new ApplicationForFoodReportItem(session, applicationForFood);
-                ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, applicationForFood.getClient().getIdOfClient(),
-                        Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE));
+                ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, applicationForFood.getClient().getIdOfClient());
                 if (info != null) {
                     item.setStartDate(info.getDateStart());
                     item.setEndDate(info.getDateEnd());
@@ -286,22 +285,19 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 criteria.add(Restrictions.eq("dtisznCode", new Long(discountInoe.getCode())));
                 List<ClientDtisznDiscountInfo> list = criteria.list();
                 for (ClientDtisznDiscountInfo info : list) {
-                    info.setLastUpdate(new Date());
-                    info.setArchived(true);
-                    info.setVersion(clientDTISZNDiscountVersion);
-                    session.update(info);
+                    DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
+                    builder.withArchived(true);
+                    builder.save(session, clientDTISZNDiscountVersion);
                 }
             }
 
             for (ApplicationForFoodReportItem item : changeDatesItems) {
                 wereChanges = true;
-                ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, item.getApplicationForFood().getClient().getIdOfClient(),
-                        Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE));
-                info.setDateStart(item.getStartDate());
-                info.setDateEnd(item.getEndDate());
-                info.setLastUpdate(new Date());
-                info.setVersion(clientDTISZNDiscountVersion);
-                session.update(info);
+                ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, item.getApplicationForFood().getClient().getIdOfClient());
+                DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
+                builder.withDateStart(item.getStartDate());
+                builder.withDateEnd(item.getEndDate());
+                builder.save(session, clientDTISZNDiscountVersion);
             }
             transaction.commit();
             transaction = null;
