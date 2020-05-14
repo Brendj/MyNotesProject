@@ -2652,60 +2652,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getWtDishesByMenu(menu);
-
-            //Получаем детализацию для одного Menu
-            for (WtDish wtDish : wtDishes) {
-                MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-
-                WtMenuGroup menuGroup = new WtMenuGroup();
-                if (wtDish.getMenuGroupMenus() != null && wtDish.getMenuGroupMenus().size() > 0) {
-                    for (WtMenuGroupMenu menuGroupMenu : wtDish.getMenuGroupMenus()) {
-                        if (menuGroupMenu.getMenuGroup() != null) {
-                            menuGroup = menuGroupMenu.getMenuGroup();
-                            break;
-                        }
-                    }
+            if (wtDishes != null && wtDishes.size() > 0) {
+                //Получаем детализацию для одного Menu
+                for (WtDish wtDish : wtDishes) {
+                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish);
+                    menuDateItemExt.getE().add(menuItemExt);
                 }
-                if (menuGroup != null) {
-                    menuItemExt.setGroup(menuGroup.getName());
-                }
-
-                menuItemExt.setName(wtDish.getDishName());
-                menuItemExt.setPrice(wtDish.getPrice().longValue());
-                if (wtDish.getCalories() == null) {
-                    menuItemExt.setCalories((double) 0);
-                } else {
-                    menuItemExt.setCalories(wtDish.getCalories().doubleValue());
-                }
-                if (wtDish.getQty() == null) {
-                    menuItemExt.setOutput("");
-                } else{
-                    menuItemExt.setOutput(wtDish.getQty());
-                }
-
-                menuItemExt.setAvailableNow(1); // доступно для продажи
-                if (wtDish.getProtein() == null) {
-                    menuItemExt.setProtein((double) 0) ;
-                } else{
-                    menuItemExt.setProtein(wtDish.getProtein().doubleValue());
-                }
-                if (wtDish.getCarbohydrates() == null) {
-                    menuItemExt.setCarbohydrates((double) 0) ;
-                } else{
-                    menuItemExt.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
-                }
-                if (wtDish.getFat() == null) {
-                    menuItemExt.setFat((double) 0) ;
-                } else{
-                    menuItemExt.setFat(wtDish.getFat().doubleValue());
-                }
-
-                menuDateItemExt.getE().add(menuItemExt);
+                menuListExt.getM().add(menuDateItemExt);
             }
-
-            menuListExt.getM().add(menuDateItemExt);
+            data.setMenuListExt(menuListExt);
         }
-        data.setMenuListExt(menuListExt);
     }
 
     @Override
@@ -3198,66 +3154,26 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getWtDishesByMenu(menu);
 
-            for (WtDish wtDish : wtDishes) {
-                MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+            if (wtDishes != null && wtDishes.size() > 0) {
+                for (WtDish wtDish : wtDishes) {
+                    MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish);
 
-                WtMenuGroup menuGroup = new WtMenuGroup();
-                if (wtDish.getMenuGroupMenus() != null && wtDish.getMenuGroupMenus().size() > 0) {
-                    for (WtMenuGroupMenu menuGroupMenu : wtDish.getMenuGroupMenus()) {
-                        if (menuGroupMenu.getMenuGroup() != null) {
-                            menuGroup = menuGroupMenu.getMenuGroup();
-                            break;
-                        }
-                    }
-                }
-
-                if (menuGroup != null) {
-                    menuItemExt.setGroup(menuGroup.getName());
-                }
-                menuItemExt.setName(wtDish.getDishName());
-                menuItemExt.setPrice(wtDish.getPrice().longValue());
-                if (wtDish.getCalories() == null) {
-                    menuItemExt.setCalories((double) 0);
-                } else {
-                    menuItemExt.setCalories(wtDish.getCalories().doubleValue());
-                }
-                if (wtDish.getQty() == null) {
-                    menuItemExt.setOutput("");
-                } else{
-                    menuItemExt.setOutput(wtDish.getQty());
-                }
-                menuItemExt.setAvailableNow(1); // доступно для продажи
-                if (wtDish.getProtein() == null) {
-                    menuItemExt.setProtein((double) 0) ;
-                } else{
-                    menuItemExt.setProtein(wtDish.getProtein().doubleValue());
-                }
-                if (wtDish.getCarbohydrates() == null) {
-                    menuItemExt.setCarbohydrates((double) 0) ;
-                } else{
-                    menuItemExt.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
-                }
-                if (wtDish.getFat() == null) {
-                    menuItemExt.setFat((double) 0) ;
-                } else{
-                    menuItemExt.setFat(wtDish.getFat().doubleValue());
-                }
-
-                if (ProhibitByGroup.containsKey(menuGroup.getName())) {
-                    menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuGroup.getName()));
-                } else {
-                    if (ProhibitByName.containsKey(wtDish.getDishName())) {
-                        menuItemExt.setIdOfProhibition(ProhibitByName.get(wtDish.getDishName()));
+                    if (ProhibitByGroup.containsKey(menuItemExt.getGroup())) {
+                        menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuItemExt.getGroup()));
                     } else {
-                        //пробегаться в цикле.
-                        for (String filter : ProhibitByFilter.keySet()) {
-                            if (wtDish.getDishName().contains(filter)) {
-                                menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
+                        if (ProhibitByName.containsKey(wtDish.getDishName())) {
+                            menuItemExt.setIdOfProhibition(ProhibitByName.get(wtDish.getDishName()));
+                        } else {
+                            //пробегаться в цикле.
+                            for (String filter : ProhibitByFilter.keySet()) {
+                                if (wtDish.getDishName().contains(filter)) {
+                                    menuItemExt.setIdOfProhibition(ProhibitByFilter.get(filter));
+                                }
                             }
                         }
                     }
+                    menuDateItemExt.getE().add(menuItemExt);
                 }
-                menuDateItemExt.getE().add(menuItemExt);
             }
             menuListExt.getM().add(menuDateItemExt);
         }
@@ -6799,22 +6715,50 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 .getWtDishesByWtComplex(wtComplex);
         if (wtDishes != null && wtDishes.size() > 0) {
             for (WtDish wtDish : wtDishes) {
-                MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-                menuItemExt.setGroup(DAOReadExternalsService.getInstance().getWtMenuGroupByWtDish(wtDish).getName());
-                menuItemExt.setName(wtDish.getDishName());
-                menuItemExt.setFullName(wtDish.getDishName());
-                menuItemExt.setPrice(wtDish.getPrice().longValue());
-                menuItemExt.setCalories(wtDish.getCalories().doubleValue());
-                menuItemExt.setOutput(wtDish.getQty());
-                menuItemExt.setAvailableNow(1); // включение блюда в меню
-                menuItemExt.setProtein(wtDish.getProtein().doubleValue());
-                menuItemExt.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
-                menuItemExt.setFat(wtDish.getFat().doubleValue());
-                menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
+                MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish);
                 menuItemExtList.add(menuItemExt);
             }
         }
         return menuItemExtList;
+    }
+
+    private MenuItemExt getMenuItemExt(ObjectFactory objectFactory, WtDish wtDish) {
+        MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
+        WtMenuGroup menuGroup = DAOReadExternalsService.getInstance().getWtMenuGroupByWtDish(wtDish);
+        if (menuGroup != null) {
+            menuItemExt.setGroup(menuGroup.getName());
+        }
+        menuItemExt.setName(wtDish.getDishName());
+        menuItemExt.setFullName(wtDish.getDishName());
+        menuItemExt.setPrice(wtDish.getPrice().longValue());
+        if (wtDish.getCalories() == null) {
+            menuItemExt.setCalories((double) 0);
+        } else {
+            menuItemExt.setCalories(wtDish.getCalories().doubleValue());
+        }
+        if (wtDish.getQty() == null) {
+            menuItemExt.setOutput("");
+        } else{
+            menuItemExt.setOutput(wtDish.getQty());
+        }
+        menuItemExt.setAvailableNow(1); // включение блюда в меню
+        if (wtDish.getProtein() == null) {
+            menuItemExt.setProtein((double) 0) ;
+        } else{
+            menuItemExt.setProtein(wtDish.getProtein().doubleValue());
+        }
+        if (wtDish.getCarbohydrates() == null) {
+            menuItemExt.setCarbohydrates((double) 0) ;
+        } else{
+            menuItemExt.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
+        }
+        if (wtDish.getFat() == null) {
+            menuItemExt.setFat((double) 0) ;
+        } else{
+            menuItemExt.setFat(wtDish.getFat().doubleValue());
+        }
+        menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
+        return menuItemExt;
     }
 
 
