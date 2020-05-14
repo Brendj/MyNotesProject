@@ -8528,8 +8528,29 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         if (StringUtils.isEmpty(guid)) {
             return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
         }
+
+        if (StringUtils.isEmpty(orgCode)) {
+            return new Result(RC_INVALID_DATA, "Код организации не может быть пустым");
+        }
+
+        if (StringUtils.isEmpty(CultureName)) {
+            return new Result(RC_INVALID_DATA, "Ниаменование не может быть пустым");
+        }
+
+        if (StringUtils.isEmpty(CultureShortName)) {
+            return new Result(RC_INVALID_DATA, "Краткое наименование не может быть пустым");
+        }
+
+        if (StringUtils.isEmpty(CultureAddress)) {
+            return new Result(RC_INVALID_DATA, "Адрес организации не может быть пустым");
+        }
+
         if (accessTime == null) {
             return new Result(RC_INVALID_DATA, "Время события не может быть пустым");
+        }
+
+        if (eventsStatus == null || (eventsStatus < 0 || eventsStatus > 5)) {
+            return new Result(RC_INVALID_DATA, "Некорректный статус события");
         }
 
         Session session = null;
