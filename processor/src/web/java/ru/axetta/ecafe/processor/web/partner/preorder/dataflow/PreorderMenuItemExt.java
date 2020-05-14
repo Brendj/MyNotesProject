@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -91,16 +92,39 @@ public class PreorderMenuItemExt {
     }
 
     public PreorderMenuItemExt(WtDish wtDish) {
-        this.setGroup(DAOReadExternalsService.getInstance().getWtMenuGroupByWtDish(wtDish).getName());
+        WtMenuGroup menuGroup = DAOReadExternalsService.getInstance().getWtMenuGroupByWtDish(wtDish);
+        if (menuGroup != null) {
+            this.setGroup(menuGroup.getName());
+        }
         this.setName(wtDish.getDishName());
         this.setFullName(wtDish.getDishName());
         this.setPrice(wtDish.getPrice().longValue());
-        this.setCalories(wtDish.getCalories().doubleValue());
-        this.setOutput(wtDish.getQty());
+        if (wtDish.getCalories() == null) {
+            this.setCalories((double) 0);
+        } else {
+            this.setCalories(wtDish.getCalories().doubleValue());
+        }
+        if (wtDish.getQty() == null) {
+            this.setOutput("");
+        } else{
+            this.setOutput(wtDish.getQty());
+        }
         this.setAvailableNow(1); // включение блюда в меню
-        this.setProtein(wtDish.getProtein().doubleValue());
-        this.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
-        this.setFat(wtDish.getFat().doubleValue());
+        if (wtDish.getProtein() == null) {
+            this.setProtein((double) 0) ;
+        } else{
+            this.setProtein(wtDish.getProtein().doubleValue());
+        }
+        if (wtDish.getCarbohydrates() == null) {
+            this.setCarbohydrates((double) 0) ;
+        } else{
+            this.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
+        }
+        if (wtDish.getFat() == null) {
+            this.setFat((double) 0) ;
+        } else{
+            this.setFat(wtDish.getFat().doubleValue());
+        }
         this.setIdOfMenuDetail(wtDish.getIdOfDish());
         this.setItemCode(wtDish.getCode().toString());
     }
