@@ -60,8 +60,7 @@
         <rich:calendar id="endDateCalendar" value="#{mainPage.taloonPreorderVerificationPage.endDate}"
                        datePattern="dd.MM.yyyy"
                        converter="dateConverter" inputClass="input-text" showWeeksBar="false">
-            <a4j:support event="onchanged" reRender="endDatePeriodSelect"
-                         actionListener="#{mainPage.totalSalesPage.onEndDateSpecified}"/>
+            <a4j:support event="onchanged" actionListener="#{mainPage.totalSalesPage.onEndDateSpecified}"/>
         </rich:calendar>
     </h:panelGrid>
     <%--    Кнопки--%>
@@ -361,11 +360,6 @@
                     </a4j:commandLink>
 
                 </rich:column>
-
-                <%--                <a4j:commandLink reRender="filter">--%>
-                <%--                    <f:setPropertyActionListener value="#{ruleEditPage}" target="#{ruleEditPage.wt}"/>--%>
-                <%--                    <h:selectBooleanCheckbox id="arm" value="#{ruleEditPage.wt}"/>--%>
-                <%--                </a4j:commandLink>--%>
 
                 <%--        Комментарий--%>
                 <rich:column headerClass="column-header">
