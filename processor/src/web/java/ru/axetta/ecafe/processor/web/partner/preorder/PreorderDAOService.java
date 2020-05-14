@@ -268,73 +268,78 @@ public class PreorderDAOService {
             Set<WtComplex> wtComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getWtComplexes(date, date, wtDiscountRuleSet, complexGroupList, ageGroupList);
 
-            // Исключение из комплексов составов, не соответствующим датам цикла
-            for (WtComplex wtComplex : wtComplexes) {
-                RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .getWtComplexInCycleDates(client, org, wtComplex);
-            }
-
-            Map<String, PreorderComplexGroup> groupMap = new HashMap<>();
-            List<PreorderComplexItemExt> list = new ArrayList<>();
-
-            for (WtComplex wtComplex : wtComplexes) {
-                Integer idOfComplex = wtComplex.getIdOfComplex().intValue();
-                String complexName = wtComplex.getName();
-                // Режим добавления блюд: если комплекс составной - режим составного комплекса,
-                // если нет - режим фиксированной цены
-                Integer complexType = wtComplex.getComposite() ? 4 : 2;
-                // Режим бесплатного питания
-                Integer discount = 0;
-                if (wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 1 || // льготное питание
-                        wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 5) { // все
-                    discount = 1;
+            if (wtComplexes.size() > 0) {
+                // Исключение из комплексов составов, не соответствующим датам цикла
+                for (WtComplex wtComplex : wtComplexes) {
+                    RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                            .getWtComplexInCycleDates(client, org, wtComplex);
                 }
-                Long complexPrice = wtComplex.getPrice().longValue();
-                Integer amount = 0;
-                if (wtComplex.getWtComplexesItems() != null && wtComplex.getWtComplexesItems().size() > 0) {
-                    for (WtComplexesItem wtComplexesItem : wtComplex.getWtComplexesItems()) {
-                        amount += wtComplexesItem.getCountDishes();
+
+                Map<String, PreorderComplexGroup> groupMap = new HashMap<>();
+                List<PreorderComplexItemExt> list = new ArrayList<>();
+
+                for (WtComplex wtComplex : wtComplexes) {
+                    Integer idOfComplex = wtComplex.getIdOfComplex().intValue();
+                    String complexName = wtComplex.getName();
+                    // Режим добавления блюд: если комплекс составной - режим составного комплекса,
+                    // если нет - режим фиксированной цены
+                    Integer complexType = wtComplex.getComposite() ? 4 : 2;
+                    // Режим бесплатного питания
+                    Integer discount = 0;
+                    if (wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 1 || // льготное питание
+                            wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 5) { // все
+                        discount = 1;
+                    }
+                    Long complexPrice = wtComplex.getPrice().longValue();
+                    Integer amount = 0;
+                    if (wtComplex.getWtComplexesItems() != null && wtComplex.getWtComplexesItems().size() > 0) {
+                        for (WtComplexesItem wtComplexesItem : wtComplex.getWtComplexesItems()) {
+                            amount += wtComplexesItem.getCountDishes();
+                        }
+                    }
+
+                    PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName,
+                            complexPrice, complexType, discount);
+                    complexItemExt.setAmount(amount);
+                    complexItemExt.setState(wtComplex.getDeleteState());
+                    complexItemExt.setIsRegular(false);
+
+                    List<PreorderMenuItemExt> menuItemExtList = getWtMenuItemsExt(wtComplex, date);
+                    if (menuItemExtList.size() > 0) {
+                        complexItemExt.setMenuItemExtList(menuItemExtList);
+                        list.add(complexItemExt);
                     }
                 }
 
-                PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName,
-                        complexPrice, complexType, discount);
-                complexItemExt.setAmount(amount);
-                complexItemExt.setState(wtComplex.getDeleteState());
-                complexItemExt.setIsRegular(false);
-
-                List<PreorderMenuItemExt> menuItemExtList = getWtMenuItemsExt(wtComplex, date);
-                if (menuItemExtList.size() > 0) {
-                    complexItemExt.setMenuItemExtList(menuItemExtList);
-                    list.add(complexItemExt);
-                }
-            }
-            for (PreorderComplexItemExt item : list) {
-                PreorderGoodParamsContainer complexParams = getComplexParams(item, client, date);
-                if (isAcceptableComplex(item, client.getClientGroup(), hasDiscount, complexParams, null, null)) {
-                    String groupName = getPreorderComplexGroup(item, complexParams);
-                    if (groupName.isEmpty()) {
-                        continue;
+                for (PreorderComplexItemExt item : list) {
+                    PreorderGoodParamsContainer complexParams = getComplexParams(item, client, date);
+                    if (isAcceptableComplex(item, client.getClientGroup(), hasDiscount, complexParams, null, null)) {
+                        String groupName = getPreorderComplexGroup(item, complexParams);
+                        if (groupName.isEmpty()) {
+                            continue;
+                        }
+                        item.setType(getPreorderComplexSubgroup(item));
+                        PreorderComplexGroup group = groupMap.get(groupName);
+                        if (group == null) {
+                            group = new PreorderComplexGroup(groupName);
+                            groupMap.put(groupName, group);
+                        }
+                        group.addItem(item);
                     }
-                    item.setType(getPreorderComplexSubgroup(item));
-                    PreorderComplexGroup group = groupMap.get(groupName);
-                    if (group == null) {
-                        group = new PreorderComplexGroup(groupName);
-                        groupMap.put(groupName, group);
-                    }
-                    group.addItem(item);
                 }
+                List<PreorderComplexGroup> groupList = new ArrayList<>(groupMap.values());
+                for (PreorderComplexGroup group : groupList) {
+                    Collections.sort(group.getItems());
+                }
+                Collections.sort(groupList);
+                groupResult.setComplexesWithGroups(groupList);
             }
-            List<PreorderComplexGroup> groupList = new ArrayList<>(groupMap.values());
-            for (PreorderComplexGroup group : groupList) {
-                Collections.sort(group.getItems());
+            else {
+                logger.warn("Список комплексов пуст");
             }
-            Collections.sort(groupList);
-            groupResult.setComplexesWithGroups(groupList);
         } else {
             logger.warn("Льготные правила для данных категорий отсутствуют: " + categoriesDiscount);
         }
-
         return groupResult;
     }
 
