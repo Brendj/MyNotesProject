@@ -6507,8 +6507,16 @@ public class Processor implements SyncProcessor {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(eventDate);
         String enterWithChecker = "0";
-        if (event.getIdOfClient() != null && event.getEventCode() == 112 && childPassChecker == null) {
-            enterWithChecker = "1"; //для определения на тип события отмечен ли вход охранником/воспитателем
+        if (event.getIdOfClient() != null) {
+            if (childPassChecker != null) {
+                enterWithChecker = "1";//16,17 событие
+            } else {
+                if (guardianId != null) {
+                    enterWithChecker = "2";//3,4 событие
+                } else {
+                    enterWithChecker = "3";//1,2 событие
+                }
+            }
         }
         return new String[]{
                 "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
