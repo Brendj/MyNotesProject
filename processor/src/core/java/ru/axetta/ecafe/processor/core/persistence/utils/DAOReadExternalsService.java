@@ -11,7 +11,6 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroupMenu;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -286,18 +285,11 @@ public class DAOReadExternalsService {
 
     public WtMenuGroup getWtMenuGroupByWtDish(WtDish wtDish) {
         Query query = entityManager.createQuery(
-                "SELECT menuGroupMenus FROM WtDish wtDish LEFT JOIN wtDish.menuGroupMenus menuGroupMenus "
-                        + "WHERE wtDish = :wtDish");
+                "SELECT menuGroup FROM WtMenuGroup menuGroup "
+                        + "LEFT JOIN menuGroup.menuGroupMenus menuGroupMenus "
+                        + "WHERE :wtDish IN ELEMENTS(menuGroupMenus.dishes)");
         query.setParameter("wtDish", wtDish);
-        List<WtMenuGroupMenu> wtMenuGroupMenus = query.getResultList();
-
-        if (wtMenuGroupMenus != null && wtMenuGroupMenus.size() > 0) {
-            for (WtMenuGroupMenu wtMenuGroupMenu : wtMenuGroupMenus) {
-                if (wtMenuGroupMenu.getMenuGroup() != null) {
-                    return wtMenuGroupMenu.getMenuGroup();
-                }
-            }
-        }
-        return null;
+        List<WtMenuGroup> res = query.getResultList();
+        return res.size() > 0 ? res.get(0) : null;
     }
 }
