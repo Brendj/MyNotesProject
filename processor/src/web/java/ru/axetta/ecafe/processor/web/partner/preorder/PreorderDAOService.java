@@ -2346,9 +2346,21 @@ public class PreorderDAOService {
     }
 
     public List<WtDish> getWtDishesByMenu(WtMenu menu) {
-        Query query = emReport.createQuery("SELECT dish FROM WtDish dish LEFT JOIN dish.menuGroupMenus mgm "
+        Query query = emReport.createQuery("SELECT dish FROM WtDish dish "
+                + "LEFT JOIN dish.menuGroupMenus mgm "
                 + "LEFT JOIN mgm.menu menu where menu = :menu");
         query.setParameter("menu", menu);
+        return query.getResultList();
+    }
+
+    public List<WtDish> getWtDishesByMenuAndDates(WtMenu menu, Date beginDate, Date endDate) {
+        Query query = emReport.createQuery("SELECT dish FROM WtDish dish "
+                + "LEFT JOIN dish.menuGroupMenus mgm "
+                + "LEFT JOIN mgm.menu menu where menu = :menu "
+                + "AND dish.dateOfBeginMenuIncluding < :beginDate AND dish.dateOfEndMenuIncluding > :endDate");
+        query.setParameter("menu", menu);
+        query.setParameter("beginDate", beginDate);
+        query.setParameter("endDate", endDate);
         return query.getResultList();
     }
 

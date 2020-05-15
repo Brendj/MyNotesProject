@@ -3028,7 +3028,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         List<WtMenu> menus = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                 .getWtMenuByDates(startDate, endDate, client.getOrg());
 
-        generateWtMenuDetailWithProhibitions(session, client, objectFactory, menus, data);
+        generateWtMenuDetailWithProhibitions(session, client, objectFactory, menus, data, startDate, endDate);
     }
 
     private void generateMenuDetailWithProhibitions(Session session, Client client, ObjectFactory objectFactory,
@@ -3121,7 +3121,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     private void generateWtMenuDetailWithProhibitions(Session session, Client client, ObjectFactory objectFactory,
-            List<WtMenu> menus, Data data) throws DatatypeConfigurationException {
+            List<WtMenu> menus, Data data, Date startDate, Date endDate) throws DatatypeConfigurationException {
         Map<String, Long> ProhibitByFilter = new HashMap<>();
         Map<String, Long> ProhibitByName = new HashMap<>();
         Map<String, Long> ProhibitByGroup = new HashMap<>();
@@ -3156,15 +3156,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             WtMenu menu = (WtMenu) currObject;
             MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
-            menuDateItemExt.setDate(toXmlDateTime(menu.getBeginDate()));
+            menuDateItemExt.setDate(toXmlDateTime(startDate));
 
             List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getWtDishesByMenu(menu);
+                    .getWtDishesByMenuAndDates(menu, startDate, endDate);
 
             if (wtDishes != null && wtDishes.size() > 0) {
                 for (WtDish wtDish : wtDishes) {
                     MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish);
-
+                    // Добавляем блокировки
                     if (ProhibitByGroup.containsKey(menuItemExt.getGroup())) {
                         menuItemExt.setIdOfProhibition(ProhibitByGroup.get(menuItemExt.getGroup()));
                     } else {
