@@ -269,6 +269,7 @@ public class PreorderDAOService {
                     .getWtComplexes(date, date, wtDiscountRuleSet, complexGroupList, ageGroupList);
 
             if (wtComplexes.size() > 0) {
+
                 // Исключение из комплексов составов, не соответствующим датам цикла
                 for (WtComplex wtComplex : wtComplexes) {
                     RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
