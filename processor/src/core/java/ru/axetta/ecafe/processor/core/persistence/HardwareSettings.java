@@ -11,7 +11,6 @@ import java.util.Set;
 
 public class HardwareSettings implements Serializable {
 
-    private Long idOfHardwareSetting;
     private Set<HardwareSettingsMT> moduleTypes = new HashSet<HardwareSettingsMT>();
     private Set<HardwareSettingsReaders> readers = new HashSet<HardwareSettingsReaders>();
     private Org org;
@@ -29,23 +28,6 @@ public class HardwareSettings implements Serializable {
     private CompositeIdOfHardwareSettings compositeIdOfHardwareSettings;
 
     public HardwareSettings() {
-    }
-
-    public HardwareSettings(Long idOfHardwareSetting, Org org, String ipHost, Date lastUpdateForIPHost,
-            String dotNetVer, Date lastUpdateForDotNetVer, String oSVer, Date lastUpdateForOSVer, String ramSize,
-            Date lastUpdateForRAMSize, String cpuHost, Date lastUpdateForCPUHost, Long version) {
-        this.idOfHardwareSetting = idOfHardwareSetting;
-        this.ipHost = ipHost;
-        this.lastUpdateForIPHost = lastUpdateForIPHost;
-        this.dotNetVer = dotNetVer;
-        this.lastUpdateForDotNetVer = lastUpdateForDotNetVer;
-        this.oSVer = oSVer;
-        this.lastUpdateForOSVer = lastUpdateForOSVer;
-        this.ramSize = ramSize;
-        this.lastUpdateForRAMSize = lastUpdateForRAMSize;
-        this.cpuHost = cpuHost;
-        this.lastUpdateForCPUHost = lastUpdateForCPUHost;
-        this.version = version;
     }
 
     //@Override
@@ -151,14 +133,6 @@ public class HardwareSettings implements Serializable {
 
     public void setVersion(Long version) {
         this.version = version;
-    }
-
-    public Long getIdOfHardwareSetting() {
-        return idOfHardwareSetting;
-    }
-
-    public void setIdOfHardwareSetting(Long idOfHardwareSetting) {
-        this.idOfHardwareSetting = idOfHardwareSetting;
     }
 
     public Set<HardwareSettingsMT> getModuleTypes() {

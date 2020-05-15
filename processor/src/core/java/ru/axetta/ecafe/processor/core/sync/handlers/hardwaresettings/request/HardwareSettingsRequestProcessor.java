@@ -52,7 +52,6 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                     switch (moduleType) {
                         case "HS":
                             if (!errorFound) {
-
                                 HardwareSettingsRequestHSItem hsItem = (HardwareSettingsRequestHSItem) item;
                                 hardwareSettings = DAOUtils
                                         .getHardwareSettingsRequestByOrgAndIdOfHardwareSetting(session,
@@ -63,9 +62,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                                     hardwareSettings.setOrg(org);
                                     CompositeIdOfHardwareSettings compositeIdOfHardwareSettings = new ru.axetta.ecafe.processor.core.persistence.CompositeIdOfHardwareSettings(orgOwner, hsItem.getIdOfHardwareSetting());
                                     hardwareSettings.setCompositeIdOfHardwareSettings(compositeIdOfHardwareSettings);
-
                                 }
-                                hardwareSettings.setIdOfHardwareSetting(hsItem.getIdOfHardwareSetting());
                             } else {
                                 errorMessage.append("Section HS not found ");
                                 status = 0;

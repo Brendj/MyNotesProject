@@ -46,11 +46,11 @@ public class TurnstileSettingsRequestTRItem extends TurnstileSettingsRequestItem
         }
         controllerModel = XMLUtils.getAttributeValue(itemNode, "ControllerModel");
         if (null == controllerModel || StringUtils.isEmpty(controllerModel)) {
-            errorMessage.append("Attribute ControllerModel not found");
+            controllerModel = "";
         }
         controllerFirmwareVersion = XMLUtils.getAttributeValue(itemNode, "ControllerFirmwareVersion");
         if (null == controllerFirmwareVersion || StringUtils.isEmpty(controllerFirmwareVersion)) {
-            errorMessage.append("Attribute controllerFirmwareVersion not found");
+            controllerFirmwareVersion = "";
         }
 
         isWorkWithLongIds = XMLUtils.getIntegerAttributeValue(itemNode, "IsReadsLongIdsIncorrectly");

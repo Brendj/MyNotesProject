@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.report.online.OnlineReportPage;
 
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
@@ -21,10 +22,7 @@ import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
 import javax.faces.model.SelectItem;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 @Component
 @Scope("session")
@@ -38,6 +36,11 @@ public class HardwareSettingsReportPage extends OnlineReportPage implements OrgL
     private String selectedDistricts = "";
 
     private Boolean allFriendlyOrgs = true;
+
+    private Boolean showAdministrator = true;
+    private Boolean showCashier = true;
+    private Boolean showGuard = true;
+    private Boolean showTurnstile = true;
 
     private final Logger logger = LoggerFactory.getLogger(HardwareSettingsReportPage.class);
 
@@ -88,7 +91,8 @@ public class HardwareSettingsReportPage extends OnlineReportPage implements OrgL
             persistenceSession = RuntimeContext.getInstance().createReportPersistenceSession();
             transaction = persistenceSession.beginTransaction();
 
-            List<String> idOfOrgListString = new ArrayList<>(idOfOrgList.size());
+            List<String> idOfOrgListString = Arrays.asList(StringUtils.split(getGetStringIdOfOrgList(), ','));
+            List<Long> idOfOrgList = new ArrayList<Long>(idOfOrgListString.size());
             for (String item : idOfOrgListString) {
                 idOfOrgList.add(Long.parseLong(item));
             }
@@ -171,5 +175,37 @@ public class HardwareSettingsReportPage extends OnlineReportPage implements OrgL
     @Override
     public Logger getLogger() {
         return logger;
+    }
+
+    public Boolean getShowAdministrator() {
+        return showAdministrator;
+    }
+
+    public void setShowAdministrator(Boolean showAdministrator) {
+        this.showAdministrator = showAdministrator;
+    }
+
+    public Boolean getShowCashier() {
+        return showCashier;
+    }
+
+    public void setShowCashier(Boolean showCashier) {
+        this.showCashier = showCashier;
+    }
+
+    public Boolean getShowGuard() {
+        return showGuard;
+    }
+
+    public void setShowGuard(Boolean showGuard) {
+        this.showGuard = showGuard;
+    }
+
+    public Boolean getShowTurnstile() {
+        return showTurnstile;
+    }
+
+    public void setShowTurnstile(Boolean showTurnstile) {
+        this.showTurnstile = showTurnstile;
     }
 }

@@ -19,6 +19,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
@@ -33,7 +34,7 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
 
     private Logger logger = LoggerFactory.getLogger(HardwareSettingsReport.class);
 
-    public HardwareSettingsReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
+    private HardwareSettingsReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
             Date endTime) {
         super(generateTime, generateDuration, print, startTime, endTime);
     }
@@ -44,11 +45,15 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
     public static class Builder extends BasicReportJob.Builder {
 
         private static final Integer SERVICED = 1;
-        private static final Integer NOT_SERVISED = 2;
+        private static final Integer NOT_SERVICED = 2;
 
         public static final String LIST_OF_ORG_IDS_PARAM = "idOfOrgList";
         public static final String SELECTED_STATUS_PARAM = "selectedStatus";
         public static final String SELECTED_DISTRICT_PARAM = "selectedDistrict";
+        public static final String SELECTED_ADMINISTRATOR_PARAM = "selectedAdministrator";
+        public static final String SELECTED_CASHIER_PARAM = "selectedCashier";
+        public static final String SELECTED_GUARD_PARAM = "selectedGuard";
+        public static final String SELECTED_TURNSTILES_PARAM = "selectedTurnstiles";
         public static final String ALL_FRIENDLY_ORGS = "allFriendlyOrgs";
 
         private String templateFilename;
@@ -76,8 +81,17 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
             String selectedDistrict = getReportProperties().getProperty(SELECTED_DISTRICT_PARAM);
             Integer selectedStatus = Integer.parseInt(getReportProperties().getProperty(SELECTED_STATUS_PARAM));
             Boolean allFriendlyOrgs = Boolean.parseBoolean(getReportProperties().getProperty(ALL_FRIENDLY_ORGS));
+            Boolean showAdministrator = Boolean
+                    .parseBoolean(getReportProperties().getProperty(SELECTED_ADMINISTRATOR_PARAM));
+            Boolean showCashier = Boolean.parseBoolean(getReportProperties().getProperty(SELECTED_CASHIER_PARAM));
+            Boolean showGuard = Boolean.parseBoolean(getReportProperties().getProperty(SELECTED_GUARD_PARAM));
+            Boolean showTurnstiles = Boolean.parseBoolean(getReportProperties().getProperty(SELECTED_TURNSTILES_PARAM));
 
             parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
+            parameterMap.put(SELECTED_ADMINISTRATOR_PARAM, showAdministrator);
+            parameterMap.put(SELECTED_CASHIER_PARAM, showCashier);
+            parameterMap.put(SELECTED_GUARD_PARAM, showGuard);
+            parameterMap.put(SELECTED_TURNSTILES_PARAM, showTurnstiles);
 
             JRDataSource dataSource = createDataSource(session, selectedStatus, selectedDistrict, idOfOrgList,
                     allFriendlyOrgs);
@@ -100,7 +114,7 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
         public static List<HardwareSettingsReportItem> buildOrgHardwareCollection(List<Long> idOfOrgList,
                 Integer statusCondition, Session persistenceSession, String selectedDistricts, Boolean allFriendlyOrgs)
                 throws Exception {
-            List<HardwareSettingsReportItem> result = new ArrayList<HardwareSettingsReportItem>(idOfOrgList.size());
+            List<HardwareSettingsReportItem> result = new ArrayList<HardwareSettingsReportItem>();
 
             Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
             if (!CollectionUtils.isEmpty(idOfOrgList)) {
@@ -119,7 +133,7 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
 
             if (statusCondition.equals(SERVICED)) {
                 orgCriteria.add(Restrictions.eq("state", Org.ACTIVE_STATE));
-            } else if (statusCondition.equals(NOT_SERVISED)) {
+            } else if (statusCondition.equals(NOT_SERVICED)) {
                 orgCriteria.add(Restrictions.eq("state", Org.INACTIVE_STATE));
             }
 
@@ -132,38 +146,140 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
                 return Collections.emptyList();
             }
 
-            Criteria hardwareSettingsCriteria = persistenceSession.createCriteria(HardwareSettings.class);
-            hardwareSettingsCriteria.add(Restrictions.in("org.idOfOrg", idOfOrgList));
-            List<HardwareSettings> listOfSettings = hardwareSettingsCriteria.list();
-
-            Criteria orgSyncCriteria = persistenceSession.createCriteria(OrgSync.class);
-            orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
-            List<OrgSync> listOfOrgSync = orgSyncCriteria.list();
-
             for (Org org : orgs) {
+
+                List<HardwareSettingsReportItem> tempList = new ArrayList<HardwareSettingsReportItem>();
+
+                Criteria hardwareSettingsCriteria = persistenceSession.createCriteria(HardwareSettings.class);
+                hardwareSettingsCriteria.add(Restrictions.eq("org.idOfOrg", org.getIdOfOrg()));
+                List<HardwareSettings> listOfSettings = hardwareSettingsCriteria.list();
+
+                Criteria orgSyncCriteria = persistenceSession.createCriteria(OrgSync.class);
+                orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
+                List<OrgSync> listOfOrgSync = orgSyncCriteria.list();
+
                 OrgSync orgSync = getOrgSyncByOrg(listOfOrgSync, org);
-                //HardwareSettings hardwareSettings = getSettingByOrg(listOfSettings, org);
 
                 for (HardwareSettings settings : listOfSettings) {
-                    Criteria readersCriteria = persistenceSession.createCriteria(HardwareSettingsReaders.class);
-                    readersCriteria
-                            .add(Restrictions.eq("hardwareSettings.idOfHardwareSetting", settings.getIdOfHardwareSetting()));
-                    HardwareSettingsReaders hardwareSettingsReaders = (HardwareSettingsReaders) readersCriteria
-                            .uniqueResult();
+                    Query query = persistenceSession.createSQLQuery(
+                            "select hs.iphost, hs.dotnetver, hs.osver, hs.ramsize, hs.cpuhost, "
+                                    + "(select r1.readername as readernameou from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 0), "
+                                    + "(select r1.firmwarever as firmwareversionou from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 0), "
+                                    + "(select r1.readername as readernamefeeding from  cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 1), "
+                                    + "(select r1.firmwarever as firmwareversionfeeding from  cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 1), "
+                                    + "(select r1.readername as readernameguard from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 2), "
+                                    + "(select r1.firmwarever as firmwareversionguard from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 2) "
+                                    //+ "(select r1.readername from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 3), "
+                                    //+ "(select r1.firmwarever from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 3) "
+                                    + " from cf_hardware_settings hs "
+                                    + "where hs.idoforg = :idOfOrg and hs.idofhardwaresetting = :idOfHardwareSetting ");
 
-                    Criteria turnstileCriteria = persistenceSession.createCriteria(TurnstileSettings.class);
-                    turnstileCriteria
-                            .add(Restrictions.eq("org.idOfOrg", settings.getOrg().getIdOfOrg()));
-                    TurnstileSettings turnstileSettings = (TurnstileSettings) turnstileCriteria.uniqueResult();
+                    query.setParameter("idOfOrg", settings.getOrg().getIdOfOrg());
+                    query.setParameter("idOfHardwareSetting",
+                            settings.getCompositeIdOfHardwareSettings().getIdOfHardwareSetting());
 
-                    Criteria settingsMTCriteria = persistenceSession.createCriteria(HardwareSettingsMT.class);
-                    settingsMTCriteria
-                            .add(Restrictions.eq("hardwareSettings.idOfHardwareSetting", settings.getIdOfHardwareSetting()));
-                    HardwareSettingsMT hardwareSettingsMT = (HardwareSettingsMT) settingsMTCriteria.uniqueResult();
+                    List list = query.list();
 
-                    HardwareSettingsReportItem item = new HardwareSettingsReportItem(org, settings,
-                            hardwareSettingsReaders, orgSync, turnstileSettings, hardwareSettingsMT);
-                    result.add(item);
+                    for (Object o : list) {
+                        Object vals[] = (Object[]) o;
+                        if (orgSync != null) {
+                            HardwareSettingsReportItem item = new HardwareSettingsReportItem(orgSync, true);
+
+                            item.setRemoteAddressOU((String) vals[0]);
+                            item.setRemoteAddressFeeding((String) vals[0]);
+                            item.setRemoteAddressGuard((String) vals[0]);
+                            item.setRemoteAddressInfo((String) vals[0]);
+
+                            item.setDotNetVersionOU((String) vals[1]);
+                            item.setDotNetVersionFeeding((String) vals[1]);
+                            item.setDotNetVersionGuard((String) vals[1]);
+                            item.setDotNetVersionInfo((String) vals[1]);
+
+                            item.setOsVersionOU((String) vals[2]);
+                            item.setOsVersionFeeding((String) vals[2]);
+                            item.setOsVersionGuard((String) vals[2]);
+                            item.setOsVersionInfo((String) vals[2]);
+
+                            item.setRamSizeOU((String) vals[3]);
+                            item.setRamSizeFeeding((String) vals[3]);
+                            item.setRamSizeGuard((String) vals[3]);
+                            item.setRamSizeInfo((String) vals[3]);
+
+                            item.setCpuVersionOU((String) vals[4]);
+                            item.setCpuVersionFeeding((String) vals[4]);
+                            item.setCpuVersionGuard((String) vals[4]);
+                            item.setCpuVersionInfo((String) vals[4]);
+
+                            item.setReaderNameOU((String) vals[5]);
+                            if (vals[6] != null) {
+                                item.setFirmwareVersionOU((String) vals[6]);
+                            }
+
+                            item.setReaderNameFeeding((String) vals[7]);
+                            if (vals[8] != null) {
+                                item.setFirmwareVersionFeeding((String) vals[8]);
+                            }
+
+                            item.setReaderNameGuard((String) vals[9]);
+                            if (vals[10] != null) {
+                                item.setFirmwareVersionGuard((String) vals[10]);
+                            }
+                            result.add(item);
+                        }
+                    }
+                }
+
+                Criteria turnstileCriteria = persistenceSession.createCriteria(TurnstileSettings.class);
+                turnstileCriteria.add(Restrictions.eq("org.idOfOrg", org.getIdOfOrg()));
+
+                List<HardwareSettingsReportItem> newTurnstile = new ArrayList<HardwareSettingsReportItem>();
+
+                List<TurnstileSettings> turnstileSettingsList = turnstileCriteria.list();
+                if (!turnstileSettingsList.isEmpty()) {
+                    if (listOfSettings.size() < turnstileSettingsList.size()) {
+                        for (int i = 0; i < turnstileSettingsList.size(); i++) {
+                            //if (i < result.size()) {
+                            if (i < listOfSettings.size()) {
+                                HardwareSettingsReportItem item = result.get(i);
+                                item.setTurnstileId(turnstileSettingsList.get(i).getTurnstileId());
+                                item.setNumOfEntries(turnstileSettingsList.get(i).getNumOfEntries());
+                                item.setNumOfTurnstile(turnstileSettingsList.size());
+                                item.setControllerModel(turnstileSettingsList.get(i).getControllerModel());
+                                item.setControllerFirmwareVersion(
+                                        turnstileSettingsList.get(i).getControllerFirmwareVersion());
+                                item.setIsWorkWithLongIds(turnstileSettingsList.get(i).getIsReadsLongIdsIncorrectly());
+                            } else {
+                                HardwareSettingsReportItem tempItem = new HardwareSettingsReportItem(orgSync, false);
+                                tempItem.setTurnstileId(turnstileSettingsList.get(i).getTurnstileId());
+                                tempItem.setNumOfEntries(turnstileSettingsList.get(i).getNumOfEntries());
+                                tempItem.setNumOfTurnstile(turnstileSettingsList.size());
+                                tempItem.setControllerModel(turnstileSettingsList.get(i).getControllerModel());
+                                tempItem.setControllerFirmwareVersion(
+                                        turnstileSettingsList.get(i).getControllerFirmwareVersion());
+                                tempItem.setIsWorkWithLongIds(
+                                        turnstileSettingsList.get(i).getIsReadsLongIdsIncorrectly());
+                                newTurnstile.add(tempItem);
+                            }
+                        }
+                    }
+
+                    if (listOfSettings.size() >= turnstileSettingsList.size()) {
+                        for (int i = 0; i < listOfSettings.size(); i++) {
+                            if (i == turnstileSettingsList.size()) {
+                                break;
+                            } else {
+                                HardwareSettingsReportItem item = result.get(i);
+                                item.setTurnstileId(turnstileSettingsList.get(i).getTurnstileId());
+                                item.setNumOfEntries(turnstileSettingsList.get(i).getNumOfEntries());
+                                item.setNumOfTurnstile(turnstileSettingsList.size());
+                                item.setControllerModel(turnstileSettingsList.get(i).getControllerModel());
+                                item.setControllerFirmwareVersion(
+                                        turnstileSettingsList.get(i).getControllerFirmwareVersion());
+                                item.setIsWorkWithLongIds(turnstileSettingsList.get(i).getIsReadsLongIdsIncorrectly());
+                            }
+                        }
+                    }
+                    result.addAll(newTurnstile);
                 }
             }
             return result;
