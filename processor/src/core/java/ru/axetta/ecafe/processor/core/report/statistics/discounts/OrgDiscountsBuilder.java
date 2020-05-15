@@ -10,6 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 import ru.axetta.ecafe.processor.core.persistence.utils.FriendlyOrganizationsInfoModel;
@@ -20,6 +21,7 @@ import ru.axetta.ecafe.processor.core.report.statistics.discounts.model.Category
 import ru.axetta.ecafe.processor.core.report.statistics.discounts.model.ClientItem;
 import ru.axetta.ecafe.processor.core.report.statistics.discounts.model.GroupItem;
 import ru.axetta.ecafe.processor.core.report.statistics.discounts.model.OrgItem;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ReportPropertiesUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -115,10 +117,11 @@ public class OrgDiscountsBuilder extends BasicReportForOrgJob.Builder {
         List<GroupItem> groupItems = new ArrayList<GroupItem>();
         String q =
                 "SELECT t.idofclient, t.idofclientgroup, t.groupname, t.firstname, t.secondname, t.surname, t.categoryname, "
-              + "   string_agg(concat(dszn.code, CASE WHEN (dszn.code IS NULL OR dszn.description IS NULL) THEN '' ELSE  '-' END, dszn.description), ',') AS dsznval "
+              + "   string_agg(concat(dszn.code, CASE WHEN (dszn.code IS NULL OR dszn.description IS NULL) THEN '' ELSE  '-' END, dszn.description), ',') AS dsznval, "
+              + "   t.CategoryType "
               + "FROM ("
               + "   SELECT c.idofclient, c.idofclientgroup, cg.groupname, p.firstname, p.secondname, p.surname, cd.categoryname, "
-              + "       info.dtiszncode AS discount_dszn_code  "
+              + "       info.dtiszncode AS discount_dszn_code, cd.CategoryType "
               + "   FROM cf_clients c "
               + "   INNER JOIN cf_clients_categorydiscounts cc ON c.idofclient=cc.idofclient AND cc.idofcategorydiscount>=0 "
               + "   INNER JOIN cf_categorydiscounts cd ON cd.idofcategorydiscount=cc.idofcategorydiscount "
@@ -159,7 +162,8 @@ public class OrgDiscountsBuilder extends BasicReportForOrgJob.Builder {
             if (!showReserve && category.equals("Резерв")) {
                 continue;
             }
-            if (!showPayComplex && category.contains("Платное")) {
+            Integer cateroryType = HibernateUtils.getDbInt(client[8]);
+            if (!showPayComplex && cateroryType != null && cateroryType.equals(CategoryDiscountEnumType.FEE_CATEGORY.getValue())) {
                 continue;
             }
             if (!lastClientId.equals(((BigInteger)client[0]).longValue())) {
