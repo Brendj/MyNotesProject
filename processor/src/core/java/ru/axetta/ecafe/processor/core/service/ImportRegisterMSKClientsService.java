@@ -399,7 +399,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
         //  Если используется старый метод полной загрузки контенгента школы, то проверяем каждого ученика в отдельности на его
         //  наличие в школе. Иначе - смотрим флаг удалено/не удалено и в зависимости от этого помещаем ученика в удаленные
-        if (deleteClientsIfNotFound) {
+        /*if (deleteClientsIfNotFound) { // Заглушено в рамках логики функционала сверки с МЭШ.Контингент
             //  Находим только удаления и подсчитываем их, если их количество больще чем ограничение, то прекращаем обновление школы и
             //  отправляем уведомление на email
             List<Client> clientsToRemove = new ArrayList<Client>();
@@ -441,133 +441,128 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     logError("Failed to delete client " + dbClient, e, logBuffer);
                 }
             }
-        } else {
-            for (ExpandedPupilInfo epi : pupils) {
-                if (epi.deleted) {
-                    Client dbClient = guidMap.get(emptyIfNull(epi.getGuid()));
-                    if (dbClient == null) {
-                        continue;
-                    }
-                    log(synchDate + "Удаление " +
-                            emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(
-                            dbClient.getPerson().getSurname()) + " " +
-                            emptyIfNull(dbClient.getPerson().getFirstName()) + " " + emptyIfNull(
-                            dbClient.getPerson().getSecondName()) + ", " +
-                            emptyIfNull(
-                                    dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()),
-                            logBuffer);
-                    addClientChange(ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION,
-                            RegistryChange.FULL_COMPARISON, false);
-                }
-            }
-        }
+        }*/
 
         //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
         for (ExpandedPupilInfo pupil : pupils) {
-            FieldProcessor.Config fieldConfig;
-            boolean updateClient = false;
-            Client cl = guidMap.get(getPupilGuid(emptyIfNull(pupil.getGuid())));
-            if (cl == null) {
-                fieldConfig = new ClientManager.ClientFieldConfig();
-            } else {
-                if (cl.getClientGroup() != null && belongToProperGroup(cl)) {
+            if (pupil.deleted) {
+                Client dbClient = guidMap.get(emptyIfNull(pupil.getGuid()));
+                if (dbClient == null) {
                     continue;
                 }
-                fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
-            }
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID, getPupilGuid(pupil.getGuid()),
-                    cl == null ? null : getClientGuid(cl), updateClient);
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SURNAME, pupil.getFamilyName(),
-                    cl == null ? null : cl.getPerson().getSurname(), updateClient);
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.NAME, pupil.getFirstName(),
-                    cl == null ? null : cl.getPerson().getFirstName(), updateClient);
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SECONDNAME, pupil.getSecondName(),
-                    cl == null ? null : cl.getPerson().getSecondName(), updateClient);
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GENDER, pupil.getGender() == null ?  "Мужской" : pupil.getGender(),
-                        cl == null || cl.getGender() == null ? "Мужской" : cl.getGender() == 0 ? "Женский" : "Мужской", updateClient);
-
-            DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BIRTH_DATE, pupil.getBirthDate(),
-                    cl == null ? null : cl.getBirthDate() == null ? null : timeFormat.format(cl.getBirthDate()), updateClient);
-
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.AGE_TYPE_GROUP, pupil.getAgeTypeGroup(),
-                    cl == null ? null : cl.getAgeTypeGroup(), updateClient);
-
-            if (pupil.getGroup() != null) {
-                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
-                        cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(),
-                        updateClient);
+                log(synchDate + "Удаление " + emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(
+                        dbClient.getPerson().getSurname()) + " " + emptyIfNull(dbClient.getPerson().getFirstName())
+                        + " " + emptyIfNull(dbClient.getPerson().getSecondName()) + ", " + emptyIfNull(
+                        dbClient.getClientGroup() == null ? "" : dbClient.getClientGroup().getGroupName()), logBuffer);
+                addClientChange(ts, org.getIdOfOrg(), dbClient, DELETE_OPERATION, RegistryChange.FULL_COMPARISON,
+                        false);
             } else {
-                //  Если группа у клиента не указана, то перемещаем его в Другие
-                updateClient = doUpdateClientGroup(fieldConfig, cl, updateClient);
-            }
-            updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.PARALLEL, pupil.getParallel(),
-                    cl == null ? null : cl.getParallel(), updateClient);
-            //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
-            boolean crossFound = false;
-            if (cl != null) {
-                if (org.getIdOfOrg().equals(cl.getOrg().getIdOfOrg())) {
-                    crossFound = true;
+                FieldProcessor.Config fieldConfig;
+                boolean updateClient = false;
+                Client cl = guidMap.get(getPupilGuid(emptyIfNull(pupil.getGuid())));
+                if (cl == null) {
+                    fieldConfig = new ClientManager.ClientFieldConfig();
                 } else {
-                    for (Org o : orgsList) {
-                        if (o.getIdOfOrg().equals(cl.getOrg().getIdOfOrg())) {
-                            crossFound = true;
-                            break;
+                    if (cl.getClientGroup() != null && belongToProperGroup(cl)) {
+                        continue;
+                    }
+                    fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
+                }
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID,
+                        getPupilGuid(pupil.getGuid()), cl == null ? null : getClientGuid(cl), updateClient);
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SURNAME, pupil.getFamilyName(),
+                        cl == null ? null : cl.getPerson().getSurname(), updateClient);
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.NAME, pupil.getFirstName(),
+                        cl == null ? null : cl.getPerson().getFirstName(), updateClient);
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SECONDNAME, pupil.getSecondName(),
+                        cl == null ? null : cl.getPerson().getSecondName(), updateClient);
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GENDER,
+                        pupil.getGender() == null ? "Мужской" : pupil.getGender(),
+                        cl == null || cl.getGender() == null ? "Мужской" : cl.getGender() == 0 ? "Женский" : "Мужской",
+                        updateClient);
+
+                DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BIRTH_DATE, pupil.getBirthDate(),
+                        cl == null ? null : cl.getBirthDate() == null ? null : timeFormat.format(cl.getBirthDate()),
+                        updateClient);
+
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.AGE_TYPE_GROUP,
+                        pupil.getAgeTypeGroup(), cl == null ? null : cl.getAgeTypeGroup(), updateClient);
+
+                if (pupil.getGroup() != null) {
+                    updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.GROUP, pupil.getGroup(),
+                            cl == null || cl.getClientGroup() == null ? null : cl.getClientGroup().getGroupName(),
+                            updateClient);
+                } else {
+                    //  Если группа у клиента не указана, то перемещаем его в Другие
+                    updateClient = doUpdateClientGroup(fieldConfig, cl, updateClient);
+                }
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.PARALLEL, pupil.getParallel(),
+                        cl == null ? null : cl.getParallel(), updateClient);
+                //  Проверяем организацию и дружественные ей - если клиент был переведен из другого ОУ, то перемещаем его
+                boolean crossFound = false;
+                if (cl != null) {
+                    if (org.getIdOfOrg().equals(cl.getOrg().getIdOfOrg())) {
+                        crossFound = true;
+                    } else {
+                        for (Org o : orgsList) {
+                            if (o.getIdOfOrg().equals(cl.getOrg().getIdOfOrg())) {
+                                crossFound = true;
+                                break;
+                            }
                         }
                     }
                 }
-            }
-            if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !crossFound) {
-                log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " +
-                        emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getSurname()) + " " +
-                        emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getFirstName()) + " " +
-                        emptyIfNull(cl.getPerson() == null ? "" : cl.getPerson().getSecondName()) + ", " +
-                        emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName())
-                        + " из школы " + cl.getOrg().getIdOfOrg() + " в школу " + org.getIdOfOrg(), logBuffer);
-                addClientChange(ts, org.getIdOfOrg(), org.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION,
-                        RegistryChange.FULL_COMPARISON, false);
-                continue;
-            }
-            if (!updateClient) {
-                continue;
-            }
-
-            doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT, pupil.getGuardiansCount(),
-                    cl == null ? null : cl.getGuardiansCount(), updateClient);
-
-            if (!pupil.getGuardianInfoList().isEmpty()) {
-                doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT_LIST, pupil.getGuardianInfoList());
-            }
-
-            try {
-                //  Если клиента по GUID найти не удалось, это значит что он новый - добавляем его
-                if (cl == null) {
-                    try {
-                        log(synchDate + "Добавление " + pupil.getGuid() + ", " +
-                                pupil.getFamilyName() + " " + pupil.getFirstName() + " " +
-                                pupil.getSecondName() + ", " + pupil.getGroup(), logBuffer);
-                        addClientChange(ts, org.getIdOfOrg(), fieldConfig, CREATE_OPERATION,
-                                RegistryChange.FULL_COMPARISON, false);
-                    } catch (Exception e) {
-                        // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
-                        logError("Ошибка добавления клиента", e, logBuffer);
-                    }
-                    //  Иначе - обновляем клиента в БД
-                } else {
-                    log(synchDate + "Изменение " +
-                            emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(cl.getPerson().getSurname()) + " " +
-                            emptyIfNull(cl.getPerson().getFirstName()) + " " + emptyIfNull(
-                            cl.getPerson().getSecondName()) + ", " +
-                            emptyIfNull(cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " на "
-                            +
-                            emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " "
-                            + emptyIfNull(pupil.getFirstName()) + " " +
-                            emptyIfNull(pupil.getSecondName()) + ", " + emptyIfNull(pupil.getGroup()), logBuffer);
-                    addClientChange(ts, org.getIdOfOrg(), fieldConfig, cl, MODIFY_OPERATION,
+                if (cl != null && !cl.getOrg().getGuid().equals(pupil.getGuidOfOrg()) && !crossFound) {
+                    log(synchDate + "Перевод " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
+                            cl.getPerson() == null ? "" : cl.getPerson().getSurname()) + " " + emptyIfNull(
+                            cl.getPerson() == null ? "" : cl.getPerson().getFirstName()) + " " + emptyIfNull(
+                            cl.getPerson() == null ? "" : cl.getPerson().getSecondName()) + ", " + emptyIfNull(
+                            cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " из школы " + cl
+                            .getOrg().getIdOfOrg() + " в школу " + org.getIdOfOrg(), logBuffer);
+                    addClientChange(ts, org.getIdOfOrg(), org.getIdOfOrg(), fieldConfig, cl, MOVE_OPERATION,
                             RegistryChange.FULL_COMPARISON, false);
+                    continue;
                 }
-            } catch (Exception e) {
-                logError("Failed to add client for " + org.getIdOfOrg() + " org", e, logBuffer);
+                if (!updateClient) {
+                    continue;
+                }
+
+                doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT, pupil.getGuardiansCount(),
+                        cl == null ? null : cl.getGuardiansCount(), updateClient);
+
+                if (!pupil.getGuardianInfoList().isEmpty()) {
+                    doClientUpdate(fieldConfig, ClientManager.FieldId.GUARDIANS_COUNT_LIST,
+                            pupil.getGuardianInfoList());
+                }
+
+                try {
+                    //  Если клиента по GUID найти не удалось, это значит что он новый - добавляем его
+                    if (cl == null) {
+                        try {
+                            log(synchDate + "Добавление " + pupil.getGuid() + ", " + pupil.getFamilyName() + " " + pupil
+                                    .getFirstName() + " " + pupil.getSecondName() + ", " + pupil.getGroup(), logBuffer);
+                            addClientChange(ts, org.getIdOfOrg(), fieldConfig, CREATE_OPERATION,
+                                    RegistryChange.FULL_COMPARISON, false);
+                        } catch (Exception e) {
+                            // Не раскомментировать, очень много исключений будет из-за дублирования клиентов
+                            logError("Ошибка добавления клиента", e, logBuffer);
+                        }
+                        //  Иначе - обновляем клиента в БД
+                    } else {
+                        log(synchDate + "Изменение " + emptyIfNull(cl.getClientGUID()) + ", " + emptyIfNull(
+                                cl.getPerson().getSurname()) + " " + emptyIfNull(cl.getPerson().getFirstName()) + " "
+                                + emptyIfNull(cl.getPerson().getSecondName()) + ", " + emptyIfNull(
+                                cl.getClientGroup() == null ? "" : cl.getClientGroup().getGroupName()) + " на "
+                                + emptyIfNull(pupil.getGuid()) + ", " + emptyIfNull(pupil.getFamilyName()) + " "
+                                + emptyIfNull(pupil.getFirstName()) + " " + emptyIfNull(pupil.getSecondName()) + ", "
+                                + emptyIfNull(pupil.getGroup()), logBuffer);
+                        addClientChange(ts, org.getIdOfOrg(), fieldConfig, cl, MODIFY_OPERATION,
+                                RegistryChange.FULL_COMPARISON, false);
+                    }
+                } catch (Exception e) {
+                    logError("Failed to add client for " + org.getIdOfOrg() + " org", e, logBuffer);
+                }
             }
         }
         log(synchDate + "Синхронизация завершена для " + org.getOfficialName(), logBuffer);
