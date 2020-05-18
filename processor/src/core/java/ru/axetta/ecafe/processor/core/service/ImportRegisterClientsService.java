@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.mail.File;
 import ru.axetta.ecafe.processor.core.partner.nsi.ClientMskNSIService;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
@@ -860,9 +861,7 @@ public class ImportRegisterClientsService {
             if (currentClient.getBirthDate() != null) {
                 ch.setBirthDateFrom(currentClient.getBirthDate().getTime());
             }
-            ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
-            ch.setOldDiscounts(StringUtils.isEmpty(currentClient.getCategoriesDiscounts()) ? "" :
-                    StringUtils.join(new TreeSet<String>(Arrays.asList(currentClient.getCategoriesDiscounts().split(","))), ","));
+            ch.setOldDiscounts(DiscountManager.getClientDiscountsAsString(currentClient));
             ch.setAgeTypeGroupFrom(currentClient.getAgeTypeGroup());
         }
         sess.save(ch);
