@@ -59,6 +59,7 @@ public class ClientMigrationHistoryService {
 
         if (isOn(NODE_DISCOUNT_CHANGE_ORG)) {
             discountChange(list);
+            deleteDOUDiscounts(list);
         }
 
         if (isOn(NODE_PLAN_ORDERS_RESTRICTIONS_CHANGE_ORG)) {
@@ -97,6 +98,33 @@ public class ClientMigrationHistoryService {
                     logger.error("Error in processOrgChange service: ", e);
                 }
             }
+        }
+    }
+
+    private void deleteDOUDiscounts(List<ClientMigration> list) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            for (ClientMigration clientMigration : list) {
+                if (!(clientMigration.getOldOrg().getType().equals(OrganizationType.KINDERGARTEN) && clientMigration.getOrg().getType().equals(OrganizationType.SCHOOL))) {
+                    continue;
+                }
+                try {
+                    Client client = DAOUtils.findClient(session, clientMigration.getClient().getIdOfClient());
+                    DiscountManager.deleteDOUDiscounts(session, client);
+                } catch (Exception e) {
+                    logger.error("Can not delete DOU discounts for client id = " + clientMigration.getClient().getIdOfClient(), e);
+                }
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in deleteDOUDiscounts", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
         }
     }
 

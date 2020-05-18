@@ -177,6 +177,21 @@ public class DiscountManager {
         session.update(client);
     }
 
+    public static void deleteDOUDiscounts(Session session, Client client) throws Exception {
+        Set<CategoryDiscount> newDiscounts = new HashSet<>();
+        for (CategoryDiscount cd : client.getCategories()) {
+            if (!cd.getOrgType().equals(CategoryDiscount.KINDERGARTEN_ID)) {
+                newDiscounts.add(cd);
+            }
+        }
+        if (newDiscounts.equals(client.getCategories())) return;
+        Integer oldDiscountMode = client.getDiscountMode();
+        Integer newDiscountMode =
+                newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+        renewDiscounts(session, client, newDiscounts, client.getCategories(), newDiscountMode, oldDiscountMode,
+                DiscountChangeHistory.MODIFY_BY_TRANSITION);
+    }
+
     public static String getClientDiscountsAsString(Client client) {
         String result = "";
         for (CategoryDiscount cd : client.getCategories()) {

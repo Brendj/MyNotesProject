@@ -34,6 +34,8 @@ public class CategoryDiscount {
 
     public final static String SCHOOL_KINDERGARTEN_STRING = "ОУ + ДОУ";
     public final static Integer SCHOOL_KINDERGARTEN_ID = -1;
+    public final static Integer KINDERGARTEN_ID = 1;
+    public final static Integer SCHOOL_ID = 0;
 
     public CategoryDiscountEnumType getCategoryType() {
         return categoryType;

@@ -159,8 +159,8 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         OrganizationType[] organizationTypes = OrganizationType.values();
         SelectItem[] items = new SelectItem[3];
         items[0] = new SelectItem(CategoryDiscount.SCHOOL_KINDERGARTEN_ID, CategoryDiscount.SCHOOL_KINDERGARTEN_STRING);
-        items[1] = new SelectItem(0, organizationTypes[0].toString());
-        items[2] = new SelectItem(1, organizationTypes[1].toString());
+        items[1] = new SelectItem(CategoryDiscount.SCHOOL_ID, organizationTypes[0].toString());
+        items[2] = new SelectItem(CategoryDiscount.KINDERGARTEN_ID, organizationTypes[1].toString());
         return items;
     }
 
