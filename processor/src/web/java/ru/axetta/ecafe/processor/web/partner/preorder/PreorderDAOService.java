@@ -56,8 +56,9 @@ public class PreorderDAOService {
     private static final Logger logger = LoggerFactory.getLogger(PreorderDAOService.class);
     private final String NEW_LINE_DELIMITER = ";";
     public static final long BASE_ID_MENU_VALUE_FOR_MODIFY = 7700000;
-    public static final String ELEMENTARY_SCHOOL = "1,2,3,4,";
-    public static final String MIDDLE_SCHOOL = "5,6,7,8,9,10,11,";
+
+    private static final Set<String> ELEMENTARY_SCHOOL = new HashSet<>(Arrays.asList("1", "2", "3", "4"));
+    private static final Set<String> MIDDLE_SCHOOL =  new HashSet<>(Arrays.asList("5", "6", "7", "8", "9", "10", "11"));
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
