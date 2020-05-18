@@ -3156,12 +3156,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             WtMenu menu = (WtMenu) currObject;
             MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
-            menuDateItemExt.setDate(toXmlDateTime(startDate));
 
             List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getWtDishesByMenuAndDates(menu, startDate, endDate);
 
             if (wtDishes != null && wtDishes.size() > 0) {
+                menuDateItemExt.setDate(toXmlDateTime(startDate));
                 for (WtDish wtDish : wtDishes) {
                     MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish);
                     // Добавляем блокировки

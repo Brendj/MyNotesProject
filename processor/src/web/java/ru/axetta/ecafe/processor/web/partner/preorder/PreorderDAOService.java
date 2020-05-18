@@ -2338,6 +2338,7 @@ public class PreorderDAOService {
         Query query = emReport.createQuery("SELECT menu FROM WtMenu menu "
                 + "LEFT JOIN FETCH menu.wtOrgGroup orgGroup "
                 + "WHERE menu.beginDate < :beginDate AND menu.endDate > :endDate "
+                + "AND menu.deleteState = 0 "
                 + "AND (:org IN elements(menu.orgs) OR :org IN elements(orgGroup.orgs))");
         query.setParameter("beginDate", beginDate, TemporalType.TIMESTAMP);
         query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
@@ -2357,7 +2358,11 @@ public class PreorderDAOService {
         Query query = emReport.createQuery("SELECT dish FROM WtDish dish "
                 + "LEFT JOIN dish.menuGroupMenus mgm "
                 + "LEFT JOIN mgm.menu menu where menu = :menu "
-                + "AND dish.dateOfBeginMenuIncluding < :beginDate AND dish.dateOfEndMenuIncluding > :endDate");
+                + "AND dish.deleteState = 0 "
+                + "AND ((dish.dateOfBeginMenuIncluding < :beginDate AND dish.dateOfEndMenuIncluding > :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding > :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding < :beginDate AND dish.dateOfEndMenuIncluding IS NULL)"
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");
         query.setParameter("menu", menu);
         query.setParameter("beginDate", beginDate);
         query.setParameter("endDate", endDate);
