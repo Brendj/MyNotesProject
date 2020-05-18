@@ -182,6 +182,8 @@ public class DiscountManager {
         for (CategoryDiscount cd : client.getCategories()) {
             if (!cd.getOrgType().equals(CategoryDiscount.KINDERGARTEN_ID)) {
                 newDiscounts.add(cd);
+            } else {
+                archiveDtisznDiscount(client, session, cd.getIdOfCategoryDiscount());
             }
         }
         if (newDiscounts.equals(client.getCategories())) return;
