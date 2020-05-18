@@ -4,7 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.request.feeding;
 
-import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
@@ -38,7 +38,6 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
             boolean errorFound;
             Long nextVersion = DAOUtils.nextVersionByApplicationForFood(session);
             Long nextHistoryVersion = DAOUtils.nextVersionByApplicationForFoodHistory(session);
-            Long otherDiscountCode = null;
             for (RequestFeedingItem item : requestFeeding.getItems()) {
                 errorFound = !item.getResCode().equals(RequestFeedingItem.ERROR_CODE_ALL_OK);
                 if (!errorFound) {
@@ -94,10 +93,7 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                 etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood,
                                         new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING,
                                                 status.getDeclineReason())));
-                                if (null == otherDiscountCode) {
-                                    otherDiscountCode = DAOUtils.getOtherDiscountCode(session);
-                                }
-                                ClientManager.addOtherDiscountForClient(session, client, otherDiscountCode);
+                                DiscountManager.addOtherDiscountForClient(session, client);
                             }
 
                             applicationForFood = DAOUtils
@@ -191,12 +187,12 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
             if (discountInfo.getArchived() || !discountInfo.getStatus().equals(ClientDTISZNDiscountStatus.CONFIRMED)
                     || !discountInfo.getDateStart().equals(item.getOtherDiscountStartDate()) || !discountInfo
                     .getDateEnd().equals(item.getOtherDiscountEndDate())) {
-                discountInfo.setArchived(Boolean.FALSE);
-                discountInfo.setStatus(ClientDTISZNDiscountStatus.CONFIRMED);
-                discountInfo.setDateStart(item.getOtherDiscountStartDate());
-                discountInfo.setDateEnd(item.getOtherDiscountEndDate());
-                discountInfo.setLastUpdate(new Date());
-                session.update(discountInfo);
+                DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(discountInfo);
+                builder.withArchived(false);
+                builder.withStatus(ClientDTISZNDiscountStatus.CONFIRMED);
+                builder.withDateStart(item.getOtherDiscountStartDate());
+                builder.withDateEnd(item.getOtherDiscountEndDate());
+                builder.save(session);
             }
         }
     }

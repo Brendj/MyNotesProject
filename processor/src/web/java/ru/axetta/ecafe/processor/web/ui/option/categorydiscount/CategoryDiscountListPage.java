@@ -49,16 +49,7 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
 
     @Override
     public void onConfirmDelete(ConfirmDeletePage confirmDeletePage) {
-        RuntimeContext runtimeContext = RuntimeContext.getInstance();
-        Session persistenceSession = null;
-        Transaction persistenceTransaction = null;
         try {
-            persistenceSession = runtimeContext.createPersistenceSession();
-            persistenceTransaction = persistenceSession.beginTransaction();
-            DAOUtils.deleteCategoryDiscount(persistenceSession, confirmDeletePage.getEntityId());
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-
             reload();
         } catch (ConstraintViolationException vce){
             logAndPrintMessage(
@@ -68,9 +59,6 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
             logAndPrintMessage("Ошибка при удалении категории: имеются зарегистрированные Правила скидок или Клиенты привязанные к категории", ode);
         } catch (Exception e) {
             logAndPrintMessage("Ошибка при удалении категории ", e);
-        } finally {
-            HibernateUtils.rollback(persistenceTransaction, getLogger());
-            HibernateUtils.close(persistenceSession, getLogger());
         }
     }
 

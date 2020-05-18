@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.service.clients;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientMigrationHistoryRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -118,8 +119,8 @@ public class ClientMigrationHistoryService {
                     }
                 }
                 Client client = DAOUtils.findClient(session, clientMigration.getClient().getIdOfClient());
-                if (ClientManager.atLeastOneDiscountEligibleToDelete(client)) {
-                    ClientManager.deleteDiscount(client, session);
+                if (DiscountManager.atLeastOneDiscountEligibleToDelete(client)) {
+                    DiscountManager.deleteDiscount(client, session);
                 }
                 ClientManager.archiveApplicationForFoodWithoutDiscount(client, session);
 
