@@ -15,23 +15,25 @@ import java.util.Set;
 @Entity
 @Table(name = "cf_wt_category_items")
 public class WtCategoryItem {
+    public static final int ACTIVE = 0;
+    public static final int DELETE = 1;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.IDENTITY)
-    @Column(name = "idOfCategoryItem")
+    @GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "cf_wt_category_items_idofcategoryitem_seq")
+    @Column(name = "idofcategoryitem")
     private Long idOfCategoryItem;
 
-    @Column(name = "createDate")
+    @Column(name = "createdate")
     private Date createDate;
 
-    @Column(name = "lastUpdate")
+    @Column(name = "lastupdate")
     private Date lastUpdate;
 
     @Column(name = "version")
     private Long version;
 
     @ManyToOne
-    @JoinColumn(name = "idOfUser")
+    @JoinColumn(name = "idofuser")
     private User user;
 
     @Column(name = "guid")
@@ -39,6 +41,9 @@ public class WtCategoryItem {
 
     @Column(name = "description")
     private String description;
+
+    @Column(name = "deletestate")
+    private Integer deleteState;
 
     @ManyToMany
     @JoinTable(name = "cf_wt_dish_categoryitem_relationships",
@@ -108,6 +113,14 @@ public class WtCategoryItem {
 
     public void setUser(User user) {
         this.user = user;
+    }
+
+    public Integer getDeleteState() {
+        return deleteState;
+    }
+
+    public void setDeleteState(Integer deleteState) {
+        this.deleteState = deleteState;
     }
 
     @Override
