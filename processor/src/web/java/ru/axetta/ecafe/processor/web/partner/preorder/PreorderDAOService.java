@@ -313,10 +313,8 @@ public class PreorderDAOService {
                 }
 
                 for (PreorderComplexItemExt item : list) {
-                    String groupName = getPreorderWtComplexGroup(item);
-                    if (groupName.isEmpty()) {
-                        continue;
-                    }
+                    WtComplex complex = getWtComplexById(item.getIdOfComplexInfo().longValue());
+                    String groupName = complex.getWtDietType().getDescription();
                     item.setType(getPreorderComplexSubgroup(item));
                     PreorderComplexGroup group = groupMap.get(groupName);
                     if (group == null) {
@@ -403,20 +401,6 @@ public class PreorderDAOService {
             else if (match(item, "ужин")) {
                 groupName = "Ужин";
             }
-        }
-        return groupName;
-    }
-
-    private String getPreorderWtComplexGroup(PreorderComplexItemExt item) {
-        String groupName = "";
-        if (match(item, "завтрак")) {
-            groupName = "Завтрак";
-        } else if (match(item, "обед")) {
-            groupName = "Обед";
-        } else if (match(item, "полдник")) {
-            groupName = "Полдник";
-        } else if (match(item, "ужин")) {
-            groupName = "Ужин";
         }
         return groupName;
     }
@@ -2617,6 +2601,7 @@ public class PreorderDAOService {
     public List<WtComplex> getWtComplexesByDates(Date beginDate, Date endDate, Org org) {
         Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
                 + "WHERE complex.beginDate < :beginDate AND complex.endDate > :endDate "
+                + "AND complex.deleteState = 0 "
                 + "AND :org IN elements(complex.orgs)");
         query.setParameter("beginDate", beginDate, TemporalType.TIMESTAMP);
         query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
@@ -2626,9 +2611,20 @@ public class PreorderDAOService {
 
     public List<WtDish> getWtDishesByComplex(WtComplex complex) {
         Query query = emReport.createQuery("SELECT dish FROM WtDish dish LEFT JOIN dish.complexItems items "
-                + "where items.wtComplex = :complex");
+                + "where items.wtComplex = :complex and dish.deleteState = 0");
         query.setParameter("complex", complex);
         return query.getResultList();
+    }
+
+    public WtComplex getWtComplexById(Long id) {
+        try {
+            Query query = emReport.createQuery("SELECT complex from WtComplex complex "
+                    + "where complex.idOfComplex = :id");
+            query.setParameter("id", id);
+            return (WtComplex) query.getSingleResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
 }
