@@ -313,20 +313,17 @@ public class PreorderDAOService {
                 }
 
                 for (PreorderComplexItemExt item : list) {
-                    PreorderGoodParamsContainer complexParams = getComplexParams(item, client, date);
-                    if (isAcceptableComplex(item, client.getClientGroup(), hasDiscount, complexParams, null, null)) {
-                        String groupName = getPreorderComplexGroup(item, complexParams);
-                        if (groupName.isEmpty()) {
-                            continue;
-                        }
-                        item.setType(getPreorderComplexSubgroup(item));
-                        PreorderComplexGroup group = groupMap.get(groupName);
-                        if (group == null) {
-                            group = new PreorderComplexGroup(groupName);
-                            groupMap.put(groupName, group);
-                        }
-                        group.addItem(item);
+                    String groupName = getPreorderWtComplexGroup(item);
+                    if (groupName.isEmpty()) {
+                        continue;
                     }
+                    item.setType(getPreorderComplexSubgroup(item));
+                    PreorderComplexGroup group = groupMap.get(groupName);
+                    if (group == null) {
+                        group = new PreorderComplexGroup(groupName);
+                        groupMap.put(groupName, group);
+                    }
+                    group.addItem(item);
                 }
                 List<PreorderComplexGroup> groupList = new ArrayList<>(groupMap.values());
                 for (PreorderComplexGroup group : groupList) {
@@ -406,6 +403,20 @@ public class PreorderDAOService {
             else if (match(item, "ужин")) {
                 groupName = "Ужин";
             }
+        }
+        return groupName;
+    }
+
+    private String getPreorderWtComplexGroup(PreorderComplexItemExt item) {
+        String groupName = "";
+        if (match(item, "завтрак")) {
+            groupName = "Завтрак";
+        } else if (match(item, "обед")) {
+            groupName = "Обед";
+        } else if (match(item, "полдник")) {
+            groupName = "Полдник";
+        } else if (match(item, "ужин")) {
+            groupName = "Ужин";
         }
         return groupName;
     }
@@ -490,11 +501,15 @@ public class PreorderDAOService {
 
     private List<PreorderMenuItemExt> getWtMenuItemsExt (WtComplex complex, Date date) {
         List<PreorderMenuItemExt> menuItemExtList = new ArrayList<>();
-
-        Query query = emReport.createQuery("SELECT dish FROM WtDish dish LEFT JOIN dish.complexItems complexItems "
+        Query query = emReport.createQuery("SELECT dish FROM WtDish dish "
+                + "LEFT JOIN dish.complexItems complexItems "
                 + "LEFT JOIN complexItems.wtComplex complex "
-                + "WHERE complex = :complex AND "
-                + "dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding > :endDate");
+                + "WHERE complex = :complex "
+                + "AND dish.deleteState = 0 "
+                + "AND ((dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding > :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding > :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding IS NULL)"
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");
         query.setParameter("complex", complex);
         query.setParameter("startDate", CalendarUtils.startOfDay(date), TemporalType.TIMESTAMP);
         query.setParameter("endDate", CalendarUtils.endOfDay(date), TemporalType.TIMESTAMP);
@@ -2448,7 +2463,8 @@ public class PreorderDAOService {
         StringBuilder sb = new StringBuilder();
         sb.append("SELECT complex FROM WtComplex complex ");
         sb.append("WHERE :rule IN ELEMENTS(complex.discountRules) ");
-        sb.append(" AND complex.beginDate < :startDate AND complex.endDate > :endDate");
+        sb.append("AND complex.deleteState = 0 ");
+        sb.append("AND complex.beginDate < :startDate AND complex.endDate > :endDate");
 
         if (complexGroupList != null && complexGroupList.size() > 0
                 && ageGroupList != null && ageGroupList.size() > 0) {
