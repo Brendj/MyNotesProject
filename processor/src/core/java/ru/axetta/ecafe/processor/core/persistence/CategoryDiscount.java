@@ -27,6 +27,8 @@ public class CategoryDiscount {
     private Boolean blockedToChange;
     private Boolean eligibleToDelete;
     private String discountRate;
+    private Boolean deletedState;
+    private Date deleteDate;
 
     private Set<DiscountRule> discountRulesInternal = new HashSet<DiscountRule>();
     private Set<Client> clientsInternal = new HashSet<Client>();
@@ -116,6 +118,7 @@ public class CategoryDiscount {
         this.discountRules = discountRules;
         this.blockedToChange = blockedToChange;
         this.eligibleToDelete = eligibleToDelete;
+        this.deletedState = false;
     }
 
     public long getIdOfCategoryDiscount() {
@@ -222,5 +225,21 @@ public class CategoryDiscount {
             case -1: return SCHOOL_KINDERGARTEN_STRING;
             default: return OrganizationType.values()[orgType].toString();
         }
+    }
+
+    public Boolean getDeletedState() {
+        return deletedState;
+    }
+
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
+    }
+
+    public Date getDeleteDate() {
+        return deleteDate;
+    }
+
+    public void setDeleteDate(Date deleteDate) {
+        this.deleteDate = deleteDate;
     }
 }
