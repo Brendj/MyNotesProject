@@ -76,7 +76,7 @@ public class MenuWithComplexesExt {
         this.idOfComplex = wtComplex.getIdOfComplex().intValue();
         this.complexName = wtComplex.getName();
         this.menuDate = wtComplex.getLastUpdate();
-        this.currentPrice = wtComplex.getPrice().longValue();
+        this.currentPrice = (wtComplex.getPrice() == null) ? 0L : wtComplex.getPrice().longValue();
         this.usedSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding() ? 0 : 1;
         this.usedVariableFeeding = org.getVariableFeeding() ? 1 : 0;
         this.isDiscountComplex = (wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 1L) ? 1 : 0;

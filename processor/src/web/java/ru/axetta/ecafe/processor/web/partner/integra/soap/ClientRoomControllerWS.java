@@ -2815,15 +2815,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List<WtAgeGroupItem> ageGroupList = RuntimeContext.getAppContext()
                     .getBean(PreorderDAOService.class).getWtAgeGroupItems(client, categoriesDiscount);
 
+            Set<WtComplex> wtComplexes = new HashSet<>();
+
             // Платное питание - отбор по типу комплекса и возрастным группам
             Set<WtComplex> wtComComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getWtComplexesByComplexGroupAndAgeGroups(startDate, endDate, complexGroup, ageGroupList);
-            Set<WtComplex> wtComplexes = new HashSet<>(wtComComplexes);
+            if (wtComComplexes.size() > 0) {
+                wtComplexes.addAll(wtComComplexes);
+            }
 
             // Отбор по правилам и возрастным группам
-            Set<WtComplex> wtDiscComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getWtComplexesByDiscountRulesAndAgeGroups(startDate, endDate, wtDiscountRuleSet, ageGroupList);
-            wtComplexes.addAll(wtDiscComplexes);
+            if (wtDiscountRuleSet.size() > 0) {
+                Set<WtComplex> wtDiscComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getWtComplexesByDiscountRulesAndAgeGroups(startDate, endDate, wtDiscountRuleSet, ageGroupList);
+                if (wtDiscComplexes.size() > 0) {
+                    wtComplexes.addAll(wtDiscComplexes);
+                }
+            }
 
             if (wtComplexes.size() > 0) {
 
