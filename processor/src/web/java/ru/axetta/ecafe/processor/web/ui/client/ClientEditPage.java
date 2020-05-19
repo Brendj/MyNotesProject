@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.client.items.ClientDiscountItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -701,14 +702,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
-        List clientCategories = Arrays.asList(client.getCategoriesDiscounts().split(","));
-        Criteria categoryDiscountCriteria = session.createCriteria(CategoryDiscount.class);
-        List<CategoryDiscount> categoryDiscountList = categoryDiscountCriteria.list();
         idOfCategoryList.clear();
-        for (CategoryDiscount categoryDiscount : categoryDiscountList) {
-            if(clientCategories.contains(categoryDiscount.getIdOfCategoryDiscount() + "")) {
-                idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
-            }
+        for (CategoryDiscount categoryDiscount : client.getCategories()) {
+            idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
         }
         Set<ClientNotificationSetting> settings = client.getNotificationSettings();
         notificationSettings = new ArrayList<NotificationSettingItem>();
@@ -1014,7 +1010,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             throw new Exception("Выберите хотя бы одну категорию льгот");
         }
         /* категори скидок */
-        StringBuilder clientCategories = new StringBuilder();
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
         if (this.idOfCategoryList.size() != 0) {
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
@@ -1023,11 +1018,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             for (Object object : categoryCriteria.list()) {
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;
                 if(isReplaceOrg && !isFriendlyReplaceOrg && categoryDiscount.getEligibleToDelete()){
-                    archiveDtisznDiscount(client, persistenceSession, categoryDiscount.getIdOfCategoryDiscount());
+                    DiscountManager.archiveDtisznDiscount(client, persistenceSession, categoryDiscount.getIdOfCategoryDiscount());
                     continue;
                 }
-                clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
-                clientCategories.append(",");
                 categoryDiscountSet.add(categoryDiscount);
             }
         } else {
@@ -1037,14 +1030,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 categoryDiscount.getClients().remove(client);
                 persistenceSession.update(categoryDiscount);
             }
-            //Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
-            //categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
         }
 
-        String newClientCategories = clientCategories.length() == 0 ? "" : clientCategories.substring(0, clientCategories.length() - 1);
-
-        if (isDiscountsChanged(client, newClientCategories)) {
-            saveDiscountChange(client, persistenceSession, clientCategories.toString());
+        if (isDiscountsChanged(client, categoryDiscountSet)) {
+            DiscountManager.saveDiscountHistory(persistenceSession, client, null, client.getCategories(), categoryDiscountSet,
+                    client.getDiscountMode(), discountMode,
+                    DiscountChangeHistory.MODIFY_IN_WEBAPP + DAOReadonlyService.getInstance().getUserFromSession().getUserName());
             client.setLastDiscountsUpdate(new Date());
         }
 
@@ -1052,7 +1043,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             client.setDiscountMode(discountMode);
         }
 
-        client.setCategoriesDiscounts(newClientCategories);
         client.setCategories(categoryDiscountSet);
 
         if(this.disablePlanCreation && this.disablePlanCreationDate == null) {
@@ -1194,15 +1184,17 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
     }
 
-    private boolean isDiscountsChanged(Client client, String newCategoriesDiscounts) {
+    private boolean isDiscountsChanged(Client client, Set<CategoryDiscount> newCategoriesDiscounts) {
         boolean isDiscountModeChanged = !(client.getDiscountMode().equals(discountMode));
-        boolean isCategoryListChanged = !(client.getCategoriesDiscounts().equals(newCategoriesDiscounts));
+        boolean isCategoryListChanged = (client.getCategories().size() != newCategoriesDiscounts.size());
+        if (isCategoryListChanged) return true;
+        isCategoryListChanged = client.getCategories().containsAll(newCategoriesDiscounts);
         return isDiscountModeChanged || isCategoryListChanged;
     }
 
-    private void saveDiscountChange(Client client, Session persistenceSession, String newCategoriesDiscounts) {
+    private void saveDiscountChange(Client client, Session persistenceSession, Set<CategoryDiscount> newCategoriesDiscounts) {
         DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, null, discountMode, client.getDiscountMode(),
-                newCategoriesDiscounts, client.getCategoriesDiscounts());
+                StringUtils.join(newCategoriesDiscounts, ','), StringUtils.join(client.getCategories(), ','));
         discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_BY_TRANSITION);
         persistenceSession.save(discountChangeHistory);
 

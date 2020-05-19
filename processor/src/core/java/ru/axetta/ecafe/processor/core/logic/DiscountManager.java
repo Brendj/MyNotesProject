@@ -1,0 +1,246 @@
+/*
+ * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
+ */
+
+package ru.axetta.ecafe.processor.core.logic;
+
+import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+
+import org.hibernate.Criteria;
+import org.hibernate.Session;
+import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import java.util.Date;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+
+public class DiscountManager {
+
+    private static final Logger logger = LoggerFactory.getLogger(DiscountManager.class);
+
+    public static void saveDiscountHistory(Session session, Client client, Org org,
+            Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts,
+            Integer oldDiscountMode, Integer newDiscountMode, String comment) {
+        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, org, newDiscountMode, oldDiscountMode,
+                extractCategoryIdsFromDiscountSet(newDiscounts), extractCategoryIdsFromDiscountSet(oldDiscounts));
+        discountChangeHistory.setComment(comment);
+        session.save(discountChangeHistory);
+    }
+
+    private static String extractCategoryIdsFromDiscountSet(Set<CategoryDiscount> categoryDiscounts) {
+        StringBuilder sb = new StringBuilder();
+        for (CategoryDiscount cd : categoryDiscounts) {
+            if (sb.length() != 0) sb.append(",");
+            sb.append(cd.getIdOfCategoryDiscount());
+        }
+        return sb.toString();
+    }
+
+    public static void addOtherDiscountForClient(Session session, Client client) throws Exception {
+        Long otherDiscountCode = DAOUtils.getOtherDiscountCode(session);
+
+        Integer oldDiscountMode = client.getDiscountMode();
+        boolean change = false;
+        if (Client.DISCOUNT_MODE_NONE == oldDiscountMode) {
+            client.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
+            change = true;
+        }
+        Integer newDiscountMode = client.getDiscountMode();
+
+        Criteria criteria = session.createCriteria(CategoryDiscount.class);
+        criteria.add(Restrictions.eq("idOfCategoryDiscount", otherDiscountCode));
+        CategoryDiscount cdOther = (CategoryDiscount)criteria.uniqueResult();
+        Set<CategoryDiscount> newCategories = client.getCategories();
+        if (!newCategories.contains(cdOther)) {
+            newCategories.add(cdOther);
+            change = true;
+        }
+        if (change) {
+            saveDiscountHistory(session, client, client.getOrg(), client.getCategories(), newCategories,
+                    oldDiscountMode, newDiscountMode, DiscountChangeHistory.MODIFY_BY_US);
+            client.setCategories(newCategories);
+            client.setLastDiscountsUpdate(new Date());
+            long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+            client.setClientRegistryVersion(clientRegistryVersion);
+            session.update(client);
+        }
+    }
+
+    public static void deleteDiscount(Client client, Session session) throws Exception {
+        Integer oldDiscountMode = client.getDiscountMode();
+        Set<CategoryDiscount> discountsAfterRemove = new HashSet<>();
+        Set<CategoryDiscount> discounts = client.getCategories();
+        for (CategoryDiscount discount : discounts) {
+            if (discount.getEligibleToDelete()) {
+                archiveDtisznDiscount(client, session, discount.getIdOfCategoryDiscount());
+            } else {
+                discountsAfterRemove.add(discount);
+            }
+        }
+        client.getCategories().clear();
+        if(!discountsAfterRemove.isEmpty()) {
+            client.setCategories(discountsAfterRemove);
+        }
+
+        String newDiscounts = "";
+        for(CategoryDiscount discount : client.getCategories()){
+            if(!newDiscounts.isEmpty()){
+                newDiscounts += ",";
+            }
+            newDiscounts += discount.getIdOfCategoryDiscount();
+        }
+        Integer newDiscountMode = discountsAfterRemove.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+        if (!oldDiscountMode.equals(newDiscountMode) || !discounts.equals(discountsAfterRemove)) {
+            client.setDiscountMode(newDiscountMode);
+            saveDiscountHistory(session, client, client.getOrg(), discounts, discountsAfterRemove, oldDiscountMode, newDiscountMode,
+                    DiscountChangeHistory.MODIFY_BY_TRANSITION);
+            client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersionWithPessimisticLock());
+            client.setLastDiscountsUpdate(new Date());
+            session.update(client);
+        }
+    }
+
+    public static void archiveDtisznDiscount(Client client, Session session, Long idOfCategoryDiscount) {
+        List<Integer> list = DAOUtils.getDsznCodeListByCategoryDiscountCode(session, idOfCategoryDiscount);
+        Long clientDTISZNDiscountVersion = null;
+        Long applicationForFoodVersion = null;
+
+        for (Integer dsznCode : list) {
+            ClientDtisznDiscountInfo info = DAOUtils
+                    .getDTISZNDiscountInfoByClientAndCode(session, client, dsznCode.longValue());
+            if (null != info) {
+                if (!info.getArchived()) {
+                    DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
+                    builder.withArchived(true);
+                    if (null == clientDTISZNDiscountVersion) {
+                        clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+                    }
+                    builder.save(session, clientDTISZNDiscountVersion);
+                }
+            }
+            ApplicationForFood food = DAOUtils
+                    .getApplicationForFoodByClientAndCode(session, client, dsznCode.longValue());
+            if (null != food) {
+                archiveApplicationForFood(session, food, applicationForFoodVersion);
+            }
+        }
+    }
+
+    public static void archiveApplicationForFood(Session session, ApplicationForFood applicationForFood, Long newVersion) {
+        if (!applicationForFood.getArchived() && isEligibleToDelete(session, applicationForFood)) {
+            applicationForFood.setArchived(true);
+            if (null == newVersion) {
+                newVersion = DAOUtils.nextVersionByApplicationForFood(session);
+            }
+            applicationForFood.setVersion(newVersion);
+            applicationForFood.setLastUpdate(new Date());
+            session.update(applicationForFood);
+        }
+    }
+
+    public static boolean isEligibleToDelete(Session session, ApplicationForFood item) {
+        CategoryDiscountDSZN categoryDiscountDSZN;
+        if (item.getDtisznCode() == null) {
+            ///для льготы Иное
+            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, 0L);
+        } else {
+            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, item.getDtisznCode());
+        }
+        return categoryDiscountDSZN.getCategoryDiscount().getEligibleToDelete();
+    }
+
+    public static boolean atLeastOneDiscountEligibleToDelete (Client client) {
+        Set<CategoryDiscount> discounts = client.getCategories();
+        for (CategoryDiscount discount : discounts) {
+            if (discount.getEligibleToDelete()) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public static void renewDiscounts(Session session, Client client,
+            Set<CategoryDiscount> newDiscounts, Set<CategoryDiscount> oldDiscounts,
+            Integer newDiscountMode, Integer oldDiscountMode, String historyComment) throws Exception {
+        client.setDiscountMode(newDiscountMode);
+
+        saveDiscountHistory(session, client, client.getOrg(), oldDiscounts, newDiscounts,
+                oldDiscountMode, newDiscountMode, historyComment);
+        client.setLastDiscountsUpdate(new Date());
+        client.setCategories(newDiscounts);
+        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+        client.setClientRegistryVersion(clientRegistryVersion);
+        session.update(client);
+    }
+
+    public static String getClientDiscountsAsString(Client client) {
+        String result = "";
+        for (CategoryDiscount cd : client.getCategories()) {
+            result += cd.getIdOfCategoryDiscount() + ",";
+        }
+        if (result.length() > 0) {
+            result = result.substring(0, result.length()-1);
+        }
+        return result;
+    }
+
+    public static String getClientDiscountsDSZNAsString(Client client) {
+        String result = "";
+        for (ClientDtisznDiscountInfo info : client.getCategoriesDSZN()) {
+            if (!info.getArchived()) {
+                result += info.getDtisznCode().toString() + ",";
+            }
+        }
+        if (result.length() > 0) {
+            result = result.substring(0, result.length()-1);
+        }
+        return result;
+    }
+
+    public static class ClientDtisznDiscountInfoBuilder {
+        private final ClientDtisznDiscountInfo info;
+
+        public ClientDtisznDiscountInfoBuilder(ClientDtisznDiscountInfo info) {
+            this.info = info;
+        }
+
+        public static ClientDtisznDiscountInfoBuilder createBuilder(ClientDtisznDiscountInfo info) {
+            return new ClientDtisznDiscountInfoBuilder(info);
+        }
+
+        public ClientDtisznDiscountInfoBuilder withArchived(Boolean archived) {
+            info.setArchived(archived);
+            return this;
+        }
+
+        public ClientDtisznDiscountInfoBuilder withDateStart(Date dateStart) {
+            info.setDateStart(dateStart);
+            return this;
+        }
+
+        public ClientDtisznDiscountInfoBuilder withDateEnd(Date dateEnd) {
+            info.setDateEnd(dateEnd);
+            return this;
+        }
+
+        public ClientDtisznDiscountInfoBuilder withStatus(ClientDTISZNDiscountStatus status) {
+            info.setStatus(status);
+            return this;
+        }
+
+        public void save(Session session, Long version) {
+            info.setLastUpdate(new Date());
+            info.setVersion(version);
+            session.update(info);
+        }
+
+        public void save(Session session) {
+            Long clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+            save(session, clientDTISZNDiscountVersion);
+        }
+    }
+}

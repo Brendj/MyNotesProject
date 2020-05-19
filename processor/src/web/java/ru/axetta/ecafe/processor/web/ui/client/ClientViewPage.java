@@ -18,7 +18,6 @@ import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.client.items.MigrantItem;
 
 import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.criterion.Restrictions;
@@ -597,19 +596,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     public static List<ClientDiscountItem> buildClientDiscountItem(Session session, Client client) {
         List<ClientDiscountItem> result = new LinkedList<ClientDiscountItem>();
 
-        List<Long> categoriesDiscountsIds = new LinkedList<Long>();
-        for(String cd : client.getCategoriesDiscounts().split(",")) {
-            if(StringUtils.isNotEmpty(cd)) {
-                categoriesDiscountsIds.add(Long.valueOf(cd));
-            }
-        }
-
-        List<CategoryDiscount> clientDiscountsList = Collections.emptyList();
-        if(!categoriesDiscountsIds.isEmpty()) {
-            Criteria clientDiscountsCriteria = session.createCriteria(CategoryDiscount.class);
-            clientDiscountsCriteria.add(Restrictions.in("idOfCategoryDiscount", categoriesDiscountsIds));
-            clientDiscountsList = clientDiscountsCriteria.list();
-        }
+        Set<CategoryDiscount> clientDiscountsList = client.getCategories();
 
         Criteria clientDiscountsDTiSZNCriteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         clientDiscountsDTiSZNCriteria.add(Restrictions.eq("client", client));
