@@ -2807,43 +2807,44 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Set<WtDiscountRule> wtDiscountRuleSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                     .getWtDiscountRules(categoriesDiscount);
 
-            // Типы комплексов
-            List<WtComplexGroupItem> complexGroupList = RuntimeContext.getAppContext()
-                    .getBean(PreorderDAOService.class).getWtComplexGroupItems(categoriesDiscount);
+            // Тип комплекса для платного питания
+            WtComplexGroupItem complexGroup = RuntimeContext.getAppContext()
+                    .getBean(PreorderDAOService.class).getWtComplexGroupItem();
 
             // Возрастные группы и параллели
             List<WtAgeGroupItem> ageGroupList = RuntimeContext.getAppContext()
                     .getBean(PreorderDAOService.class).getWtAgeGroupItems(client, categoriesDiscount);
 
-            if (wtDiscountRuleSet.size() > 0) {
-                // Комплексы
-                Set<WtComplex> wtComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .getWtComplexes(startDate, endDate, wtDiscountRuleSet, complexGroupList, ageGroupList);
+            // Платное питание - отбор по типу комплекса и возрастным группам
+            Set<WtComplex> wtComComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getWtComplexesByComplexGroupAndAgeGroups(startDate, endDate, complexGroup, ageGroupList);
+            Set<WtComplex> wtComplexes = new HashSet<>(wtComComplexes);
 
-                if (wtComplexes.size() > 0) {
+            // Отбор по правилам и возрастным группам
+            Set<WtComplex> wtDiscComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getWtComplexesByDiscountRulesAndAgeGroups(startDate, endDate, wtDiscountRuleSet, ageGroupList);
+            wtComplexes.addAll(wtDiscComplexes);
 
-                    // Исключение из комплексов составов, не соответствующим датам цикла
-                    for (WtComplex wtComplex : wtComplexes) {
-                        RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                .getWtComplexInCycleDates(client, org, wtComplex);
-                    }
+            if (wtComplexes.size() > 0) {
 
-                    List<MenuWithComplexesExt> list = new ArrayList<>();
-                    for (WtComplex wtComplex : wtComplexes) {
-                        List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtComplex);
-                        MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(wtComplex, org);
-                        menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
-                        list.add(menuWithComplexesExt);
-                    }
-
-                    result.getMenuWithComplexesList().setList(list);
-
-                } else {
-                    logger.warn("Список комплексов пуст");
+                // Исключение из комплексов составов, не соответствующим датам цикла
+                for (WtComplex wtComplex : wtComplexes) {
+                    RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                            .getWtComplexInCycleDates(client, org, wtComplex);
                 }
+
+                List<MenuWithComplexesExt> list = new ArrayList<>();
+                for (WtComplex wtComplex : wtComplexes) {
+                    List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtComplex);
+                    MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(wtComplex, org);
+                    menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
+                    list.add(menuWithComplexesExt);
+                }
+
+                result.getMenuWithComplexesList().setList(list);
+
             } else {
-                logger.warn("Льготные правила для данных категорий отсутствуют: " + categoriesDiscount);
-                throw new Exception();
+                logger.warn("Список комплексов пуст");
             }
 
         } catch (Exception ex) {

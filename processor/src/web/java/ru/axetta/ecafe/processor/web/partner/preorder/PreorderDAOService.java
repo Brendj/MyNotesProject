@@ -256,87 +256,92 @@ public class PreorderDAOService {
         Set<WtDiscountRule> wtDiscountRuleSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                 .getWtDiscountRules(categoriesDiscount);
 
-        // Типы комплексов
-        List<WtComplexGroupItem> complexGroupList = RuntimeContext.getAppContext()
-                .getBean(PreorderDAOService.class).getWtComplexGroupItems(categoriesDiscount);
-
         // Возрастные группы и параллели
         List<WtAgeGroupItem> ageGroupList = RuntimeContext.getAppContext()
                 .getBean(PreorderDAOService.class).getWtAgeGroupItems(client, categoriesDiscount);
 
-        if (wtDiscountRuleSet.size() > 0) {
-            // Комплексы
-            Set<WtComplex> wtComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getWtComplexes(date, date, wtDiscountRuleSet, complexGroupList, ageGroupList);
+        // Тип комплекса для платного питания
+        WtComplexGroupItem complexGroup = RuntimeContext.getAppContext()
+                .getBean(PreorderDAOService.class).getWtComplexGroupItem();
 
-            if (wtComplexes.size() > 0) {
+        Date startDate = CalendarUtils.startOfDay(date);
+        Date endDate = CalendarUtils.endOfDay(date);
 
-                // Исключение из комплексов составов, не соответствующим датам цикла
-                for (WtComplex wtComplex : wtComplexes) {
-                    RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                            .getWtComplexInCycleDates(client, org, wtComplex);
-                }
+        // Платное питание - отбор по типу комплекса и возрастным группам
+        Set<WtComplex> wtComComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getWtComplexesByComplexGroupAndAgeGroups(startDate, endDate, complexGroup, ageGroupList);
+        Set<WtComplex> wtComplexes = new HashSet<>(wtComComplexes);
 
-                Map<String, PreorderComplexGroup> groupMap = new HashMap<>();
-                List<PreorderComplexItemExt> list = new ArrayList<>();
+        // Отбор по правилам и возрастным группам
+        Set<WtComplex> wtDiscComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getWtComplexesByDiscountRulesAndAgeGroups(startDate, endDate, wtDiscountRuleSet, ageGroupList);
+        wtComplexes.addAll(wtDiscComplexes);
 
-                for (WtComplex wtComplex : wtComplexes) {
-                    Integer idOfComplex = wtComplex.getIdOfComplex().intValue();
-                    String complexName = wtComplex.getName();
-                    // Режим добавления блюд: если комплекс составной - режим составного комплекса,
-                    // если нет - режим фиксированной цены
-                    Integer complexType = wtComplex.getComposite() ? 4 : 2;
-                    // Режим бесплатного питания
-                    Integer discount = 0;
-                    if (wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 1 || // льготное питание
-                            wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 5) { // все
-                        discount = 1;
-                    }
-                    Long complexPrice = wtComplex.getPrice().longValue();
-                    Integer amount = 0;
-                    if (wtComplex.getWtComplexesItems() != null && wtComplex.getWtComplexesItems().size() > 0) {
-                        for (WtComplexesItem wtComplexesItem : wtComplex.getWtComplexesItems()) {
-                            amount += wtComplexesItem.getCountDishes();
-                        }
-                    }
+        if (wtComplexes.size() > 0) {
 
-                    PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName,
-                            complexPrice, complexType, discount);
-                    complexItemExt.setAmount(amount);
-                    complexItemExt.setState(wtComplex.getDeleteState());
-                    complexItemExt.setIsRegular(false);
-
-                    List<PreorderMenuItemExt> menuItemExtList = getWtMenuItemsExt(wtComplex, date);
-                    if (menuItemExtList.size() > 0) {
-                        complexItemExt.setMenuItemExtList(menuItemExtList);
-                        list.add(complexItemExt);
-                    }
-                }
-
-                for (PreorderComplexItemExt item : list) {
-                    WtComplex complex = getWtComplexById(item.getIdOfComplexInfo().longValue());
-                    String groupName = complex.getWtDietType().getDescription();
-                    item.setType(getPreorderComplexSubgroup(item));
-                    PreorderComplexGroup group = groupMap.get(groupName);
-                    if (group == null) {
-                        group = new PreorderComplexGroup(groupName);
-                        groupMap.put(groupName, group);
-                    }
-                    group.addItem(item);
-                }
-                List<PreorderComplexGroup> groupList = new ArrayList<>(groupMap.values());
-                for (PreorderComplexGroup group : groupList) {
-                    Collections.sort(group.getItems());
-                }
-                Collections.sort(groupList);
-                groupResult.setComplexesWithGroups(groupList);
+            // Исключение из комплексов составов, не соответствующим датам цикла
+            for (WtComplex wtComplex : wtComplexes) {
+                RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getWtComplexInCycleDates(client, org, wtComplex);
             }
-            else {
-                logger.warn("Список комплексов пуст");
+
+            Map<String, PreorderComplexGroup> groupMap = new HashMap<>();
+            List<PreorderComplexItemExt> list = new ArrayList<>();
+
+            for (WtComplex wtComplex : wtComplexes) {
+                Integer idOfComplex = wtComplex.getIdOfComplex().intValue();
+                String complexName = wtComplex.getName();
+                // Режим добавления блюд: если комплекс составной - режим составного комплекса,
+                // если нет - режим фиксированной цены
+                Integer complexType = wtComplex.getComposite() ? 4 : 2;
+                // Режим бесплатного питания
+                Integer discount = 0;
+                if (wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 1 || // льготное питание
+                        wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 3) { // все
+                    discount = 1;
+                }
+                Long complexPrice = wtComplex.getPrice().longValue();
+                Integer amount = 0;
+                if (wtComplex.getWtComplexesItems() != null && wtComplex.getWtComplexesItems().size() > 0) {
+                    for (WtComplexesItem wtComplexesItem : wtComplex.getWtComplexesItems()) {
+                        amount += wtComplexesItem.getCountDishes();
+                    }
+                }
+
+                PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName,
+                        complexPrice, complexType, discount);
+                complexItemExt.setAmount(amount);
+                complexItemExt.setState(wtComplex.getDeleteState());
+                complexItemExt.setIsRegular(false);
+
+                List<PreorderMenuItemExt> menuItemExtList = getWtMenuItemsExt(wtComplex, date);
+                if (menuItemExtList.size() > 0) {
+                    complexItemExt.setMenuItemExtList(menuItemExtList);
+                    list.add(complexItemExt);
+                }
             }
+
+            for (PreorderComplexItemExt item : list) {
+                WtComplex complex = getWtComplexById(item.getIdOfComplexInfo().longValue());
+                String groupName = complex.getWtDietType().getDescription();
+                item.setType(getPreorderComplexSubgroup(item));
+                PreorderComplexGroup group = groupMap.get(groupName);
+                if (group == null) {
+                    group = new PreorderComplexGroup(groupName);
+                    groupMap.put(groupName, group);
+                }
+                group.addItem(item);
+            }
+            List<PreorderComplexGroup> groupList = new ArrayList<>(groupMap.values());
+            for (PreorderComplexGroup group : groupList) {
+                Collections.sort(group.getItems());
+            }
+            Collections.sort(groupList);
+            groupResult.setComplexesWithGroups(groupList);
         } else {
-            logger.warn("Льготные правила для данных категорий отсутствуют: " + categoriesDiscount);
+            logger.warn("Список комплексов пуст");
         }
+
         return groupResult;
     }
 
@@ -2385,26 +2390,12 @@ public class PreorderDAOService {
         return wtDiscountRuleSet;
     }
 
-    public List<WtComplexGroupItem> getWtComplexGroupItems(Set<CategoryDiscount> categoriesDiscount) {
-        Set<Long> complexGroupIds = new HashSet<>();
-        if (categoriesDiscount == null) {
-            complexGroupIds.add(2L); // Платное питание
-        } else {
-            complexGroupIds.addAll(Arrays.asList(1L, 2L, 3L)); // льготное + платное + все
-        }
-        List<WtComplexGroupItem> complexGroupList = new ArrayList<>();
-
-        for (Long id : complexGroupIds) {
-            Query query = emReport.createQuery("SELECT complexGroup FROM WtComplexGroupItem complexGroup "
-                    + "WHERE complexGroup.idOfComplexGroupItem = :id");
-            query.setParameter("id", id);
-            WtComplexGroupItem res = (WtComplexGroupItem) query.getSingleResult();
-            if (res != null) {
-                complexGroupList.add(res);
-            }
-        }
-
-        return complexGroupList;
+    public WtComplexGroupItem getWtComplexGroupItem() {
+        Long complexGroupId = 2L; // Платное питание
+        Query query = emReport.createQuery("SELECT complexGroup FROM WtComplexGroupItem complexGroup "
+                + "WHERE complexGroup.idOfComplexGroupItem = :complexGroupId");
+        query.setParameter("complexGroupId", complexGroupId);
+        return (WtComplexGroupItem) query.getSingleResult();
     }
 
     public List<WtAgeGroupItem> getWtAgeGroupItems(Client client, Set<CategoryDiscount> categoriesDiscount) {
@@ -2441,80 +2432,61 @@ public class PreorderDAOService {
         return ageGroupList;
     }
 
-    public Set<WtComplex> getWtComplexes(Date startDate, Date endDate, Set<WtDiscountRule> wtDiscountRuleSet,
-            List<WtComplexGroupItem> complexGroupList, List<WtAgeGroupItem> ageGroupList) {
+    public Set<WtComplex> getWtComplexesByComplexGroupAndAgeGroups (Date startDate, Date endDate,
+            WtComplexGroupItem complexGroup, List<WtAgeGroupItem> ageGroupList) {
         Set<WtComplex> wtComplexes = new HashSet<>();
 
-        StringBuilder sb = new StringBuilder();
-        sb.append("SELECT complex FROM WtComplex complex ");
-        sb.append("WHERE :rule IN ELEMENTS(complex.discountRules) ");
-        sb.append("AND complex.deleteState = 0 ");
-        sb.append("AND complex.beginDate < :startDate AND complex.endDate > :endDate");
+        for (WtAgeGroupItem ageGroup : ageGroupList) {
+            Query query = emReport.createNativeQuery(
+                    "select c.idofcomplex from cf_wt_complexes c left join cf_wt_discountrules_complexes dc "
+                            + "on dc.idofcomplex = c.idofcomplex where c.deleteState = 0 "
+                            + "and c.beginDate < :startDate AND c.endDate > :endDate "
+                            + "and c.idofcomplexgroupitem = :complexGroupId "
+                            + "and c.idofagegroupitem = :ageGroupId "
+                            + "and dc.idofcomplex is null "
+                            + "and c.is_portal = true");
 
-        if (complexGroupList != null && complexGroupList.size() > 0
-                && ageGroupList != null && ageGroupList.size() > 0) {
+            query.setParameter("complexGroupId", complexGroup.getIdOfComplexGroupItem());
+            query.setParameter("ageGroupId", ageGroup.getIdOfAgeGroupItem());
+            query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+            query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+            List<BigInteger> res = query.getResultList();
 
-            sb.append(" AND complex.wtComplexGroupItem = :complexGroup");
-            sb.append(" AND complex.wtAgeGroupItem = :ageGroup");
-
-            for (WtDiscountRule rule : wtDiscountRuleSet) {
-                for (WtComplexGroupItem complexGroup : complexGroupList) {
-                    for (WtAgeGroupItem ageGroup : ageGroupList) {
-                        Query query = emReport.createQuery(sb.toString());
-                        query.setParameter("complexGroup", complexGroup);
-                        query.setParameter("ageGroup", ageGroup);
-                        query.setParameter("rule", rule);
-                        query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-                        query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
-                        List<WtComplex> res = query.getResultList();
-                        if (res != null && res.size() > 0) {
-                            wtComplexes.addAll(res);
-                        }
+            if (res != null && !res.isEmpty()){
+                WtComplex complex;
+                for (BigInteger id : res) {
+                    complex = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getWtComplexById(id.longValue());
+                    if (complex != null) {
+                        wtComplexes.add(complex);
                     }
                 }
             }
         }
+        return wtComplexes;
+    }
 
-        if (complexGroupList != null && complexGroupList.size() > 0 && (ageGroupList == null
-                || ageGroupList.size() == 0)) {
+    public Set<WtComplex> getWtComplexesByDiscountRulesAndAgeGroups(Date startDate, Date endDate,
+            Set<WtDiscountRule> wtDiscountRuleSet, List<WtAgeGroupItem> ageGroupList) {
+        Set<WtComplex> wtComplexes = new HashSet<>();
 
-            sb.append(" AND complex.wtAgeGroupItem = :ageGroup");
-
-            for (WtDiscountRule rule : wtDiscountRuleSet) {
-                for (WtComplexGroupItem complexGroup : complexGroupList) {
-                    Query query = emReport.createQuery(sb.toString());
-                    query.setParameter("complexGroup", complexGroup);
-                    query.setParameter("rule", rule);
-                    query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-                    query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
-                    List<WtComplex> res = query.getResultList();
-                    if (res != null && res.size() > 0) {
-                        wtComplexes.addAll(res);
-                    }
+        for (WtDiscountRule rule : wtDiscountRuleSet) {
+            for (WtAgeGroupItem ageGroup : ageGroupList) {
+                Query query = emReport.createQuery(
+                        "SELECT complex FROM WtComplex complex WHERE complex.deleteState = 0 "
+                                + "AND complex.beginDate < :startDate AND complex.endDate > :endDate "
+                                + "AND :rule IN ELEMENTS(complex.discountRules) "
+                                + "AND complex.wtAgeGroupItem = :ageGroup");
+                query.setParameter("ageGroup", ageGroup);
+                query.setParameter("rule", rule);
+                query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+                query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+                List<WtComplex> res = query.getResultList();
+                if (res != null && res.size() > 0) {
+                    wtComplexes.addAll(res);
                 }
             }
         }
-
-        if (ageGroupList != null && ageGroupList.size() > 0 && (complexGroupList == null
-                || complexGroupList.size() == 0)) {
-
-            sb.append(" AND complex.wtAgeGroupItem = :ageGroup");
-
-            for (WtDiscountRule rule : wtDiscountRuleSet) {
-                for (WtAgeGroupItem ageGroup : ageGroupList) {
-                    Query query = emReport.createQuery(sb.toString());
-                    query.setParameter("ageGroup", ageGroup);
-                    query.setParameter("rule", rule);
-                    query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-                    query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
-                    List<WtComplex> res = query.getResultList();
-                    if (res != null && res.size() > 0) {
-                        wtComplexes.addAll(res);
-                    }
-                }
-            }
-        }
-
         return wtComplexes;
     }
 

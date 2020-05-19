@@ -278,7 +278,8 @@ public class DAOReadExternalsService {
         Query query = entityManager.createQuery(
                 "SELECT dish FROM WtDish dish LEFT JOIN dish.complexItems complexItems "
                         + "LEFT JOIN complexItems.wtComplex complex "
-                        + "WHERE complex = :complex");
+                        + "WHERE complex = :complex "
+                        + "AND dish.deleteState = 0");
         query.setParameter("complex", wtComplex);
         return query.getResultList();
     }
@@ -287,7 +288,8 @@ public class DAOReadExternalsService {
         Query query = entityManager.createQuery(
                 "SELECT menuGroup FROM WtMenuGroup menuGroup "
                         + "LEFT JOIN menuGroup.menuGroupMenus menuGroupMenus "
-                        + "WHERE :wtDish IN ELEMENTS(menuGroupMenus.dishes)");
+                        + "WHERE :wtDish IN ELEMENTS(menuGroupMenus.dishes) "
+                        + "AND menuGroup.deleteState = 0");
         query.setParameter("wtDish", wtDish);
         List<WtMenuGroup> res = query.getResultList();
         return res.size() > 0 ? res.get(0) : null;
