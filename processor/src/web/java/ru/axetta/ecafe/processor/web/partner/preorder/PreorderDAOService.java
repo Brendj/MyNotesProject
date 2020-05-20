@@ -2400,6 +2400,16 @@ public class PreorderDAOService {
         if (client.getAgeTypeGroup() != null && client.getParallel() != null) {
             String ageGroupDesc = client.getAgeTypeGroup().toLowerCase();
             String parallelDesc = client.getParallel().toLowerCase();
+            for (CategoryDiscount discount : categoriesDiscount) {
+                if (ageGroupDesc.startsWith("дошкол")) {
+                    if (discount.getDescription().contains("3-7")) {
+                        ageGroupIds.add(2L); // 3-7
+                    }
+                    if (discount.getDescription().contains("5-3")) {
+                        ageGroupIds.add(1L); // 1, 5-3
+                    }
+                }
+            }
             if (ageGroupDesc.startsWith("средн") && ELEMENTARY_SCHOOL.contains(parallelDesc)) {
                 ageGroupIds.add(3L); // 1-4
                 ageGroupIds.add(7L); // Все
