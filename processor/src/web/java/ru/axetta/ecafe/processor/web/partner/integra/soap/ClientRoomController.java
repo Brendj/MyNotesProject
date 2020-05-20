@@ -554,8 +554,8 @@ public interface ClientRoomController {
     @WebMethod(operationName = "setSpecialMenu")
     Result setSpecialMenu(@WebParam(name = "contractId") Long contractId, @WebParam(name = "value") Boolean value);
 
-    @WebMethod(operationName = "getClientsGroupForPreorder")
-    ClientGroupResult getClientsGroupForPreorder(@WebParam(name="mobile") String mobile);
+    @WebMethod(operationName = "getTypeClients")
+    ClientGroupResult getTypeClients(@WebParam(name="mobile") String mobile);
 
     @WebMethod(operationName = "getPreorderComplexes")
     PreorderComplexesResult getPreorderComplexes(@WebParam(name = "contractId") Long contractId, @WebParam(name = "date") Date date);

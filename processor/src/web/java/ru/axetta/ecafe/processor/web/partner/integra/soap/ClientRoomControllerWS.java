@@ -9240,7 +9240,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public ClientGroupResult getClientsGroupForPreorder(@WebParam(name="mobile") String mobile) {
+    public ClientGroupResult getTypeClients(@WebParam(name="mobile") String mobile) {
         authenticateRequest(null);
         String mobilePhone = Client.checkAndConvertMobile(mobile);
         if (mobilePhone == null) {
