@@ -499,7 +499,7 @@ public class PreorderDAOService {
 
     private List<PreorderMenuItemExt> getWtMenuItemsExt (WtComplex complex, Date date) {
         List<PreorderMenuItemExt> menuItemExtList = new ArrayList<>();
-        Query query = emReport.createQuery("SELECT dish FROM WtDish dish "
+        Query query = emReport.createQuery("SELECT DISTINCT dish FROM WtDish dish "
                 + "LEFT JOIN dish.complexItems complexItems "
                 + "LEFT JOIN complexItems.wtComplex complex "
                 + "WHERE complex = :complex "

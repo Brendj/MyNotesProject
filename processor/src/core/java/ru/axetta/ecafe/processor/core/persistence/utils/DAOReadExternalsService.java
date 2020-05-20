@@ -276,7 +276,7 @@ public class DAOReadExternalsService {
 
     public List<WtDish> getWtDishesByWtComplex(WtComplex wtComplex) {
         Query query = entityManager.createQuery(
-                "SELECT dish FROM WtDish dish LEFT JOIN dish.complexItems complexItems "
+                "SELECT DISTINCT dish FROM WtDish dish LEFT JOIN dish.complexItems complexItems "
                         + "LEFT JOIN complexItems.wtComplex complex "
                         + "WHERE complex = :complex "
                         + "AND dish.deleteState = 0");
