@@ -6747,32 +6747,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuItemExt.setName(wtDish.getDishName());
         menuItemExt.setFullName(wtDish.getDishName());
         menuItemExt.setPrice(wtDish.getPrice().longValue());
-        if (wtDish.getCalories() == null) {
-            menuItemExt.setCalories((double) 0);
-        } else {
-            menuItemExt.setCalories(wtDish.getCalories().doubleValue());
-        }
-        if (wtDish.getQty() == null) {
-            menuItemExt.setOutput("");
-        } else{
-            menuItemExt.setOutput(wtDish.getQty());
-        }
+        menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
+        menuItemExt.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 :
+                wtDish.getCarbohydrates().doubleValue());
+        menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
+        menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
+        menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
         menuItemExt.setAvailableNow(1); // включение блюда в меню
-        if (wtDish.getProtein() == null) {
-            menuItemExt.setProtein((double) 0) ;
-        } else{
-            menuItemExt.setProtein(wtDish.getProtein().doubleValue());
-        }
-        if (wtDish.getCarbohydrates() == null) {
-            menuItemExt.setCarbohydrates((double) 0) ;
-        } else{
-            menuItemExt.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
-        }
-        if (wtDish.getFat() == null) {
-            menuItemExt.setFat((double) 0) ;
-        } else{
-            menuItemExt.setFat(wtDish.getFat().doubleValue());
-        }
         menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
         return menuItemExt;
     }

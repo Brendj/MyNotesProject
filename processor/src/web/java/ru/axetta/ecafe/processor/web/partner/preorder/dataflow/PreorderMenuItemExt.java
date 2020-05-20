@@ -99,32 +99,13 @@ public class PreorderMenuItemExt {
         this.setName(wtDish.getDishName());
         this.setFullName(wtDish.getDishName());
         this.setPrice(wtDish.getPrice().longValue());
-        if (wtDish.getCalories() == null) {
-            this.setCalories((double) 0);
-        } else {
-            this.setCalories(wtDish.getCalories().doubleValue());
-        }
-        if (wtDish.getQty() == null) {
-            this.setOutput("");
-        } else{
-            this.setOutput(wtDish.getQty());
-        }
+        this.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
+        this.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 :
+                wtDish.getCarbohydrates().doubleValue());
+        this.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
+        this.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
+        this.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
         this.setAvailableNow(1); // включение блюда в меню
-        if (wtDish.getProtein() == null) {
-            this.setProtein((double) 0) ;
-        } else{
-            this.setProtein(wtDish.getProtein().doubleValue());
-        }
-        if (wtDish.getCarbohydrates() == null) {
-            this.setCarbohydrates((double) 0) ;
-        } else{
-            this.setCarbohydrates(wtDish.getCarbohydrates().doubleValue());
-        }
-        if (wtDish.getFat() == null) {
-            this.setFat((double) 0) ;
-        } else{
-            this.setFat(wtDish.getFat().doubleValue());
-        }
         this.setIdOfMenuDetail(wtDish.getIdOfDish());
         this.setItemCode(wtDish.getCode().toString());
     }
