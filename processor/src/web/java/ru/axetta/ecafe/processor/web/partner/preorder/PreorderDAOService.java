@@ -1118,6 +1118,10 @@ public class PreorderDAOService {
                             regularPreorder.getMobile(), regularPreorder.getMobileGroupOnCreate());
                     preorderMenuDetail.setRegularPreorder(regularPreorder);
                     em.persist(preorderMenuDetail);
+                } else if (preorderMenuDetail != null) {
+                    preorderMenuDetail.setAmount(regularPreorder.getAmount());
+                    preorderMenuDetail.setRegularPreorder(regularPreorder);
+                    em.merge(preorderMenuDetail);
                 }
             }
             Set<PreorderMenuDetail> set = createPreorderMenuDetails(menuDetails, regularPreorder.getClient(),
@@ -1186,8 +1190,10 @@ public class PreorderDAOService {
     }
 
     private void testAndDeleteRegularPreorder(RegularPreorder regularPreorder) {
-        Query query = em.createQuery("select pc.idOfPreorderComplex from PreorderComplex pc "
-                + "where pc.regularPreorder = :regularPreorder and pc.preorderDate > :date and pc.deletedState = false and pc.idOfGoodsRequestPosition is null");
+        Query query = em.createQuery("select pc.idOfPreorderComplex from PreorderComplex pc join pc.preorderMenuDetails pmd "
+                + "where (pc.regularPreorder = :regularPreorder or pmd.regularPreorder = :regularPreorder) "
+                + "and pc.preorderDate > :date and pc.deletedState = false and pc.idOfGoodsRequestPosition is null "
+                + "and pmd.deletedState = false");
         query.setParameter("regularPreorder", regularPreorder);
         query.setParameter("date", new Date());
         if (query.getResultList().size() == 0) {
