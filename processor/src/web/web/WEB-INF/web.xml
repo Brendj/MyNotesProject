@@ -455,6 +455,8 @@
         <url-pattern>/smartwatch/*</url-pattern>
     </servlet-mapping>
 
+
+
     <servlet>
         <servlet-name>OkuServlet</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
@@ -508,6 +510,23 @@
     <servlet-mapping>
         <servlet-name>EzdServlet</servlet-name>
         <url-pattern>/ezd/*</url-pattern>
+    </servlet-mapping>
+
+    <servlet>
+        <servlet-name>GroupManagmentServlet</servlet-name>
+        <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
+        <init-param>
+            <param-name>resteasy.resources</param-name>
+            <param-value>ru.axetta.ecafe.processor.web.partner.foodpayment.GroupManagmentRestController</param-value>
+        </init-param>
+        <init-param>
+            <param-name>resteasy.servlet.mapping.prefix</param-name>
+            <param-value>/groupmanagment</param-value>
+        </init-param>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>GroupManagmentServlet</servlet-name>
+        <url-pattern>/groupmanagment/*</url-pattern>
     </servlet-mapping>
 
     <filter>
