@@ -868,16 +868,16 @@ public class PreorderDAOService {
 
                     List<WtDish> dishes = getWtDishesByPreorderComplexAndDates(preorderComplex, client,
                             CalendarUtils.startOfDay(date), CalendarUtils.endOfDay(date));
-
-                    try {
-                        preorderMenuDetail = createPreorderWtMenuDetail(client, preorderComplex, dishes.get(0),
-                                date, menuItem.getAmount());
-                        em.merge(preorderMenuDetail);
-                    } catch (NoResultException e) {
-                        preorderMenuDetail = createPreorderWtMenuDetail(client, preorderComplex, null, date,
-                                menuItem.getAmount());
+                    if (dishes.size() > 0) {
+                        try {
+                            preorderMenuDetail = createPreorderWtMenuDetail(client, preorderComplex, dishes.get(0), date, menuItem.getAmount());
+                            em.merge(preorderMenuDetail);
+                        } catch (NoResultException e) {
+                            preorderMenuDetail = createPreorderWtMenuDetail(client, preorderComplex, null, date,
+                                    menuItem.getAmount());
+                        }
+                        set.add(preorderMenuDetail);
                     }
-                    set.add(preorderMenuDetail);
                 }
             }
 
@@ -1648,7 +1648,7 @@ public class PreorderDAOService {
     private PreorderComplex createWtPreorderComplex(WtComplex wtComplex, Client client, Date date,
             Long nextVersion, String guardianMobile) {
         PreorderComplex preorderComplex = new PreorderComplex();
-        preorderComplex.setIdOfPreorderComplex(wtComplex.getIdOfComplex());
+        // preorderComplex.setIdOfPreorderComplex(wtComplex.getIdOfComplex());
         preorderComplex.setClient(client);
         preorderComplex.setPreorderDate(date);
         preorderComplex.setVersion(nextVersion);
@@ -2668,7 +2668,7 @@ public class PreorderDAOService {
                 + "AND dish.deleteState = 0 "
                 + "AND ((dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding > :endDate) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding > :endDate) "
-                + "OR (dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding IS NULL)"
+                + "OR (dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");
         query.setParameter("complex", complex);
         query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
@@ -2685,9 +2685,9 @@ public class PreorderDAOService {
                 + "AND dish.deleteState = 0 "
                 + "AND ((dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding > :endDate) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding > :endDate) "
-                + "OR (dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding IS NULL)"
+                + "OR (dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL)) "
-                + ":org IN elements(complex.orgs)");
+                + "AND :org IN elements(complex.orgs)");
         query.setParameter("idOfComplex", preorderComplex.getIdOfPreorderComplex());
         query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
         query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
