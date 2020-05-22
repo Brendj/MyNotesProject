@@ -16,7 +16,6 @@ import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalon;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalonType;
-import ru.axetta.ecafe.processor.core.report.SumQtyAndPriceItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
@@ -83,7 +82,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 " and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
                 " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and" +
-                " cforder.idoforg=:idoforg and case good.fullname when '' then orderdetail.MenuDetailName else good.fullname end like '" + fullname + "' and " +
+                " cforder.idoforg=:idoforg and orderdetail.MenuDetailName like '" + fullname + "' and " +
                 " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
                 " (cforder.ordertype=:orderType or (cforder.ordertype=8 " + (includeActDiscrepancies ? " "
                 : " and orderdetail.qty>=0 ") + " )) ";
