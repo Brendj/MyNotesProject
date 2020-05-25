@@ -9,18 +9,18 @@ import java.util.List;
 
 public class GroupEmployee {
     private String groupName;
-    private Long groupId;
+    private String groupId;
     private List<GroupManager> employees;
 
     public GroupEmployee(){
         employees = new LinkedList<GroupManager>();
     }
 
-    public void setGroupId(Long groupId) {
+    public void setGroupId(String groupId) {
         this.groupId = groupId;
     }
 
-    public Long getGroupId(){
+    public String getGroupId(){
         return groupId;
     }
 
