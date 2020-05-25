@@ -284,6 +284,22 @@ public class DAOReadExternalsService {
         return query.getResultList();
     }
 
+    public List<WtDish> getWtDishesByComplexAndDates(WtComplex complex, Date startDate, Date endDate) {
+        Query query = entityManager.createQuery("SELECT DISTINCT dish FROM WtDish dish "
+                + "LEFT JOIN dish.complexItems complexItems "
+                + "LEFT JOIN complexItems.wtComplex complex "
+                + "WHERE complex = :complex "
+                + "AND dish.deleteState = 0 "
+                + "AND ((dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding > :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding > :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");
+        query.setParameter("complex", complex);
+        query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+        query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+        return (List<WtDish>) query.getResultList();
+    }
+
     public WtMenuGroup getWtMenuGroupByWtDish(WtDish wtDish) {
         Query query = entityManager.createQuery(
                 "SELECT menuGroup FROM WtMenuGroup menuGroup "

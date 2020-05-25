@@ -2803,9 +2803,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 return result;
             }
             Org org = client.getOrg();
+
             Set<Long> ageGroupIds = new HashSet<>();
             boolean isPaid = false;
             boolean isFree = false;
+
+            // Льготные категории
+            Set<CategoryDiscount> categoriesDiscount = client.getCategories();
+            boolean hasDiscount = false;
 
             // 1 Группа клиента
             if (client.getClientGroup() != null) {
@@ -2828,13 +2833,57 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     result.description = RC_CLIENT_NO_LONGER_ACTIVE;
                 }
                 if (clientGroupId < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()) {
+
                     // 2 Возрастная группа
                     if (client.getAgeTypeGroup() != null && !client.getAgeTypeGroup().isEmpty()) {
                         String ageGroupDesc = client.getAgeTypeGroup().toLowerCase();
                         if (ageGroupDesc.startsWith("дошкол")) {
                             isFree = true;
                         } else {
-                            // пункт 3
+
+                            // 3 Социальная льгота
+                            if (categoriesDiscount.size() > 0) {
+                                for (CategoryDiscount categoryDiscount : categoriesDiscount) {
+                                    if (categoryDiscount.getCategoryType().getValue() == 1 ||
+                                            categoryDiscount.getCategoryType().getValue() == 3) {
+                                        hasDiscount = true;
+                                        break;
+                                    }
+                                }
+                            }
+
+                            String parallelDesc = client.getParallel().trim();
+                            // 4 Параллель для клиента-нельготника
+                            if (client.getParallel() != null && !hasDiscount) {
+                                if (PreorderDAOService.ELEMENTARY_SCHOOL.contains(parallelDesc)) {
+                                    ageGroupIds.add(3L); // 1-4
+                                    ageGroupIds.add(7L); // Все
+                                    isPaid = true;
+                                } else if (PreorderDAOService.MIDDLE_SCHOOL.contains(parallelDesc)) {
+                                    ageGroupIds.add(4L); // 5-11
+                                    isPaid = true;
+                                } else {
+                                    ageGroupIds.add(7L); // Все
+                                    isPaid = true;
+                                }
+                            }
+
+                            // 5 Параллель для клиента-льготника
+                            if (client.getParallel() != null && hasDiscount) {
+                                if (PreorderDAOService.ELEMENTARY_SCHOOL.contains(parallelDesc)) {
+                                    ageGroupIds.add(3L); // 1-4
+                                    ageGroupIds.add(7L); // Все
+                                    isPaid = true;
+                                    isFree = true;
+                                } else if (PreorderDAOService.MIDDLE_SCHOOL.contains(parallelDesc)) {
+                                    ageGroupIds.add(4L); // 5-11
+                                    isPaid = true;
+                                    isFree = true;
+                                } else {
+                                    ageGroupIds.add(7L); // Все
+                                    isPaid = true;
+                                }
+                            }
                         }
                     } else {
                         ageGroupIds.add(7L); // Все
@@ -2843,57 +2892,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 }
             }
 
-            boolean hasDiscount = false;
-            // 3 Социальная льгота
-            Set<CategoryDiscount> categoriesDiscount = client.getCategories();
-            if (categoriesDiscount.size() > 0) {
-                for (CategoryDiscount categoryDiscount : categoriesDiscount) {
-                    if (categoryDiscount.getCategoryType().getValue() == 1 ||
-                            categoryDiscount.getCategoryType().getValue() == 3) {
-                        hasDiscount = true;
-                        break;
-                    }
-                }
-            }
-
-            String parallelDesc = client.getParallel().trim();
-            // 4 Параллель для клиента-нельготника
-            if (client.getParallel() != null && !hasDiscount) {
-                if (PreorderDAOService.ELEMENTARY_SCHOOL.contains(parallelDesc)) {
-                    ageGroupIds.add(3L); // 1-4
-                    ageGroupIds.add(7L); // Все
-                    isPaid = true;
-                } else if (PreorderDAOService.MIDDLE_SCHOOL.contains(parallelDesc)) {
-                    ageGroupIds.add(4L); // 5-11
-                    isPaid = true;
-                } else {
-                    ageGroupIds.add(7L); // Все
-                    isPaid = true;
-                }
-            }
-            // 5 Параллель для клиента-льготника
-            if (client.getParallel() != null && hasDiscount) {
-                if (PreorderDAOService.ELEMENTARY_SCHOOL.contains(parallelDesc)) {
-                    ageGroupIds.add(3L); // 1-4
-                    ageGroupIds.add(7L); // Все
-                    isPaid = true;
-                    isFree = true;
-                } else if (PreorderDAOService.MIDDLE_SCHOOL.contains(parallelDesc)) {
-                    ageGroupIds.add(4L); // 5-11
-                    isPaid = true;
-                    isFree = true;
-                } else {
-                    ageGroupIds.add(7L); // Все
-                    isPaid = true;
-                }
-            }
-
             // Получение дат в диапазоне
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(startDate);
+            Date menuDate = calendar.getTime();
             while (calendar.getTime().before(endDate)) {
-                calendar.add(Calendar.DATE, 1);
-                Date menuDate = calendar.getTime();
                 Set<WtComplex> wtComplexes = new HashSet<>();
 
                 // 6-9 Платные комплексы по возрастным группам и группам
@@ -2907,7 +2910,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                 // 10 Льготные комплексы по правилам соц. скидок
                 // Льготные правила
-                if (isFree) {
+                if (isFree && categoriesDiscount.size() > 0) {
                     Set<WtDiscountRule> wtDiscountRuleSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                             .getWtDiscountRules(categoriesDiscount);
                     if (wtDiscountRuleSet.size() > 0) {
@@ -2926,7 +2929,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         // Определяем, выводить комплекс или нет
                         if (RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                     .isAvailableComplexOnDate(client, org, wtComplex, menuDate)) {
-                            List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtComplex);
+                            List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtComplex, menuDate);
                             MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(wtComplex, org,
                                     menuDate);
                             menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
@@ -2936,9 +2939,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                     result.getMenuWithComplexesList().setList(list);
 
-                } else {
-                    logger.warn("Список комплексов пуст");
                 }
+                calendar.add(Calendar.DATE, 1);
+                menuDate = calendar.getTime();
             }
 
         } catch (Exception ex) {
@@ -6811,10 +6814,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return menuItemExtList;
     }
 
-    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, WtComplex wtComplex) {
+    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, WtComplex wtComplex, Date menuDate) {
         List<MenuItemExt> menuItemExtList = new ArrayList<>();
         List<WtDish> wtDishes = DAOReadExternalsService.getInstance()
-                .getWtDishesByWtComplex(wtComplex);
+                .getWtDishesByComplexAndDates(wtComplex, menuDate, menuDate);
         if (wtDishes != null && wtDishes.size() > 0) {
             for (WtDish wtDish : wtDishes) {
                 MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish);
