@@ -4,10 +4,13 @@
 
 package ru.axetta.ecafe.processor.web.partner.integra.soap;
 
+import generated.registry.manual_synch.LoadRegistryChangeItems;
+
 import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
+import ru.axetta.ecafe.processor.web.partner.integra.soap.XMLTypes.EnterCulture;
 import ru.axetta.ecafe.processor.web.partner.preorder.soap.*;
 
 import javax.jws.WebMethod;
@@ -521,10 +524,8 @@ public interface ClientRoomController {
             @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "ticketStatus") Integer ticketStatus);
 
-    @WebMethod Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "orgCode") String orgCode,
-            @WebParam(name = "CultureName") String CultureName, @WebParam(name = "CultureShortName") String CultureShortName,
-            @WebParam(name = "CultureAddress") String CultureAddress, @WebParam(name = "accessTime") Date accessTime,
-            @WebParam(name = "eventsStatus") Integer eventsStatus);
+    @WebMethod (operationName = "enterCulture")
+    Result  enterCulture(@WebParam(name = "enterCulture") EnterCulture enterCulture);
 
     @WebMethod ClientSummaryBaseListResult getSummaryByGuardMobileMin(@WebParam(name = "guardMobile") String guardMobile);
 

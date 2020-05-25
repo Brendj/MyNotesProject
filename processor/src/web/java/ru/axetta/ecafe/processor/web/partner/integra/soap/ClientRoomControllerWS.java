@@ -65,6 +65,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResu
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryList;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
+import ru.axetta.ecafe.processor.web.partner.integra.soap.XMLTypes.EnterCulture;
 import ru.axetta.ecafe.processor.web.partner.preorder.MenuDetailNotExistsException;
 import ru.axetta.ecafe.processor.web.partner.preorder.NotEditedDayException;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
@@ -8518,38 +8519,34 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "orgCode") String orgCode,
-            @WebParam(name = "CultureName") String CultureName,
-            @WebParam(name = "CultureShortName") String CultureShortName,
-            @WebParam(name = "CultureAddress") String CultureAddress, @WebParam(name = "accessTime") Date accessTime,
-            @WebParam(name = "eventsStatus") Integer eventsStatus) {
+    public Result enterCulture(@WebParam(name = "enterCulture") EnterCulture enterCulture) {
 
         authenticateRequest(null);
-        if (StringUtils.isEmpty(guid)) {
+        if (StringUtils.isEmpty(enterCulture.getGuid())) {
             return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
         }
 
-        if (StringUtils.isEmpty(orgCode)) {
+        if (StringUtils.isEmpty(enterCulture.getOrgCode())) {
             return new Result(RC_INVALID_DATA, "Код организации не может быть пустым");
         }
 
-        if (StringUtils.isEmpty(CultureName)) {
+        if (StringUtils.isEmpty(enterCulture.getCultureName())) {
             return new Result(RC_INVALID_DATA, "Ниаменование не может быть пустым");
         }
 
-        if (StringUtils.isEmpty(CultureShortName)) {
+        if (StringUtils.isEmpty(enterCulture.getCultureShortName())) {
             return new Result(RC_INVALID_DATA, "Краткое наименование не может быть пустым");
         }
 
-        if (StringUtils.isEmpty(CultureAddress)) {
+        if (StringUtils.isEmpty(enterCulture.getCultureAddress())) {
             return new Result(RC_INVALID_DATA, "Адрес организации не может быть пустым");
         }
 
-        if (accessTime == null) {
+        if (enterCulture.getAccessTime() == null) {
             return new Result(RC_INVALID_DATA, "Время события не может быть пустым");
         }
 
-        if (eventsStatus == null || (eventsStatus < 0 || eventsStatus > 5)) {
+        if (enterCulture.getEventsStatus() == null || (enterCulture.getEventsStatus() < 0 || enterCulture.getEventsStatus() > 5)) {
             return new Result(RC_INVALID_DATA, "Некорректный статус события");
         }
 
@@ -8558,7 +8555,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client cl = DAOUtils.findClientByGuid(session, guid);
+            Client cl = DAOUtils.findClientByGuid(session, enterCulture.getGuid());
             if (cl == null) {
                 return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
             }
@@ -8568,21 +8565,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         .saveLastCardActivity(session, card.getIdOfCard(), CardActivityType.ENTER_MUSEUM);
             }
             //здесь сохранение события в таблицу и отправка уведомления
-            if (CultureName != null && CultureName.length() > 255) {
-                CultureName = CultureName.substring(0, 255);
+            if (enterCulture.getCultureName() != null && enterCulture.getCultureName().length() > 255) {
+                enterCulture.setCultureName(enterCulture.getCultureName().substring(0, 255));
             }
             ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
-            ExternalEvent event = new ExternalEvent(cl, orgCode, CultureName, CultureAddress,
-                    ExternalEventType.CULTURE, accessTime, ExternalEventStatus.fromInteger(eventsStatus), handler);
+            ExternalEvent event = new ExternalEvent(cl, enterCulture.getOrgCode(), enterCulture.getCultureName(),
+                    enterCulture.getCultureAddress(),
+                    ExternalEventType.CULTURE, enterCulture.getAccessTime(),
+                    ExternalEventStatus.fromInteger(enterCulture.getEventsStatus().intValue()), handler);
             session.save(event);
             transaction.commit();
             transaction = null;
 
             //отправка уведомления
-            if (CalendarUtils.isDateToday(accessTime)) {
+            if (CalendarUtils.isDateToday(enterCulture.getAccessTime())) {
                 ExternalEventNotificationService notificationService = RuntimeContext.getAppContext()
                         .getBean(ExternalEventNotificationService.class);
-                notificationService.setCultureShortName(CultureShortName);
+                notificationService.setCultureShortName(enterCulture.getCultureShortName());
                 notificationService.sendNotification(cl, event);
             }
             return new Result(RC_OK, RC_OK_DESC);
