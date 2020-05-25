@@ -71,15 +71,17 @@ public class MenuWithComplexesExt {
         this.usedspecialmenu = complexInfo.getUsedSpecialMenu();
     }
 
-    public MenuWithComplexesExt(WtComplex wtComplex, Org org) {
+    public MenuWithComplexesExt(WtComplex wtComplex, Org org, Date date) {
         this.idOfComplexInfo = wtComplex.getIdOfComplex();
         this.idOfComplex = wtComplex.getIdOfComplex().intValue();
         this.complexName = wtComplex.getName();
-        this.menuDate = wtComplex.getLastUpdate();
+        this.menuDate = date;
         this.currentPrice = (wtComplex.getPrice() == null) ? 0L : wtComplex.getPrice().longValue();
-        this.usedSubscriptionFeeding = org.getUsePaydableSubscriptionFeeding() ? 0 : 1;
-        this.usedVariableFeeding = org.getVariableFeeding() ? 1 : 0;
-        this.isDiscountComplex = (wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 1L) ? 1 : 0;
+        this.usedSubscriptionFeeding = 0;
+        this.usedVariableFeeding = 0;
+        this.isDiscountComplex = (wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 1L) ? 1 : 0; /// ?
+        this.modevisible = 1;
+        this.usedspecialmenu = org.getPreordersEnabled() ? 1 : 0;
     }
 
     private Integer getGoodType(ComplexInfo complexInfo) {

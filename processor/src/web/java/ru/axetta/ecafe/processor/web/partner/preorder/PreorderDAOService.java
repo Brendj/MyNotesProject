@@ -54,8 +54,10 @@ public class PreorderDAOService {
     private final String NEW_LINE_DELIMITER = ";";
     public static final long BASE_ID_MENU_VALUE_FOR_MODIFY = 7700000;
 
-    private static final Set<String> ELEMENTARY_SCHOOL = new HashSet<>(Arrays.asList("1", "2", "3", "4"));
-    private static final Set<String> MIDDLE_SCHOOL =  new HashSet<>(Arrays.asList("5", "6", "7", "8", "9", "10", "11"));
+    public static final Set<String> ELEMENTARY_SCHOOL = new HashSet<>(Arrays.asList("1", "2", "3", "4"));
+    public static final Set<String> MIDDLE_SCHOOL =  new HashSet<>(Arrays.asList("5", "6", "7", "8", "9", "10", "11", "12"));
+    public static final Long PAID_COMPLEX_GROUP_ITEM_ID = 2L;
+    public static final Long ALL_COMPLEX_GROUP_ITEM_ID = 5L;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
@@ -285,10 +287,10 @@ public class PreorderDAOService {
         if (wtComplexes.size() > 0) {
 
             // Исключение из комплексов составов, не соответствующим датам цикла
-            for (WtComplex wtComplex : wtComplexes) {
-                RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .getWtComplexInCycleDates(client, org, wtComplex);
-            }
+            //for (WtComplex wtComplex : wtComplexes) {
+            //    RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+            //            .getWtComplexInCycleDates(client, org, wtComplex);
+            //}
 
             Map<String, PreorderComplexGroup> groupMap = new HashMap<>();
             List<PreorderComplexItemExt> list = new ArrayList<>();
@@ -2454,6 +2456,49 @@ public class PreorderDAOService {
         return wtComplexes;
     }
 
+    public Set<WtComplex> getPaidWtComplexesByAgeGroups (Date startDate, Date endDate, Set<Long> ageGroupIds, Org org) {
+        Set<WtComplex> wtComplexes = new HashSet<>();
+        if (ageGroupIds != null && ageGroupIds.size() > 0) {
+            for (Long ageGroupId : ageGroupIds) {
+                Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
+                        + "WHERE complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId AND complex.deleteState = 0 "
+                        + "AND complex.beginDate < :startDate AND complex.endDate > :endDate "
+                        + "AND :org IN ELEMENTS(complex.orgs) "
+                        + "AND (complex.wtComplexGroupItem.idOfComplexGroupItem = :paidComplex OR "
+                        + "complex.wtComplexGroupItem.idOfComplexGroupItem = :allComplexes)");
+                query.setParameter("ageGroupId", ageGroupId);
+                query.setParameter("org", org);
+                query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+                query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+                query.setParameter("paidComplex", PAID_COMPLEX_GROUP_ITEM_ID);
+                query.setParameter("allComplexes", ALL_COMPLEX_GROUP_ITEM_ID);
+                List<WtComplex> res = query.getResultList();
+                if (res != null && res.size() > 0) {
+                    wtComplexes.addAll(res);
+                }
+            }
+        }
+        return wtComplexes;
+    }
+
+    public Set<WtComplex> getFreeWtComplexesByDiscountRules (Date startDate, Date endDate,
+            Set<WtDiscountRule> wtDiscountRuleSet) {
+        Set<WtComplex> wtComplexes = new HashSet<>();
+        for (WtDiscountRule rule : wtDiscountRuleSet) {
+            Query query = emReport.createQuery("SELECT complex FROM WtComplex complex WHERE complex.deleteState = 0 "
+                    + "AND complex.beginDate < :startDate AND complex.endDate > :endDate "
+                    + "AND :rule IN ELEMENTS(complex.discountRules)");
+            query.setParameter("rule", rule);
+            query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+            query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+            List<WtComplex> res = query.getResultList();
+            if (res != null && res.size() > 0) {
+                wtComplexes.addAll(res);
+            }
+        }
+        return wtComplexes;
+    }
+
     public Set<WtComplex> getWtComplexesByComplexGroup(Date startDate, Date endDate, WtComplexGroupItem complexGroup) {
         Set<WtComplex> wtComplexes = new HashSet<>();
         Query query = emReport.createNativeQuery(
@@ -2550,7 +2595,7 @@ public class PreorderDAOService {
         return query.getResultList();
     }
 
-    public void getWtComplexInCycleDates(Client client, Org org, WtComplex wtComplex) {
+    public boolean isAvailableComplexOnDate(Client client, Org org, WtComplex wtComplex, Date date) {
         Set<Date> cycleDates = new HashSet<>();
         Date startComplexDate = wtComplex.getBeginDate();
         Date endComplexDate = wtComplex.getEndDate();
@@ -2558,7 +2603,7 @@ public class PreorderDAOService {
         Calendar calendar = Calendar.getInstance();
         Date currentDate = startComplexDate;
 
-        if (wtComplex.getCycleMotion() != null) {   // компекс настроен
+        if (wtComplex.getCycleMotion() != null) {   // комплекс настроен
 
             while (currentDate.getTime() <= endComplexDate.getTime()) {
 
@@ -2589,7 +2634,8 @@ public class PreorderDAOService {
             if (wtComplex.getWtComplexesItems() != null && wtComplex.getWtComplexesItems().size() > 0) {
                 for (WtComplexesItem item : wtComplex.getWtComplexesItems()) {
                     int index = item.getCycleDay() - startComplexDay;
-                    Date itemDate = cycleDatesList.get(index);
+                    //Date itemDate = cycleDatesList.get(index);
+                    Date itemDate = date;
                     // проверка по производственному календарю
                     Boolean isWorkingDay = DAOReadonlyService.getInstance().checkWorkingDay(itemDate);
                     if (isWorkingDay != null) {
@@ -2599,7 +2645,8 @@ public class PreorderDAOService {
                                     .checkLearningDayByOrgAndClientGroup(itemDate, org, clientGroup);
                             if (isLearningDay != null && !isLearningDay) {
                                 // исключаем из меню
-                                wtComplex.getWtComplexesItems().remove(item);
+                                //wtComplex.getWtComplexesItems().remove(item);
+                                return false;
                             }
                             if (isLearningDay == null) {
                                 // проверка на субботу + 6-дневную рабочую неделю
@@ -2609,26 +2656,30 @@ public class PreorderDAOService {
                                             .isSixDaysWorkingWeek(org, clientGroup.getGroupName());
                                     if (isSixDaysWorkingWeek != null && !isSixDaysWorkingWeek) {
                                         // исключаем из меню
-                                        wtComplex.getWtComplexesItems().remove(item);
+                                        //wtComplex.getWtComplexesItems().remove(item);
+                                        return false;
                                     }
                                 }
                             }
 
                         } else {
                             // исключаем из меню
-                            wtComplex.getWtComplexesItems().remove(item);
+                            //wtComplex.getWtComplexesItems().remove(item);
+                            return false;
                         }
                     } else {
                         Boolean isLearningDay = DAOReadonlyService.getInstance()
                                 .checkLearningDayByOrgAndClientGroup(itemDate, org, clientGroup);
                         if (isLearningDay != null && !isLearningDay) {
                             // исключаем из меню
-                            wtComplex.getWtComplexesItems().remove(item);
+                            //wtComplex.getWtComplexesItems().remove(item);
+                            return false;
                         }
                     }
                 }
             }
         }
+        return true;
     }
 
     public List<WtComplex> getWtComplexesByDates(Date beginDate, Date endDate, Org org) {
