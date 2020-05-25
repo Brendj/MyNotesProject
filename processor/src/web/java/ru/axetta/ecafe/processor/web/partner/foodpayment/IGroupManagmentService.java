@@ -10,5 +10,6 @@ public interface IGroupManagmentService {
     Boolean isGroupNameAlreadyExists(long orgId, String groupName) throws Exception;
     Boolean isOrgExists(long orgId) throws Exception;
     void addOrgGroup(long orgId, String groupName) throws Exception;
-    List<GroupInfo> getOrgGroups(long orgId);
+    List<GroupInfo> getOrgGroups(long orgId) throws Exception;
+    List<GroupEmployee> getEmployees(long orgId) throws Exception;
 }
