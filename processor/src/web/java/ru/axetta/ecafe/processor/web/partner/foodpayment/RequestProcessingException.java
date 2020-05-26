@@ -20,9 +20,4 @@ public class RequestProcessingException extends Exception {
     public String getErrorMessage() {
         return errorMessage;
     }
-
-    @Override
-    public String toString(){
-        return new StringBuilder(errorCode + ": "+errorMessage).toString();
-    }
 }
