@@ -205,6 +205,8 @@
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
                 <a4j:commandButton value="Проверка соответствия флага включения функционала предзаказа ОО" action="#{otherActionsPage.relevancePreordersToOrgFlag()}" id="relevancePreordersToOrgFlag"
                                    styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
+                <a4j:commandButton value="Пересчет количественных показателей по предзаказам" action="#{otherActionsPage.preordersCheck()}" id="preordersCheck"
+                                   styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
             </h:panelGrid>
         </rich:panel>
         <rich:panel>

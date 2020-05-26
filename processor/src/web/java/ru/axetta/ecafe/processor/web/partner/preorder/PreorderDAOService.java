@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.PreorderUtils;
+import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportServiceParam;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
@@ -746,24 +747,40 @@ public class PreorderDAOService {
 
     @Transactional
     public void dailyCheck(PreorderRequestsReportServiceParam params) {
+        Date currentDate = CalendarUtils.startOfDayInUTC(new Date());
+        int day = CalendarUtils.getDayOfMonth(currentDate);
+        Date dateFrom = CalendarUtils.getFirstDayOfMonth(currentDate);
+        if (day <= PreorderRequestsReportService.DAY_PREORDER_CHECK) {
+            dateFrom = CalendarUtils.getFirstDayOfPrevMonth(currentDate);
+        }
+        dateFrom = CalendarUtils.startOfDay(dateFrom);
 
+        List<Date> weekends = GoodRequestsChangeAsyncNotificationService.getInstance().getProductionCalendarDates(currentDate);
+        Integer maxDays = RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class)
+                .getMaxDateToCreateRequests(currentDate, weekends, PreorderRequestsReportService.MAX_FORBIDDEN_DAYS);
+        Date dateTo = CalendarUtils.addDays(currentDate, maxDays);
+        dateTo = CalendarUtils.startOfDay(dateTo);
+        while (dateFrom.before(dateTo)) {
+            dailyCheckOnDate(params, dateFrom);
+            dateFrom = CalendarUtils.addDays(dateFrom, 1);
+        }
     }
 
     private void dailyCheckOnDate(PreorderRequestsReportServiceParam params, Date date) {
-        Query query = emReport.createQuery("select sum(pc.amount + pmd.amount) from PreorderComplex pc "
-                + "join pc.menuDetails pmd where pc.deletedState = false and pmd.deletedState = false "
+        Query query = emReport.createQuery("select coalesce(sum(pc.amount + pmd.amount), 0) from PreorderComplex pc "
+                + "join pc.preorderMenuDetails pmd where pc.deletedState = false and pmd.deletedState = false "
                 + "and pc.preorderDate = :date " + params.getJPACondition());
         query.setParameter("date", date);
         Long preorderAmount = (Long)query.getSingleResult();
 
-        query = emReport.createQuery("select count(pc.idOfGoodsRequestPosition) as count1 from PreorderComplex pc "
+        query = emReport.createQuery("select coalesce(count(pc.idOfGoodsRequestPosition), 0) as count1 from PreorderComplex pc "
                 + "where pc.deletedState = false and pc.idOfGoodsRequestPosition is not null "
                 + "and pc.preorderDate = :date " + params.getJPACondition());
         query.setParameter("date", date);
         Long pcAmount = (Long)query.getSingleResult();
 
-        query = emReport.createQuery("select count(pmd.idOfGoodsRequestPosition) from PreorderComplex pc "
-                + "join pc.menuDetails pmd where pc.deletedState = false and pmd.deletedState = false and pmd.idOfGoodsRequestPosition is not null "
+        query = emReport.createQuery("select coalesce(count(pmd.idOfGoodsRequestPosition), 0) from PreorderComplex pc "
+                + "join pc.preorderMenuDetails pmd where pc.deletedState = false and pmd.deletedState = false and pmd.idOfGoodsRequestPosition is not null "
                 + "and pc.preorderDate = :date " + params.getJPACondition());
         query.setParameter("date", date);
         Long pmdAmount = (Long)query.getSingleResult();
@@ -773,8 +790,12 @@ public class PreorderDAOService {
         query = em.createQuery("select pc from PreorderCheck pc where pc.date = :date order by createdDate desc");
         query.setParameter("date", date);
         query.setMaxResults(1);
-        PreorderCheck preorderCheck = (PreorderCheck)query.getSingleResult();
-        if (preorderCheck == null) preorderCheck = new PreorderCheck(date, preorderAmount, goodRequestAmount);
+        PreorderCheck preorderCheck;
+        try {
+            preorderCheck = (PreorderCheck) query.getSingleResult();
+        } catch (NoResultException e) {
+            preorderCheck = new PreorderCheck(date, preorderAmount, goodRequestAmount);
+        }
         if (!preorderAmount.equals(preorderCheck.getPreorderAmount()) || !goodRequestAmount.equals(preorderCheck.getGoodRequestAmount())) {
             PreorderCheck preorderCheckNew = new PreorderCheck(date, preorderAmount, goodRequestAmount);
             preorderCheckNew.setAlarm(true);

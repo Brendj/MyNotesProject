@@ -52,7 +52,8 @@ public class PreorderRequestsReportService extends RecoverableService {
     public static final String PREORDER_COMMENT = "- Добавлено из предзаказа -";
     private static final String TEMPLATE_FILENAME = "PreordersRequestsReport_notify.jasper";
     public final Integer PREORDER_REQUEST_TYPE = 3;
-    private static final Integer MAX_FORBIDDEN_DAYS = 3;
+    public static final Integer MAX_FORBIDDEN_DAYS = 3;
+    public static final int DAY_PREORDER_CHECK = 5;
 
     private Map<Long, GoodRequestsChangeAsyncNotificationService.OrgItem> orgItems = new HashMap<Long, GoodRequestsChangeAsyncNotificationService.OrgItem>();
 

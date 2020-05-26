@@ -628,6 +628,19 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
+    public void preordersCheck() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .dailyCheck(new PreorderRequestsReportServiceParam(new Date()));
+            printMessage("Расчет количественных показателей по предзаказам завершен");
+        } catch (Exception e) {
+            getLogger().error("Error create preordersCheck: ", e);
+            printError(
+                    "Во время расчета количественных показателей по предзаказам произошла ошибка с текстом "
+                            + e.getMessage());
+        }
+    }
+
     public void sendToAtol() {
         RuntimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).runNotifications();
     }
