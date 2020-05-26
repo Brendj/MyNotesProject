@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.ui.option.categorydiscount;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -184,6 +185,11 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
                 sb.append("} ");
                 this.setFilter(sb.substring(0, sb.length()-1));
             }
+            this.categoriesDSZN = "";
+            for (CategoryDiscountDSZN categoryDiscountDSZN : categoryDiscount.getCategoriesDiscountDSZN()) {
+                this.categoriesDSZN += categoryDiscountDSZN.getDescription() + ", ";
+            }
+            if (this.categoriesDSZN.length() > 0) this.categoriesDSZN = this.categoriesDSZN.substring(0, this.categoriesDSZN.length()-2);
         }
 
         public long getIdOfCategoryDiscount() {
