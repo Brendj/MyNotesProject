@@ -9,8 +9,8 @@ import java.util.List;
 
 public class GroupInfo {
     private String groupName;
-    private Long groupId;
-    private Long orgId;
+    private String groupId;
+    private String orgId;
     private List<GroupManager> managers;
 
     public GroupInfo(){
@@ -25,19 +25,19 @@ public class GroupInfo {
         this.groupName = groupName;
     }
 
-    public Long getGroupId(){
+    public String getGroupId(){
         return groupId;
     }
 
-    public void setGroupId(Long groupId){
+    public void setGroupId(String groupId){
         this.groupId = groupId;
     }
 
-    public Long getOrgId() {
+    public String getOrgId() {
         return orgId;
     }
 
-    public void setOrgId(Long orgId) {
+    public void setOrgId(String orgId) {
         this.orgId = orgId;
     }
 
