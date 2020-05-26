@@ -4,7 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.Client;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
+import ru.axetta.ecafe.processor.core.persistence.ClientGroupManager;
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.NullArgumentException;
@@ -28,8 +31,7 @@ public class GroupManagementService implements IGroupManagementService {
 
     @Override
     public Boolean checkPermission(String token) throws Exception {
-        throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
-                GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+        return null;
     }
 
     @Override
@@ -50,33 +52,18 @@ public class GroupManagementService implements IGroupManagementService {
                     GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
         List<GroupInfo> groupInfoList = new LinkedList<GroupInfo>();
         List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
-        friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, orgId));
-        Disjunction restrictionOrgIdIn = Restrictions.disjunction();
-        List<ClientGroup> orgGroups = new LinkedList<ClientGroup>();
+        List<ClientGroup> orgGroups = DAOUtils.getClientGroupsByIdOfOrg(persistanceSession, orgId);
         for (Org friendlyOrg:friendlyOrgs) {
-            restrictionOrgIdIn.add(Restrictions.eq("idOfMainOrg", friendlyOrg.getIdOfOrg()));
             orgGroups.addAll(DAOUtils.getClientGroupsByIdOfOrg(persistanceSession, friendlyOrg.getIdOfOrg()));
         }
         if(orgGroups.isEmpty())
             throw new RequestProcessingException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.GROUP_NOT_FOUND.getErrorMessage());
         for (ClientGroup orgGroup: orgGroups){
-            if(orgGroup.getGroupName() == null || orgGroup.getGroupName().isEmpty())
-                continue;
-            if(isGroupNotPredefined(orgGroup)){
-
-                Criteria groupNamesToOrgCriteria = persistanceSession.createCriteria(GroupNamesToOrgs.class);
-                groupNamesToOrgCriteria.add(restrictionOrgIdIn);
-                groupNamesToOrgCriteria.add(Restrictions.eq("groupName", orgGroup.getGroupName()));
-                groupNamesToOrgCriteria.setMaxResults(1);
-                GroupNamesToOrgs groupNamesToOrgs = (GroupNamesToOrgs) groupNamesToOrgCriteria.uniqueResult();
-                if(groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg().longValue() != orgGroup.getCompositeIdOfClientGroup().getIdOfOrg().longValue())
-                    continue;
-                GroupInfo groupInfo = getGroupInfo(persistanceSession, orgGroup, getClientGroupManagerByGroupName(persistanceSession,
-                        orgGroup.getGroupName(), orgGroup.getOrg().getIdOfOrg()));
-                groupInfo.setOrgId(orgGroup.getCompositeIdOfClientGroup().getIdOfOrg());
-                groupInfoList.add(groupInfo);
-            }
+            GroupInfo groupInfo = getGroupInfo(persistanceSession, orgGroup, getClientGroupManagerByGroupName(persistanceSession,
+                    orgGroup.getGroupName()));
+            groupInfo.setGroupId(orgGroup.getOrg().getIdOfOrg().toString());
+            groupInfoList.add(groupInfo);
         }
         return groupInfoList;
     }
@@ -112,67 +99,28 @@ public class GroupManagementService implements IGroupManagementService {
     @Override
     public void editEmployee(long orgId, String groupName, long contractId, Boolean status) throws Exception {
         checkOrganizationId(orgId);
-        ClientGroup clientGroup = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession, orgId, groupName);
-        if(!isGroupNotPredefined(clientGroup))
+        if(!isGroupNameAlreadyExists(orgId, groupName))
             throw new RequestProcessingException(GroupManagementErrors.GROUP_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.GROUP_NOT_FOUND.getErrorMessage());
         if(!isEmployeeExists(orgId,contractId))
             throw new RequestProcessingException(GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorMessage());
-        Client client = DAOUtils.findClientByContractId(persistanceSession, contractId);
-        Criteria employeeGroupCriteria = persistanceSession.createCriteria(ClientGroupManager.class);
-        employeeGroupCriteria.add(Restrictions.eq("clientGroupName", clientGroup.getGroupName()));
-        employeeGroupCriteria.add(Restrictions.eq("orgOwner", orgId));
-        employeeGroupCriteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
-        employeeGroupCriteria.setMaxResults(1);
-        ClientGroupManager clientGroupManager = (ClientGroupManager) employeeGroupCriteria.uniqueResult();
-        boolean deletedStatus = !status;
-        if(clientGroupManager != null && clientGroupManager.isDeleted() == deletedStatus)
-            return;
-        if(status){
-            if(clientGroupManager != null && clientGroupManager.isDeleted() != deletedStatus){
-                clientGroupManager.setDeleted(deletedStatus);
-                clientGroupManager.setVersion((clientGroupManager.getVersion()+1));
-                persistanceSession.update(clientGroupManager);
-                return;
-            }
-            if(clientGroupManager == null){
-                ClientGroupManager newClientGroupManager = new ClientGroupManager();
-                newClientGroupManager.setVersion((long) 0);
-                newClientGroupManager.setDeleted(deletedStatus);
-                newClientGroupManager.setIdOfClient(client.getIdOfClient());
-                newClientGroupManager.setOrgOwner(orgId);
-                newClientGroupManager.setClientGroupName(clientGroup.getGroupName());
-                persistanceSession.save(newClientGroupManager);
-                return;
-            }
-        }
-        if(!status){
-            if(clientGroupManager == null)
-                throw new RequestProcessingException(GroupManagementErrors.BUNCH_NOT_FOUND.getErrorCode(),
-                        GroupManagementErrors.BUNCH_NOT_FOUND.getErrorMessage());
-            if(clientGroupManager != null){
-                clientGroupManager.setDeleted(deletedStatus);
-                clientGroupManager.setVersion((clientGroupManager.getVersion()+1));
-                persistanceSession.update(clientGroupManager);
-                return;
-            }
-        }
+
+        //ClientGroup group = DAOUtils.findClientGroupByIdOfClientGroupAndIdOfOrg()
+
     }
 
-    private Boolean isGroupNotPredefined(ClientGroup group){
-        if(group == null)
-            return false;
-        if(group.getCompositeIdOfClientGroup().getIdOfClientGroup().longValue() < ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES)
+    private Boolean isGroupExists(ClientGroup group){
+        if(group != null && group.getCompositeIdOfClientGroup().getIdOfClientGroup() < ClientGroup.PREDEFINED_ID_OF_GROUP_EMPLOYEES)
             return true;
-        return false;
+        else
+            return false;
     }
 
-    private List<ClientGroupManager> getClientGroupManagerByGroupName(Session persistanceSession, String groupName, long orgId) throws Exception{
+    private List<ClientGroupManager> getClientGroupManagerByGroupName(Session persistanceSession, String groupName) throws Exception{
         Criteria managersCriteria = persistanceSession.createCriteria(ClientGroupManager.class);
         if(groupName == null || groupName.isEmpty())
             throw new NullArgumentException("Group name cannot be null or empty");
-        managersCriteria.add(Restrictions.eq("orgOwner", orgId));
         managersCriteria.add(Restrictions.eq("clientGroupName", groupName));
         managersCriteria.add(Restrictions.eq("deleted", false));
         return managersCriteria.list();
@@ -184,7 +132,7 @@ public class GroupManagementService implements IGroupManagementService {
         List<GroupManager> groupManagerList = new LinkedList<GroupManager>();
         for (Client client: clients){
             GroupManager groupManager = new GroupManager();
-            groupManager.setContractId(client.getContractId());
+            groupManager.setContractId(client.getContractId().toString());
             groupManager.setName(client.getPerson().getFirstName());
             groupManager.setSecondName(client.getPerson().getSecondName());
             groupManager.setSurname(client.getPerson().getSurname());
@@ -198,7 +146,7 @@ public class GroupManagementService implements IGroupManagementService {
             throw new NullArgumentException("ClientGroup and groupManagers cannot be null");
         GroupInfo groupInfo = new GroupInfo();
         List<Client> groupManagerClientList = new LinkedList<Client>();
-        groupInfo.setGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
+        groupInfo.setGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().toString());
         groupInfo.setGroupName(clientGroup.getGroupName());
         for (ClientGroupManager clientGroupManager: groupManagers){
             groupManagerClientList.add(DAOUtils.findClient(persistanceSession,clientGroupManager.getIdOfClient()));
@@ -211,7 +159,7 @@ public class GroupManagementService implements IGroupManagementService {
         if(organizations == null)
             throw new NullArgumentException("List of organizations cannot be null.");
         GroupEmployee groupEmployee = new GroupEmployee();
-        groupEmployee.setGroupId(groupId);
+        groupEmployee.setGroupId(groupId.toString());
         groupEmployee.setGroupName(groupName);
         Criteria employeeCriteria = persistanceSession.createCriteria(Client.class);
         Disjunction restrictionGroupOr = Restrictions.disjunction();
@@ -224,6 +172,12 @@ public class GroupManagementService implements IGroupManagementService {
         return groupEmployee;
     }
 
+    private void checkGroupName(long orgId, String groupName) throws Exception {
+        if(isGroupNameAlreadyExists(orgId, groupName))
+            throw new RequestProcessingException(GroupManagementErrors.GROUP_IS_EXISTS.getErrorCode(),
+                    GroupManagementErrors.GROUP_IS_EXISTS.getErrorMessage());
+    }
+
     private void checkOrganizationId(long orgId) throws Exception {
         if(!isOrgExists(orgId))
             throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
@@ -234,12 +188,12 @@ public class GroupManagementService implements IGroupManagementService {
         List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
         ClientGroup group;
         group = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession,orgId, groupName);
-        if(isGroupNotPredefined(group))
+        if(isGroupExists(group))
             return true;
         for (Org friendlyOrg:friendlyOrgs
         ) {
             group = DAOUtils.findClientGroupByGroupNameAndIdOfOrg(persistanceSession, friendlyOrg.getIdOfOrg(), groupName);
-            if(isGroupNotPredefined(group))
+            if(isGroupExists(group))
                 return true;
         }
         return false;
@@ -265,7 +219,7 @@ public class GroupManagementService implements IGroupManagementService {
             return false;
         Boolean clientIsBelongToOrg = false;
         for (Org org: orgList){
-            if(client.getOrg().getIdOfOrg().longValue() == org.getIdOfOrg().longValue()){
+            if(client.getOrg().getIdOfOrg() == org.getIdOfOrg()){
                 clientIsBelongToOrg = true;
                 break;
             }
@@ -274,12 +228,10 @@ public class GroupManagementService implements IGroupManagementService {
     }
 
     private Boolean clientIsEmployee(Client client){
-        Long clientGroupId = client.getIdOfClientGroup();
-        if((clientGroupId.equals(ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue()))
-                | (clientGroupId.equals(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()))
-                | (clientGroupId.equals(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue()))) {
+        if(client.getIdOfClientGroup() == ClientGroup.Predefined.CLIENT_ADMINISTRATION.getValue()
+                || client.getIdOfClientGroup() == ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()
+                || client.getIdOfClientGroup() == ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue())
             return true;
-        }
         return false;
     }
 
