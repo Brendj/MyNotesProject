@@ -32,7 +32,6 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.persistence.EntityManager;
 import javax.persistence.PersistenceContext;
 import javax.persistence.Query;
-import javax.persistence.TemporalType;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.math.BigInteger;
@@ -1021,9 +1020,12 @@ public class DAOReadonlyService {
         try {
             Query query = entityManager.createQuery(
                     "SELECT calend.flag from ProductionCalendar calend WHERE calend.day = :date ");
-            query.setParameter("date", date, TemporalType.TIMESTAMP);
-            Integer flag = (Integer) query.getSingleResult();
-            return flag == 1;
+            query.setParameter("date", date);
+            List<Integer> res = query.getResultList();
+            if (res != null && res.size() > 0) {
+                return res.get(0) == 1;
+            }
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
@@ -1036,10 +1038,14 @@ public class DAOReadonlyService {
                     "SELECT sd.isWeekend from SpecialDate sd "
                             + "WHERE sd.date = :date AND sd.deleted = false AND sd.org = :org "
                             + "AND (sd.idOfClientGroup = :idOfClientGroup OR sd.idOfClientGroup IS NULL)");
-            query.setParameter("date", date, TemporalType.TIMESTAMP);
+            query.setParameter("date", date);
             query.setParameter("org", org);
             query.setParameter("idOfClientGroup", clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-            return (Boolean) query.getSingleResult();
+            List<Boolean> res = query.getResultList();
+            if (res != null && res.size() > 0) {
+                return res.get(0);
+            }
+            return null;
         } catch (Exception e) {
             e.printStackTrace();
             return null;
