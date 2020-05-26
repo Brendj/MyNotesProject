@@ -17,7 +17,7 @@ import java.net.HttpURLConnection;
 //@Produces(MediaType.APPLICATION_JSON + "; charset=UTF-8")
 @Path(value = "")
 @Controller
-public class GroupManagmentRestController {
+public class GroupManagementRestController {
 
     @GET
     @Consumes(MediaType.APPLICATION_JSON)

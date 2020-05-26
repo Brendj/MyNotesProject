@@ -10,6 +10,7 @@ import java.util.List;
 public class GroupInfo {
     private String groupName;
     private String groupId;
+    private String orgId;
     private List<GroupManager> managers;
 
     public GroupInfo(){
@@ -30,6 +31,14 @@ public class GroupInfo {
 
     public void setGroupId(String groupId){
         this.groupId = groupId;
+    }
+
+    public String getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(String orgId) {
+        this.orgId = orgId;
     }
 
     public List<GroupManager> getManagers(){
