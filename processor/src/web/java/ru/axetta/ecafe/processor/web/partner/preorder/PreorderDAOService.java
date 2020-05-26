@@ -76,6 +76,11 @@ public class PreorderDAOService {
             public void relevancePreorders(PreorderRequestsReportServiceParam params) {
                 RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).relevancePreorders(params);
             }
+
+            @Override
+            public void dailyCheckPreorders(PreorderRequestsReportServiceParam params) {
+                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).dailyCheckPreorders(params);
+            }
         };
         RuntimeContext.getAppContext().getBean(DAOService.class).setPreorderDAOOperationsImpl(impl);
     }
@@ -737,6 +742,47 @@ public class PreorderDAOService {
         regularPreorder.setLastUpdate(new Date());
         regularPreorder.setMobile(guardianMobile);
         session.update(regularPreorder);
+    }
+
+    @Transactional
+    public void dailyCheck(PreorderRequestsReportServiceParam params) {
+
+    }
+
+    private void dailyCheckOnDate(PreorderRequestsReportServiceParam params, Date date) {
+        Query query = emReport.createQuery("select sum(pc.amount + pmd.amount) from PreorderComplex pc "
+                + "join pc.menuDetails pmd where pc.deletedState = false and pmd.deletedState = false "
+                + "and pc.preorderDate = :date " + params.getJPACondition());
+        query.setParameter("date", date);
+        Long preorderAmount = (Long)query.getSingleResult();
+
+        query = emReport.createQuery("select count(pc.idOfGoodsRequestPosition) as count1 from PreorderComplex pc "
+                + "where pc.deletedState = false and pc.idOfGoodsRequestPosition is not null "
+                + "and pc.preorderDate = :date " + params.getJPACondition());
+        query.setParameter("date", date);
+        Long pcAmount = (Long)query.getSingleResult();
+
+        query = emReport.createQuery("select count(pmd.idOfGoodsRequestPosition) from PreorderComplex pc "
+                + "join pc.menuDetails pmd where pc.deletedState = false and pmd.deletedState = false and pmd.idOfGoodsRequestPosition is not null "
+                + "and pc.preorderDate = :date " + params.getJPACondition());
+        query.setParameter("date", date);
+        Long pmdAmount = (Long)query.getSingleResult();
+
+        Long goodRequestAmount = pcAmount + pmdAmount;
+
+        query = em.createQuery("select pc from PreorderCheck pc where pc.date = :date order by createdDate desc");
+        query.setParameter("date", date);
+        query.setMaxResults(1);
+        PreorderCheck preorderCheck = (PreorderCheck)query.getSingleResult();
+        if (preorderCheck == null) preorderCheck = new PreorderCheck(date, preorderAmount, goodRequestAmount);
+        if (!preorderAmount.equals(preorderCheck.getPreorderAmount()) || !goodRequestAmount.equals(preorderCheck.getGoodRequestAmount())) {
+            PreorderCheck preorderCheckNew = new PreorderCheck(date, preorderAmount, goodRequestAmount);
+            preorderCheckNew.setAlarm(true);
+            preorderCheck.setAlarm(true);
+            em.merge(preorderCheckNew);
+        }
+        preorderCheck.setLastUpdate(new Date());
+        em.merge(preorderCheck);
     }
 
     @Transactional

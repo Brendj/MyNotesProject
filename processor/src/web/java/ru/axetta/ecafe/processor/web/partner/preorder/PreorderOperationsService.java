@@ -45,6 +45,16 @@ public class PreorderOperationsService {
         }
     }
 
+    public void dailyCheckPreorders(PreorderRequestsReportServiceParam params) {
+        logger.info("Start preorders daily check process");
+        try {
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).dailyCheck(params);
+        } catch (Exception e) {
+            logger.error("Error in preorders daily check process");
+        }
+        logger.info("End preorders daily check process");
+    }
+
     public void runRelevancePreordersToMenu(PreorderRequestsReportServiceParam params) {
         logger.info("Start relevancePreordersToMenu process");
         long nextVersion;

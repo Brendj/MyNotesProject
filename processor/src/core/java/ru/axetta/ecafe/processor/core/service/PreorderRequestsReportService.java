@@ -35,8 +35,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.*;
+import java.util.Calendar;
 
 @Component("PreorderRequestsReportService")
 @Scope("singleton")
@@ -403,6 +403,8 @@ public class PreorderRequestsReportService extends RecoverableService {
         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().generatePreordersBySchedule(params);
         //генерация заявок
         runGeneratePreorderRequests(params);
+        //сервис проверок предзаказов
+        RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().dailyCheckPreorders(params);
     }
 
     public String checkIsExistFile() throws Exception {
