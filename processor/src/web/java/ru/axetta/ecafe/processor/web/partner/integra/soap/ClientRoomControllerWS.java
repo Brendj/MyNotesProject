@@ -2893,6 +2893,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(startDate);
             Date menuDate = calendar.getTime();
+            List<MenuWithComplexesExt> list = new ArrayList<>();
             while (menuDate.getTime() <= endDate.getTime()) {
 
                 // Проверка даты по календарям
@@ -2926,7 +2927,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     }
 
                     if (wtComplexes.size() > 0) {
-                        List<MenuWithComplexesExt> list = new ArrayList<>();
                         for (WtComplex wtComplex : wtComplexes) {
                             // Определяем подходящий состав комплекса
                             WtComplexesItem complexItem = RuntimeContext.getAppContext()
@@ -2944,12 +2944,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
                             list.add(menuWithComplexesExt);
                         }
-                        result.getMenuWithComplexesList().setList(list);
                     }
                 }
                 calendar.add(Calendar.DATE, 1);
                 menuDate = calendar.getTime();
             }
+            result.getMenuWithComplexesList().setList(list);
 
         } catch (Exception ex) {
             HibernateUtils.rollback(transaction, logger);

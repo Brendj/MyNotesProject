@@ -57,7 +57,7 @@ public class PreorderDAOService {
     public static final Set<String> ELEMENTARY_SCHOOL = new HashSet<>(Arrays.asList("1", "2", "3", "4"));
     public static final Set<String> MIDDLE_SCHOOL =  new HashSet<>(Arrays.asList("5", "6", "7", "8", "9", "10", "11", "12"));
     public static final Long PAID_COMPLEX_GROUP_ITEM_ID = 2L;
-    public static final Long ALL_COMPLEX_GROUP_ITEM_ID = 5L;
+    public static final Long ALL_COMPLEX_GROUP_ITEM_ID = 3L;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
@@ -795,7 +795,19 @@ public class PreorderDAOService {
             }
         }
 
-        if (!isEditedDay(date, client)) throw new NotEditedDayException("День не доступен для редактирования предзаказа");
+        //if (!isEditedDay(date, client)) throw new NotEditedDayException("День не доступен для редактирования предзаказа");
+
+        Query queryComplexSelect = em.createQuery("select p from PreorderComplex p "
+                + "where p.client.idOfClient = :idOfClient and p.armComplexId = :idOfComplexInfo "
+                + "and p.preorderDate between :startDate and :endDate and p.deletedState = false");
+        queryComplexSelect.setParameter("idOfClient", client.getIdOfClient());
+        queryComplexSelect.setParameter("startDate", startDate);
+        queryComplexSelect.setParameter("endDate", endDate);
+
+        Query queryMenuSelect = em.createQuery("select m from PreorderMenuDetail m "
+                + "where m.client.idOfClient = :idOfClient and m.preorderComplex.idOfPreorderComplex = :idOfPreorderComplex "
+                + "and m.armIdOfMenu = :armIdOfMenu and m.deletedState = false");
+        queryMenuSelect.setParameter("idOfClient", client.getIdOfClient());
 
         for (ComplexListParam complex : list.getComplexes()) {
             Integer complexAmount = complex.getAmount();
@@ -2746,6 +2758,10 @@ public class PreorderDAOService {
                 + "WHERE ci.wtComplex = :complex AND ci.cycleDay = :cycleDay");
         query.setParameter("complex", complex);
         query.setParameter("cycleDay", cycleDay);
-        return (WtComplexesItem) query.getResultList().get(0);
+        List<WtComplexesItem> res = query.getResultList();
+        if (res != null && res.size() > 0) {
+            return res.get(0);
+        }
+        return null;
     }
 }
