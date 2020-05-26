@@ -2595,88 +2595,83 @@ public class PreorderDAOService {
         return query.getResultList();
     }
 
-    public boolean isAvailableComplexOnDate(Client client, Org org, WtComplex wtComplex, Date date) {
-        Set<Date> cycleDates = new HashSet<>();
+    public WtComplexesItem getWtComplexItemByCycle(WtComplex wtComplex, Org org, Date date) {
+        Map<Date, Integer> cycleDates = new HashMap<>();
         Date startComplexDate = wtComplex.getBeginDate();
         Date endComplexDate = wtComplex.getEndDate();
         Integer startComplexDay = wtComplex.getStartCycleDay();
+        Integer daysInCycle = wtComplex.getDayInCycle();
         Calendar calendar = Calendar.getInstance();
         Date currentDate = startComplexDate;
+        int count = startComplexDay;
+        WtComplexesItem res = null;
 
         if (wtComplex.getCycleMotion() != null) {   // комплекс настроен
-
-            while (currentDate.getTime() <= endComplexDate.getTime()) {
-
+            // Составляем карту дней цикла
+            while (currentDate.getTime() <= endComplexDate.getTime() && currentDate.getTime() <= date.getTime()) {
                 calendar.setTime(currentDate);
                 // смотрим рабочую неделю
                 if ((wtComplex.getCycleMotion() == 0 &&     // 5-дневная рабочая неделя
                         calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY &&
-                        calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) ||
-                        (wtComplex.getCycleMotion() == 1 &&
+                        calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SATURDAY) || (wtComplex.getCycleMotion() == 1 &&
                         // 6-дневная рабочая неделя
                         calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
-
                     // проверка, выпадает ли день на выходные
                     Contragent contragent = DAOReadonlyService.getInstance().findDefaultSupplier(org.getIdOfOrg());
                     Boolean isHoliday = DAOReadonlyService.getInstance().checkExcludeDays(currentDate, contragent, org);
                     if (!isHoliday) {
-                        cycleDates.add(currentDate);
+                        cycleDates.put(currentDate, count++);
                     }
                 }
-
-                calendar.add(Calendar.DATE, 1);
+                calendar.add(Calendar.DATE, 1);     // переходим к следующему дню
                 currentDate = calendar.getTime();
+                if (count > daysInCycle) {  // вышли за пределы цикла
+                    if (daysInCycle == 1) {
+                        count = 1;
+                    } else {
+                        count %= daysInCycle;
+                    }
+                }
             }
 
-            List<Date> cycleDatesList = new ArrayList<>(cycleDates);
-            ClientGroup clientGroup = client.getClientGroup();
+            Integer cycleDay = cycleDates.get(date);
+            res = getWtComplexItemByComplexAndCycleDay(wtComplex, cycleDay);
+        }
+        return res;
+    }
 
-            if (wtComplex.getWtComplexesItems() != null && wtComplex.getWtComplexesItems().size() > 0) {
-                for (WtComplexesItem item : wtComplex.getWtComplexesItems()) {
-                    int index = item.getCycleDay() - startComplexDay;
-                    //Date itemDate = cycleDatesList.get(index);
-                    Date itemDate = date;
-                    // проверка по производственному календарю
-                    Boolean isWorkingDay = DAOReadonlyService.getInstance().checkWorkingDay(itemDate);
-                    if (isWorkingDay != null) {
-                        if (isWorkingDay) {
-                            // проверка по календарю учебных дней
-                            Boolean isLearningDay = DAOReadonlyService.getInstance()
-                                    .checkLearningDayByOrgAndClientGroup(itemDate, org, clientGroup);
-                            if (isLearningDay != null && !isLearningDay) {
-                                // исключаем из меню
-                                //wtComplex.getWtComplexesItems().remove(item);
-                                return false;
-                            }
-                            if (isLearningDay == null) {
-                                // проверка на субботу + 6-дневную рабочую неделю
-                                calendar.setTime(itemDate);
-                                if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
-                                    Boolean isSixDaysWorkingWeek = DAOReadonlyService.getInstance()
-                                            .isSixDaysWorkingWeek(org, clientGroup.getGroupName());
-                                    if (isSixDaysWorkingWeek != null && !isSixDaysWorkingWeek) {
-                                        // исключаем из меню
-                                        //wtComplex.getWtComplexesItems().remove(item);
-                                        return false;
-                                    }
-                                }
-                            }
-
-                        } else {
-                            // исключаем из меню
-                            //wtComplex.getWtComplexesItems().remove(item);
-                            return false;
-                        }
-                    } else {
-                        Boolean isLearningDay = DAOReadonlyService.getInstance()
-                                .checkLearningDayByOrgAndClientGroup(itemDate, org, clientGroup);
-                        if (isLearningDay != null && !isLearningDay) {
-                            // исключаем из меню
-                            //wtComplex.getWtComplexesItems().remove(item);
+    public boolean isAvailableDate(Client client, Org org, Date date) {
+        ClientGroup clientGroup = client.getClientGroup();
+        Calendar calendar = Calendar.getInstance();
+        // проверка по производственному календарю
+        Boolean isWorkingDay = DAOReadonlyService.getInstance().checkWorkingDay(date);
+        if (isWorkingDay != null) {
+            if (isWorkingDay) {
+                // проверка по календарю учебных дней
+                Boolean isLearningDay = DAOReadonlyService.getInstance()
+                        .checkLearningDayByOrgAndClientGroup(date, org, clientGroup);
+                if (isLearningDay != null && !isLearningDay) {
+                    return false;
+                }
+                if (isLearningDay == null) {
+                    // проверка на субботу + 6-дневную рабочую неделю
+                    calendar.setTime(date);
+                    if (calendar.get(Calendar.DAY_OF_WEEK) == Calendar.SATURDAY) {
+                        Boolean isSixDaysWorkingWeek = DAOReadonlyService.getInstance()
+                                .isSixDaysWorkingWeek(org, clientGroup.getGroupName());
+                        if (isSixDaysWorkingWeek != null && !isSixDaysWorkingWeek) {
                             return false;
                         }
                     }
                 }
+            } else {
+                return false;
+            }
+        } else {
+            Boolean isLearningDay = DAOReadonlyService.getInstance()
+                    .checkLearningDayByOrgAndClientGroup(date, org, clientGroup);
+            if (isLearningDay != null && !isLearningDay) {
+                return false;
             }
         }
         return true;
@@ -2744,5 +2739,13 @@ public class PreorderDAOService {
         query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
         query.setParameter("org", client.getOrg());
         return (List<WtDish>) query.getResultList();
+    }
+
+    public WtComplexesItem getWtComplexItemByComplexAndCycleDay(WtComplex complex, Integer cycleDay) {
+        Query query = emReport.createQuery("SELECT ci FROM WtComplexesItem ci "
+                + "WHERE ci.wtComplex = :complex AND ci.cycleDay = :cycleDay");
+        query.setParameter("complex", complex);
+        query.setParameter("cycleDay", cycleDay);
+        return (WtComplexesItem) query.getResultList().get(0);
     }
 }

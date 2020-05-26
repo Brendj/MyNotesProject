@@ -50,10 +50,7 @@ import ru.axetta.ecafe.processor.core.persistence.service.card.CardNotFoundExcep
 import ru.axetta.ecafe.processor.core.persistence.service.card.CardWrongStateException;
 import ru.axetta.ecafe.processor.core.persistence.service.enterevents.EnterEventsService;
 import ru.axetta.ecafe.processor.core.persistence.utils.*;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
-import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenu;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.service.*;
 import ru.axetta.ecafe.processor.core.service.finoperator.FinManager;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
@@ -2896,49 +2893,59 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             Calendar calendar = Calendar.getInstance();
             calendar.setTime(startDate);
             Date menuDate = calendar.getTime();
-            while (calendar.getTime().before(endDate)) {
-                Set<WtComplex> wtComplexes = new HashSet<>();
+            while (menuDate.getTime() <= endDate.getTime()) {
 
-                // 6-9 Платные комплексы по возрастным группам и группам
-                if (isPaid) {
-                    Set<WtComplex> wtComComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                            .getPaidWtComplexesByAgeGroups(menuDate, menuDate, ageGroupIds, org);
-                    if (wtComComplexes.size() > 0) {
-                        wtComplexes.addAll(wtComComplexes);
-                    }
-                }
+                // Проверка даты по календарям
+                if (RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .isAvailableDate(client, org, menuDate)) {
 
-                // 10 Льготные комплексы по правилам соц. скидок
-                // Льготные правила
-                if (isFree && categoriesDiscount.size() > 0) {
-                    Set<WtDiscountRule> wtDiscountRuleSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                            .getWtDiscountRules(categoriesDiscount);
-                    if (wtDiscountRuleSet.size() > 0) {
-                        Set<WtComplex> wtDiscComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                .getFreeWtComplexesByDiscountRules(menuDate, menuDate, wtDiscountRuleSet);
-                        if (wtDiscComplexes.size() > 0) {
-                            wtComplexes.addAll(wtDiscComplexes);
+                    Set<WtComplex> wtComplexes = new HashSet<>();
+
+                    // 6-9 Платные комплексы по возрастным группам и группам
+                    if (isPaid) {
+                        Set<WtComplex> wtComComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getPaidWtComplexesByAgeGroups(menuDate, menuDate, ageGroupIds, org);
+                        if (wtComComplexes.size() > 0) {
+                            wtComplexes.addAll(wtComComplexes);
                         }
                     }
-                }
 
-                if (wtComplexes.size() > 0) {
+                    // 10 Льготные комплексы по правилам соц. скидок
+                    // Льготные правила
+                    if (isFree && categoriesDiscount.size() > 0) {
+                        Set<WtDiscountRule> wtDiscountRuleSet = RuntimeContext.getAppContext()
+                                .getBean(PreorderDAOService.class).getWtDiscountRules(categoriesDiscount);
+                        if (wtDiscountRuleSet.size() > 0) {
+                            Set<WtComplex> wtDiscComplexes = RuntimeContext.getAppContext()
+                                    .getBean(PreorderDAOService.class)
+                                    .getFreeWtComplexesByDiscountRules(menuDate, menuDate, wtDiscountRuleSet);
+                            if (wtDiscComplexes.size() > 0) {
+                                wtComplexes.addAll(wtDiscComplexes);
+                            }
+                        }
+                    }
 
-                    List<MenuWithComplexesExt> list = new ArrayList<>();
-                    for (WtComplex wtComplex : wtComplexes) {
-                        // Определяем, выводить комплекс или нет
-                        if (RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .isAvailableComplexOnDate(client, org, wtComplex, menuDate)) {
-                            List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtComplex, menuDate);
-                            MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(wtComplex, org,
-                                    menuDate);
+                    if (wtComplexes.size() > 0) {
+                        List<MenuWithComplexesExt> list = new ArrayList<>();
+                        for (WtComplex wtComplex : wtComplexes) {
+                            // Определяем подходящий состав комплекса
+                            WtComplexesItem complexItem = RuntimeContext.getAppContext()
+                                    .getBean(PreorderDAOService.class).getWtComplexItemByCycle(wtComplex, org, menuDate);
+                            List<WtDish> wtDishes;
+                            if (complexItem != null) {
+                                wtDishes = DAOReadExternalsService.getInstance()
+                                        .getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate);
+                            } else {
+                                wtDishes = DAOReadExternalsService.getInstance()
+                                        .getWtDishesByComplexAndDates(wtComplex, menuDate, menuDate);
+                            }
+                            List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtDishes);
+                            MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(wtComplex, org, menuDate);
                             menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
                             list.add(menuWithComplexesExt);
                         }
+                        result.getMenuWithComplexesList().setList(list);
                     }
-
-                    result.getMenuWithComplexesList().setList(list);
-
                 }
                 calendar.add(Calendar.DATE, 1);
                 menuDate = calendar.getTime();
@@ -6814,10 +6821,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return menuItemExtList;
     }
 
-    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, WtComplex wtComplex, Date menuDate) {
+    private List<MenuItemExt> getMenuItemsExt(ObjectFactory objectFactory, List<WtDish> wtDishes) {
         List<MenuItemExt> menuItemExtList = new ArrayList<>();
-        List<WtDish> wtDishes = DAOReadExternalsService.getInstance()
-                .getWtDishesByComplexAndDates(wtComplex, menuDate, menuDate);
         if (wtDishes != null && wtDishes.size() > 0) {
             for (WtDish wtDish : wtDishes) {
                 MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish);
