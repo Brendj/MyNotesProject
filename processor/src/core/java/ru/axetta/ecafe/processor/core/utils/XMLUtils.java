@@ -265,4 +265,9 @@ public class XMLUtils {
             }
         }
     }
+
+    public static Double getDoubleAttribute(Node node, String attributeName) {
+        String value = getAttributeValue(node, attributeName);
+        return value == null || value.isEmpty() ? null : Double.valueOf(value);
+    }
 }

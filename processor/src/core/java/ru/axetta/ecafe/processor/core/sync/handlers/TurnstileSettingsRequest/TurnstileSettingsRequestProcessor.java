@@ -35,8 +35,7 @@ public class TurnstileSettingsRequestProcessor extends AbstractProcessor<ResTurn
 
         List<ResTurnstileSettingsRequestItem> items = new ArrayList<ResTurnstileSettingsRequestItem>();
         try {
-            ResTurnstileSettingsRequestItem resItem = null;
-            boolean errorFound = false;
+            boolean errorFound;
             Long nextVersion = DAOUtils.nextVersionByTurnstileSettingsRequest(session);
             Long orgOwner = turnstileSettingsRequest.getOrgOwner();
             Integer numOfEntries = null;
@@ -77,6 +76,7 @@ public class TurnstileSettingsRequestProcessor extends AbstractProcessor<ResTurn
                                 turnstileSettings.setLastUpdateForTurnstile(trItem.getLastUpdateForTurnstileSetting());
                                 turnstileSettings.setNumOfEntries(numOfEntries);
                                 turnstileSettings.setVersion(nextVersion);
+                                turnstileSettings.setTimeCoefficient(trItem.getTimeCoefficient());
                                 session.save(turnstileSettings);
                             } else {
                                 errorMessage.append("Section TR not found ");

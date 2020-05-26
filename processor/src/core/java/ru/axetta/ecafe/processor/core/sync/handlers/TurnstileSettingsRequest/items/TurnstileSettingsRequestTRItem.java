@@ -19,23 +19,26 @@ public class TurnstileSettingsRequestTRItem extends TurnstileSettingsRequestItem
     private String controllerFirmwareVersion;
     private Integer IsReadsLongIdsIncorrectly;
     private Date lastUpdateForTurnstileSetting;
+    private Double timeCoefficient;
 
     public TurnstileSettingsRequestTRItem(String type, String errorMessage, String turnstileId, String controllerModel,
-            String controllerFirmwareVersion, Integer IsReadsLongIdsIncorrectly, Date lastUpdateForTurnstile) {
+            String controllerFirmwareVersion, Integer IsReadsLongIdsIncorrectly, Date lastUpdateForTurnstile, Double timeCoefficient) {
         super(type, errorMessage);
         this.turnstileId = turnstileId;
         this.controllerModel = controllerModel;
         this.controllerFirmwareVersion = controllerFirmwareVersion;
         this.IsReadsLongIdsIncorrectly = IsReadsLongIdsIncorrectly;
         this.lastUpdateForTurnstileSetting = lastUpdateForTurnstile;
+        this.timeCoefficient = timeCoefficient;
     }
 
     public static TurnstileSettingsRequestTRItem build(Node itemNode) {
-        String turnstileId = null;
-        String controllerModel = null;
-        String controllerFirmwareVersion = null;
-        Integer isWorkWithLongIds = null;
+        String turnstileId;
+        String controllerModel;
+        String controllerFirmwareVersion;
+        Integer isWorkWithLongIds;
         Date lastUpdateForTurnstileSetting = null;
+        Double timeCoefficient;
         String type = "TR";
 
         StringBuilder errorMessage = new StringBuilder();
@@ -69,8 +72,11 @@ public class TurnstileSettingsRequestTRItem extends TurnstileSettingsRequestItem
         } else {
             errorMessage.append("Attribute LastUpdate not found");
         }
+
+        timeCoefficient = XMLUtils.getDoubleAttribute(itemNode,"timeCoeff");
+
         return new TurnstileSettingsRequestTRItem(type, errorMessage.toString(), turnstileId, controllerModel,
-                controllerFirmwareVersion, isWorkWithLongIds, lastUpdateForTurnstileSetting);
+                controllerFirmwareVersion, isWorkWithLongIds, lastUpdateForTurnstileSetting, timeCoefficient);
     }
 
     public String getTurnstileId() {
@@ -109,7 +115,16 @@ public class TurnstileSettingsRequestTRItem extends TurnstileSettingsRequestItem
         return lastUpdateForTurnstileSetting;
     }
 
+    public Double getTimeCoefficient() {
+        return timeCoefficient;
+    }
+
+    public void setTimeCoefficient(Double timeCoefficient) {
+        this.timeCoefficient = timeCoefficient;
+    }
+
     public void setLastUpdateForTurnstileSetting(Date lastUpdateForTurnstileSetting) {
         this.lastUpdateForTurnstileSetting = lastUpdateForTurnstileSetting;
+
     }
 }

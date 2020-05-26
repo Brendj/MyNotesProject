@@ -4,8 +4,14 @@
 
 package ru.axetta.ecafe.processor.web.ui.service.orgparameters;
 
+import net.sf.jasperreports.engine.JRExporterParameter;
+import net.sf.jasperreports.engine.export.JRCsvExporterParameter;
+import net.sf.jasperreports.engine.export.JRXlsExporter;
+import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
+
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.report.BasicReportJob;
 import ru.axetta.ecafe.processor.core.report.orghardware.HardwareSettingsReport;
 import ru.axetta.ecafe.processor.core.report.orghardware.HardwareSettingsReportItem;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -21,7 +27,10 @@ import org.springframework.context.annotation.DependsOn;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
+import javax.faces.context.FacesContext;
 import javax.faces.model.SelectItem;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.http.HttpServletResponse;
 import java.util.*;
 
 @Component
@@ -40,6 +49,7 @@ public class HardwareSettingsReportPage extends OnlineReportPage implements OrgL
     private Boolean showAdministrator = true;
     private Boolean showCashier = true;
     private Boolean showGuard = true;
+    private Boolean showInfo = true;
     private Boolean showTurnstile = true;
 
     private final Logger logger = LoggerFactory.getLogger(HardwareSettingsReportPage.class);
@@ -100,7 +110,6 @@ public class HardwareSettingsReportPage extends OnlineReportPage implements OrgL
             items = HardwareSettingsReport.Builder
                     .buildOrgHardwareCollection(idOfOrgList, status, persistenceSession, selectedDistricts,
                             allFriendlyOrgs);
-            //Collections.sort(items);
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
@@ -112,12 +121,64 @@ public class HardwareSettingsReportPage extends OnlineReportPage implements OrgL
         }
     }
 
-    //public List<HardwareSettingsReportItem> getItems() {
-    //    if(items == null){
-    //        return Collections.emptyList();
-    //    }
-    //    return items;
-    //}
+    public void buildXLS(){
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        BasicReportJob report = null;
+        try {
+            startDate = new Date();
+
+            HardwareSettingsReport.Builder builder = new HardwareSettingsReport.Builder();
+
+            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.LIST_OF_ORG_IDS_PARAM, getGetStringIdOfOrgList());
+            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.SELECTED_STATUS_PARAM, status.toString());
+            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.SELECTED_DISTRICT_PARAM, selectedDistricts);
+            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.SELECTED_ADMINISTRATOR_PARAM, showAdministrator.toString());
+            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.SELECTED_CASHIER_PARAM,showCashier.toString());
+            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.SELECTED_GUARD_PARAM,showGuard.toString());
+            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.SELECTED_TURNSTILES_PARAM,showTurnstile.toString());
+            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.ALL_FRIENDLY_ORGS, allFriendlyOrgs.toString());
+
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            report = builder.build(persistenceSession, startDate, endDate, localCalendar);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Failed export report : ", e);
+            printError("Ошибка при подготовке отчета: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+        if (report != null) {
+            try {
+                FacesContext facesContext = FacesContext.getCurrentInstance();
+                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
+                        .getResponse();
+                ServletOutputStream servletOutputStream = response.getOutputStream();
+
+                facesContext.responseComplete();
+                response.setContentType("application/xls");
+                response.setHeader("Content-disposition", "inline;filename=org_settings_report.xls");
+                JRXlsExporter xlsExport = new JRXlsExporter();
+                xlsExport.setParameter(JRExporterParameter.JASPER_PRINT, report.getPrint());
+                xlsExport.setParameter(JRCsvExporterParameter.OUTPUT_STREAM, servletOutputStream);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
+                xlsExport.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_COLUMNS, Boolean.TRUE);
+                xlsExport.setParameter(JRCsvExporterParameter.CHARACTER_ENCODING, "windows-1251");
+                xlsExport.exportReport();
+                servletOutputStream.flush();
+                servletOutputStream.close();
+            } catch (Exception e) {
+                printError("Ошибка при построении отчета: " + e.getMessage());
+                logger.error("Failed build report ", e);
+            }
+        }
+    }
 
     @Override
     public String getPageFilename() {
@@ -207,5 +268,13 @@ public class HardwareSettingsReportPage extends OnlineReportPage implements OrgL
 
     public void setShowTurnstile(Boolean showTurnstile) {
         this.showTurnstile = showTurnstile;
+    }
+
+    public Boolean getShowInfo() {
+        return showInfo;
+    }
+
+    public void setShowInfo(Boolean showInfo) {
+        this.showInfo = showInfo;
     }
 }

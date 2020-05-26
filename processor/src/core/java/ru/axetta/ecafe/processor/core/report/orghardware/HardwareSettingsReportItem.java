@@ -4,13 +4,10 @@
 
 package ru.axetta.ecafe.processor.core.report.orghardware;
 
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.OrgSync;
+import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
 
 public class HardwareSettingsReportItem {
-
-    private static final Integer ADMINISTRATOR = 0;
-    private static final Integer CASHIER = 1;
-    private static final Integer GUARD = 2;
 
     //----------------- Данные ОО --------------------//
     private String orgNumberInName;
@@ -20,6 +17,7 @@ public class HardwareSettingsReportItem {
     private String district;
     private String shortAddress;//краткий адрес
     private OrganizationType type;
+    private String orgType;
 
     //----------------- ПК. АРМ администратора ОУ --------------------//
     private String clientVersion;//версия ПО
@@ -70,12 +68,7 @@ public class HardwareSettingsReportItem {
     private String controllerModel;
     private String controllerFirmwareVersion;
     private Integer isWorkWithLongIds;
-
-    private Boolean mainBuilding;
-    private Boolean changed;
-
-    private final String MAIN_BUILDING_STYLE = "mainBuilding";
-    private final String NOT_SERVICED_STYLE = "notServiced";
+    private Double timeCoefficient;
 
     public HardwareSettingsReportItem(OrgSync orgSync, Boolean setSql) {
 
@@ -86,6 +79,7 @@ public class HardwareSettingsReportItem {
         this.district = orgSync.getOrg().getDistrict();
         this.shortAddress = orgSync.getOrg().getShortAddress();
         this.type = orgSync.getOrg().getType();
+        this.orgType = orgSync.getOrg().getType().toString();
         if (setSql) {
             this.sqlVersionOU = orgSync.getSqlServerVersion();
             this.sqlVersionFeeding = orgSync.getSqlServerVersion();
@@ -96,111 +90,6 @@ public class HardwareSettingsReportItem {
         this.dataBaseSize = orgSync.getDatabaseSize();
     }
 
-    public HardwareSettingsReportItem(Org org, OrgSync orgSync, HardwareSettings hardwareSettings,
-            HardwareSettingsMT hardwareSettingsMT, HardwareSettingsReaders hardwareSettingsReaders,
-            TurnstileSettings turnstileSettings) {
-        this.orgNumberInName = org.getOrgNumberInName();
-        this.idOfOrg = org.getIdOfOrg();
-        this.shortName = org.getShortName();
-        this.shortNameInfoService = org.getShortNameInfoService();
-        this.district = org.getDistrict();
-        this.shortAddress = org.getShortAddress();
-        this.type = org.getType();
-
-        //АРМ ОУ
-        this.clientVersion = orgSync.getClientVersion();
-        this.dataBaseSize = orgSync.getDatabaseSize();
-        this.remoteAddressOU = hardwareSettings.getIpHost();
-        this.readerNameOU = hardwareSettingsReaders.getReaderName();
-        this.firmwareVersionOU = hardwareSettingsReaders.getFirmwareVer();
-
-        this.osVersionOU = hardwareSettings.getoSVer();
-        this.sqlVersionOU = orgSync.getSqlServerVersion();
-        this.dotNetVersionOU = hardwareSettings.getDotNetVer();
-        this.cpuVersionOU = hardwareSettings.getCpuHost();
-
-        this.remoteAddressFeeding = hardwareSettings.getIpHost();
-        this.readerNameFeeding = hardwareSettingsReaders.getReaderName();
-        this.firmwareVersionFeeding = hardwareSettingsReaders.getFirmwareVer();
-
-        this.osVersionFeeding = hardwareSettings.getoSVer();
-        this.sqlVersionFeeding = orgSync.getSqlServerVersion();
-        this.dotNetVersionFeeding = hardwareSettings.getDotNetVer();
-        this.cpuVersionFeeding = hardwareSettings.getCpuHost();
-
-
-        this.remoteAddressGuard = hardwareSettings.getIpHost();
-        this.readerNameGuard = hardwareSettingsReaders.getReaderName();
-        this.firmwareVersionGuard = hardwareSettingsReaders.getFirmwareVer();
-
-        this.osVersionGuard = hardwareSettings.getoSVer();
-        this.sqlVersionGuard = orgSync.getSqlServerVersion();
-        this.dotNetVersionGuard = hardwareSettings.getDotNetVer();
-        this.cpuVersionGuard = hardwareSettings.getCpuHost();
-
-
-        this.turnstileId = turnstileSettings.getTurnstileId();
-        this.numOfEntries = turnstileSettings.getNumOfEntries();
-        this.controllerModel = turnstileSettings.getControllerModel();
-        this.controllerFirmwareVersion = turnstileSettings.getControllerFirmwareVersion();
-        this.isWorkWithLongIds = turnstileSettings.getIsReadsLongIdsIncorrectly();
-    }
-
-    public HardwareSettingsReportItem(Org org, HardwareSettings hardwareSettings,
-            HardwareSettingsMT hardwareSettingsMT) {
-
-    }
-
-    //public HardwareSettingsReportItem(Org org, HardwareSettings hardwareSettings,
-    //        HardwareSettingsReaders hardwareSettingsReaders, OrgSync orgSync, TurnstileSettings turnstileSettings,
-    //        HardwareSettingsMT hardwareSettingsMT) {
-    //    this.orgNumberInName = org.getOrgNumberInName();
-    //    this.idOfOrg = org.getIdOfOrg();
-    //    this.shortName = org.getShortName();
-    //    this.shortNameInfoService = org.getShortNameInfoService();
-    //    this.district = org.getDistrict();
-    //    this.shortAddress = org.getShortAddress();
-    //    this.type = org.getType();
-    //
-    //    //АРМ ОУ
-    //    if (hardwareSettingsMT.getModuleType().equals(ADMINISTRATOR)) {
-    //        this.clientVersion = orgSync.getClientVersion();
-    //        this.dataBaseSize = orgSync.getDatabaseSize();
-    //        this.remoteAddressOU = hardwareSettings.getIpHost();
-    //        this.readerNameOU = hardwareSettingsReaders.getReaderName();
-    //        this.firmwareVersionOU = hardwareSettingsReaders.getFirmwareVer();
-    //        this.osVersionOU = hardwareSettings.getoSVer();
-    //        this.sqlVersionOU = orgSync.getSqlServerVersion();
-    //        this.dotNetVersionOU = hardwareSettings.getDotNetVer();
-    //        this.cpuVersionOU = hardwareSettings.getCpuHost();
-    //    }
-    //
-    //    if (hardwareSettingsMT.getModuleType().equals(CASHIER)) {
-    //        this.remoteAddressFeeding = hardwareSettings.getIpHost();
-    //        this.readerNameFeeding = hardwareSettingsReaders.getReaderName();
-    //        this.firmwareVersionFeeding = hardwareSettingsReaders.getFirmwareVer();
-    //        this.osVersionFeeding = hardwareSettings.getoSVer();
-    //        this.sqlVersionFeeding = orgSync.getSqlServerVersion();
-    //        this.dotNetVersionFeeding = hardwareSettings.getDotNetVer();
-    //        this.cpuVersionFeeding = hardwareSettings.getCpuHost();
-    //    }
-    //
-    //    if(hardwareSettingsMT.getModuleType().equals(GUARD)) {
-    //        this.remoteAddressGuard = hardwareSettings.getIpHost();
-    //        this.readerNameGuard = hardwareSettingsReaders.getReaderName();
-    //        this.firmwareVersionGuard = hardwareSettingsReaders.getFirmwareVer();
-    //        this.osVersionGuard = hardwareSettings.getoSVer();
-    //        this.sqlVersionGuard = orgSync.getSqlServerVersion();
-    //        this.dotNetVersionGuard = hardwareSettings.getDotNetVer();
-    //        this.cpuVersionGuard = hardwareSettings.getCpuHost();
-    //    }
-    //
-    //    this.turnstileId = turnstileSettings.getTurnstileId();
-    //    this.numOfEntries = turnstileSettings.getNumOfEntries();
-    //    this.controllerModel = turnstileSettings.getControllerModel();
-    //    this.controllerFirmwareVersion = turnstileSettings.getControllerFirmwareVersion();
-    //    this.isWorkWithLongIds = turnstileSettings.getIsReadsLongIdsIncorrectly();
-    //}
 
     public Long getIdOfOrg() {
         return idOfOrg;
@@ -577,8 +466,20 @@ public class HardwareSettingsReportItem {
     public void setNumOfTurnstile(Integer numOfTurnstile) {
         this.numOfTurnstile = numOfTurnstile;
     }
-    //public String getStyle(){
-    //    return (this.mainBuilding ? MAIN_BUILDING_STYLE + " " : "")
-    //            +  (this.status.equals(Org.STATE_NAMES[Org.INACTIVE_STATE]) ? NOT_SERVICED_STYLE : "" );
-    //}
+
+    public String getOrgType() {
+        return orgType;
+    }
+
+    public void setOrgType(String orgType) {
+        this.orgType = orgType;
+    }
+
+    public Double getTimeCoefficient() {
+        return timeCoefficient;
+    }
+
+    public void setTimeCoefficient(Double timeCoefficient) {
+        this.timeCoefficient = timeCoefficient;
+    }
 }

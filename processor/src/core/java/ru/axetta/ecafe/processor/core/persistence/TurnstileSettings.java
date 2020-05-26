@@ -6,8 +6,6 @@ package ru.axetta.ecafe.processor.core.persistence;
 
 import java.io.Serializable;
 import java.util.Date;
-import java.util.HashSet;
-import java.util.Set;
 
 public class TurnstileSettings implements Serializable {
 
@@ -20,25 +18,12 @@ public class TurnstileSettings implements Serializable {
     private String controllerFirmwareVersion;
     private Integer isReadsLongIdsIncorrectly;
     private Date lastUpdateForTurnstile;
-    private Set<Org> orgsInternal = new HashSet<>();
+    private Double timeCoefficient;
 
     public TurnstileSettings() {
 
     }
 
-    public TurnstileSettings(Long idOfTurnstileSetting, Org org, Integer numOfEntries, String turnstileId,
-            String controllerModel, String controllerFirmwareVersion, Integer isReadsLongIdsIncorrectly,
-            Date lastUpdateForTurnstile, Long version) {
-        this.idOfTurnstileSetting = idOfTurnstileSetting;
-        this.org = org;
-        this.numOfEntries = numOfEntries;
-        this.turnstileId = turnstileId;
-        this.controllerModel = controllerModel;
-        this.controllerFirmwareVersion = controllerFirmwareVersion;
-        this.isReadsLongIdsIncorrectly = isReadsLongIdsIncorrectly;
-        this.lastUpdateForTurnstile = lastUpdateForTurnstile;
-        this.version = version;
-    }
 
     public Long getIdOfTurnstileSetting() {
         return idOfTurnstileSetting;
@@ -112,11 +97,11 @@ public class TurnstileSettings implements Serializable {
         this.numOfEntries = numOfEntries;
     }
 
-    public Set<Org> getOrgsInternal() {
-        return orgsInternal;
+    public Double getTimeCoefficient() {
+        return timeCoefficient;
     }
 
-    public void setOrgsInternal(Set<Org> orgsInternal) {
-        this.orgsInternal = orgsInternal;
+    public void setTimeCoefficient(Double timeCoefficient) {
+        this.timeCoefficient = timeCoefficient;
     }
 }

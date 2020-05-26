@@ -63,6 +63,10 @@
         <h:selectBooleanCheckbox value="#{hardwareSettingsReportPage.showGuard}" styleClass="checkboxes">
             <a4j:support event="onchange" reRender="orgSettingsTable" />
         </h:selectBooleanCheckbox>
+        <h:outputText styleClass="output-text" escape="true" value="Отображать Инфопанель" />
+        <h:selectBooleanCheckbox value="#{hardwareSettingsReportPage.showInfo}" styleClass="checkboxes">
+            <a4j:support event="onchange" reRender="orgSettingsTable" />
+        </h:selectBooleanCheckbox>
         <h:outputText styleClass="output-text" escape="true" value="Отображать параметры турникетов" />
         <h:selectBooleanCheckbox value="#{hardwareSettingsReportPage.showTurnstile}" styleClass="checkboxes">
             <a4j:support event="onchange" reRender="orgSettingsTable" />
@@ -108,287 +112,357 @@
                         <h:outputText styleClass="column-header" escape="true"
                                       value="ПК. АРМ контролера входа(охранника)" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" colspan="6"
+                    <rich:column headerClass="center-aligned-column" colspan="8"
+                                 rendered="#{hardwareSettingsReportPage.showInfo}">
+                        <h:outputText styleClass="column-header" escape="true"
+                                      value="Инфопанель" />
+                    </rich:column>
+                    <rich:column headerClass="center-aligned-column" colspan="7"
                                  rendered="#{hardwareSettingsReportPage.showTurnstile}">
                         <h:outputText styleClass="column-header" escape="true" value="Параметры турникетов" />
                     </rich:column>
-                    <%--<rich:column  headerClass="center-aligned-column" breakBefore="true">--%>
-                        <%--<h:outputText styleClass="column-header" escape="true" value="Номер" />--%>
-                    <%--</rich:column>--%>
-                    <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="ID OO" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Название ПП" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Название ОО краткое" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Округ" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Краткий адрес" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column">
-                        <h:outputText styleClass="column-header" escape="true" value="Тип ОУ" />
-                    </rich:column>
-                    <%--Администратор ОУ--%>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                        <h:outputText styleClass="column-header" escape="true" value="Версия ПО" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                        <h:outputText styleClass="column-header" escape="true" value="Размер БД" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                        <h:outputText styleClass="column-header" escape="true" value="ip" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                        <h:outputText styleClass="column-header" escape="true"
-                                      value="Идентификатор/модель считывателей карт" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                        <h:outputText styleClass="column-header" escape="true"
-                                      value="Версия микропрограммы считывателя карт" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                        <h:outputText styleClass="column-header" escape="true" value="ОС" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                        <h:outputText styleClass="column-header" escape="true" value="MySQL" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                        <h:outputText styleClass="column-header" escape="true" value="Net Framework" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                        <h:outputText styleClass="column-header" escape="true" value="Процессор" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                        <h:outputText styleClass="column-header" escape="true" value="ОЗУ" />
-                    </rich:column>
-                    <%--оператор питания(кассир)--%>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showCashier}">
-                        <h:outputText styleClass="column-header" escape="true" value="ip" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showCashier}">
-                        <h:outputText styleClass="column-header" escape="true"
-                                      value="Идентификатор/модель считывателей карт" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showCashier}">
-                        <h:outputText styleClass="column-header" escape="true"
-                                      value="Версия микропрограммы считывателя карт" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showCashier}">
-                        <h:outputText styleClass="column-header" escape="true" value="ОС" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showCashier}">
-                        <h:outputText styleClass="column-header" escape="true" value="MySQL" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showCashier}">
-                        <h:outputText styleClass="column-header" escape="true" value="Net Framework" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showCashier}">
-                        <h:outputText styleClass="column-header" escape="true" value="Процессор" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showCashier}">
-                        <h:outputText styleClass="column-header" escape="true" value="ОЗУ" />
-                    </rich:column>
-                    <%--контроллер входа(охранник)--%>
-                    <rich:column headerClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                        <h:outputText styleClass="column-header" escape="true" value="ip" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                        <h:outputText styleClass="column-header" escape="true"
-                                      value="Идентификатор/модель считывателей карт" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                        <h:outputText styleClass="column-header" escape="true"
-                                      value="Версия микропрограммы считывателя карт" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                        <h:outputText styleClass="column-header" escape="true" value="ОС" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                        <h:outputText styleClass="column-header" escape="true" value="MySQL" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                        <h:outputText styleClass="column-header" escape="true" value="Net Framework" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                        <h:outputText styleClass="column-header" escape="true" value="Процессор" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                        <h:outputText styleClass="column-header" escape="true" value="ОЗУ" />
-                    </rich:column>
-                    <%--турникеты--%>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showTurnstile}">
-                        <h:outputText styleClass="column-header" escape="true" value="ip" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showTurnstile}">
-                        <h:outputText styleClass="column-header" escape="true" value="Количество входных групп" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showTurnstile}">
-                        <h:outputText styleClass="column-header" escape="true" value="Количество контроллеров" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showTurnstile}">
-                        <h:outputText styleClass="column-header" escape="true" value="Модели контроллера" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showTurnstile}">
-                        <h:outputText styleClass="column-header" escape="true" value="Версия прошивки контроллера" />
-                    </rich:column>
-                    <rich:column headerClass="center-aligned-column"
-                                 rendered="#{hardwareSettingsReportPage.showTurnstile}">
-                        <h:outputText styleClass="column-header" escape="true"
-                                      value="Считыватель читает длинные идентификаторы" />
-                    </rich:column>
                 </rich:columnGroup>
             </f:facet>
-            <rich:column sortable="true" sortBy="#{item.orgNumberInName}" headerClass="column-header" styleClass="center-aligned-column" label="Номер">
+            <rich:column sortable="true" sortBy="#{item.orgNumberInName}" headerClass="column-header"
+                         styleClass="center-aligned-column" label="Номер">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Номер"/>
+                    <h:outputText escape="true" value="Номер" />
                 </f:facet>
                 <h:outputText value="#{item.orgNumberInName}" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column">
+            <rich:column sortable="true" sortBy="#{item.idOfOrg}" headerClass="column-header"
+                         styleClass="center-aligned-column" label="ID OO">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="ID OO" />
+                </f:facet>
                 <h:outputText value="#{item.idOfOrg}" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column">
+            <rich:column sortable="true" sortBy="#{item.shortName}" headerClass="column-header"
+                         styleClass="center-aligned-column" label="Название ПП">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Название ПП" />
+                </f:facet>
                 <h:outputText value="#{item.shortName}" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column">
+            <rich:column sortable="true" sortBy="#{item.shortNameInfoService}" headerClass="column-header"
+                         styleClass="center-aligned-column" label="Название ОО краткое">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Название ОО краткое" />
+                </f:facet>
                 <h:outputText value="#{item.shortNameInfoService}" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column">
+            <rich:column sortable="true" sortBy="#{item.district}" headerClass="column-header"
+                         styleClass="center-aligned-column" label="Округ">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Округ" />
+                </f:facet>
                 <h:outputText value="#{item.district}" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column">
+            <rich:column sortable="true" sortBy="#{item.shortAddress}" headerClass="column-header"
+                         styleClass="center-aligned-column" label="Краткий адрес">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Краткий адрес" />
+                </f:facet>
                 <h:outputText value="#{item.shortAddress}" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column">
+            <rich:column sortable="true" sortBy="#{item.type}" headerClass="column-header"
+                         styleClass="center-aligned-column" label="Тип ОУ">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Тип ОУ" />
+                </f:facet>
                 <h:outputText value="#{item.type}" />
             </rich:column>
-            <%----%>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                <h:outputText value="#{item.clientVersion}" />
+            <rich:column sortable="true" sortBy="#{item.clientVersion}" headerClass="column-header" label="Версия ПО"
+                         rendered="#{hardwareSettingsReportPage.showAdministrator}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Версия ПО" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.clientVersion}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                <h:outputText value="#{item.dataBaseSize}" />
+            <rich:column sortable="true" sortBy="#{item.dataBaseSize}" headerClass="column-header" label="Размер БД"
+                         rendered="#{hardwareSettingsReportPage.showAdministrator}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Размер БД" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.dataBaseSize}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                <h:outputText value="#{item.remoteAddressOU}" />
+            <rich:column sortable="true" sortBy="#{item.remoteAddressOU}" headerClass="column-header" label="ip"
+                         rendered="#{hardwareSettingsReportPage.showAdministrator}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="ip" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.remoteAddressOU}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                <h:outputText value="#{item.readerNameOU}" />
+            <rich:column sortable="true" sortBy="#{item.readerNameOU}" headerClass="column-header" label="Идентификатор/модель считывателей карт"
+                         rendered="#{hardwareSettingsReportPage.showAdministrator}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Идентификатор/модель считывателей карт" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.readerNameOU}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                <h:outputText value="#{item.firmwareVersionOU}" />
+            <rich:column sortable="true" sortBy="#{item.firmwareVersionOU}" headerClass="column-header" label="Версия микропрограммы считывателя карт"
+                         rendered="#{hardwareSettingsReportPage.showAdministrator}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Версия микропрограммы считывателя карт" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.firmwareVersionOU}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                <h:outputText value="#{item.osVersionOU}" />
+            <rich:column sortable="true" sortBy="#{item.osVersionOU}" headerClass="column-header" label="OC"
+                         rendered="#{hardwareSettingsReportPage.showAdministrator}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="OC" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.osVersionOU}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                <h:outputText value="#{item.sqlVersionOU}" />
+            <rich:column sortable="true" sortBy="#{item.sqlVersionOU}" headerClass="column-header" label="MySQL"
+                         rendered="#{hardwareSettingsReportPage.showAdministrator}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="MySQL" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.sqlVersionOU}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                <h:outputText value="#{item.dotNetVersionOU}" />
+            <rich:column sortable="true" sortBy="#{item.dotNetVersionOU}" headerClass="column-header" label="Net Framework"
+                         rendered="#{hardwareSettingsReportPage.showAdministrator}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Net Framework" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.dotNetVersionOU}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                <h:outputText value="#{item.cpuVersionOU}" />
+            <rich:column sortable="true" sortBy="#{item.cpuVersionOU}" headerClass="column-header" label="Процессор"
+                         rendered="#{hardwareSettingsReportPage.showAdministrator}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Процессор" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.cpuVersionOU}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showAdministrator}">
-                <h:outputText value="#{item.ramSizeOU}" />
-            </rich:column>
-            <%----%>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showCashier}">
-                <h:outputText value="#{item.remoteAddressFeeding}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showCashier}">
-                <h:outputText value="#{item.readerNameFeeding}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showCashier}">
-                <h:outputText value="#{item.firmwareVersionFeeding}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showCashier}">
-                <h:outputText value="#{item.osVersionFeeding}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showCashier}">
-                <h:outputText value="#{item.sqlVersionFeeding}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showCashier}">
-                <h:outputText value="#{item.dotNetVersionFeeding}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showCashier}">
-                <h:outputText value="#{item.cpuVersionFeeding}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showCashier}">
-                <h:outputText value="#{item.ramSizeFeeding}" />
-            </rich:column>
-            <%----%>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                <h:outputText value="#{item.remoteAddressGuard}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                <h:outputText value="#{item.readerNameGuard}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                <h:outputText value="#{item.firmwareVersionGuard}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                <h:outputText value="#{item.osVersionGuard}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                <h:outputText value="#{item.sqlVersionGuard}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                <h:outputText value="#{item.dotNetVersionGuard}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                <h:outputText value="#{item.cpuVersionGuard}" />
-            </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showGuard}">
-                <h:outputText value="#{item.ramSizeGuard}" />
+            <rich:column sortable="true" sortBy="#{item.ramSizeOU}" headerClass="column-header" label="ОЗУ"
+                         rendered="#{hardwareSettingsReportPage.showAdministrator}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="ОЗУ" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.ramSizeOU}" styleClass="output-text" />
             </rich:column>
             <%----%>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showTurnstile}">
-                <h:outputText value="#{item.turnstileId}" />
+            <rich:column sortable="true" sortBy="#{item.remoteAddressFeeding}" headerClass="column-header" label="ip"
+                         rendered="#{hardwareSettingsReportPage.showCashier}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="ip" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.remoteAddressFeeding}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showTurnstile}">
-                <h:outputText value="#{item.numOfEntries}" />
+            <rich:column sortable="true" sortBy="#{item.readerNameFeeding}" headerClass="column-header" label="Идентификатор/модель считывателей карт"
+                         rendered="#{hardwareSettingsReportPage.showCashier}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Идентификатор/модель считывателей карт" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.readerNameFeeding}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showTurnstile}">
-                <h:outputText value="#{item.numOfTurnstile}" />
+            <rich:column sortable="true" sortBy="#{item.firmwareVersionFeeding}" headerClass="column-header" label="Версия микропрограммы считывателя карт"
+                         rendered="#{hardwareSettingsReportPage.showCashier}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Версия микропрограммы считывателя карт" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.firmwareVersionFeeding}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showTurnstile}">
-                <h:outputText value="#{item.controllerModel}" />
+            <rich:column sortable="true" sortBy="#{item.osVersionFeeding}" headerClass="column-header" label="OC"
+                         rendered="#{hardwareSettingsReportPage.showCashier}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="OC" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.osVersionFeeding}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showTurnstile}">
-                <h:outputText value="#{item.controllerFirmwareVersion}" />
+            <rich:column sortable="true" sortBy="#{item.sqlVersionFeeding}" headerClass="column-header" label="MySQL"
+                         rendered="#{hardwareSettingsReportPage.showCashier}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="MySQL" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.sqlVersionFeeding}" styleClass="output-text" />
             </rich:column>
-            <rich:column styleClass="center-aligned-column" rendered="#{hardwareSettingsReportPage.showTurnstile}">
-                <h:outputText value="#{item.isWorkWithLongIds}" />
+            <rich:column sortable="true" sortBy="#{item.dotNetVersionFeeding}" headerClass="column-header" label="Net Framework"
+                         rendered="#{hardwareSettingsReportPage.showCashier}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Net Framework" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.dotNetVersionFeeding}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.cpuVersionFeeding}" headerClass="column-header" label="Процессор"
+                         rendered="#{hardwareSettingsReportPage.showCashier}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Процессор" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.cpuVersionFeeding}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.ramSizeFeeding}" headerClass="column-header" label="ОЗУ"
+                         rendered="#{hardwareSettingsReportPage.showCashier}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="ОЗУ" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.ramSizeFeeding}" styleClass="output-text" />
+            </rich:column>
+            <%----%>
+            <rich:column sortable="true" sortBy="#{item.remoteAddressGuard}" headerClass="column-header" label="ip"
+                         rendered="#{hardwareSettingsReportPage.showGuard}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="ip" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.remoteAddressGuard}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.readerNameGuard}" headerClass="column-header" label="Идентификатор/модель считывателей карт"
+                         rendered="#{hardwareSettingsReportPage.showGuard}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Идентификатор/модель считывателей карт" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.readerNameGuard}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.firmwareVersionGuard}" headerClass="column-header" label="Версия микропрограммы считывателя карт"
+                         rendered="#{hardwareSettingsReportPage.showGuard}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Версия микропрограммы считывателя карт" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.firmwareVersionGuard}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.osVersionGuard}" headerClass="column-header" label="OC"
+                         rendered="#{hardwareSettingsReportPage.showGuard}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="OC" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.osVersionGuard}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.sqlVersionGuard}" headerClass="column-header" label="MySQL"
+                         rendered="#{hardwareSettingsReportPage.showGuard}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="MySQL" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.sqlVersionGuard}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.dotNetVersionGuard}" headerClass="column-header" label="Net Framework"
+                         rendered="#{hardwareSettingsReportPage.showGuard}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Net Framework" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.dotNetVersionGuard}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.cpuVersionGuard}" headerClass="column-header" label="Процессор"
+                         rendered="#{hardwareSettingsReportPage.showGuard}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Процессор" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.cpuVersionGuard}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.ramSizeGuard}" headerClass="column-header" label="ОЗУ"
+                         rendered="#{hardwareSettingsReportPage.showGuard}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="ОЗУ" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.ramSizeGuard}" styleClass="output-text" />
+            </rich:column>
+
+            <%----%>
+            <rich:column sortable="true" sortBy="#{item.remoteAddressInfo}" headerClass="column-header" label="ip"
+                         rendered="#{hardwareSettingsReportPage.showInfo}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="ip" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.remoteAddressInfo}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.readerNameInfo}" headerClass="column-header" label="Идентификатор/модель считывателей карт"
+                         rendered="#{hardwareSettingsReportPage.showInfo}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Идентификатор/модель считывателей карт" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.readerNameInfo}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.firmwareVersionInfo}" headerClass="column-header" label="Версия микропрограммы считывателя карт"
+                         rendered="#{hardwareSettingsReportPage.showInfo}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Версия микропрограммы считывателя карт" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.firmwareVersionInfo}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.osVersionInfo}" headerClass="column-header" label="OC"
+                         rendered="#{hardwareSettingsReportPage.showInfo}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="OC" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.osVersionInfo}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.sqlVersionInfo}" headerClass="column-header" label="MySQL"
+                         rendered="#{hardwareSettingsReportPage.showInfo}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="MySQL" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.sqlVersionInfo}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.dotNetVersionInfo}" headerClass="column-header" label="Net Framework"
+                         rendered="#{hardwareSettingsReportPage.showInfo}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Net Framework" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.dotNetVersionInfo}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.cpuVersionInfo}" headerClass="column-header" label="Процессор"
+                         rendered="#{hardwareSettingsReportPage.showInfo}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Процессор" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.cpuVersionInfo}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.ramSizeInfo}" headerClass="column-header" label="ОЗУ"
+                         rendered="#{hardwareSettingsReportPage.showInfo}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="ОЗУ" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.ramSizeInfo}" styleClass="output-text" />
+            </rich:column>
+            <%----%>
+            <rich:column sortable="true" sortBy="#{item.turnstileId}" headerClass="column-header" label="ip"
+                         rendered="#{hardwareSettingsReportPage.showTurnstile}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="ip" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.turnstileId}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.numOfEntries}" headerClass="column-header" label="Количество входных групп"
+                         rendered="#{hardwareSettingsReportPage.showTurnstile}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Количество входных групп" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.numOfEntries}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.numOfTurnstile}" headerClass="column-header" label="Количество контроллеров"
+                         rendered="#{hardwareSettingsReportPage.showTurnstile}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Количество контроллеров" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.numOfTurnstile}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.controllerModel}" headerClass="column-header" label="Модели контроллера"
+                         rendered="#{hardwareSettingsReportPage.showTurnstile}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Модели контроллера" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.controllerModel}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.controllerFirmwareVersion}" headerClass="column-header" label="Версия прошивки контроллера"
+                         rendered="#{hardwareSettingsReportPage.showTurnstile}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Версия прошивки контроллера" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.controllerFirmwareVersion}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.isWorkWithLongIds}" headerClass="column-header" label="Считыватель  читает длинные идентификаторы"
+                         rendered="#{hardwareSettingsReportPage.showTurnstile}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Считыватель  читает длинные идентификаторы" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.isWorkWithLongIds}" styleClass="output-text" />
+            </rich:column>
+            <rich:column sortable="true" sortBy="#{item.timeCoefficient}" headerClass="column-header" label="Коэффициент коррекции времени турникета"
+                         rendered="#{hardwareSettingsReportPage.showTurnstile}">
+                <f:facet name="header">
+                    <h:outputText escape="true" value="Коэффициент коррекции времени турникета" />
+                </f:facet>
+                <h:outputText escape="true" value="#{item.timeCoefficient}" styleClass="output-text" />
             </rich:column>
         </rich:dataTable>
     </h:panelGrid>

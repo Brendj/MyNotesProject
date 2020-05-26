@@ -10,7 +10,10 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.HardwareSettings;
+import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.OrgSync;
+import ru.axetta.ecafe.processor.core.persistence.TurnstileSettings;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportForListOrgsJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
@@ -53,6 +56,7 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
         public static final String SELECTED_ADMINISTRATOR_PARAM = "selectedAdministrator";
         public static final String SELECTED_CASHIER_PARAM = "selectedCashier";
         public static final String SELECTED_GUARD_PARAM = "selectedGuard";
+        public static final String SELECTED_INFO_RAPAM = "selectedInfo";
         public static final String SELECTED_TURNSTILES_PARAM = "selectedTurnstiles";
         public static final String ALL_FRIENDLY_ORGS = "allFriendlyOrgs";
 
@@ -85,13 +89,16 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
                     .parseBoolean(getReportProperties().getProperty(SELECTED_ADMINISTRATOR_PARAM));
             Boolean showCashier = Boolean.parseBoolean(getReportProperties().getProperty(SELECTED_CASHIER_PARAM));
             Boolean showGuard = Boolean.parseBoolean(getReportProperties().getProperty(SELECTED_GUARD_PARAM));
+            Boolean showInfo = Boolean.parseBoolean(getReportProperties().getProperty(SELECTED_INFO_RAPAM));
             Boolean showTurnstiles = Boolean.parseBoolean(getReportProperties().getProperty(SELECTED_TURNSTILES_PARAM));
 
             parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
             parameterMap.put(SELECTED_ADMINISTRATOR_PARAM, showAdministrator);
             parameterMap.put(SELECTED_CASHIER_PARAM, showCashier);
             parameterMap.put(SELECTED_GUARD_PARAM, showGuard);
+            parameterMap.put(SELECTED_INFO_RAPAM, showInfo);
             parameterMap.put(SELECTED_TURNSTILES_PARAM, showTurnstiles);
+
 
             JRDataSource dataSource = createDataSource(session, selectedStatus, selectedDistrict, idOfOrgList,
                     allFriendlyOrgs);
@@ -168,9 +175,9 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
                                     + "(select r1.readername as readernamefeeding from  cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 1), "
                                     + "(select r1.firmwarever as firmwareversionfeeding from  cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 1), "
                                     + "(select r1.readername as readernameguard from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 2), "
-                                    + "(select r1.firmwarever as firmwareversionguard from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 2) "
-                                    //+ "(select r1.readername from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 3), "
-                                    //+ "(select r1.firmwarever from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 3) "
+                                    + "(select r1.firmwarever as firmwareversionguard from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 2), "
+                                    + "(select r1.readername as readernameinfo from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 3), "
+                                    + "(select r1.firmwarever as firmwareversioninfo  from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 3) "
                                     + " from cf_hardware_settings hs "
                                     + "where hs.idoforg = :idOfOrg and hs.idofhardwaresetting = :idOfHardwareSetting ");
 
@@ -181,48 +188,52 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
                     List list = query.list();
 
                     for (Object o : list) {
-                        Object vals[] = (Object[]) o;
+                        Object[] values = (Object[]) o;
                         if (orgSync != null) {
                             HardwareSettingsReportItem item = new HardwareSettingsReportItem(orgSync, true);
 
-                            item.setRemoteAddressOU((String) vals[0]);
-                            item.setRemoteAddressFeeding((String) vals[0]);
-                            item.setRemoteAddressGuard((String) vals[0]);
-                            item.setRemoteAddressInfo((String) vals[0]);
+                            item.setRemoteAddressOU((String) values[0]);
+                            item.setRemoteAddressFeeding((String) values[0]);
+                            item.setRemoteAddressGuard((String) values[0]);
+                            item.setRemoteAddressInfo((String) values[0]);
 
-                            item.setDotNetVersionOU((String) vals[1]);
-                            item.setDotNetVersionFeeding((String) vals[1]);
-                            item.setDotNetVersionGuard((String) vals[1]);
-                            item.setDotNetVersionInfo((String) vals[1]);
+                            item.setDotNetVersionOU((String) values[1]);
+                            item.setDotNetVersionFeeding((String) values[1]);
+                            item.setDotNetVersionGuard((String) values[1]);
+                            item.setDotNetVersionInfo((String) values[1]);
 
-                            item.setOsVersionOU((String) vals[2]);
-                            item.setOsVersionFeeding((String) vals[2]);
-                            item.setOsVersionGuard((String) vals[2]);
-                            item.setOsVersionInfo((String) vals[2]);
+                            item.setOsVersionOU((String) values[2]);
+                            item.setOsVersionFeeding((String) values[2]);
+                            item.setOsVersionGuard((String) values[2]);
+                            item.setOsVersionInfo((String) values[2]);
 
-                            item.setRamSizeOU((String) vals[3]);
-                            item.setRamSizeFeeding((String) vals[3]);
-                            item.setRamSizeGuard((String) vals[3]);
-                            item.setRamSizeInfo((String) vals[3]);
+                            item.setRamSizeOU((String) values[3]);
+                            item.setRamSizeFeeding((String) values[3]);
+                            item.setRamSizeGuard((String) values[3]);
+                            item.setRamSizeInfo((String) values[3]);
 
-                            item.setCpuVersionOU((String) vals[4]);
-                            item.setCpuVersionFeeding((String) vals[4]);
-                            item.setCpuVersionGuard((String) vals[4]);
-                            item.setCpuVersionInfo((String) vals[4]);
+                            item.setCpuVersionOU((String) values[4]);
+                            item.setCpuVersionFeeding((String) values[4]);
+                            item.setCpuVersionGuard((String) values[4]);
+                            item.setCpuVersionInfo((String) values[4]);
 
-                            item.setReaderNameOU((String) vals[5]);
-                            if (vals[6] != null) {
-                                item.setFirmwareVersionOU((String) vals[6]);
+                            item.setReaderNameOU((String) values[5]);
+                            if (values[6] != null) {
+                                item.setFirmwareVersionOU((String) values[6]);
                             }
 
-                            item.setReaderNameFeeding((String) vals[7]);
-                            if (vals[8] != null) {
-                                item.setFirmwareVersionFeeding((String) vals[8]);
+                            item.setReaderNameFeeding((String) values[7]);
+                            if (values[8] != null) {
+                                item.setFirmwareVersionFeeding((String) values[8]);
                             }
 
-                            item.setReaderNameGuard((String) vals[9]);
-                            if (vals[10] != null) {
-                                item.setFirmwareVersionGuard((String) vals[10]);
+                            item.setReaderNameGuard((String) values[9]);
+                            if (values[10] != null) {
+                                item.setFirmwareVersionGuard((String) values[10]);
+                            }
+                            item.setRemoteAddressInfo((String) values[11]);
+                            if (values[12] != null) {
+                                item.setFirmwareVersionInfo((String) values[12]);
                             }
                             result.add(item);
                         }
@@ -238,7 +249,6 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
                 if (!turnstileSettingsList.isEmpty()) {
                     if (listOfSettings.size() < turnstileSettingsList.size()) {
                         for (int i = 0; i < turnstileSettingsList.size(); i++) {
-                            //if (i < result.size()) {
                             if (i < listOfSettings.size()) {
                                 HardwareSettingsReportItem item = result.get(i);
                                 item.setTurnstileId(turnstileSettingsList.get(i).getTurnstileId());
@@ -248,6 +258,7 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
                                 item.setControllerFirmwareVersion(
                                         turnstileSettingsList.get(i).getControllerFirmwareVersion());
                                 item.setIsWorkWithLongIds(turnstileSettingsList.get(i).getIsReadsLongIdsIncorrectly());
+                                item.setTimeCoefficient(turnstileSettingsList.get(i).getTimeCoefficient());
                             } else {
                                 HardwareSettingsReportItem tempItem = new HardwareSettingsReportItem(orgSync, false);
                                 tempItem.setTurnstileId(turnstileSettingsList.get(i).getTurnstileId());
@@ -258,6 +269,7 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
                                         turnstileSettingsList.get(i).getControllerFirmwareVersion());
                                 tempItem.setIsWorkWithLongIds(
                                         turnstileSettingsList.get(i).getIsReadsLongIdsIncorrectly());
+                                tempItem.setTimeCoefficient(turnstileSettingsList.get(i).getTimeCoefficient());
                                 newTurnstile.add(tempItem);
                             }
                         }
@@ -306,42 +318,6 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
             for (OrgSync orgSync : listOfOrgSync) {
                 if (orgSync.getIdOfOrg().equals(org.getIdOfOrg())) {
                     return orgSync;
-                }
-            }
-            return null;
-        }
-
-        private static HardwareSettingsReaders getReadersByOrg(List<HardwareSettingsReaders> readers, Org org) {
-            if (CollectionUtils.isEmpty(readers)) {
-                return null;
-            }
-            for (HardwareSettingsReaders hardwareSettingsReaders : readers) {
-                if (hardwareSettingsReaders.getOrgsInternal().contains(org)) {
-                    return hardwareSettingsReaders;
-                }
-            }
-            return null;
-        }
-
-        private static TurnstileSettings getTurnstilesByOrg(List<TurnstileSettings> turnstiles, Org org) {
-            if (CollectionUtils.isEmpty(turnstiles)) {
-                return null;
-            }
-            for (TurnstileSettings turnstileSettings : turnstiles) {
-                if (turnstileSettings.getOrgsInternal().contains(org)) {
-                    return turnstileSettings;
-                }
-            }
-            return null;
-        }
-
-        private static HardwareSettingsMT getHardwareSettingsMT(List<HardwareSettingsMT> hardwareSettingsMTS, Org org) {
-            if (CollectionUtils.isEmpty(hardwareSettingsMTS)) {
-                return null;
-            }
-            for (HardwareSettingsMT hardwareSettingsMT : hardwareSettingsMTS) {
-                if (hardwareSettingsMT.getOrgsInternal().contains(org)) {
-                    return hardwareSettingsMT;
                 }
             }
             return null;
