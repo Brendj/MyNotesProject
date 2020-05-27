@@ -31,7 +31,8 @@ public class GroupManagementService implements IGroupManagementService {
 
     @Override
     public Boolean checkPermission(String token) throws Exception {
-        return null;
+        throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
     }
 
     @Override
@@ -61,8 +62,8 @@ public class GroupManagementService implements IGroupManagementService {
                     GroupManagementErrors.GROUP_NOT_FOUND.getErrorMessage());
         for (ClientGroup orgGroup: orgGroups){
             GroupInfo groupInfo = getGroupInfo(persistanceSession, orgGroup, getClientGroupManagerByGroupName(persistanceSession,
-                    orgGroup.getGroupName()));
-            groupInfo.setGroupId(orgGroup.getOrg().getIdOfOrg().toString());
+                    orgGroup.getGroupName(), orgGroup.getOrg().getIdOfOrg()));
+            groupInfo.setGroupId(orgGroup.getCompositeIdOfClientGroup().getIdOfOrg().toString());
             groupInfoList.add(groupInfo);
         }
         return groupInfoList;
@@ -105,9 +106,44 @@ public class GroupManagementService implements IGroupManagementService {
         if(!isEmployeeExists(orgId,contractId))
             throw new RequestProcessingException(GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.EMPLOYEE_NOT_FOUND.getErrorMessage());
-
-        //ClientGroup group = DAOUtils.findClientGroupByIdOfClientGroupAndIdOfOrg()
-
+        Client client = DAOUtils.findClientByContractId(persistanceSession, contractId);
+        Criteria employeeGroupCriteria = persistanceSession.createCriteria(ClientGroupManager.class);
+        employeeGroupCriteria.add(Restrictions.eq("clientGroupName", groupName));
+        employeeGroupCriteria.add(Restrictions.eq("orgOwner", orgId));
+        employeeGroupCriteria.add(Restrictions.eq("idOfClient", client.getIdOfClient()));
+        employeeGroupCriteria.setMaxResults(1);
+        ClientGroupManager clientGroupManager = (ClientGroupManager)employeeGroupCriteria.list().get(0);
+        if(clientGroupManager != null && clientGroupManager.isDeleted() == status)
+            return;
+        if(status){
+            if(clientGroupManager != null && clientGroupManager.isDeleted() != status){
+                clientGroupManager.setDeleted(status);
+                clientGroupManager.setVersion((clientGroupManager.getVersion()+1));
+                persistanceSession.update(clientGroupManager);
+                return;
+            }
+            if(clientGroupManager == null){
+                ClientGroupManager newClientGroupManager = new ClientGroupManager();
+                newClientGroupManager.setVersion((long) 0);
+                newClientGroupManager.setDeleted(status);
+                newClientGroupManager.setIdOfClient(client.getIdOfClient());
+                newClientGroupManager.setOrgOwner(orgId);
+                newClientGroupManager.setClientGroupName(groupName);
+                persistanceSession.save(newClientGroupManager);
+                return;
+            }
+        }
+        if(!status){
+            if(clientGroupManager == null)
+                throw new RequestProcessingException(GroupManagementErrors.BUNCH_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.BUNCH_NOT_FOUND.getErrorMessage());
+            if(clientGroupManager != null){
+                clientGroupManager.setDeleted(status);
+                clientGroupManager.setVersion((clientGroupManager.getVersion()+1));
+                persistanceSession.update(clientGroupManager);
+                return;
+            }
+        }
     }
 
     private Boolean isGroupExists(ClientGroup group){
@@ -117,10 +153,11 @@ public class GroupManagementService implements IGroupManagementService {
             return false;
     }
 
-    private List<ClientGroupManager> getClientGroupManagerByGroupName(Session persistanceSession, String groupName) throws Exception{
+    private List<ClientGroupManager> getClientGroupManagerByGroupName(Session persistanceSession, String groupName, long orgId) throws Exception{
         Criteria managersCriteria = persistanceSession.createCriteria(ClientGroupManager.class);
         if(groupName == null || groupName.isEmpty())
             throw new NullArgumentException("Group name cannot be null or empty");
+        managersCriteria.add(Restrictions.eq("orgOwner", orgId));
         managersCriteria.add(Restrictions.eq("clientGroupName", groupName));
         managersCriteria.add(Restrictions.eq("deleted", false));
         return managersCriteria.list();
@@ -170,12 +207,6 @@ public class GroupManagementService implements IGroupManagementService {
         employeeCriteria.add(restrictionGroupOr);
         groupEmployee.setEmployees(getGroupManagersFromClients(employeeCriteria.list()));
         return groupEmployee;
-    }
-
-    private void checkGroupName(long orgId, String groupName) throws Exception {
-        if(isGroupNameAlreadyExists(orgId, groupName))
-            throw new RequestProcessingException(GroupManagementErrors.GROUP_IS_EXISTS.getErrorCode(),
-                    GroupManagementErrors.GROUP_IS_EXISTS.getErrorMessage());
     }
 
     private void checkOrganizationId(long orgId) throws Exception {
