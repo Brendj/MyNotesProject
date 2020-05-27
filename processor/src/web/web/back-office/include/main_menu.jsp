@@ -956,6 +956,10 @@
         <%--@elvariable id="preorderStatsReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreorderStatsReportPage"--%>
         <rich:panelMenuItem id="preorderStatsMenuItem" binding="#{preorderStatsReportPage.mainMenuComponent}"
                             label="Статистика по количеству заказанного питания по предзаказу" action="#{preorderStatsReportPage.show}" reRender="workspaceForm" />
+
+        <%--@elvariable id="preorderCheckReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreorderCheckReportPage"--%>
+        <rich:panelMenuItem id="preorderCheckMenuItem" binding="#{preorderCheckReportPage.mainMenuComponent}"
+                            label="Проверка создания заявок по предзаказу" action="#{preorderCheckReportPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="empInfo" binding="#{mainPage.empInfoPage.mainMenuComponent}"

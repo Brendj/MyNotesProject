@@ -630,8 +630,7 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void preordersCheck() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .dailyCheck(new PreorderRequestsReportServiceParam(new Date()));
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).dailyCheck();
             printMessage("Расчет количественных показателей по предзаказам завершен");
         } catch (Exception e) {
             getLogger().error("Error create preordersCheck: ", e);
@@ -666,7 +665,7 @@ public class OtherActionsPage extends OnlineReportPage {
             printError("Не указаны организация или клиент для выборочной генерации заявок");
             return;
         }
-        RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).runTask(params);
+        RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).runTask(params, "1", "1");
         printMessage("Операция по созданию заявок выполнена");
     }
 

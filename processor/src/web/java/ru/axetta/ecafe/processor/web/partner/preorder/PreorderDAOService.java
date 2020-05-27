@@ -79,8 +79,8 @@ public class PreorderDAOService {
             }
 
             @Override
-            public void dailyCheckPreorders(PreorderRequestsReportServiceParam params) {
-                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).dailyCheckPreorders(params);
+            public void dailyCheckPreorders() {
+                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).dailyCheckPreorders();
             }
         };
         RuntimeContext.getAppContext().getBean(DAOService.class).setPreorderDAOOperationsImpl(impl);
@@ -746,7 +746,7 @@ public class PreorderDAOService {
     }
 
     @Transactional
-    public void dailyCheck(PreorderRequestsReportServiceParam params) {
+    public void dailyCheck() {
         Date currentDate = CalendarUtils.startOfDayInUTC(new Date());
         int day = CalendarUtils.getDayOfMonth(currentDate);
         Date dateFrom = CalendarUtils.getFirstDayOfMonth(currentDate);
@@ -761,27 +761,29 @@ public class PreorderDAOService {
         Date dateTo = CalendarUtils.addDays(currentDate, maxDays);
         dateTo = CalendarUtils.startOfDay(dateTo);
         while (dateFrom.before(dateTo)) {
-            dailyCheckOnDate(params, dateFrom);
+            dailyCheckOnDate(dateFrom);
             dateFrom = CalendarUtils.addDays(dateFrom, 1);
         }
     }
 
-    private void dailyCheckOnDate(PreorderRequestsReportServiceParam params, Date date) {
-        Query query = emReport.createQuery("select coalesce(sum(pc.amount + pmd.amount), 0) from PreorderComplex pc "
-                + "join pc.preorderMenuDetails pmd where pc.deletedState = false and pmd.deletedState = false "
-                + "and pc.preorderDate = :date " + params.getJPACondition());
+    private void dailyCheckOnDate(Date date) {
+        Query query = emReport.createQuery("select coalesce(sum(pc.amount + pmd.amount), 0) from PreorderComplex pc, "
+                + "PreorderMenuDetail pmd, Org o where pmd.preorderComplex = pc and o.idOfOrg = pc.idOfOrgOnCreate "
+                + "and pc.deletedState = false and pmd.deletedState = false "
+                + "and pc.preorderDate = :date and upper(o.tag) not like '%ТЕСТ%' ");
         query.setParameter("date", date);
         Long preorderAmount = (Long)query.getSingleResult();
 
-        query = emReport.createQuery("select coalesce(count(pc.idOfGoodsRequestPosition), 0) as count1 from PreorderComplex pc "
-                + "where pc.deletedState = false and pc.idOfGoodsRequestPosition is not null "
-                + "and pc.preorderDate = :date " + params.getJPACondition());
+        query = emReport.createQuery("select coalesce(count(pc.idOfGoodsRequestPosition), 0) as count1 from PreorderComplex pc, "
+                + "Org o where o.idOfOrg = pc.idOfOrgOnCreate and pc.deletedState = false and pc.idOfGoodsRequestPosition is not null "
+                + "and pc.preorderDate = :date and upper(o.tag) not like '%ТЕСТ%' ");
         query.setParameter("date", date);
         Long pcAmount = (Long)query.getSingleResult();
 
-        query = emReport.createQuery("select coalesce(count(pmd.idOfGoodsRequestPosition), 0) from PreorderComplex pc "
-                + "join pc.preorderMenuDetails pmd where pc.deletedState = false and pmd.deletedState = false and pmd.idOfGoodsRequestPosition is not null "
-                + "and pc.preorderDate = :date " + params.getJPACondition());
+        query = emReport.createQuery("select coalesce(count(pmd.idOfGoodsRequestPosition), 0) from PreorderComplex pc, "
+                + "PreorderMenuDetail pmd, Org o where pmd.preorderComplex = pc and o.idOfOrg = pc.idOfOrgOnCreate "
+                + "and pc.deletedState = false and pmd.deletedState = false and pmd.idOfGoodsRequestPosition is not null "
+                + "and pc.preorderDate = :date and upper(o.tag) not like '%ТЕСТ%' ");
         query.setParameter("date", date);
         Long pmdAmount = (Long)query.getSingleResult();
 
@@ -801,9 +803,10 @@ public class PreorderDAOService {
             preorderCheckNew.setAlarm(true);
             preorderCheck.setAlarm(true);
             em.merge(preorderCheckNew);
+        } else {
+            preorderCheck.setLastUpdate(new Date());
+            em.merge(preorderCheck);
         }
-        preorderCheck.setLastUpdate(new Date());
-        em.merge(preorderCheck);
     }
 
     @Transactional

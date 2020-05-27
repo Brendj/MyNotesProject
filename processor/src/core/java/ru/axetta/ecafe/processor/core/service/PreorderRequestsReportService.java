@@ -394,10 +394,10 @@ public class PreorderRequestsReportService extends RecoverableService {
                 break;
             }
         }
-        runTask(params);
+        runTask(params, instance, nodes[0]);
     }
 
-    public void runTask(PreorderRequestsReportServiceParam params) throws Exception {
+    public void runTask(PreorderRequestsReportServiceParam params, String instance, String firstNode) throws Exception {
         //проверки на актуальность предзаказов
         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().relevancePreorders(params);
         //генерация предзаказов по регулярному правилу
@@ -405,7 +405,9 @@ public class PreorderRequestsReportService extends RecoverableService {
         //генерация заявок
         runGeneratePreorderRequests(params);
         //сервис проверок предзаказов
-        RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().dailyCheckPreorders(params);
+        if (instance.equals(firstNode)) {
+            RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().dailyCheckPreorders();
+        }
     }
 
     public String checkIsExistFile() throws Exception {

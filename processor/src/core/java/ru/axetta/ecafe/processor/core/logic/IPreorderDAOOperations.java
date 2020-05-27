@@ -12,5 +12,5 @@ import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportServiceParam
 public interface IPreorderDAOOperations {
     void generatePreordersBySchedule(PreorderRequestsReportServiceParam params);
     void relevancePreorders(PreorderRequestsReportServiceParam params);
-    void dailyCheckPreorders(PreorderRequestsReportServiceParam params);
+    void dailyCheckPreorders();
 }
