@@ -2841,8 +2841,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             // 3 Социальная льгота
                             if (categoriesDiscount.size() > 0) {
                                 for (CategoryDiscount categoryDiscount : categoriesDiscount) {
-                                    if (categoryDiscount.getCategoryType().getValue() == 1 ||
-                                            categoryDiscount.getCategoryType().getValue() == 3) {
+                                    if (categoryDiscount.getCategoryType().getValue() == 0 ||   // льготное
+                                            categoryDiscount.getCategoryType().getValue() == 3) {   // льготное вариативное
                                         hasDiscount = true;
                                         break;
                                     }
