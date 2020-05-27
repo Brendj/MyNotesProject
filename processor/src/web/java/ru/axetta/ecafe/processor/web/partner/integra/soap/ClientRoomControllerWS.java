@@ -2894,7 +2894,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             calendar.setTime(startDate);
             Date menuDate = calendar.getTime();
             List<MenuWithComplexesExt> list = new ArrayList<>();
-            while (menuDate.getTime() <= endDate.getTime()) {
+            while (menuDate.getTime() < endDate.getTime()) {
 
                 // Проверка даты по календарям
                 if (RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
