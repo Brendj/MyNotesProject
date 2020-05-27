@@ -513,7 +513,7 @@
     </servlet-mapping>
 
     <servlet>
-        <servlet-name>GroupManagmentServlet</servlet-name>
+        <servlet-name>GroupManagementServlet</servlet-name>
         <servlet-class>org.jboss.resteasy.plugins.server.servlet.HttpServletDispatcher</servlet-class>
         <init-param>
             <param-name>resteasy.resources</param-name>
@@ -521,12 +521,12 @@
         </init-param>
         <init-param>
             <param-name>resteasy.servlet.mapping.prefix</param-name>
-            <param-value>/groupmanagment</param-value>
+            <param-value>/groupmanagement</param-value>
         </init-param>
     </servlet>
     <servlet-mapping>
-        <servlet-name>GroupManagmentServlet</servlet-name>
-        <url-pattern>/groupmanagment/*</url-pattern>
+        <servlet-name>GroupManagementServlet</servlet-name>
+        <url-pattern>/groupmanagement/*</url-pattern>
     </servlet-mapping>
 
     <filter>
