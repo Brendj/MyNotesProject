@@ -4,13 +4,11 @@
 
 package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
-import java.util.Date;
-
 public class Result {
     private int errorCode;
     private String errorMessage;
 
-    public Result(int errorCode, String errorMessage, Date serverTimestamp) {
+    public Result(int errorCode, String errorMessage) {
         this.errorCode = errorCode;
         this.errorMessage = errorMessage;
     }
