@@ -795,7 +795,7 @@ public class PreorderDAOService {
             }
         }
 
-        //if (!isEditedDay(date, client)) throw new NotEditedDayException("День не доступен для редактирования предзаказа");
+        if (!isEditedDay(date, client)) throw new NotEditedDayException("День не доступен для редактирования предзаказа");
 
         Query queryComplexSelect = em.createQuery("select p from PreorderComplex p "
                 + "where p.client.idOfClient = :idOfClient and p.armComplexId = :idOfComplexInfo "
