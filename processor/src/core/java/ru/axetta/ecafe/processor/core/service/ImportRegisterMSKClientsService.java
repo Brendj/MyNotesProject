@@ -447,7 +447,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         for (ExpandedPupilInfo pupil : pupils) {
             if (pupil.deleted) {
                 Client dbClient = guidMap.get(emptyIfNull(pupil.getGuid()));
-                if (dbClient == null) {
+                if (dbClient == null  || dbClient.isDeletedOrLeaving()) {
                     continue;
                 }
                 log(synchDate + "Удаление " + emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(
