@@ -894,15 +894,8 @@ public class PreorderDAOService {
                         preorderMenuDetail.setDeletedState(!menuSelected);
                         em.merge(preorderMenuDetail);
                     } catch (NoResultException e) {
-                        List<WtDish> dishes = getWtDishesByPreorderComplexAndDates(preorderComplex, client,
-                                CalendarUtils.startOfDay(date), CalendarUtils.endOfDay(date));
-                        for (WtDish wtDish : dishes) {
-                            if (!preorderWtMenuDetailExists(preorderComplex, client, date, wtDish.getIdOfDish())) {
-                                preorderMenuDetail = createPreorderWtMenuDetail(client, preorderComplex, wtDish,
-                                        date, menuItem.getAmount(), guardianMobile, mobileGroupOnCreate);
-                                break;
-                            }
-                        }
+                            preorderMenuDetail = createPreorderWtMenuDetail(client, preorderComplex, null, date, menuItem.getIdOfMenuDetail(),
+                                    menuItem.getAmount(), guardianMobile, mobileGroupOnCreate);
                     }
                     set.add(preorderMenuDetail);
                 }
@@ -1823,6 +1816,16 @@ public class PreorderDAOService {
         preorderMenuDetail.setMobile(mobile);
         preorderMenuDetail.setMobileGroupOnCreate(mobileGroupOnCreate);
         return preorderMenuDetail;
+    }
+
+    private PreorderMenuDetail createPreorderWtMenuDetail(Client client, PreorderComplex preorderComplex, MenuDetail md,
+            Date date, Long idOfDish, Integer amount, String mobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate) throws MenuDetailNotExistsException {
+        WtDish wtDish = null;
+        if (md == null) wtDish = getWtDishById(idOfDish);
+        if (wtDish == null) {
+            throw new MenuDetailNotExistsException("Не найдено блюдо с ид.=" + idOfDish.toString());
+        }
+        return createPreorderWtMenuDetail(client, preorderComplex, wtDish, date, amount, mobile, mobileGroupOnCreate);
     }
 
     private PreorderMenuDetail createPreorderWtMenuDetail(Client client, PreorderComplex preorderComplex,
@@ -2760,6 +2763,17 @@ public class PreorderDAOService {
                 + "where items.wtComplex = :complex and dish.deleteState = 0");
         query.setParameter("complex", complex);
         return query.getResultList();
+    }
+
+    public WtDish getWtDishById(Long idOfDish) {
+        Query query = emReport.createQuery("SELECT dish FROM WtDish dish "
+                + "where dish.idOfDish = :idOfDish");
+        query.setParameter("idOfDish", idOfDish);
+        List<WtDish> res = query.getResultList();
+        if (res != null && res.size() > 0) {
+            return res.get(0);
+        }
+        return null;
     }
 
     public WtComplex getWtComplexById(Long id) {
