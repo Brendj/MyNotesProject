@@ -2186,11 +2186,13 @@ public class DAOUtils {
                 sum = -sum;
                 qty = -qty;
             }
-            preorderComplex.setUsedSum(preorderComplex.getUsedSum() + sum);
-            preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
-            session.update(preorderComplex);
+            if (!preorderComplex.isType4Complex() || (preorderComplex.isType4Complex() && orderDetail.getMenuType() > OrderDetail.TYPE_COMPLEX_MAX)) {
+                preorderComplex.setUsedSum(preorderComplex.getUsedSum() + sum);
+                preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
+                session.update(preorderComplex);
+            }
 
-            if (preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4) && itemCode != null) {
+            if (preorderComplex.isType4Complex() && itemCode != null) {
                 PreorderMenuDetail pmd = getPreorderMenuDetailByItemCode(preorderComplex, itemCode);
                 if (pmd != null) {
                     long sum2 = qty * pmd.getMenuDetailPrice();
