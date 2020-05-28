@@ -83,7 +83,7 @@
                 <h:outputText escape="true" value="#{item.preorderDate}" styleClass="output-text" converter="dateConverter" />
             </rich:column>
             <rich:column headerClass="column-header">
-                <h:outputText escape="true" value="#{item.orderInfo}" styleClass="output-text" />
+                <h:outputText escape="false" value="#{item.orderInfo}" styleClass="output-text" />
             </rich:column>
             <rich:column headerClass="column-header">
                 <h:outputText escape="true" value="#{item.idOfPreorderComplex}" styleClass="output-text" />

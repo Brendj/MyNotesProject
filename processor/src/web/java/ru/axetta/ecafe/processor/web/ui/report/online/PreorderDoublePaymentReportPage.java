@@ -96,7 +96,7 @@ public class PreorderDoublePaymentReportPage extends OnlineReportPage {
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
-            logger.error("Error in build preorder check report: ", e);
+            logger.error("Error in build preorder double payment report: ", e);
         } finally {
             HibernateUtils.rollback(transaction, logger);
             HibernateUtils.close(session, logger);
@@ -112,9 +112,9 @@ public class PreorderDoublePaymentReportPage extends OnlineReportPage {
         List<Order> list = query.list();
         for (Order order : list) {
             String add = order.getCompositeIdOfOrder().getIdOfOrder() + " - " + CalendarUtils.dateTimeToString(order.getOrderDate());
-            result += add + "&lt;br /&gt;";
+            result += add + "<br />";
         }
-        if (result.length() > 0) result = result.substring(9, result.length() - 12);
+        if (result.length() > 0) result = result.substring(9, result.length() - 5);
         return result;
     }
 
