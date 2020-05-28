@@ -960,6 +960,10 @@
         <%--@elvariable id="preorderCheckReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreorderCheckReportPage"--%>
         <rich:panelMenuItem id="preorderCheckMenuItem" binding="#{preorderCheckReportPage.mainMenuComponent}"
                             label="Проверка создания заявок по предзаказу" action="#{preorderCheckReportPage.show}" reRender="workspaceForm" />
+
+        <%--@elvariable id="preorderDoublePaymentReportPage" type="ru.axetta.ecafe.processor.web.ui.report.online.PreorderDoublePaymentReportPage"--%>
+        <rich:panelMenuItem id="preorderDoublePaymentMenuItem" binding="#{preorderDoublePaymentReportPage.mainMenuComponent}"
+                            label="Проверка двойных оплат" action="#{preorderDoublePaymentReportPage.show}" reRender="workspaceForm" />
     </rich:panelMenuGroup>
 
     <rich:panelMenuItem id="empInfo" binding="#{mainPage.empInfoPage.mainMenuComponent}"
