@@ -67,7 +67,29 @@ public class PreorderDoublePaymentReportPage extends OnlineReportPage {
                     + "join cf_clientgroups cg on c.idoforg = cg.idoforg and c.idofclientgroup = cg.idofclientgroup "
                     + "where pc.deletedState = 0 and pc.preorderDate between :startDate and :endDate "
                     + "and pc.modeOfAdd <> :mode and pc.amount > 0 and pc.usedAmount > pc.amount "
-                    + "order by ctg.contragentName, pc.preorderDate");
+                    + "UNION "
+                    + "select ctg.contragentName, "
+                    + "pc.preorderDate, "
+                    + "pc.idOfPreorderComplex, "
+                    + "pc.idofclient, "
+                    + "p.surname, "
+                    + "p.firstname, "
+                    + "p.secondname, "
+                    + "cg.groupName, "
+                    + "pc.complexName, "
+                    + "pc.complexPrice, "
+                    + "pc.amount, "
+                    + "pc.usedSum, "
+                    + "pc.guid "
+                    + "from cf_preorder_complex pc join cf_orgs o on pc.idoforgoncreate = o.idoforg "
+                    + "join cf_preorder_menudetail pmd on pc.idofpreordercomplex = pmd.idofpreordercomplex "
+                    + "join cf_contragents ctg on o.defaultsupplier = ctg.idofcontragent "
+                    + "join cf_clients c on pc.idofclient = c.idofclient "
+                    + "join cf_persons p on c.idofperson = p.IdOfPerson "
+                    + "join cf_clientgroups cg on c.idoforg = cg.idoforg and c.idofclientgroup = cg.idofclientgroup "
+                    + "where pc.deletedState = 0 and pmd.deletedState = 0 and pc.preorderDate between :startDate and :endDate "
+                    + "and pc.modeOfAdd = :mode and pmd.amount > 0 and pmd.usedAmount > pmd.amount "
+                    + "order by 1, 2");
             query.setParameter("startDate", startDate.getTime());
             query.setParameter("endDate", endDate.getTime());
             query.setParameter("mode", PreorderComplex.COMPLEX_MODE_4);
@@ -111,10 +133,11 @@ public class PreorderDoublePaymentReportPage extends OnlineReportPage {
         query.setParameter("guid", guid);
         List<Order> list = query.list();
         for (Order order : list) {
-            String add = order.getCompositeIdOfOrder().getIdOfOrder() + " - " + CalendarUtils.dateTimeToString(order.getOrderDate());
+            String add = "[" + order.getCompositeIdOfOrder().getIdOfOrg() + ", " + order.getCompositeIdOfOrder().getIdOfOrder()
+                    + "] - " + CalendarUtils.dateTimeToString(order.getOrderDate());
             result += add + "<br />";
         }
-        if (result.length() > 0) result = result.substring(9, result.length() - 5);
+        if (result.length() > 0) result = result.substring(0, result.length() - 6);
         return result;
     }
 
