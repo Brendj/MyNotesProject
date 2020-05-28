@@ -2551,19 +2551,35 @@ public class PreorderDAOService {
         return wtComplexes;
     }
 
-    public Set<WtComplex> getFreeWtComplexesByDiscountRules (Date startDate, Date endDate,
+    public Set<WtComplex> getFreeWtComplexesByDiscountRules (Date startDate, Date endDate, Org org,
             Set<WtDiscountRule> wtDiscountRuleSet) {
         Set<WtComplex> wtComplexes = new HashSet<>();
+        Set<BigInteger> complexIds = new HashSet<>();
         for (WtDiscountRule rule : wtDiscountRuleSet) {
-            Query query = emReport.createQuery("SELECT complex FROM WtComplex complex WHERE complex.deleteState = 0 "
-                    + "AND complex.beginDate < :startDate AND complex.endDate > :endDate "
-                    + "AND :rule IN ELEMENTS(complex.discountRules)");
-            query.setParameter("rule", rule);
+            Query query = emReport.createNativeQuery(
+                    "select distinct c.idofcomplex from cf_wt_complexes c "
+                            + "left join cf_wt_discountrules_complexes dc on dc.idofcomplex = c.idofcomplex "
+                            + "left join cf_wt_discountrules_categoryorg dco on dco.idofrule = dc.idofrule "
+                            + "left join cf_categoryorg_orgs cor on cor.idofcategoryorg = dco.idofcategoryorg "
+                            + "where c.deleteState = 0 and c.beginDate < :startDate AND c.endDate > :endDate "
+                            + "and :idofrule = dc.idofrule and cor.idoforg = :idoforg");
+            query.setParameter("idofrule", rule.getIdOfRule());
+            query.setParameter("idoforg", org.getIdOfOrg());
             query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
             query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
-            List<WtComplex> res = query.getResultList();
+            List<BigInteger> res = query.getResultList();
             if (res != null && res.size() > 0) {
-                wtComplexes.addAll(res);
+                complexIds.addAll(res);
+            }
+        }
+        if (!complexIds.isEmpty()) {
+            WtComplex complex;
+            for (BigInteger id : complexIds) {
+                complex = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getWtComplexById(id.longValue());
+                if (complex != null) {
+                    wtComplexes.add(complex);
+                }
             }
         }
         return wtComplexes;
@@ -2675,10 +2691,13 @@ public class PreorderDAOService {
         Date currentDate = startComplexDate;
         int count = startComplexDay;
         WtComplexesItem res = null;
+        if (endComplexDate.getTime() < date.getTime()) {
+            return null;    // Дата не входит в цикл
+        }
 
         if (wtComplex.getCycleMotion() != null) {   // комплекс настроен
             // Составляем карту дней цикла
-            while (currentDate.getTime() <= endComplexDate.getTime() && currentDate.getTime() <= date.getTime()) {
+            while (currentDate.getTime() <= date.getTime()) {
                 calendar.setTime(currentDate);
                 // смотрим рабочую неделю
                 if ((wtComplex.getCycleMotion() == 0 &&     // 5-дневная рабочая неделя
@@ -2688,7 +2707,7 @@ public class PreorderDAOService {
                         calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
                     // проверка, выпадает ли день на выходные
                     Contragent contragent = DAOReadonlyService.getInstance().findDefaultSupplier(org.getIdOfOrg());
-                    Boolean isHoliday = DAOReadonlyService.getInstance().checkExcludeDays(currentDate, contragent, org);
+                    Boolean isHoliday = DAOReadonlyService.getInstance().checkExcludeDays(currentDate, wtComplex);
                     if (!isHoliday) {
                         cycleDates.put(currentDate, count++);
                     }
@@ -2703,7 +2722,6 @@ public class PreorderDAOService {
                     }
                 }
             }
-
             Integer cycleDay = cycleDates.get(date);
             res = getWtComplexItemByComplexAndCycleDay(wtComplex, cycleDay);
         }

@@ -990,17 +990,12 @@ public class DAOReadonlyService {
         return result != null ? ((BigInteger) result).longValue() : 0L;
     }
 
-    public Boolean checkExcludeDays(Date date, Contragent contragent, Org org) {
+    public Boolean checkExcludeDays(Date date, WtComplex wtComplex) {
         try {
-            Query query = entityManager.createQuery(
-                    "SELECT excludeDays from WtComplexExcludeDays excludeDays "
-                            + "LEFT JOIN FETCH excludeDays.complex complex "
-                            + "LEFT JOIN FETCH complex.wtOrgGroup orgGroup "
-                            + "WHERE complex.contragent = :contragent "
-                            + "AND (:org IN elements(complex.orgs) "
-                            + "OR :org IN elements(orgGroup.orgs))");
-            query.setParameter("contragent", contragent);
-            query.setParameter("org", org);
+            Query query = entityManager.createQuery("SELECT excludeDays from WtComplexExcludeDays excludeDays "
+                            + "WHERE excludeDays.complex = :complex "
+                            + "AND excludeDays.deleteState = 0");
+            query.setParameter("complex", wtComplex);
             List<WtComplexExcludeDays> excludeDays = query.getResultList();
 
             if (excludeDays != null) {

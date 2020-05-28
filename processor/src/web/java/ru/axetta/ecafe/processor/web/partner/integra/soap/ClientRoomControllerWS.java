@@ -2919,7 +2919,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         if (wtDiscountRuleSet.size() > 0) {
                             Set<WtComplex> wtDiscComplexes = RuntimeContext.getAppContext()
                                     .getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByDiscountRules(menuDate, menuDate, wtDiscountRuleSet);
+                                    .getFreeWtComplexesByDiscountRules(menuDate, menuDate, org, wtDiscountRuleSet);
                             if (wtDiscComplexes.size() > 0) {
                                 wtComplexes.addAll(wtDiscComplexes);
                             }
