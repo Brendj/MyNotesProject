@@ -112,9 +112,9 @@ public class PreorderDoublePaymentReportPage extends OnlineReportPage {
         List<Order> list = query.list();
         for (Order order : list) {
             String add = order.getCompositeIdOfOrder().getIdOfOrder() + " - " + CalendarUtils.dateTimeToString(order.getOrderDate());
-            result += add + "<br/>";
+            result += add + "&lt;br /&gt;";
         }
-        if (result.length() > 0) result = result.substring(9, result.length() - 5);
+        if (result.length() > 0) result = result.substring(9, result.length() - 12);
         return result;
     }
 
