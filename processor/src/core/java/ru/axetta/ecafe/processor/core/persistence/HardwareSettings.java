@@ -12,7 +12,6 @@ import java.util.Set;
 public class HardwareSettings implements Serializable {
 
     private Set<HardwareSettingsMT> moduleTypes = new HashSet<HardwareSettingsMT>();
-    private Set<HardwareSettingsReaders> readers = new HashSet<HardwareSettingsReaders>();
     private Org org;
     private String ipHost;
     private Date lastUpdateForIPHost;
@@ -29,15 +28,6 @@ public class HardwareSettings implements Serializable {
 
     public HardwareSettings() {
     }
-
-    //@Override
-    //public String toString() {
-    //    return "HardwareSettingsRequest{" + "idOfHardwareSetting=" + idOfHardwareSetting + ", ipHost" + ipHost
-    //            + ", lastUpdateForIpHost" + lastUpdateForIPHost + ", dotNetVer" + dotNetVer + ", lastUpdateForDotNetVer"
-    //            + ", oSVer" + oSVer + ", lastUpdateForOSVer" + lastUpdateForOSVer + ", ramSize" + ramSize
-    //            + ", lastUpdateForRamSize" + lastUpdateForRAMSize + ", cpuHost" + cpuHost + ", lastUpdateForCPUHost+ "
-    //            + lastUpdateForCPUHost + ",version" + version + ", idOfOrg='" + org.getIdOfOrg() + '}';
-    //}
 
     public Org getOrg() {
         return org;
@@ -141,14 +131,6 @@ public class HardwareSettings implements Serializable {
 
     public void setModuleTypes(Set<HardwareSettingsMT> moduleTypes) {
         this.moduleTypes = moduleTypes;
-    }
-
-    public Set<HardwareSettingsReaders> getReaders() {
-        return readers;
-    }
-
-    public void setReaders(Set<HardwareSettingsReaders> readers) {
-        this.readers = readers;
     }
 
     public CompositeIdOfHardwareSettings getCompositeIdOfHardwareSettings() {

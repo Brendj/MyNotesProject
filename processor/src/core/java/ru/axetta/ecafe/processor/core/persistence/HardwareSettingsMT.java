@@ -16,20 +16,13 @@ public class HardwareSettingsMT implements Serializable {
     private Date lastUpdate;
     private HardwareSettings hardwareSettings;
     private Long idOfModuleType;
+    private String readerName;
+    private String firmwareVer;
     private Set<HardwareSettingsMT> orgsInternal = new HashSet<HardwareSettingsMT>();
     private Long idOfHardwareSetting;
     private Long idOfOrg;
 
     public HardwareSettingsMT() {
-    }
-
-    public HardwareSettingsMT(Integer moduleType, Integer installStatus, Date lastUpdate,
-            HardwareSettings hardwareSettings, Long idOfModuleType) {
-        this.moduleType = moduleType;
-        this.installStatus = installStatus;
-        this.lastUpdate = lastUpdate;
-        this.hardwareSettings = hardwareSettings;
-        this.idOfModuleType = idOfModuleType;
     }
 
     public Integer getModuleType() {
@@ -94,5 +87,21 @@ public class HardwareSettingsMT implements Serializable {
 
     public void setIdOfOrg(Long idOfOrg) {
         this.idOfOrg = idOfOrg;
+    }
+
+    public String getReaderName() {
+        return readerName;
+    }
+
+    public void setReaderName(String readerName) {
+        this.readerName = readerName;
+    }
+
+    public String getFirmwareVer() {
+        return firmwareVer;
+    }
+
+    public void setFirmwareVer(String firmwareVer) {
+        this.firmwareVer = firmwareVer;
     }
 }

@@ -6,7 +6,6 @@ package ru.axetta.ecafe.processor.core.sync.handlers.hardwaresettings.request;
 
 import ru.axetta.ecafe.processor.core.persistence.CompositeIdOfHardwareSettings;
 import ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT;
-import ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
@@ -17,7 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardwareSettingsRequest> {
 
@@ -31,6 +32,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
     }
 
     public ResHardwareSettingsRequest process() {
+
         ResHardwareSettingsRequest result = new ResHardwareSettingsRequest();
 
         List<ResHardwareSettingsRequestItem> items = new ArrayList<ResHardwareSettingsRequestItem>();
@@ -44,8 +46,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
             for (List<HardwareSettingsRequestItem> sectionItem : hardwareSettingsRequest.getSectionItem()) {
                 ru.axetta.ecafe.processor.core.persistence.HardwareSettings hardwareSettings = null;
                 List<HardwareSettingsMT> tempMT = new ArrayList<>();
-                List<HardwareSettingsReaders> tempReaders = new ArrayList<>();
-
+                HashMap<Integer, HardwareSettingsMT> listMT = new HashMap<Integer, HardwareSettingsMT>();
                 for (HardwareSettingsRequestItem item : sectionItem) {
                     String moduleType = item.getType();
                     errorFound = !item.getResCode().equals(HardwareSettingsRequestItem.ERROR_CODE_ALL_OK);
@@ -60,7 +61,8 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                                     hardwareSettings = new ru.axetta.ecafe.processor.core.persistence.HardwareSettings();
                                     Org org = (Org) session.get(Org.class, orgOwner);
                                     hardwareSettings.setOrg(org);
-                                    CompositeIdOfHardwareSettings compositeIdOfHardwareSettings = new ru.axetta.ecafe.processor.core.persistence.CompositeIdOfHardwareSettings(orgOwner, hsItem.getIdOfHardwareSetting());
+                                    CompositeIdOfHardwareSettings compositeIdOfHardwareSettings = new ru.axetta.ecafe.processor.core.persistence.CompositeIdOfHardwareSettings(
+                                            orgOwner, hsItem.getIdOfHardwareSetting());
                                     hardwareSettings.setCompositeIdOfHardwareSettings(compositeIdOfHardwareSettings);
                                 }
                             } else {
@@ -75,7 +77,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                                 settingsMT.setModuleType(mtItem.getValue());
                                 settingsMT.setInstallStatus(mtItem.getInstallStatus());
                                 settingsMT.setLastUpdate(mtItem.getLastUpdate());
-                                tempMT.add(settingsMT);
+                                listMT.put(settingsMT.getModuleType(), settingsMT);
                             } else {
                                 errorMessage.append("Section MT not found ");
                                 status = 0;
@@ -136,12 +138,12 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         case "CR":
                             if (!errorFound && hardwareSettings != null) {
                                 HardwareSettingsRequestCRItem crItem = (HardwareSettingsRequestCRItem) item;
-                                HardwareSettingsReaders settingsReaders = new HardwareSettingsReaders();
-                                settingsReaders.setUsedByModule(crItem.getUsedByModule());
-                                settingsReaders.setReaderName(crItem.getReaderName());
-                                settingsReaders.setFirmwareVer(crItem.getFirmwareVer());
-                                settingsReaders.setLastUpdateForReader(crItem.getLastUpdate());
-                                tempReaders.add(settingsReaders);
+
+                                HardwareSettingsMT tempCR = listMT
+                                        .get(((HardwareSettingsRequestCRItem) item).getUsedByModule());
+                                tempCR.setReaderName(crItem.getReaderName());
+                                tempCR.setFirmwareVer(crItem.getFirmwareVer());
+                                listMT.put(crItem.getUsedByModule(), tempCR);
                             } else {
                                 errorMessage.append("Section CR not found ");
                                 status = 0;
@@ -151,35 +153,24 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                 }
                 hardwareSettings.setVersion(nextVersion);
                 session.save(hardwareSettings);
-                for (HardwareSettingsMT mt : tempMT) {
+
+                for (Map.Entry<Integer, HardwareSettingsMT> entry : listMT.entrySet()) {
                     ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT hardwareSettingsMT;
-                    hardwareSettingsMT = DAOUtils
-                            .getHardwareSettingsMTByIdAndModuleType(session, hardwareSettings.getCompositeIdOfHardwareSettings(),mt.getModuleType());
+                    hardwareSettingsMT = DAOUtils.getHardwareSettingsMTByIdAndModuleType(session,
+                            hardwareSettings.getCompositeIdOfHardwareSettings(), entry.getValue().getModuleType());
 
                     if (null == hardwareSettingsMT) {
                         hardwareSettingsMT = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT();
                     }
                     hardwareSettingsMT.setHardwareSettings(hardwareSettings);
-                    hardwareSettingsMT.setModuleType(mt.getModuleType());
-                    hardwareSettingsMT.setInstallStatus(mt.getInstallStatus());
-                    hardwareSettingsMT.setLastUpdate(mt.getLastUpdate());
+                    hardwareSettingsMT.setModuleType(entry.getValue().getModuleType());
+                    hardwareSettingsMT.setInstallStatus(entry.getValue().getInstallStatus());
+                    hardwareSettingsMT.setLastUpdate(entry.getValue().getLastUpdate());
+                    hardwareSettingsMT.setFirmwareVer(entry.getValue().getFirmwareVer());
+                    hardwareSettingsMT.setReaderName(entry.getValue().getReaderName());
                     session.save(hardwareSettingsMT);
                 }
 
-                for (HardwareSettingsReaders readers : tempReaders) {
-                    ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders hardwareSettingsReaders;
-                    hardwareSettingsReaders = DAOUtils.getHardwareSettingsReadersByIdAndUsedByModule(session,
-                            hardwareSettings.getCompositeIdOfHardwareSettings(), readers.getUsedByModule());
-                    if (null == hardwareSettingsReaders) {
-                        hardwareSettingsReaders = new ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders();
-                    }
-                    hardwareSettingsReaders.setHardwareSettings(hardwareSettings);
-                    hardwareSettingsReaders.setUsedByModule(readers.getUsedByModule());
-                    hardwareSettingsReaders.setReaderName(readers.getReaderName());
-                    hardwareSettingsReaders.setFirmwareVer(readers.getFirmwareVer());
-                    hardwareSettingsReaders.setLastUpdateForReader(readers.getLastUpdateForReader());
-                    session.save(hardwareSettingsReaders);
-                }
                 items.add(new ResHardwareSettingsRequestItem(status, errorMessage.toString()));
             }
         } catch (Exception e) {

@@ -21,13 +21,6 @@
             </key>
             <one-to-many class="ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT"/>
         </set>
-        <set name="readers" cascade="none" mutable="false">
-            <key>
-                <column name="IdOfOrg"/>
-                <column name="IdOfHardwareSetting"/>
-            </key>
-            <one-to-many class="ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders"/>
-        </set>
         <property name="ipHost" column="ipHost" type="string" length="64" not-null="true"/>
         <property name="lastUpdateForIPHost" column="LastUpdateForIPHost"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
@@ -48,9 +41,5 @@
         <property name="lastUpdateForCPUHost" column="LastUpdateForCPUHost"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
         <property name="version" column="Version" type="long"/>
-        <!--<set name="readers" lazy="true" inverse="true" cascade="all">-->
-        <!--<key column="IdOfReader"/>-->
-        <!--<one-to-many class="ru.axetta.ecafe.processor.core.persistence.HardwareSettingsReaders"/>-->
-        <!--</set>-->
     </class>
 </hibernate-mapping>

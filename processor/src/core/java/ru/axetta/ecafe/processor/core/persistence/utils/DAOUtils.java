@@ -5020,12 +5020,4 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("moduleType", moduleType));
         return (HardwareSettingsMT) criteria.uniqueResult();
     }
-
-    public static HardwareSettingsReaders getHardwareSettingsReadersByIdAndUsedByModule(Session session, CompositeIdOfHardwareSettings compositeIdOfHardwareSettings, Integer usedByModule)
-            throws Exception {
-        Criteria criteria = session.createCriteria(HardwareSettingsReaders.class).createAlias("hardwareSettings","hs", JoinType.FULL_JOIN);
-        criteria.add(Restrictions.eq("hs.compositeIdOfHardwareSettings",compositeIdOfHardwareSettings));
-        criteria.add(Restrictions.eq("usedByModule", usedByModule));
-        return (HardwareSettingsReaders) criteria.uniqueResult();
-    }
 }

@@ -20,5 +20,7 @@
         <property name="lastUpdate" column="LastUpdate"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType"
                   not-null="true" length="64" update="true"/>
+        <property name="readerName" column="ReaderName" type="string" not-null="true" length="64"/>
+        <property name="firmwareVer" column="FirmwareVer" type="string" length="64"/>
     </class>
 </hibernate-mapping>

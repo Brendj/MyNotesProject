@@ -10,10 +10,7 @@ import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.HardwareSettings;
-import ru.axetta.ecafe.processor.core.persistence.Org;
-import ru.axetta.ecafe.processor.core.persistence.OrgSync;
-import ru.axetta.ecafe.processor.core.persistence.TurnstileSettings;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.report.BasicReportForAllOrgJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportForListOrgsJob;
 import ru.axetta.ecafe.processor.core.report.BasicReportJob;
@@ -22,7 +19,6 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
-import org.hibernate.Query;
 import org.hibernate.SQLQuery;
 import org.hibernate.Session;
 import org.hibernate.criterion.Order;
@@ -35,6 +31,10 @@ import java.util.*;
 
 public class HardwareSettingsReport extends BasicReportForListOrgsJob {
 
+    private static final int ADMINISTRATOR = 0;
+    private static final int FEEDING = 1;
+    private static final int GUARD = 2;
+    private static final int INFO = 3;
     private Logger logger = LoggerFactory.getLogger(HardwareSettingsReport.class);
 
     private HardwareSettingsReport(Date generateTime, long generateDuration, JasperPrint print, Date startTime,
@@ -99,7 +99,6 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
             parameterMap.put(SELECTED_INFO_RAPAM, showInfo);
             parameterMap.put(SELECTED_TURNSTILES_PARAM, showTurnstiles);
 
-
             JRDataSource dataSource = createDataSource(session, selectedStatus, selectedDistrict, idOfOrgList,
                     allFriendlyOrgs);
 
@@ -155,88 +154,60 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
 
             for (Org org : orgs) {
 
-                List<HardwareSettingsReportItem> tempList = new ArrayList<HardwareSettingsReportItem>();
-
                 Criteria hardwareSettingsCriteria = persistenceSession.createCriteria(HardwareSettings.class);
                 hardwareSettingsCriteria.add(Restrictions.eq("org.idOfOrg", org.getIdOfOrg()));
                 List<HardwareSettings> listOfSettings = hardwareSettingsCriteria.list();
 
                 Criteria orgSyncCriteria = persistenceSession.createCriteria(OrgSync.class);
                 orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
+                orgSyncCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
                 List<OrgSync> listOfOrgSync = orgSyncCriteria.list();
 
                 OrgSync orgSync = getOrgSyncByOrg(listOfOrgSync, org);
+                if (orgSync != null) {
+                    for (HardwareSettings settings : listOfSettings) {
+                        HardwareSettingsReportItem item = new HardwareSettingsReportItem();
 
-                for (HardwareSettings settings : listOfSettings) {
-                    Query query = persistenceSession.createSQLQuery(
-                            "select hs.iphost, hs.dotnetver, hs.osver, hs.ramsize, hs.cpuhost, "
-                                    + "(select r1.readername as readernameou from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 0), "
-                                    + "(select r1.firmwarever as firmwareversionou from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 0), "
-                                    + "(select r1.readername as readernamefeeding from  cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 1), "
-                                    + "(select r1.firmwarever as firmwareversionfeeding from  cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 1), "
-                                    + "(select r1.readername as readernameguard from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 2), "
-                                    + "(select r1.firmwarever as firmwareversionguard from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 2), "
-                                    + "(select r1.readername as readernameinfo from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 3), "
-                                    + "(select r1.firmwarever as firmwareversioninfo  from cf_hardware_settings_readers r1 where r1.idofhardwaresetting = hs.idofhardwaresetting and r1.idoforg = hs.idoforg and r1.usedbymodule = 3) "
-                                    + " from cf_hardware_settings hs "
-                                    + "where hs.idoforg = :idOfOrg and hs.idofhardwaresetting = :idOfHardwareSetting ");
+                        item.setOrgNumberInName(orgSync.getOrg().getOrgNumberInName());
+                        item.setIdOfOrg(orgSync.getIdOfOrg());
+                        item.setShortName(orgSync.getOrg().getShortName());
+                        item.setShortNameInfoService(orgSync.getOrg().getShortNameInfoService());
+                        item.setDistrict(orgSync.getOrg().getDistrict());
+                        item.setShortAddress(orgSync.getOrg().getShortAddress());
+                        item.setOrgType(orgSync.getOrg().getType().toString());
+                        item.setSqlVersion(orgSync.getSqlServerVersion());
+                        item.setClientVersion(orgSync.getClientVersion());
+                        item.setDataBaseSize(orgSync.getDatabaseSize());
 
-                    query.setParameter("idOfOrg", settings.getOrg().getIdOfOrg());
-                    query.setParameter("idOfHardwareSetting",
-                            settings.getCompositeIdOfHardwareSettings().getIdOfHardwareSetting());
+                        item.setRemoteAddress(settings.getIpHost());
+                        item.setDotNetVersion(settings.getDotNetVer());
+                        item.setOsVersion(settings.getDotNetVer());
+                        item.setRamSize(settings.getRamSize());
+                        item.setCpuVersion(settings.getCpuHost());
 
-                    List list = query.list();
-
-                    for (Object o : list) {
-                        Object[] values = (Object[]) o;
-                        if (orgSync != null) {
-                            HardwareSettingsReportItem item = new HardwareSettingsReportItem(orgSync, true);
-
-                            item.setRemoteAddressOU((String) values[0]);
-                            item.setRemoteAddressFeeding((String) values[0]);
-                            item.setRemoteAddressGuard((String) values[0]);
-                            item.setRemoteAddressInfo((String) values[0]);
-
-                            item.setDotNetVersionOU((String) values[1]);
-                            item.setDotNetVersionFeeding((String) values[1]);
-                            item.setDotNetVersionGuard((String) values[1]);
-                            item.setDotNetVersionInfo((String) values[1]);
-
-                            item.setOsVersionOU((String) values[2]);
-                            item.setOsVersionFeeding((String) values[2]);
-                            item.setOsVersionGuard((String) values[2]);
-                            item.setOsVersionInfo((String) values[2]);
-
-                            item.setRamSizeOU((String) values[3]);
-                            item.setRamSizeFeeding((String) values[3]);
-                            item.setRamSizeGuard((String) values[3]);
-                            item.setRamSizeInfo((String) values[3]);
-
-                            item.setCpuVersionOU((String) values[4]);
-                            item.setCpuVersionFeeding((String) values[4]);
-                            item.setCpuVersionGuard((String) values[4]);
-                            item.setCpuVersionInfo((String) values[4]);
-
-                            item.setReaderNameOU((String) values[5]);
-                            if (values[6] != null) {
-                                item.setFirmwareVersionOU((String) values[6]);
+                        Set<HardwareSettingsMT> innerList = settings.getModuleTypes();
+                        for (HardwareSettingsMT mt : innerList) {
+                            Integer moduleType = mt.getModuleType();
+                            switch (moduleType) {
+                                case (ADMINISTRATOR):
+                                    item.setReaderNameOU(mt.getReaderName());
+                                    item.setFirmwareVersionOU(mt.getFirmwareVer());
+                                    break;
+                                case (FEEDING):
+                                    item.setReaderNameFeeding(mt.getReaderName());
+                                    item.setFirmwareVersionFeeding(mt.getFirmwareVer());
+                                    break;
+                                case (GUARD):
+                                    item.setReaderNameGuard(mt.getReaderName());
+                                    item.setFirmwareVersionGuard(mt.getFirmwareVer());
+                                    break;
+                                case (INFO):
+                                    item.setReaderNameInfo(mt.getReaderName());
+                                    item.setFirmwareVersionInfo(mt.getFirmwareVer());
+                                    break;
                             }
-
-                            item.setReaderNameFeeding((String) values[7]);
-                            if (values[8] != null) {
-                                item.setFirmwareVersionFeeding((String) values[8]);
-                            }
-
-                            item.setReaderNameGuard((String) values[9]);
-                            if (values[10] != null) {
-                                item.setFirmwareVersionGuard((String) values[10]);
-                            }
-                            item.setRemoteAddressInfo((String) values[11]);
-                            if (values[12] != null) {
-                                item.setFirmwareVersionInfo((String) values[12]);
-                            }
-                            result.add(item);
                         }
+                        result.add(item);
                     }
                 }
 
@@ -260,7 +231,7 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
                                 item.setIsWorkWithLongIds(turnstileSettingsList.get(i).getIsReadsLongIdsIncorrectly());
                                 item.setTimeCoefficient(turnstileSettingsList.get(i).getTimeCoefficient());
                             } else {
-                                HardwareSettingsReportItem tempItem = new HardwareSettingsReportItem(orgSync, false);
+                                HardwareSettingsReportItem tempItem = new HardwareSettingsReportItem();
                                 tempItem.setTurnstileId(turnstileSettingsList.get(i).getTurnstileId());
                                 tempItem.setNumOfEntries(turnstileSettingsList.get(i).getNumOfEntries());
                                 tempItem.setNumOfTurnstile(turnstileSettingsList.size());
@@ -295,20 +266,6 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
                 }
             }
             return result;
-        }
-
-
-        private static HardwareSettings getSettingByOrg(List<HardwareSettings> settings, Org org) {
-            if (CollectionUtils.isEmpty(settings)) {
-                return null;
-            }
-            for (HardwareSettings setting : settings) {
-                Set<Org> setOrg = setting.getOrg().getFriendlyOrg();
-                if (setOrg.contains(org)) {
-                    return setting;
-                }
-            }
-            return null;
         }
 
         private static OrgSync getOrgSyncByOrg(List<OrgSync> listOfOrgSync, Org org) {
