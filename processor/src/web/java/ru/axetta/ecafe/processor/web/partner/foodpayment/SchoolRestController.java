@@ -28,10 +28,18 @@ public class SchoolRestController {
 
     private Logger logger = LoggerFactory.getLogger(SchoolRestController.class);
 
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "test")
+    public Response test() {
+        return Response.status(HttpURLConnection.HTTP_OK).build();
+    }
+
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "creategroup")
+    @Path(value = "createGroup")
     public Response createGroup(CreateGroupData createGroupData){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -64,7 +72,7 @@ public class SchoolRestController {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "grouplist")
+    @Path(value = "groupList")
     public Response groupList(@QueryParam(value = "token") String token, @QueryParam(value = "userId") Long userId,
             @QueryParam(value = "orgId") Long orgId){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -72,7 +80,7 @@ public class SchoolRestController {
         Transaction persistenceTransaction = null;
         IGroupManagementService groupManagementService;
         try{
-            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             ResponseGroups responseGroups = new ResponseGroups();
             groupManagementService = new GroupManagementService(persistenceSession);
@@ -111,7 +119,7 @@ public class SchoolRestController {
         Transaction persistenceTransaction = null;
         IGroupManagementService groupManagementService;
         try{
-            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
             ResponseEmployees responseEmployees = new ResponseEmployees();
@@ -141,7 +149,7 @@ public class SchoolRestController {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "editemployee")
+    @Path(value = "editEmployee")
     public Response editEmployee(EditEmployeeData editEmployeeData){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
