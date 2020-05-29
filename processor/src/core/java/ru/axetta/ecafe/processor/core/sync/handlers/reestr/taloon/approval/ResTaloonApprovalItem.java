@@ -68,11 +68,10 @@ public class ResTaloonApprovalItem {
         this.taloonNumber = taloon.getTaloonNumber();
         this.version = taloon.getVersion();
         this.deletedState = taloon.getDeletedState();
-        this.byWebSupplier = false;
         if (taloon.getComplexId() != null) {
             this.complexId = taloon.getComplexId();
         }
-        this.byWebSupplier = taloon.getByWebSupplier();
+        this.byWebSupplier = taloon.getByWebSupplier() == null ? false : taloon.getByWebSupplier();
     }
 
     public ResTaloonApprovalItem(TaloonApproval taloon, Integer ordersCount, Integer resCode) {
