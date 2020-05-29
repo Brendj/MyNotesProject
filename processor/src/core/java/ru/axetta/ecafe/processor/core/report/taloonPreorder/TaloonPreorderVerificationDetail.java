@@ -99,7 +99,6 @@ public class TaloonPreorderVerificationDetail {
     //        this.shippedQty = null;
     //    }
     //}
-
     //public String getStrShippedQty() {
     //    return strShippedQty;
     //}
@@ -228,6 +227,11 @@ public class TaloonPreorderVerificationDetail {
 
     public String getPpStateToTurnOnSecond() {
         return MAKE_CANCEL;
+    }
+
+    public String getChangedData() {
+        changedData = true;
+        return "changed";
     }
 
     public String getPpStateToClear() {

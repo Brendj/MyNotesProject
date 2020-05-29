@@ -239,7 +239,8 @@
                 <rich:column headerClass="column-header" width="4">
                     <h:inputTextarea value="#{detail.shippedQty}" styleClass="output-text" cols="4" rows="1"
                                      rendered="#{detail.enableEditShippedQty()}"
-                                     validatorMessage="Поле Отгрузка не может содержать более 4 символов">
+                                     validatorMessage="Поле Отгрузка не может содержать более 4 символов"
+                                     onchange="#{detail.changedData}">
                         <f:validateLength maximum="4"/>
                         <a4j:support event="onchange"/>
                     </h:inputTextarea>

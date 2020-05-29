@@ -63,9 +63,17 @@ public class TaloonPreorderVerification {
                         taloon.getRequestedQty(), (taloon.getPrice() == null || taloon.getRequestedQty() == null) ? 0
                         : taloon.getPrice() * taloon.getRequestedQty(), taloon.getSoldQty(),
                         (taloon.getPrice() == null || taloon.getSoldQty() == null) ? 0
-                                : taloon.getPrice() * taloon.getSoldQty(), taloon.getRequestedQty(),
-                        (taloon.getPrice() == null || taloon.getRequestedQty() == null) ? 0
-                                : taloon.getPrice() * taloon.getRequestedQty(), taloon.getReservedQty(),
+                                : taloon.getPrice() * taloon.getSoldQty(),
+
+                        // Отгрузка
+                        //taloon.getRequestedQty(),
+                        //(taloon.getPrice() == null || taloon.getRequestedQty() == null) ? 0
+                        //        : taloon.getPrice() * taloon.getRequestedQty(),
+                        taloon.getShippedQty(),
+                        (taloon.getPrice() == null || taloon.getShippedQty() == null) ? 0
+                                : taloon.getPrice() * taloon.getShippedQty(),
+
+                        taloon.getReservedQty(),
                         (taloon.getPrice() == null || taloon.getReservedQty() == null) ? 0
                                 : taloon.getPrice() * taloon.getReservedQty(), taloon.getBlockedQty(),
                         (taloon.getPrice() == null || taloon.getBlockedQty() == null) ? 0
@@ -170,7 +178,6 @@ public class TaloonPreorderVerification {
                             if (itemChangedNullSafe(taloon.getShippedQty(), detail.getShippedQty()) ||
                                     !taloon.getPpState().equals(detail.getPpState()) ||
                                     itemChangedNullSafe(taloon.getComments(), detail.getComments())) {
-                                detail.setChangedData(true);
                                 String rem = (taloon.getRemarks() == null ? "-" : taloon.getRemarks());
                                 taloon.setRemarks(rem.concat("\n").concat(String
                                         .format("Изменено в АРМ отчетности, пользователь %s, %2$td.%2$tm.%2$tY %2$tT",

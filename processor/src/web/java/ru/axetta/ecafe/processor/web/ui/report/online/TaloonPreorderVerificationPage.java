@@ -46,7 +46,7 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
     private TaloonPreorderVerificationItem currentTaloonPreorderVerificationItem;
     private String currentState;
     private String remarksToShow;
-    private Boolean changedData = false;
+    private Boolean changedData;
 
     private static final Logger logger = LoggerFactory.getLogger(TaloonPreorderVerificationPage.class);
 
