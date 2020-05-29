@@ -24,9 +24,9 @@ import java.util.List;
 
 @Path(value = "")
 @Controller
-public class GroupManagementRestController {
+public class SchoolRestController {
 
-    private Logger logger = LoggerFactory.getLogger(GroupManagementRestController.class);
+    private Logger logger = LoggerFactory.getLogger(SchoolRestController.class);
 
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
