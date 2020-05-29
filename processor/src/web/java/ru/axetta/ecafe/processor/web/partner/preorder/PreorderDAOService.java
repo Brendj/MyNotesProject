@@ -2468,7 +2468,8 @@ public class PreorderDAOService {
             return null;
         }
         Query query = emReport.createQuery("SELECT discountRule FROM WtDiscountRule discountRule "
-                + "WHERE :categoryDiscount IN ELEMENTS(discountRule.categoryDiscounts)");
+                + "WHERE :categoryDiscount IN ELEMENTS(discountRule.categoryDiscounts) "
+                + "AND discountRule.categoryDiscounts.size = 1");
         query.setParameter("categoryDiscount", elemDiscount);
         List<WtDiscountRule> res = query.getResultList();
         if (res != null && res.size() > 0) {
