@@ -80,7 +80,7 @@ public class SchoolRestController {
         Transaction persistenceTransaction = null;
         IGroupManagementService groupManagementService;
         try{
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             ResponseGroups responseGroups = new ResponseGroups();
             groupManagementService = new GroupManagementService(persistenceSession);
@@ -119,7 +119,7 @@ public class SchoolRestController {
         Transaction persistenceTransaction = null;
         IGroupManagementService groupManagementService;
         try{
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
             ResponseEmployees responseEmployees = new ResponseEmployees();
