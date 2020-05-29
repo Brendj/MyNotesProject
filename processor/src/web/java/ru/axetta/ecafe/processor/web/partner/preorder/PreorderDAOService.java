@@ -2561,9 +2561,10 @@ public class PreorderDAOService {
         if (ageGroupIds != null && ageGroupIds.size() > 0) {
             for (Long ageGroupId : ageGroupIds) {
                 Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
+                        + "LEFT JOIN complex.wtOrgGroup orgGroup "
                         + "WHERE complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId AND complex.deleteState = 0 "
                         + "AND complex.beginDate < :startDate AND complex.endDate > :endDate "
-                        + "AND :org IN ELEMENTS(complex.orgs) "
+                        + "AND (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs)) "
                         + "AND (complex.wtComplexGroupItem.idOfComplexGroupItem = :paidComplex OR "
                         + "complex.wtComplexGroupItem.idOfComplexGroupItem = :allComplexes)");
                 query.setParameter("ageGroupId", ageGroupId);
