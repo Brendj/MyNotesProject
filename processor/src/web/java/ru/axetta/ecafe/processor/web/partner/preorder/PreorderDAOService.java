@@ -753,7 +753,7 @@ public class PreorderDAOService {
         if (day <= PreorderRequestsReportService.DAY_PREORDER_CHECK) {
             dateFrom = CalendarUtils.getFirstDayOfPrevMonth(currentDate);
         }
-        dateFrom = CalendarUtils.startOfDay(dateFrom);
+        dateFrom = CalendarUtils.startOfDayInUTC(dateFrom);
 
         List<Date> weekends = GoodRequestsChangeAsyncNotificationService.getInstance().getProductionCalendarDates(currentDate);
         Integer maxDays = RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class)
