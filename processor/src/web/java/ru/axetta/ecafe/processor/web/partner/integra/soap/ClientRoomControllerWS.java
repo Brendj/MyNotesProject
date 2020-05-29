@@ -2829,6 +2829,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     logger.error(RC_CLIENT_NO_LONGER_ACTIVE);
                     result.resultCode = RC_INTERNAL_ERROR;
                     result.description = RC_CLIENT_NO_LONGER_ACTIVE;
+                    return result;
                 }
                 if (clientGroupId < ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()) {
 
