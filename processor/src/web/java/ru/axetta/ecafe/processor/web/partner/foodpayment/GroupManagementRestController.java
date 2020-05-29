@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.CreateGroupData;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.EditEmployeeData;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -38,8 +40,7 @@ public class GroupManagementRestController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "createGroup")
-    public Response createGroup(@QueryParam(value = "token") String token, @QueryParam(value = "userId") Long userId,
-            @QueryParam(value = "orgId") Long orgId, @QueryParam(value = "groupName") String groupName){
+    public Response createGroup(CreateGroupData createGroupData){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -48,16 +49,18 @@ public class GroupManagementRestController {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
-            groupManagementService.addOrgGroup(orgId, groupName);
+            groupManagementService.addOrgGroup(createGroupData.getOrgId(), createGroupData.getGroupName());
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
             return Response.status(HttpURLConnection.HTTP_CREATED).entity(new Result(0, "Ok")).build();
         }
         catch (RequestProcessingException e){
+            logger.error(("Bad request: "+createGroupData.toString()+";"+e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
         catch (Exception e){
+            logger.error("Internal error: "+e.getMessage(), e);
             return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100, "Ошибка сервера")).build();
         }
         finally {
@@ -92,9 +95,11 @@ public class GroupManagementRestController {
 
         }
         catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s",token,userId, orgId, e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
         catch (Exception e){
+            logger.error("Internal error: "+e.getMessage(), e);
             return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(0, "Ошибка сервера")).build();
         }
         finally {
@@ -128,9 +133,11 @@ public class GroupManagementRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseEmployees).build();
         }
         catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s",token,userId, orgId, e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
         catch (Exception e){
+            logger.error("Internal error: "+e.getMessage(), e);
             return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
         }
         finally {
@@ -143,9 +150,7 @@ public class GroupManagementRestController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "editEmployee")
-    public Response editEmployee(@QueryParam(value = "token") String token, @QueryParam(value = "userId") Long userId,
-            @QueryParam(value = "orgId") Long orgId, @QueryParam(value = "groupName") String groupName,
-            @QueryParam(value = "contractId") Long contractId, @QueryParam(value = "status") Boolean status){
+    public Response editEmployee(EditEmployeeData editEmployeeData){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -154,16 +159,19 @@ public class GroupManagementRestController {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
-            groupManagementService.editEmployee(orgId, groupName, contractId, status);
+            groupManagementService.editEmployee(editEmployeeData.getOrgId(), editEmployeeData.getGroupName(),
+                    editEmployeeData.getContractId(), editEmployeeData.getStatus());
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
             return Response.status(HttpURLConnection.HTTP_OK).entity(new Result(0, "Ok")).build();
         }
         catch (RequestProcessingException e){
+            logger.error(("Bad request: "+editEmployeeData.toString()+";"+e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
         catch (Exception e){
+            logger.error("Internal error: "+e.getMessage(), e);
             return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100, "Ошибка сервера")).build();
         }
         finally {
