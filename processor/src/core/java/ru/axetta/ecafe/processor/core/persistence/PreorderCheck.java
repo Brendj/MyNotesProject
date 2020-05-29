@@ -18,13 +18,13 @@ public class PreorderCheck {
     public PreorderCheck() {
     }
 
-    public PreorderCheck(Date date, Long preorderAmount, Long goodRequestAmount) {
+    public PreorderCheck(Date date, Long preorderAmount, Long goodRequestAmount, boolean alarm) {
         this.date = date;
         this.preorderAmount = preorderAmount;
         this.goodRequestAmount = goodRequestAmount;
         this.createdDate = new Date();
         this.lastUpdate = new Date();
-        this.alarm = false;
+        this.alarm = alarm;
     }
 
     public Long getIdOfPreorderCheck() {

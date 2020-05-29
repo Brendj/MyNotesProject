@@ -767,27 +767,45 @@ public class PreorderDAOService {
     }
 
     private void dailyCheckOnDate(Date date) {
-        Query query = emReport.createQuery("select coalesce(sum(pc.amount + pmd.amount), 0) from PreorderComplex pc, "
-                + "PreorderMenuDetail pmd, Org o where pmd.preorderComplex = pc and o.idOfOrg = pc.idOfOrgOnCreate "
-                + "and pc.deletedState = false and pmd.deletedState = false "
+        Query query = emReport.createQuery("select coalesce(sum(pc.amount), 0) "
+                + "from PreorderComplex pc, Org o "
+                + "where o.idOfOrg = pc.idOfOrgOnCreate "
+                + "and pc.deletedState = false and pc.modeOfAdd <> :mode "
                 + "and pc.preorderDate = :date and upper(o.tag) not like '%ТЕСТ%' ");
         query.setParameter("date", date);
+        query.setParameter("mode", PreorderComplex.COMPLEX_MODE_4);
         Long preorderAmount = (Long)query.getSingleResult();
 
-        query = emReport.createQuery("select coalesce(count(pc.idOfGoodsRequestPosition), 0) as count1 from PreorderComplex pc, "
-                + "Org o where o.idOfOrg = pc.idOfOrgOnCreate and pc.deletedState = false and pc.idOfGoodsRequestPosition is not null "
+        query = emReport.createQuery("select coalesce(sum(pmd.amount), 0) "
+                + "from PreorderComplex pc, PreorderMenuDetail pmd, Org o "
+                + "where pmd.preorderComplex = pc and o.idOfOrg = pc.idOfOrgOnCreate "
+                + "and pc.deletedState = false and pmd.deletedState = false "
+                + "and pc.modeOfAdd = :mode "
+                + "and pc.preorderDate = :date and upper(o.tag) not like '%ТЕСТ%' ");
+        query.setParameter("date", date);
+        query.setParameter("mode", PreorderComplex.COMPLEX_MODE_4);
+        preorderAmount += (Long)query.getSingleResult();
+
+        query = emReport.createQuery("select coalesce(sum(pos.totalCount), 0) as count1 "
+                + "from PreorderComplex pc, Org o, GoodRequestPosition pos "
+                + "where o.idOfOrg = pc.idOfOrgOnCreate "
+                + "and pc.idOfGoodsRequestPosition = pos.globalId "
+                + "and pc.deletedState = false and pos.deletedState = false and pc.idOfGoodsRequestPosition is not null "
                 + "and pc.preorderDate = :date and upper(o.tag) not like '%ТЕСТ%' ");
         query.setParameter("date", date);
         Long pcAmount = (Long)query.getSingleResult();
 
-        query = emReport.createQuery("select coalesce(count(pmd.idOfGoodsRequestPosition), 0) from PreorderComplex pc, "
-                + "PreorderMenuDetail pmd, Org o where pmd.preorderComplex = pc and o.idOfOrg = pc.idOfOrgOnCreate "
-                + "and pc.deletedState = false and pmd.deletedState = false and pmd.idOfGoodsRequestPosition is not null "
+        query = emReport.createQuery("select coalesce(sum(pos.totalCount), 0) "
+                + "from PreorderComplex pc, PreorderMenuDetail pmd, Org o, GoodRequestPosition pos "
+                + "where pmd.preorderComplex = pc and o.idOfOrg = pc.idOfOrgOnCreate "
+                + "and pmd.idOfGoodsRequestPosition = pos.globalId "
+                + "and pc.deletedState = false and pmd.deletedState = false and pos.deletedState = false "
+                + "and pmd.idOfGoodsRequestPosition is not null "
                 + "and pc.preorderDate = :date and upper(o.tag) not like '%ТЕСТ%' ");
         query.setParameter("date", date);
         Long pmdAmount = (Long)query.getSingleResult();
 
-        Long goodRequestAmount = pcAmount + pmdAmount;
+        Long goodRequestAmount = (pcAmount + pmdAmount) / 1000L;
 
         query = em.createQuery("select pc from PreorderCheck pc where pc.date = :date order by createdDate desc");
         query.setParameter("date", date);
@@ -796,11 +814,10 @@ public class PreorderDAOService {
         try {
             preorderCheck = (PreorderCheck) query.getSingleResult();
         } catch (NoResultException e) {
-            preorderCheck = new PreorderCheck(date, preorderAmount, goodRequestAmount);
+            preorderCheck = new PreorderCheck(date, preorderAmount, goodRequestAmount, !preorderAmount.equals(goodRequestAmount));
         }
         if (!preorderAmount.equals(preorderCheck.getPreorderAmount()) || !goodRequestAmount.equals(preorderCheck.getGoodRequestAmount())) {
-            PreorderCheck preorderCheckNew = new PreorderCheck(date, preorderAmount, goodRequestAmount);
-            preorderCheckNew.setAlarm(true);
+            PreorderCheck preorderCheckNew = new PreorderCheck(date, preorderAmount, goodRequestAmount, true);
             preorderCheck.setAlarm(true);
             em.merge(preorderCheckNew);
         } else {
