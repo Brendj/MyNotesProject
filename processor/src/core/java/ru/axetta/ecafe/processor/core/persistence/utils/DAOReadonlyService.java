@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.sms.emp.EMPProcessor;
 import ru.axetta.ecafe.processor.core.sync.response.AccountTransactionExtended;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -92,6 +93,21 @@ public class DAOReadonlyService {
                 .addScalar("discountsum", StandardBasicTypes.BIG_DECIMAL).addScalar("ordertype")
                 .addScalar("idofclient");
         return q.list();
+    }
+
+    public List<Card> getCardsToBlock(Integer daysInactivity) {
+        Date date = CalendarUtils.addDays(new Date(), -daysInactivity);
+        Query query = entityManager.createNativeQuery("select ca.IdOfCard from cf_cards ca where ca.state = 0 and ca.issuedate < :date and ca.idofclient is not null "
+                + "and not exists (select idofcard from cf_card_activity caa where caa.idofcard = ca.idofcard and caa.lastupdate > :date)");
+        query.setParameter("date", date.getTime());
+        List list = query.getResultList();
+        List<Card> result = new ArrayList<Card>();
+        for (Object obj : list) {
+            Long idOfCard = HibernateUtils.getDbLong(obj);
+            Card card = entityManager.find(Card.class, idOfCard);
+            result.add(card);
+        }
+        return result;
     }
 
     public Org findOrg(Long idOfOrg) throws Exception {
@@ -753,7 +769,7 @@ public class DAOReadonlyService {
         }
     }
 
-    public Set<WtOrgGroup> getOrgGroupsSetFromVersion(Long version, Contragent contragent, Org org) {
+public Set<WtOrgGroup> getOrgGroupsSetFromVersion(Long version, Contragent contragent, Org org) {
         try {
             Query query = entityManager.createQuery(
                     "SELECT gr FROM WtOrgGroup gr " + "WHERE gr.version > :version AND gr.contragent = :contragent AND "
@@ -870,17 +886,11 @@ public class DAOReadonlyService {
 
     public Set<WtMenuGroup> getMenuGroupsSetFromVersion(Long version, Contragent contragent) {
         try {
-            //Query query = entityManager.createQuery(
-            //        "SELECT menuGroup from WtMenuGroup menuGroup left join menuGroup.menuGroupMenus menuGroupMenus "
-            //                + "left join menuGroupMenus.menu menu left join menu.orgs orgs "
-            //                + "where menuGroup.version > :version AND "
-            //                + "menuGroup.contragent = :contragent AND :org IN elements(orgs)");
             Query query = entityManager.createQuery(
                     "SELECT menuGroup from WtMenuGroup menuGroup where menuGroup.version > :version AND "
                             + "menuGroup.contragent = :contragent");
             query.setParameter("version", version);
             query.setParameter("contragent", contragent);
-            //query.setParameter("org", org);
             List<WtMenuGroup> menuGroups = query.getResultList();
             return new HashSet<>(menuGroups);
         } catch (Exception e) {
@@ -892,8 +902,12 @@ public class DAOReadonlyService {
 
     public Set<WtMenu> getMenusSetFromVersion(Long version, Contragent contragent, Org org) {
         try {
-            Query query = entityManager.createQuery("SELECT menu from WtMenu menu where menu.version > :version "
-                    + "AND menu.contragent = :contragent AND :org IN elements(menu.orgs)");
+            Query query = entityManager.createQuery("SELECT menu from WtMenu menu "
+                    + "LEFT JOIN FETCH menu.wtOrgGroup orgGroup "
+                    + "where menu.version > :version "
+                    + "AND menu.contragent = :contragent "
+                    + "AND (:org IN elements(menu.orgs) "
+                    + "OR :org IN elements(orgGroup.orgs))");
             query.setParameter("version", version);
             query.setParameter("contragent", contragent);
             query.setParameter("org", org);
@@ -988,5 +1002,41 @@ public class DAOReadonlyService {
 
         Object result = query.getSingleResult();
         return result != null ? ((BigInteger) result).longValue() : 0L;
+    }
+
+    public Set<WtComplexExcludeDays> getExcludeDaysSetFromVersion(Long version, Contragent contragent, Org org) {
+        try {
+            Query query = entityManager.createQuery(
+                    "SELECT excludeDays from WtComplexExcludeDays excludeDays "
+                            + "LEFT JOIN FETCH excludeDays.complex complex "
+                            + "LEFT JOIN FETCH complex.wtOrgGroup orgGroup "
+                            + "WHERE excludeDays.version > :version "
+                            + "AND complex.contragent = :contragent "
+                            + "AND (:org IN elements(complex.orgs) "
+                            + "OR :org IN elements(orgGroup.orgs))");
+            query.setParameter("version", version);
+            query.setParameter("contragent", contragent);
+            query.setParameter("org", org);
+            List<WtComplexExcludeDays> excludeDays = query.getResultList();
+            return new HashSet<>(excludeDays);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
+	
+	public boolean isSixWorkWeekOrg(Long orgId) {
+        boolean resultByOrg = false; //isSixWorkWeek(orgId);
+        try {
+            List<Boolean> list = entityManager.createQuery("select distinct gnto.isSixDaysWorkWeek from GroupNamesToOrgs gnto where gnto.idOfOrg = :idOfOrg")
+                    .setParameter("idOfOrg", orgId)
+                    .getResultList();
+            if (list.contains(Boolean.TRUE))
+                return true;
+            else
+                return false;
+        } catch (Exception e) {
+            return false;
+        }
     }
 }

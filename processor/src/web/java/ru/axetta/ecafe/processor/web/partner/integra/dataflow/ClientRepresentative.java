@@ -60,6 +60,9 @@ public class ClientRepresentative {
     @XmlAttribute(name = "OrgShortName")
     private String orgShortName;
 
+    @XmlAttribute(name = "roleRepresentative")
+    private Integer roleRepresentative;
+
     public Long getId() {
         return id;
     }
@@ -130,5 +133,13 @@ public class ClientRepresentative {
 
     public void setOrgShortName(String orgShortName) {
         this.orgShortName = orgShortName;
+    }
+
+    public Integer getRoleRepresentative() {
+        return roleRepresentative;
+    }
+
+    public void setRoleRepresentative(Integer roleRepresentative) {
+        this.roleRepresentative = roleRepresentative;
     }
 }

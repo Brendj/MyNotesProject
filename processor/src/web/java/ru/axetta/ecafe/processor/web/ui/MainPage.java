@@ -309,6 +309,8 @@ public class MainPage implements Serializable {
     private final BasicWorkspacePage spbGroupContingentPage = new BasicWorkspacePage();
     private final BasicWorkspacePage spbGroupPage = new BasicWorkspacePage();
     private final BasicWorkspacePage orgParametersGroup = new BasicWorkspacePage();
+    private final BasicWorkspacePage webTechnologistGroupPage = new BasicWorkspacePage();
+    private final BasicWorkspacePage webTechnologistCatalogGroupPage = new BasicWorkspacePage();
     private final SalesReportPage salesReportPage = new SalesReportPage();
     private final SyncReportPage syncReportPage = new SyncReportPage();
     private final StatusSyncReportPage statusSyncReportPage = new StatusSyncReportPage();
@@ -534,6 +536,14 @@ public class MainPage implements Serializable {
 
     public BasicWorkspacePage getOrgParametersGroup() {
         return orgParametersGroup;
+    }
+
+    public BasicWorkspacePage getWebTechnologistGroupPage() {
+        return webTechnologistGroupPage;
+    }
+
+    public BasicWorkspacePage getWebTechnologistCatalogGroupPage() {
+        return webTechnologistCatalogGroupPage;
     }
 
     public Object showAllOrgsDiscountReportPage() {
@@ -6425,6 +6435,18 @@ public class MainPage implements Serializable {
 
     public Object showOrgParametersGroupPage(){
         currentWorkspacePage = orgParametersGroup;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showWebTechnologistGroupPage(){
+        currentWorkspacePage = webTechnologistGroupPage;
+        updateSelectedMainMenu();
+        return null;
+    }
+
+    public Object showWebTechnologistCatalogGroupPage(){
+        currentWorkspacePage = webTechnologistCatalogGroupPage;
         updateSelectedMainMenu();
         return null;
     }

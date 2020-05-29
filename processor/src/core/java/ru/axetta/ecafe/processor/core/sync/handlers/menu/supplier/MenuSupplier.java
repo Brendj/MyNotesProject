@@ -30,7 +30,7 @@ public class MenuSupplier implements SectionRequest {
     protected static final String[] CLIENT_SECTION_NAMES = new String[]{
             "OrgGroupsRequest", "CategoryItemsRequest", "TypeProductionsRequest", "AgeGroupItemsRequest",
             "DietTypesRequest", "ComplexGroupItemsRequest", "GroupItemsRequest", "DishesRequest", "MenuGroupsRequest",
-            "MenusRequest", "ComplexesRequest"};
+            "MenusRequest", "ComplexesRequest", "ExcludeDaysRequest"};
 
     public static final String SECTION_NAME = "MenuSupplier";
 
@@ -52,6 +52,7 @@ public class MenuSupplier implements SectionRequest {
     private Set<WtMenuGroup> menuGroups = new HashSet<>();
     private Set<WtMenu> menus = new HashSet<>();
     private Set<WtComplex> complexes = new HashSet<>();
+    private Set<WtComplexExcludeDays> excludeDays = new HashSet<>();
 
     private Integer resCode;
     private String errorMessage;
@@ -178,6 +179,11 @@ public class MenuSupplier implements SectionRequest {
                     }
                     break;
                 }
+                case "ExcludeDaysRequest": {
+                    excludeDays = DAOReadonlyService.getInstance().getExcludeDaysSetFromVersion(entry.getValue(),
+                            contragent, org);
+                    break;
+                }
             }
         }
     }
@@ -297,6 +303,14 @@ public class MenuSupplier implements SectionRequest {
 
     public void setComplexes(Set<WtComplex> complexes) {
         this.complexes = complexes;
+    }
+
+    public Set<WtComplexExcludeDays> getExcludeDays() {
+        return excludeDays;
+    }
+
+    public void setExcludeDays(Set<WtComplexExcludeDays> excludeDays) {
+        this.excludeDays = excludeDays;
     }
 
     public Integer getResCode() {
