@@ -2861,8 +2861,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                     isElem = true;
                                 } else if (PreorderDAOService.MIDDLE_SCHOOL.contains(parallelDesc)) {
                                     ageGroupIds.add(4L); // 5-11
+                                    ageGroupIds.add(7L); // Все
                                     isPaid = true;
                                 } else {
+                                    ageGroupIds.add(5L); // Колледж
                                     ageGroupIds.add(7L); // Все
                                     isPaid = true;
                                 }
@@ -2877,9 +2879,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                     isFree = true;
                                 } else if (PreorderDAOService.MIDDLE_SCHOOL.contains(parallelDesc)) {
                                     ageGroupIds.add(4L); // 5-11
+                                    ageGroupIds.add(7L); // Все
                                     isPaid = true;
                                     isFree = true;
                                 } else {
+                                    ageGroupIds.add(5L); // Колледж
                                     ageGroupIds.add(7L); // Все
                                     isPaid = true;
                                 }
@@ -2905,7 +2909,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                     Set<WtComplex> wtComplexes = new HashSet<>();
 
-                    // 6-9 Платные комплексы по возрастным группам и группам
+                    // 6-9, 12 Платные комплексы по возрастным группам и группам
                     if (isPaid) {
                         Set<WtComplex> wtComComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                 .getPaidWtComplexesByAgeGroups(menuDate, menuDate, ageGroupIds, org);
@@ -2932,11 +2936,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                     // 11 Льготные комплексы для начальной школы
                     if (isElem) {
-                        Set<WtDiscountRule> elemDiscRules = RuntimeContext.getAppContext()
-                                .getBean(PreorderDAOService.class).getWtElemDiscountRules();
+                        WtDiscountRule elemDiscRule = RuntimeContext.getAppContext()
+                                .getBean(PreorderDAOService.class).getWtElemDiscountRule();
                         Set<WtComplex> wtDiscComplexes = RuntimeContext.getAppContext()
                                 .getBean(PreorderDAOService.class)
-                                .getFreeWtComplexesForElem(menuDate, menuDate, org, elemDiscRules);
+                                .getFreeWtComplexesForElem(menuDate, menuDate, org, elemDiscRule);
                         if (wtDiscComplexes.size() > 0) {
                             wtComplexes.addAll(wtDiscComplexes);
                         }
@@ -2956,9 +2960,25 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                         .getWtDishesByComplexAndDates(wtComplex, menuDate, menuDate);
                             }
                             List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtDishes);
-                            MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(wtComplex, org, menuDate);
-                            menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
-                            list.add(menuWithComplexesExt);
+                            // Проверка типа питания
+                            int isDiscountComplex = wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem()
+                                    .intValue();
+                            switch(isDiscountComplex) {
+                                case 1:
+                                    getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
+                                    break;
+                                case 2:
+                                    getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 0);
+                                    break;
+                                case 3:
+                                    getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
+                                    getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 0);
+                                    break;
+                                default:
+                                    result.resultCode = RC_INTERNAL_ERROR;
+                                    result.description = RC_INTERNAL_ERROR_DESC;
+                                    return result;
+                            }
                         }
                     }
                 }
@@ -2979,6 +2999,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         result.description = RC_OK_DESC;
 
         return result;
+    }
+
+    private void getComplexExt(Org org, Date menuDate, List<MenuItemExt> menuItemExtList, WtComplex wtComplex,
+            List<MenuWithComplexesExt> list, int isDiscountComplex) {
+        MenuWithComplexesExt menuWithComplexesExt = new MenuWithComplexesExt(wtComplex, org, menuDate, isDiscountComplex);
+        menuWithComplexesExt.setMenuItemExtList(menuItemExtList);
+        list.add(menuWithComplexesExt);
     }
 
     public boolean isGoodDate(Session session, Long idOfOrg, Long idOfGroup, Date dateReq,  List<ProductionCalendar> productionCalendars) {

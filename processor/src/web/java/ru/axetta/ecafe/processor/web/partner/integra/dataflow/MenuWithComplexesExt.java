@@ -71,7 +71,7 @@ public class MenuWithComplexesExt {
         this.usedspecialmenu = complexInfo.getUsedSpecialMenu();
     }
 
-    public MenuWithComplexesExt(WtComplex wtComplex, Org org, Date date) {
+    public MenuWithComplexesExt(WtComplex wtComplex, Org org, Date date, int isDiscountComplex) {
         this.idOfComplexInfo = wtComplex.getIdOfComplex();
         this.idOfComplex = wtComplex.getIdOfComplex().intValue();
         this.complexName = wtComplex.getName();
@@ -79,7 +79,7 @@ public class MenuWithComplexesExt {
         this.currentPrice = (wtComplex.getPrice() == null) ? 0L : wtComplex.getPrice().longValue();
         this.usedSubscriptionFeeding = 0;
         this.usedVariableFeeding = 0;
-        this.isDiscountComplex = (wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 1L) ? 1 : 0; /// ?
+        this.isDiscountComplex = isDiscountComplex;
         this.modevisible = 1;
         this.usedspecialmenu = org.getPreordersEnabled() ? 1 : 0;
     }
