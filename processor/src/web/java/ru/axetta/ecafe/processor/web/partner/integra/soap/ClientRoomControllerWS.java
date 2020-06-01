@@ -2908,10 +2908,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         .isAvailableDate(client, org, menuDate)) {
 
                     Set<WtComplex> wtComplexes = new HashSet<>();
+                    Set<WtComplex> wtComComplexes = new HashSet<>();
 
                     // 6-9, 12 Платные комплексы по возрастным группам и группам
                     if (isPaid) {
-                        Set<WtComplex> wtComComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        wtComComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                 .getPaidWtComplexesByAgeGroups(menuDate, menuDate, ageGroupIds, org);
                         if (wtComComplexes.size() > 0) {
                             wtComplexes.addAll(wtComComplexes);
@@ -2965,21 +2966,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             // Проверка типа питания
                             int isDiscountComplex = wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem()
                                     .intValue();
-                            switch(isDiscountComplex) {
-                                case 1:
-                                    getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
-                                    break;
-                                case 2:
-                                    getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 0);
-                                    break;
-                                case 3:
-                                    getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
-                                    getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 0);
-                                    break;
-                                default:
-                                    result.resultCode = RC_INTERNAL_ERROR;
-                                    result.description = RC_INTERNAL_ERROR_DESC;
-                                    return result;
+                            if (isDiscountComplex == 1) {
+                                getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
+                            } else if (isDiscountComplex == 3 && !wtComComplexes.contains(wtComplex)) {
+                                getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
+                                getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 0);
+                            } else {
+                                getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 0);
                             }
                         }
                     }

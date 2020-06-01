@@ -81,7 +81,7 @@ public class MenuWithComplexesExt {
         this.usedVariableFeeding = 0;
         this.isDiscountComplex = isDiscountComplex;
         this.modevisible = 1;
-        this.usedspecialmenu = org.getPreordersEnabled() ? 1 : 0;
+        this.usedspecialmenu = org.getPreordersEnabled() && wtComplex.getIsPortal() ? 1 : 0;
     }
 
     private Integer getGoodType(ComplexInfo complexInfo) {
