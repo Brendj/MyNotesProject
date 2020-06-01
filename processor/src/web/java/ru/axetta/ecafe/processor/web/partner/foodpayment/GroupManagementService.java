@@ -63,6 +63,13 @@ public class GroupManagementService implements IGroupManagementService {
         for (ClientGroup orgGroup: orgGroups){
             if(orgGroup.getGroupName() == null || orgGroup.getGroupName().isEmpty())
                 continue;
+            Criteria groupNamesToOrgCriteria = persistanceSession.createCriteria(GroupNamesToOrgs.class);
+            groupNamesToOrgCriteria.add(Restrictions.eq("idOfOrg", orgId));
+            groupNamesToOrgCriteria.add(Restrictions.eq("groupName", orgGroup.getGroupName()));
+            groupNamesToOrgCriteria.setMaxResults(1);
+            GroupNamesToOrgs groupNamesToOrgs = (GroupNamesToOrgs) groupNamesToOrgCriteria.uniqueResult();
+            if(groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != orgGroup.getCompositeIdOfClientGroup().getIdOfOrg())
+                continue;
             if(isGroupNotPredefined(orgGroup)){
 
                 Criteria groupNamesToOrgCriteria = persistanceSession.createCriteria(GroupNamesToOrgs.class);
