@@ -2461,7 +2461,7 @@ public class PreorderDAOService {
         return wtDiscountRuleSet;
     }
 
-    public WtDiscountRule getWtElemDiscountRule() {
+    public WtDiscountRule getWtNotElemDiscountRule() {
         CategoryDiscount elemDiscount = getCategoryDiscountById(ELEM_DISCOUNT_ID);
         if (elemDiscount == null) {
             return null;
@@ -2469,6 +2469,22 @@ public class PreorderDAOService {
         Query query = emReport.createQuery("SELECT discountRule FROM WtDiscountRule discountRule "
                 + "WHERE :categoryDiscount IN ELEMENTS(discountRule.categoryDiscounts) "
                 + "ORDER BY discountRule.priority DESC");
+        query.setParameter("categoryDiscount", elemDiscount);
+        List<WtDiscountRule> res = query.getResultList();
+        if (res != null && res.size() > 0) {
+            return res.get(0);
+        }
+        return null;
+    }
+
+    public WtDiscountRule getWtElemDiscountRule() {
+        CategoryDiscount elemDiscount = getCategoryDiscountById(ELEM_DISCOUNT_ID);
+        if (elemDiscount == null) {
+            return null;
+        }
+        Query query = emReport.createQuery("SELECT discountRule FROM WtDiscountRule discountRule "
+                + "WHERE :categoryDiscount IN ELEMENTS(discountRule.categoryDiscounts) "
+                + "AND discountRule.categoryDiscounts.size = 1");
         query.setParameter("categoryDiscount", elemDiscount);
         List<WtDiscountRule> res = query.getResultList();
         if (res != null && res.size() > 0) {
@@ -2583,27 +2599,20 @@ public class PreorderDAOService {
     }
 
     public Set<WtComplex> getFreeWtComplexesByDiscountRules (Date startDate, Date endDate, Org org,
-            Set<WtDiscountRule> wtDiscountRuleSet) {
+            WtDiscountRule wtDiscountRule) {
         Set<WtComplex> wtComplexes = new HashSet<>();
-        Set<BigInteger> complexIds = new HashSet<>();
-        for (WtDiscountRule rule : wtDiscountRuleSet) {
-            Query query = emReport.createNativeQuery(
-                    "select distinct c.idofcomplex from cf_wt_complexes c "
-                            + "left join cf_wt_discountrules_complexes dc on dc.idofcomplex = c.idofcomplex "
-                            + "left join cf_wt_discountrules_categoryorg dco on dco.idofrule = dc.idofrule "
-                            + "left join cf_categoryorg_orgs cor on cor.idofcategoryorg = dco.idofcategoryorg "
-                            + "where c.deleteState = 0 and c.beginDate < :startDate AND c.endDate > :endDate "
-                            + "and :idofrule = dc.idofrule and cor.idoforg = :idoforg");
-            query.setParameter("idofrule", rule.getIdOfRule());
-            query.setParameter("idoforg", org.getIdOfOrg());
-            query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-            query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
-            List<BigInteger> res = query.getResultList();
-            if (res != null && res.size() > 0) {
-                complexIds.addAll(res);
-            }
-        }
-        if (!complexIds.isEmpty()) {
+        Query query = emReport.createNativeQuery("select distinct c.idofcomplex from cf_wt_complexes c "
+                + "left join cf_wt_discountrules_complexes dc on dc.idofcomplex = c.idofcomplex "
+                + "left join cf_wt_discountrules_categoryorg dco on dco.idofrule = dc.idofrule "
+                + "left join cf_categoryorg_orgs cor on cor.idofcategoryorg = dco.idofcategoryorg "
+                + "where c.deleteState = 0 and c.beginDate < :startDate AND c.endDate > :endDate "
+                + "and :idofrule = dc.idofrule and cor.idoforg = :idoforg");
+        query.setParameter("idofrule", wtDiscountRule.getIdOfRule());
+        query.setParameter("idoforg", org.getIdOfOrg());
+        query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+        query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+        List<BigInteger> complexIds = query.getResultList();
+        if (complexIds != null && complexIds.size() > 0) {
             WtComplex complex;
             for (BigInteger id : complexIds) {
                 complex = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
