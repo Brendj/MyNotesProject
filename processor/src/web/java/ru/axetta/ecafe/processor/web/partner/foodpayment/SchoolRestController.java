@@ -28,18 +28,10 @@ public class SchoolRestController {
 
     private Logger logger = LoggerFactory.getLogger(SchoolRestController.class);
 
-    @GET
-    @Consumes(MediaType.APPLICATION_JSON)
-    @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "test")
-    public Response test() {
-        return Response.status(HttpURLConnection.HTTP_OK).build();
-    }
-
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "createGroup")
+    @Path(value = "creategroup")
     public Response createGroup(CreateGroupData createGroupData){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -72,7 +64,7 @@ public class SchoolRestController {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "groupList")
+    @Path(value = "grouplist")
     public Response groupList(@QueryParam(value = "token") String token, @QueryParam(value = "userId") Long userId,
             @QueryParam(value = "orgId") Long orgId){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -149,7 +141,7 @@ public class SchoolRestController {
     @PUT
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "editEmployee")
+    @Path(value = "editemployee")
     public Response editEmployee(EditEmployeeData editEmployeeData){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
