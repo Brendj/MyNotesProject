@@ -61,6 +61,8 @@ public class GroupManagementService implements IGroupManagementService {
             throw new RequestProcessingException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.GROUP_NOT_FOUND.getErrorMessage());
         for (ClientGroup orgGroup: orgGroups){
+            if(orgGroup.getGroupName() == null || orgGroup.getGroupName().isEmpty())
+                continue;
             if(isGroupNotPredefined(orgGroup)){
                 GroupInfo groupInfo = getGroupInfo(persistanceSession, orgGroup, getClientGroupManagerByGroupName(persistanceSession,
                         orgGroup.getGroupName(), orgGroup.getOrg().getIdOfOrg()));
