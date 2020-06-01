@@ -41,3 +41,72 @@ COMMENT ON COLUMN cf_kf_training_form.archive IS 'Признак архивно�
 COMMENT ON COLUMN cf_kf_training_form.createdate IS 'Дата создания записи';
 COMMENT ON COLUMN cf_kf_training_form.lastupdate IS 'Дата последнего обновления';
 COMMENT ON COLUMN cf_kf_training_form.is_deleted IS 'Признак удаления записи (для АРМ)';
+
+-- Таблицы для взаимодействия с МЭШ.Контингент
+create table cf_mh_persons
+(
+    personguid varchar(255) not null
+        constraint cf_mh_persons_pkey
+            primary key,
+    createdate timestamp not null,
+    lastupdate timestamp not null,
+    birthdate timestamp,
+    classname varchar(255),
+    classuid varchar(255),
+    deletestate boolean,
+    firstname varchar(255),
+    genderid integer,
+    lastname varchar(255),
+    organizationid bigint,
+    parallelid integer,
+    patronymic varchar(255),
+    invaliddata boolean default false not null,
+    educationstageid integer,
+    comment varchar(255)
+);
+
+create table cf_mh_entity_changes
+(
+    id bigint not null
+        constraint cf_mh_entity_changes_pkey
+            primary key,
+    action integer not null,
+    createdate timestamp not null,
+    lastupdate timestamp not null,
+    entity integer not null,
+    entityid varchar(255),
+    mergedpersonids varchar(255),
+    personguid varchar(255) not null,
+    constraint cf_mh_entity_changes_personguid_entity_uk
+        unique (personguid, entity)
+);
+
+COMMENT ON TABLE cf_mh_entity_changes IS 'Таблица для обработки проблемных пакетов';
+
+COMMENT ON COLUMN cf_mh_entity_changes.id IS 'ID записи';
+COMMENT ON COLUMN cf_mh_entity_changes.action IS 'Тип изменения (создание, удаление, изменение, слияние)';
+COMMENT ON COLUMN cf_mh_entity_changes.createdate IS 'Дата создания записи';
+COMMENT ON COLUMN cf_mh_entity_changes.lastupdate IS 'Дата последнего обновления';
+COMMENT ON COLUMN cf_mh_entity_changes.entity IS 'Код измененой сущности';
+COMMENT ON COLUMN cf_mh_entity_changes.entityid IS 'ID сущности';
+COMMENT ON COLUMN cf_mh_entity_changes.mergedpersonids IS 'Старые GUIDs после слияния';
+COMMENT ON COLUMN cf_mh_entity_changes.personguid IS 'GUID NSI-3 клиента';
+
+COMMENT ON TABLE cf_mh_persons IS 'Промежуточная таблица ';
+
+COMMENT ON COLUMN cf_mh_persons.personguid IS 'GUID NSI-3 клиента';
+COMMENT ON COLUMN cf_mh_persons.createdate IS 'Дата создания записи';
+COMMENT ON COLUMN cf_mh_persons.lastupdate IS 'Дата последнего обновления';
+COMMENT ON COLUMN cf_mh_persons.birthdate IS 'Дата рождение';
+COMMENT ON COLUMN cf_mh_persons.classname IS 'Название класса';
+COMMENT ON COLUMN cf_mh_persons.classuid IS 'UID класса';
+COMMENT ON COLUMN cf_mh_persons.deletestate IS 'Флаг удаления';
+COMMENT ON COLUMN cf_mh_persons.firstname IS 'Имя';
+COMMENT ON COLUMN cf_mh_persons.genderid IS 'Код пола';
+COMMENT ON COLUMN cf_mh_persons.lastname IS 'Фамилия';
+COMMENT ON COLUMN cf_mh_persons.organizationid IS 'ID ОО из НСИ-3';
+COMMENT ON COLUMN cf_mh_persons.parallelid IS 'Код параллели';
+COMMENT ON COLUMN cf_mh_persons.patronymic IS 'Отчество';
+COMMENT ON COLUMN cf_mh_persons.invaliddata IS 'Флаг ошибки обработки';
+COMMENT ON COLUMN cf_mh_persons.educationstageid IS 'ID уровня образования';
+COMMENT ON COLUMN cf_mh_persons.comment IS 'Комментарий к ошибке обработки данных';
