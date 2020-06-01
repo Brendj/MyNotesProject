@@ -5,16 +5,16 @@
 package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
 public class GroupManager {
-    private String contractId;
+    private Long contractId;
     private String surname;
     private String name;
     private String secondName;
 
-    public String getContractId(){
+    public Long getContractId(){
         return contractId;
     }
 
-    public void setContractId(String contractId){
+    public void setContractId(Long contractId){
         this.contractId = contractId;
     }
 
