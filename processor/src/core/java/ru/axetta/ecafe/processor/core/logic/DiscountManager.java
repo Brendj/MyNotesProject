@@ -4,11 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.logic;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
+import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -21,6 +25,7 @@ import java.util.Set;
 public class DiscountManager {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscountManager.class);
+    public static final String DELETE_COMMENT = "Удаление категории льгот";
 
     public static void saveDiscountHistory(Session session, Client client, Org org,
             Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts,
@@ -216,6 +221,69 @@ public class DiscountManager {
             result = result.substring(0, result.length()-1);
         }
         return result;
+    }
+
+    public static void deleteCategoryDiscount(Long idOfCategoryDiscount) throws Exception {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            Query query = session.createSQLQuery("SELECT t.idofcategorydiscountdszn FROM cf_categorydiscounts_dszn t " + "WHERE t.idofcategorydiscount = :idOfCategoryDiscount");
+            query.setParameter("idOfCategoryDiscount", idOfCategoryDiscount);
+            query.setMaxResults(1);
+            List list = query.list();
+            if (list.size() > 0) {
+                throw new Exception("Выбранная категория имеет привязку к категории ДТиСЗН и не может быть удалена");
+            }
+
+            query = session.createSQLQuery("SELECT t.idofdrcd FROM cf_discountrules_categorydiscounts t " + "WHERE t.idofcategorydiscount = :idOfCategoryDiscount");
+            query.setParameter("idOfCategoryDiscount", idOfCategoryDiscount);
+            query.setMaxResults(1);
+            list = query.list();
+            if (list.size() > 0) {
+                throw new Exception("Выбранная категория имеет привязку к правилам скидок и не может быть удалена");
+            }
+
+            query = session.createSQLQuery("SELECT t.idofrule FROM cf_wt_discountrules_categorydiscount t " + "WHERE t.idofcategorydiscount = :idOfCategoryDiscount");
+            query.setParameter("idOfCategoryDiscount", idOfCategoryDiscount);
+            query.setMaxResults(1);
+            list = query.list();
+            if (list.size() > 0) {
+                throw new Exception(
+                        "Выбранная категория имеет привязку к правилам скидок веб технолога и не может быть удалена");
+            }
+
+            CategoryDiscount categoryDiscount = (CategoryDiscount) session
+                    .load(CategoryDiscount.class, idOfCategoryDiscount);
+
+            for (Client client : categoryDiscount.getClients()) {
+                deleteOneDiscount(session, client, categoryDiscount);
+            }
+
+            categoryDiscount.setDeletedState(true);
+            categoryDiscount.setDeleteDate(new Date());
+            session.update(categoryDiscount);
+
+            transaction.commit();
+            transaction = null;
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
+    public static void deleteOneDiscount(Session session, Client client, CategoryDiscount categoryDiscount) throws Exception {
+        Set<CategoryDiscount> oldDiscounts = client.getCategories();
+        Set<CategoryDiscount> newDiscounts = new HashSet<>();
+        for (CategoryDiscount cd : oldDiscounts) {
+            if (cd.getIdOfCategoryDiscount() != categoryDiscount.getIdOfCategoryDiscount())
+                newDiscounts.add(cd);
+        }
+        Integer oldDiscountMode = client.getDiscountMode();
+        Integer newDiscountMode =
+                newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+        renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode, DELETE_COMMENT);
     }
 
     public static class ClientDtisznDiscountInfoBuilder {

@@ -43,10 +43,13 @@
     </h:panelGroup>
 
 </h:panelGrid>
+<h:panelGrid styleClass="borderless-grid" rendered="#{categoryDiscountEditPage.deletedState}">
+    <h:outputText escape="true" value="Льгота удалена (в архиве)" styleClass="output-text-strong" />
+</h:panelGrid>
 <h:panelGrid columns="4" styleClass="borderless-grid">
     <a4j:commandButton value="Сохранить" action="#{categoryDiscountEditPage.save}" reRender="mainMenu, workspaceTogglePanel"
-                       styleClass="command-button" />
-    <a4j:commandButton value="Восстановить" action="#{categoryDiscountEditPage.reload}"
+                       styleClass="command-button" disabled="#{categoryDiscountEditPage.deletedState}" />
+    <a4j:commandButton value="Восстановить" action="#{categoryDiscountEditPage.reload}" disabled="#{categoryDiscountEditPage.deletedState}"
                        reRender="mainMenu, workspaceTogglePanel" ajaxSingle="true" styleClass="command-button" />
 </h:panelGrid>
 

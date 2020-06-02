@@ -5,7 +5,9 @@
 package ru.axetta.ecafe.processor.web.ui.option.categorydiscount;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
+import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountDSZN;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscountEnumType;
 import ru.axetta.ecafe.processor.core.persistence.DiscountRule;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -17,7 +19,6 @@ import ru.axetta.ecafe.processor.web.ui.ConfirmDeletePage;
 import org.hibernate.ObjectDeletedException;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
-import org.hibernate.exception.ConstraintViolationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
@@ -50,11 +51,8 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
     @Override
     public void onConfirmDelete(ConfirmDeletePage confirmDeletePage) {
         try {
+            DiscountManager.deleteCategoryDiscount(confirmDeletePage.getEntityId());
             reload();
-        } catch (ConstraintViolationException vce){
-            logAndPrintMessage(
-                    "Ошибка при удалении категории: имеются зарегистрированные Правила скидок или Клиенты привязанные к категории",
-                    vce);
         } catch (ObjectDeletedException ode){
             logAndPrintMessage("Ошибка при удалении категории: имеются зарегистрированные Правила скидок или Клиенты привязанные к категории", ode);
         } catch (Exception e) {
@@ -149,6 +147,7 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
         private String discountRules;
         private List<Long> idOfRuleList = new ArrayList<Long>();
         private Set<DiscountRule> discountRuleSet;
+        private Boolean deletedState;
         public static final String DISCOUNT_START = "Платное питание[";
         public static final String DISCOUNT_END = "%]";
 
@@ -162,6 +161,7 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
             this.categoryType = categoryDiscount.getCategoryType();
             this.discountRules = categoryDiscount.getDiscountRules();
             this.discountRuleSet = categoryDiscount.getDiscountsRules();
+            this.deletedState = categoryDiscount.getDeletedState();
 
             if(description.indexOf(DISCOUNT_START) == 0) {
                 String discount = description.substring(
@@ -185,6 +185,11 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
                 sb.append("} ");
                 this.setFilter(sb.substring(0, sb.length()-1));
             }
+            this.categoriesDSZN = "";
+            for (CategoryDiscountDSZN categoryDiscountDSZN : categoryDiscount.getCategoriesDiscountDSZN()) {
+                this.categoriesDSZN += categoryDiscountDSZN.getDescription() + ", ";
+            }
+            if (this.categoriesDSZN.length() > 0) this.categoriesDSZN = this.categoriesDSZN.substring(0, this.categoriesDSZN.length()-2);
         }
 
         public long getIdOfCategoryDiscount() {
@@ -281,6 +286,18 @@ public class CategoryDiscountListPage extends BasicWorkspacePage implements Conf
 
         public void setDiscountRules(String discountRules) {
             this.discountRules = discountRules;
+        }
+
+        public String getDeleted() {
+            return deletedState ? "Да" : "Нет";
+        }
+
+        public Boolean getDeletedState() {
+            return deletedState;
+        }
+
+        public void setDeletedState(Boolean deletedState) {
+            this.deletedState = deletedState;
         }
     }
 }

@@ -47,6 +47,7 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
     private String filter = "-";
     private List<Long> idOfRuleList = new ArrayList<Long>();
     private Set<DiscountRule> discountRuleSet;
+    private Boolean deletedState;
     
     public static final String DISCOUNT_START = "Платное питание[";
     public static final String DISCOUNT_END = "%]";
@@ -220,25 +221,15 @@ public class CategoryDiscountEditPage extends BasicWorkspacePage {
         }
         this.blockedToChange = categoryDiscount.getBlockedToChange();
         this.eligibleToDelete = categoryDiscount.getEligibleToDelete();
+        this.deletedState = categoryDiscount.getDeletedState();
     }
 
-    /*@Override
-    public void completeRuleListSelection(Map<Long, String> ruleMap) throws Exception {
-        //To change body of implemented methods use File | Settings | File Templates.
-        if(null != ruleMap){
-            idOfRuleList = new ArrayList<Long>();
-            if(ruleMap.isEmpty()){
-                filter = "Не выбрано";
-            } else{
-                StringBuilder stringBuilder = new StringBuilder();
-                for(Long idOfRule: ruleMap.keySet()){
-                    idOfRuleList.add(idOfRule);
-                    stringBuilder.append(ruleMap.get(idOfRule));
-                    stringBuilder.append(";");
-                }
-                filter = stringBuilder.toString();
-                discountRules=stringBuilder.toString();
-            }
-        }
-    }    */
+    public Boolean getDeletedState() {
+        return deletedState;
+    }
+
+    public void setDeletedState(Boolean deletedState) {
+        this.deletedState = deletedState;
+    }
+
 }
