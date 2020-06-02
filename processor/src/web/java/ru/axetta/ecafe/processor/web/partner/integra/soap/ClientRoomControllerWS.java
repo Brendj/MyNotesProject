@@ -2928,11 +2928,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                         // 10 Льготные комплексы по правилам соц. скидок
                         if (isFree && (wtDiscountRuleSet.size() > 0)) {
-                            WtDiscountRule notElemDiscRule = RuntimeContext.getAppContext()
-                                    .getBean(PreorderDAOService.class).getWtNotElemDiscountRule();
                             wtDiscComplexes = RuntimeContext.getAppContext()
                                     .getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByDiscountRules(menuDate, menuDate, org, notElemDiscRule);
+                                    .getFreeWtComplexesByDiscountRules(menuDate, menuDate, org, wtDiscountRuleSet);
                             if (wtDiscComplexes.size() > 0) {
                                 wtComplexes.addAll(wtDiscComplexes);
                             }
