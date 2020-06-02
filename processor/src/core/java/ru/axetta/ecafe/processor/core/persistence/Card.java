@@ -113,6 +113,14 @@ public class Card {
         return state.equals(CardState.ISSUED.getValue()) || state.equals(CardState.TEMPISSUED.getValue());
     }
 
+    public static boolean isSocial(int type) {
+        return (type == 7 || type == 8);
+    }
+
+    public static boolean isServiceType(int type) {
+        return type == 1;
+    }
+
     public Long getIdOfCard() {
         return idOfCard;
     }

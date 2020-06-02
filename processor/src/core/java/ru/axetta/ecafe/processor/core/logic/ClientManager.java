@@ -14,6 +14,8 @@ import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.*;
 
@@ -1028,7 +1030,7 @@ public class ClientManager {
                                 clientGuardian.setDisabled(true);
                                 clientGuardian.setDeletedState(false);
                                 clientGuardian.setRelation(relationType);
-                                clientGuardian.setIsLegalRepresent(registryChangeGuardians.getLegal_representative());
+                                clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(registryChangeGuardians.getIntegerRepresentative()));
                                 clientGuardian.setLastUpdate(new Date());
                                 persistenceSession.persist(clientGuardian);
                                 persistenceSession.flush();
@@ -1120,7 +1122,7 @@ public class ClientManager {
     }
 
     public static ClientGuardian createClientGuardianInfoTransactionFree(Session session, Client guardian, String relation, Boolean disabled,
-            Long idOfClientChild, ClientCreatedFromType createdFrom, Boolean legal_representative) {
+            Long idOfClientChild, ClientCreatedFromType createdFrom, Integer legal_representative) {
         ClientGuardianRelationType relationType = null;
         if (relation != null) {
             for (ClientGuardianRelationType type : ClientGuardianRelationType.values()) {
@@ -1137,7 +1139,7 @@ public class ClientManager {
         clientGuardian.setDisabled(disabled);
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(relationType);
-        clientGuardian.setIsLegalRepresent(legal_representative);
+        clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legal_representative));
         Boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
         if (enableNotifications) {
             Set<ClientGuardianNotificationSetting> settings = new HashSet<ClientGuardianNotificationSetting>();
@@ -1161,7 +1163,7 @@ public class ClientManager {
 
         persistenceSession.persist(guardian);
         createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(),
-                true, idOfClientChild, ClientCreatedFromType.REGISTRY, registryChangeGuardians.getLegal_representative());
+                true, idOfClientChild, ClientCreatedFromType.REGISTRY, registryChangeGuardians.getIntegerRepresentative());
 
         setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
     }
@@ -1553,7 +1555,7 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getIsLegalRepresent(),
+                        getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getRepresentType(),
                         getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient())));
             }
         }
@@ -1635,7 +1637,7 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
                 wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
                         notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getIsLegalRepresent(),
+                        getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getRepresentType(),
                         getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient)));
             }
         }
@@ -1701,13 +1703,56 @@ public class ClientManager {
         return clients;
     }
 
+    public static void addClientMigrationEntry(Session session,Org oldOrg, Org newOrg, Client client, String comment, String newGroupName){
+        ClientManager.checkUserOPFlag(session, oldOrg, newOrg, client.getIdOfClientGroup(), client);
+        ClientMigration migration = new ClientMigration(client, newOrg, oldOrg);
+        migration.setComment(comment);
+        if(client.getClientGroup() != null) {
+            ClientGroup clientGroup = (ClientGroup)session.load(ClientGroup.class, new CompositeIdOfClientGroup(client.getOrg().getIdOfOrg(), client.getIdOfClientGroup()));
+            migration.setOldGroupName(clientGroup.getGroupName());
+        }
+        migration.setNewGroupName(newGroupName);
+        session.save(migration);
+    }
+
+    public static void createMigrationForGuardianWithConfirm(Session session, Client guardian, Date fireTime, Org orgVisit,
+            MigrantInitiatorEnum initiator, int years) {
+        Long idOfProcessorMigrantRequest = MigrantsUtils
+                .nextIdOfProcessorMigrantRequest(session, guardian.getOrg().getIdOfOrg());
+        CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
+                guardian.getOrg().getIdOfOrg());
+        String requestNumber = ImportMigrantsService
+                .formRequestNumber(guardian.getOrg().getIdOfOrg(), orgVisit.getIdOfOrg(), idOfProcessorMigrantRequest,
+                        fireTime);
+
+        Migrant migrantNew = new Migrant(compositeIdOfMigrant, guardian.getOrg().getDefaultSupplier(),
+                requestNumber, guardian, orgVisit, fireTime, CalendarUtils.addYear(fireTime, years),
+                Migrant.NOT_SYNCHRONIZED);
+        migrantNew.setInitiator(initiator);
+        session.save(migrantNew);
+
+        session.save(ImportMigrantsService
+                .createResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                        VisitReqResolutionHist.RES_CREATED, fireTime));
+        session.flush();
+        session.save(ImportMigrantsService
+                .createResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                        VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(fireTime, 1)));
+    }
+
     /* получить список опекунов по опекаемому */
     public static List<Client> findGuardiansByClient(Session session, Long idOfChildren) throws Exception {
+        return findGuardiansByClient(session, idOfChildren, false);
+    }
+
+    public static List<Client> findGuardiansByClient(Session session, Long idOfChildren, boolean includeDisabled) throws Exception {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
-        idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        if (!includeDisabled) {
+            idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        }
         idOfGuardianCriteria.setProjection(Property.forName("idOfGuardian"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
@@ -1721,11 +1766,17 @@ public class ClientManager {
 
     /* получить список опекаемых по опекуну */
     public static List<Client> findChildsByClient(Session session, Long idOfGuardian) throws Exception {
+        return findChildsByClient(session, idOfGuardian, false);
+    }
+
+    public static List<Client> findChildsByClient(Session session, Long idOfGuardian, boolean includeDisabled) throws Exception {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
         idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
-        idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        if (!includeDisabled) {
+            idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        }
         idOfGuardianCriteria.setProjection(Property.forName("idOfChildren"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
@@ -1807,14 +1858,14 @@ public class ClientManager {
         for (ClientGuardianItem item : clientGuardians) {
             addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
-                    item.getCreatedWhereGuardian(), item.getLegalRepresentative());
+                    item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()));
         }
     }
 
     /* Добавить опекуна клиенту */
     public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled,
             ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems,
-            ClientCreatedFromType createdWhere, Boolean isLegalRepresentative) {
+            ClientCreatedFromType createdWhere, ClientGuardianRepresentType representType) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -1826,7 +1877,7 @@ public class ClientManager {
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
             clientGuardian.setCreatedFrom(createdWhere);
-            clientGuardian.setIsLegalRepresent(isLegalRepresentative);
+            clientGuardian.setRepresentType(representType);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.persist(clientGuardian);
@@ -1844,7 +1895,7 @@ public class ClientManager {
             clientGuardian.setDisabled(disabled);
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
-            clientGuardian.setIsLegalRepresent(isLegalRepresentative);
+            clientGuardian.setRepresentType(representType);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.update(clientGuardian);
@@ -1853,14 +1904,13 @@ public class ClientManager {
 
     /* Установить флаг информирования об условиях предоставления услуг по предзаказам */
     public static void setInformSpecialMenu(Session session, Client client, Client guardian, Long newVersion) {
-        /*Criteria criteria = session.createCriteria(ClientGuardian.class);
-        criteria.add(Restrictions.eq("idOfChildren", idOfClient));
-        criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
-        ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
-        cg.setInformedSpecialMenu(true);
+        Criteria cr = session.createCriteria(ClientGuardian.class);
+        cr.add(Restrictions.eq("idOfChildren", client.getIdOfClient()));
+        cr.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
+        ClientGuardian cg = (ClientGuardian)cr.uniqueResult();
         cg.setVersion(newVersion);
         cg.setLastUpdate(new Date());
-        session.update(cg);*/
+        session.update(cg);
 
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client", client));
@@ -1947,7 +1997,7 @@ public class ClientManager {
         for (ClientGuardianItem item : clientWards) {
             addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
-                    item.getCreatedWhereGuardian(), item.getLegalRepresentative());
+                    item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()));
         }
     }
 
@@ -2226,6 +2276,43 @@ public class ClientManager {
         clientGroupMigrationHistory.setComment(comment);
 
         session.save(clientGroupMigrationHistory);
+        disableGuardianshipIfClientLeaving(session, client, idOfClientGroup);
+    }
+
+    private static void disableGuardianshipIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
+        if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
+        try {
+            List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), true);
+            for (Client guardian : guardians) {
+                boolean otherChildrenExist = false;
+                List<Client> children = findChildsByClient(session, guardian.getIdOfClient());
+                for (Client child : children) {
+                    if (!child.equals(client) && (child.isStudent() || child.getClientGroup() == null) && !child.isLeaving()) {
+                        otherChildrenExist = true;
+                        break;
+                    }
+                }
+                boolean deactivateGuardianship = guardian.isParent() || guardian.isSotrudnikMsk() || guardian.isEmployee();
+                if (deactivateGuardianship) {
+                    Long version = generateNewClientGuardianVersion(session);
+                    ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
+                    clientGuardian.disable(version);
+                    if (guardian.isParent() && !otherChildrenExist) {
+                        ClientManager.createClientGroupMigrationHistory(session, guardian, guardian.getOrg(),
+                                ClientGroup.Predefined.CLIENT_LEAVING.getValue(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(),
+                                ClientGroupMigrationHistory.MODIFY_AUTO_MODE
+                                        .concat(String.format(" (ид. опекаемого=%s)", client.getIdOfClient())));
+                        guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+                        guardian.setClientRegistryVersion(clientRegistryVersion);
+                        session.update(guardian);
+                    }
+                    session.update(clientGuardian);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error in disableGuardianshipIfClientLeaving: ", e);
+        }
     }
 
     public static void checkUserOPFlag(Session session, Org oldOrg, Org newOrg, Long idOfClientGroup, Client client) {
@@ -2297,6 +2384,9 @@ public class ClientManager {
                     info.setArchived(true);
                     if (null == clientDTISZNDiscountVersion) {
                         clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
+                    }
+                    if (info.isInoe()) {
+                        info.setDateEnd(new Date());
                     }
                     info.setVersion(clientDTISZNDiscountVersion);
                     info.setLastUpdate(new Date());

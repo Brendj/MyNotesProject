@@ -59,17 +59,20 @@ public class CardService {
 
 
     //1. Регистрация карты
-    public Card registerNew(long idOfOrg, long cardNo, long cardPrintedNo, int type,
+    public Card registerNew(Org org, long cardNo, long cardPrintedNo, int type,
             Integer cardSignVerifyRes, Integer cardSignCertNum, Boolean isLongUid) throws Exception {
-        Org org = orgRepository.findOne(idOfOrg);
         return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum, isLongUid);
     }
 
-    public Card registerNew(long idOfOrg, long cardNo, long cardPrintedNo, int type, Integer cardSignVerifyRes,
+    public Card registerNew(Org org, long cardNo, long cardPrintedNo, int type, Integer cardSignVerifyRes,
             Integer cardSignCertNum, Boolean isLongUid, Integer cardTransitionState) throws Exception {
-        Org org = orgRepository.findOne(idOfOrg);
         return cardWritableRepository.createCard(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
                 isLongUid, cardTransitionState);
+    }
+
+    public void updateTransitionState(Card card, Integer transitionState) {
+        card.setTransitionState(transitionState);
+        card.setUpdateTime(new Date());
     }
 
     public Card registerNewSpecial(long idOfOrg, long cardNo, long cardPrintedNo, int type,
@@ -153,22 +156,23 @@ public class CardService {
         return cardUpdateResult(o, reset(o.getCardNo(), idOfOrg, o.getIdOfClient(), isOldArm));
     }
     //6.	Блокировка карты
-    public int block(long cardNo, long idOfOrg, long idOfClient, Boolean isOldArm) {
-        return cardWritableRepository.block(cardNo, idOfOrg, idOfClient, isOldArm);
+    public int block(long cardNo, long idOfOrg, long idOfClient, Boolean isOldArm, String lockReason, CardState blockState) {
+        return cardWritableRepository.block(cardNo, idOfOrg, idOfClient, isOldArm, lockReason, blockState);
     }
 
     public ResCardsOperationsRegistryItem tempblock(CardsOperationsRegistryItem o, long idOfOrg, Boolean isOldArm) {
-        return cardUpdateResult(o, block(o.getCardNo(), idOfOrg, o.getIdOfClient(), isOldArm));
+        return cardUpdateResult(o, block(o.getCardNo(), idOfOrg, o.getIdOfClient(), isOldArm, "", CardState.TEMPBLOCKED));
     }
 
 
     //7.	Блокировка карты со сбросом
-    public int blockAndReset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm) {
-        return cardWritableRepository.blockAndReset(cardNo, idOfOrg, idOfClient, isOldArm);
+    public int blockAndReset(long cardNo, long idOfOrg, Long idOfClient, Boolean isOldArm, String lockReason,
+            Integer transitionState) {
+        return cardWritableRepository.blockAndReset(cardNo, idOfOrg, idOfClient, isOldArm, lockReason, transitionState);
     }
 
     public ResCardsOperationsRegistryItem block(CardsOperationsRegistryItem o, long idOfOrg, Boolean isOldArm) {
-        return cardUpdateResult(o, blockAndReset(o.getCardNo(), idOfOrg, o.getIdOfClient(), isOldArm));
+        return cardUpdateResult(o, blockAndReset(o.getCardNo(), idOfOrg, o.getIdOfClient(), isOldArm, "", null));
     }
     //8.	Разблокировка карты
     public void unblock(Card card, CardsOperationsRegistryItem o){

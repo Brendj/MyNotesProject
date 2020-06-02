@@ -161,13 +161,6 @@ public class ESZMigrantsUpdateService {
 
     public static void addGroupHistory(Session session, Client client, Long idOfClientGroup)
             throws Exception {
-        ClientGroupMigrationHistory migrationHistory = new ClientGroupMigrationHistory(client.getOrg(), client);
-        migrationHistory.setComment(ClientGroupMigrationHistory.MODIFY_IN_ISPP);
-        if (client.getClientGroup() != null) {
-            migrationHistory.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
-            migrationHistory.setOldGroupName(client.getClientGroup().getGroupName());
-        }
-
         ClientGroup clientGroup = DAOUtils.findClientGroup(session,
                 new CompositeIdOfClientGroup(client.getOrg().getIdOfOrg(), idOfClientGroup));
         if (null == clientGroup) {
@@ -175,10 +168,9 @@ public class ESZMigrantsUpdateService {
                     client.getOrg().getIdOfOrg(), idOfClientGroup));
             return;
         }
-        migrationHistory.setNewGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
-        migrationHistory.setNewGroupName(clientGroup.getGroupName());
-
-        session.save(migrationHistory);
+        ClientManager.createClientGroupMigrationHistory(session, client, client.getOrg(),
+                clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup(), clientGroup.getGroupName(),
+                ClientGroupMigrationHistory.MODIFY_IN_ISPP);
     }
 
     public void scheduleSync() throws Exception {

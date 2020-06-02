@@ -4,9 +4,15 @@
 
 package ru.axetta.ecafe.processor.core.report;
 
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFood;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodState;
 import ru.axetta.ecafe.processor.core.persistence.ApplicationForFoodStatus;
+import ru.axetta.ecafe.processor.core.persistence.ClientDtisznDiscountInfo;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+
+import org.hibernate.Session;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -36,7 +42,7 @@ public class ApplicationForFoodReportItem {
 
     }
 
-    public ApplicationForFoodReportItem(ApplicationForFood applicationForFood) {
+    public ApplicationForFoodReportItem(Session session, ApplicationForFood applicationForFood) {
         this.serviceNumber = applicationForFood.getServiceNumber();
         this.createdDate = applicationForFood.getCreatedDate();
         this.applicationForFoodStatus = applicationForFood.getStatus();
@@ -53,6 +59,13 @@ public class ApplicationForFoodReportItem {
         this.mobile = applicationForFood.getMobile();
         statuses = new ArrayList<ApplicationForFoodStatus>();
         this.archieved = applicationForFood.getArchived();
+        Long code = applicationForFood.getDtisznCode() == null ? Long.parseLong(
+                RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE) : applicationForFood.getDtisznCode();
+        ClientDtisznDiscountInfo info = DAOUtils.getDTISZNOneDiscountInfoByClientAndCode(session, applicationForFood.getClient(), code);
+        if (info != null) {
+            this.startDate = info.getDateStart();
+            this.endDate = info.getDateEnd();
+        }
     }
 
     public String getApplicationForFoodStateString() {

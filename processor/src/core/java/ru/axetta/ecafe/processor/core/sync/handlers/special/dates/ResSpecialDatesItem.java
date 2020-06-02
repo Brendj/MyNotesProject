@@ -60,10 +60,11 @@ public class ResSpecialDatesItem {
     public Element toElement(Document document, String elementName) throws Exception {
         Element element = document.createElement(elementName);
         XMLUtils.setAttributeIfNotNull(element, "IdOfOrg", idOfOrg);
+        XMLUtils.setAttributeIfNotNull(element, "IdOfOrgOwner", idOfOrgOwner);
         XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.dateShortToStringFullYear(date));
         XMLUtils.setAttributeIfNotNull(element, "Res", resCode);
         XMLUtils.setAttributeIfNotNull(element, "IsWeekend", isWeekend);
-        if(!comment.isEmpty()) {
+        if(comment != null && !comment.isEmpty()) {
             XMLUtils.setAttributeIfNotNull(element, "Comment", comment);
         }
         XMLUtils.setAttributeIfNotNull(element, "GroupName", groupName);
@@ -139,5 +140,21 @@ public class ResSpecialDatesItem {
 
     public void setErrorMessage(String errorMessage) {
         this.errorMessage = errorMessage;
+    }
+
+    public Long getIdOfOrgOwner() {
+        return idOfOrgOwner;
+    }
+
+    public void setIdOfOrgOwner(Long idOfOrgOwner) {
+        this.idOfOrgOwner = idOfOrgOwner;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }

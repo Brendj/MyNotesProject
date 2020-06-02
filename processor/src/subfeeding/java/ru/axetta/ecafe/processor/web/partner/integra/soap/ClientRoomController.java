@@ -202,7 +202,8 @@ public interface ClientRoomController {
     Result changeEmail(@WebParam(name = "contractId") Long contractId, @WebParam(name = "email") String email);
 
     @WebMethod
-    Result changeExpenditureLimit(@WebParam(name = "contractId") Long contractId, @WebParam(name = "limit") long limit);
+    Result changeExpenditureLimit(@WebParam(name = "contractId") Long contractId,
+            @WebParam(name = "limit") long limit);
 
     @WebMethod Result changePassword(@WebParam(name = "contractId") Long contractId,
           @WebParam(name = "base64passwordHash") String base64passwordHash);

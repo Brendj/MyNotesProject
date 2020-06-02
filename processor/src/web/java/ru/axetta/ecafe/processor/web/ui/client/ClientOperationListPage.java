@@ -196,7 +196,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         criteria.add(Restrictions.eq("client", client));
         criteria.addOrder(Order.asc("evtDateTime"));
         List<EnterEvent> res = (List<EnterEvent>) criteria.list();
-        clientPasses = new ArrayList<ClientPassItem>();
+        clientPasses = new LinkedList<>();
         for (EnterEvent event : res) {
             clientPasses.add(new ClientPassItem(session, event));
         }
@@ -246,7 +246,7 @@ public class ClientOperationListPage extends BasicWorkspacePage {
         applicationsForFood.clear();
         List<ApplicationForFood> applicationForFoodList = DAOUtils.getApplicationForFoodListByClient(session, this.idOfClient);
         for (ApplicationForFood applicationForFood : applicationForFoodList) {
-            applicationsForFood.add(new ApplicationForFoodReportItem(applicationForFood));
+            applicationsForFood.add(new ApplicationForFoodReportItem(session, applicationForFood));
         }
     }
 

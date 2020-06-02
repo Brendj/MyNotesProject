@@ -21,7 +21,6 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
-import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterSpbClientsService;
 import ru.axetta.ecafe.processor.core.service.RegistryChangeCallback;
@@ -1499,7 +1498,8 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "cardNo") long cardNo, @WebParam(name = "cardPrintedNo") long cardPrintedNo,
             @WebParam(name = "type") int type, @WebParam(name = "cardSignVerifyRes") Integer cardSignVerifyRes,
             @WebParam(name = "cardSignCertNum") Integer cardSignCertNum,
-            @WebParam(name = "isLongUid") boolean isLongUid) throws FrontControllerException {
+            @WebParam(name = "isLongUid") boolean isLongUid,
+            @WebParam(name = "forceRegister") Integer forceRegister) throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         logger.info(String.format(
                 "Incoming registerCardWithoutClient request. orgId=%s, cardNo=%s, cardPrintedNo=%s, type=%s, cardSignVerifyRes=%s, cardSighCertNum=%s, isLongUid=%s",
@@ -1519,55 +1519,60 @@ public class FrontController extends HttpServlet {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            Card exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+            Org org = DAOUtils.findOrg(persistenceSession, idOfOrg);
+            Card exCard = null;
+            if (VersionUtils.doublesAllowed(persistenceSession, idOfOrg) && org.getNeedVerifyCardSign()) {
+                exCard = DAOUtils.findCardByCardNoDoublesAllowed(persistenceSession, org, cardNo, cardPrintedNo, cardSignCertNum, type);
+            } else {
+                exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
+            }
             if (null == exCard) {
-                card = cardService.registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
+                card = cardService.registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
                         isLongUid);
-                idOfCard = card.getIdOfCard();
-                transitionState = CardTransitionState.fromInteger(card.getTransitionState());
             } else {
                 if (VersionUtils.compareClientVersionForRegisterCard(persistenceSession, idOfOrg) < 0) {
                     throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
                 }
 
-                if (CardState.BLOCKED.getValue() != exCard.getState()) {
+                boolean secondRegisterAllowed = VersionUtils.secondRegisterAllowed(persistenceSession, idOfOrg);
+                secondRegisterAllowed = secondRegisterAllowed && Card.isServiceType(type);
+
+                if (exCard.getState() != CardState.BLOCKED.getValue() && !secondRegisterAllowed) {
                     throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
+                } else if (!secondRegisterAllowed) {
+                    testForRegisterConditions(persistenceSession, exCard, idOfOrg, secondRegisterAllowed);
+                }
+                if (secondRegisterAllowed && (forceRegister == null || forceRegister != 1))
+                    throw new CardResponseItem.CardAlreadyExistSecondRegisterAllowed(CardResponseItem.ERROR_DUPLICATE_CARD_SECOND_REGISTER_MESSAGE
+                    + exCard.getOrg().getShortNameInfoService() + ". Статус: " + CardState.fromInteger(exCard.getState()));
+
+                card = cardService
+                        .registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
+                                isLongUid, CardTransitionState.BORROWED.getCode());
+
+                if (secondRegisterAllowed && exCard.getState() != CardState.BLOCKED.getValue()) {
+                    cardService.blockAndReset(exCard.getCardNo(), exCard.getOrg().getIdOfOrg(),
+                            exCard.getClient() == null ? null : exCard.getClient().getIdOfClient(), false,
+                            CardResponseItem.USED_IN_ANOTHER_ORG, CardTransitionState.GIVEN_AWAY.getCode());
                 } else {
-                    Integer blockPeriod = runtimeContext
-                            .getPropertiesValue("ecafe.processor.card.registration.block.period", 180);
-                    Date now = new Date();
-                    if (blockPeriod >= CalendarUtils.getDifferenceInDays(exCard.getUpdateTime(), now)) {
-                        throw new CardResponseItem.CardAlreadyExist(
-                                String.format("%s. Минимальный срок блокировки карты не прошел - %dд",
-                                        CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE, blockPeriod));
-                    }
-
-                    List<Org> friendlyOrgs = DAOUtils
-                            .findAllFriendlyOrgs(persistenceSession, exCard.getOrg().getIdOfOrg());
-                    for (Org o : friendlyOrgs) {
-                        if (o.getIdOfOrg() == idOfOrg) {
-                            throw new CardResponseItem.CardAlreadyExistInYourOrg(
-                                    CardResponseItem.ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG_MESSAGE);
-                        }
-                    }
-                    card = cardService
-                            .registerNew(idOfOrg, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
-                                    isLongUid, CardTransitionState.BORROWED.getCode());
-                    idOfCard = card.getIdOfCard();
-                    transitionState = CardTransitionState.fromInteger(card.getTransitionState());
-
-                    exCard.setTransitionState(CardTransitionState.GIVEN_AWAY.getCode());
-                    persistenceSession.flush();
-                    persistenceTransaction.commit();
-                    persistenceTransaction = null;
+                    cardService.updateTransitionState(exCard, CardTransitionState.GIVEN_AWAY.getCode());
+                    persistenceSession.update(exCard);
                 }
             }
+            idOfCard = card.getIdOfCard();
+            transitionState = CardTransitionState.fromInteger(card.getTransitionState());
+            idOfCard = card.getIdOfCard();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (CardResponseItem.CardAlreadyExist e) {
             logger.error("CardAlreadyExistException", e);
             return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE, e.getMessage());
         } catch (CardResponseItem.CardAlreadyExistInYourOrg e) {
             logger.error("CardAlreadyExistInYourOrgException", e);
             return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE, e.getMessage());
+        } catch (CardResponseItem.CardAlreadyExistSecondRegisterAllowed e) {
+            logger.error("CardAlreadyExistSecondRegisterAllowed", e);
+            return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE_FOR_SECOND_REGISTER, e.getMessage());
         } catch (Exception e) {
             if (e.getMessage() == null) {
                 logger.error("Error in register card", e);
@@ -1588,6 +1593,28 @@ public class FrontController extends HttpServlet {
             HibernateUtils.close(persistenceSession, logger);
         }
         return new CardResponseItem(idOfCard, (null != transitionState) ? transitionState.getCode() : null);
+    }
+
+    private void testForRegisterConditions(Session persistenceSession, Card exCard,
+            long idOfOrg, boolean secondRegisterAllowed) throws Exception {
+        if (!secondRegisterAllowed) {
+            Integer blockPeriod = RuntimeContext.getInstance()
+                    .getPropertiesValue("ecafe.processor.card.registration.block.period", 180);
+            Date now = new Date();
+            if (blockPeriod >= CalendarUtils.getDifferenceInDays(exCard.getUpdateTime(), now)) {
+                throw new CardResponseItem.CardAlreadyExist(
+                        String.format("%s. Минимальный срок блокировки карты не прошел - %dд", CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE, blockPeriod));
+            }
+        }
+
+        List<Org> friendlyOrgs = DAOUtils
+                .findAllFriendlyOrgs(persistenceSession, exCard.getOrg().getIdOfOrg());
+        for (Org o : friendlyOrgs) {
+            if (o.getIdOfOrg() == idOfOrg) {
+                throw new CardResponseItem.CardAlreadyExistInYourOrg(
+                        CardResponseItem.ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG_MESSAGE);
+            }
+        }
     }
 
     @WebMethod(operationName = "getEnterEventsManual")
@@ -2135,7 +2162,7 @@ public class FrontController extends HttpServlet {
                             GuardianDesc.FIELD_LEGALITY));
         }
 
-        Boolean legality = Boolean.parseBoolean(legalityStr);
+        Integer legality = convertLegality(legalityStr);
 
         String gender = FrontControllerProcessor
                 .getFindClientFieldValueByName(GuardianDesc.FIELD_GENDER, guardianDescList);
@@ -2277,7 +2304,7 @@ public class FrontController extends HttpServlet {
                     .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
                             clientId, ClientCreatedFromType.ARM, null);
 
-            clientGuardian.setIsLegalRepresent(legality);
+            clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
             persistenceSession.merge(clientGuardian);
 
             persistenceTransaction.commit();
@@ -2290,6 +2317,12 @@ public class FrontController extends HttpServlet {
             HibernateUtils.rollback(persistenceTransaction, logger);
             HibernateUtils.close(persistenceSession, logger);
         }
+    }
+
+    private Integer convertLegality(String legality_str) {
+        if (legality_str.equals("true")) return 1;
+        if (legality_str.equals("false")) return 0;
+        return Integer.parseInt(legality_str);
     }
 
     @WebMethod(operationName = "registerGuardianMigrantRequest")
@@ -2356,7 +2389,7 @@ public class FrontController extends HttpServlet {
             return result;
         }
 
-        Boolean legality = Boolean.parseBoolean(legalityStr);
+        Integer legality = convertLegality(legalityStr);
 
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -2393,7 +2426,7 @@ public class FrontController extends HttpServlet {
                         .createClientGuardianInfoTransactionFree(persistenceSession, guardian, relationDegree, false,
                                 clientId, ClientCreatedFromType.ARM, null);
 
-                clientGuardian.setIsLegalRepresent(legality);
+                clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legality));
                 persistenceSession.merge(clientGuardian);
             } else {
                 logger.warn(String.format(
@@ -2402,30 +2435,8 @@ public class FrontController extends HttpServlet {
             }
 
             if (!DAOUtils.isFriendlyOrganizations(persistenceSession, guardian.getOrg(), child.getOrg())) {
-                Long idOfProcessorMigrantRequest = MigrantsUtils
-                        .nextIdOfProcessorMigrantRequest(persistenceSession, guardian.getOrg().getIdOfOrg());
-                CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
-                        guardian.getOrg().getIdOfOrg());
-                String requestNumber = ImportMigrantsService
-                        .formRequestNumber(guardian.getOrg().getIdOfOrg(), orgId, idOfProcessorMigrantRequest,
-                                fireTime);
-
-                Migrant migrantNew = new Migrant(compositeIdOfMigrant, guardian.getOrg().getDefaultSupplier(),
-                        requestNumber, guardian, org, fireTime, CalendarUtils.addYear(fireTime, 10),
-                        Migrant.NOT_SYNCHRONIZED);
-                migrantNew.setInitiator(MigrantInitiatorEnum.INITIATOR_ORG);
-                //migrantNew.setSection(request.getGroupName());
-                //migrantNew.setResolutionCodeGroup(request.getIdOfServiceClass());
-                persistenceSession.save(migrantNew);
-
-                persistenceSession.save(ImportMigrantsService
-                        .createResolutionHistory(persistenceSession, guardian, compositeIdOfMigrant.getIdOfRequest(),
-                                VisitReqResolutionHist.RES_CREATED, fireTime));
-                persistenceSession.flush();
-                persistenceSession.save(ImportMigrantsService
-                        .createResolutionHistory(persistenceSession, guardian, compositeIdOfMigrant.getIdOfRequest(),
-                                VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(fireTime, 1)));
-
+                ClientManager.createMigrationForGuardianWithConfirm(persistenceSession, guardian, fireTime, org,
+                        MigrantInitiatorEnum.INITIATOR_ORG, 10);
                 result.code = ResponseItem.OK;
                 result.message = ResponseItem.OK_MESSAGE;
             }

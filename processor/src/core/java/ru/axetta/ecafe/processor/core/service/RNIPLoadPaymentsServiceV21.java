@@ -307,7 +307,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         descriptionSimpleParameter2.setReadonly(false);
         descriptionSimpleParameter2.setRequired(true);
         descriptionSimpleParameter2.setVisible(true);
-        descriptionSimpleParameter2.setRegexp("^\\d{6,15}$");
+        descriptionSimpleParameter2.setRegexp("^\\d{1,15}$");
 
         DescriptionSimpleParameter descriptionSimpleParameter3 = serviceTypeObjectFactory.createDescriptionSimpleParameter();
         descriptionSimpleParameter3.setForPayment(true);
@@ -343,7 +343,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         descriptionSimpleParameter6.setForPayment(true);
         descriptionSimpleParameter6.setForSearch(false);
         descriptionSimpleParameter6.setLabel("Основание платежа");
-        descriptionSimpleParameter6.setName("paytReason");
+        descriptionSimpleParameter6.setName("PAYTREASON");
         descriptionSimpleParameter6.setReadonly(true);
         descriptionSimpleParameter6.setRequired(true);
         descriptionSimpleParameter6.setVisible(false);
@@ -404,9 +404,9 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         descriptionSimpleParameter12.setForSearch(false);
         descriptionSimpleParameter12.setLabel("Назначение платежа");
         descriptionSimpleParameter12.setName("PURPOSE");
-        descriptionSimpleParameter12.setReadonly(false);
+        descriptionSimpleParameter12.setReadonly(true);
         descriptionSimpleParameter12.setRequired(true);
-        descriptionSimpleParameter12.setVisible(true);
+        descriptionSimpleParameter12.setVisible(false);
         descriptionSimpleParameter12.setDefaultValue("Оплата услуг питания в образовательном учреждении");
 
         DescriptionSimpleParameter descriptionSimpleParameter13 = serviceTypeObjectFactory.createDescriptionSimpleParameter();

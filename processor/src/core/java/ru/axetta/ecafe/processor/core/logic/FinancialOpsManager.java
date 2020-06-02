@@ -226,6 +226,8 @@ public class FinancialOpsManager {
         } else {
             order.setState(Order.STATE_CANCELED);
             session.save(order);
+            PreorderComplex preorderComplex = DAOUtils.findPreorderComplexByPayment(session, payment);
+            boolean saveAllPreorderDetails = (preorderComplex == null ? false : preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4));
             for (OrderDetail od : order.getOrderDetails()) {
                 od.setState(OrderDetail.STATE_CANCELED);
                 session.save(od);
@@ -233,8 +235,8 @@ public class FinancialOpsManager {
                 criteria.add(Restrictions.eq("idOfOrg", order.getCompositeIdOfOrder().getIdOfOrg()));
                 criteria.add(Restrictions.eq("idOfOrderDetail", od.getCompositeIdOfOrderDetail().getIdOfOrderDetail()));
                 PreorderLinkOD link = (PreorderLinkOD)criteria.uniqueResult();
-                if (link != null) {
-                    DAOUtils.savePreorderGuidFromOrderDetail(session, link.getPreorderGuid(), od, true);
+                if (saveAllPreorderDetails || link != null) {
+                    DAOUtils.savePreorderGuidFromOrderDetail(session, link.getPreorderGuid(), od, true, preorderComplex, od.getItemCode());
                 }
             }
 

@@ -196,30 +196,6 @@
                         </rich:column>
                         <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
                             <f:facet name="header">
-                                <h:outputText value="Льгота ИСПП" />
-                            </f:facet>
-                            <h:outputText styleClass="output-text" value="#{e.newDiscounts}" />
-                        </rich:column>
-                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
-                            <f:facet name="header">
-                                <h:outputText value="Предыдущая Льгота ИСПП" />
-                            </f:facet>
-                            <h:outputText styleClass="output-text" value="#{e.oldDiscounts}" />
-                        </rich:column>
-                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
-                            <f:facet name="header">
-                                <h:outputText value="Льгота ДТиСЗН" />
-                            </f:facet>
-                            <h:outputText styleClass="output-text" value="#{e.benefitDSZN}" />
-                        </rich:column>
-                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
-                            <f:facet name="header">
-                                <h:outputText value="Предыдущая Льгота ДТиСЗН" />
-                            </f:facet>
-                            <h:outputText styleClass="output-text" value="#{e.benefitDSZNFrom}" />
-                        </rich:column>
-                        <rich:column styleClass="#{NSIOrgRegistrySynchPage.getLineStyleClass(e)}">
-                            <f:facet name="header">
                                 <h:outputText value="Кол. представителей" />
                             </f:facet>
                             <h:outputText styleClass="output-text" value="#{e.guardiansCount}" />

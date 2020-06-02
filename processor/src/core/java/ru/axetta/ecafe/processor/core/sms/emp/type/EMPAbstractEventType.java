@@ -241,4 +241,20 @@ public abstract class EMPAbstractEventType implements EMPEventType {
         String number = Org.extractOrgNumberFromName(name);
         return number;
     }
+
+    protected static String findValueInParams(String valueNames[], String values[]) {
+        if(valueNames == null || valueNames.length < 1) {
+            return "";
+        }
+        for(int i=0; i<values.length-1; i+=2) {
+            String name = values [i];
+            String val = values[i+1];
+            for(String vn : valueNames) {
+                if(name.equals(vn)) {
+                    return val;
+                }
+            }
+        }
+        return "";
+    }
 }

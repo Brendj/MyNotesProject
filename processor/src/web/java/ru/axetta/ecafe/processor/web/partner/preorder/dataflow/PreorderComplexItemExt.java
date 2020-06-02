@@ -7,6 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 import ru.axetta.ecafe.processor.core.persistence.ComplexInfo;
 
 import javax.xml.bind.annotation.*;
+import java.util.Date;
 import java.util.List;
 
 /**
@@ -35,10 +36,13 @@ public class PreorderComplexItemExt implements Comparable {
     private Integer state;
     @XmlAttribute(name = "isRegular")
     private Boolean isRegular;
+    @XmlAttribute(name = "creatorRole")
+    private Integer creatorRole;
     @XmlElement(name = "menuItem")
     private List<PreorderMenuItemExt> menuItemExtList;
 
     private Integer modeVisible;
+    private Date preorderDate;
 
     public PreorderComplexItemExt() {
 
@@ -180,5 +184,21 @@ public class PreorderComplexItemExt implements Comparable {
 
     public void setModeVisible(Integer modeVisible) {
         this.modeVisible = modeVisible;
+    }
+
+    public Date getPreorderDate() {
+        return preorderDate;
+    }
+
+    public void setPreorderDate(Date preorderDate) {
+        this.preorderDate = preorderDate;
+    }
+
+    public Integer getCreatorRole() {
+        return creatorRole;
+    }
+
+    public void setCreatorRole(Integer creatorRole) {
+        this.creatorRole = creatorRole;
     }
 }

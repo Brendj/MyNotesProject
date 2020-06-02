@@ -461,6 +461,11 @@ public class GoodRequestsNewReportService {
         criteria.add(Restrictions.between("gr.doneDate", beginDate, endDate));
         criteria.add(Restrictions.in("gr.orgOwner", orgMap.keySet()));
         criteria.add(Restrictions.isNotNull("good"));
+
+        //Не показываем заявки, которые сохранены, но были отклонены по причине неверной даты (у них GlobalVersion = 0)
+        criteria.add(Restrictions.not(Restrictions.eq("globalVersion", 0L)));
+        criteria.add(Restrictions.not(Restrictions.eq("gr.globalVersion", 0L)));
+
         if (preordersOnly) {
             criteria.add(Restrictions.eq("gr.comment", PREORDER_COMMENT));
         }

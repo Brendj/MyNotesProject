@@ -38,5 +38,12 @@
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.RegularPreorderState</param>
             </type>
         </property>
+        <property name="mobileGroupOnCreate" column="mobileGroupOnCreate">
+            <type name="org.hibernate.type.EnumType">
+                <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.PreorderMobileGroupOnCreateType</param>
+            </type>
+        </property>
+	<property name="sendeddailynotification" column="sendeddailynotification" type="boolean"/>
+
     </class>
 </hibernate-mapping>
