@@ -7,10 +7,7 @@ package ru.axetta.ecafe.processor.core.daoservices.order;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.daoservices.AbstractDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.*;
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.Order;
-import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
-import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalon;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalonType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -74,8 +71,8 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     public void buildRegisterStampPaidReportItem(Long idOfOrg, Date start, String fullname,
             boolean includeActDiscrepancies, OrderTypeEnumType orderTypeEnumType, List<RegisterStampPaidReportItem> result,
             GoodItem1 goodItem, String date, String number, Date time2) {
-        String sql = "select sum(orderdetail.qty) as qty, sum(orderdetail.qty * orderdetail.price) as summa  from cf_orders cforder" +
-                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+        String sql = "select cast(coalesce(sum(orderdetail.qty), 0) as  bigint) as qty, "
+                + "cast(coalesce(sum(orderdetail.qty * orderdetail.rprice), 0) as bigint) as summa  from cf_orders cforder" +
                 " and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
                 " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and" +
@@ -102,10 +99,11 @@ public class OrderDetailsDAOService extends AbstractDAOService {
             qty = ((BigInteger)row[0]).longValue();
             summa = ((BigInteger)row[1]).longValue();
         }
-        boolean showPrice = (qty * goodItem.getPrice()) == summa ? true : false;
+        boolean showPrice = goodItem.getModeOfAdd() == null || !goodItem.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4); //(qty * goodItem.getPrice()) == summa ? true : false;
         RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(goodItem, qty, date, number, start,
                 showPrice ? goodItem.getPrice() : null, summa);
-        RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(goodItem,qty,"Итого", CalendarUtils.addDays(time2, 1));
+        RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(goodItem,qty,"Итого", null, CalendarUtils.addDays(time2, 1),
+                showPrice ? goodItem.getPrice() : null, summa);
         result.add(item);
         result.add(total);
     }
@@ -378,15 +376,17 @@ public class OrderDetailsDAOService extends AbstractDAOService {
     public List<GoodItem1> findAllGoodsByOrderType(Long idOfOrg, Date startTime, Date endTime, OrderTypeEnumType orderTypeEnumType){
         Set<Integer> orderTypeEnumTypeSet = new HashSet<Integer>();
         orderTypeEnumTypeSet.add(orderTypeEnumType.ordinal());
-        String sql = "SELECT good1_.IdOfGood AS globalId, "
+        String sql = "SELECT distinct good1_.IdOfGood AS globalId, "
                 + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 3) ELSE split_part(good1_.FullName, '/', 3) END AS pathPart3, "
                 + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 4) ELSE split_part(good1_.FullName, '/', 4) END AS pathPart4, "
                 + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 2) ELSE split_part(good1_.FullName, '/', 2) END AS pathPart2, "
                 + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 1) ELSE split_part(good1_.FullName, '/', 1) END AS pathPart1, "
-                + "orderdetai0_.MenuDetailName AS fullName, orderdetai0_.rPrice AS price, order2_.CreatedDate as createdDate, orderdetai0_.Qty as qty "
+                + "orderdetai0_.MenuDetailName AS fullName, pc.modeofadd as modeOfAdd "
                 + "FROM CF_OrderDetails orderdetai0_ LEFT OUTER JOIN cf_goods good1_ ON orderdetai0_.IdOfGood=good1_.IdOfGood "
                 + "LEFT OUTER JOIN CF_Orders order2_ ON orderdetai0_.IdOfOrg=order2_.IdOfOrg AND orderdetai0_.IdOfOrder=order2_.IdOfOrder "
                 + "LEFT OUTER JOIN CF_Orgs org3_ ON order2_.IdOfOrg=org3_.IdOfOrg "
+                + "left outer join cf_preorder_linkod pp on orderdetai0_.idoforder = pp.idoforder and orderdetai0_.idoforderdetail = pp.idoforderdetail "
+                + "left outer join cf_preorder_complex pc on pp.preorderguid = pc.guid "
                 + "WHERE order2_.State=0 AND orderdetai0_.State=0 AND (order2_.OrderType IN (:orderType)) "
                 + "AND (orderdetai0_.IdOfGood IS NOT NULL) AND org3_.IdOfOrg=:idOfOrg "
                 + "AND (order2_.CreatedDate BETWEEN :startDate AND :endDate) AND orderdetai0_.MenuType>=:mintype AND orderdetai0_.MenuType<=:maxtype ORDER BY fullName";
@@ -399,7 +399,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         query.setParameter("endDate", endTime.getTime());
         query.setResultTransformer(Transformers.aliasToBean(GoodItem1.class));
         query.addScalar("globalId").addScalar("pathPart3").addScalar("pathPart4").addScalar("pathPart2")
-                .addScalar("pathPart1").addScalar("fullName").addScalar("price").addScalar("createdDate")
+                .addScalar("pathPart1").addScalar("fullName").addScalar("modeOfAdd")
         .addScalar("qty");
         return  (List<GoodItem1>) query.list();
     }
