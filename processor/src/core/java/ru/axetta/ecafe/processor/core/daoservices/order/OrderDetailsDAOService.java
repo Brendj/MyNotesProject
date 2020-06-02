@@ -381,7 +381,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 4) ELSE split_part(good1_.FullName, '/', 4) END AS pathPart4, "
                 + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 2) ELSE split_part(good1_.FullName, '/', 2) END AS pathPart2, "
                 + "CASE good1_.FullName WHEN '' THEN split_part(orderdetai0_.MenuDetailName, '/', 1) ELSE split_part(good1_.FullName, '/', 1) END AS pathPart1, "
-                + "orderdetai0_.MenuDetailName AS fullName, pc.modeofadd as modeOfAdd "
+                + "orderdetai0_.MenuDetailName AS fullName, case when pc.modeofadd = 4 then 0 else orderdetai0_.rprice end as price, pc.modeofadd as modeOfAdd "
                 + "FROM CF_OrderDetails orderdetai0_ LEFT OUTER JOIN cf_goods good1_ ON orderdetai0_.IdOfGood=good1_.IdOfGood "
                 + "LEFT OUTER JOIN CF_Orders order2_ ON orderdetai0_.IdOfOrg=order2_.IdOfOrg AND orderdetai0_.IdOfOrder=order2_.IdOfOrder "
                 + "LEFT OUTER JOIN CF_Orgs org3_ ON order2_.IdOfOrg=org3_.IdOfOrg "
@@ -399,7 +399,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         query.setParameter("endDate", endTime.getTime());
         query.setResultTransformer(Transformers.aliasToBean(GoodItem1.class));
         query.addScalar("globalId").addScalar("pathPart3").addScalar("pathPart4").addScalar("pathPart2")
-                .addScalar("pathPart1").addScalar("fullName").addScalar("modeOfAdd")
+                .addScalar("pathPart1").addScalar("fullName").addScalar("price").addScalar("modeOfAdd")
         .addScalar("qty");
         return  (List<GoodItem1>) query.list();
     }
