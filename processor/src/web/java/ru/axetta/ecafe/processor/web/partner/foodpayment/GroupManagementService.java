@@ -50,8 +50,11 @@ public class GroupManagementService implements IGroupManagementService {
                     GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
         List<GroupInfo> groupInfoList = new LinkedList<GroupInfo>();
         List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
-        List<ClientGroup> orgGroups = DAOUtils.getClientGroupsByIdOfOrg(persistanceSession, orgId);
+        friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, orgId));
+        Disjunction restrictionOrgIdIn = Restrictions.disjunction();
+        List<ClientGroup> orgGroups = new LinkedList<ClientGroup>();
         for (Org friendlyOrg:friendlyOrgs) {
+            restrictionOrgIdIn.add(Restrictions.eq("idOfMainOrg", friendlyOrg.getIdOfOrg()));
             orgGroups.addAll(DAOUtils.getClientGroupsByIdOfOrg(persistanceSession, friendlyOrg.getIdOfOrg()));
         }
         if(orgGroups.isEmpty())
@@ -60,14 +63,15 @@ public class GroupManagementService implements IGroupManagementService {
         for (ClientGroup orgGroup: orgGroups){
             if(orgGroup.getGroupName() == null || orgGroup.getGroupName().isEmpty())
                 continue;
-            Criteria groupNamesToOrgCriteria = persistanceSession.createCriteria(GroupNamesToOrgs.class);
-            groupNamesToOrgCriteria.add(Restrictions.eq("idOfOrg", orgId));
-            groupNamesToOrgCriteria.add(Restrictions.eq("groupName", orgGroup.getGroupName()));
-            groupNamesToOrgCriteria.setMaxResults(1);
-            GroupNamesToOrgs groupNamesToOrgs = (GroupNamesToOrgs) groupNamesToOrgCriteria.uniqueResult();
-            if(groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg() != orgGroup.getCompositeIdOfClientGroup().getIdOfOrg())
-                continue;
             if(isGroupNotPredefined(orgGroup)){
+
+                Criteria groupNamesToOrgCriteria = persistanceSession.createCriteria(GroupNamesToOrgs.class);
+                groupNamesToOrgCriteria.add(restrictionOrgIdIn);
+                groupNamesToOrgCriteria.add(Restrictions.eq("groupName", orgGroup.getGroupName()));
+                groupNamesToOrgCriteria.setMaxResults(1);
+                GroupNamesToOrgs groupNamesToOrgs = (GroupNamesToOrgs) groupNamesToOrgCriteria.uniqueResult();
+                if(groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg().longValue() != orgGroup.getCompositeIdOfClientGroup().getIdOfOrg().longValue())
+                    continue;
                 GroupInfo groupInfo = getGroupInfo(persistanceSession, orgGroup, getClientGroupManagerByGroupName(persistanceSession,
                         orgGroup.getGroupName(), orgGroup.getOrg().getIdOfOrg()));
                 groupInfo.setOrgId(orgGroup.getCompositeIdOfClientGroup().getIdOfOrg());
