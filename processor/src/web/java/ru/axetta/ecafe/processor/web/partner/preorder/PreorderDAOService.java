@@ -1197,6 +1197,7 @@ public class PreorderDAOService {
         query.setParameter("regularPreorder", regularPreorder);
         query.setParameter("date", new Date());
         if (query.getResultList().size() == 0) {
+            regularPreorder.setState(RegularPreorderState.CHANGE_BY_SERVICE);
             regularPreorder.setDeletedState(true);
             regularPreorder.setLastUpdate(new Date());
             em.merge(regularPreorder);
