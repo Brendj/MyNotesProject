@@ -2909,6 +2909,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
                     Set<WtComplex> wtComplexes = new HashSet<>();
                     Set<WtComplex> wtComComplexes = new HashSet<>();
+                    Set<WtComplex> wtDiscComplexes = new HashSet<>();
+                    Set<WtComplex> wtElemDiscComplexes = new HashSet<>();
 
                     // 6-9, 12 Платные комплексы по возрастным группам и группам
                     if (isPaid) {
@@ -2928,7 +2930,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         if (isFree && (wtDiscountRuleSet.size() > 0)) {
                             WtDiscountRule notElemDiscRule = RuntimeContext.getAppContext()
                                     .getBean(PreorderDAOService.class).getWtNotElemDiscountRule();
-                            Set<WtComplex> wtDiscComplexes = RuntimeContext.getAppContext()
+                            wtDiscComplexes = RuntimeContext.getAppContext()
                                     .getBean(PreorderDAOService.class)
                                     .getFreeWtComplexesByDiscountRules(menuDate, menuDate, org, notElemDiscRule);
                             if (wtDiscComplexes.size() > 0) {
@@ -2941,11 +2943,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     if (isElem) {
                         WtDiscountRule elemDiscRule = RuntimeContext.getAppContext()
                                 .getBean(PreorderDAOService.class).getWtElemDiscountRule();
-                        Set<WtComplex> wtDiscComplexes = RuntimeContext.getAppContext()
+                        wtElemDiscComplexes = RuntimeContext.getAppContext()
                                 .getBean(PreorderDAOService.class)
                                 .getFreeWtComplexesForElem(menuDate, menuDate, org, elemDiscRule);
                         if (wtDiscComplexes.size() > 0) {
-                            wtComplexes.addAll(wtDiscComplexes);
+                            wtComplexes.addAll(wtElemDiscComplexes);
                         }
                     }
 
@@ -2968,7 +2970,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                     .intValue();
                             if (isDiscountComplex == 1) {
                                 getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
-                            } else if (isDiscountComplex == 3 && !wtComComplexes.contains(wtComplex)) {
+                            } else if (isDiscountComplex == 3 && (wtDiscComplexes.contains(wtComplex) ||
+                                    wtElemDiscComplexes.contains(wtComplex))) {
                                 getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
                                 getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 0);
                             } else {

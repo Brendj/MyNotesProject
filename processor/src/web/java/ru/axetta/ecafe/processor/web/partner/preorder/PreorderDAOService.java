@@ -2634,7 +2634,7 @@ public class PreorderDAOService {
                 + "left join cf_categoryorg_orgs cor on cor.idofcategoryorg = dco.idofcategoryorg "
                 + "where c.deleteState = 0 and c.beginDate < :startDate AND c.endDate > :endDate "
                 + "and c.idofagegroupitem = :elemAgeGroup "
-                + "and (c.idofcomplexgroupitem = :freeComplex or c.idofcomplexgroupitem = :allComplexes)"
+                + "and (c.idofcomplexgroupitem = :freeComplex or c.idofcomplexgroupitem = :allComplexes) "
                 + "and :idofrule = dc.idofrule and cor.idoforg = :idoforg");
         query.setParameter("idofrule", wtDiscountRule.getIdOfRule());
         query.setParameter("idoforg", org.getIdOfOrg());
