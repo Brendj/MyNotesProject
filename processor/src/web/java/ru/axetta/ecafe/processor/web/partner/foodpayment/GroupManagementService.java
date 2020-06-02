@@ -4,10 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
-import ru.axetta.ecafe.processor.core.persistence.Client;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
-import ru.axetta.ecafe.processor.core.persistence.ClientGroupManager;
-import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.NullArgumentException;
@@ -53,18 +50,31 @@ public class GroupManagementService implements IGroupManagementService {
                     GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
         List<GroupInfo> groupInfoList = new LinkedList<GroupInfo>();
         List<Org> friendlyOrgs = DAOUtils.findFriendlyOrgs(persistanceSession, orgId);
-        List<ClientGroup> orgGroups = DAOUtils.getClientGroupsByIdOfOrg(persistanceSession, orgId);
+        friendlyOrgs.add(DAOUtils.findOrg(persistanceSession, orgId));
+        Disjunction restrictionOrgIdIn = Restrictions.disjunction();
+        List<ClientGroup> orgGroups = new LinkedList<ClientGroup>();
         for (Org friendlyOrg:friendlyOrgs) {
+            restrictionOrgIdIn.add(Restrictions.eq("idOfMainOrg", friendlyOrg.getIdOfOrg()));
             orgGroups.addAll(DAOUtils.getClientGroupsByIdOfOrg(persistanceSession, friendlyOrg.getIdOfOrg()));
         }
         if(orgGroups.isEmpty())
             throw new RequestProcessingException(GroupManagementErrors.GROUPS_NOT_FOUND.getErrorCode(),
                     GroupManagementErrors.GROUP_NOT_FOUND.getErrorMessage());
         for (ClientGroup orgGroup: orgGroups){
+            if(orgGroup.getGroupName() == null || orgGroup.getGroupName().isEmpty())
+                continue;
             if(isGroupNotPredefined(orgGroup)){
+
+                Criteria groupNamesToOrgCriteria = persistanceSession.createCriteria(GroupNamesToOrgs.class);
+                groupNamesToOrgCriteria.add(restrictionOrgIdIn);
+                groupNamesToOrgCriteria.add(Restrictions.eq("groupName", orgGroup.getGroupName()));
+                groupNamesToOrgCriteria.setMaxResults(1);
+                GroupNamesToOrgs groupNamesToOrgs = (GroupNamesToOrgs) groupNamesToOrgCriteria.uniqueResult();
+                if(groupNamesToOrgs != null && groupNamesToOrgs.getIdOfOrg().longValue() != orgGroup.getCompositeIdOfClientGroup().getIdOfOrg().longValue())
+                    continue;
                 GroupInfo groupInfo = getGroupInfo(persistanceSession, orgGroup, getClientGroupManagerByGroupName(persistanceSession,
                         orgGroup.getGroupName(), orgGroup.getOrg().getIdOfOrg()));
-                groupInfo.setOrgId(orgGroup.getCompositeIdOfClientGroup().getIdOfOrg().toString());
+                groupInfo.setOrgId(orgGroup.getCompositeIdOfClientGroup().getIdOfOrg());
                 groupInfoList.add(groupInfo);
             }
         }
@@ -174,7 +184,7 @@ public class GroupManagementService implements IGroupManagementService {
         List<GroupManager> groupManagerList = new LinkedList<GroupManager>();
         for (Client client: clients){
             GroupManager groupManager = new GroupManager();
-            groupManager.setContractId(client.getContractId().toString());
+            groupManager.setContractId(client.getContractId());
             groupManager.setName(client.getPerson().getFirstName());
             groupManager.setSecondName(client.getPerson().getSecondName());
             groupManager.setSurname(client.getPerson().getSurname());
@@ -188,7 +198,7 @@ public class GroupManagementService implements IGroupManagementService {
             throw new NullArgumentException("ClientGroup and groupManagers cannot be null");
         GroupInfo groupInfo = new GroupInfo();
         List<Client> groupManagerClientList = new LinkedList<Client>();
-        groupInfo.setGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup().toString());
+        groupInfo.setGroupId(clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
         groupInfo.setGroupName(clientGroup.getGroupName());
         for (ClientGroupManager clientGroupManager: groupManagers){
             groupManagerClientList.add(DAOUtils.findClient(persistanceSession,clientGroupManager.getIdOfClient()));
@@ -201,7 +211,7 @@ public class GroupManagementService implements IGroupManagementService {
         if(organizations == null)
             throw new NullArgumentException("List of organizations cannot be null.");
         GroupEmployee groupEmployee = new GroupEmployee();
-        groupEmployee.setGroupId(groupId.toString());
+        groupEmployee.setGroupId(groupId);
         groupEmployee.setGroupName(groupName);
         Criteria employeeCriteria = persistanceSession.createCriteria(Client.class);
         Disjunction restrictionGroupOr = Restrictions.disjunction();
