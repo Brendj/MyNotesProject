@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.web.ui.client;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
@@ -193,7 +194,7 @@ public class ClientListPage extends BasicWorkspacePage implements OrgSelectPage.
                 this.externalId = client.getClientGUID();
             }
             this.createdFrom = client.getCreatedFrom();
-            this.categoriesDiscounts = client.getCategoriesDiscounts();
+            this.categoriesDiscounts = DiscountManager.getClientDiscountsAsString(client);
         }
 
         public Long getIdOfClient() {

@@ -1912,40 +1912,6 @@ public class DAOUtils {
         return version;
     }
 
-    public static void deleteCategoryDiscount(Session session, long id) {
-        //TODO: разобораться надо ли это с учетом ввода таблицы связи
-        CategoryDiscount categoryDiscount = (CategoryDiscount) session.load(CategoryDiscount.class, id);
-        Criteria clientCriteria = session.createCriteria(Client.class);
-        Criterion exp1 = Restrictions.or(Restrictions
-                        .like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + "", MatchMode.EXACT),
-                Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + ",",
-                        MatchMode.START));
-        Criterion exp2 = Restrictions.or(Restrictions
-                        .like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount(), MatchMode.END),
-                Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount() + ",",
-                        MatchMode.ANYWHERE));
-        Criterion expression = Restrictions.or(exp1, exp2);
-        clientCriteria.add(expression);
-        List<Client> clients = clientCriteria.list();
-        for (Client client : clients) {
-            String categoriesDiscounts = client.getCategoriesDiscounts();
-            if (categoriesDiscounts.contains("," + id + ",")) {
-                categoriesDiscounts = categoriesDiscounts.replace("," + id + ",", ",");
-            } else if (categoriesDiscounts.startsWith(id + ",")) {
-                categoriesDiscounts = categoriesDiscounts.substring((id + ",").length());
-            } else if (categoriesDiscounts.endsWith("," + id)) {
-                categoriesDiscounts = categoriesDiscounts
-                        .substring(0, categoriesDiscounts.length() - ("," + id).length());
-            } else {
-                categoriesDiscounts = categoriesDiscounts.replace("" + id, "");
-            }
-            client.setCategoriesDiscounts(categoriesDiscounts);
-            session.save(client);
-        }
-
-        session.delete(categoryDiscount);
-    }
-
     public static void deleteCategoryDiscountDSZN(Session session, Long id, Long nextVersion) {
         CategoryDiscountDSZN categoryDiscountDSZN = (CategoryDiscountDSZN) session
                 .load(CategoryDiscountDSZN.class, id.intValue());
@@ -4582,12 +4548,11 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static ClientDtisznDiscountInfo getActualDTISZNDiscountsInfoInoeByClient(Session session, Long idOfClient,
-            Long code) {
+    public static ClientDtisznDiscountInfo getActualDTISZNDiscountsInfoInoeByClient(Session session, Long idOfClient) {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
         criteria.add(Restrictions.eq("archived", false));
-        criteria.add(Restrictions.eq("dtisznCode", code));
+        criteria.add(Restrictions.eq("dtisznCode", Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE)));
         List list = criteria.list();
         if (list.size() == 0 || list.size() > 1) {
             return null;
@@ -4895,6 +4860,14 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(CategoryDiscountDSZN.class);
         criteria.add(Restrictions.eq("categoryDiscount.idOfCategoryDiscount", idOfCategoryDiscount));
         criteria.setProjection(Projections.property("code"));
+        return criteria.list();
+    }
+
+    public static List<ApplicationForFood> getApplicationForFoodInoeByClient(Session session, Client client) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.isNull("dtisznCode"));
+        criteria.add(Restrictions.eq("archived", false));
         return criteria.list();
     }
 
