@@ -48,7 +48,6 @@ public class TaloonPreorderVerificationDetail {
     private String comments;
     private boolean summaryDay;
     private TaloonPreorderVerificationComplex complex;
-    private boolean changedData;
 
     public TaloonPreorderVerificationDetail() {
     }
@@ -85,7 +84,6 @@ public class TaloonPreorderVerificationDetail {
         this.remarks = remarks;
         this.comments = comments;
         this.summaryDay = summaryDay;
-        changedData = false;
     }
 
     //public void setStrShippedQty(String strShippedQty) {
@@ -229,11 +227,6 @@ public class TaloonPreorderVerificationDetail {
         return MAKE_CANCEL;
     }
 
-    public String getChangedData() {
-        changedData = true;
-        return "changed";
-    }
-
     public String getPpStateToClear() {
         return MAKE_CLEAR;
     }
@@ -303,6 +296,10 @@ public class TaloonPreorderVerificationDetail {
 
     public Boolean isEmptyTotal() {
         return isSummaryDay() && complexId == null && complexName == null && goodsGuid == null && taloonDate == null;
+    }
+
+    public Boolean isEmptyShippedQty() {
+        return shippedQty == null || shippedQty == 0;
     }
 
     public Boolean isTotal() {
@@ -500,14 +497,6 @@ public class TaloonPreorderVerificationDetail {
 
     public void setComplex(TaloonPreorderVerificationComplex complex) {
         this.complex = complex;
-    }
-
-    public boolean isChangedData() {
-        return changedData;
-    }
-
-    public void setChangedData(boolean changedData) {
-        this.changedData = changedData;
     }
 
     public Long getIdOfOrgCreated() {

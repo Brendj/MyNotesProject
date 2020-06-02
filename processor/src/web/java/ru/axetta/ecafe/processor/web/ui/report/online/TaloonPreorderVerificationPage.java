@@ -146,7 +146,6 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
                 }
             }
         }
-        checkDataChanged();
     }
 
     public void confirmPpStateAllDay() {
@@ -181,18 +180,8 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
         return false;
     }
 
-    public void checkDataChanged() {
-        setChangedData(false);
-        for (TaloonPreorderVerificationItem item : items) {
-            for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
-                for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-                    if (detail.isChangedData()) {
-                        setChangedData(true);
-                        return;
-                    }
-                }
-            }
-        }
+    public void changeData() {
+        changedData = true;
     }
 
     public boolean isPpStateNotSelected() {
