@@ -134,7 +134,7 @@ public class PreorderOperationsService {
         String html = "<html><body><table><tbody><tr><td>Дата</td><td>Количество в предзаказе</td><td>Количество в заявках</td><td>Изменено</td>%s</tr></tbody></table></body></html>";
         String text = "";
         for (PreorderCheck preorderCheck : list) {
-            text = String.format("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", CalendarUtils.dateToString(preorderCheck.getDate()),
+            text += String.format("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", CalendarUtils.dateToString(preorderCheck.getDate()),
                     preorderCheck.getPreorderAmount(), preorderCheck.getGoodRequestAmount(), CalendarUtils.dateTimeToString(preorderCheck.getLastUpdate()));
         }
         html = String.format(html, text);
