@@ -847,25 +847,35 @@ public class EventNotificationService {
         return Integer.parseInt(id);
     }
 
-    public static boolean isEnterEventWithChecker(String[] values) {
-        String id = findValueInParams(new String [] {ENTER_WITH_CHECKER_VALUES_KEY}, values);
-        return id.equals("1");
-    }
-
     private EMPEventType getEnterEventEMPType(Client destClient, Client dataClient, Integer direction, String[] values) {
         EMPEventType empType;
         int type;
-        if (isEnterEventWithChecker(values)) {
-            if (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)
-                type = EMPEventTypeFactory.ENTER_WITH_CHECKER;
-            else
-                type = EMPEventTypeFactory.LEAVE_WITH_CHECKER;
-        }
-        else {
-            if (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)
-                type = EMPEventTypeFactory.ENTER_EVENT;
-            else
-                type = EMPEventTypeFactory.LEAVE_EVENT;
+        String id = findValueInParams(new String [] {ENTER_WITH_CHECKER_VALUES_KEY}, values);
+        switch (id) {
+            case "1":
+                if (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)
+                    type = EMPEventTypeFactory.ENTER_WITH_CHECKER;
+                else
+                    type = EMPEventTypeFactory.LEAVE_WITH_CHECKER;
+                break;
+            case "2":
+                if (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)
+                    type = EMPEventTypeFactory.ENTER_WITH_GUARDIAN_EVENT;
+                else
+                    type = EMPEventTypeFactory.LEAVE_WITH_GUARDIAN_EVENT;
+                break;
+            case "3":
+                if (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)
+                    type = EMPEventTypeFactory.ENTER_EVENT;
+                else
+                    type = EMPEventTypeFactory.LEAVE_EVENT;
+                break;
+            default:
+                if (direction == EnterEvent.ENTRY || direction == EnterEvent.RE_ENTRY)
+                    type = EMPEventTypeFactory.ENTER_EVENT;
+                else
+                    type = EMPEventTypeFactory.LEAVE_EVENT;
+                break;
         }
         if (dataClient != null) {
             empType = EMPEventTypeFactory.buildEvent(type, dataClient, destClient);
