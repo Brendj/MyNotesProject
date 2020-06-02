@@ -630,7 +630,7 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void preordersCheck() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).dailyCheck();
+            RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).dailyCheckPreorders();
             printMessage("Расчет количественных показателей по предзаказам завершен");
         } catch (Exception e) {
             getLogger().error("Error create preordersCheck: ", e);

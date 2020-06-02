@@ -766,6 +766,15 @@ public class PreorderDAOService {
         }
     }
 
+    public List<PreorderCheck> getPreorderCheckListForNotification() {
+        Query query = emReport.createQuery("select pc from PreorderCheck pc "
+                + "where pc.lastUpdate between :startDate and :endDate and pc.alarm = true");
+        query.setParameter("startDate", CalendarUtils.startOfDay(new Date()));
+        query.setParameter("endDate", CalendarUtils.endOfDay(new Date()));
+
+        return query.getResultList();
+    }
+
     private void dailyCheckOnDate(Date date) {
         Query query = emReport.createQuery("select coalesce(sum(pc.amount), 0) "
                 + "from PreorderComplex pc, Org o "
