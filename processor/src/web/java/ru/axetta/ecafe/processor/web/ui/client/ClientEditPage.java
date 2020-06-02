@@ -1188,7 +1188,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         boolean isDiscountModeChanged = !(client.getDiscountMode().equals(discountMode));
         boolean isCategoryListChanged = (client.getCategories().size() != newCategoriesDiscounts.size());
         if (isCategoryListChanged) return true;
-        isCategoryListChanged = client.getCategories().containsAll(newCategoriesDiscounts);
+        isCategoryListChanged = !client.getCategories().equals(newCategoriesDiscounts);
         return isDiscountModeChanged || isCategoryListChanged;
     }
 
