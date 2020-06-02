@@ -12,10 +12,8 @@
         </id>
         <property name="idoforg" column="idoforg" type="long" />
         <property name="orgguid" column="guid" type="string" length="32"/>
-        <property name="idofcomplex" column="idofcomplex" type="integer"/>
-        <property name="complexname" column="complexname" type="string" length="32"/>
+        <property name="ekisid" column="ekisid" type="long" />
         <property name="groupname" column="groupname" type="string" length="32"/>
-        <property name="menudate" column="menudate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
     </class>
 </hibernate-mapping>
 

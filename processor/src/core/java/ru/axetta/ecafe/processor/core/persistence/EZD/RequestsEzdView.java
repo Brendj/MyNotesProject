@@ -15,10 +15,8 @@ public class RequestsEzdView {
     private Long id;
     private Long idoforg;
     private String orgguid;
-    private Integer idofcomplex;
-    private String complexname;
+    private Long ekisid;
     private String groupname;
-    private Date menudate;
 
 
     public Long getIdoforg() {
@@ -29,21 +27,6 @@ public class RequestsEzdView {
         this.idoforg = idoforg;
     }
 
-    public Integer getIdofcomplex() {
-        return idofcomplex;
-    }
-
-    public void setIdofcomplex(Integer idofcomplex) {
-        this.idofcomplex = idofcomplex;
-    }
-
-    public String getComplexname() {
-        return complexname;
-    }
-
-    public void setComplexname(String complexname) {
-        this.complexname = complexname;
-    }
 
     public String getGroupname() {
         return groupname;
@@ -51,14 +34,6 @@ public class RequestsEzdView {
 
     public void setGroupname(String groupname) {
         this.groupname = groupname;
-    }
-
-    public Date getMenudate() {
-        return menudate;
-    }
-
-    public void setMenudate(Date menudate) {
-        this.menudate = menudate;
     }
 
     public Long getId() {
@@ -75,5 +50,13 @@ public class RequestsEzdView {
 
     public void setOrgguid(String orgguid) {
         this.orgguid = orgguid;
+    }
+
+    public Long getEkisid() {
+        return ekisid;
+    }
+
+    public void setEkisid(Long ekisid) {
+        this.ekisid = ekisid;
     }
 }

@@ -4919,8 +4919,7 @@ public class DAOUtils {
         query.executeUpdate();
     }
 
-    public static List getAllDateFromViewEZD(Session persistenceSession, List<Org> orgs, String groupname,
-            Date startDate) throws Exception {
+    public static List getAllDateFromViewEZD(Session persistenceSession, List<Org> orgs, String groupname) throws Exception {
         Criteria criteria = persistenceSession.createCriteria(RequestsEzdView.class);
         if (orgs != null && !orgs.isEmpty()) {
             List<Long> ids = new ArrayList<>();
@@ -4932,7 +4931,7 @@ public class DAOUtils {
         if (groupname != null) {
             criteria.add(Restrictions.eq("groupname", groupname));
         }
-        criteria.add(Restrictions.gt("menudate", startDate));
+        //criteria.add(Restrictions.gt("menudate", startDate));
         return criteria.list();
     }
 
@@ -4948,12 +4947,6 @@ public class DAOUtils {
         criteria.add(Restrictions.gt("specDate", new Date()));
         criteria.add(Restrictions.in("groupname", groupName));
         criteria.add(Restrictions.in("idoforg", idofOrg));
-        return criteria.list();
-    }
-
-    public static List getAllDateFromProdactionCalendarForEZD(Session persistenceSession) throws Exception {
-        Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
-        criteria.add(Restrictions.gt("day", new Date()));
         return criteria.list();
     }
 
