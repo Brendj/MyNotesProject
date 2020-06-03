@@ -10,7 +10,10 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodAgeGroupType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodType;
-import ru.axetta.ecafe.processor.core.persistence.utils.*;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.PreorderUtils;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportServiceParam;
@@ -1655,6 +1658,7 @@ public class PreorderDAOService {
             PreorderMobileGroupOnCreateType mobileGroupOnCreate) throws MenuDetailNotExistsException {
         PreorderComplex preorderComplex = new PreorderComplex();
         preorderComplex.setClient(client);
+        preorderComplex.setArmComplexId(idOfComplex);
         preorderComplex.setPreorderDate(date);
         preorderComplex.setAmount(complexAmount);
         preorderComplex.setVersion(nextVersion);
@@ -1845,11 +1849,16 @@ public class PreorderDAOService {
         preorderMenuDetail.setState(PreorderState.OK);
         preorderMenuDetail.setMenuDetailName(wtDish.getDishName());
         preorderMenuDetail.setMenuDetailPrice(wtDish.getPrice().longValue());
-        WtMenuGroup menuGroup = DAOReadExternalsService.getInstance().getWtMenuGroupByWtDish(wtDish);
-        //if (menuGroup != null) {
-        //    preorderMenuDetail.setGroupName(menuGroup.getName());
-        //}
-        preorderMenuDetail.setGroupName("Комплексы");
+
+        StringBuilder sb = new StringBuilder();
+        if (wtDish.getCategoryItems() != null && wtDish.getCategoryItems().size() > 0) {
+            for (WtCategoryItem ci : wtDish.getCategoryItems()) {
+                sb.append(ci.getDescription()).append(",");
+            }
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        preorderMenuDetail.setGroupName(sb.toString());
+
         preorderMenuDetail.setItemCode(wtDish.getCode().toString());
         preorderMenuDetail.setAvailableNow(0);
         preorderMenuDetail.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
@@ -1859,7 +1868,6 @@ public class PreorderDAOService {
         preorderMenuDetail.setMenuDetailOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
         preorderMenuDetail.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
         preorderMenuDetail.setShortName(wtDish.getDishName());
-        preorderMenuDetail.setIdOfGood(wtDish.getIdOfDish());
         preorderMenuDetail.setIdOfDish(wtDish.getIdOfDish());
         preorderMenuDetail.setMobile(mobile);
         preorderMenuDetail.setMobileGroupOnCreate(mobileGroupOnCreate);
