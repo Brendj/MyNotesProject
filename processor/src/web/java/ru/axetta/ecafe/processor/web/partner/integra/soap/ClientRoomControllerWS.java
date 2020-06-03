@@ -2413,6 +2413,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private Set<Long> getIdOfMenusByOrderDetails(List<OrderDetail> detailsList) {
         Set set = new HashSet<Long>();
         for (OrderDetail detail : detailsList) {
+            if (detail.getIdOfMenuFromSync() != null && detail.getIdOfMenuFromSync() != 0)
             set.add(detail.getIdOfMenuFromSync());
         }
         return set;
