@@ -2169,7 +2169,7 @@ public class DAOUtils {
     }
 
     public static void savePreorderGuidFromOrderDetail(Session session, String guid, OrderDetail orderDetail,
-            boolean cancelOrder, PreorderComplex preorderComplex, String itemCode) {
+            boolean cancelOrder, PreorderComplex preorderComplex, String itemCode, Long orderSum) {
         if (!cancelOrder) {
             PreorderLinkOD linkOD = new PreorderLinkOD(guid, orderDetail);
             session.save(linkOD);
@@ -2180,14 +2180,14 @@ public class DAOUtils {
             preorderComplex = (PreorderComplex) criteria.uniqueResult();
         }
         if (preorderComplex != null) {
-            long sum = orderDetail.getQty() * orderDetail.getRPrice();
+            long sum = orderSum;
             long qty = orderDetail.getQty();
             if (cancelOrder) {
                 sum = -sum;
                 qty = -qty;
             }
             if (!preorderComplex.isType4Complex() || (preorderComplex.isType4Complex() && orderDetail.getMenuType() > OrderDetail.TYPE_COMPLEX_MAX)) {
-                preorderComplex.setUsedSum(preorderComplex.getUsedSum() + sum);
+                preorderComplex.setUsedSum(sum);
                 preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
                 session.update(preorderComplex);
             }
