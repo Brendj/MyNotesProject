@@ -61,6 +61,8 @@ public class PreorderDAOService {
     public static final Long ALL_COMPLEX_GROUP_ITEM_ID = 3L;
     public static final Long ELEM_AGE_GROUP_ITEM_ID = 3L;
     public static final Long ELEM_DISCOUNT_ID = -90L;
+    public static final Long MIDDLE_DISCOUNT_ID = -91L;
+    public static final Long HIGH_DISCOUNT_ID = -92L;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
@@ -2461,20 +2463,111 @@ public class PreorderDAOService {
         return wtDiscountRuleSet;
     }
 
-    public WtDiscountRule getWtElemDiscountRule() {
-        CategoryDiscount elemDiscount = getCategoryDiscountById(ELEM_DISCOUNT_ID);
-        if (elemDiscount == null) {
+    public Set<WtDiscountRule> getWtDiscountRulesByCategoryOrg(Set<CategoryDiscount> categoriesDiscount, Org org) {
+        Set<WtDiscountRule> wtDiscountRuleSet = new HashSet<>();
+        Set<BigInteger> rulesIds = new HashSet<>();
+        if (categoriesDiscount != null && categoriesDiscount.size() > 0) {
+            for (CategoryDiscount categoryDiscount : categoriesDiscount) {
+                Query query = emReport.createNativeQuery("select d.idofrule from cf_wt_discountrules d "
+                        + "left join cf_wt_discountrules_categoryorg dco on dco.idofrule = d.idofrule "
+                        + "left join cf_categoryorg_orgs cor on cor.idofcategoryorg = dco.idofcategoryorg "
+                        + "left join cf_wt_discountrules_categorydiscount dc on dc.idofrule = d.idofrule "
+                        + "where cor.idoforg = :idoforg and dc.idofcategorydiscount = :discount");
+                query.setParameter("discount", categoryDiscount.getIdOfCategoryDiscount());
+                query.setParameter("idoforg", org.getIdOfOrg());
+                List<BigInteger> res = query.getResultList();
+                if (res != null && res.size() > 0) {
+                    rulesIds.addAll(res);
+                }
+            }
+        }
+        if (rulesIds.size() > 0) {
+            WtDiscountRule rule;
+            for (BigInteger id : rulesIds) {
+                rule = getWtDiscountRuleById(id.longValue());
+                if (rule != null) {
+                    wtDiscountRuleSet.add(rule);
+                }
+            }
+        }
+        return wtDiscountRuleSet;
+    }
+
+    public Set<WtDiscountRule> getWtDiscountRulesWithMaxPriority(Set<WtDiscountRule> rules) {
+        Set<WtDiscountRule> res = new HashSet<>();
+        int max = 0;
+        for (WtDiscountRule rule : rules) {
+            if (rule.getPriority() > max) {
+                max = rule.getPriority();
+            }
+        }
+        for (WtDiscountRule rule : rules) {
+            if (rule.getPriority() == max) {
+                res.add(rule);
+            }
+        }
+        return res;
+    }
+
+    public Set<WtDiscountRule> getWtElemDiscountRules(Org org) {
+        Set<WtDiscountRule> wtDiscountRuleSet = new HashSet<>();
+        Set<BigInteger> rulesIds = new HashSet<>();
+        Query query = emReport.createNativeQuery("select d.idofrule from cf_wt_discountrules d "
+                + "left join cf_wt_discountrules_categoryorg dco on dco.idofrule = d.idofrule "
+                + "left join cf_categoryorg_orgs cor on cor.idofcategoryorg = dco.idofcategoryorg "
+                + "left join cf_wt_discountrules_categorydiscount dc on dc.idofrule = d.idofrule "
+                + "where cor.idoforg = :idoforg and dc.idofcategorydiscount = :discount "
+                + "and d.idofrule in (select dc2.idofrule from cf_wt_discountrules_categorydiscount dc2 "
+                + "group by dc2.idofrule having count (dc2.*) = 1)");
+        query.setParameter("discount", ELEM_DISCOUNT_ID);
+        query.setParameter("idoforg", org.getIdOfOrg());
+        List<BigInteger> res = query.getResultList();
+        if (res != null && res.size() > 0) {
+            rulesIds.addAll(res);
+        }
+        if (rulesIds.size() > 0) {
+            WtDiscountRule rule;
+            for (BigInteger id : rulesIds) {
+                rule = getWtDiscountRuleById(id.longValue());
+                if (rule != null) {
+                    wtDiscountRuleSet.add(rule);
+                }
+            }
+        }
+        return wtDiscountRuleSet;
+    }
+
+    public Set<WtDiscountRule> getWtDiscountRuleBySecondDiscount(Set<WtDiscountRule> wtDiscountRuleSet,
+            CategoryDiscount discount) {
+        Set<WtDiscountRule> wtDiscountRules = new HashSet<>();
+        if (discount == null) {
             return null;
         }
-        Query query = emReport.createQuery("SELECT discountRule FROM WtDiscountRule discountRule "
-                + "WHERE :categoryDiscount IN ELEMENTS(discountRule.categoryDiscounts) "
-                + "AND discountRule.categoryDiscounts.size = 1");
-        query.setParameter("categoryDiscount", elemDiscount);
-        List<WtDiscountRule> res = query.getResultList();
-        if (res != null && res.size() > 0) {
-            return res.get(0);
+        if (wtDiscountRuleSet != null && wtDiscountRuleSet.size() > 0) {
+            for (WtDiscountRule rule : wtDiscountRuleSet) {
+                Query query = emReport.createQuery("SELECT discountRule FROM WtDiscountRule discountRule "
+                        + "WHERE :discount IN ELEMENTS(discountRule.categoryDiscounts) AND discountRule = :rule");
+                query.setParameter("discount", discount);
+                query.setParameter("rule", rule);
+                List<WtDiscountRule> res = query.getResultList();
+                if (res != null && res.size() > 0) {
+                    wtDiscountRules.addAll(res);
+                }
+            }
         }
-        return null;
+        return wtDiscountRules;
+    }
+
+    public CategoryDiscount getElemDiscount() {
+        return getCategoryDiscountById(ELEM_DISCOUNT_ID);
+    }
+
+    public CategoryDiscount getMiddleDiscount() {
+        return getCategoryDiscountById(MIDDLE_DISCOUNT_ID);
+    }
+
+    public CategoryDiscount getHighDiscount() {
+        return getCategoryDiscountById(HIGH_DISCOUNT_ID);
     }
 
     public CategoryDiscount getCategoryDiscountById(Long id) {
@@ -2582,65 +2675,44 @@ public class PreorderDAOService {
         return wtComplexes;
     }
 
-    public Set<WtComplex> getFreeWtComplexesByDiscountRules (Date startDate, Date endDate, Org org,
+    public Set<WtComplex> getFreeWtComplexesByDiscountRules(Date startDate, Date endDate,
             Set<WtDiscountRule> wtDiscountRuleSet) {
         Set<WtComplex> wtComplexes = new HashSet<>();
-        Set<BigInteger> complexIds = new HashSet<>();
         for (WtDiscountRule rule : wtDiscountRuleSet) {
-            Query query = emReport.createNativeQuery("select distinct c.idofcomplex from cf_wt_complexes c "
-                    + "left join cf_wt_discountrules_complexes dc on dc.idofcomplex = c.idofcomplex "
-                    + "left join cf_wt_discountrules_categoryorg dco on dco.idofrule = dc.idofrule "
-                    + "left join cf_categoryorg_orgs cor on cor.idofcategoryorg = dco.idofcategoryorg "
-                    + "where c.deleteState = 0 and c.beginDate < :startDate AND c.endDate > :endDate "
-                    + "and :idofrule = dc.idofrule and cor.idoforg = :idoforg");
-            query.setParameter("idofrule", rule.getIdOfRule());
-            query.setParameter("idoforg", org.getIdOfOrg());
+            Query query = emReport.createQuery("select complex from WtComplex complex "
+                    + "where complex.deleteState = 0 and complex.beginDate < :startDate AND complex.endDate > :endDate "
+                    + "and :rule in elements(complex.discountRules)");
+            query.setParameter("rule", rule);
             query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
             query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
-            List<BigInteger> res = query.getResultList();
+            List<WtComplex> res = query.getResultList();
             if (res != null && res.size() > 0) {
-                complexIds.addAll(res);
-            }
-        }
-        if (complexIds.size() > 0) {
-            WtComplex complex;
-            for (BigInteger id : complexIds) {
-                complex = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .getWtComplexById(id.longValue());
-                if (complex != null) {
-                    wtComplexes.add(complex);
-                }
+                wtComplexes.addAll(res);
             }
         }
         return wtComplexes;
     }
 
-    public Set<WtComplex> getFreeWtComplexesForElem (Date startDate, Date endDate, Org org,
-            WtDiscountRule wtDiscountRule) {
+    public Set<WtComplex> getFreeWtComplexesByRulesAndAgeGroups(Date startDate, Date endDate,
+            Set<WtDiscountRule> wtDiscountRuleSet, Set<Long> ageGroupIds) {
         Set<WtComplex> wtComplexes = new HashSet<>();
-        Query query = emReport.createNativeQuery("select distinct c.idofcomplex from cf_wt_complexes c "
-                + "left join cf_wt_discountrules_complexes dc on dc.idofcomplex = c.idofcomplex "
-                + "left join cf_wt_discountrules_categoryorg dco on dco.idofrule = dc.idofrule "
-                + "left join cf_categoryorg_orgs cor on cor.idofcategoryorg = dco.idofcategoryorg "
-                + "where c.deleteState = 0 and c.beginDate < :startDate AND c.endDate > :endDate "
-                + "and c.idofagegroupitem = :elemAgeGroup "
-                + "and (c.idofcomplexgroupitem = :freeComplex or c.idofcomplexgroupitem = :allComplexes) "
-                + "and :idofrule = dc.idofrule and cor.idoforg = :idoforg");
-        query.setParameter("idofrule", wtDiscountRule.getIdOfRule());
-        query.setParameter("idoforg", org.getIdOfOrg());
-        query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-        query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
-        query.setParameter("elemAgeGroup", ELEM_AGE_GROUP_ITEM_ID);
-        query.setParameter("freeComplex", FREE_COMPLEX_GROUP_ITEM_ID);
-        query.setParameter("allComplexes", ALL_COMPLEX_GROUP_ITEM_ID);
-        List<BigInteger> complexIds = query.getResultList();
-        if (complexIds != null && complexIds.size() > 0) {
-            WtComplex complex;
-            for (BigInteger id : complexIds) {
-                complex = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .getWtComplexById(id.longValue());
-                if (complex != null) {
-                    wtComplexes.add(complex);
+        for (WtDiscountRule rule : wtDiscountRuleSet) {
+            for (Long ageGroupId : ageGroupIds) {
+                Query query = emReport.createQuery("select complex from WtComplex complex "
+                        + "where complex.deleteState = 0 and complex.beginDate < :startDate AND complex.endDate > :endDate "
+                        + "and complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId "
+                        + "and :rule in elements(complex.discountRules) "
+                        + "and (complex.wtComplexGroupItem.idOfComplexGroupItem = :freeComplex "
+                        + "or complex.wtComplexGroupItem.idOfComplexGroupItem = :allComplexes)");
+                query.setParameter("rule", rule);
+                query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+                query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+                query.setParameter("ageGroupId", ageGroupId);
+                query.setParameter("freeComplex", FREE_COMPLEX_GROUP_ITEM_ID);
+                query.setParameter("allComplexes", ALL_COMPLEX_GROUP_ITEM_ID);
+                List<WtComplex> res = query.getResultList();
+                if (res != null && res.size() > 0) {
+                    wtComplexes.addAll(res);
                 }
             }
         }
@@ -2866,6 +2938,17 @@ public class PreorderDAOService {
             return null;
         }
     }
+
+        public WtDiscountRule getWtDiscountRuleById (Long id){
+            try {
+                Query query = emReport
+                        .createQuery("SELECT rule from WtDiscountRule rule " + "where rule.idOfRule = :id");
+                query.setParameter("id", id);
+                return (WtDiscountRule) query.getSingleResult();
+            } catch (Exception e) {
+                return null;
+            }
+        }
 
     public List<WtDish> getWtDishesByComplexAndDates(WtComplex complex, Date startDate, Date endDate) {
         Query query = emReport.createQuery("SELECT DISTINCT dish FROM WtDish dish "

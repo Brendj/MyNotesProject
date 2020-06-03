@@ -251,7 +251,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String COMMENT_MPGU_CREATE = "{Создано на mos.ru %s пользователем с номером телефона %s)}";
     private static final String COMMENT_BACK_CREATE = "{Создано в ИСПП при регистрации заявления на питание}";
     private static final String groupNotForMos = "сотрудн";
-    private static final String WT_GROUP_NAME = "Комплексы";
 
     private static final List<SectionType> typesForSummary = new ArrayList<SectionType>(
             Arrays.asList(SectionType.ACC_INC_REGISTRY, SectionType.ACCOUNT_OPERATIONS_REGISTRY,
@@ -2805,6 +2804,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             boolean isPaid = false;
             boolean isFree = false;
             boolean isElem = false;
+            boolean isMiddle = false;
 
             // Льготные категории
             Set<CategoryDiscount> categoriesDiscount = client.getCategories();
@@ -2856,41 +2856,32 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                             if (client.getParallel() != null && !hasDiscount) {
                                 if (PreorderDAOService.ELEMENTARY_SCHOOL.contains(parallelDesc)) {
                                     ageGroupIds.add(3L); // 1-4
-                                    ageGroupIds.add(7L); // Все
-                                    isPaid = true;
                                     isElem = true;
                                 } else if (PreorderDAOService.MIDDLE_SCHOOL.contains(parallelDesc)) {
                                     ageGroupIds.add(4L); // 5-11
-                                    ageGroupIds.add(7L); // Все
-                                    isPaid = true;
+                                    isMiddle = true;
                                 } else {
                                     ageGroupIds.add(5L); // Колледж
-                                    ageGroupIds.add(7L); // Все
-                                    isPaid = true;
                                 }
+                                isPaid = true;
                             }
 
                             // 5 Параллель для клиента-льготника
                             if (client.getParallel() != null && hasDiscount) {
                                 if (PreorderDAOService.ELEMENTARY_SCHOOL.contains(parallelDesc)) {
                                     ageGroupIds.add(3L); // 1-4
-                                    ageGroupIds.add(7L); // Все
-                                    isPaid = true;
-                                    isFree = true;
+                                    isElem = true;
                                 } else if (PreorderDAOService.MIDDLE_SCHOOL.contains(parallelDesc)) {
                                     ageGroupIds.add(4L); // 5-11
-                                    ageGroupIds.add(7L); // Все
-                                    isPaid = true;
-                                    isFree = true;
+                                    isMiddle = true;
                                 } else {
                                     ageGroupIds.add(5L); // Колледж
-                                    ageGroupIds.add(7L); // Все
-                                    isPaid = true;
                                 }
+                                isPaid = true;
+                                isFree = true;
                             }
                         }
                     } else {
-                        ageGroupIds.add(7L); // Все
                         isPaid = true;
                     }
                 }
@@ -2908,45 +2899,102 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         .isAvailableDate(client, org, menuDate)) {
 
                     Set<WtComplex> wtComplexes = new HashSet<>();
-                    Set<WtComplex> wtComComplexes = new HashSet<>();
                     Set<WtComplex> wtDiscComplexes = new HashSet<>();
-                    Set<WtComplex> wtElemDiscComplexes = new HashSet<>();
 
                     // 6-9, 12 Платные комплексы по возрастным группам и группам
                     if (isPaid) {
-                        wtComComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        ageGroupIds.add(7L); // Все
+                        Set<WtComplex> wtComComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                 .getPaidWtComplexesByAgeGroups(menuDate, menuDate, ageGroupIds, org);
                         if (wtComComplexes.size() > 0) {
                             wtComplexes.addAll(wtComComplexes);
                         }
                     }
 
-                    // Льготные правила
+                    Set<WtComplex> resComplexes = new HashSet<>();
+
+                    // Правила по льготам
                     if (categoriesDiscount.size() > 0) {
+
                         Set<WtDiscountRule> wtDiscountRuleSet = RuntimeContext.getAppContext()
-                                .getBean(PreorderDAOService.class).getWtDiscountRules(categoriesDiscount);
+                                .getBean(PreorderDAOService.class)
+                                .getWtDiscountRulesByCategoryOrg(categoriesDiscount, org);
+                        // проверка на размерность набора
 
                         // 10 Льготные комплексы по правилам соц. скидок
-                        if (isFree && (wtDiscountRuleSet.size() > 0)) {
-                            wtDiscComplexes = RuntimeContext.getAppContext()
-                                    .getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByDiscountRules(menuDate, menuDate, org, wtDiscountRuleSet);
-                            if (wtDiscComplexes.size() > 0) {
-                                wtComplexes.addAll(wtDiscComplexes);
+                        if (isFree && !isElem && !isMiddle) {
+                            Set<WtDiscountRule> discRules = RuntimeContext.getAppContext()
+                                    .getBean(PreorderDAOService.class).getWtDiscountRulesWithMaxPriority(wtDiscountRuleSet);
+                            resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                    .getFreeWtComplexesByDiscountRules(menuDate, menuDate, discRules);
+                            if (resComplexes.size() > 0) {
+                                wtDiscComplexes.addAll(resComplexes);
                             }
                         }
+
+                        // 13 Льготы для начальной школы
+                        if (isFree && isElem) {
+                            CategoryDiscount discount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                    .getElemDiscount();
+                            Set<WtDiscountRule> discRules = RuntimeContext.getAppContext()
+                                    .getBean(PreorderDAOService.class)
+                                    .getWtDiscountRuleBySecondDiscount(wtDiscountRuleSet, discount);
+                            discRules = RuntimeContext.getAppContext()
+                                    .getBean(PreorderDAOService.class).getWtDiscountRulesWithMaxPriority(discRules);
+                            resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                            if (resComplexes.size() > 0) {
+                                wtDiscComplexes.addAll(resComplexes);
+                            }
+                        }
+
+                        // 14 Льготы для средней и высшей школы
+                        // сократить !
+                        if (isFree && isMiddle) {
+                            ageGroupIds.add(7L); // Все
+                            CategoryDiscount discount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                    .getMiddleDiscount();
+                            Set<WtDiscountRule> discRules = RuntimeContext.getAppContext()
+                                    .getBean(PreorderDAOService.class)
+                                    .getWtDiscountRuleBySecondDiscount(wtDiscountRuleSet, discount);
+                            discRules = RuntimeContext.getAppContext()
+                                    .getBean(PreorderDAOService.class).getWtDiscountRulesWithMaxPriority(discRules);
+                            resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                            if (resComplexes.size() > 0) {
+                                wtDiscComplexes.addAll(resComplexes);
+                            }
+
+                            discount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                    .getHighDiscount();
+                            discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                    .getWtDiscountRuleBySecondDiscount(wtDiscountRuleSet, discount);
+                            discRules = RuntimeContext.getAppContext()
+                                    .getBean(PreorderDAOService.class).getWtDiscountRulesWithMaxPriority(discRules);
+                            resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                            if (resComplexes.size() > 0) {
+                                wtDiscComplexes.addAll(resComplexes);
+                            }
+                        }
+
                     }
 
                     // 11 Льготные комплексы для начальной школы
-                    if (isElem) {
-                        WtDiscountRule elemDiscRule = RuntimeContext.getAppContext()
-                                .getBean(PreorderDAOService.class).getWtElemDiscountRule();
-                        wtElemDiscComplexes = RuntimeContext.getAppContext()
-                                .getBean(PreorderDAOService.class)
-                                .getFreeWtComplexesForElem(menuDate, menuDate, org, elemDiscRule);
-                        if (wtDiscComplexes.size() > 0) {
-                            wtComplexes.addAll(wtElemDiscComplexes);
+                    if (!isFree && isElem) {
+                        Set<WtDiscountRule> discRules = RuntimeContext.getAppContext()
+                                .getBean(PreorderDAOService.class).getWtElemDiscountRules(org);
+                        discRules = RuntimeContext.getAppContext()
+                                .getBean(PreorderDAOService.class).getWtDiscountRulesWithMaxPriority(discRules);
+                        resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                        if (resComplexes.size() > 0) {
+                            wtDiscComplexes.addAll(resComplexes);
                         }
+                    }
+
+                    if (wtDiscComplexes.size() > 0) {
+                        wtComplexes.addAll(wtDiscComplexes);
                     }
 
                     if (wtComplexes.size() > 0) {
@@ -2968,8 +3016,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                     .intValue();
                             if (isDiscountComplex == 1) {
                                 getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
-                            } else if (isDiscountComplex == 3 && (wtDiscComplexes.contains(wtComplex) ||
-                                    wtElemDiscComplexes.contains(wtComplex))) {
+                            } else if (isDiscountComplex == 3 && wtDiscComplexes.contains(wtComplex)) {
                                 getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
                                 getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 0);
                             } else {
@@ -6873,7 +6920,14 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private MenuItemExt getMenuItemExt(ObjectFactory objectFactory, WtDish wtDish) {
         MenuItemExt menuItemExt = objectFactory.createMenuItemExt();
-        menuItemExt.setGroup(WT_GROUP_NAME);
+        StringBuilder sb = new StringBuilder();
+        if (wtDish.getCategoryItems() != null && wtDish.getCategoryItems().size() > 0) {
+            for (WtCategoryItem ci : wtDish.getCategoryItems()) {
+                sb.append(ci.getDescription()).append(",");
+            }
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        menuItemExt.setGroup(sb.toString());
         menuItemExt.setName(wtDish.getDishName());
         menuItemExt.setPrice(wtDish.getPrice().longValue() * 100);
         menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
