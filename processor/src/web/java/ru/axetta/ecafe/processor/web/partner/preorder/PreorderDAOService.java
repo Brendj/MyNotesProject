@@ -650,6 +650,40 @@ public class PreorderDAOService {
                 && regularComplex.getEndDate().equals(regularPreorder.getEndDate());
     }
 
+    private boolean regularDatesIntersect(RegularPreorderParam regularComplex, RegularPreorder regularPreorder) {
+        return CalendarUtils.betweenDate(regularComplex.getStartDate(), regularPreorder.getStartDate(), regularPreorder.getEndDate())
+                || CalendarUtils.betweenDate(regularComplex.getEndDate(), regularPreorder.getStartDate(), regularPreorder.getEndDate());
+    }
+
+    private void createNewRegular(Client client, RegularPreorderParam regularComplex,
+            Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu, String guardianMobile,
+            PreorderMobileGroupOnCreateType mobileGroupOnCreate, String menuDetailName, Long menuDetailPrice, String itemCode) throws Exception {
+        RegularPreorder regularPreorder = null;
+        if (isComplex) {
+            ComplexInfo ci = getComplexInfo(client, idOfComplex, date);
+            if (getMenuDetailList(ci.getIdOfComplexInfo()).size() == 0) {
+                throw new MenuDetailNotExistsException("Не найдены блюда для комплекса с ид.=" + idOfComplex.toString());
+            }
+            String complexName = null;
+            Long complexPrice = null;
+            if (ci != null) {
+                complexName = ci.getComplexName();
+                complexPrice = ci.getCurrentPrice();
+            }
+            regularPreorder = new RegularPreorder(client, regularComplex.getStartDate(), regularComplex.getEndDate(), null, idOfComplex,
+                    amount, complexName, regularComplex.getMonday(), regularComplex.getTuesday(), regularComplex.getWednesday(),
+                    regularComplex.getThursday(), regularComplex.getFriday(), regularComplex.getSaturday(), complexPrice, guardianMobile,
+                    RegularPreorderState.CHANGE_BY_USER, mobileGroupOnCreate);
+            em.persist(regularPreorder);
+        } else {
+            regularPreorder = new RegularPreorder(client, regularComplex.getStartDate(), regularComplex.getEndDate(), itemCode, idOfComplex,
+                    amount, menuDetailName, regularComplex.getMonday(), regularComplex.getTuesday(), regularComplex.getWednesday(),
+                    regularComplex.getThursday(), regularComplex.getFriday(), regularComplex.getSaturday(), menuDetailPrice, guardianMobile,
+                    RegularPreorderState.CHANGE_BY_USER, mobileGroupOnCreate);
+            em.persist(regularPreorder);
+        }
+    }
+
     private void createRegularPreorder(Client client, RegularPreorderParam regularComplex,
             Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu, String guardianMobile,
             PreorderMobileGroupOnCreateType mobileGroupOnCreate) throws Exception {
@@ -673,6 +707,11 @@ public class PreorderDAOService {
         try {
             regularPreorder = (RegularPreorder) query.getSingleResult();
             if (regularEquals(regularComplex, regularPreorder) && regularPreorder.getAmount().equals(amount)) return;
+            if (!regularDatesIntersect(regularComplex, regularPreorder)) {
+                createNewRegular(client, regularComplex,
+                        amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,
+                        mobileGroupOnCreate, menuDetailName, menuDetailPrice, itemCode);
+            }
             regularPreorder.setAmount(amount);
             regularPreorder.setMonday(regularComplex.getMonday());
             regularPreorder.setTuesday(regularComplex.getTuesday());
@@ -686,29 +725,9 @@ public class PreorderDAOService {
             regularPreorder.setLastUpdate(new Date());
             em.merge(regularPreorder);
         } catch (NoResultException e) {
-            if (isComplex) {
-                ComplexInfo ci = getComplexInfo(client, idOfComplex, date);
-                if (getMenuDetailList(ci.getIdOfComplexInfo()).size() == 0) {
-                    throw new MenuDetailNotExistsException("Не найдены блюда для комплекса с ид.=" + idOfComplex.toString());
-                }
-                String complexName = null;
-                Long complexPrice = null;
-                if (ci != null) {
-                    complexName = ci.getComplexName();
-                    complexPrice = ci.getCurrentPrice();
-                }
-                regularPreorder = new RegularPreorder(client, regularComplex.getStartDate(), regularComplex.getEndDate(), null, idOfComplex,
-                        amount, complexName, regularComplex.getMonday(), regularComplex.getTuesday(), regularComplex.getWednesday(),
-                        regularComplex.getThursday(), regularComplex.getFriday(), regularComplex.getSaturday(), complexPrice, guardianMobile,
-                        RegularPreorderState.CHANGE_BY_USER, mobileGroupOnCreate);
-                em.persist(regularPreorder);
-            } else {
-                regularPreorder = new RegularPreorder(client, regularComplex.getStartDate(), regularComplex.getEndDate(), itemCode, idOfComplex,
-                        amount, menuDetailName, regularComplex.getMonday(), regularComplex.getTuesday(), regularComplex.getWednesday(),
-                        regularComplex.getThursday(), regularComplex.getFriday(), regularComplex.getSaturday(), menuDetailPrice, guardianMobile,
-                        RegularPreorderState.CHANGE_BY_USER, mobileGroupOnCreate);
-                em.persist(regularPreorder);
-            }
+            createNewRegular(client, regularComplex,
+                    amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,
+                    mobileGroupOnCreate, menuDetailName, menuDetailPrice, itemCode);
         }
         createPreordersFromRegular(regularPreorder, true);
     }
@@ -1190,6 +1209,7 @@ public class PreorderDAOService {
     }
 
     private void testAndDeleteRegularPreorder(RegularPreorder regularPreorder) {
+        if (!CalendarUtils.betweenDate(new Date(), regularPreorder.getStartDate(), regularPreorder.getEndDate())) return;
         Query query = em.createQuery("select pc.idOfPreorderComplex from PreorderComplex pc join pc.preorderMenuDetails pmd "
                 + "where (pc.regularPreorder = :regularPreorder or pmd.regularPreorder = :regularPreorder) "
                 + "and pc.preorderDate > :date and pc.deletedState = false and pc.idOfGoodsRequestPosition is null "
