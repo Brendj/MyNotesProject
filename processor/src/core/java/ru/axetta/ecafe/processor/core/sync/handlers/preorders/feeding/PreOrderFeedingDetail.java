@@ -21,6 +21,7 @@ public class PreOrderFeedingDetail {
     private final Long price;
     private final String itemCode;
     private String goodsGuid;
+    private final String shortName;
 
     public PreOrderFeedingDetail(Session session, PreorderMenuDetail menuDetail, Integer complexId, String guid) {
         this.idOfMenu = menuDetail.getArmIdOfMenu();
@@ -30,6 +31,7 @@ public class PreOrderFeedingDetail {
         this.guid = guid;
         this.price = menuDetail.getMenuDetailPrice();
         this.itemCode = menuDetail.getItemCode();
+        this.shortName = menuDetail.getShortName();
         if (menuDetail.getIdOfGood() != null) {
             Query query = session.createQuery("select g.guid from Good g where g.globalId = :id");
             query.setParameter("id", menuDetail.getIdOfGood());
@@ -46,6 +48,7 @@ public class PreOrderFeedingDetail {
         this.guid = complex.getGuid();
         this.price = complex.getComplexPrice();
         this.itemCode = null;
+        this.shortName = null;
     }
 
     public Integer getComplexId() {
@@ -99,7 +102,14 @@ public class PreOrderFeedingDetail {
         if (null != goodsGuid) {
             element.setAttribute("GoodsGuid", goodsGuid);
         }
+        if (null != shortName) {
+            element.setAttribute("ShortName", shortName);
+        }
 
         return element;
+    }
+
+    public String getShortName() {
+        return shortName;
     }
 }
