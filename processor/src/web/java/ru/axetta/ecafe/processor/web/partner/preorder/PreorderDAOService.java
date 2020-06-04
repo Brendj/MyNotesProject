@@ -10,10 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.feeding.SubscriptionFeeding;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodAgeGroupType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.GoodType;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
-import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
-import ru.axetta.ecafe.processor.core.persistence.utils.PreorderUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.*;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.*;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportServiceParam;
@@ -245,98 +242,134 @@ public class PreorderDAOService {
     }
 
     @Transactional(readOnly = true)
-    public PreorderListWithComplexesGroupResult getPreorderComplexesWithWtMenuList(Long contractId, Date date) {
+    public PreorderListWithComplexesGroupResult getPreorderComplexesWithWtMenuList(Client client, Date date,
+            Set<CategoryDiscount> categoriesDiscount, Set<Long> ageGroupIds, Map<String, Boolean> complexSign) {
         PreorderListWithComplexesGroupResult groupResult = new PreorderListWithComplexesGroupResult();
-        Client client = getClientByContractId(contractId);
         Org org = client.getOrg();
 
-        // Категории скидок
-        Set<CategoryDiscount> categoriesDiscount = client.getCategories();
-        Boolean hasDiscount = false;
-        for (CategoryDiscount categoryDiscount : categoriesDiscount) {
-            if(!categoryDiscount.getCategoryName().toLowerCase().contains("резерв")){
-                hasDiscount |= (categoryDiscount.getCategoryType() == CategoryDiscountEnumType.CATEGORY_WITH_DISCOUNT);
-            }
-        }
-
-        // Льготные правила
-        Set<WtDiscountRule> wtDiscountRuleSet = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                .getWtDiscountRules(categoriesDiscount);
-
-        // Возрастные группы и параллели
-        List<WtAgeGroupItem> ageGroupList = RuntimeContext.getAppContext()
-                .getBean(PreorderDAOService.class).getWtAgeGroupItems(client, categoriesDiscount);
-
-        // Тип комплекса для платного питания
-        WtComplexGroupItem complexGroup = RuntimeContext.getAppContext()
-                .getBean(PreorderDAOService.class).getWtComplexGroupItem();
-
+        // Проверка даты по календарям
         if (isAvailableDate(client, org, date)) {
 
             Date startDate = CalendarUtils.startOfDay(date);
             Date endDate = CalendarUtils.endOfDay(date);
-
             Set<WtComplex> wtComplexes = new HashSet<>();
+            Set<WtComplex> wtDiscComplexes = new HashSet<>();
 
-            // Платное питание - отбор по типу комплекса и возрастным группам
-            Set<WtComplex> wtComComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getWtComplexesByComplexGroupAndAgeGroups(startDate, endDate, complexGroup, ageGroupList);
-            if (wtComComplexes.size() > 0) {
-                wtComplexes.addAll(wtComComplexes);
-            }
-
-            // Отбор по правилам и возрастным группам
-            if (wtDiscountRuleSet.size() > 0) {
-                Set<WtComplex> wtDiscComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .getWtComplexesByDiscountRulesAndAgeGroups(startDate, endDate, wtDiscountRuleSet, ageGroupList);
-                if (wtDiscComplexes.size() > 0) {
-                    wtComplexes.addAll(wtDiscComplexes);
+            // 7-9, 11-12 Платные комплексы по возрастным группам и группам
+            if (complexSign.get("Paid")) {
+                ageGroupIds.add(7L); // Все
+                Set<WtComplex> wtComComplexes = getPaidWtComplexesByAgeGroupsAndPortal(startDate, endDate, ageGroupIds,
+                        org);
+                if (wtComComplexes.size() > 0) {
+                    wtComplexes.addAll(wtComComplexes);
                 }
             }
 
-            if (wtComplexes.size() > 0) {
+            Set<WtComplex> resComplexes = new HashSet<>();
 
+            // Правила по льготам
+            if (categoriesDiscount.size() > 0) {
+
+                Set<WtDiscountRule> wtDiscountRuleSet = getWtDiscountRulesByCategoryOrg(categoriesDiscount, org);
+                // проверка на размерность набора
+
+                // 15 Льготные комплексы по правилам соц. скидок
+                if (complexSign.get("Free") && !complexSign.get("Elem") && !complexSign.get("Middle")) {
+                    Set<WtDiscountRule> discRules = getWtDiscountRulesWithMaxPriority(wtDiscountRuleSet);
+                    resComplexes = getFreeWtComplexesByDiscountRules(startDate, startDate, discRules);
+                    if (resComplexes.size() > 0) {
+                        wtDiscComplexes.addAll(resComplexes);
+                    }
+                }
+
+                // 13 Льготы для начальной школы
+                if (complexSign.get("Free") && complexSign.get("Elem")) {
+                    CategoryDiscount discount = getElemDiscount();
+                    Set<WtDiscountRule> discRules = getWtDiscountRuleBySecondDiscount(wtDiscountRuleSet, discount);
+                    discRules = getWtDiscountRulesWithMaxPriority(discRules);
+                    resComplexes = getFreeWtComplexesByRulesAndAgeGroups(startDate, startDate, discRules, ageGroupIds);
+                    if (resComplexes.size() > 0) {
+                        wtDiscComplexes.addAll(resComplexes);
+                    }
+                }
+
+                // 14 Льготы для средней и высшей школы
+                if (complexSign.get("Free") && complexSign.get("Middle")) {
+                    ageGroupIds.add(7L); // Все
+                    CategoryDiscount middleDiscount = getMiddleDiscount();
+                    CategoryDiscount highDiscount = getHighDiscount();
+                    Set<WtDiscountRule> discRules = getWtDiscountRuleByTwoDiscounts(wtDiscountRuleSet, middleDiscount,
+                            highDiscount);
+                    discRules = getWtDiscountRulesWithMaxPriority(discRules);
+                    resComplexes = getFreeWtComplexesByRulesAndAgeGroups(startDate, startDate, discRules, ageGroupIds);
+                    if (resComplexes.size() > 0) {
+                        wtDiscComplexes.addAll(resComplexes);
+                    }
+                }
+            }
+
+            // 10 Льготные комплексы для начальной школы
+            if (!complexSign.get("Free") && complexSign.get("Elem")) {
+                Set<WtDiscountRule> discRules = getWtElemDiscountRules(org);
+                discRules = getWtDiscountRulesWithMaxPriority(discRules);
+                resComplexes = getFreeWtComplexesByRulesAndAgeGroups(startDate, startDate, discRules, ageGroupIds);
+                if (resComplexes.size() > 0) {
+                    wtDiscComplexes.addAll(resComplexes);
+                }
+            }
+
+            if (wtDiscComplexes.size() > 0) {
+                wtComplexes.addAll(wtDiscComplexes);
+            }
+
+            if (wtComplexes.size() > 0) {
                 Map<String, PreorderComplexGroup> groupMap = new HashMap<>();
                 List<PreorderComplexItemExt> list = new ArrayList<>();
 
                 for (WtComplex wtComplex : wtComplexes) {
+
                     Integer idOfComplex = wtComplex.getIdOfComplex().intValue();
                     String complexName = wtComplex.getName();
                     // Режим добавления блюд: если комплекс составной - режим составного комплекса,
                     // если нет - режим фиксированной цены
                     Integer complexType = wtComplex.getComposite() ? 4 : 2;
-                    // Режим бесплатного питания
-                    Integer discount = 0;
-                    if (wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 1 || // льготное питание
-                            wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem() == 3) { // все
-                        discount = 1;
-                    }
                     Long complexPrice = (wtComplex.getPrice() == null) ? 0L : wtComplex.getPrice().longValue();
-                    Integer amount = 0;
-                    if (wtComplex.getWtComplexesItems() != null && wtComplex.getWtComplexesItems().size() > 0) {
-                        for (WtComplexesItem wtComplexesItem : wtComplex.getWtComplexesItems()) {
-                            amount += wtComplexesItem.getCountDishes();
-                        }
+                    Integer amount = getAmountForPreorderComplex(client, startDate, endDate);
+
+                    PreorderComplexItemExt complexItemExt;
+                    PreorderComplexItemExt complexItemExt2 = null;
+                    // Проверка типа питания
+                    int isDiscountComplex = wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem().intValue();
+                    if (isDiscountComplex == 1) {
+                        complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, complexType,
+                                true, amount, wtComplex.getDeleteState(), false);
+                    } else if (isDiscountComplex == 3 && wtDiscComplexes.contains(wtComplex)) {
+                        complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, complexType,
+                                true, amount, wtComplex.getDeleteState(), false);
+                        complexItemExt2 = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, complexType,
+                                false, amount, wtComplex.getDeleteState(), false);
+                    } else {
+                        complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName, complexPrice, complexType,
+                                false, amount, wtComplex.getDeleteState(), false);
                     }
 
-                    PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(idOfComplex, complexName,
-                            complexPrice, complexType, discount);
-                    complexItemExt.setAmount(amount);
-                    complexItemExt.setState(wtComplex.getDeleteState());
-                    complexItemExt.setIsRegular(false);
-
-                    // !!! Исключение из комплексов составов, не соответствующих датам цикла !!!
-
-                    List<PreorderMenuItemExt> menuItemExtList = getWtMenuItemsExt(wtComplex, date);
+                    List<PreorderMenuItemExt> menuItemExtList = getWtMenuItemsExt(wtComplex, client, org, startDate,
+                            endDate);
                     if (menuItemExtList.size() > 0) {
                         complexItemExt.setMenuItemExtList(menuItemExtList);
+                        if (complexItemExt2 != null) {
+                            complexItemExt2.setMenuItemExtList(menuItemExtList);
+                        }
                         list.add(complexItemExt);
                     }
                 }
 
                 for (PreorderComplexItemExt item : list) {
-                    WtComplex complex = getWtComplexById(item.getIdOfComplexInfo().longValue());
-                    String groupName = complex.getWtDietType().getDescription();
+                    PreorderGoodParamsContainer complexParams = getComplexParams(item, client, date);
+                    String groupName = getPreorderComplexGroup(item, complexParams);
+                    if (groupName.isEmpty()) {
+                        continue;
+                    }
                     item.setType(getPreorderComplexSubgroup(item));
                     PreorderComplexGroup group = groupMap.get(groupName);
                     if (group == null) {
@@ -344,6 +377,7 @@ public class PreorderDAOService {
                         groupMap.put(groupName, group);
                     }
                     group.addItem(item);
+
                 }
                 List<PreorderComplexGroup> groupList = new ArrayList<>(groupMap.values());
                 for (PreorderComplexGroup group : groupList) {
@@ -351,13 +385,38 @@ public class PreorderDAOService {
                 }
                 Collections.sort(groupList);
                 groupResult.setComplexesWithGroups(groupList);
-            } else {
-                logger.warn("Список комплексов пуст");
             }
-        } else {
-            logger.warn("Неподходящая дата");
         }
         return groupResult;
+    }
+
+    private Integer getAmountForPreorderComplex(Client client, Date startDate, Date endDate) {
+        Query query = emReport.createQuery("SELECT sum(pc.amount) FROM PreorderComplex pc "
+                + "WHERE pc.client = :client AND pc.preorderDate between :startDate and :endDate "
+                + "AND pc.deletedState = false");
+        query.setParameter("client", client);
+        query.setParameter("startDate", startDate.getTime());
+        query.setParameter("endDate", endDate.getTime());
+        List<Integer> res =  query.getResultList();
+        if (res != null && res.size() > 0) {
+            return res.get(0);
+        }
+        return 0;
+    }
+
+    private Integer getAmountForPreorderMenuDetail(Client client, Date startDate, Date endDate, WtDish wtDish) {
+        Query query = emReport.createQuery("SELECT sum(pmd.amount) FROM PreorderMenuDetail pmd "
+                + "WHERE pmd.client = :client AND pmd.preorderDate between :startDate and :endDate "
+                + "AND pmd.deletedState = false AND pmd.idOfDish = :idOfDish");
+        query.setParameter("client", client);
+        query.setParameter("startDate", startDate.getTime());
+        query.setParameter("endDate", endDate.getTime());
+        query.setParameter("idOfDish", wtDish.getIdOfDish());
+        List<Integer> res =  query.getResultList();
+        if (res == null && res.size() == 0) {
+            return 0;
+        }
+        return res.get(0);
     }
 
     public PreorderGoodParamsContainer getComplexParams(PreorderComplexItemExt item, Client client, Date date) {
@@ -504,31 +563,50 @@ public class PreorderDAOService {
         return menuItemExtList;
     }
 
-    private List<PreorderMenuItemExt> getWtMenuItemsExt (WtComplex complex, Date date) {
-        List<PreorderMenuItemExt> menuItemExtList = new ArrayList<>();
-        List<WtDish> res = getWtDishesByComplexAndDates(complex, CalendarUtils.startOfDay(date),
-                CalendarUtils.endOfDay(date));
-
-        Set<Long> set = new HashSet<>();
-        for (WtDish wtDish : res) {
-            Integer amount = 0;
-            if (wtDish.getComplexItems() != null && wtDish.getComplexItems().size() > 0) {
-                for (WtComplexesItem wtComplexesItem : wtDish.getComplexItems()) {
-                    amount += wtComplexesItem.getCountDishes();
-                }
+    public String getMenuGroupByWtDish(WtDish wtDish) {
+        StringBuilder sb = new StringBuilder();
+        if (wtDish.getCategoryItems() != null && wtDish.getCategoryItems().size() > 0) {
+            for (WtCategoryItem ci : wtDish.getCategoryItems()) {
+                sb.append(ci.getDescription()).append(",");
             }
-            Integer state = wtDish.getDeleteState();
+            sb.deleteCharAt(sb.length() - 1);
+        }
+        return sb.toString();
+    }
 
+    private List<PreorderMenuItemExt> getWtMenuItemsExt(WtComplex wtComplex, Client client, Org org, Date startDate,
+            Date endDate) {
+        List<PreorderMenuItemExt> menuItemExtList = new ArrayList<>();
+
+        // Определяем подходящий состав комплекса
+        WtComplexesItem complexItem = getWtComplexItemByCycle(wtComplex, org, startDate);
+        List<WtDish> wtDishes;
+        if (complexItem != null) {
+            wtDishes = DAOReadExternalsService.getInstance().getWtDishesByComplexItemAndDates(complexItem, startDate,
+                    endDate);
+        } else {
+            wtDishes = DAOReadExternalsService.getInstance().getWtDishesByComplexAndDates(wtComplex, startDate, endDate);
+        }
+
+        for (WtDish wtDish : wtDishes) {
             PreorderMenuItemExt menuItemExt = new PreorderMenuItemExt(wtDish);
-
+            menuItemExt.setGroup(getMenuGroupByWtDish(wtDish));
+            menuItemExt.setName(wtDish.getDishName());
+            menuItemExt.setFullName(wtDish.getComponentsOfDish());
+            menuItemExt.setPrice(wtDish.getPrice().longValue() * 100);
+            menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
+            menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
+            menuItemExt.setAvailableNow(0);
+            menuItemExt.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 :
+                    wtDish.getCarbohydrates().doubleValue());
+            menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
+            menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
+            menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
+            Integer amount = getAmountForPreorderMenuDetail(client, startDate, endDate, wtDish);
             menuItemExt.setAmount(amount);
-            menuItemExt.setState(state);
             menuItemExt.setIsRegular(false);
             menuItemExt.setAvailableForRegular(false);
-            if (!set.contains(menuItemExt.getIdOfMenuDetail())) {
-                menuItemExtList.add(menuItemExt);
-                set.add(menuItemExt.getIdOfMenuDetail());
-            }
+            menuItemExtList.add(menuItemExt);
         }
         return menuItemExtList;
     }
@@ -1849,16 +1927,7 @@ public class PreorderDAOService {
         preorderMenuDetail.setState(PreorderState.OK);
         preorderMenuDetail.setMenuDetailName(wtDish.getDishName());
         preorderMenuDetail.setMenuDetailPrice(wtDish.getPrice().longValue());
-
-        StringBuilder sb = new StringBuilder();
-        if (wtDish.getCategoryItems() != null && wtDish.getCategoryItems().size() > 0) {
-            for (WtCategoryItem ci : wtDish.getCategoryItems()) {
-                sb.append(ci.getDescription()).append(",");
-            }
-            sb.deleteCharAt(sb.length() - 1);
-        }
-        preorderMenuDetail.setGroupName(sb.toString());
-
+        preorderMenuDetail.setGroupName(getMenuGroupByWtDish(wtDish));
         preorderMenuDetail.setItemCode(wtDish.getCode().toString());
         preorderMenuDetail.setAvailableNow(0);
         preorderMenuDetail.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
@@ -2526,7 +2595,7 @@ public class PreorderDAOService {
                 + "left join cf_wt_discountrules_categorydiscount dc on dc.idofrule = d.idofrule "
                 + "where cor.idoforg = :idoforg and dc.idofcategorydiscount = :discount "
                 + "and d.idofrule in (select dc2.idofrule from cf_wt_discountrules_categorydiscount dc2 "
-                + "group by dc2.idofrule having count (dc2.*) = 1)");
+                + "group by dc2.idofrule having count (dc2.idofrule) = 1)");
         query.setParameter("discount", ELEM_DISCOUNT_ID);
         query.setParameter("idoforg", org.getIdOfOrg());
         List<BigInteger> res = query.getResultList();
@@ -2556,6 +2625,29 @@ public class PreorderDAOService {
                 Query query = emReport.createQuery("SELECT discountRule FROM WtDiscountRule discountRule "
                         + "WHERE :discount IN ELEMENTS(discountRule.categoryDiscounts) AND discountRule = :rule");
                 query.setParameter("discount", discount);
+                query.setParameter("rule", rule);
+                List<WtDiscountRule> res = query.getResultList();
+                if (res != null && res.size() > 0) {
+                    wtDiscountRules.addAll(res);
+                }
+            }
+        }
+        return wtDiscountRules;
+    }
+
+    public Set<WtDiscountRule> getWtDiscountRuleByTwoDiscounts(Set<WtDiscountRule> wtDiscountRuleSet,
+            CategoryDiscount firstDiscount, CategoryDiscount secondDiscount) {
+        Set<WtDiscountRule> wtDiscountRules = new HashSet<>();
+        if (firstDiscount == null || secondDiscount == null) {
+            return null;
+        }
+        if (wtDiscountRuleSet != null && wtDiscountRuleSet.size() > 0) {
+            for (WtDiscountRule rule : wtDiscountRuleSet) {
+                Query query = emReport.createQuery("SELECT discountRule FROM WtDiscountRule discountRule "
+                        + "WHERE discountRule = :rule AND (:firstDiscount IN ELEMENTS(discountRule.categoryDiscounts) "
+                        + "OR :secondDiscount IN ELEMENTS(discountRule.categoryDiscounts))");
+                query.setParameter("firstDiscount", firstDiscount);
+                query.setParameter("secondDiscount", secondDiscount);
                 query.setParameter("rule", rule);
                 List<WtDiscountRule> res = query.getResultList();
                 if (res != null && res.size() > 0) {
@@ -2664,6 +2756,33 @@ public class PreorderDAOService {
                 Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
                         + "LEFT JOIN complex.wtOrgGroup orgGroup "
                         + "WHERE complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId AND complex.deleteState = 0 "
+                        + "AND complex.beginDate < :startDate AND complex.endDate > :endDate "
+                        + "AND (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs)) "
+                        + "AND (complex.wtComplexGroupItem.idOfComplexGroupItem = :paidComplex OR "
+                        + "complex.wtComplexGroupItem.idOfComplexGroupItem = :allComplexes)");
+                query.setParameter("ageGroupId", ageGroupId);
+                query.setParameter("org", org);
+                query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+                query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+                query.setParameter("paidComplex", PAID_COMPLEX_GROUP_ITEM_ID);
+                query.setParameter("allComplexes", ALL_COMPLEX_GROUP_ITEM_ID);
+                List<WtComplex> res = query.getResultList();
+                if (res != null && res.size() > 0) {
+                    wtComplexes.addAll(res);
+                }
+            }
+        }
+        return wtComplexes;
+    }
+
+    public Set<WtComplex> getPaidWtComplexesByAgeGroupsAndPortal(Date startDate, Date endDate, Set<Long> ageGroupIds, Org org) {
+        Set<WtComplex> wtComplexes = new HashSet<>();
+        if (ageGroupIds != null && ageGroupIds.size() > 0) {
+            for (Long ageGroupId : ageGroupIds) {
+                Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
+                        + "LEFT JOIN complex.wtOrgGroup orgGroup "
+                        + "WHERE complex.isPortal = true AND complex.deleteState = 0 "
+                        + "AND complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId "
                         + "AND complex.beginDate < :startDate AND complex.endDate > :endDate "
                         + "AND (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs)) "
                         + "AND (complex.wtComplexGroupItem.idOfComplexGroupItem = :paidComplex OR "
