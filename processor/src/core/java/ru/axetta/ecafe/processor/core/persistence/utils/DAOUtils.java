@@ -12,6 +12,7 @@ import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdMenuView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
@@ -4947,6 +4948,17 @@ public class DAOUtils {
         criteria.add(Restrictions.gt("specDate", new Date()));
         criteria.add(Restrictions.in("groupname", groupName));
         criteria.add(Restrictions.in("idoforg", idofOrg));
+        return criteria.list();
+    }
+
+
+    public static List getAllMenuForEZD(Session persistenceSession,
+            List<Long> idofOrg) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(RequestsEzdMenuView.class);
+        criteria.add(Restrictions.gt("menuDate", new Date()));
+        if (idofOrg != null && !idofOrg.isEmpty()) {
+            criteria.add(Restrictions.in("idOforg", idofOrg));
+        }
         return criteria.list();
     }
 

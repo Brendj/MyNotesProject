@@ -9,6 +9,7 @@ import java.util.List;
 
 public class DiscountComplexOrg {
    private String guid;
+   private Long ekisid;
    private List<DiscountComplexGroup> groups;
 
    public DiscountComplexOrg(){
@@ -30,5 +31,13 @@ public class DiscountComplexOrg {
 
    public void setGuid(String guid) {
       this.guid = guid;
+   }
+
+   public Long getEkisid() {
+      return ekisid;
+   }
+
+   public void setEkisid(Long ekisid) {
+      this.ekisid = ekisid;
    }
 }
