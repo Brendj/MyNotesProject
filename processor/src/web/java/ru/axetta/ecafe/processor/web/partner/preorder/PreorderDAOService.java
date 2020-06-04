@@ -271,7 +271,6 @@ public class PreorderDAOService {
             if (categoriesDiscount.size() > 0) {
 
                 Set<WtDiscountRule> wtDiscountRuleSet = getWtDiscountRulesByCategoryOrg(categoriesDiscount, org);
-                // проверка на размерность набора
 
                 // 15 Льготные комплексы по правилам соц. скидок
                 if (complexSign.get("Free") && !complexSign.get("Elem") && !complexSign.get("Middle")) {
