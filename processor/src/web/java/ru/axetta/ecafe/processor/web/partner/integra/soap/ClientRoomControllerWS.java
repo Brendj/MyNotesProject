@@ -65,10 +65,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResu
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryList;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
-import ru.axetta.ecafe.processor.web.partner.preorder.MenuDetailNotExistsException;
-import ru.axetta.ecafe.processor.web.partner.preorder.NotEditedDayException;
-import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
-import ru.axetta.ecafe.processor.web.partner.preorder.PreorderGoodParamsContainer;
+import ru.axetta.ecafe.processor.web.partner.preorder.*;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderComplexItemExt;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderListWithComplexesGroupResult;
 import ru.axetta.ecafe.processor.web.partner.preorder.dataflow.PreorderSaveListParam;
@@ -189,6 +186,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_NOT_EDITED_DAY = 700L;
     private static final Long RC_WRONG_GROUP = 710L;
     private static final Long RC_MOBILE_DIFFERENT_GROUPS = 711L;
+    private static final Long RC_REGULAR_ALREADY_DELETED = 712L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -242,6 +240,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_INVALID_INPUT_DATA = "Неверные входные данные";
     private static final String RC_WRONG_GROUP_DESC = "Неверная группа клиента";
     private static final String RC_MOBILE_DIFFERENT_GROUPS_DESC = "Номер принадлежит клиентам из разных групп";
+    private static final String RC_REGULAR_ALREADY_DELETED_DESC = "Для выбранного комплекса или блюда не настроен повтор заказа";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -9364,6 +9363,9 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } catch (NotEditedDayException e) {
             result.resultCode = RC_NOT_EDITED_DAY;
             result.description = RC_NOT_EDITED_DAY_DESC;
+        } catch (RegularAlreadyDeleted e) {
+            result.resultCode = RC_REGULAR_ALREADY_DELETED;
+            result.description = RC_REGULAR_ALREADY_DELETED_DESC;
         } catch (Exception e) {
             logger.error("Error in putPreorderComplex", e);
             result.resultCode = RC_INTERNAL_ERROR;

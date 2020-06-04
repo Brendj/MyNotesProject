@@ -725,6 +725,7 @@ public class PreorderDAOService {
             regularPreorderSelect.setParameter("itemCode", menuDetail.getItemCode());
         }
         RegularPreorder regularPreorder = (RegularPreorder) regularPreorderSelect.getSingleResult();
+        if (regularPreorder.getDeletedState()) throw new RegularAlreadyDeleted("Для выбранного комплекса или блюда не настроен повтор заказа");
         deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.OK, guardianMobile, RegularPreorderState.CHANGE_BY_USER);
     }
 
