@@ -11,6 +11,7 @@ import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingDAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.SyncRequest;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
@@ -25,6 +26,8 @@ import org.springframework.stereotype.Controller;
 import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
+import java.math.BigDecimal;
+import java.math.BigInteger;
 import java.net.HttpURLConnection;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -71,7 +74,11 @@ public class EzdController {
 
         //Вычисление результата запроса
         try {
-
+            List<Long> test = new ArrayList<>();
+            test.add(72L);
+            test.add(33L);
+            DAOService.getInstance().getComplexesByGroupForWEBARM(test);
+            ///////////////////
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
 
@@ -248,88 +255,165 @@ public class EzdController {
             DiscountComplexItem discountComplexItem = null;
             String curDatesString;
             ComplexesItem complexesItem;
+            List complexes = null;
             for (RequestsEzdView requestsEzdView : requestsEzdViews) {
                 String curGroupName = requestsEzdView.getGroupname();
                 Long ekisid = requestsEzdView.getEkisid();
                 String guid = requestsEzdView.getOrgguid();
+                Long idOforg = requestsEzdView.getIdoforg();
                 List<Date> dates = massCorrectDates.get((long) counter1);
                 counter1++;
-                if (menuforCurrentOrg.isEmpty() || (idCurrentOrg != null && !idCurrentOrg.equals(requestsEzdView.getIdoforg())))
-                {
-                    menuforCurrentOrg.clear();
-                    idCurrentOrg = requestsEzdView.getIdoforg();
-                    for (RequestsEzdMenuView requestsEzdMenuView: allMenuForEZD)
-                    {
-                        if (requestsEzdMenuView.getIdOforg().equals(requestsEzdView.getIdoforg()))
-                            menuforCurrentOrg.add(requestsEzdMenuView);
-                    }
-                }
-
-                for (RequestsEzdMenuView requestsEzdMenuView : menuforCurrentOrg)
-                {
-                    //Если такая дата подходит для группы + орг
-                    if (dates.contains(CalendarUtils.startOfDay(requestsEzdMenuView.getMenuDate()))) {
-                        //Проверка на то, что данный комплекс подходит для данной группы
-                        String complexname = requestsEzdMenuView.getComplexname();
-                        badComplex = true;
-                        try {
-                            clas = extractDigits(curGroupName);
-                        } catch (NumberFormatException e) //т.е. в названии группы нет чисел
-                        {
-                            clas = 0;
-                        }
-                        if (clas > 0 && clas < 5)//1-4
-                        {
-                            if (!complexname.contains("1-4")) {
-                                badComplex = false;
+                if (!requestsEzdView.getUsewebarm()) {
+                    if (menuforCurrentOrg.isEmpty() || (idCurrentOrg != null && !idCurrentOrg
+                            .equals(requestsEzdView.getIdoforg()))) {
+                        menuforCurrentOrg.clear();
+                        idCurrentOrg = requestsEzdView.getIdoforg();
+                        for (RequestsEzdMenuView requestsEzdMenuView : allMenuForEZD) {
+                            if (requestsEzdMenuView.getIdOforg().equals(requestsEzdView.getIdoforg())) {
+                                menuforCurrentOrg.add(requestsEzdMenuView);
                             }
+                        }
+                    }
 
-                        } else {
-                            if (clas > 4 && clas < 12)//5-11
+                    for (RequestsEzdMenuView requestsEzdMenuView : menuforCurrentOrg) {
+                        //Если такая дата подходит для группы + орг
+                        if (dates.contains(CalendarUtils.startOfDay(requestsEzdMenuView.getMenuDate()))) {
+                            //Проверка на то, что данный комплекс подходит для данной группы
+                            String complexname = requestsEzdMenuView.getComplexname();
+                            badComplex = true;
+                            try {
+                                clas = extractDigits(curGroupName);
+                            } catch (NumberFormatException e) //т.е. в названии группы нет чисел
                             {
-                                if (!complexname.contains("5-")) {
+                                clas = 0;
+                            }
+                            if (clas > 0 && clas < 5)//1-4
+                            {
+                                if (!complexname.contains("1-4")) {
                                     badComplex = false;
                                 }
+
+                            } else {
+                                if (clas > 4 && clas < 12)//5-11
+                                {
+                                    if (!complexname.contains("5-")) {
+                                        badComplex = false;
+                                    }
+                                }
+                            }
+
+                            //Если комплекс подходит, то ...
+                            if (badComplex) {
+                                //Заполняем ответ
+
+                                //Если организация с такой guid не встречалась раньше, то создаем
+                                if (orgGuidResponse == null || !orgGuidResponse.equals(guid)) {
+                                    discountComplexOrg = new DiscountComplexOrg();
+                                    discountComplexOrg.setGuid(guid);
+                                    discountComplexOrg.setEkisid(ekisid);
+                                    responseToEZD.getOrg().add(discountComplexOrg);
+                                    orgGuidResponse = guid;
+                                    groupNameResponse = null;
+                                }
+
+                                //Достаем группы
+                                if (groupNameResponse == null || !groupNameResponse.equals(curGroupName)) {
+                                    discountComplexGroup = new DiscountComplexGroup();
+                                    discountComplexGroup.setGroupName(curGroupName);
+                                    discountComplexOrg.getGroups().add(discountComplexGroup);
+                                    groupNameResponse = curGroupName;
+                                    currentDatesResponse = null;
+                                }
+
+
+                                curDatesString = requestsEzdMenuView.getMenuDate().toString();
+                                //Достаем дни
+                                if (currentDatesResponse == null || !currentDatesResponse.equals(curDatesString)) {
+                                    discountComplexItem = new DiscountComplexItem();
+                                    discountComplexItem.setDate(new SimpleDateFormat("dd.MM.yyyy")
+                                            .format(requestsEzdMenuView.getMenuDate()));
+                                    discountComplexGroup.getDays().add(discountComplexItem);
+                                    currentDatesResponse = curDatesString;
+                                }
+
+                                complexesItem = new ComplexesItem();
+                                complexesItem.setComplexname(complexname);
+                                complexesItem.setIdofcomplex(requestsEzdMenuView.getIdofcomplex().toString());
+                                discountComplexItem.getComplexeslist().add(complexesItem);
                             }
                         }
-
-                        //Если комплекс подходит, то ...
-                        if (badComplex) {
-                            //Заполняем ответ
-
-                            //Если организация с такой guid не встречалась раньше, то создаем
-                            if (orgGuidResponse == null || !orgGuidResponse.equals(guid)) {
-                                discountComplexOrg = new DiscountComplexOrg();
-                                discountComplexOrg.setGuid(guid);
-                                discountComplexOrg.setEkisid(ekisid);
-                                responseToEZD.getOrg().add(discountComplexOrg);
-                                orgGuidResponse = guid;
-                                groupNameResponse = null;
+                    }
+                }
+                else
+                {
+                    //Часть по web-арм
+                    if (idCurrentOrg == null || !idCurrentOrg.equals(idOforg)) {
+                        idCurrentOrg = idOforg;
+                        complexes = null;
+                        List<Long> groups = DAOService.getInstance().getGroupByOrgForWEBARM(idOforg);
+                        if (groups.isEmpty()) {
+                            //7.2
+                            List<Long> complexesTemp = DAOService.getInstance().getComplexesByOrgForWEBARM(idOforg);
+                            if (!complexesTemp.isEmpty()) {
+                                //7.4
+                                complexes = DAOService.getInstance().getComplexesByComplexForWEBARM(complexesTemp);
                             }
+                        } else {
+                            //7.3
+                            complexes = DAOService.getInstance().getComplexesByGroupForWEBARM(groups);
+                        }
+                    }
 
-                            //Достаем группы
-                            if (groupNameResponse == null || !groupNameResponse.equals(curGroupName)) {
-                                discountComplexGroup = new DiscountComplexGroup();
-                                discountComplexGroup.setGroupName(curGroupName);
-                                discountComplexOrg.getGroups().add(discountComplexGroup);
-                                groupNameResponse = curGroupName;
-                                currentDatesResponse = null;
+                    if (complexes != null)
+                    {
+                        for (Object complex : complexes) {
+                            //7.5
+                            Object[] obj = (Object[]) complex;
+                            Long idComplex = ((BigInteger)(obj[0])).longValue();
+                            String complexName = (String) (obj[1]);
+                            Date startDate = (Date) (obj[2]);
+                            Date endDate = (Date) (obj[3]);
+                            for (Date date1: dates)
+                            {
+                                if (date1.getTime() > startDate.getTime() && date1.getTime() < endDate.getTime())
+                                {
+                                    //Заполняем ответ
+                                    //Если организация с такой guid не встречалась раньше, то создаем
+                                    if (orgGuidResponse == null || !orgGuidResponse.equals(guid)) {
+                                        discountComplexOrg = new DiscountComplexOrg();
+                                        discountComplexOrg.setGuid(guid);
+                                        discountComplexOrg.setEkisid(ekisid);
+                                        responseToEZD.getOrg().add(discountComplexOrg);
+                                        orgGuidResponse = guid;
+                                        groupNameResponse = null;
+                                    }
+
+                                    //Достаем группы
+                                    if (groupNameResponse == null || !groupNameResponse.equals(curGroupName)) {
+                                        discountComplexGroup = new DiscountComplexGroup();
+                                        discountComplexGroup.setGroupName(curGroupName);
+                                        discountComplexOrg.getGroups().add(discountComplexGroup);
+                                        groupNameResponse = curGroupName;
+                                        currentDatesResponse = null;
+                                    }
+
+
+                                    curDatesString = date1.toString();
+                                    //Достаем дни
+                                    if (currentDatesResponse == null || !currentDatesResponse.equals(curDatesString)) {
+                                        discountComplexItem = new DiscountComplexItem();
+                                        discountComplexItem.setDate(new SimpleDateFormat("dd.MM.yyyy")
+                                                .format(date1));
+                                        discountComplexGroup.getDays().add(discountComplexItem);
+                                        currentDatesResponse = curDatesString;
+                                    }
+
+                                    complexesItem = new ComplexesItem();
+                                    complexesItem.setComplexname(complexName);
+                                    complexesItem.setIdofcomplex(idComplex.toString());
+                                    discountComplexItem.getComplexeslist().add(complexesItem);
+                                }
                             }
-
-
-                            curDatesString = requestsEzdMenuView.getMenuDate().toString();
-                            //Достаем дни
-                            if (currentDatesResponse == null || !currentDatesResponse.equals(curDatesString)) {
-                                discountComplexItem = new DiscountComplexItem();
-                                discountComplexItem.setDate(new SimpleDateFormat("dd.MM.yyyy").format(requestsEzdMenuView.getMenuDate()));
-                                discountComplexGroup.getDays().add(discountComplexItem);
-                                currentDatesResponse = curDatesString;
-                            }
-
-                            complexesItem = new ComplexesItem();
-                            complexesItem.setComplexname(complexname);
-                            complexesItem.setIdofcomplex(requestsEzdMenuView.getIdofcomplex().toString());
-                            discountComplexItem.getComplexeslist().add(complexesItem);
                         }
                     }
                 }

@@ -16,6 +16,7 @@ public class RequestsEzdView {
     private Long idoforg;
     private String orgguid;
     private Long ekisid;
+    private Boolean usewebarm;
     private String groupname;
 
 
@@ -58,5 +59,13 @@ public class RequestsEzdView {
 
     public void setEkisid(Long ekisid) {
         this.ekisid = ekisid;
+    }
+
+    public Boolean getUsewebarm() {
+        return usewebarm;
+    }
+
+    public void setUsewebarm(Boolean usewebarm) {
+        this.usewebarm = usewebarm;
     }
 }
