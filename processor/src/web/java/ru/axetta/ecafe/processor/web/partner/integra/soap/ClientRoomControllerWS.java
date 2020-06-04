@@ -2519,11 +2519,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 .process(san, ClientRoomControllerWS.ClientRequest.CLIENT_ID_SAN, new Processor() {
                     public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                             Session session, Transaction transaction) throws Exception {
-                        if (!client.getOrg().getUseWebArm()) {
-                            processMenuFirstDay(client.getOrg(), data, objectFactory, session, startDate, endDate);
-                        } else {
-                            processWtMenuFirstDay(client.getOrg(), data, objectFactory, session, startDate, endDate);
-                        }
+                        processMenuFirstDay(client.getOrg(), data, objectFactory, session, startDate, endDate);
                     }
                 }, null);
 
@@ -2544,7 +2540,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         Data data = new ClientRequest().process(contractId, new Processor() {
             public void process(Client client, Integer subBalanceNum, Data data, ObjectFactory objectFactory,
                     Session session, Transaction transaction) throws Exception {
-                processMenuFirstDay(client.getOrg(), data, objectFactory, session, startDate, endDate);
+                if (!client.getOrg().getUseWebArm()) {
+                    processMenuFirstDay(client.getOrg(), data, objectFactory, session, startDate, endDate);
+                } else {
+                    processWtMenuFirstDay(client.getOrg(), data, objectFactory, session, startDate, endDate);
+                }
             }
         });
 
@@ -3100,7 +3100,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             for (CategoryDiscount categoryDiscount : categoriesDiscount) {
                 if (categoryDiscount.getCategoryType().getValue() == 0 ||   // льготное
                         categoryDiscount.getCategoryType().getValue() == 3) {   // льготное вариативное
-                  return true;
+                     return true;
                 }
             }
         }
