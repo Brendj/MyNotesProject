@@ -138,9 +138,8 @@ public class EzdController {
                             if (countwait == 0) {
                                 flag = true;
                             }
-                        } else {
-                            startedDate = CalendarUtils.addOneDay(startedDate);
                         }
+                        startedDate = CalendarUtils.addOneDay(startedDate);
                     } while (!flag);
                 }
                 List<Date> dates = new ArrayList<>();
@@ -396,9 +395,8 @@ public class EzdController {
                             if (countwait == 0) {
                                 flag = true;
                             }
-                        } else {
-                            startedDate = CalendarUtils.addOneDay(startedDate);
                         }
+                        startedDate = CalendarUtils.addOneDay(startedDate);
                     } while (!flag);
                 }
                 List<Date> dates = new ArrayList<>();
