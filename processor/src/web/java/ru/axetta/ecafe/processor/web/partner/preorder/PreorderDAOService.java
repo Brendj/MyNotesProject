@@ -352,31 +352,30 @@ public class PreorderDAOService {
                                 false, amount, wtComplex.getDeleteState(), false);
                     }
 
-                    List<PreorderMenuItemExt> menuItemExtList = getWtMenuItemsExt(wtComplex, client, org, startDate,
-                            endDate);
-                    if (menuItemExtList.size() > 0) {
-                        complexItemExt.setMenuItemExtList(menuItemExtList);
-                        if (complexItemExt2 != null) {
-                            complexItemExt2.setMenuItemExtList(menuItemExtList);
-                        }
-                        list.add(complexItemExt);
-                    }
-                }
-
-                for (PreorderComplexItemExt item : list) {
-                    PreorderGoodParamsContainer complexParams = getComplexParams(item, client, date);
-                    String groupName = getPreorderComplexGroup(item, complexParams);
-                    if (groupName.isEmpty()) {
-                        continue;
-                    }
-                    item.setType(getPreorderComplexSubgroup(item));
+                    // Распределение по группам
+                    String groupName = wtComplex.getWtDietType().getDescription();
                     PreorderComplexGroup group = groupMap.get(groupName);
                     if (group == null) {
                         group = new PreorderComplexGroup(groupName);
                         groupMap.put(groupName, group);
                     }
-                    group.addItem(item);
 
+                    List<PreorderMenuItemExt> menuItemExtList = getWtMenuItemsExt(wtComplex, client, org, startDate,
+                            endDate);
+                    if (menuItemExtList.size() > 0) {
+                        complexItemExt.setMenuItemExtList(menuItemExtList);
+                        group.addItem(complexItemExt);
+                        list.add(complexItemExt);
+                        if (complexItemExt2 != null) {
+                            complexItemExt2.setMenuItemExtList(menuItemExtList);
+                            group.addItem(complexItemExt2);
+                            list.add(complexItemExt2);
+                        }
+                    }
+                }
+
+                for (PreorderComplexItemExt item : list) {
+                    item.setType(getPreorderComplexSubgroup(item));
                 }
                 List<PreorderComplexGroup> groupList = new ArrayList<>(groupMap.values());
                 for (PreorderComplexGroup group : groupList) {
@@ -394,13 +393,10 @@ public class PreorderDAOService {
                 + "WHERE pc.client = :client AND pc.preorderDate between :startDate and :endDate "
                 + "AND pc.deletedState = false");
         query.setParameter("client", client);
-        query.setParameter("startDate", startDate.getTime());
-        query.setParameter("endDate", endDate.getTime());
-        List<Integer> res =  query.getResultList();
-        if (res != null && res.size() > 0) {
-            return res.get(0);
-        }
-        return 0;
+        query.setParameter("startDate", startDate);
+        query.setParameter("endDate", endDate);
+        Integer res = (Integer) query.getSingleResult();
+        return (res == null) ? 0 : res;
     }
 
     private Integer getAmountForPreorderMenuDetail(Client client, Date startDate, Date endDate, WtDish wtDish) {
@@ -408,14 +404,11 @@ public class PreorderDAOService {
                 + "WHERE pmd.client = :client AND pmd.preorderDate between :startDate and :endDate "
                 + "AND pmd.deletedState = false AND pmd.idOfDish = :idOfDish");
         query.setParameter("client", client);
-        query.setParameter("startDate", startDate.getTime());
-        query.setParameter("endDate", endDate.getTime());
+        query.setParameter("startDate", startDate);
+        query.setParameter("endDate", endDate);
         query.setParameter("idOfDish", wtDish.getIdOfDish());
-        List<Integer> res =  query.getResultList();
-        if (res == null && res.size() == 0) {
-            return 0;
-        }
-        return res.get(0);
+        Integer res = (Integer) query.getSingleResult();
+        return (res == null) ? 0 : res;
     }
 
     public PreorderGoodParamsContainer getComplexParams(PreorderComplexItemExt item, Client client, Date date) {

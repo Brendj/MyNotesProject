@@ -2986,15 +2986,17 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private PreorderListWithComplexesGroupResult processPreorderComplexesWithWtMenuList(Long contractId, Date date) {
         Session session = null;
         Transaction transaction = null;
-
         PreorderListWithComplexesGroupResult groupResult = new PreorderListWithComplexesGroupResult();
-        Client client = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                .getClientByContractId(contractId);
-        Org org = client.getOrg();
 
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
+
+            Client client = findClientByContractId(session, contractId, groupResult);
+            if (client == null) {
+                return groupResult;
+            }
+            Org org = client.getOrg();
 
             // 1 Проверка на включение предзаказа
             if (!org.getPreordersEnabled()) {
@@ -3055,9 +3057,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         } finally {
             HibernateUtils.close(session, logger);
         }
-        groupResult.resultCode = RC_OK;
-        groupResult.description = RC_OK_DESC;
-
         return groupResult;
     }
 
