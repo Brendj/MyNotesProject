@@ -4,7 +4,14 @@
 
 package ru.axetta.ecafe.processor.core.report.orghardware;
 
-import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.HardwareSettings;
+import ru.axetta.ecafe.processor.core.persistence.OrgSync;
+import ru.axetta.ecafe.processor.core.persistence.TurnstileSettings;
+
+import org.hibernate.Query;
+import org.hibernate.Session;
+
+import java.util.Date;
 
 public class HardwareSettingsReportItem {
 
@@ -15,8 +22,9 @@ public class HardwareSettingsReportItem {
     private String shortNameInfoService;//ОО краткое
     private String district;
     private String shortAddress;//краткий адрес
-    private OrganizationType type;
-    private String orgType;
+    private String typeOU;
+    private String moduleType; //модуль
+    private Date lastUpdate; //последнее изменение
 
     //----------------- ПК --------------------//
     private String clientVersion;//версия ПО
@@ -27,15 +35,8 @@ public class HardwareSettingsReportItem {
     private String dotNetVersion;
     private String cpuVersion;
     private String ramSize;
-
-    private String readerNameOU;
-    private String firmwareVersionOU;
-    private String readerNameFeeding;
-    private String firmwareVersionFeeding;
-    private String readerNameGuard;
-    private String firmwareVersionGuard;
-    private String readerNameInfo;
-    private String firmwareVersionInfo;
+    private String readerName;
+    private String firmwareVersion;
 
     //----------------- параметры турникетов --------------------//
     private String turnstileId;//ip/mac
@@ -43,8 +44,73 @@ public class HardwareSettingsReportItem {
     private Integer numOfTurnstile;
     private String controllerModel;
     private String controllerFirmwareVersion;
-    private Integer isWorkWithLongIds;
+    private String isWorkWithLongIds;
     private Double timeCoefficient;
+
+    public HardwareSettingsReportItem(HardwareSettings settings, OrgSync orgSync, String moduleType, String readerName,
+            String firmwareVersion, Boolean isAdministrator, Session persistenceSession) {
+        setOrgNumberInName(orgSync.getOrg().getOrgNumberInName());
+        setIdOfOrg(orgSync.getIdOfOrg());
+        setShortName(orgSync.getOrg().getShortName());
+        setShortNameInfoService(orgSync.getOrg().getShortNameInfoService());
+        setDistrict(orgSync.getOrg().getDistrict());
+        setShortAddress(orgSync.getOrg().getShortAddress());
+        setTypeOU(orgSync.getOrg().getType().toString());
+
+        setModuleType(moduleType);
+
+        if(isAdministrator) {
+            setSqlVersion(orgSync.getSqlServerVersion());
+            setDataBaseSize(orgSync.getDatabaseSize());
+        }
+        setClientVersion(orgSync.getClientVersion());
+
+        setRemoteAddress(settings.getIpHost());
+        setDotNetVersion(settings.getDotNetVer());
+        setOsVersion(settings.getoSVer());
+        setRamSize(settings.getRamSize());
+        setCpuVersion(settings.getCpuHost());
+        setReaderName(readerName);
+        setFirmwareVersion(firmwareVersion);
+
+        Query query = persistenceSession.createSQLQuery(
+                "select " + "(select to_timestamp(max(date)/1000)"
+                        + "from (values(lastupdateforiphost), (lastupdatefordotnetver), (lastupdateforosver),"
+                        + "(lastupdateforramsize), (lastupdateforcpuhost)) as updatedate (date)) as date"
+                        + " from cf_hardware_settings "
+                        + "where idofhardwaresetting = :idOfHardwareSetting ");
+        query.setParameter("idOfHardwareSetting",
+                settings.getCompositeIdOfHardwareSettings().getIdOfHardwareSetting());
+        setLastUpdate((Date) query.uniqueResult());
+    }
+
+    public HardwareSettingsReportItem(TurnstileSettings ts,int numOfTurnstile,OrgSync orgSync) {
+
+        setOrgNumberInName(orgSync.getOrg().getOrgNumberInName());
+        setIdOfOrg(orgSync.getIdOfOrg());
+        setShortName(orgSync.getOrg().getShortName());
+        setShortNameInfoService(orgSync.getOrg().getShortNameInfoService());
+        setDistrict(orgSync.getOrg().getDistrict());
+        setShortAddress(orgSync.getOrg().getShortAddress());
+        setTypeOU(orgSync.getOrg().getType().toString());
+
+        setModuleType("Турникет");
+
+        setTurnstileId(ts.getTurnstileId());
+        setNumOfEntries(ts.getNumOfEntries());
+        setNumOfTurnstile(numOfTurnstile);
+        setControllerModel(ts.getControllerModel());
+        setControllerFirmwareVersion(ts.getControllerFirmwareVersion());
+        if(ts.getIsReadsLongIdsIncorrectly()==1)
+        {
+            setIsWorkWithLongIds("Да");
+        } else {
+            setIsWorkWithLongIds("Нет");
+        }
+        setTimeCoefficient(ts.getTimeCoefficient());
+        setLastUpdate(ts.getLastUpdateForTurnstile());
+
+    }
 
     public String getOrgNumberInName() {
         return orgNumberInName;
@@ -92,22 +158,6 @@ public class HardwareSettingsReportItem {
 
     public void setShortAddress(String shortAddress) {
         this.shortAddress = shortAddress;
-    }
-
-    public OrganizationType getType() {
-        return type;
-    }
-
-    public void setType(OrganizationType type) {
-        this.type = type;
-    }
-
-    public String getOrgType() {
-        return orgType;
-    }
-
-    public void setOrgType(String orgType) {
-        this.orgType = orgType;
     }
 
     public String getClientVersion() {
@@ -174,70 +224,6 @@ public class HardwareSettingsReportItem {
         this.ramSize = ramSize;
     }
 
-    public String getReaderNameOU() {
-        return readerNameOU;
-    }
-
-    public void setReaderNameOU(String readerNameOU) {
-        this.readerNameOU = readerNameOU;
-    }
-
-    public String getFirmwareVersionOU() {
-        return firmwareVersionOU;
-    }
-
-    public void setFirmwareVersionOU(String firmwareVersionOU) {
-        this.firmwareVersionOU = firmwareVersionOU;
-    }
-
-    public String getReaderNameFeeding() {
-        return readerNameFeeding;
-    }
-
-    public void setReaderNameFeeding(String readerNameFeeding) {
-        this.readerNameFeeding = readerNameFeeding;
-    }
-
-    public String getFirmwareVersionFeeding() {
-        return firmwareVersionFeeding;
-    }
-
-    public void setFirmwareVersionFeeding(String firmwareVersionFeeding) {
-        this.firmwareVersionFeeding = firmwareVersionFeeding;
-    }
-
-    public String getReaderNameGuard() {
-        return readerNameGuard;
-    }
-
-    public void setReaderNameGuard(String readerNameGuard) {
-        this.readerNameGuard = readerNameGuard;
-    }
-
-    public String getFirmwareVersionGuard() {
-        return firmwareVersionGuard;
-    }
-
-    public void setFirmwareVersionGuard(String firmwareVersionGuard) {
-        this.firmwareVersionGuard = firmwareVersionGuard;
-    }
-
-    public String getReaderNameInfo() {
-        return readerNameInfo;
-    }
-
-    public void setReaderNameInfo(String readerNameInfo) {
-        this.readerNameInfo = readerNameInfo;
-    }
-
-    public String getFirmwareVersionInfo() {
-        return firmwareVersionInfo;
-    }
-
-    public void setFirmwareVersionInfo(String firmwareVersionInfo) {
-        this.firmwareVersionInfo = firmwareVersionInfo;
-    }
-
     public String getTurnstileId() {
         return turnstileId;
     }
@@ -278,11 +264,11 @@ public class HardwareSettingsReportItem {
         this.controllerFirmwareVersion = controllerFirmwareVersion;
     }
 
-    public Integer getIsWorkWithLongIds() {
+    public String getIsWorkWithLongIds() {
         return isWorkWithLongIds;
     }
 
-    public void setIsWorkWithLongIds(Integer isWorkWithLongIds) {
+    public void setIsWorkWithLongIds(String isWorkWithLongIds) {
         this.isWorkWithLongIds = isWorkWithLongIds;
     }
 
@@ -292,5 +278,45 @@ public class HardwareSettingsReportItem {
 
     public void setTimeCoefficient(Double timeCoefficient) {
         this.timeCoefficient = timeCoefficient;
+    }
+
+    public Date getLastUpdate() {
+        return lastUpdate;
+    }
+
+    public void setLastUpdate(Date lastUpdate) {
+        this.lastUpdate = lastUpdate;
+    }
+
+    public String getTypeOU() {
+        return typeOU;
+    }
+
+    public void setTypeOU(String typeOU) {
+        this.typeOU = typeOU;
+    }
+
+    public String getModuleType() {
+        return moduleType;
+    }
+
+    public void setModuleType(String moduleType) {
+        this.moduleType = moduleType;
+    }
+
+    public String getReaderName() {
+        return readerName;
+    }
+
+    public void setReaderName(String readerName) {
+        this.readerName = readerName;
+    }
+
+    public String getFirmwareVersion() {
+        return firmwareVersion;
+    }
+
+    public void setFirmwareVersion(String firmwareVersion) {
+        this.firmwareVersion = firmwareVersion;
     }
 }

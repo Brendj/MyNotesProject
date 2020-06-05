@@ -100,7 +100,7 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
             parameterMap.put(SELECTED_TURNSTILES_PARAM, showTurnstiles);
 
             JRDataSource dataSource = createDataSource(session, selectedStatus, selectedDistrict, idOfOrgList,
-                    allFriendlyOrgs);
+                    allFriendlyOrgs, showAdministrator, showCashier, showGuard, showInfo, showTurnstiles);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(templateFilename, parameterMap, dataSource);
 
@@ -111,15 +111,17 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
         }
 
         private JRDataSource createDataSource(Session session, Integer statusCondition, String selectedDistrict,
-                List<Long> idOfOrgList, Boolean allFriendlyOrg) throws Exception {
+                List<Long> idOfOrgList, Boolean allFriendlyOrg, Boolean showAdministrator, Boolean showCashier,
+                Boolean showGuard, Boolean showInfo, Boolean showTurnstiles) throws Exception {
             return new JRBeanCollectionDataSource(
-                    buildOrgHardwareCollection(idOfOrgList, statusCondition, session, selectedDistrict,
-                            allFriendlyOrg));
+                    buildOrgHardwareCollection(idOfOrgList, statusCondition, session, selectedDistrict, allFriendlyOrg,
+                            showAdministrator, showCashier, showGuard, showInfo, showTurnstiles));
         }
 
         public static List<HardwareSettingsReportItem> buildOrgHardwareCollection(List<Long> idOfOrgList,
-                Integer statusCondition, Session persistenceSession, String selectedDistricts, Boolean allFriendlyOrgs)
-                throws Exception {
+                Integer statusCondition, Session persistenceSession, String selectedDistricts, Boolean allFriendlyOrgs,
+                Boolean showAdministrator, Boolean showCashier, Boolean showGuard, Boolean showInfo,
+                Boolean showTurnstiles) throws Exception {
             List<HardwareSettingsReportItem> result = new ArrayList<HardwareSettingsReportItem>();
 
             Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
@@ -166,103 +168,58 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
                 OrgSync orgSync = getOrgSyncByOrg(listOfOrgSync, org);
                 if (orgSync != null) {
                     for (HardwareSettings settings : listOfSettings) {
-                        HardwareSettingsReportItem item = new HardwareSettingsReportItem();
-
-                        item.setOrgNumberInName(orgSync.getOrg().getOrgNumberInName());
-                        item.setIdOfOrg(orgSync.getIdOfOrg());
-                        item.setShortName(orgSync.getOrg().getShortName());
-                        item.setShortNameInfoService(orgSync.getOrg().getShortNameInfoService());
-                        item.setDistrict(orgSync.getOrg().getDistrict());
-                        item.setShortAddress(orgSync.getOrg().getShortAddress());
-                        item.setOrgType(orgSync.getOrg().getType().toString());
-                        item.setSqlVersion(orgSync.getSqlServerVersion());
-                        item.setClientVersion(orgSync.getClientVersion());
-                        item.setDataBaseSize(orgSync.getDatabaseSize());
-
-                        item.setRemoteAddress(settings.getIpHost());
-                        item.setDotNetVersion(settings.getDotNetVer());
-                        item.setOsVersion(settings.getDotNetVer());
-                        item.setRamSize(settings.getRamSize());
-                        item.setCpuVersion(settings.getCpuHost());
-
                         Set<HardwareSettingsMT> innerList = settings.getModuleTypes();
                         for (HardwareSettingsMT mt : innerList) {
                             Integer moduleType = mt.getModuleType();
                             switch (moduleType) {
                                 case (ADMINISTRATOR):
-                                    item.setReaderNameOU(mt.getReaderName());
-                                    item.setFirmwareVersionOU(mt.getFirmwareVer());
+                                    if (showAdministrator) {
+                                        result.add(new HardwareSettingsReportItem(settings, orgSync,
+                                                "АРМ администратора ОУ", mt.getReaderName(), mt.getFirmwareVer(), true,
+                                                persistenceSession));
+                                    } else {
+                                        continue;
+                                    }
                                     break;
                                 case (FEEDING):
-                                    item.setReaderNameFeeding(mt.getReaderName());
-                                    item.setFirmwareVersionFeeding(mt.getFirmwareVer());
+                                    if (showCashier) {
+                                        result.add(new HardwareSettingsReportItem(settings, orgSync,
+                                                "АРМ оператора питания(кассира)", mt.getReaderName(),
+                                                mt.getFirmwareVer(), false, persistenceSession));
+                                    } else {
+                                        continue;
+                                    }
                                     break;
                                 case (GUARD):
-                                    item.setReaderNameGuard(mt.getReaderName());
-                                    item.setFirmwareVersionGuard(mt.getFirmwareVer());
+                                    if (showGuard) {
+                                        result.add(new HardwareSettingsReportItem(settings, orgSync,
+                                                "АРМ контроллера входа(охранника)", mt.getReaderName(),
+                                                mt.getFirmwareVer(), false, persistenceSession));
+                                    } else {
+                                        continue;
+                                    }
                                     break;
                                 case (INFO):
-                                    item.setReaderNameInfo(mt.getReaderName());
-                                    item.setFirmwareVersionInfo(mt.getFirmwareVer());
+                                    if (showInfo) {
+                                        result.add(new HardwareSettingsReportItem(settings, orgSync, "Инфопанель",
+                                                mt.getReaderName(), mt.getFirmwareVer(), false, persistenceSession));
+                                    } else {
+                                        continue;
+                                    }
                                     break;
                             }
                         }
-                        result.add(item);
                     }
-                }
 
-                Criteria turnstileCriteria = persistenceSession.createCriteria(TurnstileSettings.class);
-                turnstileCriteria.add(Restrictions.eq("org.idOfOrg", org.getIdOfOrg()));
+                    Criteria turnstileCriteria = persistenceSession.createCriteria(TurnstileSettings.class);
+                    turnstileCriteria.add(Restrictions.eq("org.idOfOrg", org.getIdOfOrg()));
 
-                List<HardwareSettingsReportItem> newTurnstile = new ArrayList<HardwareSettingsReportItem>();
-
-                List<TurnstileSettings> turnstileSettingsList = turnstileCriteria.list();
-                if (!turnstileSettingsList.isEmpty()) {
-                    if (listOfSettings.size() < turnstileSettingsList.size()) {
-                        for (int i = 0; i < turnstileSettingsList.size(); i++) {
-                            if (i < listOfSettings.size()) {
-                                HardwareSettingsReportItem item = result.get(i);
-                                item.setTurnstileId(turnstileSettingsList.get(i).getTurnstileId());
-                                item.setNumOfEntries(turnstileSettingsList.get(i).getNumOfEntries());
-                                item.setNumOfTurnstile(turnstileSettingsList.size());
-                                item.setControllerModel(turnstileSettingsList.get(i).getControllerModel());
-                                item.setControllerFirmwareVersion(
-                                        turnstileSettingsList.get(i).getControllerFirmwareVersion());
-                                item.setIsWorkWithLongIds(turnstileSettingsList.get(i).getIsReadsLongIdsIncorrectly());
-                                item.setTimeCoefficient(turnstileSettingsList.get(i).getTimeCoefficient());
-                            } else {
-                                HardwareSettingsReportItem tempItem = new HardwareSettingsReportItem();
-                                tempItem.setTurnstileId(turnstileSettingsList.get(i).getTurnstileId());
-                                tempItem.setNumOfEntries(turnstileSettingsList.get(i).getNumOfEntries());
-                                tempItem.setNumOfTurnstile(turnstileSettingsList.size());
-                                tempItem.setControllerModel(turnstileSettingsList.get(i).getControllerModel());
-                                tempItem.setControllerFirmwareVersion(
-                                        turnstileSettingsList.get(i).getControllerFirmwareVersion());
-                                tempItem.setIsWorkWithLongIds(
-                                        turnstileSettingsList.get(i).getIsReadsLongIdsIncorrectly());
-                                tempItem.setTimeCoefficient(turnstileSettingsList.get(i).getTimeCoefficient());
-                                newTurnstile.add(tempItem);
-                            }
+                    List<TurnstileSettings> turnstileSettingsList = turnstileCriteria.list();
+                    for (TurnstileSettings ts : turnstileSettingsList) {
+                        if (showTurnstiles) {
+                            result.add(new HardwareSettingsReportItem(ts, turnstileSettingsList.size(), orgSync));
                         }
                     }
-
-                    if (listOfSettings.size() >= turnstileSettingsList.size()) {
-                        for (int i = 0; i < listOfSettings.size(); i++) {
-                            if (i == turnstileSettingsList.size()) {
-                                break;
-                            } else {
-                                HardwareSettingsReportItem item = result.get(i);
-                                item.setTurnstileId(turnstileSettingsList.get(i).getTurnstileId());
-                                item.setNumOfEntries(turnstileSettingsList.get(i).getNumOfEntries());
-                                item.setNumOfTurnstile(turnstileSettingsList.size());
-                                item.setControllerModel(turnstileSettingsList.get(i).getControllerModel());
-                                item.setControllerFirmwareVersion(
-                                        turnstileSettingsList.get(i).getControllerFirmwareVersion());
-                                item.setIsWorkWithLongIds(turnstileSettingsList.get(i).getIsReadsLongIdsIncorrectly());
-                            }
-                        }
-                    }
-                    result.addAll(newTurnstile);
                 }
             }
             return result;

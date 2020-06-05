@@ -109,7 +109,7 @@ public class HardwareSettingsReportPage extends OnlineReportPage implements OrgL
 
             items = HardwareSettingsReport.Builder
                     .buildOrgHardwareCollection(idOfOrgList, status, persistenceSession, selectedDistricts,
-                            allFriendlyOrgs);
+                            allFriendlyOrgs, showAdministrator, showCashier, showGuard, showInfo,showTurnstile);
             transaction.commit();
             transaction = null;
         } catch (Exception e) {
@@ -121,7 +121,7 @@ public class HardwareSettingsReportPage extends OnlineReportPage implements OrgL
         }
     }
 
-    public void buildXLS(){
+    public void buildXLS() {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -131,14 +131,22 @@ public class HardwareSettingsReportPage extends OnlineReportPage implements OrgL
 
             HardwareSettingsReport.Builder builder = new HardwareSettingsReport.Builder();
 
-            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.LIST_OF_ORG_IDS_PARAM, getGetStringIdOfOrgList());
-            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.SELECTED_STATUS_PARAM, status.toString());
-            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.SELECTED_DISTRICT_PARAM, selectedDistricts);
-            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.SELECTED_ADMINISTRATOR_PARAM, showAdministrator.toString());
-            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.SELECTED_CASHIER_PARAM,showCashier.toString());
-            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.SELECTED_GUARD_PARAM,showGuard.toString());
-            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.SELECTED_TURNSTILES_PARAM,showTurnstile.toString());
-            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.ALL_FRIENDLY_ORGS, allFriendlyOrgs.toString());
+            builder.getReportProperties()
+                    .setProperty(HardwareSettingsReport.Builder.LIST_OF_ORG_IDS_PARAM, getGetStringIdOfOrgList());
+            builder.getReportProperties()
+                    .setProperty(HardwareSettingsReport.Builder.SELECTED_STATUS_PARAM, status.toString());
+            builder.getReportProperties()
+                    .setProperty(HardwareSettingsReport.Builder.SELECTED_DISTRICT_PARAM, selectedDistricts);
+            builder.getReportProperties().setProperty(HardwareSettingsReport.Builder.SELECTED_ADMINISTRATOR_PARAM,
+                    showAdministrator.toString());
+            builder.getReportProperties()
+                    .setProperty(HardwareSettingsReport.Builder.SELECTED_CASHIER_PARAM, showCashier.toString());
+            builder.getReportProperties()
+                    .setProperty(HardwareSettingsReport.Builder.SELECTED_GUARD_PARAM, showGuard.toString());
+            builder.getReportProperties()
+                    .setProperty(HardwareSettingsReport.Builder.SELECTED_TURNSTILES_PARAM, showTurnstile.toString());
+            builder.getReportProperties()
+                    .setProperty(HardwareSettingsReport.Builder.ALL_FRIENDLY_ORGS, allFriendlyOrgs.toString());
 
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
@@ -155,8 +163,7 @@ public class HardwareSettingsReportPage extends OnlineReportPage implements OrgL
         if (report != null) {
             try {
                 FacesContext facesContext = FacesContext.getCurrentInstance();
-                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext()
-                        .getResponse();
+                HttpServletResponse response = (HttpServletResponse) facesContext.getExternalContext().getResponse();
                 ServletOutputStream servletOutputStream = response.getOutputStream();
 
                 facesContext.responseComplete();
