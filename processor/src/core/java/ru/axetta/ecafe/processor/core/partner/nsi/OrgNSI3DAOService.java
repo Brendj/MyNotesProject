@@ -54,12 +54,12 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
                 + "addr.unad as UNAD, "                               //13
                 + "'' as pp_status, "                                  //14
                 + "addr.unique_address_id as ekis_address_id, "                            //15
-                + "trim(addr.area), "                                  //16
-                + "trim(org.egisso_id), "                              //17
-                + "trim(addr.address_asur), "                          //18
-                + "trim(addr.district), "                               //19
-                + "trim(org.founder), "                                 //20
-                + "trim(org.subordination_value) "                      //21
+                + "trim(addr.area) as area, "                                  //16
+                + "trim(org.egisso_id) as egisso_id, "                              //17
+                + "trim(addr.address_asur) as address_asur, "                          //18
+                + "trim(addr.district) as district, "                               //19
+                + "trim(org.founder) as founder, "                                 //20
+                + "trim(org.subordination_value) as subordination "                      //21
                 + "FROM "
                 + "cf_kf_organization_registry org "
                 + "INNER JOIN cf_kf_eo_address addr ON addr.global_object_id = org.global_id "
