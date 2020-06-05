@@ -112,7 +112,7 @@ public class PreOrderFeedingDetail {
             element.setAttribute("GoodsGuid", goodsGuid);
         }
         if (null != idOfDish) {
-            element.setAttribute("idOfDish", idOfDish.toString());
+            element.setAttribute("IdOfDish", idOfDish.toString());
         }
 
         return element;
