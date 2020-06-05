@@ -2976,7 +2976,9 @@ public class PreorderDAOService {
                 }
             }
             Integer cycleDay = cycleDates.get(date);
-            res = getWtComplexItemByComplexAndCycleDay(wtComplex, cycleDay);
+            if (cycleDay != null) {
+                res = getWtComplexItemByComplexAndCycleDay(wtComplex, cycleDay);
+            }
         }
         return res;
     }

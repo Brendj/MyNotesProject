@@ -305,13 +305,13 @@ public class DAOReadExternalsService {
         Query query = entityManager.createQuery("SELECT DISTINCT dish FROM WtDish dish "
                 + "WHERE :complexItem IN ELEMENTS(dish.complexItems) "
                 + "AND dish.deleteState = 0 "
-                + "AND ((dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding > :endDate) "
-                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding > :endDate) "
-                + "OR (dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
+                + "AND ((dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding >= :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding >= :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");
         query.setParameter("complexItem", complexItem);
-        query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-        query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+        query.setParameter("startDate", startDate, TemporalType.DATE);
+        query.setParameter("endDate", endDate, TemporalType.DATE);
         return (List<WtDish>) query.getResultList();
     }
 

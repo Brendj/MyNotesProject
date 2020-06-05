@@ -2848,84 +2848,51 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List<MenuWithComplexesExt> list = new ArrayList<>();
             while (menuDate.getTime() < endDate.getTime()) {
 
-                // Проверка даты по календарям
-                if (RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .isAvailableDate(client, org, menuDate)) {
+                 // Проверка даты по календарям
+                //if (!RuntimeContext.getAppContext().getBean(PreorderDAOService.class).isAvailableDate(client, org, menuDate)) {
+                //    return result;
+                //}
 
-                    Set<WtComplex> wtComplexes = new HashSet<>();
-                    Set<WtComplex> wtDiscComplexes = new HashSet<>();
+                Set<WtComplex> wtComplexes = new HashSet<>();
+                Set<WtComplex> wtDiscComplexes = new HashSet<>();
 
-                    // 6-9, 12 Платные комплексы по возрастным группам и группам
-                    if (complexSign.get("Paid")) {
-                        ageGroupIds.add(7L); // Все
-                        Set<WtComplex> wtComComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                .getPaidWtComplexesByAgeGroups(menuDate, menuDate, ageGroupIds, org);
-                        if (wtComComplexes.size() > 0) {
-                            wtComplexes.addAll(wtComComplexes);
+                // 6-9, 12 Платные комплексы по возрастным группам и группам
+                if (complexSign.get("Paid")) {
+                    ageGroupIds.add(7L); // Все
+                    Set<WtComplex> wtComComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                            .getPaidWtComplexesByAgeGroups(menuDate, menuDate, ageGroupIds, org);
+                    if (wtComComplexes.size() > 0) {
+                        wtComplexes.addAll(wtComComplexes);
+                    }
+                }
+
+                Set<WtComplex> resComplexes = new HashSet<>();
+
+                // Правила по льготам
+                if (categoriesDiscount.size() > 0) {
+
+                    Set<WtDiscountRule> wtDiscountRuleSet = RuntimeContext.getAppContext()
+                            .getBean(PreorderDAOService.class).getWtDiscountRulesByCategoryOrg(categoriesDiscount, org);
+
+                    // 10 Льготные комплексы по правилам соц. скидок
+                    if (complexSign.get("Free") && !complexSign.get("Elem") && !complexSign.get("Middle")) {
+                        Set<WtDiscountRule> discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getWtDiscountRulesWithMaxPriority(wtDiscountRuleSet);
+                        resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getFreeWtComplexesByDiscountRules(menuDate, menuDate, discRules);
+                        if (resComplexes.size() > 0) {
+                            wtDiscComplexes.addAll(resComplexes);
                         }
                     }
 
-                    Set<WtComplex> resComplexes = new HashSet<>();
-
-                    // Правила по льготам
-                    if (categoriesDiscount.size() > 0) {
-
-                        Set<WtDiscountRule> wtDiscountRuleSet = RuntimeContext.getAppContext()
-                                .getBean(PreorderDAOService.class)
-                                .getWtDiscountRulesByCategoryOrg(categoriesDiscount, org);
-
-                        // 10 Льготные комплексы по правилам соц. скидок
-                        if (complexSign.get("Free") && !complexSign.get("Elem") && !complexSign.get("Middle")) {
-                            Set<WtDiscountRule> discRules = RuntimeContext.getAppContext()
-                                    .getBean(PreorderDAOService.class).getWtDiscountRulesWithMaxPriority(wtDiscountRuleSet);
-                            resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByDiscountRules(menuDate, menuDate, discRules);
-                            if (resComplexes.size() > 0) {
-                                wtDiscComplexes.addAll(resComplexes);
-                            }
-                        }
-
-                        // 13 Льготы для начальной школы
-                        if (complexSign.get("Free") && complexSign.get("Elem")) {
-                            CategoryDiscount discount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getElemDiscount();
-                            Set<WtDiscountRule> discRules = RuntimeContext.getAppContext()
-                                    .getBean(PreorderDAOService.class)
-                                    .getWtDiscountRuleBySecondDiscount(wtDiscountRuleSet, discount);
-                            discRules = RuntimeContext.getAppContext()
-                                    .getBean(PreorderDAOService.class).getWtDiscountRulesWithMaxPriority(discRules);
-                            resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
-                            if (resComplexes.size() > 0) {
-                                wtDiscComplexes.addAll(resComplexes);
-                            }
-                        }
-
-                        // 14 Льготы для средней и высшей школы
-                        if (complexSign.get("Free") && complexSign.get("Middle")) {
-                            ageGroupIds.add(7L); // Все
-                            CategoryDiscount middleDiscount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getMiddleDiscount();
-                            CategoryDiscount highDiscount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getHighDiscount();
-                            Set<WtDiscountRule> discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getWtDiscountRuleByTwoDiscounts(wtDiscountRuleSet, middleDiscount, highDiscount);
-                            discRules = RuntimeContext.getAppContext()
-                                    .getBean(PreorderDAOService.class).getWtDiscountRulesWithMaxPriority(discRules);
-                            resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
-                            if (resComplexes.size() > 0) {
-                                wtDiscComplexes.addAll(resComplexes);
-                            }
-                        }
-                    }
-
-                    // 11 Льготные комплексы для начальной школы
-                    if (!complexSign.get("Free") && complexSign.get("Elem")) {
-                        Set<WtDiscountRule> discRules = RuntimeContext.getAppContext()
-                                .getBean(PreorderDAOService.class).getWtElemDiscountRules(org);
-                        discRules = RuntimeContext.getAppContext()
-                                .getBean(PreorderDAOService.class).getWtDiscountRulesWithMaxPriority(discRules);
+                    // 13 Льготы для начальной школы
+                    if (complexSign.get("Free") && complexSign.get("Elem")) {
+                        CategoryDiscount discount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getElemDiscount();
+                        Set<WtDiscountRule> discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getWtDiscountRuleBySecondDiscount(wtDiscountRuleSet, discount);
+                        discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getWtDiscountRulesWithMaxPriority(discRules);
                         resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                 .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
                         if (resComplexes.size() > 0) {
@@ -2933,35 +2900,66 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         }
                     }
 
-                    if (wtDiscComplexes.size() > 0) {
-                        wtComplexes.addAll(wtDiscComplexes);
+                    // 14 Льготы для средней и высшей школы
+                    if (complexSign.get("Free") && complexSign.get("Middle")) {
+                        ageGroupIds.add(7L); // Все
+                        CategoryDiscount middleDiscount = RuntimeContext.getAppContext()
+                                .getBean(PreorderDAOService.class).getMiddleDiscount();
+                        CategoryDiscount highDiscount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getHighDiscount();
+                        Set<WtDiscountRule> discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getWtDiscountRuleByTwoDiscounts(wtDiscountRuleSet, middleDiscount, highDiscount);
+                        discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getWtDiscountRulesWithMaxPriority(discRules);
+                        resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                        if (resComplexes.size() > 0) {
+                            wtDiscComplexes.addAll(resComplexes);
+                        }
                     }
+                }
 
-                    if (wtComplexes.size() > 0) {
-                        for (WtComplex wtComplex : wtComplexes) {
-                            // Определяем подходящий состав комплекса
-                            WtComplexesItem complexItem = RuntimeContext.getAppContext()
-                                    .getBean(PreorderDAOService.class).getWtComplexItemByCycle(wtComplex, org, menuDate);
-                            List<WtDish> wtDishes;
-                            if (complexItem != null) {
-                                wtDishes = DAOReadExternalsService.getInstance()
-                                        .getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate);
-                            } else {
-                                wtDishes = DAOReadExternalsService.getInstance()
-                                        .getWtDishesByComplexAndDates(wtComplex, menuDate, menuDate);
-                            }
-                            List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtDishes);
-                            // Проверка типа питания
-                            int isDiscountComplex = wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem()
-                                    .intValue();
-                            if (isDiscountComplex == 1) {
-                                getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
-                            } else if (isDiscountComplex == 3 && wtDiscComplexes.contains(wtComplex)) {
-                                getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
-                                getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 0);
-                            } else {
-                                getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 0);
-                            }
+                // 11 Льготные комплексы для начальной школы
+                if (!complexSign.get("Free") && complexSign.get("Elem")) {
+                    Set<WtDiscountRule> discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                            .getWtElemDiscountRules(org);
+                    discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                            .getWtDiscountRulesWithMaxPriority(discRules);
+                    resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                            .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                    if (resComplexes.size() > 0) {
+                        wtDiscComplexes.addAll(resComplexes);
+                    }
+                }
+
+                if (wtDiscComplexes.size() > 0) {
+                    wtComplexes.addAll(wtDiscComplexes);
+                }
+
+                if (wtComplexes.size() > 0) {
+                    for (WtComplex wtComplex : wtComplexes) {
+                        // Определяем подходящий состав комплекса
+                        WtComplexesItem complexItem = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getWtComplexItemByCycle(wtComplex, org, menuDate);
+                        List<WtDish> wtDishes;
+                        if (complexItem != null) {
+                            wtDishes = DAOReadExternalsService.getInstance()
+                                    .getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate);
+                        } else {
+                            // комплекс не выводим
+                            continue;
+                            //wtDishes = DAOReadExternalsService.getInstance().getWtDishesByComplexAndDates(wtComplex, menuDate, menuDate);
+                        }
+                        List<MenuItemExt> menuItemExtList = getMenuItemsExt(objectFactory, wtDishes);
+                        // Проверка типа питания
+                        int isDiscountComplex = wtComplex.getWtComplexGroupItem().getIdOfComplexGroupItem().intValue();
+                        if (isDiscountComplex == 1) {
+                            getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
+                        } else if (isDiscountComplex == 3 && wtDiscComplexes.contains(wtComplex)) {
+                            getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 1);
+                            getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 0);
+                        } else {
+                            getComplexExt(org, menuDate, menuItemExtList, wtComplex, list, 0);
                         }
                     }
                 }
