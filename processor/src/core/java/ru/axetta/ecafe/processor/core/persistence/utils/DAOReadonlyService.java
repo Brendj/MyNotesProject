@@ -1014,8 +1014,10 @@ public class DAOReadonlyService {
     public Boolean checkWorkingDay(Date date) {
         try {
             Query query = entityManager.createQuery(
-                    "SELECT calend.flag from ProductionCalendar calend WHERE calend.day = :date ");
-            query.setParameter("date", date);
+                    "SELECT calend.flag from ProductionCalendar calend WHERE calend.day "
+                            + "between :dateBegin and :dateEnd");
+            query.setParameter("dateBegin", CalendarUtils.startOfDay(date));
+            query.setParameter("dateEnd", CalendarUtils.endOfDay(date));
             List<Integer> res = query.getResultList();
             if (res != null && res.size() > 0) {
                 return res.get(0) == 1;
@@ -1031,9 +1033,10 @@ public class DAOReadonlyService {
         try {
             Query query = entityManager.createQuery(
                     "SELECT sd.isWeekend from SpecialDate sd "
-                            + "WHERE sd.date = :date AND sd.deleted = false AND sd.org = :org "
+                            + "WHERE sd.date between :dateBegin and :dateEnd AND sd.deleted = false AND sd.org = :org "
                             + "AND (sd.idOfClientGroup = :idOfClientGroup OR sd.idOfClientGroup IS NULL)");
-            query.setParameter("date", date);
+            query.setParameter("dateBegin", CalendarUtils.startOfDay(date));
+            query.setParameter("dateEnd", CalendarUtils.endOfDay(date));
             query.setParameter("org", org);
             query.setParameter("idOfClientGroup", clientGroup.getCompositeIdOfClientGroup().getIdOfClientGroup());
             List<Boolean> res = query.getResultList();
