@@ -177,6 +177,12 @@ public class OtherActionsPage extends OnlineReportPage {
         printMessage("Очистка выполнена. Смотри лог");
     }
 
+    public void endBenefitNotification() {
+        BenefitService service = RuntimeContext.getAppContext().getBean(BenefitService.class);
+        service.runEndBenefit(true);
+        printMessage("Оповещения об окончании срока действия льготы отправлены. Смотри лог");
+    }
+
     public void runSendEMPEventEMIAS() throws Exception {
         RuntimeContext runtimeContext = null;
         Session persistenceSession = null;
@@ -626,6 +632,11 @@ public class OtherActionsPage extends OnlineReportPage {
         RuntimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).runNotifications();
     }
 
+    public void autoBlockCards() {
+        RuntimeContext.getAppContext().getBean(CardBlockService.class).run();
+        printMessage("Операция блокировки ЭИ завершена");
+    }
+
     public void preorderRequestsManualGenerate() throws Exception {
         PreorderRequestsReportServiceParam params = new PreorderRequestsReportServiceParam(startDate);
         params.getIdOfOrgList().clear();
@@ -688,7 +699,7 @@ public class OtherActionsPage extends OnlineReportPage {
 
     public void runUpdateApplicationsForFoodTask() throws Exception {
         try {
-            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodTask();
+            RuntimeContext.getAppContext().getBean(DTSZNDiscountsReviseService.class).updateApplicationsForFoodTask(true);
             printMessage("Обработка ЗЛП завершена");
         } catch (Exception e) {
             getLogger().error("Error in runUpdateApplicationsForFoodTask: ", e);

@@ -6,12 +6,15 @@ package ru.axetta.ecafe.processor.core.service.nsi;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVScheduledStatus;
 import ru.axetta.ecafe.processor.core.partner.etpmv.ETPMVService;
 import ru.axetta.ecafe.processor.core.partner.revise.ReviseDAOService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.BenefitService;
+import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.ssl.EasySSLProtocolSocketFactory;
@@ -43,6 +46,8 @@ import java.net.URL;
 import java.nio.charset.Charset;
 import java.util.*;
 import java.util.Calendar;
+
+import static ru.axetta.ecafe.processor.core.logic.ClientManager.findGuardiansByClient;
 
 @Component
 public class DTSZNDiscountsReviseService {
@@ -318,7 +323,7 @@ public class DTSZNDiscountsReviseService {
             }
             updateArchivedFlagForDiscountsDB();
             runTaskPart2(fireTime);
-            updateApplicationsForFoodTask();
+            updateApplicationsForFoodTask(false);
         }
     }
 
@@ -556,7 +561,7 @@ public class DTSZNDiscountsReviseService {
         return entityIds;
     }
 
-    public void updateApplicationsForFoodTask() throws Exception {
+    public void updateApplicationsForFoodTask(boolean forTest) throws Exception {
         Session session = null;
         Transaction transaction = null;
         try {
@@ -640,6 +645,35 @@ public class DTSZNDiscountsReviseService {
                                         status, applicationVersion, historyVersion, true);
                         statusList.add(new ETPMVScheduledStatus(applicationForFood.getServiceNumber(),
                                 status.getApplicationForFoodState(), status.getDeclineReason()));
+                        //Отправка уведомления клтенту
+                        Client client = applicationForFood.getClient();
+                        ClientDtisznDiscountInfo clientDtisznDiscountInfo = DAOUtils
+                                .getDTISZNDiscountInfoByClientAndCode(session, client, applicationForFood.getDtisznCode());
+                        String[] values = new String[]{
+                                BenefitService.SERVICE_NUMBER, applicationForFood.getServiceNumber(),
+                                BenefitService.DATE, CalendarUtils.dateToString(applicationForFood.getCreatedDate()),
+                                BenefitService.DTISZN_CODE, clientDtisznDiscountInfo.getDtisznCode().toString(),
+                                BenefitService.DTISZN_DESCRIPTION, clientDtisznDiscountInfo.getDtisznDescription()};
+                        values = EventNotificationService.attachGenderToValues(client.getGender(), values);
+                        if (forTest)
+                            values = attachValue(values, "TEST", "true");
+
+                        List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), null);
+                        if (!(guardians == null || guardians.isEmpty())) {
+                            //Оправка всем представителям
+                            for (Client destGuardian : guardians) {
+                                RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                        .sendNotification(destGuardian, client,
+                                                EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values, new Date());
+                            }
+                        }
+                        else
+                        {
+                            //Отправка только клиенту
+                            RuntimeContext.getAppContext().getBean(EventNotificationService.class)
+                                    .sendNotification(client, null,
+                                            EventNotificationService.NOTIFICATION_PREFERENTIAL_FOOD, values, new Date());
+                        }
                     }
                     logger.info(String.format("Application with number updated to %s ClientDtisznDiscountInfo{status = %s, dateStart = %s, dateEnd = %s}",
                             isDiscountOk ? "ok" : "denied", info.getStatus().toString(), info.getDateStart().toString(), info.getDateEnd().toString()));
@@ -672,6 +706,13 @@ public class DTSZNDiscountsReviseService {
         }
     }
 
+    private String[] attachValue(String[] values, String name, String value) {
+        String[] newValues = new String[values.length + 2];
+        System.arraycopy(values, 0, newValues, 0, values.length);
+        newValues[newValues.length-2] = name;
+        newValues[newValues.length-1] = value;
+        return newValues;
+    }
 
     public void updateApplicationForFood(Session session, Client client, List<ClientDtisznDiscountInfo> infoList) {
         ApplicationForFood application = DAOUtils.findActiveApplicationForFoodByClient(session, client);
@@ -715,20 +756,13 @@ public class DTSZNDiscountsReviseService {
 
         Date fireTime = new Date();
 
-        String oldDiscounts = client.getCategoriesDiscounts();
-        String newDiscounts;
+        Set<CategoryDiscount> oldDiscounts = client.getCategories();
+        Set<CategoryDiscount> newDiscounts;
 
-        String[] discounts = StringUtils.split(client.getCategoriesDiscounts(), ',');
-        List<Long> categoryDiscountsList = new ArrayList<Long>(discounts.length);
-        for (String discount : discounts) {
-            Long discountCode;
-            try {
-                discountCode = Long.parseLong(discount);
-            } catch (NumberFormatException e) {
-                logger.warn(String.format("Unable to parse discount code=%s for client with id=%d", discount,
-                        client.getIdOfClient()));
-                continue;
-            }
+        //String[] discounts = StringUtils.split(client.getCategoriesDiscounts(), ',');
+        List<Long> categoryDiscountsList = new ArrayList<Long>(oldDiscounts.size());
+        for (CategoryDiscount categoryDiscount : oldDiscounts) {
+            Long discountCode = categoryDiscount.getIdOfCategoryDiscount();
 
             List<CategoryDiscountDSZN> categoryDiscountDSZNList = DAOUtils
                     .getCategoryDiscountDSZNByCategoryDiscountCode(session, discountCode);
@@ -772,14 +806,14 @@ public class DTSZNDiscountsReviseService {
                 }
             }
         }
-        newDiscounts = StringUtils.join(discountCodes, ",");
+        newDiscounts = ClientManager.getCategoriesSet(session, StringUtils.join(discountCodes, ","));
         Integer oldDiscountMode = client.getDiscountMode();
         Integer newDiscountMode =
-                StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+                newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 
         if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
             try {
-                ClientManager
+                DiscountManager
                         .renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode,
                                 DiscountChangeHistory.MODIFY_IN_REGISTRY);
             } catch (Exception e) {
@@ -856,7 +890,7 @@ public class DTSZNDiscountsReviseService {
             Long nextVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
 
             Query query = session.createSQLQuery(
-                    "update cf_client_dtiszn_discount_info set archived = 1, version = :version, lastupdate = :lastUpdate "
+                    "update cf_client_dtiszn_discount_info set archived = 1, sendnotification = false, version = :version, lastupdate = :lastUpdate "
                    + "where (lastreceiveddate not between :start and :end or lastreceiveddate is null) and dtiszncode <> :otherDiscountCode");
             query.setParameter("start", CalendarUtils.startOfDay(fireTime).getTime());
             query.setParameter("end", CalendarUtils.endOfDay(fireTime).getTime());
@@ -1044,7 +1078,7 @@ public class DTSZNDiscountsReviseService {
 
         updateArchivedFlagForDiscountsDB();
         runTaskPart2(fireTime);
-        updateApplicationsForFoodTask();
+        updateApplicationsForFoodTask(false);
         if (StringUtils.isEmpty(guid) && discountItemList != null && discountItemList.getDate() != null) {
             DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(discountItemList.getDate()), Option.OPTION_REVISE_LAST_DATE);
         }
@@ -1068,10 +1102,9 @@ public class DTSZNDiscountsReviseService {
             for (ClientDtisznDiscountInfo info : list) {
                 try {
                     transaction = session.beginTransaction();
-                    info.setArchived(true);
-                    info.setVersion(nextVersion);
-                    info.setLastUpdate(fireTime);
-                    session.update(info);
+                    DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
+                    builder.withArchived(true);
+                    builder.save(session, nextVersion);
 
                     if (!info.getDtisznCode().equals(0L)) {
                         transaction.commit();
@@ -1082,30 +1115,30 @@ public class DTSZNDiscountsReviseService {
                     List<ClientDtisznDiscountInfo> infoList = new ArrayList<>();
                     infoList.add(info);
                     updateApplicationForFood(session, client, infoList);
-                    if (StringUtils.isEmpty(client.getCategoriesDiscounts())) {
+                    if (client.getCategories().size() == 0) {
                         transaction.commit();
                         transaction = null;
                         continue;
                     }
 
                     CategoryDiscountDSZN categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, info.getDtisznCode());
-                    String isppCode = Long.toString(categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount()); //код льготы ИСПП для льготы из Инфо
-                    List<String> discounts = new ArrayList(Arrays.asList(client.getCategoriesDiscounts().split(",")));
-                    String oldDiscounts = client.getCategoriesDiscounts();
+                    Long isppCode = categoryDiscountDSZN.getCategoryDiscount().getIdOfCategoryDiscount(); //код льготы ИСПП для льготы из Инфо
+                    Set<CategoryDiscount> discounts = client.getCategories();
+                    Set oldDiscounts = client.getCategories();
                     Integer oldDiscountMode = client.getDiscountMode();
 
-                    for (Iterator<String> iterator = discounts.iterator(); iterator.hasNext(); ) {
-                        String s = iterator.next();
-                        if (s.equals(isppCode)) {
+                    for (Iterator<CategoryDiscount> iterator = discounts.iterator(); iterator.hasNext(); ) {
+                        CategoryDiscount s = iterator.next();
+                        if (s.getIdOfCategoryDiscount() == isppCode) {
                             iterator.remove();
                         }
                     }
-                    String newDiscounts = StringUtils.join(discounts, ",");
-                    Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+                    //String newDiscounts = StringUtils.join(discounts, ",");
+                    Integer newDiscountMode = discounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 
-                    if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
+                    if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(discounts)) {
                         try {
-                            ClientManager.renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode,
+                            DiscountManager.renewDiscounts(session, client, discounts, oldDiscounts, newDiscountMode,
                                     oldDiscountMode, DiscountChangeHistory.MODIFY_IN_REGISTRY);
                         } catch (Exception e) {
                             transaction.rollback();

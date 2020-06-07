@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.client.items.ClientDiscountItem;
 import ru.axetta.ecafe.processor.core.client.items.ClientGuardianItem;
 import ru.axetta.ecafe.processor.core.client.items.NotificationSettingItem;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
@@ -701,14 +702,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
 
     public void fill(Session session, Long idOfClient) throws Exception {
         Client client = (Client) session.load(Client.class, idOfClient);
-        List clientCategories = Arrays.asList(client.getCategoriesDiscounts().split(","));
-        Criteria categoryDiscountCriteria = session.createCriteria(CategoryDiscount.class);
-        List<CategoryDiscount> categoryDiscountList = categoryDiscountCriteria.list();
         idOfCategoryList.clear();
-        for (CategoryDiscount categoryDiscount : categoryDiscountList) {
-            if(clientCategories.contains(categoryDiscount.getIdOfCategoryDiscount() + "")) {
-                idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
-            }
+        for (CategoryDiscount categoryDiscount : client.getCategories()) {
+            idOfCategoryList.add(categoryDiscount.getIdOfCategoryDiscount());
         }
         Set<ClientNotificationSetting> settings = client.getNotificationSettings();
         notificationSettings = new ArrayList<NotificationSettingItem>();
@@ -828,13 +824,13 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 if (!guardianExists(idOfClient))
                     clientGuardianItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, false, false));
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, ClientGuardianRepresentType.UNKNOWN, false));
             }
             if (typeAddClient.equals("ward")) {
                 if (!wardExists(idOfClient))
                     clientWardItems.add(new ClientGuardianItem(client, false, null, ClientManager.getNotificationSettings(),
                             ClientCreatedFromType.DEFAULT, ClientCreatedFromType.BACK_OFFICE,
-                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, false, false));
+                            DAOReadonlyService.getInstance().getUserFromSession().getUserName(), false, ClientGuardianRepresentType.UNKNOWN, false));
             }
         }
     }
@@ -1014,7 +1010,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             throw new Exception("Выберите хотя бы одну категорию льгот");
         }
         /* категори скидок */
-        StringBuilder clientCategories = new StringBuilder();
         Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
         if (this.idOfCategoryList.size() != 0) {
             Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
@@ -1023,11 +1018,9 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             for (Object object : categoryCriteria.list()) {
                 CategoryDiscount categoryDiscount = (CategoryDiscount) object;
                 if(isReplaceOrg && !isFriendlyReplaceOrg && categoryDiscount.getEligibleToDelete()){
-                    archiveDtisznDiscount(client, persistenceSession, categoryDiscount.getIdOfCategoryDiscount());
+                    DiscountManager.archiveDtisznDiscount(client, persistenceSession, categoryDiscount.getIdOfCategoryDiscount());
                     continue;
                 }
-                clientCategories.append(categoryDiscount.getIdOfCategoryDiscount());
-                clientCategories.append(",");
                 categoryDiscountSet.add(categoryDiscount);
             }
         } else {
@@ -1037,14 +1030,12 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 categoryDiscount.getClients().remove(client);
                 persistenceSession.update(categoryDiscount);
             }
-            //Criteria categoryCriteria = persistenceSession.createCriteria(CategoryDiscount.class);
-            //categoryCriteria.add(Restrictions.in("idOfCategoryDiscount", this.idOfCategoryList));
         }
 
-        String newClientCategories = clientCategories.length() == 0 ? "" : clientCategories.substring(0, clientCategories.length() - 1);
-
-        if (isDiscountsChanged(client, newClientCategories)) {
-            saveDiscountChange(client, persistenceSession, clientCategories.toString());
+        if (isDiscountsChanged(client, categoryDiscountSet)) {
+            DiscountManager.saveDiscountHistory(persistenceSession, client, null, client.getCategories(), categoryDiscountSet,
+                    client.getDiscountMode(), discountMode,
+                    DiscountChangeHistory.MODIFY_IN_WEBAPP + DAOReadonlyService.getInstance().getUserFromSession().getUserName());
             client.setLastDiscountsUpdate(new Date());
         }
 
@@ -1052,7 +1043,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             client.setDiscountMode(discountMode);
         }
 
-        client.setCategoriesDiscounts(newClientCategories);
         client.setCategories(categoryDiscountSet);
 
         if(this.disablePlanCreation && this.disablePlanCreationDate == null) {
@@ -1071,6 +1061,21 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
                 client.getNotificationSettings().remove(newSetting);
             }
         }
+
+        if (clientGuardianItems != null && !clientGuardianItems.isEmpty()) {
+            addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems);
+        }
+        if (removeListGuardianItems != null && !removeListGuardianItems.isEmpty()) {
+            removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
+        }
+
+        if (clientWardItems != null && !clientWardItems.isEmpty()) {
+            addWardsByClient(persistenceSession, idOfClient, clientWardItems);
+        }
+        if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
+            removeWardsByClient(persistenceSession, idOfClient, removeListWardItems);
+        }
+
         if (isReplaceOrg) {
             if (client.getClientGroup() != null) {
                 clientMigration.setOldGroupName(client.getClientGroup().getGroupName());
@@ -1128,20 +1133,6 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             client.setIdOfClientGroup(this.idOfClientGroup);
         }
 
-        if (clientGuardianItems != null && !clientGuardianItems.isEmpty()) {
-            addGuardiansByClient(persistenceSession, idOfClient, clientGuardianItems);
-        }
-        if (removeListGuardianItems != null && !removeListGuardianItems.isEmpty()) {
-            removeGuardiansByClient(persistenceSession, idOfClient, removeListGuardianItems);
-        }
-
-        if (clientWardItems != null && !clientWardItems.isEmpty()) {
-            addWardsByClient(persistenceSession, idOfClient, clientWardItems);
-        }
-        if (removeListWardItems != null && !removeListWardItems.isEmpty()) {
-            removeWardsByClient(persistenceSession, idOfClient, removeListWardItems);
-        }
-
         resetNewFlags();
 
         client.setGender(this.gender);
@@ -1167,15 +1158,20 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
             return;
         }
         StringBuilder notValidGuardianSB = new StringBuilder();
+        StringBuilder notValidRepresentative = new StringBuilder();
         for(ClientGuardianItem item : clientGuardianItems){
             if(item.getRelation().equals(-1)){
-                notValidGuardianSB.append(item.getPersonName());
-                notValidGuardianSB.append(" ");
+                notValidGuardianSB.append(item.getPersonName()).append(" ");
+            }
+            if (item.getRepresentativeType() <= ClientGuardianRepresentType.UNKNOWN.getCode()) {
+                notValidRepresentative.append(item.getPersonName()).append(" ");
             }
         }
-        if(notValidGuardianSB.length() != 0){
-            throw new Exception("У следующих опекунов не указан степень родства: "
-                    + notValidGuardianSB.toString());
+        if(notValidGuardianSB.length() > 0){
+            throw new Exception("У следующих опекунов не указана степень родства: " + notValidGuardianSB.toString());
+        }
+        if (notValidRepresentative.length() > 0) {
+            throw new Exception("У следующих опекунов не указаны полномочия: " + notValidRepresentative.toString());
         }
     }
 
@@ -1188,15 +1184,17 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
     }
 
-    private boolean isDiscountsChanged(Client client, String newCategoriesDiscounts) {
+    private boolean isDiscountsChanged(Client client, Set<CategoryDiscount> newCategoriesDiscounts) {
         boolean isDiscountModeChanged = !(client.getDiscountMode().equals(discountMode));
-        boolean isCategoryListChanged = !(client.getCategoriesDiscounts().equals(newCategoriesDiscounts));
+        boolean isCategoryListChanged = (client.getCategories().size() != newCategoriesDiscounts.size());
+        if (isCategoryListChanged) return true;
+        isCategoryListChanged = !client.getCategories().equals(newCategoriesDiscounts);
         return isDiscountModeChanged || isCategoryListChanged;
     }
 
-    private void saveDiscountChange(Client client, Session persistenceSession, String newCategoriesDiscounts) {
+    private void saveDiscountChange(Client client, Session persistenceSession, Set<CategoryDiscount> newCategoriesDiscounts) {
         DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, null, discountMode, client.getDiscountMode(),
-                newCategoriesDiscounts, client.getCategoriesDiscounts());
+                StringUtils.join(newCategoriesDiscounts, ','), StringUtils.join(client.getCategories(), ','));
         discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_BY_TRANSITION);
         persistenceSession.save(discountChangeHistory);
 
@@ -1369,8 +1367,21 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     public SelectItem[] getRelations() {
         SelectItem[] result = new SelectItem[ClientGuardianRelationType.values().length + 1];
         result[0] = new SelectItem(-1, "");
-        for (int i = 0; i < ClientGuardianRelationType.values().length; i++) {
-            result[i+1] = new SelectItem(i, ClientGuardianRelationType.fromInteger(i).toString());
+        int i = 0;
+        for (ClientGuardianRelationType relType : ClientGuardianRelationType.values()) {
+            result[i+1] = new SelectItem(relType.getCode(), relType.getDescription());
+            i++;
+        }
+
+        return result;
+    }
+
+    public SelectItem[] getRepresentativeList() {
+        SelectItem[] result = new SelectItem[ClientGuardianRepresentType.values().length];
+        int i = 0;
+        for (ClientGuardianRepresentType type : ClientGuardianRepresentType.values()) {
+            result[i] = new SelectItem(type.getCode(), type.getDescription());
+            i++;
         }
         return result;
     }

@@ -27,6 +27,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Se
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
@@ -532,7 +533,8 @@ public class DAOUtils {
         return (Card) persistenceSession.get(Card.class, idOfCard);
     }
 
-    public static Card findCardByCardNoDoublesAllowed(Session session, Org cardOrg, Long cardNo, Long cardPrintedNo, Integer cardSignCertNum) throws Exception {
+    public static Card findCardByCardNoDoublesAllowed(Session session, Org cardOrg, Long cardNo, Long cardPrintedNo,
+            Integer cardSignCertNum, int type) throws Exception {
         Criteria cr = session.createCriteria(Card.class);
         cr.add(Restrictions.eq("cardNo", cardNo));
         cr.add(Restrictions.in("org", findAllFriendlyOrgs(session, cardOrg.getIdOfOrg())));
@@ -544,10 +546,12 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(Card.class);
         criteria.add(Restrictions.eq("cardNo", cardNo));
         criteria.add(Restrictions.eq("cardPrintedNo", cardPrintedNo));
-        if (cardSignCertNum == null) {
-            criteria.add(Restrictions.isNull("cardSignCertNum"));
-        } else {
-            criteria.add(Restrictions.eq("cardSignCertNum", cardSignCertNum));
+        if (!Card.isSocial(type)) {
+            if (cardSignCertNum == null) {
+                criteria.add(Restrictions.isNull("cardSignCertNum"));
+            } else {
+                criteria.add(Restrictions.eq("cardSignCertNum", cardSignCertNum));
+            }
         }
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
         criteria.setMaxResults(1);
@@ -560,6 +564,28 @@ public class DAOUtils {
         criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
         criteria.setMaxResults(1);
         return (Card) criteria.uniqueResult();
+    }
+
+    public static Card findCardByCardNoExtended(Session session, Long cardNo, Long idOfClient, Long idOfGuardian, Long idOfVisitor) {
+        if (cardNo == null) return null;
+        try {
+            Criteria criteria = session.createCriteria(Card.class);
+            criteria.add(Restrictions.eq("cardNo", cardNo));
+            if (idOfClient != null || idOfGuardian != null || idOfVisitor != null) {
+                List<Long> ids = new ArrayList<>();
+                if (idOfClient != null) ids.add(idOfClient);
+                if (idOfGuardian != null) ids.add(idOfGuardian);
+                if (idOfVisitor != null) ids.add(idOfVisitor);
+                if (ids.size() > 0)
+                    criteria.add(Restrictions.in("client.idOfClient", ids));
+            }
+            criteria.addOrder(org.hibernate.criterion.Order.desc("updateTime"));
+            criteria.setMaxResults(1);
+            return (Card) criteria.uniqueResult();
+        } catch (Exception e) {
+            logger.error("Error in findCardByCardNoExtended", e);
+            return null;
+        }
     }
 
     public static NewCard findNewCardByCardNo(Session persistenceSession, long cardNo) throws Exception {
@@ -1886,40 +1912,6 @@ public class DAOUtils {
         return version;
     }
 
-    public static void deleteCategoryDiscount(Session session, long id) {
-        //TODO: разобораться надо ли это с учетом ввода таблицы связи
-        CategoryDiscount categoryDiscount = (CategoryDiscount) session.load(CategoryDiscount.class, id);
-        Criteria clientCriteria = session.createCriteria(Client.class);
-        Criterion exp1 = Restrictions.or(Restrictions
-                        .like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + "", MatchMode.EXACT),
-                Restrictions.like("categoriesDiscounts", categoryDiscount.getIdOfCategoryDiscount() + ",",
-                        MatchMode.START));
-        Criterion exp2 = Restrictions.or(Restrictions
-                        .like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount(), MatchMode.END),
-                Restrictions.like("categoriesDiscounts", "," + categoryDiscount.getIdOfCategoryDiscount() + ",",
-                        MatchMode.ANYWHERE));
-        Criterion expression = Restrictions.or(exp1, exp2);
-        clientCriteria.add(expression);
-        List<Client> clients = clientCriteria.list();
-        for (Client client : clients) {
-            String categoriesDiscounts = client.getCategoriesDiscounts();
-            if (categoriesDiscounts.contains("," + id + ",")) {
-                categoriesDiscounts = categoriesDiscounts.replace("," + id + ",", ",");
-            } else if (categoriesDiscounts.startsWith(id + ",")) {
-                categoriesDiscounts = categoriesDiscounts.substring((id + ",").length());
-            } else if (categoriesDiscounts.endsWith("," + id)) {
-                categoriesDiscounts = categoriesDiscounts
-                        .substring(0, categoriesDiscounts.length() - ("," + id).length());
-            } else {
-                categoriesDiscounts = categoriesDiscounts.replace("" + id, "");
-            }
-            client.setCategoriesDiscounts(categoriesDiscounts);
-            session.save(client);
-        }
-
-        session.delete(categoryDiscount);
-    }
-
     public static void deleteCategoryDiscountDSZN(Session session, Long id, Long nextVersion) {
         CategoryDiscountDSZN categoryDiscountDSZN = (CategoryDiscountDSZN) session
                 .load(CategoryDiscountDSZN.class, id.intValue());
@@ -2034,6 +2026,11 @@ public class DAOUtils {
 
     public static List<DiscountRule> listDiscountRules(EntityManager em) {
         javax.persistence.Query q = em.createQuery("from DiscountRule order by priority, idOfRule asc");
+        return q.getResultList();
+    }
+
+    public static List<WtDiscountRule> listWtDiscountRules(EntityManager em) {
+        javax.persistence.Query q = em.createQuery("from WtDiscountRule order by priority, idOfRule asc");
         return q.getResultList();
     }
 
@@ -3397,12 +3394,56 @@ public class DAOUtils {
         session.flush();
     }
 
-    public static List<GroupNamesToOrgs> getAllGroupnamesToOrgsByIdOfOrg(Session session, Long idOfOrg) {
+    public static List<GroupNamesToOrgs> getAllGroupnamesToOrgsByIdOfOrgAndMain(Session session, Long idOfOrg) {
         Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
         criteria.add(Restrictions.eq("idOfOrg", idOfOrg));
         criteria.add(Restrictions.eq("idOfMainOrg", idOfOrg));
 
         List<GroupNamesToOrgs> result = criteria.list();
+
+        return result;
+    }
+
+    public static List<GroupNamesToOrgs> getAllGroupnamesToOrgsByIdOfOrg(Session session, Long idOfOrg) {
+        Query query = session.createSQLQuery(
+                "select distinct cg.* from cf_groupnames_to_orgs cg \n"
+                        + "join cf_clientgroups ccg on cg.groupname = ccg.groupname and cg.idoforg = ccg.idoforg\n"
+                        + "join cf_clients cc on cc.idofclientgroup = ccg.idofclientgroup and cc.idoforg=cg.idoforg\n"
+                        + "where cc.idofclient is not null and cg.idoforg=:idOfOrg");
+
+        query.setParameter("idOfOrg", idOfOrg);
+        List list = (List<GroupNamesToOrgs>) query.list();
+        List<GroupNamesToOrgs> result = new ArrayList<>();
+        for (Object o : list) {
+            Object[] row = (Object[]) o;
+            GroupNamesToOrgs groupNamesToOrgs = new GroupNamesToOrgs();
+            groupNamesToOrgs.setIdOfGroupNameToOrg(((BigInteger)row[0]).longValue());
+            groupNamesToOrgs.setIdOfOrg(((BigInteger)row[1]).longValue());
+            groupNamesToOrgs.setIdOfMainOrg(((BigInteger)row[2]).longValue());
+            groupNamesToOrgs.setMainBuilding((Integer) row[3]);
+            groupNamesToOrgs.setVersion(((BigInteger)row[4]).longValue());
+            groupNamesToOrgs.setGroupName((String) row[5]);
+            groupNamesToOrgs.setParentGroupName((String) row[6]);
+            Integer midl = (Integer) row[7];
+            if (midl != null && midl == 1)
+            {
+                groupNamesToOrgs.setIsMiddleGroup(true);
+            }
+            else
+            {
+                groupNamesToOrgs.setIsMiddleGroup(false);
+            }
+            Integer six = (Integer) row[8];
+            if (six != null && six == 1)
+            {
+                groupNamesToOrgs.setIsSixDaysWorkWeek(true);
+            }
+            else
+            {
+                groupNamesToOrgs.setIsSixDaysWorkWeek(false);
+            }
+            result.add(groupNamesToOrgs);
+        }
 
         return result;
     }
@@ -3417,7 +3458,7 @@ public class DAOUtils {
     }
 
     public static void setMainBuildingGroupnamesToOrgs(Session session, Long idOfOrg) {
-        List<GroupNamesToOrgs> groupNamesToOrgsList = getAllGroupnamesToOrgsByIdOfOrg(session, idOfOrg);
+        List<GroupNamesToOrgs> groupNamesToOrgsList = getAllGroupnamesToOrgsByIdOfOrgAndMain(session, idOfOrg);
 
         if (!groupNamesToOrgsList.isEmpty()) {
             for (GroupNamesToOrgs groupNamesToOrg : groupNamesToOrgsList) {
@@ -4507,12 +4548,11 @@ public class DAOUtils {
         return criteria.list();
     }
 
-    public static ClientDtisznDiscountInfo getActualDTISZNDiscountsInfoInoeByClient(Session session, Long idOfClient,
-            Long code) {
+    public static ClientDtisznDiscountInfo getActualDTISZNDiscountsInfoInoeByClient(Session session, Long idOfClient) {
         Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
         criteria.add(Restrictions.eq("client.idOfClient", idOfClient));
         criteria.add(Restrictions.eq("archived", false));
-        criteria.add(Restrictions.eq("dtisznCode", code));
+        criteria.add(Restrictions.eq("dtisznCode", Long.parseLong(RuntimeContext.getAppContext().getBean(ETPMVService.class).BENEFIT_INOE)));
         List list = criteria.list();
         if (list.size() == 0 || list.size() > 1) {
             return null;
@@ -4630,6 +4670,14 @@ public class DAOUtils {
         criteria.add(Restrictions.eq("client", client));
         criteria.add(Restrictions.in("dtisznCode", codeList));
         return criteria.list();
+    }
+
+    public static List<ClientDtisznDiscountInfo> getCategoryDiscountListWithEndBenefitBeetwenDates(Session session, Date startDate, Date endDate) {
+        Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
+        criteria.add(Restrictions.gt("dateEnd", startDate));
+        criteria.add(Restrictions.lt("dateEnd", endDate));
+        criteria.add(Restrictions.not(Restrictions.eq("sendnotification", true)));
+        return (List<ClientDtisznDiscountInfo>) criteria.list();
     }
 
     public static ClientDtisznDiscountInfo getDTISZNOneDiscountInfoByClientAndCode(Session session, Client client,
@@ -4815,6 +4863,14 @@ public class DAOUtils {
         return criteria.list();
     }
 
+    public static List<ApplicationForFood> getApplicationForFoodInoeByClient(Session session, Client client) {
+        Criteria criteria = session.createCriteria(ApplicationForFood.class);
+        criteria.add(Restrictions.eq("client", client));
+        criteria.add(Restrictions.isNull("dtisznCode"));
+        criteria.add(Restrictions.eq("archived", false));
+        return criteria.list();
+    }
+
     public static ApplicationForFood getApplicationForFoodByClientAndCode(Session session, Client client, Long code) {
         Criteria criteria = session.createCriteria(ApplicationForFood.class);
         criteria.add(Restrictions.eq("client", client));
@@ -4953,6 +5009,21 @@ public class DAOUtils {
         Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
         criteria.add(Restrictions.ge("day", startDate));
         criteria.add(Restrictions.le("day", endDate));
+        return criteria.list();
+    }
+
+    public static List getAllDateFromProdactionCalendarForFutureDates(Session persistenceSession) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(ProductionCalendar.class);
+        criteria.add(Restrictions.gt("day", new Date()));
+        return criteria.list();
+    }
+
+    public static List<SpecialDate> findSpecialDateForDates(Session persistenceSession, CompositeIdOfSpecialDate compositeIdOfSpecialDate) throws Exception {
+        Criteria criteria = persistenceSession.createCriteria(SpecialDate.class);
+        criteria.add(Restrictions.eq("idOfOrg", compositeIdOfSpecialDate.getIdOfOrg()));
+        criteria.add(Restrictions.ge("date", CalendarUtils.startOfDay(compositeIdOfSpecialDate.getDate())));
+        criteria.add(Restrictions.le("date", CalendarUtils.endOfDay(compositeIdOfSpecialDate.getDate())));
+        criteria.add(Restrictions.not(Restrictions.eq("deleted", true)));
         return criteria.list();
     }
 }

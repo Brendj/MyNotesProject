@@ -9,6 +9,7 @@ import generated.spb.register.Pupil;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.CardManagerProcessor;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.partner.spb.SpbClientService;
 import ru.axetta.ecafe.processor.core.persistence.*;
@@ -414,11 +415,11 @@ public class ImportRegisterSpbClientsService {
 
             if(org.getChangesDSZN()) {
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.BENEFIT_DSZN, pupil.getBenefit() == null ? null :
-                        pupil.getBenefit().getCode(), cl == null ? null : cl.getCategoriesDiscountsDSZN() == null ? null : cl.getCategoriesDiscountsDSZN(),
+                        pupil.getBenefit().getCode(), cl == null ? null : cl.getCategoriesDSZN().size() == 0 ? null : DiscountManager.getClientDiscountsDSZNAsString(cl),
                         updateClient);
                 if(!updateClient) {
-                    updateClient = doCategoriesUpdate(getCategoriesString(pupil.getBenefit().getCode(), cl == null ? null : cl.getCategoriesDiscounts(),
-                                    categoryMap, categoryDSZNMap), cl == null ? null : cl.getCategoriesDiscounts());
+                    updateClient = doCategoriesUpdate(getCategoriesString(pupil.getBenefit().getCode(), cl == null ? null : DiscountManager.getClientDiscountsAsString(cl),
+                                    categoryMap, categoryDSZNMap), cl == null ? null : DiscountManager.getClientDiscountsAsString(cl));
                 }
             }
 
@@ -530,11 +531,11 @@ public class ImportRegisterSpbClientsService {
         if(checkBenefits) {
             ch.setBenefitDSZN(clientBenefitDSZN);
             ch.setNewDiscounts(StringUtils.join(getCategoriesByDSZNCodes(sess, clientBenefitDSZN,
-                    currentClient != null ? currentClient.getCategoriesDiscounts() : ""), ","));
+                    currentClient != null ? DiscountManager.getClientDiscountsAsString(currentClient) : ""), ","));
             if(currentClient != null) {
-                ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
-                ch.setOldDiscounts(StringUtils.isEmpty(currentClient.getCategoriesDiscounts()) ? "" :
-                        StringUtils.join(new TreeSet<String>(Arrays.asList(currentClient.getCategoriesDiscounts().split(","))), ","));
+                ch.setBenefitDSZNFrom(DiscountManager.getClientDiscountsDSZNAsString(currentClient));
+                ch.setOldDiscounts(StringUtils.isEmpty(DiscountManager.getClientDiscountsAsString(currentClient)) ? "" :
+                        StringUtils.join(new TreeSet<String>(Arrays.asList(DiscountManager.getClientDiscountsAsString(currentClient).split(","))), ","));
             }
         }
 
@@ -578,9 +579,9 @@ public class ImportRegisterSpbClientsService {
             if (currentClient.getBirthDate() != null) {
                 ch.setBirthDateFrom(currentClient.getBirthDate().getTime());
             }
-            ch.setBenefitDSZNFrom(currentClient.getCategoriesDiscountsDSZN());
-            ch.setOldDiscounts(StringUtils.isEmpty(currentClient.getCategoriesDiscounts()) ? "" :
-                    StringUtils.join(new TreeSet<String>(Arrays.asList(currentClient.getCategoriesDiscounts().split(","))), ","));
+            ch.setBenefitDSZNFrom(DiscountManager.getClientDiscountsDSZNAsString(currentClient));
+            ch.setOldDiscounts(currentClient.getCategories().size() == 0 ? "" :
+                    StringUtils.join(new TreeSet<String>(Arrays.asList(DiscountManager.getClientDiscountsAsString(currentClient).split(","))), ","));
         }
         sess.save(ch);
     }
@@ -610,8 +611,8 @@ public class ImportRegisterSpbClientsService {
         }
         ch.setCheckBenefits(checkBenefits);
         if(checkBenefits) {
-            ch.setBenefitDSZN(currentClient.getCategoriesDiscountsDSZN());
-            ch.setNewDiscounts(currentClient.getCategoriesDiscounts());
+            ch.setBenefitDSZN(DiscountManager.getClientDiscountsDSZNAsString(currentClient));
+            ch.setNewDiscounts(DiscountManager.getClientDiscountsAsString(currentClient));
         }
         sess.save(ch);
     }
@@ -789,19 +790,8 @@ public class ImportRegisterSpbClientsService {
 
     //@Transactional
     private void addClientGroupMigrationEntry(Session session,Org org, Client client, RegistryChange change){
-        ClientGroupMigrationHistory migration = new ClientGroupMigrationHistory(org,client);
-        migration.setComment(ClientGroupMigrationHistory.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
-        migration.setNewGroupName(change.getGroupName());
-        if(client.getIdOfClientGroup() != null) {
-            // в методе ClientManager.modifyClientTransactionFree в этом поле сохранен новый ИД группы
-            migration.setNewGroupId(client.getIdOfClientGroup());
-        }
-        if (client.getClientGroup() != null) {
-            // так как сущность client еще не обновлена, то в поле clientGroup хранятся данные старой группы
-            migration.setOldGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
-            migration.setOldGroupName(client.getClientGroup().getGroupName());
-        }
-        session.save(migration);
+        ClientManager.createClientGroupMigrationHistory(session, client, org, client.getIdOfClientGroup(),
+                change.getGroupName(), ClientGroupMigrationHistory.MODIFY_IN_REGISTRY.concat(String.format(" (ид. ОО=%s)", change.getIdOfOrg())));
     }
 
     @Transactional

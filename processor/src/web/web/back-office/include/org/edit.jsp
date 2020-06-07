@@ -27,6 +27,10 @@
     <h:inputText value="#{mainPage.orgEditPage.officialName}" maxlength="256" styleClass="input-text" size="150" />
     <h:outputText escape="true" value="Краткое наименование" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.shortNameInfoService}" maxlength="128" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="Учредитель" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.founder}" maxlength="128" styleClass="input-text long-field" />
+    <h:outputText escape="true" value="Подчиненность" styleClass="output-text" />
+    <h:inputText value="#{mainPage.orgEditPage.subordination}" maxlength="128" styleClass="input-text long-field" />
     <h:outputText escape="true" value="Адрес" styleClass="output-text" />
     <h:inputText value="#{mainPage.orgEditPage.address}" maxlength="256" styleClass="input-text" size="150" />
     <h:outputText escape="true" value="Короткий адрес" styleClass="output-text" />

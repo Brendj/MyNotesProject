@@ -9,6 +9,8 @@ import generated.emp_events.*;
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.service.BenefitService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.ExternalEventNotificationService;
 import ru.axetta.ecafe.processor.core.sms.DeliveryResponse;
@@ -208,10 +210,22 @@ public class EMPSmsServiceImpl extends ISmsService {
         String synchDate = "[Отправка события " + date + "]: ";
         empProcessor.log(synchDate + "Событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] "
                 + client.getMobile());
+        Long idofclientdtiszndiscountinfo = null;
+        if (event.getType() == EMPEventTypeFactory.END_BENEFIT) {
+            for (String k : event.getParameters().keySet()) {
+                if (k.equals(BenefitService.ID_DISCOUNT_INFO)) {
+                    idofclientdtiszndiscountinfo = Long.valueOf(event.getParameters().get(k));
+                }
+            }
+            //Удаляем значение идентификатора из списка параметров
+            event.getParameters().keySet().remove(BenefitService.ID_DISCOUNT_INFO);
+        }
 
+        if ((RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sms.service.test", "false")
+                .equals("true") && event.getParameters().get("TEST") != null) ||
+                RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sms.service.allcopytotest", "false")
+                .equals("true")) {
 
-        if (RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.sms.service.test", "false")
-                .equals("true") && event.getParameters().get("TEST") != null) {
             //  Отправка запроса на тестовый контур
             SubscriptionPortType subscription = createEventController(true);
             if (subscription != null) {
@@ -219,9 +233,13 @@ public class EMPSmsServiceImpl extends ISmsService {
                 SendSubscriptionStreamEventsResponseType response = subscription
                         .sendSubscriptionStreamEvents(eventParam);
                 if (response.getErrorCode() != 0) {
+                    if (event.getType() == EMPEventTypeFactory.END_BENEFIT)
+                        DAOService.getInstance().setSendedNotificationforDTISZNDiscount(idofclientdtiszndiscountinfo, false);
                     empProcessor.log(synchDate + "[Тестовый контур] Не удалось доставить событие " + event.getType()
                             + " для клиента [" + client.getIdOfClient() + "] " + client.getMobile());
                 }
+                if (event.getType() == EMPEventTypeFactory.END_BENEFIT)
+                    DAOService.getInstance().setSendedNotificationforDTISZNDiscount(idofclientdtiszndiscountinfo, true);
             }
         }
         if (event.getParameters().get("TEST") == null) {
@@ -237,6 +255,8 @@ public class EMPSmsServiceImpl extends ISmsService {
             Date timeAfter = new Date();
             addResponseTime(timeAfter.getTime() - timeBefore.getTime());
             if (response.getErrorCode() != 0) {
+                if (event.getType() == EMPEventTypeFactory.END_BENEFIT)
+                    DAOService.getInstance().setSendedNotificationforDTISZNDiscount(idofclientdtiszndiscountinfo, false);
                 empProcessor
                         .log(synchDate + "Не удалось доставить событие " + event.getType() + " для клиента [" + client
                                 .getIdOfClient() + "] " + client.getMobile());
@@ -245,6 +265,8 @@ public class EMPSmsServiceImpl extends ISmsService {
                         String.format("Failed to execute event notification: Error [%s] %s", response.getErrorCode(),
                                 response.getErrorMessage())).setMessageId(eventParam.getId());
             }
+            if (event.getType() == EMPEventTypeFactory.END_BENEFIT)
+                DAOService.getInstance().setSendedNotificationforDTISZNDiscount(idofclientdtiszndiscountinfo, true);
             empProcessor.log(synchDate + "Событие " + event.getType() + " для клиента [" + client.getIdOfClient() + "] "
                     + client.getMobile() + " доставлено");
             updateStats(OUTCOME_STATS_ID, 1);

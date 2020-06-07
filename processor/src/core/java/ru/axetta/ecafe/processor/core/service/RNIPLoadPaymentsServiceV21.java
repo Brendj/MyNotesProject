@@ -307,7 +307,7 @@ public class RNIPLoadPaymentsServiceV21 extends RNIPLoadPaymentsServiceV116 {
         descriptionSimpleParameter2.setReadonly(false);
         descriptionSimpleParameter2.setRequired(true);
         descriptionSimpleParameter2.setVisible(true);
-        descriptionSimpleParameter2.setRegexp("^\\d{6,15}$");
+        descriptionSimpleParameter2.setRegexp("^\\d{1,15}$");
 
         DescriptionSimpleParameter descriptionSimpleParameter3 = serviceTypeObjectFactory.createDescriptionSimpleParameter();
         descriptionSimpleParameter3.setForPayment(true);

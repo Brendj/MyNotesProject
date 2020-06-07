@@ -28,5 +28,6 @@
         <property name="createdDateInternal" column="CreatedDateInternal" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="lastReceivedDate" column="LastReceivedDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"/>
         <property name="source" column="Source" type="string"/>
+        <property name="sendnotification" column="sendnotification" type="java.lang.Boolean"/>
     </class>
 </hibernate-mapping>

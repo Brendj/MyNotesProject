@@ -14,6 +14,8 @@ import ru.axetta.ecafe.processor.core.partner.nsi.MskNSIService;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
+import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.service.ImportMigrantsService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterClientsService;
 import ru.axetta.ecafe.processor.core.utils.*;
 
@@ -494,24 +496,20 @@ public class ClientManager {
             //token[34]
             if (fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null && fieldConfig.getValue(FieldId.CHECKBENEFITS) != null) {
                 if(Boolean.valueOf(fieldConfig.getValue(FieldId.CHECKBENEFITS))) {
-                    client.setCategoriesDiscountsDSZN(fieldConfig.getValue(FieldId.BENEFIT_DSZN));
-
-                    String newDiscounts = fieldConfig.getValue(FieldId.BENEFIT);
-                    String oldDiscounts = client.getCategoriesDiscounts();
-
+                    Set<CategoryDiscount> newDiscounts = getCategoriesSet(persistenceSession, fieldConfig.getValue(FieldId.BENEFIT));
                     Integer oldDiscountMode = client.getDiscountMode();
-                    Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
+                    Integer newDiscountMode = newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
 
-                    client.setCategoriesDiscounts(newDiscounts);
                     client.setDiscountMode(newDiscountMode);
 
-                    if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
-                        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, org,
-                                newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
-                        discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
-                        persistenceSession.save(discountChangeHistory);
+                    if (!oldDiscountMode.equals(newDiscountMode) || !newDiscounts.equals(client.getCategories())) {
+
+                        DiscountManager.saveDiscountHistory(persistenceSession, client, client.getOrg(), new HashSet<CategoryDiscount>(),
+                                newDiscounts, Client.DISCOUNT_MODE_NONE, Client.DISCOUNT_MODE_BY_CATEGORY, DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                        client.setCategories(newDiscounts);
+
                         client.setLastDiscountsUpdate(new Date());
-                        client.setCategories(getCategoriesSet(persistenceSession, newDiscounts));
+                        client.setCategories(newDiscounts);
                     }
                 }
             }
@@ -539,26 +537,6 @@ public class ClientManager {
             logger.error("Ошибка при обновлении данных клиента", e);
             throw new Exception(e);
         }
-    }
-
-    public static void renewDiscounts(Session session, Client client, String newDiscounts, String oldDiscounts,
-            Integer newDiscountMode, Integer oldDiscountMode, String historyComment) throws Exception {
-        client.setCategoriesDiscounts(newDiscounts);
-        client.setDiscountMode(newDiscountMode);
-
-        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
-                newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
-        discountChangeHistory.setComment(historyComment);
-        session.save(discountChangeHistory);
-        client.setLastDiscountsUpdate(new Date());
-        try {
-            client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
-        } catch (Exception e) {
-            logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
-        }
-        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
-        client.setClientRegistryVersion(clientRegistryVersion);
-        session.update(client);
     }
 
     public static Set<CategoryDiscount> getCategoriesSet(Session session, String categories) {
@@ -795,7 +773,7 @@ public class ClientManager {
             logger.debug("create client");
             Client client = new Client(organization, person, contractPerson, 0, notifyByEmail, notifyBySms,
                     notifyByPUSH, contractId, contractDate, contractState, password, payForSms, clientRegistryVersion,
-                    limit, expenditureLimit, "", "");
+                    limit, expenditureLimit);
 
             client.setAddress(fieldConfig.getValue(ClientManager.FieldId.ADDRESS)); //tokens[12]);
             client.setPhone(fieldConfig.getValue(ClientManager.FieldId.PHONE));//tokens[13]);
@@ -898,21 +876,6 @@ public class ClientManager {
                 checkBenefits = Boolean.valueOf(fieldConfig.getValue(FieldId.CHECKBENEFITS));
             }
 
-            //token[34]
-            if (checkBenefits && fieldConfig.getValue(FieldId.BENEFIT_DSZN) != null) {
-                client.setCategoriesDiscountsDSZN(fieldConfig.getValue(FieldId.BENEFIT_DSZN));
-            } else {
-                client.setCategoriesDiscountsDSZN("");
-            }
-
-            //token[39]
-            if (checkBenefits && StringUtils.isNotEmpty(fieldConfig.getValue(FieldId.BENEFIT))) {
-                client.setCategoriesDiscounts(fieldConfig.getValue(FieldId.BENEFIT));
-                client.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
-            } else {
-                client.setCategoriesDiscounts("");
-            }
-
             //token[35])
             if (fieldConfig.getValue(FieldId.GUARDIANS_COUNT) != null) {
                 client.setGuardiansCount(fieldConfig.getValue(FieldId.GUARDIANS_COUNT));
@@ -960,11 +923,10 @@ public class ClientManager {
             }
 
             if (checkBenefits && StringUtils.isNotEmpty(fieldConfig.getValue(FieldId.BENEFIT))) {
-                DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, organization, Client.DISCOUNT_MODE_BY_CATEGORY,
-                        Client.DISCOUNT_MODE_NONE, fieldConfig.getValue(FieldId.BENEFIT), "");
-                discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_REGISTRY);
-                persistenceSession.save(discountChangeHistory);
-                client.setCategories(getCategoriesSet(persistenceSession, fieldConfig.getValue(FieldId.BENEFIT)));
+                Set<CategoryDiscount> newDiscounts = getCategoriesSet(persistenceSession, fieldConfig.getValue(FieldId.BENEFIT));
+                DiscountManager.saveDiscountHistory(persistenceSession, client, organization, new HashSet<CategoryDiscount>(),
+                        newDiscounts, Client.DISCOUNT_MODE_NONE, Client.DISCOUNT_MODE_BY_CATEGORY, DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                client.setCategories(newDiscounts);
                 client.setLastDiscountsUpdate(new Date());
                 persistenceSession.update(client);
             }
@@ -1028,7 +990,7 @@ public class ClientManager {
                                 clientGuardian.setDisabled(true);
                                 clientGuardian.setDeletedState(false);
                                 clientGuardian.setRelation(relationType);
-                                clientGuardian.setIsLegalRepresent(registryChangeGuardians.getLegal_representative());
+                                clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(registryChangeGuardians.getIntegerRepresentative()));
                                 clientGuardian.setLastUpdate(new Date());
                                 persistenceSession.persist(clientGuardian);
                                 persistenceSession.flush();
@@ -1085,7 +1047,7 @@ public class ClientManager {
         Client clientGuardianToSave = new Client(org, personGuardian, contractGuardianPerson, 0, runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_EMAIL_NEW_CLIENTS),
                 false, runtimeContext.getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS), contractIdGuardian, currentDate, 0, "" + contractIdGuardian, 0,
                 clientRegistryVersionGuardian, limitGuardian,
-                RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT), "", "");
+                RuntimeContext.getInstance().getOptionValueInt(Option.OPTION_DEFAULT_EXPENDITURE_LIMIT));
 
         ClientGroup clientGroup = findGroupByIdOfOrgAndGroupName(session, org.getIdOfOrg(), ClientGroup.Predefined.CLIENT_PARENTS.getNameOfGroup());
 
@@ -1120,7 +1082,7 @@ public class ClientManager {
     }
 
     public static ClientGuardian createClientGuardianInfoTransactionFree(Session session, Client guardian, String relation, Boolean disabled,
-            Long idOfClientChild, ClientCreatedFromType createdFrom, Boolean legal_representative) {
+            Long idOfClientChild, ClientCreatedFromType createdFrom, Integer legal_representative) {
         ClientGuardianRelationType relationType = null;
         if (relation != null) {
             for (ClientGuardianRelationType type : ClientGuardianRelationType.values()) {
@@ -1137,7 +1099,7 @@ public class ClientManager {
         clientGuardian.setDisabled(disabled);
         clientGuardian.setDeletedState(false);
         clientGuardian.setRelation(relationType);
-        clientGuardian.setIsLegalRepresent(legal_representative);
+        clientGuardian.setRepresentType(ClientGuardianRepresentType.fromInteger(legal_representative));
         Boolean enableNotifications = RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_ENABLE_NOTIFICATIONS_ON_BALANCES_AND_EE);
         if (enableNotifications) {
             Set<ClientGuardianNotificationSetting> settings = new HashSet<ClientGuardianNotificationSetting>();
@@ -1161,7 +1123,7 @@ public class ClientManager {
 
         persistenceSession.persist(guardian);
         createClientGuardianInfoTransactionFree(persistenceSession, guardian, registryChangeGuardians.getRelationship(),
-                true, idOfClientChild, ClientCreatedFromType.REGISTRY, registryChangeGuardians.getLegal_representative());
+                true, idOfClientChild, ClientCreatedFromType.REGISTRY, registryChangeGuardians.getIntegerRepresentative());
 
         setAppliedRegistryChangeGuardian(persistenceSession, registryChangeGuardians);
     }
@@ -1202,13 +1164,8 @@ public class ClientManager {
 
             Client client;
 
-            if (noComment) {
-                client = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession,
-                        persistenceTransaction, null);
-            } else {
-                client = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession,
-                        persistenceTransaction, String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
-            }
+            client = registerClientTransactionFree(idOfOrg, fieldConfig, checkFullNameUnique, persistenceSession,
+                persistenceTransaction, noComment ? null : String.format(MskNSIService.COMMENT_AUTO_CREATE, dateCreate));
 
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -1553,7 +1510,7 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientGuardian);
                 guardianItems.add(new ClientGuardianItem(cl, clientGuardian.isDisabled(), clientGuardian.getRelation(),
                         notificationSettings, clientGuardian.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getIsLegalRepresent(),
+                        getInformedSpecialMenu(session, idOfClient, cl.getIdOfClient()), clientGuardian.getRepresentType(),
                         getAllowedPreorderByClient(session, idOfClient, cl.getIdOfClient())));
             }
         }
@@ -1635,7 +1592,7 @@ public class ClientManager {
                 List<NotificationSettingItem> notificationSettings = getNotificationSettings(clientWard);
                 wardItems.add(new ClientGuardianItem(cl, clientWard.isDisabled(), clientWard.getRelation(),
                         notificationSettings, clientWard.getCreatedFrom(), cl.getCreatedFrom(), cl.getCreatedFromDesc(),
-                        getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getIsLegalRepresent(),
+                        getInformedSpecialMenu(session, cl.getIdOfClient(), idOfClient), clientWard.getRepresentType(),
                         getAllowedPreorderByClient(session, cl.getIdOfClient(), idOfClient)));
             }
         }
@@ -1701,13 +1658,56 @@ public class ClientManager {
         return clients;
     }
 
+    public static void addClientMigrationEntry(Session session,Org oldOrg, Org newOrg, Client client, String comment, String newGroupName){
+        ClientManager.checkUserOPFlag(session, oldOrg, newOrg, client.getIdOfClientGroup(), client);
+        ClientMigration migration = new ClientMigration(client, newOrg, oldOrg);
+        migration.setComment(comment);
+        if(client.getClientGroup() != null) {
+            ClientGroup clientGroup = (ClientGroup)session.load(ClientGroup.class, new CompositeIdOfClientGroup(client.getOrg().getIdOfOrg(), client.getIdOfClientGroup()));
+            migration.setOldGroupName(clientGroup.getGroupName());
+        }
+        migration.setNewGroupName(newGroupName);
+        session.save(migration);
+    }
+
+    public static void createMigrationForGuardianWithConfirm(Session session, Client guardian, Date fireTime, Org orgVisit,
+            MigrantInitiatorEnum initiator, int years) {
+        Long idOfProcessorMigrantRequest = MigrantsUtils
+                .nextIdOfProcessorMigrantRequest(session, guardian.getOrg().getIdOfOrg());
+        CompositeIdOfMigrant compositeIdOfMigrant = new CompositeIdOfMigrant(idOfProcessorMigrantRequest,
+                guardian.getOrg().getIdOfOrg());
+        String requestNumber = ImportMigrantsService
+                .formRequestNumber(guardian.getOrg().getIdOfOrg(), orgVisit.getIdOfOrg(), idOfProcessorMigrantRequest,
+                        fireTime);
+
+        Migrant migrantNew = new Migrant(compositeIdOfMigrant, guardian.getOrg().getDefaultSupplier(),
+                requestNumber, guardian, orgVisit, fireTime, CalendarUtils.addYear(fireTime, years),
+                Migrant.NOT_SYNCHRONIZED);
+        migrantNew.setInitiator(initiator);
+        session.save(migrantNew);
+
+        session.save(ImportMigrantsService
+                .createResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                        VisitReqResolutionHist.RES_CREATED, fireTime));
+        session.flush();
+        session.save(ImportMigrantsService
+                .createResolutionHistory(session, guardian, compositeIdOfMigrant.getIdOfRequest(),
+                        VisitReqResolutionHist.RES_CONFIRMED, CalendarUtils.addSeconds(fireTime, 1)));
+    }
+
     /* получить список опекунов по опекаемому */
     public static List<Client> findGuardiansByClient(Session session, Long idOfChildren) throws Exception {
+        return findGuardiansByClient(session, idOfChildren, false);
+    }
+
+    public static List<Client> findGuardiansByClient(Session session, Long idOfChildren, boolean includeDisabled) throws Exception {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
-        idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        if (!includeDisabled) {
+            idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        }
         idOfGuardianCriteria.setProjection(Property.forName("idOfGuardian"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
@@ -1721,11 +1721,17 @@ public class ClientManager {
 
     /* получить список опекаемых по опекуну */
     public static List<Client> findChildsByClient(Session session, Long idOfGuardian) throws Exception {
+        return findChildsByClient(session, idOfGuardian, false);
+    }
+
+    public static List<Client> findChildsByClient(Session session, Long idOfGuardian, boolean includeDisabled) throws Exception {
         List<Client> clients = new ArrayList<Client>();
         DetachedCriteria idOfGuardianCriteria = DetachedCriteria.forClass(ClientGuardian.class);
         idOfGuardianCriteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
         idOfGuardianCriteria.add(Restrictions.ne("deletedState", true));
-        idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        if (!includeDisabled) {
+            idOfGuardianCriteria.add(Restrictions.ne("disabled", true));
+        }
         idOfGuardianCriteria.setProjection(Property.forName("idOfChildren"));
         Criteria subCriteria = idOfGuardianCriteria.getExecutableCriteria(session);
         Integer countResult = subCriteria.list().size();
@@ -1807,14 +1813,14 @@ public class ClientManager {
         for (ClientGuardianItem item : clientGuardians) {
             addGuardianByClient(session, idOfClient, item.getIdOfClient(), newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
-                    item.getCreatedWhereGuardian(), item.getLegalRepresentative());
+                    item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()));
         }
     }
 
     /* Добавить опекуна клиенту */
     public static void addGuardianByClient(Session session, Long idOfChildren, Long idOfGuardian, Long version, Boolean disabled,
             ClientGuardianRelationType relation, List<NotificationSettingItem> notificationItems,
-            ClientCreatedFromType createdWhere, Boolean isLegalRepresentative) {
+            ClientCreatedFromType createdWhere, ClientGuardianRepresentType representType) {
         Criteria criteria = session.createCriteria(ClientGuardian.class);
         criteria.add(Restrictions.eq("idOfChildren", idOfChildren));
         criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
@@ -1826,7 +1832,7 @@ public class ClientManager {
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
             clientGuardian.setCreatedFrom(createdWhere);
-            clientGuardian.setIsLegalRepresent(isLegalRepresentative);
+            clientGuardian.setRepresentType(representType);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.persist(clientGuardian);
@@ -1844,7 +1850,7 @@ public class ClientManager {
             clientGuardian.setDisabled(disabled);
             clientGuardian.setDeletedState(false);
             clientGuardian.setRelation(relation);
-            clientGuardian.setIsLegalRepresent(isLegalRepresentative);
+            clientGuardian.setRepresentType(representType);
             attachNotifications(clientGuardian, notificationItems);
             clientGuardian.setLastUpdate(new Date());
             session.update(clientGuardian);
@@ -1853,14 +1859,13 @@ public class ClientManager {
 
     /* Установить флаг информирования об условиях предоставления услуг по предзаказам */
     public static void setInformSpecialMenu(Session session, Client client, Client guardian, Long newVersion) {
-        /*Criteria criteria = session.createCriteria(ClientGuardian.class);
-        criteria.add(Restrictions.eq("idOfChildren", idOfClient));
-        criteria.add(Restrictions.eq("idOfGuardian", idOfGuardian));
-        ClientGuardian cg = (ClientGuardian)criteria.uniqueResult();
-        cg.setInformedSpecialMenu(true);
+        Criteria cr = session.createCriteria(ClientGuardian.class);
+        cr.add(Restrictions.eq("idOfChildren", client.getIdOfClient()));
+        cr.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
+        ClientGuardian cg = (ClientGuardian)cr.uniqueResult();
         cg.setVersion(newVersion);
         cg.setLastUpdate(new Date());
-        session.update(cg);*/
+        session.update(cg);
 
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client", client));
@@ -1947,7 +1952,7 @@ public class ClientManager {
         for (ClientGuardianItem item : clientWards) {
             addGuardianByClient(session, item.getIdOfClient(), idOfClient, newGuardiansVersions, item.getDisabled(),
                     ClientGuardianRelationType.fromInteger(item.getRelation()), item.getNotificationItems(),
-                    item.getCreatedWhereGuardian(), item.getLegalRepresentative());
+                    item.getCreatedWhereGuardian(), ClientGuardianRepresentType.fromInteger(item.getRepresentativeType()));
         }
     }
 
@@ -2167,36 +2172,6 @@ public class ClientManager {
         }
     }
 
-    public static void addOtherDiscountForClient(Session session, Client client, Long otherDiscountCode) throws Exception {
-        String oldDiscounts = client.getCategoriesDiscounts();
-        String newDiscounts = oldDiscounts;
-        if (!StringUtils.isEmpty(newDiscounts)) {
-            newDiscounts += ",";
-        }
-        newDiscounts += otherDiscountCode.toString();
-        client.setCategoriesDiscounts(newDiscounts);
-
-        Integer oldDiscountMode = client.getDiscountMode();
-
-        if (Client.DISCOUNT_MODE_NONE == oldDiscountMode) {
-            client.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
-        }
-
-        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
-                Client.DISCOUNT_MODE_BY_CATEGORY, oldDiscountMode, newDiscounts, oldDiscounts);
-        discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_BY_US);
-        session.save(discountChangeHistory);
-        client.setLastDiscountsUpdate(new Date());
-        try {
-            client.setCategories(ClientManager.getCategoriesSet(session, newDiscounts));
-        } catch (Exception e) {
-            logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()));
-        }
-        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
-        client.setClientRegistryVersion(clientRegistryVersion);
-        session.update(client);
-    }
-
     public static void removeExternalIdFromClients(Session session, Long externalId) throws Exception {
         Criteria criteria = session.createCriteria(Client.class);
         criteria.add(Restrictions.eq("externalId", externalId));
@@ -2226,6 +2201,62 @@ public class ClientManager {
         clientGroupMigrationHistory.setComment(comment);
 
         session.save(clientGroupMigrationHistory);
+        disableGuardianshipIfClientLeaving(session, client, idOfClientGroup);
+        archiveApplicationForFoodIfClientLeaving(session, client, idOfClientGroup);
+    }
+
+    private static void archiveApplicationForFoodIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
+        if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
+        try {
+            List<ApplicationForFood> list = DAOUtils.getApplicationForFoodInoeByClient(session, client);
+            Long version = null;
+            for (ApplicationForFood applicationForFood : list) {
+                DiscountManager.archiveApplicationForFood(session, applicationForFood, version);
+            }
+            ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, client.getIdOfClient());
+            if (info == null) return;
+            DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
+            builder.withDateEnd(new Date());
+            builder.save(session);
+        } catch (Exception e) {
+            logger.error("Error in archiveApplicationForFoodIfClientLeaving: ", e);
+        }
+    }
+
+    private static void disableGuardianshipIfClientLeaving(Session session, Client client, Long newIdOfClientGroup) {
+        if (newIdOfClientGroup != null && !newIdOfClientGroup.equals(ClientGroup.Predefined.CLIENT_LEAVING.getValue())) return;
+        try {
+            List<Client> guardians = findGuardiansByClient(session, client.getIdOfClient(), true);
+            for (Client guardian : guardians) {
+                boolean otherChildrenExist = false;
+                List<Client> children = findChildsByClient(session, guardian.getIdOfClient());
+                for (Client child : children) {
+                    if (!child.equals(client) && (child.isStudent() || child.getClientGroup() == null) && !child.isLeaving()) {
+                        otherChildrenExist = true;
+                        break;
+                    }
+                }
+                boolean deactivateGuardianship = guardian.isParent() || guardian.isSotrudnikMsk() || guardian.isEmployee();
+                if (deactivateGuardianship) {
+                    Long version = generateNewClientGuardianVersion(session);
+                    ClientGuardian clientGuardian = DAOUtils.findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
+                    clientGuardian.disable(version);
+                    if (guardian.isParent() && !otherChildrenExist) {
+                        ClientManager.createClientGroupMigrationHistory(session, guardian, guardian.getOrg(),
+                                ClientGroup.Predefined.CLIENT_LEAVING.getValue(), ClientGroup.Predefined.CLIENT_LEAVING.getNameOfGroup(),
+                                ClientGroupMigrationHistory.MODIFY_AUTO_MODE
+                                        .concat(String.format(" (ид. опекаемого=%s)", client.getIdOfClient())));
+                        guardian.setIdOfClientGroup(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
+                        long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
+                        guardian.setClientRegistryVersion(clientRegistryVersion);
+                        session.update(guardian);
+                    }
+                    session.update(clientGuardian);
+                }
+            }
+        } catch (Exception e) {
+            logger.error("Error in disableGuardianshipIfClientLeaving: ", e);
+        }
     }
 
     public static void checkUserOPFlag(Session session, Org oldOrg, Org newOrg, Long idOfClientGroup, Client client) {
@@ -2246,114 +2277,13 @@ public class ClientManager {
         }
     }
 
-    public static void deleteDiscount(Client client, Session session) throws Exception {
-        Integer oldDiscountMode = client.getDiscountMode();
-        String oldDiscounts = client.getCategoriesDiscounts();
-        Set<CategoryDiscount> discountsAfterRemove = new HashSet<>();
-        Set<CategoryDiscount> discounts = client.getCategories();
-        for (CategoryDiscount discount : discounts) {
-            if (discount.getEligibleToDelete()) {
-                archiveDtisznDiscount(client, session, discount.getIdOfCategoryDiscount());
-            } else {
-                discountsAfterRemove.add(discount);
-            }
-        }
-        client.getCategories().clear();
-        if(!discountsAfterRemove.isEmpty()) {
-            client.setCategories(discountsAfterRemove);
-        }
-
-        String newDiscounts = "";
-        for(CategoryDiscount discount : client.getCategories()){
-            if(!newDiscounts.isEmpty()){
-                newDiscounts += ",";
-            }
-            newDiscounts += discount.getIdOfCategoryDiscount();
-        }
-        Integer newDiscountMode = StringUtils.isEmpty(newDiscounts) ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
-        if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
-            client.setCategoriesDiscounts(newDiscounts);
-            client.setDiscountMode(newDiscountMode);
-            DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, client.getOrg(),
-                    newDiscountMode, oldDiscountMode, newDiscounts, oldDiscounts);
-            discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_BY_TRANSITION);
-            client.setClientRegistryVersion(DAOUtils.updateClientRegistryVersionWithPessimisticLock());
-            session.save(discountChangeHistory);
-            client.setLastDiscountsUpdate(new Date());
-            session.update(client);
-        }
-    }
-
-    public static void archiveDtisznDiscount(Client client, Session session, Long idOfCategoryDiscount) {
-        List<Integer> list = DAOUtils.getDsznCodeListByCategoryDiscountCode(session, idOfCategoryDiscount);
-        Long clientDTISZNDiscountVersion = null;
-        Long applicationForFoodVersion = null;
-
-        for (Integer dsznCode : list) {
-            ClientDtisznDiscountInfo info = DAOUtils
-                    .getDTISZNDiscountInfoByClientAndCode(session, client, dsznCode.longValue());
-            if (null != info) {
-                if (!info.getArchived()) {
-                    info.setArchived(true);
-                    if (null == clientDTISZNDiscountVersion) {
-                        clientDTISZNDiscountVersion = DAOUtils.nextVersionByClientDTISZNDiscountInfo(session);
-                    }
-                    info.setVersion(clientDTISZNDiscountVersion);
-                    info.setLastUpdate(new Date());
-                    session.update(info);
-                }
-            }
-            ApplicationForFood food = DAOUtils
-                    .getApplicationForFoodByClientAndCode(session, client, dsznCode.longValue());
-            if (null != food) {
-                if (!food.getArchived()) {
-                    food.setArchived(true);
-                    if (null == applicationForFoodVersion) {
-                        applicationForFoodVersion = DAOUtils.nextVersionByApplicationForFood(session);
-                    }
-                    food.setVersion(applicationForFoodVersion);
-                    food.setLastUpdate(new Date());
-                    session.update(food);
-                }
-            }
-        }
-    }
-
     public static void archiveApplicationForFoodWithoutDiscount(Client client, Session session) {
         List<ApplicationForFood> list = DAOUtils.getApplicationForFoodByClient(session, client);
         Long applicationForFoodVersion = null;
 
         for (ApplicationForFood item : list) {
-            if (!item.getArchived() && isEligibleToDelete(session, item)) {
-                item.setArchived(true);
-                if (null == applicationForFoodVersion) {
-                    applicationForFoodVersion = DAOUtils.nextVersionByApplicationForFood(session);
-                }
-                item.setVersion(applicationForFoodVersion);
-                item.setLastUpdate(new Date());
-                session.update(item);
-            }
+            DiscountManager.archiveApplicationForFood(session, item, applicationForFoodVersion);
         }
     }
 
-    public static boolean atLeastOneDiscountEligibleToDelete (Client client) {
-        Set<CategoryDiscount> discounts = client.getCategories();
-        for (CategoryDiscount discount : discounts) {
-            if (discount.getEligibleToDelete()) {
-                return true;
-            }
-        }
-        return false;
-    }
-
-    public static boolean isEligibleToDelete(Session session, ApplicationForFood item) {
-        CategoryDiscountDSZN categoryDiscountDSZN;
-        if (item.getDtisznCode() == null) {
-            ///для льготы Иное
-            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, 0L);
-        } else {
-            categoryDiscountDSZN = DAOUtils.getCategoryDiscountDSZNByDSZNCode(session, item.getDtisznCode());
-        }
-        return categoryDiscountDSZN.getCategoryDiscount().getEligibleToDelete();
-    }
 }

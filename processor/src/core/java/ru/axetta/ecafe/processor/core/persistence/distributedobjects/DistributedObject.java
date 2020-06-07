@@ -238,6 +238,8 @@ public abstract class DistributedObject{
 
     public DistributedObject getCurrentDistributedObject(Criteria criteria) {
         criteria.add(Restrictions.eq("guid", this.getGuid()));
+        this.createProjections(criteria);
+        criteria.setResultTransformer(Transformers.aliasToBean(this.getClass()));
         criteria.setMaxResults(1);
         return (DistributedObject) criteria.uniqueResult();
     }

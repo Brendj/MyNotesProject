@@ -17,6 +17,7 @@ public class VersionUtils {
     private static final String CARD_REGISTRATION_CLIENT_VERSION_DOUBLES_ALLOWED_VALUE = "2.7.93.1";
 
     private static final String CARD_REGISTRATION_ALLOW_DOUBLES_OPTION = "ecafe.processor.card.registration.allow.doubles";
+    private static final String CARD_REGISTRATION_ALLOW_SECOND_REGISTER_OPTION = "ecafe.processor.card.registration.allow.second.register";
 
     public static int compareClientVersionForRegisterCard(Session session, Long idOfOrg) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -39,6 +40,11 @@ public class VersionUtils {
     public static boolean doublesAllowed(Session session, long idOfOrg) {
         return doublesOnlyAllowed()
                 && compareClientVersionForRegisterCardInternal(session, idOfOrg, CARD_REGISTRATION_CLIENT_VERSION_DOUBLES_ALLOWED_VALUE) >= 0;
+    }
+
+    public static boolean secondRegisterAllowed(Session session, long idOfOrg) {
+        return doublesAllowed(session, idOfOrg)
+                && RuntimeContext.getInstance().getPropertiesValue(CARD_REGISTRATION_ALLOW_SECOND_REGISTER_OPTION, "false").equals("true");
     }
 
     public static boolean doublesOnlyAllowed() {

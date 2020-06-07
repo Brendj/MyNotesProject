@@ -43,6 +43,7 @@ public class PreorderComplex {
     private Integer modeFree;
     private Long idOfOrgOnCreate;
     private String mobile;
+    private PreorderMobileGroupOnCreateType mobileGroupOnCreate;
 
     public static Integer getDaysOfRegularPreorders() {
         return Integer.parseInt(RuntimeContext
@@ -281,5 +282,13 @@ public class PreorderComplex {
 
     public void setMobile(String mobile) {
         this.mobile = mobile;
+    }
+
+    public PreorderMobileGroupOnCreateType getMobileGroupOnCreate() {
+        return mobileGroupOnCreate;
+    }
+
+    public void setMobileGroupOnCreate(PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
+        this.mobileGroupOnCreate = mobileGroupOnCreate;
     }
 }

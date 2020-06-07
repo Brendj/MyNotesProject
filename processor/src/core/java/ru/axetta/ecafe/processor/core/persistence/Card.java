@@ -114,7 +114,11 @@ public class Card {
     }
 
     public static boolean isSocial(int type) {
-        return (type == 6 || type == 7 || type == 8);
+        return (type == 7 || type == 8);
+    }
+
+    public static boolean isServiceType(int type) {
+        return type == 1;
     }
 
     public Long getIdOfCard() {

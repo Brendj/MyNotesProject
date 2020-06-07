@@ -50,7 +50,9 @@
     <a4j:commandButton value="Отправить пробное событие на ЕМП" action="#{otherActionsPage.runSendEMPEvent}"
                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
     <a4j:commandButton value="Очистить таблицу меню" action="#{otherActionsPage.cleaningMenu}"
-                        reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
+    <a4j:commandButton value="Оповещение об окончании срока действия льготы" action="#{otherActionsPage.endBenefitNotification}"
+                       reRender="mainMenu, workspaceTogglePanel" styleClass="command-button" />
         <rich:panel>
             <h:panelGrid columns="2">
                 <h:outputText escape="true" value="Отправить все события ЕМИАС по клиенту на тестовый сервис ЕМП"
@@ -251,6 +253,8 @@
             <h:outputText value="Ид. организаций:"/>
             <h:inputText value="#{otherActionsPage.updateSpbClientDoubles}" size="50"/>
         </rich:panel>
+        <a4j:commandButton value="Блокировка ЭИ без транзакций" action="#{otherActionsPage.autoBlockCards()}" id="autoBlockCards"
+                           styleClass="command-button" reRender="mainMenu, workspaceTogglePanel" />
 
     </h:panelGrid>
 

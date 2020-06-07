@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -142,12 +141,17 @@ public class ExternalEventNotificationService {
                                 notificationService.sendNotificationAsync(destGuardian, client, type, values,
                                         event.getEvtDateTime());
                             }
+                            else
+                            {
+                                logger.info("Отправка уведомления невозможна по причине отсутствия социальной льготы");
+                            }
                         }
                     }
                 }
             }
             //отправка клиенту
             if (event.getEvtType().equals(ExternalEventType.SPECIAL)) { //Если тип = Служебные сообщения, то ....
+                logger.info("Отправка уведомления клиенту л/с" + client.getContractId());
                 if (clas > 0 && clas < 5)//1-4
                 {
                     //Если учащийся с 1-4 класс
@@ -161,6 +165,10 @@ public class ExternalEventNotificationService {
                         if (ClientHaveDiscount(persistenceSession, client)) {
                             notificationService
                                     .sendNotificationAsync(client, null, type, values, event.getEvtDateTime());
+                        }
+                        else
+                        {
+                            logger.info("Отправка уведомления невозможна по причине отсутствия социальной льготы");
                         }
                     }
                 }
@@ -195,10 +203,8 @@ public class ExternalEventNotificationService {
 
     public boolean ClientHaveDiscount(Session session, Client client) {
         List<Long> categoriesDiscountsIds = new LinkedList<Long>();
-        for (String cd : client.getCategoriesDiscounts().split(",")) {
-            if (StringUtils.isNotEmpty(cd)) {
-                categoriesDiscountsIds.add(Long.valueOf(cd));
-            }
+        for (CategoryDiscount cd : client.getCategories()) {
+            categoriesDiscountsIds.add(cd.getIdOfCategoryDiscount());
         }
 
         List<CategoryDiscount> clientDiscountsList = Collections.emptyList();
