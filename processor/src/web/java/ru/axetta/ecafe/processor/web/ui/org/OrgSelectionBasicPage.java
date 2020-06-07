@@ -6,11 +6,14 @@ package ru.axetta.ecafe.processor.web.ui.org;
 
 import ru.axetta.ecafe.processor.core.daoservices.context.ContextDAOServices;
 import ru.axetta.ecafe.processor.core.daoservices.org.OrgShortItem;
+import ru.axetta.ecafe.processor.core.persistence.Contragent;
 import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.OrganizationType;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
+import ru.axetta.ecafe.processor.web.ui.MainPage;
 
 import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
@@ -33,19 +36,10 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected String region;
     protected String filter;
     protected String idFilter;
-    protected Integer supplierFilter; // Legacy-code, but JSP not work without him
-
-    /*
-           0 - доступны все фильтры
-           1 - доступны только фильтр по ОУ, ДОУ и СОШ
-           2 - доступен только фильтр по поставщикам
-           3 - доступны только фильтры по ОУ, ДОУ, СОШ и по поставщикам
-           4 - доступен только фильтр по ДОУ
-           5 - доступен только фильтр по СОШ
-           6 - доступны все фильтры для всех поставщиков
-        */
+    protected Long idOfSelectedContragent;
+    protected List<SelectItem> regions;
+    protected List<SelectItem> contragentsList = Collections.emptyList();
     protected Integer filterMode = 0;
-
     protected Boolean districtFilterDisabled = false;
 
     // По мере расширения типов ОО необходимо дополнять нижеизложенные группы
@@ -54,6 +48,12 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
             OrganizationType.KINDERGARTEN,
             OrganizationType.PROFESSIONAL,
             OrganizationType.ADDEDEDUCATION
+    );
+
+    protected List<Integer> unsupportedUserRole = Arrays.asList(
+            User.DefaultRole.ADMIN_SECURITY.ordinal(),
+            User.DefaultRole.ADMIN.ordinal(),
+            User.DefaultRole.CARD_OPERATOR.ordinal()
     );
 
     protected static final List<OrganizationType> ONLY_SUPPLIERS = Collections
@@ -154,13 +154,15 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     }
 
     public List<SelectItem> getRegions() {
-        List<String> regions = DAOService.getInstance().getRegions();
-        List<SelectItem> items = new ArrayList<SelectItem>();
-        items.add(new SelectItem(""));
-        for (String reg : regions) {
-            items.add(new SelectItem(reg));
+        if(CollectionUtils.isEmpty(regions)) {
+            List<String> regionsFromDB = DAOService.getInstance().getRegions();
+            regions = new LinkedList<>();
+            regions.add(new SelectItem(""));
+            for (String reg : regionsFromDB) {
+                regions.add(new SelectItem(reg));
+            }
         }
-        return items;
+        return regions;
     }
 
     private List<OrganizationTypeItem> buildAvailableOrganizationTypes(){
@@ -210,14 +212,6 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
 
     public void setDistrictFilterDisabled(Boolean districtFilterDisabled) {
         this.districtFilterDisabled = districtFilterDisabled;
-    }
-
-    public Integer getSupplierFilter() {
-        return supplierFilter;
-    }
-
-    public void setSupplierFilter(Integer supplierFilter) {
-        this.supplierFilter = supplierFilter;
     }
 
     public void updateOrgTypesItems() {
@@ -322,7 +316,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
             List<Long> idOfSupplierList) throws Exception {
         deselectAllItems();
         return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
-                idOfSourceMenuOrgList, idOfSupplierList, null, null);
+                idOfSourceMenuOrgList, idOfSupplierList, idOfSelectedContragent, null);
     }
 
     @SuppressWarnings("unchecked")
@@ -330,7 +324,43 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
             throws Exception {
         deselectAllItems();
         return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
-                idOfSourceMenuOrgList, Collections.EMPTY_LIST, null, null);
+                idOfSourceMenuOrgList, Collections.EMPTY_LIST, idOfSelectedContragent, null);
+    }
+
+    public List<SelectItem> getContragentsList() {
+        if (CollectionUtils.isEmpty(contragentsList)) {
+            try {
+                User user = MainPage.getSessionInstance().getCurrentUser();
+                if (unsupportedUserRole.contains(user.getIdOfRole())) {
+                    return Collections.emptyList();
+                }
+
+                List<Contragent> contragents = DAOService.getInstance().contragentsListByUser(user.getIdOfUser());
+                contragentsList = new LinkedList<>();
+
+                contragentsList.add(new SelectItem(null, ""));
+                for (Contragent c : contragents) {
+                    SelectItem item = new SelectItem(c.getIdOfContragent(), c.getContragentName());
+                    contragentsList.add(item);
+                }
+            } catch (Exception e) {
+                getLogger().error("Exception when build ContragentList in OrgSelectionBasicPage", e);
+                contragentsList = Collections.emptyList();
+            }
+        }
+        return contragentsList;
+    }
+
+    public void setContragentsList(List<SelectItem> contragentsList) {
+        this.contragentsList = contragentsList;
+    }
+
+    public Long getIdOfSelectedContragent() {
+        return idOfSelectedContragent;
+    }
+
+    public void setIdOfSelectedContragent(Long idOfSelectedContragent) {
+        this.idOfSelectedContragent = idOfSelectedContragent;
     }
 
     public static class OrganizationTypeItem {

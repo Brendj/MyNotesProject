@@ -80,6 +80,14 @@
                                         <a4j:support event="onchange" action="#{mainPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                     </h:selectOneMenu>
+                                    <h:outputText escape="true" value="Поставщик питания: " styleClass="output-text" />
+                                    <h:selectOneMenu id="contragentList"
+                                                     value="#{mainPage.orgSelectPage.idOfSelectedContragent}"
+                                                     styleClass="output-text" style="width:386px;">
+                                        <f:selectItems value="#{mainPage.orgSelectPage.contragentsList}" />
+                                        <a4j:support event="onchange" action="#{mainPage.updateOrgSelectPage}"
+                                                     reRender="modalOrgSelectorOrgTable"/>
+                                    </h:selectOneMenu>
                                 </h:panelGrid>
                                     <rich:simpleTogglePanel label="Показать доп. фильтры" switchType="client" opened="false"
                                                             styleClass="borderNone" timeout="10"
