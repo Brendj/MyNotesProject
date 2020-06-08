@@ -328,16 +328,18 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     protected List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfSourceMenuOrgList,
             List<Long> idOfSupplierList) throws Exception {
         deselectAllItems();
+        Long idOfContragent = idOfSelectedContragent == null || idOfSelectedContragent.equals(-1L) ? null : idOfSelectedContragent;
         return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
-                idOfSourceMenuOrgList, idOfSupplierList, idOfSelectedContragent, null);
+                idOfSourceMenuOrgList, idOfSupplierList, idOfContragent, null);
     }
 
     @SuppressWarnings("unchecked")
     protected List<OrgShortItem> retrieveOrgs(Session session, List<Long> idOfSourceMenuOrgList)
             throws Exception {
         deselectAllItems();
+        Long idOfContragent = idOfSelectedContragent == null || idOfSelectedContragent.equals(-1L) ? null : idOfSelectedContragent;
         return retrieveOrgs(session, getFilter(), getAvailableOrganizationTypes(), getIdFilter(), getRegion(),
-                idOfSourceMenuOrgList, Collections.EMPTY_LIST, idOfSelectedContragent, null);
+                idOfSourceMenuOrgList, Collections.EMPTY_LIST,idOfContragent , null);
     }
 
     public List<SelectItem> getContragentsList() {
@@ -351,7 +353,7 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
                 List<Contragent> contragents = DAOService.getInstance().contragentsListByUser(user.getIdOfUser());
                 contragentsList = new LinkedList<>();
 
-                contragentsList.add(new SelectItem(null, ""));
+                contragentsList.add(new SelectItem(-1L, ""));
                 for (Contragent c : contragents) {
                     SelectItem item = new SelectItem(c.getIdOfContragent(), c.getContragentName());
                     contragentsList.add(item);
