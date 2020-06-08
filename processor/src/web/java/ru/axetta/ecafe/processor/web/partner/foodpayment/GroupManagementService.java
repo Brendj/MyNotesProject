@@ -138,7 +138,7 @@ public class GroupManagementService implements IGroupManagementService {
             }
             if(clientGroupManager == null){
                 ClientGroupManager newClientGroupManager = new ClientGroupManager();
-                newClientGroupManager.setVersion((long) 0);
+                newClientGroupManager.setVersion(DAOUtils.nextVersionByGroupNameToOrg(persistanceSession));
                 newClientGroupManager.setDeleted(deletedStatus);
                 newClientGroupManager.setIdOfClient(client.getIdOfClient());
                 newClientGroupManager.setOrgOwner(orgId);
@@ -153,7 +153,7 @@ public class GroupManagementService implements IGroupManagementService {
                         GroupManagementErrors.BUNCH_NOT_FOUND.getErrorMessage());
             if(clientGroupManager != null){
                 clientGroupManager.setDeleted(deletedStatus);
-                clientGroupManager.setVersion((clientGroupManager.getVersion()+1));
+                clientGroupManager.setVersion(DAOUtils.nextVersionByGroupNameToOrg(persistanceSession));
                 persistanceSession.update(clientGroupManager);
                 return;
             }
