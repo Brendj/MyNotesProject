@@ -116,12 +116,10 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
 
         if (CollectionUtils.isNotEmpty(idOfSupplierList)){
                 orgCriteria.add(Restrictions.in("defaultSupplier.idOfContragent", idOfSupplierList));
-        }
-
-        if (idOfContract != null) {
-            orgCriteria.add(Restrictions.eq("contractId", "" + idOfContract));
         } else if (idOfContragent != null) {
             orgCriteria.add(Restrictions.eq("defaultSupplier.idOfContragent", idOfContragent));
+        } else if(idOfContract != null) {
+            orgCriteria.add(Restrictions.eq("contractId", "" + idOfContract));
         }
 
         if(CollectionUtils.isNotEmpty(orgTypes)) {
@@ -213,6 +211,21 @@ public class OrgSelectionBasicPage extends BasicWorkspacePage {
     public void setDistrictFilterDisabled(Boolean districtFilterDisabled) {
         this.districtFilterDisabled = districtFilterDisabled;
     }
+
+        /*
+           0 - доступны все фильтры
+           1 - доступны только фильтр по ОУ, ДОУ и СОШ
+           2 - доступен только фильтр по поставщикам
+           3 - доступны только фильтры по ОУ, ДОУ, СОШ и по поставщикам
+           4 - доступен только фильтр по ДОУ
+           5 - доступен только фильтр по СОШ
+           6 - доступны все фильтры для всех поставщиков
+        */
+
+    public Boolean disableContragentFilter(){
+        return getFilterMode().equals(2);
+    }
+
 
     public void updateOrgTypesItems() {
         switch (getFilterMode()) {

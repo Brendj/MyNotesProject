@@ -81,7 +81,7 @@
                                                      reRender="modalOrgListSelectorOrgTable" />
                                     </h:selectOneMenu>
                                     <h:outputText escape="true" value="Поставщик питания: " styleClass="output-text" />
-                                    <h:selectOneMenu id="contragentList"
+                                    <h:selectOneMenu id="contragentList" disabled="#{mainPage.orgListSelectPage.disableContragentFilter()}"
                                                      value="#{mainPage.orgSelectPage.idOfSelectedContragent}"
                                                      styleClass="output-text" style="width:386px;">
                                         <f:selectItems value="#{mainPage.orgSelectPage.contragentsList}" />
