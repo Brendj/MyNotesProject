@@ -902,7 +902,7 @@ public class PreorderDAOService {
             RegularPreorderParam regularComplex = complex.getRegularComplex();
             if (regularComplex != null) {
                 if (regularComplex.getEnabled() && complex.getAmount() > 0) {
-                    createRegularPreorder(client, regularComplex, complex.getAmount(),
+                    createWtRegularPreorder(client, regularComplex, complex.getAmount(),
                             complex.getIdOfComplex(), date, true, null, guardianMobile, mobileGroupOnCreate);
                 } else {
                     deleteRegularPreorder(client, complex.getIdOfComplex(), true, null, date, guardianMobile);
@@ -948,7 +948,7 @@ public class PreorderDAOService {
                     RegularPreorderParam regularMenuItem = menuItem.getRegularMenuDetail();
                     if (regularMenuItem != null) {
                         if (regularMenuItem.getEnabled() && menuItem.getAmount() > 0) {
-                            createRegularPreorder(client, regularMenuItem, menuItem.getAmount(), idOfComplex, date,
+                            createWtRegularPreorder(client, regularMenuItem, menuItem.getAmount(), idOfComplex, date,
                                     false, menuItem.getIdOfMenuDetail(), guardianMobile, mobileGroupOnCreate);
                         } else {
                             deleteRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(), date,
@@ -1059,6 +1059,72 @@ public class PreorderDAOService {
                 if (ci != null) {
                     complexName = ci.getComplexName();
                     complexPrice = ci.getCurrentPrice();
+                }
+                regularPreorder = new RegularPreorder(client, regularComplex.getStartDate(), regularComplex.getEndDate(), null, idOfComplex,
+                        amount, complexName, regularComplex.getMonday(), regularComplex.getTuesday(), regularComplex.getWednesday(),
+                        regularComplex.getThursday(), regularComplex.getFriday(), regularComplex.getSaturday(), complexPrice, guardianMobile,
+                        RegularPreorderState.CHANGE_BY_USER, mobileGroupOnCreate);
+                em.persist(regularPreorder);
+            } else {
+                regularPreorder = new RegularPreorder(client, regularComplex.getStartDate(), regularComplex.getEndDate(), itemCode, idOfComplex,
+                        amount, menuDetailName, regularComplex.getMonday(), regularComplex.getTuesday(), regularComplex.getWednesday(),
+                        regularComplex.getThursday(), regularComplex.getFriday(), regularComplex.getSaturday(), menuDetailPrice, guardianMobile,
+                        RegularPreorderState.CHANGE_BY_USER, mobileGroupOnCreate);
+                em.persist(regularPreorder);
+            }
+        }
+        createPreordersFromRegular(regularPreorder, true);
+    }
+
+    private void createWtRegularPreorder(Client client, RegularPreorderParam regularComplex,
+            Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu, String guardianMobile,
+            PreorderMobileGroupOnCreateType mobileGroupOnCreate) throws Exception {
+        String menuDetailName = null;
+        Long menuDetailPrice = null;
+        String itemCode = null;
+        String condition = isComplex ? " and m.idOfComplex = :idOfComplex " : " and m.itemCode = :itemCode ";
+        Query query = em.createQuery("select m from RegularPreorder m "
+                + "where m.client = :client " + condition + " and m.deletedState = false");
+        query.setParameter("client", client);
+        if (isComplex)
+            query.setParameter("idOfComplex", idOfComplex);
+        else {
+            MenuDetail md = getMenuDetail(client, idOfMenu, date);
+            menuDetailName = md.getMenuDetailName();
+            menuDetailPrice = md.getPrice();
+            itemCode = md.getItemCode();
+            query.setParameter("itemCode", itemCode);
+        }
+        RegularPreorder regularPreorder = null;
+        try {
+            regularPreorder = (RegularPreorder) query.getSingleResult();
+            if (regularEquals(regularComplex, regularPreorder) && regularPreorder.getAmount().equals(amount)) return;
+            regularPreorder.setAmount(amount);
+            regularPreorder.setMonday(regularComplex.getMonday());
+            regularPreorder.setTuesday(regularComplex.getTuesday());
+            regularPreorder.setWednesday(regularComplex.getWednesday());
+            regularPreorder.setThursday(regularComplex.getThursday());
+            regularPreorder.setFriday(regularComplex.getFriday());
+            regularPreorder.setSaturday(regularComplex.getSaturday());
+            regularPreorder.setStartDate(regularComplex.getStartDate());
+            regularPreorder.setEndDate(regularComplex.getEndDate());
+            regularPreorder.setMobile(guardianMobile);
+            regularPreorder.setLastUpdate(new Date());
+            em.merge(regularPreorder);
+        } catch (NoResultException e) {
+            if (isComplex) {
+                WtComplex wtComplex = getWtComplex(client, idOfComplex, date);
+                List<WtDish> wtDishes = getWtDishesByComplexAndDates(wtComplex, CalendarUtils.startOfDay(date),
+                        CalendarUtils.endOfDay(date));
+                if (wtDishes.size() == 0) {
+                    throw new MenuDetailNotExistsException("Не найдены блюда для комплекса с ид.=" + idOfComplex.toString());
+                }
+                String complexName = null;
+                Long complexPrice = null;
+                if (wtComplex != null) {
+                    complexName = wtComplex.getName();
+                    complexPrice = wtComplex.getPrice() == null ? 0L :
+                            wtComplex.getPrice().multiply(new BigDecimal(100)).longValue();
                 }
                 regularPreorder = new RegularPreorder(client, regularComplex.getStartDate(), regularComplex.getEndDate(), null, idOfComplex,
                         amount, complexName, regularComplex.getMonday(), regularComplex.getTuesday(), regularComplex.getWednesday(),
