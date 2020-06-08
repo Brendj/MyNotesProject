@@ -37,6 +37,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.annotation.PostConstruct;
 import javax.persistence.*;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.util.*;
 
@@ -1746,7 +1747,8 @@ public class PreorderDAOService {
         }
         if (wtComplex != null) {
             preorderComplex.setComplexName(wtComplex.getName());
-            preorderComplex.setComplexPrice(wtComplex.getPrice() == null ? 0L : wtComplex.getPrice().longValue());
+            preorderComplex.setComplexPrice(wtComplex.getPrice() == null ? 0L :
+                    wtComplex.getPrice().multiply(new BigDecimal(100)) .longValue());
             preorderComplex.setModeFree(0);
             preorderComplex.setModeOfAdd(0);
         } else {
@@ -1914,7 +1916,7 @@ public class PreorderDAOService {
         preorderMenuDetail.setDeletedState(wtDish.getDeleteState() != 0);
         preorderMenuDetail.setState(PreorderState.OK);
         preorderMenuDetail.setMenuDetailName(wtDish.getDishName());
-        preorderMenuDetail.setMenuDetailPrice(wtDish.getPrice().longValue());
+        preorderMenuDetail.setMenuDetailPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
         preorderMenuDetail.setGroupName(getMenuGroupByWtDish(wtDish));
         preorderMenuDetail.setItemCode(wtDish.getCode().toString());
         preorderMenuDetail.setAvailableNow(0);
@@ -1948,14 +1950,15 @@ public class PreorderDAOService {
 
     private WtComplex getWtComplex(Client client, Integer idOfComplex, Date date) {
         Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
-                + "WHERE complex.beginDate < :startDate AND complex.endDate > :endDate "
+                + "LEFT JOIN complex.wtOrgGroup orgGroup "
+                + "WHERE complex.beginDate <= :startDate AND complex.endDate >= :endDate "
                 + "AND complex.deleteState = 0 "
                 + "AND complex.idOfComplex = :idOfComplex "
-                + "AND :org IN elements(complex.orgs)");
+                + "AND (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs)) ");
         query.setParameter("org", client.getOrg());
         query.setParameter("idOfComplex", idOfComplex.longValue());
-        query.setParameter("startDate", CalendarUtils.startOfDay(date));
-        query.setParameter("endDate", CalendarUtils.endOfDay(date));
+        query.setParameter("startDate", CalendarUtils.startOfDay(date), TemporalType.DATE);
+        query.setParameter("endDate", CalendarUtils.endOfDay(date), TemporalType.DATE);
         try {
             return (WtComplex)query.getSingleResult();
         } catch (Exception e) {
@@ -2955,7 +2958,7 @@ public class PreorderDAOService {
                         // 6-дневная рабочая неделя
                         calendar.get(Calendar.DAY_OF_WEEK) != Calendar.SUNDAY)) {
                     // проверка, выпадает ли день на выходные
-                    Contragent contragent = DAOReadonlyService.getInstance().findDefaultSupplier(org.getIdOfOrg());
+                    //Contragent contragent = DAOReadonlyService.getInstance().findDefaultSupplier(org.getIdOfOrg());
                     Boolean isHoliday = DAOReadonlyService.getInstance().checkExcludeDays(currentDate, wtComplex);
                     if (!isHoliday) {
                         cycleDates.put(currentDate, count++);
