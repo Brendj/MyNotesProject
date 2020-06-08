@@ -2586,11 +2586,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private void processWtMenuFirstDay(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
             Date endDate) throws DatatypeConfigurationException {
-
-        List<WtMenu> menus = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                .getWtMenuByDates(startDate, endDate, org);
-
-        generateWtMenuDetail(objectFactory, menus, session, data);
+        generateWtMenuDetail(org, data, objectFactory, session, startDate, endDate);
     }
 
     private void generateMenuDetail(ObjectFactory objectFactory, List menus, Session session, Data data)
@@ -2638,32 +2634,48 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         data.setMenuListExt(menuListExt);
     }
 
-    private void generateWtMenuDetail(ObjectFactory objectFactory, List menus, Session session, Data data)
+    private void generateWtMenuDetail(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate, Date endDate)
             throws DatatypeConfigurationException {
 
         MenuListExt menuListExt = objectFactory.createMenuListExt();
-        int nRecs = 0;
-        for (Object currObject : menus) {
-            if (nRecs++ > MAX_RECS) {
-                break;
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startDate);
+        Date menuDate = calendar.getTime();
+
+        while (menuDate.getTime() < endDate.getTime()) {
+
+            List<WtMenu> menus = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getWtMenuByDates(menuDate, menuDate, org);
+            int nRecs = 0;
+
+            MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
+            menuDateItemExt.setDate(toXmlDateTime(menuDate));
+            Set<WtDish> wtDishSet = new HashSet<>();
+
+            for (WtMenu menu : menus) {
+                if (nRecs++ > MAX_RECS) {
+                    break;
+                }
+                List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getWtDishesByMenuAndDates(menu, menuDate, menuDate);
+                if (wtDishes != null && wtDishes.size() > 0) {
+                    wtDishSet.addAll(wtDishes);
+                }
             }
 
-            WtMenu menu = (WtMenu) currObject;
-            MenuDateItemExt menuDateItemExt = objectFactory.createMenuDateItemExt();
-            menuDateItemExt.setDate(toXmlDateTime(menu.getBeginDate()));
-
-            List<WtDish> wtDishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                    .getWtDishesByMenu(menu);
-            if (wtDishes != null && wtDishes.size() > 0) {
+            if (wtDishSet != null && wtDishSet.size() > 0) {
                 //Получаем детализацию для одного Menu
-                for (WtDish wtDish : wtDishes) {
+                for (WtDish wtDish : wtDishSet) {
                     MenuItemExt menuItemExt = getMenuItemExt(objectFactory, wtDish);
                     menuDateItemExt.getE().add(menuItemExt);
                 }
-                menuListExt.getM().add(menuDateItemExt);
             }
-            data.setMenuListExt(menuListExt);
+            menuListExt.getM().add(menuDateItemExt);
+            calendar.add(Calendar.DATE, 1);
+            menuDate = calendar.getTime();
         }
+        data.setMenuListExt(menuListExt);
     }
 
     @Override
@@ -3576,68 +3588,44 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private void processWtComplexList(Org org, Data data, ObjectFactory objectFactory, Session session, Date startDate,
             Date endDate) throws DatatypeConfigurationException {
 
-        List<WtComplex> complexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                .getWtComplexesByDates(startDate, endDate, org);
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(startDate);
+        Date menuDate = calendar.getTime();
 
-        List<List<WtComplex>> sortedComplexes = new ArrayList<>();
-
-        Date currDate = null;
-        ArrayList<WtComplex> currComplexListWithSameDate = new ArrayList<>();
-
-        for (WtComplex currComplex : complexes) {
-
-            if (currDate == null) {
-                currComplexListWithSameDate.add(currComplex);
-                currDate = currComplex.getBeginDate();
-                continue;
-            }
-
-            if (currComplex.getBeginDate().equals(currDate)) {
-                currComplexListWithSameDate.add(currComplex);
-
-            } else {
-                ArrayList<WtComplex> newComplexes = new ArrayList<>(currComplexListWithSameDate);
-
-                sortedComplexes.add(newComplexes);
-
-                currComplexListWithSameDate = new ArrayList<>();
-                currComplexListWithSameDate.add(currComplex);
-                currDate = currComplex.getBeginDate();
-            }
-        }
-
-        currDate = null;
         ComplexDateList complexDateList = new ComplexDateList();
 
-        for (List<WtComplex> complexesWithSameDate : sortedComplexes) {
+        while (menuDate.getTime() < endDate.getTime()) {
+
+            // Находим комлексы
+            List<WtComplex> complexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getWtComplexesByDates(menuDate, menuDate, org);
 
             ComplexDate complexDate = new ComplexDate();
 
-            for (WtComplex wtComplex : complexesWithSameDate) {
-
+            for (WtComplex wtComplex : complexes) {
                 Complex complex = new Complex();
 
                 List<WtDish> dishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .getWtDishesByComplex(wtComplex);
+                        .getWtDishesByComplexAndDates(wtComplex, menuDate, menuDate);
 
                 if (!dishes.isEmpty()) {
                     for (WtDish dish : dishes) {
                         ComplexDetail complexDetail = new ComplexDetail();
                         complexDetail.setName(dish.getDishName());
                         complex.getE().add(complexDetail);
-                        complex.setName(wtComplex.getName());
                     }
-
+                    complex.setName(wtComplex.getName());
                     complexDate.getE().add(complex);
-                    complexDate.setDate(toXmlDateTime(wtComplex.getBeginDate()));
+                    complexDate.setDate(toXmlDateTime(menuDate));
 
                     logger.info("complexName: " + wtComplex.getName());
                 }
             }
-
             if (!complexDate.getE().isEmpty()) {
                 complexDateList.getE().add(complexDate);
             }
+            calendar.add(Calendar.DATE, 1);
+            menuDate = calendar.getTime();
         }
         data.setComplexDateList(complexDateList);
     }

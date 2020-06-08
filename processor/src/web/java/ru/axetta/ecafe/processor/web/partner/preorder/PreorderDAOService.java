@@ -2481,37 +2481,29 @@ public class PreorderDAOService {
     }
 
     public List<WtMenu> getWtMenuByDates(Date beginDate, Date endDate, Org org) {
-        Query query = emReport.createQuery("SELECT menu FROM WtMenu menu "
+        Query query = emReport.createQuery("SELECT DISTINCT menu FROM WtMenu menu "
                 + "LEFT JOIN FETCH menu.wtOrgGroup orgGroup "
-                + "WHERE menu.beginDate < :beginDate AND menu.endDate > :endDate "
+                + "WHERE menu.beginDate <= :beginDate AND menu.endDate >= :endDate "
                 + "AND menu.deleteState = 0 "
                 + "AND (:org IN elements(menu.orgs) OR :org IN elements(orgGroup.orgs))");
-        query.setParameter("beginDate", beginDate, TemporalType.TIMESTAMP);
-        query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+        query.setParameter("beginDate", beginDate, TemporalType.DATE);
+        query.setParameter("endDate", endDate, TemporalType.DATE);
         query.setParameter("org", org);
         return query.getResultList();
     }
 
-    public List<WtDish> getWtDishesByMenu(WtMenu menu) {
-        Query query = emReport.createQuery("SELECT dish FROM WtDish dish "
-                + "LEFT JOIN dish.menuGroupMenus mgm "
-                + "LEFT JOIN mgm.menu menu where menu = :menu");
-        query.setParameter("menu", menu);
-        return query.getResultList();
-    }
-
-    public List<WtDish> getWtDishesByMenuAndDates(WtMenu menu, Date beginDate, Date endDate) {
-        Query query = emReport.createQuery("SELECT dish FROM WtDish dish "
+    public List<WtDish> getWtDishesByMenuAndDates(WtMenu menu, Date startDate, Date endDate) {
+        Query query = emReport.createQuery("SELECT DISTINCT dish FROM WtDish dish "
                 + "LEFT JOIN dish.menuGroupMenus mgm "
                 + "LEFT JOIN mgm.menu menu where menu = :menu "
                 + "AND dish.deleteState = 0 "
-                + "AND ((dish.dateOfBeginMenuIncluding < :beginDate AND dish.dateOfEndMenuIncluding > :endDate) "
-                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding > :endDate) "
-                + "OR (dish.dateOfBeginMenuIncluding < :beginDate AND dish.dateOfEndMenuIncluding IS NULL)"
-                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");
+                + "AND ((dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding >= :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding >= :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");;
         query.setParameter("menu", menu);
-        query.setParameter("beginDate", beginDate);
-        query.setParameter("endDate", endDate);
+        query.setParameter("startDate", startDate, TemporalType.DATE);
+        query.setParameter("endDate", endDate, TemporalType.DATE);
         return query.getResultList();
     }
 
@@ -3021,11 +3013,12 @@ public class PreorderDAOService {
 
     public List<WtComplex> getWtComplexesByDates(Date beginDate, Date endDate, Org org) {
         Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
-                + "WHERE complex.beginDate < :beginDate AND complex.endDate > :endDate "
+                + "LEFT JOIN complex.wtOrgGroup orgGroup "
+                + "WHERE complex.beginDate <= :beginDate AND complex.endDate >= :endDate "
                 + "AND complex.deleteState = 0 "
-                + "AND :org IN elements(complex.orgs)");
-        query.setParameter("beginDate", beginDate, TemporalType.TIMESTAMP);
-        query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+                + "AND (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs)) ");
+        query.setParameter("beginDate", beginDate, TemporalType.DATE);
+        query.setParameter("endDate", endDate, TemporalType.DATE);
         query.setParameter("org", org);
         return query.getResultList();
     }
@@ -3073,16 +3066,15 @@ public class PreorderDAOService {
     public List<WtDish> getWtDishesByComplexAndDates(WtComplex complex, Date startDate, Date endDate) {
         Query query = emReport.createQuery("SELECT DISTINCT dish FROM WtDish dish "
                 + "LEFT JOIN dish.complexItems complexItems "
-                + "LEFT JOIN complexItems.wtComplex complex "
-                + "WHERE complex = :complex "
+                + "WHERE complexItems.wtComplex = :complex "
                 + "AND dish.deleteState = 0 "
-                + "AND ((dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding > :endDate) "
-                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding > :endDate) "
-                + "OR (dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
+                + "AND ((dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding >= :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding >= :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");
         query.setParameter("complex", complex);
-        query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-        query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+        query.setParameter("startDate", startDate, TemporalType.DATE);
+        query.setParameter("endDate", endDate, TemporalType.DATE);
         return (List<WtDish>) query.getResultList();
     }
 
