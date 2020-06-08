@@ -399,8 +399,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         query.setParameter("endDate", endTime.getTime());
         query.setResultTransformer(Transformers.aliasToBean(GoodItem1.class));
         query.addScalar("globalId").addScalar("pathPart3").addScalar("pathPart4").addScalar("pathPart2")
-                .addScalar("pathPart1").addScalar("fullName").addScalar("price").addScalar("modeOfAdd")
-        .addScalar("qty");
+                .addScalar("pathPart1").addScalar("fullName").addScalar("price").addScalar("modeOfAdd");
         return  (List<GoodItem1>) query.list();
     }
 
