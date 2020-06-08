@@ -574,31 +574,27 @@ public class PreorderDAOService {
         WtComplexesItem complexItem = getWtComplexItemByCycle(wtComplex, org, startDate);
         List<WtDish> wtDishes;
         if (complexItem != null) {
-            wtDishes = DAOReadExternalsService.getInstance().getWtDishesByComplexItemAndDates(complexItem, startDate,
-                    endDate);
-        } else {
-            wtDishes = DAOReadExternalsService.getInstance().getWtDishesByComplexAndDates(wtComplex, startDate, endDate);
-        }
-
-        for (WtDish wtDish : wtDishes) {
-            PreorderMenuItemExt menuItemExt = new PreorderMenuItemExt(wtDish);
-            menuItemExt.setGroup(getMenuGroupByWtDish(wtDish));
-            menuItemExt.setName(wtDish.getDishName());
-            menuItemExt.setFullName(wtDish.getComponentsOfDish());
-            menuItemExt.setPrice(wtDish.getPrice().longValue() * 100);
-            menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
-            menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
-            menuItemExt.setAvailableNow(0);
-            menuItemExt.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 :
-                    wtDish.getCarbohydrates().doubleValue());
-            menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
-            menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
-            menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
-            Integer amount = getAmountForPreorderMenuDetail(client, startDate, endDate, wtDish);
-            menuItemExt.setAmount(amount);
-            menuItemExt.setIsRegular(false);
-            menuItemExt.setAvailableForRegular(false);
-            menuItemExtList.add(menuItemExt);
+            wtDishes = DAOReadExternalsService.getInstance()
+                    .getWtDishesByComplexItemAndDates(complexItem, startDate, endDate);
+            for (WtDish wtDish : wtDishes) {
+                PreorderMenuItemExt menuItemExt = new PreorderMenuItemExt(wtDish);
+                menuItemExt.setGroup(getMenuGroupByWtDish(wtDish));
+                menuItemExt.setName(wtDish.getDishName());
+                menuItemExt.setFullName(wtDish.getComponentsOfDish());
+                menuItemExt.setPrice(wtDish.getPrice().longValue() * 100);
+                menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
+                menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
+                menuItemExt.setAvailableNow(0);
+                menuItemExt.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 : wtDish.getCarbohydrates().doubleValue());
+                menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
+                menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
+                menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
+                Integer amount = getAmountForPreorderMenuDetail(client, startDate, endDate, wtDish);
+                menuItemExt.setAmount(amount);
+                menuItemExt.setIsRegular(false);
+                menuItemExt.setAvailableForRegular(false);
+                menuItemExtList.add(menuItemExt);
+            }
         }
         return menuItemExtList;
     }
