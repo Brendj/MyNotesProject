@@ -389,7 +389,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
                 + "left outer join cf_preorder_linkod pp on orderdetai0_.idoforder = pp.idoforder and orderdetai0_.idoforderdetail = pp.idoforderdetail "
                 + "left outer join cf_preorder_complex pc on pp.preorderguid = pc.guid "
                 + "WHERE order2_.State=0 AND orderdetai0_.State=0 AND (order2_.OrderType IN (:orderType)) "
-                + "AND (orderdetai0_.IdOfGood IS NOT NULL) AND org3_.IdOfOrg=:idOfOrg "
+                + "AND (orderdetai0_.IdOfGood IS NOT NULL) AND org3_.IdOfOrg=:idOfOrg and pc.modeofadd is not null "
                 + "AND (order2_.CreatedDate BETWEEN :startDate AND :endDate) AND orderdetai0_.MenuType>=:mintype AND orderdetai0_.MenuType<=:maxtype ORDER BY fullName";
         SQLQuery query = getSession().createSQLQuery(sql);
         query.setParameterList("orderType",orderTypeEnumTypeSet);
