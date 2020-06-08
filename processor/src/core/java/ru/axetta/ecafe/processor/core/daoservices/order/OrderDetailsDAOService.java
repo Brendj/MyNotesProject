@@ -73,6 +73,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
             GoodItem1 goodItem, String date, String number, Date time2) {
         String sql = "select cast(coalesce(sum(orderdetail.qty), 0) as  bigint) as qty, "
                 + "cast(coalesce(sum(orderdetail.qty * orderdetail.rprice), 0) as bigint) as summa  from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
                 " and orderdetail.idoforder = cforder.idoforder" +
                 " left join cf_goods good on good.idofgood = orderdetail.idofgood" +
                 " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and" +
