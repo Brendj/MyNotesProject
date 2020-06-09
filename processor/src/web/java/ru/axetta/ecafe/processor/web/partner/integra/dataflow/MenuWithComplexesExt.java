@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.products.Go
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 
 import javax.xml.bind.annotation.*;
+import java.math.BigDecimal;
 import java.util.Date;
 import java.util.List;
 
@@ -76,7 +77,8 @@ public class MenuWithComplexesExt {
         this.idOfComplex = wtComplex.getIdOfComplex().intValue();
         this.complexName = wtComplex.getName();
         this.menuDate = date;
-        this.currentPrice = (wtComplex.getPrice() == null) ? 0L : wtComplex.getPrice().longValue();
+        this.currentPrice = (wtComplex.getPrice() == null) ? 0L : wtComplex.getPrice()
+                .multiply(new BigDecimal(100)).longValue();
         this.usedSubscriptionFeeding = 0;
         this.usedVariableFeeding = 0;
         this.isDiscountComplex = isDiscountComplex;
