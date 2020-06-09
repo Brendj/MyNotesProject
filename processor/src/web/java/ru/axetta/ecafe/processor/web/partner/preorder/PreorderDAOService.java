@@ -333,7 +333,8 @@ public class PreorderDAOService {
                     // Режим добавления блюд: если комплекс составной - режим составного комплекса,
                     // если нет - режим фиксированной цены
                     Integer complexType = wtComplex.getComposite() ? 4 : 2;
-                    Long complexPrice = (wtComplex.getPrice() == null) ? 0L : wtComplex.getPrice().longValue();
+                    Long complexPrice = (wtComplex.getPrice() == null) ? 0L :
+                            wtComplex.getPrice().multiply(new BigDecimal(100)).longValue();
                     Integer amount = getAmountForPreorderComplex(client, startDate, endDate);
 
                     PreorderComplexItemExt complexItemExt;
@@ -582,7 +583,7 @@ public class PreorderDAOService {
                 menuItemExt.setGroup(getMenuGroupByWtDish(wtDish));
                 menuItemExt.setName(wtDish.getDishName());
                 menuItemExt.setFullName(wtDish.getComponentsOfDish());
-                menuItemExt.setPrice(wtDish.getPrice().longValue() * 100);
+                menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
                 menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
                 menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
                 menuItemExt.setAvailableNow(0);
@@ -2805,14 +2806,14 @@ public class PreorderDAOService {
                 Query query = emReport.createQuery("SELECT complex FROM WtComplex complex "
                         + "LEFT JOIN complex.wtOrgGroup orgGroup "
                         + "WHERE complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId AND complex.deleteState = 0 "
-                        + "AND complex.beginDate < :startDate AND complex.endDate > :endDate "
+                        + "AND complex.beginDate <= :startDate AND complex.endDate >= :endDate "
                         + "AND (:org IN ELEMENTS(complex.orgs) or :org IN ELEMENTS(orgGroup.orgs)) "
                         + "AND (complex.wtComplexGroupItem.idOfComplexGroupItem = :paidComplex OR "
                         + "complex.wtComplexGroupItem.idOfComplexGroupItem = :allComplexes)");
                 query.setParameter("ageGroupId", ageGroupId);
                 query.setParameter("org", org);
-                query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-                query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+                query.setParameter("startDate", startDate, TemporalType.DATE);
+                query.setParameter("endDate", endDate, TemporalType.DATE);
                 query.setParameter("paidComplex", PAID_COMPLEX_GROUP_ITEM_ID);
                 query.setParameter("allComplexes", ALL_COMPLEX_GROUP_ITEM_ID);
                 List<WtComplex> res = query.getResultList();
@@ -2856,11 +2857,11 @@ public class PreorderDAOService {
         Set<WtComplex> wtComplexes = new HashSet<>();
         for (WtDiscountRule rule : wtDiscountRuleSet) {
             Query query = emReport.createQuery("select complex from WtComplex complex "
-                    + "where complex.deleteState = 0 and complex.beginDate < :startDate AND complex.endDate > :endDate "
+                    + "where complex.deleteState = 0 and complex.beginDate <= :startDate AND complex.endDate >= :endDate "
                     + "and :rule in elements(complex.discountRules)");
             query.setParameter("rule", rule);
-            query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-            query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+            query.setParameter("startDate", startDate, TemporalType.DATE);
+            query.setParameter("endDate", endDate, TemporalType.DATE);
             List<WtComplex> res = query.getResultList();
             if (res != null && res.size() > 0) {
                 wtComplexes.addAll(res);
@@ -2875,14 +2876,14 @@ public class PreorderDAOService {
         for (WtDiscountRule rule : wtDiscountRuleSet) {
             for (Long ageGroupId : ageGroupIds) {
                 Query query = emReport.createQuery("select complex from WtComplex complex "
-                        + "where complex.deleteState = 0 and complex.beginDate < :startDate AND complex.endDate > :endDate "
+                        + "where complex.deleteState = 0 and complex.beginDate <= :startDate AND complex.endDate >= :endDate "
                         + "and complex.wtAgeGroupItem.idOfAgeGroupItem = :ageGroupId "
                         + "and :rule in elements(complex.discountRules) "
                         + "and (complex.wtComplexGroupItem.idOfComplexGroupItem = :freeComplex "
                         + "or complex.wtComplexGroupItem.idOfComplexGroupItem = :allComplexes)");
                 query.setParameter("rule", rule);
-                query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-                query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+                query.setParameter("startDate", startDate, TemporalType.DATE);
+                query.setParameter("endDate", endDate, TemporalType.DATE);
                 query.setParameter("ageGroupId", ageGroupId);
                 query.setParameter("freeComplex", FREE_COMPLEX_GROUP_ITEM_ID);
                 query.setParameter("allComplexes", ALL_COMPLEX_GROUP_ITEM_ID);

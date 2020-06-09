@@ -106,6 +106,7 @@ import javax.xml.ws.handler.MessageContext;
 import javax.xml.ws.handler.soap.SOAPMessageContext;
 import java.awt.*;
 import java.io.IOException;
+import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.security.MessageDigest;
 import java.security.cert.X509Certificate;
@@ -2888,7 +2889,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         if (complexSign.get("Free") && !complexSign.get("Elem") && !complexSign.get("Middle")) {
                             Set<WtDiscountRule> discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                     .getWtDiscountRulesWithMaxPriority(wtDiscountRuleSet);
-                            resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getFreeWtComplexesByDiscountRules(menuDate, menuDate, discRules);
+                            resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                    .getFreeWtComplexesByDiscountRules(menuDate, menuDate, discRules);
                             if (resComplexes.size() > 0) {
                                 wtDiscComplexes.addAll(resComplexes);
                             }
@@ -2900,8 +2902,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                                     .getElemDiscount();
                             Set<WtDiscountRule> discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                     .getWtDiscountRuleBySecondDiscount(wtDiscountRuleSet, discount);
-                            discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtDiscountRulesWithMaxPriority(discRules);
-                            resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                            discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                    .getWtDiscountRulesWithMaxPriority(discRules);
+                            resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
                             if (resComplexes.size() > 0) {
                                 wtDiscComplexes.addAll(resComplexes);
                             }
@@ -2910,12 +2914,16 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         // 14 Льготы для средней и высшей школы
                         if (complexSign.get("Free") && complexSign.get("Middle")) {
                             ageGroupIds.add(7L); // Все
-                            CategoryDiscount middleDiscount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMiddleDiscount();
-                            CategoryDiscount highDiscount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getHighDiscount();
+                            CategoryDiscount middleDiscount = RuntimeContext.getAppContext()
+                                    .getBean(PreorderDAOService.class).getMiddleDiscount();
+                            CategoryDiscount highDiscount = RuntimeContext.getAppContext()
+                                    .getBean(PreorderDAOService.class).getHighDiscount();
                             Set<WtDiscountRule> discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                     .getWtDiscountRuleByTwoDiscounts(wtDiscountRuleSet, middleDiscount, highDiscount);
-                            discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtDiscountRulesWithMaxPriority(discRules);
-                            resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                            discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                    .getWtDiscountRulesWithMaxPriority(discRules);
+                            resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                    .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
                             if (resComplexes.size() > 0) {
                                 wtDiscComplexes.addAll(resComplexes);
                             }
@@ -2926,8 +2934,10 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     if (!complexSign.get("Free") && complexSign.get("Elem")) {
                         Set<WtDiscountRule> discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
                                 .getWtElemDiscountRules(org);
-                        discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getWtDiscountRulesWithMaxPriority(discRules);
-                        resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
+                        discRules = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getWtDiscountRulesWithMaxPriority(discRules);
+                        resComplexes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                                .getFreeWtComplexesByRulesAndAgeGroups(menuDate, menuDate, discRules, ageGroupIds);
                         if (resComplexes.size() > 0) {
                             wtDiscComplexes.addAll(resComplexes);
                         }
@@ -6984,7 +6994,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         String menuGroup = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getMenuGroupByWtDish(wtDish);
         menuItemExt.setGroup(menuGroup);
         menuItemExt.setName(wtDish.getDishName());
-        menuItemExt.setPrice(wtDish.getPrice().longValue() * 100);
+        menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
         menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
         menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
         menuItemExt.setAvailableNow(0);
