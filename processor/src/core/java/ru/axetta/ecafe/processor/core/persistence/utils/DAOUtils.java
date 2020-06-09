@@ -4376,11 +4376,10 @@ public class DAOUtils {
 
     public static long nextVersionByApplicationForFood(Session session) {
         long version = 0L;
-        Query query = session.createSQLQuery(
-                "select apf.version from cf_applications_for_food as apf order by apf.version desc limit 1 for update");
+        Query query = session.createSQLQuery("select nextval('application_for_food_id_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -4437,11 +4436,10 @@ public class DAOUtils {
 
     public static long nextVersionByApplicationForFoodHistory(Session session) {
         long version = 0L;
-        Query query = session.createSQLQuery(
-                "select apfh.version from cf_applications_for_food_history as apfh order by apfh.version desc limit 1 for update");
+        Query query = session.createSQLQuery("select nextval('application_for_food_history_id_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
