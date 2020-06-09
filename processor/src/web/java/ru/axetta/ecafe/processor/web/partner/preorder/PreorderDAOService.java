@@ -397,8 +397,8 @@ public class PreorderDAOService {
         query.setParameter("client", client);
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
-        Integer res = (Integer) query.getSingleResult();
-        return (res == null) ? 0 : res;
+        Long res = (Long) query.getSingleResult();
+        return (res == null) ? 0 : res.intValue();
     }
 
     private Integer getAmountForPreorderMenuDetail(Client client, Date startDate, Date endDate, WtDish wtDish) {
@@ -409,8 +409,8 @@ public class PreorderDAOService {
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
         query.setParameter("idOfDish", wtDish.getIdOfDish());
-        Integer res = (Integer) query.getSingleResult();
-        return (res == null) ? 0 : res;
+        Long res = (Long) query.getSingleResult();
+        return (res == null) ? 0 : res.intValue();
     }
 
     public PreorderGoodParamsContainer getComplexParams(PreorderComplexItemExt item, Client client, Date date) {
