@@ -3528,7 +3528,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         }
 
-
+        sortedComplexes.add(currComplexListWithSameDate);
         currDate = null;
         ComplexDateList complexDateList = new ComplexDateList();
 

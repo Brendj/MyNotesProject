@@ -1090,10 +1090,13 @@ public class PreorderDAOService {
         if (isComplex)
             query.setParameter("idOfComplex", idOfComplex);
         else {
-            MenuDetail md = getMenuDetail(client, idOfMenu, date);
-            menuDetailName = md.getMenuDetailName();
-            menuDetailPrice = md.getPrice();
-            itemCode = md.getItemCode();
+            WtDish wtDish = getWtDish(idOfMenu, date);
+            if (wtDish != null) {
+                menuDetailName = wtDish.getDishName();
+                menuDetailPrice = wtDish.getPrice() == null ? 0L :
+                        wtDish.getPrice().multiply(new BigDecimal(100)).longValue();
+            }
+            itemCode = idOfMenu.toString();
             query.setParameter("itemCode", itemCode);
         }
         RegularPreorder regularPreorder = null;
@@ -2030,7 +2033,26 @@ public class PreorderDAOService {
             return (WtComplex)query.getSingleResult();
         } catch (Exception e) {
             logger.error(String.format("Can't find wtComplex idOfComplex=%s, date=%s, idOfClient=%s",
-                    idOfComplex, date.getTime(), client.getIdOfClient()), e);
+                    idOfComplex, date, client.getIdOfClient()), e);
+            return null;
+        }
+    }
+
+    private WtDish getWtDish(Long idOfDish, Date date) {
+        Query query = emReport.createQuery(
+                "SELECT dish FROM WtDish dish WHERE dish.idOfDish = :idOfDish "
+                        + "AND dish.deleteState = 0 "
+                        + "AND ((dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding >= :endDate) "
+                        + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding >= :endDate) "
+                        + "OR (dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
+                        + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");
+        query.setParameter("idOfDish", idOfDish);
+        query.setParameter("startDate", CalendarUtils.startOfDay(date), TemporalType.DATE);
+        query.setParameter("endDate", CalendarUtils.endOfDay(date), TemporalType.DATE);
+        try {
+            return (WtDish)query.getSingleResult();
+        } catch (Exception e) {
+            logger.error(String.format("Can't find wtDish idOfDish=%s, date=%s", idOfDish, date, e));
             return null;
         }
     }
