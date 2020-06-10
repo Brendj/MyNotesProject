@@ -1096,9 +1096,9 @@ public class PreorderDAOService {
                 menuDetailName = wtDish.getDishName();
                 menuDetailPrice = wtDish.getPrice() == null ? 0L :
                         wtDish.getPrice().multiply(new BigDecimal(100)).longValue();
+                itemCode = wtDish.getCode().toString();
+                query.setParameter("itemCode", itemCode);
             }
-            itemCode = idOfMenu.toString();
-            query.setParameter("itemCode", itemCode);
         }
         RegularPreorder regularPreorder = null;
         try {
@@ -1655,7 +1655,7 @@ public class PreorderDAOService {
                         continue;
                     }
                 }
-                Long complexPrice = wtComplex.getPrice().multiply(new BigDecimal(100)).longValue();
+                Long complexPrice = wtComplex.getPrice() == null ? 0L : wtComplex.getPrice().multiply(new BigDecimal(100)).longValue();
                 if (comparePrice ? !complexPrice.equals(regularPreorder.getPrice()) : false) { //не найден комплекс или цена не совпадает с рег. заказом
                     logger.info("Complex price not not match to regular");
                     currentDate = CalendarUtils.addDays(currentDate, 1);
@@ -2259,20 +2259,19 @@ public class PreorderDAOService {
 
     private WtDish getWtDishByItemCodeAndPrice(String itemCode, Date date, Long price, WtComplex wtComplex) {
         String priceCondition = (price == null ? "" : " and dish.price = :price");
-        Query query = emReport.createQuery("SELECT dish FROM WtDish dish "
+        Query query = emReport.createQuery("SELECT distinct dish FROM WtDish dish "
                 + "LEFT JOIN dish.complexItems complexItems "
-                + "WHERE dish.idOfDish = :id AND complexItems.wtComplex = :complex "
+                + "WHERE dish.code = :itemCode AND complexItems.wtComplex = :complex "
                 + "AND dish.deleteState = 0 "
                 + "AND ((dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding >= :endDate) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding >= :endDate) "
                 + "OR (dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))"  + priceCondition);
         query.setParameter("complex", wtComplex);
-        query.setParameter("id", Long.parseLong(itemCode));
-        query.setParameter("startDate", CalendarUtils.startOfDay(date));
-        query.setParameter("endDate", CalendarUtils.endOfDay(date));
-        if (price != null) query.setParameter("price", new BigDecimal(price).divide(new BigDecimal(100),
-                RoundingMode.HALF_UP));
+        query.setParameter("itemCode", Integer.parseInt(itemCode));
+        query.setParameter("startDate", CalendarUtils.startOfDay(date), TemporalType.DATE);
+        query.setParameter("endDate", CalendarUtils.endOfDay(date), TemporalType.DATE);
+        if (price != null) query.setParameter("price", new BigDecimal(price).divide(new BigDecimal(100), 2, RoundingMode.HALF_UP));
         try {
             return (WtDish)query.getSingleResult();
         } catch (Exception e) {
