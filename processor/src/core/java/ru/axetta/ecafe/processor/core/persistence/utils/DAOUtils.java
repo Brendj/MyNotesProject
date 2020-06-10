@@ -3635,7 +3635,7 @@ public class DAOUtils {
         startDate = CalendarUtils.addMonth(startDate, -1);
         Query query = session.createQuery("select pc from PreorderComplex pc "
                 + "where (pc.idOfOrgOnCreate = :idOfOrg or (pc.idOfOrgOnCreate is null and pc.client.org.idOfOrg = :idOfOrg)) "
-                + "and pc.preorderDate > :date and pc.usedAmount = 0");
+                + "and pc.preorderDate > :date and pc.usedAmount = 0 and pc.deletedState = false");
         query.setParameter("idOfOrg", orgOwner);
         query.setParameter("date", startDate);
         return query.list();
