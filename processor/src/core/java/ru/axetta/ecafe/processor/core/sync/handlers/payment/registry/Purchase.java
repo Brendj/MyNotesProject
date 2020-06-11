@@ -121,6 +121,32 @@ public class Purchase {
     public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty,
             long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin,
             String itemCode, String guidOfGoods, Long idOfRule, Long idOfMenu, String manufacturer,
+            String guidPreOrderDetail, Integer fRation) {
+        this.discount = discount;
+        this.socDiscount = socDiscount;
+        this.idOfOrderDetail = idOfOrderDetail;
+        this.name = name;
+        this.qty = qty;
+        this.rPrice = rPrice;
+        this.rootMenu = rootMenu;
+        this.menuOutput = menuOutput;
+        this.type = type;
+        this.menuGroup = menuGroup;
+        this.menuOrigin = menuOrigin;
+        this.itemCode = itemCode;
+        this.guidOfGoods = guidOfGoods;
+        this.idOfRule = idOfRule;
+        this.idOfMenu = idOfMenu;
+        this.manufacturer = manufacturer;
+        this.guidPreOrderDetail = guidPreOrderDetail;
+        this.fRation = fRation;
+        this.idOfComplex = null;
+        this.idOfDish = null;
+    }
+
+    public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty,
+            long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin,
+            String itemCode, String guidOfGoods, Long idOfRule, Long idOfMenu, String manufacturer,
             String guidPreOrderDetail, Integer fRation, Long idOfComplex, Long idOfDish) {
         this.discount = discount;
         this.socDiscount = socDiscount;
