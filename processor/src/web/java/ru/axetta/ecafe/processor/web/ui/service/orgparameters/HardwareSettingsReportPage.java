@@ -95,6 +95,10 @@ public class HardwareSettingsReportPage extends OnlineReportPage implements OrgL
     }
 
     public void buildHTML() {
+        if(getGetStringIdOfOrgList().isEmpty()){
+            printError("Для применения настроек необходимо выгрузить в таблицу хотя бы 1 ОО");
+            return;
+        }
         Session persistenceSession = null;
         Transaction transaction = null;
         try {
@@ -122,6 +126,10 @@ public class HardwareSettingsReportPage extends OnlineReportPage implements OrgL
     }
 
     public void buildXLS() {
+        if(getGetStringIdOfOrgList().isEmpty()){
+            printError("Для применения настроек необходимо выгрузить в таблицу хотя бы 1 ОО");
+            return;
+        }
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;

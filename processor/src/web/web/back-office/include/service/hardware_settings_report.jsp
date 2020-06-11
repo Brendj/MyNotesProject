@@ -163,120 +163,120 @@
                 </f:facet>
                 <h:outputText value="#{item.moduleType}" />
             </rich:column>
-            <rich:column sortable="true" sortBy="#{item.clientVersion}" headerClass="column-header" label="Версия ПО">
+            <rich:column sortable="true" sortBy="#{item.clientVersion}" headerClass="column-header" label="Версия ПО" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Версия ПО" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.clientVersion}" styleClass="output-text" />
             </rich:column>
-            <rich:column sortable="true" sortBy="#{item.dataBaseSize}" headerClass="column-header" label="Размер БД">
+            <rich:column sortable="true" sortBy="#{item.dataBaseSize}" headerClass="column-header" label="Размер БД" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Размер БД" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.dataBaseSize}" styleClass="output-text" />
             </rich:column>
-            <rich:column sortable="true" sortBy="#{item.remoteAddress}" headerClass="column-header" label="ip">
+            <rich:column sortable="true" sortBy="#{item.remoteAddress}" headerClass="column-header" label="ip" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="ip" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.remoteAddress}" styleClass="output-text" />
             </rich:column>
-            <rich:column sortable="true" sortBy="#{item.lastUpdate}" headerClass="column-header"
-                         label="Последнее изменение">
+            <rich:column sortable="true" sortBy="#{item.lastUpdate}" headerClass="column-header "
+                         label="Последнее изменение" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Последнее изменение" />
+                    <h:outputText escape="true" value="Последнее изменение"/>
                 </f:facet>
-                <h:outputText escape="true" value="#{item.lastUpdate}" styleClass="output-text" />
+                <h:outputText escape="true" value="#{item.lastUpdate}" styleClass="output-text" converter="timeConverter"/>
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.readerName}" headerClass="column-header"
-                         label="Идентификатор/модель считывателей карт">
+                         label="Идентификатор/модель считывателей карт" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Идентификатор/модель считывателей карт" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.readerName}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.firmwareVersion}" headerClass="column-header"
-                         label="Версия микропрограммы считывателя карт">
+                         label="Версия микропрограммы считывателя карт" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Версия микропрограммы считывателя карт" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.firmwareVersion}" styleClass="output-text" />
             </rich:column>
-            <rich:column sortable="true" sortBy="#{item.osVersion}" headerClass="column-header" label="OC">
-                <f:facet name="header">
-                    <h:outputText escape="true" value="OC" />
+            <rich:column sortable="true" sortBy="#{item.osVersion}" headerClass="column-header" label="Операционная система" styleClass="center-aligned-column">
+                <f:facet name="header" >
+                    <h:outputText escape="true" value="Операционная система" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.osVersion}" styleClass="output-text" />
             </rich:column>
-            <rich:column sortable="true" sortBy="#{item.sqlVersion}" headerClass="column-header" label="MySQL">
+            <rich:column sortable="true" sortBy="#{item.sqlVersion}" headerClass="column-header" label="MySQL" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="MySQL" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.sqlVersion}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.dotNetVersion}" headerClass="column-header"
-                         label="Net Framework">
+                         label="Net Framework" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Net Framework" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.dotNetVersion}" styleClass="output-text" />
             </rich:column>
-            <rich:column sortable="true" sortBy="#{item.cpuVersion}" headerClass="column-header" label="Процессор">
+            <rich:column sortable="true" sortBy="#{item.cpuVersion}" headerClass="column-header" label="Процессор" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Процессор" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.cpuVersion}" styleClass="output-text" />
             </rich:column>
-            <rich:column sortable="true" sortBy="#{item.ramSize}" headerClass="column-header" label="ОЗУ">
+            <rich:column sortable="true" sortBy="#{item.ramSize}" headerClass="column-header" label="ОЗУ" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="ОЗУ" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.ramSize}" styleClass="output-text" />
             </rich:column>
             <%----%>
-            <rich:column sortable="true" sortBy="#{item.turnstileId}" headerClass="column-header" label="ip/mac">
-                <f:facet name="header">
+            <rich:column sortable="true" sortBy="#{item.turnstileId}" headerClass="column-header" label="ip/mac" styleClass="center-aligned-column">
+                <f:facet name="header" >
                     <h:outputText escape="true" value="ip/mac" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.turnstileId}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.numOfEntries}" headerClass="column-header"
-                         label="Количество входных групп">
+                         label="Количество входных групп" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Количество входных групп" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.numOfEntries}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.numOfTurnstile}" headerClass="column-header"
-                         label="Количество контроллеров">
+                         label="Количество контроллеров" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Количество контроллеров" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.numOfTurnstile}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.controllerModel}" headerClass="column-header"
-                         label="Модели контроллера">
+                         label="Модели контроллера" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Модели контроллера" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.controllerModel}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.controllerFirmwareVersion}" headerClass="column-header"
-                         label="Версия прошивки контроллера">
+                         label="Версия прошивки контроллера" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Версия прошивки контроллера" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.controllerFirmwareVersion}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.isWorkWithLongIds}" headerClass="column-header"
-                         label="Считыватель  читает длинные идентификаторы">
+                         label="Считыватель  читает длинные идентификаторы" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Считыватель  читает длинные идентификаторы" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.isWorkWithLongIds}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.timeCoefficient}" headerClass="column-header"
-                         label="Коэффициент коррекции времени турникета">
+                         label="Коэффициент коррекции времени турникета" styleClass="center-aligned-column">
                 <f:facet name="header">
                     <h:outputText escape="true" value="Коэффициент коррекции времени турникета" />
                 </f:facet>
