@@ -3106,6 +3106,11 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
     private boolean checkSocialDiscount(Set<CategoryDiscount> categoriesDiscount) {
         if (categoriesDiscount.size() > 0) {
+            CategoryDiscount reserveDiscount = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                    .getReserveDiscount();
+            if (categoriesDiscount.size() == 1 && categoriesDiscount.contains(reserveDiscount)) {
+                return false;
+            }
             for (CategoryDiscount categoryDiscount : categoriesDiscount) {
                 if (categoryDiscount.getCategoryType().getValue() == 0 ||   // льготное
                         categoryDiscount.getCategoryType().getValue() == 3) {   // льготное вариативное

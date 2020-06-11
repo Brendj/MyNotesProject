@@ -65,6 +65,7 @@ public class PreorderDAOService {
     public static final Long ELEM_DISCOUNT_ID = -90L;
     public static final Long MIDDLE_DISCOUNT_ID = -91L;
     public static final Long HIGH_DISCOUNT_ID = -92L;
+    public static final Long RESERVE_DISCOUNT_ID = 50L;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager em;
@@ -2931,6 +2932,10 @@ public class PreorderDAOService {
 
     public CategoryDiscount getHighDiscount() {
         return getCategoryDiscountById(HIGH_DISCOUNT_ID);
+    }
+
+    public CategoryDiscount getReserveDiscount() {
+        return getCategoryDiscountById(RESERVE_DISCOUNT_ID);
     }
 
     public CategoryDiscount getCategoryDiscountById(Long id) {
