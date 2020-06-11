@@ -74,7 +74,10 @@
                                disabled="#{!mainPage.taloonPreorderVerificationPage.changedData}"
                                reRender="taloonPreorderVerificationTable" styleClass="command-button"
                                status="reportGenerateStatus" id="applyAbove"/>
-
+        </h:panelGrid>
+        <h:panelGrid styleClass="borderless-grid">
+            <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
+                           warnClass="warn-messages"/>
         </h:panelGrid>
         <a4j:status id="reportGenerateStatus">
             <f:facet name="start">
