@@ -55,11 +55,28 @@ public class HardwareSettingsReportItem {
         setShortNameInfoService(orgSync.getOrg().getShortNameInfoService());
         setDistrict(orgSync.getOrg().getDistrict());
         setShortAddress(orgSync.getOrg().getShortAddress());
-        setTypeOU(orgSync.getOrg().getType().toString());
+        Integer codeOU = orgSync.getOrg().getType().getCode();
+        switch (codeOU) {
+            case 0:
+                setTypeOU("СОШ");
+                break;
+            case 1:
+                setTypeOU("ДОУ");
+                break;
+            case 2:
+                setTypeOU("ПП");
+                break;
+            case 3:
+                setTypeOU("СПО");
+                break;
+            case 4:
+                setTypeOU("ДО");
+                break;
+        }
 
         setModuleType(moduleType);
 
-        if(isAdministrator) {
+        if (isAdministrator) {
             setSqlVersion(orgSync.getSqlServerVersion());
             setDataBaseSize(orgSync.getDatabaseSize());
         }
@@ -73,18 +90,15 @@ public class HardwareSettingsReportItem {
         setReaderName(readerName);
         setFirmwareVersion(firmwareVersion);
 
-        Query query = persistenceSession.createSQLQuery(
-                "select " + "(select to_timestamp(max(date)/1000)"
-                        + "from (values(lastupdateforiphost), (lastupdatefordotnetver), (lastupdateforosver),"
-                        + "(lastupdateforramsize), (lastupdateforcpuhost)) as updatedate (date)) as date"
-                        + " from cf_hardware_settings "
-                        + "where idofhardwaresetting = :idOfHardwareSetting ");
-        query.setParameter("idOfHardwareSetting",
-                settings.getCompositeIdOfHardwareSettings().getIdOfHardwareSetting());
-        setLastUpdate((Date) query.uniqueResult());
+        Query query = persistenceSession.createSQLQuery("select " + "(select to_timestamp(max(date)/1000)"
+                + "from (values(lastupdateforiphost), (lastupdatefordotnetver), (lastupdateforosver),"
+                + "(lastupdateforramsize), (lastupdateforcpuhost)) as updatedate (date)) as date"
+                + " from cf_hardware_settings " + "where idofhardwaresetting = :idOfHardwareSetting ");
+        query.setParameter("idOfHardwareSetting", settings.getCompositeIdOfHardwareSettings().getIdOfHardwareSetting());
+        setLastUpdate((Date) query.setMaxResults(1).uniqueResult());
     }
 
-    public HardwareSettingsReportItem(TurnstileSettings ts,int numOfTurnstile,OrgSync orgSync) {
+    public HardwareSettingsReportItem(TurnstileSettings ts, int numOfTurnstile, OrgSync orgSync) {
 
         setOrgNumberInName(orgSync.getOrg().getOrgNumberInName());
         setIdOfOrg(orgSync.getIdOfOrg());
@@ -92,7 +106,24 @@ public class HardwareSettingsReportItem {
         setShortNameInfoService(orgSync.getOrg().getShortNameInfoService());
         setDistrict(orgSync.getOrg().getDistrict());
         setShortAddress(orgSync.getOrg().getShortAddress());
-        setTypeOU(orgSync.getOrg().getType().toString());
+        Integer codeOU = orgSync.getOrg().getType().getCode();
+        switch (codeOU) {
+            case 0:
+                setTypeOU("СОШ");
+                break;
+            case 1:
+                setTypeOU("ДОУ");
+                break;
+            case 2:
+                setTypeOU("ПП");
+                break;
+            case 3:
+                setTypeOU("СПО");
+                break;
+            case 4:
+                setTypeOU("ДО");
+                break;
+        }
 
         setModuleType("Турникет");
 
@@ -101,15 +132,13 @@ public class HardwareSettingsReportItem {
         setNumOfTurnstile(numOfTurnstile);
         setControllerModel(ts.getControllerModel());
         setControllerFirmwareVersion(ts.getControllerFirmwareVersion());
-        if(ts.getIsReadsLongIdsIncorrectly()==1)
-        {
+        if (ts.getIsReadsLongIdsIncorrectly() == 1) {
             setIsWorkWithLongIds("Да");
         } else {
             setIsWorkWithLongIds("Нет");
         }
         setTimeCoefficient(ts.getTimeCoefficient());
         setLastUpdate(ts.getLastUpdateForTurnstile());
-
     }
 
     public String getOrgNumberInName() {
