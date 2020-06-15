@@ -491,7 +491,7 @@ public class EzdController {
             Integer counter1 = 0;
             List<RequestsEzdMenuView> menuforCurrentOrg = new ArrayList<>();
             Long idCurrentOrg = null;
-            boolean badComplex;
+            boolean goodComplex;
             Integer clas;
             //Здесь хранятся последние сформированные данные по guid, group и дата для ответа в ЭЖД
             String orgGuidResponse = null;
@@ -527,7 +527,7 @@ public class EzdController {
                         if (dates.contains(CalendarUtils.startOfDay(requestsEzdMenuView.getMenuDate()))) {
                             //Проверка на то, что данный комплекс подходит для данной группы
                             String complexname = requestsEzdMenuView.getComplexname();
-                            badComplex = true;
+                            goodComplex = false;
                             try {
                                 clas = extractDigits(curGroupName);
                             } catch (NumberFormatException e) //т.е. в названии группы нет чисел
@@ -536,21 +536,21 @@ public class EzdController {
                             }
                             if (clas > 0 && clas < 5)//1-4
                             {
-                                if (!complexname.contains("1-4")) {
-                                    badComplex = false;
+                                if (complexname.contains("1-4")) {
+                                    goodComplex = true;
                                 }
 
                             } else {
                                 if (clas > 4 && clas < 12)//5-11
                                 {
-                                    if (!complexname.contains("5-")) {
-                                        badComplex = false;
+                                    if (complexname.contains("5-")) {
+                                        goodComplex = true;
                                     }
                                 }
                             }
 
                             //Если комплекс подходит, то ...
-                            if (badComplex) {
+                            if (goodComplex) {
                                 //Заполняем ответ
 
                                 //Если организация с такой guid не встречалась раньше, то создаем
