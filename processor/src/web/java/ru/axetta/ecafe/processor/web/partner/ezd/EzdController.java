@@ -123,6 +123,9 @@ public class EzdController {
             for (RequestsEzdView requestsEzdView : requestsEzdViews) {
                 Date startedDate = currentDate;
                 String curGroupName = requestsEzdView.getGroupname();
+                if (curGroupName.equals("8-А")) {
+                    System.out.println("test");
+                }
                 Long curOrg = requestsEzdView.getIdoforg();
                 //Сколько дней пропустить
                 Integer countwait = allIdtoSetiings.get(curOrg);
@@ -151,7 +154,9 @@ public class EzdController {
             for (int i = 0; i < massCorrectDates.size(); i++) {
                 List<Date> dates = massCorrectDates.get((long) i);
                 RequestsEzdView requestsEzdView = requestsEzdViews.get(i);
-
+                if (requestsEzdView.getGroupname().equals("8-А")) {
+                    System.out.println("test");
+                }
                 Date startedDate = CalendarUtils.addOneDay(dates.get(0));
                 Integer countMax = countDayz;
                 //4.1
@@ -175,7 +180,6 @@ public class EzdController {
                         //4.1.1
                         if (flag) {
                             if (productionCalendarSaved.getFlag() == 2) {
-                                startedDate = CalendarUtils.addOneDay(startedDate);
                                 flag2 = true;
                             }
 
