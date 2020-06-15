@@ -4168,7 +4168,6 @@ public class Processor implements SyncProcessor {
                 //if (DAOUtils.existOrder(persistenceSession, idOfOrg, payment.getIdOfOrder())) {
                 if (order != null) {
                     // if order == payment (may be last sync result was not transferred to client)
-                    Long orderCardNo = order.getCard() == null ? null : order.getCard().getCardNo();
                     if ((order.getCreateTime().equals(payment.getTime())) && (order.getSumByCard().equals(payment.getSumByCard()))) {
                         return new ResPaymentRegistryItem(payment.getIdOfOrder(), 0, "Order is already registered");
                     } else {
