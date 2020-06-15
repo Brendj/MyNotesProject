@@ -252,7 +252,7 @@ public class TaloonPreorderVerificationDetail {
     }
 
     public Boolean needFillShippedQty() {
-        return (shippedQty == null || shippedQty == 0);
+        return ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED && (shippedQty == null || shippedQty == 0);
     }
 
     public Boolean getRemarksEmpty() {

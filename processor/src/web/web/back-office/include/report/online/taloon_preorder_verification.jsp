@@ -242,9 +242,16 @@
                     <%--        Отгрузка шт--%>
                     <rich:column headerClass="column-header" width="4">
                         <h:inputTextarea value="#{detail.shippedQty}" styleClass="output-text" cols="4" rows="1"
-                                         rendered="#{detail.enableEditShippedQty()}"
+                                         rendered="#{detail.enableEditShippedQty() and !detail.needFillShippedQty()}"
                                          validatorMessage="Поле Отгрузка не может содержать более 4 символов">
                             <f:validateLength maximum="4"/>
+                            <a4j:support event="onchange" action="#{mainPage.taloonPreorderVerificationPage.changeData()}"
+                                         reRender="buttons"/>
+                        </h:inputTextarea>
+                        <h:inputTextarea value="#{detail.shippedQty}" styleClass="output-text" cols="4" rows="1"
+                                         rendered="#{detail.enableEditShippedQty() and detail.needFillShippedQty()}"
+                                         validatorMessage="Заполните поле Отгрузка">
+                            <f:validateLongRange minimum="1" maximum="9999"/>
                             <a4j:support event="onchange" action="#{mainPage.taloonPreorderVerificationPage.changeData()}"
                                          reRender="buttons"/>
                         </h:inputTextarea>
@@ -300,8 +307,6 @@
                                                          target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
                             <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}"
                                                          target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
-                            <f:setPropertyActionListener value="true"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.changedData}"/>
                             <h:graphicImage value="/images/taloons/applied-gray.png"/>
                         </a4j:commandLink>
 
@@ -315,8 +320,6 @@
                                                          target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
                             <f:setPropertyActionListener value="#{detail.ppStateToTurnOnSecond}"
                                                          target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
-                            <f:setPropertyActionListener value="true"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.changedData}"/>
                             <h:graphicImage value="/images/taloons/canceled-gray.png"/>
                         </a4j:commandLink>
 
@@ -327,8 +330,6 @@
                                                          target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
                             <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}"
                                                          target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
-                            <f:setPropertyActionListener value="true"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.changedData}"/>
                             <h:graphicImage value="/images/taloons/canceled.png"/>
                         </a4j:commandLink>
 
@@ -337,8 +338,6 @@
                                          action="#{detail.deselectPpState()}"
                                          onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
                             <f:setPropertyActionListener value="#{detail}" target="#{detail.ppState}"/>
-                            <f:setPropertyActionListener value="true"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.changedData}"/>
                             <h:graphicImage value="/images/taloons/applied.png"/>
                         </a4j:commandLink>
 
@@ -348,8 +347,6 @@
                                          action="#{item.confirmPpState()}"
                                          onclick="if (#{!item.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
                             <f:setPropertyActionListener value="#{item}" target="#{item.getPpState()}"/>
-                            <f:setPropertyActionListener value="true"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.changedData}"/>
                             <h:graphicImage value="/images/taloons/applied-big.png"/>
                         </a4j:commandLink>
                         <%--            Отменить выбор для всего дня--%>
@@ -358,8 +355,6 @@
                                          action="#{item.deselectPpState()}" style="color:lightgray;"
                                          onclick="if (#{!item.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
                             <f:setPropertyActionListener value="#{item}" target="#{item.getPpState()}"/>
-                            <f:setPropertyActionListener value="true"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.changedData}"/>
                             <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
                         </a4j:commandLink>
 
@@ -368,8 +363,6 @@
                                          rendered="#{detail.summaryDay and !detail.isTotal() and detail.isEmptyTotal()}"
                                          action="#{mainPage.taloonPreorderVerificationPage.confirmPpStateAllDay()}"
                                          onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedSetPeriodFirstFlag()}) { alert('Операция запрещена'); return false; }">
-                            <f:setPropertyActionListener value="true"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.changedData}"/>
                             <h:graphicImage value="/images/taloons/applied-big.png"/>
                         </a4j:commandLink>
                         <%--            Отменить выбор для всего периода--%>
@@ -378,8 +371,6 @@
                                          action="#{mainPage.taloonPreorderVerificationPage.deselectPpStateAllDay()}"
                                          style="color:lightgray;"
                                          onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedClearPeriodFirstFlag()}) { alert('Операция запрещена'); return false; }">
-                            <f:setPropertyActionListener value="true"
-                                                         target="#{mainPage.taloonPreorderVerificationPage.changedData}"/>
                             <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
                         </a4j:commandLink>
 
