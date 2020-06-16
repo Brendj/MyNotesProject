@@ -2250,7 +2250,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         HTTPDataHandler handler = new HTTPDataHandler(data);
         authenticateRequest(null, handler);
         ObjectFactory objectFactory = new ObjectFactory();
-        return processPurchaseListWithDetails(contractId, objectFactory, startDate, endDate, mode, handler);
+        Org org = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getOrgByContractId(contractId);
+        if (!org.getUseWebArm()) {
+            return processPurchaseListWithDetails(contractId, objectFactory, startDate, endDate, mode, handler);
+        } else {
+            return processPurchaseWtListWithDetails(contractId, objectFactory, startDate, endDate, mode, handler);
+        }
     }
 
     private PurchaseListWithDetailsResult processPurchaseListWithDetails(Long contractId, ObjectFactory objectFactory,
@@ -2334,6 +2339,134 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     if (od.isFRationSpecified()) {
                         purchaseWithDetailsElementExt.setfRation(od.getfRation().getCode());
                     }
+                    if (od.getIdOfMenuFromSync() != null) {
+
+                        MenuDetail menuDetail = findMenuDetailByOrderDetail(od.getIdOfMenuFromSync(), menuDetails);
+
+                        if (menuDetail != null) {
+                            purchaseWithDetailsElementExt.setPrice(menuDetail.getPrice());
+                            purchaseWithDetailsElementExt.setCalories(menuDetail.getCalories());
+                            purchaseWithDetailsElementExt.setOutput(menuDetail.getMenuDetailOutput());
+                            purchaseWithDetailsElementExt.setVitB1(menuDetail.getVitB1());
+                            purchaseWithDetailsElementExt.setVitB2(menuDetail.getVitB2());
+                            purchaseWithDetailsElementExt.setVitPp(menuDetail.getVitPp());
+                            purchaseWithDetailsElementExt.setVitC(menuDetail.getVitC());
+                            purchaseWithDetailsElementExt.setVitA(menuDetail.getVitA());
+                            purchaseWithDetailsElementExt.setVitE(menuDetail.getVitE());
+                            purchaseWithDetailsElementExt.setMinCa(menuDetail.getMinCa());
+                            purchaseWithDetailsElementExt.setMinP(menuDetail.getMinP());
+                            purchaseWithDetailsElementExt.setMinMg(menuDetail.getMinMg());
+                            purchaseWithDetailsElementExt.setMinFe(menuDetail.getMinFe());
+                            purchaseWithDetailsElementExt.setProtein(menuDetail.getProtein());
+                            purchaseWithDetailsElementExt.setFat(menuDetail.getFat());
+                            purchaseWithDetailsElementExt.setCarbohydrates(menuDetail.getCarbohydrates());
+                        }
+                    }
+
+                    purchaseWithDetailsExt.getE().add(purchaseWithDetailsElementExt);
+                }
+
+                purchaseListWithDetailsExt.getP().add(purchaseWithDetailsExt);
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+        result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
+
+        return result;
+    }
+
+    private PurchaseListWithDetailsResult processPurchaseWtListWithDetails(Long contractId, ObjectFactory objectFactory,
+            Date startDate, Date endDate, Short mode, HTTPDataHandler handler) {
+        PurchaseListWithDetailsResult result = new PurchaseListWithDetailsResult();
+        PurchaseListWithDetailsExt purchaseListWithDetailsExt = objectFactory.createPurchaseListWithDetailsExt();
+        try {
+            Client client = DAOReadExternalsService.getInstance().findClient(null, contractId);
+
+            if (client == null) {
+                return result;
+            }
+            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), new Date(System.currentTimeMillis()),
+                    handler.getData().getSsoId(), client.getIdOfClient(), handler.getData().getOperationType());
+
+            int nRecs = 0;
+            Date nextToEndDate = DateUtils.addDays(endDate, 1);
+            List<Order> ordersList = DAOReadExternalsService.getInstance()
+                    .getClientOrdersByPeriod(client, startDate, nextToEndDate);
+            if (ordersList.size() == 0) {
+                result.resultCode = RC_OK;
+                result.description = RC_OK_DESC;
+                result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
+                return result;
+            }
+            List<OrderDetail> detailsList = DAOReadExternalsService.getInstance().getOrderDetailsByOrders(ordersList);
+
+            Set<Long> orderOrgIds = getOrgsByOrders(ordersList);
+
+            // Получить блюда по orderdetails
+
+            Set<Long> menuIds = getIdOfMenusByOrderDetails(detailsList);
+            if (orderOrgIds.size() == 0 || menuIds.size() == 0) {
+                result.resultCode = RC_OK;
+                result.description = RC_OK_DESC;
+                result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
+                return result;
+            }
+            List<MenuDetail> menuDetails = DAOReadExternalsService.getInstance()
+                    .getMenuDetailsByOrderDetails(orderOrgIds, menuIds, startDate, endDate);
+
+            Map<Long, Date> lastProcessMap = new HashMap<Long, Date>();
+            for (Object o : ordersList) {
+                if (nRecs++ > MAX_RECS_getPurchaseList) {
+                    break;
+                }
+                // заполняем по заказам
+                Order order = (Order) o;
+                PurchaseWithDetailsExt purchaseWithDetailsExt = objectFactory.createPurchaseWithDetailsExt();
+                purchaseWithDetailsExt.setByCard(order.getSumByCard());
+                purchaseWithDetailsExt.setSocDiscount(order.getSocDiscount());
+                purchaseWithDetailsExt.setTrdDiscount(order.getTrdDiscount());
+                purchaseWithDetailsExt.setDonation(order.getGrantSum());
+                purchaseWithDetailsExt.setSum(order.getRSum());
+                purchaseWithDetailsExt.setByCash(order.getSumByCash());
+                purchaseWithDetailsExt.setLastUpdateDate(
+                        toXmlDateTime(getLastPaymentRegistryDate(order.getOrg().getIdOfOrg(), lastProcessMap)));
+                if (order.getCard() == null) {
+                    purchaseWithDetailsExt.setIdOfCard(null);
+                } else {
+                    purchaseWithDetailsExt.setIdOfCard(order.getCard().getIdOfCard());
+                }
+                purchaseWithDetailsExt.setTime(toXmlDateTime(order.getCreateTime()));
+                if (mode != null && mode == 1) {
+                    purchaseWithDetailsExt.setState(order.getState());
+                }
+                for (OrderDetail od : findDetailsByOrder(order, detailsList)) {
+                    // заполняем по покупкам
+                    PurchaseWithDetailsElementExt purchaseWithDetailsElementExt = objectFactory
+                            .createPurchaseWithDetailsElementExt();
+                    purchaseWithDetailsElementExt
+                            .setIdOfOrderDetail(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
+                    purchaseWithDetailsElementExt.setAmount(od.getQty());
+                    purchaseWithDetailsElementExt.setName(od.getMenuDetailName());
+                    purchaseWithDetailsElementExt.setSum(od.getRPrice() * od.getQty());
+                    purchaseWithDetailsElementExt.setMenuType(od.getMenuType());
+                    purchaseWithDetailsElementExt.setLastUpdateDate(
+                            toXmlDateTime(getLastPaymentRegistryDate(order.getOrg().getIdOfOrg(), lastProcessMap)));
+                    if (od.isComplex()) {
+                        purchaseWithDetailsElementExt.setType(1);
+                    } else if (od.isComplexItem()) {
+                        purchaseWithDetailsElementExt.setType(2);
+                    } else {
+                        purchaseWithDetailsElementExt.setType(0);
+                    }
+                    if (od.isFRationSpecified()) {
+                        purchaseWithDetailsElementExt.setfRation(od.getfRation().getCode());
+                    }
+                    // если пришли с синхронизацией - od.idOfComplex и od.idOfDish должны быть заполнены
                     if (od.getIdOfMenuFromSync() != null) {
 
                         MenuDetail menuDetail = findMenuDetailByOrderDetail(od.getIdOfMenuFromSync(), menuDetails);
