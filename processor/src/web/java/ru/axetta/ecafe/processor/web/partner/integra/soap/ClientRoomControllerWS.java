@@ -2405,27 +2405,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             List<OrderDetail> detailsList = DAOReadExternalsService.getInstance().getOrderDetailsByOrders(ordersList);
 
-            Set<Long> orderOrgIds = getOrgsByOrders(ordersList);
-
-            // Получить блюда по orderdetails
-
-            Set<Long> menuIds = getIdOfMenusByOrderDetails(detailsList);
-            if (orderOrgIds.size() == 0 || menuIds.size() == 0) {
+            // получить блюда по детализации заказов orderdetails
+            Set<WtDish> dishes = DAOReadExternalsService.getInstance()
+                    .getWtDishesByOrderDetails(detailsList, startDate, endDate);
+            if (dishes == null || dishes.size() == 0) {
                 result.resultCode = RC_OK;
                 result.description = RC_OK_DESC;
                 result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
                 return result;
             }
-            List<MenuDetail> menuDetails = DAOReadExternalsService.getInstance()
-                    .getMenuDetailsByOrderDetails(orderOrgIds, menuIds, startDate, endDate);
 
-            Map<Long, Date> lastProcessMap = new HashMap<Long, Date>();
-            for (Object o : ordersList) {
+            Map<Long, Date> lastProcessMap = new HashMap<>();
+            for (Order order : ordersList) {
                 if (nRecs++ > MAX_RECS_getPurchaseList) {
                     break;
                 }
                 // заполняем по заказам
-                Order order = (Order) o;
                 PurchaseWithDetailsExt purchaseWithDetailsExt = objectFactory.createPurchaseWithDetailsExt();
                 purchaseWithDetailsExt.setByCard(order.getSumByCard());
                 purchaseWithDetailsExt.setSocDiscount(order.getSocDiscount());
@@ -2466,28 +2461,31 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     if (od.isFRationSpecified()) {
                         purchaseWithDetailsElementExt.setfRation(od.getfRation().getCode());
                     }
-                    // если пришли с синхронизацией - od.idOfComplex и od.idOfDish должны быть заполнены
-                    if (od.getIdOfMenuFromSync() != null) {
-
-                        MenuDetail menuDetail = findMenuDetailByOrderDetail(od.getIdOfMenuFromSync(), menuDetails);
-
-                        if (menuDetail != null) {
-                            purchaseWithDetailsElementExt.setPrice(menuDetail.getPrice());
-                            purchaseWithDetailsElementExt.setCalories(menuDetail.getCalories());
-                            purchaseWithDetailsElementExt.setOutput(menuDetail.getMenuDetailOutput());
-                            purchaseWithDetailsElementExt.setVitB1(menuDetail.getVitB1());
-                            purchaseWithDetailsElementExt.setVitB2(menuDetail.getVitB2());
-                            purchaseWithDetailsElementExt.setVitPp(menuDetail.getVitPp());
-                            purchaseWithDetailsElementExt.setVitC(menuDetail.getVitC());
-                            purchaseWithDetailsElementExt.setVitA(menuDetail.getVitA());
-                            purchaseWithDetailsElementExt.setVitE(menuDetail.getVitE());
-                            purchaseWithDetailsElementExt.setMinCa(menuDetail.getMinCa());
-                            purchaseWithDetailsElementExt.setMinP(menuDetail.getMinP());
-                            purchaseWithDetailsElementExt.setMinMg(menuDetail.getMinMg());
-                            purchaseWithDetailsElementExt.setMinFe(menuDetail.getMinFe());
-                            purchaseWithDetailsElementExt.setProtein(menuDetail.getProtein());
-                            purchaseWithDetailsElementExt.setFat(menuDetail.getFat());
-                            purchaseWithDetailsElementExt.setCarbohydrates(menuDetail.getCarbohydrates());
+                    // если пришли с синхронизацией - od.idOfDish должно быть заполнено (od.idOfComplex?)
+                    if (od.getIdOfDish() != null) {
+                        WtDish wtDish = findWtDishByOrderDetail(od.getIdOfDish(), dishes);
+                        if (wtDish != null) {
+                            purchaseWithDetailsElementExt.setPrice(wtDish.getPrice()
+                                    .multiply(new BigDecimal(100)).longValue());
+                            purchaseWithDetailsElementExt.setCalories(wtDish.getCalories() == null ? (double) 0
+                                    : wtDish.getCalories().doubleValue());
+                            purchaseWithDetailsElementExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
+                            purchaseWithDetailsElementExt.setVitB1(0.0);
+                            purchaseWithDetailsElementExt.setVitB2(0.0);
+                            purchaseWithDetailsElementExt.setVitPp(0.0);
+                            purchaseWithDetailsElementExt.setVitC(0.0);
+                            purchaseWithDetailsElementExt.setVitA(0.0);
+                            purchaseWithDetailsElementExt.setVitE(0.0);
+                            purchaseWithDetailsElementExt.setMinCa(0.0);
+                            purchaseWithDetailsElementExt.setMinP(0.0);
+                            purchaseWithDetailsElementExt.setMinMg(0.0);
+                            purchaseWithDetailsElementExt.setMinFe(0.0);
+                            purchaseWithDetailsElementExt.setProtein(wtDish.getProtein() == null ? (double) 0
+                                    : wtDish.getProtein().doubleValue());
+                            purchaseWithDetailsElementExt.setFat(wtDish.getFat() == null ? (double) 0
+                                    : wtDish.getFat().doubleValue());
+                            purchaseWithDetailsElementExt.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0
+                                    : wtDish.getCarbohydrates().doubleValue());
                         }
                     }
 
@@ -2531,6 +2529,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         for (MenuDetail detail : menuDetails) {
             if (idOfMenuFromSync.equals(detail.getIdOfMenuFromSync())) {
                 return detail;
+            }
+        }
+        return null;
+    }
+
+    private WtDish findWtDishByOrderDetail(Long idOfDish, Set<WtDish> dishes) {
+        for (WtDish wtDish : dishes) {
+            if (idOfDish.equals(wtDish.getIdOfDish())) {
+                return wtDish;
             }
         }
         return null;
