@@ -19,6 +19,9 @@ public class FPGroup {
     @JsonProperty("GroupId")
     private Long groupId;
 
+    @JsonProperty("OrgId")
+    private Long orgId;
+
     @JsonProperty("Clients")
     private List<FPClient> clients;
 
@@ -48,5 +51,13 @@ public class FPGroup {
 
     public void setClients(List<FPClient> clients) {
         this.clients = clients;
+    }
+
+    public Long getOrgId() {
+        return orgId;
+    }
+
+    public void setOrgId(Long orgId) {
+        this.orgId = orgId;
     }
 }

@@ -173,12 +173,11 @@ public class SchoolRestController {
         }
     }
 
-    @GET
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "clientslist")
-    public Response clientsList(@QueryParam(value = "token") String token, @QueryParam(value = "userId") Long userId,
-            @QueryParam(value = "orgId") Long orgId, @QueryParam(value = "groupsList") ListLong groupsList) {
+    public Response clientsList(ClientsListRequest clientsListRequest) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -187,7 +186,7 @@ public class SchoolRestController {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
-            ResponseClients responseClients = groupManagementService.getClientsList(groupsList.getList(), orgId);
+            ResponseClients responseClients = groupManagementService.getClientsList(clientsListRequest.getGroupsList(), clientsListRequest.getOrgId());
             persistenceTransaction.commit();
             persistenceTransaction = null;
             responseClients.setErrorCode(0);
@@ -195,11 +194,12 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseClients).build();
         }
         catch (RequestProcessingException e){
-            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s",token,userId, orgId, e.toString()), e);
+            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s", clientsListRequest.getToken(),
+                    clientsListRequest.getUserId(), clientsListRequest.getOrgId(), e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
         catch (Exception e){
-            logger.error("Internal error: "+e.getMessage(), e);
+            logger.error("Internal error: " + e.getMessage(), e);
             return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
         }
         finally {

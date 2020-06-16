@@ -162,22 +162,25 @@ public class GroupManagementService implements IGroupManagementService {
     }
 
     @Override
-    public ResponseClients getClientsList(List<Long> groupsList, long idOfOrg) throws Exception {
+    public ResponseClients getClientsList(List<String> groupsList, long idOfOrg) throws Exception {
+        List<Long> idOfOrgList = DAOUtils.findFriendlyOrgIds(persistanceSession, idOfOrg);
+        if (idOfOrgList.size() == 0) throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
+                GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
         ResponseClients responseClients = new ResponseClients();
-        responseClients.setOrgId(idOfOrg);
-        for (Long idOfGroup : groupsList) {
+        for (String nameOfGroup : groupsList) {
             FPGroup fpGroup = new FPGroup();
-            fpGroup.setGroupId(idOfGroup);
+            fpGroup.setGroupName(nameOfGroup);
             Query query = persistanceSession.createQuery("select c from Client c "
                     + "join fetch c.clientGroup "
                     + "join fetch c.person "
                     + "left join fetch c.categoriesInternal "
-                    + "where c.org.idOfOrg = :idOfOrg and c.clientGroup.compositeIdOfClientGroup.idOfClientGroup = :idOfGroup order by c.contractId");
-            query.setParameter("idOfOrg", idOfOrg);
-            query.setParameter("idOfGroup", idOfGroup);
+                    + "where c.org.idOfOrg in (:idOfOrgList) and c.clientGroup.groupName = :nameOfGroup order by c.contractId");
+            query.setParameterList("idOfOrgList", idOfOrgList);
+            query.setParameter("nameOfGroup", nameOfGroup);
             List<Client> list = query.list();
             for (Client client : list) {
-                fpGroup.setGroupName(client.getClientGroup().getGroupName());
+                fpGroup.setGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+                fpGroup.setOrgId(client.getOrg().getIdOfOrg());
                 FPClient fpClient = new FPClient(client);
                 fpGroup.getClients().add(fpClient);
             }

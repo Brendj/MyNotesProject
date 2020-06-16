@@ -14,5 +14,5 @@ public interface IGroupManagementService {
     List<GroupInfo> getOrgGroups(long orgId) throws Exception;
     List<GroupEmployee> getEmployees(long orgId) throws Exception;
     void editEmployee(long orgId, String groupName, long contractId, Boolean status) throws Exception;
-    ResponseClients getClientsList(List<Long> groupsList, long idOfOrg) throws Exception;
+    ResponseClients getClientsList(List<String> groupsList, long idOfOrg) throws Exception;
 }

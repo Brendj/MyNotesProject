@@ -11,9 +11,6 @@ import java.util.List;
 
 public class ResponseClients extends Result {
 
-    @JsonProperty("OrgId")
-    private Long orgId;
-
     @JsonProperty("Groups")
     private List<FPGroup> groups;
 
@@ -27,13 +24,5 @@ public class ResponseClients extends Result {
 
     public void setGroups(List<FPGroup> groups) {
         this.groups = groups;
-    }
-
-    public Long getOrgId() {
-        return orgId;
-    }
-
-    public void setOrgId(Long orgId) {
-        this.orgId = orgId;
     }
 }
