@@ -29,6 +29,8 @@ public class ComplexInfo {
     private Integer rootComplex; //Идентификатор комплекса-родителя для связывания комплексов в группы
     private Integer usedSpecialMenu; //Признак использования комплекса в предзаказах
 
+    public static final int SET_DISHES_COMPLEX = 4;
+
     protected ComplexInfo() {}
 
     public ComplexInfo(int idOfComplex, Org org, Date menuDate, int modeFree, int modeGrant, int modeOfAdd,

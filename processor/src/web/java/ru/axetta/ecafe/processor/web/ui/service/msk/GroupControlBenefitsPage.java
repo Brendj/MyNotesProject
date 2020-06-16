@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DiscountChangeHistory;
@@ -183,28 +184,14 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
                                             }
                                         }
 
-                                        String categoryDiscounts = "";
-
-                                        int countSize = 0;
-
-                                        for (CategoryDiscount clientCategory : clientCategoryDiscounts) {
-                                            ++countSize;
-                                            categoryDiscounts =
-                                                    categoryDiscounts + clientCategory.getIdOfCategoryDiscount();
-                                            if (clientCategoryDiscounts.size() > 1
-                                                    && countSize < clientCategoryDiscounts.size()) {
-                                                categoryDiscounts = categoryDiscounts + ',';
-                                            }
-                                        }
-
                                         long clientRegistryVersion = DAOUtils
                                                 .updateClientRegistryVersion(persistenceSession);
 
-                                        saveClientDiscountChange(persistenceSession, client, 3, categoriesDiscounts);
+                                        DiscountManager.saveDiscountHistory(persistenceSession, client, client.getOrg(), client.getCategories(), clientCategoryDiscounts,
+                                                client.getDiscountMode(), Client.DISCOUNT_MODE_BY_CATEGORY, DiscountChangeHistory.MODIFY_IN_SERVICE);
                                         client.setLastDiscountsUpdate(new Date());
-                                        client.setDiscountMode(3);
+                                        client.setDiscountMode(Client.DISCOUNT_MODE_BY_CATEGORY);
                                         client.setCategories(clientCategoryDiscounts);
-                                        client.setCategoriesDiscounts(categoryDiscounts);
                                         client.setClientRegistryVersion(clientRegistryVersion);
                                         persistenceSession.update(client);
                                         groupControlBenefitsItems
@@ -221,10 +208,10 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
                                         long clientRegistryVersion = DAOUtils
                                                 .updateClientRegistryVersion(persistenceSession);
 
-                                        saveClientDiscountChange(persistenceSession, client, 3, categoriesDiscounts);
+                                        DiscountManager.saveDiscountHistory(persistenceSession, client, client.getOrg(), client.getCategories(), categoryDiscountSet,
+                                                client.getDiscountMode(), Client.DISCOUNT_MODE_BY_CATEGORY, DiscountChangeHistory.MODIFY_IN_SERVICE);
                                         client.setLastDiscountsUpdate(new Date());
                                         client.setDiscountMode(3);
-                                        client.setCategoriesDiscounts(categoriesDiscounts);
                                         client.setCategories(categoryDiscountSet);
                                         client.setClientRegistryVersion(clientRegistryVersion);
                                         persistenceSession.update(client);
@@ -274,11 +261,4 @@ public class GroupControlBenefitsPage extends BasicWorkspacePage {
         }
     }
 
-    public void saveClientDiscountChange(Session session, Client client, Integer discountMode,
-            String categoriesDiscount) {
-        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, null, discountMode, client.getDiscountMode(),
-                categoriesDiscount, client.getCategoriesDiscounts());
-        discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_SERVICE);
-        session.save(discountChangeHistory);
-    }
 }

@@ -29,6 +29,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.VersionUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
+import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -1498,7 +1499,8 @@ public class FrontController extends HttpServlet {
             @WebParam(name = "cardNo") long cardNo, @WebParam(name = "cardPrintedNo") long cardPrintedNo,
             @WebParam(name = "type") int type, @WebParam(name = "cardSignVerifyRes") Integer cardSignVerifyRes,
             @WebParam(name = "cardSignCertNum") Integer cardSignCertNum,
-            @WebParam(name = "isLongUid") boolean isLongUid) throws FrontControllerException {
+            @WebParam(name = "isLongUid") boolean isLongUid,
+            @WebParam(name = "forceRegister") Integer forceRegister) throws FrontControllerException {
         checkRequestValidity(idOfOrg);
         logger.info(String.format(
                 "Incoming registerCardWithoutClient request. orgId=%s, cardNo=%s, cardPrintedNo=%s, type=%s, cardSignVerifyRes=%s, cardSighCertNum=%s, isLongUid=%s",
@@ -1520,59 +1522,58 @@ public class FrontController extends HttpServlet {
             persistenceTransaction = persistenceSession.beginTransaction();
             Org org = DAOUtils.findOrg(persistenceSession, idOfOrg);
             Card exCard = null;
-            if (VersionUtils.doublesAllowed(persistenceSession, idOfOrg) && org.getNeedVerifyCardSign() && !Card.isSocial(type)) {
-                exCard = DAOUtils.findCardByCardNoDoublesAllowed(persistenceSession, org, cardNo, cardPrintedNo, cardSignCertNum);
+            if (VersionUtils.doublesAllowed(persistenceSession, idOfOrg) && org.getNeedVerifyCardSign()) {
+                exCard = DAOUtils.findCardByCardNoDoublesAllowed(persistenceSession, org, cardNo, cardPrintedNo, cardSignCertNum, type);
             } else {
                 exCard = DAOUtils.findCardByCardNo(persistenceSession, cardNo);
             }
             if (null == exCard) {
                 card = cardService.registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
                         isLongUid);
-                idOfCard = card.getIdOfCard();
-                transitionState = CardTransitionState.fromInteger(card.getTransitionState());
             } else {
                 if (VersionUtils.compareClientVersionForRegisterCard(persistenceSession, idOfOrg) < 0) {
                     throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
                 }
 
-                if (CardState.BLOCKED.getValue() != exCard.getState()) {
+                boolean secondRegisterAllowed = VersionUtils.secondRegisterAllowed(persistenceSession, idOfOrg);
+                secondRegisterAllowed = secondRegisterAllowed && Card.isServiceType(type);
+
+                if (exCard.getState() != CardState.BLOCKED.getValue() && !secondRegisterAllowed) {
                     throw new CardResponseItem.CardAlreadyExist(CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE);
+                } else if (!secondRegisterAllowed) {
+                    testForRegisterConditions(persistenceSession, exCard, idOfOrg, secondRegisterAllowed);
+                }
+                if (secondRegisterAllowed && (forceRegister == null || forceRegister != 1))
+                    throw new CardResponseItem.CardAlreadyExistSecondRegisterAllowed(CardResponseItem.ERROR_DUPLICATE_CARD_SECOND_REGISTER_MESSAGE
+                    + exCard.getOrg().getShortNameInfoService() + ". Статус: " + CardState.fromInteger(exCard.getState()));
+
+                card = cardService
+                        .registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
+                                isLongUid, CardTransitionState.BORROWED.getCode());
+
+                if (secondRegisterAllowed && exCard.getState() != CardState.BLOCKED.getValue()) {
+                    cardService.blockAndReset(exCard.getCardNo(), exCard.getOrg().getIdOfOrg(),
+                            exCard.getClient() == null ? null : exCard.getClient().getIdOfClient(), false,
+                            CardResponseItem.USED_IN_ANOTHER_ORG, CardTransitionState.GIVEN_AWAY.getCode());
                 } else {
-                    Integer blockPeriod = runtimeContext
-                            .getPropertiesValue("ecafe.processor.card.registration.block.period", 180);
-                    Date now = new Date();
-                    if (blockPeriod >= CalendarUtils.getDifferenceInDays(exCard.getUpdateTime(), now)) {
-                        throw new CardResponseItem.CardAlreadyExist(
-                                String.format("%s. Минимальный срок блокировки карты не прошел - %dд",
-                                        CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE, blockPeriod));
-                    }
-
-                    List<Org> friendlyOrgs = DAOUtils
-                            .findAllFriendlyOrgs(persistenceSession, exCard.getOrg().getIdOfOrg());
-                    for (Org o : friendlyOrgs) {
-                        if (o.getIdOfOrg() == idOfOrg) {
-                            throw new CardResponseItem.CardAlreadyExistInYourOrg(
-                                    CardResponseItem.ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG_MESSAGE);
-                        }
-                    }
-                    card = cardService
-                            .registerNew(org, cardNo, cardPrintedNo, type, cardSignVerifyRes, cardSignCertNum,
-                                    isLongUid, CardTransitionState.BORROWED.getCode());
-                    idOfCard = card.getIdOfCard();
-                    transitionState = CardTransitionState.fromInteger(card.getTransitionState());
-
-                    exCard.setTransitionState(CardTransitionState.GIVEN_AWAY.getCode());
-                    persistenceSession.flush();
-                    persistenceTransaction.commit();
-                    persistenceTransaction = null;
+                    cardService.updateTransitionState(exCard, CardTransitionState.GIVEN_AWAY.getCode());
+                    persistenceSession.update(exCard);
                 }
             }
+            idOfCard = card.getIdOfCard();
+            transitionState = CardTransitionState.fromInteger(card.getTransitionState());
+            idOfCard = card.getIdOfCard();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
         } catch (CardResponseItem.CardAlreadyExist e) {
             logger.error("CardAlreadyExistException", e);
             return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE, e.getMessage());
         } catch (CardResponseItem.CardAlreadyExistInYourOrg e) {
             logger.error("CardAlreadyExistInYourOrgException", e);
             return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE, e.getMessage());
+        } catch (CardResponseItem.CardAlreadyExistSecondRegisterAllowed e) {
+            logger.error("CardAlreadyExistSecondRegisterAllowed", e);
+            return new CardResponseItem(CardResponseItem.ERROR_DUPLICATE_FOR_SECOND_REGISTER, e.getMessage());
         } catch (Exception e) {
             if (e.getMessage() == null) {
                 logger.error("Error in register card", e);
@@ -1593,6 +1594,28 @@ public class FrontController extends HttpServlet {
             HibernateUtils.close(persistenceSession, logger);
         }
         return new CardResponseItem(idOfCard, (null != transitionState) ? transitionState.getCode() : null);
+    }
+
+    private void testForRegisterConditions(Session persistenceSession, Card exCard,
+            long idOfOrg, boolean secondRegisterAllowed) throws Exception {
+        if (!secondRegisterAllowed) {
+            Integer blockPeriod = RuntimeContext.getInstance()
+                    .getPropertiesValue("ecafe.processor.card.registration.block.period", 180);
+            Date now = new Date();
+            if (blockPeriod >= CalendarUtils.getDifferenceInDays(exCard.getUpdateTime(), now)) {
+                throw new CardResponseItem.CardAlreadyExist(
+                        String.format("%s. Минимальный срок блокировки карты не прошел - %dд", CardResponseItem.ERROR_CARD_ALREADY_EXIST_MESSAGE, blockPeriod));
+            }
+        }
+
+        List<Org> friendlyOrgs = DAOUtils
+                .findAllFriendlyOrgs(persistenceSession, exCard.getOrg().getIdOfOrg());
+        for (Org o : friendlyOrgs) {
+            if (o.getIdOfOrg() == idOfOrg) {
+                throw new CardResponseItem.CardAlreadyExistInYourOrg(
+                        CardResponseItem.ERROR_CARD_ALREADY_EXIST_IN_YOUR_ORG_MESSAGE);
+            }
+        }
     }
 
     @WebMethod(operationName = "getEnterEventsManual")
@@ -1966,6 +1989,38 @@ public class FrontController extends HttpServlet {
         return CalendarUtils.dateTimeToString(new Date());
     }
 
+    @WebMethod(operationName = "getBalancesForPayPlan")
+    public PayPlanBalanceListResponse getBalancesForPayPlan(@WebParam(name = "orgId") Long orgId,
+            @WebParam(name = "balanceList") PayPlanBalanceList payPlanBalanceList)
+            throws FrontControllerException {
+        checkRequestValidity(orgId);
+        PayPlanBalanceListResponse result = new PayPlanBalanceListResponse();
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+            for (PayPlanBalanceItem item : payPlanBalanceList.getItems()) {
+                PayPlanBalanceItem resultItem = new PayPlanBalanceItem(item.getIdOfClient());
+                Client client = DAOReadonlyService.getInstance().findClientById(item.getIdOfClient());
+                if (client == null) throw new Exception("Client not found in getBalancesForPayPlan. IdOfClient = " + item.getIdOfClient());
+                long preorderSum = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getNotPaidPreordersSum(client, CalendarUtils.startOfDay(new Date()));
+                long resultSum = client.getBalance() - item.getSumma() - preorderSum;
+                resultItem.setSumma(resultSum);
+                result.addItem(resultItem);
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Error in getBalancesForPayPlan", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
 
     @WebMethod(operationName = "unblockOrReturnCard")
     public ResponseItem unblockOrReturnCard(@WebParam(name = "cardNo") Long cardNo,

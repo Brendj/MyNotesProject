@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.web.ui.service.msk;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.CategoryDiscount;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.DiscountChangeHistory;
@@ -109,13 +110,13 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
                         clientGroup = "";
                     }
 
-                    // Сохраняем историю изменения льгот
-                    saveClientDiscountChange(persistenceSession, client, 0, "");
+
+                    Set<CategoryDiscount> emptyCategoryDiscountSet = new HashSet<CategoryDiscount>();// Сохраняем историю изменения льгот
+                    DiscountManager.saveDiscountHistory(persistenceSession, client, client.getOrg(), client.getCategories(),
+                            emptyCategoryDiscountSet, client.getDiscountMode(), Client.DISCOUNT_MODE_NONE, DiscountChangeHistory.MODIFY_IN_SERVICE);
                     client.setLastDiscountsUpdate(new Date());
 
                     Set<CategoryDiscount> categoryDiscountSet = client.getCategories();
-
-                    Set<CategoryDiscount> emptyCategoryDiscountSet = new HashSet<CategoryDiscount>();
 
                     if (!categoryDiscountSet.isEmpty()) {
                         String categoriesDiscounts = "";
@@ -136,8 +137,7 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
                                         + categoriesDiscounts + ")");
 
                         long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
-                        client.setDiscountMode(0);
-                        client.setCategoriesDiscounts("");
+                        client.setDiscountMode(Client.DISCOUNT_MODE_NONE);
                         client.setClientRegistryVersion(clientRegistryVersion);
                         client.setCategories(emptyCategoryDiscountSet);
                         persistenceSession.update(client);
@@ -154,8 +154,7 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
                         if (client.getDiscountMode() == 3) {
                             long clientRegistryVersion = DAOUtils.updateClientRegistryVersion(persistenceSession);
 
-                            client.setDiscountMode(0);
-                            client.setCategoriesDiscounts("");
+                            client.setDiscountMode(Client.DISCOUNT_MODE_NONE);
                             client.setClientRegistryVersion(clientRegistryVersion);
                             persistenceSession.update(client);
                         }
@@ -171,14 +170,6 @@ public class CancelCategoryBenefitsPage extends BasicWorkspacePage {
         } finally {
             HibernateUtils.close(persistenceSession, logger);
         }
-    }
-
-    public void saveClientDiscountChange(Session session, Client client, Integer discountMode,
-            String categoriesDiscount) {
-        DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, null, discountMode, client.getDiscountMode(),
-                categoriesDiscount, client.getCategoriesDiscounts());
-        discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_SERVICE);
-        session.save(discountChangeHistory);
     }
 
     public List<GroupControlBenefitsItems> getGroupControlBenefitsItemsList() {

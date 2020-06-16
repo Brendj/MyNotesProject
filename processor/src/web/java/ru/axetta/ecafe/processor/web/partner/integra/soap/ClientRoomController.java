@@ -8,10 +8,7 @@ import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
-import ru.axetta.ecafe.processor.web.partner.preorder.soap.AddRegistrationCardResult;
-import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderClientSummaryResult;
-import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderComplexesResult;
-import ru.axetta.ecafe.processor.web.partner.preorder.soap.PreorderParam;
+import ru.axetta.ecafe.processor.web.partner.preorder.soap.*;
 
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
@@ -245,7 +242,7 @@ public interface ClientRoomController {
     Result changeEmail(@WebParam(name = "contractId") Long contractId, @WebParam(name = "email") String email);
 
     @WebMethod
-    Result changeExpenditureLimit(@WebParam(name = "contractId") Long contractId, @WebParam(name = "limit") long limit);
+    Result changeExpenditureLimit(@WebParam(name = "contractId") Long contractId, @WebParam(name = "roleRepresentative") Long roleRepresentative,  @WebParam(name = "limit") long limit);
 
     @WebMethod
     Result changeThresholdBalanceNotify(@WebParam(name = "contractId") Long contractId, @WebParam(name = "threshold") long threshold);
@@ -279,7 +276,8 @@ public interface ClientRoomController {
 
     @WebMethod Result setGuardianshipDisabled(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "guardMobile") String guardMobile,
-            @WebParam(name = "value") Boolean value);
+            @WebParam(name = "value") Boolean value,
+            @WebParam(name = "roleRepresentative") Integer roleRepresentative);
 
     @WebMethod EnterEventStatusListResult getEnterEventStatusListByGUID(@WebParam(name = "guid") List<String> guids);
 
@@ -504,7 +502,9 @@ public interface ClientRoomController {
             @WebParam(name = "mobile") String mobile, @WebParam(name = "gender") Integer gender,
             @WebParam(name = "childContractId") Long childContractId, @WebParam(name = "creatorMobile") String creatorMobile,
             @WebParam(name = "passportNumber") String passportNumber, @WebParam(name = "passportSeries") String passportSeries,
-            @WebParam(name = "typeCard") Integer typeCard);
+            @WebParam(name = "typeCard") Integer typeCard,
+            @WebParam(name = "roleRepresentative") Integer roleRepresentative,
+            @WebParam(name = "degree") Integer relation);
 
     /*@WebMethod Result changeGuardian(@WebParam(name = "contractId") Long contractId, @WebParam(name = "firstName") String firstName,
             @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
@@ -554,11 +554,14 @@ public interface ClientRoomController {
     @WebMethod(operationName = "setSpecialMenu")
     Result setSpecialMenu(@WebParam(name = "contractId") Long contractId, @WebParam(name = "value") Boolean value);
 
-    @WebMethod(operationName = "getClientsGroupForPreorder")
-    ClientGroupResult getClientsGroupForPreorder(@WebParam(name="mobile") String mobile);
+    @WebMethod(operationName = "getTypeClients")
+    ClientGroupResult getTypeClients(@WebParam(name="mobile") String mobile);
 
     @WebMethod(operationName = "getPreorderComplexes")
     PreorderComplexesResult getPreorderComplexes(@WebParam(name = "contractId") Long contractId, @WebParam(name = "date") Date date);
+
+    @WebMethod(operationName = "getPreorderAllComplexes")
+    PreorderAllComplexesResult getPreorderAllComplexes(@WebParam(name = "contractId") Long contractId);
 
     @WebMethod(operationName = "getPeopleQuantityByOrg")
     public PeopleQuantityInOrgResult getPeopleQuantityByOrg(@WebParam(name = "organizationUid") String ogrn);

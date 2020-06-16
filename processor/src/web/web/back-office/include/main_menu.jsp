@@ -984,6 +984,42 @@
         <rich:panelMenuItem id="orgSyncRequest" binding="#{orgSyncRequestPage.mainMenuComponent}" reRender="workspaceForm"
                             label="Запрос проведения синхронизации" action="#{orgSyncRequestPage.show}"/>
     </rich:panelMenuGroup>
+
+    <rich:panelMenuGroup id="webTechnologistGroupMenuItem" label="WEB-Технолог"
+                         binding="#{mainPage.webTechnologistGroupPage.mainMenuComponent}"
+                         rendered="#{mainPage.eligibleToServiceAdmin}">
+        <a4j:support event="onclick" reRender="workspaceForm" action="#{mainPage.showWebTechnologistGroupPage}" />
+        <rich:panelMenuGroup id="webTechnologistCatalogs" label="Справочники" binding="#{mainPage.webTechnologistCatalogGroupPage.mainMenuComponent}">
+            <a4j:support event="onclick" reRender="workspaceForm"
+                         action="#{mainPage.showWebTechnologistCatalogGroupPage}"/>
+            <%-- TODO: Функционал по задаче https://gitlab.iteco.mobi/ispp/processor/issues/148 отключен до востребования
+            <%--@elvariable id="catalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.CatalogListPage"--%>
+            <%--<rich:panelMenuItem id="webTechnologistUserCatalogsList"
+                                binding="#{catalogListPage.mainMenuComponent}"
+                                label="Пользовательские справочники категорий блюд" action="#{catalogListPage.show}"
+                                reRender="workspaceForm" />--%>
+            <%--@elvariable id="ageGroupCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.catalog.AgeGroupCatalogListPage"
+            <rich:panelMenuItem id="webTechnologistAgeGroupItemList"
+                                binding="#{ageGroupCatalogListPage.mainMenuComponent}"
+                                label="Возрастная категория" action="#{ageGroupCatalogListPage.show}"
+                                reRender="workspaceForm" />
+            @elvariable id="typeOfProductionCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.catalog.TypeOfProductionCatalogListPage"
+            <rich:panelMenuItem id="webTechnologistTypeOfProductionItemList"
+                                binding="#{typeOfProductionCatalogListPage.mainMenuComponent}"
+                                label="Вид производства" action="#{typeOfProductionCatalogListPage.show}"
+                                reRender="workspaceForm" />--%>
+            <%--@elvariable id="categoryItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.catalog.CategoryItemCatalogListPage"--%>
+            <rich:panelMenuItem id="webTechnologistCategoryCatalogsItemList"
+                                binding="#{categoryItemCatalogListPage.mainMenuComponent}"
+                                label="Категории блюд" action="#{categoryItemCatalogListPage.show}"
+                                reRender="workspaceForm" />
+            <%--@elvariable id="groupItemCatalogListPage" type="ru.axetta.ecafe.processor.web.ui.service.webtechnologist.catalog.GroupItemCatalogListPage"
+            <rich:panelMenuItem id="webTechnologistGroupCatalogsItemsList"
+                                binding="#{groupItemCatalogListPage.mainMenuComponent}"
+                                label="Группы блюд" action="#{groupItemCatalogListPage.show}"
+                                reRender="workspaceForm" />--%>
+        </rich:panelMenuGroup>
+    </rich:panelMenuGroup>
 </rich:panelMenuGroup>
 
 <rich:panelMenuGroup id="monitoringGroupMenu" binding="#{mainPage.monitoringGroupPage.mainMenuComponent}"

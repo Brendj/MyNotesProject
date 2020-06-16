@@ -28,7 +28,6 @@ public class ClientGuardian {
     private ClientCreatedFromType createdFrom;
     private Date lastUpdate;
     private CardRequest cardRequest;
-    private Boolean informedSpecialMenu;
     private ClientGuardianRepresentType representType;
 
     protected ClientGuardian() {}
@@ -182,14 +181,6 @@ public class ClientGuardian {
 
     public void setCardRequest(CardRequest cardRequest) {
         this.cardRequest = cardRequest;
-    }
-
-    public Boolean getInformedSpecialMenu() {
-        return informedSpecialMenu == null ? false : informedSpecialMenu;
-    }
-
-    public void setInformedSpecialMenu(Boolean informedSpecialMenu) {
-        this.informedSpecialMenu = informedSpecialMenu;
     }
 
     public ClientGuardianRepresentType getRepresentType() {

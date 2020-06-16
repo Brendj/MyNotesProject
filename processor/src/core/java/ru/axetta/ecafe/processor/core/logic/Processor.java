@@ -20,6 +20,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.MigrantsUtils;
+import ru.axetta.ecafe.processor.core.service.CardBlockService;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.geoplaner.GeoplanerManager;
 import ru.axetta.ecafe.processor.core.service.meal.MealManager;
@@ -3985,7 +3986,9 @@ public class Processor implements SyncProcessor {
                         clientGuardian.setVersion(resultClientGuardianVersion);
                         clientGuardian.setDeletedState(item.isDeleted());
                         clientGuardian.setRepresentType(item.getRepresentType());
-                        clientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        if (item.getRelation() != null) {
+                            clientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        }
                         if (item.isDeleted()) {
                             clientGuardian.delete(resultClientGuardianVersion);
                         }
@@ -4006,7 +4009,9 @@ public class Processor implements SyncProcessor {
                             MigrantsUtils
                                     .disableMigrantRequestIfExists(persistenceSession, idOfOrg, item.getIdOfGuardian());
                         }
-                        dbClientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        if (item.getRelation() != null) {
+                            dbClientGuardian.setRelation(ClientGuardianRelationType.fromInteger(item.getRelation()));
+                        }
                         dbClientGuardian.setVersion(resultClientGuardianVersion);
                         dbClientGuardian.setDisabled(item.getDisabled());
                         dbClientGuardian.setRepresentType(item.getRepresentType());
@@ -4016,6 +4021,7 @@ public class Processor implements SyncProcessor {
                     }
                 } catch (Exception e) {
                     resultClientGuardian.addItem(item, 100, e.getMessage());
+                    logger.error("Error in process ClientGuardian section: ", e);
                 }
             }
             persistenceTransaction.commit();
@@ -4176,12 +4182,14 @@ public class Processor implements SyncProcessor {
                 Card card = null;
                 Long cardNo = payment.getCardNo();
                 if (null != cardNo) {
-                    card = findCardByCardNo(persistenceSession, cardNo);
+                    card = findCardByCardNoExtended(persistenceSession, cardNo, payment.getIdOfClient(), null, null);
                     if (null == card) {
                         return new ResPaymentRegistryItem(payment.getIdOfOrder(), 200,
                                 String.format("Unknown card, IdOfOrg == %s, IdOfOrder == %s, CardNo == %s", idOfOrg,
                                         payment.getIdOfOrder(), cardNo));
                     }
+                    RuntimeContext.getAppContext().getBean(CardBlockService.class)
+                            .saveLastCardActivity(persistenceSession, card.getIdOfCard(), CardActivityType.ORDER);
                 }
                 // If client specified - load client from data model
                 Client client = null;
@@ -4273,6 +4281,12 @@ public class Processor implements SyncProcessor {
                         if (good != null) {
                             orderDetail.setGood(good);
                         }
+                    }
+                    if (purchase.getIdOfComplex() != null) {
+                        orderDetail.setIdOfComplex(purchase.getIdOfComplex());
+                    }
+                    if (purchase.getIdOfDish() != null) {
+                        orderDetail.setIdOfDish(purchase.getIdOfDish());
                     }
                     if (saveAllPreorderDetails || purchase.getGuidPreOrderDetail() != null) {
                         savePreorderGuidFromOrderDetail(persistenceSession, purchase.getGuidPreOrderDetail(),
@@ -4735,7 +4749,6 @@ public class Processor implements SyncProcessor {
             }
 
             String categoriesFromPacket = getCanonicalDiscounts(clientParamItem.getCategoriesDiscounts());
-            String categoriesFromClient = getCanonicalDiscounts(client.getCategoriesDiscounts());
 
             Set<CategoryDiscount> categoryDiscountSet = new HashSet<CategoryDiscount>();
             Set<CategoryDiscount> categoryDiscountOfClient = client.getCategories();
@@ -4754,8 +4767,7 @@ public class Processor implements SyncProcessor {
                     for (Object object : categoryDiscountCriteria.list()) {
                         categoryDiscountSet.add((CategoryDiscount) object);
                     }
-                    if (!categoriesFromPacket.equals(categoriesFromClient)) {
-                        client.setCategoriesDiscounts(categoriesFromPacket);
+                    if (!categoryDiscountSet.equals(categoryDiscountOfClient)) {
                         if (!categoriesFromPacket.equals("")) {
                             client.setCategories(categoryDiscountSet);
                         }
@@ -4763,8 +4775,7 @@ public class Processor implements SyncProcessor {
                 }
             } else {
                 /* Льгота по категориями то очищаем */
-                if (!categoriesFromClient.equals("")) {
-                    client.setCategoriesDiscounts("");
+                if (!client.getCategories().isEmpty()) {
                     client.setCategories(new HashSet<CategoryDiscount>());
                 }
             }
@@ -4773,10 +4784,8 @@ public class Processor implements SyncProcessor {
             if (!(newClientDiscountMode == oldClientDiscountMode) || !(categoryDiscountSet
                     .equals(categoryDiscountOfClient))) {
                 Org org = (Org) persistenceSession.get(Org.class, idOfOrg);
-                DiscountChangeHistory discountChangeHistory = new DiscountChangeHistory(client, org,
-                        newClientDiscountMode, oldClientDiscountMode, categoriesFromPacket, categoriesFromClient);
-                discountChangeHistory.setComment(DiscountChangeHistory.MODIFY_IN_ARM);
-                persistenceSession.save(discountChangeHistory);
+                DiscountManager.saveDiscountHistory(persistenceSession, client, org, categoryDiscountOfClient, categoryDiscountSet,
+                        oldClientDiscountMode, newClientDiscountMode, DiscountChangeHistory.MODIFY_IN_ARM);
                 client.setLastDiscountsUpdate(new Date());
             }
             client.setDiscountMode(clientParamItem.getDiscountMode());
@@ -6057,10 +6066,15 @@ public class Processor implements SyncProcessor {
                     enterEvent.setGuardianId(guardianId);
                     enterEvent.setChildPassChecker(e.getChildPassChecker());
                     enterEvent.setChildPassCheckerId(e.getChildPassCheckerId());
-                    //enterEvent.setIdOfClientGroup(e.getIdOfClientGroup());
                     enterEvent.setIdOfClientGroup(
                             clientFromEnterEvent == null ? null : clientFromEnterEvent.getIdOfClientGroup());
                     persistenceSession.save(enterEvent);
+
+                    Card card = DAOUtils.findCardByCardNoExtended(persistenceSession, e.getIdOfCard(), idOfClient, guardianId, e.getIdOfVisitor());
+                    if (card != null) {
+                        RuntimeContext.getAppContext().getBean(CardBlockService.class)
+                                .saveLastCardActivity(persistenceSession, card.getIdOfCard(), CardActivityType.ENTER_EVENT);
+                    }
 
                     if (RuntimeContext.RegistryType.isSpb() && ScudManager.serviceIsWork) {
                         DAOUtils.createEnterEventsSendInfo(enterEvent, persistenceSession);
@@ -6165,7 +6179,7 @@ public class Processor implements SyncProcessor {
                             e.getPassDirection() == EnterEvent.ENTRY || e.getPassDirection() == EnterEvent.EXIT
                                     || e.getPassDirection() == EnterEvent.RE_ENTRY
                                     || e.getPassDirection() == EnterEvent.RE_EXIT) && e.getIdOfCard() != null) {
-                        Card card = findCardByCardNo(persistenceSession, e.getIdOfCard());
+
                         final CompositeIdOfEnterEvent compositeIdOfEnterEvent = enterEvent.getCompositeIdOfEnterEvent();
                         if (card == null) {
                             final String message = "Не найдена карта по событию прохода: idOfOrg=%d, idOfEnterEvent=%d, idOfCard=%d";
@@ -6494,8 +6508,16 @@ public class Processor implements SyncProcessor {
         DateFormat df = DateFormat.getDateTimeInstance(DateFormat.FULL, DateFormat.FULL);
         String empTime = df.format(eventDate);
         String enterWithChecker = "0";
-        if (event.getIdOfClient() != null && event.getEventCode() == 112 && childPassChecker == null) {
-            enterWithChecker = "1"; //для определения на тип события отмечен ли вход охранником/воспитателем
+        if (event.getIdOfClient() != null) {
+            if (childPassChecker != null) {
+                enterWithChecker = "1";//16,17 событие
+            } else {
+                if (guardianId != null) {
+                    enterWithChecker = "2";//3,4 событие
+                } else {
+                    enterWithChecker = "3";//1,2 событие
+                }
+            }
         }
         return new String[]{
                 "balance", CurrencyStringUtils.copecksToRubles(client.getBalance()), "contractId",
@@ -7294,7 +7316,7 @@ public class Processor implements SyncProcessor {
         }
         //Если новая организация не совпадает ни со старой, ни с дружественными старой, то удаляем льготы
         if (isReplaceOrg(client, oldOrgs, newIdOfOrg)) {
-            ClientManager.deleteDiscount(client, session);
+            DiscountManager.deleteDiscount(client, session);
             return true;
         }
         return false;

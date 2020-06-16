@@ -36,6 +36,9 @@ public class Purchase {
     private final String manufacturer;
     private final String guidPreOrderDetail;
     private final Integer fRation;
+    private final Long idOfComplex;
+    private final Long idOfDish;
+
 
     public static Purchase build(Node purchaseNode, SyncRequest.MenuGroups menuGroups) throws Exception {
         NamedNodeMap namedNodeMap = purchaseNode.getAttributes();
@@ -98,13 +101,27 @@ public class Purchase {
         String guidPreOrderDetail = getStringValueNullSafe(namedNodeMap, "GuidPreOrderDetail");
         Integer fRation = getIntegerValueNullSafe(namedNodeMap, "FRation");
 
+        Long idOfComplex = null;
+        String idOfComplexStr = getStringValueNullSafe(namedNodeMap, "IdOfComplex");
+        if (idOfComplexStr != null) {
+            idOfComplex = Long.parseLong(idOfComplexStr);
+        }
+
+        Long idOfDish = null;
+        String idOfDishStr = getStringValueNullSafe(namedNodeMap, "IdOfDish");
+        if (idOfDishStr != null) {
+            idOfDish = Long.parseLong(idOfDishStr);
+        }
+
         return new Purchase(discount, socDiscount, idOfOrderDetail, name, qty, rPrice, rootMenu,
-                menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods, idOfRule, idOfMenu, manufacturer, guidPreOrderDetail, fRation);
+                menuOutput, type, menuGroup, menuOrigin, itemCode, guidOfGoods, idOfRule, idOfMenu, manufacturer,
+                guidPreOrderDetail, fRation, idOfComplex, idOfDish);
     }
 
     public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty,
             long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin,
-            String itemCode, String guidOfGoods, Long idOfRule, Long idOfMenu, String manufacturer, String guidPreOrderDetail, Integer fRation) {
+            String itemCode, String guidOfGoods, Long idOfRule, Long idOfMenu, String manufacturer,
+            String guidPreOrderDetail, Integer fRation) {
         this.discount = discount;
         this.socDiscount = socDiscount;
         this.idOfOrderDetail = idOfOrderDetail;
@@ -123,6 +140,34 @@ public class Purchase {
         this.manufacturer = manufacturer;
         this.guidPreOrderDetail = guidPreOrderDetail;
         this.fRation = fRation;
+        this.idOfComplex = null;
+        this.idOfDish = null;
+    }
+
+    public Purchase(long discount, long socDiscount, long idOfOrderDetail, String name, long qty,
+            long rPrice, String rootMenu, String menuOutput, int type, String menuGroup, int menuOrigin,
+            String itemCode, String guidOfGoods, Long idOfRule, Long idOfMenu, String manufacturer,
+            String guidPreOrderDetail, Integer fRation, Long idOfComplex, Long idOfDish) {
+        this.discount = discount;
+        this.socDiscount = socDiscount;
+        this.idOfOrderDetail = idOfOrderDetail;
+        this.name = name;
+        this.qty = qty;
+        this.rPrice = rPrice;
+        this.rootMenu = rootMenu;
+        this.menuOutput = menuOutput;
+        this.type = type;
+        this.menuGroup = menuGroup;
+        this.menuOrigin = menuOrigin;
+        this.itemCode = itemCode;
+        this.guidOfGoods = guidOfGoods;
+        this.idOfRule = idOfRule;
+        this.idOfMenu = idOfMenu;
+        this.manufacturer = manufacturer;
+        this.guidPreOrderDetail = guidPreOrderDetail;
+        this.fRation = fRation;
+        this.idOfComplex = idOfComplex;
+        this.idOfDish = idOfDish;
     }
 
     public Long getDiscount() {
@@ -187,6 +232,14 @@ public class Purchase {
 
     public String getManufacturer() {
         return manufacturer;
+    }
+
+    public Long getIdOfComplex() {
+        return idOfComplex;
+    }
+
+    public Long getIdOfDish() {
+        return idOfDish;
     }
 
     @Override

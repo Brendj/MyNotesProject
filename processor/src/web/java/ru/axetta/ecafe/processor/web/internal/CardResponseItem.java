@@ -40,4 +40,10 @@ public class CardResponseItem extends ResponseItem {
             super(message);
         }
     }
+
+    public static class CardAlreadyExistSecondRegisterAllowed extends Exception {
+        public CardAlreadyExistSecondRegisterAllowed(String message) {
+            super(message);
+        }
+    }
 }

@@ -1879,6 +1879,20 @@ public class DAOService {
         return 0L;
     }
 
+    public ComplexInfo getComplexInfo(Client client, Integer idOfComplex, Date date) {
+        Query query = entityManager.createQuery("select ci from ComplexInfo ci where ci.org.idOfOrg = :idOfOrg "
+                + "and ci.idOfComplex = :idOfComplex and ci.menuDate between :startDate and :endDate");
+        query.setParameter("idOfOrg", client.getOrg().getIdOfOrg());
+        query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("startDate", CalendarUtils.startOfDay(date));
+        query.setParameter("endDate", CalendarUtils.endOfDay(date));
+        try {
+            return (ComplexInfo)query.getSingleResult();
+        } catch (Exception e) {
+            logger.error(String.format("Cant find complexInfo idOfComplex=%s, date=%s, idOfClient=%s", idOfComplex, date.getTime(), client.getIdOfClient()), e);
+            return null;
+        }
+    }
     public long getNextIdOfOrder(Org org) {
         Session session = (Session) entityManager.getDelegate();
         org.hibernate.Query q = session.createSQLQuery("SELECT max(idoforder) FROM cf_orders WHERE idoforg=:idoforg");
@@ -2887,6 +2901,14 @@ public class DAOService {
         ClientDtisznDiscountInfo clientDtisznDiscountInfo = entityManager.find(ClientDtisznDiscountInfo.class, idofclientdtiszndiscountinfo);
         clientDtisznDiscountInfo.setSendnotification(sendnotification);
         session.update(clientDtisznDiscountInfo);
+    }
+	
+    public boolean setFlagSendedNotification(Long idofregularpreorder, Boolean valuec) {
+        Query q = entityManager
+                .createNativeQuery("update cf_regular_preorders set sendeddailynotification = :valuec where idofregularpreorder = :idofregularpreorder");
+        q.setParameter("valuec", valuec);
+        q.setParameter("idofregularpreorder", idofregularpreorder);
+        return q.executeUpdate() > 0;
     }
 
 }

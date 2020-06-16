@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ClientBalanceHoldFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.balance.hold.ResClientBalanceHoldData;
@@ -420,7 +421,7 @@ public class SyncResponse {
                 this.contractState = client.getContractState();
                 this.contractId = client.getContractId();
                 this.freePayMaxCount = client.getFreePayMaxCount();
-                this.categoriesDiscounts = client.getCategoriesDiscounts();
+                this.categoriesDiscounts = DiscountManager.getClientDiscountsAsString(client);
                 this.clientGroup=client.getClientGroup();
                 this.notifyViaEmail=client.isNotifyViaEmail();
                 this.notifyViaSMS=client.isNotifyViaSMS();
@@ -435,7 +436,7 @@ public class SyncResponse {
                 this.isUseLastEEModeForPlan = client.isUseLastEEModeForPlan()==null ? false : client.isUseLastEEModeForPlan();
                 this.gender = client.getGender();
                 this.birthDate = client.getBirthDate();
-                this.categoriesDiscountsDSZN = client.getCategoriesDiscountsDSZN();
+                this.categoriesDiscountsDSZN = DiscountManager.getClientDiscountsDSZNAsString(client);
                 this.lastDiscountsUpdate = client.getLastDiscountsUpdate();
                 this.disablePlanCreationDate = client.getDisablePlanCreationDate();
                 this.disablePlanEndDate = client.getDisablePlanEndDate();

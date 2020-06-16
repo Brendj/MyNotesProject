@@ -16,10 +16,7 @@ import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 public class OrgSettingDAOUtils {
     private static final Logger logger = LoggerFactory.getLogger(OrgSettingDAOUtils.class);
@@ -31,6 +28,20 @@ public class OrgSettingDAOUtils {
         criteria.add(Restrictions.gt("version", maxVersion));
         criteria.add(Restrictions.in("idOfOrg", friendlyOrgsIds));
         return criteria.list();
+    }
+
+    public static Integer getSettingItemByOrgAndType(Session session, Long idOfOrg, Integer settingtype)
+    {
+        try {
+            List<Long> idOfOrgs = new ArrayList<>();
+            idOfOrgs.add(idOfOrg);
+            Map<Long, Integer> result = getOrgSettingItemByOrgAndType(session, idOfOrgs, settingtype);
+            return result.get(idOfOrg);
+        }
+        catch (Exception e)
+        {
+            return 0;
+        }
     }
 
     public static Long getMaxVersionOfOrgSettingForFriendlyOrgGroup(Long idOfOrg, Session session) {
