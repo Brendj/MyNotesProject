@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
@@ -158,6 +159,31 @@ public class GroupManagementService implements IGroupManagementService {
                 return;
             }
         }
+    }
+
+    @Override
+    public ResponseClients getClientsList(List<Long> groupsList, long idOfOrg) throws Exception {
+        ResponseClients responseClients = new ResponseClients();
+        responseClients.setOrgId(idOfOrg);
+        for (Long idOfGroup : groupsList) {
+            FPGroup fpGroup = new FPGroup();
+            fpGroup.setGroupId(idOfGroup);
+            Query query = persistanceSession.createQuery("select c from Client c "
+                    + "join fetch c.clientGroup "
+                    + "join fetch c.person "
+                    + "left join fetch c.categoriesInternal "
+                    + "where c.org.idOfOrg = :idOfOrg and c.clientGroup.compositeIdOfClientGroup.idOfClientGroup = :idOfGroup order by c.contractId");
+            query.setParameter("idOfOrg", idOfOrg);
+            query.setParameter("idOfGroup", idOfGroup);
+            List<Client> list = query.list();
+            for (Client client : list) {
+                fpGroup.setGroupName(client.getClientGroup().getGroupName());
+                FPClient fpClient = new FPClient(client);
+                fpGroup.getClients().add(fpClient);
+            }
+            responseClients.getGroups().add(fpGroup);
+        }
+        return responseClients;
     }
 
     private Boolean isGroupNotPredefined(ClientGroup group){
