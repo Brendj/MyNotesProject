@@ -58,6 +58,11 @@
         <property name="eligibleToDelete" column="eligibleToDelete" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
                   not-null="true"/>
 
+        <property name="deletedState" column="deletedState" type="ru.axetta.ecafe.processor.core.persistence.BoolType"
+                  not-null="true"/>
+        <property name="deleteDate" column="deleteDate" type="ru.axetta.ecafe.processor.core.persistence.DateType"
+                  not-null="false" />
+
 
     </class>
 </hibernate-mapping>

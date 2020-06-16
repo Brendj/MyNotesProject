@@ -106,6 +106,14 @@
              </f:facet>
              <h:selectBooleanCheckbox value="#{item.eligibleToDelete}" styleClass="output-text" disabled="true"/>
          </rich:column>
+        <rich:column headerClass="center-aligned-column" style="text-align:left">
+            <f:facet name="header">
+                <h:panelGroup>
+                    <h:outputText styleClass="output-text" escape="true" value="В архиве" />
+                </h:panelGroup>
+            </f:facet>
+            <h:outputText styleClass="output-text" value="#{item.deleted}" />
+        </rich:column>
          <rich:column headerClass="column-header" rendered="#{mainPage.eligibleToEditCategory}"
                       style="text-align:center">
              <f:facet name="header">

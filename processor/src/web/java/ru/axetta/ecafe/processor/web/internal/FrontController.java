@@ -30,6 +30,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.VersionUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
+import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -1989,6 +1990,38 @@ public class FrontController extends HttpServlet {
         return CalendarUtils.dateTimeToString(new Date());
     }
 
+    @WebMethod(operationName = "getBalancesForPayPlan")
+    public PayPlanBalanceListResponse getBalancesForPayPlan(@WebParam(name = "orgId") Long orgId,
+            @WebParam(name = "balanceList") PayPlanBalanceList payPlanBalanceList)
+            throws FrontControllerException {
+        checkRequestValidity(orgId);
+        PayPlanBalanceListResponse result = new PayPlanBalanceListResponse();
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+            for (PayPlanBalanceItem item : payPlanBalanceList.getItems()) {
+                PayPlanBalanceItem resultItem = new PayPlanBalanceItem(item.getIdOfClient());
+                Client client = DAOReadonlyService.getInstance().findClientById(item.getIdOfClient());
+                if (client == null) throw new Exception("Client not found in getBalancesForPayPlan. IdOfClient = " + item.getIdOfClient());
+                long preorderSum = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getNotPaidPreordersSum(client, CalendarUtils.startOfDay(new Date()));
+                long resultSum = client.getBalance() - item.getSumma() - preorderSum;
+                resultItem.setSumma(resultSum);
+                result.addItem(resultItem);
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Error in getBalancesForPayPlan", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
 
     @WebMethod(operationName = "unblockOrReturnCard")
     public ResponseItem unblockOrReturnCard(@WebParam(name = "cardNo") Long cardNo,

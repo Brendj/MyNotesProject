@@ -9,7 +9,6 @@ import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
-import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -204,10 +203,8 @@ public class ExternalEventNotificationService {
 
     public boolean ClientHaveDiscount(Session session, Client client) {
         List<Long> categoriesDiscountsIds = new LinkedList<Long>();
-        for (String cd : client.getCategoriesDiscounts().split(",")) {
-            if (StringUtils.isNotEmpty(cd)) {
-                categoriesDiscountsIds.add(Long.valueOf(cd));
-            }
+        for (CategoryDiscount cd : client.getCategories()) {
+            categoriesDiscountsIds.add(cd.getIdOfCategoryDiscount());
         }
 
         List<CategoryDiscount> clientDiscountsList = Collections.emptyList();

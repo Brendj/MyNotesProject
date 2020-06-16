@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.persistence.service.clients;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.dao.clients.ClientMigrationHistoryRepository;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
@@ -58,6 +59,7 @@ public class ClientMigrationHistoryService {
 
         if (isOn(NODE_DISCOUNT_CHANGE_ORG)) {
             discountChange(list);
+            deleteDOUDiscounts(list);
         }
 
         if (isOn(NODE_PLAN_ORDERS_RESTRICTIONS_CHANGE_ORG)) {
@@ -99,6 +101,33 @@ public class ClientMigrationHistoryService {
         }
     }
 
+    private void deleteDOUDiscounts(List<ClientMigration> list) {
+        Session session = null;
+        Transaction transaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            transaction = session.beginTransaction();
+            for (ClientMigration clientMigration : list) {
+                if (!(clientMigration.getOldOrg().getType().equals(OrganizationType.KINDERGARTEN) && clientMigration.getOrg().getType().equals(OrganizationType.SCHOOL))) {
+                    continue;
+                }
+                try {
+                    Client client = DAOUtils.findClient(session, clientMigration.getClient().getIdOfClient());
+                    DiscountManager.deleteDOUDiscounts(session, client);
+                } catch (Exception e) {
+                    logger.error("Can not delete DOU discounts for client id = " + clientMigration.getClient().getIdOfClient(), e);
+                }
+            }
+            transaction.commit();
+            transaction = null;
+        } catch (Exception e) {
+            logger.error("Error in deleteDOUDiscounts", e);
+        } finally {
+            HibernateUtils.rollback(transaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+    }
+
     private void discountChange(List<ClientMigration> list) {
         for (ClientMigration clientMigration : list) {
             if (clientMigration.getOldOrg() == null) {
@@ -118,8 +147,8 @@ public class ClientMigrationHistoryService {
                     }
                 }
                 Client client = DAOUtils.findClient(session, clientMigration.getClient().getIdOfClient());
-                if (ClientManager.atLeastOneDiscountEligibleToDelete(client)) {
-                    ClientManager.deleteDiscount(client, session);
+                if (DiscountManager.atLeastOneDiscountEligibleToDelete(client)) {
+                    DiscountManager.deleteDiscount(client, session);
                 }
                 ClientManager.archiveApplicationForFoodWithoutDiscount(client, session);
 

@@ -8,6 +8,7 @@ import generated.nsiws_delta.*;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.Client;
 import ru.axetta.ecafe.processor.core.persistence.ClientGroup;
 import ru.axetta.ecafe.processor.core.persistence.Org;
@@ -306,7 +307,8 @@ public class NSIDeltaProcessor {
         fieldConfig.setValue(ClientManager.FieldId.GROUP, solveField(item.getGroup(), cl != null && cl.getClientGroup() != null ? cl.getClientGroup().getGroupName() : ""));
         fieldConfig.setValue(ClientManager.FieldId.GENDER, solveField(item.getGender(), cl != null && cl.getGender() != null ? getGenderFromInteger(cl.getGender()) : ""));
         fieldConfig.setValue(ClientManager.FieldId.BIRTH_DATE, solveField(item.getBirthDate(), cl != null && cl.getBirthDate() != null ? getBirthDateFromDate(cl.getBirthDate()) : ""));
-        fieldConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, solveField(item.getBenefitDSZN(), cl != null ? cl.getCategoriesDiscountsDSZN() : ""));
+        fieldConfig.setValue(ClientManager.FieldId.BENEFIT_DSZN, solveField(item.getBenefitDSZN(), cl != null ? DiscountManager
+                .getClientDiscountsDSZNAsString(cl) : ""));
         fieldConfig.setValue(ClientManager.FieldId.AGE_TYPE_GROUP, solveField(item.getAgeTypeGroup(), cl != null ? cl.getAgeTypeGroup() : ""));
         fieldConfig.setValue(ClientManager.FieldId.GUARDIANS_COUNT, solveField(new Integer(item.getGuardians().size()).toString(), cl != null ? cl.getGuardiansCount() : ""));
         if (item.getGuardians() != null && item.getGuardians().size() > 0 ) {

@@ -1118,6 +1118,10 @@ public class PreorderDAOService {
                             regularPreorder.getMobile(), regularPreorder.getMobileGroupOnCreate());
                     preorderMenuDetail.setRegularPreorder(regularPreorder);
                     em.persist(preorderMenuDetail);
+                } else if (preorderMenuDetail != null) {
+                    preorderMenuDetail.setAmount(regularPreorder.getAmount());
+                    preorderMenuDetail.setRegularPreorder(regularPreorder);
+                    em.merge(preorderMenuDetail);
                 }
             }
             Set<PreorderMenuDetail> set = createPreorderMenuDetails(menuDetails, regularPreorder.getClient(),
@@ -1186,11 +1190,14 @@ public class PreorderDAOService {
     }
 
     private void testAndDeleteRegularPreorder(RegularPreorder regularPreorder) {
-        Query query = em.createQuery("select pc.idOfPreorderComplex from PreorderComplex pc "
-                + "where pc.regularPreorder = :regularPreorder and pc.preorderDate > :date and pc.deletedState = false and pc.idOfGoodsRequestPosition is null");
+        Query query = em.createQuery("select pc.idOfPreorderComplex from PreorderComplex pc join pc.preorderMenuDetails pmd "
+                + "where (pc.regularPreorder = :regularPreorder or pmd.regularPreorder = :regularPreorder) "
+                + "and pc.preorderDate > :date and pc.deletedState = false and pc.idOfGoodsRequestPosition is null "
+                + "and pmd.deletedState = false");
         query.setParameter("regularPreorder", regularPreorder);
         query.setParameter("date", new Date());
         if (query.getResultList().size() == 0) {
+            regularPreorder.setState(RegularPreorderState.CHANGE_BY_SERVICE);
             regularPreorder.setDeletedState(true);
             regularPreorder.setLastUpdate(new Date());
             em.merge(regularPreorder);
@@ -1498,18 +1505,34 @@ public class PreorderDAOService {
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
         List<PreorderComplex> list = query.getResultList();
-        Long sum = 0L;
+        return getPreorderSumFromList(list);
+    }
+
+    private long getPreorderSumFromList(List<PreorderComplex> list) {
+        long sum = 0L;
         Set<Long> set = new HashSet<Long>();
         for (PreorderComplex complex : list) {
             if (!set.contains(complex.getIdOfPreorderComplex())) {
                 sum += complex.getComplexPrice() * complex.getAmount() - complex.getUsedSum();
                 set.add(complex.getIdOfPreorderComplex());
                 for (PreorderMenuDetail pmd : complex.getPreorderMenuDetails()) {
-                    sum += pmd.getMenuDetailPrice() * pmd.getAmount();
+                    sum += (pmd.getMenuDetailPrice() * pmd.getAmount()) - pmd.getUsedSum();
                 }
             }
         }
-        return sum; // client.getBalance() - sum;
+        return sum;
+    }
+
+    @Transactional
+    public long getNotPaidPreordersSum(Client client, Date dateFrom) {
+        Query query = emReport.createQuery("select pc from PreorderComplex pc join fetch pc.preorderMenuDetails pmd "
+                + "where pc.client.idOfClient = :idOfClient and pc.preorderDate >= :startDate "
+                + "and pc.deletedState = false and pmd.deletedState = false and (pc.idOfGoodsRequestPosition is not null "
+                + "or pmd.idOfGoodsRequestPosition is not null) ");
+        query.setParameter("idOfClient", client.getIdOfClient());
+        query.setParameter("startDate", dateFrom);
+        List<PreorderComplex> list = query.getResultList();
+        return getPreorderSumFromList(list);
     }
 
     @Transactional(propagation = Propagation.REQUIRED)

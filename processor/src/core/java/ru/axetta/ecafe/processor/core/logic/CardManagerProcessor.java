@@ -39,6 +39,7 @@ public class CardManagerProcessor implements CardManager {
     private static final Logger logger = LoggerFactory.getLogger(Processor.class);
     private final SessionFactory persistenceSessionFactory;
     private final EventNotificator eventNotificator;
+    private static final Integer SMARTWATCH_CARD_SIGN_CERT_NUM = 16;
     public static Long getPriceOfMifare() {
         return Long.parseLong(RuntimeContext.getInstance().getConfigProperties().getProperty("ecafe.processor.card.priceOfMifare"));
     }
@@ -675,6 +676,7 @@ public class CardManagerProcessor implements CardManager {
         card.setOrg(client.getOrg());
         card.setCreateTime(new Date());
         card.setTransitionState(CardTransitionState.OWN.getCode());
+        card.setCardSignCertNum(SMARTWATCH_CARD_SIGN_CERT_NUM);
         session.save(card);
 
         HistoryCard historyCard = new HistoryCard();
