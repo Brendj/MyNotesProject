@@ -23,7 +23,7 @@
         </property>
 
         <property name="code">
-            <column name="code" sql-type="integer"/>
+            <column name="code" sql-type="varchar(32)" length="32"/>
         </property>
 
         <property name="price">
