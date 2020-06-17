@@ -107,7 +107,7 @@ public class PreorderMenuItemExt {
         this.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
         this.setAvailableNow(1); // включение блюда в меню
         this.setIdOfMenuDetail(wtDish.getIdOfDish());
-        this.setItemCode(wtDish.getCode().toString());
+        this.setItemCode(wtDish.getCode());
     }
 
     public String getGroup() {

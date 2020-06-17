@@ -1145,7 +1145,7 @@ public class PreorderDAOService {
                 menuDetailName = wtDish.getDishName();
                 menuDetailPrice = wtDish.getPrice() == null ? 0L :
                         wtDish.getPrice().multiply(new BigDecimal(100)).longValue();
-                itemCode = wtDish.getCode().toString();
+                itemCode = wtDish.getCode();
                 query.setParameter("itemCode", itemCode);
             }
         }
@@ -2213,7 +2213,7 @@ public class PreorderDAOService {
         preorderMenuDetail.setMenuDetailName(wtDish.getDishName());
         preorderMenuDetail.setMenuDetailPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
         preorderMenuDetail.setGroupName(getMenuGroupByWtDish(wtDish));
-        preorderMenuDetail.setItemCode(wtDish.getCode().toString());
+        preorderMenuDetail.setItemCode(wtDish.getCode());
         preorderMenuDetail.setAvailableNow(0);
         preorderMenuDetail.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
         preorderMenuDetail.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 :
