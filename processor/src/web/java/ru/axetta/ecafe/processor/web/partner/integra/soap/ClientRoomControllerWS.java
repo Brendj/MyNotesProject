@@ -66,6 +66,7 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsS
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryList;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.XMLTypes.EnterCulture;
+import ru.axetta.ecafe.processor.web.partner.integra.soap.XMLTypes.Guardian;
 import ru.axetta.ecafe.processor.web.partner.preorder.MenuDetailNotExistsException;
 import ru.axetta.ecafe.processor.web.partner.preorder.NotEditedDayException;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
@@ -8033,22 +8034,13 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result addGuardian(@WebParam(name = "firstName") String firstName,
-            @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
-            @WebParam(name = "mobile") String mobile, @WebParam(name = "gender") Integer gender,
-            @WebParam(name = "childContractId") Long childContractId,
-            @WebParam(name = "creatorMobile") String creatorMobile,
-            @WebParam(name = "passportNumber") String passportNumber,
-            @WebParam(name = "passportSeries") String passportSeries,
-            @WebParam(name = "typeCard") Integer typeCard,
-            @WebParam(name = "roleRepresentative") Integer roleRepresentative,
-            @WebParam(name = "degree") Integer relation) {
-
+    public Result addGuardian(@WebParam(name = "guardian") Guardian guardian)
+    {
         authenticateRequest(null);
 
-        String mobilePhone = Client.checkAndConvertMobile(mobile);
-        if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(surname) || StringUtils.isEmpty(mobilePhone)
-                || childContractId == null) {
+        String mobilePhone = Client.checkAndConvertMobile(guardian.getMobile());
+        if (StringUtils.isEmpty(guardian.getFirstName()) || StringUtils.isEmpty(guardian.getSurname()) || StringUtils.isEmpty(mobilePhone)
+                || guardian.getChildContractId() == null) {
             return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
         }
         if (StringUtils.isEmpty(mobilePhone)) {
@@ -8063,21 +8055,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             transaction = session.beginTransaction();
 
             String dateString = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
-            String remark = String.format(COMMENT_MPGU_CREATE, dateString, creatorMobile);
-            Client client = findClient(session, childContractId, null, result);
+            String remark = String.format(COMMENT_MPGU_CREATE, dateString, guardian.getCreatorMobile());
+            Client client = findClient(session, guardian.getChildContractId(), null, result);
             if (client == null) {
                 return new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
 
             Org org = client.getOrg();
             int count = 0;
-            Client guardian = null;
-            if (secondName == null) {
-                secondName = "";
+            Client guardian1 = null;
+            if (guardian.getSurname() == null) {
+                guardian.setSurname("");
             }
             //List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
             List<Client> exClients = DAOUtils
-                    .findClientsByFIO(session, org.getFriendlyOrg(), firstName, surname, secondName, mobilePhone);
+                    .findClientsByFIO(session, org.getFriendlyOrg(), guardian.getFirstName(), guardian.getSurname(), guardian.getSecondName(), mobilePhone);
             for (Client cl : exClients) {
                 if (cl.getClientGroup() == null || cl.getClientGroup().getCompositeIdOfClientGroup()
                         .getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()) || cl
@@ -8089,36 +8081,39 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     return new Result(RC_INVALID_DATA, "Клиент уже зарегистрирован");
                 }*/
                 count++;
-                guardian = cl;
+                guardian1 = cl;
             }
             if (count > 1) {
                 return new Result(RC_SEVERAL_CLIENTS_WERE_FOUND, RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
             }
-            if (guardian == null) {
+            if (guardian1 == null) {
+                Integer gender = guardian.getGender();
                 if (gender != null && gender.equals(2)) {
                     gender = 0;
                 } else {
                     gender = 1;
                 }
-                guardian = ClientManager
-                        .createGuardianTransactionFree(session, firstName, secondName, surname, mobile, remark, gender,
-                                org, ClientCreatedFromType.MPGU, creatorMobile, null, passportNumber, passportSeries,
+                guardian1 = ClientManager
+                        .createGuardianTransactionFree(session, guardian.getFirstName(), guardian.getSecondName(),
+                                guardian.getSurname(), guardian.getMobile(), remark, gender,
+                                org, ClientCreatedFromType.MPGU, guardian.getCreatorMobile(), null,
+                                guardian.getPassportNumber(), guardian.getPassportSeries(),
                                 null, null);
             } else {
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
-                guardian.setClientRegistryVersion(clientRegistryVersion);
-                guardian.setCreatedFromDesc(creatorMobile);
-                guardian.setPassportNumber(passportNumber);
-                guardian.setPassportSeries(passportSeries);
-                session.update(guardian);
+                guardian1.setClientRegistryVersion(clientRegistryVersion);
+                guardian1.setCreatedFromDesc(guardian.getCreatorMobile());
+                guardian1.setPassportNumber(guardian.getPassportNumber());
+                guardian1.setPassportSeries(guardian.getPassportSeries());
+                session.update(guardian1);
             }
 
             ClientGuardian clientGuardian = DAOUtils
-                    .findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
+                    .findClientGuardian(session, client.getIdOfClient(), guardian1.getIdOfClient());
             if (clientGuardian == null) {
                 clientGuardian = ClientManager
-                        .createClientGuardianInfoTransactionFree(session, guardian, ClientGuardianRelationType.fromInteger(relation).getDescription(), false, client.getIdOfClient(),
-                                ClientCreatedFromType.MPGU, roleRepresentative);
+                        .createClientGuardianInfoTransactionFree(session, guardian1, ClientGuardianRelationType.fromInteger(guardian.getRelation().intValue()).getDescription(), false, client.getIdOfClient(),
+                                ClientCreatedFromType.MPGU, guardian.getRoleRepresentative());
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
                 clientGuardian.restore(newGuardiansVersions);
@@ -8126,7 +8121,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 session.update(clientGuardian);
             }
             session.flush();
-            result = addCardRequest(session, typeCard, passportNumber, passportSeries, guardian, creatorMobile,
+            result = addCardRequest(session, guardian.getTypeCard(), guardian.getPassportNumber(),
+                    guardian.getPassportSeries(), guardian1, guardian.getCreatorMobile(),
                     clientGuardian);
 
             transaction.commit();

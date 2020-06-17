@@ -10,6 +10,7 @@ import ru.axetta.ecafe.processor.core.client.RequestWebParam;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.*;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResult;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
+import ru.axetta.ecafe.processor.web.partner.integra.soap.XMLTypes.Guardian;
 import ru.axetta.ecafe.processor.web.partner.integra.soap.XMLTypes.EnterCulture;
 import ru.axetta.ecafe.processor.web.partner.preorder.soap.*;
 
@@ -500,14 +501,8 @@ public interface ClientRoomController {
 
     @WebMethod ClientContractIdResult getContractIdByGUID(@WebParam(name = "GUID") String guid);
 
-    @WebMethod Result addGuardian(@WebParam(name = "firstName") String firstName,
-            @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
-            @WebParam(name = "mobile") String mobile, @WebParam(name = "gender") Integer gender,
-            @WebParam(name = "childContractId") Long childContractId, @WebParam(name = "creatorMobile") String creatorMobile,
-            @WebParam(name = "passportNumber") String passportNumber, @WebParam(name = "passportSeries") String passportSeries,
-            @WebParam(name = "typeCard") Integer typeCard,
-            @WebParam(name = "roleRepresentative") Integer roleRepresentative,
-            @WebParam(name = "degree") Integer relation);
+    @WebMethod(operationName = "addGuardian")
+    Result addGuardian(@WebParam(name = "guardian") Guardian guardian);
 
     /*@WebMethod Result changeGuardian(@WebParam(name = "contractId") Long contractId, @WebParam(name = "firstName") String firstName,
             @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
