@@ -835,16 +835,15 @@ public class DTSZNDiscountsReviseService {
             session.setFlushMode(FlushMode.MANUAL);
             transaction = session.beginTransaction();
 
+            Long otherDiscountCode = DAOUtils.getOtherDiscountCode(session);
             List<Long> clientList;
             if (null == startDate) {
                 clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfo(session);
             } else {
-                clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(session, startDate);
+                clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(session, startDate, otherDiscountCode);
             }
 
             Integer clientCounter = 1;
-
-            Long otherDiscountCode = DAOUtils.getOtherDiscountCode(session);
 
             for (Long idOfClient : clientList) {
                 if (null == transaction || !transaction.isActive()) {

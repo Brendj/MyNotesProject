@@ -4634,15 +4634,16 @@ public class DAOUtils {
         return (GroupNamesToOrgs) criteria.uniqueResult();
     }
 
-    public static List<Long> getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(Session session, Date date) {
+    public static List<Long> getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(Session session, Date date, Long otherDiscountCode) {
         List<Long> clientGroupList = new LinkedList<Long>();
         clientGroupList.add(ClientGroup.Predefined.CLIENT_LEAVING.getValue());
         clientGroupList.add(ClientGroup.Predefined.CLIENT_DELETED.getValue());
         clientGroupList.add(ClientGroup.Predefined.CLIENT_OTHER_ORG.getValue());
         Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo "
-                + "where lastUpdate >= :date and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
+                + "where (lastUpdate >= :date or (dtisznCode = :otherDiscountCode and dateEnd > :date)) and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
         query.setParameter("date", date);
         query.setParameterList("clientGroups", clientGroupList);
+        query.setParameter("otherDiscountCode", otherDiscountCode);
         return query.list();
     }
 
