@@ -101,3 +101,5 @@ comment on column cf_mh_persons.guidnsi is 'GUID в НСИ-1';
 -- Правки от веб арма ПП
 alter table cf_wt_dishes drop constraint cf_wt_dishes_code_contragent;
 alter table cf_wt_dishes alter column code set data type varchar (32);
+
+--! ФИНАЛИЗИРОВАН 18.06.2020, НЕ МЕНЯТЬ
