@@ -2660,14 +2660,6 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             List<ComplexInfo> complexInfoList = criteria.list();
             PreorderDAOService preorderDAOService = RuntimeContext.getAppContext().getBean(PreorderDAOService.class);
 
-            //Получаем категории льгот для клиента
-            List<CategoryDiscount> clientDiscountsList = Collections.emptyList();
-            if (client.getCategories().size() != 0) {
-                Criteria clientDiscountsCriteria = session.createCriteria(CategoryDiscount.class);
-                clientDiscountsCriteria.add(Restrictions.in("idOfCategoryDiscount", client.getCategories()));
-                clientDiscountsList = clientDiscountsCriteria.list();
-            }
-
             List<MenuWithComplexesExt> list = new ArrayList<MenuWithComplexesExt>();
             Map<Date, Boolean> mapDatesForComplex = new HashMap<>();
 
@@ -2692,7 +2684,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     PreorderComplexItemExt complexItemExt = new PreorderComplexItemExt(ci.getIdOfComplex(), ci.getComplexName(), ci.getCurrentPrice(), ci.getModeOfAdd(), ci.getModeFree(), ci.getModeVisible());
                     PreorderGoodParamsContainer complexParams = preorderDAOService.getComplexParams(complexItemExt, client, ci.getMenuDate());
 
-                    if (!preorderDAOService.isAcceptableComplex(complexItemExt, client.getClientGroup(), client.hasDiscount(), complexParams, client.getAgeTypeGroup(), clientDiscountsList))
+                    if (!preorderDAOService.isAcceptableComplex(complexItemExt, client.getClientGroup(), client.hasDiscount(),
+                            complexParams, client.getAgeTypeGroup(), new ArrayList(client.getCategories())))
                         continue;
                 } else {
                     //для предопределенных не включаем комплексы с какой-либо категорией
