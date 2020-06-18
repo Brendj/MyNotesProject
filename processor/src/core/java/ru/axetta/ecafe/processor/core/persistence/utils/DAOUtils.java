@@ -3629,6 +3629,17 @@ public class DAOUtils {
         return query.list();
     }
 
+    public static List<PreorderComplex> getPreorderComplexForOrgNewBase(Session session, long orgOwner) throws Exception {
+        Date startDate = CalendarUtils.getFirstDayOfMonth(new Date());
+        startDate = CalendarUtils.addMonth(startDate, -1);
+        Query query = session.createQuery("select pc from PreorderComplex pc "
+                + "where (pc.idOfOrgOnCreate = :idOfOrg or (pc.idOfOrgOnCreate is null and pc.client.org.idOfOrg = :idOfOrg)) "
+                + "and pc.preorderDate > :date and pc.usedAmount = 0 and pc.deletedState = false");
+        query.setParameter("idOfOrg", orgOwner);
+        query.setParameter("date", startDate);
+        return query.list();
+    }
+
     public static List<PreorderMenuDetail> getPreorderMenuDetailByPreorderComplex(Session session,
             PreorderComplex complex) throws Exception {
         Criteria criteria = session.createCriteria(PreorderMenuDetail.class);
