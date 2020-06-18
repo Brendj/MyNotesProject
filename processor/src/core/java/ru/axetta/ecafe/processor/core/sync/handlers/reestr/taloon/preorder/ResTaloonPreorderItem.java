@@ -134,7 +134,7 @@ public class ResTaloonPreorderItem {
             XMLUtils.setAttributeIfNotNull(element,"GoodsName",this.goodsName);
             XMLUtils.setAttributeIfNotNull(element,"GoodsGuid",this.goodsGuid == null ? "" : this.goodsGuid);
             if (idOfDish != null) {
-                XMLUtils.setAttributeIfNotNull(element, "DishId", complexId);
+                XMLUtils.setAttributeIfNotNull(element, "DishId", idOfDish);
             }
             XMLUtils.setAttributeIfNotNull(element, "ByWebSupplier", byWebSupplier);
             if(isppState != null) XMLUtils.setAttributeIfNotNull(element, "ISPP_State", isppState.ordinal());
