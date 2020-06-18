@@ -628,6 +628,18 @@ public class OtherActionsPage extends OnlineReportPage {
         }
     }
 
+    public void preordersCheck() throws Exception {
+        try {
+            RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).dailyCheckPreorders();
+            printMessage("Расчет количественных показателей по предзаказам завершен");
+        } catch (Exception e) {
+            getLogger().error("Error create preordersCheck: ", e);
+            printError(
+                    "Во время расчета количественных показателей по предзаказам произошла ошибка с текстом "
+                            + e.getMessage());
+        }
+    }
+
     public void sendToAtol() {
         RuntimeContext.getAppContext().getBean(PaymentAdditionalTasksProcessor.class).runNotifications();
     }
@@ -653,7 +665,7 @@ public class OtherActionsPage extends OnlineReportPage {
             printError("Не указаны организация или клиент для выборочной генерации заявок");
             return;
         }
-        RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).runTask(params);
+        RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class).runTask(params, "1", "1");
         printMessage("Операция по созданию заявок выполнена");
     }
 
