@@ -31,6 +31,9 @@ ALTER TABLE cf_orderdetails
     ADD COLUMN idofcomplex bigint,
     ADD COLUMN idofdish bigint;
 
+COMMENT ON COLUMN cf_orderdetails.idofcomplex IS 'Идентификатор комплекса от веб-поставщика';
+COMMENT ON COLUMN cf_orderdetails.idofdish IS 'Идентификатор блюда от веб-поставщика';
+
 --Таблица ежедневных проверок по предзаказам
 CREATE TABLE cf_preorder_check (
     idOfPreorderCheck bigserial NOT NULL primary key,
