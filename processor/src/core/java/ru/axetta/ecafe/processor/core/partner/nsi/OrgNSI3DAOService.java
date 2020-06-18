@@ -39,12 +39,12 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
         entityManager.setFlushMode(FlushModeType.COMMIT);
         Query query = entityManager.createNativeQuery("select distinct "
                 + "'' as building_guid, "                                                                  //0
-                + "concat_ws(' / ', addr.area, addr.district, addr.address_asur) as FullAddress, "     //1
-                + "org.full_name as FullName, "                            //2
-                + "org.short_name as ShortName, "                     //3
+                + "trim(concat_ws(' / ', addr.area, addr.district, addr.address_asur)) as FullAddress, "     //1
+                + "trim(org.full_name) as FullName, "                            //2
+                + "trim(org.short_name) as ShortName, "                     //3
                 + "cast(org.inn as varchar) as Inn, "                                  //4
                 + "org.ogrn as Ogrn, "                                //5
-                + "org.director as Person, "                         //6
+                + "trim(from org.director) as Person, "                         //6
                 + "'' as ExternalUid, "                     //7
                 + "'' as EkisGuid, "                       //8
                 + "org.eo_id as EkisIds, "                          //9
@@ -54,12 +54,12 @@ public class OrgNSI3DAOService extends OrgSymmetricDAOService {
                 + "addr.unad as UNAD, "                               //13
                 + "'' as pp_status, "                                  //14
                 + "addr.unique_address_id as ekis_address_id, "                            //15
-                + "addr.area, "                                  //16
-                + "org.egisso_id, "                              //17
-                + "addr.address_asur, "                          //18
-                + "addr.district, "                               //19
-                + "org.founder, "                                 //20
-                + "org.subordination_value "                      //21
+                + "trim(addr.area) as area, "                                  //16
+                + "trim(org.egisso_id) as egisso_id, "                              //17
+                + "trim(addr.address_asur) as address_asur, "                          //18
+                + "trim(addr.district) as district, "                               //19
+                + "trim(org.founder) as founder, "                                 //20
+                + "trim(org.subordination_value) as subordination "                      //21
                 + "FROM "
                 + "cf_kf_organization_registry org "
                 + "INNER JOIN cf_kf_eo_address addr ON addr.global_object_id = org.global_id "
