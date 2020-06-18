@@ -37,6 +37,8 @@ public class PreorderMenuDetail {
     private Long usedAmount;
     private String mobile;
     private PreorderMobileGroupOnCreateType mobileGroupOnCreate;
+    private Long idOfDish;
+
 
     public PreorderMenuDetail() {
         this.usedSum = 0L;
@@ -288,5 +290,13 @@ public class PreorderMenuDetail {
 
     public void setMobileGroupOnCreate(PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
         this.mobileGroupOnCreate = mobileGroupOnCreate;
+    }
+
+    public Long getIdOfDish() {
+        return idOfDish;
+    }
+
+    public void setIdOfDish(Long idOfDish) {
+        this.idOfDish = idOfDish;
     }
 }

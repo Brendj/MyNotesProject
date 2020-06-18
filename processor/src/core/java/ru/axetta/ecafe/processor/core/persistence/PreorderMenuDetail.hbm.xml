@@ -47,5 +47,6 @@
                 <param name="enumClass">ru.axetta.ecafe.processor.core.persistence.PreorderMobileGroupOnCreateType</param>
             </type>
         </property>
+        <property name="idOfDish" column="idOfDish" type="long"/>
     </class>
 </hibernate-mapping>

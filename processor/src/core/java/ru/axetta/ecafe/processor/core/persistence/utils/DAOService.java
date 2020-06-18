@@ -2927,4 +2927,16 @@ public class DAOService {
         q.setParameter("idOfUser", idOfUser);
         return q.getResultList();
     }
+
+    public WtComplex getWtComplexById(Long idOfComplex) {
+        Query query = entityManager.createQuery("select complex from WtComplex complex "
+                + "where complex.idOfComplex = :idOfComplex");
+        query.setParameter("idOfComplex", idOfComplex);
+        try {
+            return (WtComplex) query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

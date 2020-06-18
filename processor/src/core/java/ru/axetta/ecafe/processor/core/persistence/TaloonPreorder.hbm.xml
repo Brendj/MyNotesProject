@@ -53,6 +53,8 @@
         <property name="remarks" column="Remarks" type="string" length="1024"/>
         <property name="comments" column="comments" type="string" length="128"/>
         <property name="guid" type="string" column="guid" />
+        <property name="idOfDish" column="idOfDish" type="long"/>
+        <property name="byWebSupplier" column="byWebSupplier" type="boolean" not-null="true"/>
 
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
                      insert="false" update="false"/>
