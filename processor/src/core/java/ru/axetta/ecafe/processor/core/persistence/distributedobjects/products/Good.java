@@ -121,7 +121,7 @@ public class Good extends ConfigurationProviderDistributedObject {
             throw new DistributedObjectException("GoodGroup NOT_FOUND_VALUE");
         }
         //Если конфигурация у провайдера поменялась, то меняем и группы. Чтобы группа соответствовала товару
-        if (gg.getIdOfConfigurationProvider().equals(getIdOfConfigurationProvider()))
+        if (gg.getIdOfConfigurationProvider() == null || !gg.getIdOfConfigurationProvider().equals(getIdOfConfigurationProvider()))
         {
             gg.setIdOfConfigurationProvider(getIdOfConfigurationProvider());
             session.update(gg);
