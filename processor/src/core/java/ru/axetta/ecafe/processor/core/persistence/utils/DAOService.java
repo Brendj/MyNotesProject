@@ -2911,4 +2911,11 @@ public class DAOService {
         return q.executeUpdate() > 0;
     }
 
+    public List<Contragent> contragentsListByUser(Long idOfUser) {
+        Query q = entityManager.createQuery("select c from User u inner join u.contragents c"
+                + " where u.idOfUser = :idOfUser order by c.contragentName");
+
+        q.setParameter("idOfUser", idOfUser);
+        return q.getResultList();
+    }
 }

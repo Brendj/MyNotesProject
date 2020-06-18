@@ -1849,6 +1849,7 @@ public class MainPage implements Serializable {
                 runtimeContext = RuntimeContext.getInstance();
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
+                orgSelectPage.updateOrgTypesItems();
                 orgSelectPage.fill(idOfContragent, idOfContract, persistenceSession, idOfContragentOrgList);
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -1898,9 +1899,9 @@ public class MainPage implements Serializable {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setFilter("");
-                orgListSelectPage.setTagFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
+                orgListSelectPage.updateOrgTypesItems();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
@@ -1941,9 +1942,9 @@ public class MainPage implements Serializable {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setFilter("");
-                orgListSelectPage.setTagFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
+                orgListSelectPage.updateOrgTypesItems();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
@@ -1980,9 +1981,9 @@ public class MainPage implements Serializable {
                 persistenceSession = runtimeContext.createPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setFilter("");
-                orgListSelectPage.setTagFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
+                orgListSelectPage.updateOrgTypesItems();
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {
                     orgListSelectPage.fill(persistenceSession, false, idOfContragentOrgList, idOfContragentList);
                 } else {
@@ -2053,6 +2054,7 @@ public class MainPage implements Serializable {
             runtimeContext = RuntimeContext.getInstance();
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+            orgSelectPage.updateOrgTypesItems();
             orgSelectPage.fill(persistenceSession, idOfContragentOrgList);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -2140,7 +2142,7 @@ public class MainPage implements Serializable {
     }
 
     public Object updateOrgListSelectPageWithItemDeselection() {
-        if (orgListSelectPage.getSupplierFilter() == 2) {
+        if (orgListSelectPage.getFilterMode() == 2) {
             orgListSelectPage.setDistrictFilterDisabled(true);
         } else {
             orgListSelectPage.setDistrictFilterDisabled(false);
@@ -2151,7 +2153,7 @@ public class MainPage implements Serializable {
     }
 
     public Object updateOrgSelectPageWithItemDeselection() {
-        if (orgSelectPage.getSupplierFilter() == 2) {
+        if (orgSelectPage.getFilterMode() == 2) {
             orgSelectPage.setDistrictFilterDisabled(true);
         } else {
             orgSelectPage.setDistrictFilterDisabled(false);
@@ -2163,6 +2165,7 @@ public class MainPage implements Serializable {
     public Object clearOrgListSelectedItemsList() {
         orgFilterOfSelectOrgListSelectPage = "";
         orgListSelectPage.deselectAllItems();
+        orgListSelectPage.clearSelectedOrgMap();
         updateOrgListSelectPage();
         return null;
     }
