@@ -31,7 +31,7 @@ public class MaintenanceService {
 
     private Logger logger = LoggerFactory.getLogger(MaintenanceService.class);
 
-    private static int MAXROWS = 50;
+    private static int MAXROWS = 50000;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -150,7 +150,7 @@ public class MaintenanceService {
                         try {
                             //Получаем дату окончания действия интервального меню
                             Date date = dateFormat.parse(row.substring(29, 39));
-                            if (date.getTime() < new Date().getTime()) {
+                            if (date.getTime() > new Date().getTime()) {
                                 //Если дата окончания больше текущей, то удаляем это меню из списка
                                 it.remove();
                                 break;
