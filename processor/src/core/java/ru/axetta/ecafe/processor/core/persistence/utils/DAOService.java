@@ -2502,6 +2502,15 @@ public class DAOService {
     }
 
     @Transactional
+    public String getDeletedLastedDateMenu() {
+        try {
+            return getOnlineOptionValue(Option.OPTION_LAST_DELATED_DATE_MENU);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    @Transactional
     public void setOnlineOptionValue(String value, int option) {
         String str_query = "select optiontext from cf_options where idofoption = :idofoption";
         Query q = entityManager.createNativeQuery(str_query);
