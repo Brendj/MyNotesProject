@@ -164,10 +164,14 @@ public class GroupManagementService implements IGroupManagementService {
     @Override
     public ResponseClients getClientsList(List<String> groupsList, long idOfOrg) throws Exception {
         List<Long> idOfOrgList = DAOUtils.findFriendlyOrgIds(persistanceSession, idOfOrg);
-        if (idOfOrgList.size() == 0) throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND.getErrorCode(),
-                GroupManagementErrors.ORG_NOT_FOUND.getErrorMessage());
+        if (idOfOrgList.size() == 0) throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND);
         ResponseClients responseClients = new ResponseClients();
         for (String nameOfGroup : groupsList) {
+            List groups = DAOUtils.findClientGroupsByGroupNameForAllOrgsIgnoreCase(persistanceSession, idOfOrgList, nameOfGroup);
+            if (groups.size() == 0) throw new RequestProcessingException(GroupManagementErrors.GROUP_NOT_FOUND);
+            GroupNamesToOrgs gnto = DAOUtils.findGroupFromGroupNamesToOrgs(persistanceSession, idOfOrgList, nameOfGroup);
+            ClientGroup cg = findClientGroup(gnto, groups, nameOfGroup);
+            
             FPGroup fpGroup = new FPGroup();
             fpGroup.setGroupName(nameOfGroup);
             Query query = persistanceSession.createQuery("select c from Client c "
