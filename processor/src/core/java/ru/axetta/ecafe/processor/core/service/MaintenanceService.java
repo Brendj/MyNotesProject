@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -29,7 +31,7 @@ public class MaintenanceService {
 
     private Logger logger = LoggerFactory.getLogger(MaintenanceService.class);
 
-    private static int MAXROWS = 50000;
+    private static int MAXROWS = 50;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -87,8 +89,17 @@ public class MaintenanceService {
         String orgFilter =
                 (isSource ? "" : "not") + " in (select distinct mer.idOfSourceOrg from CF_MenuExchangeRules mer)";
 
-        Long maxDate = ((BigInteger) entityManager.createNativeQuery("SELECT * FROM cf_deleted_date_menu")
-                .getSingleResult()).longValue();
+        Date maxDate = null;
+        try {
+            maxDate = CalendarUtils.parseDateWithDayTime(DAOService.getInstance().getDeletedLastedDateMenu());
+            if (maxDate == null)
+            {
+                maxDate = new Date(0L);
+            }
+        } catch (Exception ignore) {
+            maxDate = new Date(0L);
+        }
+
 
         boolean full;
         boolean fullclean = false;
@@ -100,23 +111,25 @@ public class MaintenanceService {
                     "select m.IdOfMenu, m.IdOfOrg, m.MenuDate " + "from CF_Menu m where m.IdOfOrg " + orgFilter
                             + " and m.MenuDate < :date and m.MenuDate > :mindate order by m.MenuDate");
             query.setParameter("date", timeToClean);
-            query.setParameter("mindate", maxDate);
+            query.setParameter("mindate", maxDate.getTime());
 
             //Максимальное количество записей для очистки - 50000
             List<Object[]> records = query.setMaxResults(MAXROWS / 5).getResultList();
 
             Object[] el1 = records.get(records.size() - 1);
-            maxDate = ((BigInteger) el1[2]).longValue();
+            maxDate = new Date(((BigInteger) el1[2]).longValue());
 
             if (records.size() == MAXROWS / 5) {
-                setMaxDate(maxDate);
+                DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(maxDate), Option.OPTION_LAST_DELATED_DATE_MENU);
             } else {
-                if (maxDate.equals(0L))
+                Long time = maxDate.getTime();
+                if (time.equals(0L))
                 {
                     //Это сработает в том случае, если все в таблице почищено
                     fullclean = true;
                 }
-                setMaxDate(0L);
+                maxDate.setTime(0L);
+                DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(maxDate), Option.OPTION_LAST_DELATED_DATE_MENU);
             }
             Iterator<Object[]> it = records.iterator();
 
@@ -137,7 +150,7 @@ public class MaintenanceService {
                         try {
                             //Получаем дату окончания действия интервального меню
                             Date date = dateFormat.parse(row.substring(29, 39));
-                            if (date.getTime() > new Date().getTime()) {
+                            if (date.getTime() < new Date().getTime()) {
                                 //Если дата окончания больше текущей, то удаляем это меню из списка
                                 it.remove();
                                 break;
@@ -192,15 +205,6 @@ public class MaintenanceService {
                 + "MenuExchange - %d";
         return String.format(format, new Date(timeToClean), menuCount, menuDetailCount, goodBasicBasketPriceCount,
                 complexInfoCount, complexInfoDetailCount, menuExchangeDeletedCount);
-    }
-
-    @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
-    public int setMaxDate(Long maxDate) {
-        Session session = entityManager.unwrap(Session.class);
-        org.hibernate.Query q1 = session
-                .createSQLQuery("UPDATE cf_deleted_date_menu SET date=:maxDate where date is not NULL");
-        q1.setParameter("maxDate", maxDate);
-        return q1.executeUpdate();
     }
 
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.REQUIRES_NEW)
