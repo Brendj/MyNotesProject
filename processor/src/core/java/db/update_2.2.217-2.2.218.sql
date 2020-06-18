@@ -22,3 +22,8 @@ ALTER TABLE cf_preorder_menudetail
 ALTER TABLE cf_taloon_preorder
     ADD COLUMN idofdish bigint,
     ADD COLUMN bywebsupplier boolean NOT NULL DEFAULT false;
+
+-- 506
+ALTER TABLE cf_orderdetails
+    ADD COLUMN idofcomplex bigint,
+    ADD COLUMN idofdish bigint;
