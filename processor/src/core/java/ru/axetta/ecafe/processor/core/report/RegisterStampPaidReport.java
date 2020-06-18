@@ -113,12 +113,15 @@ public class RegisterStampPaidReport extends BasicReportForOrgJob {
                 } else {
                     for (GoodItem1 goodItem : allGoods) {
                         String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
-                        Long val = service.buildRegisterStampBodyValueByOrderType(org.getIdOfOrg(), calendar.getTime(),
+                        service.buildRegisterStampPaidReportItem(org.getIdOfOrg(), calendar.getTime(),
+                                goodItem.getFullName(), withOutActDiscrepancies, OrderTypeEnumType.PAY_PLAN, result,
+                                goodItem, date, number, endTime);
+                        /*Long val = service.buildRegisterStampBodyValueByOrderType(org.getIdOfOrg(), calendar.getTime(),
                                 goodItem.getFullName(), withOutActDiscrepancies, OrderTypeEnumType.PAY_PLAN);
                         RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(goodItem,val,date,number, time);
                         RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(goodItem,val,"Итого", CalendarUtils.addDays(endTime, 1));
                         result.add(item);
-                        result.add(total);
+                        result.add(total);*/
                     }
                 }
                 calendar.add(Calendar.DATE, 1);
