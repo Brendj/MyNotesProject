@@ -3035,11 +3035,10 @@ public class DAOUtils {
 
     public static long nextVersionByClientPhoto(Session session) {
         long version = 0L;
-        Query query = session.createSQLQuery(
-                "select cp.version from cf_clientphoto as cp where cp.version is not null order by cp.version desc limit 1 for update");
+        Query query = session.createSQLQuery("select nextval('clientphoto_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
