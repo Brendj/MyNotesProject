@@ -6,6 +6,8 @@ package ru.axetta.ecafe.processor.core.service;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.persistence.Option;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -28,6 +30,8 @@ import java.util.*;
 public class MaintenanceService {
 
     private Logger logger = LoggerFactory.getLogger(MaintenanceService.class);
+
+    private static int MAXROWS = 50000;
 
     @PersistenceContext(unitName = "processorPU")
     private EntityManager entityManager;
@@ -70,9 +74,9 @@ public class MaintenanceService {
     @SuppressWarnings("unchecked")
     @Transactional(rollbackFor = Exception.class, propagation = Propagation.SUPPORTS, readOnly = true)
     public String clean(boolean isSource) throws Exception {
-        logger.debug("start clean: "+ new Date());
+        logger.debug("start clean: " + new Date());
         //Получаем количество дней, старше которых нужно чистить таблицу
-        long menuDaysForDeletion =  RuntimeContext.getInstance().getOptionValueInt(
+        long menuDaysForDeletion = RuntimeContext.getInstance().getOptionValueInt(
                 isSource ? Option.OPTION_SRC_ORG_MENU_DAYS_FOR_DELETION : Option.OPTION_MENU_DAYS_FOR_DELETION);
         if (menuDaysForDeletion < 0) {
             menuDaysForDeletion = 1;
@@ -82,59 +86,102 @@ public class MaintenanceService {
 
         //Если очиска раз в 30 дней - то только тех записей,что нет в этой таблице
         //Если очистка старше 730 дней - то очистка только тех записей, что есть в данной таблице
-        String orgFilter = (isSource ? "" : "not") + " in (select distinct mer.idOfSourceOrg from CF_MenuExchangeRules mer)";
+        String orgFilter =
+                (isSource ? "" : "not") + " in (select distinct mer.idOfSourceOrg from CF_MenuExchangeRules mer)";
 
-        //Получаем список меню
-        Query query = entityManager.createNativeQuery(
-                "select m.IdOfMenu, m.IdOfOrg from CF_Menu m where m.IdOfOrg " + orgFilter + " and m.MenuDate < :date order by m.MenuDate")
-                .setParameter("date", timeToClean);
-        //Максимальное количество записей для очистки - 60000
-        List<Object[]> records = query.setMaxResults(60000).getResultList();
-        Iterator<Object[]> it = records.iterator();
-        while (it.hasNext()) {
-            Object[] el = it.next();
-            Long idOfMenu = ((BigInteger) el[0]).longValue();
+        Date maxDate = null;
+        try {
+            maxDate = CalendarUtils.parseDateWithDayTime(DAOService.getInstance().getDeletedLastedDateMenu());
+            if (maxDate == null)
+            {
+                maxDate = new Date(0L);
+            }
+        } catch (Exception ignore) {
+            maxDate = new Date(0L);
+        }
 
-            //Находим детали меню для данного заказа
-            query = entityManager.createNativeQuery(
-                    "select m.MenuPath from CF_MenuDetails m where m.IdOfMenu = :idOfMenu")
-                    .setParameter("idOfMenu", idOfMenu);
 
-            List<String> recordsMenuDetail = query.getResultList();
+        boolean full;
+        boolean fullclean = false;
+        List<Object[]> result = new ArrayList<>();
+        do {
+            full = true;
+            //Получаем список меню
+            Query query = entityManager.createNativeQuery(
+                    "select m.IdOfMenu, m.IdOfOrg, m.MenuDate " + "from CF_Menu m where m.IdOfOrg " + orgFilter
+                            + " and m.MenuDate < :date and m.MenuDate > :mindate order by m.MenuDate");
+            query.setParameter("date", timeToClean);
+            query.setParameter("mindate", maxDate.getTime());
 
-            for (String row : recordsMenuDetail) {
-                if (row.indexOf("[Интервальное]") == 0)
+            //Максимальное количество записей для очистки - 50000
+            List<Object[]> records = query.setMaxResults(MAXROWS / 5).getResultList();
+
+            Object[] el1 = records.get(records.size() - 1);
+            maxDate = new Date(((BigInteger) el1[2]).longValue());
+
+            if (records.size() == MAXROWS / 5) {
+                DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(maxDate), Option.OPTION_LAST_DELATED_DATE_MENU);
+            } else {
+                Long time = maxDate.getTime();
+                if (time.equals(0L))
                 {
-                    DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
-                    try {
-                        //Получаем дату окончания действия интервального меню
-                        Date date = dateFormat.parse(row.substring(29, 39));
-                        if (date.getTime() > new Date().getTime()) {
-                            //Если дата окончания больше текущей, то удаляем это меню из списка
-                            it.remove();
-                            break;
+                    //Это сработает в том случае, если все в таблице почищено
+                    fullclean = true;
+                }
+                maxDate.setTime(0L);
+                DAOService.getInstance().setOnlineOptionValue(CalendarUtils.dateTimeToString(maxDate), Option.OPTION_LAST_DELATED_DATE_MENU);
+            }
+            Iterator<Object[]> it = records.iterator();
+
+            while (it.hasNext()) {
+                Object[] el = it.next();
+                Long idOfMenu = ((BigInteger) el[0]).longValue();
+
+                //Находим детали меню для данного заказа
+                query = entityManager
+                        .createNativeQuery("SELECT m.MenuPath FROM CF_MenuDetails m WHERE m.IdOfMenu = :idOfMenu")
+                        .setParameter("idOfMenu", idOfMenu);
+
+                List<String> recordsMenuDetail = query.getResultList();
+
+                for (String row : recordsMenuDetail) {
+                    if (row.indexOf("[Интервальное]") == 0) {
+                        DateFormat dateFormat = new SimpleDateFormat("dd/MM/yyyy");
+                        try {
+                            //Получаем дату окончания действия интервального меню
+                            Date date = dateFormat.parse(row.substring(29, 39));
+                            if (date.getTime() > new Date().getTime()) {
+                                //Если дата окончания больше текущей, то удаляем это меню из списка
+                                it.remove();
+                                break;
+                            }
+                        } catch (Exception e) {
+                            logger.debug("Cannot format row: " + row);
                         }
-                    }
-                    catch (Exception e)
-                    {
-                        logger.debug("Cannot format row: "+ row);
                     }
                 }
             }
-        }
+            result.addAll(records);
+            if (MAXROWS > result.size()) {
+                full = false;
+            }
 
-        logger.debug("count menu: "+ records.size());
+
+        } while (!full || fullclean);
+
+
+        logger.debug("count menu: " + result.size());
         Set<Long> orgIds = new HashSet<Long>();
         MaintenanceService proxy = getProxy();
 
         logger.info("Cleaning menu details and menu...");
-        int complexInfoDetailCount  = 0;
+        int complexInfoDetailCount = 0;
         int complexInfoCount = 0;
-        int goodBasicBasketPriceCount  = 0;
+        int goodBasicBasketPriceCount = 0;
         int menuDetailCount = 0;
         int menuCount = 0;
         //Для каждого меню
-        for (Object[] row : records) {
+        for (Object[] row : result) {
             Long idOfMenu = ((BigInteger) row[0]).longValue();
             orgIds.add(((BigInteger) row[1]).longValue());
             int[] res = cleanMenuInformationInternal(idOfMenu);
@@ -142,7 +189,7 @@ public class MaintenanceService {
             complexInfoDetailCount += res[0];
             complexInfoCount += res[1];
             goodBasicBasketPriceCount += res[2];
-            menuDetailCount  += res[3];
+            menuDetailCount += res[3];
             menuCount += res[4];
         }
 
@@ -154,11 +201,9 @@ public class MaintenanceService {
         }
 
         final String format = "Deleted all records before - %s, deleted records count: Menu - %d, "
-                + "MenuDetail - %d, GoodBasicBasketPrice - %d, "
-                + "ComplexInfo - %d, ComplexInfoDetail - %d, "
+                + "MenuDetail - %d, GoodBasicBasketPrice - %d, " + "ComplexInfo - %d, ComplexInfoDetail - %d, "
                 + "MenuExchange - %d";
-        return String.format(format, new Date(timeToClean), menuCount,
-                menuDetailCount , goodBasicBasketPriceCount,
+        return String.format(format, new Date(timeToClean), menuCount, menuDetailCount, goodBasicBasketPriceCount,
                 complexInfoCount, complexInfoDetailCount, menuExchangeDeletedCount);
     }
 
@@ -167,7 +212,8 @@ public class MaintenanceService {
         int[] res = new int[5];
         Session session = entityManager.unwrap(Session.class);
 
-        org.hibernate.Query qMenuDetailsDelete = session.createQuery("select idOfMenuDetail from MenuDetail WHERE menu.idOfMenu = :idOfMenu");
+        org.hibernate.Query qMenuDetailsDelete = session
+                .createQuery("select idOfMenuDetail from MenuDetail WHERE menu.idOfMenu = :idOfMenu");
         qMenuDetailsDelete.setParameter("idOfMenu", idOfMenu);
 
         List menuDetailsForDelete = qMenuDetailsDelete.list();
@@ -178,16 +224,17 @@ public class MaintenanceService {
             qComplexInfo.setParameterList("menuDetailsForDelete", menuDetailsForDelete);
             res[0] = qComplexInfo.executeUpdate();
 
-            org.hibernate.Query qComplex = session.createQuery("delete from ComplexInfo where menuDetail.idOfMenuDetail in (:menuDetailsForDelete)");
+            org.hibernate.Query qComplex = session
+                    .createQuery("delete from ComplexInfo where menuDetail.idOfMenuDetail in (:menuDetailsForDelete)");
             qComplex.setParameterList("menuDetailsForDelete", menuDetailsForDelete);
             res[1] = qComplex.executeUpdate();
 
             //org.hibernate.Query qGoodBasicBasketPrice = session.createQuery("update GoodBasicBasketPrice set idofmenudetail = null where idOfMenuDetail in (select idOfMenuDetail from MenuDetail WHERE menu.idOfMenu = :idOfMenu)");
-            org.hibernate.Query qGoodBasicBasketPrice = session.createQuery("delete from GoodBasicBasketPrice where idOfMenuDetail in (:menuDetailsForDelete)");
+            org.hibernate.Query qGoodBasicBasketPrice = session
+                    .createQuery("delete from GoodBasicBasketPrice where idOfMenuDetail in (:menuDetailsForDelete)");
             qGoodBasicBasketPrice.setParameterList("menuDetailsForDelete", menuDetailsForDelete);
             res[2] = qGoodBasicBasketPrice.executeUpdate();
-        } else
-        {
+        } else {
             res[0] = 0;
             res[1] = 0;
             res[2] = 0;
