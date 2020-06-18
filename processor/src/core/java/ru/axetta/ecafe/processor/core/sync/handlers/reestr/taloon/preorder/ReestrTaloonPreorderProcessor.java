@@ -80,6 +80,7 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
                     Org orgOwner = (Org)session.load(Org.class, item.getOrgOwnerId());
                     Boolean deletedState = item.getDeletedState();
                     Boolean byWebSupplier = item.getByWebSupplier();
+                    Long idOfDish = item.getIdOfDish();
                     Long taloonNumber = item.getTaloonNumber();
                     Long versionFromClient = item.getVersion();
                     if ((versionFromClient == null && taloon != null) || (versionFromClient != null && taloon != null && versionFromClient < taloon.getVersion())) {
@@ -115,6 +116,7 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
                         taloon.setTaloonNumber(taloonNumber);
                         taloon.setComments(comments);
                         taloon.setComplexId(complexId);
+                        taloon.setIdOfDish(idOfDish);
 
                         session.saveOrUpdate(taloon);
 
