@@ -170,7 +170,8 @@ public class GroupManagementService implements IGroupManagementService {
             List groups = DAOUtils.findClientGroupsByGroupNameForAllOrgsIgnoreCase(persistanceSession, idOfOrgList, nameOfGroup);
             if (groups.size() == 0) throw new RequestProcessingException(GroupManagementErrors.GROUP_NOT_FOUND);
             GroupNamesToOrgs gnto = DAOUtils.findGroupFromGroupNamesToOrgs(persistanceSession, idOfOrgList, nameOfGroup);
-            ClientGroup cg = findClientGroup(gnto, groups, nameOfGroup);
+            ClientGroup cg = findClientGroup(gnto, groups, idOfOrg);
+            if (cg == null) throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND);
             
             FPGroup fpGroup = new FPGroup();
             fpGroup.setGroupName(nameOfGroup);
@@ -183,7 +184,7 @@ public class GroupManagementService implements IGroupManagementService {
             query.setParameter("nameOfGroup", nameOfGroup);
             List<Client> list = query.list();
             for (Client client : list) {
-                fpGroup.setGroupId(client.getClientGroup().getCompositeIdOfClientGroup().getIdOfClientGroup());
+                fpGroup.setGroupId(cg.getCompositeIdOfClientGroup().getIdOfClientGroup());
                 fpGroup.setOrgId(client.getOrg().getIdOfOrg());
                 FPClient fpClient = new FPClient(client);
                 fpGroup.getClients().add(fpClient);
@@ -191,6 +192,18 @@ public class GroupManagementService implements IGroupManagementService {
             responseClients.getGroups().add(fpGroup);
         }
         return responseClients;
+    }
+
+    private ClientGroup findClientGroup(GroupNamesToOrgs gnto, List<ClientGroup> groups, Long idOfOrg) {
+        if (gnto == null || gnto.getIdOfOrg() == null) {
+            for (ClientGroup clientGroup : groups) {
+                if (clientGroup.getCompositeIdOfClientGroup().getIdOfOrg().equals(idOfOrg)) return clientGroup;
+            }
+        }
+        for (ClientGroup clientGroup : groups) {
+            if (clientGroup.getCompositeIdOfClientGroup().getIdOfOrg().equals(gnto.getIdOfOrg())) return clientGroup;
+        }
+        return null;
     }
 
     private Boolean isGroupNotPredefined(ClientGroup group){
