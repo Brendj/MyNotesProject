@@ -120,6 +120,12 @@ public class Good extends ConfigurationProviderDistributedObject {
         if (gg == null) {
             throw new DistributedObjectException("GoodGroup NOT_FOUND_VALUE");
         }
+        //Если конфигурация у провайдера поменялась, то меняем и группы. Чтобы группа соответствовала товару
+        if (gg.getIdOfConfigurationProvider().equals(getIdOfConfigurationProvider()))
+        {
+            gg.setIdOfConfigurationProvider(getIdOfConfigurationProvider());
+            session.update(gg);
+        }
         setGoodGroup(gg);
         Product p = DAOUtils.findDistributedObjectByRefGUID(Product.class, session, guidOfP);
         TechnologicalMap tm = DAOUtils.findDistributedObjectByRefGUID(TechnologicalMap.class, session, guidOfTM);
