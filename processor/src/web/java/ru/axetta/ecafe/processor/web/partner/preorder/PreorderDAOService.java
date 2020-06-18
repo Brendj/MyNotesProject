@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.persistence.utils.PreorderUtils;
+import ru.axetta.ecafe.processor.core.service.GoodRequestsChangeAsyncNotificationService;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportService;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportServiceParam;
 import ru.axetta.ecafe.processor.core.service.SubscriptionFeedingService;
@@ -75,6 +76,11 @@ public class PreorderDAOService {
             @Override
             public void relevancePreorders(PreorderRequestsReportServiceParam params) {
                 RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).relevancePreorders(params);
+            }
+
+            @Override
+            public void dailyCheckPreorders() {
+                RuntimeContext.getAppContext().getBean(PreorderOperationsService.class).dailyCheckPreorders();
             }
         };
         RuntimeContext.getAppContext().getBean(DAOService.class).setPreorderDAOOperationsImpl(impl);
@@ -724,7 +730,12 @@ public class PreorderDAOService {
             MenuDetail menuDetail = getMenuDetail(client, idOfMenu, date);
             regularPreorderSelect.setParameter("itemCode", menuDetail.getItemCode());
         }
-        RegularPreorder regularPreorder = (RegularPreorder) regularPreorderSelect.getSingleResult();
+        RegularPreorder regularPreorder;
+        try {
+            regularPreorder = (RegularPreorder) regularPreorderSelect.getSingleResult();
+        } catch (NoResultException e) {
+            throw new RegularAlreadyDeleted("Для выбранного комплекса или блюда не настроен повтор заказа");
+        }
         deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.OK, guardianMobile, RegularPreorderState.CHANGE_BY_USER);
     }
 
@@ -737,6 +748,96 @@ public class PreorderDAOService {
         regularPreorder.setLastUpdate(new Date());
         regularPreorder.setMobile(guardianMobile);
         session.update(regularPreorder);
+    }
+
+    @Transactional
+    public void dailyCheck() {
+        Date currentDate = CalendarUtils.startOfDayInUTC(new Date());
+        int day = CalendarUtils.getDayOfMonth(currentDate);
+        Date dateFrom = CalendarUtils.getFirstDayOfMonth(currentDate);
+        if (day <= PreorderRequestsReportService.DAY_PREORDER_CHECK) {
+            dateFrom = CalendarUtils.getFirstDayOfPrevMonth(currentDate);
+        }
+        dateFrom = CalendarUtils.startOfDayInUTC(dateFrom);
+
+        List<Date> weekends = GoodRequestsChangeAsyncNotificationService.getInstance().getProductionCalendarDates(currentDate);
+        Integer maxDays = RuntimeContext.getAppContext().getBean(PreorderRequestsReportService.class)
+                .getMaxDateToCreateRequests(currentDate, weekends, PreorderRequestsReportService.MAX_FORBIDDEN_DAYS);
+        Date dateTo = CalendarUtils.addDays(currentDate, maxDays);
+        dateTo = CalendarUtils.startOfDay(dateTo);
+        while (dateFrom.before(dateTo)) {
+            dailyCheckOnDate(dateFrom);
+            dateFrom = CalendarUtils.addDays(dateFrom, 1);
+        }
+    }
+
+    public List<PreorderCheck> getPreorderCheckListForNotification() {
+        Query query = emReport.createQuery("select pc from PreorderCheck pc "
+                + "where pc.lastUpdate between :startDate and :endDate and pc.alarm = true");
+        query.setParameter("startDate", CalendarUtils.startOfDay(new Date()));
+        query.setParameter("endDate", CalendarUtils.endOfDay(new Date()));
+
+        return query.getResultList();
+    }
+
+    private void dailyCheckOnDate(Date date) {
+        Query query = emReport.createQuery("select coalesce(sum(pc.amount), 0) "
+                + "from PreorderComplex pc, Org o "
+                + "where o.idOfOrg = pc.idOfOrgOnCreate "
+                + "and pc.deletedState = false and pc.modeOfAdd <> :mode "
+                + "and pc.preorderDate = :date and upper(o.tag) not like '%ТЕСТ%' ");
+        query.setParameter("date", date);
+        query.setParameter("mode", PreorderComplex.COMPLEX_MODE_4);
+        Long preorderAmount = (Long)query.getSingleResult();
+
+        query = emReport.createQuery("select coalesce(sum(pmd.amount), 0) "
+                + "from PreorderComplex pc, PreorderMenuDetail pmd, Org o "
+                + "where pmd.preorderComplex = pc and o.idOfOrg = pc.idOfOrgOnCreate "
+                + "and pc.deletedState = false and pmd.deletedState = false "
+                + "and pc.modeOfAdd = :mode "
+                + "and pc.preorderDate = :date and upper(o.tag) not like '%ТЕСТ%' ");
+        query.setParameter("date", date);
+        query.setParameter("mode", PreorderComplex.COMPLEX_MODE_4);
+        preorderAmount += (Long)query.getSingleResult();
+
+        query = emReport.createQuery("select coalesce(sum(pos.totalCount), 0) as count1 "
+                + "from PreorderComplex pc, Org o, GoodRequestPosition pos "
+                + "where o.idOfOrg = pc.idOfOrgOnCreate "
+                + "and pc.idOfGoodsRequestPosition = pos.globalId "
+                + "and pc.deletedState = false and pos.deletedState = false and pc.idOfGoodsRequestPosition is not null "
+                + "and pc.preorderDate = :date and upper(o.tag) not like '%ТЕСТ%' ");
+        query.setParameter("date", date);
+        Long pcAmount = (Long)query.getSingleResult();
+
+        query = emReport.createQuery("select coalesce(sum(pos.totalCount), 0) "
+                + "from PreorderComplex pc, PreorderMenuDetail pmd, Org o, GoodRequestPosition pos "
+                + "where pmd.preorderComplex = pc and o.idOfOrg = pc.idOfOrgOnCreate "
+                + "and pmd.idOfGoodsRequestPosition = pos.globalId "
+                + "and pc.deletedState = false and pmd.deletedState = false and pos.deletedState = false "
+                + "and pmd.idOfGoodsRequestPosition is not null "
+                + "and pc.preorderDate = :date and upper(o.tag) not like '%ТЕСТ%' ");
+        query.setParameter("date", date);
+        Long pmdAmount = (Long)query.getSingleResult();
+
+        Long goodRequestAmount = (pcAmount + pmdAmount) / 1000L;
+
+        query = em.createQuery("select pc from PreorderCheck pc where pc.date = :date order by createdDate desc");
+        query.setParameter("date", date);
+        query.setMaxResults(1);
+        PreorderCheck preorderCheck;
+        try {
+            preorderCheck = (PreorderCheck) query.getSingleResult();
+        } catch (NoResultException e) {
+            preorderCheck = new PreorderCheck(date, preorderAmount, goodRequestAmount, !preorderAmount.equals(goodRequestAmount));
+        }
+        if (!preorderAmount.equals(preorderCheck.getPreorderAmount()) || !goodRequestAmount.equals(preorderCheck.getGoodRequestAmount())) {
+            PreorderCheck preorderCheckNew = new PreorderCheck(date, preorderAmount, goodRequestAmount, true);
+            preorderCheck.setAlarm(true);
+            em.merge(preorderCheckNew);
+        } else {
+            preorderCheck.setLastUpdate(new Date());
+            em.merge(preorderCheck);
+        }
     }
 
     @Transactional

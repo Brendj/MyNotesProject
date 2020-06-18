@@ -58,6 +58,10 @@ public class PreorderComplex {
         return usedSum != null && usedSum > 0;
     }
 
+    public boolean isType4Complex() {
+        return modeOfAdd.equals(COMPLEX_MODE_4);
+    }
+
     public static void delete(Session session, Long idOfPreorderComplex, Long nextVersion, PreorderState state) {
         Query query = session.createQuery("update PreorderComplex pc set pc.deletedState = true, state = :state, amount = 0, "
                 + "version = :version, lastUpdate =:lastUpdate where pc.idOfPreorderComplex = :idOfPreorderComplex");
