@@ -8,3 +8,6 @@
 ALTER TABLE cf_orderdetails
     ADD COLUMN idofcomplex bigint,
     ADD COLUMN idofdish bigint;
+
+COMMENT ON COLUMN cf_orderdetails.idofcomplex IS 'Идентификатор комплекса от веб-поставщика';
+COMMENT ON COLUMN cf_orderdetails.idofdish IS 'Идентификатор блюда от веб-поставщика';
