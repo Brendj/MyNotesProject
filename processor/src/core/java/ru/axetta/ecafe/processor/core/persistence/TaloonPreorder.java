@@ -40,6 +40,8 @@ public class TaloonPreorder {
     private Boolean deletedState;
     private String remarks;
     private String comments;
+    private Long idOfDish;
+    private Boolean byWebSupplier;
 
     public TaloonPreorder() {
         //for Hibernate only
@@ -269,7 +271,21 @@ public class TaloonPreorder {
         this.comments = comments;
     }
 
+    public Long getIdOfDish() {
+        return idOfDish;
+    }
 
+    public void setIdOfDish(Long idOfDish) {
+        this.idOfDish = idOfDish;
+    }
+
+    public Boolean getByWebSupplier() {
+        return byWebSupplier;
+    }
+
+    public void setByWebSupplier(Boolean byWebSupplier) {
+        this.byWebSupplier = byWebSupplier;
+    }
 
     @Override
     public boolean equals(Object o) {

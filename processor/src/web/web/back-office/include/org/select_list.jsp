@@ -66,6 +66,12 @@
                                         <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                     </h:inputText>
+                                    <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
+                                    <h:inputText id="inputIdFilter" value="#{mainPage.orgListSelectPage.idFilter}"
+                                                 size="60" maxlength="120" styleClass="input-text">
+                                        <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
+                                                     reRender="modalOrgListSelectorOrgTable" />
+                                    </h:inputText>
                                     <h:outputText escape="true" value="Округ: " styleClass="output-text" />
                                     <h:selectOneMenu id="regionsList" value="#{mainPage.orgListSelectPage.region}"
                                                      style="width:386px;"
@@ -74,46 +80,32 @@
                                         <a4j:support event="onchange" action="#{mainPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                     </h:selectOneMenu>
+                                    <h:outputText escape="true" value="Поставщик питания: " styleClass="output-text" />
+                                    <h:selectOneMenu id="contragentList" disabled="#{mainPage.orgListSelectPage.disableContragentFilter()}"
+                                                     value="#{mainPage.orgSelectPage.idOfSelectedContragent}"
+                                                     styleClass="output-text" style="width:386px;">
+                                        <f:selectItems value="#{mainPage.orgSelectPage.contragentsList}" />
+                                        <a4j:support event="onchange" action="#{mainPage.updateOrgSelectPage}"
+                                                     reRender="modalOrgSelectorOrgTable"/>
+                                    </h:selectOneMenu>
                                 </h:panelGrid>
                                     <rich:simpleTogglePanel label="Показать доп. фильтры" switchType="client" opened="false"
                                                             styleClass="borderNone" timeout="10"
                                                             headerClass="imageNone borderNone linkClass"
                                                             bodyClass="imageNone borderNone">
-                                        <h:panelGrid id="contentDiv22" columns="2" styleClass="borderless-grid">
-                                            <h:outputText escape="true" value="Фильтр по тэгу: " styleClass="output-text" />
-                                            <h:inputText id="inputTagFilter" value="#{mainPage.orgListSelectPage.tagFilter}"
-                                                 size="60" maxlength="120" styleClass="input-text">
-                                                <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
-                                                     reRender="modalOrgListSelectorOrgTable" />
-                                            </h:inputText>
-                                            <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
-                                            <h:inputText id="inputIdFilter" value="#{mainPage.orgListSelectPage.idFilter}"
-                                                 size="60" maxlength="120" styleClass="input-text">
-                                                <a4j:support requestDelay="1000" event="onkeyup" action="#{mainPage.updateOrgListSelectPage}"
-                                                     reRender="modalOrgListSelectorOrgTable" />
-                                            </h:inputText>
+                                        <h:panelGrid columns="3">
+                                            <a4j:repeat id="OrganizationTypesForSelectMany"
+                                                        value="#{mainPage.orgListSelectPage.availableOrganizationTypes}" var="item" >
+                                                <h:panelGrid columns="2">
+                                                    <h:selectBooleanCheckbox value="#{item.selected}" disabled="#{item.disabled}">
+                                                        <a4j:support event="onchange" action="#{mainPage.updateOrgListSelectPageWithItemDeselection}"
+                                                                     reRender="modalOrgListSelectorForm" requestDelay="1000"/>
+                                                    </h:selectBooleanCheckbox>
+                                                    <h:outputText styleClass="output-text" value="#{item.typeName}"/>
+                                                </h:panelGrid>
+                                            </a4j:repeat>
                                         </h:panelGrid>
                                     </rich:simpleTogglePanel>
-
-                                <h:panelGrid id="radioButtons" columns="1" styleClass="borderless-grid">
-                                    <h:selectOneRadio value="#{mainPage.orgListSelectPage.supplierFilter}"
-                                                      converter="javax.faces.Integer" styleClass="output-text">
-                                        <a4j:support event="onclick" action="#{mainPage.updateOrgListSelectPage}"
-                                                     reRender="modalOrgListSelectorOrgTable" />
-                                        <f:selectItem itemValue="0" itemLabel="Любые организации"
-                                                      itemDisabled="#{mainPage.orgListSelectPage.allOrgFilterDisabled}" />
-                                        <f:selectItem itemValue="1" itemLabel="Только ОУ"
-                                                      itemDisabled="#{mainPage.orgListSelectPage.schoolFilterDisabled}" />
-                                        <f:selectItem itemValue="4" itemLabel="Только ДОУ"
-                                                      itemDisabled="#{mainPage.orgListSelectPage.primarySchoolFilterDisabled}" />
-                                        <f:selectItem itemValue="5" itemLabel="Только СОУ"
-                                                      itemDisabled="#{mainPage.orgListSelectPage.secondarySchoolFilterDisabled}" />
-                                        <f:selectItem itemValue="2" itemLabel="Только поставщики"
-                                                      itemDisabled="#{mainPage.orgListSelectPage.supplierFilterDisabled}" />
-                                        <f:selectItem itemValue="6" itemLabel="Показать все организации"
-                                                      itemDisabled="#{mainPage.orgListSelectPage.allOrgsFilterDisabled}" />
-                                    </h:selectOneRadio>
-                                </h:panelGrid>
                             </h:panelGrid>
                         </h:panelGrid>
                         <a4j:commandLink action="#{mainPage.updateOrgListSelectPage}"
@@ -121,7 +113,6 @@
                                          styleClass="command-link">
                             <h:graphicImage value="/images/16x16/delete.png" style="border: 0;" />
                             <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.filter}" />
-                            <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.tagFilter}" />
                             <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.idFilter}" />
                             <f:setPropertyActionListener value="" target="#{mainPage.orgListSelectPage.region}" />
                         </a4j:commandLink>

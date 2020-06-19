@@ -53,6 +53,8 @@ public class TaloonPreorderItem {
     private Integer resCode;
     private Long version;
     private String comments;
+    private Long idOfDish;
+    private Boolean byWebSupplier;
 
     public static TaloonPreorderItem build(Node itemNode, Long orgOwner) {
         String guid = null;
@@ -77,6 +79,8 @@ public class TaloonPreorderItem {
         Long version = null;
         StringBuilder errorMessage = new StringBuilder();
         String comments = null;
+        Long idOfDish = null;
+        Boolean byWebSupplier = false;
 
         guid = XMLUtils.getAttributeValue(itemNode, "Guid");
         if (StringUtils.isEmpty(guid)) {
@@ -225,6 +229,24 @@ public class TaloonPreorderItem {
             ppState = TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED.ordinal();
         }
 
+        String strWebSupplier = XMLUtils.getAttributeValue(itemNode, "ByWebSupplier");
+        if (StringUtils.isNotEmpty(strWebSupplier)) {
+            try {
+                byWebSupplier = (Integer.parseInt(strWebSupplier) == 1);
+            } catch (NumberFormatException e) {
+                errorMessage.append( "NumberFormatException incorrect format ByWebSupplier");
+            }
+        }
+
+        String strDishId = XMLUtils.getAttributeValue(itemNode, "DishId");
+        if(StringUtils.isNotEmpty(strDishId)){
+            try {
+                idOfDish =  Long.parseLong(strDishId);
+            } catch (NumberFormatException e){
+                errorMessage.append("NumberFormatException DishId is not parsed");
+            }
+        }
+
         String strDeletedState = XMLUtils.getAttributeValue(itemNode, "D");
         if (StringUtils.isNotEmpty(strDeletedState)) {
             try {
@@ -246,7 +268,7 @@ public class TaloonPreorderItem {
         return new TaloonPreorderItem(guid, orgId, orgIdCreated, date, complexId, complexName, goodsName,goodsGuid, soldQty, requestedQty, shippedQty,
                 reservedQty, blockedQty, price,
                 TaloonCreatedTypeEnum.fromInteger(createdType), TaloonISPPStatesEnum.fromInteger(isppState), TaloonPPStatesEnum.fromInteger(ppState),
-                taloonNumber, orgOwner, deletedState, version, errorMessage.toString(), comments);
+                taloonNumber, orgOwner, idOfDish, byWebSupplier, deletedState, version, errorMessage.toString(), comments);
     }
 
     private static boolean isOldQtyFormat(Node itemNode) {
@@ -272,7 +294,7 @@ public class TaloonPreorderItem {
     private TaloonPreorderItem(String guid, Long orgId, Long orgIdCreated, Date date, Long complexId, String complexName, String goodsName, String goodsGuid, Integer soldQty,
             Integer requestedQty, Integer shippedQty, Integer reservedQty, Integer blockedQty,
             Long price, TaloonCreatedTypeEnum createdType, TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,
-            Long taloonNumber, Long orgOwnerId, Boolean deletedState, Long version, String errorMessage, String comments) {
+            Long taloonNumber, Long orgOwnerId, Long idOfDish, Boolean byWebSupplier, Boolean deletedState, Long version, String errorMessage, String comments) {
         this.setGuid(guid);
         this.setOrgId(orgId);
         this.setOrgIdCreated(orgIdCreated);
@@ -293,6 +315,8 @@ public class TaloonPreorderItem {
         this.setDeletedState(deletedState);
         this.setGoodsName(goodsName);
         this.setGoodsGuid(goodsGuid);
+        this.setIdOfDish(idOfDish);
+        this.setByWebSupplier(byWebSupplier);
         this.version = version;
         this.setErrorMessage(errorMessage);
         if (errorMessage.equals("")) {
@@ -493,5 +517,21 @@ public class TaloonPreorderItem {
 
     public void setGuid(String guid) {
         this.guid = guid;
+    }
+
+    public Long getIdOfDish() {
+        return idOfDish;
+    }
+
+    public void setIdOfDish(Long idOfDish) {
+        this.idOfDish = idOfDish;
+    }
+
+    public Boolean getByWebSupplier() {
+        return byWebSupplier;
+    }
+
+    public void setByWebSupplier(Boolean byWebSupplier) {
+        this.byWebSupplier = byWebSupplier;
     }
 }

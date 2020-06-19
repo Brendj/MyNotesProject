@@ -1075,7 +1075,6 @@ public class FrontController extends HttpServlet {
         logger.debug("checkRequestValidity");
         checkRequestValidity(orgId);
 
-        boolean isExistsOrgByIdAndTags; // = DAOService.getInstance().existsOrgByIdAndTags(orgId, "БЛОК_РЕГ_УЧ");
         String notifyByPush =
                 RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
         String notifyByEmail =
@@ -1100,12 +1099,6 @@ public class FrontController extends HttpServlet {
                 String orgIdForClient = getClientParamDescValueByName("orgId", cd.getClientDescParams().getParam());
                 if (orgIdForClient == null) {
                     throw new FrontControllerException("Не найден обязательный параметр orgId");
-                }
-                isExistsOrgByIdAndTags = DAOService.getInstance()
-                        .existsOrgByIdAndTags(Long.parseLong(orgIdForClient), "БЛОК_РЕГ_УЧ");
-                if (isExistsOrgByIdAndTags && !ClientGroup.predefinedGroupNames().contains(group)) {
-                    throw new FrontControllerException(
-                            "Запрещена регистрация учащихся, используйте синхронизацию с Реестрами");
                 }
 
                 ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
@@ -1248,7 +1241,6 @@ public class FrontController extends HttpServlet {
         logger.debug("checkRequestValidity");
         checkRequestValidity(orgId);
 
-        boolean isExistsOrgByIdAndTags = DAOService.getInstance().existsOrgByIdAndTags(orgId, "БЛОК_РЕГ_УЧ");
         String notifyByPush =
                 RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
         String notifyByEmail =
@@ -1259,10 +1251,6 @@ public class FrontController extends HttpServlet {
             try {
                 //ClientManager.ClientFieldConfig fc = ClientDesc.buildClientFieldConfig(cd);
                 logger.debug("create FieldConfig");
-                if (isExistsOrgByIdAndTags && !ClientGroup.predefinedGroupNames().contains(cd.group)) {
-                    throw new FrontControllerException(
-                            "Запрещена регистрация учащихся, используйте синхронизацию с Реестрами");
-                }
                 ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
                 logger.debug("check client params");
                 if (cd.contractSurname != null) {

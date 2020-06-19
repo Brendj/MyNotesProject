@@ -159,7 +159,6 @@ public class DirectorPage implements Serializable {
                 persistenceSession = runtimeContext.createReportPersistenceSession();
                 persistenceTransaction = persistenceSession.beginTransaction();
                 orgListSelectPage.setFilter("");
-                orgListSelectPage.setTagFilter("");
                 orgListSelectPage.setIdFilter("");
                 orgListSelectPage.setRegion("");
                 if (orgFilterOfSelectOrgListSelectPage.length() == 0) {

@@ -49,6 +49,8 @@
         <property name="taloonNumber" column="TaloonNumber" type="long" not-null="false"/>
         <property name="version" column="Version" type="long" not-null="true"/>
         <property name="deletedState" column="DeletedState" type="boolean" not-null="true"/>
+        <property name="complexId" column="complexId" type="long"/>
+        <property name="byWebSupplier" column="byWebSupplier" type="boolean" not-null="true"/>
 
         <many-to-one name="org" class="ru.axetta.ecafe.processor.core.persistence.Org" column="IdOfOrg" not-null="true"
                      insert="false" update="false"/>

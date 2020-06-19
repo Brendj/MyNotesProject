@@ -44,6 +44,8 @@ public class ResTaloonApprovalItem {
     private Integer resultCode;
     private String errorMessage;
     private Long taloonNumber;
+    private Long complexId;
+    private Boolean byWebSupplier;
 
     public ResTaloonApprovalItem() {
 
@@ -66,6 +68,10 @@ public class ResTaloonApprovalItem {
         this.taloonNumber = taloon.getTaloonNumber();
         this.version = taloon.getVersion();
         this.deletedState = taloon.getDeletedState();
+        if (taloon.getComplexId() != null) {
+            this.complexId = taloon.getComplexId();
+        }
+        this.byWebSupplier = taloon.getByWebSupplier() == null ? false : taloon.getByWebSupplier();
     }
 
     public ResTaloonApprovalItem(TaloonApproval taloon, Integer ordersCount, Integer resCode) {
@@ -102,6 +108,10 @@ public class ResTaloonApprovalItem {
         if (createdType != null) {
             XMLUtils.setAttributeIfNotNull(element, "CreatedType", createdType.ordinal());
         }
+        if (complexId != null) {
+            XMLUtils.setAttributeIfNotNull(element, "ComplexId", complexId);
+        }
+        XMLUtils.setAttributeIfNotNull(element, "ByWebSupplier", byWebSupplier);
         XMLUtils.setAttributeIfNotNull(element,"GoodsName",this.goodsName);
         XMLUtils.setAttributeIfNotNull(element,"GoodsGuid",this.goodsGuid == null ? "" : this.goodsGuid);
         if(isppState != null) XMLUtils.setAttributeIfNotNull(element, "ISPP_State", isppState.ordinal());
@@ -264,5 +274,21 @@ public class ResTaloonApprovalItem {
 
     public void setPpState(TaloonPPStatesEnum ppState) {
         this.ppState = ppState;
+    }
+
+    public Long getComplexId() {
+        return complexId;
+    }
+
+    public void setComplexId(Long complexId) {
+        this.complexId = complexId;
+    }
+
+    public Boolean getByWebSupplier() {
+        return byWebSupplier;
+    }
+
+    public void setByWebSupplier(Boolean byWebSupplier) {
+        this.byWebSupplier = byWebSupplier;
     }
 }

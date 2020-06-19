@@ -69,6 +69,8 @@ public class OrderDetail {
     private String manufacturer;
     private boolean sendToExternal;
     private OrderDetailFRationType fRation;
+    private Long idOfComplex;
+    private Long idOfDish;
 
     public String getManufacturer() {
         return manufacturer;
@@ -284,6 +286,22 @@ public class OrderDetail {
 
     public void setSendToExternal(boolean sendToExternal) {
         this.sendToExternal = sendToExternal;
+    }
+
+    public Long getIdOfComplex() {
+        return idOfComplex;
+    }
+
+    public void setIdOfComplex(Long idOfComplex) {
+        this.idOfComplex = idOfComplex;
+    }
+
+    public Long getIdOfDish() {
+        return idOfDish;
+    }
+
+    public void setIdOfDish(Long idOfDish) {
+        this.idOfDish = idOfDish;
     }
 
     @Override

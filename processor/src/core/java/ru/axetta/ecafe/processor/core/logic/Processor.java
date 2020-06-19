@@ -4282,9 +4282,15 @@ public class Processor implements SyncProcessor {
                             orderDetail.setGood(good);
                         }
                     }
+                    if (purchase.getIdOfComplex() != null) {
+                        orderDetail.setIdOfComplex(purchase.getIdOfComplex());
+                    }
+                    if (purchase.getIdOfDish() != null) {
+                        orderDetail.setIdOfDish(purchase.getIdOfDish());
+                    }
                     if (saveAllPreorderDetails || purchase.getGuidPreOrderDetail() != null) {
                         savePreorderGuidFromOrderDetail(persistenceSession, purchase.getGuidPreOrderDetail(),
-                                orderDetail, false, preorderComplex, purchase.getItemCode());
+                                orderDetail, false, preorderComplex, purchase.getItemCode(), payment.getRSum());
                     }
                     persistenceSession.save(orderDetail);
                     totalPurchaseDiscount += purchase.getDiscount() * Math.abs(purchase.getQty());
