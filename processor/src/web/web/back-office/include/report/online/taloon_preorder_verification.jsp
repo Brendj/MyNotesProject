@@ -71,8 +71,9 @@
                                status="reportGenerateStatus" id="reloadButton"/>
 
             <a4j:commandButton value="Подтвердить" action="#{mainPage.taloonPreorderVerificationPage.apply}"
-                               disabled="#{!mainPage.taloonPreorderVerificationPage.changedData}"
-                               reRender="taloonPreorderVerificationTable" styleClass="command-button"
+                               reRender="buttons" styleClass="command-button"
+                               disabled="#{!mainPage.taloonPreorderVerificationPage.changedData or
+                               mainPage.taloonPreorderVerificationPage.needFillQty}"
                                status="reportGenerateStatus" id="applyAbove"/>
         </h:panelGrid>
         <h:panelGrid styleClass="borderless-grid">
@@ -142,19 +143,19 @@
                            center-aligned-column, center-aligned-column, center-aligned-column, center-aligned-column,
                            center-aligned-column">
                     <%--       Дата--%>
-                    <rich:column headerClass="column-header" rowspan="#{item.getDetailsSize()}"
+                    <rich:column headerClass="column-header" rowspan="#{item.detailsSize}"
                                  rendered="#{item.getRowInItem(rowComplexKey, rowDetailKey) eq 0}">
                         <h:outputText escape="false" value="<strong>"
                                       rendered="#{detail.summaryDay}"/>
                         <h:outputText escape="true" value="#{item.taloonDate}" styleClass="output-text"
-                                      converter="dateConverter" rendered="#{!complex.taloonDateEmpty()}"/>
+                                      converter="dateConverter" rendered="#{!complex.taloonDateEmpty}"/>
                         <h:outputText escape="true" value="Итого" styleClass="output-text"
-                                      rendered="#{complex.taloonDateEmpty()}"/>
+                                      rendered="#{complex.taloonDateEmpty}"/>
                         <h:outputText escape="false" value="</strong>"
                                       rendered="#{detail.summaryDay}"/>
                     </rich:column>
                     <%--        Комплекс--%>
-                    <rich:column headerClass="column-header" rowspan="#{complex.details.size()}"
+                    <rich:column headerClass="column-header" rowspan="#{complex.detailsSize}"
                                  rendered="#{rowDetailKey eq 0}">
                         <h:outputText value="#{detail.complexName}" styleClass="output-text"/>
                     </rich:column>
@@ -242,25 +243,25 @@
                     <%--        Отгрузка шт--%>
                     <rich:column headerClass="column-header" width="4">
                         <h:inputTextarea value="#{detail.shippedQty}" styleClass="output-text" cols="4" rows="1"
-                                         rendered="#{detail.enableEditShippedQty() and !detail.needFillShippedQty()}"
+                                         rendered="#{detail.enableEditShippedQty and !detail.needFillShippedQty}"
                                          validatorMessage="Поле Отгрузка не может содержать более 4 символов">
                             <f:validateLength maximum="4"/>
-                            <a4j:support event="onchange" action="#{mainPage.taloonPreorderVerificationPage.changeData()}"
+                            <a4j:support event="onchange" action="#{detail.setChangedData(true)}"
                                          reRender="buttons"/>
                         </h:inputTextarea>
                         <h:inputTextarea value="#{detail.shippedQty}" styleClass="output-text" cols="4" rows="1"
-                                         rendered="#{detail.enableEditShippedQty() and detail.needFillShippedQty()}"
+                                         rendered="#{detail.enableEditShippedQty and detail.needFillShippedQty}"
                                          validatorMessage="Заполните поле Отгрузка">
                             <f:validateLongRange minimum="1" maximum="9999"/>
-                            <a4j:support event="onchange" action="#{mainPage.taloonPreorderVerificationPage.changeData()}"
+                            <a4j:support event="onchange" action="#{detail.setChangedData(true)}"
                                          reRender="buttons"/>
                         </h:inputTextarea>
                         <h:outputText escape="false" value="<strong>"
                                       rendered="#{detail.summaryDay}"/>
                         <h:outputText escape="true" value="#{detail.shippedQty}" styleClass="output-text"
-                                      rendered="#{!detail.enableEditShippedQty() and !detail.isEmptyShippedQty()}"/>
+                                      rendered="#{!detail.enableEditShippedQty and !detail.emptyShippedQty}"/>
                         <h:outputText escape="true" value="#{detail.reservedQty}" styleClass="output-text"
-                                      rendered="#{!detail.enableEditShippedQty() and detail.isEmptyShippedQty()}"/>
+                                      rendered="#{!detail.enableEditShippedQty and detail.emptyShippedQty}"/>
                         <h:outputText escape="false" value="</strong>"
                                       rendered="#{detail.summaryDay}"/>
                     </rich:column>
@@ -275,20 +276,19 @@
                     </rich:column>
                     <%--        Разница шт--%>
                     <rich:column headerClass="column-header">
-                        <h:outputText escape="false" value="<strong>"
-                                      rendered="#{detail.summaryDay}"/>
-                        <h:outputText escape="true" value="#{detail.differedQty}" styleClass="output-text"/>
-                        <h:outputText escape="false" value="</strong>"
-                                      rendered="#{detail.summaryDay}"/>
+                        <h:outputText escape="false" value="<strong>" rendered="#{detail.summaryDay and !detail.emptyTotal}"/>
+                        <h:outputText escape="true" value="#{detail.shippedQty - detail.soldQty}" styleClass="output-text"
+                                      rendered="#{!detail.emptyTotal}"/>
+                        <h:outputText escape="false" value="</strong>" rendered="#{detail.summaryDay and !detail.emptyTotal}"/>
                     </rich:column>
                     <%--        Разница руб--%>
                     <rich:column headerClass="column-header">
                         <h:outputText escape="false" value="<strong>"
-                                      rendered="#{detail.summaryDay}"/>
-                        <h:outputText escape="true" value="#{detail.differedSum}" styleClass="output-text"
-                                      converter="copeckSumConverter"/>
+                                      rendered="#{detail.summaryDay and !detail.emptyTotal}"/>
+                        <h:outputText escape="true" value="#{(detail.shippedQty - detail.soldQty) * detail.price}" styleClass="output-text"
+                                      rendered="#{!detail.emptyTotal}" converter="copeckSumConverter"/>
                         <h:outputText escape="false" value="</strong>"
-                                      rendered="#{detail.summaryDay}"/>
+                                      rendered="#{detail.summaryDay and !detail.emptyTotal}"/>
                     </rich:column>
                     <%--        Статус ОО--%>
                     <rich:column headerClass="column-header">
@@ -297,80 +297,88 @@
                     <%--        Статус ПП--%>
                     <rich:column headerClass="column-header">
                         <%--            Изменить статус записи--%>
-
                         <a4j:commandLink reRender="buttons"
                                          rendered="#{detail.ppStateNotSelected}"
-                                         action="#{mainPage.taloonPreorderVerificationPage.switchPpState()}"
-                                         onclick="if (#{!detail.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }"
+                                         action="#{mainPage.taloonPreorderVerificationPage.switchPpState}"
+                                         onclick="if (#{!detail.allowedSetFirstFlag}) { alert('Операция запрещена'); return false; }"
                                          style="color:lightgray;">
                             <f:setPropertyActionListener value="#{detail}"
                                                          target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
                             <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}"
                                                          target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
+                            <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
                             <h:graphicImage value="/images/taloons/applied-gray.png"/>
                         </a4j:commandLink>
 
                         <a4j:commandLink reRender="buttons"
                                          rendered="#{detail.ppStateNotSelected}"
-                                         action="#{mainPage.taloonPreorderVerificationPage.switchPpState()}"
-                                         oncomplete="if (#{detail.needFillShippedQty()}) { alert('Заполните отгрузку ПП'); }"
-                                         onclick="if (#{!detail.allowedSetSecondFlag()}) { alert('Операция запрещена'); return false; }"
+                                         action="#{mainPage.taloonPreorderVerificationPage.switchPpState}"
+                                         oncomplete="if (#{detail.needFillShippedQty}) { alert('Заполните отгрузку ПП'); }"
+                                         onclick="if (#{!detail.allowedSetSecondFlag}) { alert('Операция запрещена'); return false; }"
                                          style="color:lightgray;">
                             <f:setPropertyActionListener value="#{detail}"
                                                          target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
                             <f:setPropertyActionListener value="#{detail.ppStateToTurnOnSecond}"
                                                          target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
+                            <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
                             <h:graphicImage value="/images/taloons/canceled-gray.png"/>
                         </a4j:commandLink>
 
                         <a4j:commandLink reRender="buttons" rendered="#{detail.ppStateCanceled}"
-                                         action="#{mainPage.taloonPreorderVerificationPage.resetPpState()}"
-                                         onclick="if (#{!detail.allowedClearSecondFlag()}) { alert('Операция запрещена'); return false; }">
+                                         action="#{mainPage.taloonPreorderVerificationPage.resetPpState}"
+                                         onclick="if (#{!detail.allowedClearSecondFlag}) { alert('Операция запрещена'); return false; }">
                             <f:setPropertyActionListener value="#{detail}"
                                                          target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
-                            <f:setPropertyActionListener value="#{detail.ppStateToTurnOnFirst}"
+                            <f:setPropertyActionListener value="#{detail.getPpStateToClear}"
                                                          target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
+                            <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
                             <h:graphicImage value="/images/taloons/canceled.png"/>
                         </a4j:commandLink>
 
                         <a4j:commandLink reRender="buttons"
                                          rendered="#{detail.ppStateConfirmed}"
-                                         action="#{detail.deselectPpState()}"
-                                         onclick="if (#{!detail.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
-                            <f:setPropertyActionListener value="#{detail}" target="#{detail.ppState}"/>
+                                         action="#{detail.deselectPpState}"
+                                         onclick="if (#{!detail.allowedClearFirstFlag}) { alert('Операция запрещена'); return false; }">
+                            <f:setPropertyActionListener value="#{detail}"
+                                                         target="#{mainPage.taloonPreorderVerificationPage.currentTaloonPreorderVerificationDetail}"/>
+                            <f:setPropertyActionListener value="#{detail.getPpStateToClear}"
+                                                         target="#{mainPage.taloonPreorderVerificationPage.currentState}"/>
+                            <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
                             <h:graphicImage value="/images/taloons/applied.png"/>
                         </a4j:commandLink>
 
                         <%--            Подтвердить для всего дня--%>
                         <a4j:commandLink reRender="buttons"
-                                         rendered="#{detail.summaryDay and !detail.isTotal() and !detail.isEmptyTotal()}"
-                                         action="#{item.confirmPpState()}"
-                                         onclick="if (#{!item.allowedSetFirstFlag()}) { alert('Операция запрещена'); return false; }">
-                            <f:setPropertyActionListener value="#{item}" target="#{item.getPpState()}"/>
+                                         rendered="#{detail.summaryDay and !detail.total and !detail.emptyTotal}"
+                                         action="#{item.confirmPpState}"
+                                         onclick="if (#{!item.allowedSetFirstFlag}) { alert('Операция запрещена'); return false; }">
+                            <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
                             <h:graphicImage value="/images/taloons/applied-big.png"/>
                         </a4j:commandLink>
                         <%--            Отменить выбор для всего дня--%>
                         <a4j:commandLink reRender="buttons"
-                                         rendered="#{detail.summaryDay and !detail.isTotal() and !detail.isEmptyTotal()}"
-                                         action="#{item.deselectPpState()}" style="color:lightgray;"
-                                         onclick="if (#{!item.allowedClearFirstFlag()}) { alert('Операция запрещена'); return false; }">
-                            <f:setPropertyActionListener value="#{item}" target="#{item.getPpState()}"/>
+                                         rendered="#{detail.summaryDay and !detail.total and !detail.emptyTotal}"
+                                         action="#{item.deselectPpState}" style="color:lightgray;"
+                                         onclick="if (#{!item.allowedClearFirstFlag}) { alert('Операция запрещена'); return false; }">
+                            <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
                             <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
                         </a4j:commandLink>
 
                         <%--            Подтвердить для всего периода--%>
                         <a4j:commandLink reRender="buttons"
-                                         rendered="#{detail.summaryDay and !detail.isTotal() and detail.isEmptyTotal()}"
-                                         action="#{mainPage.taloonPreorderVerificationPage.confirmPpStateAllDay()}"
-                                         onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedSetPeriodFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                                         rendered="#{detail.summaryDay and !detail.total and detail.emptyTotal}"
+                                         action="#{mainPage.taloonPreorderVerificationPage.confirmPpStateAllDay}"
+                                         onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedSetPeriodFirstFlag}) { alert('Операция запрещена'); return false; }">
+                            <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
                             <h:graphicImage value="/images/taloons/applied-big.png"/>
                         </a4j:commandLink>
                         <%--            Отменить выбор для всего периода--%>
                         <a4j:commandLink reRender="buttons"
-                                         rendered="#{detail.summaryDay and !detail.isTotal() and detail.isEmptyTotal()}"
-                                         action="#{mainPage.taloonPreorderVerificationPage.deselectPpStateAllDay()}"
+                                         rendered="#{detail.summaryDay and !detail.total and detail.emptyTotal}"
+                                         action="#{mainPage.taloonPreorderVerificationPage.deselectPpStateAllDay}"
                                          style="color:lightgray;"
-                                         onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedClearPeriodFirstFlag()}) { alert('Операция запрещена'); return false; }">
+                                         onclick="if (#{!mainPage.taloonPreorderVerificationPage.allowedClearPeriodFirstFlag}) { alert('Операция запрещена'); return false; }">
+                            <f:setPropertyActionListener value="true" target="#{detail.changedData}"/>
                             <h:graphicImage value="/images/taloons/applied-big-gray.png"/>
                         </a4j:commandLink>
 
@@ -379,11 +387,11 @@
                     <%--        Комментарий--%>
                     <rich:column headerClass="column-header">
                         <h:inputTextarea value="#{detail.comments}" styleClass="output-text" id="comment" cols="20"
-                                         rows="2" rendered="#{!detail.summaryDay and !detail.isTotal()}"
+                                         rows="2" rendered="#{!detail.summaryDay and !detail.total}"
                                          validatorMessage="Комментарий не может быть больше 128 символов">
                             <f:validateLength maximum="128"/>
                             <a4j:support event="onchange"
-                                         action="#{mainPage.taloonPreorderVerificationPage.changeData()}"
+                                         action="#{detail.setChangedData(true)}"
                                          reRender="buttons"/>
                         </h:inputTextarea>
                     </rich:column>
@@ -398,7 +406,6 @@
                                                          target="#{mainPage.taloonPreorderVerificationPage.remarksToShow}"/>
                         </a4j:commandButton>
                     </rich:column>
-
                 </rich:subTable>
             </rich:subTable>
 
@@ -419,7 +426,8 @@
 
         <h:panelGrid styleClass="borderless-grid" columns="1">
             <a4j:commandButton value="Подтвердить" action="#{mainPage.taloonPreorderVerificationPage.apply}"
-                               disabled="#{!mainPage.taloonPreorderVerificationPage.changedData}"
+                               disabled="#{!mainPage.taloonPreorderVerificationPage.changedData or
+                               mainPage.taloonPreorderVerificationPage.needFillQty}"
                                reRender="taloonPreorderVerificationTable" styleClass="command-button"
                                status="reportGenerateStatus" id="applyButton"/>
         </h:panelGrid>

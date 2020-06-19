@@ -69,7 +69,9 @@ public class ReestrTaloonPreorderProcessor extends AbstractProcessor<ResReestrTa
                     }
 
                     Integer requestedQty = item.getRequestedQty();
-                    Integer shippedQty = item.getShippedQty();
+                    // по умолчанию Отгрузка заполняется значением из поля Заказ ИСПП
+                    Integer shippedQty = item.getShippedQty() == null || item.getShippedQty() == 0 ?
+                            item.getRequestedQty() : item.getShippedQty() ;
                     Integer reservedQty = item.getReservedQty();
                     Integer blockedQty = item.getBlockedQty();
                     TaloonCreatedTypeEnum createdType = item.getCreatedType();

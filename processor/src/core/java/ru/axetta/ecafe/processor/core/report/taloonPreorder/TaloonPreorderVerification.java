@@ -50,7 +50,7 @@ public class TaloonPreorderVerification {
             item.setTaloonDate(date);
             complexMap = new HashMap<>();
             TaloonPreorderVerificationDetail detailSum = new TaloonPreorderVerificationDetail(null, null, null, date,
-                    null, null, "Всего", null, null, 0, 0L, 0, 0L, 0, 0L, 0, 0L, 0, 0L, 0, 0L, null, null, null, null,
+                    null, null, "Всего", null, null, 0, 0L, 0, 0L, 0, 0L, 0, 0L, 0, 0L, null, null, null, null,
                     true);
 
             for (TaloonPreorder taloon : list) {
@@ -63,25 +63,13 @@ public class TaloonPreorderVerification {
                         taloon.getRequestedQty(), (taloon.getPrice() == null || taloon.getRequestedQty() == null) ? 0
                         : taloon.getPrice() * taloon.getRequestedQty(), taloon.getSoldQty(),
                         (taloon.getPrice() == null || taloon.getSoldQty() == null) ? 0
-                                : taloon.getPrice() * taloon.getSoldQty(),
-
-                        // Отгрузка
-                        //taloon.getRequestedQty(),
-                        //(taloon.getPrice() == null || taloon.getRequestedQty() == null) ? 0
-                        //        : taloon.getPrice() * taloon.getRequestedQty(),
-                        taloon.getShippedQty(),
+                                : taloon.getPrice() * taloon.getSoldQty(), taloon.getShippedQty(),
                         (taloon.getPrice() == null || taloon.getShippedQty() == null) ? 0
-                                : taloon.getPrice() * taloon.getShippedQty(),
-
-                        taloon.getReservedQty(),
+                                : taloon.getPrice() * taloon.getShippedQty(), taloon.getReservedQty(),
                         (taloon.getPrice() == null || taloon.getReservedQty() == null) ? 0
                                 : taloon.getPrice() * taloon.getReservedQty(), taloon.getBlockedQty(),
                         (taloon.getPrice() == null || taloon.getBlockedQty() == null) ? 0
                                 : taloon.getPrice() * taloon.getBlockedQty(),
-                        (taloon.getRequestedQty() == null || taloon.getSoldQty() == null) ? 0
-                                : (taloon.getRequestedQty() - taloon.getSoldQty()),
-                        (taloon.getPrice() == null || taloon.getRequestedQty() == null || taloon.getSoldQty() == null)
-                                ? 0 : taloon.getPrice() * (taloon.getRequestedQty() - taloon.getSoldQty()),
                         taloon.getIsppState(), taloon.getPpState(), taloon.getRemarks(), taloon.getComments(), false);
 
                 addComplexToMap(item, complexMap, date, detail, taloon.getComplexId(), taloon.getComplexName());
@@ -95,8 +83,7 @@ public class TaloonPreorderVerification {
                                     detail.getPrice(), detail.getRequestedQty(), detail.getRequestedSum(),
                                     detail.getSoldQty(), detail.getSoldSum(), detail.getShippedQty(),
                                     detail.getShippedSum(), detail.getReservedQty(), detail.getReservedSum(),
-                                    detail.getBlockedQty(), detail.getBlockedSum(), detail.getDifferedQty(),
-                                    detail.getDifferedSum(), null, null, null, null, true));
+                                    detail.getBlockedQty(), detail.getBlockedSum(), null, null, null, null, true));
                 } else {
                     summaryMap.get(taloon.getComplexId() + taloon.getGoodsGuid()).addQtyAndGet(detail);
                 }
@@ -122,7 +109,7 @@ public class TaloonPreorderVerification {
         emptyComplex.setItem(item);
         TaloonPreorderVerificationDetail emptyDetail = new TaloonPreorderVerificationDetail(null, null, null, null,
                 null, null, "За весь период", null, null, null, null, null, null, null, null, null, null, null, null,
-                null, null, null, null, null, null, true);
+                null, null, null, null, true);
         emptyDetail.setComplex(emptyComplex);
         emptyComplex.getDetails().add(emptyDetail);
         item.getComplexes().add(emptyComplex);

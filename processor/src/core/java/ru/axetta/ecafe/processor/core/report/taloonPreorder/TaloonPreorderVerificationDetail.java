@@ -40,8 +40,6 @@ public class TaloonPreorderVerificationDetail {
     private Long reservedSum;
     private Integer blockedQty;
     private Long blockedSum;
-    private Integer differedQty;
-    private Long differedSum;
     private TaloonISPPStatesEnum isppState;
     private TaloonPPStatesEnum ppState;
     private String remarks;
@@ -49,14 +47,25 @@ public class TaloonPreorderVerificationDetail {
     private boolean summaryDay;
     private TaloonPreorderVerificationComplex complex;
 
+    private boolean changedData;
+    private boolean enableEditShippedQty;
+    private boolean needFillShippedQty;
+    private boolean allowedSetFirstFlag;
+    private boolean allowedSetSecondFlag;
+    private boolean total;
+    private boolean emptyTotal;
+    private boolean emptyShippedQty;
+    private boolean allowedClearFirstFlag;
+    private boolean allowedClearSecondFlag;
+
     public TaloonPreorderVerificationDetail() {
     }
 
     public TaloonPreorderVerificationDetail(String guid, Long idOfOrg, Long idOfOrgCreated, Date taloonDate,
             Long complexId, String complexName, String goodsName, String goodsGuid, Long price, Integer requestedQty,
             Long requestedSum, Integer soldQty, Long soldSum, Integer shippedQty, Long shippedSum, Integer reservedQty,
-            Long reservedSum, Integer blockedQty, Long blockedSum, Integer differedQty, Long differedSum,
-            TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState, String remarks, String comments,
+            Long reservedSum, Integer blockedQty, Long blockedSum, TaloonISPPStatesEnum isppState,
+            TaloonPPStatesEnum ppState, String remarks, String comments,
             boolean summaryDay) {
         this.guid = guid;
         this.idOfOrg = idOfOrg;
@@ -77,8 +86,6 @@ public class TaloonPreorderVerificationDetail {
         this.reservedSum = reservedSum;
         this.blockedQty = blockedQty;
         this.blockedSum = blockedSum;
-        this.differedQty = differedQty;
-        this.differedSum = differedSum;
         this.isppState = isppState;
         this.ppState = ppState;
         this.remarks = remarks;
@@ -119,91 +126,91 @@ public class TaloonPreorderVerificationDetail {
         }
     }
 
-    public Boolean allowedSetFirstFlag() {
+    public boolean isAllowedSetFirstFlag() {
         int period = getPeriod();
         if (period == 1) {
             if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED
                     && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CONFIRMED) {
-                return false;
+                return allowedSetFirstFlag = false;
             } else {
-                return true;
+                return allowedSetFirstFlag = true;
             }
         }
         if (period == 2 || period == 3) {
             if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
-                return false;
+                return allowedSetFirstFlag = false;
             } else {
-                return true;
+                return allowedSetFirstFlag = true;
             }
         }
-        return true;
+        return allowedSetFirstFlag = true;
     }
 
-    public Boolean allowedClearFirstFlag() {
+    public boolean isAllowedClearFirstFlag() {
         int period = getPeriod();
         if (period == 1) {
-            return false;
+            return allowedClearFirstFlag = false;
         }
         if (period == 2 || period == 3) {
             if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
-                return false;
+                return allowedClearFirstFlag = false;
             } else {
-                return true;
+                return allowedClearFirstFlag = true;
             }
         }
-        return true;
+        return allowedClearFirstFlag = true;
     }
 
-    public Boolean allowedSetSecondFlag() {
+    public boolean isAllowedSetSecondFlag() {
         int period = getPeriod();
         if (period == 1) {
-            return false;
+            return allowedSetSecondFlag = false;
         }
         if (period == 2 || period == 3) {
             if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
-                return false;
+                return allowedSetSecondFlag = false;
             } else {
-                return true;
+                return allowedSetSecondFlag = true;
             }
         }
-        return true;
+        return allowedSetSecondFlag = true;
     }
 
-    public Boolean allowedClearSecondFlag() {
+    public boolean isAllowedClearSecondFlag() {
         int period = getPeriod();
         if (period == 1) {
             if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED
                     && ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
-                return true;
+                return allowedClearSecondFlag = true;
             } else {
-                return false;
+                return allowedClearSecondFlag = false;
             }
         }
         if (period == 2 || period == 3) {
             if (isppState == TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED) {
-                return false;
+                return allowedClearSecondFlag = false;
             } else {
-                return true;
+                return allowedClearSecondFlag = true;
             }
         }
-        return true;
+        return allowedClearSecondFlag = true;
     }
 
-    public Boolean enableEditShippedQty() {
+    public boolean isEnableEditShippedQty() {
         if (summaryDay) {
-            return false;
+            return enableEditShippedQty = false;
         }
         Date currentDate = new Date();
         Date firstMonthDate = CalendarUtils.getFirstDayOfNextMonth(taloonDate);
         Date redDate = CalendarUtils.addDays(firstMonthDate, 5);
         if (currentDate.after(redDate)) {
-            return false;
+            return enableEditShippedQty = false;
         }
         if (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED
                 || ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED) {
-            return true;
+            return enableEditShippedQty = true;
         } else {
-            return false;
+            return enableEditShippedQty = false;
         }
     }
 
@@ -251,8 +258,8 @@ public class TaloonPreorderVerificationDetail {
         return (ppState == TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED);
     }
 
-    public Boolean needFillShippedQty() {
-        return ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED && (shippedQty == null || shippedQty == 0);
+    public boolean isNeedFillShippedQty() {
+        return needFillShippedQty = ppState == TaloonPPStatesEnum.TALOON_PP_STATE_CANCELED && (shippedQty == null || shippedQty == 0);
     }
 
     public Boolean getRemarksEmpty() {
@@ -270,8 +277,6 @@ public class TaloonPreorderVerificationDetail {
         this.setReservedSum(getLongSum(this.getReservedSum(), arg.getReservedSum()));
         this.setBlockedQty(getIntSum(this.getBlockedQty(), arg.getBlockedQty()));
         this.setBlockedSum(getLongSum(this.getBlockedSum(), arg.getBlockedSum()));
-        this.setDifferedQty(getIntSum(this.getDifferedQty(), arg.getDifferedQty()));
-        this.setDifferedSum(getLongSum(this.getDifferedSum(), arg.getDifferedSum()));
     }
 
     private Integer getIntSum(Integer value1, Integer value2) {
@@ -294,18 +299,17 @@ public class TaloonPreorderVerificationDetail {
         this.ppState = ppState;
     }
 
-    public Boolean isEmptyTotal() {
-        return isSummaryDay() && complexId == null && complexName == null && goodsGuid == null && taloonDate == null;
+    public boolean isEmptyTotal() {
+        return emptyTotal = isSummaryDay() && complexId == null && complexName == null && goodsGuid == null && taloonDate == null;
     }
 
-    public Boolean isEmptyShippedQty() {
-        return shippedQty == null || shippedQty == 0;
+    public boolean isEmptyShippedQty() {
+        return emptyShippedQty = shippedQty == null || shippedQty == 0;
     }
 
-    public Boolean isTotal() {
-        return isSummaryDay() && complexId != null && taloonDate == null;
+    public boolean isTotal() {
+        return total = isSummaryDay() && complexId != null && taloonDate == null;
     }
-
 
     public Long getPrice() {
         return price;
@@ -451,22 +455,6 @@ public class TaloonPreorderVerificationDetail {
         this.blockedSum = blockedSum;
     }
 
-    public Integer getDifferedQty() {
-        return differedQty;
-    }
-
-    public void setDifferedQty(Integer differedQty) {
-        this.differedQty = differedQty;
-    }
-
-    public Long getDifferedSum() {
-        return differedSum;
-    }
-
-    public void setDifferedSum(Long differedSum) {
-        this.differedSum = differedSum;
-    }
-
     public Long getComplexId() {
         return complexId;
     }
@@ -521,5 +509,13 @@ public class TaloonPreorderVerificationDetail {
 
     public void setShippedQty(Integer shippedQty) {
         this.shippedQty = shippedQty;
+    }
+
+    public boolean isChangedData() {
+        return changedData;
+    }
+
+    public void setChangedData(boolean changedData) {
+        this.changedData = changedData;
     }
 }

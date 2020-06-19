@@ -46,7 +46,11 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
     private TaloonPreorderVerificationItem currentTaloonPreorderVerificationItem;
     private String currentState;
     private String remarksToShow;
+
     private boolean changedData;
+    private boolean needFillQty;
+    private boolean allowedSetPeriodFirstFlag;
+    private boolean allowedClearPeriodFirstFlag;
 
     private static final Logger logger = LoggerFactory.getLogger(TaloonPreorderVerificationPage.class);
 
@@ -91,6 +95,7 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
 
     public void apply() throws Exception {
         Session session = null;
+        changedData = false;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             builder.applyChanges(session, items);
@@ -102,6 +107,7 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
 
     public void reload() throws Exception {
         Session session = null;
+        changedData = false;
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             setItems(builder.getItems(session, startDate, endDate, idOfOrg));
@@ -161,35 +167,54 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
         }
     }
 
-    public boolean allowedSetPeriodFirstFlag() {
+    public boolean isAllowedSetPeriodFirstFlag() {
         for (TaloonPreorderVerificationItem item : items) {
-            if (item.allowedSetFirstFlag()) {
-                return true;
+            if (item.isAllowedSetFirstFlag()) {
+                return allowedSetPeriodFirstFlag = true;
             }
         }
-        return false;
+        return allowedSetPeriodFirstFlag = false;
     }
 
-    public boolean allowedClearPeriodFirstFlag() {
+    public boolean isAllowedClearPeriodFirstFlag() {
         for (TaloonPreorderVerificationItem item : items) {
-            if (item.allowedClearFirstFlag()) {
-                return true;
+            if (item.isAllowedClearFirstFlag()) {
+                return allowedClearPeriodFirstFlag = true;
             }
         }
-        return false;
+        return allowedClearPeriodFirstFlag = false;
     }
 
-    public void changeData() {
+    public boolean isChangedData() {
+        if (items == null) {
+            return changedData = false;
+        }
         for (TaloonPreorderVerificationItem item : items) {
             for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
                 for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
-                    if (detail.needFillShippedQty()) {
-                        changedData = false;
+                    if (detail.isChangedData()) {
+                        return changedData = true;
                     }
                 }
             }
         }
-        changedData = true;
+        return changedData = false;
+    }
+
+    public boolean isNeedFillQty() {
+        if (items == null) {
+            return needFillQty = false;
+        }
+        for (TaloonPreorderVerificationItem item : items) {
+            for (TaloonPreorderVerificationComplex complex : item.getComplexes()) {
+                for (TaloonPreorderVerificationDetail detail : complex.getDetails()) {
+                    if (detail.isNeedFillShippedQty()) {
+                        return needFillQty = true;
+                    }
+                }
+            }
+        }
+        return needFillQty = false;
     }
 
     public boolean isPpStateNotSelected() {
@@ -292,13 +317,5 @@ public class TaloonPreorderVerificationPage extends BasicWorkspacePage implement
 
     public void setRemarksToShow(String remarksToShow) {
         this.remarksToShow = remarksToShow;
-    }
-
-    public boolean getChangedData() {
-        return changedData;
-    }
-
-    public void setChangedData(boolean changedData) {
-        this.changedData = changedData;
     }
 }
