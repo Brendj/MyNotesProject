@@ -4806,12 +4806,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     @Override
     public Result setGuardianshipDisabled(@WebParam(name = "contractId") Long contractId,
             @WebParam(name = "guardMobile") String guardMobile, @WebParam(name = "value") Boolean value,
-            @WebParam(name = "roleRepresentative") Integer roleRepresentative) {
+            @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal) {
         authenticateRequest(contractId);
-        return processSetGuardianship(contractId, guardMobile, value, roleRepresentative);
+        return processSetGuardianship(contractId, guardMobile, value, roleRepresentativePrincipal);
     }
 
-    private Result processSetGuardianship(Long contractId, String guardMobile, Boolean value, Integer roleRepresentative) {
+    private Result processSetGuardianship(Long contractId, String guardMobile, Boolean value, Integer roleRepresentativePrincipal) {
         Result result = new Result();
 
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
@@ -4822,7 +4822,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new InvalidDataException("Не заполнен номер телефона опекуна");
             }
 
-            if (roleRepresentative != null && (roleRepresentative < 0 || roleRepresentative > 2)) {
+            if (roleRepresentativePrincipal != null && (roleRepresentativePrincipal < 0 || roleRepresentativePrincipal > 2)) {
                 throw new InvalidDataException("Возможно только законным представителем");
             }
             session = runtimeContext.createPersistenceSession();
@@ -4850,7 +4850,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         cg.setDisabled(value);
                         cg.setVersion(getClientGuardiansResultVersion(session));
                         cg.setLastUpdate(new Date());
-                        cg.setRepresentType(ClientGuardianRepresentType.fromInteger(roleRepresentative));
+                        cg.setRepresentType(ClientGuardianRepresentType.fromInteger(roleRepresentativePrincipal));
                         session.persist(cg);
                     }
                 }
