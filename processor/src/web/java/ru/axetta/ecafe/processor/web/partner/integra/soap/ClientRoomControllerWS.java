@@ -65,8 +65,6 @@ import ru.axetta.ecafe.processor.web.partner.integra.dataflow.org.OrgSummaryResu
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummary;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryList;
 import ru.axetta.ecafe.processor.web.partner.integra.dataflow.visitors.VisitorsSummaryResult;
-import ru.axetta.ecafe.processor.web.partner.integra.soap.XMLTypes.EnterCulture;
-import ru.axetta.ecafe.processor.web.partner.integra.soap.XMLTypes.Guardian;
 import ru.axetta.ecafe.processor.web.partner.preorder.MenuDetailNotExistsException;
 import ru.axetta.ecafe.processor.web.partner.preorder.NotEditedDayException;
 import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
@@ -8034,13 +8032,22 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result addGuardian(@WebParam(name = "guardian") Guardian guardian)
-    {
+    public Result addGuardian(@WebParam(name = "firstName") String firstName,
+            @WebParam(name = "secondName") String secondName, @WebParam(name = "surname") String surname,
+            @WebParam(name = "mobile") String mobile, @WebParam(name = "gender") Integer gender,
+            @WebParam(name = "childContractId") Long childContractId,
+            @WebParam(name = "creatorMobile") String creatorMobile,
+            @WebParam(name = "passportNumber") String passportNumber,
+            @WebParam(name = "passportSeries") String passportSeries,
+            @WebParam(name = "typeCard") Integer typeCard,
+            @WebParam(name = "roleRepresentative") Integer roleRepresentative,
+            @WebParam(name = "degree") Integer relation) {
+
         authenticateRequest(null);
 
-        String mobilePhone = Client.checkAndConvertMobile(guardian.getMobile());
-        if (StringUtils.isEmpty(guardian.getFirstName()) || StringUtils.isEmpty(guardian.getSurname()) || StringUtils.isEmpty(mobilePhone)
-                || guardian.getChildContractId() == null) {
+        String mobilePhone = Client.checkAndConvertMobile(mobile);
+        if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(surname) || StringUtils.isEmpty(mobilePhone)
+                || childContractId == null) {
             return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
         }
         if (StringUtils.isEmpty(mobilePhone)) {
@@ -8055,21 +8062,21 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             transaction = session.beginTransaction();
 
             String dateString = new SimpleDateFormat("dd.MM.yyyy").format(new Date(System.currentTimeMillis()));
-            String remark = String.format(COMMENT_MPGU_CREATE, dateString, guardian.getCreatorMobile());
-            Client client = findClient(session, guardian.getChildContractId(), null, result);
+            String remark = String.format(COMMENT_MPGU_CREATE, dateString, creatorMobile);
+            Client client = findClient(session, childContractId, null, result);
             if (client == null) {
                 return new Result(RC_CLIENT_NOT_FOUND, RC_CLIENT_NOT_FOUND_DESC);
             }
 
             Org org = client.getOrg();
             int count = 0;
-            Client guardian1 = null;
-            if (guardian.getSurname() == null) {
-                guardian.setSurname("");
+            Client guardian = null;
+            if (secondName == null) {
+                secondName = "";
             }
             //List<Client> guardians = ClientManager.findGuardiansByClient(session, client.getIdOfClient());
             List<Client> exClients = DAOUtils
-                    .findClientsByFIO(session, org.getFriendlyOrg(), guardian.getFirstName(), guardian.getSurname(), guardian.getSecondName(), mobilePhone);
+                    .findClientsByFIO(session, org.getFriendlyOrg(), firstName, surname, secondName, mobilePhone);
             for (Client cl : exClients) {
                 if (cl.getClientGroup() == null || cl.getClientGroup().getCompositeIdOfClientGroup()
                         .getIdOfClientGroup().equals(ClientGroup.Predefined.CLIENT_DELETED.getValue()) || cl
@@ -8081,39 +8088,36 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                     return new Result(RC_INVALID_DATA, "Клиент уже зарегистрирован");
                 }*/
                 count++;
-                guardian1 = cl;
+                guardian = cl;
             }
             if (count > 1) {
                 return new Result(RC_SEVERAL_CLIENTS_WERE_FOUND, RC_SEVERAL_CLIENTS_WERE_FOUND_DESC);
             }
-            if (guardian1 == null) {
-                Integer gender = guardian.getGender();
+            if (guardian == null) {
                 if (gender != null && gender.equals(2)) {
                     gender = 0;
                 } else {
                     gender = 1;
                 }
-                guardian1 = ClientManager
-                        .createGuardianTransactionFree(session, guardian.getFirstName(), guardian.getSecondName(),
-                                guardian.getSurname(), guardian.getMobile(), remark, gender,
-                                org, ClientCreatedFromType.MPGU, guardian.getCreatorMobile(), null,
-                                guardian.getPassportNumber(), guardian.getPassportSeries(),
+                guardian = ClientManager
+                        .createGuardianTransactionFree(session, firstName, secondName, surname, mobile, remark, gender,
+                                org, ClientCreatedFromType.MPGU, creatorMobile, null, passportNumber, passportSeries,
                                 null, null);
             } else {
                 long clientRegistryVersion = DAOUtils.updateClientRegistryVersionWithPessimisticLock();
-                guardian1.setClientRegistryVersion(clientRegistryVersion);
-                guardian1.setCreatedFromDesc(guardian.getCreatorMobile());
-                guardian1.setPassportNumber(guardian.getPassportNumber());
-                guardian1.setPassportSeries(guardian.getPassportSeries());
-                session.update(guardian1);
+                guardian.setClientRegistryVersion(clientRegistryVersion);
+                guardian.setCreatedFromDesc(creatorMobile);
+                guardian.setPassportNumber(passportNumber);
+                guardian.setPassportSeries(passportSeries);
+                session.update(guardian);
             }
 
             ClientGuardian clientGuardian = DAOUtils
-                    .findClientGuardian(session, client.getIdOfClient(), guardian1.getIdOfClient());
+                    .findClientGuardian(session, client.getIdOfClient(), guardian.getIdOfClient());
             if (clientGuardian == null) {
                 clientGuardian = ClientManager
-                        .createClientGuardianInfoTransactionFree(session, guardian1, ClientGuardianRelationType.fromInteger(guardian.getRelation().intValue()).getDescription(), false, client.getIdOfClient(),
-                                ClientCreatedFromType.MPGU, guardian.getRoleRepresentative());
+                        .createClientGuardianInfoTransactionFree(session, guardian, ClientGuardianRelationType.fromInteger(relation).getDescription(), false, client.getIdOfClient(),
+                                ClientCreatedFromType.MPGU, roleRepresentative);
             } else if (clientGuardian.getDeletedState() || clientGuardian.isDisabled()) {
                 Long newGuardiansVersions = ClientManager.generateNewClientGuardianVersion(session);
                 clientGuardian.restore(newGuardiansVersions);
@@ -8121,8 +8125,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 session.update(clientGuardian);
             }
             session.flush();
-            result = addCardRequest(session, guardian.getTypeCard(), guardian.getPassportNumber(),
-                    guardian.getPassportSeries(), guardian1, guardian.getCreatorMobile(),
+            result = addCardRequest(session, typeCard, passportNumber, passportSeries, guardian, creatorMobile,
                     clientGuardian);
 
             transaction.commit();
@@ -8515,34 +8518,38 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     }
 
     @Override
-    public Result enterCulture(@WebParam(name = "enterCulture") EnterCulture enterCulture) {
+    public Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "orgCode") String orgCode,
+            @WebParam(name = "CultureName") String cultureName,
+            @WebParam(name = "CultureShortName") String cultureShortName,
+            @WebParam(name = "CultureAddress") String cultureAddress, @WebParam(name = "accessTime") Date accessTime,
+            @WebParam(name = "eventsStatus") Long eventsStatus) {
 
         authenticateRequest(null);
-        if (StringUtils.isEmpty(enterCulture.getGuid())) {
+        if (StringUtils.isEmpty(guid)) {
             return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
         }
 
-        if (StringUtils.isEmpty(enterCulture.getOrgCode())) {
+        if (StringUtils.isEmpty(orgCode)) {
             return new Result(RC_INVALID_DATA, "Код организации не может быть пустым");
         }
 
-        if (StringUtils.isEmpty(enterCulture.getCultureName())) {
+        if (StringUtils.isEmpty(cultureName)) {
             return new Result(RC_INVALID_DATA, "Ниаменование не может быть пустым");
         }
 
-        if (StringUtils.isEmpty(enterCulture.getCultureShortName())) {
+        if (StringUtils.isEmpty(cultureShortName)) {
             return new Result(RC_INVALID_DATA, "Краткое наименование не может быть пустым");
         }
 
-        if (StringUtils.isEmpty(enterCulture.getCultureAddress())) {
+        if (StringUtils.isEmpty(cultureAddress)) {
             return new Result(RC_INVALID_DATA, "Адрес организации не может быть пустым");
         }
 
-        if (enterCulture.getAccessTime() == null) {
+        if (accessTime == null) {
             return new Result(RC_INVALID_DATA, "Время события не может быть пустым");
         }
 
-        if (enterCulture.getEventsStatus() == null || (enterCulture.getEventsStatus() < 0 || enterCulture.getEventsStatus() > 5)) {
+        if (eventsStatus == null || (eventsStatus < 0 || eventsStatus > 5)) {
             return new Result(RC_INVALID_DATA, "Некорректный статус события");
         }
 
@@ -8551,7 +8558,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
-            Client cl = DAOUtils.findClientByGuid(session, enterCulture.getGuid());
+            Client cl = DAOUtils.findClientByGuid(session, guid);
             if (cl == null) {
                 return new Result(RC_INVALID_DATA, RC_CLIENT_GUID_NOT_FOUND_DESC);
             }
@@ -8561,23 +8568,23 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         .saveLastCardActivity(session, card.getIdOfCard(), CardActivityType.ENTER_MUSEUM);
             }
             //здесь сохранение события в таблицу и отправка уведомления
-            if (enterCulture.getCultureName() != null && enterCulture.getCultureName().length() > 255) {
-                enterCulture.setCultureName(enterCulture.getCultureName().substring(0, 255));
+            if (cultureName != null && cultureName.length() > 255) {
+                cultureName = cultureName.substring(0, 255);
             }
             ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
-            ExternalEvent event = new ExternalEvent(cl, enterCulture.getOrgCode(), enterCulture.getCultureName(),
-                    enterCulture.getCultureAddress(),
-                    ExternalEventType.CULTURE, enterCulture.getAccessTime(),
-                    ExternalEventStatus.fromInteger(enterCulture.getEventsStatus().intValue()), handler);
+            ExternalEvent event = new ExternalEvent(cl, orgCode, cultureName,
+                    cultureAddress,
+                    ExternalEventType.CULTURE, accessTime,
+                    ExternalEventStatus.fromInteger(eventsStatus.intValue()), handler);
             session.save(event);
             transaction.commit();
             transaction = null;
 
             //отправка уведомления
-            if (CalendarUtils.isDateToday(enterCulture.getAccessTime())) {
+            if (CalendarUtils.isDateToday(accessTime)) {
                 ExternalEventNotificationService notificationService = RuntimeContext.getAppContext()
                         .getBean(ExternalEventNotificationService.class);
-                notificationService.setCultureShortName(enterCulture.getCultureShortName());
+                notificationService.setCultureShortName(cultureShortName);
                 notificationService.sendNotification(cl, event);
             }
             return new Result(RC_OK, RC_OK_DESC);
