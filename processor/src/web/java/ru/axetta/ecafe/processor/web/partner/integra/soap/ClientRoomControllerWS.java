@@ -189,6 +189,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final Long RC_NOT_EDITED_DAY = 700L;
     private static final Long RC_WRONG_GROUP = 710L;
     private static final Long RC_MOBILE_DIFFERENT_GROUPS = 711L;
+    private static final Long RC_INVALID_CREATOR = 720L;
 
 
     private static final String RC_OK_DESC = "OK";
@@ -242,6 +243,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_INVALID_INPUT_DATA = "Неверные входные данные";
     private static final String RC_WRONG_GROUP_DESC = "Неверная группа клиента";
     private static final String RC_MOBILE_DIFFERENT_GROUPS_DESC = "Номер принадлежит клиентам из разных групп";
+    private static final String RC_INVALID_CREATOR_DESC = "Данный клиент не может добавить представителя";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -8045,14 +8047,36 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
         authenticateRequest(null);
 
+        String mobilePhoneCreator = Client.checkAndConvertMobile(creatorMobile);
         String mobilePhone = Client.checkAndConvertMobile(mobile);
         if (StringUtils.isEmpty(firstName) || StringUtils.isEmpty(surname) || StringUtils.isEmpty(mobilePhone)
-                || childContractId == null) {
+                || childContractId == null || StringUtils.isEmpty(mobilePhoneCreator)) {
             return new Result(RC_INVALID_DATA, "Не заполнены обязательные поля");
         }
         if (StringUtils.isEmpty(mobilePhone)) {
             return new Result(RC_INVALID_DATA, RC_INVALID_MOBILE);
         }
+
+        //Проверка на возможность создания
+        boolean canAdded = false;
+        Client clientChild = DAOService.getInstance().findClientById(childContractId);
+        if (clientChild == null) {
+            return new Result(RC_INVALID_DATA, RC_CLIENT_NOT_FOUND_DESC);
+        }
+        List<ClientGuardian> clientGuardians = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                .getClientGuardian(clientChild, mobilePhoneCreator);
+        for (ClientGuardian clientGuardian: clientGuardians)
+        {
+            if (clientGuardian.getRepresentType().getCode() == 1 || clientGuardian.getRepresentType().getCode() == 2) {
+                canAdded = true;
+                break;
+            }
+        }
+        if (!canAdded)
+        {
+            return new Result(RC_INVALID_CREATOR, RC_INVALID_CREATOR_DESC);
+        }
+
 
         Result result = new Result();
         Session session = null;
