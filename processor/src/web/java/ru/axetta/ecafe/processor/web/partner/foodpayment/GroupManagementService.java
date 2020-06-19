@@ -171,7 +171,7 @@ public class GroupManagementService implements IGroupManagementService {
             if (groups.size() == 0) throw new RequestProcessingException(GroupManagementErrors.GROUP_NOT_FOUND);
             GroupNamesToOrgs gnto = DAOUtils.findGroupFromGroupNamesToOrgs(persistanceSession, idOfOrgList, nameOfGroup);
             ClientGroup cg = findClientGroup(gnto, groups, idOfOrg);
-            if (cg == null) throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND);
+            if (cg == null) throw new RequestProcessingException(GroupManagementErrors.GROUP_NOT_FOUND);
             
             FPGroup fpGroup = new FPGroup();
             fpGroup.setGroupName(nameOfGroup);
@@ -199,6 +199,7 @@ public class GroupManagementService implements IGroupManagementService {
             for (ClientGroup clientGroup : groups) {
                 if (clientGroup.getCompositeIdOfClientGroup().getIdOfOrg().equals(idOfOrg)) return clientGroup;
             }
+            return null;
         }
         for (ClientGroup clientGroup : groups) {
             if (clientGroup.getCompositeIdOfClientGroup().getIdOfOrg().equals(gnto.getIdOfOrg())) return clientGroup;
