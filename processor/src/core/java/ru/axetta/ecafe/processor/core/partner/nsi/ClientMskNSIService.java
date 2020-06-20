@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.OrgSync;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.ImportRegisterMSKClientsService;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -34,19 +35,7 @@ import java.util.*;
 @Component("ClientMskNSIService")
 @Scope("singleton")
 public class ClientMskNSIService extends MskNSIService {
-
     private static final Logger logger = LoggerFactory.getLogger(ClientMskNSIService.class);
-
-    private String getGroup(String currentGroup, String initialGroup) {
-        String group = currentGroup;
-        if (group == null || group.trim().length() == 0) {
-            group = initialGroup;
-        }
-        if (group != null) {
-            group = group.replaceAll("[ -]", "");
-        }
-        return group;
-    }
 
     public void fillTable(BufferedReader bufferedReader) throws Exception {
         //stub
@@ -64,7 +53,7 @@ public class ClientMskNSIService extends MskNSIService {
         searchByStatus.setAttributeOp("not like");
         searchPredicateInfo.addSearchPredicate(searchByStatus);
 
-        Boolean guidOK;
+        boolean guidOK;
         for (String guid : orgGuids.getOrgGuids()) {
             guidOK = false;
             if (searchPredicateInfo.getSearchPredicates().size() > 1) {
@@ -137,58 +126,6 @@ public class ClientMskNSIService extends MskNSIService {
 
     public List<ImportRegisterMSKClientsService.ExpandedPupilInfo> getClientsForOrgs(Set<String> guids, String familyName,
             String firstName, String secondName, int importIteration) throws Exception {
-        /*
-        От Козлова
-        */
-        /*String tbl = getNSIWorkTable();
-        String orgFilter = "";
-        if (guids != null && guids.size() > 0) {
-            for (String guid : guids) {
-                if (orgFilter.length() > 0) {
-                    orgFilter += " or ";
-                }
-                orgFilter += "item['" + tbl + "/GUID образовательного учреждения']='" + guid + "'";
-            }
-        }
-
-        String query = "select " +
-                "item['" + tbl + "/Фамилия'], " +
-                "item['" + tbl + "/Имя'], " +
-                "item['" + tbl + "/Отчество'], " +
-                "item['" + tbl + "/GUID'], " +
-                "item['" + tbl + "/Дата рождения'], " +
-                "item['" + tbl + "/Класс или группа зачисления'], " +
-                "item['" + tbl + "/Дата зачисления'], " +
-                "item['" + tbl + "/Дата отчисления'], " +
-                "item['" + tbl + "/Текущий класс или группа'], " +
-                "item['" + tbl + "/GUID образовательного учреждения'], " +
-                "item['" + tbl + "/Статус записи'] " +
-                "from catalog('Реестр обучаемых') " +
-                "where ";
-        if (orgFilter.length() > 0) {
-            query += " item['" + tbl + "/Статус записи'] not like 'Удален%'";
-            query += " and (" + orgFilter + ")";
-            if (familyName != null && familyName.length() > 0) {
-                query += " and item['" + tbl + "/Фамилия'] like '%" + familyName + "%'";
-            }
-            if (firstName != null && firstName.length() > 0) {
-                query += " and item['" + tbl + "/Имя'] like '%" + firstName + "%'";
-            }
-            if (secondName != null && secondName.length() > 0) {
-                query += " and item['" + tbl + "/Отчество'] like '%" + secondName + "%'";
-            }
-        } else { // при поиске по ФИО используем для быстроты только полное совпадение
-            if (familyName != null && familyName.length() > 0) {
-                query += " item['" + tbl + "/Фамилия'] = '" + familyName + "'";
-            }
-            if (firstName != null && firstName.length() > 0) {
-                query += " and item['" + tbl + "/Имя'] = '" + firstName + "'";
-            }
-            if (secondName != null && secondName.length() > 0) {
-                query += " and item['" + tbl + "/Отчество'] = '" + secondName + "'";
-            }
-        }*/
-
         if(guids == null || guids.size() < 1) {
             throw new Exception("Запрос конитингенту без указания организации запрещен. Необходимо указывать организацию!");
         }
@@ -196,7 +133,7 @@ public class ClientMskNSIService extends MskNSIService {
         SearchPredicateInfo searchPredicateInfo = new SearchPredicateInfo();
         searchPredicateInfo.setCatalogName("Реестр обучаемых");
         String guidCase = "";
-        if (guids != null && guids.size() > 0) {
+        if (CollectionUtils.isNotEmpty(guids)) {
             for (String guid : guids) {
                 if(guidCase.length() > 0) {
                     guidCase += ", ";
@@ -301,11 +238,9 @@ public class ClientMskNSIService extends MskNSIService {
                 if (attr.getName().equals("Класс")) {
                     pupilInfo.groupNewWay = getGroupFromClassAttribute(attr);
                 }
-
                 if (attr.getName().equals("GUID образовательного учреждения")) {
                     pupilInfo.guidOfOrg = attr.getValue().get(0).getValue();
                 }
-
                 if (attr.getName().equals("Льготы учащегося")) {
                     List<Integer> benefits = new ArrayList<Integer>();
                     for (GroupValue groupValue : attr.getGroupValue()) {
@@ -317,7 +252,6 @@ public class ClientMskNSIService extends MskNSIService {
                                 }
                             }
                         }
-
                     }
                     Collections.sort(benefits);
                     pupilInfo.benefitDSZN = StringUtils.join(benefits, ",");
@@ -326,7 +260,6 @@ public class ClientMskNSIService extends MskNSIService {
                 if (attr.getName().equals("Пол")) {
                     pupilInfo.gender = attr.getValue().get(0).getValue();
                 }
-
                 if (attr.getName().equals("Представители")) {
                     for (GroupValue groupValue : attr.getGroupValue()) {
                         ImportRegisterMSKClientsService.GuardianInfo guardianInfo = new ImportRegisterMSKClientsService.GuardianInfo();
@@ -370,7 +303,6 @@ public class ClientMskNSIService extends MskNSIService {
                         }
                     }
                 }
-
                 pupilInfo.guardiansCount = String.valueOf(pupilInfo.getGuardianInfoList().size());
             }
 

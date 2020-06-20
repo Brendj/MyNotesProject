@@ -345,7 +345,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         if(guids.size() == 0){
             return new ArrayList<Client>();
         }
-        javax.persistence.Query q = em.createQuery("from Client where clientGUID in :guids");
+        javax.persistence.Query q = em.createQuery("from Client where meshGUID in :guids");
         q.setParameter("guids", guids);
         List<Client> result = q.getResultList();
         return result != null ? result : new ArrayList<Client>();
@@ -385,10 +385,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         List<Client> currentClients = findClientsWithoutPredefinedForOrgAndFriendly(org);
         List<Org> orgsList = DAOUtils.findFriendlyOrgs(em, org);   //  Текущая организация и дружественные ей
 
-        List<String> pupilsGuidList = new ArrayList<String>();
+        List<String> pupilsGuidList = new LinkedList<>();
         for (ExpandedPupilInfo pupil : pupils) {
-            if(pupil.getGuid() != null && !pupil.getGuid().isEmpty()) {
-                pupilsGuidList.add(getPupilGuid(pupil.getGuid()));
+            if(StringUtils.isNotEmpty(pupil.getMeshGUID())) {
+                pupilsGuidList.add(getPupilGuid(pupil.getMeshGUID()));
             }
         }
 
@@ -1202,8 +1202,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         if (idOfRegistryChange == null) {
             return null;
         }
-        RegistryChange change = em.find(RegistryChange.class, idOfRegistryChange);
-        return change;
+        return em.find(RegistryChange.class, idOfRegistryChange);
     }
 
     @Override
@@ -1211,8 +1210,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         if (idOfRegistryChangeError == null) {
             return null;
         }
-        RegistryChangeError e = em.find(RegistryChangeError.class, idOfRegistryChangeError);
-        return e;
+        return em.find(RegistryChangeError.class, idOfRegistryChangeError);
     }
 
     @Override
@@ -1616,10 +1614,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             //  !!!!!!!!!!
             //  !!!!!!!!!!
             saveClients(synchDate, date, System.currentTimeMillis(), org, pupils, logBuffer, false);
-            //DAOService.getInstance().updateOrgRegistrySync(idOfOrg, new Date().getTime());
             return logBuffer;
         } catch (Exception e) {
-            //DAOService.getInstance().updateOrgRegistrySync(idOfOrg, 0);
             isSuccessEnd = false;
             throw e;
         } finally {
@@ -1662,42 +1658,6 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
     private static List<GuardianInfo> emptyIfNull(List<GuardianInfo> list) {
         return list.isEmpty() ? new ArrayList<GuardianInfo>() : list;
     }
-
-    /*
-    // Скедулинг идет через Spring
-    // возможно если нужно будет настраиваемое расписание взять этот код
-
-    public static class SyncJob implements Job {
-        @Override
-        public void execute(JobExecutionContext arg0) throws JobExecutionException {
-            RuntimeContext.getAppContext().getBean(NSISyncService.class).doSync();
-        }
-    }
-
-    final static String JOB_NAME="sync";
-
-
-    public void scheduleSync() throws Exception {
-        mskNSIService.init();
-
-        String syncSchedule = RuntimeContext.getInstance().getNsiServiceConfig().syncSchedule;
-        logger.info("Scheduling NSI sync job: "+syncSchedule);
-        JobDetail jobDetail = new JobDetail(JOB_NAME,Scheduler.DEFAULT_GROUP, SyncJob.class);
-
-        CronTrigger trigger = new CronTrigger(JOB_NAME, Scheduler.DEFAULT_GROUP);
-        //trigger.setStartTime(new Date());
-        //trigger.setEndTime(new Date(new Date().getTime() + 10 * 60 * 1000));
-        trigger.setCronExpression(syncSchedule);
-
-        SchedulerFactory sfb = new StdSchedulerFactory();
-        Scheduler scheduler = sfb.getScheduler();
-        if (scheduler.getTrigger(JOB_NAME, Scheduler.DEFAULT_GROUP)!=null) {
-            scheduler.deleteJob(JOB_NAME, Scheduler.DEFAULT_GROUP);
-        }
-        scheduler.scheduleJob(jobDetail, trigger);
-        scheduler.start();
-    } */
-
 
     public static void log(String str, StringBuffer logBuffer) {
         if (logBuffer != null) {
@@ -1745,6 +1705,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         public String guardiansCount;
         public String ageTypeGroup;
         public String parallel;
+        public String meshGUID;
 
         public List<GuardianInfo> guardianInfoList = new ArrayList<GuardianInfo>();
 
@@ -1862,6 +1823,14 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
         public void setAgeTypeGroup(String ageTypeGroup) {
             this.ageTypeGroup = ageTypeGroup;
+        }
+
+        public String getMeshGUID() {
+            return meshGUID;
+        }
+
+        public void setMeshGUID(String meshGUID) {
+            this.meshGUID = meshGUID;
         }
 
         public void copyFrom(ExpandedPupilInfo pi) {
