@@ -72,7 +72,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                     + "              p.classname AS group,\n"
                     + "              p.deletestate AS deleted,\n"
                     + "              el.title AS ageTypeGroup,\n"
-                    + "              p.organizationid\n"
+                    + "              p.organizationid,\n"
                     + "              p.personguid\n"
                     + "       FROM cf_mh_persons AS p\n"
                     + "                   JOIN cf_orgs AS o ON p.organizationid = o.organizationIdFromNSI\n"
