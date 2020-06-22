@@ -655,7 +655,7 @@ public class PreorderDAOService {
                 || CalendarUtils.betweenDate(regularComplex.getEndDate(), regularPreorder.getStartDate(), regularPreorder.getEndDate());
     }
 
-    private void createNewRegular(Client client, RegularPreorderParam regularComplex,
+    private RegularPreorder createNewRegular(Client client, RegularPreorderParam regularComplex,
             Integer amount, Integer idOfComplex, Date date, boolean isComplex, Long idOfMenu, String guardianMobile,
             PreorderMobileGroupOnCreateType mobileGroupOnCreate, String menuDetailName, Long menuDetailPrice, String itemCode) throws Exception {
         RegularPreorder regularPreorder = null;
@@ -682,6 +682,7 @@ public class PreorderDAOService {
                     RegularPreorderState.CHANGE_BY_USER, mobileGroupOnCreate);
             em.persist(regularPreorder);
         }
+        return regularPreorder;
     }
 
     private void createRegularPreorder(Client client, RegularPreorderParam regularComplex,
@@ -725,7 +726,7 @@ public class PreorderDAOService {
             regularPreorder.setLastUpdate(new Date());
             em.merge(regularPreorder);
         } catch (NoResultException e) {
-            createNewRegular(client, regularComplex,
+            regularPreorder = createNewRegular(client, regularComplex,
                     amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,
                     mobileGroupOnCreate, menuDetailName, menuDetailPrice, itemCode);
         }
