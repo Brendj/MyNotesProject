@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
@@ -192,6 +193,36 @@ public class GroupManagementService implements IGroupManagementService {
             responseClients.getGroups().add(fpGroup);
         }
         return responseClients;
+    }
+
+    @Override
+    public ResponseDiscounts getDiscountsList(Long idOfOrg) throws Exception {
+        List<Long> idOfOrgList = DAOUtils.findFriendlyOrgIds(persistanceSession, idOfOrg);
+        if (idOfOrgList.size() == 0) throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND);
+        ResponseDiscounts responseDiscounts = new ResponseDiscounts();
+        List<CategoryDiscount> categoryDiscounts = DiscountManager.getCategoryDiscounts(persistanceSession);
+        for (CategoryDiscount categoryDiscount : categoryDiscounts) {
+            if (categoryDiscount.getDiscountsRules().size() == 0) continue;
+            for (DiscountRule discountRule : categoryDiscount.getDiscountsRules()) {
+                if (discountRule.getCategoryOrgs().size() == 0) {
+                    ResponseDiscountItem item = new ResponseDiscountItem(categoryDiscount);
+                    responseDiscounts.addItem(item);
+                    continue;
+                }
+                ResponseDiscountItem item = null;
+                for (CategoryOrg categoryOrg : discountRule.getCategoryOrgs()) {
+                    for (Org o : categoryOrg.getOrgs()) {
+                        if (idOfOrgList.contains(o.getIdOfOrg())) {
+                            if (item == null) item = new ResponseDiscountItem(categoryDiscount);
+                            item.addCategoryOrg(categoryOrg.getCategoryName(), o.getIdOfOrg());
+                        }
+                    }
+                }
+                if (item != null) responseDiscounts.addItem(item);
+            }
+        }
+
+        return responseDiscounts;
     }
 
     private ClientGroup findClientGroup(GroupNamesToOrgs gnto, List<ClientGroup> groups, Long idOfOrg) {

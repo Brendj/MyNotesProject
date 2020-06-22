@@ -19,7 +19,6 @@ import javax.ws.rs.*;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
-import java.util.ArrayList;
 import java.util.List;
 
 
@@ -208,18 +207,39 @@ public class SchoolRestController {
         }
     }
 
-    public static class ListLong {
-        private final List<Long> list = new ArrayList<>();
-
-        public ListLong(String value) {
-            String[] arr = value.split(",");
-            for (String str : arr) {
-                list.add(new Long(str));
-            }
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "discounts")
+    public Response getDiscounts(@QueryParam(value = "token") String token, @QueryParam(value = "userId") Long userId,
+            @QueryParam(value = "orgId") Long orgId) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        IGroupManagementService groupManagementService;
+        try{
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            groupManagementService = new GroupManagementService(persistenceSession);
+            ResponseDiscounts responseDiscounts = groupManagementService.getDiscountsList(orgId);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            responseDiscounts.setErrorCode(0);
+            responseDiscounts.setErrorMessage("Ok");
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscounts).build();
         }
-
-        public List<Long> getList() {
-            return list;
+        catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s", token,
+                    userId, orgId, e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
         }
     }
 

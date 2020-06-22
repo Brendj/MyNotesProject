@@ -286,6 +286,12 @@ public class DiscountManager {
         renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode, DELETE_COMMENT);
     }
 
+    public static List<CategoryDiscount> getCategoryDiscounts(Session session) {
+        Criteria criteria = session.createCriteria(CategoryDiscount.class);
+        criteria.add(Restrictions.ne("deletedState", true));
+        return criteria.list();
+    }
+
     public static class ClientDtisznDiscountInfoBuilder {
         private final ClientDtisznDiscountInfo info;
 
