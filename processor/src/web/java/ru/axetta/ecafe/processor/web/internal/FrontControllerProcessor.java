@@ -114,7 +114,7 @@ public class FrontControllerProcessor {
 
     public List<RegistryChangeItemV2> loadRegistryChangeItemsV2_ForClassName(long idOfOrg, long revisionDate, Integer actionFilter,
             String nameFilter, String className) {
-        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
+        SimpleDateFormat dateTimeFormat = new SimpleDateFormat("dd.MM.yyyy");
 
         try {
             List<RegistryChangeItemV2> itemParams = new LinkedList<>();

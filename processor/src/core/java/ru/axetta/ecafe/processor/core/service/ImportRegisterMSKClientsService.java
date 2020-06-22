@@ -16,6 +16,7 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.FieldProcessor;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
 import org.hibernate.Query;
@@ -706,11 +707,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         q.setParameter("notificationId", notificationId);
         q.setParameter("operation", operation);
         List res = q.list();
-        if (res == null || res.size() < 1) {
-            return false;
-        } else {
-            return true;
-        }
+        return CollectionUtils.isNotEmpty(res);
     }
 
     public void addClientChange(long ts, long idOfOrg, Long idOfMigrateOrg,
