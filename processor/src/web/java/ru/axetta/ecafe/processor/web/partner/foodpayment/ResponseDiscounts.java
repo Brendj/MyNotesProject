@@ -6,23 +6,23 @@ package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-import java.util.ArrayList;
-import java.util.List;
+import java.util.HashSet;
+import java.util.Set;
 
 public class ResponseDiscounts extends Result {
     @JsonProperty("Discounts")
-    private List<ResponseDiscountItem> items;
+    private Set<ResponseDiscountItem> items;
 
     public void addItem(ResponseDiscountItem item) {
-        if (this.items == null) this.items = new ArrayList<>();
+        if (this.items == null) this.items = new HashSet<>();
         items.add(item);
     }
 
-    public List<ResponseDiscountItem> getItems() {
+    public Set<ResponseDiscountItem> getItems() {
         return items;
     }
 
-    public void setItems(List<ResponseDiscountItem> items) {
+    public void setItems(Set<ResponseDiscountItem> items) {
         this.items = items;
     }
 }

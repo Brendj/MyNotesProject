@@ -48,6 +48,11 @@ public class ResponseDiscountItem {
         categoryOrgs.add(item);
     }
 
+    @Override
+    public int hashCode() {
+        return idOfCategoryDiscount.hashCode();
+    }
+
     public String getCategoryName() {
         return categoryName;
     }
