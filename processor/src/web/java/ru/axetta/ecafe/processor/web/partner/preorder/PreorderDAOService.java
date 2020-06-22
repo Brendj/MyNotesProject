@@ -709,7 +709,7 @@ public class PreorderDAOService {
             regularPreorder = (RegularPreorder) query.getSingleResult();
             if (regularEquals(regularComplex, regularPreorder) && regularPreorder.getAmount().equals(amount)) return;
             if (!regularDatesIntersect(regularComplex, regularPreorder)) {
-                createNewRegular(client, regularComplex,
+                regularPreorder = createNewRegular(client, regularComplex,
                         amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,
                         mobileGroupOnCreate, menuDetailName, menuDetailPrice, itemCode);
             }
