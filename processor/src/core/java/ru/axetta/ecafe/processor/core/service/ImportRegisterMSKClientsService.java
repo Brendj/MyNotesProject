@@ -383,7 +383,6 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
         //  Открываем сессию и загружаем клиентов, которые сейчас находятся в БД
         Session session = (Session) em.getDelegate();
-        List<Client> currentClients = findClientsWithoutPredefinedForOrgAndFriendly(org);
         List<Org> orgsList = DAOUtils.findFriendlyOrgs(em, org);   //  Текущая организация и дружественные ей
 
         List<String> pupilsGuidList = new LinkedList<>();
@@ -396,12 +395,14 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         List<Client> findByGuidsList = findClientsByGuids(pupilsGuidList);
         Map<String, Client> guidMap = new HashMap<String, Client>();
         for(Client client : findByGuidsList){
-            guidMap.put(getClientGuid(client), client);
+            guidMap.put(client.getMeshGUID(), client);
         }
 
         //  Если используется старый метод полной загрузки контенгента школы, то проверяем каждого ученика в отдельности на его
         //  наличие в школе. Иначе - смотрим флаг удалено/не удалено и в зависимости от этого помещаем ученика в удаленные
-        /*if (deleteClientsIfNotFound) { // Заглушено в рамках логики функционала сверки с МЭШ.Контингент
+        /*
+        List<Client> currentClients = findClientsWithoutPredefinedForOrgAndFriendly(org);
+        if (deleteClientsIfNotFound) { // Заглушено в рамках логики функционала сверки с МЭШ.Контингент
             //  Находим только удаления и подсчитываем их, если их количество больще чем ограничение, то прекращаем обновление школы и
             //  отправляем уведомление на email
             List<Client> clientsToRemove = new ArrayList<Client>();

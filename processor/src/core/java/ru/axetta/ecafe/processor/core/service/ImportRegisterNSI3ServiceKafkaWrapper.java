@@ -147,7 +147,7 @@ public class ImportRegisterNSI3ServiceKafkaWrapper extends ImportRegisterFileSer
                 pupil.group = HibernateUtils.getDbString(row[8]);
                 pupil.deleted = Boolean.parseBoolean(HibernateUtils.getDbString(row[9]));
                 pupil.ageTypeGroup = HibernateUtils.getDbString(row[10]);
-                pupil.meshGUID = HibernateUtils.getDbString(row[11]);
+                pupil.meshGUID = HibernateUtils.getDbString(row[12]);
 
                 pupils.add(pupil);
             }
