@@ -53,6 +53,13 @@ public class ResponseDiscountItem {
         return idOfCategoryDiscount.hashCode();
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (!(o instanceof ResponseDiscountItem)) return false;
+        return idOfCategoryDiscount != null && idOfCategoryDiscount.equals(((ResponseDiscountItem) o).getIdOfCategoryDiscount());
+    }
+
     public String getCategoryName() {
         return categoryName;
     }
