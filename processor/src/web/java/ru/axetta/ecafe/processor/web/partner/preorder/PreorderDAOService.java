@@ -623,7 +623,7 @@ public class PreorderDAOService {
         List<PreorderMenuItemExt> menuItemExtList = new ArrayList<>();
 
         // Определяем подходящий состав комплекса
-        WtComplexesItem complexItem = getWtComplexItemByCycle(wtComplex, org, startDate);
+        WtComplexesItem complexItem = getWtComplexItemByCycle(wtComplex, startDate);
         List<WtDish> wtDishes;
         if (complexItem != null) {
             wtDishes = DAOReadExternalsService.getInstance()
@@ -979,7 +979,7 @@ public class PreorderDAOService {
                         preorderComplex = createWtPreorderComplex(idOfComplex, client, date, complexAmount, null,
                                 nextVersion, guardianMobile, mobileGroupOnCreate);
                         if (complex.getMenuItems() == null) {
-                            //создаем детализацию предзаказа по блюдам меню
+                            // создаем детализацию предзаказа по блюдам меню, т.к. ее нет в запросе
                             Set<PreorderMenuDetail> set = createPreorderWtMenuDetails(idOfComplex, client, date,
                                     preorderComplex, guardianMobile, mobileGroupOnCreate);
                             preorderComplex.setPreorderMenuDetails(set);
@@ -2142,18 +2142,23 @@ public class PreorderDAOService {
     private Set<PreorderMenuDetail> createPreorderWtMenuDetails(Integer idOfComplex, Client client, Date date,
             PreorderComplex preorderComplex, String mobile, PreorderMobileGroupOnCreateType mobileGroupOnCreate)
             throws Exception {
-        WtComplex wtComplex = getWtComplex(client, idOfComplex, date);
-        List<WtDish> list = getWtDishesByComplex(wtComplex);
         Set<PreorderMenuDetail> result = new HashSet<>();
-
-        List<WtDish> dishes = getWtDishesByPreorderComplexAndDates(preorderComplex, client,
-                CalendarUtils.startOfDay(date), CalendarUtils.endOfDay(date));
-
-        for (WtDish wtDish : dishes) {
-            if (!preorderWtMenuDetailExists(preorderComplex, client, date, wtDish.getIdOfDish())) {
-                PreorderMenuDetail pmd = createPreorderWtMenuDetail(client, preorderComplex, wtDish, date, 0,
-                        mobile, mobileGroupOnCreate);
-                result.add(pmd);
+        WtComplex wtComplex = getWtComplex(client, idOfComplex, date);
+        if (wtComplex == null) {
+            return result;
+        }
+        // Определяем подходящий состав комплекса
+        WtComplexesItem complexItem = getWtComplexItemByCycle(wtComplex, CalendarUtils.startOfDay(date));
+        List<WtDish> wtDishes;
+        if (complexItem != null) {
+            wtDishes = DAOReadExternalsService.getInstance()
+                    .getWtDishesByComplexItemAndDates(complexItem, CalendarUtils.startOfDay(date), CalendarUtils.endOfDay(date));
+            for (WtDish wtDish : wtDishes) {
+                if (!preorderWtMenuDetailExists(preorderComplex, client, date, wtDish.getIdOfDish())) {
+                    PreorderMenuDetail pmd = createPreorderWtMenuDetail(client, preorderComplex, wtDish, date, 0,
+                            mobile, mobileGroupOnCreate);
+                    result.add(pmd);
+                }
             }
         }
         return result;
@@ -3278,7 +3283,7 @@ public class PreorderDAOService {
         return query.getResultList();
     }
 
-    public WtComplexesItem getWtComplexItemByCycle(WtComplex wtComplex, Org org, Date date) {
+    public WtComplexesItem getWtComplexItemByCycle(WtComplex wtComplex, Date date) {
         Map<Date, Integer> cycleDates = new HashMap<>();
         Date startComplexDate = wtComplex.getBeginDate();
         Date endComplexDate = wtComplex.getEndDate();
@@ -3428,25 +3433,6 @@ public class PreorderDAOService {
         query.setParameter("complex", complex);
         query.setParameter("startDate", startDate, TemporalType.DATE);
         query.setParameter("endDate", endDate, TemporalType.DATE);
-        return (List<WtDish>) query.getResultList();
-    }
-
-    private List<WtDish> getWtDishesByPreorderComplexAndDates(PreorderComplex preorderComplex, Client client,
-            Date startDate, Date endDate) {
-        Query query = emReport.createQuery("SELECT DISTINCT dish FROM WtDish dish "
-                + "LEFT JOIN dish.complexItems complexItems "
-                + "LEFT JOIN complexItems.wtComplex complex "
-                + "WHERE complex.idOfComplex = :idOfComplex "
-                + "AND dish.deleteState = 0 "
-                + "AND ((dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding > :endDate) "
-                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding > :endDate) "
-                + "OR (dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
-                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL)) "
-                + "AND :org IN elements(complex.orgs)");
-        query.setParameter("idOfComplex", preorderComplex.getIdOfPreorderComplex());
-        query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
-        query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
-        query.setParameter("org", client.getOrg());
         return (List<WtDish>) query.getResultList();
     }
 
