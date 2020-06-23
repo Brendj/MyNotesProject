@@ -708,23 +708,14 @@ public class PreorderDAOService {
         try {
             regularPreorder = (RegularPreorder) query.getSingleResult();
             if (regularEquals(regularComplex, regularPreorder) && regularPreorder.getAmount().equals(amount)) return;
-            if (!regularDatesIntersect(regularComplex, regularPreorder)) {
-                regularPreorder = createNewRegular(client, regularComplex,
-                        amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,
-                        mobileGroupOnCreate, menuDetailName, menuDetailPrice, itemCode);
+            if (regularDatesIntersect(regularComplex, regularPreorder)) {
+                deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.DELETED,
+                        guardianMobile, RegularPreorderState.CHANGE_BY_USER);
             }
-            regularPreorder.setAmount(amount);
-            regularPreorder.setMonday(regularComplex.getMonday());
-            regularPreorder.setTuesday(regularComplex.getTuesday());
-            regularPreorder.setWednesday(regularComplex.getWednesday());
-            regularPreorder.setThursday(regularComplex.getThursday());
-            regularPreorder.setFriday(regularComplex.getFriday());
-            regularPreorder.setSaturday(regularComplex.getSaturday());
-            regularPreorder.setStartDate(regularComplex.getStartDate());
-            regularPreorder.setEndDate(regularComplex.getEndDate());
-            regularPreorder.setMobile(guardianMobile);
-            regularPreorder.setLastUpdate(new Date());
-            em.merge(regularPreorder);
+            regularPreorder = createNewRegular(client, regularComplex,
+                    amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,
+                    mobileGroupOnCreate, menuDetailName, menuDetailPrice, itemCode);
+            em.persist(regularPreorder);
         } catch (NoResultException e) {
             regularPreorder = createNewRegular(client, regularComplex,
                     amount, idOfComplex, date, isComplex, idOfMenu, guardianMobile,
