@@ -383,7 +383,7 @@ public class PreorderDAOService {
                     Integer complexType = wtComplex.getComposite() ? 4 : 2;
                     Long complexPrice = (wtComplex.getPrice() == null) ? 0L :
                             wtComplex.getPrice().multiply(new BigDecimal(100)).longValue();
-                    Integer amount = getAmountForPreorderComplex(client, startDate, endDate);
+                    Integer amount = getAmountForPreorderComplex(client, idOfComplex, startDate, endDate);
 
                     PreorderComplexItemExt complexItemExt;
                     PreorderComplexItemExt complexItemExt2 = null;
@@ -438,13 +438,14 @@ public class PreorderDAOService {
         return groupResult;
     }
 
-    private Integer getAmountForPreorderComplex(Client client, Date startDate, Date endDate) {
+    private Integer getAmountForPreorderComplex(Client client, Integer idOfComplex, Date startDate, Date endDate) {
         Query query = emReport.createQuery("SELECT sum(pc.amount) FROM PreorderComplex pc "
                 + "WHERE pc.client = :client AND pc.preorderDate between :startDate and :endDate "
-                + "AND pc.deletedState = false");
+                + "AND pc.deletedState = false AND pc.armComplexId = :idOfComplex");
         query.setParameter("client", client);
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
+        query.setParameter("idOfComplex", idOfComplex);
         Long res = (Long) query.getSingleResult();
         return (res == null) ? 0 : res.intValue();
     }
