@@ -1745,17 +1745,18 @@ public class PreorderDAOService {
                         currentDate = CalendarUtils.addDays(currentDate, 1);
                         continue;
                     }
-                }
-                PreorderMenuDetail preorderMenuDetail = findPreorderWtDish(currentDate, regularPreorder.getClient(), wtDish.getIdOfDish());
-                if ((preorderMenuDetail == null || (preorderMenuDetail != null && allowCreateNewPreorderMenuDetail(preorderMenuDetail)))
-                        && !forcePreorderMenuDetailExists(regularPreorder, currentDate)) {
-                    //на искомую дату нет предзаказа, надо создавать
-                    logger.info("===Create preorder menudetail from regular===");
-                    preorderMenuDetail = createPreorderWtMenuDetail(regularPreorder.getClient(), preorderComplex,
-                            wtDish, currentDate, regularPreorder.getAmount(), regularPreorder.getMobile(),
-                            regularPreorder.getMobileGroupOnCreate());
-                    preorderMenuDetail.setRegularPreorder(regularPreorder);
-                    em.persist(preorderMenuDetail);
+                    PreorderMenuDetail preorderMenuDetail = findPreorderWtDish(currentDate, regularPreorder.getClient(),
+                            wtDish.getIdOfDish());
+                    if ((preorderMenuDetail == null || (preorderMenuDetail != null && allowCreateNewPreorderMenuDetail(
+                            preorderMenuDetail))) && !forcePreorderMenuDetailExists(regularPreorder, currentDate)) {
+                        //на искомую дату нет предзаказа, надо создавать
+                        logger.info("===Create preorder menudetail from regular===");
+                        preorderMenuDetail = createPreorderWtMenuDetail(regularPreorder.getClient(), preorderComplex,
+                                wtDish, currentDate, regularPreorder.getAmount(), regularPreorder.getMobile(),
+                                regularPreorder.getMobileGroupOnCreate());
+                        preorderMenuDetail.setRegularPreorder(regularPreorder);
+                        em.persist(preorderMenuDetail);
+                    }
                 }
             }
             Set<PreorderMenuDetail> set = createPreorderWtMenuDetails(wtDishes, regularPreorder.getClient(),
