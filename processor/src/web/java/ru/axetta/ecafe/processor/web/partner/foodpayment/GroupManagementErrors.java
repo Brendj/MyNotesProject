@@ -12,7 +12,8 @@ public enum GroupManagementErrors {
     EMPLOYEE_NOT_FOUND(105, "Сотрудник не найден"),
     EMPLOYEES_NOT_FOUND(106, "Сотрудники не найдены"),
     GROUPS_NOT_FOUND(107, "Группы не найдены"),
-    GROUP_IS_EXISTS(108, "Данная группа уже есть в организации");
+    GROUP_IS_EXISTS(108, "Данная группа уже есть в организации"),
+    DISCOUNT_NOT_FOUND(109, "Льгота не найдена");
 
     private int errorCode;
     private String errorMessage;

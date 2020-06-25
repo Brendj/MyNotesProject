@@ -14,12 +14,14 @@ import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class GroupManagementService implements IGroupManagementService {
-
+    Logger logger = LoggerFactory.getLogger(GroupManagementService.class);
 
     private Session persistanceSession;
 
@@ -223,6 +225,69 @@ public class GroupManagementService implements IGroupManagementService {
         }
 
         return responseDiscounts;
+    }
+
+    @Override
+    public ResponseDiscountClients processDiscountClientsList(DiscountClientsListRequest discountClientsListRequest) throws Exception {
+        ResponseDiscountClients result = new ResponseDiscountClients();
+        CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.load(CategoryDiscount.class, discountClientsListRequest.getDiscountId());
+        if (categoryDiscount == null) {
+            throw new RequestProcessingException(GroupManagementErrors.DISCOUNT_NOT_FOUND);
+        }
+        ResponseDiscounts availableDiscounts = getDiscountsList(discountClientsListRequest.getOrgId());
+        List<Long> allOrgs = DAOUtils.findFriendlyOrgIds(persistanceSession, discountClientsListRequest.getOrgId());
+        for (Long contractId : discountClientsListRequest.getClients()) {
+            Client client = DAOUtils.findClientByContractId(persistanceSession, contractId);
+            if (client == null || !allOrgs.contains(client.getOrg().getIdOfOrg()) || !client.isStudent()) {
+                result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_CLIENT_NOT_FOUND,
+                        ResponseDiscountClientsItem.MESSAGE_CLIENT_NOT_FOUND));
+                continue;
+            }
+            if (discountClientsListRequest.getStatus()) {
+                //добавление льготы
+                if (client.getCategories().contains(categoryDiscount)) {
+                    result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_OK,
+                            ResponseDiscountClientsItem.MESSAGE_OK));
+                } else {
+                    if (isProperDiscount(availableDiscounts, discountClientsListRequest.getDiscountId())) {
+                        try {
+                            DiscountManager.addDiscount(persistanceSession, client, categoryDiscount,
+                                    DiscountChangeHistory.MODIFY_IN_SERVICE);
+                            result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_OK,
+                                    ResponseDiscountClientsItem.MESSAGE_OK));
+                        } catch (Exception e) {
+                            logger.error("Error in add discount processDiscountClientsList: ", e);
+                            result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_INTERNAL_ERROR,
+                                    ResponseDiscountClientsItem.MESSAGE_INTERNAL_ERROR));
+                        }
+                    } else {
+                        result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_DISCOUNT_NOT_FOUND,
+                                ResponseDiscountClientsItem.MESSAGE_DISCOUNT_NOT_FOUND));
+                    }
+                }
+            } else {
+                //удаление льготы
+                try {
+                    if (client.getCategories().contains(categoryDiscount)) {
+                        DiscountManager.deleteOneDiscount(persistanceSession, client, categoryDiscount);
+                    }
+                    result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_OK,
+                            ResponseDiscountClientsItem.MESSAGE_OK));
+                } catch (Exception e) {
+                    logger.error("Error in delete discount processDiscountClientsList: ", e);
+                    result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_INTERNAL_ERROR,
+                            ResponseDiscountClientsItem.MESSAGE_INTERNAL_ERROR));
+                }
+            }
+        }
+        return result;
+    }
+
+    private boolean isProperDiscount(ResponseDiscounts availableDiscounts, Long discountId) {
+        for (ResponseDiscountItem item : availableDiscounts.getItems()) {
+            if (item.getIdOfCategoryDiscount().equals(discountId)) return true;
+        }
+        return false;
     }
 
     private ClientGroup findClientGroup(GroupNamesToOrgs gnto, List<ClientGroup> groups, Long idOfOrg) {

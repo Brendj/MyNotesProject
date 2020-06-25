@@ -170,7 +170,10 @@ public class DiscountManager {
 
     public static void renewDiscounts(Session session, Client client,
             Set<CategoryDiscount> newDiscounts, Set<CategoryDiscount> oldDiscounts,
-            Integer newDiscountMode, Integer oldDiscountMode, String historyComment) throws Exception {
+            String historyComment) throws Exception {
+        Integer oldDiscountMode = client.getDiscountMode();
+        Integer newDiscountMode =
+                newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
         client.setDiscountMode(newDiscountMode);
 
         saveDiscountHistory(session, client, client.getOrg(), oldDiscounts, newDiscounts,
@@ -192,11 +195,19 @@ public class DiscountManager {
             }
         }
         if (newDiscounts.equals(client.getCategories())) return;
-        Integer oldDiscountMode = client.getDiscountMode();
-        Integer newDiscountMode =
-                newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
-        renewDiscounts(session, client, newDiscounts, client.getCategories(), newDiscountMode, oldDiscountMode,
+        renewDiscounts(session, client, newDiscounts, client.getCategories(),
                 DiscountChangeHistory.MODIFY_BY_TRANSITION);
+    }
+
+    public static void addDiscount(Session session, Client client, CategoryDiscount categoryDiscount, String historyComment) throws Exception {
+        Set<CategoryDiscount> newDiscounts = new HashSet<>();
+        for (CategoryDiscount cd : client.getCategories()) {
+            newDiscounts.add(cd);
+        }
+        newDiscounts.add(categoryDiscount);
+        if (newDiscounts.equals(client.getCategories())) return;
+
+        renewDiscounts(session, client, newDiscounts, client.getCategories(), historyComment);
     }
 
     public static String getClientDiscountsAsString(Client client) {
@@ -280,10 +291,7 @@ public class DiscountManager {
             if (cd.getIdOfCategoryDiscount() != categoryDiscount.getIdOfCategoryDiscount())
                 newDiscounts.add(cd);
         }
-        Integer oldDiscountMode = client.getDiscountMode();
-        Integer newDiscountMode =
-                newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
-        renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode, DELETE_COMMENT);
+        renewDiscounts(session, client, newDiscounts, oldDiscounts, DELETE_COMMENT);
     }
 
     public static List<CategoryDiscount> getCategoryDiscounts(Session session) {
