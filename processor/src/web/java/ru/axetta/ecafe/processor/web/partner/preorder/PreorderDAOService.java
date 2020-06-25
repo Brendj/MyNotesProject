@@ -1687,8 +1687,15 @@ public class PreorderDAOService {
                 currentDate = CalendarUtils.addDays(currentDate, 1);
                 continue;
             }
-            List<WtDish> wtDishes = getWtDishesByComplexAndDates(wtComplex, CalendarUtils.startOfDay(currentDate),
-                    CalendarUtils.endOfDay(currentDate));
+            WtComplexesItem complexItem = getWtComplexItemByCycle(wtComplex, CalendarUtils.startOfDay(currentDate));
+            List<WtDish> wtDishes;
+            if (complexItem == null) {
+                logger.info("No wtDishes found");
+                currentDate = CalendarUtils.addDays(currentDate, 1);
+                continue;
+            }
+            wtDishes = DAOReadExternalsService.getInstance()
+                        .getWtDishesByComplexItemAndDates(complexItem, CalendarUtils.startOfDay(currentDate), CalendarUtils.endOfDay(currentDate));
             if (wtDishes.size() == 0) {
                 logger.info("No wtDishes found");
                 currentDate = CalendarUtils.addDays(currentDate, 1);
@@ -1698,10 +1705,9 @@ public class PreorderDAOService {
             if ((preorderComplex == null || (preorderComplex != null && allowCreateNewPreorderComplex(preorderComplex)))
                     && !forcePreorderComplexExists(regularPreorder, currentDate)) {
                 //на искомую дату нет предзаказа, надо создавать
-
                 boolean comparePrice = !isMenuDetailPreorder(regularPreorder); //здесь сравниваем по цене если заказ на комплекс, а не на блюдо
                 if (!comparePrice) {
-                    wtDish = getWtDishByItemCodeAndPrice(regularPreorder.getItemCode(), currentDate,
+                    wtDish = getWtDishByItemCodeAndPrice(complexItem, regularPreorder.getItemCode(), currentDate,
                             regularPreorder.getPrice(), wtComplex);
                     if (wtDish == null) {
                         logger.info("Not found wtDish");
@@ -1731,7 +1737,7 @@ public class PreorderDAOService {
                     preorderComplex = findPreorderComplex(currentDate, regularPreorder.getClient(), regularPreorder.getIdOfComplex());
                 }
                 if (preorderComplex != null && !preorderComplex.getDeletedState() && wtDish == null) {
-                    wtDish = getWtDishByItemCodeAndPrice(regularPreorder.getItemCode(), currentDate,
+                    wtDish = getWtDishByItemCodeAndPrice(complexItem, regularPreorder.getItemCode(), currentDate,
                             regularPreorder.getPrice(), wtComplex);
                     if (wtDish == null) {
                         logger.info("Not found wtDish");
@@ -2319,16 +2325,18 @@ public class PreorderDAOService {
         }
     }
 
-    private WtDish getWtDishByItemCodeAndPrice(String itemCode, Date date, Long price, WtComplex wtComplex) {
+    private WtDish getWtDishByItemCodeAndPrice(WtComplexesItem complexItem, String itemCode, Date date, Long price, WtComplex wtComplex) {
         String priceCondition = (price == null ? "" : " and dish.price = :price");
-        Query query = emReport.createQuery("SELECT distinct dish FROM WtDish dish "
+        Query query = emReport.createQuery("SELECT dish FROM WtDish dish "
                 + "LEFT JOIN dish.complexItems complexItems "
                 + "WHERE dish.code = :itemCode AND complexItems.wtComplex = :complex "
+                + "AND :complexItem IN ELEMENTS(dish.complexItems) "
                 + "AND dish.deleteState = 0 "
                 + "AND ((dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding >= :endDate) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding >= :endDate) "
                 + "OR (dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
                 + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))"  + priceCondition);
+        query.setParameter("complexItem", complexItem);
         query.setParameter("complex", wtComplex);
         query.setParameter("itemCode", itemCode);
         query.setParameter("startDate", CalendarUtils.startOfDay(date), TemporalType.DATE);
