@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.CreateGroupData;
 import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.EditEmployeeData;
+import ru.axetta.ecafe.processor.web.token.security.jwt.GetTokenServiceImpl;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -15,7 +16,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.stereotype.Controller;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
 import javax.ws.rs.core.Response;
 import java.net.HttpURLConnection;
@@ -27,6 +30,36 @@ import java.util.List;
 public class SchoolRestController {
 
     private Logger logger = LoggerFactory.getLogger(SchoolRestController.class);
+
+
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "signin")
+    public Response signin(@Context HttpServletRequest request,@QueryParam(value = "username") String username, @QueryParam(value = "password") String password){
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        GetTokenServiceImpl tokenService;
+        try{
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            tokenService = new GetTokenServiceImpl();
+            String token = tokenService.getToken(persistenceSession, username, password, request.getRemoteAddr());
+            persistenceSession.flush();
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            return Response.status(HttpURLConnection.HTTP_OK).entity(token).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: "+e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100, "Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
 
     @POST
     @Consumes(MediaType.APPLICATION_JSON)
