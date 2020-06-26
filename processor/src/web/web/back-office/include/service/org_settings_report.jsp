@@ -84,6 +84,13 @@
             <h:graphicImage value="/images/gif/waiting.gif" alt="waiting" />
         </f:facet>
     </a4j:status>
+    <h:panelGrid style="text-align: right" columns="5" columnClasses="selectAll_text,selectAll_button">
+        <a4j:commandLink value="Отметить все записи к применению" action="#{orgSettingsReportPage.doMarkAll()}"
+                         reRender="workspaceTogglePanel" styleClass="command-button" />
+        <rich:spacer width="20px" />
+        <a4j:commandLink value="Снять все записи c применения" action="#{orgSettingsReportPage.doUnmarkAll()}"
+                         reRender="workspaceTogglePanel" styleClass="command-button" />
+    </h:panelGrid>
     <rich:dataTable id="orgSettingsTable" value="#{orgSettingsReportPage.items}" var="item" rows="25"
                     sortMode="single"
                     rowClasses="center-aligned-column" lang="rus"
@@ -93,6 +100,14 @@
         </f:facet>
         <!-- main info -->
         <!--id="orgSettingsMainInfoPart"-->
+        <rich:column sortable="true" sortBy="#{item.select}" headerClass="column-header" styleClass="#{item.style}" label="Прим.">
+            <f:facet name="header">
+                <h:outputText escape="true" value="Прим." />
+            </f:facet>
+            <h:selectBooleanCheckbox value="#{item.select}" styleClass="checkboxes" disabled="false">
+                <a4j:support event="onchange"/>
+            </h:selectBooleanCheckbox>
+        </rich:column>
         <rich:column sortable="true" sortBy="#{item.orgNumberInName}" headerClass="column-header" styleClass="#{item.style}" label="Номер">
             <f:facet name="header">
                 <h:outputText escape="true" value="Номер" />
@@ -223,7 +238,7 @@
                 <h:outputText escape="true" value="Использовать Web-АРМ" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{item.useWebArm}" styleClass="checkboxes">
-                <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
+                <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
         <rich:column headerClass="column-header" styleClass="#{item.style}" label="Абонементное питание" rendered="#{orgSettingsReportPage.showFeedingSettings}">
@@ -232,7 +247,7 @@
             </f:facet>
             <h:selectBooleanCheckbox value="#{item.usePaydableSubscriptionFeeding}"
                                      styleClass="checkboxes">
-                <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
+                <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
         <rich:column headerClass="column-header" styleClass="#{item.style}" label="Вариатвиное питание" rendered="#{orgSettingsReportPage.showFeedingSettings}">
@@ -241,7 +256,7 @@
             </f:facet>
             <h:selectBooleanCheckbox value="#{item.variableFeeding}"
                                      styleClass="checkboxes">
-                <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
+                <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
         <rich:column headerClass="column-header" styleClass="#{item.style}" label="Предзаказ" rendered="#{orgSettingsReportPage.showFeedingSettings}">
@@ -249,7 +264,7 @@
                 <h:outputText escape="true" value="Предзаказ" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{item.preordersEnabled}" styleClass="checkboxes">
-                <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
+                <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
         <rich:column headerClass="column-header" styleClass="#{item.style}" label="Оплата/сторнирование месяц продажи" rendered="#{orgSettingsReportPage.showFeedingSettings}">
@@ -258,7 +273,7 @@
             </f:facet>
             <h:selectBooleanCheckbox value="#{item.reverseMonthOfSale}" disabled="false"
                                      styleClass="checkboxes">
-                <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
+                <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
         <rich:column headerClass="column-header" styleClass="#{item.style}" label="Контроль расхождения времени оплаты" rendered="#{orgSettingsReportPage.showFeedingSettings}">
@@ -267,7 +282,7 @@
             </f:facet>
             <h:selectBooleanCheckbox value="#{item.denyPayPlanForTimeDifference}"
                                      styleClass="checkboxes">
-                <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
+                <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
         <rich:column headerClass="column-header" styleClass="#{item.style}" label="Возможность ухода в минус"
@@ -299,7 +314,7 @@
                 <h:outputText escape="true" value="Запрет на выдачу временной карты" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{item.oneActiveCard}" styleClass="checkboxes">
-                <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
+                <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
         <rich:column headerClass="column-header" styleClass="#{item.style}" label="Дубликаты для основных карт" rendered="#{orgSettingsReportPage.showCardSettings}">
@@ -307,7 +322,7 @@
                 <h:outputText escape="true" value="Дубликаты для основных карт" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{item.enableDuplicateCard}" styleClass="checkboxes" disabled="false">
-                <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
+                <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
         <rich:column headerClass="column-header" styleClass="#{item.style}" label="Несколько активных карт в ОО" rendered="#{orgSettingsReportPage.showCardSettings}">
@@ -315,7 +330,7 @@
                 <h:outputText escape="true" value="Несколько активных карт в ОО" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{item.multiCardModeEnabled}" styleClass="checkboxes">
-                <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
+                <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
         <rich:column headerClass="column-header" styleClass="#{item.style}" label="ЭЦП для карт" rendered="#{orgSettingsReportPage.showCardSettings}">
@@ -323,7 +338,7 @@
                 <h:outputText escape="true" value="ЭЦП для карт" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{item.needVerifyCardSign}" styleClass="checkboxes">
-                <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
+                <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
         <!-- Other Settings -->
@@ -334,7 +349,7 @@
             </f:facet>
             <h:selectBooleanCheckbox value="#{item.requestForVisitsToOtherOrg}"
                                      styleClass="checkboxes">
-                <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
+                <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
         <rich:column headerClass="column-header" styleClass="#{item.style}" label="Режим \"Летний период\"" rendered="#{orgSettingsReportPage.showOtherSetting}">
@@ -342,7 +357,7 @@
                 <h:outputText escape="true" value="Режим \"Летний период\"" />
             </f:facet>
             <h:selectBooleanCheckbox value="#{item.isWorkInSummerTime}" styleClass="checkboxes">
-                <a4j:support event="onchange" action="#{item.isChangedWhenModify()}" />
+                <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
         <f:facet name="footer">

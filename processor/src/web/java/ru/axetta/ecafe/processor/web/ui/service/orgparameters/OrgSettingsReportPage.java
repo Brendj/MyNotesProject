@@ -98,6 +98,24 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
         }
     }
 
+    public void doMarkAll(){
+        if(CollectionUtils.isEmpty(items)){
+            return;
+        }
+        for(OrgSettingsReportItem i : items){
+            i.setSelect(true);
+        }
+    }
+
+    public void doUnmarkAll(){
+        if(CollectionUtils.isEmpty(items)){
+            return;
+        }
+        for(OrgSettingsReportItem i : items){
+            i.setSelect(false);
+        }
+    }
+
     public Integer getStatus() {
         return status;
     }
@@ -216,7 +234,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
             Long nextOrgVersion = DAOUtils.nextVersionByOrgStucture(session);
             for (OrgSettingsReportItem item : items){
-                if(!item.getChanged()) {
+                if(!item.getSelect()) {
                     continue;
                 }
                 try {
@@ -251,7 +269,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     session.update(org);
 
                     logger.info("Success");
-                    item.setChanged(false);
+                    item.setSelect(false);
                 } catch (Exception e) {
                     logger.error("Exception when try change Org settings ID: " + item.getIdOfOrg(), e);
                     problemOrgsId.add(item.getIdOfOrg());
