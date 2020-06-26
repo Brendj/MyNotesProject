@@ -14,18 +14,18 @@ import java.util.List;
  */
 public class ResponseDiscountGroups extends Result {
     @JsonProperty("Groups")
-    private List<ResponseDiscountClients> clients;
+    private List<ResponseDiscountGroupItem> clients;
 
-    public void addItem(ResponseDiscountClients item) {
+    public void addItem(ResponseDiscountGroupItem item) {
         if (this.clients == null) this.clients = new ArrayList<>();
         clients.add(item);
     }
 
-    public List<ResponseDiscountClients> getClients() {
+    public List<ResponseDiscountGroupItem> getClients() {
         return clients;
     }
 
-    public void setClients(List<ResponseDiscountClients> clients) {
+    public void setClients(List<ResponseDiscountGroupItem> clients) {
         this.clients = clients;
     }
 }
