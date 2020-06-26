@@ -291,7 +291,7 @@ public class SchoolRestController {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
-            ResponseDiscountClients responseDiscounts = groupManagementService.processDiscountGroupsList(discountClientsListRequest);
+            ResponseDiscountGroups responseDiscounts = groupManagementService.processDiscountGroupsList(discountClientsListRequest);
             persistenceTransaction.commit();
             persistenceTransaction = null;
             responseDiscounts.setErrorCode(0);

@@ -244,20 +244,22 @@ public class GroupManagementService implements IGroupManagementService {
     }
 
     @Override
-    public ResponseDiscountClients processDiscountGroupsList(DiscountGroupsListRequest discountGroupsListRequest) throws Exception {
+    public ResponseDiscountGroups processDiscountGroupsList(DiscountGroupsListRequest discountGroupsListRequest) throws Exception {
         CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.load(CategoryDiscount.class, discountGroupsListRequest.getDiscountId());
         if (categoryDiscount == null) {
             throw new RequestProcessingException(GroupManagementErrors.DISCOUNT_NOT_FOUND);
         }
         ResponseDiscounts availableDiscounts = getDiscountsList(discountGroupsListRequest.getOrgId());
-        ResponseDiscountClients result = new ResponseDiscountClients();
+        ResponseDiscountGroups result = new ResponseDiscountGroups();
         ResponseClients responseClients = getClientsList(discountGroupsListRequest.getGroups(), discountGroupsListRequest.getOrgId());
         List<Long> allOrgs = DAOUtils.findFriendlyOrgIds(persistanceSession, discountGroupsListRequest.getOrgId());
         for (FPGroup fpGroup : responseClients.getGroups()) {
+            ResponseDiscountClients resultClients = new ResponseDiscountClients();
             for (FPClient fpClient : fpGroup.getClients()) {
-                result.addItem(processDiscountClient(allOrgs, fpClient.getContractId(), discountGroupsListRequest.getStatus(),
+                resultClients.addItem(processDiscountClient(allOrgs, fpClient.getContractId(), discountGroupsListRequest.getStatus(),
                         categoryDiscount, availableDiscounts));
             }
+            result.addItem(resultClients);
         }
         return result;
     }
