@@ -255,6 +255,7 @@ public class GroupManagementService implements IGroupManagementService {
         List<Long> allOrgs = DAOUtils.findFriendlyOrgIds(persistanceSession, discountGroupsListRequest.getOrgId());
         for (FPGroup fpGroup : responseClients.getGroups()) {
             ResponseDiscountClients resultClients = new ResponseDiscountClients();
+            resultClients.setGroupName(fpGroup.getGroupName());
             for (FPClient fpClient : fpGroup.getClients()) {
                 resultClients.addItem(processDiscountClient(allOrgs, fpClient.getContractId(), discountGroupsListRequest.getStatus(),
                         categoryDiscount, availableDiscounts));

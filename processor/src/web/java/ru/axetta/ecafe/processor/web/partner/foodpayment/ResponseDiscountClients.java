@@ -10,6 +10,8 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ResponseDiscountClients extends Result {
+    private String groupName;
+
     @JsonProperty("Clients")
     private List<ResponseDiscountClientsItem> items;
 
@@ -24,5 +26,13 @@ public class ResponseDiscountClients extends Result {
 
     public void setItems(List<ResponseDiscountClientsItem> items) {
         this.items = items;
+    }
+
+    public String getGroupName() {
+        return groupName;
+    }
+
+    public void setGroupName(String groupName) {
+        this.groupName = groupName;
     }
 }
