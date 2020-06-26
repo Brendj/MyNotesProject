@@ -16,7 +16,6 @@ import ru.axetta.ecafe.processor.core.persistence.OrderDetail;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalon;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.RegistryTalonType;
-import ru.axetta.ecafe.processor.core.report.SumQtyAndPriceItem;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Criteria;
@@ -483,6 +482,111 @@ public class OrderDetailsDAOService extends AbstractDAOService {
             }
         }
         return clientReportItems;
+    }
+
+    // Подсчет количества для меню веб-технолога
+    public Long buildRegisterStampBodyWtMenuValue(Long idOfOrg, Date start, String dietType, String ageGroup,
+            boolean includeActDiscrepancies) {
+        String sql ="select sum(orderdetail.qty) "
+                + " from cf_orders cforder "
+                + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
+                + "     left join cf_wt_complexes complex on complex.idofcomplex = orderdetail.idofcomplex"
+                + "     left join cf_wt_diet_type diettype on complex.idofdiettype = diettype.idofdiettype"
+                + "     left join cf_wt_agegroup_items agegroup on complex.idofagegroupitem = agegroup.idofagegroupitem"
+                + " where cforder.state=0 "
+                + "     and orderdetail.state=0 "
+                + "     and cforder.createddate>=:startDate "
+                + "     and cforder.createddate<=:endDate "
+                + "     and orderdetail.socdiscount>0 "
+                + "     and cforder.idoforg=:idoforg "
+                + "     and diettype.description like '" + dietType + "' "
+                + "     and agegroup.description like '" + ageGroup + "' "
+                + "     and orderdetail.menutype>=:mintype "
+                + "     and orderdetail.menutype<=:maxtype "
+                + "     and (cforder.ordertype in (4,6,10,11,12) or (cforder.ordertype=8"
+                + (includeActDiscrepancies ?" ":" and orderdetail.qty>=0 ") + " )) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg",idOfOrg);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",start.getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis()-1;
+        query.setParameter("endDate", endTime);
+        List list = query.list();
+        if(list==null || list.isEmpty() || list.get(0)==null){
+            return  0L;
+        } else {
+            return new Long(list.get(0).toString());
+        }
+    }
+
+    // Подсчет суточной пробы для льготного питания - меню веб-технолога
+    public Long buildRegisterStampDailySampleWtMenuValueNew(Long idOfOrg, Date start, String dietType, String ageGroup) {
+        String sql ="select sum(orderdetail.qty) from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                "   and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_wt_complexes complex on complex.idofcomplex = orderdetail.idofcomplex" +
+                " left join cf_wt_diet_type diettype on complex.idofdiettype = diettype.idofdiettype" +
+                " left join cf_wt_agegroup_items agegroup on complex.idofagegroupitem = agegroup.idofagegroupitem" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate between :startDate and :endDate and orderdetail.socdiscount>0 and" +
+                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and" +
+                " cforder.idoforg=:idoforg and diettype.description like '" + dietType + "' and" +
+                " agegroup.description like '" + ageGroup + "' and cforder.ordertype in (5) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg",idOfOrg);
+        query.setParameter("startDate",start.getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis()-1;
+        query.setParameter("endDate", endTime);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        Object res = query.uniqueResult();
+        if (res==null) {
+            return 0L;
+        } else {
+            return ((BigInteger) res).longValue();
+        }
+    }
+
+
+    // Подсчет питьевой воды для меню веб-технолога
+    public Long buildRegisterStampBodyWtMenuWaterValue(Long idOfOrg, Date start, boolean includeActDiscrepancies) {
+        String sql ="select sum(orderdetail.qty) "
+                + " from cf_orders cforder "
+                + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
+                + "     left join cf_wt_complexes complex on complex.idofcomplex = orderdetail.idofcomplex"
+                + " where cforder.state=0 "
+                + "     and orderdetail.state=0 "
+                + "     and cforder.createddate>=:startDate "
+                + "     and cforder.createddate<=:endDate "
+                + "     and orderdetail.socdiscount>0 "
+                + "     and cforder.idoforg=:idoforg "
+                + "     and complex.name like 'Вода%' "
+                + "     and orderdetail.menutype>=:mintype "
+                + "     and orderdetail.menutype<=:maxtype "
+                + "     and (cforder.ordertype in (4,6,10,11,12) or (cforder.ordertype=8"
+                + (includeActDiscrepancies ?" ":" and orderdetail.qty>=0 ") + " )) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg",idOfOrg);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",start.getTime());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis()-1;
+        query.setParameter("endDate", endTime);
+        List list = query.list();
+        if(list==null || list.isEmpty() || list.get(0)==null){
+            return  0L;
+        } else {
+            return new Long(list.get(0).toString());
+        }
     }
 
 }
