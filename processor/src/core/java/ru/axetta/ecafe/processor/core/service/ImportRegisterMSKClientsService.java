@@ -1605,6 +1605,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
             //  Итеративно загружаем клиентов, используя ограничения
             List<ExpandedPupilInfo> pupils = service.getPupilsByOrgGUID(orgGuids, null, null, null);
+            if(CollectionUtils.isEmpty(pupils)){
+                log("Нет данных для сверки", logBuffer);
+                return logBuffer;
+            }
             log(synchDate + "Получено " + pupils.size() + " записей", logBuffer);
             //  !!!!!!!!!!
             //  !!!!!!!!!!
