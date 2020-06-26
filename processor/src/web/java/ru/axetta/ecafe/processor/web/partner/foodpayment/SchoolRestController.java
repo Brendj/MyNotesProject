@@ -278,4 +278,40 @@ public class SchoolRestController {
         }
     }
 
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "editdiscountgroups")
+    public Response editDiscountGroups(DiscountGroupsListRequest discountClientsListRequest) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        IGroupManagementService groupManagementService;
+        try{
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            groupManagementService = new GroupManagementService(persistenceSession);
+            ResponseDiscountClients responseDiscounts = groupManagementService.processDiscountGroupsList(discountClientsListRequest);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            responseDiscounts.setErrorCode(0);
+            responseDiscounts.setErrorMessage("Ok");
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscounts).build();
+
+        }
+        catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s", discountClientsListRequest.getToken(),
+                    discountClientsListRequest.getUserId(), discountClientsListRequest.getOrgId(), e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
 }

@@ -237,50 +237,74 @@ public class GroupManagementService implements IGroupManagementService {
         ResponseDiscounts availableDiscounts = getDiscountsList(discountClientsListRequest.getOrgId());
         List<Long> allOrgs = DAOUtils.findFriendlyOrgIds(persistanceSession, discountClientsListRequest.getOrgId());
         for (Long contractId : discountClientsListRequest.getClients()) {
-            Client client = DAOUtils.findClientByContractId(persistanceSession, contractId);
-            if (client == null || !allOrgs.contains(client.getOrg().getIdOfOrg()) || !client.isStudent()) {
-                result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_CLIENT_NOT_FOUND,
-                        ResponseDiscountClientsItem.MESSAGE_CLIENT_NOT_FOUND));
-                continue;
-            }
-            if (discountClientsListRequest.getStatus()) {
-                //добавление льготы
-                if (client.getCategories().contains(categoryDiscount)) {
-                    result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_OK,
-                            ResponseDiscountClientsItem.MESSAGE_OK));
-                } else {
-                    if (isProperDiscount(availableDiscounts, discountClientsListRequest.getDiscountId())) {
-                        try {
-                            DiscountManager.addDiscount(persistanceSession, client, categoryDiscount,
-                                    DiscountChangeHistory.MODIFY_IN_SERVICE);
-                            result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_OK,
-                                    ResponseDiscountClientsItem.MESSAGE_OK));
-                        } catch (Exception e) {
-                            logger.error("Error in add discount processDiscountClientsList: ", e);
-                            result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_INTERNAL_ERROR,
-                                    ResponseDiscountClientsItem.MESSAGE_INTERNAL_ERROR));
-                        }
-                    } else {
-                        result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_DISCOUNT_NOT_FOUND,
-                                ResponseDiscountClientsItem.MESSAGE_DISCOUNT_NOT_FOUND));
-                    }
-                }
-            } else {
-                //удаление льготы
-                try {
-                    if (client.getCategories().contains(categoryDiscount)) {
-                        DiscountManager.deleteOneDiscount(persistanceSession, client, categoryDiscount);
-                    }
-                    result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_OK,
-                            ResponseDiscountClientsItem.MESSAGE_OK));
-                } catch (Exception e) {
-                    logger.error("Error in delete discount processDiscountClientsList: ", e);
-                    result.addItem(new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_INTERNAL_ERROR,
-                            ResponseDiscountClientsItem.MESSAGE_INTERNAL_ERROR));
-                }
+            result.addItem(processDiscountClient(allOrgs, contractId, discountClientsListRequest.getStatus(),
+                    categoryDiscount, availableDiscounts));
+        }
+        return result;
+    }
+
+    @Override
+    public ResponseDiscountClients processDiscountGroupsList(DiscountGroupsListRequest discountGroupsListRequest) throws Exception {
+        CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.load(CategoryDiscount.class, discountGroupsListRequest.getDiscountId());
+        if (categoryDiscount == null) {
+            throw new RequestProcessingException(GroupManagementErrors.DISCOUNT_NOT_FOUND);
+        }
+        ResponseDiscounts availableDiscounts = getDiscountsList(discountGroupsListRequest.getOrgId());
+        ResponseDiscountClients result = new ResponseDiscountClients();
+        ResponseClients responseClients = getClientsList(discountGroupsListRequest.getGroups(), discountGroupsListRequest.getOrgId());
+        List<Long> allOrgs = DAOUtils.findFriendlyOrgIds(persistanceSession, discountGroupsListRequest.getOrgId());
+        for (FPGroup fpGroup : responseClients.getGroups()) {
+            for (FPClient fpClient : fpGroup.getClients()) {
+                result.addItem(processDiscountClient(allOrgs, fpClient.getContractId(), discountGroupsListRequest.getStatus(),
+                        categoryDiscount, availableDiscounts));
             }
         }
         return result;
+    }
+
+    private ResponseDiscountClientsItem processDiscountClient(List<Long> allOrgs, Long contractId, Boolean status,
+            CategoryDiscount categoryDiscount, ResponseDiscounts availableDiscounts) {
+        Client client = DAOUtils.findClientByContractId(persistanceSession, contractId);
+        if (client == null || !allOrgs.contains(client.getOrg().getIdOfOrg()) || !client.isStudent()) {
+            return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_CLIENT_NOT_FOUND,
+                    ResponseDiscountClientsItem.MESSAGE_CLIENT_NOT_FOUND);
+        }
+        if (status) {
+            //добавление льготы
+            if (client.getCategories().contains(categoryDiscount)) {
+                return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_OK,
+                        ResponseDiscountClientsItem.MESSAGE_OK);
+            } else {
+                if (isProperDiscount(availableDiscounts, categoryDiscount.getIdOfCategoryDiscount())) {
+                    try {
+                        DiscountManager.addDiscount(persistanceSession, client, categoryDiscount,
+                                DiscountChangeHistory.MODIFY_IN_SERVICE);
+                        return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_OK,
+                                ResponseDiscountClientsItem.MESSAGE_OK);
+                    } catch (Exception e) {
+                        logger.error("Error in add discount processDiscountClientsList: ", e);
+                        return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_INTERNAL_ERROR,
+                                ResponseDiscountClientsItem.MESSAGE_INTERNAL_ERROR);
+                    }
+                } else {
+                    return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_DISCOUNT_NOT_FOUND,
+                            ResponseDiscountClientsItem.MESSAGE_DISCOUNT_NOT_FOUND);
+                }
+            }
+        } else {
+            //удаление льготы
+            try {
+                if (client.getCategories().contains(categoryDiscount)) {
+                    DiscountManager.deleteOneDiscount(persistanceSession, client, categoryDiscount);
+                }
+                return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_OK,
+                        ResponseDiscountClientsItem.MESSAGE_OK);
+            } catch (Exception e) {
+                logger.error("Error in delete discount processDiscountClientsList: ", e);
+                return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_INTERNAL_ERROR,
+                        ResponseDiscountClientsItem.MESSAGE_INTERNAL_ERROR);
+            }
+        }
     }
 
     private boolean isProperDiscount(ResponseDiscounts availableDiscounts, Long discountId) {
