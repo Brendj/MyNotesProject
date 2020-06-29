@@ -250,10 +250,7 @@ public class GroupManagementService implements IGroupManagementService {
     @Override
     public ResponseDiscountClients processDiscountClientsList(DiscountClientsListRequest discountClientsListRequest) throws Exception {
         ResponseDiscountClients result = new ResponseDiscountClients();
-        CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.get(CategoryDiscount.class, discountClientsListRequest.getDiscountId());
-        if (categoryDiscount == null) {
-            throw new RequestProcessingException(GroupManagementErrors.DISCOUNT_NOT_FOUND);
-        }
+        CategoryDiscount categoryDiscount = getCategoryDiscount(discountClientsListRequest.getDiscountId());
         ResponseDiscounts availableDiscounts = getDiscountsList(discountClientsListRequest.getOrgId());
         List<Long> allOrgs = DAOUtils.findFriendlyOrgIds(persistanceSession, discountClientsListRequest.getOrgId());
         for (Long contractId : discountClientsListRequest.getClients()) {
@@ -265,10 +262,7 @@ public class GroupManagementService implements IGroupManagementService {
 
     @Override
     public ResponseDiscountGroups processDiscountGroupsList(DiscountGroupsListRequest discountGroupsListRequest) throws Exception {
-        CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.get(CategoryDiscount.class, discountGroupsListRequest.getDiscountId());
-        if (categoryDiscount == null) {
-            throw new RequestProcessingException(GroupManagementErrors.DISCOUNT_NOT_FOUND);
-        }
+        CategoryDiscount categoryDiscount = getCategoryDiscount(discountGroupsListRequest.getDiscountId());
         ResponseDiscounts availableDiscounts = getDiscountsList(discountGroupsListRequest.getOrgId());
         ResponseDiscountGroups result = new ResponseDiscountGroups();
         ResponseClients responseClients = getClientsList(discountGroupsListRequest.getGroups(), discountGroupsListRequest.getOrgId());
@@ -282,6 +276,17 @@ public class GroupManagementService implements IGroupManagementService {
             result.addItem(resultClients);
         }
         return result;
+    }
+
+    private CategoryDiscount getCategoryDiscount(Long idOfCategoryDiscount) throws Exception {
+        CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.get(CategoryDiscount.class, idOfCategoryDiscount);
+        if (categoryDiscount == null) {
+            throw new RequestProcessingException(GroupManagementErrors.DISCOUNT_NOT_FOUND);
+        }
+        if (categoryDiscount.getBlockedToChange()) {
+            throw new RequestProcessingException(GroupManagementErrors.DISCOUNT_NOT_MODIFY);
+        }
+        return categoryDiscount;
     }
 
     private ResponseDiscountClientsItem processDiscountClient(List<Long> allOrgs, Long contractId, Boolean status,
