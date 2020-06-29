@@ -6,6 +6,7 @@ package ru.axetta.ecafe.processor.core.utils;
 
 import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 
+import org.apache.commons.lang.math.NumberUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
@@ -26,6 +27,9 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.text.DecimalFormat;
+import java.text.DecimalFormatSymbols;
+import java.text.ParseException;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
@@ -266,8 +270,29 @@ public class XMLUtils {
         }
     }
 
-    public static Double getDoubleAttribute(Node node, String attributeName) {
+    public static Double getDoubleAttributeWithComma(Node node, String attributeName) {
         String value = getAttributeValue(node, attributeName);
-        return value == null || value.isEmpty() ? null : Double.valueOf(value);
+        if (value == null || value.isEmpty()) {
+            return null;
+        }
+        String tempString = value.replace(',','.');
+        boolean isStringValid = NumberUtils.isNumber(tempString);
+        Double parsedString = null;
+
+        if (!isStringValid) {
+            return null;
+        } else {
+            try {
+                DecimalFormat df = new DecimalFormat();
+                DecimalFormatSymbols symbols = new DecimalFormatSymbols();
+                symbols.setDecimalSeparator(',');
+
+                df.setDecimalFormatSymbols(symbols);
+                parsedString = df.parse(value).doubleValue();
+            } catch (ParseException e) {
+                return null;
+            }
+            return parsedString;
+        }
     }
 }

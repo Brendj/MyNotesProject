@@ -73,7 +73,7 @@ public class TurnstileSettingsRequestTRItem extends TurnstileSettingsRequestItem
             errorMessage.append("Attribute LastUpdate not found");
         }
 
-        timeCoefficient = XMLUtils.getDoubleAttribute(itemNode,"timeCoeff");
+        timeCoefficient = XMLUtils.getDoubleAttributeWithComma(itemNode,"TimeCoeff");
 
         return new TurnstileSettingsRequestTRItem(type, errorMessage.toString(), turnstileId, controllerModel,
                 controllerFirmwareVersion, isWorkWithLongIds, lastUpdateForTurnstileSetting, timeCoefficient);

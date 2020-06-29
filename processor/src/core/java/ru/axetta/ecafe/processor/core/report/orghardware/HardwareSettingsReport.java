@@ -125,6 +125,7 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
             List<HardwareSettingsReportItem> result = new ArrayList<HardwareSettingsReportItem>();
 
             Criteria orgCriteria = persistenceSession.createCriteria(Org.class);
+            Criteria orgSyncCriteria = persistenceSession.createCriteria(OrgSync.class);
             if (!CollectionUtils.isEmpty(idOfOrgList)) {
                 if (allFriendlyOrgs) {
                     SQLQuery subQuery = persistenceSession.createSQLQuery(
@@ -134,8 +135,10 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
 
                     List<Long> idsOfFriendlyOrg = subQuery.list();
                     orgCriteria.add(Restrictions.in("idOfOrg", idsOfFriendlyOrg));
+                    orgSyncCriteria.add(Restrictions.in("idOfOrg",idsOfFriendlyOrg));
                 } else {
                     orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
+                    orgSyncCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
                 }
             }
 
@@ -159,13 +162,9 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
                 Criteria hardwareSettingsCriteria = persistenceSession.createCriteria(HardwareSettings.class);
                 hardwareSettingsCriteria.add(Restrictions.eq("org.idOfOrg", org.getIdOfOrg()));
                 List<HardwareSettings> listOfSettings = hardwareSettingsCriteria.list();
-
-                Criteria orgSyncCriteria = persistenceSession.createCriteria(OrgSync.class);
-                orgCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
-                orgSyncCriteria.add(Restrictions.in("idOfOrg", idOfOrgList));
                 List<OrgSync> listOfOrgSync = orgSyncCriteria.list();
-
                 OrgSync orgSync = getOrgSyncByOrg(listOfOrgSync, org);
+
                 if (orgSync != null) {
                     for (HardwareSettings settings : listOfSettings) {
                         Set<HardwareSettingsMT> innerList = settings.getModuleTypes();

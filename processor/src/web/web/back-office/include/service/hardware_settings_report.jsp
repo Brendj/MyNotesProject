@@ -91,7 +91,7 @@
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText styleClass="output-text" escape="true" value="Отчет по оборудованию" />
         <rich:dataTable id="hardwareSettingsTable" value="#{hardwareSettingsReportPage.items}" var="item"
-                        rowKeyVar="row" rows="44" footerClass="data-table-footer"
+                        rowKeyVar="row" rows="26" footerClass="data-table-footer"
                         columnClasses="right-aligned-column, left-aligned-column,left-aligned-column">
             <f:facet name="header">
                 <rich:columnGroup>
@@ -131,7 +131,7 @@
             <rich:column sortable="true" sortBy="#{item.shortNameInfoService}" headerClass="column-header"
                          styleClass="center-aligned-column" label="Название ОО краткое">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Название ОО краткое" />
+                    <h:outputText styleClass="column-header" escape="false" value="Название ОО<br/> краткое" />
                 </f:facet>
                 <h:outputText value="#{item.shortNameInfoService}" />
             </rich:column>
@@ -191,14 +191,14 @@
             <rich:column sortable="true" sortBy="#{item.readerName}" headerClass="column-header"
                          label="Идентификатор/модель считывателей карт" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Идентификатор/модель считывателей карт" />
+                    <h:outputText styleClass="column-header" escape="false" value="Идентификатор/модель<br/> считывателей карт" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.readerName}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.firmwareVersion}" headerClass="column-header"
                          label="Версия микропрограммы считывателя карт" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Версия микропрограммы считывателя карт" />
+                    <h:outputText styleClass="column-header" escape="false" value="Версия микропрограммы<br/> считывателя карт" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.firmwareVersion}" styleClass="output-text" />
             </rich:column>
@@ -264,21 +264,21 @@
             <rich:column sortable="true" sortBy="#{item.controllerFirmwareVersion}" headerClass="column-header"
                          label="Версия прошивки контроллера" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Версия прошивки контроллера" />
+                    <h:outputText styleClass="column-header" escape="false" value="Версия прошивки<br/> контроллера" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.controllerFirmwareVersion}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.isWorkWithLongIds}" headerClass="column-header"
                          label="Считыватель  читает длинные идентификаторы" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Считыватель  читает длинные идентификаторы" />
+                    <h:outputText styleClass="column-header" escape="false" value="Считыватель  читает<br/> длинные идентификаторы" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.isWorkWithLongIds}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.timeCoefficient}" headerClass="column-header"
                          label="Коэффициент коррекции времени турникета" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Коэффициент коррекции времени турникета" />
+                    <h:outputText styleClass="column-header" escape="false" value="Коэффициент коррекции<br/> времени турникета" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.timeCoefficient}" styleClass="output-text" />
             </rich:column>

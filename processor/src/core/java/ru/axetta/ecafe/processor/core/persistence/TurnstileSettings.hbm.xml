@@ -22,5 +22,6 @@
         <property name="isReadsLongIdsIncorrectly" column="IsReadsLongIdsIncorrectly" type="integer" not-null="true"/>
         <property name="lastUpdateForTurnstile" column="LastUpdateForTurnstile"
                   type="ru.axetta.ecafe.processor.core.persistence.DateType" not-null="true"/>
+        <property name="timeCoefficient" column="TimeCoefficient" type="double"/>
     </class>
 </hibernate-mapping>
