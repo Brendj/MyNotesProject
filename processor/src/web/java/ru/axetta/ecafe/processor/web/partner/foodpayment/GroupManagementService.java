@@ -169,22 +169,33 @@ public class GroupManagementService implements IGroupManagementService {
         List<Long> idOfOrgList = DAOUtils.findFriendlyOrgIds(persistanceSession, idOfOrg);
         if (idOfOrgList.size() == 0) throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND);
         ResponseClients responseClients = new ResponseClients();
+        boolean groupsNotFound = true;
         for (String nameOfGroup : groupsList) {
+            nameOfGroup = nameOfGroup.trim();
             List groups = DAOUtils.findClientGroupsByGroupNameForAllOrgsIgnoreCase(persistanceSession, idOfOrgList, nameOfGroup);
-            if (groups.size() == 0) throw new RequestProcessingException(GroupManagementErrors.GROUP_NOT_FOUND);
+            if (groups.size() == 0) {
+                addFPGroupNotFound(responseClients, nameOfGroup);
+                continue;
+            }
             GroupNamesToOrgs gnto = DAOUtils.findGroupFromGroupNamesToOrgs(persistanceSession, idOfOrgList, nameOfGroup);
             ClientGroup cg = findClientGroup(gnto, groups, idOfOrg);
-            if (cg == null) throw new RequestProcessingException(GroupManagementErrors.GROUP_NOT_FOUND);
-            
+            if (cg == null) {
+                addFPGroupNotFound(responseClients, nameOfGroup);
+                continue;
+            }
+
+            groupsNotFound = false;
             FPGroup fpGroup = new FPGroup();
+            fpGroup.setCode(0);
+            fpGroup.setMessage("OK");
             fpGroup.setGroupName(nameOfGroup);
             Query query = persistanceSession.createQuery("select distinct c from Client c "
                     + "join fetch c.clientGroup "
                     + "join fetch c.person "
                     + "left join fetch c.categoriesInternal "
-                    + "where c.org.idOfOrg in (:idOfOrgList) and c.clientGroup.groupName = :nameOfGroup order by c.contractId");
+                    + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName) = :nameOfGroup order by c.contractId");
             query.setParameterList("idOfOrgList", idOfOrgList);
-            query.setParameter("nameOfGroup", nameOfGroup);
+            query.setParameter("nameOfGroup", nameOfGroup.toUpperCase());
             List<Client> list = query.list();
             for (Client client : list) {
                 fpGroup.setGroupId(cg.getCompositeIdOfClientGroup().getIdOfClientGroup());
@@ -194,7 +205,16 @@ public class GroupManagementService implements IGroupManagementService {
             }
             responseClients.getGroups().add(fpGroup);
         }
+        if (groupsNotFound) throw new RequestProcessingException(GroupManagementErrors.GROUP_NOT_FOUND);
         return responseClients;
+    }
+
+    private void addFPGroupNotFound(ResponseClients responseClients, String groupName) {
+        FPGroup fpGroup = new FPGroup();
+        fpGroup.setGroupName(groupName);
+        fpGroup.setCode(GroupManagementErrors.GROUP_NOT_FOUND.getErrorCode());
+        fpGroup.setMessage(GroupManagementErrors.GROUP_NOT_FOUND.getErrorMessage());
+        responseClients.getGroups().add(fpGroup);
     }
 
     @Override
@@ -230,7 +250,7 @@ public class GroupManagementService implements IGroupManagementService {
     @Override
     public ResponseDiscountClients processDiscountClientsList(DiscountClientsListRequest discountClientsListRequest) throws Exception {
         ResponseDiscountClients result = new ResponseDiscountClients();
-        CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.load(CategoryDiscount.class, discountClientsListRequest.getDiscountId());
+        CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.get(CategoryDiscount.class, discountClientsListRequest.getDiscountId());
         if (categoryDiscount == null) {
             throw new RequestProcessingException(GroupManagementErrors.DISCOUNT_NOT_FOUND);
         }
@@ -245,7 +265,7 @@ public class GroupManagementService implements IGroupManagementService {
 
     @Override
     public ResponseDiscountGroups processDiscountGroupsList(DiscountGroupsListRequest discountGroupsListRequest) throws Exception {
-        CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.load(CategoryDiscount.class, discountGroupsListRequest.getDiscountId());
+        CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.get(CategoryDiscount.class, discountGroupsListRequest.getDiscountId());
         if (categoryDiscount == null) {
             throw new RequestProcessingException(GroupManagementErrors.DISCOUNT_NOT_FOUND);
         }

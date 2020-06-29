@@ -25,6 +25,12 @@ public class FPGroup {
     @JsonProperty("Clients")
     private List<FPClient> clients;
 
+    @JsonProperty("ResultCode")
+    private Integer code;
+
+    @JsonProperty("ResultMessage")
+    private String message;
+
     public FPGroup() {
         this.clients = new ArrayList<>();
     }
@@ -59,5 +65,21 @@ public class FPGroup {
 
     public void setOrgId(Long orgId) {
         this.orgId = orgId;
+    }
+
+    public Integer getCode() {
+        return code;
+    }
+
+    public void setCode(Integer code) {
+        this.code = code;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
     }
 }

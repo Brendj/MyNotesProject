@@ -706,7 +706,7 @@ public class DAOUtils {
 
     public static GroupNamesToOrgs findGroupFromGroupNamesToOrgs(Session session, List<Long> idOfOrgsList, String groupName) {
         Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
-        List l = criteria.add(Restrictions.and(Restrictions.eq("groupName", groupName).ignoreCase(), Restrictions.in("idOfOrg", idOfOrgsList)))
+        List l = criteria.add(Restrictions.and(Restrictions.eq("groupName", groupName.trim()).ignoreCase(), Restrictions.in("idOfOrg", idOfOrgsList)))
                 .list();
         if (l.size() > 0) {
             return (GroupNamesToOrgs) l.get(0);
