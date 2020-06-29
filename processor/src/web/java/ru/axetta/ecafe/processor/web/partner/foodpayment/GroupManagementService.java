@@ -178,7 +178,7 @@ public class GroupManagementService implements IGroupManagementService {
             
             FPGroup fpGroup = new FPGroup();
             fpGroup.setGroupName(nameOfGroup);
-            Query query = persistanceSession.createQuery("select c from Client c "
+            Query query = persistanceSession.createQuery("select distinct c from Client c "
                     + "join fetch c.clientGroup "
                     + "join fetch c.person "
                     + "left join fetch c.categoriesInternal "
