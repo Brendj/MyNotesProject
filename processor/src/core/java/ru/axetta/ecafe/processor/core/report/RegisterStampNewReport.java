@@ -12,6 +12,9 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampReportItem;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.WtComplexItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -102,8 +105,15 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
             }
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
+            // если нет товаров, то надо смотреть комплексы!
             List<GoodItem> allGoods = service.findAllGoods(org.getIdOfOrg(), startTime, endTime, service.getReducedPaymentOrderTypesWithDailySample());
             allGoods.addAll(service.findAllGoods(org.getIdOfOrg(), startTime, endTime, service.getWaterAccountingOrderTypesWithDailySample()));
+
+            // типы диет для комплексов, добавить ordertypes
+            List<WtComplexItem> allComplexes = service.findAllWtComplexes(org.getIdOfOrg(), startTime, endTime);
+            List<WtDietType> allDietTypes = service.findAllDietTypes(org.getIdOfOrg(), startTime, endTime);
+            List<WtAgeGroupItem> allAgeGroups = service.findAllAgeGroups(org.getIdOfOrg(), startTime, endTime);
+            //List<GoodItem> allWtGoods = service.findAllWtGoods(org.getIdOfOrg(), startTime, endTime, service.getReducedPaymentOrderTypesWithDailySample());
 
             Map<Date, Long> numbers = service.findAllRegistryTalons(org.getIdOfOrg(), startTime, endTime);
 
@@ -119,7 +129,8 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
             while (endTime.getTime()>calendar.getTimeInMillis()){
                 Date time = calendar.getTime();
                 String date = timeFormat.format(time);
-                if(allGoods.isEmpty()){
+
+                if(allGoods.isEmpty() && allDietTypes.isEmpty()){
                     RegisterStampReportItem itemEmpty = new RegisterStampReportItem(emptyGoodItem,0L,date, time);
                     RegisterStampReportItem totalEmpty = new RegisterStampReportItem(emptyGoodItem,0L,"Итого", CalendarUtils
                             .addDays(endTime, 1));
@@ -143,30 +154,15 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                         Long val = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                 goodItem.getFullName(), withOutActDiscrepancies);
 
-                        // кол-во для комплексов веб-технолога
-                        Long wtVal = service.buildRegisterStampBodyWtMenuValue(org.getIdOfOrg(), calendar.getTime(),
-                                goodItem.getPathPart4(), goodItem.getPathPart3(), withOutActDiscrepancies);
-                        val += wtVal;
-
                         RegisterStampReportItem item = new RegisterStampReportItem(goodItem,val,date,number, time);
                         if (item.getLevel3().equals("1,5-3") || item.getLevel3().equals("1.5-3")) {
                             data.getList153().add(item);
                             Long valDaily = service.buildRegisterStampDailySampleValueNew(org.getIdOfOrg(), item.getDateTime(), goodItem.getFullName());
 
-                            // кол-во для комплексов веб-технолога
-                            Long wtValDaily = service.buildRegisterStampDailySampleWtMenuValueNew(org.getIdOfOrg(), item.getDateTime(),
-                                    item.getLevel4(), item.getLevel3());
-                            valDaily += wtValDaily;
-
                             RegisterStampReportItem itemDaily = new RegisterStampReportItem(goodItem,valDaily,date,number, time);
                             data.getList153().add(itemDaily);
                             Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                     goodItem.getFullName(), withOutActDiscrepancies);
-
-                            // кол-во для комплексов веб-технолога
-                            Long wtVal1 = service.buildRegisterStampBodyWtMenuValue(org.getIdOfOrg(), calendar.getTime(),
-                                    item.getLevel4(), item.getLevel3(), withOutActDiscrepancies);
-                            val1 += wtVal1;
 
                             RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1 + valDaily,"Итого", CalendarUtils.addDays(endTime, 1));
                             data.getList153().add(total1);
@@ -174,20 +170,10 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                             data.getList37().add(item);
                             Long valDaily = service.buildRegisterStampDailySampleValueNew(org.getIdOfOrg(), item.getDateTime(), goodItem.getFullName());
 
-                            // кол-во для комплексов веб-технолога
-                            Long wtValDaily = service.buildRegisterStampDailySampleWtMenuValueNew(org.getIdOfOrg(), item.getDateTime(),
-                                    item.getLevel4(), item.getLevel3());
-                            valDaily += wtValDaily;
-
                             RegisterStampReportItem itemDaily = new RegisterStampReportItem(goodItem,valDaily,date,number, time);
                             data.getList37().add(itemDaily);
                             Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                     goodItem.getFullName(), withOutActDiscrepancies);
-
-                            // кол-во для комплексов веб-технолога
-                            Long wtVal1 = service.buildRegisterStampBodyWtMenuValue(org.getIdOfOrg(), calendar.getTime(),
-                                    item.getLevel4(), item.getLevel3(), withOutActDiscrepancies);
-                            val1 += wtVal1;
 
                             RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1 + valDaily,"Итого", CalendarUtils.addDays(endTime, 1));
                             data.getList37().add(total1);
@@ -195,20 +181,10 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                             data.getList14().add(item);
                             Long valDaily = service.buildRegisterStampDailySampleValueNew(org.getIdOfOrg(), item.getDateTime(), goodItem.getFullName());
 
-                            // кол-во для комплексов веб-технолога
-                            Long wtValDaily = service.buildRegisterStampDailySampleWtMenuValueNew(org.getIdOfOrg(), item.getDateTime(),
-                                    item.getLevel4(), item.getLevel3());
-                            valDaily += wtValDaily;
-
                             RegisterStampReportItem itemDaily = new RegisterStampReportItem(goodItem,valDaily,date,number, time);
                             data.getList14().add(itemDaily);
                             Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                     goodItem.getFullName(), withOutActDiscrepancies);
-
-                            // кол-во для комплексов веб-технолога
-                            Long wtVal1 = service.buildRegisterStampBodyWtMenuValue(org.getIdOfOrg(), calendar.getTime(),
-                                    item.getLevel4(), item.getLevel3(), withOutActDiscrepancies);
-                            val1 += wtVal1;
 
                             RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1 + valDaily,"Итого", CalendarUtils.addDays(endTime, 1));
                             data.getList14().add(total1);
@@ -216,20 +192,10 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                             data.getList511().add(item);
                             Long valDaily = service.buildRegisterStampDailySampleValueNew(org.getIdOfOrg(), item.getDateTime(), goodItem.getFullName());
 
-                            // кол-во для комплексов веб-технолога
-                            Long wtValDaily = service.buildRegisterStampDailySampleWtMenuValueNew(org.getIdOfOrg(), item.getDateTime(),
-                                    item.getLevel4(), item.getLevel3());
-                            valDaily += wtValDaily;
-
                             RegisterStampReportItem itemDaily = new RegisterStampReportItem(goodItem,valDaily,date,number, time);
                             data.getList511().add(itemDaily);
                             Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                     goodItem.getFullName(), withOutActDiscrepancies);
-
-                            // кол-во для комплексов веб-технолога
-                            Long wtVal1 = service.buildRegisterStampBodyWtMenuValue(org.getIdOfOrg(), calendar.getTime(),
-                                    item.getLevel4(), item.getLevel3(), withOutActDiscrepancies);
-                            val1 += wtVal1;
 
                             RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1 + valDaily,"Итого", CalendarUtils.addDays(endTime, 1));
                             data.getList511().add(total1);
@@ -237,10 +203,6 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                             waterItems.add(item);
                             Long val1 = service.buildRegisterStampBodyValue(org.getIdOfOrg(), calendar.getTime(),
                                     goodItem.getFullName(), withOutActDiscrepancies);
-
-                            // кол-во для комплексов веб-технолога
-                            Long wtVal1 = service.buildRegisterStampBodyWtMenuWaterValue(org.getIdOfOrg(), calendar.getTime(), withOutActDiscrepancies);
-                            val1 += wtVal1;
 
                             RegisterStampReportItem total1 = new RegisterStampReportItem(goodItem,val1,"Итого", CalendarUtils.addDays(endTime, 1));
                             total1.setLevel4("Вода питьевая");
@@ -251,6 +213,86 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                             headerMap.put(item.getLevel4(), item);
                         }
                     }
+
+                    // цикл по типам диет и возрастным группам для комплексов
+                    String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
+                    for (WtDietType dietType : allDietTypes) {
+                        for (WtAgeGroupItem ageGroup : allAgeGroups) {
+                            Long val = service.buildRegisterStampBodyWtMenuValue(org.getIdOfOrg(), time, dietType, ageGroup, withOutActDiscrepancies);
+                            RegisterStampReportItem item = new RegisterStampReportItem(ageGroup.getDescription(),
+                                    dietType.getDescription(), val, date, number, time);
+
+                            if (item.getLevel3().equals("1,5-3") || item.getLevel3().equals("1.5-3")) {
+                                data.getList153().add(item);
+
+                                Long valDaily = service.buildRegisterStampDailySampleWtMenuValueNew(org.getIdOfOrg(), item.getDateTime(), dietType, ageGroup);
+                                RegisterStampReportItem itemDaily = new RegisterStampReportItem(ageGroup.getDescription(), dietType.getDescription(), valDaily,
+                                        date, number, time);
+                                data.getList153().add(itemDaily);
+
+                                Long val1 = service.buildRegisterStampBodyWtMenuValue(org.getIdOfOrg(), calendar.getTime(),
+                                        dietType, ageGroup, withOutActDiscrepancies);
+                                RegisterStampReportItem total1 = new RegisterStampReportItem(ageGroup.getDescription(), dietType.getDescription(), val1 + valDaily,
+                                        "Итого", null, CalendarUtils.addDays(endTime, 1));
+                                data.getList153().add(total1);
+
+                            } else if (item.getLevel3().equals("3-7")) {
+                                data.getList37().add(item);
+                                Long valDaily = service.buildRegisterStampDailySampleWtMenuValueNew(org.getIdOfOrg(), item.getDateTime(), dietType, ageGroup);
+                                RegisterStampReportItem itemDaily = new RegisterStampReportItem(ageGroup.getDescription(), dietType.getDescription(), valDaily,
+                                        date, number, time);
+                                data.getList37().add(itemDaily);
+
+                                Long val1 = service.buildRegisterStampBodyWtMenuValue(org.getIdOfOrg(), calendar.getTime(),
+                                        dietType, ageGroup, withOutActDiscrepancies);
+                                RegisterStampReportItem total1 = new RegisterStampReportItem(ageGroup.getDescription(), dietType.getDescription(), val1 + valDaily,
+                                        "Итого", null, CalendarUtils.addDays(endTime, 1));
+                                data.getList37().add(total1);
+
+                            } else if (item.getLevel3().equals("1-4")) {
+                                data.getList14().add(item);
+                                Long valDaily = service.buildRegisterStampDailySampleWtMenuValueNew(org.getIdOfOrg(), item.getDateTime(), dietType, ageGroup);
+                                RegisterStampReportItem itemDaily = new RegisterStampReportItem(ageGroup.getDescription(), dietType.getDescription(), valDaily,
+                                        date, number, time);
+                                data.getList14().add(itemDaily);
+
+                                Long val1 = service.buildRegisterStampBodyWtMenuValue(org.getIdOfOrg(), calendar.getTime(),
+                                        dietType, ageGroup, withOutActDiscrepancies);
+                                RegisterStampReportItem total1 = new RegisterStampReportItem(ageGroup.getDescription(), dietType.getDescription(), val1 + valDaily,
+                                        "Итого", null, CalendarUtils.addDays(endTime, 1));
+                                data.getList14().add(total1);
+
+                            } else if (item.getLevel3().equals("5-11")) {
+                                data.getList511().add(item);
+                                Long valDaily = service.buildRegisterStampDailySampleWtMenuValueNew(org.getIdOfOrg(), item.getDateTime(), dietType, ageGroup);
+                                RegisterStampReportItem itemDaily = new RegisterStampReportItem(ageGroup.getDescription(), dietType.getDescription(), valDaily,
+                                        date, number, time);
+                                data.getList511().add(itemDaily);
+
+                                Long val1 = service.buildRegisterStampBodyWtMenuValue(org.getIdOfOrg(), calendar.getTime(),
+                                        dietType, ageGroup, withOutActDiscrepancies);
+                                RegisterStampReportItem total1 = new RegisterStampReportItem(ageGroup.getDescription(), dietType.getDescription(), val1 + valDaily,
+                                        "Итого", null, CalendarUtils.addDays(endTime, 1));
+                                data.getList511().add(total1);
+
+                            } else if (item.getOrderType().equals(1)) {
+                                waterItems.add(item);
+                                Long val1 = service.buildRegisterStampBodyWtMenuValue(org.getIdOfOrg(), calendar.getTime(),
+                                        dietType, ageGroup, withOutActDiscrepancies);
+                                RegisterStampReportItem total1 = new RegisterStampReportItem(ageGroup.getDescription(), dietType.getDescription(), val1,
+                                        "Итого", null, CalendarUtils.addDays(endTime, 1));
+                                total1.setLevel4("Вода питьевая");
+                                waterItems.add(total1);
+                            }
+
+                            if (StringUtils.isNotEmpty(item.getLevel4()) && !headerMap.keySet()
+                                    .contains(item.getLevel4())) {
+                                headerMap.put(item.getLevel4(), item);
+                            }
+                        }
+                    }
+
+
                 }
 
                 if (!addWaterCategory(headerMap))
