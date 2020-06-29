@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -27,6 +27,7 @@ import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Se
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSetting;
 import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
@@ -2132,6 +2133,12 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(Good.class);
         criteria.add(Restrictions.eq("guid", guidOfGood));
         return (Good) criteria.uniqueResult();
+    }
+
+    public static WtComplex findWtComplexById(Session session, Long idOfComplex) {
+        Criteria criteria = session.createCriteria(WtComplex.class);
+        criteria.add(Restrictions.eq("idOfComplex", idOfComplex));
+        return (WtComplex) criteria.uniqueResult();
     }
 
     public static void savePreorderGuidFromOrderDetail(Session session, String guid, OrderDetail orderDetail,

@@ -4,13 +4,16 @@
 
 package ru.axetta.ecafe.processor.core.daoservices.order.items;
 
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtAgeGroupItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDietType;
+
 import java.util.Objects;
 
 public class WtComplexItem {
 
     private Long idOfComplex;
-    private Long idOfDietType;
-    private Long idOfAgeGroup;
+    private WtDietType dietType;
+    private WtAgeGroupItem ageGroup;
     private Integer orderType;
 
     public WtComplexItem() {
@@ -24,20 +27,20 @@ public class WtComplexItem {
         this.idOfComplex = idOfComplex;
     }
 
-    public Long getIdOfDietType() {
-        return idOfDietType;
+    public WtDietType getDietType() {
+        return dietType;
     }
 
-    public void setIdOfDietType(Long idOfDietType) {
-        this.idOfDietType = idOfDietType;
+    public void setDietType(WtDietType dietType) {
+        this.dietType = dietType;
     }
 
-    public Long getIdOfAgeGroup() {
-        return idOfAgeGroup;
+    public WtAgeGroupItem getAgeGroup() {
+        return ageGroup;
     }
 
-    public void setIdOfAgeGroup(Long idOfAgeGroup) {
-        this.idOfAgeGroup = idOfAgeGroup;
+    public void setAgeGroup(WtAgeGroupItem ageGroup) {
+        this.ageGroup = ageGroup;
     }
 
     public Integer getOrderType() {
@@ -57,12 +60,12 @@ public class WtComplexItem {
             return false;
         }
         WtComplexItem that = (WtComplexItem) o;
-        return idOfComplex.equals(that.idOfComplex) && idOfDietType.equals(that.idOfDietType) && idOfAgeGroup
-                .equals(that.idOfAgeGroup) && Objects.equals(orderType, that.orderType);
+        return idOfComplex.equals(that.idOfComplex) && dietType.equals(that.dietType) && ageGroup.equals(that.ageGroup)
+                && Objects.equals(orderType, that.orderType);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(idOfComplex, idOfDietType, idOfAgeGroup, orderType);
+        return Objects.hash(idOfComplex, dietType, ageGroup, orderType);
     }
 }

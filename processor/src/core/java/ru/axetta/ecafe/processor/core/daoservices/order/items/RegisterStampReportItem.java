@@ -177,13 +177,14 @@ public class RegisterStampReportItem implements Comparable<RegisterStampReportIt
         }
     }
 
-    public RegisterStampReportItem(String level3, String level4, Long qty, String date, String number, Date dateTime) {
+    public RegisterStampReportItem(String level3, String level4, Long qty, String date, String number, Date dateTime, Integer orderType) {
         this.level3 = level3;
         this.level4 = level4;
         this.qty = qty;
         this.date = date;
         this.number = number;
         this.dateTime = dateTime;
+        this.orderType = orderType;
         if (number != null && !number.equals("")) {
             this.datePlusNumber = date + " № " + number;
         } else {
