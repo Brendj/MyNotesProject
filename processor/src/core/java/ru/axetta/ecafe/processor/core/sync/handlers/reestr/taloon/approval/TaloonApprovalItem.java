@@ -48,6 +48,8 @@ public class TaloonApprovalItem {
     private String errorMessage;
     private Integer resCode;
     private Long version;
+    private Long complexId;
+    private Boolean byWebSupplier;
 
     public static TaloonApprovalItem build(Node itemNode, Long orgOwner) {
         Long orgId = null;
@@ -67,6 +69,8 @@ public class TaloonApprovalItem {
         Long taloonNumber = null;
         Long version = null;
         StringBuilder errorMessage = new StringBuilder();
+        Long complexId = null;
+        Boolean byWebSupplier = false;
 
         //Три обязательных поля (orgId, date, name)- первичный ключ
         String strOrgId = XMLUtils.getAttributeValue(itemNode, "OrgId");
@@ -155,7 +159,8 @@ public class TaloonApprovalItem {
         if (StringUtils.isNotEmpty(strCreatedType)) {
             try {
                 createdType = Integer.parseInt(strCreatedType);
-                if (!createdType.equals(TaloonCreatedTypeEnum.TALOON_CREATED_TYPE_AUTO.ordinal()) && !createdType.equals(TaloonCreatedTypeEnum.TALOON_CREATED_TYPE_MANUAL.ordinal())) {
+                if (!createdType.equals(TaloonCreatedTypeEnum.TALOON_CREATED_TYPE_AUTO.ordinal()) &&
+                        !createdType.equals(TaloonCreatedTypeEnum.TALOON_CREATED_TYPE_MANUAL.ordinal())) {
                     errorMessage.append("Attribute CreatedType not valid\n");
                 }
             } catch (NumberFormatException e) {
@@ -169,7 +174,8 @@ public class TaloonApprovalItem {
         if (StringUtils.isNotEmpty(strIsppState)) {
             try {
                 isppState = Integer.parseInt(strIsppState);
-                if (!isppState.equals(TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED.ordinal()) && !isppState.equals(TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED.ordinal())) {
+                if (!isppState.equals(TaloonISPPStatesEnum.TALOON_ISPP_STATE_NOT_SELECTED.ordinal()) &&
+                        !isppState.equals(TaloonISPPStatesEnum.TALOON_ISPP_STATE_CONFIRMED.ordinal())) {
                     errorMessage.append("Attribute ISPP_State not valid");
                 }
             } catch (NumberFormatException e) {
@@ -195,6 +201,24 @@ public class TaloonApprovalItem {
             ppState = TaloonPPStatesEnum.TALOON_PP_STATE_NOT_SELECTED.ordinal();
         }
 
+        String strWebSupplier = XMLUtils.getAttributeValue(itemNode, "ByWebSupplier");
+        if (StringUtils.isNotEmpty(strWebSupplier)) {
+            try {
+                byWebSupplier = (Integer.parseInt(strWebSupplier) == 1);
+            } catch (NumberFormatException e) {
+                errorMessage.append( "NumberFormatException incorrect format ByWebSupplier");
+            }
+        }
+
+        String strComplexId = XMLUtils.getAttributeValue(itemNode, "ComplexId");
+        if(StringUtils.isNotEmpty(strComplexId)){
+            try {
+                complexId =  Long.parseLong(strComplexId);
+            } catch (NumberFormatException e){
+                errorMessage.append("NumberFormatException ComplexId is not parsed");
+            }
+        }
+
         String strDeletedState = XMLUtils.getAttributeValue(itemNode, "D");
         if (StringUtils.isNotEmpty(strDeletedState)) {
             try {
@@ -215,7 +239,7 @@ public class TaloonApprovalItem {
 
         return new TaloonApprovalItem(orgId, orgIdCreated, date, name,goodsName,goodsGuid, soldedQty, requestedQty, shippedQty, price,
                 TaloonCreatedTypeEnum.fromInteger(createdType), TaloonISPPStatesEnum.fromInteger(isppState), TaloonPPStatesEnum.fromInteger(ppState),
-                taloonNumber, orgOwner, deletedState, version, errorMessage.toString());
+                taloonNumber, orgOwner, complexId, byWebSupplier, deletedState, version, errorMessage.toString());
     }
 
     private static boolean isOldQtyFormat(Node itemNode) {
@@ -240,7 +264,7 @@ public class TaloonApprovalItem {
 
     private TaloonApprovalItem(Long orgId, Long orgIdCreated, Date date, String name,String goodsName,String goodsGuid, Integer soldedQty,
             Integer requestedQty, Integer shippedQty, Long price, TaloonCreatedTypeEnum createdType, TaloonISPPStatesEnum isppState, TaloonPPStatesEnum ppState,
-            Long taloonNumber, Long orgOwnerId, Boolean deletedState, Long version, String errorMessage) {
+            Long taloonNumber, Long orgOwnerId, Long complexId, Boolean byWebSupplier, Boolean deletedState, Long version, String errorMessage) {
         this.setOrgId(orgId);
         this.setOrgIdCreated(orgIdCreated);
         this.setDate(date);
@@ -257,6 +281,8 @@ public class TaloonApprovalItem {
         this.setDeletedState(deletedState);
         this.setGoodsName(goodsName);
         this.setGoodsGuid(goodsGuid);
+        this.setComplexId(complexId);
+        this.setByWebSupplier(byWebSupplier);
         this.version = version;
         this.setErrorMessage(errorMessage);
         if (errorMessage.equals("")) {
@@ -416,5 +442,21 @@ public class TaloonApprovalItem {
 
     public void setVersion(Long version) {
         this.version = version;
+    }
+
+    public Long getComplexId() {
+        return complexId;
+    }
+
+    public void setComplexId(Long complexId) {
+        this.complexId = complexId;
+    }
+
+    public Boolean getByWebSupplier() {
+        return byWebSupplier;
+    }
+
+    public void setByWebSupplier(Boolean byWebSupplier) {
+        this.byWebSupplier = byWebSupplier;
     }
 }

@@ -38,12 +38,12 @@ public class DirectorOrgListSelectPage extends OrgSelectionBasicPage {
 
     public void completeOrgListSelection(boolean ok) throws Exception {
         setFilterMode(0);
+        resetAvailableOrganizationTypes();
 
         Map<Long, String> orgMap = null;
         if (ok) {
             updateSelectedOrgs();
-            orgMap = new HashMap<Long, String>();
-            orgMap.putAll(selectedOrgs);
+            orgMap = new HashMap<Long, String>(selectedOrgs);
         }
         if (!completeHandlerLists.empty()) {
             completeHandlerLists.peek().completeDirectorOrgListSelection(orgMap);
@@ -154,7 +154,7 @@ public class DirectorOrgListSelectPage extends OrgSelectionBasicPage {
     public String getSelectedOrgsString() {
         String s = "";
         for (String org : getSelectedOrgs().values()) {
-            s = s + org + ", ";
+            s += org + ", ";
         }
         if (s.length() > 2) {
             return s.substring(0, s.length() - 2);

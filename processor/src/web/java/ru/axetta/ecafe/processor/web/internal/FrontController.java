@@ -29,6 +29,7 @@ import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.core.utils.VersionUtils;
 import ru.axetta.ecafe.processor.web.internal.front.items.*;
+import ru.axetta.ecafe.processor.web.partner.preorder.PreorderDAOService;
 import ru.axetta.ecafe.util.DigitalSignatureUtils;
 
 import org.apache.commons.lang.StringUtils;
@@ -1073,7 +1074,6 @@ public class FrontController extends HttpServlet {
         logger.debug("checkRequestValidity");
         checkRequestValidity(orgId);
 
-        boolean isExistsOrgByIdAndTags; // = DAOService.getInstance().existsOrgByIdAndTags(orgId, "БЛОК_РЕГ_УЧ");
         String notifyByPush =
                 RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
         String notifyByEmail =
@@ -1098,12 +1098,6 @@ public class FrontController extends HttpServlet {
                 String orgIdForClient = getClientParamDescValueByName("orgId", cd.getClientDescParams().getParam());
                 if (orgIdForClient == null) {
                     throw new FrontControllerException("Не найден обязательный параметр orgId");
-                }
-                isExistsOrgByIdAndTags = DAOService.getInstance()
-                        .existsOrgByIdAndTags(Long.parseLong(orgIdForClient), "БЛОК_РЕГ_УЧ");
-                if (isExistsOrgByIdAndTags && !ClientGroup.predefinedGroupNames().contains(group)) {
-                    throw new FrontControllerException(
-                            "Запрещена регистрация учащихся, используйте синхронизацию с Реестрами");
                 }
 
                 ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
@@ -1246,7 +1240,6 @@ public class FrontController extends HttpServlet {
         logger.debug("checkRequestValidity");
         checkRequestValidity(orgId);
 
-        boolean isExistsOrgByIdAndTags = DAOService.getInstance().existsOrgByIdAndTags(orgId, "БЛОК_РЕГ_УЧ");
         String notifyByPush =
                 RuntimeContext.getInstance().getOptionValueBool(Option.OPTION_NOTIFY_BY_PUSH_NEW_CLIENTS) ? "1" : "0";
         String notifyByEmail =
@@ -1257,10 +1250,6 @@ public class FrontController extends HttpServlet {
             try {
                 //ClientManager.ClientFieldConfig fc = ClientDesc.buildClientFieldConfig(cd);
                 logger.debug("create FieldConfig");
-                if (isExistsOrgByIdAndTags && !ClientGroup.predefinedGroupNames().contains(cd.group)) {
-                    throw new FrontControllerException(
-                            "Запрещена регистрация учащихся, используйте синхронизацию с Реестрами");
-                }
                 ClientManager.ClientFieldConfig fc = new ClientManager.ClientFieldConfig();
                 logger.debug("check client params");
                 if (cd.contractSurname != null) {
@@ -1988,6 +1977,38 @@ public class FrontController extends HttpServlet {
         return CalendarUtils.dateTimeToString(new Date());
     }
 
+    @WebMethod(operationName = "getBalancesForPayPlan")
+    public PayPlanBalanceListResponse getBalancesForPayPlan(@WebParam(name = "orgId") Long orgId,
+            @WebParam(name = "balanceList") PayPlanBalanceList payPlanBalanceList)
+            throws FrontControllerException {
+        checkRequestValidity(orgId);
+        PayPlanBalanceListResponse result = new PayPlanBalanceListResponse();
+        Session session = null;
+        Transaction persistenceTransaction = null;
+        try {
+            session = RuntimeContext.getInstance().createPersistenceSession();
+            persistenceTransaction = session.beginTransaction();
+            for (PayPlanBalanceItem item : payPlanBalanceList.getItems()) {
+                PayPlanBalanceItem resultItem = new PayPlanBalanceItem(item.getIdOfClient());
+                Client client = DAOReadonlyService.getInstance().findClientById(item.getIdOfClient());
+                if (client == null) throw new Exception("Client not found in getBalancesForPayPlan. IdOfClient = " + item.getIdOfClient());
+                long preorderSum = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getNotPaidPreordersSum(client, CalendarUtils.startOfDay(new Date()));
+                long resultSum = client.getBalance() - item.getSumma() - preorderSum;
+                resultItem.setSumma(resultSum);
+                result.addItem(resultItem);
+            }
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+        } catch (Exception e) {
+            logger.error("Error in getBalancesForPayPlan", e);
+            throw new FrontControllerException("Ошибка: " + e.getMessage());
+        } finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(session, logger);
+        }
+        return result;
+    }
 
     @WebMethod(operationName = "unblockOrReturnCard")
     public ResponseItem unblockOrReturnCard(@WebParam(name = "cardNo") Long cardNo,

@@ -80,7 +80,6 @@
                                || !mainPage.deliveredServicesElectronicCollationReportPage.emptyContragent()}"
                                id="orgDeliveredServicesSelectButton">
                 <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
-                <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.supplierFilter}" />
                 <f:setPropertyActionListener
                         value="#{mainPage.deliveredServicesElectronicCollationReportPage.getStringIdOfOrgList}"
                         target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />

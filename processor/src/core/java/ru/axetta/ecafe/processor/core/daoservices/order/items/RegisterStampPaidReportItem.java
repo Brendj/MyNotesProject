@@ -26,6 +26,19 @@ public class RegisterStampPaidReportItem {
     private String number;
     private Date dateTime;
 
+    public RegisterStampPaidReportItem(GoodItem1 goodItem, Long qty, String date, String number, Date dateTime, Long price, Long total) {
+        this.level1 = goodItem.getPathPart1();
+        this.level2 = goodItem.getPathPart2();
+        this.level3 = goodItem.getPathPart3();
+        this.level4 = goodItem.getPathPart4();
+        this.qty = qty;
+        this.date = date;
+        this.number = number;
+        this.dateTime = dateTime;
+        this.price = price;
+        this.total = total;
+    }
+
     public RegisterStampPaidReportItem(GoodItem1 goodItem, Long qty, String date, Date dateTime) {
         this(goodItem, qty, date, null, dateTime);
     }

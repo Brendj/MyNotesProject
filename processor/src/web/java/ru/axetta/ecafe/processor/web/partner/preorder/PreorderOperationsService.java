@@ -5,14 +5,12 @@
 package ru.axetta.ecafe.processor.web.partner.preorder;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
-import ru.axetta.ecafe.processor.core.persistence.PreorderComplex;
-import ru.axetta.ecafe.processor.core.persistence.ProductionCalendar;
-import ru.axetta.ecafe.processor.core.persistence.RegularPreorder;
-import ru.axetta.ecafe.processor.core.persistence.SpecialDate;
+import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.service.PreorderRequestsReportServiceParam;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Scope;
@@ -27,6 +25,7 @@ import java.util.*;
 @Scope("singleton")
 public class PreorderOperationsService {
     private static final Logger logger = LoggerFactory.getLogger(PreorderOperationsService.class);
+    public static final String PREORDER_CHECK_EMAIL_NOTIFICATION_PROPERTY = "ecafe.processor.preorder.check.email";
 
     public void relevancePreorders(PreorderRequestsReportServiceParam params) {
         logger.info("Start process relevance preorders");
@@ -43,6 +42,17 @@ public class PreorderOperationsService {
         } catch(Exception e) {
             logger.error("Error in process relevance preorders");
         }
+    }
+
+    public void dailyCheckPreorders() {
+        logger.info("Start preorders daily check process");
+        try {
+            RuntimeContext.getAppContext().getBean(PreorderDAOService.class).dailyCheck();
+            sendPreorderCheckNotifications(RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getPreorderCheckListForNotification());
+        } catch (Exception e) {
+            logger.error("Error in preorders daily check process:", e);
+        }
+        logger.info("End preorders daily check process");
     }
 
     public void runRelevancePreordersToMenu(PreorderRequestsReportServiceParam params) {
@@ -116,5 +126,27 @@ public class PreorderOperationsService {
                 logger.error("Error in delete expired regular preorder: ", e);
             }
         }
+    }
+
+    private void sendPreorderCheckNotifications(List<PreorderCheck> list) {
+        String email = getEmailForPreorderCheckNotification();
+        if (list.size() == 0 || StringUtils.isEmpty(email)) return;
+        String html = "<html><body><table><tbody><tr><td>Дата</td><td>Количество в предзаказе</td><td>Количество в заявках</td><td>Изменено</td>%s</tr></tbody></table></body></html>";
+        String text = "";
+        for (PreorderCheck preorderCheck : list) {
+            text += String.format("<tr><td>%s</td><td>%s</td><td>%s</td><td>%s</td></tr>", CalendarUtils.dateToString(preorderCheck.getDate()),
+                    preorderCheck.getPreorderAmount(), preorderCheck.getGoodRequestAmount(), CalendarUtils.dateTimeToString(preorderCheck.getLastUpdate()));
+        }
+        html = String.format(html, text);
+        try {
+            RuntimeContext.getInstance().getPostman()
+                    .postNotificationEmail(email, "Уведомление об изменениях в предзаказах", html);
+        } catch (Exception e) {
+            logger.error("Failed to send email notification", e);
+        }
+    }
+
+    private String getEmailForPreorderCheckNotification() {
+        return RuntimeContext.getInstance().getConfigProperties().getProperty(PREORDER_CHECK_EMAIL_NOTIFICATION_PROPERTY, "");
     }
 }

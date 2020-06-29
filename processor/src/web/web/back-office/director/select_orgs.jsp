@@ -66,6 +66,12 @@
                                         <a4j:support requestDelay="1000" event="onkeyup" action="#{directorPage.updateOrgListSelectPage}"
                                                      reRender="modalOrgListSelectorOrgTable" />
                                     </h:inputText>
+                                    <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
+                                    <h:inputText id="inputIdFilter" value="#{directorPage.orgListSelectPage.idFilter}"
+                                                 size="60" maxlength="120" styleClass="input-text">
+                                        <a4j:support requestDelay="1000" event="onkeyup" action="#{directorPage.updateOrgListSelectPage}"
+                                                     reRender="modalOrgListSelectorOrgTable" />
+                                    </h:inputText>
                                     <h:outputText escape="true" value="Округ: " styleClass="output-text" />
                                     <h:selectOneMenu id="regionsList" value="#{directorPage.orgListSelectPage.region}"
                                                      style="width:386px;"
@@ -79,41 +85,19 @@
                                                             styleClass="borderNone" timeout="10"
                                                             headerClass="imageNone borderNone linkClass"
                                                             bodyClass="imageNone borderNone">
-                                        <h:panelGrid id="contentDiv22" columns="2" styleClass="borderless-grid">
-                                            <h:outputText escape="true" value="Фильтр по тэгу: " styleClass="output-text" />
-                                            <h:inputText id="inputTagFilter" value="#{directorPage.orgListSelectPage.tagFilter}"
-                                                 size="60" maxlength="120" styleClass="input-text">
-                                                <a4j:support requestDelay="1000" event="onkeyup" action="#{directorPage.updateOrgListSelectPage}"
-                                                     reRender="modalOrgListSelectorOrgTable" />
-                                            </h:inputText>
-                                            <h:outputText escape="true" value="Фильтр по ID: " styleClass="output-text" />
-                                            <h:inputText id="inputIdFilter" value="#{directorPage.orgListSelectPage.idFilter}"
-                                                 size="60" maxlength="120" styleClass="input-text">
-                                                <a4j:support requestDelay="1000" event="onkeyup" action="#{directorPage.updateOrgListSelectPage}"
-                                                     reRender="modalOrgListSelectorOrgTable" />
-                                            </h:inputText>
+                                        <h:panelGrid columns="2">
+                                            <a4j:repeat id="DirectorOrganizationTypesForSelectMany"
+                                                        value="#{directorPage.orgListSelectPage.availableOrganizationTypes}" var="item">
+                                                <h:panelGrid columns="2">
+                                                    <h:selectBooleanCheckbox value="#{item.selected}" disabled="#{item.disabled}">
+                                                        <a4j:support event="onchange" action="#{directorPage.updateOrgListSelectPage}"
+                                                                     reRender="modalOrgListSelectorForm" requestDelay="1000"/>
+                                                    </h:selectBooleanCheckbox>
+                                                    <h:outputText styleClass="output-text" value="#{item.typeName}"/>
+                                                </h:panelGrid>
+                                            </a4j:repeat>
                                         </h:panelGrid>
                                     </rich:simpleTogglePanel>
-
-                                <h:panelGrid id="radioButtons" columns="1" styleClass="borderless-grid">
-                                    <h:selectOneRadio value="#{directorPage.orgListSelectPage.supplierFilter}"
-                                                      converter="javax.faces.Integer" styleClass="output-text">
-                                        <a4j:support event="onclick" action="#{directorPage.updateOrgListSelectPage}"
-                                                     reRender="modalOrgListSelectorOrgTable" />
-                                        <f:selectItem itemValue="0" itemLabel="Любые организации"
-                                                      itemDisabled="#{directorPage.orgListSelectPage.allOrgFilterDisabled}" />
-                                        <f:selectItem itemValue="1" itemLabel="Только ОУ"
-                                                      itemDisabled="#{directorPage.orgListSelectPage.schoolFilterDisabled}" />
-                                        <f:selectItem itemValue="4" itemLabel="Только ДОУ"
-                                                      itemDisabled="#{directorPage.orgListSelectPage.primarySchoolFilterDisabled}" />
-                                        <f:selectItem itemValue="5" itemLabel="Только СОУ"
-                                                      itemDisabled="#{directorPage.orgListSelectPage.secondarySchoolFilterDisabled}" />
-                                        <f:selectItem itemValue="2" itemLabel="Только поставщики"
-                                                      itemDisabled="#{directorPage.orgListSelectPage.supplierFilterDisabled}" />
-                                        <f:selectItem itemValue="6" itemLabel="Показать все организации"
-                                                      itemDisabled="#{directorPage.orgListSelectPage.allOrgsFilterDisabled}" />
-                                    </h:selectOneRadio>
-                                </h:panelGrid>
                             </h:panelGrid>
                         </h:panelGrid>
                         <a4j:commandLink action="#{directorPage.updateOrgListSelectPage}"

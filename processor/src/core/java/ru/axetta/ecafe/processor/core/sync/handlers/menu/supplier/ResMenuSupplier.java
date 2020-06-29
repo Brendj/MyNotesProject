@@ -14,6 +14,7 @@ import org.apache.cxf.common.util.StringUtils;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
+import java.math.BigDecimal;
 import java.text.SimpleDateFormat;
 import java.util.*;
 
@@ -245,7 +246,7 @@ public class ResMenuSupplier implements AbstractToElement {
 
         int price;
         if (dish.getPrice() != null) {
-            price = (int) dish.getPrice().floatValue() * 100; // цена в копейках
+            price = dish.getPrice().multiply(new BigDecimal(100)).intValue(); // цена в копейках
         } else {
             price = 0;
         }
@@ -378,7 +379,7 @@ public class ResMenuSupplier implements AbstractToElement {
 
         int price;
         if (complex.getPrice() != null) {
-            price = (int) complex.getPrice().floatValue() * 100; // цена в копейках
+            price = complex.getPrice().multiply(new BigDecimal(100)).intValue(); // цена в копейках
         } else {
             price = 0;
         }

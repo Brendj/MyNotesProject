@@ -396,7 +396,7 @@
             <a4j:commandButton value="Редактировать" action="#{mainPage.showCategoryListSelectPage}" reRender="modalCategoryListSelectorPanel"
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalCategoryListSelectorPanel')}.show();"
                                styleClass="command-link">
-                <f:param name="fullList" value="false" />
+                <f:param name="fullList" value="true" />
                 <f:setPropertyActionListener value="#{mainPage.clientEditPage.idOfCategoryListString}"
                                              target="#{mainPage.categoryFilterOfSelectCategoryListSelectPage}" />
             </a4j:commandButton>
