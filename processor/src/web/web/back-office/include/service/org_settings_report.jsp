@@ -94,203 +94,274 @@
     <rich:dataTable id="orgSettingsTable" value="#{orgSettingsReportPage.items}" var="item" rows="25"
                     sortMode="single"
                     rowClasses="center-aligned-column" lang="rus"
-                    footerClass="data-table-footer">
+                    footerClass="data-table-footer"
+                    headerClass="column-header gray">
         <f:facet name="header">
-            <h:outputText escape="true" value="Отчет по образовательным комплексам" />
+            <rich:columnGroup>
+                <%--<h:outputText escape="true" value="Отчет по образовательным комплексам" />--%>
+                <rich:column colspan="1">
+                    <h:outputText escape="true" value="Прим." />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.orgNumberInName}" rowspan="2">
+                    <h:outputText escape="true" value="Номер" />
+                </rich:column>
+                <rich:column sortable="trueщ" sortBy="#{item.idOfOrg}" rowspan="2">
+                    <h:outputText escape="true" value="ID ОО" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.shortName}" rowspan="2">
+                    <h:outputText escape="true" value="Название ПП" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.officialName}" rowspan="2">
+                    <h:outputText escape="true" value="Полное название" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.shortNameInfoService}"  rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="Наименование" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.district}" rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="Округ" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.shortAddress}" rowspan="2">
+                    <h:outputText escape="true" value="Адрес" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.type}" rowspan="2">
+                    <h:outputText escape="true" value="Тип ОУ" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.status}" rowspan="2">
+                    <h:outputText escape="true" value="Статус" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.GUID}" rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="GUID" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.additionalIdBuilding}" rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="Доп.ид здания" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.btiUnom}" rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="УНОМ" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.btiUnad}" rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="УНАД" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.INN}" rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="ИНН" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.typeInternal}" rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="Тип ОУ при внедрении" />
+                </rich:column>
+                <rich:column rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="Номер версии АРМа" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.defaultSupplierName}" rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="Поставщик питания" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.productionConfig}" rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="Производственная конфигурация" />
+                </rich:column>
+                <rich:column sortable="true" sortBy="#{item.orgCategory}" rowspan="2" rendered="#{orgSettingsReportPage.showRequisite}">
+                    <h:outputText escape="true" value="Категории ОУ" />
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" colspan="1">
+                    <h:outputText escape="true" value="Использовать Web-АРМ" />
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" colspan="1">
+                    <h:outputText escape="true" value="Абонементное питание" />
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" colspan="1">
+                    <h:outputText escape="true" value="Вариатвиное питание" />
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" colspan="1">
+                    <h:outputText escape="true" value="Предзаказ" />
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" colspan="1">
+                    <h:outputText escape="true" value="Оплата/сторнирование месяц продажи + 5 дней следующего" />
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" colspan="1">
+                    <h:outputText escape="true" value="Контроль расхождения времени оплаты" />
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}" rowspan="2">
+                    <h:outputText escape="true" value="Возможность ухода в минус при оплате Платного плана / Абонементного питания" />
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showCardSettings}" colspan="1">
+                    <h:outputText escape="true" value="Запрет на выдачу временной карты" />
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showCardSettings}" colspan="1">
+                    <h:outputText escape="true" value="Дубликаты для основных карт" />
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showCardSettings}" colspan="1">
+                    <h:outputText escape="true" value="Несколько активных карт в ОО" />
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showCardSettings}" colspan="1">
+                    <h:outputText escape="true" value="ЭЦП для карт" />
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showOtherSetting}" colspan="1">
+                    <h:outputText escape="true" value="Заявки на посещение других ОО" />
+                </rich:column>
+                <rich:column rendered="#{orgSettingsReportPage.showOtherSetting}" colspan="1">
+                    <h:outputText escape="true" value="Режим \"Летний период\"" />
+                </rich:column>
+                <rich:column breakBefore="true">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" disabled="false">
+                        <a4j:support event="onchange"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column>
+                    <h:selectBooleanCheckbox styleClass="checkboxes" disabled="false">
+                        <a4j:support event="onchange"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column>
+                    <h:selectBooleanCheckbox styleClass="checkboxes" disabled="false">
+                        <a4j:support event="onchange"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column>
+                    <h:selectBooleanCheckbox styleClass="checkboxes" disabled="false">
+                        <a4j:support event="onchange"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column>
+                    <h:selectBooleanCheckbox styleClass="checkboxes" disabled="false">
+                        <a4j:support event="onchange"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column>
+                    <h:selectBooleanCheckbox styleClass="checkboxes" disabled="false">
+                        <a4j:support event="onchange"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column>
+                    <h:selectBooleanCheckbox styleClass="checkboxes" disabled="false">
+                        <a4j:support event="onchange"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column>
+                    <h:selectBooleanCheckbox styleClass="checkboxes" disabled="false">
+                        <a4j:support event="onchange"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column>
+                    <h:selectBooleanCheckbox styleClass="checkboxes" disabled="false">
+                        <a4j:support event="onchange"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column>
+                    <h:selectBooleanCheckbox styleClass="checkboxes" disabled="false">
+                        <a4j:support event="onchange"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column>
+                    <h:selectBooleanCheckbox styleClass="checkboxes" disabled="false">
+                        <a4j:support event="onchange"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column>
+                    <h:selectBooleanCheckbox styleClass="checkboxes" disabled="false">
+                        <a4j:support event="onchange"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+                <rich:column>
+                    <h:selectBooleanCheckbox styleClass="checkboxes" disabled="false">
+                        <a4j:support event="onchange"/>
+                    </h:selectBooleanCheckbox>
+                </rich:column>
+            </rich:columnGroup>
         </f:facet>
         <!-- main info -->
-        <!--id="orgSettingsMainInfoPart"-->
-        <rich:column sortable="true" sortBy="#{item.select}" headerClass="column-header" styleClass="#{item.style}" label="Прим.">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Прим." />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" >
             <h:selectBooleanCheckbox value="#{item.select}" styleClass="checkboxes" disabled="false">
                 <a4j:support event="onchange"/>
             </h:selectBooleanCheckbox>
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.orgNumberInName}" headerClass="column-header" styleClass="#{item.style}" label="Номер">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Номер" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}">
             <h:outputText escape="true" value="#{item.orgNumberInName}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.idOfOrg}" headerClass="column-header" styleClass="#{item.style}" label="ID OO">
-            <f:facet name="header">
-                <h:outputText escape="true" value="ID ОО" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}">
             <h:outputText escape="true" value="#{item.idOfOrg}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.shortName}" headerClass="column-header" styleClass="#{item.style}" label="Название">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Название ПП" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}">
             <h:outputText escape="true" value="#{item.shortName}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.officialName}" headerClass="column-header" styleClass="#{item.style}" label="Название" rendered="#{orgSettingsReportPage.showRequisite}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Полное название" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}">
             <h:outputText escape="true" value="#{item.officialName}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.shortNameInfoService}" headerClass="column-header" styleClass="#{item.style}" label="Название" rendered="#{orgSettingsReportPage.showRequisite}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Наименование" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showRequisite}">
             <h:outputText escape="true" value="#{item.shortNameInfoService}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.district}" headerClass="column-header" styleClass="#{item.style}" label="Округ">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Округ" />
-            </f:facet>
+        <rich:column  styleClass="#{item.style}">
             <h:outputText escape="true" value="#{item.district}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.shortAddress}" headerClass="column-header" styleClass="#{item.style}" label="Адрес">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Адрес" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}">
             <h:outputText escape="true" value="#{item.shortAddress}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.type}" headerClass="column-header" styleClass="#{item.style}" label="Тип ОУ">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Тип ОУ" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}">
             <h:outputText escape="true" value="#{item.type}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.status}" headerClass="column-header" styleClass="#{item.style}" label="Статус">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Статус" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}">
             <h:outputText escape="true" value="#{item.status}" styleClass="output-text" />
         </rich:column>
         <!-- Requisites -->
-        <!--id="orgSettingsRequisitesInfoPart" rendered="orgSettingsReportPage.showRequisite"-->
-        <rich:column sortable="true" sortBy="#{item.GUID}" headerClass="column-header" styleClass="#{item.style}" label="GUID" rendered="#{orgSettingsReportPage.showRequisite}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="GUID" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showRequisite}">
             <h:outputText escape="true" value="#{item.GUID}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.additionalIdBuilding}" headerClass="column-header" rendered="#{orgSettingsReportPage.showRequisite}"
-                     styleClass="#{item.style}" label="Доп.ид здания">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Доп.ид здания" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.additionalIdBuilding}"
-                          styleClass="output-text" />
+        <rich:column rendered="#{orgSettingsReportPage.showRequisite}" styleClass="#{item.style}">
+            <h:outputText escape="true" value="#{item.additionalIdBuilding}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.btiUnom}" headerClass="column-header" styleClass="#{item.style}" label="УНОМ" rendered="#{orgSettingsReportPage.showRequisite}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="УНОМ" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showRequisite}">
             <h:outputText escape="true" value="#{item.btiUnom}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.btiUnad}" headerClass="column-header" styleClass="#{item.style}" label="УНАД" rendered="#{orgSettingsReportPage.showRequisite}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="УНАД" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showRequisite}">
             <h:outputText escape="true" value="#{item.btiUnad}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.INN}" headerClass="column-header" styleClass="#{item.style}" label="ИНН" rendered="#{orgSettingsReportPage.showRequisite}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="ИНН" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showRequisite}">
             <h:outputText escape="true" value="#{item.INN}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.typeInternal}" headerClass="column-header" rendered="#{orgSettingsReportPage.showRequisite}"
-                     styleClass="#{item.style}" label="Тип ОУ при внедрении">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Тип ОУ при внедрении" />
-            </f:facet>
+        <rich:column rendered="#{orgSettingsReportPage.showRequisite}" styleClass="#{item.style}">
             <h:outputText escape="true" value="#{item.typeInternal}" styleClass="output-text" />
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Номер версии АРМа" rendered="#{orgSettingsReportPage.showRequisite}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Номер версии АРМа" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showRequisite}">
             <h:outputText escape="true" value="#{item.armVersionNumber}" styleClass="output-text" />
         </rich:column>
-        <!-- id="orgSettingsSupplierInfoPart"-->
-        <rich:column sortable="true" sortBy="#{item.defaultSupplierName}" headerClass="column-header" rendered="#{orgSettingsReportPage.showRequisite}"
-                     styleClass="#{item.style}" label="Поставщик питания">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Поставщик питания" />
-            </f:facet>
-            <h:outputText escape="true" value="#{item.defaultSupplierName}"
-                          styleClass="output-text" />
+        <!-- orgSettingsSupplierInfoPart-->
+        <rich:column rendered="#{orgSettingsReportPage.showRequisite}" styleClass="#{item.style}">
+            <h:outputText escape="true" value="#{item.defaultSupplierName}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.productionConfig}" headerClass="column-header" rendered="#{orgSettingsReportPage.showRequisite}"
-                     styleClass="#{item.style}" label="Производственная конфигурация">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Производственная конфигурация" />
-            </f:facet>
+        <rich:column rendered="#{orgSettingsReportPage.showRequisite}" styleClass="#{item.style}">
             <h:outputText escape="true" value="#{item.productionConfig}" styleClass="output-text" />
         </rich:column>
-        <rich:column sortable="true" sortBy="#{item.orgCategory}" headerClass="column-header" styleClass="#{item.style}" label="Категории ОУ" rendered="#{orgSettingsReportPage.showRequisite}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Категории ОУ" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showRequisite}">
             <h:outputText escape="true" value="#{item.orgCategory}" styleClass="output-text" />
         </rich:column>
         <!-- Feeding Settings -->
-        <!--id="orgSettingsFeedingPart" rendered="orgSettingsReportPage.showFeedingSettings"-->
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Использовать Web-АРМ" rendered="#{orgSettingsReportPage.showFeedingSettings}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Использовать Web-АРМ" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
             <h:selectBooleanCheckbox value="#{item.useWebArm}" styleClass="checkboxes">
                 <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Абонементное питание" rendered="#{orgSettingsReportPage.showFeedingSettings}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Абонементное питание" />
-            </f:facet>
-            <h:selectBooleanCheckbox value="#{item.usePaydableSubscriptionFeeding}"
-                                     styleClass="checkboxes">
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
+            <h:selectBooleanCheckbox value="#{item.usePaydableSubscriptionFeeding}" styleClass="checkboxes">
                 <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Вариатвиное питание" rendered="#{orgSettingsReportPage.showFeedingSettings}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Вариатвиное питание" />
-            </f:facet>
-            <h:selectBooleanCheckbox value="#{item.variableFeeding}"
-                                     styleClass="checkboxes">
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
+            <h:selectBooleanCheckbox value="#{item.variableFeeding}" styleClass="checkboxes">
                 <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Предзаказ" rendered="#{orgSettingsReportPage.showFeedingSettings}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Предзаказ" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
             <h:selectBooleanCheckbox value="#{item.preordersEnabled}" styleClass="checkboxes">
                 <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Оплата/сторнирование месяц продажи" rendered="#{orgSettingsReportPage.showFeedingSettings}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Оплата/сторнирование месяц продажи + 5 дней следующего" />
-            </f:facet>
-            <h:selectBooleanCheckbox value="#{item.reverseMonthOfSale}" disabled="false"
-                                     styleClass="checkboxes">
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
+            <h:selectBooleanCheckbox value="#{item.reverseMonthOfSale}" disabled="false" styleClass="checkboxes">
                 <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Контроль расхождения времени оплаты" rendered="#{orgSettingsReportPage.showFeedingSettings}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Контроль расхождения времени оплаты" />
-            </f:facet>
-            <h:selectBooleanCheckbox value="#{item.denyPayPlanForTimeDifference}"
-                                     styleClass="checkboxes">
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
+            <h:selectBooleanCheckbox value="#{item.denyPayPlanForTimeDifference}" styleClass="checkboxes">
                 <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Возможность ухода в минус"
-                     rendered="#{orgSettingsReportPage.showFeedingSettings}">
-            <f:facet name="header">
-                <h:outputText escape="true"
-                              value="Возможность ухода в минус при оплате Платного плана / Абонементного питания" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showFeedingSettings}">
             <h:panelGrid columnClasses="center-aligned-column" columns="1" rendered="#{item.idOfSetting != -1}" styleClass="center-aligned-column">
                 <a4j:commandLink reRender="mainMenu, workspaceForm" value="#{item.settingName}"
                                  action="#{mainPage.showFeedingSettingEditPage}"
@@ -300,62 +371,40 @@
                     <f:setPropertyActionListener value="#{item.idOfSetting}"
                                                  target="#{mainPage.selectedIdOfFeedingSetting}" />
                 </a4j:commandLink>
-                <h:outputText escape="true" value="#{item.limit}" converter="copeckSumConverter"
-                              styleClass="output-text" />
+                <h:outputText escape="true" value="#{item.limit}" converter="copeckSumConverter" styleClass="output-text" />
             </h:panelGrid>
             <h:panelGrid columnClasses="center-aligned-column" columns="1" rendered="#{item.idOfSetting == -1}">
                 <h:outputText escape="true" styleClass="output-text" value="#{item.settingName}" />
             </h:panelGrid>
         </rich:column>
         <!-- Cards Settings -->
-        <!--id="orgSettingsCardPart" rendered="orgSettingsReportPage.showCardSettings"-->
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Запрет на выдачу временной карты" rendered="#{orgSettingsReportPage.showCardSettings}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Запрет на выдачу временной карты" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showCardSettings}">
             <h:selectBooleanCheckbox value="#{item.oneActiveCard}" styleClass="checkboxes">
                 <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Дубликаты для основных карт" rendered="#{orgSettingsReportPage.showCardSettings}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Дубликаты для основных карт" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showCardSettings}">
             <h:selectBooleanCheckbox value="#{item.enableDuplicateCard}" styleClass="checkboxes" disabled="false">
                 <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Несколько активных карт в ОО" rendered="#{orgSettingsReportPage.showCardSettings}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Несколько активных карт в ОО" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showCardSettings}">
             <h:selectBooleanCheckbox value="#{item.multiCardModeEnabled}" styleClass="checkboxes">
                 <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="ЭЦП для карт" rendered="#{orgSettingsReportPage.showCardSettings}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="ЭЦП для карт" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showCardSettings}">
             <h:selectBooleanCheckbox value="#{item.needVerifyCardSign}" styleClass="checkboxes">
                 <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
         <!-- Other Settings -->
-        <!--id="orgSettingsOtherPart" rendered="orgSettingsReportPage.showOtherSetting"-->
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Заявки на посещение других ОО" rendered="#{orgSettingsReportPage.showOtherSetting}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Заявки на посещение других ОО" />
-            </f:facet>
-            <h:selectBooleanCheckbox value="#{item.requestForVisitsToOtherOrg}"
-                                     styleClass="checkboxes">
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showOtherSetting}">
+            <h:selectBooleanCheckbox value="#{item.requestForVisitsToOtherOrg}" styleClass="checkboxes">
                 <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
         </rich:column>
-        <rich:column headerClass="column-header" styleClass="#{item.style}" label="Режим \"Летний период\"" rendered="#{orgSettingsReportPage.showOtherSetting}">
-            <f:facet name="header">
-                <h:outputText escape="true" value="Режим \"Летний период\"" />
-            </f:facet>
+        <rich:column styleClass="#{item.style}" rendered="#{orgSettingsReportPage.showOtherSetting}">
             <h:selectBooleanCheckbox value="#{item.isWorkInSummerTime}" styleClass="checkboxes">
                 <a4j:support event="onchange" />
             </h:selectBooleanCheckbox>
