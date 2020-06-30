@@ -44,10 +44,13 @@ import java.util.*;
 @DependsOn("runtimeContext")
 public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSelectPage.CompleteHandlerList{
 
+    private final Logger logger = LoggerFactory.getLogger(OrgSettingsReportPage.class);
+
     private Integer status = 0;
     private List<SelectItem> statuses;
     private List<OrgSettingsReportItem> items = Collections.emptyList();
     private List<SelectItem> listOfOrgDistricts;
+    private Boolean[] selectedColumns = buildSelectedColumns();
     private String selectedDistricts = "";
 
     private Boolean showRequisite = false;
@@ -56,7 +59,45 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private Boolean showOtherSetting = true;
     private Boolean allFriendlyOrgs = true;
 
-    private final Logger logger = LoggerFactory.getLogger(OrgSettingsReportPage.class);
+    //TODO: delete  array, set all flags as variable
+
+    private Boolean[] buildSelectedColumns() {
+        return new Boolean[]{
+                false, // useWebArm
+                false, // usePaydableSubscriptionFeeding
+                false, // variableFeeding
+                false, // preordersEnabled
+                false, // reverseMonthOfSale
+                false, // denyPayPlanForTimeDifference
+                false, // oneActiveCard
+                false, // enableDuplicateCard
+                false, // multiCardModeEnabled
+                false, // needVerifyCardSign
+                false, // requestForVisitsToOtherOrg
+                false  // isWorkInSummerTime
+        };
+    }
+
+    private void processSelectedColumes(List<OrgSettingsReportItem> items) {
+        if(CollectionUtils.isEmpty(items)){
+            selectedColumns = buildSelectedColumns();
+            return;
+        }
+        for(OrgSettingsReportItem item : items){
+            selectedColumns[0] |= item.getUseWebArm();
+            selectedColumns[1] |= item.getUsePaydableSubscriptionFeeding();
+            selectedColumns[2] |= item.getVariableFeeding();
+            selectedColumns[3] |= item.getPreordersEnabled();
+            selectedColumns[4] |= item.getReverseMonthOfSale();
+            selectedColumns[5] |= item.getDenyPayPlanForTimeDifference();
+            selectedColumns[6] |= item.getOneActiveCard();
+            selectedColumns[7] |= item.getEnableDuplicateCard();
+            selectedColumns[8] |= item.getMultiCardModeEnabled();
+            selectedColumns[9] |= item.getNeedVerifyCardSign();
+            selectedColumns[10] |= item.getRequestForVisitsToOtherOrg();
+            selectedColumns[11] |= item.getIsWorkInSummerTime();
+        }
+    }
 
     private List<SelectItem> buildStatuses() {
         List<SelectItem> items = new ArrayList<SelectItem>(3);
@@ -98,22 +139,63 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
         }
     }
 
-    public void doMarkAll(){
+    public void doMarkAll(Long index){
         if(CollectionUtils.isEmpty(items)){
             return;
         }
-        for(OrgSettingsReportItem i : items){
-            i.setSelect(true);
+
+        int i = index.intValue();
+        selectedColumns[i] = !selectedColumns[i];
+        Boolean val = selectedColumns[i];
+
+        for(OrgSettingsReportItem item : items){
+            switch (i){
+                case 0:
+                    item.setUseWebArm(val);
+                    break;
+                case 1:
+                    item.setUsePaydableSubscriptionFeeding(val);
+                    break;
+                case 2:
+                    item.setVariableFeeding(val);
+                    break;
+                case 3:
+                    item.setPreordersEnabled(val);
+                    break;
+                case 4:
+                    item.setReverseMonthOfSale(val);
+                    break;
+                case 5:
+                    item.setDenyPayPlanForTimeDifference(val);
+                    break;
+                case 6:
+                    item.setOneActiveCard(val);
+                    break;
+                case 7:
+                    item.setEnableDuplicateCard(val);
+                    break;
+                case 8:
+                    item.setMultiCardModeEnabled(val);
+                    break;
+                case 9:
+                    item.setNeedVerifyCardSign(val);
+                    break;
+                case 10:
+                    item.setRequestForVisitsToOtherOrg(val);
+                    break;
+                case 11:
+                    item.setIsWorkInSummerTime(val);
+                    break;
+            }
         }
     }
 
-    public void doUnmarkAll(){
-        if(CollectionUtils.isEmpty(items)){
-            return;
-        }
-        for(OrgSettingsReportItem i : items){
-            i.setSelect(false);
-        }
+    public Boolean[] getSelectedColumns() {
+        return selectedColumns;
+    }
+
+    public void setSelectedColumns(Boolean[] selectedColumns) {
+        this.selectedColumns = selectedColumns;
     }
 
     public Integer getStatus() {
@@ -147,6 +229,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
             items = OrgSettingsReport.Builder.buildOrgSettingCollection(idOfOrgList, status, persistenceSession, selectedDistricts, allFriendlyOrgs);
             Collections.sort(items);
+            processSelectedColumes(items);
 
             transaction.commit();
             transaction = null;
@@ -234,7 +317,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
             Long nextOrgVersion = DAOUtils.nextVersionByOrgStucture(session);
             for (OrgSettingsReportItem item : items){
-                if(!item.getSelect()) {
+                if(!item.getChanged()) {
                     continue;
                 }
                 try {
@@ -269,7 +352,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
                     session.update(org);
 
                     logger.info("Success");
-                    item.setSelect(false);
+                    item.setChanged(false);
                 } catch (Exception e) {
                     logger.error("Exception when try change Org settings ID: " + item.getIdOfOrg(), e);
                     problemOrgsId.add(item.getIdOfOrg());

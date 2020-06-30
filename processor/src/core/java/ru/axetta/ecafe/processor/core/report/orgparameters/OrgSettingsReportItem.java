@@ -68,7 +68,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
 
     //----------------- Служебные переменные --------------------//
     private Boolean mainBuilding;
-    private Boolean select = false;
+    private Boolean changed;
 
     private final String MAIN_BUILDING_STYLE = "mainBuilding";
     private final String NOT_SERVICED_STYLE = "notServiced";
@@ -454,11 +454,15 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
         this.shortNameInfoService = shortNameInfoService;
     }
 
-    public Boolean getSelect() {
-        return select;
+    public Boolean getChanged() {
+        return changed;
     }
 
-    public void setSelect(Boolean select) {
-        this.select = select;
+    public void setChanged(Boolean changed) {
+        this.changed = changed;
+    }
+
+    public void change(){
+        changed = true;
     }
 }
