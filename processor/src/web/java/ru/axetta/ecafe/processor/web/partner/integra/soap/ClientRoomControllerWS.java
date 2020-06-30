@@ -3749,8 +3749,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             for (WtComplex wtComplex : complexes) {
                 Complex complex = new Complex();
 
-                List<WtDish> dishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .getWtDishesByComplexAndDates(wtComplex, menuDate, menuDate);
+                // Определяем подходящий состав комплекса
+                WtComplexesItem complexItem = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getWtComplexItemByCycle(wtComplex, menuDate);
+                List<WtDish> dishes;
+                if (complexItem != null) {
+                    dishes = DAOReadExternalsService.getInstance().getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate);
+                } else {
+                    // комплекс не выводим
+                    continue;
+                }
+
+                //List<WtDish> dishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                //        .getWtDishesByComplexAndDates(wtComplex, menuDate, menuDate);
 
                 if (!dishes.isEmpty()) {
                     for (WtDish dish : dishes) {
