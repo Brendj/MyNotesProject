@@ -848,6 +848,13 @@ public class PreorderDAOService {
                 }
             }
             if (preorderComplex != null) {
+
+                if (preorderComplex.getPreorderMenuDetails() == null) {
+                    preorderComplex.setPreorderMenuDetails(set);
+                }
+                if (set.size() > 0) {
+                    preorderComplex.getPreorderMenuDetails().addAll(set);
+                }
                 complexSelected = false;
                 for (PreorderMenuDetail pmd : preorderComplex.getPreorderMenuDetails()) {
                     if (pmd.getAmount() > 0) {
