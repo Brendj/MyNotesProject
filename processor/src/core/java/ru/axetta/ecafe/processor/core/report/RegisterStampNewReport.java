@@ -210,7 +210,7 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                         }
                     }
 
-                    // цикл по типам диет и возрастным группам для комплексов
+                    // цикл по комплексам
                     String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
                     for (WtComplexItem complexItem : allComplexes) {
 
@@ -286,8 +286,7 @@ public class RegisterStampNewReport extends BasicReportForOrgJob {
                             waterItems.add(total1);
                         }
 
-                        if (StringUtils.isNotEmpty(item.getLevel4()) && !headerMap.keySet()
-                                .contains(item.getLevel4())) {
+                        if (StringUtils.isNotEmpty(item.getLevel4()) && !headerMap.keySet().contains(item.getLevel4())) {
                             headerMap.put(item.getLevel4(), item);
                         }
                     }

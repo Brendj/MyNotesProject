@@ -575,41 +575,4 @@ public class OrderDetailsDAOService extends AbstractDAOService {
             return ((BigInteger) res).longValue();
         }
     }
-
-
-    // Подсчет питьевой воды для меню веб-технолога
-    public Long buildRegisterStampBodyWtMenuWaterValue(Long idOfOrg, Date start, boolean includeActDiscrepancies) {
-        String sql ="select sum(orderdetail.qty) "
-                + " from cf_orders cforder "
-                + "     left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg and orderdetail.idoforder = cforder.idoforder"
-                + "     left join cf_wt_complexes complex on complex.idofcomplex = orderdetail.idofcomplex"
-                + " where cforder.state=0 "
-                + "     and orderdetail.state=0 "
-                + "     and cforder.createddate>=:startDate "
-                + "     and cforder.createddate<=:endDate "
-                + "     and orderdetail.socdiscount>0 "
-                + "     and cforder.idoforg=:idoforg "
-                + "     and complex.name like 'Вода%' "
-                + "     and orderdetail.menutype>=:mintype "
-                + "     and orderdetail.menutype<=:maxtype "
-                + "     and (cforder.ordertype in (4,6,10,11,12) or (cforder.ordertype=8"
-                + (includeActDiscrepancies ?" ":" and orderdetail.qty>=0 ") + " )) ";
-        Query query = getSession().createSQLQuery(sql);
-        query.setParameter("idoforg",idOfOrg);
-        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
-        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
-        query.setParameter("startDate",start.getTime());
-        Calendar calendar = Calendar.getInstance();
-        calendar.setTime(start);
-        calendar.add(Calendar.DATE, 1);
-        long endTime = calendar.getTimeInMillis()-1;
-        query.setParameter("endDate", endTime);
-        List list = query.list();
-        if(list==null || list.isEmpty() || list.get(0)==null){
-            return  0L;
-        } else {
-            return new Long(list.get(0).toString());
-        }
-    }
-
 }
