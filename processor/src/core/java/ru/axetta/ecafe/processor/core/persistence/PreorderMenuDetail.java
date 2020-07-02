@@ -86,7 +86,7 @@ public class PreorderMenuDetail {
         }
         final PreorderMenuDetail preorderMenuDetail = (PreorderMenuDetail) o;
         return preorderComplex.getGuid().equals(preorderMenuDetail.getPreorderComplex().getGuid())
-                && armIdOfMenu.equals(preorderMenuDetail.getArmIdOfMenu());
+                && itemCode.equals(preorderMenuDetail.getItemCode());
     }
 
     @Override
