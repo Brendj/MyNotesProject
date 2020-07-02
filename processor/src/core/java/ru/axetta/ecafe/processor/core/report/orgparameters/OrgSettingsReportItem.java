@@ -68,7 +68,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
 
     //----------------- Служебные переменные --------------------//
     private Boolean mainBuilding;
-    private Boolean changed;
+    private Boolean changed = false;
 
     private final String MAIN_BUILDING_STYLE = "mainBuilding";
     private final String NOT_SERVICED_STYLE = "notServiced";

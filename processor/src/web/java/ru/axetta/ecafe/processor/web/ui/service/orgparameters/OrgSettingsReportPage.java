@@ -47,10 +47,10 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private final Logger logger = LoggerFactory.getLogger(OrgSettingsReportPage.class);
 
     private Integer status = 0;
+    private Long numOfChangedRecords = 0L;
     private List<SelectItem> statuses;
     private List<OrgSettingsReportItem> items = Collections.emptyList();
     private List<SelectItem> listOfOrgDistricts;
-    private Boolean[] selectedColumns = buildSelectedColumns();
     private String selectedDistricts = "";
 
     private Boolean showRequisite = false;
@@ -59,43 +59,52 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private Boolean showOtherSetting = true;
     private Boolean allFriendlyOrgs = true;
 
-    //TODO: delete  array, set all flags as variable
+    private Boolean allUseWebArm = false;
+    private Boolean allUsePaydableSubscriptionFeeding = false;
+    private Boolean allVariableFeeding = false;
+    private Boolean allPreordersEnabled = false;
+    private Boolean allReverseMonthOfSale = false;
+    private Boolean allDenyPayPlanForTimeDifference = false;
+    private Boolean allOneActiveCard = false;
+    private Boolean allEnableDuplicateCard = false;
+    private Boolean allMultiCardModeEnabled = false;
+    private Boolean allNeedVerifyCardSign = false;
+    private Boolean allRequestForVisitsToOtherOrg = false;
+    private Boolean allIsWorkInSummerTime = false;
 
-    private Boolean[] buildSelectedColumns() {
-        return new Boolean[]{
-                false, // useWebArm
-                false, // usePaydableSubscriptionFeeding
-                false, // variableFeeding
-                false, // preordersEnabled
-                false, // reverseMonthOfSale
-                false, // denyPayPlanForTimeDifference
-                false, // oneActiveCard
-                false, // enableDuplicateCard
-                false, // multiCardModeEnabled
-                false, // needVerifyCardSign
-                false, // requestForVisitsToOtherOrg
-                false  // isWorkInSummerTime
-        };
+    private void resetSelectedColumns() {
+        allUseWebArm = false;
+        allUsePaydableSubscriptionFeeding = false;
+        allVariableFeeding = false;
+        allPreordersEnabled = false;
+        allReverseMonthOfSale = false;
+        allDenyPayPlanForTimeDifference = false;
+        allOneActiveCard = false;
+        allEnableDuplicateCard = false;
+        allMultiCardModeEnabled = false;
+        allNeedVerifyCardSign = false;
+        allRequestForVisitsToOtherOrg = false;
+        allIsWorkInSummerTime = false;
     }
 
     private void processSelectedColumes(List<OrgSettingsReportItem> items) {
         if(CollectionUtils.isEmpty(items)){
-            selectedColumns = buildSelectedColumns();
+            resetSelectedColumns();
             return;
         }
         for(OrgSettingsReportItem item : items){
-            selectedColumns[0] |= item.getUseWebArm();
-            selectedColumns[1] |= item.getUsePaydableSubscriptionFeeding();
-            selectedColumns[2] |= item.getVariableFeeding();
-            selectedColumns[3] |= item.getPreordersEnabled();
-            selectedColumns[4] |= item.getReverseMonthOfSale();
-            selectedColumns[5] |= item.getDenyPayPlanForTimeDifference();
-            selectedColumns[6] |= item.getOneActiveCard();
-            selectedColumns[7] |= item.getEnableDuplicateCard();
-            selectedColumns[8] |= item.getMultiCardModeEnabled();
-            selectedColumns[9] |= item.getNeedVerifyCardSign();
-            selectedColumns[10] |= item.getRequestForVisitsToOtherOrg();
-            selectedColumns[11] |= item.getIsWorkInSummerTime();
+            allUseWebArm |= item.getUseWebArm();
+            allUsePaydableSubscriptionFeeding |= item.getUsePaydableSubscriptionFeeding();
+            allVariableFeeding |= item.getVariableFeeding();
+            allPreordersEnabled |= item.getPreordersEnabled();
+            allReverseMonthOfSale |= item.getReverseMonthOfSale();
+            allDenyPayPlanForTimeDifference |= item.getDenyPayPlanForTimeDifference();
+            allOneActiveCard |= item.getOneActiveCard();
+            allEnableDuplicateCard |= item.getEnableDuplicateCard();
+            allMultiCardModeEnabled |= item.getMultiCardModeEnabled();
+            allNeedVerifyCardSign |= item.getNeedVerifyCardSign();
+            allRequestForVisitsToOtherOrg |= item.getRequestForVisitsToOtherOrg();
+            allIsWorkInSummerTime |= item.getIsWorkInSummerTime();
         }
     }
 
@@ -139,63 +148,64 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
         }
     }
 
-    public void doMarkAll(Long index){
+    public void countChangedRows(){
+        numOfChangedRecords = 0L;
         if(CollectionUtils.isEmpty(items)){
             return;
         }
-
-        int i = index.intValue();
-        selectedColumns[i] = !selectedColumns[i];
-        Boolean val = selectedColumns[i];
-
         for(OrgSettingsReportItem item : items){
-            switch (i){
-                case 0:
-                    item.setUseWebArm(val);
-                    break;
-                case 1:
-                    item.setUsePaydableSubscriptionFeeding(val);
-                    break;
-                case 2:
-                    item.setVariableFeeding(val);
-                    break;
-                case 3:
-                    item.setPreordersEnabled(val);
-                    break;
-                case 4:
-                    item.setReverseMonthOfSale(val);
-                    break;
-                case 5:
-                    item.setDenyPayPlanForTimeDifference(val);
-                    break;
-                case 6:
-                    item.setOneActiveCard(val);
-                    break;
-                case 7:
-                    item.setEnableDuplicateCard(val);
-                    break;
-                case 8:
-                    item.setMultiCardModeEnabled(val);
-                    break;
-                case 9:
-                    item.setNeedVerifyCardSign(val);
-                    break;
-                case 10:
-                    item.setRequestForVisitsToOtherOrg(val);
-                    break;
-                case 11:
-                    item.setIsWorkInSummerTime(val);
-                    break;
+            if(item.getChanged()){
+                numOfChangedRecords++;
             }
         }
     }
 
-    public Boolean[] getSelectedColumns() {
-        return selectedColumns;
-    }
-
-    public void setSelectedColumns(Boolean[] selectedColumns) {
-        this.selectedColumns = selectedColumns;
+    public void doMarkAll(Long index){
+        if(CollectionUtils.isEmpty(items)){
+            return;
+        }
+        int i = index.intValue();
+        for(OrgSettingsReportItem item : items){
+            switch (i){
+                case 0:
+                    item.setUseWebArm(allUseWebArm);
+                    break;
+                case 1:
+                    item.setUsePaydableSubscriptionFeeding(allUsePaydableSubscriptionFeeding);
+                    break;
+                case 2:
+                    item.setVariableFeeding(allVariableFeeding);
+                    break;
+                case 3:
+                    item.setPreordersEnabled(allPreordersEnabled);
+                    break;
+                case 4:
+                    item.setReverseMonthOfSale(allReverseMonthOfSale);
+                    break;
+                case 5:
+                    item.setDenyPayPlanForTimeDifference(allDenyPayPlanForTimeDifference);
+                    break;
+                case 6:
+                    item.setOneActiveCard(allOneActiveCard);
+                    break;
+                case 7:
+                    item.setEnableDuplicateCard(allEnableDuplicateCard);
+                    break;
+                case 8:
+                    item.setMultiCardModeEnabled(allMultiCardModeEnabled);
+                    break;
+                case 9:
+                    item.setNeedVerifyCardSign(allNeedVerifyCardSign);
+                    break;
+                case 10:
+                    item.setRequestForVisitsToOtherOrg(allRequestForVisitsToOtherOrg);
+                    break;
+                case 11:
+                    item.setIsWorkInSummerTime(allIsWorkInSummerTime);
+                    break;
+            }
+            item.change();
+        }
     }
 
     public Integer getStatus() {
@@ -454,5 +464,109 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     public void setAllFriendlyOrgs(Boolean allFriendlyOrgs) {
         this.allFriendlyOrgs = allFriendlyOrgs;
+    }
+
+    public Boolean getAllUseWebArm() {
+        return allUseWebArm;
+    }
+
+    public void setAllUseWebArm(Boolean allUseWebArm) {
+        this.allUseWebArm = allUseWebArm;
+    }
+
+    public Boolean getAllUsePaydableSubscriptionFeeding() {
+        return allUsePaydableSubscriptionFeeding;
+    }
+
+    public void setAllUsePaydableSubscriptionFeeding(Boolean allUsePaydableSubscriptionFeeding) {
+        this.allUsePaydableSubscriptionFeeding = allUsePaydableSubscriptionFeeding;
+    }
+
+    public Boolean getAllVariableFeeding() {
+        return allVariableFeeding;
+    }
+
+    public void setAllVariableFeeding(Boolean allVariableFeeding) {
+        this.allVariableFeeding = allVariableFeeding;
+    }
+
+    public Boolean getAllPreordersEnabled() {
+        return allPreordersEnabled;
+    }
+
+    public void setAllPreordersEnabled(Boolean allPreordersEnabled) {
+        this.allPreordersEnabled = allPreordersEnabled;
+    }
+
+    public Boolean getAllReverseMonthOfSale() {
+        return allReverseMonthOfSale;
+    }
+
+    public void setAllReverseMonthOfSale(Boolean allReverseMonthOfSale) {
+        this.allReverseMonthOfSale = allReverseMonthOfSale;
+    }
+
+    public Boolean getAllDenyPayPlanForTimeDifference() {
+        return allDenyPayPlanForTimeDifference;
+    }
+
+    public void setAllDenyPayPlanForTimeDifference(Boolean allDenyPayPlanForTimeDifference) {
+        this.allDenyPayPlanForTimeDifference = allDenyPayPlanForTimeDifference;
+    }
+
+    public Boolean getAllOneActiveCard() {
+        return allOneActiveCard;
+    }
+
+    public void setAllOneActiveCard(Boolean allOneActiveCard) {
+        this.allOneActiveCard = allOneActiveCard;
+    }
+
+    public Boolean getAllEnableDuplicateCard() {
+        return allEnableDuplicateCard;
+    }
+
+    public void setAllEnableDuplicateCard(Boolean allEnableDuplicateCard) {
+        this.allEnableDuplicateCard = allEnableDuplicateCard;
+    }
+
+    public Boolean getAllMultiCardModeEnabled() {
+        return allMultiCardModeEnabled;
+    }
+
+    public void setAllMultiCardModeEnabled(Boolean allMultiCardModeEnabled) {
+        this.allMultiCardModeEnabled = allMultiCardModeEnabled;
+    }
+
+    public Boolean getAllNeedVerifyCardSign() {
+        return allNeedVerifyCardSign;
+    }
+
+    public void setAllNeedVerifyCardSign(Boolean allNeedVerifyCardSign) {
+        this.allNeedVerifyCardSign = allNeedVerifyCardSign;
+    }
+
+    public Boolean getAllRequestForVisitsToOtherOrg() {
+        return allRequestForVisitsToOtherOrg;
+    }
+
+    public void setAllRequestForVisitsToOtherOrg(Boolean allRequestForVisitsToOtherOrg) {
+        this.allRequestForVisitsToOtherOrg = allRequestForVisitsToOtherOrg;
+    }
+
+    public Boolean getAllIsWorkInSummerTime() {
+        return allIsWorkInSummerTime;
+    }
+
+    public void setAllIsWorkInSummerTime(Boolean allIsWorkInSummerTime) {
+        this.allIsWorkInSummerTime = allIsWorkInSummerTime;
+    }
+
+    public Long getNumOfChangedRecords() {
+        return numOfChangedRecords;
+    }
+
+    public void setNumOfChangedRecords(Long numOfChangedRecords) {
+        this.numOfChangedRecords = numOfChangedRecords;
     }
 }

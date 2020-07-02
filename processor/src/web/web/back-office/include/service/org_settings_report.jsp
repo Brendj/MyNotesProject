@@ -20,6 +20,32 @@
 </style>
 
 <%--@elvariable id="orgSettingsReportPage" type="ru.axetta.ecafe.processor.web.ui.service.orgparameters.OrgSettingsReportPage"--%>
+<rich:modalPanel id="OrgSettingConfirmPanel" domElementAttachment="form" autosized="true">
+    <f:facet name="header">
+        <h:outputText value="Потверждение изменений" />
+    </f:facet>
+    <f:facet name="controls">
+        <h:panelGroup>
+            <rich:componentControl for="OrgSettingConfirmPanel" attachTo="hidelink" operation="hide"
+                                   event="onclick" />
+        </h:panelGroup>
+    </f:facet>
+    <h:panelGrid columns="1" styleClass="borderless-grid">
+        <h:outputText styleClass="output-text" escape="true"
+                      value="Количество записей на изменение: #{orgSettingsReportPage.numOfChangedRecords}" />
+    </h:panelGrid>
+    <h:panelGrid columns="2" styleClass="borderless-grid">
+        <a4j:commandButton oncomplete="Richfaces.hideModalPanel('OrgSettingConfirmPanel')"
+                           action="#{orgSettingsReportPage.applyChanges()}"
+                           reRender="workspaceTogglePanel, OrgSettingConfirmPanel"
+                           value="Потвердить"
+                           status="reportGenerateStatus" />
+        <a4j:commandButton oncomplete="Richfaces.hideModalPanel('OrgSettingConfirmPanel')"
+                           reRender="workspaceTogglePanel, OrgSettingConfirmPanel, orgSettingsTable"
+                           value="Закрыть"
+                           status="reportGenerateStatus" />
+    </h:panelGrid>
+</rich:modalPanel>
 <h:panelGrid id="orgSettingsReportPanelGrid" binding="#{orgSettingsReportPage.pageComponent}"
              styleClass="borderless-grid">
     <h:panelGrid styleClass="borderless-grid" columns="2">
@@ -189,62 +215,62 @@
                     <h:outputText escape="true" value="Режим \"Летний период\"" />
                 </rich:column>
                 <rich:column breakBefore="true" rendered="#{orgSettingsReportPage.showFeedingSettings}">
-                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.selectedColumns[0]}" disabled="false">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allUseWebArm}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(0)}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
-                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.selectedColumns[1]}" disabled="false">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allUsePaydableSubscriptionFeeding}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(1)}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
-                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.selectedColumns[2]}" disabled="false">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allVariableFeeding}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(2)}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
-                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.selectedColumns[3]}" disabled="false">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allPreordersEnabled}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(3)}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
-                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.selectedColumns[4]}" disabled="false">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allReverseMonthOfSale}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(4)}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column rendered="#{orgSettingsReportPage.showFeedingSettings}">
-                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.selectedColumns[5]}" disabled="false">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allDenyPayPlanForTimeDifference}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(5)}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column rendered="#{orgSettingsReportPage.showCardSettings}">
-                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.selectedColumns[6]}" disabled="false">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allOneActiveCard}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(6)}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column rendered="#{orgSettingsReportPage.showCardSettings}">
-                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.selectedColumns[7]}" disabled="false">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allEnableDuplicateCard}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(7)}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column rendered="#{orgSettingsReportPage.showCardSettings}">
-                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.selectedColumns[8]}" disabled="false">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allMultiCardModeEnabled}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(8)}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column rendered="#{orgSettingsReportPage.showCardSettings}">
-                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.selectedColumns[9]}" disabled="false">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allNeedVerifyCardSign}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(9)}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column rendered="#{orgSettingsReportPage.showOtherSetting}">
-                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.selectedColumns[10]}" disabled="false">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allRequestForVisitsToOtherOrg}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(10)}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
                 <rich:column rendered="#{orgSettingsReportPage.showOtherSetting}">
-                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.selectedColumns[11]}" disabled="false">
+                    <h:selectBooleanCheckbox styleClass="checkboxes" value="#{orgSettingsReportPage.allIsWorkInSummerTime}" disabled="false">
                         <a4j:support reRender="orgSettingsTable" event="onchange" action="#{orgSettingsReportPage.doMarkAll(11)}"/>
                     </h:selectBooleanCheckbox>
                 </rich:column>
@@ -404,8 +430,9 @@
         </f:facet>
     </rich:dataTable>
     <h:panelGrid styleClass="borderless-grid" columns="1">
-        <a4j:commandButton value="Применить изменения" action="#{orgSettingsReportPage.applyChanges()}"
-                           reRender="orgSettingsTable" styleClass="command-button"
+        <a4j:commandButton value="Применить изменения" action="#{orgSettingsReportPage.countChangedRows()}"
+                           oncomplete="Richfaces.showModalPanel('OrgSettingConfirmPanel')"
+                           reRender="OrgSettingConfirmPanel" styleClass="command-button"
                            status="reportGenerateStatus" id="applyChangesButton" />
     </h:panelGrid>
 
