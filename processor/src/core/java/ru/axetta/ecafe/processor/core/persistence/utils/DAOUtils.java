@@ -186,7 +186,7 @@ public class DAOUtils {
 
     public static Client findClientByMeshGuid(Session persistenceSession, String guid) {
         Criteria criteria = persistenceSession.createCriteria(Client.class);
-        criteria.add(Restrictions.eq("meshGUID", guid).ignoreCase());
+        criteria.add(Restrictions.eq("meshGUID", guid));
         List<Client> resultList = (List<Client>) criteria.list();
         return resultList.isEmpty() ? null : resultList.get(0);
     }
