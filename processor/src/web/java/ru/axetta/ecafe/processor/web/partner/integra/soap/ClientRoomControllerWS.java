@@ -10404,7 +10404,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     public CheckApplicationForFoodResult checkApplicationForFood(@WebParam(name = "clientGuid") String clientGuid,
             @WebParam(name = "meshGuid") String meshGuid) {
         CheckApplicationForFoodResult result = new CheckApplicationForFoodResult();
-        if (StringUtils.isEmpty(clientGuid)) {
+        if (StringUtils.isEmpty(clientGuid) && StringUtils.isEmpty(meshGuid)) {
             result.resultCode = RC_REQUIRED_FIELDS_ARE_NOT_FILLED;
             result.description = RC_REQUIRED_FIELDS_ARE_NOT_FILLED_DESC;
             return result;
