@@ -1180,10 +1180,11 @@ public class PreorderDAOService {
                 if (wtComplex != null) {
 
                     // Определяем подходящий состав комплекса
-                    WtComplexesItem complexItem = getWtComplexItemByCycle(wtComplex, date);
+                    WtComplexesItem complexItem = getWtComplexItemByCycle(wtComplex, CalendarUtils.startOfDay(date));
                     List<WtDish> wtDishes = null;
                     if (complexItem != null) {
-                        wtDishes = DAOReadExternalsService.getInstance().getWtDishesByComplexItemAndDates(complexItem, date, date);
+                        wtDishes = DAOReadExternalsService.getInstance().getWtDishesByComplexItemAndDates(complexItem,
+                                CalendarUtils.startOfDay(date), CalendarUtils.endOfDay(date));
                     }
                     //List<WtDish> wtDishes = getWtDishesByComplexAndDates(wtComplex, CalendarUtils.startOfDay(date), CalendarUtils.endOfDay(date));
 
