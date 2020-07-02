@@ -44,6 +44,7 @@
             </type>
         </property>
 	<property name="sendeddailynotification" column="sendeddailynotification" type="boolean"/>
+        <property name="idOfDish" column="idofdish" type="long"/>
 
     </class>
 </hibernate-mapping>
