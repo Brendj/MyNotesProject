@@ -10417,7 +10417,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
 
             Client client = null;
             if (!StringUtils.isEmpty(meshGuid)) {
-                client = DAOUtils.findClientByMeshGuid(persistenceSession, clientGuid);
+                client = DAOUtils.findClientByMeshGuid(persistenceSession, meshGuid);
             }
 
             if (client == null) {
