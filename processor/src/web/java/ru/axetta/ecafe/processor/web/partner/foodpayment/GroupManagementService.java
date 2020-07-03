@@ -224,6 +224,11 @@ public class GroupManagementService implements IGroupManagementService {
         ResponseDiscounts responseDiscounts = new ResponseDiscounts();
         List<CategoryDiscount> categoryDiscounts = DiscountManager.getCategoryDiscounts(persistanceSession);
         for (CategoryDiscount categoryDiscount : categoryDiscounts) {
+            if (categoryDiscount.getCategoryName().equals(DiscountManager.RESERV_DISCOUNT)) {
+                ResponseDiscountItem item = new ResponseDiscountItem(categoryDiscount);
+                responseDiscounts.addItem(item);
+                continue;
+            }
             if (categoryDiscount.getDiscountsRules().size() == 0) continue;
             for (DiscountRule discountRule : categoryDiscount.getDiscountsRules()) {
                 if (discountRule.getCategoryOrgs().size() == 0) {

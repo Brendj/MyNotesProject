@@ -26,6 +26,7 @@ public class DiscountManager {
 
     private static final Logger logger = LoggerFactory.getLogger(DiscountManager.class);
     public static final String DELETE_COMMENT = "Удаление категории льгот";
+    public static final String RESERV_DISCOUNT = "Резерв";
 
     public static void saveDiscountHistory(Session session, Client client, Org org,
             Set<CategoryDiscount> oldDiscounts, Set<CategoryDiscount> newDiscounts,
