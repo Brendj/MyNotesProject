@@ -59,52 +59,52 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private Boolean showOtherSetting = true;
     private Boolean allFriendlyOrgs = true;
 
-    private Boolean allUseWebArm = false;
-    private Boolean allUsePaydableSubscriptionFeeding = false;
-    private Boolean allVariableFeeding = false;
-    private Boolean allPreordersEnabled = false;
-    private Boolean allReverseMonthOfSale = false;
-    private Boolean allDenyPayPlanForTimeDifference = false;
-    private Boolean allOneActiveCard = false;
-    private Boolean allEnableDuplicateCard = false;
-    private Boolean allMultiCardModeEnabled = false;
-    private Boolean allNeedVerifyCardSign = false;
-    private Boolean allRequestForVisitsToOtherOrg = false;
-    private Boolean allIsWorkInSummerTime = false;
+    private Boolean allUseWebArm = true;
+    private Boolean allUsePaydableSubscriptionFeeding = true;
+    private Boolean allVariableFeeding = true;
+    private Boolean allPreordersEnabled = true;
+    private Boolean allReverseMonthOfSale = true;
+    private Boolean allDenyPayPlanForTimeDifference = true;
+    private Boolean allOneActiveCard = true;
+    private Boolean allEnableDuplicateCard = true;
+    private Boolean allMultiCardModeEnabled = true;
+    private Boolean allNeedVerifyCardSign = true;
+    private Boolean allRequestForVisitsToOtherOrg = true;
+    private Boolean allIsWorkInSummerTime = true;
 
     private void resetSelectedColumns() {
-        allUseWebArm = false;
-        allUsePaydableSubscriptionFeeding = false;
-        allVariableFeeding = false;
-        allPreordersEnabled = false;
-        allReverseMonthOfSale = false;
-        allDenyPayPlanForTimeDifference = false;
-        allOneActiveCard = false;
-        allEnableDuplicateCard = false;
-        allMultiCardModeEnabled = false;
-        allNeedVerifyCardSign = false;
-        allRequestForVisitsToOtherOrg = false;
-        allIsWorkInSummerTime = false;
+        allUseWebArm = true;
+        allUsePaydableSubscriptionFeeding = true;
+        allVariableFeeding = true;
+        allPreordersEnabled = true;
+        allReverseMonthOfSale = true;
+        allDenyPayPlanForTimeDifference = true;
+        allOneActiveCard = true;
+        allEnableDuplicateCard = true;
+        allMultiCardModeEnabled = true;
+        allNeedVerifyCardSign = true;
+        allRequestForVisitsToOtherOrg = true;
+        allIsWorkInSummerTime = true;
     }
 
-    private void processSelectedColumes(List<OrgSettingsReportItem> items) {
+    private void processSelectedColumns(List<OrgSettingsReportItem> items) {
         if(CollectionUtils.isEmpty(items)){
             resetSelectedColumns();
             return;
         }
         for(OrgSettingsReportItem item : items){
-            allUseWebArm |= item.getUseWebArm();
-            allUsePaydableSubscriptionFeeding |= item.getUsePaydableSubscriptionFeeding();
-            allVariableFeeding |= item.getVariableFeeding();
-            allPreordersEnabled |= item.getPreordersEnabled();
-            allReverseMonthOfSale |= item.getReverseMonthOfSale();
-            allDenyPayPlanForTimeDifference |= item.getDenyPayPlanForTimeDifference();
-            allOneActiveCard |= item.getOneActiveCard();
-            allEnableDuplicateCard |= item.getEnableDuplicateCard();
-            allMultiCardModeEnabled |= item.getMultiCardModeEnabled();
-            allNeedVerifyCardSign |= item.getNeedVerifyCardSign();
-            allRequestForVisitsToOtherOrg |= item.getRequestForVisitsToOtherOrg();
-            allIsWorkInSummerTime |= item.getIsWorkInSummerTime();
+            allUseWebArm &= item.getUseWebArm();
+            allUsePaydableSubscriptionFeeding &= item.getUsePaydableSubscriptionFeeding();
+            allVariableFeeding &= item.getVariableFeeding();
+            allPreordersEnabled &= item.getPreordersEnabled();
+            allReverseMonthOfSale &= item.getReverseMonthOfSale();
+            allDenyPayPlanForTimeDifference &= item.getDenyPayPlanForTimeDifference();
+            allOneActiveCard &= item.getOneActiveCard();
+            allEnableDuplicateCard &= item.getEnableDuplicateCard();
+            allMultiCardModeEnabled &= item.getMultiCardModeEnabled();
+            allNeedVerifyCardSign &= item.getNeedVerifyCardSign();
+            allRequestForVisitsToOtherOrg &= item.getRequestForVisitsToOtherOrg();
+            allIsWorkInSummerTime &= item.getIsWorkInSummerTime();
         }
     }
 
@@ -118,7 +118,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     private List<SelectItem> buildListOfOrgDistricts(Session session) {
         List<String> allDistricts = null;
-        List<SelectItem> selectItemList = new LinkedList<SelectItem>();
+        List<SelectItem> selectItemList = new LinkedList<>();
         selectItemList.add(new SelectItem("", "Все"));
         try{
             allDistricts = DAOUtils.getAllDistinctDepartmentsFromOrgs(session);
@@ -232,14 +232,14 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
             transaction = persistenceSession.beginTransaction();
 
             List<String> idOfOrgListString = Arrays.asList(StringUtils.split(getGetStringIdOfOrgList(), ','));
-            List<Long> idOfOrgList = new ArrayList<Long>(idOfOrgListString.size());
+            List<Long> idOfOrgList = new ArrayList<>(idOfOrgListString.size());
             for (String item : idOfOrgListString) {
                 idOfOrgList.add(Long.parseLong(item));
             }
 
             items = OrgSettingsReport.Builder.buildOrgSettingCollection(idOfOrgList, status, persistenceSession, selectedDistricts, allFriendlyOrgs);
             Collections.sort(items);
-            processSelectedColumes(items);
+            processSelectedColumns(items);
 
             transaction.commit();
             transaction = null;
@@ -319,7 +319,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
         Session session = null;
         Transaction transaction = null;
-        List<Long> problemOrgsId = new LinkedList<Long>();
+        List<Long> problemOrgsId = new LinkedList<>();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
