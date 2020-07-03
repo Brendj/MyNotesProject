@@ -840,7 +840,7 @@ public class DTSZNDiscountsReviseService {
             if (null == startDate) {
                 clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfo(session);
             } else {
-                clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(session, startDate, otherDiscountCode);
+                clientList = DAOUtils.getUniqueClientIdFromClientDTISZNDiscountInfoSinceDate(session, startDate);
             }
 
             Integer clientCounter = 1;
