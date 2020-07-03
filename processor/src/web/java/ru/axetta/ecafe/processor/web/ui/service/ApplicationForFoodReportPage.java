@@ -297,6 +297,9 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
                 builder.withDateStart(item.getStartDate());
                 builder.withDateEnd(item.getEndDate());
+                item.getApplicationForFood().setDiscountDateStart(item.getStartDate());
+                item.getApplicationForFood().setDiscountDateEnd(item.getEndDate());
+                session.update(item.getApplicationForFood());
                 builder.save(session, clientDTISZNDiscountVersion);
             }
             transaction.commit();
