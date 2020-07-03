@@ -963,7 +963,13 @@ public class DTSZNDiscountsReviseService {
                 if (null == transaction || !transaction.isActive()) {
                     transaction = session.beginTransaction();
                 }
-                Client client = DAOUtils.findClientByGuid(session, item.getRegistryGUID());
+                Client client = null;
+                if (!StringUtils.isEmpty(item.getMeshGUID())) {
+                    client = DAOUtils.findClientByMeshGuid(session, item.getMeshGUID());
+                }
+                if (client == null) {
+                    client = DAOUtils.findClientByGuid(session, item.getRegistryGUID());
+                }
                 if (null == client || !isStudent(client)) {
                     //logger.info(String.format("Client with guid = { %s } not found", item.getPerson().getId()));
                     if (0 == counter++ % maxRecords) {
