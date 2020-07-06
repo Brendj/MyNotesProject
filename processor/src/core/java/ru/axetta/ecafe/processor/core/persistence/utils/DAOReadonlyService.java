@@ -1009,7 +1009,7 @@ public Set<WtOrgGroup> getOrgGroupsSetFromVersion(Long version, Contragent contr
                 + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgr.idofmenugroup = mg.id "
                 + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
                 + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
-                + "WHERE m.idofmenu = :idOfMenu group by mgd.idofdish");
+                + "WHERE m.idofmenu = :idOfMenu AND mgd.idofdish is not null group by mgd.idofdish");
         query.setParameter("idOfMenu", menuId);
         List<BigInteger> temp = query.getResultList();
         for(BigInteger o : temp) {
