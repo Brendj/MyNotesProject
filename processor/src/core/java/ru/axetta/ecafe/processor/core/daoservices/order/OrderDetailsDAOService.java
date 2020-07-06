@@ -191,7 +191,7 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
 
     @SuppressWarnings("unchecked")
-    // для веб-технолога, добавить отбор комплексов по датам и categoryorgs
+    // для веб-технолога, добавить отбор комплексов по датам и categoryorgs?
     public List<WtComplexItem> findAllWtComplexes(Long idOfOrg, Date startTime, Date endTime, Set orderTypes) {
         String sql = "select distinct complex.idOfComplex as idOfComplex, "
                 + "complex.wtDietType as dietType, "
@@ -218,6 +218,37 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         query.setParameter("endDate", endTime);
         query.setResultTransformer(Transformers.aliasToBean(WtComplexItem.class));
         return  (List<WtComplexItem>) query.list();
+    }
+
+    public List<WtPaidComplexItem> findAllWtComplexesByOrderType(Long idOfOrg, Date startTime, Date endTime,
+            OrderTypeEnumType orderTypeEnumType) {
+        Set<Integer> orderTypeEnumTypeSet = new HashSet<Integer>();
+        orderTypeEnumTypeSet.add(orderTypeEnumType.ordinal());
+        String sql = "select distinct complex.idOfComplex as idOfComplex, "
+                + "complex.wtDietType as dietType, "
+                + "complex.wtAgeGroupItem as ageGroup, "
+                + "details.rPrice as price "
+                + "from OrderDetail details "
+                + "left join details.wtComplex complex "
+                + "left join details.order ord "
+                + "left join ord.org o "
+                + "where ord.state=0 "
+                + "and details.state=0 "
+                + "and ord.orderType in (:orderType) "
+                + "and details.wtComplex is not null "
+                + "and o.idOfOrg=:idOfOrg "
+                + "and ord.createTime between :startDate and :endDate "
+                + "and details.menuType >= :mintype "
+                + "and details.menuType <=:maxtype";
+        Query query = getSession().createQuery(sql);
+        query.setParameter("idOfOrg",idOfOrg);
+        query.setParameterList("orderType", orderTypeEnumTypeSet);
+        query.setParameter("mintype",OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype",OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("startDate",startTime);
+        query.setParameter("endDate", endTime);
+        query.setResultTransformer(Transformers.aliasToBean(WtPaidComplexItem.class));
+        return  (List<WtPaidComplexItem>) query.list();
     }
 
     /* получаем список всех товаров для льготного питания */

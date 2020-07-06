@@ -8,6 +8,7 @@ import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import ru.axetta.ecafe.processor.core.daoservices.order.OrderDetailsDAOService;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.GoodItem1;
 import ru.axetta.ecafe.processor.core.daoservices.order.items.RegisterStampPaidReportItem;
+import ru.axetta.ecafe.processor.core.daoservices.order.items.WtPaidComplexItem;
 import ru.axetta.ecafe.processor.core.persistence.OrderTypeEnumType;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -96,6 +97,9 @@ public class RegisterStampPaidReport extends BasicReportForOrgJob {
             List<GoodItem1> allGoods = service.findAllGoodsByOrderType(org.getIdOfOrg(), startTime, endTime,
                     OrderTypeEnumType.PAY_PLAN);
             Map<Date, Long> numbers = service.findAllRegistryTalonsPaid(org.getIdOfOrg(), startTime, endTime);
+
+            List<WtPaidComplexItem> allComplexes = service.findAllWtComplexesByOrderType(org.getIdOfOrg(), startTime, endTime,
+                    OrderTypeEnumType.PAY_PLAN);
 
             DateFormat timeFormat = new SimpleDateFormat("dd.MM.yyyy");
             List<RegisterStampPaidReportItem> result = new ArrayList<RegisterStampPaidReportItem>();
