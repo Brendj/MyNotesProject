@@ -222,12 +222,12 @@ public class OrderDetailsDAOService extends AbstractDAOService {
 
     public List<WtPaidComplexItem> findAllWtComplexesByOrderType(Long idOfOrg, Date startTime, Date endTime,
             OrderTypeEnumType orderTypeEnumType) {
-        Set<Integer> orderTypeEnumTypeSet = new HashSet<Integer>();
-        orderTypeEnumTypeSet.add(orderTypeEnumType.ordinal());
+        Set<OrderTypeEnumType> orderTypeEnumTypeSet = new HashSet<>();
+        orderTypeEnumTypeSet.add(orderTypeEnumType);
         String sql = "select distinct complex.idOfComplex as idOfComplex, "
                 + "complex.wtDietType as dietType, "
                 + "complex.wtAgeGroupItem as ageGroup, "
-                + "details.rPrice as price "
+                + "details.RPrice as price "
                 + "from OrderDetail details "
                 + "left join details.wtComplex complex "
                 + "left join details.order ord "
