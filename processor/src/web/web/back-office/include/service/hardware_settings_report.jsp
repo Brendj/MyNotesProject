@@ -91,11 +91,11 @@
     <h:panelGrid styleClass="borderless-grid">
         <h:outputText styleClass="output-text" escape="true" value="Отчет по оборудованию" />
         <rich:dataTable id="hardwareSettingsTable" value="#{hardwareSettingsReportPage.items}" var="item"
-                        rowKeyVar="row" rows="26" footerClass="data-table-footer"
+                        rowKeyVar="row" rows="20" footerClass="data-table-footer"
                         columnClasses="right-aligned-column, left-aligned-column,left-aligned-column">
             <f:facet name="header">
                 <rich:columnGroup>
-                    <rich:column headerClass="center-aligned-column" colspan="7" style="height:60px">
+                    <rich:column headerClass="center-aligned-column" colspan="7">
                         <h:outputText styleClass="column-header" escape="true" value="Данные ОО" />
                     </rich:column>
                     <rich:column headerClass="center-aligned-column" colspan="1">
@@ -124,7 +124,7 @@
             <rich:column sortable="true" sortBy="#{item.shortName}" headerClass="column-header"
                          styleClass="center-aligned-column" label="Название ПП">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Название ПП" />
+                    <h:outputText escape="false" value="Название<br/> ПП" />
                 </f:facet>
                 <h:outputText value="#{item.shortName}" />
             </rich:column>
@@ -145,7 +145,7 @@
             <rich:column sortable="true" sortBy="#{item.shortAddress}" headerClass="column-header"
                          styleClass="center-aligned-column" label="Краткий адрес">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Краткий адрес" />
+                    <h:outputText escape="false" value="Краткий<br/> адрес" />
                 </f:facet>
                 <h:outputText value="#{item.shortAddress}" />
             </rich:column>
@@ -165,13 +165,13 @@
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.clientVersion}" headerClass="column-header" label="Версия ПО" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Версия ПО" />
+                    <h:outputText escape="false" value="Версия<br/> ПО" />
                 </f:facet>
-                <h:outputText escape="true" value="#{item.clientVersion}" styleClass="output-text" />
+                <h:outputText escape="false" value="#{item.clientVersion}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.dataBaseSize}" headerClass="column-header" label="Размер БД" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Размер БД" />
+                    <h:outputText escape="false" value="Размер<br/> БД" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.dataBaseSize}" styleClass="output-text" />
             </rich:column>
@@ -184,7 +184,7 @@
             <rich:column sortable="true" sortBy="#{item.lastUpdate}" headerClass="column-header "
                          label="Последнее изменение" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Последнее изменение"/>
+                    <h:outputText escape="false" value="Последнее<br/> изменение"/>
                 </f:facet>
                 <h:outputText escape="true" value="#{item.lastUpdate}" styleClass="output-text" converter="timeConverter"/>
             </rich:column>
@@ -217,7 +217,7 @@
             <rich:column sortable="true" sortBy="#{item.dotNetVersion}" headerClass="column-header"
                          label="Net Framework" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Net Framework" />
+                    <h:outputText escape="false" value="Net<br/> Framework" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.dotNetVersion}" styleClass="output-text" />
             </rich:column>
@@ -243,45 +243,56 @@
             <rich:column sortable="true" sortBy="#{item.numOfEntries}" headerClass="column-header"
                          label="Количество входных групп" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Количество входных групп" />
+                    <h:outputText escape="false" value="Количество<br/> входных групп" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.numOfEntries}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.numOfTurnstile}" headerClass="column-header"
                          label="Количество контроллеров" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Количество контроллеров" />
+                    <h:outputText escape="false" value="Количество<br/> контроллеров" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.numOfTurnstile}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.controllerModel}" headerClass="column-header"
                          label="Модели контроллера" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText escape="true" value="Модели контроллера" />
+                    <h:outputText escape="false" value="Модели<br/> контроллера" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.controllerModel}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.controllerFirmwareVersion}" headerClass="column-header"
                          label="Версия прошивки контроллера" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText styleClass="column-header" escape="false" value="Версия прошивки<br/> контроллера" />
+                    <h:outputText styleClass="column-header" escape="false" value="Версия<br/> прошивки<br/> контроллера" />
                 </f:facet>
-                <h:outputText escape="true" value="#{item.controllerFirmwareVersion}" styleClass="output-text" />
+                <h:outputText escape="false" value="#{item.controllerFirmwareVersion}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.isWorkWithLongIds}" headerClass="column-header"
                          label="Считыватель  читает длинные идентификаторы" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText styleClass="column-header" escape="false" value="Считыватель  читает<br/> длинные идентификаторы" />
+                    <h:outputText styleClass="column-header" escape="false" value="Считыватель<br/> читает длинные<br/> идентификаторы" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.isWorkWithLongIds}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.timeCoefficient}" headerClass="column-header"
                          label="Коэффициент коррекции времени турникета" styleClass="center-aligned-column">
                 <f:facet name="header">
-                    <h:outputText styleClass="column-header" escape="false" value="Коэффициент коррекции<br/> времени турникета" />
+                    <h:outputText styleClass="column-header" escape="false" value="Коэффициент<br/> коррекции<br/> времени<br/> турникета" />
                 </f:facet>
-                <h:outputText escape="true" value="#{item.timeCoefficient}" styleClass="output-text" />
+                <h:outputText escape="false" value="#{item.timeCoefficient}" styleClass="output-text" />
             </rich:column>
+            <f:facet name="footer">
+                <rich:datascroller for="hardwareSettingsTable" renderIfSinglePage="false" maxPages="5" fastControls="hide"
+                                   stepControls="auto" boundaryControls="hide">
+                    <f:facet name="previous">
+                        <h:graphicImage value="/images/16x16/left-arrow.png" />
+                    </f:facet>
+                    <f:facet name="next">
+                        <h:graphicImage value="/images/16x16/right-arrow.png" />
+                    </f:facet>
+                </rich:datascroller>
+            </f:facet>
         </rich:dataTable>
     </h:panelGrid>
     <rich:messages styleClass="messages" errorClass="error-messages" infoClass="info-messages"
