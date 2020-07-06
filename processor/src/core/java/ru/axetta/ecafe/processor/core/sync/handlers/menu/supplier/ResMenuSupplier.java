@@ -133,7 +133,9 @@ public class ResMenuSupplier implements AbstractToElement {
 
         Element menusElem = document.createElement("Menus");
         for (WtMenu menu : menus) {
-            menusElem.appendChild(menuToElement(document, menu));
+            if (DAOReadonlyService.getInstance().isMenuItemAvailable (menu.getIdOfMenu())) {
+                menusElem.appendChild(menuToElement(document, menu));
+            }
         }
 
         Element complexesElem = document.createElement("Complexes");
