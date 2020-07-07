@@ -102,6 +102,38 @@ public class OrderDetailsDAOService extends AbstractDAOService {
         }
     }
 
+    // для меню веб-технолога
+    @SuppressWarnings("unchecked")
+    public Long buildRegisterStampBodyWtMenuValueByOrderType(Long idOfOrg, Date start, Long idOfComplex,
+            boolean includeActDiscrepancies, OrderTypeEnumType orderTypeEnumType) {
+        String sql = "select sum(orderdetail.qty) from cf_orders cforder" +
+                " left join cf_orderdetails orderdetail on orderdetail.idoforg = cforder.idoforg " +
+                " and orderdetail.idoforder = cforder.idoforder" +
+                " left join cf_wt_complexes complex on complex.idofcomplex = orderdetail.idofcomplex" +
+                " where cforder.state=0 and orderdetail.state=0 and cforder.createddate>=:startDate and cforder.createddate<=:endDate and" +
+                " cforder.idoforg=:idoforg and complex.idofcomplex = :idOfComplex and " +
+                " orderdetail.menutype>=:mintype and orderdetail.menutype<=:maxtype and " +
+                " (cforder.ordertype=:orderType or (cforder.ordertype=8 " + (includeActDiscrepancies ? " "
+                : " and orderdetail.qty>=0 ") + " )) ";
+        Query query = getSession().createSQLQuery(sql);
+        query.setParameter("idoforg", idOfOrg);
+        query.setParameter("mintype", OrderDetail.TYPE_COMPLEX_MIN);
+        query.setParameter("maxtype", OrderDetail.TYPE_COMPLEX_MAX);
+        query.setParameter("idOfComplex", idOfComplex);
+        query.setParameter("startDate", start.getTime());
+        query.setParameter("orderType", orderTypeEnumType.ordinal());
+        Calendar calendar = Calendar.getInstance();
+        calendar.setTime(start);
+        calendar.add(Calendar.DATE, 1);
+        long endTime = calendar.getTimeInMillis() - 1;
+        query.setParameter("endDate", endTime);
+        List list = query.list();
+        if (list == null || list.isEmpty() || list.get(0) == null) {
+            return 0L;
+        } else {
+            return new Long(list.get(0).toString());
+        }
+    }
 
 
     /* Подсчет суточной пробы для льготного питания*/

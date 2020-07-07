@@ -109,7 +109,7 @@ public class RegisterStampPaidReport extends BasicReportForOrgJob {
             while (endTime.getTime() > calendar.getTimeInMillis()) {
                 Date time = calendar.getTime();
                 String date = timeFormat.format(time);
-                if (allGoods.isEmpty()) {
+                if (allGoods.isEmpty() && allComplexes.isEmpty()) {
                     RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(emptyGoodItem,0L,date, time);
                     RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(emptyGoodItem,0L,"Итого", CalendarUtils.addDays(endTime, 1));
                     result.add(item);
@@ -121,6 +121,21 @@ public class RegisterStampPaidReport extends BasicReportForOrgJob {
                                 goodItem.getFullName(), withOutActDiscrepancies, OrderTypeEnumType.PAY_PLAN);
                         RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(goodItem,val,date,number, time);
                         RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(goodItem,val,"Итого", CalendarUtils.addDays(endTime, 1));
+                        result.add(item);
+                        result.add(total);
+                    }
+
+                    for (WtPaidComplexItem complexItem : allComplexes) {
+                        String number = numbers.get(time) == null ? "" : Long.toString(numbers.get(time));
+                        String dietType = complexItem.getDietType().getDescription();
+                        String ageGroup = complexItem.getAgeGroup().getDescription();
+
+
+                        Long val = service.buildRegisterStampBodyWtMenuValueByOrderType(org.getIdOfOrg(), calendar.getTime(),
+                                complexItem.getIdOfComplex(), withOutActDiscrepancies, OrderTypeEnumType.PAY_PLAN);
+                        RegisterStampPaidReportItem item = new RegisterStampPaidReportItem(ageGroup, dietType, val, date, number, time, complexItem.getPrice());
+                        RegisterStampPaidReportItem total = new RegisterStampPaidReportItem(ageGroup, dietType, val,
+                                "Итого", null, CalendarUtils.addDays(endTime, 1), complexItem.getPrice());
                         result.add(item);
                         result.add(total);
                     }
