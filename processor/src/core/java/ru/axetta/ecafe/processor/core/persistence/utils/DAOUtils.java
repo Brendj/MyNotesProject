@@ -30,6 +30,7 @@ import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
+import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
@@ -4668,9 +4669,10 @@ public class DAOUtils {
         clientGroupList.add(ClientGroup.Predefined.CLIENT_DELETED.getValue());
         clientGroupList.add(ClientGroup.Predefined.CLIENT_OTHER_ORG.getValue());
         Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo "
-                + "where lastUpdate >= :date and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
+                + "where (lastUpdate >= :date or (dtisznCode = :otherDiscountCode and dateEnd > :date)) and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
         query.setParameter("date", date);
         query.setParameterList("clientGroups", clientGroupList);
+        query.setParameter("otherDiscountCode", DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE);
         return query.list();
     }
 
