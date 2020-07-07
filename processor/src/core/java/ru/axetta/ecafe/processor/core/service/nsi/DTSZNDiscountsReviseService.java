@@ -814,7 +814,7 @@ public class DTSZNDiscountsReviseService {
         if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(newDiscounts)) {
             try {
                 DiscountManager
-                        .renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode,
+                        .renewDiscounts(session, client, newDiscounts, oldDiscounts,
                                 DiscountChangeHistory.MODIFY_IN_REGISTRY);
             } catch (Exception e) {
                 logger.error(String.format("Unexpected discount code for client with id=%d", client.getIdOfClient()), e);
@@ -1138,8 +1138,8 @@ public class DTSZNDiscountsReviseService {
 
                     if (!oldDiscountMode.equals(newDiscountMode) || !oldDiscounts.equals(discounts)) {
                         try {
-                            DiscountManager.renewDiscounts(session, client, discounts, oldDiscounts, newDiscountMode,
-                                    oldDiscountMode, DiscountChangeHistory.MODIFY_IN_REGISTRY);
+                            DiscountManager.renewDiscounts(session, client, discounts, oldDiscounts,
+                                    DiscountChangeHistory.MODIFY_IN_REGISTRY);
                         } catch (Exception e) {
                             transaction.rollback();
                             transaction = null;
