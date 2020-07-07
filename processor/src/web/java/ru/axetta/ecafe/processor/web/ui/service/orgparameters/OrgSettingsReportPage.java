@@ -88,8 +88,8 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     }
 
     private void processSelectedColumns(List<OrgSettingsReportItem> items) {
+        resetSelectedColumns();
         if(CollectionUtils.isEmpty(items)){
-            resetSelectedColumns();
             return;
         }
         for(OrgSettingsReportItem item : items){
