@@ -13,6 +13,11 @@ public class RequestProcessingException extends Exception {
         this.errorMessage = errorMessage;
     }
 
+    public RequestProcessingException(GroupManagementErrors error) {
+        this.errorCode = error.getErrorCode();
+        this.errorMessage = error.getErrorMessage();
+    }
+
     public int getErrorCode() {
         return errorCode;
     }

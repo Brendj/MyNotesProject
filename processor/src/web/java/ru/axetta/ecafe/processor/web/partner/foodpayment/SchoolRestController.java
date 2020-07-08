@@ -172,5 +172,146 @@ public class SchoolRestController {
         }
     }
 
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "clientslist")
+    public Response clientsList(ClientsListRequest clientsListRequest) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        IGroupManagementService groupManagementService;
+        try{
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            groupManagementService = new GroupManagementService(persistenceSession);
+            ResponseClients responseClients = groupManagementService.getClientsList(clientsListRequest.getGroupsList(), clientsListRequest.getOrgId());
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            responseClients.setErrorCode(0);
+            responseClients.setErrorMessage("Ok");
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseClients).build();
+        }
+        catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s", clientsListRequest.getToken(),
+                    clientsListRequest.getUserId(), clientsListRequest.getOrgId(), e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "discounts")
+    public Response getDiscounts(@QueryParam(value = "token") String token, @QueryParam(value = "userId") Long userId,
+            @QueryParam(value = "orgId") Long orgId) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        IGroupManagementService groupManagementService;
+        try{
+            persistenceSession = runtimeContext.createReportPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            groupManagementService = new GroupManagementService(persistenceSession);
+            ResponseDiscounts responseDiscounts = groupManagementService.getDiscountsList(orgId);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            responseDiscounts.setErrorCode(0);
+            responseDiscounts.setErrorMessage("Ok");
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscounts).build();
+        }
+        catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s", token,
+                    userId, orgId, e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "editdiscountclients")
+    public Response editDiscountClients(DiscountClientsListRequest discountClientsListRequest) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        IGroupManagementService groupManagementService;
+        try{
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            groupManagementService = new GroupManagementService(persistenceSession);
+            ResponseDiscountClients responseDiscounts = groupManagementService.processDiscountClientsList(discountClientsListRequest);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            responseDiscounts.setErrorCode(0);
+            responseDiscounts.setErrorMessage("Ok");
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscounts).build();
+        }
+        catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s", discountClientsListRequest.getToken(),
+                    discountClientsListRequest.getUserId(), discountClientsListRequest.getOrgId(), e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @POST
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "editdiscountgroups")
+    public Response editDiscountGroups(DiscountGroupsListRequest discountClientsListRequest) {
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        IGroupManagementService groupManagementService;
+        try{
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            groupManagementService = new GroupManagementService(persistenceSession);
+            ResponseDiscountGroups responseDiscounts = groupManagementService.processDiscountGroupsList(discountClientsListRequest);
+            persistenceTransaction.commit();
+            persistenceTransaction = null;
+            responseDiscounts.setErrorCode(0);
+            responseDiscounts.setErrorMessage("Ok");
+            return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscounts).build();
+
+        }
+        catch (RequestProcessingException e){
+            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s", discountClientsListRequest.getToken(),
+                    discountClientsListRequest.getUserId(), discountClientsListRequest.getOrgId(), e.toString()), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: " + e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100,"Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
 
 }

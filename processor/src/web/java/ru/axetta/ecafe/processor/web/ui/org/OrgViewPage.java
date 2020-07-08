@@ -592,11 +592,6 @@ public class OrgViewPage extends BasicWorkspacePage {
         this.statusDetails = statusDetails;
     }
 
-    public Object updateBalance(){
-        for (int i=0;i<10000000;i++);
-        return null;
-    }
-
     public Boolean getPayByCashier() {
         return payByCashier;
     }
