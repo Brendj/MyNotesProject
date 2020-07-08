@@ -33,7 +33,7 @@ public class HelpRequestProcessor extends AbstractProcessor<ResHelpRequest> {
         try {
             ResHelpRequestItem resItem = null;
             boolean errorFound = false;
-            Long nextVersion = helpRequest.getMaxVersion();
+            Long nextVersion = DAOUtils.nextVersionByHelpRequests(session);
             for (HelpRequestItem item : helpRequest.getItems()) {
                 errorFound = !item.getResCode().equals(HelpRequestItem.ERROR_CODE_ALL_OK);
                 if (!errorFound) {
