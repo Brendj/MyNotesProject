@@ -273,11 +273,8 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                         if (categoryDiscount.getIdOfCategoryDiscount() != isppCodeInoe)
                             newDiscounts.add(categoryDiscount);
                     }
-                    Integer oldDiscountMode = client.getDiscountMode();
-                    Integer newDiscountMode =
-                            newDiscounts.size() == 0 ? Client.DISCOUNT_MODE_NONE : Client.DISCOUNT_MODE_BY_CATEGORY;
                     DiscountManager
-                            .renewDiscounts(session, client, newDiscounts, oldDiscounts, newDiscountMode, oldDiscountMode, ARCHIEVE_COMMENT);
+                            .renewDiscounts(session, client, newDiscounts, oldDiscounts, ARCHIEVE_COMMENT);
                 }
                 Criteria criteria = session.createCriteria(ClientDtisznDiscountInfo.class);
                 criteria.add(Restrictions.eq("client", client));
