@@ -4,20 +4,24 @@
 
 package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
+import ru.axetta.ecafe.processor.core.logic.DiscountManager;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 
 import org.apache.commons.lang.NullArgumentException;
 import org.hibernate.Criteria;
+import org.hibernate.Query;
 import org.hibernate.Session;
 import org.hibernate.criterion.Disjunction;
 import org.hibernate.criterion.Restrictions;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.LinkedList;
 import java.util.List;
 
 public class GroupManagementService implements IGroupManagementService {
-
+    Logger logger = LoggerFactory.getLogger(GroupManagementService.class);
 
     private Session persistanceSession;
 
@@ -158,6 +162,201 @@ public class GroupManagementService implements IGroupManagementService {
                 return;
             }
         }
+    }
+
+    @Override
+    public ResponseClients getClientsList(List<String> groupsList, long idOfOrg) throws Exception {
+        List<Long> idOfOrgList = DAOUtils.findFriendlyOrgIds(persistanceSession, idOfOrg);
+        if (idOfOrgList.size() == 0) throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND);
+        ResponseClients responseClients = new ResponseClients();
+        boolean groupsNotFound = true;
+        for (String nameOfGroup : groupsList) {
+            nameOfGroup = nameOfGroup.trim();
+            List groups = DAOUtils.findClientGroupsByGroupNameForAllOrgsIgnoreCase(persistanceSession, idOfOrgList, nameOfGroup);
+            if (groups.size() == 0) {
+                addFPGroupNotFound(responseClients, nameOfGroup);
+                continue;
+            }
+            GroupNamesToOrgs gnto = DAOUtils.findGroupFromGroupNamesToOrgs(persistanceSession, idOfOrgList, nameOfGroup);
+            ClientGroup cg = findClientGroup(gnto, groups, idOfOrg);
+            if (cg == null) {
+                addFPGroupNotFound(responseClients, nameOfGroup);
+                continue;
+            }
+
+            groupsNotFound = false;
+            FPGroup fpGroup = new FPGroup();
+            fpGroup.setCode(0);
+            fpGroup.setMessage("OK");
+            fpGroup.setGroupName(nameOfGroup);
+            Query query = persistanceSession.createQuery("select distinct c from Client c "
+                    + "join fetch c.clientGroup "
+                    + "join fetch c.person "
+                    + "left join fetch c.categoriesInternal "
+                    + "where c.org.idOfOrg in (:idOfOrgList) and upper(c.clientGroup.groupName) = :nameOfGroup order by c.contractId");
+            query.setParameterList("idOfOrgList", idOfOrgList);
+            query.setParameter("nameOfGroup", nameOfGroup.toUpperCase());
+            List<Client> list = query.list();
+            for (Client client : list) {
+                fpGroup.setGroupId(cg.getCompositeIdOfClientGroup().getIdOfClientGroup());
+                fpGroup.setOrgId(client.getOrg().getIdOfOrg());
+                FPClient fpClient = new FPClient(client);
+                fpGroup.getClients().add(fpClient);
+            }
+            responseClients.getGroups().add(fpGroup);
+        }
+        if (groupsNotFound) throw new RequestProcessingException(GroupManagementErrors.GROUP_NOT_FOUND);
+        return responseClients;
+    }
+
+    private void addFPGroupNotFound(ResponseClients responseClients, String groupName) {
+        FPGroup fpGroup = new FPGroup();
+        fpGroup.setGroupName(groupName);
+        fpGroup.setCode(GroupManagementErrors.GROUP_NOT_FOUND.getErrorCode());
+        fpGroup.setMessage(GroupManagementErrors.GROUP_NOT_FOUND.getErrorMessage());
+        responseClients.getGroups().add(fpGroup);
+    }
+
+    @Override
+    public ResponseDiscounts getDiscountsList(Long idOfOrg) throws Exception {
+        List<Long> idOfOrgList = DAOUtils.findFriendlyOrgIds(persistanceSession, idOfOrg);
+        if (idOfOrgList.size() == 0) throw new RequestProcessingException(GroupManagementErrors.ORG_NOT_FOUND);
+        ResponseDiscounts responseDiscounts = new ResponseDiscounts();
+        List<CategoryDiscount> categoryDiscounts = DiscountManager.getCategoryDiscounts(persistanceSession);
+        for (CategoryDiscount categoryDiscount : categoryDiscounts) {
+            if (categoryDiscount.getCategoryName().equals(DiscountManager.RESERV_DISCOUNT)) {
+                ResponseDiscountItem item = new ResponseDiscountItem(categoryDiscount);
+                responseDiscounts.addItem(item);
+                continue;
+            }
+            if (categoryDiscount.getDiscountsRules().size() == 0) continue;
+            for (DiscountRule discountRule : categoryDiscount.getDiscountsRules()) {
+                if (discountRule.getCategoryOrgs().size() == 0) {
+                    ResponseDiscountItem item = new ResponseDiscountItem(categoryDiscount);
+                    responseDiscounts.addItem(item);
+                    continue;
+                }
+                ResponseDiscountItem item = null;
+                for (CategoryOrg categoryOrg : discountRule.getCategoryOrgs()) {
+                    for (Org o : categoryOrg.getOrgs()) {
+                        if (idOfOrgList.contains(o.getIdOfOrg())) {
+                            if (item == null) item = new ResponseDiscountItem(categoryDiscount);
+                            item.addCategoryOrg(categoryOrg.getCategoryName(), o.getIdOfOrg());
+                        }
+                    }
+                }
+                if (item != null) responseDiscounts.addItem(item);
+            }
+        }
+
+        return responseDiscounts;
+    }
+
+    @Override
+    public ResponseDiscountClients processDiscountClientsList(DiscountClientsListRequest discountClientsListRequest) throws Exception {
+        ResponseDiscountClients result = new ResponseDiscountClients();
+        CategoryDiscount categoryDiscount = getCategoryDiscount(discountClientsListRequest.getDiscountId());
+        ResponseDiscounts availableDiscounts = getDiscountsList(discountClientsListRequest.getOrgId());
+        List<Long> allOrgs = DAOUtils.findFriendlyOrgIds(persistanceSession, discountClientsListRequest.getOrgId());
+        for (Long contractId : discountClientsListRequest.getClients()) {
+            result.addItem(processDiscountClient(allOrgs, contractId, discountClientsListRequest.getStatus(),
+                    categoryDiscount, availableDiscounts));
+        }
+        return result;
+    }
+
+    @Override
+    public ResponseDiscountGroups processDiscountGroupsList(DiscountGroupsListRequest discountGroupsListRequest) throws Exception {
+        CategoryDiscount categoryDiscount = getCategoryDiscount(discountGroupsListRequest.getDiscountId());
+        ResponseDiscounts availableDiscounts = getDiscountsList(discountGroupsListRequest.getOrgId());
+        ResponseDiscountGroups result = new ResponseDiscountGroups();
+        ResponseClients responseClients = getClientsList(discountGroupsListRequest.getGroups(), discountGroupsListRequest.getOrgId());
+        List<Long> allOrgs = DAOUtils.findFriendlyOrgIds(persistanceSession, discountGroupsListRequest.getOrgId());
+        for (FPGroup fpGroup : responseClients.getGroups()) {
+            ResponseDiscountGroupItem resultClients = new ResponseDiscountGroupItem(fpGroup.getGroupName());
+            for (FPClient fpClient : fpGroup.getClients()) {
+                resultClients.addItem(processDiscountClient(allOrgs, fpClient.getContractId(), discountGroupsListRequest.getStatus(),
+                        categoryDiscount, availableDiscounts));
+            }
+            result.addItem(resultClients);
+        }
+        return result;
+    }
+
+    private CategoryDiscount getCategoryDiscount(Long idOfCategoryDiscount) throws Exception {
+        CategoryDiscount categoryDiscount = (CategoryDiscount)persistanceSession.get(CategoryDiscount.class, idOfCategoryDiscount);
+        if (categoryDiscount == null) {
+            throw new RequestProcessingException(GroupManagementErrors.DISCOUNT_NOT_FOUND);
+        }
+        if (categoryDiscount.getBlockedToChange()) {
+            throw new RequestProcessingException(GroupManagementErrors.DISCOUNT_NOT_MODIFY);
+        }
+        return categoryDiscount;
+    }
+
+    private ResponseDiscountClientsItem processDiscountClient(List<Long> allOrgs, Long contractId, Boolean status,
+            CategoryDiscount categoryDiscount, ResponseDiscounts availableDiscounts) {
+        Client client = DAOUtils.findClientByContractId(persistanceSession, contractId);
+        if (client == null || !allOrgs.contains(client.getOrg().getIdOfOrg()) || !client.isStudent()) {
+            return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_CLIENT_NOT_FOUND,
+                    ResponseDiscountClientsItem.MESSAGE_CLIENT_NOT_FOUND);
+        }
+        if (status) {
+            //добавление льготы
+            if (client.getCategories().contains(categoryDiscount)) {
+                return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_OK,
+                        ResponseDiscountClientsItem.MESSAGE_OK);
+            } else {
+                if (isProperDiscount(availableDiscounts, categoryDiscount.getIdOfCategoryDiscount())) {
+                    try {
+                        DiscountManager.addDiscount(persistanceSession, client, categoryDiscount,
+                                DiscountChangeHistory.MODIFY_IN_SERVICE);
+                        return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_OK,
+                                ResponseDiscountClientsItem.MESSAGE_OK);
+                    } catch (Exception e) {
+                        logger.error("Error in add discount processDiscountClientsList: ", e);
+                        return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_INTERNAL_ERROR,
+                                ResponseDiscountClientsItem.MESSAGE_INTERNAL_ERROR);
+                    }
+                } else {
+                    return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_DISCOUNT_NOT_FOUND,
+                            ResponseDiscountClientsItem.MESSAGE_DISCOUNT_NOT_FOUND);
+                }
+            }
+        } else {
+            //удаление льготы
+            try {
+                if (client.getCategories().contains(categoryDiscount)) {
+                    DiscountManager.deleteOneDiscount(persistanceSession, client, categoryDiscount);
+                }
+                return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_OK,
+                        ResponseDiscountClientsItem.MESSAGE_OK);
+            } catch (Exception e) {
+                logger.error("Error in delete discount processDiscountClientsList: ", e);
+                return new ResponseDiscountClientsItem(contractId, ResponseDiscountClientsItem.CODE_INTERNAL_ERROR,
+                        ResponseDiscountClientsItem.MESSAGE_INTERNAL_ERROR);
+            }
+        }
+    }
+
+    private boolean isProperDiscount(ResponseDiscounts availableDiscounts, Long discountId) {
+        for (ResponseDiscountItem item : availableDiscounts.getItems()) {
+            if (item.getIdOfCategoryDiscount().equals(discountId)) return true;
+        }
+        return false;
+    }
+
+    private ClientGroup findClientGroup(GroupNamesToOrgs gnto, List<ClientGroup> groups, Long idOfOrg) {
+        if (gnto == null || gnto.getIdOfOrg() == null) {
+            for (ClientGroup clientGroup : groups) {
+                if (clientGroup.getCompositeIdOfClientGroup().getIdOfOrg().equals(idOfOrg)) return clientGroup;
+            }
+            return null;
+        }
+        for (ClientGroup clientGroup : groups) {
+            if (clientGroup.getCompositeIdOfClientGroup().getIdOfOrg().equals(gnto.getIdOfOrg())) return clientGroup;
+        }
+        return null;
     }
 
     private Boolean isGroupNotPredefined(ClientGroup group){
