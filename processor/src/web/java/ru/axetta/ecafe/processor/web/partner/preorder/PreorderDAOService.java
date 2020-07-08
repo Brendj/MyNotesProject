@@ -957,7 +957,7 @@ public class PreorderDAOService {
                     createWtRegularPreorder(client, regularComplex, complex.getAmount(),
                             complex.getIdOfComplex(), date, true, null, guardianMobile, mobileGroupOnCreate);
                 } else {
-                    deleteRegularPreorder(client, complex.getIdOfComplex(), true, null, date, guardianMobile);
+                    deleteWtRegularPreorder(client, complex.getIdOfComplex(), true, null, date, guardianMobile);
                 }
                 continue;
             }
@@ -1003,7 +1003,7 @@ public class PreorderDAOService {
                             createWtRegularPreorder(client, regularMenuItem, menuItem.getAmount(), idOfComplex, date,
                                     false, menuItem.getIdOfMenuDetail(), guardianMobile, mobileGroupOnCreate);
                         } else {
-                            deleteRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(), date,
+                            deleteWtRegularPreorder(client, null, false, menuItem.getIdOfMenuDetail(), date,
                                     guardianMobile);
                         }
                         continue;
@@ -1225,6 +1225,25 @@ public class PreorderDAOService {
         else {
             MenuDetail menuDetail = getMenuDetail(client, idOfMenu, date);
             regularPreorderSelect.setParameter("itemCode", menuDetail.getItemCode());
+        }
+        RegularPreorder regularPreorder = (RegularPreorder) regularPreorderSelect.getSingleResult();
+        deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.OK, guardianMobile, RegularPreorderState.CHANGE_BY_USER);
+    }
+
+    private void deleteWtRegularPreorder(Client client, Integer idOfComplex, boolean isComplex, Long idOfDish,
+            Date date, String guardianMobile) throws Exception {
+        String condition = isComplex ? " and m.idOfComplex = :idOfComplex " : " and m.idOfDish = :idOfDish ";
+        Query regularPreorderSelect = em.createQuery("select m from RegularPreorder m "
+                + "where m.client = :client " + condition + " and m.deletedState = false");
+        regularPreorderSelect.setParameter("client", client);
+        if (isComplex)
+            regularPreorderSelect.setParameter("idOfComplex", idOfComplex);
+        else {
+            WtDish wtDish = getWtDish(idOfDish, date);
+            if (wtDish == null) {
+                throw new MenuDetailNotExistsException("Не найдено блюдо с ид.=" + idOfDish.toString());
+            }
+            regularPreorderSelect.setParameter("idOfDish", idOfDish);
         }
         RegularPreorder regularPreorder = (RegularPreorder) regularPreorderSelect.getSingleResult();
         deleteRegularPreorderInternal((Session)em.getDelegate(), regularPreorder, PreorderState.OK, guardianMobile, RegularPreorderState.CHANGE_BY_USER);
