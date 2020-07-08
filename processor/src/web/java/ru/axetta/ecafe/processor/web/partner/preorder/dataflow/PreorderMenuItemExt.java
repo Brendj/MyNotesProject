@@ -7,6 +7,9 @@ package ru.axetta.ecafe.processor.web.partner.preorder.dataflow;
 
 import ru.axetta.ecafe.processor.core.persistence.MenuDetail;
 import ru.axetta.ecafe.processor.core.persistence.PreorderMenuDetail;
+import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadExternalsService;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup;
 
 import javax.xml.bind.annotation.XmlAccessType;
 import javax.xml.bind.annotation.XmlAccessorType;
@@ -86,6 +89,25 @@ public class PreorderMenuItemExt {
         this.setFat(pmd.getFat());
         this.setIdOfMenuDetail(pmd.getArmIdOfMenu());
         this.setItemCode(pmd.getItemCode());
+    }
+
+    public PreorderMenuItemExt(WtDish wtDish) {
+        WtMenuGroup menuGroup = DAOReadExternalsService.getInstance().getWtMenuGroupByWtDish(wtDish);
+        if (menuGroup != null) {
+            this.setGroup(menuGroup.getName());
+        }
+        this.setName(wtDish.getDishName());
+        this.setFullName(wtDish.getDishName());
+        this.setPrice(wtDish.getPrice().longValue());
+        this.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
+        this.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 :
+                wtDish.getCarbohydrates().doubleValue());
+        this.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
+        this.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
+        this.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
+        this.setAvailableNow(1); // включение блюда в меню
+        this.setIdOfMenuDetail(wtDish.getIdOfDish());
+        this.setItemCode(wtDish.getCode().toString());
     }
 
     public String getGroup() {

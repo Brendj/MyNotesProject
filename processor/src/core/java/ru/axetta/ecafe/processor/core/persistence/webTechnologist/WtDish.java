@@ -30,7 +30,7 @@ public class WtDish {
     private String componentsOfDish;
 
     @Column(name = "code")
-    private Integer code;
+    private String code;
 
     @Column(name = "price")
     private BigDecimal price;
@@ -143,11 +143,11 @@ public class WtDish {
         this.componentsOfDish = componentsOfDish;
     }
 
-    public Integer getCode() {
+    public String getCode() {
         return code;
     }
 
-    public void setCode(Integer code) {
+    public void setCode(String code) {
         this.code = code;
     }
 

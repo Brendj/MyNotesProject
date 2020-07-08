@@ -35,8 +35,8 @@ import javax.annotation.PostConstruct;
 import java.io.File;
 import java.math.BigInteger;
 import java.text.SimpleDateFormat;
-import java.util.Calendar;
 import java.util.*;
+import java.util.Calendar;
 
 @Component("PreorderRequestsReportService")
 @Scope("singleton")
@@ -52,7 +52,8 @@ public class PreorderRequestsReportService extends RecoverableService {
     public static final String PREORDER_COMMENT = "- Добавлено из предзаказа -";
     private static final String TEMPLATE_FILENAME = "PreordersRequestsReport_notify.jasper";
     public final Integer PREORDER_REQUEST_TYPE = 3;
-    private static final Integer MAX_FORBIDDEN_DAYS = 3;
+    public static final Integer MAX_FORBIDDEN_DAYS = 3;
+    public static final int DAY_PREORDER_CHECK = 5;
 
     private Map<Long, GoodRequestsChangeAsyncNotificationService.OrgItem> orgItems = new HashMap<Long, GoodRequestsChangeAsyncNotificationService.OrgItem>();
 
@@ -393,16 +394,20 @@ public class PreorderRequestsReportService extends RecoverableService {
                 break;
             }
         }
-        runTask(params);
+        runTask(params, instance, nodes[0]);
     }
 
-    public void runTask(PreorderRequestsReportServiceParam params) throws Exception {
+    public void runTask(PreorderRequestsReportServiceParam params, String instance, String firstNode) throws Exception {
         //проверки на актуальность предзаказов
         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().relevancePreorders(params);
         //генерация предзаказов по регулярному правилу
         RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().generatePreordersBySchedule(params);
         //генерация заявок
         runGeneratePreorderRequests(params);
+        //сервис проверок предзаказов
+        if (instance.equals(firstNode)) {
+            RuntimeContext.getAppContext().getBean(DAOService.class).getPreorderDAOOperationsImpl().dailyCheckPreorders();
+        }
     }
 
     public String checkIsExistFile() throws Exception {

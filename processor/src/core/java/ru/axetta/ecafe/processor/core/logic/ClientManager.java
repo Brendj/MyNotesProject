@@ -1859,13 +1859,15 @@ public class ClientManager {
 
     /* Установить флаг информирования об условиях предоставления услуг по предзаказам */
     public static void setInformSpecialMenu(Session session, Client client, Client guardian, Long newVersion) {
-        Criteria cr = session.createCriteria(ClientGuardian.class);
-        cr.add(Restrictions.eq("idOfChildren", client.getIdOfClient()));
-        cr.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
-        ClientGuardian cg = (ClientGuardian)cr.uniqueResult();
-        cg.setVersion(newVersion);
-        cg.setLastUpdate(new Date());
-        session.update(cg);
+        if (guardian != null) {
+            Criteria cr = session.createCriteria(ClientGuardian.class);
+            cr.add(Restrictions.eq("idOfChildren", client.getIdOfClient()));
+            cr.add(Restrictions.eq("idOfGuardian", guardian.getIdOfClient()));
+            ClientGuardian cg = (ClientGuardian) cr.uniqueResult();
+            cg.setVersion(newVersion);
+            cg.setLastUpdate(new Date());
+            session.update(cg);
+        }
 
         Criteria criteria = session.createCriteria(PreorderFlag.class);
         criteria.add(Restrictions.eq("client", client));

@@ -8,6 +8,10 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.logic.ClientManager;
 import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplex;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtComplexesItem;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDish;
+import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtMenuGroup;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
@@ -269,5 +273,56 @@ public class DAOReadExternalsService {
             if (passDirections.contains(pd)) result = 1;
         }
         return result; //0 - по событиям проходов нет в ОО, 1 - находится в ОО
+    }
+
+    public List<WtDish> getWtDishesByWtComplex(WtComplex wtComplex) {
+        Query query = entityManager.createQuery(
+                "SELECT DISTINCT dish FROM WtDish dish LEFT JOIN dish.complexItems complexItems "
+                        + "LEFT JOIN complexItems.wtComplex complex "
+                        + "WHERE complex = :complex "
+                        + "AND dish.deleteState = 0");
+        query.setParameter("complex", wtComplex);
+        return query.getResultList();
+    }
+
+    public List<WtDish> getWtDishesByComplexAndDates(WtComplex complex, Date startDate, Date endDate) {
+        Query query = entityManager.createQuery("SELECT DISTINCT dish FROM WtDish dish "
+                + "LEFT JOIN dish.complexItems complexItems "
+                + "LEFT JOIN complexItems.wtComplex complex "
+                + "WHERE complex = :complex "
+                + "AND dish.deleteState = 0 "
+                + "AND ((dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding > :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding > :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding < :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");
+        query.setParameter("complex", complex);
+        query.setParameter("startDate", startDate, TemporalType.TIMESTAMP);
+        query.setParameter("endDate", endDate, TemporalType.TIMESTAMP);
+        return (List<WtDish>) query.getResultList();
+    }
+
+    public List<WtDish> getWtDishesByComplexItemAndDates(WtComplexesItem complexItem, Date startDate, Date endDate) {
+        Query query = entityManager.createQuery("SELECT DISTINCT dish FROM WtDish dish "
+                + "WHERE :complexItem IN ELEMENTS(dish.complexItems) "
+                + "AND dish.deleteState = 0 "
+                + "AND ((dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding >= :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding >= :endDate) "
+                + "OR (dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
+                + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");
+        query.setParameter("complexItem", complexItem);
+        query.setParameter("startDate", startDate, TemporalType.DATE);
+        query.setParameter("endDate", endDate, TemporalType.DATE);
+        return (List<WtDish>) query.getResultList();
+    }
+
+    public WtMenuGroup getWtMenuGroupByWtDish(WtDish wtDish) {
+        Query query = entityManager.createQuery(
+                "SELECT menuGroup FROM WtMenuGroup menuGroup "
+                        + "LEFT JOIN menuGroup.menuGroupMenus menuGroupMenus "
+                        + "WHERE :wtDish IN ELEMENTS(menuGroupMenus.dishes) "
+                        + "AND menuGroup.deleteState = 0");
+        query.setParameter("wtDish", wtDish);
+        List<WtMenuGroup> res = query.getResultList();
+        return res.size() > 0 ? res.get(0) : null;
     }
 }

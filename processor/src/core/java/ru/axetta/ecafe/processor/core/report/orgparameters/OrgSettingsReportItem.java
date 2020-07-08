@@ -68,7 +68,7 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
 
     //----------------- Служебные переменные --------------------//
     private Boolean mainBuilding;
-    private Boolean changed;
+    private Boolean changed = false;
 
     private final String MAIN_BUILDING_STYLE = "mainBuilding";
     private final String NOT_SERVICED_STYLE = "notServiced";
@@ -126,7 +126,6 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
         this.isWorkInSummerTime = org.getIsWorkInSummerTime();
 
         this.mainBuilding = org.isMainBuilding();
-        this.changed = false;
     }
 
     private String buildOrgCategoriesString(Set<CategoryOrg> categories) {
@@ -249,14 +248,6 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
         this.productionConfig = productionConfig;
     }
 
-    public Boolean getChanged() {
-        return changed;
-    }
-
-    public void setChanged(Boolean changed) {
-        this.changed = changed;
-    }
-
     public String getOrgCategory() {
         return orgCategory;
     }
@@ -317,10 +308,6 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
     public String getStyle(){
         return (this.mainBuilding ? MAIN_BUILDING_STYLE + " " : "")
                 +  (this.status.equals(Org.STATE_NAMES[Org.INACTIVE_STATE]) ? NOT_SERVICED_STYLE : "" );
-    }
-
-    public void isChangedWhenModify(){
-        this.changed = true;
     }
 
     public Boolean getPreordersEnabled() {
@@ -465,5 +452,17 @@ public class OrgSettingsReportItem implements Comparable<OrgSettingsReportItem>{
 
     public void setShortNameInfoService(String shortNameInfoService) {
         this.shortNameInfoService = shortNameInfoService;
+    }
+
+    public Boolean getChanged() {
+        return changed;
+    }
+
+    public void setChanged(Boolean changed) {
+        this.changed = changed;
+    }
+
+    public void change(){
+        changed = true;
     }
 }

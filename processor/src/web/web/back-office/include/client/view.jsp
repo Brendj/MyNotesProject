@@ -160,6 +160,8 @@
     <h:inputText value="#{mainPage.clientViewPage.externalId}" maxlength="64" styleClass="input-text" readonly="true"/>
     <h:outputText escape="true" value="Идентификатор GUID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.clientGUID}" maxlength="64" styleClass="input-text long-field" readonly="true"/>
+    <h:outputText escape="true" value="Идентификатор MESH GUID" styleClass="output-text" />
+    <h:inputText value="#{mainPage.clientViewPage.meshGUID}" maxlength="64" styleClass="input-text long-field" readonly="true"/>
     <h:outputText escape="true" value="Идентификатор SSOID" styleClass="output-text" />
     <h:inputText value="#{mainPage.clientViewPage.clientSSOID}" maxlength="64" styleClass="input-text long-field" readonly="true"/>
     <h:outputText escape="true" value="Идентификатор REGID" styleClass="output-text" />

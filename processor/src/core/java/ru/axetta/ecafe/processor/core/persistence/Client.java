@@ -105,6 +105,7 @@ public class Client {
     private Set<GuardSan> guardSan;
     private Long externalId;
     private String clientGUID;
+    private String meshGUID;
     private Set<Card> cards = new HashSet<Card>();
     private Set<Call> calls = new HashSet<Call>();
     private Set<Notification> notifications = new HashSet<Notification>();
@@ -744,6 +745,14 @@ public class Client {
 
     public void setClientGUID(String clientGUID) {
         this.clientGUID = clientGUID;
+    }
+
+    public String getMeshGUID() {
+        return meshGUID;
+    }
+
+    public void setMeshGUID(String meshGUID) {
+        this.meshGUID = meshGUID;
     }
 
     public Set<Card> getCardsInternal() {

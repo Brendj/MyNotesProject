@@ -2502,6 +2502,15 @@ public class DAOService {
     }
 
     @Transactional
+    public String getDeletedLastedDateMenu() {
+        try {
+            return getOnlineOptionValue(Option.OPTION_LAST_DELATED_DATE_MENU);
+        } catch (Exception e) {
+            return "";
+        }
+    }
+
+    @Transactional
     public void setOnlineOptionValue(String value, int option) {
         String str_query = "select optiontext from cf_options where idofoption = :idofoption";
         Query q = entityManager.createNativeQuery(str_query);
@@ -2911,4 +2920,23 @@ public class DAOService {
         return q.executeUpdate() > 0;
     }
 
+    public List<Contragent> contragentsListByUser(Long idOfUser) {
+        Query q = entityManager.createQuery("select c from User u inner join u.contragents c"
+                + " where u.idOfUser = :idOfUser order by c.contragentName");
+
+        q.setParameter("idOfUser", idOfUser);
+        return q.getResultList();
+    }
+
+    public WtComplex getWtComplexById(Long idOfComplex) {
+        Query query = entityManager.createQuery("select complex from WtComplex complex "
+                + "where complex.idOfComplex = :idOfComplex");
+        query.setParameter("idOfComplex", idOfComplex);
+        try {
+            return (WtComplex) query.getSingleResult();
+        } catch (Exception e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

@@ -39,7 +39,6 @@
                                         #{rich:component('modalOrgSelectorPanel')}.show();"
                            styleClass="command-link" style="width: 25px;">
             <f:setPropertyActionListener value="0" target="#{mainPage.orgSelectPage.filterMode}" />
-            <f:setPropertyActionListener value="1" target="#{mainPage.orgSelectPage.supplierFilter}" />
             <f:setPropertyActionListener value="#{kznClientsStatisticCreatePage.getStringIdOfOrgList}"
                                          target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
         </a4j:commandButton>

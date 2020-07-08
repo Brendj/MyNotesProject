@@ -37,6 +37,8 @@ public class PreorderMenuDetail {
     private Long usedAmount;
     private String mobile;
     private PreorderMobileGroupOnCreateType mobileGroupOnCreate;
+    private Long idOfDish;
+
 
     public PreorderMenuDetail() {
         this.usedSum = 0L;
@@ -72,6 +74,24 @@ public class PreorderMenuDetail {
             this.preorderComplex.setDeletedState(true);
             this.preorderComplex.setAmount(0);
         }
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PreorderMenuDetail)) {
+            return false;
+        }
+        final PreorderMenuDetail preorderMenuDetail = (PreorderMenuDetail) o;
+        return preorderComplex.getGuid().equals(preorderMenuDetail.getPreorderComplex().getGuid())
+                && itemCode.equals(preorderMenuDetail.getItemCode());
+    }
+
+    @Override
+    public int hashCode() {
+        return idOfPreorderMenuDetail != null ? idOfPreorderMenuDetail.hashCode() : 0;
     }
 
     public Long getIdOfPreorderMenuDetail() {
@@ -288,5 +308,13 @@ public class PreorderMenuDetail {
 
     public void setMobileGroupOnCreate(PreorderMobileGroupOnCreateType mobileGroupOnCreate) {
         this.mobileGroupOnCreate = mobileGroupOnCreate;
+    }
+
+    public Long getIdOfDish() {
+        return idOfDish;
+    }
+
+    public void setIdOfDish(Long idOfDish) {
+        this.idOfDish = idOfDish;
     }
 }

@@ -73,6 +73,18 @@ public class PreorderComplexItemExt implements Comparable {
         this.setDiscount(modeFree == 1 ? true : false);
     }
 
+    public PreorderComplexItemExt(Integer idOfComplex, String complexName, Long currentPrice, Integer complexType,
+            Boolean discount, Integer amount, Integer deleteState, Boolean isRegular) {
+        this.setIdOfComplexInfo(idOfComplex);
+        this.setComplexName(complexName);
+        this.setCurrentPrice(currentPrice);
+        this.setComplexType(complexType);
+        this.setDiscount(discount);
+        this.setAmount(amount);
+        this.setState(deleteState);
+        this.setIsRegular(isRegular);
+    }
+
     public List<PreorderMenuItemExt> getMenuItemExtList() {
         return menuItemExtList;
     }

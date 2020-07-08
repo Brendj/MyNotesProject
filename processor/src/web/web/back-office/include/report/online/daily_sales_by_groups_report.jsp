@@ -40,7 +40,6 @@
                                oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgListSelectorPanel')}.show();"
                                styleClass="command-link" style="width: 25px;" >
                 <f:setPropertyActionListener value="0" target="#{mainPage.orgListSelectPage.filterMode}" />
-                <f:setPropertyActionListener value="1" target="#{mainPage.orgListSelectPage.supplierFilter}" />
                 <f:setPropertyActionListener value="#{dailySalesByGroupsReportPage.getStringIdOfOrgList}"
                                              target="#{mainPage.orgFilterOfSelectOrgListSelectPage}" />
                                </a4j:commandButton>

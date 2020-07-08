@@ -30,6 +30,7 @@ import ru.axetta.ecafe.processor.core.persistence.orgsettings.OrgSettingGroup;
 import ru.axetta.ecafe.processor.core.persistence.webTechnologist.WtDiscountRule;
 import ru.axetta.ecafe.processor.core.service.EventNotificationService;
 import ru.axetta.ecafe.processor.core.service.RNIPLoadPaymentsService;
+import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.sync.SectionType;
 import ru.axetta.ecafe.processor.core.sync.handlers.interactive.report.data.InteractiveReportDataItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.org.owners.OrgOwner;
@@ -692,6 +693,24 @@ public class DAOUtils {
                 .list();
         if (l.size() > 0) {
             return (ClientGroup) l.get(0);
+        }
+        return null;
+    }
+
+    public static List<ClientGroup> findClientGroupsByGroupNameForAllOrgsIgnoreCase(Session persistenceSession,
+            List<Long> idOfOrgsList, String groupName) throws Exception {
+        Criteria clientGroupCriteria = persistenceSession.createCriteria(ClientGroup.class);
+        return clientGroupCriteria
+                .add(Restrictions.and(Restrictions.eq("groupName", groupName.trim()).ignoreCase(), Restrictions.in("org.idOfOrg", idOfOrgsList)))
+                .list();
+    }
+
+    public static GroupNamesToOrgs findGroupFromGroupNamesToOrgs(Session session, List<Long> idOfOrgsList, String groupName) {
+        Criteria criteria = session.createCriteria(GroupNamesToOrgs.class);
+        List l = criteria.add(Restrictions.and(Restrictions.eq("groupName", groupName.trim()).ignoreCase(), Restrictions.in("idOfOrg", idOfOrgsList)))
+                .list();
+        if (l.size() > 0) {
+            return (GroupNamesToOrgs) l.get(0);
         }
         return null;
     }
@@ -2135,7 +2154,7 @@ public class DAOUtils {
     }
 
     public static void savePreorderGuidFromOrderDetail(Session session, String guid, OrderDetail orderDetail,
-            boolean cancelOrder, PreorderComplex preorderComplex, String itemCode) {
+            boolean cancelOrder, PreorderComplex preorderComplex, String itemCode, Long orderSum) {
         if (!cancelOrder) {
             PreorderLinkOD linkOD = new PreorderLinkOD(guid, orderDetail);
             session.save(linkOD);
@@ -2146,17 +2165,19 @@ public class DAOUtils {
             preorderComplex = (PreorderComplex) criteria.uniqueResult();
         }
         if (preorderComplex != null) {
-            long sum = orderDetail.getQty() * orderDetail.getRPrice();
+            long sum = orderSum;
             long qty = orderDetail.getQty();
             if (cancelOrder) {
                 sum = -sum;
                 qty = -qty;
             }
-            preorderComplex.setUsedSum(preorderComplex.getUsedSum() + sum);
-            preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
-            session.update(preorderComplex);
+            if (!preorderComplex.isType4Complex() || (preorderComplex.isType4Complex() && orderDetail.getMenuType() > OrderDetail.TYPE_COMPLEX_MAX)) {
+                preorderComplex.setUsedSum(sum);
+                preorderComplex.setUsedAmount(preorderComplex.getUsedAmount() + qty);
+                session.update(preorderComplex);
+            }
 
-            if (preorderComplex.getModeOfAdd().equals(PreorderComplex.COMPLEX_MODE_4) && itemCode != null) {
+            if (preorderComplex.isType4Complex() && itemCode != null) {
                 PreorderMenuDetail pmd = getPreorderMenuDetailByItemCode(preorderComplex, itemCode);
                 if (pmd != null) {
                     long sum2 = qty * pmd.getMenuDetailPrice();
@@ -3035,11 +3056,10 @@ public class DAOUtils {
 
     public static long nextVersionByClientPhoto(Session session) {
         long version = 0L;
-        Query query = session.createSQLQuery(
-                "select cp.version from cf_clientphoto as cp where cp.version is not null order by cp.version desc limit 1 for update");
+        Query query = session.createSQLQuery("select nextval('clientphoto_version_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -3627,6 +3647,17 @@ public class DAOUtils {
                 + "where pc.version > :version and (pc.idOfOrgOnCreate = :idOfOrg or (pc.idOfOrgOnCreate is null and pc.client.org.idOfOrg = :idOfOrg))");
         query.setParameter("version", version);
         query.setParameter("idOfOrg", orgOwner);
+        return query.list();
+    }
+
+    public static List<PreorderComplex> getPreorderComplexForOrgNewBase(Session session, long orgOwner) throws Exception {
+        Date startDate = CalendarUtils.getFirstDayOfMonth(new Date());
+        startDate = CalendarUtils.addMonth(startDate, -1);
+        Query query = session.createQuery("select pc from PreorderComplex pc "
+                + "where (pc.idOfOrgOnCreate = :idOfOrg or (pc.idOfOrgOnCreate is null and pc.client.org.idOfOrg = :idOfOrg)) "
+                + "and pc.preorderDate > :date and pc.usedAmount = 0 and pc.deletedState = false");
+        query.setParameter("idOfOrg", orgOwner);
+        query.setParameter("date", startDate);
         return query.list();
     }
 
@@ -4376,11 +4407,10 @@ public class DAOUtils {
 
     public static long nextVersionByApplicationForFood(Session session) {
         long version = 0L;
-        Query query = session.createSQLQuery(
-                "select apf.version from cf_applications_for_food as apf order by apf.version desc limit 1 for update");
+        Query query = session.createSQLQuery("select nextval('application_for_food_id_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -4437,11 +4467,10 @@ public class DAOUtils {
 
     public static long nextVersionByApplicationForFoodHistory(Session session) {
         long version = 0L;
-        Query query = session.createSQLQuery(
-                "select apfh.version from cf_applications_for_food_history as apfh order by apfh.version desc limit 1 for update");
+        Query query = session.createSQLQuery("select nextval('application_for_food_history_id_seq')");
         Object o = query.uniqueResult();
         if (o != null) {
-            version = Long.valueOf(o.toString()) + 1;
+            version = HibernateUtils.getDbLong(o);
         }
         return version;
     }
@@ -4640,9 +4669,10 @@ public class DAOUtils {
         clientGroupList.add(ClientGroup.Predefined.CLIENT_DELETED.getValue());
         clientGroupList.add(ClientGroup.Predefined.CLIENT_OTHER_ORG.getValue());
         Query query = session.createQuery("select distinct client.idOfClient from ClientDtisznDiscountInfo "
-                + "where lastUpdate >= :date and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
+                + "where (lastUpdate >= :date or (dtisznCode = :otherDiscountCode and dateEnd > :date)) and client.clientGroup.compositeIdOfClientGroup.idOfClientGroup not in (:clientGroups)");
         query.setParameter("date", date);
         query.setParameterList("clientGroups", clientGroupList);
+        query.setParameter("otherDiscountCode", DTSZNDiscountsReviseService.OTHER_DISCOUNT_CODE);
         return query.list();
     }
 
