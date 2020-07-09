@@ -44,7 +44,10 @@ import java.util.*;
 @DependsOn("runtimeContext")
 public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSelectPage.CompleteHandlerList{
 
+    private final Logger logger = LoggerFactory.getLogger(OrgSettingsReportPage.class);
+
     private Integer status = 0;
+    private Long numOfChangedRecords = 0L;
     private List<SelectItem> statuses;
     private List<OrgSettingsReportItem> items = Collections.emptyList();
     private List<SelectItem> listOfOrgDistricts;
@@ -56,7 +59,54 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
     private Boolean showOtherSetting = true;
     private Boolean allFriendlyOrgs = true;
 
-    private final Logger logger = LoggerFactory.getLogger(OrgSettingsReportPage.class);
+    private Boolean allUseWebArm = true;
+    private Boolean allUsePaydableSubscriptionFeeding = true;
+    private Boolean allVariableFeeding = true;
+    private Boolean allPreordersEnabled = true;
+    private Boolean allReverseMonthOfSale = true;
+    private Boolean allDenyPayPlanForTimeDifference = true;
+    private Boolean allOneActiveCard = true;
+    private Boolean allEnableDuplicateCard = true;
+    private Boolean allMultiCardModeEnabled = true;
+    private Boolean allNeedVerifyCardSign = true;
+    private Boolean allRequestForVisitsToOtherOrg = true;
+    private Boolean allIsWorkInSummerTime = true;
+
+    private void resetSelectedColumns() {
+        allUseWebArm = true;
+        allUsePaydableSubscriptionFeeding = true;
+        allVariableFeeding = true;
+        allPreordersEnabled = true;
+        allReverseMonthOfSale = true;
+        allDenyPayPlanForTimeDifference = true;
+        allOneActiveCard = true;
+        allEnableDuplicateCard = true;
+        allMultiCardModeEnabled = true;
+        allNeedVerifyCardSign = true;
+        allRequestForVisitsToOtherOrg = true;
+        allIsWorkInSummerTime = true;
+    }
+
+    private void processSelectedColumns(List<OrgSettingsReportItem> items) {
+        resetSelectedColumns();
+        if(CollectionUtils.isEmpty(items)){
+            return;
+        }
+        for(OrgSettingsReportItem item : items){
+            allUseWebArm &= item.getUseWebArm();
+            allUsePaydableSubscriptionFeeding &= item.getUsePaydableSubscriptionFeeding();
+            allVariableFeeding &= item.getVariableFeeding();
+            allPreordersEnabled &= item.getPreordersEnabled();
+            allReverseMonthOfSale &= item.getReverseMonthOfSale();
+            allDenyPayPlanForTimeDifference &= item.getDenyPayPlanForTimeDifference();
+            allOneActiveCard &= item.getOneActiveCard();
+            allEnableDuplicateCard &= item.getEnableDuplicateCard();
+            allMultiCardModeEnabled &= item.getMultiCardModeEnabled();
+            allNeedVerifyCardSign &= item.getNeedVerifyCardSign();
+            allRequestForVisitsToOtherOrg &= item.getRequestForVisitsToOtherOrg();
+            allIsWorkInSummerTime &= item.getIsWorkInSummerTime();
+        }
+    }
 
     private List<SelectItem> buildStatuses() {
         List<SelectItem> items = new ArrayList<SelectItem>(3);
@@ -68,7 +118,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     private List<SelectItem> buildListOfOrgDistricts(Session session) {
         List<String> allDistricts = null;
-        List<SelectItem> selectItemList = new LinkedList<SelectItem>();
+        List<SelectItem> selectItemList = new LinkedList<>();
         selectItemList.add(new SelectItem("", "Все"));
         try{
             allDistricts = DAOUtils.getAllDistinctDepartmentsFromOrgs(session);
@@ -98,6 +148,66 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
         }
     }
 
+    public void countChangedRows(){
+        numOfChangedRecords = 0L;
+        if(CollectionUtils.isEmpty(items)){
+            return;
+        }
+        for(OrgSettingsReportItem item : items){
+            if(item.getChanged()){
+                numOfChangedRecords++;
+            }
+        }
+    }
+
+    public void doMarkAll(Long index){
+        if(CollectionUtils.isEmpty(items)){
+            return;
+        }
+        int i = index.intValue();
+        for(OrgSettingsReportItem item : items){
+            switch (i){
+                case 0:
+                    item.setUseWebArm(allUseWebArm);
+                    break;
+                case 1:
+                    item.setUsePaydableSubscriptionFeeding(allUsePaydableSubscriptionFeeding);
+                    break;
+                case 2:
+                    item.setVariableFeeding(allVariableFeeding);
+                    break;
+                case 3:
+                    item.setPreordersEnabled(allPreordersEnabled);
+                    break;
+                case 4:
+                    item.setReverseMonthOfSale(allReverseMonthOfSale);
+                    break;
+                case 5:
+                    item.setDenyPayPlanForTimeDifference(allDenyPayPlanForTimeDifference);
+                    break;
+                case 6:
+                    item.setOneActiveCard(allOneActiveCard);
+                    break;
+                case 7:
+                    item.setEnableDuplicateCard(allEnableDuplicateCard);
+                    break;
+                case 8:
+                    item.setMultiCardModeEnabled(allMultiCardModeEnabled);
+                    break;
+                case 9:
+                    item.setNeedVerifyCardSign(allNeedVerifyCardSign);
+                    break;
+                case 10:
+                    item.setRequestForVisitsToOtherOrg(allRequestForVisitsToOtherOrg);
+                    break;
+                case 11:
+                    item.setIsWorkInSummerTime(allIsWorkInSummerTime);
+                    break;
+            }
+            item.change();
+        }
+    }
+
     public Integer getStatus() {
         return status;
     }
@@ -122,13 +232,14 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
             transaction = persistenceSession.beginTransaction();
 
             List<String> idOfOrgListString = Arrays.asList(StringUtils.split(getGetStringIdOfOrgList(), ','));
-            List<Long> idOfOrgList = new ArrayList<Long>(idOfOrgListString.size());
+            List<Long> idOfOrgList = new ArrayList<>(idOfOrgListString.size());
             for (String item : idOfOrgListString) {
                 idOfOrgList.add(Long.parseLong(item));
             }
 
             items = OrgSettingsReport.Builder.buildOrgSettingCollection(idOfOrgList, status, persistenceSession, selectedDistricts, allFriendlyOrgs);
             Collections.sort(items);
+            processSelectedColumns(items);
 
             transaction.commit();
             transaction = null;
@@ -208,7 +319,7 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
         Session session = null;
         Transaction transaction = null;
-        List<Long> problemOrgsId = new LinkedList<Long>();
+        List<Long> problemOrgsId = new LinkedList<>();
         try {
             session = RuntimeContext.getInstance().createPersistenceSession();
             transaction = session.beginTransaction();
@@ -353,5 +464,109 @@ public class OrgSettingsReportPage extends OnlineReportPage implements OrgListSe
 
     public void setAllFriendlyOrgs(Boolean allFriendlyOrgs) {
         this.allFriendlyOrgs = allFriendlyOrgs;
+    }
+
+    public Boolean getAllUseWebArm() {
+        return allUseWebArm;
+    }
+
+    public void setAllUseWebArm(Boolean allUseWebArm) {
+        this.allUseWebArm = allUseWebArm;
+    }
+
+    public Boolean getAllUsePaydableSubscriptionFeeding() {
+        return allUsePaydableSubscriptionFeeding;
+    }
+
+    public void setAllUsePaydableSubscriptionFeeding(Boolean allUsePaydableSubscriptionFeeding) {
+        this.allUsePaydableSubscriptionFeeding = allUsePaydableSubscriptionFeeding;
+    }
+
+    public Boolean getAllVariableFeeding() {
+        return allVariableFeeding;
+    }
+
+    public void setAllVariableFeeding(Boolean allVariableFeeding) {
+        this.allVariableFeeding = allVariableFeeding;
+    }
+
+    public Boolean getAllPreordersEnabled() {
+        return allPreordersEnabled;
+    }
+
+    public void setAllPreordersEnabled(Boolean allPreordersEnabled) {
+        this.allPreordersEnabled = allPreordersEnabled;
+    }
+
+    public Boolean getAllReverseMonthOfSale() {
+        return allReverseMonthOfSale;
+    }
+
+    public void setAllReverseMonthOfSale(Boolean allReverseMonthOfSale) {
+        this.allReverseMonthOfSale = allReverseMonthOfSale;
+    }
+
+    public Boolean getAllDenyPayPlanForTimeDifference() {
+        return allDenyPayPlanForTimeDifference;
+    }
+
+    public void setAllDenyPayPlanForTimeDifference(Boolean allDenyPayPlanForTimeDifference) {
+        this.allDenyPayPlanForTimeDifference = allDenyPayPlanForTimeDifference;
+    }
+
+    public Boolean getAllOneActiveCard() {
+        return allOneActiveCard;
+    }
+
+    public void setAllOneActiveCard(Boolean allOneActiveCard) {
+        this.allOneActiveCard = allOneActiveCard;
+    }
+
+    public Boolean getAllEnableDuplicateCard() {
+        return allEnableDuplicateCard;
+    }
+
+    public void setAllEnableDuplicateCard(Boolean allEnableDuplicateCard) {
+        this.allEnableDuplicateCard = allEnableDuplicateCard;
+    }
+
+    public Boolean getAllMultiCardModeEnabled() {
+        return allMultiCardModeEnabled;
+    }
+
+    public void setAllMultiCardModeEnabled(Boolean allMultiCardModeEnabled) {
+        this.allMultiCardModeEnabled = allMultiCardModeEnabled;
+    }
+
+    public Boolean getAllNeedVerifyCardSign() {
+        return allNeedVerifyCardSign;
+    }
+
+    public void setAllNeedVerifyCardSign(Boolean allNeedVerifyCardSign) {
+        this.allNeedVerifyCardSign = allNeedVerifyCardSign;
+    }
+
+    public Boolean getAllRequestForVisitsToOtherOrg() {
+        return allRequestForVisitsToOtherOrg;
+    }
+
+    public void setAllRequestForVisitsToOtherOrg(Boolean allRequestForVisitsToOtherOrg) {
+        this.allRequestForVisitsToOtherOrg = allRequestForVisitsToOtherOrg;
+    }
+
+    public Boolean getAllIsWorkInSummerTime() {
+        return allIsWorkInSummerTime;
+    }
+
+    public void setAllIsWorkInSummerTime(Boolean allIsWorkInSummerTime) {
+        this.allIsWorkInSummerTime = allIsWorkInSummerTime;
+    }
+
+    public Long getNumOfChangedRecords() {
+        return numOfChangedRecords;
+    }
+
+    public void setNumOfChangedRecords(Long numOfChangedRecords) {
+        this.numOfChangedRecords = numOfChangedRecords;
     }
 }

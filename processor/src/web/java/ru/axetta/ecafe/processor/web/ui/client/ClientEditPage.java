@@ -309,6 +309,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
     private Long idOfClientGroup;
     private Long externalId;
     private String clientGUID;
+    private String meshGUID;
     private String clientIacRegId;
     private Integer discountMode;
     private List<SelectItem> selectItemList = new ArrayList<SelectItem>();
@@ -684,6 +685,14 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         this.clientGUID = clientGUID;
     }
 
+    public String getMeshGUID() {
+        return meshGUID;
+    }
+
+    public void setMeshGUID(String meshGUID) {
+        this.meshGUID = meshGUID;
+    }
+
     public String getClientIacRegId() {
         return clientIacRegId;
     }
@@ -991,10 +1000,16 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         } else {
             client.setExternalId(this.externalId);
         }
-        if (this.clientGUID == null || this.clientGUID.isEmpty()) {
+        if (StringUtils.isEmpty(clientGUID)) {
             client.setClientGUID(null);
         } else {
             client.setClientGUID(this.clientGUID);
+        }
+
+        if(StringUtils.isEmpty(meshGUID)){
+            client.setMeshGUID(null);
+        } else {
+            client.setMeshGUID(meshGUID);
         }
         if (this.clientIacRegId == null || this.clientIacRegId.isEmpty()) {
             client.setIacRegId(null);
@@ -1257,6 +1272,7 @@ public class ClientEditPage extends BasicWorkspacePage implements OrgSelectPage.
         }
         this.externalId = client.getExternalId();
         this.clientGUID = client.getClientGUID();
+        this.meshGUID = client.getMeshGUID();
         this.clientIacRegId = client.getIacRegId();
         this.discountMode = client.getDiscountMode();
         /* filter fill*/

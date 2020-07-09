@@ -9,6 +9,7 @@ import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.service.nsi.DTSZNDiscountsReviseService;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
+import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
@@ -93,7 +94,9 @@ public class RequestFeedingProcessor extends AbstractProcessor<ResRequestFeeding
                                 etpStatuses.add(new ResRequestFeedingETPStatuses(applicationForFood,
                                         new ApplicationForFoodStatus(ApplicationForFoodState.RESULT_PROCESSING,
                                                 status.getDeclineReason())));
-                                DiscountManager.addOtherDiscountForClient(session, client);
+                                if (CalendarUtils.betweenDate(new Date(), item.getOtherDiscountStartDate(), item.getOtherDiscountEndDate())) {
+                                    DiscountManager.addOtherDiscountForClient(session, client);
+                                }
                             }
 
                             applicationForFood = DAOUtils

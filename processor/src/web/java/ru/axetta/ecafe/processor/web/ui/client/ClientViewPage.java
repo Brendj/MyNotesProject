@@ -207,6 +207,7 @@ public class ClientViewPage extends BasicWorkspacePage {
     private String middleGroup;
     private Long externalId;
     private String clientGUID;
+    private String meshGUID;
     private String clientSSOID;
     private String clientIacRegId;
     private Integer gender;
@@ -244,6 +245,14 @@ public class ClientViewPage extends BasicWorkspacePage {
 
     public String getClientGUID() {
         return clientGUID;
+    }
+
+    public String getMeshGUID() {
+        return meshGUID;
+    }
+
+    public void setMeshGUID(String meshGUID) {
+        this.meshGUID = meshGUID;
     }
 
     public String getClientSSOID() {
@@ -528,6 +537,7 @@ public class ClientViewPage extends BasicWorkspacePage {
         this.limit = client.getLimit();
         this.expenditureLimit = client.getExpenditureLimit();
         this.clientGUID = client.getClientGUID();
+        this.meshGUID = client.getMeshGUID();
         this.clientSSOID = client.getSsoid();
         this.clientIacRegId = client.getIacRegId();
         this.externalId = client.getExternalId();

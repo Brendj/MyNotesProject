@@ -76,6 +76,24 @@ public class PreorderMenuDetail {
         }
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) {
+            return true;
+        }
+        if (!(o instanceof PreorderMenuDetail)) {
+            return false;
+        }
+        final PreorderMenuDetail preorderMenuDetail = (PreorderMenuDetail) o;
+        return preorderComplex.getGuid().equals(preorderMenuDetail.getPreorderComplex().getGuid())
+                && itemCode.equals(preorderMenuDetail.getItemCode());
+    }
+
+    @Override
+    public int hashCode() {
+        return idOfPreorderMenuDetail != null ? idOfPreorderMenuDetail.hashCode() : 0;
+    }
+
     public Long getIdOfPreorderMenuDetail() {
         return idOfPreorderMenuDetail;
     }
