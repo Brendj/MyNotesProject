@@ -93,6 +93,7 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
             Boolean showTurnstiles = Boolean.parseBoolean(getReportProperties().getProperty(SELECTED_TURNSTILES_PARAM));
 
             parameterMap.put("startDate", CalendarUtils.dateShortToStringFullYear(startTime));
+            parameterMap.put("IS_IGNORE_PAGINATION", true);
             parameterMap.put(SELECTED_ADMINISTRATOR_PARAM, showAdministrator);
             parameterMap.put(SELECTED_CASHIER_PARAM, showCashier);
             parameterMap.put(SELECTED_GUARD_PARAM, showGuard);
