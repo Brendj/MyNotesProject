@@ -74,6 +74,9 @@ public class TurnstileSettingsRequestTRItem extends TurnstileSettingsRequestItem
         }
 
         timeCoefficient = XMLUtils.getDoubleAttributeWithComma(itemNode,"TimeCoeff");
+        if(null == timeCoefficient) {
+            errorMessage.append("Attribute TimeCoeff not found");
+        }
 
         return new TurnstileSettingsRequestTRItem(type, errorMessage.toString(), turnstileId, controllerModel,
                 controllerFirmwareVersion, isWorkWithLongIds, lastUpdateForTurnstileSetting, timeCoefficient);
