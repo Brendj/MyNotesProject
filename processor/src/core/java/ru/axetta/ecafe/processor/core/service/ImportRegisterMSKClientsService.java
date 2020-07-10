@@ -342,11 +342,21 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         return query.getResultList();
     }
 
-    public List<Client> findClientsByGuids(List<String> guids) {
-        if(guids.size() == 0){
+    public List<Client> findClientsByMeshGuids(List<String> guids) {
+        if(CollectionUtils.isEmpty(guids)){
             return new ArrayList<Client>();
         }
         javax.persistence.Query q = em.createQuery("from Client where meshGUID in :guids");
+        q.setParameter("guids", guids);
+        List<Client> result = q.getResultList();
+        return result != null ? result : new ArrayList<Client>();
+    }
+
+    public List<Client> findClientsByNSIGuids(List<String> guids) {
+        if(CollectionUtils.isEmpty(guids)){
+            return new ArrayList<Client>();
+        }
+        javax.persistence.Query q = em.createQuery("from Client where clientGUID in :guids");
         q.setParameter("guids", guids);
         List<Client> result = q.getResultList();
         return result != null ? result : new ArrayList<Client>();
@@ -385,17 +395,30 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         Session session = (Session) em.getDelegate();
         List<Org> orgsList = DAOUtils.findFriendlyOrgs(em, org);   //  Текущая организация и дружественные ей
 
-        List<String> pupilsGuidList = new LinkedList<>();
+        List<String> pupilsMeshGuidList = new LinkedList<>();
         for (ExpandedPupilInfo pupil : pupils) {
             if(StringUtils.isNotEmpty(pupil.getMeshGUID())) {
-                pupilsGuidList.add(getPupilGuid(pupil.getMeshGUID()));
+                pupilsMeshGuidList.add(getPupilGuid(pupil.getMeshGUID()));
             }
         }
 
-        List<Client> findByGuidsList = findClientsByGuids(pupilsGuidList);
-        Map<String, Client> guidMap = new HashMap<String, Client>();
+        List<String> pupilsNSIGuidList = new LinkedList<>();
+        for (ExpandedPupilInfo pupil : pupils) {
+            if(StringUtils.isNotEmpty(pupil.getMeshGUID())) {
+                pupilsNSIGuidList.add(getPupilGuid(pupil.getGuid()));
+            }
+        }
+
+        List<Client> findByGuidsList = findClientsByMeshGuids(pupilsMeshGuidList);
+        Map<String, Client> meshGuidMap = new HashMap<>();
         for(Client client : findByGuidsList){
-            guidMap.put(client.getMeshGUID(), client);
+            meshGuidMap.put(client.getMeshGUID(), client);
+        }
+
+        findByGuidsList = findClientsByNSIGuids(pupilsNSIGuidList);
+        Map<String, Client> nsiGuidMap = new HashMap<>();
+        for(Client client : findByGuidsList){
+            nsiGuidMap.put(client.getMeshGUID(), client);
         }
 
         //  Если используется старый метод полной загрузки контенгента школы, то проверяем каждого ученика в отдельности на его
@@ -449,8 +472,11 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         //  Проходим по ответу от Реестров и анализируем надо ли обновлять его или нет
         for (ExpandedPupilInfo pupil : pupils) {
             if (pupil.deleted) {
-                Client dbClient = guidMap.get(emptyIfNull(pupil.getGuid()));
-                if (dbClient == null  || dbClient.isDeletedOrLeaving()) {
+                Client dbClient = meshGuidMap.get(emptyIfNull(pupil.getMeshGUID()));
+                if (dbClient == null) {
+                    dbClient = nsiGuidMap.get(emptyIfNull(pupil.getGuid()));
+                }
+                if (dbClient == null || dbClient.isDeletedOrLeaving()) {
                     continue;
                 }
                 log(synchDate + "Удаление " + emptyIfNull(dbClient.getClientGUID()) + ", " + emptyIfNull(
@@ -462,7 +488,10 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             } else {
                 FieldProcessor.Config fieldConfig;
                 boolean updateClient = false;
-                Client cl = guidMap.get(getPupilGuid(emptyIfNull(pupil.getGuid())));
+                Client cl = meshGuidMap.get(getPupilGuid(emptyIfNull(pupil.getMeshGUID())));
+                if (cl == null) {
+                    cl = nsiGuidMap.get(emptyIfNull(pupil.getGuid()));
+                }
                 if (cl == null) {
                     fieldConfig = new ClientManager.ClientFieldConfig();
                 } else {
@@ -471,6 +500,8 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                     }
                     fieldConfig = new ClientManager.ClientFieldConfigForUpdate();
                 }
+                updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.MESH_GUID,
+                        getPupilGuid(pupil.getMeshGUID()), cl == null ? null : cl.getMeshGUID(), updateClient);
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.CLIENT_GUID,
                         getPupilGuid(pupil.getGuid()), cl == null ? null : getClientGuid(cl), updateClient);
                 updateClient = doClientUpdate(fieldConfig, ClientManager.FieldId.SURNAME, pupil.getFamilyName(),
@@ -724,6 +755,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             return;
         }
 
+        String meshGuid = fieldConfig.getValue(ClientManager.FieldId.MESH_GUID);
         String clientGuid = emptyIfNull(fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID));
         String name = trim(fieldConfig.getValue(ClientManager.FieldId.NAME), 64, clientGuid, "Имя ученика");
         String secondname = trim(fieldConfig.getValue(ClientManager.FieldId.SECONDNAME), 128, clientGuid, "Отчество ученика");
@@ -737,6 +769,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
         String parallel = trim(fieldConfig.getValue(ClientManager.FieldId.PARALLEL), 255, clientGuid, "Параллель");
 
         RegistryChange ch = getRegistryChangeClassInstance();
+        ch.setMeshGUID(meshGuid);
         ch.setClientGUID(clientGuid);
         ch.setFirstName(name);
         ch.setSecondName(secondname);
@@ -897,6 +930,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
 
         RegistryChange ch = getRegistryChangeClassInstance();
         ch.setClientGUID(emptyIfNull(currentClient.getClientGUID()));
+        ch.setMeshGUID(currentClient.getMeshGUID());
         ch.setFirstName(currentClient.getPerson().getFirstName());
         ch.setSecondName(currentClient.getPerson().getSecondName());
         ch.setSurname(currentClient.getPerson().getSurname());
@@ -1312,6 +1346,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
                         createConfig.setValue(ClientManager.FieldId.CONTRACT_ID, contractId);
                     }
                     setGuidFromChange(createConfig, change);
+                    createConfig.setValue(ClientManager.FieldId.MESH_GUID, change.getMeshGUID());
                     createConfig.setValue(ClientManager.FieldId.SURNAME, change.getSurname());
                     createConfig.setValue(ClientManager.FieldId.NAME, change.getFirstName());
                     createConfig.setValue(ClientManager.FieldId.SECONDNAME, change.getSecondName());
@@ -1618,6 +1653,7 @@ public class ImportRegisterMSKClientsService implements ImportClientRegisterServ
             saveClients(synchDate, date, System.currentTimeMillis(), org, pupils, logBuffer, false);
             return logBuffer;
         } catch (Exception e) {
+            logError(null, e, logBuffer);
             isSuccessEnd = false;
             throw e;
         } finally {

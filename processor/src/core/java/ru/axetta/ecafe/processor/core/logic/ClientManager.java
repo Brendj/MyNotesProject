@@ -85,7 +85,8 @@ public class ClientManager {
         CREATED_FROM,
         MIDDLE_GROUP,
         IAC_REG_ID,
-        PARALLEL
+        PARALLEL,
+        MESH_GUID
     }
 
     static FieldProcessor.Def[] fieldInfo = {
@@ -136,6 +137,7 @@ public class ClientManager {
             new FieldProcessor.Def(42, false, false, "Подгруппа", null, FieldId.MIDDLE_GROUP, false),
             new FieldProcessor.Def(43, false, false, "ИАЦ regID", null, FieldId.IAC_REG_ID, true),
             new FieldProcessor.Def(44, false, false, "Параллель", null, FieldId.PARALLEL, true),
+            new FieldProcessor.Def(45, false, false, "GUID MESH", null, FieldId.MESH_GUID, true),
             new FieldProcessor.Def(-1, false, false, "#", null, -1, false) // поля которые стоит пропустить в файле
     };
 
@@ -840,21 +842,21 @@ public class ClientManager {
                 if (!StringUtils.isEmpty(middleGroup)) client.setMiddleGroup(middleGroup);
             }
 
-            if (fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID) != null) {
-                String clientGUID = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
-                if (clientGUID.isEmpty()) {
-                    client.setClientGUID(null);
-                } else {
-                    client.setClientGUID(clientGUID);
-                }
+            String clientGuid = fieldConfig.getValue(ClientManager.FieldId.CLIENT_GUID);
+            if (StringUtils.isNotEmpty(clientGuid)) {
+                client.setClientGUID(clientGuid);
+            }
+
+            String meshGuid = fieldConfig.getValue(FieldId.MESH_GUID);
+            if (StringUtils.isNotEmpty(meshGuid)) {
+                client.setMeshGUID(meshGuid);
             }
 
             //tokens[32])
             if (fieldConfig.getValue(FieldId.GENDER) != null) {
                 if (fieldConfig.getValue(FieldId.GENDER).equals("m")) {
                     client.setGender(1);
-                }
-                if (fieldConfig.getValue(FieldId.GENDER).equals("f")) {
+                } else {
                     client.setGender(0);
                 }
             } else {
