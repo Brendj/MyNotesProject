@@ -8,7 +8,6 @@ import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.ite
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.items.TurnstileSettingsRequestTRItem;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.items.TurnstileSettingsRequestTSItem;
 import ru.axetta.ecafe.processor.core.sync.request.SectionRequest;
-import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.w3c.dom.Node;
 
@@ -22,7 +21,6 @@ public class TurnstileSettingsRequest implements SectionRequest {
     public static final String SECTION_NAME = "TurnstileSettings";
 
     private final Long orgOwner;
-    private final Long maxVersion;
     private final List<List<TurnstileSettingsRequestItem>> sectionItem;
 
     public enum ModuleType {
@@ -58,7 +56,6 @@ public class TurnstileSettingsRequest implements SectionRequest {
     public TurnstileSettingsRequest(Node turnstileSettingNode, Long orgOwner) {
         List<TurnstileSettingsRequestItem> items;
         this.orgOwner = orgOwner;
-        maxVersion = XMLUtils.getLongAttributeValue(turnstileSettingNode, "V");
         this.sectionItem = new ArrayList<List<TurnstileSettingsRequestItem>>();
 
         Node tsNode = turnstileSettingNode.getFirstChild();
@@ -73,7 +70,7 @@ public class TurnstileSettingsRequest implements SectionRequest {
                     if (Node.ELEMENT_NODE == turnstilesNode.getNodeType()) {
                         Node trNode = turnstilesNode.getFirstChild();
                         while (null != trNode) {
-                            if (Node.ELEMENT_NODE == trNode.getNodeType()) {
+                            if (Node.ELEMENT_NODE == trNode.getNodeType()&& trNode.getNodeName().equals("TR")) {
                                 TurnstileSettingsRequestTRItem trItem = TurnstileSettingsRequestTRItem.build(trNode);
                                 items.add(trItem);
                             }
@@ -99,10 +96,6 @@ public class TurnstileSettingsRequest implements SectionRequest {
 
     public Long getOrgOwner() {
         return orgOwner;
-    }
-
-    public Long getMaxVersion() {
-        return maxVersion;
     }
 
     public List<List<TurnstileSettingsRequestItem>> getSectionItem() {
