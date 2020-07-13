@@ -27,6 +27,8 @@ public class TurnstileSettingsRequestTSItem extends TurnstileSettingsRequestItem
         if (null == numOfEntries) {
             errorMessage.append("Attribute NumOfEntries not found");
         }
+        System.out.print("NumOfEntries=");
+        System.out.println(numOfEntries);
         return new TurnstileSettingsRequestTSItem(numOfEntries, type, errorMessage.toString());
     }
 
