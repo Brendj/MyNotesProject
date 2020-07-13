@@ -69,8 +69,8 @@ public class TurnstileSettingsRequest implements SectionRequest {
                 items.add(tsItem);
                 Node turnstilesNode = tsNode.getFirstChild();
                 System.out.println("1.turnstilesNode=" + turnstilesNode.getNodeName());
-                while (null != turnstileSettingNode) {
-                    if (Node.ELEMENT_NODE == turnstilesNode.getNodeType() && turnstileSettingNode.getNodeName().equals("Turnstiles")) {
+                while (null != turnstilesNode) {
+                    if (Node.ELEMENT_NODE == turnstilesNode.getNodeType() && turnstilesNode.getNodeName().equals("Turnstiles")) {
                         System.out.println("2.turnstilesNode=" + turnstilesNode.getNodeName());
                         Node trNode = turnstilesNode.getFirstChild();
                         System.out.println("1.trNode=" + trNode.getNodeName());
@@ -84,7 +84,7 @@ public class TurnstileSettingsRequest implements SectionRequest {
                         }
                         sectionItem.add(items);
                     }
-                    turnstileSettingNode = turnstileSettingNode.getNextSibling();
+                    turnstilesNode = turnstilesNode.getNextSibling();
                 }
             }
             tsNode = tsNode.getNextSibling();
