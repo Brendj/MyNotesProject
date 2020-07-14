@@ -9,3 +9,8 @@ ALTER TABLE cf_regular_preorders
     ADD COLUMN idofdish bigint;
 
 COMMENT ON COLUMN cf_regular_preorders.idofdish IS 'Идентификатор блюда от веб-поставщика';
+
+-- 569
+CREATE UNIQUE INDEX cf_client_meshguid_uk ON cf_clients (meshguid);
+
+--! ФИНАЛИЗИРОВАН 13.07.2020, НЕ МЕНЯТЬ
