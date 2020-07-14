@@ -470,26 +470,32 @@ public class PreorderDAOService {
         return res.size() != 0 && res.get(0) != null;
     }
 
-    private Integer getAmountForPreorderMenuDetail(Client client, Date startDate, Date endDate, WtDish wtDish) {
+    private Integer getAmountForPreorderMenuDetail(Client client, Date startDate, Date endDate, WtDish wtDish,
+            WtComplex wtComplex) {
         Query query = emReport.createQuery("SELECT sum(pmd.amount) FROM PreorderMenuDetail pmd "
+                + "LEFT JOIN pmd.preorderComplex complex "
                 + "WHERE pmd.client = :client AND pmd.preorderDate between :startDate and :endDate "
-                + "AND pmd.deletedState = false AND pmd.idOfDish = :idOfDish");
+                + "AND pmd.deletedState = false AND pmd.idOfDish = :idOfDish AND complex.armComplexId = :idOfComplex");
         query.setParameter("client", client);
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
         query.setParameter("idOfDish", wtDish.getIdOfDish());
+        query.setParameter("idOfComplex", wtComplex.getIdOfComplex().intValue());
         Long res = (Long) query.getSingleResult();
         return (res == null) ? 0 : res.intValue();
     }
 
-    private boolean getRegularSignForPreorderMenuDetail(Client client, Date startDate, Date endDate, WtDish wtDish) {
+    private boolean getRegularSignForPreorderMenuDetail(Client client, Date startDate, Date endDate, WtDish wtDish,
+            WtComplex wtComplex) {
         Query query = emReport.createQuery("SELECT pmd.regularPreorder FROM PreorderMenuDetail pmd "
+                + "LEFT JOIN pmd.preorderComplex complex "
                 + "WHERE pmd.client = :client AND pmd.preorderDate between :startDate and :endDate "
-                + "AND pmd.deletedState = false AND pmd.idOfDish = :idOfDish");
+                + "AND pmd.deletedState = false AND pmd.idOfDish = :idOfDish AND complex.armComplexId = :idOfComplex");
         query.setParameter("client", client);
         query.setParameter("startDate", startDate);
         query.setParameter("endDate", endDate);
         query.setParameter("idOfDish", wtDish.getIdOfDish());
+        query.setParameter("idOfComplex", wtComplex.getIdOfComplex().intValue());
         List<RegularPreorder> res = query.getResultList();
         return res.size() != 0 && res.get(0) != null;
     }
@@ -674,8 +680,8 @@ public class PreorderDAOService {
                 menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
                 menuItemExt.setProtein(wtDish.getProtein() == null ? (double) 0 : wtDish.getProtein().doubleValue());
                 menuItemExt.setIdOfMenuDetail(wtDish.getIdOfDish());
-                menuItemExt.setAmount(getAmountForPreorderMenuDetail(client, startDate, endDate, wtDish));
-                menuItemExt.setIsRegular(getRegularSignForPreorderMenuDetail(client, startDate, endDate, wtDish));
+                menuItemExt.setAmount(getAmountForPreorderMenuDetail(client, startDate, endDate, wtDish, wtComplex));
+                menuItemExt.setIsRegular(getRegularSignForPreorderMenuDetail(client, startDate, endDate, wtDish, wtComplex));
                 menuItemExt.setAvailableForRegular(false);
                 menuItemExtList.add(menuItemExt);
             }
