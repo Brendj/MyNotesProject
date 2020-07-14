@@ -387,6 +387,7 @@ public class SyncResponse {
             private final boolean confirmVisualRecognition;
             private final int discountMode;
             private final String guid;
+            private final String meshGUID;
             private boolean tempClient;
             private int clientType;
             private final boolean isUseLastEEModeForPlan;
@@ -433,6 +434,7 @@ public class SyncResponse {
                 this.confirmVisualRecognition = client.getConfirmVisualRecognition();
                 this.discountMode = client.getDiscountMode();
                 this.guid = client.getClientGUID();
+                this.meshGUID = client.getMeshGUID();
                 this.clientType = clientType;
                 if (this.clientGroup!=null) this.clientGroup.getGroupName(); // lazy load
                 this.isUseLastEEModeForPlan = client.isUseLastEEModeForPlan()==null ? false : client.isUseLastEEModeForPlan();
@@ -597,6 +599,9 @@ public class SyncResponse {
                 }
                 if (null != this.guid) {
                     element.setAttribute("GUID", this.guid);
+                }
+                if(this.meshGUID != null){
+                    element.setAttribute("meshGUID", this.meshGUID);
                 }
                 element.setAttribute("ContractState", Integer.toString(this.contractState));
                 if (null != this.freePayMaxCount) {

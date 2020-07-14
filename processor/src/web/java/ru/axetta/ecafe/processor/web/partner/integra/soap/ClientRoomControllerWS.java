@@ -2249,7 +2249,12 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         HTTPDataHandler handler = new HTTPDataHandler(data);
         authenticateRequest(null, handler);
         ObjectFactory objectFactory = new ObjectFactory();
-        return processPurchaseListWithDetails(contractId, objectFactory, startDate, endDate, mode, handler);
+        Org org = RuntimeContext.getAppContext().getBean(PreorderDAOService.class).getOrgByContractId(contractId);
+        if (!org.getUseWebArm()) {
+            return processPurchaseListWithDetails(contractId, objectFactory, startDate, endDate, mode, handler);
+        } else {
+            return processPurchaseWtListWithDetails(contractId, objectFactory, startDate, endDate, mode, handler);
+        }
     }
 
     private PurchaseListWithDetailsResult processPurchaseListWithDetails(Long contractId, ObjectFactory objectFactory,
@@ -2374,6 +2379,132 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         return result;
     }
 
+    private PurchaseListWithDetailsResult processPurchaseWtListWithDetails(Long contractId, ObjectFactory objectFactory,
+            Date startDate, Date endDate, Short mode, HTTPDataHandler handler) {
+        PurchaseListWithDetailsResult result = new PurchaseListWithDetailsResult();
+        PurchaseListWithDetailsExt purchaseListWithDetailsExt = objectFactory.createPurchaseListWithDetailsExt();
+        try {
+            Client client = DAOReadExternalsService.getInstance().findClient(null, contractId);
+
+            if (client == null) {
+                return result;
+            }
+            handler.saveLogInfoService(logger, handler.getData().getIdOfSystem(), new Date(System.currentTimeMillis()),
+                    handler.getData().getSsoId(), client.getIdOfClient(), handler.getData().getOperationType());
+
+            int nRecs = 0;
+            Date nextToEndDate = DateUtils.addDays(endDate, 1);
+            List<Order> ordersList = DAOReadExternalsService.getInstance()
+                    .getClientOrdersByPeriod(client, startDate, nextToEndDate);
+            if (ordersList.size() == 0) {
+                result.resultCode = RC_OK;
+                result.description = RC_OK_DESC;
+                result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
+                return result;
+            }
+            List<OrderDetail> detailsList = DAOReadExternalsService.getInstance().getOrderDetailsByOrders(ordersList);
+
+            // получить блюда по детализации заказов orderdetails
+            Set<WtDish> dishes = DAOReadExternalsService.getInstance()
+                    .getWtDishesByOrderDetails(detailsList, startDate, endDate);
+            if (dishes == null || dishes.size() == 0) {
+                result.resultCode = RC_OK;
+                result.description = RC_OK_DESC;
+                result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
+                return result;
+            }
+
+            Map<Long, Date> lastProcessMap = new HashMap<>();
+            for (Order order : ordersList) {
+                if (nRecs++ > MAX_RECS_getPurchaseList) {
+                    break;
+                }
+                // заполняем по заказам
+                PurchaseWithDetailsExt purchaseWithDetailsExt = objectFactory.createPurchaseWithDetailsExt();
+                purchaseWithDetailsExt.setByCard(order.getSumByCard());
+                purchaseWithDetailsExt.setSocDiscount(order.getSocDiscount());
+                purchaseWithDetailsExt.setTrdDiscount(order.getTrdDiscount());
+                purchaseWithDetailsExt.setDonation(order.getGrantSum());
+                purchaseWithDetailsExt.setSum(order.getRSum());
+                purchaseWithDetailsExt.setByCash(order.getSumByCash());
+                purchaseWithDetailsExt.setLastUpdateDate(
+                        toXmlDateTime(getLastPaymentRegistryDate(order.getOrg().getIdOfOrg(), lastProcessMap)));
+                if (order.getCard() == null) {
+                    purchaseWithDetailsExt.setIdOfCard(null);
+                } else {
+                    purchaseWithDetailsExt.setIdOfCard(order.getCard().getIdOfCard());
+                }
+                purchaseWithDetailsExt.setTime(toXmlDateTime(order.getCreateTime()));
+                if (mode != null && mode == 1) {
+                    purchaseWithDetailsExt.setState(order.getState());
+                }
+                for (OrderDetail od : findDetailsByOrder(order, detailsList)) {
+                    // заполняем по покупкам
+                    PurchaseWithDetailsElementExt purchaseWithDetailsElementExt = objectFactory
+                            .createPurchaseWithDetailsElementExt();
+                    purchaseWithDetailsElementExt
+                            .setIdOfOrderDetail(od.getCompositeIdOfOrderDetail().getIdOfOrderDetail());
+                    purchaseWithDetailsElementExt.setAmount(od.getQty());
+                    purchaseWithDetailsElementExt.setName(od.getMenuDetailName());
+                    purchaseWithDetailsElementExt.setSum(od.getRPrice() * od.getQty());
+                    purchaseWithDetailsElementExt.setMenuType(od.getMenuType());
+                    purchaseWithDetailsElementExt.setLastUpdateDate(
+                            toXmlDateTime(getLastPaymentRegistryDate(order.getOrg().getIdOfOrg(), lastProcessMap)));
+                    if (od.isComplex()) {
+                        purchaseWithDetailsElementExt.setType(1);
+                    } else if (od.isComplexItem()) {
+                        purchaseWithDetailsElementExt.setType(2);
+                    } else {
+                        purchaseWithDetailsElementExt.setType(0);
+                    }
+                    if (od.isFRationSpecified()) {
+                        purchaseWithDetailsElementExt.setfRation(od.getfRation().getCode());
+                    }
+                    // если пришли с синхронизацией - od.idOfDish должно быть заполнено (od.idOfComplex?)
+                    if (od.getIdOfDish() != null) {
+                        WtDish wtDish = findWtDishByOrderDetail(od.getIdOfDish(), dishes);
+                        if (wtDish != null) {
+                            purchaseWithDetailsElementExt.setPrice(wtDish.getPrice()
+                                    .multiply(new BigDecimal(100)).longValue());
+                            purchaseWithDetailsElementExt.setCalories(wtDish.getCalories() == null ? (double) 0
+                                    : wtDish.getCalories().doubleValue());
+                            purchaseWithDetailsElementExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
+                            purchaseWithDetailsElementExt.setVitB1(0.0);
+                            purchaseWithDetailsElementExt.setVitB2(0.0);
+                            purchaseWithDetailsElementExt.setVitPp(0.0);
+                            purchaseWithDetailsElementExt.setVitC(0.0);
+                            purchaseWithDetailsElementExt.setVitA(0.0);
+                            purchaseWithDetailsElementExt.setVitE(0.0);
+                            purchaseWithDetailsElementExt.setMinCa(0.0);
+                            purchaseWithDetailsElementExt.setMinP(0.0);
+                            purchaseWithDetailsElementExt.setMinMg(0.0);
+                            purchaseWithDetailsElementExt.setMinFe(0.0);
+                            purchaseWithDetailsElementExt.setProtein(wtDish.getProtein() == null ? (double) 0
+                                    : wtDish.getProtein().doubleValue());
+                            purchaseWithDetailsElementExt.setFat(wtDish.getFat() == null ? (double) 0
+                                    : wtDish.getFat().doubleValue());
+                            purchaseWithDetailsElementExt.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0
+                                    : wtDish.getCarbohydrates().doubleValue());
+                        }
+                    }
+
+                    purchaseWithDetailsExt.getE().add(purchaseWithDetailsElementExt);
+                }
+
+                purchaseListWithDetailsExt.getP().add(purchaseWithDetailsExt);
+            }
+        } catch (Exception ex) {
+            logger.error(ex.getMessage(), ex);
+            result.resultCode = RC_INTERNAL_ERROR;
+            result.description = RC_INTERNAL_ERROR_DESC;
+        }
+        result.resultCode = RC_OK;
+        result.description = RC_OK_DESC;
+        result.purchaseListWithDetailsExt = purchaseListWithDetailsExt;
+
+        return result;
+    }
+
     private Date getLastPaymentRegistryDate(Long idOfOrg, Map<Long, Date> map) {
         if (!map.containsKey(idOfOrg)) {
             map.put(idOfOrg,
@@ -2397,6 +2528,15 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         for (MenuDetail detail : menuDetails) {
             if (idOfMenuFromSync.equals(detail.getIdOfMenuFromSync())) {
                 return detail;
+            }
+        }
+        return null;
+    }
+
+    private WtDish findWtDishByOrderDetail(Long idOfDish, Set<WtDish> dishes) {
+        for (WtDish wtDish : dishes) {
+            if (idOfDish.equals(wtDish.getIdOfDish())) {
+                return wtDish;
             }
         }
         return null;
@@ -2937,7 +3077,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         for (WtComplex wtComplex : wtComplexes) {
                             // Определяем подходящий состав комплекса
                             WtComplexesItem complexItem = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                                    .getWtComplexItemByCycle(wtComplex, org, menuDate);
+                                    .getWtComplexItemByCycle(wtComplex, menuDate);
                             List<WtDish> wtDishes;
                             if (complexItem != null) {
                                 wtDishes = DAOReadExternalsService.getInstance().getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate);
@@ -3606,8 +3746,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             for (WtComplex wtComplex : complexes) {
                 Complex complex = new Complex();
 
-                List<WtDish> dishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
-                        .getWtDishesByComplexAndDates(wtComplex, menuDate, menuDate);
+                // Определяем подходящий состав комплекса
+                WtComplexesItem complexItem = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                        .getWtComplexItemByCycle(wtComplex, menuDate);
+                List<WtDish> dishes;
+                if (complexItem != null) {
+                    dishes = DAOReadExternalsService.getInstance().getWtDishesByComplexItemAndDates(complexItem, menuDate, menuDate);
+                } else {
+                    // комплекс не выводим
+                    continue;
+                }
+
+                //List<WtDish> dishes = RuntimeContext.getAppContext().getBean(PreorderDAOService.class)
+                //        .getWtDishesByComplexAndDates(wtComplex, menuDate, menuDate);
 
                 if (!dishes.isEmpty()) {
                     for (WtDish dish : dishes) {
@@ -9097,7 +9248,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "CultureName") String CultureName,
             @WebParam(name = "CultureShortName") String CultureShortName,
             @WebParam(name = "CultureAddress") String CultureAddress, @WebParam(name = "accessTime") Date accessTime,
-            @WebParam(name = "eventsStatus") Integer eventsStatus) {
+            @WebParam(name = "eventsStatus") Long eventsStatus) {
 
         authenticateRequest(null);
         if (StringUtils.isEmpty(guid)) {
@@ -9148,7 +9299,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
             ExternalEvent event = new ExternalEvent(cl, orgCode, CultureName, CultureAddress,
-                    ExternalEventType.CULTURE, accessTime, ExternalEventStatus.fromInteger(eventsStatus), handler);
+                    ExternalEventType.CULTURE, accessTime, ExternalEventStatus.fromInteger(eventsStatus.intValue()), handler);
             session.save(event);
             transaction.commit();
             transaction = null;

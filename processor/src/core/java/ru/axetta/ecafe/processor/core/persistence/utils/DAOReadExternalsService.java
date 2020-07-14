@@ -192,6 +192,31 @@ public class DAOReadExternalsService {
         return query.getResultList();
     }
 
+    public Set<WtDish> getWtDishesByOrderDetails(List<OrderDetail> detailsList, Date startDate, Date endDate) {
+        Set<Long> dishIds = new HashSet<>();
+        for (OrderDetail od : detailsList) {
+            if (od.getIdOfDish() != null) {
+                dishIds.add(od.getIdOfDish());
+            }
+        }
+        if (dishIds.size() > 0) {
+            Query query = entityManager.createQuery(
+                    "SELECT dish FROM WtDish dish WHERE dish.idOfDish in :dishIds AND dish.deleteState = 0 " +
+                            "AND ((dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding >= :endDate) "
+                            + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding >= :endDate) "
+                            + "OR (dish.dateOfBeginMenuIncluding <= :startDate AND dish.dateOfEndMenuIncluding IS NULL) "
+                            + "OR (dish.dateOfBeginMenuIncluding IS NULL AND dish.dateOfEndMenuIncluding IS NULL))");
+            query.setParameter("dishIds", dishIds);
+            query.setParameter("startDate", startDate, TemporalType.DATE);
+            query.setParameter("endDate", endDate, TemporalType.DATE);
+            List<WtDish> res = query.getResultList();
+            if (res != null && res.size() > 0) {
+                return new HashSet<>(res);
+            }
+        }
+        return null;
+    }
+
     public List getPaymentsList(Client client, Integer subBalanceNum, Date endDate, Date startDate) {
         Date nextToEndDate = DateUtils.addDays(endDate, 1);
         Query query = entityManager.createQuery("select cp from ClientPayment cp inner join cp.transaction tr where cp.payType = :payType and "
