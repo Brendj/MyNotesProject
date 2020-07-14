@@ -170,6 +170,9 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
                     for (HardwareSettings settings : listOfSettings) {
                         Set<HardwareSettingsMT> innerList = settings.getModuleTypes();
                         for (HardwareSettingsMT mt : innerList) {
+                            if(mt.getInstallStatus() == 0) {
+                                continue;
+                            }
                             Integer moduleType = mt.getModuleType();
                             switch (moduleType) {
                                 case (ADMINISTRATOR):
