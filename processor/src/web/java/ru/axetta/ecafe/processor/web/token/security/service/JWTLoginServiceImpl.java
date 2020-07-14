@@ -15,19 +15,21 @@ import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Component;
 
 import javax.security.auth.login.LoginException;
 import java.util.Date;
 
-@Component("JWTLoginService")
+
 public class JWTLoginServiceImpl implements JWTLoginService {
 
     private static final Logger logger = LoggerFactory.getLogger(JWTLoginServiceImpl.class);
 
-    @Autowired
+
     private JwtUserDetailsService userDetailsService;
+
+    public JWTLoginServiceImpl(){
+        userDetailsService = new JwtUserDetailsService();
+    }
 
     @Override
     public boolean login(String username, String password, String remoteAddr, Session persistenceSession)

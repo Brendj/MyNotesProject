@@ -14,6 +14,7 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.HttpServletRequest;
@@ -98,6 +99,7 @@ public class SchoolRestController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "grouplist")
+    @PreAuthorize("hasAuthority('ADMIN')")
     public Response groupList(@QueryParam(value = "token") String token, @QueryParam(value = "userId") Long userId,
             @QueryParam(value = "orgId") Long orgId){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();

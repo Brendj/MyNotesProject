@@ -55,9 +55,9 @@ public class JWTAuthenticationManager implements AuthenticationManager {
         } catch (Exception ex) {
             throw new AuthenticationServiceException("Token corrupted");
         }
-        if (claims.get("TOKEN_EXPIRATION_DATE", Long.class) == null)
+        if (claims.get("TOKEN_EXPIRATION_DATE") == null)
             throw new AuthenticationServiceException("Invalid token");
-        Date expiredDate = new Date(claims.get("TOKEN_EXPIRATION_DATE", Long.class));
+        Date expiredDate = new Date(claims.get("TOKEN_EXPIRATION_DATE").toString());
         if (expiredDate.after(new Date()))
             return buildFullTokenAuthentication(authentication, claims);
         else
@@ -65,7 +65,7 @@ public class JWTAuthenticationManager implements AuthenticationManager {
     }
 
     private JWTAuthentication buildFullTokenAuthentication(JWTAuthentication authentication, DefaultClaims claims) {
-        User user = (User) userDetailsService.loadUserByUsername(claims.get("USERNAME", String.class));
+        User user = (User) userDetailsService.loadUserByUsername(claims.get("USERNAME").toString());
         if (user.isEnabled()) {
             Collection<GrantedAuthority> authorities = user.getAuthorities();
             JWTAuthentication fullJWTAuthentication =

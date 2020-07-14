@@ -25,7 +25,7 @@ public class JwtUserDetailsImpl implements UserDetails {
         this.refreshToken = refreshToken;
         this.refreshTokenHash = refreshTokenHash;
         this.grantedAuthorities = new ArrayList<>();
-        this.grantedAuthorities.add(new GrantedAuthorityImpl(user.getRoleName()));
+        this.grantedAuthorities.add(new GrantedAuthorityImpl(User.DefaultRole.parse(user.getIdOfRole()).name()));
     }
 
 

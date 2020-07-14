@@ -9,12 +9,14 @@ import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
 
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginService;
+import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginServiceImpl;
+import ru.axetta.ecafe.processor.web.token.security.service.JwtUserDetailsImpl;
+import ru.axetta.ecafe.processor.web.token.security.service.JwtUserDetailsService;
 
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.security.core.userdetails.UserDetailsService;
 
 import java.util.Calendar;
@@ -35,14 +37,16 @@ public class GetTokenServiceImpl {
     private UserDetailsService userDetailsService;
 
     @Autowired
-    private JWTLoginService JWTLoginService;
+    private JWTLoginService JWTLoginServiceImpl;
 
     public String getToken(Session persistenceSession, String username, String password, String remoteAddr) throws Exception {
         if (username == null || password == null || remoteAddr == null)
             throw new Exception("Authentication error");
         Map<String, Object> tokenData = new HashMap<>();
-        if (JWTLoginService.login(username, password, remoteAddr,persistenceSession)) {
-            User user = (User) userDetailsService.loadUserByUsername(username);
+        JWTLoginServiceImpl = new JWTLoginServiceImpl();
+        userDetailsService = new JwtUserDetailsService();
+        if (JWTLoginServiceImpl.login(username, password, remoteAddr,persistenceSession)) {
+            JwtUserDetailsImpl user = (JwtUserDetailsImpl) userDetailsService.loadUserByUsername(username);
             tokenData.put("clientType", "user");
             tokenData.put("user_role", user.getAuthorities());
             tokenData.put("username", user.getUsername());
