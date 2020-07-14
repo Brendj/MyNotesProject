@@ -77,15 +77,6 @@
         <url-pattern>/back-office/index.faces</url-pattern>
     </filter-mapping>
 
-    <filter>
-        <filter-name>springSecurityTokenFilter</filter-name>
-        <filter-class>ru.axetta.ecafe.processor.web.token.security.jwt.JWTAuthenticationFilter</filter-class>
-    </filter>
-    <filter-mapping>
-        <filter-name>springSecurityTokenFilter</filter-name>
-        <url-pattern>/school/api/v1/**</url-pattern>
-    </filter-mapping>
-
     <!--<filter>
         <filter-name>PreorderServiceFilter</filter-name>
         <filter-class>ru.axetta.ecafe.processor.web.partner.preorder.PreorderServiceFilter</filter-class>
@@ -547,6 +538,15 @@
         <url-pattern>/fps/api/*</url-pattern>
         <url-pattern>/assessment/*</url-pattern>
         <url-pattern>/smartwatch/*</url-pattern>
+        <url-pattern>/school/api/v1/*</url-pattern>
+    </filter-mapping>
+
+    <filter>
+        <filter-name>springSecurityTokenFilter</filter-name>
+        <filter-class>ru.axetta.ecafe.processor.web.token.security.jwt.JWTAuthenticationFilter</filter-class>
+    </filter>
+    <filter-mapping>
+        <filter-name>springSecurityTokenFilter</filter-name>
         <url-pattern>/school/api/v1/*</url-pattern>
     </filter-mapping>
 
