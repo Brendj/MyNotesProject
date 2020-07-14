@@ -7160,7 +7160,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
         menuItemExt.setPrice(wtDish.getPrice().multiply(new BigDecimal(100)).longValue());
         menuItemExt.setCalories(wtDish.getCalories() == null ? (double) 0 : wtDish.getCalories().doubleValue());
         menuItemExt.setOutput(wtDish.getQty() == null ? "" : wtDish.getQty());
-        menuItemExt.setAvailableNow(0);
+        menuItemExt.setAvailableNow(1);
         menuItemExt.setCarbohydrates(wtDish.getCarbohydrates() == null ? (double) 0 :
                 wtDish.getCarbohydrates().doubleValue());
         menuItemExt.setFat(wtDish.getFat() == null ? (double) 0 : wtDish.getFat().doubleValue());
