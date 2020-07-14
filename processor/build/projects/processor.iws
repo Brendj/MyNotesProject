@@ -42,9 +42,9 @@
       <change beforePath="$PROJECT_DIR$/core.iml" beforeDir="false" afterPath="$PROJECT_DIR$/core.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/j2ee.iml" beforeDir="false" afterPath="$PROJECT_DIR$/j2ee.iml" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/org-room.iml" beforeDir="false" afterPath="$PROJECT_DIR$/org-room.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/processor.ipr" beforeDir="false" afterPath="$PROJECT_DIR$/processor.ipr" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/processor.iws" beforeDir="false" afterPath="$PROJECT_DIR$/processor.iws" afterDir="false" />
       <change beforePath="$PROJECT_DIR$/web.iml" beforeDir="false" afterPath="$PROJECT_DIR$/web.iml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/web/web/WEB-INF/web.xml" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/web/WEB-INF/web.xml" afterDir="false" />
     </list>
     <list id="d97cb2f4-a0b2-437d-82e4-6aca4782d0ca" name="Ignore" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -350,6 +350,11 @@
     </FindUsagesManager>
   </component>
   <component name="Git.Settings">
+    <option name="RECENT_BRANCH_BY_REPOSITORY">
+      <map>
+        <entry key="$PROJECT_DIR$/../../.." value="dev_220" />
+      </map>
+    </option>
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$/../../.." />
   </component>
   <component name="HibernateTools">
@@ -675,7 +680,7 @@
     <property name="options.searchVisible" value="true" />
     <property name="options.splitter.details.proportions" value="0.2" />
     <property name="options.splitter.main.proportions" value="0.3" />
-    <property name="project.structure.last.edited" value="Libraries" />
+    <property name="project.structure.last.edited" value="Artifacts" />
     <property name="project.structure.proportion" value="0.24023438" />
     <property name="project.structure.side.proportion" value="0.27440348" />
     <property name="recentsLimit" value="5" />
@@ -1137,7 +1142,13 @@
     <configuration default="true" type="JBossConfiguration" factoryName="Remote" ALTERNATIVE_JRE_ENABLED="false">
       <option name="LOCAL" value="false" />
       <deployment />
-      <server-settings />
+      <server-settings>
+        <data>
+          <option name="serverGroup" value="" />
+          <option name="transportHostId" />
+          <server-group />
+        </data>
+      </server-settings>
       <predefined_log_file enabled="true" id="JBoss" />
       <RunnerSettings RunnerId="Debug">
         <option name="DEBUG_PORT" value="1344" />
@@ -2079,42 +2090,42 @@
     </GetOptions>
   </component>
   <component name="WindowStateProjectService">
-    <state width="1382" height="305" key="GridCell.Tab.0.bottom" timestamp="1594729462613">
+    <state width="1382" height="305" key="GridCell.Tab.0.bottom" timestamp="1594731964497">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="305" key="GridCell.Tab.0.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594729462613" />
-    <state width="1382" height="305" key="GridCell.Tab.0.center" timestamp="1594729462613">
+    <state width="1382" height="305" key="GridCell.Tab.0.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594731964497" />
+    <state width="1382" height="305" key="GridCell.Tab.0.center" timestamp="1594731964497">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="305" key="GridCell.Tab.0.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594729462613" />
-    <state width="1382" height="305" key="GridCell.Tab.0.left" timestamp="1594729462612">
+    <state width="1382" height="305" key="GridCell.Tab.0.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594731964497" />
+    <state width="1382" height="305" key="GridCell.Tab.0.left" timestamp="1594731964497">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="305" key="GridCell.Tab.0.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594729462612" />
-    <state width="1382" height="305" key="GridCell.Tab.0.right" timestamp="1594729462613">
+    <state width="1382" height="305" key="GridCell.Tab.0.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594731964497" />
+    <state width="1382" height="305" key="GridCell.Tab.0.right" timestamp="1594731964497">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="305" key="GridCell.Tab.0.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594729462613" />
-    <state width="1382" height="305" key="GridCell.Tab.1.bottom" timestamp="1594729462327">
+    <state width="1382" height="305" key="GridCell.Tab.0.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594731964497" />
+    <state width="1382" height="305" key="GridCell.Tab.1.bottom" timestamp="1594731964497">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="305" key="GridCell.Tab.1.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594729462327" />
-    <state width="1382" height="305" key="GridCell.Tab.1.center" timestamp="1594729462327">
+    <state width="1382" height="305" key="GridCell.Tab.1.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594731964497" />
+    <state width="1382" height="305" key="GridCell.Tab.1.center" timestamp="1594731964497">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="305" key="GridCell.Tab.1.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594729462327" />
-    <state width="1382" height="305" key="GridCell.Tab.1.left" timestamp="1594729462327">
+    <state width="1382" height="305" key="GridCell.Tab.1.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594731964497" />
+    <state width="1382" height="305" key="GridCell.Tab.1.left" timestamp="1594731964497">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="305" key="GridCell.Tab.1.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594729462327" />
-    <state width="1382" height="305" key="GridCell.Tab.1.right" timestamp="1594729462327">
+    <state width="1382" height="305" key="GridCell.Tab.1.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594731964497" />
+    <state width="1382" height="305" key="GridCell.Tab.1.right" timestamp="1594731964497">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="305" key="GridCell.Tab.1.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594729462327" />
-    <state x="505" y="131" key="SettingsEditor" timestamp="1594729169883">
+    <state width="1382" height="305" key="GridCell.Tab.1.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594731964497" />
+    <state x="505" y="131" key="SettingsEditor" timestamp="1594731638830">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state x="505" y="131" key="SettingsEditor/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594729169883" />
+    <state x="505" y="131" key="SettingsEditor/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594731638830" />
   </component>
   <component name="XDebuggerManager">
     <breakpoint-manager>
