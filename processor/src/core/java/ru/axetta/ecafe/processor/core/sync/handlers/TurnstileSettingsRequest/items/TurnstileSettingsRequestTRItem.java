@@ -44,29 +44,22 @@ public class TurnstileSettingsRequestTRItem extends TurnstileSettingsRequestItem
         StringBuilder errorMessage = new StringBuilder();
 
         turnstileId = XMLUtils.getAttributeValue(itemNode, "TurnstileId");
-        System.out.println("turnstileId=" + turnstileId);
         if (null == turnstileId || StringUtils.isEmpty(turnstileId)) {
             errorMessage.append("Attribute TurnstileId not found");
         }
         controllerModel = XMLUtils.getAttributeValue(itemNode, "ControllerModel");
-        System.out.println("ControllerModel=" + controllerModel);
         if (null == controllerModel || StringUtils.isEmpty(controllerModel)) {
             controllerModel = "";
         }
         controllerFirmwareVersion = XMLUtils.getAttributeValue(itemNode, "ControllerFirmwareVersion");
-        System.out.println("ControllerFirmwareVersion=" + controllerFirmwareVersion);
         if (null == controllerFirmwareVersion || StringUtils.isEmpty(controllerFirmwareVersion)) {
             controllerFirmwareVersion = "";
         }
-
         isWorkWithLongIds = XMLUtils.getIntegerAttributeValue(itemNode, "IsReadsLongIdsIncorrectly");
-        System.out.println("isWorkingWithLongIds=" + isWorkWithLongIds);
         if (null == isWorkWithLongIds) {
             errorMessage.append("Attribute IsReadsLongIdsIncorrectly not found");
         }
-
         String requestDateString = XMLUtils.getAttributeValue(itemNode, "LastUpdate");
-        System.out.println("LastUpdate =" + lastUpdateForTurnstileSetting);
         if (StringUtils.isNotEmpty(requestDateString)) {
             try {
                 SimpleDateFormat simpleDateFormat = new SimpleDateFormat("dd.MM.yyyy HH:mm:ss");
@@ -77,9 +70,7 @@ public class TurnstileSettingsRequestTRItem extends TurnstileSettingsRequestItem
         } else {
             errorMessage.append("Attribute LastUpdate not found");
         }
-
         timeCoefficient = XMLUtils.getDoubleAttributeWithComma(itemNode,"TimeCoeff");
-        System.out.println("TimeCoeff=" + timeCoefficient);
         if(null == timeCoefficient) {
             errorMessage.append("Attribute TimeCoeff not found");
         }

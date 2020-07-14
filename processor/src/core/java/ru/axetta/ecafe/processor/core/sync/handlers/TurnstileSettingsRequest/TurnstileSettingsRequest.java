@@ -59,24 +59,17 @@ public class TurnstileSettingsRequest implements SectionRequest {
         this.sectionItem = new ArrayList<List<TurnstileSettingsRequestItem>>();
 
         Node tsNode = turnstileSettingNode.getFirstChild();
-
-        System.out.println("1.tsNode=" + tsNode.getNodeName());
         while (null != tsNode) {
             if (Node.ELEMENT_NODE == tsNode.getNodeType() && tsNode.getNodeName().equals("TS")) {
-                System.out.println("2.tsNode=" + tsNode.getNodeName());
                 items = new ArrayList<TurnstileSettingsRequestItem>();
                 TurnstileSettingsRequestTSItem tsItem = TurnstileSettingsRequestTSItem.build(tsNode);
                 items.add(tsItem);
                 Node turnstilesNode = tsNode.getFirstChild();
-                System.out.println("1.turnstilesNode=" + turnstilesNode.getNodeName());
                 while (null != turnstilesNode) {
                     if (Node.ELEMENT_NODE == turnstilesNode.getNodeType() && turnstilesNode.getNodeName().equals("Turnstiles")) {
-                        System.out.println("2.turnstilesNode=" + turnstilesNode.getNodeName());
                         Node trNode = turnstilesNode.getFirstChild();
-                        System.out.println("1.trNode=" + trNode.getNodeName());
                         while (null != trNode) {
                             if (Node.ELEMENT_NODE == trNode.getNodeType()&& trNode.getNodeName().equals("TR")) {
-                                System.out.println("2.trNode=" + trNode.getNodeName());
                                 TurnstileSettingsRequestTRItem trItem = TurnstileSettingsRequestTRItem.build(trNode);
                                 items.add(trItem);
                             }
