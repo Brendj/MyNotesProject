@@ -9248,7 +9248,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "CultureName") String CultureName,
             @WebParam(name = "CultureShortName") String CultureShortName,
             @WebParam(name = "CultureAddress") String CultureAddress, @WebParam(name = "accessTime") Date accessTime,
-            @WebParam(name = "eventsStatus") Integer eventsStatus) {
+            @WebParam(name = "eventsStatus") Long eventsStatus) {
 
         authenticateRequest(null);
         if (StringUtils.isEmpty(guid)) {
@@ -9299,7 +9299,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             }
             ExternalEventVersionHandler handler = new ExternalEventVersionHandler(session);
             ExternalEvent event = new ExternalEvent(cl, orgCode, CultureName, CultureAddress,
-                    ExternalEventType.CULTURE, accessTime, ExternalEventStatus.fromInteger(eventsStatus), handler);
+                    ExternalEventType.CULTURE, accessTime, ExternalEventStatus.fromInteger(eventsStatus.intValue()), handler);
             session.save(event);
             transaction.commit();
             transaction = null;

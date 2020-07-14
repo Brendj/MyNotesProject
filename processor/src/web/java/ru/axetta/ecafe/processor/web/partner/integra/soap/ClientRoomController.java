@@ -13,6 +13,7 @@ import ru.axetta.ecafe.processor.web.partner.preorder.soap.*;
 import javax.jws.WebMethod;
 import javax.jws.WebParam;
 import javax.jws.WebService;
+import javax.xml.bind.annotation.XmlElement;
 import java.awt.*;
 import java.util.Date;
 import java.util.List;
@@ -521,10 +522,13 @@ public interface ClientRoomController {
             @WebParam(name = "museumName") String museumName, @WebParam(name = "accessTime") Date accessTime,
             @WebParam(name = "ticketStatus") Integer ticketStatus);
 
-    @WebMethod Result enterCulture(@WebParam(name = "guid") String guid, @WebParam(name = "orgCode") String orgCode,
-            @WebParam(name = "CultureName") String CultureName, @WebParam(name = "CultureShortName") String CultureShortName,
-            @WebParam(name = "CultureAddress") String CultureAddress, @WebParam(name = "accessTime") Date accessTime,
-            @WebParam(name = "eventsStatus") Integer eventsStatus);
+    @WebMethod Result enterCulture(@XmlElement(required=true)@WebParam(name = "guid") String guid,
+            @XmlElement(required=true)@WebParam(name = "orgCode") String orgCode,
+            @XmlElement(required=true)@WebParam(name = "CultureName") String CultureName,
+            @XmlElement(required=true)@WebParam(name = "CultureShortName") String CultureShortName,
+            @XmlElement(required=true)@WebParam(name = "CultureAddress") String CultureAddress,
+            @XmlElement(required=true)@WebParam(name = "accessTime") Date accessTime,
+            @XmlElement(required=true)@WebParam(name = "eventsStatus") Long eventsStatus);
 
     @WebMethod ClientSummaryBaseListResult getSummaryByGuardMobileMin(@WebParam(name = "guardMobile") String guardMobile);
 
