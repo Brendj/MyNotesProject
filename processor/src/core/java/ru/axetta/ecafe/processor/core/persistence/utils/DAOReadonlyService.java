@@ -1004,6 +1004,22 @@ public class DAOReadonlyService {
         return result != null ? ((BigInteger) result).longValue() : 0L;
     }
 
+    public Boolean isMenuItemAvailable (Long menuId) {
+        Query query = entityManager.createNativeQuery("SELECT count(mg.id) FROM cf_wt_menu_groups mg "
+                + "LEFT JOIN cf_wt_menu_group_relationships mgr ON mgr.idofmenugroup = mg.id "
+                + "LEFT JOIN cf_wt_menu_group_dish_relationships mgd ON mgd.idofmenumenugrouprelation = mgr.id "
+                + "LEFT JOIN cf_wt_menu m ON m.idofmenu = mgr.idofmenu "
+                + "WHERE m.idofmenu = :idOfMenu AND mgd.idofdish is not null group by mgd.idofdish");
+        query.setParameter("idOfMenu", menuId);
+        List<BigInteger> temp = query.getResultList();
+        for(BigInteger o : temp) {
+            if (o.intValue() > 1) {
+                return false;
+            }
+        }
+        return true;
+    }
+
     public Set<WtComplexExcludeDays> getExcludeDaysSetFromVersion(Long version, Contragent contragent, Org org) {
         try {
             Query query = entityManager.createQuery(
