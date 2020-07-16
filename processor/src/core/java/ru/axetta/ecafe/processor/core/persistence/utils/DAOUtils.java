@@ -5101,4 +5101,10 @@ public class DAOUtils {
         criteria.add(Restrictions.not(Restrictions.eq("deleted", true)));
         return criteria.list();
     }
+
+    public static List<TurnstileSettings> getTurnstileListByOrg(Session session, Long idOfOrg) throws Exception {
+        Criteria criteria = session.createCriteria(TurnstileSettings.class);
+        criteria.add(Restrictions.eq("org.idOfOrg", idOfOrg));
+        return criteria.list();
+    }
 }

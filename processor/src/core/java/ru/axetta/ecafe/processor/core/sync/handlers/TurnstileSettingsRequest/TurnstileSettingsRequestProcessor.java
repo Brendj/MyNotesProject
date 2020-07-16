@@ -5,6 +5,7 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.TurnstileSettings;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
 import ru.axetta.ecafe.processor.core.sync.handlers.TurnstileSettingsRequest.items.ResTurnstileSettingsRequestItem;
@@ -43,6 +44,7 @@ public class TurnstileSettingsRequestProcessor extends AbstractProcessor<ResTurn
             int status = 1;
 
             ru.axetta.ecafe.processor.core.persistence.TurnstileSettings turnstileSettings = null;
+            List <TurnstileSettings> turnstileSettingsToRemove = DAOUtils.getTurnstileListByOrg(session,orgOwner);
 
             for (List<TurnstileSettingsRequestItem> sectionItem : turnstileSettingsRequest.getSectionItem()) {
                 for (TurnstileSettingsRequestItem item : sectionItem) {
@@ -78,6 +80,7 @@ public class TurnstileSettingsRequestProcessor extends AbstractProcessor<ResTurn
                                 turnstileSettings.setVersion(nextVersion);
                                 turnstileSettings.setTimeCoefficient(trItem.getTimeCoefficient());
                                 session.save(turnstileSettings);
+                                turnstileSettingsToRemove.remove(turnstileSettings);
                             } else {
                                 errorMessage.append("Section TR not found ");
                                 status = 0;
@@ -86,8 +89,12 @@ public class TurnstileSettingsRequestProcessor extends AbstractProcessor<ResTurn
                     }
                 }
             }
-
             items.add(new ResTurnstileSettingsRequestItem(status, errorMessage.toString()));
+
+            for(TurnstileSettings settings:turnstileSettingsToRemove) {
+                session.delete(settings);
+            }
+
         } catch (Exception e) {
             logger.error("Error saving TurnstileSettingRequest", e);
             return null;
