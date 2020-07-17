@@ -152,7 +152,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                 }
                 hardwareSettings.setVersion(nextVersion);
                 if (status == 1) {
-                    session.save(hardwareSettings);
+                    session.saveOrUpdate(hardwareSettings);
                     for (Map.Entry<Integer, HardwareSettingsMT> entry : listMT.entrySet()) {
                         ru.axetta.ecafe.processor.core.persistence.HardwareSettingsMT hardwareSettingsMT;
                         hardwareSettingsMT = DAOUtils.getHardwareSettingsMTByIdAndModuleType(session,
@@ -167,7 +167,7 @@ public class HardwareSettingsRequestProcessor extends AbstractProcessor<ResHardw
                         hardwareSettingsMT.setLastUpdate(entry.getValue().getLastUpdate());
                         hardwareSettingsMT.setFirmwareVer(entry.getValue().getFirmwareVer());
                         hardwareSettingsMT.setReaderName(entry.getValue().getReaderName());
-                        session.save(hardwareSettingsMT);
+                        session.saveOrUpdate(hardwareSettingsMT);
                     }
                 }
 

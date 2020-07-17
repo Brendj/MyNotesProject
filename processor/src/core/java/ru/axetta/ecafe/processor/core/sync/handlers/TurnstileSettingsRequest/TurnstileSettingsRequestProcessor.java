@@ -79,7 +79,7 @@ public class TurnstileSettingsRequestProcessor extends AbstractProcessor<ResTurn
                                 turnstileSettings.setNumOfEntries(numOfEntries);
                                 turnstileSettings.setVersion(nextVersion);
                                 turnstileSettings.setTimeCoefficient(trItem.getTimeCoefficient());
-                                session.save(turnstileSettings);
+                                session.saveOrUpdate(turnstileSettings);
                                 turnstileSettingsToRemove.remove(turnstileSettings);
                             } else {
                                 errorMessage.append("Section TR not found ");
