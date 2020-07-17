@@ -15,6 +15,8 @@ import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 
 import javax.servlet.http.HttpServletRequest;
@@ -26,7 +28,7 @@ import java.net.HttpURLConnection;
 import java.util.List;
 
 
-@Path(value = "")
+@Path(value = "/")
 @Controller
 public class SchoolRestController {
 
@@ -36,7 +38,7 @@ public class SchoolRestController {
     @GET
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
-    @Path(value = "signin")
+    @Path(value = "authorization/signin")
     public Response signin(@Context HttpServletRequest request,@QueryParam(value = "username") String username, @QueryParam(value = "password") String password){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
@@ -66,7 +68,8 @@ public class SchoolRestController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "creategroup")
-    public Response createGroup(CreateGroupData createGroupData){
+    public Response createGroup(@Context HttpServletRequest request,CreateGroupData createGroupData){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;

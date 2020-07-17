@@ -54,7 +54,7 @@ public class GetTokenServiceImpl {
             tokenData.put("token_create_date", new Date().getTime());
             Calendar calendar = Calendar.getInstance();
             calendar.add(Calendar.MINUTE, tokenExpiration);
-            tokenData.put("token_expiration_date", calendar.getTime());
+            tokenData.put("TOKEN_EXPIRATION_DATE", calendar.getTime());
             JwtBuilder jwtBuilder = Jwts.builder();
             jwtBuilder.setExpiration(calendar.getTime());
             jwtBuilder.setClaims(tokenData);

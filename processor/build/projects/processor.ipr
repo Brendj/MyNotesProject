@@ -1993,6 +1993,7 @@
         <root url="jar://$PROJECT_DIR$/../lib/com.springsource.org.aopalliance-1.0.0.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/spring305/spring-security-core-3.0.5.RELEASE.jar!/" />
         <root url="jar://$PROJECT_DIR$/../lib/spring305/spring-security-web-3.0.5.RELEASE.jar!/" />
+        <root url="jar://$PROJECT_DIR$/../lib/spring305/spring-security-config-3.0.5.RELEASE.jar!/" />
       </CLASSES>
       <JAVADOC />
       <SOURCES />

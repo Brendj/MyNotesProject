@@ -15,7 +15,6 @@ import org.springframework.security.authentication.AuthenticationServiceExceptio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.User;
 import org.springframework.stereotype.Service;
 
 import java.util.Collection;
@@ -57,19 +56,19 @@ public class JWTAuthenticationManager implements AuthenticationManager {
         }
         if (claims.get("TOKEN_EXPIRATION_DATE") == null)
             throw new AuthenticationServiceException("Invalid token");
-        Date expiredDate = new Date(claims.get("TOKEN_EXPIRATION_DATE").toString());
-        if (expiredDate.after(new Date()))
+        Long expiredDate = (Long) claims.get("TOKEN_EXPIRATION_DATE");
+        if (new Date().getTime() < expiredDate)
             return buildFullTokenAuthentication(authentication, claims);
         else
             throw new AuthenticationServiceException("Token expired date error");
     }
 
     private JWTAuthentication buildFullTokenAuthentication(JWTAuthentication authentication, DefaultClaims claims) {
-        User user = (User) userDetailsService.loadUserByUsername(claims.get("USERNAME").toString());
-        if (user.isEnabled()) {
-            Collection<GrantedAuthority> authorities = user.getAuthorities();
+        //User user = (User) userDetailsService.loadUserByUsername(claims.get("USERNAME").toString());
+        if ((Boolean) claims.get("user_is_enabled")) {
+            Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) claims.get("user_role");
             JWTAuthentication fullJWTAuthentication =
-                    new JWTAuthentication(authentication.getToken(), authorities, true, user);
+                    new JWTAuthentication(authentication.getToken(), authorities, true, null);
             return fullJWTAuthentication;
         } else {
             throw new AuthenticationServiceException("User disabled");

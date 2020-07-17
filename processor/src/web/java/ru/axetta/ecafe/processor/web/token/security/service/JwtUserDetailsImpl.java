@@ -19,6 +19,10 @@ public class JwtUserDetailsImpl implements UserDetails {
     private final String refreshToken;
     private final String refreshTokenHash;
     private Collection<GrantedAuthority> grantedAuthorities;
+    private Integer idOfRole;
+    private String roleName;
+    private Long contractId;
+
 
     public JwtUserDetailsImpl(final User user, final String refreshToken, final String refreshTokenHash ) {
         this.user = user;
@@ -65,4 +69,5 @@ public class JwtUserDetailsImpl implements UserDetails {
     }
 
     public User getUser() { return user; }
+
 }
