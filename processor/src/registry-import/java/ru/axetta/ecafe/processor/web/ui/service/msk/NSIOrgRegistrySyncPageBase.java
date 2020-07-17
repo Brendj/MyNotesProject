@@ -11,7 +11,6 @@ import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.RegistryChange;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
 import ru.axetta.ecafe.processor.core.service.*;
-import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.internal.FrontController.FrontControllerException;
 import ru.axetta.ecafe.processor.web.internal.FrontControllerProcessor;
@@ -603,12 +602,9 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
                 gender = "";
             } else {
                 int genderInt = Integer.parseInt(parent.getList().get(18).getFieldValueParam());
-
                 if (genderInt == 1) {
                     gender = "Мужской";
-                }
-
-                if (genderInt == 0) {
+                } else {
                     gender = "Женский";
                 }
             }
@@ -616,16 +612,16 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
             if (parent.getList().get(19).getFieldValueParam().equals("")) {
                 birthDate = "";
             } else {
-                birthDate = parent.getList().get(19).getFieldValueParam().substring(0, 10);
+                birthDate = parent.getList().get(19).getFieldValueParam();
             }
+
             if (parent.getList().get(21).getFieldValueParam().equals("")) {
                 genderFrom = "";
             } else {
                 int genderInt = Integer.parseInt(parent.getList().get(21).getFieldValueParam());
-
                 if (genderInt == 1) {
                     genderFrom = "Мужской";
-                } else if (genderInt == 0) {
+                } else {
                     genderFrom = "Женский";
                 }
             }
@@ -633,8 +629,7 @@ public class NSIOrgRegistrySyncPageBase extends BasicWorkspacePage {
             if (parent.getList().get(22).getFieldValueParam().equals("")) {
                 birthDateFrom = "";
             } else {
-                birthDateFrom = CalendarUtils.dateShortToStringFullYear(
-                        new Date(Long.parseLong(parent.getList().get(22).getFieldValueParam())));
+                birthDateFrom = parent.getList().get(22).getFieldValueParam();
             }
 
             guardiansCount = parent.getList().get(24).getFieldValueParam();

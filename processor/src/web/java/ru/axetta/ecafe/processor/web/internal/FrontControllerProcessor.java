@@ -195,7 +195,7 @@ public class FrontControllerProcessor {
                 RegistryChangeItemParam r21 = new RegistryChangeItemParam("genderFrom", c.getGenderFrom() == null ? "" : c.getGenderFrom().toString());
                 registryChangeItemParams.add(r21);
 
-                RegistryChangeItemParam r22 = new RegistryChangeItemParam("birthDateFrom", c.getBirthDateFrom() == null ? "" : c.getBirthDateFrom().toString());
+                RegistryChangeItemParam r22 = new RegistryChangeItemParam("birthDateFrom", c.getBirthDateFrom() == null ? "" : dateTimeFormat.format(c.getBirthDateFrom()));
                 registryChangeItemParams.add(r22);
 
                 RegistryChangeItemParam r23 = new RegistryChangeItemParam("oldDiscounts", c.getCheckBenefitsSafe() ? c.getOldDiscounts()== null ? "" : c.getOldDiscounts() : null);
