@@ -1,0 +1,398 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HardwareSettingsReport" pageWidth="3368" pageHeight="2380" orientation="Landscape" columnWidth="3328" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8f0717fc-66ac-4415-a578-5fd162f5d4ff">
+	<property name="ireport.zoom" value="2.357947691000003"/>
+	<property name="ireport.x" value="0"/>
+	<property name="ireport.y" value="0"/>
+	<style name="table">
+		<box>
+			<pen lineWidth="1.0" lineColor="#000000"/>
+		</box>
+	</style>
+	<field name="orgNumberInName" class="java.lang.String"/>
+	<field name="idOfOrg" class="java.lang.Long"/>
+	<field name="shortName" class="java.lang.String"/>
+	<field name="shortNameInfoService" class="java.lang.String"/>
+	<field name="district" class="java.lang.String"/>
+	<field name="shortAddress" class="java.lang.String"/>
+	<field name="typeOU" class="java.lang.String"/>
+	<field name="moduleType" class="java.lang.String"/>
+	<field name="lastUpdate" class="java.util.Date"/>
+	<field name="clientVersion" class="java.lang.String"/>
+	<field name="dataBaseSize" class="java.lang.Double"/>
+	<field name="sqlVersion" class="java.lang.String"/>
+	<field name="remoteAddress" class="java.lang.String"/>
+	<field name="dotNetVersion" class="java.lang.String"/>
+	<field name="osVersion" class="java.lang.String"/>
+	<field name="ramSize" class="java.lang.String"/>
+	<field name="cpuVersion" class="java.lang.String"/>
+	<field name="readerName" class="java.lang.String"/>
+	<field name="firmwareVersion" class="java.lang.String"/>
+	<field name="turnstileId" class="java.lang.String"/>
+	<field name="numOfEntries" class="java.lang.Integer"/>
+	<field name="numOfTurnstile" class="java.lang.Integer"/>
+	<field name="controllerModel" class="java.lang.String"/>
+	<field name="controllerFirmwareVersion" class="java.lang.String"/>
+	<field name="isWorkWithLongIds" class="java.lang.String"/>
+	<field name="timeCoefficient" class="java.lang.Double"/>
+	<background>
+		<band splitType="Stretch"/>
+	</background>
+	<title>
+		<band height="80" splitType="Stretch">
+			<textField>
+				<reportElement style="table" x="0" y="56" width="2732" height="24" uuid="158a7fb3-e046-4d29-88dd-ea83131aa9ca"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle">
+					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<textFieldExpression><![CDATA["Отчет по оборудованию "]]></textFieldExpression>
+			</textField>
+		</band>
+	</title>
+	<pageHeader>
+		<band height="21" splitType="Stretch">
+			<staticText>
+				<reportElement style="table" x="0" y="0" width="632" height="20" uuid="75170e03-6318-44f5-b262-b45766d398e6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Данные ОО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="632" y="1" width="2100" height="20" uuid="da98ce39-a742-453d-aa5c-bb3705b35621"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font fontName="SansSerif" size="10" isBold="true" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
+				</textElement>
+				<text><![CDATA[Параметры]]></text>
+			</staticText>
+		</band>
+	</pageHeader>
+	<columnHeader>
+		<band height="34" splitType="Stretch">
+			<staticText>
+				<reportElement style="table" x="0" y="0" width="62" height="34" uuid="ae812740-0d46-4d96-bfe9-9abec9b2f4bd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Номер]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="62" y="0" width="46" height="34" uuid="4bb8ca85-8ae3-4697-a7f0-07b23a2fe449"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ID OO]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" x="108" y="0" width="110" height="34" uuid="ec91866c-4958-4180-9869-be1976712835"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Название ПП]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="218" y="0" width="136" height="34" uuid="23fb329e-28da-4cd8-9d92-9c8f85683e27"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Название ОО краткое ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="354" y="0" width="68" height="34" uuid="8834f801-c3b2-4652-bd05-bdd5d6f36fa2"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Округ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="422" y="0" width="91" height="34" uuid="c39f4619-1bfe-47e5-b271-5f5c4acc1bd5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Краткий адрес]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="513" y="0" width="119" height="34" uuid="71ac407a-62a3-4026-85b6-0b1a8576fa9f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Тип ОУ]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="632" y="0" width="119" height="34" uuid="ad345c75-ac0b-4842-a1f0-abb3fe125a9f"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Модуль]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="751" y="0" width="93" height="34" uuid="67689bc9-c6b6-4d5c-af48-006c8fe1d339"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Версия ПО]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="844" y="0" width="94" height="34" uuid="cc40cc8c-bb0f-48dc-a90c-4f14c50376bd"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Размер БД]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="938" y="0" width="122" height="34" uuid="f04bccc6-129e-4e2e-8f20-ca554b25c15e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ip]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="1060" y="0" width="122" height="34" uuid="ddf961f5-e064-47b3-8a06-aa98334cf585"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Последнее изменение]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="1938" y="0" width="134" height="34" uuid="7b99624f-268b-4686-9238-102242904ea0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ip/mac]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="2072" y="0" width="89" height="34" uuid="9be65a5f-a8a7-4c30-b793-0ddb7a0f6056"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Количество входных групп]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="2161" y="0" width="80" height="34" uuid="fa2360c6-77c4-4f11-bffe-b24eb02d0348"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Количество контроллеров]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="2241" y="0" width="71" height="34" uuid="ca2022e9-fddf-4484-b65f-061bcd8efcf3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Модели контроллера]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="2312" y="0" width="104" height="34" uuid="c0aa7bb3-5a4d-4a7e-bc91-0499419a4e6b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Версия прошивки контроллера]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="2416" y="0" width="158" height="34" uuid="621bb98c-7bca-479e-946c-5d0929bef7b5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Считыватель читает длинные идентификаторы]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="2574" y="0" width="158" height="34" uuid="192fa1ed-a7c9-4a71-acef-67d9dcda5d4e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Коэффициент коррекции времени турникета]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="1182" y="0" width="125" height="34" uuid="2d9e520e-dca2-4003-b6b1-81b7d217b68d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Идентификатор/модель считывателей карт]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="1307" y="0" width="135" height="34" uuid="c3d2a7d5-66b1-483d-a446-cc60c8c28762"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Версия микропрограммы считывателя карт]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="1442" y="0" width="106" height="34" uuid="a46ebb41-b51e-4fc2-94a9-eed5acc1f104"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ОС]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="1548" y="0" width="88" height="34" uuid="38a5256b-bee8-4735-a010-d7690b1723b4"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[MySQL]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="1636" y="0" width="105" height="34" uuid="bac554b8-c75c-40f9-964f-2087c93938ba"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Net Framework]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="1741" y="0" width="102" height="34" uuid="ec6edcd2-3174-49be-af47-0b57fa0ef940"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[Процессор]]></text>
+			</staticText>
+			<staticText>
+				<reportElement style="table" mode="Transparent" x="1843" y="0" width="95" height="34" uuid="4af3d91f-20c2-4702-a61b-03982e08aa77"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
+					<font isBold="true"/>
+				</textElement>
+				<text><![CDATA[ОЗУ]]></text>
+			</staticText>
+		</band>
+	</columnHeader>
+	<detail>
+		<band height="126" splitType="Stretch">
+			<textField isBlankWhenNull="false">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="0" y="0" width="62" height="73" uuid="41b652b1-9596-4a80-91ca-335da4110857"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{orgNumberInName}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="62" y="0" width="46" height="73" uuid="24760867-823d-4052-8085-8a5842fca2f0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{idOfOrg}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="108" y="0" width="110" height="73" uuid="f0e471fa-ebdc-4486-9ab6-94cf6c9a2a76"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{shortName}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="218" y="0" width="136" height="73" uuid="71b3eb14-c015-4230-a670-e26f482798ce"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{shortNameInfoService}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="354" y="0" width="68" height="73" uuid="62d11059-dcfc-4884-aca0-5311dedfafd6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{district}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="422" y="0" width="91" height="73" uuid="181ce7ad-2b7c-49c3-a823-3646b8e42ff0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{shortAddress}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="513" y="0" width="119" height="73" uuid="616407ca-c792-4e63-9598-84f87a2725ae"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{typeOU}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="751" y="0" width="93" height="73" uuid="d693aa8d-b21f-4f8f-8138-29999c33608c"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{clientVersion}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="844" y="0" width="94" height="73" uuid="3395158b-b11f-4b84-aeac-0eb73167a4ae"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{dataBaseSize}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="938" y="0" width="122" height="73" uuid="7ee8f330-6f1e-4008-997a-4fc1979e4db5"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{remoteAddress}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="false">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="632" y="0" width="119" height="73" uuid="46af188d-ea25-4831-aa38-53ee62d3fe4b"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{moduleType}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1060" y="0" width="122" height="73" uuid="4cce138f-06c1-438c-af7f-27ea8e2249d6"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{lastUpdate}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1182" y="0" width="125" height="73" uuid="4c459830-d8f7-460a-8144-92612a58fdcc"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{readerName}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1307" y="0" width="135" height="73" uuid="26c75c5c-494a-4d5b-a7c9-fb73529fe50a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{firmwareVersion}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1442" y="0" width="106" height="73" uuid="dacbed34-5dd5-445c-b1d0-9248846e713d"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{osVersion}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1548" y="0" width="88" height="73" uuid="801e7abd-0acc-4f8e-b5a6-c66e91a50c1a"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{sqlVersion}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1636" y="0" width="105" height="73" uuid="46b03d69-72f7-4127-911e-79a3d98ce565"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{dotNetVersion}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1741" y="0" width="102" height="73" uuid="bd0230c7-23dd-49cd-b8f7-6756fa6eca10"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{cpuVersion}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1843" y="0" width="95" height="73" uuid="a8b66c07-a48f-4980-825e-79bd19f1d115"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{ramSize}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="1938" y="0" width="134" height="73" uuid="c7df2554-dd98-4eb0-b418-3d48e262ff30"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{turnstileId}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2072" y="0" width="89" height="73" uuid="31b66704-c20b-43ef-a8b3-b2a4d4d45c1e"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{numOfEntries}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2161" y="0" width="80" height="73" uuid="5861921e-730f-4cdb-8843-fb80c337ae50"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{numOfTurnstile}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2241" y="0" width="71" height="73" uuid="e4f802af-fe15-4d58-92b6-f39a5df38695"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{controllerModel}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2312" y="0" width="104" height="73" uuid="9e2f725a-6739-4787-9cd8-1a9d4d6286c3"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{controllerFirmwareVersion}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2416" y="0" width="158" height="73" uuid="f9b9ee99-b258-4a48-a007-76bde9c80ac0"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{isWorkWithLongIds}]]></textFieldExpression>
+			</textField>
+			<textField isBlankWhenNull="true">
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2574" y="0" width="158" height="73" uuid="1f8a185c-0e91-4951-9221-095413dda139"/>
+				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
+				<textFieldExpression><![CDATA[$F{timeCoefficient}]]></textFieldExpression>
+			</textField>
+		</band>
+	</detail>
+	<columnFooter>
+		<band height="34" splitType="Stretch"/>
+	</columnFooter>
+	<pageFooter>
+		<band height="54" splitType="Stretch"/>
+	</pageFooter>
+	<summary>
+		<band height="42" splitType="Stretch"/>
+	</summary>
+</jasperReport>
