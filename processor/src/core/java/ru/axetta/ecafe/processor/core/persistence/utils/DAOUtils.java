@@ -13,8 +13,8 @@ import ru.axetta.ecafe.processor.core.payment.PaymentRequest;
 import ru.axetta.ecafe.processor.core.persistence.*;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
-import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
+import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -2978,6 +2978,19 @@ public class DAOUtils {
         return version;
     }
 
+    public static long nextVersionByGoodRequest(Session session) {
+        long version = 0L;
+        Query query = session.createSQLQuery(
+                "select currentversion from cf_do_versions "
+                        + "where UPPER(distributedobjectclassname) = :distributedObjectClassName for update");
+        query.setParameter("distributedObjectClassName", "GoodRequest".toUpperCase());
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
     //todo Можно переделать все получения версии без for update на этот метод
     public static long nextVersionByTableWithoutLock(Session session, String tableName) {
         long version = 0L;
@@ -3235,6 +3248,14 @@ public class DAOUtils {
         criteria.add(Restrictions.in("org", orgs));
         criteria.add(Restrictions.gt("version", version));
         //criteria.add(Restrictions.eq("deletedState", false));
+        return criteria.list();
+    }
+
+    public static List<GoodRequest> getGoodRequestForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
+        List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
+        Criteria criteria = session.createCriteria(GoodRequest.class);
+        criteria.add(Restrictions.in("orgOwner", orgs));
+        criteria.add(Restrictions.gt("globalVersion", version));
         return criteria.list();
     }
 

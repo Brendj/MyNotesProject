@@ -37,6 +37,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.ResRe
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.ResAccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingData;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.ResRequestFeeding;
+import ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier.RequestsSupplierData;
+import ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier.ResRequestsSupplier;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.ResSpecialDates;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesData;
 import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.ResSyncSettingsSection;
@@ -1243,6 +1245,8 @@ public class SyncResponse {
     private EmiasSection emias;
     private EmiasSectionForARMAnswer emiasSectionForARMAnswer;
     private ResMenuSupplier resMenuSupplier;
+    private ResRequestsSupplier resRequestsSupplier;
+    private RequestsSupplierData requestsSupplierData;
 
     private List<AbstractToElement> responseSections = new ArrayList<AbstractToElement>();
 
@@ -1267,7 +1271,7 @@ public class SyncResponse {
             ResMenusCalendar resMenusCalendar, MenusCalendarData menusCalendarData, ClientBalanceHoldFeeding clientBalanceHoldFeeding,
             ResClientBalanceHoldData resClientBalanceHoldData, OrgSettingSection orgSetting, GoodRequestEZDSection goodRequestEZDSection,
             ResSyncSettingsSection resSyncSettingsSection, SyncSettingsSection syncSettingsSection, EmiasSection emias, EmiasSectionForARMAnswer emiasSectionForARMAnswer,
-            ResMenuSupplier resMenuSupplier) {
+            ResMenuSupplier resMenuSupplier, ResRequestsSupplier resRequestsSupplier, RequestsSupplierData requestsSupplierData) {
         this.syncType = syncType;
         this.idOfOrg = idOfOrg;
         this.orgName = orgName;
@@ -1332,6 +1336,8 @@ public class SyncResponse {
 		this.emias = emias;
         this.emiasSectionForARMAnswer = emiasSectionForARMAnswer;
         this.resMenuSupplier = resMenuSupplier;
+        this.resRequestsSupplier = resRequestsSupplier;
+        this.requestsSupplierData = requestsSupplierData;
     }
 
     public SyncResponse(SyncType syncType, Long idOfOrg, String orgName, OrganizationType organizationType,
@@ -1655,6 +1661,15 @@ public class SyncResponse {
         if (resMenuSupplier != null) {
             envelopeElement.appendChild(resMenuSupplier.toElement(document));
         }
+
+        if (resRequestsSupplier != null) {
+            envelopeElement.appendChild(resRequestsSupplier.toElement(document));
+        }
+
+        if (requestsSupplierData != null) {
+            envelopeElement.appendChild(requestsSupplierData.toElement(document));
+        }
+
 
     }
 

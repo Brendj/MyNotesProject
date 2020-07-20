@@ -5,19 +5,28 @@
 package ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier;
 
 import ru.axetta.ecafe.processor.core.persistence.Org;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.core.sync.manager.DistributedObjectException;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.core.utils.XMLUtils;
 
 import org.apache.commons.lang.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.w3c.dom.Node;
 
 import java.util.Date;
+import java.util.LinkedList;
+import java.util.List;
 
 public class RequestsSupplierItem {
 
     public static final Integer ERROR_CODE_ALL_OK = 0;
     public static final Integer ERROR_CODE_NOT_VALID_ATTRIBUTE = 100;
+
+    private static final Logger logger = LoggerFactory.getLogger(RequestsSupplierItem.class);
 
     private Long orgId;
     private String guid;
@@ -27,10 +36,18 @@ public class RequestsSupplierItem {
     private String staffGuid;
     private Boolean deletedState;
     private Long version;
+    private List<RequestsSupplierDetail> requestsSupplierDetailList;
+
+    private GoodRequest goodRequest;
+
     private String errorMessage;
     private Integer resCode;
 
-    public static RequestsSupplierItem build(Node itemNode, Long idOfOrgOwner) {
+    public RequestsSupplierItem() {
+        requestsSupplierDetailList = new LinkedList<>();
+    }
+
+    public void build(Node itemNode, Long idOfOrgOwner) {
         Long orgId = null;
         String guid = null;
         String number = null;
@@ -40,6 +57,7 @@ public class RequestsSupplierItem {
         Boolean deletedState = false;
         Long version = null;
         StringBuilder errorMessage = new StringBuilder();
+        List<RequestsSupplierDetail> requestsSupplierDetailList = new LinkedList<>();
 
         String strOrgId = XMLUtils.getAttributeValue(itemNode, "OrgId");
         if (StringUtils.isNotEmpty(strOrgId)) {
@@ -89,6 +107,8 @@ public class RequestsSupplierItem {
             } catch (NumberFormatException e) {
                 errorMessage.append("NumberFormatException: incorrect format of the attribute Type");
             }
+        } else {
+            errorMessage.append("Attribute Type was not found");
         }
 
         staffGuid = XMLUtils.getAttributeValue(itemNode, "StaffGuid");
@@ -105,28 +125,72 @@ public class RequestsSupplierItem {
             }
         }
 
-        version = XMLUtils.getLongAttributeValue(itemNode, "V");
+        //version = XMLUtils.getLongAttributeValue(itemNode, "V");
 
-        return new RequestsSupplierItem(orgId, guid, number, doneDate, RequestsSupplierTypeEnum.fromInteger(type),
-                staffGuid, deletedState, version, errorMessage.toString());
+        //Node detailNode = itemNode.getFirstChild();
+        //while (detailNode != null) {
+        //    if (Node.ELEMENT_NODE == detailNode.getNodeType() && detailNode.getNodeName().equals("RDI")) {
+        //        RequestsSupplierDetail detail = new RequestsSupplierDetail();
+        //        detail.build(detailNode);
+        //        requestsSupplierDetailList.add(detail);
+        //        errorMessage.append(detail.getErrorMessage());
+        //    }
+        //    detailNode = detailNode.getNextSibling();
+        //}
+
+        DistributedObject distributedObject = null;
+        try {
+            distributedObject = GoodRequest.class.newInstance();
+            distributedObject.setIdOfSyncOrg(orgId);
+            distributedObject = distributedObject.build(itemNode);
+        } catch (Exception e) {
+            if (distributedObject != null) {
+                if (!(e instanceof DistributedObjectException)) {
+                    distributedObject.setDistributedObjectException(new DistributedObjectException("Internal Error"));
+                    logger.error(distributedObject.toString(), e);
+                }
+            }
+        }
+
+        GoodRequest goodRequest = (GoodRequest) distributedObject;
+
+        Node detailNode = itemNode.getFirstChild();
+        while (detailNode != null) {
+            if (Node.ELEMENT_NODE == detailNode.getNodeType() && detailNode.getNodeName().equals("RDI")) {
+
+                RequestsSupplierDetail detail = new RequestsSupplierDetail();
+                detail.build(detailNode, orgId, goodRequest);
+                requestsSupplierDetailList.add(detail);
+                errorMessage.append(detail.getErrorMessage());
+
+            }
+            detailNode = detailNode.getNextSibling();
+        }
+
+        this.setProperties(orgId, guid, number, doneDate, RequestsSupplierTypeEnum.fromInteger(type), staffGuid,
+                deletedState, version, errorMessage.toString(), requestsSupplierDetailList, (GoodRequest) distributedObject);
     }
 
-    private RequestsSupplierItem(Long orgId, String guid, String number, Date doneDate, RequestsSupplierTypeEnum type,
-            String staffGuid, Boolean deletedState, Long version, String errorMessage) {
-        this.setOrgId(orgId);
-        this.setGuid(guid);
-        this.setNumber(number);
-        this.setDoneDate(doneDate);
-        this.setType(type);
-        this.setStaffGuid(staffGuid);
-        this.setDeletedState(deletedState);
-        this.setVersion(version);
+    private void setProperties(Long orgId, String guid, String number, Date doneDate, RequestsSupplierTypeEnum type,
+            String staffGuid, Boolean deletedState, Long version, String errorMessage,
+            List<RequestsSupplierDetail> requestsSupplierDetailList,
+            GoodRequest goodRequest) {
+        this.orgId = orgId;
+        this.guid = guid;
+        this.number = number;
+        this.doneDate = doneDate;
+        this.type = type;
+        this.staffGuid = staffGuid;
+        this.deletedState = deletedState;
+        this.version = version;
         this.setErrorMessage(errorMessage);
         if (errorMessage.equals("")) {
             this.setResCode(ERROR_CODE_ALL_OK);
         } else {
             this.setResCode(ERROR_CODE_NOT_VALID_ATTRIBUTE);
         }
+        this.requestsSupplierDetailList = requestsSupplierDetailList;
+        this.goodRequest = goodRequest;
     }
 
     public String getGuid() {
@@ -207,5 +271,21 @@ public class RequestsSupplierItem {
 
     public void setResCode(Integer resCode) {
         this.resCode = resCode;
+    }
+
+    public List<RequestsSupplierDetail> getRequestsSupplierDetailList() {
+        return requestsSupplierDetailList;
+    }
+
+    public void setRequestsSupplierDetailList(List<RequestsSupplierDetail> requestsSupplierDetailList) {
+        this.requestsSupplierDetailList = requestsSupplierDetailList;
+    }
+
+    public GoodRequest getGoodRequest() {
+        return goodRequest;
+    }
+
+    public void setGoodRequest(GoodRequest goodRequest) {
+        this.goodRequest = goodRequest;
     }
 }

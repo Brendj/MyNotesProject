@@ -27,7 +27,8 @@ public class RequestsSupplier implements SectionRequest {
         Node itemNode = requestSupplierNode.getFirstChild();
         while (itemNode != null) {
             if (Node.ELEMENT_NODE == itemNode.getNodeType() && itemNode.getNodeName().equals("RI")) {
-                RequestsSupplierItem item = RequestsSupplierItem.build(itemNode, idOfOrgOwner);
+                RequestsSupplierItem item = new RequestsSupplierItem();
+                item.build(itemNode, idOfOrgOwner);
                 items.add(item);
             }
             itemNode = itemNode.getNextSibling();

@@ -59,6 +59,8 @@ import ru.axetta.ecafe.processor.core.sync.handlers.reestr.taloon.preorder.Reest
 import ru.axetta.ecafe.processor.core.sync.handlers.registry.operations.account.AccountOperationsRegistry;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeeding;
 import ru.axetta.ecafe.processor.core.sync.handlers.request.feeding.RequestFeedingBuilder;
+import ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier.RequestsSupplier;
+import ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier.RequestsSupplierBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDates;
 import ru.axetta.ecafe.processor.core.sync.handlers.special.dates.SpecialDatesBuilder;
 import ru.axetta.ecafe.processor.core.sync.handlers.syncsettings.request.SyncSettingsRequestBuilder;
@@ -2793,6 +2795,7 @@ public class SyncRequest {
             builders.add(new SyncSettingsRequestBuilder(idOfOrg));
 			builders.add(new EmiasBuilder());
             builders.add(new MenuSupplierBuilder(idOfOrg));
+            builders.add(new RequestsSupplierBuilder(idOfOrg));
             return builders;
         }
 
@@ -3103,6 +3106,10 @@ public class SyncRequest {
 
     public MenuSupplier getMenuSupplier() {
         return this.findSection(MenuSupplier.class);
+    }
+
+    public RequestsSupplier getRequestsSupplier() {
+        return this.findSection(RequestsSupplier.class);
     }
 
     public <T extends SectionRequest> T findSection(Class classT) {
