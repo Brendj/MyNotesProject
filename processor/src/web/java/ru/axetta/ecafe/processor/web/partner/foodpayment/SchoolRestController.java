@@ -8,7 +8,9 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.CreateGroupData;
 import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.EditEmployeeData;
-import ru.axetta.ecafe.processor.web.token.security.jwt.GetTokenServiceImpl;
+import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
+import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginService;
+import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginServiceImpl;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -43,11 +45,14 @@ public class SchoolRestController {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
-        GetTokenServiceImpl tokenService;
+        JwtTokenProvider tokenService;
+        JWTLoginService jwtLoginService;
         try{
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            tokenService = new GetTokenServiceImpl();
+            tokenService = new JwtTokenProvider();
+            jwtLoginService = new JWTLoginServiceImpl();
+
             String token = tokenService.getToken(persistenceSession, username, password, request.getRemoteAddr());
             persistenceSession.flush();
             persistenceTransaction.commit();

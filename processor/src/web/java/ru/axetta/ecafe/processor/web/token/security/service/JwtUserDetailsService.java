@@ -14,13 +14,15 @@ import org.hibernate.Transaction;
 import org.hibernate.criterion.Restrictions;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Scope;
 import org.springframework.dao.DataAccessException;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Component;
 
-@Component("userDetailsService")
+@Component
+@Scope("singleton")
 public class JwtUserDetailsService implements UserDetailsService {
 
     private Logger logger = LoggerFactory.getLogger(JwtUserDetailsService.class);
@@ -31,7 +33,7 @@ public class JwtUserDetailsService implements UserDetailsService {
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         try{
-            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             Criteria userCriteria = persistenceSession.createCriteria(User.class);
             userCriteria.add(Restrictions.eq("userName", username));
@@ -45,7 +47,7 @@ public class JwtUserDetailsService implements UserDetailsService {
             return new JwtUserDetailsImpl(user, null, null);
         }
         catch (Exception e){
-            throw new UsernameNotFoundException("User " + username + " was not found");
+            throw e;
         }
         finally {
             HibernateUtils.rollback(persistenceTransaction, logger);

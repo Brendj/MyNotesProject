@@ -11,4 +11,8 @@ public class JwtAuthenticationException extends AuthenticationException {
     public JwtAuthenticationException(String msg) {
         super(msg);
     }
+
+    public JwtAuthenticationException(JwtAuthenticationErrorDTO jwtAuthenticationErrorDTO){
+        super(jwtAuthenticationErrorDTO.toString());
+    }
 }

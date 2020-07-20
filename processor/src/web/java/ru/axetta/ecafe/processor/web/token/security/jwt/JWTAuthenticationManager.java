@@ -4,30 +4,25 @@
 
 package ru.axetta.ecafe.processor.web.token.security.jwt;
 
-import io.jsonwebtoken.Jwts;
+import io.jsonwebtoken.Jwt;
 import io.jsonwebtoken.impl.DefaultClaims;
 
-import ru.axetta.ecafe.processor.web.token.security.service.JwtUserDetailsService;
+import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.web.token.security.service.JwtUserDetailsImpl;
+import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrorDTO;
+import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
+import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
 import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import java.util.Collection;
-import java.util.Date;
 
 @Service
 public class JWTAuthenticationManager implements AuthenticationManager {
-
-    private final String key = "testKey";
-
-
-    @Autowired
-    private JwtUserDetailsService userDetailsService;
+    
 
     @Override
     public Authentication authenticate(Authentication authentication) throws AuthenticationException {
@@ -43,35 +38,23 @@ public class JWTAuthenticationManager implements AuthenticationManager {
             if(ex instanceof AuthenticationServiceException)
                 throw ex;
         }
-        return null;
+        return authentication;
     }
 
     private JWTAuthentication processAuthentication(JWTAuthentication authentication) throws AuthenticationException {
         String token = authentication.getToken();
-        DefaultClaims claims;
+        Jwt jwtToken;
+        JwtTokenProvider jwtTokenProvider = RuntimeContext.getAppContext().getBean(JwtTokenProvider.class);
         try {
-            claims = (DefaultClaims) Jwts.parser().setSigningKey(key).parse(token).getBody();
-        } catch (Exception ex) {
-            throw new AuthenticationServiceException("Token corrupted");
-        }
-        if (claims.get("TOKEN_EXPIRATION_DATE") == null)
-            throw new AuthenticationServiceException("Invalid token");
-        Long expiredDate = (Long) claims.get("TOKEN_EXPIRATION_DATE");
-        if (new Date().getTime() < expiredDate)
-            return buildFullTokenAuthentication(authentication, claims);
-        else
-            throw new AuthenticationServiceException("Token expired date error");
-    }
-
-    private JWTAuthentication buildFullTokenAuthentication(JWTAuthentication authentication, DefaultClaims claims) {
-        //User user = (User) userDetailsService.loadUserByUsername(claims.get("USERNAME").toString());
-        if ((Boolean) claims.get("user_is_enabled")) {
-            Collection<GrantedAuthority> authorities = (Collection<GrantedAuthority>) claims.get("user_role");
-            JWTAuthentication fullJWTAuthentication =
-                    new JWTAuthentication(authentication.getToken(), authorities, true, null);
-            return fullJWTAuthentication;
-        } else {
-            throw new AuthenticationServiceException("User disabled");
+            jwtToken = jwtTokenProvider.validateToken(token);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) jwtTokenProvider.getUserDetailsFromToken((DefaultClaims) jwtToken.getBody());
+            JWTAuthentication jwtAuthentication = new JWTAuthentication(token,jwtUserDetails.getAuthorities(),true, jwtUserDetails);
+            if(!jwtUserDetails.isEnabled())
+                throw new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.USER_DISABLED.getErrorCode(),
+                        JwtAuthenticationErrors.USER_DISABLED.getErrorMessage()));
+            return jwtAuthentication;
+        } catch (AuthenticationException ex) {
+            throw ex;
         }
     }
 }
