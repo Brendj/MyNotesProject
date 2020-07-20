@@ -11,6 +11,8 @@ import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.EditEmployeeD
 import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginService;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginServiceImpl;
+import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginErrors;
+import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginException;
 
 import org.hibernate.Session;
 import org.hibernate.Transaction;
@@ -52,12 +54,64 @@ public class SchoolRestController {
             persistenceTransaction = persistenceSession.beginTransaction();
             tokenService = new JwtTokenProvider();
             jwtLoginService = new JWTLoginServiceImpl();
+            if(jwtLoginService.login(username, password, request.getRemoteAddr(), persistenceSession)){
+                String token = tokenService.getToken(username);
+                persistenceSession.flush();
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                return Response.status(HttpURLConnection.HTTP_OK).entity(token).build();
+            }
+            else
+                throw new JwtLoginException(JwtLoginErrors.UNSUCCESSFUL_AUTHORIZATION.getErrorCode(),
+                        JwtLoginErrors.UNSUCCESSFUL_AUTHORIZATION.getErrorMessage());
 
-            String token = tokenService.getToken(persistenceSession, username, password, request.getRemoteAddr());
-            persistenceSession.flush();
-            persistenceTransaction.commit();
-            persistenceTransaction = null;
-            return Response.status(HttpURLConnection.HTTP_OK).entity(token).build();
+        }
+        catch (JwtLoginException e){
+            logger.error("Login error: "+e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+                    .entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
+        }
+        catch (Exception e){
+            logger.error("Internal error: "+e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_INTERNAL_ERROR).entity(new Result(100, "Ошибка сервера")).build();
+        }
+        finally {
+            HibernateUtils.rollback(persistenceTransaction, logger);
+            HibernateUtils.close(persistenceSession, logger);
+        }
+    }
+
+    @GET
+    @Consumes(MediaType.APPLICATION_JSON)
+    @Produces(MediaType.APPLICATION_JSON)
+    @Path(value = "authorization/refreshtoken")
+    public Response refreshToken(@Context HttpServletRequest request,@QueryParam(value = "username") String username, @QueryParam(value = "password") String password){
+        RuntimeContext runtimeContext = RuntimeContext.getInstance();
+        Session persistenceSession = null;
+        Transaction persistenceTransaction = null;
+        JwtTokenProvider tokenService;
+        JWTLoginService jwtLoginService;
+        try{
+            persistenceSession = runtimeContext.createPersistenceSession();
+            persistenceTransaction = persistenceSession.beginTransaction();
+            tokenService = new JwtTokenProvider();
+            jwtLoginService = new JWTLoginServiceImpl();
+            if(jwtLoginService.login(username, password, request.getRemoteAddr(), persistenceSession)){
+                String token = tokenService.getToken(username);
+                persistenceSession.flush();
+                persistenceTransaction.commit();
+                persistenceTransaction = null;
+                return Response.status(HttpURLConnection.HTTP_OK).entity(token).build();
+            }
+            else
+                throw new JwtLoginException(JwtLoginErrors.UNSUCCESSFUL_AUTHORIZATION.getErrorCode(),
+                        JwtLoginErrors.UNSUCCESSFUL_AUTHORIZATION.getErrorMessage());
+
+        }
+        catch (JwtLoginException e){
+            logger.error("Login error: "+e.getMessage(), e);
+            return Response.status(HttpURLConnection.HTTP_BAD_REQUEST)
+                    .entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
         catch (Exception e){
             logger.error("Internal error: "+e.getMessage(), e);

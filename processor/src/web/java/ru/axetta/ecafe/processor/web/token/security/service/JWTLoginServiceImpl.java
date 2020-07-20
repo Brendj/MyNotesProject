@@ -10,13 +10,14 @@ import ru.axetta.ecafe.processor.core.persistence.Option;
 import ru.axetta.ecafe.processor.core.persistence.SecurityJournalAuthenticate;
 import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOService;
+import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginErrors;
+import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginException;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import javax.security.auth.login.LoginException;
 import java.util.Date;
 
 
@@ -41,27 +42,30 @@ public class JWTLoginServiceImpl implements JWTLoginService {
                     .createLoginFaultRecord(remoteAddr, null, null,
                             SecurityJournalAuthenticate.DenyCause.LOGIN_MISSING.getIdentification());
             DAOService.getInstance().writeAuthJournalRecord(record);
-            throw new LoginException("Username missing");
+            throw new JwtLoginException(JwtLoginErrors.USERNAME_IS_NULL.getErrorCode(),
+                    JwtLoginErrors.USERNAME_IS_NULL.getErrorMessage());
         }
         if (StringUtils.isEmpty(password)) {
             User user;
             try {
                 user = ((JwtUserDetailsImpl) userDetailsService.loadUserByUsername(username)).getUser();
             } catch (Exception e) {
-                throw new LoginException("User not found" + "\n" + e.getMessage());
+                throw new JwtLoginException(JwtLoginErrors.USER_NOT_FOUND.getErrorCode(),
+                        JwtLoginErrors.USER_NOT_FOUND.getErrorMessage());
             }
             processBadPassword(user, remoteAddr);
             SecurityJournalAuthenticate record = SecurityJournalAuthenticate
-                    .createLoginFaultRecord(remoteAddr, username, null,
+                    .createLoginFaultRecord(remoteAddr, username, user,
                             SecurityJournalAuthenticate.DenyCause.PASSWORD_MISSING.getIdentification());
             DAOService.getInstance().writeAuthJournalRecord(record);
 
-            throw new LoginException(String.format("User \"%s\": password missing", username));
+            throw new JwtLoginException(JwtLoginErrors.INVALID_PASSWORD.getErrorCode(),
+                    JwtLoginErrors.INVALID_PASSWORD.getErrorMessage() + String.format(" for user \"%s\"", username));
         }
         try {
             loginSuccsess = checkUserCredentials(username, password, remoteAddr);
         } catch (Exception e) {
-            throw new LoginException(e.getMessage());
+            throw new JwtLoginException(JwtLoginErrors.USER_IS_BLOCKED.getErrorCode(), e.getMessage());
         }
         return loginSuccsess;
     }
@@ -83,7 +87,7 @@ public class JWTLoginServiceImpl implements JWTLoginService {
                     .createUserEditRecord(SecurityJournalAuthenticate.EventType.BLOCK_USER, remoteAddr,
                             user.getUserName(), user, true, null, message);
             DAOService.getInstance().writeAuthJournalRecord(record);
-            throw new LoginException(mess);
+            throw new JwtLoginException(JwtLoginErrors.USER_IS_BLOCKED.getErrorCode(), mess);
         }
     }
 
@@ -95,7 +99,8 @@ public class JWTLoginServiceImpl implements JWTLoginService {
                         .createLoginFaultRecord(remoteAddr, username, null,
                                 SecurityJournalAuthenticate.DenyCause.USER_NOT_FOUND.getIdentification());
                 DAOService.getInstance().writeAuthJournalRecord(record);
-                throw new LoginException("User not found");
+                throw new JwtLoginException(JwtLoginErrors.USER_NOT_FOUND.getErrorCode(),
+                        JwtLoginErrors.USER_NOT_FOUND.getErrorMessage());
             }
             if ((user.isBlocked()) && (!user.blockedDateExpired())) {
                 String mess = String.format("User \"%s\" is blocked. Access denied.", username);
@@ -105,7 +110,7 @@ public class JWTLoginServiceImpl implements JWTLoginService {
                                 SecurityJournalAuthenticate.DenyCause.USER_BLOCKED.getIdentification());
                 DAOService.getInstance().writeAuthJournalRecord(record);
 
-                throw new LoginException(mess);
+                throw new JwtLoginException(JwtLoginErrors.USER_IS_BLOCKED.getErrorCode(), mess);
             }
             if (!user.loginAllowed()) {
                 String mess = String.format("User \"%s\" is blocked . Access denied.", username);
@@ -115,7 +120,7 @@ public class JWTLoginServiceImpl implements JWTLoginService {
                                 SecurityJournalAuthenticate.DenyCause.LONG_INACTIVITY.getIdentification());
                 DAOService.getInstance().writeAuthJournalRecord(record);
 
-                throw new LoginException(mess);
+                throw new JwtLoginException(JwtLoginErrors.USER_IS_BLOCKED.getErrorCode(), mess);
             }
             final Integer idOfRole = user.getIdOfRole();
             /*final String userRole = request.getParameter("ecafeUserRole");
@@ -147,7 +152,8 @@ public class JWTLoginServiceImpl implements JWTLoginService {
                                 SecurityJournalAuthenticate.DenyCause.WRONG_PASSWORD.getIdentification());
                 DAOService.getInstance().writeAuthJournalRecord(record);
 
-                throw new LoginException("Password is invalid");
+                throw new JwtLoginException(JwtLoginErrors.INVALID_PASSWORD.getErrorCode(),
+                        JwtLoginErrors.INVALID_PASSWORD.getErrorMessage());
             }
             return true;
         } catch (Exception e) {

@@ -8,7 +8,8 @@ public enum JwtLoginErrors {
     USERNAME_IS_NULL(200, "Username cannot be null"),
     INVALID_PASSWORD(201, "Invalid password"),
     USER_NOT_FOUND(203,"User not found"),
-    USER_IS_BLOCKED(204,"User is blocked");
+    USER_IS_BLOCKED(204,"User is blocked"),
+    UNSUCCESSFUL_AUTHORIZATION(205, "Unsuccessful authorization");
 
     private int errorCode;
     private String errorMessage;
