@@ -8043,6 +8043,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             @WebParam(name = "passportSeries") String passportSeries,
             @WebParam(name = "typeCard") Integer typeCard,
             @WebParam(name = "roleRepresentative") Integer roleRepresentative,
+            @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal,
             @WebParam(name = "degree") Integer relation) {
 
         authenticateRequest(null);
@@ -8067,7 +8068,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 .getClientGuardian(clientChild, mobilePhoneCreator);
         for (ClientGuardian clientGuardian: clientGuardians)
         {
-            if (clientGuardian.getRepresentType().getCode() == 1 || clientGuardian.getRepresentType().getCode() == 2) {
+            if ((clientGuardian.getRepresentType().getCode() == 1 && roleRepresentativePrincipal == 1) ||
+                    (clientGuardian.getRepresentType().getCode() == 2 && roleRepresentativePrincipal == 2)) {
                 canAdded = true;
                 break;
             }

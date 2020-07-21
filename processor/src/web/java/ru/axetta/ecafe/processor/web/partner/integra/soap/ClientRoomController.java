@@ -508,6 +508,7 @@ public interface ClientRoomController {
             @WebParam(name = "passportSeries") String passportSeries,
             @WebParam(name = "typeCard") Integer typeCard,
             @WebParam(name = "roleRepresentative") Integer roleRepresentative,
+            @WebParam(name = "roleRepresentativePrincipal") Integer roleRepresentativePrincipal,
             @WebParam(name = "degree") Integer relation);
 
     /*@WebMethod Result changeGuardian(@WebParam(name = "contractId") Long contractId, @WebParam(name = "firstName") String firstName,
