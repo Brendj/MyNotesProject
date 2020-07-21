@@ -11,9 +11,11 @@ import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.utils.CalendarUtils;
 import ru.axetta.ecafe.processor.web.ui.BasicWorkspacePage;
 import ru.axetta.ecafe.processor.web.ui.MainPage;
+import ru.axetta.ecafe.processor.web.ui.client.ClientSelectPage;
 import ru.axetta.ecafe.processor.web.ui.contragent.ContragentListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgListSelectPage;
 import ru.axetta.ecafe.processor.web.ui.org.OrgMainBuildingListSelectPage;
+import ru.axetta.ecafe.processor.web.ui.org.OrgSelectPage;
 
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Criteria;
@@ -38,7 +40,7 @@ import java.util.*;
  * To change this template use File | Settings | File Templates.
  */
 public class UserEditPage extends BasicWorkspacePage implements ContragentListSelectPage.CompleteHandler, OrgListSelectPage.CompleteHandlerList,
-        OrgMainBuildingListSelectPage.CompleteHandler {
+        OrgMainBuildingListSelectPage.CompleteHandler, OrgSelectPage.CompleteHandler, ClientSelectPage.CompleteHandler {
 
     protected Long idOfUser;
     protected String userName;
@@ -70,6 +72,10 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     protected String surname;
     protected String secondName;
     protected String department;
+    protected OrgItem userOrg = new OrgItem(null, null);
+    protected String userOrgName = "Не выбрано";
+    protected Long userIdOfClient;
+    protected String userClientName = "Не выбрано";
 
     protected UserNotificationType selectOrgType;
 
@@ -171,6 +177,10 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 user.setPerson(person);
                 session.save(person);
             }
+            if(userOrg.idOfOrg != null)
+                user.setOrg((Org) session.load(Org.class, userOrg.idOfOrg));
+            if(userIdOfClient != null)
+                user.setClient((Client) session.load(Client.class, userIdOfClient));
             user.setPhone(phone);
             user.setEmail(email);
             user.setUpdateTime(new Date());
@@ -204,6 +214,22 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                 if (contragentItems.isEmpty()) {
                     this.printError("Список контрагентов пуст.");
                     throw new RuntimeException("Contragent list is empty");
+                }
+            }
+            if(role != null && (role.equals(User.DefaultRole.CLASSROOM_TEACHER)
+                    || role.equals(User.DefaultRole.CLASSROOM_TEACHER_WITH_FOOD_PAYMENT)
+                    || role.equals(User.DefaultRole.INFORMATION_SYSTEM_OPERATOR))) {
+                user.setRoleName(role.toString());
+                if(user.getClient() == null){
+                    this.printError("Выберите клиента.");
+                    throw new RuntimeException("Client field is null");
+                }
+            }
+            if(role != null && role.equals(User.DefaultRole.PRODUCTION_DIRECTOR)){
+                user.setRoleName(role.toString());
+                if(user.getOrg() == null){
+                    this.printError("Выберите организацию.");
+                    throw new RuntimeException("Org field is null");
                 }
             }
             user.getContragents().clear();
@@ -700,6 +726,14 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
         this.region = user.getRegion();
         this.needChangePassword = user.getNeedChangePassword();
         this.changePassword = false;
+        if(user.getClient() != null){
+            this.userClientName = user.getClient().getPerson().getFullName();
+            this.userIdOfClient = user.getClient().getIdOfClient();
+        }
+        if(user.getOrg() != null){
+            this.userOrg = new OrgItem(user.getOrg().getIdOfOrg(), user.getOrg().getShortName());
+            this.userOrgName = userOrg.getShortName();
+        }
         initRegions(session);
     }
 
@@ -742,6 +776,14 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
     public void setDepartment(String department) {
         this.department = department;
     }
+
+    public String getUserOrgName() { return userOrgName; }
+
+    public void setUserOrgName(String userOrgName) { this.userOrgName = userOrgName; }
+
+    public String getUserClientName() { return  userClientName; }
+
+    public void setUserClientName(String userClientName) { this.userClientName = userClientName; }
 
     public static class ContragentItem {
 
@@ -959,6 +1001,35 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
                     organizationsFilter = stringBuilder.substring(0, stringBuilder.length() - 2);
                 }
             }
+        }
+    }
+
+    @Override
+    public void completeOrgSelection(Session session, Long idOfOrg) throws Exception {
+        if(idOfOrg == null){
+            this.userOrg = new OrgItem(null, "Не выбрано");
+            this.userOrgName = "Не выбрано";
+        }
+        else {
+            Org org = (Org) session.load(Org.class, idOfOrg);
+            this.userOrg = new OrgItem(org.getIdOfOrg(), org.getShortName());
+            this.userOrgName = org.getShortName();
+        }
+    }
+
+    @Override
+    public void completeClientSelection(Session session, Long idOfClient) throws Exception {
+        if(idOfClient == null) {
+            this.userIdOfClient = null;
+            this.userClientName = "Не выбрано";
+        }
+        else {
+            Client client = (Client) session.load(Client.class,idOfClient);
+            this.userIdOfClient = client.getIdOfClient();
+            this.userClientName = client.getPerson().getFullName();
+            this.firstName = client.getPerson().getFirstName();
+            this.secondName = client.getPerson().getSecondName();
+            this.surname = client.getPerson().getSurname();
         }
     }
 }

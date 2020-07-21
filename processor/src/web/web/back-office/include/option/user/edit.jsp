@@ -16,6 +16,14 @@
              columns="2">
     <h:outputText escape="true" value="Имя пользователя" styleClass="output-text" />
     <h:inputText value="#{mainPage.userEditPage.userName}" maxlength="64" styleClass="input-text" />
+    <h:outputText escape="true" value="Клиент" styleClass="output-text"/>
+    <h:panelGroup styleClass="borderless-div">
+        <h:inputText value="#{mainPage.userEditPage.userClientName}" readonly="true" styleClass="input-text"
+                     style="margin-right: 2px;" />
+        <a4j:commandButton value="..." action="#{mainPage.showClientSelectPage}" reRender="modalClientSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalClientSelectorPanel')}.show();"
+                           styleClass="command-link" style="width: 25px;" />
+    </h:panelGroup>
     <h:outputText escape="true" value="Фамилия" styleClass="output-text" />
     <h:inputText value="#{mainPage.userEditPage.surname}" maxlength="64" styleClass="input-text" />
     <h:outputText escape="true" value="Имя" styleClass="output-text" />
@@ -94,6 +102,14 @@
                                          target="#{mainPage.contragentListSelectPage.selectedIds}" />
         </a4j:commandButton>
         <h:outputText value=" {#{mainPage.userEditPage.contragentFilter}}" styleClass="output-text" escape="true" />
+    </h:panelGroup>
+    <h:outputText escape="true" value="Организация" styleClass="output-text"/>
+    <h:panelGroup>
+        <a4j:commandButton value="..." action="#{mainPage.showOrgSelectPage}"
+                           reRender="modalOrgSelectorPanel"
+                           oncomplete="if (#{facesContext.maximumSeverity == null}) #{rich:component('modalOrgSelectorPanel')}.show()"
+                           styleClass="command-link" style="width: 25px;" />
+        <h:outputText styleClass="output-text" escape="true" value=" {#{mainPage.userEditPage.userOrgName}}" />
     </h:panelGroup>
     <h:outputText escape="true" value="Список организаций рассылки (заявок)" styleClass="output-text" rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}" />
     <h:panelGroup rendered="#{!mainPage.userEditPage.isSecurityAdmin && !mainPage.userEditPage.isDirector}">
