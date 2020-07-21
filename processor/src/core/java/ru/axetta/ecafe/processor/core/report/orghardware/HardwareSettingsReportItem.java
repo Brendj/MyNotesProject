@@ -41,7 +41,6 @@ public class HardwareSettingsReportItem {
     //----------------- параметры турникетов --------------------//
     private String turnstileId;//ip/mac
     private Integer numOfEntries;
-    private Integer numOfTurnstile;
     private String controllerModel;
     private String controllerFirmwareVersion;
     private String isWorkWithLongIds;
@@ -98,7 +97,7 @@ public class HardwareSettingsReportItem {
         setLastUpdate((Date) query.setMaxResults(1).uniqueResult());
     }
 
-    public HardwareSettingsReportItem(TurnstileSettings ts, int numOfTurnstile, OrgSync orgSync) {
+    public HardwareSettingsReportItem(TurnstileSettings ts, OrgSync orgSync) {
 
         setOrgNumberInName(orgSync.getOrg().getOrgNumberInName());
         setIdOfOrg(orgSync.getIdOfOrg());
@@ -126,10 +125,8 @@ public class HardwareSettingsReportItem {
         }
 
         setModuleType("Турникет");
-
         setTurnstileId(ts.getTurnstileId());
         setNumOfEntries(ts.getNumOfEntries());
-        setNumOfTurnstile(numOfTurnstile);
         setControllerModel(ts.getControllerModel());
         setControllerFirmwareVersion(ts.getControllerFirmwareVersion());
         if (ts.getIsReadsLongIdsIncorrectly() == 1) {
@@ -267,14 +264,6 @@ public class HardwareSettingsReportItem {
 
     public void setNumOfEntries(Integer numOfEntries) {
         this.numOfEntries = numOfEntries;
-    }
-
-    public Integer getNumOfTurnstile() {
-        return numOfTurnstile;
-    }
-
-    public void setNumOfTurnstile(Integer numOfTurnstile) {
-        this.numOfTurnstile = numOfTurnstile;
     }
 
     public String getControllerModel() {

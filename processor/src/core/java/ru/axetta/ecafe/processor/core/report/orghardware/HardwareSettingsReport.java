@@ -220,7 +220,7 @@ public class HardwareSettingsReport extends BasicReportForListOrgsJob {
                     List<TurnstileSettings> turnstileSettingsList = turnstileCriteria.list();
                     for (TurnstileSettings ts : turnstileSettingsList) {
                         if (showTurnstiles) {
-                            result.add(new HardwareSettingsReportItem(ts, turnstileSettingsList.size(), orgSync));
+                            result.add(new HardwareSettingsReportItem(ts, orgSync));
                         }
                     }
                 }

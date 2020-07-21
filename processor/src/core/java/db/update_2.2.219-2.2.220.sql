@@ -5,6 +5,17 @@
 -- Пакет обновлений 220
 
 --340
+
+drop table if exists cf_hardware_settings_mt;
+
+drop table if exists cf_hardware_settings;
+
+drop table if exists cf_turnstile_settings;
+
+drop sequence if exists cf_hardwaresettings_idofhardwaresetting_mt_seq;
+
+drop sequence if exists cf_turnstilesettings_idofturnstilesetting_seq;
+
 CREATE TABLE public.cf_hardware_settings
 (
   idoforg                int8 NOT NULL,

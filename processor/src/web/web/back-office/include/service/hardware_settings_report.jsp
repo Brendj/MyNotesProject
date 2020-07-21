@@ -33,13 +33,6 @@
             </a4j:commandButton>
             <h:outputText styleClass="output-text" escape="true" value=" {#{hardwareSettingsReportPage.filter}}" />
         </h:panelGroup>
-        <%--<h:outputText styleClass="output-text" escape="true" value="Статус" />--%>
-        <%--<h:selectOneMenu id="orgStatus"--%>
-        <%--value="#{hardwareSettingsReportPage.status}"--%>
-        <%--styleClass="input-text" style="width: 250px;">--%>
-        <%--<f:selectItems value="#{hardwareSettingsReportPage.statuses}" />--%>
-        <%--<a4j:support event="onchange" />--%>
-        <%--</h:selectOneMenu>--%>
         <h:outputText styleClass="output-text" escape="true" value="Округ" />
         <h:selectOneMenu id="orgDistricts" value="#{hardwareSettingsReportPage.selectedDistricts}"
                          styleClass="input-text" style="width: 250px;">
@@ -101,7 +94,7 @@
                     <rich:column headerClass="center-aligned-column" colspan="1">
                         <h:outputText styleClass="column-header" escape="true" value="" />
                     </rich:column>
-                    <rich:column headerClass="center-aligned-column" colspan="18">
+                    <rich:column headerClass="center-aligned-column" colspan="17">
                         <h:outputText styleClass="column-header" escape="true"
                                       value="Параметры" />
                     </rich:column>
@@ -246,13 +239,6 @@
                     <h:outputText escape="false" value="Количество<br/> входных групп" />
                 </f:facet>
                 <h:outputText escape="true" value="#{item.numOfEntries}" styleClass="output-text" />
-            </rich:column>
-            <rich:column sortable="true" sortBy="#{item.numOfTurnstile}" headerClass="column-header"
-                         label="Количество контроллеров" styleClass="center-aligned-column">
-                <f:facet name="header">
-                    <h:outputText escape="false" value="Количество<br/> контроллеров" />
-                </f:facet>
-                <h:outputText escape="true" value="#{item.numOfTurnstile}" styleClass="output-text" />
             </rich:column>
             <rich:column sortable="true" sortBy="#{item.controllerModel}" headerClass="column-header"
                          label="Модели контроллера" styleClass="center-aligned-column">
