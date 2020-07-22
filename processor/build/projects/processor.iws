@@ -37,7 +37,10 @@
     <option name="historyRevisionsNumber" value="4" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="ispp/processor#556&#10;Удалены поля userId, token из сущностей запросов&#10;Обновлена сущность refreshToken&#10;Реализована проверка пользователя" />
+    <list default="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="ispp/processor#556&#10;add upd sql">
+      <change beforePath="$PROJECT_DIR$/processor.iws" beforeDir="false" afterPath="$PROJECT_DIR$/processor.iws" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JwtTokenProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JwtTokenProvider.java" afterDir="false" />
+    </list>
     <list id="d97cb2f4-a0b2-437d-82e4-6aca4782d0ca" name="Ignore" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1723,7 +1726,7 @@
       <workItem from="1595185753264" duration="1231000" />
       <workItem from="1595231913840" duration="8519000" />
       <workItem from="1595315353255" duration="29073000" />
-      <workItem from="1595399532758" duration="14252000" />
+      <workItem from="1595399532758" duration="15385000" />
     </task>
     <task id="LOCAL-00001">
       <created>1353601439266</created>
@@ -1998,7 +2001,14 @@
       <option name="project" value="LOCAL" />
       <updated>1595416822691</updated>
     </task>
-    <option name="localTasksCounter" value="40" />
+    <task id="LOCAL-00040" summary="ispp/processor#556&#10;add upd sql">
+      <created>1595417079903</created>
+      <option name="number" value="00040" />
+      <option name="presentableId" value="LOCAL-00040" />
+      <option name="project" value="LOCAL" />
+      <updated>1595417079904</updated>
+    </task>
+    <option name="localTasksCounter" value="41" />
     <servers>
       <JIRA url="https://bugtracker.axetta.ru:9901/browse/ECAFE">
         <username>kadyrov</username>
@@ -2067,7 +2077,6 @@
     <option name="PERFORM_COMMIT_IN_BACKGROUND" value="false" />
     <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
     <option name="USE_COMMIT_MESSAGE_MARGIN" value="false" />
-    <MESSAGE value="удалил ссылки на не используемые страницы" />
     <MESSAGE value="Сделал текст заголовок белым цветом, далее рекомендуется использовать стиль для текста заголовка column-header" />
     <MESSAGE value="Поправил запрос по вычислению данных по контрагентам перевел из нативного SQL в CriteriaAPI" />
     <MESSAGE value="Добавлены колонки&#10;Клиентов с покупкой платного питания - &#10;Клиентов с покупкой льготного питания - &#10;Клиентов с покупкой платного питания / покупкой льготного питания -&#10;Исправлено&#10;Уникальных клиентов с платежными операциями заменить на &quot;Клиентов с пополнениями&quot;" />
@@ -2092,7 +2101,8 @@
     <MESSAGE value="ispp/processor#556&#10;Добавлены классы ошибок,&#10;реализованы методы валидации токена, преобразования токена в userDetails etc" />
     <MESSAGE value="ispp/processor#556&#10;add libs" />
     <MESSAGE value="ispp/processor#556&#10;Удалены поля userId, token из сущностей запросов&#10;Обновлена сущность refreshToken&#10;Реализована проверка пользователя" />
-    <option name="LAST_COMMIT_MESSAGE" value="ispp/processor#556&#10;Удалены поля userId, token из сущностей запросов&#10;Обновлена сущность refreshToken&#10;Реализована проверка пользователя" />
+    <MESSAGE value="ispp/processor#556&#10;add upd sql" />
+    <option name="LAST_COMMIT_MESSAGE" value="ispp/processor#556&#10;add upd sql" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
@@ -2195,10 +2205,10 @@
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
     <state x="505" y="131" key="SettingsEditor/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594906217206" />
-    <state x="617" y="289" key="Vcs.Push.Dialog.v2" timestamp="1595241755447">
+    <state x="617" y="289" key="Vcs.Push.Dialog.v2" timestamp="1595417086938">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state x="617" y="289" key="Vcs.Push.Dialog.v2/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595241755447" />
+    <state x="617" y="289" key="Vcs.Push.Dialog.v2/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595417086938" />
     <state x="754" y="448" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1594898200963">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>

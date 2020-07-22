@@ -40,7 +40,7 @@ public class JwtTokenProvider {
     public String createToken(String username) throws Exception {
         if (username == null)
             throw new Exception("Authentication error");
-        Map<String, Object> tokenData = new HashMap<>();
+        Map<String, Object> tokenData = new LinkedHashMap<String, Object>();
         UserDetailsService userDetailsService = RuntimeContext.getAppContext().getBean(JwtUserDetailsService.class);
         JwtUserDetailsImpl user = (JwtUserDetailsImpl) userDetailsService.loadUserByUsername(username);
         tokenData.put(JwtClaimsConstant.CLIENT_TYPE, "user");
