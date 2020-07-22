@@ -9,7 +9,8 @@ public enum JwtLoginErrors {
     INVALID_PASSWORD(201, "Invalid password"),
     USER_NOT_FOUND(203,"User not found"),
     USER_IS_BLOCKED(204,"User is blocked"),
-    UNSUCCESSFUL_AUTHORIZATION(205, "Unsuccessful authorization");
+    UNSUCCESSFUL_AUTHORIZATION(205, "Unsuccessful authorization"),
+    INVALID_REFRESH_TOKEN(206, "Invalid refresh token");
 
     private int errorCode;
     private String errorMessage;

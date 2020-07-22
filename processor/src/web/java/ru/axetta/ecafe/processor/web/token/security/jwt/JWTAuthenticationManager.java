@@ -14,7 +14,6 @@ import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
 
 import org.springframework.security.authentication.AuthenticationManager;
-import org.springframework.security.authentication.AuthenticationServiceException;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.stereotype.Service;
@@ -35,7 +34,7 @@ public class JWTAuthenticationManager implements AuthenticationManager {
                 return authentication;
             }
         } catch (Exception ex) {
-            if(ex instanceof AuthenticationServiceException)
+            if(ex instanceof AuthenticationException)
                 throw ex;
         }
         return authentication;

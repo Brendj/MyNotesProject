@@ -8,6 +8,7 @@ import ru.axetta.ecafe.processor.core.RuntimeContext;
 
 
 public final class JwtConfig {
+    public static final String REFRESH_TOKEN_KEY = "zW5bJg8mFh";
     public static final String TOKEN_HEADER = "Authorization";
     public static final String TOKEN_PREFIX = "Bearer ";
 
@@ -15,11 +16,11 @@ public final class JwtConfig {
         return RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.schoolapi.JwtAuth.secretKey", null);
     }
 
-    public static Integer getExpirationTime(){
-        return RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.schoolapi.JwtAuth.expiration_time", 0);
+    public static Long getExpirationTime(){
+        return new Long(RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.schoolapi.JwtAuth.expiration_time", 0) * 1000);
     }
 
-    public static Integer getExpirationLongTime(){
-        return RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.schoolapi.JwtAuth.expiration_long_time",0);
+    public static Long getExpirationLongTime(){
+        return new Long(RuntimeContext.getInstance().getPropertiesValue("ecafe.processor.schoolapi.JwtAuth.expiration_long_time",0) * 1000);
     }
 }

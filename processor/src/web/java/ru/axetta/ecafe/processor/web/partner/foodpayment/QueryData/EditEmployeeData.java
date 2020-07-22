@@ -35,7 +35,7 @@ public class EditEmployeeData extends QueryBodyData {
 
     @Override
     public String toString(){
-        return new StringBuilder(String.format("EditEmployeeData: token = %s; userId = %o; orgId = %o; groupName = %s; contractId = %o; status = %s",
-                this.getToken(), this.getUserId(), this.getOrgId(), this.groupName, this.contractId, this.status)).toString();
+        return new StringBuilder(String.format("EditEmployeeData: orgId = %o; groupName = %s; contractId = %o; status = %s",
+                this.getOrgId(), this.groupName, this.contractId, this.status)).toString();
     }
 }

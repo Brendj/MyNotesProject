@@ -4,7 +4,10 @@
 
 package ru.axetta.ecafe.processor.web.token.security.jwt;
 
+import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrorDTO;
+import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.JwtAuthenticationException;
+import ru.axetta.ecafe.processor.web.token.security.util.JwtConfig;
 
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
@@ -24,7 +27,6 @@ import java.io.IOException;
 
 public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFilter {
 
-    private static final String AUTHORIZATION_HEADER = "Auhorization";
 
     public JWTAuthenticationFilter() {
         super("/school/api/v1/");
@@ -55,20 +57,16 @@ public class JWTAuthenticationFilter extends AbstractAuthenticationProcessingFil
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
             throws AuthenticationException, IOException, ServletException {
-        String token = request.getHeader(AUTHORIZATION_HEADER);
-        if (token == null || !token.startsWith("Bearer ")){
-            throw new JwtAuthenticationException("Token invalid");
+        String token = request.getHeader(JwtConfig.TOKEN_HEADER);
+        if (token == null || !token.startsWith(JwtConfig.TOKEN_PREFIX)) {
+            throw new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_INVALID.getErrorCode(),
+                    JwtAuthenticationErrors.TOKEN_INVALID.getErrorMessage()));
         }
         JWTAuthentication JWTAuthentication = new JWTAuthentication(token.substring(7));
         Authentication authentication = getAuthenticationManager().authenticate(JWTAuthentication);
         return authentication;
     }
 
-    /*@Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, Authentication authResult)
-            throws IOException, ServletException {
-        SecurityContextHolder.getContext().setAuthentication(authResult);
-    }*/
 
     @Override
     protected boolean requiresAuthentication(HttpServletRequest request, HttpServletResponse response){

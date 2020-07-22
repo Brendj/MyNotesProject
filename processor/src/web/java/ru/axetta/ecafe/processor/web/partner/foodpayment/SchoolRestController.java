@@ -5,12 +5,18 @@
 package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
 import ru.axetta.ecafe.processor.core.RuntimeContext;
+import ru.axetta.ecafe.processor.core.persistence.RefreshToken;
+import ru.axetta.ecafe.processor.core.persistence.User;
 import ru.axetta.ecafe.processor.core.utils.HibernateUtils;
 import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.CreateGroupData;
 import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.EditEmployeeData;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.LoginData;
+import ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData.RefreshTokenData;
 import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginService;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginServiceImpl;
+import ru.axetta.ecafe.processor.web.token.security.service.JwtUserDetailsImpl;
+import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginDTO;
 import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginException;
 
@@ -18,7 +24,6 @@ import org.hibernate.Session;
 import org.hibernate.Transaction;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
@@ -39,11 +44,11 @@ public class SchoolRestController {
     private Logger logger = LoggerFactory.getLogger(SchoolRestController.class);
 
 
-    @GET
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "authorization/signin")
-    public Response signin(@Context HttpServletRequest request,@QueryParam(value = "username") String username, @QueryParam(value = "password") String password){
+    public Response signin(@Context HttpServletRequest request, LoginData loginData){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -52,14 +57,18 @@ public class SchoolRestController {
         try{
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
+            if(loginData.getUsername() == null || loginData.getPassword() == null)
+                throw new JwtLoginException(JwtLoginErrors.USERNAME_IS_NULL.getErrorCode(),
+                        JwtLoginErrors.USERNAME_IS_NULL.getErrorMessage());
             tokenService = new JwtTokenProvider();
             jwtLoginService = new JWTLoginServiceImpl();
-            if(jwtLoginService.login(username, password, request.getRemoteAddr(), persistenceSession)){
-                String token = tokenService.getToken(username);
+            if(jwtLoginService.login(loginData.getUsername(), loginData.getPassword(), request.getRemoteAddr(), persistenceSession)){
+                String token = tokenService.createToken(loginData.getUsername());
+                String refreshToken = tokenService.createRefreshToken(null,loginData.getUsername(),request.getRemoteAddr(),persistenceSession);
                 persistenceSession.flush();
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
-                return Response.status(HttpURLConnection.HTTP_OK).entity(token).build();
+                return Response.status(HttpURLConnection.HTTP_OK).entity(new JwtLoginDTO(token, refreshToken)).build();
             }
             else
                 throw new JwtLoginException(JwtLoginErrors.UNSUCCESSFUL_AUTHORIZATION.getErrorCode(),
@@ -81,31 +90,24 @@ public class SchoolRestController {
         }
     }
 
-    @GET
+    @POST
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "authorization/refreshtoken")
-    public Response refreshToken(@Context HttpServletRequest request,@QueryParam(value = "username") String username, @QueryParam(value = "password") String password){
+    public Response refreshToken(@Context HttpServletRequest request, RefreshTokenData refreshTokenData){
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
         JwtTokenProvider tokenService;
-        JWTLoginService jwtLoginService;
         try{
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
-            tokenService = new JwtTokenProvider();
-            jwtLoginService = new JWTLoginServiceImpl();
-            if(jwtLoginService.login(username, password, request.getRemoteAddr(), persistenceSession)){
-                String token = tokenService.getToken(username);
-                persistenceSession.flush();
-                persistenceTransaction.commit();
-                persistenceTransaction = null;
-                return Response.status(HttpURLConnection.HTTP_OK).entity(token).build();
-            }
-            else
-                throw new JwtLoginException(JwtLoginErrors.UNSUCCESSFUL_AUTHORIZATION.getErrorCode(),
-                        JwtLoginErrors.UNSUCCESSFUL_AUTHORIZATION.getErrorMessage());
+            tokenService = RuntimeContext.getAppContext().getBean(JwtTokenProvider.class);
+            RefreshToken refreshToken = tokenService.refreshTokenIsValid(refreshTokenData.getRefreshToken(),request.getRemoteAddr(),persistenceSession);
+            String accessToken = tokenService.createToken(refreshToken.getUser().getUserName());
+            String newRefreshToken = tokenService.createRefreshToken(refreshToken.getRefreshTokenHash(),
+                    refreshToken.getUser().getUserName(),request.getRemoteAddr(), persistenceSession);
+            return Response.status(HttpURLConnection.HTTP_OK).entity(new JwtLoginDTO(accessToken, newRefreshToken)).build();
 
         }
         catch (JwtLoginException e){
@@ -137,11 +139,18 @@ public class SchoolRestController {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
+            checkAuthentication(authentication);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            //Проверка на доступ определенной роли
+            groupManagementService.checkPermission(jwtUserDetails.getIdOfRole(),
+                    User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification(),
+                    jwtUserDetails.getIdOfOrg().longValue(), createGroupData.getOrgId());
             groupManagementService.addOrgGroup(createGroupData.getOrgId(), createGroupData.getGroupName());
             persistenceSession.flush();
             persistenceTransaction.commit();
             persistenceTransaction = null;
             return Response.status(HttpURLConnection.HTTP_CREATED).entity(new Result(0, "Ok")).build();
+
         }
         catch (RequestProcessingException e){
             logger.error(("Bad request: "+createGroupData.toString()+";"+e.toString()), e);
@@ -161,9 +170,8 @@ public class SchoolRestController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "grouplist")
-    @PreAuthorize("hasAuthority('ADMIN')")
-    public Response groupList(@QueryParam(value = "token") String token, @QueryParam(value = "userId") Long userId,
-            @QueryParam(value = "orgId") Long orgId){
+    public Response groupList(@QueryParam(value = "orgId") Long orgId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -173,6 +181,12 @@ public class SchoolRestController {
             persistenceTransaction = persistenceSession.beginTransaction();
             ResponseGroups responseGroups = new ResponseGroups();
             groupManagementService = new GroupManagementService(persistenceSession);
+            checkAuthentication(authentication);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            //Проверка на доступ определенной роли
+            groupManagementService.checkPermission(jwtUserDetails.getIdOfRole(),
+                    User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification(),
+                    jwtUserDetails.getIdOfOrg().longValue(), orgId.longValue());
             List<GroupInfo> groupInfoList = groupManagementService.getOrgGroups(orgId);
             persistenceSession.flush();
             persistenceTransaction.commit();
@@ -184,7 +198,7 @@ public class SchoolRestController {
 
         }
         catch (RequestProcessingException e){
-            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s",token,userId, orgId, e.toString()), e);
+            logger.error(String.format("Bad request: orgId = %o; %s",orgId, e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
         catch (Exception e){
@@ -201,8 +215,8 @@ public class SchoolRestController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "employees")
-    public Response employees(@QueryParam(value = "token") String token, @QueryParam(value = "userId") Long userId,
-            @QueryParam(value = "orgId") Long orgId){
+    public Response employees(@QueryParam(value = "orgId") Long orgId){
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -211,6 +225,12 @@ public class SchoolRestController {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
+            checkAuthentication(authentication);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            //Проверка на доступ определенной роли
+            groupManagementService.checkPermission(jwtUserDetails.getIdOfRole(),
+                    User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification(),
+                    jwtUserDetails.getIdOfOrg().longValue(), orgId.longValue());
             ResponseEmployees responseEmployees = new ResponseEmployees();
             List<GroupEmployee> groupEmployeeList = groupManagementService.getEmployees(orgId);
             persistenceSession.flush();
@@ -222,7 +242,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseEmployees).build();
         }
         catch (RequestProcessingException e){
-            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s",token,userId, orgId, e.toString()), e);
+            logger.error(String.format("Bad request: orgId = %o; %s", orgId, e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
         catch (Exception e){
@@ -248,6 +268,13 @@ public class SchoolRestController {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            checkAuthentication(authentication);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            //Проверка на доступ определенной роли
+            groupManagementService.checkPermission(jwtUserDetails.getIdOfRole(),
+                    User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification(),
+                    jwtUserDetails.getIdOfOrg().longValue(), editEmployeeData.getOrgId());
             groupManagementService.editEmployee(editEmployeeData.getOrgId(), editEmployeeData.getGroupName(),
                     editEmployeeData.getContractId(), editEmployeeData.getStatus());
             persistenceSession.flush();
@@ -282,6 +309,13 @@ public class SchoolRestController {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            checkAuthentication(authentication);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            //Проверка на доступ определенной роли
+            groupManagementService.checkPermission(jwtUserDetails.getIdOfRole(),
+                    User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification(),
+                    jwtUserDetails.getIdOfOrg().longValue(), clientsListRequest.getOrgId().longValue());
             ResponseClients responseClients = groupManagementService.getClientsList(clientsListRequest.getGroupsList(), clientsListRequest.getOrgId());
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -290,8 +324,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseClients).build();
         }
         catch (RequestProcessingException e){
-            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s", clientsListRequest.getToken(),
-                    clientsListRequest.getUserId(), clientsListRequest.getOrgId(), e.toString()), e);
+            logger.error(String.format("Bad request: orgId = %o; %s", clientsListRequest.getOrgId(), e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
         catch (Exception e){
@@ -308,8 +341,7 @@ public class SchoolRestController {
     @Consumes(MediaType.APPLICATION_JSON)
     @Produces(MediaType.APPLICATION_JSON)
     @Path(value = "discounts")
-    public Response getDiscounts(@QueryParam(value = "token") String token, @QueryParam(value = "userId") Long userId,
-            @QueryParam(value = "orgId") Long orgId) {
+    public Response getDiscounts(@QueryParam(value = "orgId") Long orgId) {
         RuntimeContext runtimeContext = RuntimeContext.getInstance();
         Session persistenceSession = null;
         Transaction persistenceTransaction = null;
@@ -318,6 +350,13 @@ public class SchoolRestController {
             persistenceSession = runtimeContext.createReportPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            checkAuthentication(authentication);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            //Проверка на доступ определенной роли
+            groupManagementService.checkPermission(jwtUserDetails.getIdOfRole(),
+                    User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification(),
+                    jwtUserDetails.getIdOfOrg().longValue(), orgId.longValue());
             ResponseDiscounts responseDiscounts = groupManagementService.getDiscountsList(orgId);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -326,8 +365,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscounts).build();
         }
         catch (RequestProcessingException e){
-            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s", token,
-                    userId, orgId, e.toString()), e);
+            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s", orgId, e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
         catch (Exception e){
@@ -353,6 +391,13 @@ public class SchoolRestController {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            checkAuthentication(authentication);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            //Проверка на доступ определенной роли
+            groupManagementService.checkPermission(jwtUserDetails.getIdOfRole(),
+                    User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification(),
+                    jwtUserDetails.getIdOfOrg().longValue(), discountClientsListRequest.getOrgId().longValue());
             ResponseDiscountClients responseDiscounts = groupManagementService.processDiscountClientsList(discountClientsListRequest);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -361,8 +406,7 @@ public class SchoolRestController {
             return Response.status(HttpURLConnection.HTTP_OK).entity(responseDiscounts).build();
         }
         catch (RequestProcessingException e){
-            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s", discountClientsListRequest.getToken(),
-                    discountClientsListRequest.getUserId(), discountClientsListRequest.getOrgId(), e.toString()), e);
+            logger.error(String.format("Bad request: orgId = %o; %s", discountClientsListRequest.getOrgId(), e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
         catch (Exception e){
@@ -388,6 +432,13 @@ public class SchoolRestController {
             persistenceSession = runtimeContext.createPersistenceSession();
             persistenceTransaction = persistenceSession.beginTransaction();
             groupManagementService = new GroupManagementService(persistenceSession);
+            Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+            checkAuthentication(authentication);
+            JwtUserDetailsImpl jwtUserDetails = (JwtUserDetailsImpl) authentication.getPrincipal();
+            //Проверка на доступ определенной роли
+            groupManagementService.checkPermission(jwtUserDetails.getIdOfRole(),
+                    User.DefaultRole.INFORMATION_SYSTEM_OPERATOR.getIdentification(),
+                    jwtUserDetails.getIdOfOrg().longValue(), discountClientsListRequest.getOrgId().longValue());
             ResponseDiscountGroups responseDiscounts = groupManagementService.processDiscountGroupsList(discountClientsListRequest);
             persistenceTransaction.commit();
             persistenceTransaction = null;
@@ -397,8 +448,7 @@ public class SchoolRestController {
 
         }
         catch (RequestProcessingException e){
-            logger.error(String.format("Bad request: token = %s; userId = %o; orgId = %o; %s", discountClientsListRequest.getToken(),
-                    discountClientsListRequest.getUserId(), discountClientsListRequest.getOrgId(), e.toString()), e);
+            logger.error(String.format("Bad request: orgId = %o; %s", discountClientsListRequest.getOrgId(), e.toString()), e);
             return Response.status(HttpURLConnection.HTTP_BAD_REQUEST).entity(new Result(e.getErrorCode(), e.getErrorMessage())).build();
         }
         catch (Exception e){
@@ -410,5 +460,25 @@ public class SchoolRestController {
             HibernateUtils.close(persistenceSession, logger);
         }
     }
+
+    private void checkAuthentication(Authentication authentication) throws Exception {
+        if(authentication == null || authentication.getPrincipal() == null || !authentication.isAuthenticated()){
+            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+        }
+        if(!userDetailsIsValid((JwtUserDetailsImpl) authentication.getPrincipal())){
+            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+        }
+    }
+
+    private boolean userDetailsIsValid(JwtUserDetailsImpl userDetails){
+        if(userDetails.isEnabled() && userDetails.getIdOfOrg() != null && userDetails.getIdOfRole() != null && userDetails.getIdOfUser() != null){
+            return true;
+        }
+        return false;
+    }
+
+
 
 }

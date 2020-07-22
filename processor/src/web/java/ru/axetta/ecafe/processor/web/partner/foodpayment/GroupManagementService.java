@@ -31,9 +31,16 @@ public class GroupManagementService implements IGroupManagementService {
 
 
     @Override
-    public Boolean checkPermission(String token) throws Exception {
-        throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
-                GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+    public void checkPermission(int userIdOfRole, int permittedIdOfRole, long userOrgId, long requestOrgId)
+            throws Exception {
+        if(userIdOfRole != permittedIdOfRole)
+            throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                    GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+        if(userOrgId != requestOrgId){
+            if(!orgIsFriendly(requestOrgId, userOrgId))
+                throw new RequestProcessingException(GroupManagementErrors.USER_NOT_FOUND.getErrorCode(),
+                        GroupManagementErrors.USER_NOT_FOUND.getErrorMessage());
+        }
     }
 
     @Override
@@ -478,6 +485,17 @@ public class GroupManagementService implements IGroupManagementService {
                 | (clientGroupId.equals(ClientGroup.Predefined.CLIENT_EMPLOYEES.getValue()))
                 | (clientGroupId.equals(ClientGroup.Predefined.CLIENT_TECH_EMPLOYEES.getValue()))) {
             return true;
+        }
+        return false;
+    }
+
+    private boolean orgIsFriendly(long orgId, long friendlyOrgId) throws Exception{
+        List<Org> orgs = DAOUtils.findFriendlyOrgs(persistanceSession,orgId);
+        for (Org org: orgs){
+            if(org.getIdOfOrg() != null){
+                if(org.getIdOfOrg().longValue() == friendlyOrgId)
+                    return true;
+            }
         }
         return false;
     }

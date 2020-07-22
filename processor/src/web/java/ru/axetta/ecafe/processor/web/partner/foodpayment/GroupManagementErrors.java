@@ -7,7 +7,7 @@ package ru.axetta.ecafe.processor.web.partner.foodpayment;
 public enum GroupManagementErrors {
     ORG_NOT_FOUND(101, "Организация не найдена."),
     GROUP_NOT_FOUND(102,"Группа не найдена"),
-    USER_NOT_FOUND(103,"Пользователь не найдет"),
+    USER_NOT_FOUND(103,"Пользователь не найден"),
     BUNCH_NOT_FOUND(104, "Связка не найдена"),
     EMPLOYEE_NOT_FOUND(105, "Сотрудник не найден"),
     EMPLOYEES_NOT_FOUND(106, "Сотрудники не найдены"),

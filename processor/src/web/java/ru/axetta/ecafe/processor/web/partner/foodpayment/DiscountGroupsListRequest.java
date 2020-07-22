@@ -9,11 +9,6 @@ import org.codehaus.jackson.annotate.JsonProperty;
 import java.util.List;
 
 public class DiscountGroupsListRequest {
-    @JsonProperty("Token")
-    private String token;
-
-    @JsonProperty("UserId")
-    private Long userId;
 
     @JsonProperty("OrgId")
     private Long orgId;
@@ -26,22 +21,6 @@ public class DiscountGroupsListRequest {
 
     @JsonProperty("Groups")
     private List<String> groups;
-
-    public String getToken() {
-        return token;
-    }
-
-    public void setToken(String token) {
-        this.token = token;
-    }
-
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     public Long getOrgId() {
         return orgId;
