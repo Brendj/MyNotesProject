@@ -4850,7 +4850,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                         cg.setDisabled(value);
                         cg.setVersion(getClientGuardiansResultVersion(session));
                         cg.setLastUpdate(new Date());
-                        cg.setRepresentType(ClientGuardianRepresentType.fromInteger(roleRepresentativePrincipal));
+                        //cg.setRepresentType(ClientGuardianRepresentType.fromInteger(roleRepresentativePrincipal));
                         session.persist(cg);
                     }
                 }
