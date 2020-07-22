@@ -125,19 +125,6 @@ public class RequestsSupplierItem {
             }
         }
 
-        //version = XMLUtils.getLongAttributeValue(itemNode, "V");
-
-        //Node detailNode = itemNode.getFirstChild();
-        //while (detailNode != null) {
-        //    if (Node.ELEMENT_NODE == detailNode.getNodeType() && detailNode.getNodeName().equals("RDI")) {
-        //        RequestsSupplierDetail detail = new RequestsSupplierDetail();
-        //        detail.build(detailNode);
-        //        requestsSupplierDetailList.add(detail);
-        //        errorMessage.append(detail.getErrorMessage());
-        //    }
-        //    detailNode = detailNode.getNextSibling();
-        //}
-
         DistributedObject distributedObject = null;
         try {
             distributedObject = GoodRequest.class.newInstance();
@@ -151,7 +138,6 @@ public class RequestsSupplierItem {
                 }
             }
         }
-
         GoodRequest goodRequest = (GoodRequest) distributedObject;
 
         Node detailNode = itemNode.getFirstChild();
@@ -168,7 +154,7 @@ public class RequestsSupplierItem {
         }
 
         this.setProperties(orgId, guid, number, doneDate, RequestsSupplierTypeEnum.fromInteger(type), staffGuid,
-                deletedState, version, errorMessage.toString(), requestsSupplierDetailList, (GoodRequest) distributedObject);
+                deletedState, version, errorMessage.toString(), requestsSupplierDetailList, goodRequest);
     }
 
     private void setProperties(Long orgId, String guid, String number, Date doneDate, RequestsSupplierTypeEnum type,

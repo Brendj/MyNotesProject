@@ -15,6 +15,7 @@ import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -2980,10 +2981,34 @@ public class DAOUtils {
 
     public static long nextVersionByGoodRequest(Session session) {
         long version = 0L;
+        //Query query = session.createSQLQuery(
+        //        "select currentversion from cf_do_versions "
+        //                + "where UPPER(distributedobjectclassname) = :distributedObjectClassName for update");
+        //query.setParameter("distributedObjectClassName", "GoodRequest".toUpperCase());
         Query query = session.createSQLQuery(
-                "select currentversion from cf_do_versions "
+                "select globalversion from cf_goods_requests order by globalversion desc limit 1 for update");
+        Object o = query.uniqueResult();
+        if (o != null) {
+            version = Long.valueOf(o.toString()) + 1;
+        }
+        return version;
+    }
+
+    public static List<DOVersion> getDoVersionList(Session session, String className) {
+        Query query = session.createSQLQuery("select currentversion from cf_do_versions "
                         + "where UPPER(distributedobjectclassname) = :distributedObjectClassName for update");
-        query.setParameter("distributedObjectClassName", "GoodRequest".toUpperCase());
+        query.setParameter("distributedObjectClassName", className.toUpperCase());
+        return (List<DOVersion>) query.list();
+    }
+
+    public static long nextVersionByGoodRequestPosition(Session session) {
+        long version = 0L;
+        //Query query = session.createSQLQuery(
+        //        "select currentversion from cf_do_versions "
+        //                + "where UPPER(distributedobjectclassname) = :distributedObjectClassName for update");
+        //query.setParameter("distributedObjectClassName", "GoodRequestPosition".toUpperCase());
+        Query query = session.createSQLQuery(
+                "select globalversion from cf_goods_requests_positions order by globalversion desc limit 1 for update");
         Object o = query.uniqueResult();
         if (o != null) {
             version = Long.valueOf(o.toString()) + 1;
@@ -3252,9 +3277,10 @@ public class DAOUtils {
     }
 
     public static List<GoodRequest> getGoodRequestForOrgSinceVersion(Session session, Long idOfOrg, long version) throws Exception {
-        List<Org> orgs = findAllFriendlyOrgs(session, idOfOrg);
+        //List<Long> orgIds = findFriendlyOrgIds(session, idOfOrg);
         Criteria criteria = session.createCriteria(GoodRequest.class);
-        criteria.add(Restrictions.in("orgOwner", orgs));
+        //criteria.add(Restrictions.in("orgOwner", orgIds));
+        criteria.add(Restrictions.eq("orgOwner", idOfOrg));
         criteria.add(Restrictions.gt("globalVersion", version));
         return criteria.list();
     }
@@ -3872,6 +3898,28 @@ public class DAOUtils {
         Criteria criteria = session.createCriteria(GoodRequestPosition.class);
         criteria.add(Restrictions.eq("goodRequest", request));
         return criteria.list();
+    }
+
+    public static List<GoodRequestPosition> getGoodRequestPositionsByGoodRequest(Session session,
+            GoodRequest request) {
+        Query query = session.createSQLQuery("select grp.idofgoodsrequestposition from cf_goods_requests_positions grp "
+                + "where grp.idofgoodsrequest = :idOfGoodRequest").setParameter("idOfGoodRequest",
+                request.getGlobalId());
+        List<GoodRequestPosition> result = new ArrayList<>();
+        for (Object o : query.list()) {
+            result.add(getGoodRequestPositionById(session, ((BigInteger) o).longValue()));
+        }
+        return result;
+    }
+
+    public static GoodRequestPosition getGoodRequestPositionById(Session session, Long id) {
+        try {
+            Query query = session.createQuery("SELECT grp from GoodRequestPosition grp where grp.globalId = :id");
+            query.setParameter("id", id);
+            return (GoodRequestPosition) query.uniqueResult();
+        } catch (Exception e) {
+            return null;
+        }
     }
 
     public static GoodRequest findGoodRequestByPreorderInfo(Session session, Long idOfOrg, Date createdDate) {

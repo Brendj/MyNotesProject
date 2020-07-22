@@ -26,16 +26,18 @@ public class ResRequestsSupplierDetail {
     public ResRequestsSupplierDetail() {
     }
 
-    public ResRequestsSupplierDetail(GoodRequestPosition detail) {
-        this.guid = detail.getGuid();
-        this.idOfComplex = detail.getComplexId() == null ? null : detail.getComplexId().longValue();
-        //this.idOfDish = detail.;
-        //this.fType = detail;
-        this.totalCount = detail.getTotalCount().intValue();
-        this.dProbeCount = detail.getDailySampleCount() == null ? 0 : detail.getDailySampleCount().intValue();
-        this.tempClientsCount = detail.getTempClientsCount() == null ? 0 : detail.getTempClientsCount().intValue();
-        this.deletedState = detail.getDeletedState();
-        this.version = detail.getGlobalVersion();
+    public ResRequestsSupplierDetail(GoodRequestPosition goodRequestPosition) {
+        this.guid = goodRequestPosition.getGuid();
+        this.idOfComplex = goodRequestPosition.getComplexId() == null ? null : goodRequestPosition.getComplexId().longValue();
+        this.idOfDish = goodRequestPosition.getIdOfDish();
+        this.fType = RequestsSupplierDetailTypeEnum.fromInteger(goodRequestPosition.getType());
+        this.totalCount = goodRequestPosition.getTotalCount().intValue();
+        this.dProbeCount = goodRequestPosition.getDailySampleCount() == null ? 0 :
+                goodRequestPosition.getDailySampleCount().intValue();
+        this.tempClientsCount = goodRequestPosition.getTempClientsCount() == null ? 0 :
+                goodRequestPosition.getTempClientsCount().intValue();
+        this.deletedState = goodRequestPosition.getDeletedState();
+        this.version = goodRequestPosition.getGlobalVersion();
     }
 
     public Element toElement(Document document, String elementName) throws Exception {

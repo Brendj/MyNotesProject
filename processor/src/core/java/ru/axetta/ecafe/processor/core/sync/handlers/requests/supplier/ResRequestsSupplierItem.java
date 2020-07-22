@@ -32,18 +32,23 @@ public class ResRequestsSupplierItem {
     private String errorMessage;
 
     public ResRequestsSupplierItem() {
-        List<ResRequestsSupplierDetail> resRequestsSupplierDetailList = new LinkedList<>();
     }
 
     public ResRequestsSupplierItem(GoodRequest goodRequest) {
         this.guid = goodRequest.getGuid();
         this.number = goodRequest.getNumber();
         this.doneDate = goodRequest.getDoneDate();
-        //this.type = goodRequest.;
+        this.type = RequestsSupplierTypeEnum.fromInteger(goodRequest.getRequestType());
         this.orgId = goodRequest.getOrgOwner();
         this.staffGuid = goodRequest.getGuidOfStaff();
         this.deletedState = goodRequest.getDeletedState();
         this.version = goodRequest.getGlobalVersion();
+        this.staffGuid = goodRequest.getStaff().getGuid();
+    }
+
+    public ResRequestsSupplierItem(String guid, Long version) {
+        this.guid = guid;
+        this.version = version;
     }
 
     public Element toElement(Document document, String elementName) throws Exception {
@@ -76,6 +81,9 @@ public class ResRequestsSupplierItem {
     public void addDetails(List<GoodRequestPosition> details) {
         if (details == null || details.isEmpty()) {
             return;
+        }
+        if (this.resRequestsSupplierDetailList == null) {
+           this.resRequestsSupplierDetailList = new LinkedList<>();
         }
         for (GoodRequestPosition detail : details) {
             this.getResRequestsSupplierDetailList().add(new ResRequestsSupplierDetail(detail));

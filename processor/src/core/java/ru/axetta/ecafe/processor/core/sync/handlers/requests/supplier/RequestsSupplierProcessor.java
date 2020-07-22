@@ -6,8 +6,10 @@ package ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier;
 
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
+import ru.axetta.ecafe.processor.core.persistence.distributedobjects.settings.Staff;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOReadonlyService;
 import ru.axetta.ecafe.processor.core.persistence.utils.DAOUtils;
 import ru.axetta.ecafe.processor.core.sync.AbstractProcessor;
@@ -44,11 +46,11 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
 
             for (RequestsSupplierItem item : requestsSupplier.getItems()) {
                 errorFound = !item.getResCode().equals(RequestsSupplierItem.ERROR_CODE_ALL_OK);
-                //if (!errorFound) {
+                String guid = item.getGuid();
+
+                if (!errorFound) {
 
                     Long idOfOrg = item.getOrgId();
-                    String guid = item.getGuid();
-
                     String number = item.getNumber();
                     Date doneDate = item.getDoneDate();
                     RequestsSupplierTypeEnum type = item.getType();
@@ -58,38 +60,61 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
 
                     GoodRequest goodRequest = DAOReadonlyService.getInstance().findGoodRequestByGuid(guid);
 
-                    if ((versionFromClient == null && goodRequest != null) || (versionFromClient != null &&
-                            goodRequest != null && versionFromClient < goodRequest.getGlobalVersion())) {
+                    if ((versionFromClient == null && goodRequest != null) || (versionFromClient != null
+                            && goodRequest != null && versionFromClient < goodRequest.getGlobalVersion())) {
                         errorFound = true;
                         item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
-                        item.setErrorMessage("Record versions conflict");
+                        item.setErrorMessage("Record version conflict");
                     } else {
                         if (goodRequest == null) {
                             goodRequest = item.getGoodRequest();
                         }
 
+                        Staff staff = DAOReadonlyService.getInstance().findStaffByGuid(staffGuid);
+                        if (staff == null) {
+                            item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
+                            item.setErrorMessage("No such a staff record");
+                        }
+
                         goodRequest.setOrgOwner(idOfOrg);
                         goodRequest.setNumber(number);
+                        goodRequest.setGlobalVersion(nextVersion);
+                        goodRequest.setDeletedState(deletedState);
                         goodRequest.setCreatedDate(new Date(System.currentTimeMillis()));
                         goodRequest.setDoneDate(doneDate);
                         goodRequest.setState(DocumentState.FOLLOW);
                         goodRequest.setRequestType(type.ordinal());
+                        goodRequest.setStaff(staff);
                         goodRequest.setGuidOfStaff(staffGuid);
                         goodRequest.setSendAll(SendToAssociatedOrgs.SendToMain);
 
                         session.saveOrUpdate(goodRequest);
 
+                        //List<DOVersion> doVersionList = DAOUtils.getDoVersionList(session, "GoodRequest");
+                        //DOVersion doVersion = null;
+                        //Long version = null;
+                        //if (doVersionList.size() == 0) {
+                        //    doVersion = new DOVersion();
+                        //    doVersion.setCurrentVersion(0L);
+                        //    version = 0L;
+                        //} else {
+                        //    doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
+                        //    version = doVersion.getCurrentVersion() + 1;
+                        //    doVersion.setCurrentVersion(version);
+                        //}
+
                         List<RequestsSupplierDetail> requestsSupplierDetailList = item.getRequestsSupplierDetailList();
                         if (requestsSupplierDetailList != null && requestsSupplierDetailList.size() > 0) {
                             for (RequestsSupplierDetail detail : requestsSupplierDetailList) {
+                                Long nextPositionVersion = DAOUtils.nextVersionByGoodRequestPosition(session);
                                 Long detailVersionFromClient = detail.getVersion();
 
                                 GoodRequestPosition goodRequestPosition = DAOReadonlyService.getInstance()
                                         .findGoodRequestPositionByGuid(guid);
 
-                                if ((detailVersionFromClient == null && goodRequestPosition != null) ||
-                                        (detailVersionFromClient != null && goodRequestPosition != null &&
-                                                detailVersionFromClient < goodRequestPosition.getGlobalVersion())) {
+                                if ((detailVersionFromClient == null && goodRequestPosition != null) || (
+                                        detailVersionFromClient != null && goodRequestPosition != null
+                                                && detailVersionFromClient < goodRequestPosition.getGlobalVersion())) {
                                     errorFound = true;
                                     item.setResCode(RequestsSupplierItem.ERROR_CODE_NOT_VALID_ATTRIBUTE);
                                     item.setErrorMessage("Record versions conflict");
@@ -102,9 +127,11 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                                 if (detail.getIdOfComplex() != null) {
                                     goodRequestPosition.setComplexId(detail.getIdOfComplex().intValue());
                                 }
-                                // idOfDish
-                                // fType
+
+                                goodRequestPosition.setIdOfDish(detail.getIdOfDish());
+                                goodRequestPosition.setType(detail.getfType().ordinal());
                                 goodRequestPosition.setNetWeight(0L);
+                                goodRequestPosition.setUnitsScale(UnitScale.GRAMS);
                                 goodRequestPosition.setCreatedDate(new Date(System.currentTimeMillis()));
                                 goodRequestPosition.setTotalCount(detail.getTotalCount().longValue());
                                 if (detail.getdProbeCount() != null) {
@@ -113,18 +140,22 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                                 if (detail.getTempClientsCount() != null) {
                                     goodRequestPosition.setTempClientsCount(detail.getTempClientsCount().longValue());
                                 }
+                                goodRequestPosition.setGlobalVersion(nextPositionVersion);
+                                goodRequest.setDeletedState(detail.getDeletedState());
+
+                                session.saveOrUpdate(goodRequestPosition);
                             }
                         }
+                        //resItem = new ResRequestsSupplierItem(goodRequest);
                     }
+                }
+                //if (errorFound) {
+                    resItem = new ResRequestsSupplierItem(guid, nextVersion);
+                //}
 
-                resItem = new ResRequestsSupplierItem();
-                resItem.setGuid(guid);
-                resItem.setVersion(nextVersion);
                 resItem.setResultCode(item.getResCode());
                 resItem.setErrorMessage(item.getErrorMessage());
-
                 items.add(resItem);
-                //}
             }
             session.flush();
 
@@ -146,7 +177,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
         for (GoodRequest goodRequest : list) {
             if (goodRequest != null) {
                 resItem = new ResRequestsSupplierItem(goodRequest);
-                List<GoodRequestPosition> details = DAOUtils.getGoodRequestPositionsFromGoodRequest(session, goodRequest);
+                List<GoodRequestPosition> details = DAOUtils.getGoodRequestPositionsByGoodRequest(session, goodRequest);
                 if (!details.isEmpty()) {
                     resItem.addDetails(details);
                 }

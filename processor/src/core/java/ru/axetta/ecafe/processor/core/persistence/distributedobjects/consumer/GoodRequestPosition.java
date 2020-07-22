@@ -55,6 +55,8 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
     private Boolean notified;
     private InformationContents informationContent = InformationContents.ONLY_CURRENT_ORG;
     private Integer complexId;
+    private Long idOfDish;
+    private Integer type;
 
     @Override
     public List<DistributedObject> process(Session session, Long idOfOrg, Long currentMaxVersion,
@@ -364,5 +366,21 @@ public class GoodRequestPosition extends ConsumerRequestDistributedObject {
 
     public void setComplexId(Integer complexId) {
         this.complexId = complexId;
+    }
+
+    public Long getIdOfDish() {
+        return idOfDish;
+    }
+
+    public void setIdOfDish(Long idOfDish) {
+        this.idOfDish = idOfDish;
+    }
+
+    public Integer getType() {
+        return type;
+    }
+
+    public void setType(Integer type) {
+        this.type = type;
     }
 }
