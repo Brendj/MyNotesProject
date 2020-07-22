@@ -37,30 +37,7 @@
     <option name="historyRevisionsNumber" value="4" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="ispp/processor#556&#10;add libs">
-      <change afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/RefreshToken.hbm.xml" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../src/core/java/ru/axetta/ecafe/processor/core/persistence/RefreshToken.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/LoginData.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/RefreshTokenData.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/util/login/JwtLoginDTO.java" afterDir="false" />
-      <change afterPath="$PROJECT_DIR$/../../src/web/test/ru/axetta/test/md5DigestAsHexTest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/processor.iws" beforeDir="false" afterPath="$PROJECT_DIR$/processor.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/ClientsListRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/ClientsListRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/DiscountClientsListRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/DiscountClientsListRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/DiscountGroupsListRequest.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/DiscountGroupsListRequest.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/GroupManagementErrors.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/GroupManagementErrors.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/GroupManagementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/GroupManagementService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/IGroupManagementService.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/IGroupManagementService.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/CreateGroupData.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/CreateGroupData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/EditEmployeeData.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/EditEmployeeData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/QueryBodyData.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/QueryBodyData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/SchoolRestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/SchoolRestController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JWTAuthenticationFilter.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JWTAuthenticationFilter.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JWTAuthenticationManager.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JWTAuthenticationManager.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JwtTokenProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JwtTokenProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/util/JwtConfig.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/util/JwtConfig.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/util/login/JwtLoginErrors.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/util/login/JwtLoginErrors.java" afterDir="false" />
-    </list>
+    <list default="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="ispp/processor#556&#10;Удалены поля userId, token из сущностей запросов&#10;Обновлена сущность refreshToken&#10;Реализована проверка пользователя" />
     <list id="d97cb2f4-a0b2-437d-82e4-6aca4782d0ca" name="Ignore" comment="" />
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
@@ -1746,7 +1723,7 @@
       <workItem from="1595185753264" duration="1231000" />
       <workItem from="1595231913840" duration="8519000" />
       <workItem from="1595315353255" duration="29073000" />
-      <workItem from="1595399532758" duration="13939000" />
+      <workItem from="1595399532758" duration="14252000" />
     </task>
     <task id="LOCAL-00001">
       <created>1353601439266</created>
@@ -2014,7 +1991,14 @@
       <option name="project" value="LOCAL" />
       <updated>1595241752314</updated>
     </task>
-    <option name="localTasksCounter" value="39" />
+    <task id="LOCAL-00039" summary="ispp/processor#556&#10;Удалены поля userId, token из сущностей запросов&#10;Обновлена сущность refreshToken&#10;Реализована проверка пользователя">
+      <created>1595416822691</created>
+      <option name="number" value="00039" />
+      <option name="presentableId" value="LOCAL-00039" />
+      <option name="project" value="LOCAL" />
+      <updated>1595416822691</updated>
+    </task>
+    <option name="localTasksCounter" value="40" />
     <servers>
       <JIRA url="https://bugtracker.axetta.ru:9901/browse/ECAFE">
         <username>kadyrov</username>
@@ -2083,7 +2067,6 @@
     <option name="PERFORM_COMMIT_IN_BACKGROUND" value="false" />
     <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
     <option name="USE_COMMIT_MESSAGE_MARGIN" value="false" />
-    <MESSAGE value="страницы не используются" />
     <MESSAGE value="удалил ссылки на не используемые страницы" />
     <MESSAGE value="Сделал текст заголовок белым цветом, далее рекомендуется использовать стиль для текста заголовка column-header" />
     <MESSAGE value="Поправил запрос по вычислению данных по контрагентам перевел из нативного SQL в CriteriaAPI" />
@@ -2108,7 +2091,8 @@
     <MESSAGE value="ECAFE-2092 Процессинг падает (Error 500)&#10;#3" />
     <MESSAGE value="ispp/processor#556&#10;Добавлены классы ошибок,&#10;реализованы методы валидации токена, преобразования токена в userDetails etc" />
     <MESSAGE value="ispp/processor#556&#10;add libs" />
-    <option name="LAST_COMMIT_MESSAGE" value="ispp/processor#556&#10;add libs" />
+    <MESSAGE value="ispp/processor#556&#10;Удалены поля userId, token из сущностей запросов&#10;Обновлена сущность refreshToken&#10;Реализована проверка пользователя" />
+    <option name="LAST_COMMIT_MESSAGE" value="ispp/processor#556&#10;Удалены поля userId, token из сущностей запросов&#10;Обновлена сущность refreshToken&#10;Реализована проверка пользователя" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
@@ -2338,7 +2322,7 @@
         </line-breakpoint>
         <line-breakpoint enabled="true" type="java-line">
           <url>file://$PROJECT_DIR$/../../src/web/test/ru/axetta/test/md5DigestAsHexTest.java</url>
-          <line>15</line>
+          <line>13</line>
           <option name="timeStamp" value="232" />
         </line-breakpoint>
       </breakpoints>
