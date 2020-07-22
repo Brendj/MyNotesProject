@@ -4824,7 +4824,7 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
                 throw new InvalidDataException("Не заполнен номер телефона опекуна");
             }
 
-            if (roleRepresentativePrincipal != null && (roleRepresentativePrincipal < 0 || roleRepresentativePrincipal > 2)) {
+            if (roleRepresentativePrincipal != null && (roleRepresentativePrincipal < 0 || roleRepresentativePrincipal > 1)) {
                 throw new InvalidDataException("Возможно только законным представителем");
             }
             session = runtimeContext.createPersistenceSession();
