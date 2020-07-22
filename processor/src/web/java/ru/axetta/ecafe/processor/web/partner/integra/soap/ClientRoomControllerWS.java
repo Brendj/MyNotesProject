@@ -244,6 +244,8 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
     private static final String RC_WRONG_GROUP_DESC = "Неверная группа клиента";
     private static final String RC_MOBILE_DIFFERENT_GROUPS_DESC = "Номер принадлежит клиентам из разных групп";
     private static final String RC_INVALID_CREATOR_DESC = "Данный клиент не может добавить представителя";
+    private static final String RC_INVALID_REPREZENTIVE_TYPE = "Не указан тип представительства";
+    private static final String RC_INVALID_REPREZENTIVE_CREATOR_TYPE = "Не указан тип предствавителя";
     private static final int MAX_RECS = 50;
     private static final int MAX_RECS_getPurchaseList = 500;
     private static final int MAX_RECS_getEventsList = 1000;
@@ -8058,9 +8060,19 @@ public class ClientRoomControllerWS extends HttpServlet implements ClientRoomCon
             return new Result(RC_INVALID_DATA, RC_INVALID_MOBILE);
         }
 
+        if (roleRepresentative == null)
+        {
+            return new Result(RC_INVALID_DATA, RC_INVALID_REPREZENTIVE_TYPE);
+        }
+
+        if (roleRepresentativePrincipal == null)
+        {
+            return new Result(RC_INVALID_DATA, RC_INVALID_REPREZENTIVE_CREATOR_TYPE);
+        }
+
         //Проверка на возможность создания
         boolean canAdded = false;
-        Client clientChild = DAOService.getInstance().findClientById(childContractId);
+        Client clientChild = DAOService.getInstance().getClientByContractId(childContractId);
         if (clientChild == null) {
             return new Result(RC_INVALID_DATA, RC_CLIENT_NOT_FOUND_DESC);
         }
