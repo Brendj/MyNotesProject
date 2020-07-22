@@ -292,10 +292,8 @@ public class ApplicationForFoodReportPage extends OnlineReportPage {
                 wereChanges = true;
                 ClientDtisznDiscountInfo info = DAOUtils.getActualDTISZNDiscountsInfoInoeByClient(session, item.getApplicationForFood().getClient().getIdOfClient());
                 DiscountManager.ClientDtisznDiscountInfoBuilder builder = new DiscountManager.ClientDtisznDiscountInfoBuilder(info);
-                for (ApplicationForFoodStatus status : item.getStatuses()) {
-                    DAOUtils.updateApplicationForFoodWithVersion(session, item.getApplicationForFood(), status,
+                DAOUtils.updateApplicationForFoodWithVersion(session, item.getApplicationForFood(), item.getApplicationForFood().getStatus(),
                             nextVersion, historyVersion);
-                }
                 builder.withDateStart(item.getStartDate());
                 builder.withDateEnd(item.getEndDate());
                 builder.save(session, clientDTISZNDiscountVersion);
