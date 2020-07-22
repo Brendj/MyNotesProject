@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.core.sync.handlers.requests.supplier;
 
+import ru.axetta.ecafe.processor.core.daoservices.DOVersionRepository;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DocumentState;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.SendToAssociatedOrgs;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.UnitScale;
@@ -41,15 +42,14 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
 
         try {
             ResRequestsSupplierItem resItem = null;
-            Long nextVersion = DAOUtils.nextVersionByGoodRequest(session);
             boolean errorFound = false;
 
             for (RequestsSupplierItem item : requestsSupplier.getItems()) {
                 errorFound = !item.getResCode().equals(RequestsSupplierItem.ERROR_CODE_ALL_OK);
-                String guid = item.getGuid();
 
                 if (!errorFound) {
 
+                    String guid = item.getGuid();
                     Long idOfOrg = item.getOrgId();
                     String number = item.getNumber();
                     Date doneDate = item.getDoneDate();
@@ -58,6 +58,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                     Boolean deletedState = item.getDeletedState();
                     Long versionFromClient = item.getVersion();
 
+                    Long nextVersion = DAOUtils.nextVersionByGoodRequest(session);
                     GoodRequest goodRequest = DAOReadonlyService.getInstance().findGoodRequestByGuid(guid);
 
                     if ((versionFromClient == null && goodRequest != null) || (versionFromClient != null
@@ -89,19 +90,7 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                         goodRequest.setSendAll(SendToAssociatedOrgs.SendToMain);
 
                         session.saveOrUpdate(goodRequest);
-
-                        //List<DOVersion> doVersionList = DAOUtils.getDoVersionList(session, "GoodRequest");
-                        //DOVersion doVersion = null;
-                        //Long version = null;
-                        //if (doVersionList.size() == 0) {
-                        //    doVersion = new DOVersion();
-                        //    doVersion.setCurrentVersion(0L);
-                        //    version = 0L;
-                        //} else {
-                        //    doVersion = entityManager.find(DOVersion.class, doVersionList.get(0).getIdOfDOObject());
-                        //    version = doVersion.getCurrentVersion() + 1;
-                        //    doVersion.setCurrentVersion(version);
-                        //}
+                        DOVersionRepository.updateClassVersion("GoodRequest", session);
 
                         List<RequestsSupplierDetail> requestsSupplierDetailList = item.getRequestsSupplierDetailList();
                         if (requestsSupplierDetailList != null && requestsSupplierDetailList.size() > 0) {
@@ -144,14 +133,16 @@ public class RequestsSupplierProcessor extends AbstractProcessor<ResRequestsSupp
                                 goodRequest.setDeletedState(detail.getDeletedState());
 
                                 session.saveOrUpdate(goodRequestPosition);
+                                DOVersionRepository.updateClassVersion("GoodRequestPosition", session);
                             }
                         }
                         //resItem = new ResRequestsSupplierItem(goodRequest);
+                        resItem = new ResRequestsSupplierItem(goodRequest.getGuid(), goodRequest.getGlobalVersion());
                     }
                 }
-                //if (errorFound) {
-                    resItem = new ResRequestsSupplierItem(guid, nextVersion);
-                //}
+                if (errorFound) {
+                    resItem = new ResRequestsSupplierItem(item.getGuid(), item.getVersion());
+                }
 
                 resItem.setResultCode(item.getResCode());
                 resItem.setErrorMessage(item.getErrorMessage());

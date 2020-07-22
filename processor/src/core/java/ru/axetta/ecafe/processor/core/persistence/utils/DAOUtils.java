@@ -15,7 +15,6 @@ import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzd;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdSpecialDateView;
 import ru.axetta.ecafe.processor.core.persistence.Order;
 import ru.axetta.ecafe.processor.core.persistence.EZD.RequestsEzdView;
-import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DOVersion;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.DistributedObject;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequest;
 import ru.axetta.ecafe.processor.core.persistence.distributedobjects.consumer.GoodRequestPosition;
@@ -2981,10 +2980,6 @@ public class DAOUtils {
 
     public static long nextVersionByGoodRequest(Session session) {
         long version = 0L;
-        //Query query = session.createSQLQuery(
-        //        "select currentversion from cf_do_versions "
-        //                + "where UPPER(distributedobjectclassname) = :distributedObjectClassName for update");
-        //query.setParameter("distributedObjectClassName", "GoodRequest".toUpperCase());
         Query query = session.createSQLQuery(
                 "select globalversion from cf_goods_requests order by globalversion desc limit 1 for update");
         Object o = query.uniqueResult();
@@ -2994,19 +2989,8 @@ public class DAOUtils {
         return version;
     }
 
-    public static List<DOVersion> getDoVersionList(Session session, String className) {
-        Query query = session.createSQLQuery("select currentversion from cf_do_versions "
-                        + "where UPPER(distributedobjectclassname) = :distributedObjectClassName for update");
-        query.setParameter("distributedObjectClassName", className.toUpperCase());
-        return (List<DOVersion>) query.list();
-    }
-
     public static long nextVersionByGoodRequestPosition(Session session) {
         long version = 0L;
-        //Query query = session.createSQLQuery(
-        //        "select currentversion from cf_do_versions "
-        //                + "where UPPER(distributedobjectclassname) = :distributedObjectClassName for update");
-        //query.setParameter("distributedObjectClassName", "GoodRequestPosition".toUpperCase());
         Query query = session.createSQLQuery(
                 "select globalversion from cf_goods_requests_positions order by globalversion desc limit 1 for update");
         Object o = query.uniqueResult();
