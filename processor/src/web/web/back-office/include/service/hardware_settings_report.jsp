@@ -43,12 +43,12 @@
         <h:selectBooleanCheckbox value="#{hardwareSettingsReportPage.allFriendlyOrgs}" styleClass="checkboxes">
             <a4j:support event="onchange" reRender="hardwareSettingsTable" />
         </h:selectBooleanCheckbox>
-        <h:outputText styleClass="output-text" escape="true" value="Отображать данные АРМ Администратора ОО" />
+        <h:outputText styleClass="output-text" escape="true" value="Отображать данные АРМ администратора ОО" />
         <h:selectBooleanCheckbox value="#{hardwareSettingsReportPage.showAdministrator}" styleClass="checkboxes">
             <a4j:support event="onchange" reRender="orgSettingsTable" />
         </h:selectBooleanCheckbox>
         <h:outputText styleClass="output-text" escape="true"
-                      value="Отображать данные АРМ Оператора Питания (кассира)" />
+                      value="Отображать данные АРМ оператора питания (кассира)" />
         <h:selectBooleanCheckbox value="#{hardwareSettingsReportPage.showCashier}" styleClass="checkboxes">
             <a4j:support event="onchange" reRender="orgSettingsTable" />
         </h:selectBooleanCheckbox>

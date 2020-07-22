@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <jasperReport xmlns="http://jasperreports.sourceforge.net/jasperreports" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd" name="HardwareSettingsReport" pageWidth="3368" pageHeight="2380" orientation="Landscape" columnWidth="3328" leftMargin="20" rightMargin="20" topMargin="20" bottomMargin="20" uuid="8f0717fc-66ac-4415-a578-5fd162f5d4ff">
 	<property name="ireport.zoom" value="2.357947691000003"/>
-	<property name="ireport.x" value="0"/>
+	<property name="ireport.x" value="3991"/>
 	<property name="ireport.y" value="0"/>
 	<style name="table">
 		<box>
@@ -29,7 +29,6 @@
 	<field name="firmwareVersion" class="java.lang.String"/>
 	<field name="turnstileId" class="java.lang.String"/>
 	<field name="numOfEntries" class="java.lang.Integer"/>
-	<field name="numOfTurnstile" class="java.lang.Integer"/>
 	<field name="controllerModel" class="java.lang.String"/>
 	<field name="controllerFirmwareVersion" class="java.lang.String"/>
 	<field name="isWorkWithLongIds" class="java.lang.String"/>
@@ -40,7 +39,7 @@
 	<title>
 		<band height="80" splitType="Stretch">
 			<textField>
-				<reportElement style="table" x="0" y="56" width="2732" height="24" uuid="158a7fb3-e046-4d29-88dd-ea83131aa9ca"/>
+				<reportElement style="table" x="0" y="56" width="2652" height="24" uuid="158a7fb3-e046-4d29-88dd-ea83131aa9ca"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle">
 					<font fontName="DejaVu Sans" size="14" isBold="true" pdfFontName="DejaVu Sans" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
@@ -58,7 +57,7 @@
 				<text><![CDATA[Данные ОО]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" x="632" y="1" width="2100" height="20" uuid="da98ce39-a742-453d-aa5c-bb3705b35621"/>
+				<reportElement style="table" x="632" y="1" width="2020" height="20" uuid="da98ce39-a742-453d-aa5c-bb3705b35621"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font fontName="SansSerif" size="10" isBold="true" pdfEncoding="Cp1251" isPdfEmbedded="true"/>
 				</textElement>
@@ -167,35 +166,28 @@
 				<text><![CDATA[Количество входных групп]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" mode="Transparent" x="2161" y="0" width="80" height="34" uuid="fa2360c6-77c4-4f11-bffe-b24eb02d0348"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
-					<font isBold="true"/>
-				</textElement>
-				<text><![CDATA[Количество контроллеров]]></text>
-			</staticText>
-			<staticText>
-				<reportElement style="table" mode="Transparent" x="2241" y="0" width="71" height="34" uuid="ca2022e9-fddf-4484-b65f-061bcd8efcf3"/>
+				<reportElement style="table" mode="Transparent" x="2161" y="0" width="71" height="34" uuid="ca2022e9-fddf-4484-b65f-061bcd8efcf3"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Модели контроллера]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" mode="Transparent" x="2312" y="0" width="104" height="34" uuid="c0aa7bb3-5a4d-4a7e-bc91-0499419a4e6b"/>
+				<reportElement style="table" mode="Transparent" x="2232" y="0" width="104" height="34" uuid="c0aa7bb3-5a4d-4a7e-bc91-0499419a4e6b"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Версия прошивки контроллера]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" mode="Transparent" x="2416" y="0" width="158" height="34" uuid="621bb98c-7bca-479e-946c-5d0929bef7b5"/>
+				<reportElement style="table" mode="Transparent" x="2336" y="0" width="158" height="34" uuid="621bb98c-7bca-479e-946c-5d0929bef7b5"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font isBold="true"/>
 				</textElement>
 				<text><![CDATA[Считыватель читает длинные идентификаторы]]></text>
 			</staticText>
 			<staticText>
-				<reportElement style="table" mode="Transparent" x="2574" y="0" width="158" height="34" uuid="192fa1ed-a7c9-4a71-acef-67d9dcda5d4e"/>
+				<reportElement style="table" mode="Transparent" x="2494" y="0" width="158" height="34" uuid="192fa1ed-a7c9-4a71-acef-67d9dcda5d4e"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none">
 					<font isBold="true"/>
 				</textElement>
@@ -360,27 +352,22 @@
 				<textFieldExpression><![CDATA[$F{numOfEntries}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2161" y="0" width="80" height="73" uuid="5861921e-730f-4cdb-8843-fb80c337ae50"/>
-				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
-				<textFieldExpression><![CDATA[$F{numOfTurnstile}]]></textFieldExpression>
-			</textField>
-			<textField isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2241" y="0" width="71" height="73" uuid="e4f802af-fe15-4d58-92b6-f39a5df38695"/>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2161" y="0" width="71" height="73" uuid="e4f802af-fe15-4d58-92b6-f39a5df38695"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
 				<textFieldExpression><![CDATA[$F{controllerModel}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2312" y="0" width="104" height="73" uuid="9e2f725a-6739-4787-9cd8-1a9d4d6286c3"/>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2232" y="0" width="104" height="73" uuid="9e2f725a-6739-4787-9cd8-1a9d4d6286c3"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
 				<textFieldExpression><![CDATA[$F{controllerFirmwareVersion}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2416" y="0" width="158" height="73" uuid="f9b9ee99-b258-4a48-a007-76bde9c80ac0"/>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2336" y="0" width="158" height="73" uuid="f9b9ee99-b258-4a48-a007-76bde9c80ac0"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
 				<textFieldExpression><![CDATA[$F{isWorkWithLongIds}]]></textFieldExpression>
 			</textField>
 			<textField isBlankWhenNull="true">
-				<reportElement style="table" stretchType="RelativeToTallestObject" x="2574" y="0" width="158" height="73" uuid="1f8a185c-0e91-4951-9221-095413dda139"/>
+				<reportElement style="table" stretchType="RelativeToTallestObject" x="2494" y="0" width="158" height="73" uuid="1f8a185c-0e91-4951-9221-095413dda139"/>
 				<textElement textAlignment="Center" verticalAlignment="Middle" markup="none"/>
 				<textFieldExpression><![CDATA[$F{timeCoefficient}]]></textFieldExpression>
 			</textField>
