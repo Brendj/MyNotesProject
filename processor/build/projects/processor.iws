@@ -37,9 +37,8 @@
     <option name="historyRevisionsNumber" value="4" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="ispp/processor#556&#10;add upd sql">
+    <list default="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="ispp/processor#556&#10;fix hashmap">
       <change beforePath="$PROJECT_DIR$/processor.iws" beforeDir="false" afterPath="$PROJECT_DIR$/processor.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JwtTokenProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JwtTokenProvider.java" afterDir="false" />
     </list>
     <list id="d97cb2f4-a0b2-437d-82e4-6aca4782d0ca" name="Ignore" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -1726,7 +1725,7 @@
       <workItem from="1595185753264" duration="1231000" />
       <workItem from="1595231913840" duration="8519000" />
       <workItem from="1595315353255" duration="29073000" />
-      <workItem from="1595399532758" duration="15385000" />
+      <workItem from="1595399532758" duration="17350000" />
     </task>
     <task id="LOCAL-00001">
       <created>1353601439266</created>
@@ -2008,7 +2007,14 @@
       <option name="project" value="LOCAL" />
       <updated>1595417079904</updated>
     </task>
-    <option name="localTasksCounter" value="41" />
+    <task id="LOCAL-00041" summary="ispp/processor#556&#10;fix hashmap">
+      <created>1595418548655</created>
+      <option name="number" value="00041" />
+      <option name="presentableId" value="LOCAL-00041" />
+      <option name="project" value="LOCAL" />
+      <updated>1595418548655</updated>
+    </task>
+    <option name="localTasksCounter" value="42" />
     <servers>
       <JIRA url="https://bugtracker.axetta.ru:9901/browse/ECAFE">
         <username>kadyrov</username>
@@ -2077,7 +2083,6 @@
     <option name="PERFORM_COMMIT_IN_BACKGROUND" value="false" />
     <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
     <option name="USE_COMMIT_MESSAGE_MARGIN" value="false" />
-    <MESSAGE value="Сделал текст заголовок белым цветом, далее рекомендуется использовать стиль для текста заголовка column-header" />
     <MESSAGE value="Поправил запрос по вычислению данных по контрагентам перевел из нативного SQL в CriteriaAPI" />
     <MESSAGE value="Добавлены колонки&#10;Клиентов с покупкой платного питания - &#10;Клиентов с покупкой льготного питания - &#10;Клиентов с покупкой платного питания / покупкой льготного питания -&#10;Исправлено&#10;Уникальных клиентов с платежными операциями заменить на &quot;Клиентов с пополнениями&quot;" />
     <MESSAGE value="Добавлены методы для страница общей статистики по задаче ECAFE-771" />
@@ -2102,7 +2107,8 @@
     <MESSAGE value="ispp/processor#556&#10;add libs" />
     <MESSAGE value="ispp/processor#556&#10;Удалены поля userId, token из сущностей запросов&#10;Обновлена сущность refreshToken&#10;Реализована проверка пользователя" />
     <MESSAGE value="ispp/processor#556&#10;add upd sql" />
-    <option name="LAST_COMMIT_MESSAGE" value="ispp/processor#556&#10;add upd sql" />
+    <MESSAGE value="ispp/processor#556&#10;fix hashmap" />
+    <option name="LAST_COMMIT_MESSAGE" value="ispp/processor#556&#10;fix hashmap" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
@@ -2165,38 +2171,38 @@
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
     <state x="729" y="298" key="FileChooserDialogImpl/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594898472671" />
-    <state width="1382" height="304" key="GridCell.Tab.0.bottom" timestamp="1595416692490">
+    <state width="1382" height="304" key="GridCell.Tab.0.bottom" timestamp="1595418510718">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.0.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595416692490" />
-    <state width="1382" height="304" key="GridCell.Tab.0.center" timestamp="1595416692490">
+    <state width="1382" height="304" key="GridCell.Tab.0.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595418510718" />
+    <state width="1382" height="304" key="GridCell.Tab.0.center" timestamp="1595418510718">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.0.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595416692490" />
-    <state width="1382" height="304" key="GridCell.Tab.0.left" timestamp="1595416692489">
+    <state width="1382" height="304" key="GridCell.Tab.0.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595418510718" />
+    <state width="1382" height="304" key="GridCell.Tab.0.left" timestamp="1595418510718">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.0.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595416692489" />
-    <state width="1382" height="304" key="GridCell.Tab.0.right" timestamp="1595416692490">
+    <state width="1382" height="304" key="GridCell.Tab.0.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595418510718" />
+    <state width="1382" height="304" key="GridCell.Tab.0.right" timestamp="1595418510718">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.0.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595416692490" />
-    <state width="1382" height="304" key="GridCell.Tab.1.bottom" timestamp="1595416692490">
+    <state width="1382" height="304" key="GridCell.Tab.0.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595418510718" />
+    <state width="1382" height="304" key="GridCell.Tab.1.bottom" timestamp="1595418510719">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.1.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595416692490" />
-    <state width="1382" height="304" key="GridCell.Tab.1.center" timestamp="1595416692490">
+    <state width="1382" height="304" key="GridCell.Tab.1.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595418510719" />
+    <state width="1382" height="304" key="GridCell.Tab.1.center" timestamp="1595418510719">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.1.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595416692490" />
-    <state width="1382" height="304" key="GridCell.Tab.1.left" timestamp="1595416692490">
+    <state width="1382" height="304" key="GridCell.Tab.1.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595418510719" />
+    <state width="1382" height="304" key="GridCell.Tab.1.left" timestamp="1595418510719">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.1.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595416692490" />
-    <state width="1382" height="304" key="GridCell.Tab.1.right" timestamp="1595416692490">
+    <state width="1382" height="304" key="GridCell.Tab.1.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595418510719" />
+    <state width="1382" height="304" key="GridCell.Tab.1.right" timestamp="1595418510719">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.1.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595416692490" />
+    <state width="1382" height="304" key="GridCell.Tab.1.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595418510719" />
     <state x="724" y="259" key="RollbackChangesDialog" timestamp="1594920859786">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
@@ -2205,10 +2211,10 @@
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
     <state x="505" y="131" key="SettingsEditor/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594906217206" />
-    <state x="617" y="289" key="Vcs.Push.Dialog.v2" timestamp="1595417086938">
+    <state x="617" y="289" key="Vcs.Push.Dialog.v2" timestamp="1595418553039">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state x="617" y="289" key="Vcs.Push.Dialog.v2/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595417086938" />
+    <state x="617" y="289" key="Vcs.Push.Dialog.v2/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595418553039" />
     <state x="754" y="448" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1594898200963">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
@@ -2233,6 +2239,10 @@
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
     <state x="734" y="291" width="931" height="530" key="find.popup/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595174694087" />
+    <state x="801" y="269" key="git4idea.branch.GitSmartOperationDialog" timestamp="1595420763624">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state x="801" y="269" key="git4idea.branch.GitSmartOperationDialog/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595420763624" />
     <state x="687" y="243" width="672" height="678" key="search.everywhere.popup" timestamp="1595168179468">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
