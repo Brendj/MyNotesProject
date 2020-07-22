@@ -4,6 +4,7 @@
 
 package ru.axetta.ecafe.processor.web.token.security.service;
 
+import ru.axetta.ecafe.processor.core.persistence.Org;
 import ru.axetta.ecafe.processor.core.persistence.User;
 
 import org.springframework.security.core.GrantedAuthority;
@@ -61,8 +62,21 @@ public class JwtUserDetailsImpl implements UserDetails {
         else
             this.contractId = user.getClient().getContractId();
         if(user.getOrg() == null){
-            this.idOfOrg = null;
-            this.shortOrgName = null;
+            if(user.getClient() != null){
+                Org userClientOrg = user.getClient().getOrg();
+                if(userClientOrg != null){
+                    this.idOfOrg = userClientOrg.getIdOfOrg();
+                    this.shortOrgName = userClientOrg.getShortName();
+                }
+                else {
+                    this.idOfOrg = null;
+                    this.shortOrgName = null;
+                }
+            }
+            else {
+                this.idOfOrg = null;
+                this.shortOrgName = null;
+            }
         }
         else{
             this.idOfOrg = user.getOrg().getIdOfOrg();

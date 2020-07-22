@@ -16,7 +16,6 @@ import ru.axetta.ecafe.processor.web.token.security.jwt.JwtTokenProvider;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginService;
 import ru.axetta.ecafe.processor.web.token.security.service.JWTLoginServiceImpl;
 import ru.axetta.ecafe.processor.web.token.security.service.JwtUserDetailsImpl;
-import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginDTO;
 import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginErrors;
 import ru.axetta.ecafe.processor.web.token.security.util.login.JwtLoginException;
 
@@ -64,7 +63,7 @@ public class SchoolRestController {
             jwtLoginService = new JWTLoginServiceImpl();
             if(jwtLoginService.login(loginData.getUsername(), loginData.getPassword(), request.getRemoteAddr(), persistenceSession)){
                 String token = tokenService.createToken(loginData.getUsername());
-                String refreshToken = tokenService.createRefreshToken(null,loginData.getUsername(),request.getRemoteAddr(),persistenceSession);
+                String refreshToken = tokenService.createRefreshToken(loginData.getUsername(),request.getRemoteAddr(),persistenceSession);
                 persistenceSession.flush();
                 persistenceTransaction.commit();
                 persistenceTransaction = null;
@@ -105,8 +104,8 @@ public class SchoolRestController {
             tokenService = RuntimeContext.getAppContext().getBean(JwtTokenProvider.class);
             RefreshToken refreshToken = tokenService.refreshTokenIsValid(refreshTokenData.getRefreshToken(),request.getRemoteAddr(),persistenceSession);
             String accessToken = tokenService.createToken(refreshToken.getUser().getUserName());
-            String newRefreshToken = tokenService.createRefreshToken(refreshToken.getRefreshTokenHash(),
-                    refreshToken.getUser().getUserName(),request.getRemoteAddr(), persistenceSession);
+            String newRefreshToken = tokenService.createRefreshToken(refreshToken.getUser().getUserName(),
+                    request.getRemoteAddr(), persistenceSession);
             return Response.status(HttpURLConnection.HTTP_OK).entity(new JwtLoginDTO(accessToken, newRefreshToken)).build();
 
         }

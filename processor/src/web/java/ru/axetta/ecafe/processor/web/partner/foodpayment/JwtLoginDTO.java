@@ -2,11 +2,11 @@
  * Copyright (c) 2020. Axetta LLC. All Rights Reserved.
  */
 
-package ru.axetta.ecafe.processor.web.token.security.util.login;
+package ru.axetta.ecafe.processor.web.partner.foodpayment;
 
 import org.codehaus.jackson.annotate.JsonProperty;
 
-public class JwtLoginDTO {
+public class JwtLoginDTO extends Result {
 
     @JsonProperty("access_token")
     private String accessToken;
@@ -15,6 +15,7 @@ public class JwtLoginDTO {
     private String refreshToken;
 
     public JwtLoginDTO(String accessToken, String refreshToken){
+        super(100, "Ok");
         this.accessToken = accessToken;
         this.refreshToken = refreshToken;
     }

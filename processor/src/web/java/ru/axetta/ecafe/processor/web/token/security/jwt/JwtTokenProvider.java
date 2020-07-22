@@ -86,14 +86,10 @@ public class JwtTokenProvider {
         return refreshTokenEntity;
     }
 
-    public String createRefreshToken(String refreshToken,String username, String remoteAddress, Session persistenceSession)
+    public String createRefreshToken(String username, String remoteAddress, Session persistenceSession)
             throws Exception {
-        Criteria refreshTokenCriteria = persistenceSession.createCriteria(RefreshToken.class);
-        refreshTokenCriteria.add(Restrictions.eq("refreshTokenHash",refreshToken));
-        RefreshToken refreshTokenEntity = (RefreshToken) refreshTokenCriteria.uniqueResult();
         User user = DAOUtils.findUser(persistenceSession, username);
-        if(refreshTokenEntity != null)
-            persistenceSession.delete(refreshTokenEntity);
+        closeAllUserRefreshTokenSessions(user, persistenceSession);
         String refreshTokenHash = CryptoUtils.MD5(username+System.currentTimeMillis()+JwtConfig.REFRESH_TOKEN_KEY);
         RefreshToken newRefreshToken = new RefreshToken();
         newRefreshToken.setRefreshTokenHash(refreshTokenHash);
@@ -163,6 +159,15 @@ public class JwtTokenProvider {
         catch (Exception ex){
             throw  new JwtAuthenticationException(new JwtAuthenticationErrorDTO(JwtAuthenticationErrors.TOKEN_INVALID.getErrorCode(),
                     JwtAuthenticationErrors.TOKEN_INVALID.getErrorMessage()));
+        }
+    }
+
+    public void closeAllUserRefreshTokenSessions(User user, Session persistenceSession) throws Exception {
+        Criteria refreshTokenCriteria = persistenceSession.createCriteria(RefreshToken.class);
+        refreshTokenCriteria.add(Restrictions.eq("user",user));
+        List<RefreshToken> refreshTokenList = refreshTokenCriteria.list();
+        for(RefreshToken refreshToken: refreshTokenList){
+            persistenceSession.delete(refreshToken);
         }
     }
 
