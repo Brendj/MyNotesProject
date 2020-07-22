@@ -1789,7 +1789,6 @@ public class PreorderDAOService {
                 } else if (preorderMenuDetail != null) {
                     preorderMenuDetail.setAmount(regularPreorder.getAmount());
                     preorderMenuDetail.setRegularPreorder(regularPreorder);
-                    preorderMenuDetail.setDeletedState(false);
                     em.merge(preorderMenuDetail);
                 }
             }
@@ -1960,7 +1959,6 @@ public class PreorderDAOService {
                     } else if (preorderMenuDetail != null) {
                         preorderMenuDetail.setAmount(regularPreorder.getAmount());
                         preorderMenuDetail.setRegularPreorder(regularPreorder);
-                        preorderMenuDetail.setDeletedState(false);
                         em.merge(preorderMenuDetail);
                     }
                 }
