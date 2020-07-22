@@ -97,7 +97,9 @@ public class GoodRequest extends ConsumerRequestDistributedObject {
     @Override
     protected void appendAttributes(Element element) {
         XMLUtils.setAttributeIfNotNull(element, "OrgOwner", orgOwner);
-        XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(dateOfGoodsRequest));
+        if (dateOfGoodsRequest != null) {
+            XMLUtils.setAttributeIfNotNull(element, "Date", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(dateOfGoodsRequest));
+        }
         XMLUtils.setAttributeIfNotNull(element, "Number", number);
         XMLUtils.setAttributeIfNotNull(element, "State", state.ordinal());
         XMLUtils.setAttributeIfNotNull(element, "DoneDate", CalendarUtils.toStringFullDateTimeWithLocalTimeZone(doneDate));
