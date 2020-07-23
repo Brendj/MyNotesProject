@@ -37,15 +37,8 @@
     <option name="historyRevisionsNumber" value="4" />
   </component>
   <component name="ChangeListManager">
-    <list default="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="ispp/processor#556&#10;upd processor.iws">
+    <list default="true" id="c1a7c9cc-8870-4b15-b8fe-d400deb6c61f" name="Default" comment="ispp/processor#580&#10;fix">
       <change beforePath="$PROJECT_DIR$/processor.iws" beforeDir="false" afterPath="$PROJECT_DIR$/processor.iws" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/synctest.iml" beforeDir="false" afterPath="$PROJECT_DIR$/synctest.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/util.iml" beforeDir="false" afterPath="$PROJECT_DIR$/util.iml" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/RefreshTokenData.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/QueryData/RefreshTokenData.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/SchoolRestController.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/SchoolRestController.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JwtTokenProvider.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/jwt/JwtTokenProvider.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/service/JwtUserDetailsImpl.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/service/JwtUserDetailsImpl.java" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/token/security/util/login/JwtLoginDTO.java" beforeDir="false" afterPath="$PROJECT_DIR$/../../src/web/java/ru/axetta/ecafe/processor/web/partner/foodpayment/JwtLoginDTO.java" afterDir="false" />
     </list>
     <list id="d97cb2f4-a0b2-437d-82e4-6aca4782d0ca" name="Ignore" comment="" />
     <option name="SHOW_DIALOG" value="false" />
@@ -686,12 +679,9 @@
     <property name="settings.editor.selected.configurable" value="spring.boot" />
   </component>
   <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding\web\resources\scripts" />
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding\web\resources\styles" />
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\web\back-office" />
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\java\org\richfaces\renderkit\calendar" />
-      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\web\WEB-INF\classes\META-INF\resources" />
+    <key name="CreateClassDialog.RecentsKey">
+      <recent name="ru.axetta.ecafe.processor.web.partner.integra.dataflow" />
+      <recent name="ru.axetta.ecafe.processor.core.sync.handlers.client.request" />
     </key>
     <key name="ImportMappingsDialog.RecentPackages">
       <recent name="ru.axetta.ecafe.processor.core.persistence.distributedobjects" />
@@ -715,11 +705,11 @@
       <recent name="" />
     </key>
     <key name="MoveClassesOrPackagesDialog.RECENTS_KEY">
+      <recent name="ru.axetta.ecafe.processor.web.partner.foodpayment.QueryData" />
       <recent name="ru.axetta.ecafe.processor.web.partner.foodpayment" />
       <recent name="ru.axetta.ecafe.processor.web.ui.converter" />
       <recent name="ru.axetta.ecafe.processor.web.ui.service.msk" />
       <recent name="ru.axetta.ecafe.processor.core.report" />
-      <recent name="ru.axetta.ecafe.processor.web" />
     </key>
     <key name="CopyFile.RECENT_KEYS">
       <recent name="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding\java\ru\axetta\ecafe\processor\web\partner\integra\dataflow" />
@@ -739,9 +729,12 @@
       <recent name="http://31.13.60.141:8080/processor/soap/client?wsdl" />
       <recent name="https://github.com/SpringSource/spring-data-jpa-examples.git" />
     </key>
-    <key name="CreateClassDialog.RecentsKey">
-      <recent name="ru.axetta.ecafe.processor.web.partner.integra.dataflow" />
-      <recent name="ru.axetta.ecafe.processor.core.sync.handlers.client.request" />
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding\web\resources\scripts" />
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\subfeeding\web\resources\styles" />
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\web\back-office" />
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\java\org\richfaces\renderkit\calendar" />
+      <recent name="D:\workspace\ecafe\alpha_processor\processor\src\web\web\WEB-INF\classes\META-INF\resources" />
     </key>
   </component>
   <component name="RunManager" selected="JBoss Server.JBoss 7.1.1.Final1">
@@ -2021,7 +2014,21 @@
       <option name="project" value="LOCAL" />
       <updated>1595418548655</updated>
     </task>
-    <option name="localTasksCounter" value="42" />
+    <task id="LOCAL-00042" summary="ispp/processor#580&#10;fix">
+      <created>1595510456887</created>
+      <option name="number" value="00042" />
+      <option name="presentableId" value="LOCAL-00042" />
+      <option name="project" value="LOCAL" />
+      <updated>1595510456887</updated>
+    </task>
+    <task id="LOCAL-00043" summary="ispp/processor#580&#10;fix">
+      <created>1595510585386</created>
+      <option name="number" value="00043" />
+      <option name="presentableId" value="LOCAL-00043" />
+      <option name="project" value="LOCAL" />
+      <updated>1595510585386</updated>
+    </task>
+    <option name="localTasksCounter" value="44" />
     <servers>
       <JIRA url="https://bugtracker.axetta.ru:9901/browse/ECAFE">
         <username>kadyrov</username>
@@ -2090,7 +2097,6 @@
     <option name="PERFORM_COMMIT_IN_BACKGROUND" value="false" />
     <option name="INCLUDE_TEXT_INTO_SHELF" value="false" />
     <option name="USE_COMMIT_MESSAGE_MARGIN" value="false" />
-    <MESSAGE value="Поправил запрос по вычислению данных по контрагентам перевел из нативного SQL в CriteriaAPI" />
     <MESSAGE value="Добавлены колонки&#10;Клиентов с покупкой платного питания - &#10;Клиентов с покупкой льготного питания - &#10;Клиентов с покупкой платного питания / покупкой льготного питания -&#10;Исправлено&#10;Уникальных клиентов с платежными операциями заменить на &quot;Клиентов с пополнениями&quot;" />
     <MESSAGE value="Добавлены методы для страница общей статистики по задаче ECAFE-771" />
     <MESSAGE value="Реализован отчет по миграции клиентов, исправлен не дочет если клиент регистрируется в другой корпус организации" />
@@ -2115,7 +2121,8 @@
     <MESSAGE value="ispp/processor#556&#10;Удалены поля userId, token из сущностей запросов&#10;Обновлена сущность refreshToken&#10;Реализована проверка пользователя" />
     <MESSAGE value="ispp/processor#556&#10;add upd sql" />
     <MESSAGE value="ispp/processor#556&#10;fix hashmap" />
-    <option name="LAST_COMMIT_MESSAGE" value="ispp/processor#556&#10;fix hashmap" />
+    <MESSAGE value="ispp/processor#580&#10;fix" />
+    <option name="LAST_COMMIT_MESSAGE" value="ispp/processor#580&#10;fix" />
     <option name="MAKE_NEW_CHANGELIST_ACTIVE" value="true" />
     <option name="OPTIMIZE_IMPORTS_BEFORE_PROJECT_COMMIT" value="true" />
   </component>
@@ -2166,14 +2173,14 @@
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
     <state x="830" y="272" key="#com.intellij.ide.util.MemberChooser/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595341363418" />
-    <state x="754" y="355" key="#com.intellij.ide.util.PackageChooserDialog" timestamp="1595428840957">
+    <state x="754" y="355" key="#com.intellij.ide.util.PackageChooserDialog" timestamp="1595510421697">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state x="754" y="355" key="#com.intellij.ide.util.PackageChooserDialog/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595428840957" />
-    <state x="691" y="425" width="782" height="269" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1595428848887">
+    <state x="754" y="355" key="#com.intellij.ide.util.PackageChooserDialog/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595510421697" />
+    <state x="691" y="425" width="844" height="269" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes" timestamp="1595510423441">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state x="691" y="425" width="782" height="269" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595428848887" />
+    <state x="691" y="425" width="844" height="269" key="#com.intellij.refactoring.move.moveClassesOrPackages.MoveClassesOrPackagesDialog.classes/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595510423441" />
     <state width="518" height="438" key="DebuggerActiveHint" timestamp="1594801784111">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
@@ -2182,38 +2189,42 @@
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
     <state x="729" y="298" key="FileChooserDialogImpl/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594898472671" />
-    <state width="1382" height="304" key="GridCell.Tab.0.bottom" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.0.bottom" timestamp="1595510688766">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.0.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
-    <state width="1382" height="304" key="GridCell.Tab.0.center" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.0.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595510688766" />
+    <state width="1382" height="304" key="GridCell.Tab.0.center" timestamp="1595510688765">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.0.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
-    <state width="1382" height="304" key="GridCell.Tab.0.left" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.0.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595510688765" />
+    <state width="1382" height="304" key="GridCell.Tab.0.left" timestamp="1595510688765">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.0.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
-    <state width="1382" height="304" key="GridCell.Tab.0.right" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.0.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595510688765" />
+    <state width="1382" height="304" key="GridCell.Tab.0.right" timestamp="1595510688766">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.0.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
-    <state width="1382" height="304" key="GridCell.Tab.1.bottom" timestamp="1595433222427">
+    <state width="1382" height="304" key="GridCell.Tab.0.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595510688766" />
+    <state width="1382" height="304" key="GridCell.Tab.1.bottom" timestamp="1595510688766">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.1.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222427" />
-    <state width="1382" height="304" key="GridCell.Tab.1.center" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.1.bottom/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595510688766" />
+    <state width="1382" height="304" key="GridCell.Tab.1.center" timestamp="1595510688766">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.1.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
-    <state width="1382" height="304" key="GridCell.Tab.1.left" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.1.center/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595510688766" />
+    <state width="1382" height="304" key="GridCell.Tab.1.left" timestamp="1595510688766">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.1.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
-    <state width="1382" height="304" key="GridCell.Tab.1.right" timestamp="1595433222426">
+    <state width="1382" height="304" key="GridCell.Tab.1.left/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595510688766" />
+    <state width="1382" height="304" key="GridCell.Tab.1.right" timestamp="1595510688766">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state width="1382" height="304" key="GridCell.Tab.1.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595433222426" />
+    <state width="1382" height="304" key="GridCell.Tab.1.right/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595510688766" />
+    <state x="913" y="424" width="942" height="263" key="MultipleFileMergeDialog" timestamp="1595511136269">
+      <screen x="0" y="0" width="2048" height="1112" />
+    </state>
+    <state x="913" y="424" width="942" height="263" key="MultipleFileMergeDialog/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595511136269" />
     <state x="724" y="259" key="RollbackChangesDialog" timestamp="1594920859786">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
@@ -2222,10 +2233,10 @@
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
     <state x="505" y="131" key="SettingsEditor/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1594906217206" />
-    <state x="617" y="289" key="Vcs.Push.Dialog.v2" timestamp="1595423402667">
+    <state x="617" y="289" key="Vcs.Push.Dialog.v2" timestamp="1595511225757">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
-    <state x="617" y="289" key="Vcs.Push.Dialog.v2/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595423402667" />
+    <state x="617" y="289" key="Vcs.Push.Dialog.v2/0.0.2048.1112/-1920.0.1920.1040@0.0.2048.1112" timestamp="1595511225757" />
     <state x="754" y="448" key="com.intellij.jarRepository.RepositoryAttachDialog-DOWNLOAD" timestamp="1594898200963">
       <screen x="0" y="0" width="2048" height="1112" />
     </state>
