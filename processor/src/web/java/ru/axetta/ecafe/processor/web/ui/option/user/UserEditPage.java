@@ -179,8 +179,12 @@ public class UserEditPage extends BasicWorkspacePage implements ContragentListSe
             }
             if(userOrg.idOfOrg != null)
                 user.setOrg((Org) session.load(Org.class, userOrg.idOfOrg));
+            else
+                user.setOrg(null);
             if(userIdOfClient != null)
                 user.setClient((Client) session.load(Client.class, userIdOfClient));
+            else
+                user.setClient(null);
             user.setPhone(phone);
             user.setEmail(email);
             user.setUpdateTime(new Date());
